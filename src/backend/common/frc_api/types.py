@@ -45,8 +45,8 @@ class AwardAssignmentModelV2(TypedDict):
     schoolName: str | None
     fullTeamName: str | None
     person: str | None
-    CmpQualifying: bool
-    CmpQualifyingReason: str | None
+    cmpQualifying: bool
+    cmpQualifyingReason: str | None
 
 
 type AwardIds = Literal[
@@ -125,16 +125,16 @@ class DistrictRankingTeamModelV2(TypedDict):
 
 
 class EventAnnouncementModel(TypedDict):
-    FMSAnnouncementId: str
-    Type: AnnouncementType
-    Title: str | None
-    Text: str | None
-    StartTimeUtc: str
-    EndTimeUtc: str | None
-    DisplayWeb: bool
-    DisplayApi: bool
-    Author: str | None
-    IsDeleted: bool
+    fMSAnnouncementId: str
+    type: AnnouncementType
+    title: str | None
+    text: str | None
+    startTimeUtc: str
+    endTimeUtc: str | None
+    displayWeb: bool
+    displayApi: bool
+    author: str | None
+    isDeleted: bool
 
 
 class EventRankingTeamModelV2(TypedDict):
@@ -161,8 +161,8 @@ type GridRowType = Literal["Top", "Mid", "Bottom"]
 
 
 class Link(TypedDict):
-    Row: GridRowType
-    Nodes: list[int] | None
+    row: GridRowType
+    nodes: list[int] | None
 
 
 class MatchResultTeamModelV2(TypedDict):
@@ -184,41 +184,41 @@ type PlayoffTiebreakType = Literal[
 
 
 class PlayoffTiebreakTypeStringValueTuple(TypedDict):
-    Item1: PlayoffTiebreakType
-    Item2: str | None
+    item1: PlayoffTiebreakType
+    item2: str | None
 
 
 class ReefRowScore(TypedDict):
-    NodeA: bool
-    NodeB: bool
-    NodeC: bool
-    NodeD: bool
-    NodeE: bool
-    NodeF: bool
-    NodeG: bool
-    NodeH: bool
-    NodeI: bool
-    NodeJ: bool
-    NodeK: bool
-    NodeL: bool
+    nodeA: bool
+    nodeB: bool
+    nodeC: bool
+    nodeD: bool
+    nodeE: bool
+    nodeF: bool
+    nodeG: bool
+    nodeH: bool
+    nodeI: bool
+    nodeJ: bool
+    nodeK: bool
+    nodeL: bool
 
 
 class ReefScore(TypedDict):
-    TopRow: ReefRowScore
-    MidRow: ReefRowScore
-    BotRow: ReefRowScore
-    Trough: int
+    topRow: ReefRowScore
+    midRow: ReefRowScore
+    botRow: ReefRowScore
+    trough: int
 
 
 class RegionalDetail(TypedDict):
-    TournamentCode: str | None
-    TotalPoints: int
-    QualificationPerformancePoints: int
-    AllianceSelectionPoints: int
-    PlayoffAdvancementPoints: int
-    AwardPoints: int
-    TeamAgePoints: int
-    AwardId: AwardIds
+    tournamentCode: str | None
+    totalPoints: int
+    qualificationPerformancePoints: int
+    allianceSelectionPoints: int
+    playoffAdvancementPoints: int
+    awardPoints: int
+    teamAgePoints: int
+    awardId: AwardIds
 
 
 type RegionalRankingEventStatusTypes = Literal["NotStarted", "InProgress", "Completed"]
@@ -235,50 +235,50 @@ type RegionalRankingStatusTypes = Literal[
 
 
 class RegionalRankingTeamDetailModelV31(TypedDict):
-    Rank: int
-    TeamNumber: int
-    NameShort: str | None
-    Regional1Points: int | None
-    Regional1Details: RegionalDetail
-    Regional2PointsProjection: int | None
-    Regional2Points: int | None
-    Regional2Details: RegionalDetail
-    RegionalDirectPoints: int | None
-    RegionalDirectDetails: RegionalDetail
-    TotalPoints: int
-    ChampionshipStatus: RegionalRankingStatusTypes
-    QualifiedFirstCmp: bool
-    QualifiedFirstCmpDate: str | None
-    QualifiedFirstCmpEventWeek: int
-    QualifiedFirstCmpEventCode: str | None
-    QualifiedFirstCmpAwardId: AwardIds
-    QualifiedFirstCmpAwardName: str | None
-    DeclinedFirstCmp: bool
-    DeclinedFirstCmpDate: str | None
-    Tiebreakers: dict[str, int] | None
-    AdjustPoints: int
+    rank: int
+    teamNumber: int
+    nameShort: str | None
+    regional1Points: int | None
+    regional1Details: RegionalDetail
+    regional2PointsProjection: int | None
+    regional2Points: int | None
+    regional2Details: RegionalDetail
+    regionalDirectPoints: int | None
+    regionalDirectDetails: RegionalDetail
+    totalPoints: int
+    championshipStatus: RegionalRankingStatusTypes
+    qualifiedFirstCmp: bool
+    qualifiedFirstCmpDate: str | None
+    qualifiedFirstCmpEventWeek: int
+    qualifiedFirstCmpEventCode: str | None
+    qualifiedFirstCmpAwardId: AwardIds
+    qualifiedFirstCmpAwardName: str | None
+    declinedFirstCmp: bool
+    declinedFirstCmpDate: str | None
+    tiebreakers: dict[str, int] | None
+    adjustPoints: int
 
 
 class RegionalRankingTeamSummaryModelV31(TypedDict):
-    TeamNumber: int
-    Rank: int
-    TotalPoints: int
-    Event1Code: str | None
-    Event1Points: int
-    Event1AwardId: AwardIds
-    Event2Code: str | None
-    Event2Points: int
-    Event2AwardId: AwardIds
-    Event2PointsProjected: int
-    EventDirectCode: str | None
-    EventDirectPoints: int
-    EventDirectAwardId: AwardIds
-    AdjustPoints: int
-    QualifiedFirstCmp: bool
-    QualifiedFirstCmpReason: str | None
-    QualifiedFirstCmpDate: str | None
-    DeclinedFirstCmp: bool
-    DeclinedFirstCmpDate: str | None
+    teamNumber: int
+    rank: int
+    totalPoints: int
+    event1Code: str | None
+    event1Points: int
+    event1AwardId: AwardIds
+    event2Code: str | None
+    event2Points: int
+    event2AwardId: AwardIds
+    event2PointsProjected: int
+    eventDirectCode: str | None
+    eventDirectPoints: int
+    eventDirectAwardId: AwardIds
+    adjustPoints: int
+    qualifiedFirstCmp: bool
+    qualifiedFirstCmpReason: str | None
+    qualifiedFirstCmpDate: str | None
+    declinedFirstCmp: bool
+    declinedFirstCmpDate: str | None
 
 
 class ScheduleHybridModelTeamV2(TypedDict):
@@ -302,7 +302,7 @@ class ScheduleHybridModelV2(TypedDict):
     tournamentLevel: str | None
     actualStartTime: str | None
     postResultTime: str | None
-    Teams: list[ScheduleHybridModelTeamV2] | None
+    teams: list[ScheduleHybridModelTeamV2] | None
 
 
 class ScheduleTeamModelV2(TypedDict):
@@ -717,8 +717,6 @@ class ScoreDetailModelAlliance2025(TypedDict):
 
 
 class ScoreDetailModelGoal2026(TypedDict):
-    AutoCount: int
-    transitionCount: int
     shift1Count: int
     shift2Count: int
     shift3Count: int
@@ -742,20 +740,20 @@ class ScoreDetailModel2015(TypedDict):
     matchNumber: int
     coopertition: str | None
     coopertitionPoints: int
-    Alliances: list[ScoreDetailModelAlliance2015] | None
+    alliances: list[ScoreDetailModelAlliance2015] | None
 
 
 class ScoreDetailModel2016(TypedDict):
     matchLevel: str | None
     matchNumber: int
-    AudienceGroup: str | None
-    Alliances: list[ScoreDetailModelAlliance2016] | None
+    audienceGroup: str | None
+    alliances: list[ScoreDetailModelAlliance2016] | None
 
 
 class ScoreDetailModel2017(TypedDict):
     matchLevel: str | None
     matchNumber: int
-    Alliances: list[ScoreDetailModelAlliance2017] | None
+    alliances: list[ScoreDetailModelAlliance2017] | None
 
 
 class ScoreDetailModel2018(TypedDict):
@@ -764,7 +762,7 @@ class ScoreDetailModel2018(TypedDict):
     switchLeftNearColor: str | None
     switchRightNearColor: str | None
     scaleNearColor: str | None
-    Alliances: list[ScoreDetailModelAlliance2018] | None
+    alliances: list[ScoreDetailModelAlliance2018] | None
 
 
 class ScoreDetailsModelReturn2015(TypedDict):
@@ -850,7 +848,7 @@ class SeasonSummaryModelV2(TypedDict):
     kickoff: str | None
     rookieStart: int
     teamCount: int
-    FRCChampionships: list[SeasonSummaryCmpModelV2] | None
+    fRCChampionships: list[SeasonSummaryCmpModelV2] | None
 
 
 class SeasonTeamModelV2(TypedDict):
@@ -922,21 +920,21 @@ class EventRankingListModelV2(TypedDict):
 
 
 class EventRegionalRankingSummaryModelV31(TypedDict):
-    SeasonYear: int
-    EventCode: str | None
-    EventName: str | None
-    WeekNumber: int
-    Country: str | None
-    TeamCapacity: int
-    StartDate: str
-    EndDate: str
-    EventStatus: RegionalRankingEventStatusTypes
-    PrequalifiedTeamCount: int
-    PriorEventQualifiedTeamCount: int
-    RegionalPoolQualifiedTeamCount: int
-    EventQualifiedTeamCount: int
-    EventNotQualifiedTeamCount: int
-    EventNoneCount: int
+    seasonYear: int
+    eventCode: str | None
+    eventName: str | None
+    weekNumber: int
+    country: str | None
+    teamCapacity: int
+    startDate: str
+    endDate: str
+    eventStatus: RegionalRankingEventStatusTypes
+    prequalifiedTeamCount: int
+    priorEventQualifiedTeamCount: int
+    regionalPoolQualifiedTeamCount: int
+    eventQualifiedTeamCount: int
+    eventNotQualifiedTeamCount: int
+    eventNoneCount: int
 
 
 class EventScheduleHybridModelV2(TypedDict):
@@ -956,51 +954,51 @@ class MatchResultModelV2(TypedDict):
     actualStartTime: str | None
     tournamentLevel: str | None
     postResultTime: str | None
-    Teams: list[MatchResultTeamModelV2] | None
+    teams: list[MatchResultTeamModelV2] | None
 
 
 class RegionalRankingEventDetailModelV31(TypedDict):
-    Rank: int
-    TeamNumber: int
-    TeamName: str | None
-    RegionalPoints: int
-    RegionalDetails: RegionalDetail
-    ChampionshipStatus: RegionalRankingStatusTypes
-    QualifiedFirstCmp: bool
-    QualifiedFirstCmpDate: str | None
-    QualifiedFirstCmpEventWeek: int
-    QualifiedFirstCmpEventCode: str | None
-    QualifiedFirstCmpAwardId: AwardIds
-    QualifiedFirstCmpAwardName: str | None
-    Tiebreakers: dict[str, int] | None
+    rank: int
+    teamNumber: int
+    teamName: str | None
+    regionalPoints: int
+    regionalDetails: RegionalDetail
+    championshipStatus: RegionalRankingStatusTypes
+    qualifiedFirstCmp: bool
+    qualifiedFirstCmpDate: str | None
+    qualifiedFirstCmpEventWeek: int
+    qualifiedFirstCmpEventCode: str | None
+    qualifiedFirstCmpAwardId: AwardIds
+    qualifiedFirstCmpAwardName: str | None
+    tiebreakers: dict[str, int] | None
 
 
 class RegionalRankingTeamDetailListModelV31(TypedDict):
-    Season: int
-    Teams: list[RegionalRankingTeamDetailModelV31] | None
-    TeamCountTotal: int
-    TeamCountPage: int
-    PageCurrent: int
-    PageTotal: int
+    season: int
+    teams: list[RegionalRankingTeamDetailModelV31] | None
+    teamCountTotal: int
+    teamCountPage: int
+    pageCurrent: int
+    pageTotal: int
 
 
 class RegionalRankingTeamSummaryListModelV31(TypedDict):
-    Season: int
-    Teams: list[RegionalRankingTeamSummaryModelV31] | None
-    TeamCountTotal: int
-    TeamCountPage: int
-    PageCurrent: int
-    PageTotal: int
+    season: int
+    teams: list[RegionalRankingTeamSummaryModelV31] | None
+    teamCountTotal: int
+    teamCountPage: int
+    pageCurrent: int
+    pageTotal: int
 
 
 class ScheduleModelV31(TypedDict):
-    PlayoffLevel: str | None
+    playoffLevel: str | None
     description: str | None
     startTime: str | None
     matchNumber: int
     field: str | None
     tournamentLevel: str | None
-    Teams: list[ScheduleTeamModelV2] | None
+    teams: list[ScheduleTeamModelV2] | None
 
 
 class ScoreDetailModelAlliance2023(TypedDict):
@@ -1076,72 +1074,72 @@ class ScoreDetailModelAlliance2026(TypedDict):
 class ScoreDetailModel2019(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    Alliances: list[ScoreDetailModelAlliance2019] | None
+    alliances: list[ScoreDetailModelAlliance2019] | None
 
 
 class ScoreDetailModel2020(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    Alliances: list[ScoreDetailModelAlliance2020] | None
+    alliances: list[ScoreDetailModelAlliance2020] | None
 
 
 class ScoreDetailModel2021(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    Alliances: list[ScoreDetailModelAlliance2021] | None
+    alliances: list[ScoreDetailModelAlliance2021] | None
 
 
 class ScoreDetailModel2022(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    Alliances: list[ScoreDetailModelAlliance2022] | None
+    alliances: list[ScoreDetailModelAlliance2022] | None
 
 
 class ScoreDetailModel2023(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    WinningAlliance: AllianceType
-    Tiebreaker: PlayoffTiebreakTypeStringValueTuple
-    Alliances: list[ScoreDetailModelAlliance2023] | None
+    winningAlliance: AllianceType
+    tiebreaker: PlayoffTiebreakTypeStringValueTuple
+    alliances: list[ScoreDetailModelAlliance2023] | None
 
 
 class ScoreDetailModel2024(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    WinningAlliance: AllianceType
-    Tiebreaker: PlayoffTiebreakTypeStringValueTuple
+    winningAlliance: AllianceType
+    tiebreaker: PlayoffTiebreakTypeStringValueTuple
     coopertitionBonusAchieved: bool
     melodyBonusThresholdCoop: int
     melodyBonusThresholdNonCoop: int
     melodyBonusThreshold: int
     ensembleBonusStagePointsThreshold: int
     ensembleBonusOnStageRobotsThreshold: int
-    Alliances: list[ScoreDetailModelAlliance2024] | None
+    alliances: list[ScoreDetailModelAlliance2024] | None
 
 
 class ScoreDetailModel2025(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    WinningAlliance: AllianceType
-    Tiebreaker: PlayoffTiebreakTypeStringValueTuple
+    winningAlliance: AllianceType
+    tiebreaker: PlayoffTiebreakTypeStringValueTuple
     coopertitionBonusAchieved: bool
     coralBonusLevelsThresholdCoop: int
     coralBonusLevelsThresholdNonCoop: int
     coralBonusLevelsThreshold: int
     bargeBonusThreshold: int
     autoBonusCoralThreshold: int
-    Alliances: list[ScoreDetailModelAlliance2025] | None
+    alliances: list[ScoreDetailModelAlliance2025] | None
 
 
 class ScoreDetailModel2026(TypedDict):
     matchLevel: TournamentLevel
     matchNumber: int
-    WinningAlliance: AllianceType
-    Tiebreaker: PlayoffTiebreakTypeStringValueTuple
+    winningAlliance: AllianceType
+    tiebreaker: PlayoffTiebreakTypeStringValueTuple
     energizedThreshold: int
     superchargedThreshold: int
     traversalThreshold: int
-    Alliances: list[ScoreDetailModelAlliance2026] | None
+    alliances: list[ScoreDetailModelAlliance2026] | None
 
 
 class ScoreDetailsModelReturn2019(TypedDict):
@@ -1212,11 +1210,11 @@ class TeamAvatarListingsModelV2(TypedDict):
 
 
 class EventRegionalRankingSummaryListModelV31(TypedDict):
-    EventSummaries: list[EventRegionalRankingSummaryModelV31] | None
-    EventCountTotal: int
-    EventCountPage: int
-    PageCurrent: int
-    PageTotal: int
+    eventSummaries: list[EventRegionalRankingSummaryModelV31] | None
+    eventCountTotal: int
+    eventCountPage: int
+    pageCurrent: int
+    pageTotal: int
 
 
 class MatchResultListModelV2(TypedDict):
@@ -1224,15 +1222,15 @@ class MatchResultListModelV2(TypedDict):
 
 
 class RegionalRankingEventDetailListModelV31(TypedDict):
-    SeasonYear: int
-    EventCode: str | None
-    EventName: str | None
-    EventStatus: RegionalRankingEventStatusTypes
-    TeamDetails: list[RegionalRankingEventDetailModelV31] | None
-    TeamCountTotal: int
-    TeamCountPage: int
-    PageCurrent: int
-    PageTotal: int
+    seasonYear: int
+    eventCode: str | None
+    eventName: str | None
+    eventStatus: RegionalRankingEventStatusTypes
+    teamDetails: list[RegionalRankingEventDetailModelV31] | None
+    teamCountTotal: int
+    teamCountPage: int
+    pageCurrent: int
+    pageTotal: int
 
 
 class ScheduleListModelV31(TypedDict):
