@@ -368,9 +368,6 @@ jobs:
         run: sudo sysctl -w kernel.apparmor_restrict_unprivileged_userns=0
       - name: Set up uv
         uses: astral-sh/setup-uv@v6
-      - name: Generate requirements.txt
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: make freeze
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
