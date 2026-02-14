@@ -467,6 +467,78 @@
           }
         }
       }
+    },
+    "/event/{eventKey}/webcasts/update": {
+      "patch": {
+        "tags": [
+          "Event Webcasts"
+        ],
+        "summary": "Add webcasts to an event",
+        "description": "Append new webcasts to an event's existing webcast list",
+        "operationId": "addEventWebcasts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebcastUpdate"
+              }
+            }
+          },
+          "description": "List of webcasts to add",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Event Webcasts"
+        ],
+        "summary": "Remove webcasts from an event",
+        "description": "Remove specified webcasts from an event's webcast list",
+        "operationId": "deleteEventWebcasts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebcastUpdate"
+              }
+            }
+          },
+          "description": "List of webcasts to remove",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
     }
   },
   "servers": [
@@ -737,6 +809,41 @@
             "type": "string",
             "description": "The name for the match, to be shown on the event page",
             "example": "Quals 10"
+          }
+        }
+      },
+      "Webcast": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string",
+            "description": "Type of webcast (e.g., youtube, twitch, livestream, http_stream)",
+            "example": "youtube"
+          },
+          "channel": {
+            "type": "string",
+            "description": "Channel identifier for the webcast",
+            "example": "abc123"
+          },
+          "file": {
+            "type": "string",
+            "description": "Optional file identifier for certain webcast types",
+            "example": "stream.mp4"
+          }
+        }
+      },
+      "WebcastUpdate": {
+        "type": "object",
+        "required": [
+          "webcasts"
+        ],
+        "properties": {
+          "webcasts": {
+            "type": "array",
+            "description": "List of webcasts to add or remove",
+            "items": {
+              "$ref": "#/components/schemas/Webcast"
+            }
           }
         }
       }
