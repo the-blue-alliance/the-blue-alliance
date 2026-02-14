@@ -68,7 +68,7 @@ docker-compose exec tba bash
 ```
 
 ## Running Python Commands
-**NEVER** run `python3` directly on the host machine. All Python dependencies are managed by `uv` and isolated in a virtual environment. Use one of these approaches:
+All Python dependencies are managed by `uv` and isolated in a virtual environment. Use one of these approaches:
 
 ### Via `uv run` (preferred for one-off commands)
 `uv run` executes a command within the managed virtual environment, automatically syncing dependencies first if needed.
