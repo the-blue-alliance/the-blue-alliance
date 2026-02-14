@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
-import optparse
+import argparse
 import os
+import sys
+import time
 
 SCRIPTS_MAIN = [
     "src/backend/web/static/jwplayer/jwplayer.js",
@@ -40,6 +42,14 @@ SCRIPTS_FIREBASE_OUT = "src/build/javascript/tba_combined_js.firebase.min.js"
 SCRIPTS_FIREBASE_SERVICEWORKER_OUT = "src/build/javascript/firebase-messaging-sw.js"
 SCRIPTS_EVENTWIZARD_OUT = "src/build/javascript/tba_combined_js.eventwizard.min.js"
 
+# All bundles: (input_files, output_file, label)
+BUNDLES = [
+    (SCRIPTS_MAIN, SCRIPTS_MAIN_OUT, "Main"),
+    (SCRIPTS_FIREBASE, SCRIPTS_FIREBASE_OUT, "Firebase"),
+    # (SCRIPTS_FIREBASE_SERVICEWORKER, SCRIPTS_FIREBASE_SERVICEWORKER_OUT, "Firebase Messaging Serviceworker"),
+    (SCRIPTS_EVENTWIZARD, SCRIPTS_EVENTWIZARD_OUT, "EventWizard"),
+]
+
 
 def compress_js(in_files, out_file):
     os.system(
@@ -49,29 +59,89 @@ def compress_js(in_files, out_file):
     print("")
 
 
-def main(kind=None):
+def all_source_files():
+    """Return the deduplicated set of all source files across all bundles."""
+    files = set()
+    for in_files, _, _ in BUNDLES:
+        files.update(in_files)
+    return files
+
+
+def build(kind=None):
     for directory in ["src/build/javascript"]:
         if not os.path.exists(directory):
             os.makedirs(directory)
 
     if kind == "js" or kind is None:
-        print("Compressing Main JavaScript...")
-        compress_js(SCRIPTS_MAIN, SCRIPTS_MAIN_OUT)
+        for in_files, out_file, label in BUNDLES:
+            print("Compressing %s JavaScript..." % label)
+            compress_js(in_files, out_file)
 
-        print("Compressing Firebase JavaScript...")
-        compress_js(SCRIPTS_FIREBASE, SCRIPTS_FIREBASE_OUT)
 
-        # print('Compressing Firebase Messaging Serviceworker JavaScript...')
-        # compress_js(SCRIPTS_FIREBASE_SERVICEWORKER, SCRIPTS_FIREBASE_SERVICEWORKER_OUT)
-        #
-        print("Compressing EventWizard JavaScript...")
-        compress_js(SCRIPTS_EVENTWIZARD, SCRIPTS_EVENTWIZARD_OUT)
+def watch():
+    """Watch source files for changes and rebuild affected bundles."""
+    from watchdog.events import FileSystemEventHandler
+    from watchdog.observers import Observer
+
+    # Build a mapping from source file path -> list of bundles that include it
+    file_to_bundles = {}
+    watch_dirs = set()
+    for in_files, out_file, label in BUNDLES:
+        for f in in_files:
+            abs_path = os.path.abspath(f)
+            file_to_bundles.setdefault(abs_path, []).append((in_files, out_file, label))
+            watch_dirs.add(os.path.dirname(abs_path))
+
+    class CompressHandler(FileSystemEventHandler):
+        def __init__(self):
+            self._last_rebuild = 0.0
+
+        def on_modified(self, event):
+            if event.is_directory:
+                return
+            abs_path = os.path.abspath(event.src_path)
+            if abs_path not in file_to_bundles:
+                return
+            # Debounce: skip if we just rebuilt within the last second
+            now = time.time()
+            if now - self._last_rebuild < 1.0:
+                return
+            self._last_rebuild = now
+            for in_files, out_file, label in file_to_bundles[abs_path]:
+                print(
+                    "\n[watch] %s changed, recompressing %s JavaScript..."
+                    % (os.path.basename(event.src_path), label)
+                )
+                compress_js(in_files, out_file)
+
+    handler = CompressHandler()
+    observer = Observer()
+    for d in watch_dirs:
+        observer.schedule(handler, d, recursive=False)
+
+    observer.start()
+    print("[watch] Watching %d source files for changes..." % len(file_to_bundles))
+    sys.stdout.flush()
+
+    try:
+        while True:
+            time.sleep(1)
+    except KeyboardInterrupt:
+        observer.stop()
+    observer.join()
 
 
 if __name__ == "__main__":
-    parser = optparse.OptionParser()
-    options, args = parser.parse_args()
-    if len(args) < 1:
-        main()
-    else:
-        main(args[0])
+    parser = argparse.ArgumentParser(description="Compress legacy JS bundles")
+    parser.add_argument(
+        "--watch",
+        action="store_true",
+        help="After initial build, watch source files and rebuild on changes",
+    )
+    parser.add_argument("kind", nargs="?", default=None, help="Build kind (e.g. 'js')")
+    args = parser.parse_args()
+
+    build(args.kind)
+
+    if args.watch:
+        watch()

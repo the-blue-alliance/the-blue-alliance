@@ -1,7 +1,9 @@
 FROM node:24-alpine
 
 # Python 3 is needed for do_compress.py (legacy JS concatenation)
-RUN apk add --no-cache python3
+# py3-pip is needed to install watchdog for file watching
+RUN apk add --no-cache python3 py3-pip
+RUN pip3 install --break-system-packages watchdog
 
 # uglify-js is needed by do_compress.py
 RUN npm install -g uglify-js@3.17.4
