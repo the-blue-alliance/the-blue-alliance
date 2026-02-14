@@ -30,6 +30,9 @@ from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
+from backend.common.manipulators.regional_champs_pool_manipulator import (
+    RegionalChampsPoolManipulator,
+)
 from backend.common.manipulators.regional_pool_team_manipulator import (
     RegionalPoolTeamManipulator,
 )
@@ -41,6 +44,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
+from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
@@ -50,6 +54,9 @@ from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
     TParsedDistrictAdvancement,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_regional_rankings_parser import (
+    TParsedRegionalAdvancement,
 )
 
 blueprint = Blueprint("frc_api", __name__)
@@ -928,4 +935,47 @@ def district_rankings(district_key: DistrictKey) -> Response:
         target="py3-tasks-io",
         queue_name="default",
     )
+    return make_response("")
+
+
+@blueprint.route("/tasks/get/regional_advancement/", defaults={"year": None})
+@blueprint.route("/tasks/get/regional_advancement/<int:year>")
+def get_regional_advancement(year: Optional[Year]) -> Response:
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    if not SeasonHelper.is_valid_regional_pool_year(year):
+        return make_response("Invalid year for regional pool", 400)
+
+    df = DatafeedFMSAPI(save_response=True)
+    data: TParsedRegionalAdvancement = df.get_regional_rankings(year).get_result()
+
+    pool_future = RegionalChampsPool.get_or_insert_async(
+        RegionalChampsPool.render_key_name(year)
+    )
+    pool = pool_future.get_result()
+
+    if data:
+        pool.advancement = data.advancement
+        pool.adjustments = data.adjustments
+        RegionalChampsPoolManipulator.createOrUpdate(pool)
+
+        # If adjust points changed, enqueue a rankings update to incorporate them
+        taskqueue.add(
+            url=url_for("math.regional_champs_pool_rankings_calc", year=year),
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        import json
+        from dataclasses import asdict
+
+        return make_response(
+            f"Fetched advancement: <pre>{json.dumps(asdict(data), indent=2)}</pre>"
+        )
+
     return make_response("")
