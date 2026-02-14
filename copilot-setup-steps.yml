@@ -1,7 +1,7 @@
 name: Development Environment Setup
 description: |
   Complete setup for The Blue Alliance development environment.
-  This file configures the environment to ensure Python, Node.js, and PWA tests all pass.
+  This file configures the environment so that Python, Node.js, and PWA tests can run successfully.
   
   Prerequisites:
   - Python 3.13 or higher
@@ -33,14 +33,3 @@ steps:
 
   - name: Install PWA dependencies
     run: pnpm --dir pwa install --frozen-lockfile
-
-# Test commands to validate the setup
-tests:
-  - name: Python tests
-    run: make test
-
-  - name: Node.js tests
-    run: npm run test
-
-  - name: PWA tests
-    run: pnpm --dir pwa test
