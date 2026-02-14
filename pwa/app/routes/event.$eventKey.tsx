@@ -8,6 +8,7 @@ import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
 import StatbotIcon from '~icons/lucide/chart-spline';
+import DownloadIcon from '~icons/lucide/download';
 import WebsiteIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import LocationIcon from '~icons/lucide/map-pin';
@@ -103,6 +104,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
+import { downloadCSV, generateMatchCSV } from '~/lib/csvExport';
 import {
   getCurrentWeekEvents,
   getEventDateString,
@@ -481,7 +483,22 @@ function ResultsTab({
 
   return (
     <>
-      <TableOfContents tocItems={tocItems} inView={inView} mobileOnly />
+      <div className="flex items-center justify-between">
+        <TableOfContents tocItems={tocItems} inView={inView} mobileOnly />
+        {sortedMatches.length > 0 && (
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => {
+              const csv = generateMatchCSV(sortedMatches);
+              downloadCSV(csv, `${event.key}_matches.csv`);
+            }}
+          >
+            <DownloadIcon className="mr-1 size-4" />
+            Export CSV
+          </Button>
+        )}
+      </div>
 
       <div className="flex flex-wrap gap-4 lg:flex-nowrap">
         <TableOfContentsSection
