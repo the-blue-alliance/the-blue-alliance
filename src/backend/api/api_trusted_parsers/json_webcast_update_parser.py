@@ -3,24 +3,11 @@ from typing import List, TypedDict
 from pyre_extensions import safe_json
 
 from backend.common.datafeed_parsers.exceptions import ParserInputException
-from backend.common.models.webcast import Webcast, WebcastType
-
-
-class _WebcastDict(TypedDict, total=False):
-    type: WebcastType
-    channel: str
-    file: str
-    url: str
-    date: str
+from backend.common.models.webcast import Webcast
 
 
 class WebcastUpdateInput(TypedDict, total=False):
-    webcasts: List[_WebcastDict]
-
-
-class WebcastUpdateParsed(TypedDict, total=False):
     webcasts: List[Webcast]
-
 
 class JSONWebcastUpdateParser:
     @staticmethod
