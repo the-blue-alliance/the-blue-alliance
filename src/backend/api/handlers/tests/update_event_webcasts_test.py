@@ -1,8 +1,8 @@
 import json
 from typing import Dict, List, Optional
 
-import pytest
-from google.appengine.ext import ndb, testbed
+import pytest  # noqa: F401
+from google.appengine.ext import ndb, testbed  # noqa: F401
 from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
@@ -198,6 +198,60 @@ def test_patch_no_webcasts_provided(api_client: Client) -> None:
         data=request_body,
     )
     assert response.status_code == 400
+
+
+def test_patch_add_webcast_from_url_youtube(api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {
+        "webcasts": [
+            {
+                "url": "https://www.youtube.com/watch?v=abc123xyz",
+            },
+        ]
+    }
+    request_body = json.dumps(request)
+    response = api_client.patch(
+        REQUEST_PATH_PATCH,
+        headers=get_auth_headers(REQUEST_PATH_PATCH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    webcasts = event.webcast
+    assert len(webcasts) == 1
+    assert webcasts[0]["type"] == "youtube"
+    assert webcasts[0]["channel"] == "abc123xyz"
+
+
+def test_patch_add_webcast_from_url_twitch(api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {
+        "webcasts": [
+            {
+                "url": "https://twitch.tv/twitchchannel",
+            },
+        ]
+    }
+    request_body = json.dumps(request)
+    response = api_client.patch(
+        REQUEST_PATH_PATCH,
+        headers=get_auth_headers(REQUEST_PATH_PATCH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    webcasts = event.webcast
+    assert len(webcasts) == 1
+    assert webcasts[0]["type"] == "twitch"
+    assert webcasts[0]["channel"] == "twitchchannel"
 
 
 def test_delete_single_webcast(api_client: Client) -> None:

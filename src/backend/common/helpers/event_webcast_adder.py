@@ -41,10 +41,10 @@ class EventWebcastAdder:
         webcast_type: WebcastType,
         channel: str,
         file: Optional[str],
-    ) -> Event:
+    ) -> Event | None:
         webcasts = event.webcast
         if not webcasts or index >= len(webcasts):
-            return
+            return None
 
         webcast = webcasts[index]
         if (
@@ -52,7 +52,7 @@ class EventWebcastAdder:
             or channel != webcast.get("channel")
             or file != webcast.get("file")
         ):
-            return
+            return None
 
         webcasts.pop(index)
         event.webcast_json = json.dumps(webcasts)

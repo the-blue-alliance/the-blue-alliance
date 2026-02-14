@@ -815,20 +815,30 @@
       "Webcast": {
         "type": "object",
         "properties": {
+          "url": {
+            "type": "string",
+            "description": "Optional URL that will be parsed to extract webcast type and channel. Either provide url OR type+channel+file",
+            "example": "https://youtu.be/abc123"
+          },
           "type": {
             "type": "string",
-            "description": "Type of webcast (e.g., youtube, twitch, livestream, http_stream)",
+            "description": "Type of webcast (e.g., youtube, twitch, livestream, http_stream). Required if url is not provided",
             "example": "youtube"
           },
           "channel": {
             "type": "string",
-            "description": "Channel identifier for the webcast",
+            "description": "Channel identifier for the webcast. Required if url is not provided",
             "example": "abc123"
           },
           "file": {
             "type": "string",
             "description": "Optional file identifier for certain webcast types",
             "example": "stream.mp4"
+          },
+          "date": {
+            "type": "string",
+            "description": "Optional date in YYYY-MM-DD format for when the webcast aired",
+            "example": "2024-01-15"
           }
         }
       },
