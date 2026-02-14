@@ -1,0 +1,27 @@
+# CI-specific compose overrides
+# Usage: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+#
+# Changes from base:
+#   - webpack runs in one-shot build mode (WATCH=false) and tba waits for it to finish
+#   - tba has a healthcheck on the admin server (port 8000), the last thing to start
+#   - datastore dependency is non-blocking (it starts fast enough to be ready before tba needs it)
+
+services:
+  webpack:
+    environment:
+      - WATCH=false
+
+  tba:
+    depends_on:
+      firebase:
+        condition: service_started
+      datastore:
+        condition: service_started
+      webpack:
+        condition: service_completed_successfully
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://0.0.0.0:8000"]
+      interval: 15s
+      timeout: 10s
+      retries: 30
+      start_period: 300s

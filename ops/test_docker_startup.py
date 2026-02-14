@@ -11,6 +11,7 @@ import time
 import requests
 
 TIME_LIMIT = 10 * 60  # seconds
+HOMEPAGE_URL = "http://localhost:8080"
 MODULE_NAMES = {
     "default",
     "py3-web",
@@ -20,7 +21,7 @@ MODULE_NAMES = {
     "py3-tasks-cpu",
 }
 
-# Wait up to |TIME_LIMIT| for all modules to start and webpack to build
+# Wait up to |TIME_LIMIT| for all services to start
 start_time = time.time()
 while time.time() - start_time < TIME_LIMIT:
     # Check for started modules
@@ -49,15 +50,14 @@ while time.time() - start_time < TIME_LIMIT:
     print(m.group(0))
 
     # Check that homepage returns a 200
-    url = "http://localhost:8080"
     try:
-        r = requests.get(url)
-        print(f"Status code: {r.status_code}")
+        r = requests.get(HOMEPAGE_URL, timeout=5)
+        print(f"Homepage: {r.status_code}")
         if r.status_code == 200:
             print("Startup successful!")
             sys.exit(0)
-    except requests.ConnectionError:
-        print("Connection refused, retrying...")
+    except (requests.ConnectionError, requests.Timeout):
+        print("Homepage not ready")
         time.sleep(5)
         continue
 

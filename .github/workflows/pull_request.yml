@@ -403,7 +403,7 @@ jobs:
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
       - name: Start Containers
         if: steps.changes.outputs.web == 'true'
-        run: docker compose up -d --build
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
       - name: Test Docker Startup
         if: steps.changes.outputs.web == 'true'
         run: uv run ./ops/test_docker_startup.py
