@@ -71,7 +71,6 @@ services:
       - TBA_DOCKER_COMPOSE=true
       - FIREBASE_AUTH_EMULATOR_HOST=firebase:9099
       - FIREBASE_DATABASE_EMULATOR_HOST=firebase:9000
-    profiles: ["tools"] # TODO: Remove...
 
   ### Tools
 
@@ -82,7 +81,6 @@ services:
     profiles: ["tools"]
     volumes:
       - ./:/tba:delegated
-    working_dir: /tba
     entrypoint:
       - /bin/bash
       - -c

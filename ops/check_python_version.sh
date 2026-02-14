@@ -38,12 +38,12 @@ GAE_RUNTIME="python${PYTHON_VERSION//./}"
 ERRORS=0
 UPDATED=0
 
-# Update a file in-place with sed
+# Update a file in-place with sed (portable across macOS and Linux)
 update_file() {
     local file="$1"
     local pattern="$2"
 
-    sed -i '' "$pattern" "$file"
+    sed -i.bak "$pattern" "$file" && rm -f "$file.bak"
     echo "UPDATED: $file"
     UPDATED=$((UPDATED + 1))
 }
@@ -56,10 +56,10 @@ if [[ -f "$PYPROJECT" ]]; then
     if [[ "$CURRENT_REQUIRES_PYTHON" != "$EXPECTED_REQUIRES_PYTHON" ]]; then
         if [[ "$UPDATE_MODE" == true ]]; then
             if grep -q 'requires-python' "$PYPROJECT"; then
-                sed -i '' "s|requires-python = \".*\"|requires-python = \"$EXPECTED_REQUIRES_PYTHON\"|" "$PYPROJECT"
+                sed -i.bak "s|requires-python = \".*\"|requires-python = \"$EXPECTED_REQUIRES_PYTHON\"|" "$PYPROJECT" && rm -f "$PYPROJECT.bak"
             else
-                sed -i '' "/^description/a\\
-requires-python = \"$EXPECTED_REQUIRES_PYTHON\"" "$PYPROJECT"
+                sed -i.bak "/^description/a\\
+requires-python = \"$EXPECTED_REQUIRES_PYTHON\"" "$PYPROJECT" && rm -f "$PYPROJECT.bak"
             fi
             echo "UPDATED: $PYPROJECT (requires-python = \"$EXPECTED_REQUIRES_PYTHON\")"
             UPDATED=$((UPDATED + 1))
@@ -112,7 +112,7 @@ for dockerfile in "$REPO_ROOT"/ops/dev/docker/Dockerfile*; do
         local_expected_env_value="python$PYTHON_VERSION"
         if [[ "$local_env_default" != "$local_expected_env_value" ]]; then
             if [[ "$UPDATE_MODE" == true ]]; then
-                sed -i '' "s|ENV PYTHON_VERSION=.*|ENV PYTHON_VERSION=$local_expected_env_value|" "$dockerfile"
+                sed -i.bak "s|ENV PYTHON_VERSION=.*|ENV PYTHON_VERSION=$local_expected_env_value|" "$dockerfile" && rm -f "$dockerfile.bak"
                 echo "UPDATED: $dockerfile (ENV PYTHON_VERSION)"
                 UPDATED=$((UPDATED + 1))
             else
@@ -133,7 +133,7 @@ for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
         if [[ "$MISMATCHES" -gt 0 ]]; then
             if [[ "$UPDATE_MODE" == true ]]; then
                 # Update all python-version entries (handles both quoted styles)
-                sed -i '' -E "s/(python-version:[[:space:]]*[\"']?)[0-9.]+([\"']?)/\1$PYTHON_VERSION\2/g" "$workflow"
+                sed -i.bak -E "s/(python-version:[[:space:]]*[\"']?)[0-9.]+([\"']?)/\1$PYTHON_VERSION\2/g" "$workflow" && rm -f "$workflow.bak"
                 echo "UPDATED: $workflow ($MISMATCHES occurrences)"
                 UPDATED=$((UPDATED + 1))
             else
