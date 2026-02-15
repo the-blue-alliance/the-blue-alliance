@@ -26,6 +26,7 @@ import {
   Match,
   Media,
   Team,
+  TeamEventStatus,
   Webcast,
 } from '~/api/tba/read';
 import {
@@ -37,6 +38,7 @@ import {
   getEventRankingsOptions,
   getEventTeamMediaOptions,
   getEventTeamsOptions,
+  getEventTeamsStatusesOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
@@ -228,6 +230,10 @@ function EventPage() {
     getEventTeamMediaOptions({ path: { event_key: eventKey } }),
   );
 
+  const teamStatusesQuery = useQuery(
+    getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
+  );
+
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
     [matches],
@@ -386,6 +392,7 @@ function EventPage() {
               teams={teamsQuery.data}
               media={teamMediaQuery.data}
               year={event.year}
+              statuses={teamStatusesQuery.data}
             />
           )}
         </TabsContent>
@@ -520,6 +527,36 @@ function ResultsTab({
   );
 }
 
+function TeamStatusBadge({ status }: { status?: TeamEventStatus | null }) {
+  if (!status?.playoff?.status) return null;
+
+  if (status.playoff.status === 'won') {
+    return (
+      <Badge variant="default" className="bg-yellow-600 text-xs">
+        Winner
+      </Badge>
+    );
+  }
+
+  if (status.playoff.status === 'eliminated') {
+    return (
+      <Badge variant="secondary" className="text-xs opacity-70">
+        Eliminated
+      </Badge>
+    );
+  }
+
+  if (status.playoff.status === 'playing') {
+    return (
+      <Badge variant="default" className="bg-green-600 text-xs">
+        Playing
+      </Badge>
+    );
+  }
+
+  return null;
+}
+
 function AwardsTab({ awards }: { awards: Award[] }) {
   awards.sort(sortAwardsComparator);
   return (
@@ -562,10 +599,12 @@ function TeamsTab({
   teams,
   media,
   year,
+  statuses,
 }: {
   teams: Team[];
   media: Media[];
   year: number;
+  statuses?: Record<string, TeamEventStatus | null>;
 }) {
   teams.sort(sortTeamsComparator);
 
@@ -609,9 +648,12 @@ function TeamsTab({
                     )}
                   </TableCell>
                   <TableCell className="mt-1 flex flex-col">
-                    <TeamLink teamOrKey={t.key} year={year}>
-                      {t.team_number}
-                    </TeamLink>
+                    <div className="flex items-center gap-1.5">
+                      <TeamLink teamOrKey={t.key} year={year}>
+                        {t.team_number}
+                      </TeamLink>
+                      <TeamStatusBadge status={statuses?.[t.key]} />
+                    </div>
                     <div>{t.nickname}</div>
                   </TableCell>
                   <TableCell className={'text-xs'}>
