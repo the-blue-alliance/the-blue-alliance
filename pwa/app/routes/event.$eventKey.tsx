@@ -67,6 +67,7 @@ import {
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
 import TeamAvatar from '~/components/tba/teamAvatar';
+import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -469,13 +470,16 @@ function ResultsTab({
       />
     ) : null;
 
-  const showDoubleElim8Bracket =
+  const showDoubleElimBracket =
     alliances.length > 0 &&
     event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
 
-  const showDoubleElim4Bracket =
+  const showTraditionalBracket =
     alliances.length > 0 &&
-    event.playoff_type === PlayoffType.DOUBLE_ELIM_4_TEAM;
+    (event.playoff_type === PlayoffType.BRACKET_8_TEAM ||
+      event.playoff_type === PlayoffType.BRACKET_4_TEAM ||
+      event.playoff_type === PlayoffType.BRACKET_16_TEAM ||
+      event.playoff_type === PlayoffType.BRACKET_2_TEAM);
 
   const tocItems = [
     { slug: 'qual-matches', label: 'Qualification Matches' },
@@ -512,7 +516,7 @@ function ResultsTab({
         </div>
       </div>
 
-      {showDoubleElim8Bracket && (
+      {showDoubleElimBracket && (
         <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
           <EliminationBracket
             alliances={alliances}
@@ -522,9 +526,9 @@ function ResultsTab({
         </TableOfContentsSection>
       )}
 
-      {showDoubleElim4Bracket && (
+      {showTraditionalBracket && (
         <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
-          <DoubleElim4TeamBracket
+          <TraditionalBracket
             alliances={alliances}
             matches={elims}
             event={event}
