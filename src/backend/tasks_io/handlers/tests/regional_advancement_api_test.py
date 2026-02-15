@@ -1,32 +1,18 @@
 from unittest import mock
 
-import pytest
 from freezegun import freeze_time
 from google.appengine.ext import testbed
 from werkzeug.test import Client
 
 from backend.common.futures import InstantFuture
 from backend.common.models.regional_champs_pool import RegionalChampsPool
-from backend.common.sitevars.regional_advancement_api_secrets import (
-    ContentType as RegionalAdvancementAPISecretsContentType,
-    RegionalAdvancementApiSecret,
-)
-from backend.tasks_io.datafeeds.datafeed_regional_advancement import (
-    RegionalChampsAdvancement,
-)
-from backend.tasks_io.datafeeds.parsers.ra.regional_advancement_parser import (
+from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_regional_rankings_parser import (
     TParsedRegionalAdvancement,
 )
 
 
-@pytest.fixture(autouse=True)
-def ra_api_secrets(ndb_stub) -> None:
-    RegionalAdvancementApiSecret.put(
-        RegionalAdvancementAPISecretsContentType(url_format="/{year}")
-    )
-
-
-@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
+@mock.patch.object(DatafeedFMSAPI, "get_regional_rankings")
 def test_get_bad_season(
     ra_api_mock: mock.Mock,
     tasks_client: Client,
@@ -38,7 +24,7 @@ def test_get_bad_season(
 
 
 @freeze_time("2025-04-01")
-@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
+@mock.patch.object(DatafeedFMSAPI, "get_regional_rankings")
 def test_get_current_season(
     ra_api_mock: mock.Mock,
     tasks_client: Client,
@@ -66,7 +52,7 @@ def test_get_current_season(
         assert r.status_code == 200
 
 
-@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
+@mock.patch.object(DatafeedFMSAPI, "get_regional_rankings")
 def test_get_explicit_season(
     ra_api_mock: mock.Mock,
     tasks_client: Client,
@@ -94,7 +80,7 @@ def test_get_explicit_season(
         assert r.status_code == 200
 
 
-@mock.patch.object(RegionalChampsAdvancement, "fetch_async")
+@mock.patch.object(DatafeedFMSAPI, "get_regional_rankings")
 def test_get_explicit_season_doest_write_out_in_taskqueue(
     ra_api_mock: mock.Mock,
     tasks_client: Client,
