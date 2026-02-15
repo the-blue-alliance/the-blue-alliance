@@ -4,6 +4,7 @@ import { Event, Match } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
 import { ScoreBreakdown2015 } from '~/components/tba/match/scoreBreakdown2015';
 import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
+import ScoreBreakdown2022 from '~/components/tba/match/scoreBreakdown2022';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
@@ -12,6 +13,7 @@ import { Checkbox } from '~/components/ui/checkbox';
 import {
   isScoreBreakdown2015,
   isScoreBreakdown2018,
+  isScoreBreakdown2022,
   isScoreBreakdown2023,
   isScoreBreakdown2024,
   isScoreBreakdown2025,
@@ -115,6 +117,15 @@ export default function MatchDetails({
   if (isScoreBreakdown2023(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2023
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2022(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2022
         scoreBreakdown={match.score_breakdown}
         match={match}
       />
