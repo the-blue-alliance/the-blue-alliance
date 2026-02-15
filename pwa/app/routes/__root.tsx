@@ -20,6 +20,7 @@ import { MatchModal } from '~/components/tba/match/matchModal';
 import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
+import { Toaster } from '~/components/ui/sonner';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
 import { ApiError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
@@ -204,6 +205,7 @@ function RootComponent() {
               </>
             )}
           </AuthContextProvider>
+          <Toaster />
         </ThemeProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />
