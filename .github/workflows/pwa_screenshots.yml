@@ -1,0 +1,249 @@
+name: PWA Screenshots
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "pwa/**"
+      - "ops/pwa/**"
+      - ".github/workflows/pwa_screenshots.yml"
+  workflow_dispatch:
+
+jobs:
+  pwa-screenshots:
+    name: "PWA Screenshots"
+    runs-on: ubuntu-24.04
+    # Skip if TBA API key is not available (e.g. fork PRs without secrets)
+    env:
+      TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+    steps:
+      - name: Check for API key
+        id: check-key
+        run: |
+          if [ -z "$TBA_API_READ_KEY" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "TBA_API_READ_KEY not available (expected for fork PRs). Skipping screenshots."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
+      # --- Parse extra screenshot pages from PR description ---
+      - name: Parse screenshot pages from PR body
+        if: steps.check-key.outputs.skip != 'true'
+        id: extra-pages
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const body = pr.data.body || '';
+
+            // Strip fenced code blocks so we don't match examples in docs
+            const stripped = body.replace(/```[\s\S]*?```/g, '');
+
+            // Look for a "Screenshot Pages" section with bullet-pointed paths
+            // Format:  ## Screenshot Pages
+            //          - /match/2024mil_f1m2
+            //          - /team/254/2024 My Custom Name
+            const section = stripped.match(/## Screenshot Pages\s*\n([\s\S]*?)(?:\n##|\n\n---|\s*$)/);
+            if (!section) {
+              core.setOutput('json', '[]');
+              core.info('No "## Screenshot Pages" section found in PR body');
+              return;
+            }
+
+            const lines = section[1].split('\n');
+            const pages = [];
+            for (const line of lines) {
+              const match = line.match(/^\s*[-*]\s+(\/\S+)(?:\s+(.+))?/);
+              if (match) {
+                const path = match[1];
+                const name = match[2] || path;
+                pages.push({ name: name.trim(), path });
+              }
+            }
+
+            core.setOutput('json', JSON.stringify(pages));
+            core.info(`Found ${pages.length} extra page(s): ${pages.map(p => p.path).join(', ')}`);
+
+      # --- Setup toolchain ---
+      - name: Checkout PR branch
+        if: steps.check-key.outputs.skip != 'true'
+        uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        if: steps.check-key.outputs.skip != 'true'
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
+
+      - name: Set up Node
+        if: steps.check-key.outputs.skip != 'true'
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
+
+      - name: Cache Playwright browsers
+        if: steps.check-key.outputs.skip != 'true'
+        uses: actions/cache@v5
+        with:
+          path: ~/.cache/ms-playwright
+          key: ${{ runner.os }}-playwright-${{ hashFiles('pwa/pnpm-lock.yaml') }}
+          restore-keys: |
+            ${{ runner.os }}-playwright-
+
+      - name: Install dependencies
+        if: steps.check-key.outputs.skip != 'true'
+        run: pnpm --dir pwa install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        if: steps.check-key.outputs.skip != 'true'
+        run: pnpm --dir pwa exec playwright install --with-deps chromium
+
+      # --- Build and screenshot PR branch ---
+      - name: Create dotenv (PR)
+        if: steps.check-key.outputs.skip != 'true'
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+          FIREBASE_API_KEY: fake-api-key
+          GCLOUD_PROJECT_ID: demo-test
+
+      - name: Build PWA (PR branch)
+        if: steps.check-key.outputs.skip != 'true'
+        run: pnpm --dir pwa run build
+
+      - name: Take PR screenshots
+        if: steps.check-key.outputs.skip != 'true'
+        working-directory: pwa
+        run: |
+          node ./server.js &
+          SERVER_PID=$!
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Server is ready"
+              break
+            fi
+            sleep 2
+          done
+          node ../ops/pwa/take-screenshots.mjs
+          kill $SERVER_PID 2>/dev/null || true
+        env:
+          NODE_ENV: production
+          SCREENSHOT_DIR: ${{ github.workspace }}/screenshots-after
+          EXTRA_PAGES: ${{ steps.extra-pages.outputs.json }}
+
+      # --- Save scripts and switch to base branch ---
+      - name: Save scripts for base branch
+        if: steps.check-key.outputs.skip != 'true'
+        run: |
+          cp ops/pwa/take-screenshots.mjs /tmp/take-screenshots.mjs
+          cp ops/pwa/generate-screenshot-comment.mjs /tmp/generate-screenshot-comment.mjs
+
+      - name: Checkout base branch
+        if: steps.check-key.outputs.skip != 'true'
+        uses: actions/checkout@v6
+        with:
+          ref: ${{ github.event.pull_request.base.sha }}
+          clean: false
+
+      # --- Build and screenshot base branch ---
+      - name: Install dependencies (base)
+        if: steps.check-key.outputs.skip != 'true'
+        id: base-deps
+        continue-on-error: true
+        run: pnpm --dir pwa install --frozen-lockfile
+
+      - name: Create dotenv (base)
+        if: steps.check-key.outputs.skip != 'true' && steps.base-deps.outcome == 'success'
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
+          FIREBASE_API_KEY: fake-api-key
+          GCLOUD_PROJECT_ID: demo-test
+
+      - name: Build PWA (base branch)
+        if: steps.check-key.outputs.skip != 'true' && steps.base-deps.outcome == 'success'
+        id: base-build
+        continue-on-error: true
+        run: pnpm --dir pwa run build
+
+      - name: Take base screenshots
+        if: steps.check-key.outputs.skip != 'true' && steps.base-build.outcome == 'success'
+        continue-on-error: true
+        working-directory: pwa
+        run: |
+          node ./server.js &
+          SERVER_PID=$!
+          for i in $(seq 1 30); do
+            if curl -sf http://localhost:3000 > /dev/null 2>&1; then
+              echo "Server is ready"
+              break
+            fi
+            sleep 2
+          done
+          node /tmp/take-screenshots.mjs
+          kill $SERVER_PID 2>/dev/null || true
+        env:
+          NODE_ENV: production
+          SCREENSHOT_DIR: ${{ github.workspace }}/screenshots-before
+          EXTRA_PAGES: ${{ steps.extra-pages.outputs.json }}
+
+      # --- Generate comment and post ---
+      - name: Generate screenshot comment
+        if: steps.check-key.outputs.skip != 'true'
+        run: node /tmp/generate-screenshot-comment.mjs
+        env:
+          BEFORE_DIR: ${{ github.workspace }}/screenshots-before
+          AFTER_DIR: ${{ github.workspace }}/screenshots-after
+          PR_NUMBER: ${{ github.event.pull_request.number }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+
+      - name: Post comment on PR
+        if: steps.check-key.outputs.skip != 'true'
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const fs = require('fs');
+            const path = '${{ github.workspace }}/pwa_screenshots_message.md';
+
+            if (!fs.existsSync(path)) {
+              core.warning('No screenshot comment file found');
+              return;
+            }
+
+            const body = fs.readFileSync(path, 'utf8');
+            const marker = '<!-- pwa-screenshots-comment -->';
+            const fullBody = `${marker}\n${body}`;
+
+            // Find and update existing comment, or create new one
+            const comments = await github.paginate(github.rest.issues.listComments, {
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ github.event.pull_request.number }},
+            });
+            const existing = comments.find(c => c.body && c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: fullBody,
+              });
+              core.info(`Updated comment ${existing.id}`);
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ${{ github.event.pull_request.number }},
+                body: fullBody,
+              });
+              core.info('Created new comment');
+            }

@@ -83,3 +83,19 @@ npm run typecheck    # Type checking
 npm run lint         # Lint code
 npx playwright test  # E2E tests
 ```
+
+## PR Screenshots
+
+PRs that touch `pwa/` files automatically get before/after screenshots posted as a comment. By default, the Homepage, a Team page, and an Event page are captured.
+
+To request screenshots of additional pages, add a `## Screenshot Pages` section to the PR description with bullet-pointed paths:
+
+```markdown
+## Screenshot Pages
+
+- /match/2024mil_f1m2
+- /team/254/2024 Team 254 Page
+- /gameday
+```
+
+Each line is `- /path` optionally followed by a display name. If no name is given, the path is used.
