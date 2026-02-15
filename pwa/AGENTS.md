@@ -92,6 +92,7 @@ To request screenshots of additional pages, add a `## Screenshot Pages` section 
 
 ```markdown
 ## Screenshot Pages
+
 - /match/2024mil_f1m2
 - /team/254/2024 Team 254 Page
 - /gameday
