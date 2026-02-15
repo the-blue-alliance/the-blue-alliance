@@ -13,12 +13,14 @@ import { mkdirSync } from "fs";
 import { join } from "path";
 import { pathToFileURL } from "url";
 
-// Resolve playwright from the working directory's node_modules (pwa/)
+// Resolve @playwright/test from the working directory's node_modules (pwa/)
 // rather than relative to this script's location (ops/pwa/).
-const playwrightPath = pathToFileURL(
-  join(process.cwd(), "node_modules", "playwright", "index.mjs")
+// pnpm only hoists direct dependencies, so we use @playwright/test (direct dep)
+// instead of playwright (transitive dep).
+const pwPath = pathToFileURL(
+  join(process.cwd(), "node_modules", "@playwright", "test", "index.mjs")
 ).href;
-const { chromium } = await import(playwrightPath);
+const { chromium } = await import(pwPath);
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const SCREENSHOT_DIR = process.env.SCREENSHOT_DIR || "screenshots";
