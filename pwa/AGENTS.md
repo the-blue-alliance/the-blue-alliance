@@ -86,9 +86,7 @@ npx playwright test  # E2E tests
 
 ## PR Screenshots
 
-PRs that touch `pwa/` files automatically get before/after screenshots posted as a comment. By default, the Homepage, a Team page, and an Event page are captured.
-
-To request screenshots of additional pages, add a `## Screenshot Pages` section to the PR description with bullet-pointed paths:
+PRs that touch `pwa/` files can get before/after screenshots posted as a comment. To request screenshots, add a `## Screenshot Pages` section to the PR description:
 
 ```markdown
 ## Screenshot Pages
@@ -98,4 +96,4 @@ To request screenshots of additional pages, add a `## Screenshot Pages` section 
 - /gameday
 ```
 
-Each line is `- /path` optionally followed by a display name. If no name is given, the path is used.
+Each line is `- /path` optionally followed by a display name. If no name is given, the path is used. If no pages are listed, the workflow skips screenshot capture.
