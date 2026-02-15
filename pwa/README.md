@@ -155,9 +155,7 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 
 ## PR Screenshots
 
-PRs that touch `pwa/` files automatically get before/after screenshots posted as a PR comment (via the `PWA Screenshots` workflow). By default, the Homepage, a Team page, and an Event page are captured.
-
-To request screenshots of additional pages, add a `## Screenshot Pages` section to your PR description:
+PRs that touch `pwa/` files can get before/after screenshots posted as a PR comment (via the `PWA Screenshots` workflow). To request screenshots, add a `## Screenshot Pages` section to your PR description:
 
 ```markdown
 ## Screenshot Pages
@@ -167,7 +165,7 @@ To request screenshots of additional pages, add a `## Screenshot Pages` section 
 - /gameday
 ```
 
-Each line is `- /path` optionally followed by a display name. The workflow parses this section and adds those pages to the screenshot set.
+Each line is `- /path` optionally followed by a display name. If no pages are listed, the workflow skips screenshot capture.
 
 > **Note:** Screenshots require the `TBA_API_READ_KEY` secret, which is only available for same-repo branches (not fork PRs). Fork PRs will gracefully skip screenshot capture.
 

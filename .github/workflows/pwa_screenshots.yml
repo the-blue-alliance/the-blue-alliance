@@ -27,10 +27,10 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
-      # --- Parse extra screenshot pages from PR description ---
+      # --- Parse screenshot pages from PR description ---
       - name: Parse screenshot pages from PR body
         if: steps.check-key.outputs.skip != 'true'
-        id: extra-pages
+        id: pages
         uses: actions/github-script@v8
         with:
           script: |
@@ -51,7 +51,7 @@ jobs:
             const section = stripped.match(/## Screenshot Pages\s*\n([\s\S]*?)(?:\n##|\n\n---|\s*$)/);
             if (!section) {
               core.setOutput('json', '[]');
-              core.info('No "## Screenshot Pages" section found in PR body');
+              core.info('No "## Screenshot Pages" section found in PR body — skipping screenshots');
               return;
             }
 
@@ -67,21 +67,25 @@ jobs:
             }
 
             core.setOutput('json', JSON.stringify(pages));
-            core.info(`Found ${pages.length} extra page(s): ${pages.map(p => p.path).join(', ')}`);
+            if (pages.length === 0) {
+              core.info('## Screenshot Pages section found but no pages listed — skipping screenshots');
+            } else {
+              core.info(`Found ${pages.length} page(s): ${pages.map(p => p.path).join(', ')}`);
+            }
 
       # --- Setup toolchain ---
       - name: Checkout PR branch
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         uses: actions/checkout@v6
 
       - name: Set up pnpm
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         uses: pnpm/action-setup@v4
         with:
           version: "10.24.0"
 
       - name: Set up Node
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         uses: actions/setup-node@v6
         with:
           node-version: "24"
@@ -89,7 +93,7 @@ jobs:
           cache-dependency-path: "pwa/pnpm-lock.yaml"
 
       - name: Cache Playwright browsers
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         uses: actions/cache@v5
         with:
           path: ~/.cache/ms-playwright
@@ -98,16 +102,16 @@ jobs:
             ${{ runner.os }}-playwright-
 
       - name: Install dependencies
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         run: pnpm --dir pwa install --frozen-lockfile
 
       - name: Install Playwright browsers
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         run: pnpm --dir pwa exec playwright install --with-deps chromium
 
       # --- Build and screenshot PR branch ---
       - name: Create dotenv (PR)
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
@@ -115,11 +119,11 @@ jobs:
           GCLOUD_PROJECT_ID: demo-test
 
       - name: Build PWA (PR branch)
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         run: pnpm --dir pwa run build
 
       - name: Take PR screenshots
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         working-directory: pwa
         run: |
           node ./server.js &
@@ -136,17 +140,17 @@ jobs:
         env:
           NODE_ENV: production
           SCREENSHOT_DIR: ${{ github.workspace }}/screenshots-after
-          EXTRA_PAGES: ${{ steps.extra-pages.outputs.json }}
+          PAGES: ${{ steps.pages.outputs.json }}
 
       # --- Save scripts and switch to base branch ---
       - name: Save scripts for base branch
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         run: |
           cp ops/pwa/take-screenshots.mjs /tmp/take-screenshots.mjs
           cp ops/pwa/generate-screenshot-comment.mjs /tmp/generate-screenshot-comment.mjs
 
       - name: Checkout base branch
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         uses: actions/checkout@v6
         with:
           ref: ${{ github.event.pull_request.base.sha }}
@@ -154,13 +158,13 @@ jobs:
 
       # --- Build and screenshot base branch ---
       - name: Install dependencies (base)
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         id: base-deps
         continue-on-error: true
         run: pnpm --dir pwa install --frozen-lockfile
 
       - name: Create dotenv (base)
-        if: steps.check-key.outputs.skip != 'true' && steps.base-deps.outcome == 'success'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]' && steps.base-deps.outcome == 'success'
         run: ./ops/pwa/create_dotenv.sh --env
         env:
           TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
@@ -168,13 +172,13 @@ jobs:
           GCLOUD_PROJECT_ID: demo-test
 
       - name: Build PWA (base branch)
-        if: steps.check-key.outputs.skip != 'true' && steps.base-deps.outcome == 'success'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]' && steps.base-deps.outcome == 'success'
         id: base-build
         continue-on-error: true
         run: pnpm --dir pwa run build
 
       - name: Take base screenshots
-        if: steps.check-key.outputs.skip != 'true' && steps.base-build.outcome == 'success'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]' && steps.base-build.outcome == 'success'
         continue-on-error: true
         working-directory: pwa
         run: |
@@ -192,11 +196,11 @@ jobs:
         env:
           NODE_ENV: production
           SCREENSHOT_DIR: ${{ github.workspace }}/screenshots-before
-          EXTRA_PAGES: ${{ steps.extra-pages.outputs.json }}
+          PAGES: ${{ steps.pages.outputs.json }}
 
       # --- Generate comment and post ---
       - name: Generate screenshot comment
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         run: node /tmp/generate-screenshot-comment.mjs
         env:
           BEFORE_DIR: ${{ github.workspace }}/screenshots-before
@@ -206,7 +210,7 @@ jobs:
           GITHUB_REPOSITORY: ${{ github.repository }}
 
       - name: Post comment on PR
-        if: steps.check-key.outputs.skip != 'true'
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         uses: actions/github-script@v8
         with:
           script: |
