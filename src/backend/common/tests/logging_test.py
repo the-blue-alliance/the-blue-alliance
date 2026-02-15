@@ -5,9 +5,12 @@ from unittest.mock import patch
 from werkzeug.test import create_environ
 
 from backend.common.logging import (
+    clear_logging_context,
     configure_logging,
+    get_logging_context,
     GoogleCloudJsonFormatter,
     logging_context,
+    set_logging_context,
 )
 from backend.common.middleware import TraceRequestMiddleware
 
@@ -149,3 +152,80 @@ def test_TraceRequestMiddleware_initializes_logging_context(app) -> None:
     assert hasattr(logging_context.request, "logging_context")
     assert isinstance(logging_context.request.logging_context, dict)
     assert len(logging_context.request.logging_context) == 0
+
+
+def test_set_logging_context() -> None:
+    """Test set_logging_context helper function."""
+
+    # Set up a mock request
+    class MockRequest:
+        logging_context = {}
+
+    logging_context.request = MockRequest()
+
+    # Set some context values
+    set_logging_context("user_id", "user123")
+    set_logging_context("trace_id", "xyz789")
+
+    assert logging_context.request.logging_context["user_id"] == "user123"
+    assert logging_context.request.logging_context["trace_id"] == "xyz789"
+
+    # Clean up
+    del logging_context.request
+
+
+def test_get_logging_context() -> None:
+    """Test get_logging_context helper function."""
+
+    # Set up a mock request with context
+    class MockRequest:
+        logging_context = {"key1": "value1", "key2": "value2"}
+
+    logging_context.request = MockRequest()
+
+    context = get_logging_context()
+    assert context == {"key1": "value1", "key2": "value2"}
+
+    # Clean up
+    del logging_context.request
+
+    # Test when no request exists
+    context_no_request = get_logging_context()
+    assert context_no_request == {}
+
+
+def test_clear_logging_context() -> None:
+    """Test clear_logging_context helper function."""
+
+    # Set up a mock request with context
+    class MockRequest:
+        logging_context = {"key1": "value1", "key2": "value2"}
+
+    logging_context.request = MockRequest()
+
+    # Clear the context
+    clear_logging_context()
+
+    assert logging_context.request.logging_context == {}
+
+    # Clean up
+    del logging_context.request
+
+
+def test_set_logging_context_initializes_dict() -> None:
+    """Test that set_logging_context initializes the dict if it doesn't exist."""
+
+    # Set up a mock request without logging_context
+    class MockRequest:
+        pass
+
+    logging_context.request = MockRequest()
+
+    # This should initialize the dict
+    set_logging_context("key", "value")
+
+    assert hasattr(logging_context.request, "logging_context")
+    assert logging_context.request.logging_context == {"key": "value"}
+
+    # Clean up
+    del logging_context.request

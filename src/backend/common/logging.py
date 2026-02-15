@@ -1,5 +1,6 @@
 import json
 import logging
+from typing import Any, Dict
 
 import google.cloud.logging
 from werkzeug.local import Local
@@ -8,6 +9,41 @@ from backend.common.environment import Environment
 
 # Request-local context for storing additional logging context
 logging_context = Local()
+
+
+def set_logging_context(key: str, value: Any) -> None:
+    """
+    Set a key-value pair in the request-local logging context.
+    This context will be included in all log messages during this request.
+
+    Example:
+        set_logging_context("user_id", "user123")
+        set_logging_context("request_id", "req-abc-123")
+    """
+    if hasattr(logging_context, "request") and logging_context.request:
+        if not hasattr(logging_context.request, "logging_context"):
+            logging_context.request.logging_context = {}
+        logging_context.request.logging_context[key] = value
+
+
+def get_logging_context() -> Dict[str, Any]:
+    """
+    Get the current request-local logging context.
+
+    Returns:
+        Dictionary of context key-value pairs, or empty dict if no context.
+    """
+    if hasattr(logging_context, "request") and logging_context.request:
+        return getattr(logging_context.request, "logging_context", {})
+    return {}
+
+
+def clear_logging_context() -> None:
+    """
+    Clear all values from the request-local logging context.
+    """
+    if hasattr(logging_context, "request") and logging_context.request:
+        logging_context.request.logging_context = {}
 
 
 class GoogleCloudJsonFormatter(logging.Formatter):
