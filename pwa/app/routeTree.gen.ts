@@ -180,7 +180,7 @@ export interface FileRoutesByFullPath {
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
-  '/account': typeof AccountIndexRoute
+  '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -261,7 +261,7 @@ export interface FileRouteTypes {
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
-    | '/account'
+    | '/account/'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
     | '/team/$teamNumber/history'
@@ -423,7 +423,7 @@ declare module '@tanstack/react-router' {
     '/account/': {
       id: '/account/'
       path: '/account'
-      fullPath: '/account'
+      fullPath: '/account/'
       preLoaderRoute: typeof AccountIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
