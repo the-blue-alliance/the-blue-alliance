@@ -191,9 +191,17 @@ class TrustedApiAuthHelper:
                 and event.year == datetime.datetime.now().year
             )
         ):
-            return "Only allowed to edit events: {}".format(
-                ", ".join(allowed_event_keys)
-            )
+            if auth.all_official_events:
+                if allowed_event_keys:
+                    return "Only allowed to edit events: all current-season official events, {}".format(
+                        ", ".join(allowed_event_keys)
+                    )
+                else:
+                    return "Only allowed to edit events: all current-season official events"
+            else:
+                return "Only allowed to edit events: {}".format(
+                    ", ".join(allowed_event_keys)
+                )
 
         missing_auths = required_auth_types.difference(set(auth.auth_types_enum))
         if missing_auths != set():

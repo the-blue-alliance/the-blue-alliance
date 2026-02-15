@@ -22,7 +22,7 @@ const TeamLink = forwardRef<
       year?: number;
     } & AnchorHTMLAttributes<HTMLAnchorElement>
   >
->(({ teamOrKey, year, ...props }, ref) => {
+>(({ teamOrKey, year, className, ...props }, ref) => {
   const teamNumber: string =
     typeof teamOrKey === 'string'
       ? removeNonNumeric(teamOrKey)
@@ -34,6 +34,7 @@ const TeamLink = forwardRef<
     <Link
       to="/team/$teamNumber/{-$year}"
       params={{ teamNumber, year: yearSuffix }}
+      className={className ?? 'text-foreground hover:underline'}
       {...props}
       ref={ref}
     />

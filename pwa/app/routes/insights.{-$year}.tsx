@@ -129,12 +129,21 @@ function SingleYearInsights({
 
   return (
     <div className="py-8">
-      <div className="flex flex-wrap justify-between">
-        <h1 className="mb-3 text-3xl font-medium">
-          Insights ({year > 0 ? year : 'Overall'})
-        </h1>
+      <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
+        <div>
+          <h1
+            className="bg-gradient-to-r from-foreground to-foreground/70
+              bg-clip-text text-4xl font-bold tracking-tight text-transparent"
+          >
+            Insights
+          </h1>
+          <p className="mt-2 text-lg text-muted-foreground">
+            {year > 0 ? `${year} Season` : 'All-Time Records'}
+          </p>
+        </div>
 
         <Select
+          value={year > 0 ? `${year}` : 'Overall'}
           onValueChange={(value) => {
             void navigate({
               to: '/insights/{-$year}',
@@ -142,8 +151,10 @@ function SingleYearInsights({
             });
           }}
         >
-          <SelectTrigger className="w-[180px] cursor-pointer">
-            <SelectValue placeholder={'Overall'} />
+          <SelectTrigger
+            className="w-[180px] cursor-pointer border-border/50 shadow-sm"
+          >
+            <SelectValue placeholder="Overall" />
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="Overall" className="cursor-pointer">
@@ -158,14 +169,30 @@ function SingleYearInsights({
         </Select>
       </div>
 
-      <h3 className="mb-4 text-xl font-medium">Notables</h3>
-      {notableDiv}
+      <div className="mb-8">
+        <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
+          <span
+            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
+              from-primary to-primary/50"
+          />
+          Notables
+        </h2>
+        {notableDiv}
+      </div>
 
-      <h3 className="my-4 text-xl font-medium">Leaderboards</h3>
-      <div className="gap-3 lg:grid lg:grid-cols-2">
-        {leaderboards.map((l, i) => (
-          <Leaderboard leaderboard={l} key={i} year={year} />
-        ))}
+      <div>
+        <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
+          <span
+            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
+              from-primary to-primary/50"
+          />
+          Leaderboards
+        </h2>
+        <div className="grid gap-6 lg:grid-cols-2">
+          {leaderboards.map((l, i) => (
+            <Leaderboard leaderboard={l} key={i} year={year} />
+          ))}
+        </div>
       </div>
     </div>
   );
@@ -178,7 +205,7 @@ function NotablesYearSpecific({ notables }: { notables: NotablesInsight[] }) {
   );
 
   return (
-    <div className="gap-3 lg:grid lg:grid-cols-2">
+    <div className="grid gap-6 lg:grid-cols-2">
       {hof && (
         <TitledCard
           cardTitle={joinComponents(
@@ -231,7 +258,7 @@ function NotablesOverall({
   year: number;
 }) {
   return (
-    <div className="gap-3 lg:grid lg:grid-cols-2">
+    <div className="grid gap-6 lg:grid-cols-2">
       {notables.map((n, i) => {
         const leaderboard = leaderboardFromNotable(n);
         const context = n.data.entries.reduce<Record<string, ReactNode>>(
