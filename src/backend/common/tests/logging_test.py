@@ -1,6 +1,6 @@
 import json
 import logging
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from werkzeug.test import create_environ
 
@@ -122,20 +122,67 @@ def test_configure_logging_prod() -> None:
 
 
 def test_configure_logging_prod_not_unit_test() -> None:
-    """Test that configure_logging uses JSON formatter in prod when not in unit test."""
+    """Test that configure_logging preserves Google Cloud handler and applies JSON formatter."""
     with patch("backend.common.logging.Environment.is_prod", return_value=True):
         with patch(
             "backend.common.logging.Environment.is_unit_test", return_value=False
         ):
-            with patch("google.cloud.logging.Client"):
+            # Mock the Google Cloud logging client
+            mock_client = Mock()
+            # Use a real StreamHandler so setFormatter actually works
+            test_handler = logging.StreamHandler()
+
+            with patch("google.cloud.logging.Client", return_value=mock_client):
+                # Mock setup_logging to add a handler like the real one does
+                def mock_setup_logging():
+                    root_logger = logging.getLogger()
+                    # Clear any existing handlers first
+                    root_logger.handlers.clear()
+                    root_logger.addHandler(test_handler)
+
+                mock_client.setup_logging = mock_setup_logging
+
                 configure_logging()
 
                 root_logger = logging.getLogger()
-                assert len(root_logger.handlers) > 0
+                # Verify the handler was preserved (not removed)
+                assert test_handler in root_logger.handlers
 
-                handler = root_logger.handlers[0]
-                # In prod (not unit test), should use GoogleCloudJsonFormatter
-                assert isinstance(handler.formatter, GoogleCloudJsonFormatter)
+                # Verify our JSON formatter was applied to the handler
+                assert isinstance(test_handler.formatter, GoogleCloudJsonFormatter)
+
+
+def test_configure_logging_preserves_multiple_handlers() -> None:
+    """Test that all handlers added by setup_logging are preserved and formatted."""
+    with patch("backend.common.logging.Environment.is_prod", return_value=True):
+        with patch(
+            "backend.common.logging.Environment.is_unit_test", return_value=False
+        ):
+            mock_client = Mock()
+            # Create multiple handlers like Google Cloud might add
+            handler1 = logging.StreamHandler()
+            handler2 = logging.StreamHandler()
+
+            with patch("google.cloud.logging.Client", return_value=mock_client):
+
+                def mock_setup_logging():
+                    root_logger = logging.getLogger()
+                    root_logger.handlers.clear()
+                    root_logger.addHandler(handler1)
+                    root_logger.addHandler(handler2)
+
+                mock_client.setup_logging = mock_setup_logging
+
+                configure_logging()
+
+                root_logger = logging.getLogger()
+                # Both handlers should be preserved
+                assert handler1 in root_logger.handlers
+                assert handler2 in root_logger.handlers
+
+                # Both should have the JSON formatter
+                assert isinstance(handler1.formatter, GoogleCloudJsonFormatter)
+                assert isinstance(handler2.formatter, GoogleCloudJsonFormatter)
 
 
 def test_TraceRequestMiddleware_initializes_logging_context(app) -> None:

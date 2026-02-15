@@ -83,32 +83,35 @@ def configure_logging() -> None:
 
     threading.Thread._delete = safe_delete  # type: ignore
 
-    if Environment.is_prod() and not Environment.is_unit_test():
-        # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
-        client = google.cloud.logging.Client()
-        client.setup_logging()
-
     log_level = Environment.log_level() or "INFO"
-
-    # Use JSON formatter for Google Cloud in production, regular format otherwise
-    if Environment.is_prod() and not Environment.is_unit_test():
-        formatter = GoogleCloudJsonFormatter("%(name)s: %(message)s")
-    else:
-        formatter = logging.Formatter(
-            "%(levelname)s\t %(asctime)s %(pathname)s:%(lineno)d] %(name)s: %(message)s"
-        )
 
     # Configure the root logger
     root_logger = logging.getLogger()
     root_logger.setLevel(logging.getLevelName(log_level.upper()))
 
-    # Remove any existing handlers and add our handler with the appropriate formatter
-    for handler in root_logger.handlers[:]:
-        root_logger.removeHandler(handler)
+    if Environment.is_prod() and not Environment.is_unit_test():
+        # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
+        # This adds a CloudLoggingHandler which we need to preserve
+        client = google.cloud.logging.Client()
+        client.setup_logging()
 
-    handler = logging.StreamHandler()
-    handler.setFormatter(formatter)
-    root_logger.addHandler(handler)
+        # Apply our custom JSON formatter to the handler(s) added by setup_logging
+        formatter = GoogleCloudJsonFormatter("%(name)s: %(message)s")
+        for handler in root_logger.handlers:
+            handler.setFormatter(formatter)
+    else:
+        # In dev/local, use standard logging format
+        formatter = logging.Formatter(
+            "%(levelname)s\t %(asctime)s %(pathname)s:%(lineno)d] %(name)s: %(message)s"
+        )
+
+        # Remove any existing handlers and add our handler
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
+
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+        root_logger.addHandler(handler)
 
     ndb_log_level = Environment.ndb_log_level()
     if ndb_log_level:
