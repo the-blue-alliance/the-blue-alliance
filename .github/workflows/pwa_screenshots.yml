@@ -27,6 +27,45 @@ jobs:
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
 
+      # --- Parse extra screenshot pages from PR description ---
+      - name: Parse screenshot pages from PR body
+        if: steps.check-key.outputs.skip != 'true'
+        id: extra-pages
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number,
+            });
+            const body = pr.data.body || '';
+
+            // Look for a "Screenshot Pages" section with bullet-pointed paths
+            // Format:  ## Screenshot Pages
+            //          - /match/2024mil_f1m2
+            //          - /team/254/2024 My Custom Name
+            const section = body.match(/## Screenshot Pages\s*\n([\s\S]*?)(?:\n##|\n\n---|\s*$)/);
+            if (!section) {
+              core.setOutput('json', '[]');
+              core.info('No "## Screenshot Pages" section found in PR body');
+              return;
+            }
+
+            const lines = section[1].split('\n');
+            const pages = [];
+            for (const line of lines) {
+              const match = line.match(/^\s*[-*]\s+(\/\S+)(?:\s+(.+))?/);
+              if (match) {
+                const path = match[1];
+                const name = match[2] || path;
+                pages.push({ name: name.trim(), path });
+              }
+            }
+
+            core.setOutput('json', JSON.stringify(pages));
+            core.info(`Found ${pages.length} extra page(s): ${pages.map(p => p.path).join(', ')}`);
+
       # --- Setup toolchain ---
       - name: Checkout PR branch
         if: steps.check-key.outputs.skip != 'true'
@@ -94,6 +133,7 @@ jobs:
         env:
           NODE_ENV: production
           SCREENSHOT_DIR: ${{ github.workspace }}/screenshots-after
+          EXTRA_PAGES: ${{ steps.extra-pages.outputs.json }}
 
       # --- Save scripts and switch to base branch ---
       - name: Save scripts for base branch
@@ -149,6 +189,7 @@ jobs:
         env:
           NODE_ENV: production
           SCREENSHOT_DIR: ${{ github.workspace }}/screenshots-before
+          EXTRA_PAGES: ${{ steps.extra-pages.outputs.json }}
 
       # --- Generate comment and post ---
       - name: Generate screenshot comment

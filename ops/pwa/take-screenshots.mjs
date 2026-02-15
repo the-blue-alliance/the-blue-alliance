@@ -7,6 +7,7 @@
  * Environment variables:
  *   BASE_URL       - Server URL (default: http://localhost:3000)
  *   SCREENSHOT_DIR - Output directory for screenshots (default: screenshots)
+ *   EXTRA_PAGES    - JSON array of {name, path} objects for additional pages
  */
 
 import { mkdirSync } from "fs";
@@ -25,18 +26,26 @@ const { chromium } = await import(pwPath);
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const SCREENSHOT_DIR = process.env.SCREENSHOT_DIR || "screenshots";
 
-// Canonical pages using historical data that won't change
-const PAGES = [
+// Canonical pages — small set that covers key page types
+const CANONICAL_PAGES = [
   { name: "Homepage", path: "/" },
   { name: "Team 604 (2024)", path: "/team/604/2024" },
   { name: "Event 2024mil", path: "/event/2024mil" },
-  { name: "Match 2024mil_f1m2", path: "/match/2024mil_f1m2" },
-  { name: "Teams List", path: "/teams" },
-  { name: "Events 2024", path: "/events/2024" },
-  { name: "GameDay", path: "/gameday" },
-  { name: "About", path: "/about" },
-  { name: "API Docs", path: "/apidocs" },
 ];
+
+// Merge canonical pages with any extra pages from EXTRA_PAGES env var
+// EXTRA_PAGES should be a JSON array of {name, path} objects
+let extraPages = [];
+if (process.env.EXTRA_PAGES) {
+  try {
+    extraPages = JSON.parse(process.env.EXTRA_PAGES);
+    console.log(`Adding ${extraPages.length} extra page(s) from PR description`);
+  } catch (err) {
+    console.warn(`Failed to parse EXTRA_PAGES: ${err.message}`);
+  }
+}
+
+const PAGES = [...CANONICAL_PAGES, ...extraPages];
 
 function toFilename(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png";

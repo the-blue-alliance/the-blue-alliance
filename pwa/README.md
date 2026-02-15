@@ -153,6 +153,23 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 3. Add a validator to `vite.config.ts`
 4. You can then reference it in code with `import.env.meta.VITE_MY_VAR`.
 
+## PR Screenshots
+
+PRs that touch `pwa/` files automatically get before/after screenshots posted as a PR comment (via the `PWA Screenshots` workflow). By default, the Homepage, a Team page, and an Event page are captured.
+
+To request screenshots of additional pages, add a `## Screenshot Pages` section to your PR description:
+
+```markdown
+## Screenshot Pages
+- /match/2024mil_f1m2
+- /team/254/2024 Team 254 Page
+- /gameday
+```
+
+Each line is `- /path` optionally followed by a display name. The workflow parses this section and adds those pages to the screenshot set.
+
+> **Note:** Screenshots require the `TBA_API_READ_KEY` secret, which is only available for same-repo branches (not fork PRs). Fork PRs will gracefully skip screenshot capture.
+
 ## Playwright tests
 
 Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports.
