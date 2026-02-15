@@ -1,11 +1,12 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 import { getEvent, getMatch } from '~/api/tba/read';
+import FavoriteButton from '~/components/tba/favoriteButton';
 import { EventLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { MODEL_TYPE, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/match/$matchKey')({
   loader: async ({ params }) => {
@@ -63,14 +64,17 @@ function MatchPage() {
 
   return (
     <div>
-      <h1 className="mt-8 mb-4 text-4xl">
-        {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}{' '}
-        <small className="text-xl">
-          <EventLink eventOrKey={event}>
-            {event.name} {event.year}
-          </EventLink>
-        </small>
-      </h1>
+      <div className="mt-8 mb-4 flex items-center gap-2">
+        <h1 className="text-4xl">
+          {matchTitleShort(match, event.playoff_type ?? PlayoffType.CUSTOM)}{' '}
+          <small className="text-xl">
+            <EventLink eventOrKey={event}>
+              {event.name} {event.year}
+            </EventLink>
+          </small>
+        </h1>
+        <FavoriteButton modelKey={match.key} modelType={MODEL_TYPE.MATCH} />
+      </div>
       <MatchDetails match={match} event={event} />
     </div>
   );
