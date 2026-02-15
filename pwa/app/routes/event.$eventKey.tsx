@@ -23,6 +23,7 @@ import {
   EliminationAlliance,
   Event,
   EventCoprs,
+  EventOprs,
   Match,
   Media,
   Team,
@@ -33,6 +34,7 @@ import {
   getEventAwardsOptions,
   getEventCoprsOptions,
   getEventMatchesOptions,
+  getEventOprsOptions,
   getEventOptions,
   getEventRankingsOptions,
   getEventTeamMediaOptions,
@@ -209,6 +211,10 @@ function EventPage() {
 
   const coprsQuery = useQuery(
     getEventCoprsOptions({ path: { event_key: eventKey } }),
+  );
+
+  const oprsQuery = useQuery(
+    getEventOprsOptions({ path: { event_key: eventKey } }),
   );
 
   const colorsQuery = useQuery({
@@ -391,6 +397,9 @@ function EventPage() {
         </TabsContent>
 
         <TabsContent value="insights">
+          {oprsQuery.data && oprsQuery.data.oprs && (
+            <OprTable oprs={oprsQuery.data} year={event.year} />
+          )}
           <MatchStatsTable
             matches={sortedMatches.filter(
               (m) =>
@@ -741,6 +750,68 @@ function MatchStatsTable({
         ))}
       </TableBody>
     </Table>
+  );
+}
+
+function OprTable({ oprs, year }: { oprs: EventOprs; year: number }) {
+  const teamKeys = Object.keys(oprs.oprs ?? {}).sort(
+    (a, b) => (oprs.oprs?.[b] ?? 0) - (oprs.oprs?.[a] ?? 0),
+  );
+
+  if (teamKeys.length === 0) return null;
+
+  return (
+    <div className="mb-6">
+      <h2 className="mb-2 text-xl font-medium">OPR / DPR / CCWM</h2>
+      <div className="max-h-[500px] overflow-y-auto rounded-md border">
+        <Table>
+          <TableHeader>
+            <TableRow>
+              <TableHead
+                className="sticky top-0 z-10 w-[60px] bg-background text-center"
+              >
+                #
+              </TableHead>
+              <TableHead className="sticky top-0 z-10 bg-background">
+                Team
+              </TableHead>
+              <TableHead className="sticky top-0 z-10 bg-background text-right">
+                OPR
+              </TableHead>
+              <TableHead className="sticky top-0 z-10 bg-background text-right">
+                DPR
+              </TableHead>
+              <TableHead className="sticky top-0 z-10 bg-background text-right">
+                CCWM
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {teamKeys.map((teamKey, i) => (
+              <TableRow key={teamKey}>
+                <TableCell className="text-center text-muted-foreground">
+                  {i + 1}
+                </TableCell>
+                <TableCell>
+                  <TeamLink teamOrKey={teamKey} year={year}>
+                    {teamKey.substring(3)}
+                  </TeamLink>
+                </TableCell>
+                <TableCell className="text-right font-mono">
+                  {(oprs.oprs?.[teamKey] ?? 0).toFixed(2)}
+                </TableCell>
+                <TableCell className="text-right font-mono">
+                  {(oprs.dprs?.[teamKey] ?? 0).toFixed(2)}
+                </TableCell>
+                <TableCell className="text-right font-mono">
+                  {(oprs.ccwms?.[teamKey] ?? 0).toFixed(2)}
+                </TableCell>
+              </TableRow>
+            ))}
+          </TableBody>
+        </Table>
+      </div>
+    </div>
   );
 }
 
