@@ -1,5 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router';
-import { ReactNode } from 'react';
+import type { ReactNode } from 'react';
 
 import { NotablesInsight } from '~/api/tba/read';
 import { getInsightsNotablesYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
