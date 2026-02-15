@@ -156,7 +156,8 @@ async function main() {
     : [];
 
   const timestamp = Date.now();
-  const rows = [];
+  const changed = [];
+  const unchanged = [];
 
   for (const filename of afterFiles) {
     const name = filenameToName(filename);
@@ -167,21 +168,43 @@ async function main() {
     const afterUrl = await uploadImage(branchAfterPath, afterPath);
 
     let beforeUrl = null;
+    let isChanged = true;
     if (beforeFiles.includes(filename)) {
       const beforePath = join(BEFORE_DIR, filename);
-      const branchBeforePath = `pwa/pr-${PR_NUMBER}/${timestamp}/before/${filename}`;
-      beforeUrl = await uploadImage(branchBeforePath, beforePath);
+      // Compare files byte-for-byte to detect visual changes
+      const beforeBuf = readFileSync(beforePath);
+      const afterBuf = readFileSync(afterPath);
+      isChanged = !beforeBuf.equals(afterBuf);
+
+      // Only upload before screenshot if the page changed
+      if (isChanged) {
+        const branchBeforePath = `pwa/pr-${PR_NUMBER}/${timestamp}/before/${filename}`;
+        beforeUrl = await uploadImage(branchBeforePath, beforePath);
+      }
+      console.log(`  ${isChanged ? "CHANGED" : "unchanged"}`);
+    } else {
+      console.log(`  NEW (no base screenshot)`);
     }
 
-    rows.push({ name, beforeUrl, afterUrl });
+    const row = { name, beforeUrl, afterUrl, isChanged };
+    if (isChanged) {
+      changed.push(row);
+    } else {
+      unchanged.push(row);
+    }
   }
 
   // Generate markdown
   let message = "## PWA Screenshots\n\n";
-  message +=
-    "Visual comparison of PWA pages between the base branch and this PR.\n\n";
 
-  for (const { name, beforeUrl, afterUrl } of rows) {
+  if (changed.length === 0 && unchanged.length > 0) {
+    message += "No visual changes detected across all pages.\n\n";
+  } else if (changed.length > 0) {
+    message += `**${changed.length} page(s) with visual changes:**\n\n`;
+  }
+
+  // Show changed pages expanded
+  for (const { name, beforeUrl, afterUrl } of changed) {
     if (!afterUrl) continue;
 
     message += `### ${name}\n\n`;
@@ -194,6 +217,17 @@ async function main() {
       message += `*New page (no base branch screenshot)*\n\n`;
       message += `![After](${afterUrl})\n\n`;
     }
+  }
+
+  // Collapse unchanged pages
+  if (unchanged.length > 0) {
+    message += `<details>\n<summary>${unchanged.length} unchanged page(s)</summary>\n\n`;
+    for (const { name, afterUrl } of unchanged) {
+      if (!afterUrl) continue;
+      message += `**${name}**\n\n`;
+      message += `![${name}](${afterUrl})\n\n`;
+    }
+    message += `</details>\n`;
   }
 
   writeFileSync(OUTPUT_FILE, message);
