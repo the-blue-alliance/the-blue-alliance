@@ -1,8 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router';
-import type { ReactNode } from 'react';
 
 import { NotablesInsight } from '~/api/tba/read';
 import { getInsightsNotablesYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import { Banner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import {
@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { joinComponents, publicCacheControlHeaders } from '~/lib/utils';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/hall-of-fame')({
   loader: async ({ context: { queryClient } }) => {
@@ -93,6 +93,14 @@ function HallOfFamePage() {
   );
 }
 
+function getAwardName(year: number): string {
+  return year >= 2023 ? 'FIRST Impact Award' : "Chairman's Award";
+}
+
+function parseEventYear(eventKey: string): number {
+  return parseInt(eventKey.substring(0, 4));
+}
+
 function HallOfFameTable({
   entries,
 }: {
@@ -108,23 +116,33 @@ function HallOfFameTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[80px]">Team</TableHead>
-              <TableHead className="w-[60px] text-center">Wins</TableHead>
-              <TableHead>Events</TableHead>
+              <TableHead>Banners</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {entries.map((entry) => (
               <TableRow key={entry.team_key}>
-                <TableCell>
+                <TableCell className="align-top">
                   <TeamLink teamOrKey={entry.team_key}>
                     {entry.team_key.substring(3)}
                   </TeamLink>
                 </TableCell>
-                <TableCell className="text-center">
-                  {entry.context.length}
-                </TableCell>
                 <TableCell>
-                  <EventContextList context={entry.context} />
+                  <div className="flex flex-row flex-wrap gap-2">
+                    {entry.context.map((eventKey) => {
+                      const year = parseEventYear(eventKey);
+                      return (
+                        <EventLink key={eventKey} eventOrKey={eventKey}>
+                          <Banner
+                            title={getAwardName(year)}
+                            description={eventKey}
+                            year={year}
+                            className="h-48 w-28 text-xs"
+                          />
+                        </EventLink>
+                      );
+                    })}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -161,23 +179,33 @@ function WorldChampionsTable({
           <TableHeader>
             <TableRow>
               <TableHead className="w-[80px]">Team</TableHead>
-              <TableHead className="w-[60px] text-center">Wins</TableHead>
-              <TableHead>Events</TableHead>
+              <TableHead>Banners</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
             {sortedEntries.map((entry) => (
               <TableRow key={entry.team_key}>
-                <TableCell>
+                <TableCell className="align-top">
                   <TeamLink teamOrKey={entry.team_key}>
                     {entry.team_key.substring(3)}
                   </TeamLink>
                 </TableCell>
-                <TableCell className="text-center">
-                  {entry.context.length}
-                </TableCell>
                 <TableCell>
-                  <EventContextList context={entry.context} />
+                  <div className="flex flex-row flex-wrap gap-2">
+                    {entry.context.map((eventKey) => {
+                      const year = parseEventYear(eventKey);
+                      return (
+                        <EventLink key={eventKey} eventOrKey={eventKey}>
+                          <Banner
+                            title="Winner"
+                            description={eventKey}
+                            year={year}
+                            className="h-48 w-28 text-xs"
+                          />
+                        </EventLink>
+                      );
+                    })}
+                  </div>
                 </TableCell>
               </TableRow>
             ))}
@@ -185,16 +213,5 @@ function WorldChampionsTable({
         </Table>
       </CardContent>
     </Card>
-  );
-}
-
-function EventContextList({ context }: { context: string[] }): ReactNode {
-  return joinComponents(
-    context.map((eventKey) => (
-      <EventLink key={eventKey} eventOrKey={eventKey}>
-        {eventKey}
-      </EventLink>
-    )),
-    ', ',
   );
 }
