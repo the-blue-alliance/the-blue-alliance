@@ -36,6 +36,7 @@ const allRoutes = defineAllRoutes([
   '/local/debug',
   '/match_suggestion',
   '/match/$matchKey',
+  '/mytba',
   '/privacy',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
