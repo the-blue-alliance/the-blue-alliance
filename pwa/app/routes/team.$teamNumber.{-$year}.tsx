@@ -179,16 +179,45 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       };
     }
 
+    const { team } = loaderData;
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'SportsTeam',
+      name: `Team ${team.team_number} - ${team.nickname}`,
+      url: `https://www.thebluealliance.com/team/${team.team_number}`,
+      location: {
+        '@type': 'Place',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: team.city,
+          addressRegion: team.state_prov,
+          postalCode: team.postal_code,
+          addressCountry: team.country,
+        },
+      },
+      memberOf: {
+        '@type': 'SportsOrganization',
+        name: 'FIRST Robotics Competition',
+        url: 'https://www.firstinspires.org',
+      },
+    };
+
     return {
       meta: [
         {
-          title: `${loaderData.team.nickname} - Team ${loaderData.team.team_number} - The Blue Alliance`,
+          title: `${team.nickname} - Team ${team.team_number} - The Blue Alliance`,
         },
         {
           name: 'description',
           content:
-            `From ${loaderData.team.city}, ${loaderData.team.state_prov} ${loaderData.team.postal_code}, ${loaderData.team.country}.` +
+            `From ${team.city}, ${team.state_prov} ${team.postal_code}, ${team.country}.` +
             ' Team information, match results, and match videos from the FIRST Robotics Competition.',
+        },
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(jsonLd),
         },
       ],
     };
