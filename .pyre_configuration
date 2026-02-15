@@ -27,6 +27,7 @@
     {"site-package": "pyre_extensions"},
     {"site-package": "six", "is_toplevel_module": true},
     {"site-package": "requests_mock"},
+    {"site-package": "watchdog"},
     {"site-package": "werkzeug"}
   ]
 }

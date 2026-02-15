@@ -1,0 +1,11 @@
+FROM node:24-alpine
+
+# Install uv for Python dependency management (uv manages its own Python)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+# uglify-js is needed by do_compress.py
+RUN npm install -g uglify-js@3.17.4
+
+WORKDIR /tba
+
+ENTRYPOINT ["./ops/dev/webpack/entrypoint.sh"]

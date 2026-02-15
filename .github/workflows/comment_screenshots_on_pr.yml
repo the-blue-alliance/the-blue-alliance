@@ -16,12 +16,11 @@ jobs:
       - name: Set up Python 3.13
         uses: actions/setup-python@v6
         with:
-          python-version: '3.13'
-          cache: 'pip'
-      - name: Install Dependencies
+          python-version: "3.13"
+      - name: Install Python Dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install -r requirements.txt
+          pip install requests
       - name: Download artifact
         uses: actions/github-script@v8
         with:
@@ -47,7 +46,7 @@ jobs:
       - name: Upload screenshots and generate message
         id: upload_screenshots
         run: |
-          ./ops/pr_screenshots/generate_screenshots_message.py ${{ secrets.GITHUB_TOKEN }}
+          python ./ops/pr_screenshots/generate_screenshots_message.py ${{ secrets.GITHUB_TOKEN }}
           MESSAGE=$(cat ci_screenshots_message.md)
           MESSAGE="${MESSAGE//'%'/'%25'}"
           MESSAGE="${MESSAGE//$'\n'/'%0A'}"

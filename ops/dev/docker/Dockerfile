@@ -1,84 +1,31 @@
-FROM ubuntu:24.04
-LABEL maintainer="The Blue Alliance"
+FROM python:3.13
 
-# Set debconf to run non-interactively
-RUN echo 'debconf debconf/frontend select Noninteractive' | debconf-set-selections
+# Add Google Cloud SDK apt repository
+RUN curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
+    | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
+    && echo "deb [signed-by=/usr/share/keyrings/cloud.google.gpg] https://packages.cloud.google.com/apt cloud-sdk main" \
+    > /etc/apt/sources.list.d/google-cloud-sdk.list
 
-# Get base system dependencies
-RUN apt-get update && apt-get install -y \
-    build-essential \
-    wget \
-    curl \
-    unzip \
-    sudo \
+# Install Google Cloud SDK
+RUN apt-get update && apt-get install -y --no-install-recommends \
     jq \
-    tmux \
-    vim \
-    openssh-server
-
-RUN apt-get install software-properties-common -y
-RUN add-apt-repository ppa:deadsnakes/ppa -y
-
-# Setup python environment
-ENV PYTHON_VERSION=python3.13
-RUN apt-get update && apt-get install -y \
-    "$PYTHON_VERSION" \
-    "$PYTHON_VERSION-venv" \
-    "$PYTHON_VERSION-dev"
-RUN update-alternatives --install /usr/bin/python python "/usr/bin/$PYTHON_VERSION" 1
-RUN update-alternatives --install /usr/bin/python3 python3 "/usr/bin/$PYTHON_VERSION" 1
-RUN echo 1 | update-alternatives --config python
-RUN echo 1 | update-alternatives --config python3
-
-# The ubuntu python3-pip package depends on distutils, which is not available in Python 3.13
-# So we install pip manually using get-pip.py
-RUN curl -sS https://bootstrap.pypa.io/get-pip.py | python3
-
-# Add gcloud repository and Cloud SDK dependencies
-RUN apt-get update && apt-get install -y apt-transport-https curl
-RUN echo "deb https://packages.cloud.google.com/apt cloud-sdk main" | sudo tee -a /etc/apt/sources.list.d/google-cloud-sdk.list
-RUN curl https://packages.cloud.google.com/apt/doc/apt-key.gpg | sudo apt-key add -
-RUN apt-get update && apt-get install -y \
-    google-cloud-sdk \
-    google-cloud-sdk-app-engine-python \
-    google-cloud-sdk-app-engine-python-extras \
-    google-cloud-sdk-datastore-emulator \
-    google-cloud-sdk-pubsub-emulator
+    google-cloud-cli \
+    google-cloud-cli-app-engine-python \
+    google-cloud-cli-app-engine-python-extras \
+    google-cloud-cli-datastore-emulator \
+    && rm -rf /var/lib/apt/lists/*
 ENV HTTPLIB2_CA_CERTS="/usr/lib/google-cloud-sdk/platform/google_appengine/lib/httplib2/httplib2/cacerts.txt"
 
-# Install JDK for firebase-tools
-RUN apt-get update && apt-get install default-jre -y
+# Install legacy-cgi (removed in Python 3.13, but required by dev_appserver.py)
+RUN pip install --no-cache-dir legacy-cgi
 
-# Set up nvm and nodejs
-ENV NVM_DIR=/nvm
-ENV NODE_VERSION=24
-RUN mkdir -p $NVM_DIR  \
-    && wget -qO- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash \
-    && . $NVM_DIR/nvm.sh \
-    && nvm install $NODE_VERSION --silent \
-    && nvm alias default $NODE_VERSION \
-    && nvm use default --silent
+# Install uv
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
-# Configure ssh server
-RUN mkdir /var/run/sshd
-RUN echo 'root:tba' | chpasswd
-RUN sed -i 's/#PermitRootLogin prohibit-password/PermitRootLogin yes/' /etc/ssh/sshd_config
-RUN sed 's@session\s*required\s*pam_loginuid.so@session optional pam_loginuid.so@g' -i /etc/pam.d/sshd
-ENV NOTVISIBLE="in users profile"
-RUN echo "export VISIBLE=now" >> /etc/profile
-EXPOSE 22
+WORKDIR /tba
 
-# Expose Firebase emulator
-EXPOSE 4000
-EXPOSE 4400
-EXPOSE 4500
-EXPOSE 9005
-EXPOSE 9000
-EXPOSE 9099
-
-# Expose ports for TBA
+# Expose GAE admin + module ports
 EXPOSE 8000
-EXPOSE 8080-8089
+EXPOSE 8080-8088
 
-# Start SSH server
-CMD ["/usr/sbin/sshd", "-D"]
+ENTRYPOINT ["./ops/dev/scripts/dev_appserver.sh"]
