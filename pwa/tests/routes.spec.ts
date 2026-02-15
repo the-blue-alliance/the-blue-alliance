@@ -32,6 +32,7 @@ const allRoutes = defineAllRoutes([
   '/event/$eventKey',
   '/events/{-$year}',
   '/gameday',
+  '/hall-of-fame',
   '/insights/{-$year}',
   '/local/debug',
   '/match_suggestion',
