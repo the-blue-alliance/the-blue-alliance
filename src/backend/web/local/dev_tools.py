@@ -1,5 +1,7 @@
+import base64
 import datetime
 import json
+import os
 import random
 from typing import List
 
@@ -223,7 +225,26 @@ def seed_test_team() -> Response:
     TeamManipulator.createOrUpdate(team)
 
     team_ref = Media.create_reference("team", "frc2")
+    avatar_foreign_key = f"avatar_{year}_frc2"
+
+    # Load avatar image from test_data/reindeer_avatar.png
+    avatar_path = os.path.join(
+        os.path.dirname(__file__), "test_data", "reindeer_avatar.png"
+    )
+    avatar_b64 = ""
+    if os.path.exists(avatar_path):
+        with open(avatar_path, "rb") as f:
+            avatar_b64 = base64.b64encode(f.read()).decode("ascii")
+
     media_list = [
+        Media(
+            id=Media.render_key_name(MediaType.AVATAR, avatar_foreign_key),
+            media_type_enum=MediaType.AVATAR,
+            foreign_key=avatar_foreign_key,
+            year=year,
+            references=[team_ref],
+            details_json=json.dumps({"base64Image": avatar_b64}),
+        ),
         Media(
             id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, "dQw4w9WgXcQ"),
             media_type_enum=MediaType.YOUTUBE_VIDEO,
