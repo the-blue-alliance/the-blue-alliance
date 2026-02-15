@@ -271,6 +271,7 @@ def event_detail(event_key: EventKey) -> Response:
         )
         for i in range(max_teams):
             row[f"red{i + 1}"] = red_teams[i]
+        for i in range(max_teams):
             row[f"blue{i + 1}"] = blue_teams[i]
         row["red_score"] = str(red_score) if red_score >= 0 else ""
         row["blue_score"] = str(blue_score) if blue_score >= 0 else ""
