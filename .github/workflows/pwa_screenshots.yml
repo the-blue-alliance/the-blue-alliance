@@ -41,11 +41,14 @@ jobs:
             });
             const body = pr.data.body || '';
 
+            // Strip fenced code blocks so we don't match examples in docs
+            const stripped = body.replace(/```[\s\S]*?```/g, '');
+
             // Look for a "Screenshot Pages" section with bullet-pointed paths
             // Format:  ## Screenshot Pages
             //          - /match/2024mil_f1m2
             //          - /team/254/2024 My Custom Name
-            const section = body.match(/## Screenshot Pages\s*\n([\s\S]*?)(?:\n##|\n\n---|\s*$)/);
+            const section = stripped.match(/## Screenshot Pages\s*\n([\s\S]*?)(?:\n##|\n\n---|\s*$)/);
             if (!section) {
               core.setOutput('json', '[]');
               core.info('No "## Screenshot Pages" section found in PR body');
