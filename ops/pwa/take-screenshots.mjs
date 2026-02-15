@@ -1,13 +1,14 @@
 /**
  * PWA Screenshot Capture Script
  *
- * Takes full-page screenshots of canonical PWA pages using Playwright.
+ * Takes full-page screenshots of PWA pages using Playwright.
+ * Pages to screenshot are specified via the PAGES env var (JSON array).
  * Designed to run against a built & running PWA server.
  *
  * Environment variables:
  *   BASE_URL       - Server URL (default: http://localhost:3000)
  *   SCREENSHOT_DIR - Output directory for screenshots (default: screenshots)
- *   EXTRA_PAGES    - JSON array of {name, path} objects for additional pages
+ *   PAGES          - JSON array of {name, path} objects for pages to screenshot
  */
 
 import { mkdirSync } from "fs";
@@ -26,26 +27,21 @@ const { chromium } = await import(pwPath);
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const SCREENSHOT_DIR = process.env.SCREENSHOT_DIR || "screenshots";
 
-// Canonical pages — small set that covers key page types
-const CANONICAL_PAGES = [
-  { name: "Homepage", path: "/" },
-  { name: "Team 604 (2024)", path: "/team/604/2024" },
-  { name: "Event 2024mil", path: "/event/2024mil" },
-];
-
-// Merge canonical pages with any extra pages from EXTRA_PAGES env var
-// EXTRA_PAGES should be a JSON array of {name, path} objects
-let extraPages = [];
-if (process.env.EXTRA_PAGES) {
+// Pages to screenshot, specified via PAGES env var (JSON array of {name, path})
+let PAGES = [];
+if (process.env.PAGES) {
   try {
-    extraPages = JSON.parse(process.env.EXTRA_PAGES);
-    console.log(`Adding ${extraPages.length} extra page(s) from PR description`);
+    PAGES = JSON.parse(process.env.PAGES);
+    console.log(`Screenshotting ${PAGES.length} page(s) from PR description`);
   } catch (err) {
-    console.warn(`Failed to parse EXTRA_PAGES: ${err.message}`);
+    console.warn(`Failed to parse PAGES: ${err.message}`);
   }
 }
 
-const PAGES = [...CANONICAL_PAGES, ...extraPages];
+if (PAGES.length === 0) {
+  console.log("No pages to screenshot. Add a ## Screenshot Pages section to the PR description.");
+  process.exit(0);
+}
 
 function toFilename(name) {
   return name.toLowerCase().replace(/[^a-z0-9]+/g, "-") + ".png";
