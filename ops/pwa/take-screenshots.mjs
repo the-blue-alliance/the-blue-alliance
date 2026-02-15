@@ -9,9 +9,16 @@
  *   SCREENSHOT_DIR - Output directory for screenshots (default: screenshots)
  */
 
-import { chromium } from "playwright";
 import { mkdirSync } from "fs";
 import { join } from "path";
+import { pathToFileURL } from "url";
+
+// Resolve playwright from the working directory's node_modules (pwa/)
+// rather than relative to this script's location (ops/pwa/).
+const playwrightPath = pathToFileURL(
+  join(process.cwd(), "node_modules", "playwright", "index.mjs")
+).href;
+const { chromium } = await import(playwrightPath);
 
 const BASE_URL = process.env.BASE_URL || "http://localhost:3000";
 const SCREENSHOT_DIR = process.env.SCREENSHOT_DIR || "screenshots";

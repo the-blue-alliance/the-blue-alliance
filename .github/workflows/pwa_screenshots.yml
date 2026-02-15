@@ -89,7 +89,7 @@ jobs:
             fi
             sleep 2
           done
-          NODE_PATH=node_modules node ../ops/pwa/take-screenshots.mjs
+          node ../ops/pwa/take-screenshots.mjs
           kill $SERVER_PID 2>/dev/null || true
         env:
           NODE_ENV: production
@@ -144,7 +144,7 @@ jobs:
             fi
             sleep 2
           done
-          NODE_PATH=node_modules node /tmp/take-screenshots.mjs
+          node /tmp/take-screenshots.mjs
           kill $SERVER_PID 2>/dev/null || true
         env:
           NODE_ENV: production
