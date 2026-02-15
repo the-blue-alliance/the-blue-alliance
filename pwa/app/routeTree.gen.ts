@@ -10,6 +10,7 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThanksRouteImport } from './routes/thanks'
+import { Route as SearchRouteImport } from './routes/search'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
 import { Route as GamedayRouteImport } from './routes/gameday'
@@ -37,6 +38,11 @@ import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './rout
 const ThanksRoute = ThanksRouteImport.update({
   id: '/thanks',
   path: '/thanks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SearchRoute = SearchRouteImport.update({
+  id: '/search',
+  path: '/search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PrivacyRoute = PrivacyRouteImport.update({
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
+  '/search': typeof SearchRoute
   '/thanks': typeof ThanksRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
@@ -197,6 +204,7 @@ export interface FileRoutesByTo {
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
+  '/search': typeof SearchRoute
   '/thanks': typeof ThanksRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
@@ -224,6 +232,7 @@ export interface FileRoutesById {
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
+  '/search': typeof SearchRoute
   '/thanks': typeof ThanksRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs_/v3': typeof ApidocsV3Route
@@ -252,6 +261,7 @@ export interface FileRouteTypes {
     | '/gameday'
     | '/match_suggestion'
     | '/privacy'
+    | '/search'
     | '/thanks'
     | '/account/mytba'
     | '/apidocs/v3'
@@ -278,6 +288,7 @@ export interface FileRouteTypes {
     | '/gameday'
     | '/match_suggestion'
     | '/privacy'
+    | '/search'
     | '/thanks'
     | '/account/mytba'
     | '/apidocs/v3'
@@ -304,6 +315,7 @@ export interface FileRouteTypes {
     | '/gameday'
     | '/match_suggestion'
     | '/privacy'
+    | '/search'
     | '/thanks'
     | '/account/mytba'
     | '/apidocs_/v3'
@@ -331,6 +343,7 @@ export interface RootRouteChildren {
   GamedayRoute: typeof GamedayRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
+  SearchRoute: typeof SearchRoute
   ThanksRoute: typeof ThanksRoute
   AccountMytbaRoute: typeof AccountMytbaRoute
   ApidocsV3Route: typeof ApidocsV3Route
@@ -355,6 +368,13 @@ declare module '@tanstack/react-router' {
       path: '/thanks'
       fullPath: '/thanks'
       preLoaderRoute: typeof ThanksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/search': {
+      id: '/search'
+      path: '/search'
+      fullPath: '/search'
+      preLoaderRoute: typeof SearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/privacy': {
@@ -531,6 +551,7 @@ const rootRouteChildren: RootRouteChildren = {
   GamedayRoute: GamedayRoute,
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
+  SearchRoute: SearchRoute,
   ThanksRoute: ThanksRoute,
   AccountMytbaRoute: AccountMytbaRoute,
   ApidocsV3Route: ApidocsV3Route,
