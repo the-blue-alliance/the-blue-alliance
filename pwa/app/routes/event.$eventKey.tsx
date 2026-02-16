@@ -173,14 +173,54 @@ export const Route = createFileRoute('/event/$eventKey')({
       };
     }
 
+    const event = loaderData.event;
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'SportsEvent',
+      name: `${event.name} ${event.year}`,
+      description: `${event.year} ${event.name} FIRST Robotics Competition`,
+      startDate: event.start_date,
+      endDate: event.end_date,
+      url: `https://www.thebluealliance.com/event/${event.key}`,
+      ...(event.lat &&
+        event.lng && {
+          location: {
+            '@type': 'Place',
+            name: event.location_name ?? event.name,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: event.city,
+              addressRegion: event.state_prov,
+              addressCountry: event.country,
+            },
+            geo: {
+              '@type': 'GeoCoordinates',
+              latitude: event.lat,
+              longitude: event.lng,
+            },
+          },
+        }),
+      organizer: {
+        '@type': 'Organization',
+        name: 'FIRST',
+        url: 'https://www.firstinspires.org',
+      },
+    };
+
     return {
       meta: [
         {
-          title: `${loaderData.event.name} (${loaderData.event.year}) - The Blue Alliance`,
+          title: `${event.name} (${event.year}) - The Blue Alliance`,
         },
         {
           name: 'description',
-          content: `Videos and match results for the ${loaderData.event.year} ${loaderData.event.name} FIRST Robotics Competition.`,
+          content: `Videos and match results for the ${event.year} ${event.name} FIRST Robotics Competition.`,
+        },
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(jsonLd),
         },
       ],
     };
