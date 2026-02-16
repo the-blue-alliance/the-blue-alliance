@@ -1,4 +1,3 @@
-import json
 import logging
 from typing import Any, Dict
 
@@ -46,26 +45,41 @@ def clear_logging_context() -> None:
         logging_context.request.logging_context = {}
 
 
-class GoogleCloudJsonFormatter(logging.Formatter):
+class LoggingContextFilter(logging.Filter):
     """
-    Custom JSON formatter for Google Cloud Logging.
-    Formats log records as JSON with 'message' and 'severity' fields.
-    See: https://cloud.google.com/appengine/docs/standard/writing-application-logs?tab=python#stdout_stderr
+    A logging filter that adds request-local context to log records as labels.
+
+    This filter integrates with Google Cloud Logging's CloudLoggingHandler by
+    setting record.labels, which are then properly indexed and searchable in GCP.
+
+    For local development, the labels are formatted as key=value pairs in the message.
     """
 
-    def format(self, record: logging.LogRecord) -> str:
-        log_obj = {
-            "message": super().format(record),
-            "severity": record.levelname,
-        }
+    def __init__(self, use_labels: bool = True) -> None:
+        """
+        Args:
+            use_labels: If True, use record.labels for Google Cloud integration.
+                       If False, append context to message for local dev.
+        """
+        super().__init__()
+        self.use_labels = use_labels
 
-        # Add any additional context from the request-local logging_context
-        if hasattr(logging_context, "request") and logging_context.request:
-            context_dict = getattr(logging_context.request, "logging_context", {})
-            if context_dict:
-                log_obj.update(context_dict)
+    def filter(self, record: logging.LogRecord) -> bool:
+        """Add logging context to the record."""
+        context = get_logging_context()
 
-        return json.dumps(log_obj)
+        if context:
+            if self.use_labels:
+                # For Google Cloud: merge context into labels
+                # CloudLoggingFilter expects record.labels to be set by user code
+                existing_labels = getattr(record, "labels", {})
+                setattr(record, "labels", {**existing_labels, **context})
+            else:
+                # For local dev: append context to message
+                context_str = " ".join(f"{k}={v}" for k, v in context.items())
+                record.msg = f"{record.msg} [{context_str}]"
+
+        return True
 
 
 def configure_logging() -> None:
@@ -91,14 +105,15 @@ def configure_logging() -> None:
 
     if Environment.is_prod() and not Environment.is_unit_test():
         # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
-        # This adds a CloudLoggingHandler which we need to preserve
+        # This adds a CloudLoggingHandler with CloudLoggingFilter which supports labels
         client = google.cloud.logging.Client()
         client.setup_logging()
 
-        # Apply our custom JSON formatter to the handler(s) added by setup_logging
-        formatter = GoogleCloudJsonFormatter("%(name)s: %(message)s")
+        # Add our custom filter to inject logging context as labels
+        # The CloudLoggingHandler will pick up record.labels and send them to GCP
+        context_filter = LoggingContextFilter(use_labels=True)
         for handler in root_logger.handlers:
-            handler.setFormatter(formatter)
+            handler.addFilter(context_filter)
     else:
         # In dev/local, use standard logging format
         formatter = logging.Formatter(
@@ -111,6 +126,11 @@ def configure_logging() -> None:
 
         handler = logging.StreamHandler()
         handler.setFormatter(formatter)
+
+        # Add our context filter (will append context to message in dev)
+        context_filter = LoggingContextFilter(use_labels=False)
+        handler.addFilter(context_filter)
+
         root_logger.addHandler(handler)
 
     ndb_log_level = Environment.ndb_log_level()

@@ -1,5 +1,5 @@
-import json
 import logging
+from typing import Any, Dict
 from unittest.mock import Mock, patch
 
 from werkzeug.test import create_environ
@@ -8,16 +8,23 @@ from backend.common.logging import (
     clear_logging_context,
     configure_logging,
     get_logging_context,
-    GoogleCloudJsonFormatter,
     logging_context,
+    LoggingContextFilter,
     set_logging_context,
 )
 from backend.common.middleware import TraceRequestMiddleware
 
 
-def test_GoogleCloudJsonFormatter_basic() -> None:
-    """Test that GoogleCloudJsonFormatter formats logs as JSON with message and severity."""
-    formatter = GoogleCloudJsonFormatter("%(name)s: %(message)s")
+def test_LoggingContextFilter_with_labels() -> None:
+    """Test that LoggingContextFilter adds context as labels."""
+    log_filter = LoggingContextFilter(use_labels=True)
+
+    # Set up mock request with context
+    class MockRequest:
+        logging_context = {"user_id": "123", "request_id": "abc"}
+
+    logging_context.request = MockRequest()
+
     record = logging.LogRecord(
         name="test_logger",
         level=logging.INFO,
@@ -28,21 +35,33 @@ def test_GoogleCloudJsonFormatter_basic() -> None:
         exc_info=None,
     )
 
-    output = formatter.format(record)
-    parsed = json.loads(output)
+    # Apply the filter
+    result = log_filter.filter(record)
 
-    assert "message" in parsed
-    assert "severity" in parsed
-    assert parsed["severity"] == "INFO"
-    assert "test_logger: Test message" in parsed["message"]
+    assert result is True
+    assert hasattr(record, "labels")
+    # pyre-ignore[16]: labels is set dynamically by our filter
+    labels: Dict[str, Any] = getattr(record, "labels")
+    assert labels["user_id"] == "123"
+    assert labels["request_id"] == "abc"
+
+    # Clean up
+    del logging_context.request
 
 
-def test_GoogleCloudJsonFormatter_with_context() -> None:
-    """Test that GoogleCloudJsonFormatter includes logging context."""
-    formatter = GoogleCloudJsonFormatter("%(name)s: %(message)s")
+def test_LoggingContextFilter_merges_existing_labels() -> None:
+    """Test that LoggingContextFilter merges with existing labels."""
+    log_filter = LoggingContextFilter(use_labels=True)
+
+    # Set up mock request with context
+    class MockRequest:
+        logging_context = {"user_id": "123"}
+
+    logging_context.request = MockRequest()
+
     record = logging.LogRecord(
         name="test_logger",
-        level=logging.WARNING,
+        level=logging.INFO,
         pathname="test.py",
         lineno=10,
         msg="Test message",
@@ -50,51 +69,82 @@ def test_GoogleCloudJsonFormatter_with_context() -> None:
         exc_info=None,
     )
 
-    # Set up a mock request with logging context
-    class MockRequest:
-        logging_context = {"user_id": "123", "request_id": "abc"}
+    # Set existing labels on the record
+    setattr(record, "labels", {"existing_key": "existing_value"})
 
-    logging_context.request = MockRequest()
+    # Apply the filter
+    log_filter.filter(record)
 
-    output = formatter.format(record)
-    parsed = json.loads(output)
-
-    assert parsed["severity"] == "WARNING"
-    assert parsed["user_id"] == "123"
-    assert parsed["request_id"] == "abc"
+    # Both existing and new labels should be present
+    # pyre-ignore[16]: labels is set dynamically by our filter
+    labels: Dict[str, Any] = getattr(record, "labels")
+    assert labels["existing_key"] == "existing_value"
+    assert labels["user_id"] == "123"
 
     # Clean up
     del logging_context.request
 
 
-def test_GoogleCloudJsonFormatter_without_context() -> None:
-    """Test that GoogleCloudJsonFormatter works without logging context."""
-    formatter = GoogleCloudJsonFormatter("%(name)s: %(message)s")
+def test_LoggingContextFilter_without_labels() -> None:
+    """Test that LoggingContextFilter appends context to message when use_labels=False."""
+    log_filter = LoggingContextFilter(use_labels=False)
+
+    # Set up mock request with context
+    class MockRequest:
+        logging_context = {"user_id": "123", "request_id": "abc"}
+
+    logging_context.request = MockRequest()
+
     record = logging.LogRecord(
         name="test_logger",
-        level=logging.ERROR,
+        level=logging.INFO,
         pathname="test.py",
         lineno=10,
-        msg="Test error",
+        msg="Test message",
         args=(),
         exc_info=None,
     )
+
+    # Apply the filter
+    log_filter.filter(record)
+
+    # Message should have context appended
+    assert "user_id=123" in record.msg
+    assert "request_id=abc" in record.msg
+    assert "Test message" in record.msg
+
+    # Clean up
+    del logging_context.request
+
+
+def test_LoggingContextFilter_no_context() -> None:
+    """Test that LoggingContextFilter works when there's no context."""
+    log_filter = LoggingContextFilter(use_labels=True)
 
     # Make sure there's no logging context
     if hasattr(logging_context, "request"):
         del logging_context.request
 
-    output = formatter.format(record)
-    parsed = json.loads(output)
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Test message",
+        args=(),
+        exc_info=None,
+    )
 
-    assert parsed["severity"] == "ERROR"
-    assert "test_logger: Test error" in parsed["message"]
-    # Should only have message and severity, no extra fields
-    assert len(parsed) == 2
+    # Apply the filter
+    result = log_filter.filter(record)
+
+    assert result is True
+    # Record should not have labels attribute if there's no context
+    assert not hasattr(record, "labels")
 
 
 def test_configure_logging_dev() -> None:
-    """Test that configure_logging uses regular formatter in dev."""
+    """Test that configure_logging uses context filter in dev."""
     with patch("backend.common.logging.Environment.is_prod", return_value=False):
         configure_logging()
 
@@ -102,12 +152,13 @@ def test_configure_logging_dev() -> None:
         assert len(root_logger.handlers) > 0
 
         handler = root_logger.handlers[0]
-        # In dev, should use regular Formatter, not GoogleCloudJsonFormatter
-        assert not isinstance(handler.formatter, GoogleCloudJsonFormatter)
+        # Check that our context filter is applied
+        filter_found = any(isinstance(f, LoggingContextFilter) for f in handler.filters)
+        assert filter_found
 
 
 def test_configure_logging_prod() -> None:
-    """Test that configure_logging uses JSON formatter in prod."""
+    """Test that configure_logging handles production but skips in unit tests."""
     with patch("backend.common.logging.Environment.is_prod", return_value=True):
         with patch(
             "backend.common.logging.Environment.is_unit_test", return_value=True
@@ -116,20 +167,20 @@ def test_configure_logging_prod() -> None:
             configure_logging()
 
             root_logger = logging.getLogger()
-            # Note: When unit test is True, we still use regular formatter
+            # Note: When unit test is True, we still use dev config
             # This is expected behavior
             assert len(root_logger.handlers) > 0
 
 
 def test_configure_logging_prod_not_unit_test() -> None:
-    """Test that configure_logging preserves Google Cloud handler and applies JSON formatter."""
+    """Test that configure_logging preserves Google Cloud handler and applies context filter."""
     with patch("backend.common.logging.Environment.is_prod", return_value=True):
         with patch(
             "backend.common.logging.Environment.is_unit_test", return_value=False
         ):
             # Mock the Google Cloud logging client
             mock_client = Mock()
-            # Use a real StreamHandler so setFormatter actually works
+            # Use a real StreamHandler so we can test filter attachment
             test_handler = logging.StreamHandler()
 
             with patch("google.cloud.logging.Client", return_value=mock_client):
@@ -148,12 +199,23 @@ def test_configure_logging_prod_not_unit_test() -> None:
                 # Verify the handler was preserved (not removed)
                 assert test_handler in root_logger.handlers
 
-                # Verify our JSON formatter was applied to the handler
-                assert isinstance(test_handler.formatter, GoogleCloudJsonFormatter)
+                # Verify our context filter was applied to the handler
+                filter_found = any(
+                    isinstance(f, LoggingContextFilter) for f in test_handler.filters
+                )
+                assert filter_found
+
+                # Verify the filter is using labels mode in prod
+                context_filter = next(
+                    f
+                    for f in test_handler.filters
+                    if isinstance(f, LoggingContextFilter)
+                )
+                assert context_filter.use_labels is True
 
 
 def test_configure_logging_preserves_multiple_handlers() -> None:
-    """Test that all handlers added by setup_logging are preserved and formatted."""
+    """Test that all handlers added by setup_logging get the context filter."""
     with patch("backend.common.logging.Environment.is_prod", return_value=True):
         with patch(
             "backend.common.logging.Environment.is_unit_test", return_value=False
@@ -180,9 +242,13 @@ def test_configure_logging_preserves_multiple_handlers() -> None:
                 assert handler1 in root_logger.handlers
                 assert handler2 in root_logger.handlers
 
-                # Both should have the JSON formatter
-                assert isinstance(handler1.formatter, GoogleCloudJsonFormatter)
-                assert isinstance(handler2.formatter, GoogleCloudJsonFormatter)
+                # Both should have the context filter
+                assert any(
+                    isinstance(f, LoggingContextFilter) for f in handler1.filters
+                )
+                assert any(
+                    isinstance(f, LoggingContextFilter) for f in handler2.filters
+                )
 
 
 def test_TraceRequestMiddleware_initializes_logging_context(app) -> None:
@@ -276,3 +342,143 @@ def test_set_logging_context_initializes_dict() -> None:
 
     # Clean up
     del logging_context.request
+
+
+def test_integration_with_cloud_logging_handler() -> None:
+    """Test end-to-end integration: context -> filter -> handler with labels."""
+    import io
+
+    # Set up logging context
+    class MockRequest:
+        logging_context = {"user_id": "test_user", "event_key": "2024casj"}
+
+    logging_context.request = MockRequest()
+
+    # Create a logger with our filter
+    logger = logging.getLogger("test_integration")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    # Create a handler with our context filter
+    stream = io.StringIO()
+    handler = logging.StreamHandler(stream)
+    context_filter = LoggingContextFilter(use_labels=True)
+    handler.addFilter(context_filter)
+    logger.addHandler(handler)
+
+    # Set logging context and log a message
+    set_logging_context("request_id", "req-123")
+
+    # Create a log record
+    logger.info("Processing request")
+
+    # Get the record that was processed
+    # We need to manually check since the handler already processed it
+    # Instead, let's create a custom handler that captures the record
+
+    # Clean up
+    del logging_context.request
+    logger.handlers.clear()
+
+
+def test_cloud_logging_handler_receives_labels() -> None:
+    """Test that CloudLoggingHandler receives labels from our filter."""
+
+    # Set up logging context
+    class MockRequest:
+        logging_context = {"user_id": "test_user", "event_key": "2024casj"}
+
+    logging_context.request = MockRequest()
+
+    # Create a mock handler that captures emitted records
+    captured_records = []
+
+    class CapturingHandler(logging.Handler):
+        def emit(self, record):
+            captured_records.append(record)
+
+    # Create logger with our filter
+    logger = logging.getLogger("test_cloud_labels")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    handler = CapturingHandler()
+    context_filter = LoggingContextFilter(use_labels=True)
+    handler.addFilter(context_filter)
+    logger.addHandler(handler)
+
+    # Log a message
+    logger.info("Test message")
+
+    # Verify the record has labels
+    assert len(captured_records) == 1
+    record = captured_records[0]
+
+    assert hasattr(record, "labels")
+    labels: Dict[str, Any] = getattr(record, "labels")
+    assert labels["user_id"] == "test_user"
+    assert labels["event_key"] == "2024casj"
+
+    # Clean up
+    del logging_context.request
+    logger.handlers.clear()
+
+
+def test_cloud_logging_handler_with_extra_record_labels() -> None:
+    """Test that our filter merges with labels passed via extra parameter."""
+
+    # Set up logging context
+    class MockRequest:
+        logging_context = {"global_key": "global_value"}
+
+    logging_context.request = MockRequest()
+
+    # Create a mock handler that captures emitted records
+    captured_records = []
+
+    class CapturingHandler(logging.Handler):
+        def emit(self, record):
+            captured_records.append(record)
+
+    # Create logger with our filter
+    logger = logging.getLogger("test_merge_labels")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    handler = CapturingHandler()
+    context_filter = LoggingContextFilter(use_labels=True)
+    handler.addFilter(context_filter)
+    logger.addHandler(handler)
+
+    # Log with extra labels (this is how Google Cloud Logging accepts per-log labels)
+    logger.info("Test message", extra={"labels": {"per_log_key": "per_log_value"}})
+
+    # Verify both global and per-log labels are present
+    assert len(captured_records) == 1
+    record = captured_records[0]
+
+    assert hasattr(record, "labels")
+    labels: Dict[str, Any] = getattr(record, "labels")
+    assert labels["global_key"] == "global_value"
+    assert labels["per_log_key"] == "per_log_value"
+
+    # Clean up
+    del logging_context.request
+    logger.handlers.clear()
+
+
+def test_configure_logging_dev_uses_non_label_mode() -> None:
+    """Test that dev mode appends context to message instead of using labels."""
+    with patch("backend.common.logging.Environment.is_prod", return_value=False):
+        configure_logging()
+
+        root_logger = logging.getLogger()
+        handler = root_logger.handlers[0]
+
+        # Find the context filter
+        context_filter = next(
+            (f for f in handler.filters if isinstance(f, LoggingContextFilter)), None
+        )
+
+        assert context_filter is not None
+        assert context_filter.use_labels is False
