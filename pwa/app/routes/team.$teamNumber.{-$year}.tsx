@@ -61,6 +61,7 @@ import {
   calculateTeamRecordsFromMatches,
   getTeamsUnpenalizedHighScore,
 } from '~/lib/matchUtils';
+import { getImageMedia } from '~/lib/mediaUtils';
 import {
   MODEL_TYPE,
   addRecords,
@@ -259,22 +260,7 @@ function TeamPage(): React.JSX.Element {
 
   yearsParticipated.sort((a, b) => b - a);
 
-  const robotPics = useMemo(
-    () =>
-      media
-        .filter((m) => m.type === 'imgur')
-        .sort((a, b) => {
-          if (a.preferred) {
-            return -1;
-          }
-          if (b.preferred) {
-            return 1;
-          }
-
-          return 0;
-        }),
-    [media],
-  );
+  const robotPics = useMemo(() => getImageMedia(media), [media]);
 
   const maybeAvatar = useMemo(
     () => media.find((m) => m.type === 'avatar'),
