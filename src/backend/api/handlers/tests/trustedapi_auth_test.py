@@ -977,3 +977,114 @@ def test_file_upload_succeeds_with_correct_permission(
 
     assert resp.status_code == 200
     assert "Success" in resp.json
+
+
+@freeze_time("2019-06-01")
+def test_error_message_with_all_official_events_and_event_keys(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    Test that error message includes "all current-season official events" when
+    all_official_events is True and event_list is not empty
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=False)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other",
+        auth_types=[AuthType.EVENT_TEAMS],
+        all_official_events=True,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401
+    assert "Error" in resp.json
+    assert (
+        resp.json["Error"]
+        == "Only allowed to edit events: all current-season official events, 2019other"
+    )
+
+
+@freeze_time("2019-06-01")
+def test_error_message_with_all_official_events_only(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    Test that error message includes only "all current-season official events" when
+    all_official_events is True and event_list is empty
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=False)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        None,
+        auth_types=[AuthType.EVENT_TEAMS],
+        all_official_events=True,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401
+    assert "Error" in resp.json
+    assert (
+        resp.json["Error"]
+        == "Only allowed to edit events: all current-season official events"
+    )
+
+
+@freeze_time("2019-06-01")
+def test_error_message_without_all_official_events(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    Test that error message does not include "all current-season official events" when
+    all_official_events is False
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=False)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other",
+        auth_types=[AuthType.EVENT_TEAMS],
+        all_official_events=False,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401
+    assert "Error" in resp.json
+    assert resp.json["Error"] == "Only allowed to edit events: 2019other"

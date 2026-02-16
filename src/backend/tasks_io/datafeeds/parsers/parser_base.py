@@ -1,9 +1,10 @@
 import abc
-from typing import Any, Generic, TypeVar
+from typing import Generic, TypeVar
 
+TParserInput = TypeVar("TInput")
 TParsedResponse = TypeVar("TParsedResponse")
 
 
-class ParserBase(abc.ABC, Generic[TParsedResponse]):
+class ParserBase(abc.ABC, Generic[TParserInput, TParsedResponse]):
     @abc.abstractmethod
-    def parse(self, response: Any) -> TParsedResponse: ...
+    def parse(self, response: TParserInput) -> TParsedResponse: ...

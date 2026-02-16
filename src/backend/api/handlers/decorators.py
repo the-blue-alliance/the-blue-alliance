@@ -11,6 +11,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.consts.renamed_districts import RenamedDistricts
+from backend.common.logging import set_logging_context
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -35,6 +36,8 @@ def api_authenticated(func):
                     auth_owner_id = auth.owner.id() if auth.owner else None
                     # Set for our GA event tracking in `track_call_after_response`
                     g.auth_description = auth.description
+                    # Add API key to logging context for searchability in logs
+                    set_logging_context("api_auth_key", auth_key)
                 else:
                     return (
                         {

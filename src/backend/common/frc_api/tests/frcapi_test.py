@@ -1,4 +1,6 @@
 import json
+from typing import Any
+from unittest import mock
 from unittest.mock import patch
 
 import pytest
@@ -55,70 +57,74 @@ def test_root() -> None:
     with patch.object(FRCAPI, "_get") as mock_get:
         api.root()
 
-    mock_get.assert_called_once_with("/")
+    mock_get.assert_called_once_with("/", mock.ANY)
 
 
 def test_event_list() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.event_list(2020)
-    mock_get.assert_called_once_with("/2020/events")
+    mock_get.assert_called_once_with("/2020/events", mock.ANY)
 
 
 def test_event_info() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.event_info(2020, "MIKET")
-    mock_get.assert_called_once_with("/2020/events?eventCode=MIKET")
+    mock_get.assert_called_once_with("/2020/events?eventCode=MIKET", mock.ANY)
 
 
 def test_event_teams() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.event_teams(2020, "MIKET", 1)
-    mock_get.assert_called_once_with("/2020/teams?eventCode=MIKET&page=1")
+    mock_get.assert_called_once_with("/2020/teams?eventCode=MIKET&page=1", mock.ANY)
 
 
 def test_event_team_avatars() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.event_team_avatars(2020, "MIKET", 1)
-    mock_get.assert_called_once_with("/2020/avatars?eventCode=MIKET&page=1")
+    mock_get.assert_called_once_with("/2020/avatars?eventCode=MIKET&page=1", mock.ANY)
 
 
 def test_event_alliances() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.alliances(2020, "MIKET")
-    mock_get.assert_called_once_with("/2020/alliances/MIKET")
+    mock_get.assert_called_once_with("/2020/alliances/MIKET", mock.ANY)
 
 
 def test_event_rankings() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.rankings(2020, "MIKET")
-    mock_get.assert_called_once_with("/2020/rankings/MIKET")
+    mock_get.assert_called_once_with("/2020/rankings/MIKET", mock.ANY)
 
 
 def test_event_schedule() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.match_schedule(2020, "MIKET", "qual")
-    mock_get.assert_called_once_with("/2020/schedule/MIKET?tournamentLevel=qual")
+    mock_get.assert_called_once_with(
+        "/2020/schedule/MIKET?tournamentLevel=qual", mock.ANY
+    )
 
 
 def test_event_matches() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.matches(2020, "MIKET", "qual")
-    mock_get.assert_called_once_with("/2020/matches/MIKET?tournamentLevel=qual")
+    mock_get.assert_called_once_with(
+        "/2020/matches/MIKET?tournamentLevel=qual", mock.ANY
+    )
 
 
 def test_event_scores() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.match_scores(2020, "MIKET", "qual")
-    mock_get.assert_called_once_with("/2020/scores/MIKET/qual")
+    mock_get.assert_called_once_with("/2020/scores/MIKET/qual", mock.ANY)
 
 
 def test_awards_no_event_code_no_team_number() -> None:
@@ -135,7 +141,7 @@ def test_awards_event_code() -> None:
     with patch.object(FRCAPI, "_get") as mock_get:
         api.awards(2020, event_code="MIKET")
 
-    mock_get.assert_called_once_with("/2020/awards/event/MIKET")
+    mock_get.assert_called_once_with("/2020/awards/event/MIKET", mock.ANY)
 
 
 def test_awards_team_number() -> None:
@@ -143,7 +149,7 @@ def test_awards_team_number() -> None:
     with patch.object(FRCAPI, "_get") as mock_get:
         api.awards(2020, team_number=2337)
 
-    mock_get.assert_called_once_with("/2020/awards/team/2337")
+    mock_get.assert_called_once_with("/2020/awards/team/2337", mock.ANY)
 
 
 def test_awards_event_code_team_number() -> None:
@@ -151,35 +157,37 @@ def test_awards_event_code_team_number() -> None:
     with patch.object(FRCAPI, "_get") as mock_get:
         api.awards(2020, event_code="MIKET", team_number=2337)
 
-    mock_get.assert_called_once_with("/2020/awards/eventteam/MIKET/2337")
+    mock_get.assert_called_once_with("/2020/awards/eventteam/MIKET/2337", mock.ANY)
 
 
 def test_district_list() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.district_list(2020)
-    mock_get.assert_called_once_with("/2020/districts")
+    mock_get.assert_called_once_with("/2020/districts", mock.ANY)
 
 
 def test_district_rankings() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.district_rankings(2020, "ne", 1)
-    mock_get.assert_called_once_with("/2020/rankings/district?districtCode=ne&page=1")
+    mock_get.assert_called_once_with(
+        "/2020/rankings/district?districtCode=ne&page=1", mock.ANY
+    )
 
 
 def test_team_details() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.team_details(2020, 254)
-    mock_get.assert_called_once_with("/2020/teams?teamNumber=254")
+    mock_get.assert_called_once_with("/2020/teams?teamNumber=254", mock.ANY)
 
 
 def test_team_avatars() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.team_avatar(2020, 254)
-    mock_get.assert_called_once_with("/2020/avatars?teamNumber=254")
+    mock_get.assert_called_once_with("/2020/avatars?teamNumber=254", mock.ANY)
 
 
 @pytest.mark.parametrize(
@@ -199,7 +207,7 @@ def test_get(
     }
 
     with patch.object(urlfetch_stub, "_Dynamic_Fetch") as mock_fetch:
-        api._get(endpoint).get_result()
+        api._get(endpoint, Any).get_result()
 
     assert mock_fetch.call_count == 1
     called_request = mock_fetch.call_args[0][0]

@@ -1,11 +1,13 @@
 from dataclasses import dataclass
-from typing import Any, Dict, Tuple
+from typing import cast, Dict, List, Tuple
 
+from backend.common.frc_api.types import (
+    DistrictRankingListModelV2,
+    DistrictRankingTeamModelV2,
+)
 from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.keys import TeamKey
-from backend.tasks_io.datafeeds.parsers.json.parser_paginated_json import (
-    ParserPaginatedJSON,
-)
+from backend.tasks_io.datafeeds.parsers.parser_paginated import ParserPaginated
 
 
 @dataclass
@@ -14,9 +16,11 @@ class TParsedDistrictAdvancement:
     adjustments: Dict[TeamKey, int]
 
 
-class FMSAPIDistrictRankingsParser(ParserPaginatedJSON[TParsedDistrictAdvancement]):
+class FMSAPIDistrictRankingsParser(
+    ParserPaginated[DistrictRankingListModelV2, TParsedDistrictAdvancement]
+):
     def parse(
-        self, response: Dict[str, Any]
+        self, response: DistrictRankingListModelV2
     ) -> Tuple[TParsedDistrictAdvancement, bool]:
         current_page = response["pageCurrent"]
         total_pages = response["pageTotal"]
@@ -24,7 +28,10 @@ class FMSAPIDistrictRankingsParser(ParserPaginatedJSON[TParsedDistrictAdvancemen
         district_ranks: DistrictAdvancement = {}
         adjustments: Dict[TeamKey, int] = {}
 
-        for ranking in response["districtRanks"]:
+        api_ranks = cast(
+            List[DistrictRankingTeamModelV2], response.get("districtRanks") or []
+        )
+        for ranking in api_ranks:
             team_key = f"frc{ranking["teamNumber"]}"
             district_ranks[team_key] = {
                 "dcmp": ranking["qualifiedDistrictCmp"],

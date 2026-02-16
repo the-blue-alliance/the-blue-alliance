@@ -43,7 +43,9 @@ import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
+import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
 import EliminationBracket from '~/components/tba/eliminationBracket';
+import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   EventLocationLink,
@@ -119,6 +121,7 @@ import {
 } from '~/lib/rankingPoints';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
+  MODEL_TYPE,
   camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
@@ -237,9 +240,12 @@ function EventPage() {
 
   return (
     <div className="py-8">
-      <h1 className="mb-2 text-3xl font-medium">
-        {event.name} {event.year}
-      </h1>
+      <div className="mb-2 flex items-center gap-2">
+        <h1 className="text-3xl font-medium">
+          {event.name} {event.year}
+        </h1>
+        <FavoriteButton modelKey={eventKey} modelType={MODEL_TYPE.EVENT} />
+      </div>
 
       <div className="mb-4 space-y-1">
         <DetailEntity icon={<DateIcon />}>
@@ -463,9 +469,13 @@ function ResultsTab({
       />
     ) : null;
 
-  const showBracket =
+  const showDoubleElim8Bracket =
     alliances.length > 0 &&
     event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
+
+  const showDoubleElim4Bracket =
+    alliances.length > 0 &&
+    event.playoff_type === PlayoffType.DOUBLE_ELIM_4_TEAM;
 
   const tocItems = [
     { slug: 'qual-matches', label: 'Qualification Matches' },
@@ -502,9 +512,19 @@ function ResultsTab({
         </div>
       </div>
 
-      {showBracket && (
+      {showDoubleElim8Bracket && (
         <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
           <EliminationBracket
+            alliances={alliances}
+            matches={elims}
+            event={event}
+          />
+        </TableOfContentsSection>
+      )}
+
+      {showDoubleElim4Bracket && (
+        <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
+          <DoubleElim4TeamBracket
             alliances={alliances}
             matches={elims}
             event={event}

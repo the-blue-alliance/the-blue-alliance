@@ -8,7 +8,7 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 TParsedResponse = TypeVar("TParsedResponse")
 
 
-class ParserHTML(ParserBase[TParsedResponse]):
+class ParserHTML(ParserBase[bytes, TParsedResponse]):
     """
     Provides a basic structure for parsing pages.
     Parsers are not allowed to return Model objects, only dictionaries.

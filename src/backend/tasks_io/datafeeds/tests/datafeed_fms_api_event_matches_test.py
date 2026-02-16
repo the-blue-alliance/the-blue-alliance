@@ -33,15 +33,16 @@ def test_get_event_matches() -> None:
     score_response = URLFetchResult.mock_for_content("", 200, "")
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
-    ) as mock_hybrid_schedule_api, patch.object(
-        FRCAPI, "match_scores", return_value=InstantFuture(score_response)
-    ) as mock_match_scores_api, patch.object(
-        FMSAPIHybridScheduleParser, "parse"
-    ) as mock_schedule_parse, patch.object(
-        FMSAPIMatchDetailsParser, "parse"
-    ) as mock_match_detail_parser:
+    with (
+        patch.object(
+            FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_hybrid_schedule_api,
+        patch.object(
+            FRCAPI, "match_scores", return_value=InstantFuture(score_response)
+        ) as mock_match_scores_api,
+        patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
+        patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+    ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
         df.get_event_matches("2020miket").get_result()
@@ -64,15 +65,16 @@ def test_get_event_matches_cmp() -> None:
     score_response = URLFetchResult.mock_for_content("", 200, "")
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
-    ) as mock_hybrid_schedule_api, patch.object(
-        FRCAPI, "match_scores", return_value=InstantFuture(score_response)
-    ) as mock_match_scores_api, patch.object(
-        FMSAPIHybridScheduleParser, "parse"
-    ) as mock_schedule_parse, patch.object(
-        FMSAPIMatchDetailsParser, "parse"
-    ) as mock_match_detail_parser:
+    with (
+        patch.object(
+            FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_hybrid_schedule_api,
+        patch.object(
+            FRCAPI, "match_scores", return_value=InstantFuture(score_response)
+        ) as mock_match_scores_api,
+        patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
+        patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+    ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
         df.get_event_matches("2014gal").get_result()
@@ -107,15 +109,16 @@ def test_get_event_matches_qual_sync_disabled() -> None:
     score_response = URLFetchResult.mock_for_content("", 200, "")
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
-    ) as mock_hybrid_schedule_api, patch.object(
-        FRCAPI, "match_scores", return_value=InstantFuture(score_response)
-    ) as mock_match_scores_api, patch.object(
-        FMSAPIHybridScheduleParser, "parse"
-    ) as mock_schedule_parse, patch.object(
-        FMSAPIMatchDetailsParser, "parse"
-    ) as mock_match_detail_parser:
+    with (
+        patch.object(
+            FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_hybrid_schedule_api,
+        patch.object(
+            FRCAPI, "match_scores", return_value=InstantFuture(score_response)
+        ) as mock_match_scores_api,
+        patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
+        patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+    ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
         df.get_event_matches("2025casj").get_result()
@@ -146,15 +149,16 @@ def test_get_event_matches_playoff_sync_disabled() -> None:
     score_response = URLFetchResult.mock_for_content("", 200, "")
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
-    ) as mock_hybrid_schedule_api, patch.object(
-        FRCAPI, "match_scores", return_value=InstantFuture(score_response)
-    ) as mock_match_scores_api, patch.object(
-        FMSAPIHybridScheduleParser, "parse"
-    ) as mock_schedule_parse, patch.object(
-        FMSAPIMatchDetailsParser, "parse"
-    ) as mock_match_detail_parser:
+    with (
+        patch.object(
+            FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_hybrid_schedule_api,
+        patch.object(
+            FRCAPI, "match_scores", return_value=InstantFuture(score_response)
+        ) as mock_match_scores_api,
+        patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
+        patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+    ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
         df.get_event_matches("2025casj").get_result()
@@ -187,15 +191,16 @@ def test_get_event_matches_both_sync_disabled() -> None:
     score_response = URLFetchResult.mock_for_content("", 200, "")
 
     df = DatafeedFMSAPI()
-    with patch.object(
-        FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
-    ) as mock_hybrid_schedule_api, patch.object(
-        FRCAPI, "match_scores", return_value=InstantFuture(score_response)
-    ) as mock_match_scores_api, patch.object(
-        FMSAPIHybridScheduleParser, "parse"
-    ) as mock_schedule_parse, patch.object(
-        FMSAPIMatchDetailsParser, "parse"
-    ) as mock_match_detail_parser:
+    with (
+        patch.object(
+            FRCAPI, "hybrid_schedule", return_value=InstantFuture(schedule_response)
+        ) as mock_hybrid_schedule_api,
+        patch.object(
+            FRCAPI, "match_scores", return_value=InstantFuture(score_response)
+        ) as mock_match_scores_api,
+        patch.object(FMSAPIHybridScheduleParser, "parse") as mock_schedule_parse,
+        patch.object(FMSAPIMatchDetailsParser, "parse") as mock_match_detail_parser,
+    ):
         mock_schedule_parse.side_effect = ([], [])
         mock_match_detail_parser.return_value = {}
         df.get_event_matches("2025casj").get_result()

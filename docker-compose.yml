@@ -24,6 +24,8 @@ services:
       <<: *env-vars
     ports:
       - "8089:8089"
+    volumes:
+      - datastore-data:/data/datastore
     healthcheck:
       test: ["CMD", "curl", "-f", "http://localhost:8089/"]
       interval: 10s
@@ -37,6 +39,7 @@ services:
     build:
       context: ./
       dockerfile: ./ops/dev/docker/Dockerfile
+
     depends_on:
       firebase:
         condition: service_started
@@ -69,47 +72,20 @@ services:
       - FIREBASE_AUTH_EMULATOR_HOST=firebase:9099
       - FIREBASE_DATABASE_EMULATOR_HOST=firebase:9000
 
-  test:
+  ### Tools
+
+  lint-bash:
     build:
       context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile.test
+      dockerfile: ./ops/dev/docker/Dockerfile.lint_bash
     profiles: ["tools"]
     volumes:
       - ./:/tba:delegated
-    working_dir: /tba
     entrypoint:
       - /bin/bash
       - -c
-      - './ops/test_py3.sh "$@"'
+      - './ops/lint_bash.sh "$@"'
       - --
 
-  lint:
-    build:
-      context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile.test
-    profiles: ["tools"]
-    volumes:
-      - ./:/tba:delegated
-    working_dir: /tba
-    entrypoint:
-      - /bin/bash
-      - -c
-      - './ops/lint_py3.sh "$@"'
-      - --
-
-  # (Note from Zach): pyre is currently busted somehow with this setup.
-  # I'm gonna push on it later, but also pyre kind of sucks, and it would
-  # be great to move away from it, so I'm not going to put any effort into
-  # fixing this right now.
-  #
-  # typecheck:
-  #   build:
-  #     context: ./
-  #     dockerfile: ./ops/dev/docker/Dockerfile.test
-  #   depends_on:
-  #   - tba
-  #   volumes:
-  #     - ./:/tba:delegated
-  #   working_dir: /tba
-  #   entrypoint: ["/bin/bash", "-c"]
-  #   command: ["pyre --version none check"]
+volumes:
+  datastore-data:

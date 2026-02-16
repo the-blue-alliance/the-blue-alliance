@@ -1,0 +1,35 @@
+name: Development Environment Setup
+description: |
+  Complete setup for The Blue Alliance development environment.
+  This file configures the environment so that Python, Node.js, and PWA tests can run successfully.
+  
+  Prerequisites:
+  - Python 3.13 or higher
+  - Node.js 22 or higher
+  - Git
+
+steps:
+  # Python environment setup
+  - name: Install uv (Python package manager)
+    run: python3 -m pip install uv
+
+  - name: Sync Python dependencies
+    run: make sync
+
+  # Node.js environment setup for main project
+  - name: Install Node.js dependencies
+    run: npm ci
+
+  # PWA environment setup
+  - name: Install pnpm
+    run: npm install -g pnpm@10.24.0
+
+  - name: Create PWA environment file
+    run: ./ops/pwa/create_dotenv.sh --env
+    env:
+      TBA_API_READ_KEY: TEST_KEY
+      FIREBASE_API_KEY: fake-api-key
+      GCLOUD_PROJECT_ID: demo-test
+
+  - name: Install PWA dependencies
+    run: pnpm --dir pwa install --frozen-lockfile

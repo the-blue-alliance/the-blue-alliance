@@ -20,6 +20,9 @@ from backend.api.api_trusted_parsers.json_rankings_parser import JSONRankingsPar
 from backend.api.api_trusted_parsers.json_team_list_parser import (
     JSONTeamListParser,
 )
+from backend.api.api_trusted_parsers.json_webcast_update_parser import (
+    JSONWebcastUpdateParser,
+)
 from backend.api.api_trusted_parsers.json_zebra_motionworks_parser import (
     JSONZebraMotionWorksParser,
 )
@@ -383,6 +386,54 @@ def add_event_media(event_key: EventKey) -> Response:
 
     MediaManipulator.createOrUpdate(media_to_put)
     return profiled_jsonify({"Success": "Media successfully added"})
+
+
+@require_write_auth({AuthType.EVENT_INFO})
+@validate_keys
+def update_event_webcasts(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
+    parsed_data = JSONWebcastUpdateParser.parse(request.data)
+    event: Event = none_throws(Event.get_by_id(event_key))
+
+    if "webcasts" not in parsed_data:
+        return make_response(profiled_jsonify({"Error": "No webcasts provided"}), 400)
+
+    webcasts_to_change = parsed_data["webcasts"]
+
+    if request.method == "PATCH":
+        # Append webcasts to the existing list using the helper
+        for webcast in webcasts_to_change:
+            EventWebcastAdder.add_webcast(event, webcast, update=False)
+    elif request.method == "DELETE":
+        # Remove webcasts from the event
+        current_webcasts = event.webcast or []
+        indices_to_delete = []
+
+        # Find indices of webcasts to remove
+        for i, current_webcast in enumerate(current_webcasts):
+            for webcast_to_remove in webcasts_to_change:
+                if (
+                    current_webcast.get("type") == webcast_to_remove.get("type")
+                    and current_webcast.get("channel")
+                    == webcast_to_remove.get("channel")
+                    and current_webcast.get("file") == webcast_to_remove.get("file")
+                ):
+                    indices_to_delete.append(i)
+                    break
+
+        # Delete in reverse order to maintain correct indices
+        for index in sorted(indices_to_delete, reverse=True):
+            webcast = current_webcasts[index]
+            EventWebcastAdder.remove_webcast(
+                event,
+                index,
+                webcast.get("type"),
+                webcast.get("channel"),
+                webcast.get("file"),
+            )
+
+    EventManipulator.createOrUpdate(event, auto_union=False)
+    return profiled_jsonify({"Success": f"Event {event_key} webcasts updated"})
 
 
 @require_write_auth({AuthType.ZEBRA_MOTIONWORKS})

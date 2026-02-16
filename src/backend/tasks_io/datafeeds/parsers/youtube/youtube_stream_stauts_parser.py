@@ -30,7 +30,7 @@ class _StreamStatusResponse(TypedDict):
     items: List[_StreamDataResponse]
 
 
-class YoutubeStreamStatusParser(ParserBase[Webcast]):
+class YoutubeStreamStatusParser(ParserBase[Any, Webcast]):
     """
     See: https://developers.google.com/youtube/v3/docs/videos/list
     """

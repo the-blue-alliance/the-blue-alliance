@@ -13,8 +13,9 @@ def test_init():
     project = "test-project"
     region = "us-central1"
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
 
@@ -38,8 +39,9 @@ def test_start_job_no_overrides():
     mock_jobs_client = Mock(spec=JobsClient)
     mock_jobs_client.run_job.return_value = mock_operation
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.jobs_client = mock_jobs_client
@@ -72,8 +74,9 @@ def test_start_job_with_args():
     mock_jobs_client = Mock(spec=JobsClient)
     mock_jobs_client.run_job.return_value = mock_operation
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.jobs_client = mock_jobs_client
@@ -105,8 +108,9 @@ def test_start_job_with_env():
     mock_jobs_client = Mock(spec=JobsClient)
     mock_jobs_client.run_job.return_value = mock_operation
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.jobs_client = mock_jobs_client
@@ -140,8 +144,9 @@ def test_start_job_with_args_and_env():
     mock_jobs_client = Mock(spec=JobsClient)
     mock_jobs_client.run_job.return_value = mock_operation
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.jobs_client = mock_jobs_client
@@ -171,8 +176,9 @@ def test_start_job_no_metadata():
     mock_jobs_client = Mock(spec=JobsClient)
     mock_jobs_client.run_job.return_value = mock_operation
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.jobs_client = mock_jobs_client
@@ -223,8 +229,9 @@ def test_get_job_status_states(
     mock_executions_client = Mock(spec=ExecutionsClient)
     mock_executions_client.get_execution.return_value = execution
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.executions_client = mock_executions_client
@@ -263,8 +270,9 @@ def test_get_job_status_with_condition_message():
     mock_executions_client = Mock(spec=ExecutionsClient)
     mock_executions_client.get_execution.return_value = execution
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.executions_client = mock_executions_client
@@ -320,8 +328,9 @@ def test_get_job_status_with_reason_enums(reason_type, reason_value, expected_te
     mock_executions_client = Mock(spec=ExecutionsClient)
     mock_executions_client.get_execution.return_value = execution
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.executions_client = mock_executions_client
@@ -365,8 +374,9 @@ def test_get_job_status_uses_first_condition():
     mock_executions_client = Mock(spec=ExecutionsClient)
     mock_executions_client.get_execution.return_value = execution
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.executions_client = mock_executions_client
@@ -388,8 +398,9 @@ def test_get_job_status_no_execution():
     mock_executions_client = Mock(spec=ExecutionsClient)
     mock_executions_client.get_execution.side_effect = Exception("Not found")
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.executions_client = mock_executions_client
@@ -420,8 +431,9 @@ def test_get_job_status_correct_name_format():
     mock_executions_client = Mock(spec=ExecutionsClient)
     mock_executions_client.get_execution.return_value = execution
 
-    with patch.object(JobsClient, "__init__", return_value=None), patch.object(
-        ExecutionsClient, "__init__", return_value=None
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
     ):
         client = GCloudRunClient(project, region)
         client.executions_client = mock_executions_client

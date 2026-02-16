@@ -14,7 +14,7 @@ class _StreamStatusResponse(TypedDict):
     data: List[_StreamDataResponse]
 
 
-class TwitchStreamStatusParser(ParserBase[Webcast]):
+class TwitchStreamStatusParser(ParserBase[Any, Webcast]):
     """
     See: https://dev.twitch.tv/docs/api/reference/#get-streams
     """

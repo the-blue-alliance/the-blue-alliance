@@ -1,32 +1,40 @@
 import json
-from typing import Any, Dict, List, Optional, Set
+from typing import List, Optional, Set
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
+from backend.common.frc_api.types import (
+    AwardAssignmentListModelV2,
+    AwardAssignmentModelV2,
+)
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.team import Team
-from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
+from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class FMSAPIAwardsParser(ParserJSON[List[Award]]):
+class FMSAPIAwardsParser(ParserBase[AwardAssignmentListModelV2, List[Award]]):
     def __init__(
         self, event: Event, valid_team_nums: Optional[Set[int]] = None
     ) -> None:
         self.event = event
         self.valid_team_nums = valid_team_nums
 
-    def parse(self, response: Dict[str, Any]) -> Optional[List[Award]]:
+    def parse(self, response: AwardAssignmentListModelV2) -> List[Award]:
         awards_by_type = {}
-        for award in response["Awards"]:
+
+        api_awards: list[AwardAssignmentModelV2] = response["Awards"] or []
+        for award in api_awards:
             team_number = award["teamNumber"]
 
             valid_team_nums = self.valid_team_nums
             if valid_team_nums is not None and team_number not in valid_team_nums:
                 continue
 
-            award_type_enum = AwardHelper.parse_award_type(award["name"])
+            api_award_name = none_throws(award["name"])
+            award_type_enum = AwardHelper.parse_award_type(api_award_name)
             if award_type_enum is None:
                 continue
 
@@ -81,4 +89,4 @@ class FMSAPIAwardsParser(ParserJSON[List[Award]]):
                 )
             )
 
-        return awards if awards else None
+        return awards

@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Any, Dict, Optional
 
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.twitch_access_token import TwitchAccessToken
@@ -14,7 +14,7 @@ from backend.tasks_io.datafeeds.parsers.twitch.twitch_stream_status_parser impor
 )
 
 
-class TwitchGetAccessToken(DatafeedBase[TwitchAccessToken]):
+class TwitchGetAccessToken(DatafeedBase[Any, TwitchAccessToken]):
 
     def __init__(self, refresh_token: Optional[str]) -> None:
         super().__init__()
@@ -50,7 +50,7 @@ class TwitchGetAccessToken(DatafeedBase[TwitchAccessToken]):
         return TwitchAccessTokenParser(self.client_id)
 
 
-class TwitchWebcastStatus(DatafeedBase[Webcast]):
+class TwitchWebcastStatus(DatafeedBase[Any, Webcast]):
 
     def __init__(self, access_token: TwitchAccessToken, webcast: Webcast) -> None:
         super().__init__()

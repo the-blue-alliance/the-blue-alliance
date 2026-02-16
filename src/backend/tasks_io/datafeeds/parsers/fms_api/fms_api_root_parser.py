@@ -1,8 +1,9 @@
-from typing import Any, cast, Dict
+from typing import cast
 
 from typing_extensions import TypedDict
 
-from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
+from backend.common.frc_api.types import ApiIndexModelV2
+from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class RootInfo(TypedDict):
@@ -13,6 +14,6 @@ class RootInfo(TypedDict):
     status: str
 
 
-class FMSAPIRootParser(ParserJSON[RootInfo]):
-    def parse(self, response: Dict[str, Any]) -> RootInfo:
+class FMSAPIRootParser(ParserBase[ApiIndexModelV2, RootInfo]):
+    def parse(self, response: ApiIndexModelV2) -> RootInfo:
         return cast(RootInfo, response)

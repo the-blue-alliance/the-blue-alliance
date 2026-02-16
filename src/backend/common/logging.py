@@ -1,8 +1,112 @@
+import json
 import logging
+from typing import Any, Dict
 
-import google.cloud.logging
+from werkzeug.local import Local
 
 from backend.common.environment import Environment
+
+# Request-local context for storing additional logging context
+logging_context = Local()
+
+
+def set_logging_context(key: str, value: Any) -> None:
+    """
+    Set a key-value pair in the request-local logging context.
+    This context will be included in all log messages during this request.
+
+    Example:
+        set_logging_context("user_id", "user123")
+        set_logging_context("request_id", "req-abc-123")
+    """
+    if hasattr(logging_context, "request") and logging_context.request:
+        if not hasattr(logging_context.request, "logging_context"):
+            logging_context.request.logging_context = {}
+        logging_context.request.logging_context[key] = value
+
+
+def get_logging_context() -> Dict[str, Any]:
+    """
+    Get the current request-local logging context.
+
+    Returns:
+        Dictionary of context key-value pairs, or empty dict if no context.
+    """
+    if hasattr(logging_context, "request") and logging_context.request:
+        return getattr(logging_context.request, "logging_context", {})
+    return {}
+
+
+def clear_logging_context() -> None:
+    """
+    Clear all values from the request-local logging context.
+    """
+    if hasattr(logging_context, "request") and logging_context.request:
+        logging_context.request.logging_context = {}
+
+
+class LoggingContextFilter(logging.Filter):
+    """
+    A logging filter that adds request-local context to log records as labels.
+
+    This filter integrates with Google Cloud Logging by setting record attributes
+    that are picked up by our custom formatters.
+
+    For local development, the labels are formatted as key=value pairs in the message.
+    """
+
+    def __init__(self, use_labels: bool = True) -> None:
+        """
+        Args:
+            use_labels: If True, use record.labels for Google Cloud integration.
+                       If False, append context to message for local dev.
+        """
+        super().__init__()
+        self.use_labels = use_labels
+
+    def filter(self, record: logging.LogRecord) -> bool:
+        """Add logging context to the record."""
+        context = get_logging_context()
+
+        if context:
+            if self.use_labels:
+                # For Google Cloud: merge context into labels
+                existing_labels = getattr(record, "labels", {})
+                setattr(record, "labels", {**existing_labels, **context})
+            else:
+                # For local dev: append context to message
+                context_str = " ".join(f"{k}={v}" for k, v in context.items())
+                record.msg = f"{record.msg} [{context_str}]"
+
+        return True
+
+
+class GoogleCloudStructuredFormatter(logging.Formatter):
+    """
+    A JSON formatter for Google Cloud Logging in App Engine.
+
+    App Engine's standard Python 3 runtime automatically integrates with Cloud Logging
+    when you write structured JSON to stdout. This formatter outputs logs in the format
+    expected by App Engine.
+
+    See: https://cloud.google.com/appengine/docs/standard/python3/writing-application-logs
+    """
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Format the log record as JSON for App Engine."""
+        # Start with the basic log structure
+        log_object = {
+            "message": super().format(record),
+            "severity": record.levelname,
+        }
+
+        # Add labels if present (set by LoggingContextFilter)
+        labels = getattr(record, "labels", None)
+        if labels:
+            # Use the special key that App Engine recognizes for labels
+            log_object["logging.googleapis.com/labels"] = labels
+
+        return json.dumps(log_object)
 
 
 def configure_logging() -> None:
@@ -20,16 +124,48 @@ def configure_logging() -> None:
 
     threading.Thread._delete = safe_delete  # type: ignore
 
-    if Environment.is_prod() and not Environment.is_unit_test():
-        # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
-        client = google.cloud.logging.Client()
-        client.setup_logging()
-
     log_level = Environment.log_level() or "INFO"
-    logging.basicConfig(
-        level=logging.getLevelName(log_level.upper()),
-        format="%(levelname)s\t %(asctime)s %(pathname)s:%(lineno)d] %(name)s: %(message)s",
-    )
+
+    # Configure the root logger
+    root_logger = logging.getLogger()
+    root_logger.setLevel(logging.getLevelName(log_level.upper()))
+
+    if Environment.is_prod() and not Environment.is_unit_test():
+        # In App Engine, write structured JSON to stdout
+        # App Engine's runtime automatically integrates with Cloud Logging
+        # and properly formats these as request logs (protoPayload)
+        formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+
+        # Remove any existing handlers and add our handler
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
+
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+
+        # Add our context filter to inject labels
+        context_filter = LoggingContextFilter(use_labels=True)
+        handler.addFilter(context_filter)
+
+        root_logger.addHandler(handler)
+    else:
+        # In dev/local, use standard logging format
+        formatter = logging.Formatter(
+            "%(levelname)s\t %(asctime)s %(pathname)s:%(lineno)d] %(name)s: %(message)s"
+        )
+
+        # Remove any existing handlers and add our handler
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
+
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+
+        # Add our context filter (will append context to message in dev)
+        context_filter = LoggingContextFilter(use_labels=False)
+        handler.addFilter(context_filter)
+
+        root_logger.addHandler(handler)
 
     ndb_log_level = Environment.ndb_log_level()
     if ndb_log_level:

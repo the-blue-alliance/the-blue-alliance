@@ -11,7 +11,7 @@ def test_parse_no_alliances(test_data_importer):
         data = json.load(f)
 
     alliances = FMSAPIEventAlliancesParser().parse(data)
-    assert alliances is None
+    assert alliances == []
 
 
 def test_parse_8alliances(test_data_importer):
