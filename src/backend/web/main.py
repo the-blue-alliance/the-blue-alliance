@@ -43,6 +43,7 @@ from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.search import search_handler
 from backend.web.handlers.static import (
     add_data,
+    faq,
     bigquery,
     brand,
     contact,
@@ -150,6 +151,7 @@ app.add_url_rule("/search", view_func=search_handler)
 app.add_url_rule("/webcasts", view_func=webcast_list)
 # Static pages
 app.add_url_rule("/add-data", view_func=add_data)
+app.add_url_rule("/faq", view_func=faq)
 app.add_url_rule("/brand", view_func=brand)
 app.add_url_rule("/contact", view_func=contact)
 app.add_url_rule("/opr", view_func=opr)

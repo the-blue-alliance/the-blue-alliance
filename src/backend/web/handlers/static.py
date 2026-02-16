@@ -12,6 +12,11 @@ def add_data() -> str:
 
 
 @cached_public(ttl=timedelta(weeks=1))
+def faq() -> str:
+    return render_template("faq.html")
+
+
+@cached_public(ttl=timedelta(weeks=1))
 def brand() -> str:
     return render_template("brand.html")
 
