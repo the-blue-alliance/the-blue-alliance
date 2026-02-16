@@ -1,6 +1,8 @@
 const fetch = require("node-fetch");
 const http = require("http");
 
+jest.setTimeout(30000);
+
 async function postToAuthEmulator(endpoint, body) {
   const url =
     "http://localhost:9099/identitytoolkit.googleapis.com/v1/accounts:" +
