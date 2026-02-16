@@ -1,6 +1,7 @@
+import json
 import logging
 from typing import Any, Dict
-from unittest.mock import Mock, patch
+from unittest.mock import patch
 
 from werkzeug.test import create_environ
 
@@ -8,11 +9,81 @@ from backend.common.logging import (
     clear_logging_context,
     configure_logging,
     get_logging_context,
+    GoogleCloudStructuredFormatter,
     logging_context,
     LoggingContextFilter,
     set_logging_context,
 )
 from backend.common.middleware import TraceRequestMiddleware
+
+
+def test_GoogleCloudStructuredFormatter_basic() -> None:
+    """Test that GoogleCloudStructuredFormatter formats logs as JSON."""
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Test message",
+        args=(),
+        exc_info=None,
+    )
+
+    output = formatter.format(record)
+    parsed = json.loads(output)
+
+    assert "message" in parsed
+    assert "severity" in parsed
+    assert parsed["severity"] == "INFO"
+    assert "test_logger: Test message" in parsed["message"]
+
+
+def test_GoogleCloudStructuredFormatter_with_labels() -> None:
+    """Test that GoogleCloudStructuredFormatter includes labels."""
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.WARNING,
+        pathname="test.py",
+        lineno=10,
+        msg="Test message",
+        args=(),
+        exc_info=None,
+    )
+
+    # Set labels on the record (as our filter would do)
+    setattr(record, "labels", {"user_id": "123", "request_id": "abc"})
+
+    output = formatter.format(record)
+    parsed = json.loads(output)
+
+    assert parsed["severity"] == "WARNING"
+    assert "logging.googleapis.com/labels" in parsed
+    assert parsed["logging.googleapis.com/labels"]["user_id"] == "123"
+    assert parsed["logging.googleapis.com/labels"]["request_id"] == "abc"
+
+
+def test_GoogleCloudStructuredFormatter_without_labels() -> None:
+    """Test that GoogleCloudStructuredFormatter works without labels."""
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.ERROR,
+        pathname="test.py",
+        lineno=10,
+        msg="Test error",
+        args=(),
+        exc_info=None,
+    )
+
+    output = formatter.format(record)
+    parsed = json.loads(output)
+
+    assert parsed["severity"] == "ERROR"
+    assert "test_logger: Test error" in parsed["message"]
+    # Should not have labels key if no labels were set
+    assert "logging.googleapis.com/labels" not in parsed
 
 
 def test_LoggingContextFilter_with_labels() -> None:
@@ -173,82 +244,48 @@ def test_configure_logging_prod() -> None:
 
 
 def test_configure_logging_prod_not_unit_test() -> None:
-    """Test that configure_logging preserves Google Cloud handler and applies context filter."""
+    """Test that configure_logging uses structured JSON formatter in production."""
     with patch("backend.common.logging.Environment.is_prod", return_value=True):
         with patch(
             "backend.common.logging.Environment.is_unit_test", return_value=False
         ):
-            # Mock the Google Cloud logging client
-            mock_client = Mock()
-            # Use a real StreamHandler so we can test filter attachment
-            test_handler = logging.StreamHandler()
+            configure_logging()
 
-            with patch("google.cloud.logging.Client", return_value=mock_client):
-                # Mock setup_logging to add a handler like the real one does
-                def mock_setup_logging():
-                    root_logger = logging.getLogger()
-                    # Clear any existing handlers first
-                    root_logger.handlers.clear()
-                    root_logger.addHandler(test_handler)
+            root_logger = logging.getLogger()
+            assert len(root_logger.handlers) > 0
 
-                mock_client.setup_logging = mock_setup_logging
+            handler = root_logger.handlers[0]
+            # Verify our JSON formatter was applied
+            assert isinstance(handler.formatter, GoogleCloudStructuredFormatter)
 
-                configure_logging()
-
-                root_logger = logging.getLogger()
-                # Verify the handler was preserved (not removed)
-                assert test_handler in root_logger.handlers
-
-                # Verify our context filter was applied to the handler
-                filter_found = any(
-                    isinstance(f, LoggingContextFilter) for f in test_handler.filters
-                )
-                assert filter_found
-
-                # Verify the filter is using labels mode in prod
-                context_filter = next(
-                    f
-                    for f in test_handler.filters
-                    if isinstance(f, LoggingContextFilter)
-                )
-                assert context_filter.use_labels is True
+            # Verify the context filter is using labels mode in prod
+            context_filter = next(
+                (f for f in handler.filters if isinstance(f, LoggingContextFilter)),
+                None,
+            )
+            assert context_filter is not None
+            assert context_filter.use_labels is True
 
 
-def test_configure_logging_preserves_multiple_handlers() -> None:
-    """Test that all handlers added by setup_logging get the context filter."""
+def test_configure_logging_handler_in_prod() -> None:
+    """Test that configure_logging sets up handler with correct formatter and filter."""
     with patch("backend.common.logging.Environment.is_prod", return_value=True):
         with patch(
             "backend.common.logging.Environment.is_unit_test", return_value=False
         ):
-            mock_client = Mock()
-            # Create multiple handlers like Google Cloud might add
-            handler1 = logging.StreamHandler()
-            handler2 = logging.StreamHandler()
+            configure_logging()
 
-            with patch("google.cloud.logging.Client", return_value=mock_client):
+            root_logger = logging.getLogger()
+            # Should have exactly one handler
+            assert len(root_logger.handlers) == 1
 
-                def mock_setup_logging():
-                    root_logger = logging.getLogger()
-                    root_logger.handlers.clear()
-                    root_logger.addHandler(handler1)
-                    root_logger.addHandler(handler2)
+            handler = root_logger.handlers[0]
+            # Should be a StreamHandler with our formatter
+            assert isinstance(handler, logging.StreamHandler)
+            assert isinstance(handler.formatter, GoogleCloudStructuredFormatter)
 
-                mock_client.setup_logging = mock_setup_logging
-
-                configure_logging()
-
-                root_logger = logging.getLogger()
-                # Both handlers should be preserved
-                assert handler1 in root_logger.handlers
-                assert handler2 in root_logger.handlers
-
-                # Both should have the context filter
-                assert any(
-                    isinstance(f, LoggingContextFilter) for f in handler1.filters
-                )
-                assert any(
-                    isinstance(f, LoggingContextFilter) for f in handler2.filters
-                )
+            # Should have the context filter
+            assert any(isinstance(f, LoggingContextFilter) for f in handler.filters)
 
 
 def test_TraceRequestMiddleware_initializes_logging_context(app) -> None:

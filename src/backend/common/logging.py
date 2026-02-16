@@ -1,7 +1,7 @@
+import json
 import logging
 from typing import Any, Dict
 
-import google.cloud.logging
 from werkzeug.local import Local
 
 from backend.common.environment import Environment
@@ -49,8 +49,8 @@ class LoggingContextFilter(logging.Filter):
     """
     A logging filter that adds request-local context to log records as labels.
 
-    This filter integrates with Google Cloud Logging's CloudLoggingHandler by
-    setting record.labels, which are then properly indexed and searchable in GCP.
+    This filter integrates with Google Cloud Logging by setting record attributes
+    that are picked up by our custom formatters.
 
     For local development, the labels are formatted as key=value pairs in the message.
     """
@@ -71,7 +71,6 @@ class LoggingContextFilter(logging.Filter):
         if context:
             if self.use_labels:
                 # For Google Cloud: merge context into labels
-                # CloudLoggingFilter expects record.labels to be set by user code
                 existing_labels = getattr(record, "labels", {})
                 setattr(record, "labels", {**existing_labels, **context})
             else:
@@ -80,6 +79,34 @@ class LoggingContextFilter(logging.Filter):
                 record.msg = f"{record.msg} [{context_str}]"
 
         return True
+
+
+class GoogleCloudStructuredFormatter(logging.Formatter):
+    """
+    A JSON formatter for Google Cloud Logging in App Engine.
+
+    App Engine's standard Python 3 runtime automatically integrates with Cloud Logging
+    when you write structured JSON to stdout. This formatter outputs logs in the format
+    expected by App Engine.
+
+    See: https://cloud.google.com/appengine/docs/standard/python3/writing-application-logs
+    """
+
+    def format(self, record: logging.LogRecord) -> str:
+        """Format the log record as JSON for App Engine."""
+        # Start with the basic log structure
+        log_object = {
+            "message": super().format(record),
+            "severity": record.levelname,
+        }
+
+        # Add labels if present (set by LoggingContextFilter)
+        labels = getattr(record, "labels", None)
+        if labels:
+            # Use the special key that App Engine recognizes for labels
+            log_object["logging.googleapis.com/labels"] = labels
+
+        return json.dumps(log_object)
 
 
 def configure_logging() -> None:
@@ -104,16 +131,23 @@ def configure_logging() -> None:
     root_logger.setLevel(logging.getLevelName(log_level.upper()))
 
     if Environment.is_prod() and not Environment.is_unit_test():
-        # Setting this up only needs to be done in prod to ensure logs are grouped properly with the request.
-        # This adds a CloudLoggingHandler with CloudLoggingFilter which supports labels
-        client = google.cloud.logging.Client()
-        client.setup_logging()
+        # In App Engine, write structured JSON to stdout
+        # App Engine's runtime automatically integrates with Cloud Logging
+        # and properly formats these as request logs (protoPayload)
+        formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
 
-        # Add our custom filter to inject logging context as labels
-        # The CloudLoggingHandler will pick up record.labels and send them to GCP
+        # Remove any existing handlers and add our handler
+        for handler in root_logger.handlers[:]:
+            root_logger.removeHandler(handler)
+
+        handler = logging.StreamHandler()
+        handler.setFormatter(formatter)
+
+        # Add our context filter to inject labels
         context_filter = LoggingContextFilter(use_labels=True)
-        for handler in root_logger.handlers:
-            handler.addFilter(context_filter)
+        handler.addFilter(context_filter)
+
+        root_logger.addHandler(handler)
     else:
         # In dev/local, use standard logging format
         formatter = logging.Formatter(
