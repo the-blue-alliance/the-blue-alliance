@@ -43,11 +43,11 @@ from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.search import search_handler
 from backend.web.handlers.static import (
     add_data,
-    faq,
     bigquery,
     brand,
     contact,
     donate,
+    faq,
     opr,
     privacy,
     swag,
