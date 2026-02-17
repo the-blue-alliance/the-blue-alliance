@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Type Check
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make typecheck
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Format & Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make lint
@@ -35,7 +35,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
@@ -52,7 +52,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Download all artifacts
         uses: actions/download-artifact@v7
       - name: Combine coverage
@@ -518,7 +518,7 @@ jobs:
           python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.default == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.default == 'true'
         uses: google-github-actions/auth@v3
@@ -568,7 +568,7 @@ jobs:
           python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.web == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Download production artifacts
         if: steps.changes.outputs.web == 'true'
         uses: actions/download-artifact@v7
@@ -618,7 +618,7 @@ jobs:
           python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.api == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Update env_variables.yaml
         if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/update_env_variables_yaml.sh
@@ -662,7 +662,7 @@ jobs:
           python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.tasks-io == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-io == 'true'
         uses: google-github-actions/auth@v3
@@ -701,7 +701,7 @@ jobs:
           python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.tasks-cpu == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: google-github-actions/auth@v3

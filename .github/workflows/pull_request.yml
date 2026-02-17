@@ -25,7 +25,7 @@ jobs:
               - 'uv.lock'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Type Check
         if: steps.changes.outputs.python == 'true'
         run: make typecheck
@@ -44,7 +44,7 @@ jobs:
               - 'uv.lock'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Format & Lint
         if: steps.changes.outputs.python == 'true'
         run: make lint
@@ -67,7 +67,7 @@ jobs:
               - '.test_durations'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Tests
         if: steps.changes.outputs.python == 'true'
         run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
@@ -95,7 +95,7 @@ jobs:
               - '.test_durations'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Download all artifacts
         if: steps.changes.outputs.python == 'true'
         uses: actions/download-artifact@v7
