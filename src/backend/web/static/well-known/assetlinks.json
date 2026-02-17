@@ -1,0 +1,14 @@
+[
+  {
+    "relation": [
+      "delegate_permission/common.handle_all_urls"
+    ],
+    "target": {
+      "namespace": "android_app",
+      "package_name": "com.thebluealliance.androidclient",
+      "sha256_cert_fingerprints": [
+        "65:01:22:67:93:F4:30:84:E0:8E:BA:24:82:19:4F:22:BF:C4:5F:A3:8F:27:77:A1:2F:4A:AB:8C:73:EA:09:E0"
+      ]
+    }
+  }
+]
