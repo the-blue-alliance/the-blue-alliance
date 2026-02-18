@@ -3,7 +3,7 @@ It is possible to change the way the local instance inside the dev container run
 ```bash
 $ cp tba_dev_config.json tba_dev_config.local.json
 $ edit tba_dev_config.local.json
-$ vagrant halt && vagrant up
+$ docker-compose down && docker-compose up --build
 ```
 
 ## tba_dev_config Options

@@ -335,10 +335,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v6
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v6
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -362,11 +360,6 @@ jobs:
   ops-test:
     name: Ops Fullstack Test
     runs-on: ubuntu-24.04
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
     steps:
       - uses: actions/checkout@v6
       # See https://github.com/puppeteer/puppeteer/issues/12818
@@ -390,40 +383,15 @@ jobs:
       - name: Install Node Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
-      - name: Install Vagrant
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: |
-          wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-          sudo apt update
-          sudo apt install vagrant
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-      - name: Set up Docker Buildx
-        id: buildx
+      - name: Start Containers
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: network=host
-      - name: Build Docker Image
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+      - name: Test Docker Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/build-push-action@v6.19.2
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: ./ops/dev/docker
-          push: true
-          tags: localhost:5000/tba-py3-dev:latest
-          cache-from: |
-            type=gha
-            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-          cache-to: type=gha,mode=max
-      - name: Start Container
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: vagrant up
-      - name: Test Vagrant Startup
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/test_vagrant_startup.py
+        run: python ./ops/test_docker_startup.py
       - name: Test Ops Fullstack
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_ops.sh
@@ -442,11 +410,6 @@ jobs:
           filters: |
             queue:
               - 'src/queue.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.queue == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.queue == 'true'
         uses: google-github-actions/auth@v3
@@ -475,11 +438,6 @@ jobs:
           filters: |
             index:
               - 'src/index.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.index == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.index == 'true'
         uses: google-github-actions/auth@v3
@@ -511,11 +469,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.default == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.default == 'true'
         uses: astral-sh/setup-uv@v7
@@ -561,11 +514,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.web == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.web == 'true'
         uses: astral-sh/setup-uv@v7
@@ -611,11 +559,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.api == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.api == 'true'
         uses: astral-sh/setup-uv@v7
@@ -655,11 +598,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.tasks-io == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.tasks-io == 'true'
         uses: astral-sh/setup-uv@v7
@@ -694,11 +632,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.tasks-cpu == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: astral-sh/setup-uv@v7
@@ -783,11 +716,6 @@ jobs:
           filters: |
             cron:
               - 'src/cron.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.cron == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.cron == 'true'
         uses: google-github-actions/auth@v3
@@ -825,11 +753,6 @@ jobs:
           filters: |
             dispatch:
               - 'src/dispatch.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.dispatch == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.dispatch == 'true'
         uses: google-github-actions/auth@v3

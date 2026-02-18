@@ -34,9 +34,11 @@ describe("GameDay", () => {
     const browser = await puppeteer.launch({ headless: "new" });
     page = await browser.newPage();
 
-    await page.goto("http://localhost:8080/gameday");
+    await page.goto("http://localhost:8080/gameday", {
+      waitUntil: "networkidle0",
+    });
     await page.waitForSelector(".gameday");
-  });
+  }, 30000);
 
   it('should be titled "GameDay - The Blue Alliance"', async () => {
     await expect(page.title()).resolves.toMatch("GameDay - The Blue Alliance");
