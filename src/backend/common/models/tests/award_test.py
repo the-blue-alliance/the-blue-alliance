@@ -156,6 +156,54 @@ def test_normalized_name() -> None:
     assert a3.normalized_name == "Woodie Flowers Award"
 
 
+def test_normalized_name_chairmans_impact() -> None:
+    # Before 2023, should be Chairman's Award
+    a1 = Award(
+        id="2022ct_0",
+        year=2022,
+        award_type_enum=AwardType.CHAIRMANS,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2022ct"),
+        name_str="Regional Chairman's Award",
+    )
+    assert a1.normalized_name == "Chairman's Award"
+
+    # 2023 and later, should be FIRST Impact Award
+    a2 = Award(
+        id="2023ct_0",
+        year=2023,
+        award_type_enum=AwardType.CHAIRMANS,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2023ct"),
+        name_str="Regional FIRST Impact Award",
+    )
+    assert a2.normalized_name == "FIRST Impact Award"
+
+
+def test_normalized_name_deans_list_leadership() -> None:
+    # Before 2025, should be Dean's List (falls through to name_str)
+    a1 = Award(
+        id="2024ct_4",
+        year=2024,
+        award_type_enum=AwardType.DEANS_LIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2024ct"),
+        name_str="FIRST Dean's List Finalist Award",
+    )
+    assert a1.normalized_name == "FIRST Dean's List Finalist Award"
+
+    # 2025 and later, should be FIRST Leadership Award
+    a2 = Award(
+        id="2025ct_4",
+        year=2025,
+        award_type_enum=AwardType.DEANS_LIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2025ct"),
+        name_str="FIRST Leadership Award",
+    )
+    assert a2.normalized_name == "FIRST Leadership Award"
+
+
 def test_recipients_team() -> None:
     recipients = [AwardRecipient(awardee=None, team_number=176)]
     a1 = Award(

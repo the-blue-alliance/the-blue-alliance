@@ -158,6 +158,10 @@ NORMALIZED_NAMES_2023 = {
     AwardType.CHAIRMANS_FINALIST: "FIRST Impact Award Finalist",
 }
 
+NORMALIZED_NAMES_2025 = {
+    AwardType.DEANS_LIST: "FIRST Leadership Award",
+}
+
 
 # Only searchable awards. Obscure & old awards not listed
 SEARCHABLE: Dict[AwardType, str] = {
