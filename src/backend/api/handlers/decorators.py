@@ -1,4 +1,5 @@
 import json
+import logging
 from functools import wraps
 from typing import Callable, Type, TypeVar
 
@@ -23,7 +24,7 @@ from backend.common.profiler import Span
 def api_authenticated(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        with Span("api_authenticated"):
+        with Span("api_authenticated") as span:
             auth_key = request.headers.get(
                 "X-TBA-Auth-Key", request.args.get("X-TBA-Auth-Key")
             )
@@ -38,6 +39,13 @@ def api_authenticated(func):
                     g.auth_description = auth.description
                     # Add API key to logging context for searchability in logs
                     set_logging_context("api_auth_key", auth_key)
+                    # Add to trace span for visibility in Cloud Trace
+                    span.set_label("api_auth_key", auth_key)
+                    span.set_label("auth_owner_id", str(auth_owner_id))
+                    # Log API key usage for visibility in GCP Console
+                    logging.info(
+                        f"API request authenticated with key: {auth_key[:16]}... (owner: {auth_owner_id})"
+                    )
                 else:
                     return (
                         {

@@ -69,6 +69,7 @@ class Span(object):
         Spans are sent by send_traces() which is called when the request context ends
         """
         self._name = name
+        self._labels = {}  # Cloud Trace spans support labels
 
         if hasattr(trace_context, "request") and trace_context.request:
             tcontext = trace_context.request.headers.get(
@@ -86,6 +87,17 @@ class Span(object):
         else:
             self._do_trace = False
 
+    def set_label(self, key: str, value: str) -> None:
+        """
+        Add a label to this span. Labels are key-value pairs that appear in Cloud Trace.
+        They help with filtering and analyzing traces in the GCP Console.
+
+        Args:
+            key: Label key (e.g., "api_key", "user_id")
+            value: Label value (will be converted to string)
+        """
+        self._labels[key] = str(value)
+
     def __enter__(self):
         if self._do_trace:
             logging.debug("CREATED SPAN: {}".format(self._name))
@@ -102,7 +114,7 @@ class Span(object):
     def dict(self):
         """Format as a dictionary of the correct shape for sending to the Cloud
         Trace REST API as a JSON object"""
-        return {
+        span_dict = {
             "kind": "SPAN_KIND_UNSPECIFIED",
             "name": self._name,
             "parentSpanId": self._root_span_id,
@@ -110,3 +122,9 @@ class Span(object):
             "startTime": self._startTime.isoformat() + "Z",
             "endTime": self._endTime.isoformat() + "Z",
         }
+
+        # Add labels if any were set
+        if self._labels:
+            span_dict["labels"] = self._labels
+
+        return span_dict
