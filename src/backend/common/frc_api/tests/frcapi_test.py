@@ -60,18 +60,36 @@ def test_root() -> None:
     mock_get.assert_called_once_with("/", mock.ANY)
 
 
-def test_event_list() -> None:
+def test_event_list_pre_2026() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.event_list(2020)
-    mock_get.assert_called_once_with("/2020/events", mock.ANY)
+    mock_get.assert_called_once_with("/2020/events", mock.ANY, version="v3.0")
 
 
-def test_event_info() -> None:
+def test_event_list_post_2026() -> None:
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.event_list(2026)
+    mock_get.assert_called_once_with("/2026/events", mock.ANY, version="v3.3")
+
+
+def test_event_info_pre_2026() -> None:
     api = FRCAPI("zach")
     with patch.object(FRCAPI, "_get") as mock_get:
         api.event_info(2020, "MIKET")
-    mock_get.assert_called_once_with("/2020/events?eventCode=MIKET", mock.ANY)
+    mock_get.assert_called_once_with(
+        "/2020/events?eventCode=MIKET", mock.ANY, version="v3.0"
+    )
+
+
+def test_event_info_post_2026() -> None:
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.event_info(2026, "MIKET")
+    mock_get.assert_called_once_with(
+        "/2026/events?eventCode=MIKET", mock.ANY, version="v3.3"
+    )
 
 
 def test_event_teams() -> None:

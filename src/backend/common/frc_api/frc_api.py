@@ -3,7 +3,17 @@ import json
 import logging
 import os
 import re
-from typing import Any, cast, Dict, Generator, Literal, Optional, TypedDict, TypeVar
+from typing import (
+    Any,
+    cast,
+    Dict,
+    Generator,
+    Literal,
+    Optional,
+    TypedDict,
+    TypeVar,
+    Union,
+)
 
 from google.appengine.ext import ndb
 from pyre_extensions import JSON, none_throws
@@ -32,6 +42,7 @@ from backend.common.frc_api.types import (
     ScoreDetailModel2026,
     SeasonDistrictListModelV2,
     SeasonEventListModelV31,
+    SeasonEventListModelV33,
     SeasonTeamListModelV2,
     TeamAvatarListingsModelV2,
 )
@@ -118,15 +129,29 @@ class FRCAPI:
 
     def event_list(
         self, year: Year
-    ) -> TypedFuture[TypedURLFetchResult[SeasonEventListModelV31]]:
+    ) -> TypedFuture[
+        TypedURLFetchResult[SeasonEventListModelV31 | SeasonEventListModelV33]
+    ]:
         endpoint = f"/{year}/events"
-        return self._get(endpoint, SeasonEventListModelV31)
+        version = "v3.3" if year >= 2026 else "v3.0"
+        return self._get(
+            endpoint,
+            Union[SeasonEventListModelV31, SeasonEventListModelV33],
+            version=version,
+        )
 
     def event_info(
         self, year: Year, event_short: str
-    ) -> TypedFuture[TypedURLFetchResult[SeasonEventListModelV31]]:
+    ) -> TypedFuture[
+        TypedURLFetchResult[SeasonEventListModelV31 | SeasonEventListModelV33]
+    ]:
         endpoint = f"/{year}/events?eventCode={event_short}"
-        return self._get(endpoint, SeasonEventListModelV31)
+        version = "v3.3" if year >= 2026 else "v3.0"
+        return self._get(
+            endpoint,
+            Union[SeasonEventListModelV31, SeasonEventListModelV33],
+            version=version,
+        )
 
     def event_teams(
         self, year: Year, event_short: str, page: int

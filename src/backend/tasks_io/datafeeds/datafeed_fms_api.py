@@ -18,6 +18,7 @@ from backend.common.frc_api.types import (
     EventScheduleHybridModelV2,
     SeasonDistrictListModelV2,
     SeasonEventListModelV31,
+    SeasonEventListModelV33,
     SeasonTeamListModelV2,
     TeamAvatarListingsModelV2,
 )
@@ -159,9 +160,9 @@ class DatafeedFMSAPI:
     def get_event_list(
         self, year: Year
     ) -> Generator[Any, Any, Tuple[List[Event], List[District]]]:
-        event_list_response: TypedURLFetchResult[SeasonEventListModelV31] = (
-            yield self.api.event_list(year)
-        )
+        event_list_response: TypedURLFetchResult[
+            SeasonEventListModelV31 | SeasonEventListModelV33
+        ] = (yield self.api.event_list(year))
         result = self._parse(event_list_response, FMSAPIEventListParser(year))
         return result or ([], [])
 
@@ -175,9 +176,9 @@ class DatafeedFMSAPI:
 
         event = Event.get_by_id(event_key)
         api_event_short = self._get_event_short(year, event_short, event)
-        event_info_response: TypedURLFetchResult[SeasonEventListModelV31] = (
-            yield self.api.event_info(year, api_event_short)
-        )
+        event_info_response: TypedURLFetchResult[
+            SeasonEventListModelV31 | SeasonEventListModelV33
+        ] = (yield self.api.event_info(year, api_event_short))
         result = self._parse(
             event_info_response,
             FMSAPIEventListParser(year, short=event_short),
