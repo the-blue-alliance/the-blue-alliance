@@ -67,7 +67,7 @@ export default tseslint.config([
       pluginReact.configs.flat.recommended,
       pluginReact.configs.flat['jsx-runtime'],
     ],
-    settings: { react: { version: 'detect' } },
+    settings: { react: { version: '19' } }, // Avoids auto-detection crash
     languageOptions: { globals: globals.browser },
     rules: {
       'react/prop-types': 'off',
