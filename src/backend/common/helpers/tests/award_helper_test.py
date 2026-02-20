@@ -50,6 +50,7 @@ def test_organize_awards() -> None:
         ("Dean's List Winner #9", AwardType.DEANS_LIST),
         ("Dean's List Winner", AwardType.DEANS_LIST),
         ("Dean's List", AwardType.DEANS_LIST),
+        ("FIRST Leadership Award", AwardType.DEANS_LIST),
         (
             "Excellence in Design Award sponsored by Autodesk (3D CAD)",
             AwardType.EXCELLENCE_IN_DESIGN_CAD,
