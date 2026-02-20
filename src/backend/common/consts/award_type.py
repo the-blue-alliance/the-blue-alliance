@@ -158,7 +158,7 @@ NORMALIZED_NAMES_2023 = {
     AwardType.CHAIRMANS_FINALIST: "FIRST Impact Award Finalist",
 }
 
-NORMALIZED_NAMES_2025 = {
+NORMALIZED_NAMES_2026 = {
     AwardType.DEANS_LIST: "FIRST Leadership Award",
 }
 
