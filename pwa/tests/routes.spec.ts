@@ -37,6 +37,7 @@ const allRoutes = defineAllRoutes([
   '/match_suggestion',
   '/match/$matchKey',
   '/privacy',
+  '/search',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
   '/team/$teamNumber/stats',
