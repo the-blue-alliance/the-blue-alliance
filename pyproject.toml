@@ -10,7 +10,7 @@ dependencies = [
     "Flask-Caching==2.3.1",
     "Flask-Cors==6.0.2",
     "Flask-WTF==1.2.2",
-    "google-api-core==2.29.0",
+    "google-api-core==2.30.0",
     "google-api-python-client==2.190.0",
     "google-cloud-logging==3.13.0",
     "google-cloud-run==0.15.0",
