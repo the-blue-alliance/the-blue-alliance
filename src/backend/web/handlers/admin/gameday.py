@@ -40,6 +40,10 @@ def gameday_dashboard_post() -> Response:
         if webcast_file:
             webcast["file"] = webcast_file
 
+        webcast_date = request.form.get("webcast_date")
+        if webcast_date:
+            webcast["date"] = webcast_date
+
         GamedaySpecialWebcasts.add_special_webcast(webcast)
     elif action == "delete" and item == "webcast":
         key_to_remove = request.form["webcast_key"]
