@@ -27,6 +27,7 @@ from backend.common.frc_api.types import (
     EventRankingListModelV2,
     EventScheduleHybridModelV2,
     MatchResultListModelV2,
+    RegionalRankingTeamDetailListModelV31,
     ScheduleListModelV31,
     ScoreDetailModel2015,
     ScoreDetailModel2016,
@@ -239,6 +240,12 @@ class FRCAPI:
             f"/{year}/rankings/district?districtCode={district_short}&page={page}"
         )
         return self._get(endpoint, DistrictRankingListModelV2)
+
+    def regional_rankings(
+        self, year: Year, page: int
+    ) -> TypedFuture[TypedURLFetchResult[RegionalRankingTeamDetailListModelV31]]:
+        endpoint = f"/{year}/rankings/regional/teamdetail?page={page}"
+        return self._get(endpoint, RegionalRankingTeamDetailListModelV31)
 
     """ Attempt to fetch the endpoint from the FRC API
 
