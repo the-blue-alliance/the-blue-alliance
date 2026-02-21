@@ -116,6 +116,10 @@ import {
 } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
 import {
+  getDefaultAutoComponentName,
+  getDefaultTeleopComponentName,
+} from '~/lib/oprUtils';
+import {
   RANKING_POINT_LABELS,
   getBonusRankingPoints,
 } from '~/lib/rankingPoints';
@@ -408,6 +412,8 @@ function EventPage() {
                     : { teams: {} }
                 }
                 coprs={coprsQuery.data}
+                defaultXCopr={getDefaultTeleopComponentName(event.year)}
+                defaultYCopr={getDefaultAutoComponentName(event.year)}
               />
               <ComponentsTable coprs={coprsQuery.data} year={event.year} />
             </>

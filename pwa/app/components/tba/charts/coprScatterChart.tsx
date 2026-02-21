@@ -93,12 +93,16 @@ function getNonWhiteTeamColor(
 export default function CoprScatterChart({
   coprs,
   colors,
+  defaultXCopr,
+  defaultYCopr,
 }: {
   coprs: EventCoprs;
   colors: EventColors;
+  defaultXCopr: string;
+  defaultYCopr: string;
 }) {
-  const [selectedXCopr, setSelectedXCopr] = useState('teleopPoints');
-  const [selectedYCopr, setSelectedYCopr] = useState('autoPoints');
+  const [selectedXCopr, setSelectedXCopr] = useState(defaultXCopr);
+  const [selectedYCopr, setSelectedYCopr] = useState(defaultYCopr);
   const [data, setData] = useState<Datapoint[]>([]);
 
   useEffect(() => {
