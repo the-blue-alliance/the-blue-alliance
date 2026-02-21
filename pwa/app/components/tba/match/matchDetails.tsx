@@ -7,6 +7,7 @@ import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
+import ScoreBreakdown2026 from '~/components/tba/match/scoreBreakdown2026';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
@@ -15,6 +16,7 @@ import {
   isScoreBreakdown2023,
   isScoreBreakdown2024,
   isScoreBreakdown2025,
+  isScoreBreakdown2026,
 } from '~/lib/rankingPoints';
 
 function formatMatchDate(timestamp: number, timezone: string): string {
@@ -93,6 +95,15 @@ export default function MatchDetails({
     match.actual_time ?? match.time ?? match.predicted_time;
 
   let sbDiv = null;
+
+  if (isScoreBreakdown2026(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2026
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
 
   if (isScoreBreakdown2025(match.score_breakdown)) {
     sbDiv = (
