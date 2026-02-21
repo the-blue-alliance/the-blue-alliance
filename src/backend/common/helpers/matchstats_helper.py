@@ -178,6 +178,65 @@ MANUAL_COMPONENTS = {
             ]
         ),
     },
+    2026: {
+        "Hub Auto Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("autoCount", 0),
+        "Hub Auto Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("autoPoints", 0),
+        "Hub Endgame Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("endgameCount", 0),
+        "Hub Endgame Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("endgamePoints", 0),
+        "Hub Shift 1 Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift1Count", 0),
+        "Hub Shift 1 Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift1Points", 0),
+        "Hub Shift 2 Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift2Count", 0),
+        "Hub Shift 2 Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift2Points", 0),
+        "Hub Shift 3 Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift3Count", 0),
+        "Hub Shift 3 Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift3Points", 0),
+        "Hub Shift 4 Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift4Count", 0),
+        "Hub Shift 4 Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift4Points", 0),
+        "Hub Teleop Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("teleopCount", 0),
+        "Hub Teleop Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("teleopPoints", 0),
+        "Hub Total Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("totalCount", 0),
+        "Hub Total Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("totalPoints", 0),
+        "Hub Transition Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("transitionCount", 0),
+        "Hub Transition Points": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("transitionPoints", 0),
+        "Hub Uncounted": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("uncounted", 0),
+    },
 }
 
 
@@ -299,24 +358,25 @@ class MatchstatsHelper(object):
     @classmethod
     def calculate_coprs(cls, matches: List[Match], year: Year) -> EventComponentOPRs:
         coprs: OrderedDict[Component, TeamStatMap] = OrderedDict()
+        matches_with_score_breakdown = [
+            match for match in matches if match.score_breakdown is not None
+        ]
 
-        if matches is None or len(matches) == 0:
+        if len(matches_with_score_breakdown) == 0:
             return coprs
 
-        first_match = matches[0]
-        if first_match.score_breakdown is None:
-            return coprs
+        first_match = matches_with_score_breakdown[0]
 
-        team_list, team_id_map = cls.build_team_mapping(matches)
+        team_list, team_id_map = cls.build_team_mapping(matches_with_score_breakdown)
         if not team_list:
             return {}
 
-        Minv = cls.build_Minv_matrix(matches, team_id_map)
+        Minv = cls.build_Minv_matrix(matches_with_score_breakdown, team_id_map)
 
         if year in MANUAL_COMPONENTS.keys():
             for name, accessor in MANUAL_COMPONENTS[year].items():
                 coprs[name] = cls.calc_stat(
-                    matches, team_list, team_id_map, Minv, accessor
+                    matches_with_score_breakdown, team_list, team_id_map, Minv, accessor
                 )
 
         # For each k-v in score_breakdown, attempt to convert v to a float.
@@ -332,7 +392,7 @@ class MatchstatsHelper(object):
                 pass
             else:
                 coprs[component] = cls.calc_stat(
-                    matches,
+                    matches_with_score_breakdown,
                     team_list,
                     team_id_map,
                     Minv,
