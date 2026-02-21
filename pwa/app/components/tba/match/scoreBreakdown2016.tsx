@@ -270,8 +270,7 @@ export default function ScoreBreakdown2016({
         }
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.breachPoints} /{' '}
-          {scoreBreakdown.red.capturePoints}
+          {scoreBreakdown.red.breachPoints} / {scoreBreakdown.red.capturePoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
           Breach / Capture Points

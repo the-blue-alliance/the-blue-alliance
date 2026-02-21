@@ -70,22 +70,19 @@ export default function ScoreBreakdown2019({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot1 ===
-              'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot1 === 'CrossedHabLineInSandstorm'
             }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot2 ===
-              'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot2 === 'CrossedHabLineInSandstorm'
             }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot3 ===
-              'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot3 === 'CrossedHabLineInSandstorm'
             }
             teamKey={match.alliances.blue.team_keys[2]}
           />
