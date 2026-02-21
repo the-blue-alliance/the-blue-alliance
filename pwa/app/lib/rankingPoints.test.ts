@@ -11,6 +11,8 @@ import {
   isScoreBreakdown2022Alliance,
   isScoreBreakdown2023Alliance,
   isScoreBreakdown2024Alliance,
+  isScoreBreakdown2025Alliance,
+  isScoreBreakdown2026Alliance,
 } from '~/lib/rankingPoints';
 
 describe('rankingPoints', () => {
@@ -111,6 +113,30 @@ describe('rankingPoints', () => {
   );
 
   test.each([
+    [{ coralBonusAchieved: true }, true],
+    [{ coralBonusAchieved: false }, true],
+    [{}, false],
+  ])(
+    'isScoreBreakdown2025Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2025Alliance(score_breakdown)).toBe(expected);
+    },
+  );
+
+  test.each([
+    [{ energizedAchieved: true }, true],
+    [{ energizedAchieved: false }, true],
+    [{}, false],
+  ])(
+    'isScoreBreakdown2026Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2026Alliance(score_breakdown)).toBe(expected);
+    },
+  );
+
+  test.each([
     [{ teleopDefensesBreached: true }, [true, false]],
     [
       { teleopDefensesBreached: false, teleopTowerCaptured: true },
@@ -197,6 +223,36 @@ describe('rankingPoints', () => {
       [false, true],
     ],
     [{ melodyBonusAchieved: true, ensembleBonusAchieved: true }, [true, true]],
+
+    // 2025
+    [{ coralBonusAchieved: true }, [false, true, false]],
+    [
+      { autoBonusAchieved: true, coralBonusAchieved: false },
+      [true, false, false],
+    ],
+    [
+      {
+        autoBonusAchieved: true,
+        coralBonusAchieved: true,
+        bargeBonusAchieved: true,
+      },
+      [true, true, true],
+    ],
+
+    // 2026
+    [{ energizedAchieved: true }, [true, false, false]],
+    [
+      { energizedAchieved: false, superchargedAchieved: true },
+      [false, true, false],
+    ],
+    [
+      {
+        energizedAchieved: true,
+        superchargedAchieved: true,
+        traversalAchieved: true,
+      },
+      [true, true, true],
+    ],
   ])(
     `getBonusRankingPoints (%#)`,
     (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {

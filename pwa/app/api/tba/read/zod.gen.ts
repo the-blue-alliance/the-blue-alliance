@@ -1360,6 +1360,7 @@ export const zMatch = z.object({
     zMatchScoreBreakdown2023,
     zMatchScoreBreakdown2024,
     zMatchScoreBreakdown2025,
+    zMatchScoreBreakdown2026,
     z.null(),
   ]),
   videos: z.array(

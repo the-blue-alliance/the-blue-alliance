@@ -20,6 +20,8 @@ import {
   MatchScoreBreakdown2024Alliance,
   MatchScoreBreakdown2025,
   MatchScoreBreakdown2025Alliance,
+  MatchScoreBreakdown2026,
+  MatchScoreBreakdown2026Alliance,
 } from '~/api/tba/read';
 
 export const RANKING_POINT_LABELS: Record<number, string[]> = {
@@ -33,6 +35,7 @@ export const RANKING_POINT_LABELS: Record<number, string[]> = {
   2023: ['Sustainability Bonus', 'Activation Bonus'],
   2024: ['Melody Bonus', 'Ensemble Bonus'],
   2025: ['Auto Bonus', 'Coral Bonus', 'Barge Bonus'],
+  2026: ['Energized Bonus', 'Supercharged Bonus', 'Traversal Bonus'],
 };
 
 export type MatchScoreBreakdown = Match['score_breakdown'];
@@ -226,6 +229,25 @@ export function isScoreBreakdown2025Alliance(
   );
 }
 
+export function isScoreBreakdown2026(
+  scoreBreakdown: MatchScoreBreakdown,
+): scoreBreakdown is MatchScoreBreakdown2026 {
+  return (
+    scoreBreakdown !== null &&
+    (scoreBreakdown.red as MatchScoreBreakdown2026Alliance)
+      .energizedAchieved !== undefined
+  );
+}
+
+export function isScoreBreakdown2026Alliance(
+  scoreBreakdown: MatchScoreBreakdownAlliance,
+): scoreBreakdown is MatchScoreBreakdown2026Alliance {
+  return (
+    (scoreBreakdown as MatchScoreBreakdown2026Alliance).energizedAchieved !==
+    undefined
+  );
+}
+
 export function getBonusRankingPoints(
   scoreBreakdown: MatchScoreBreakdownAlliance,
 ): boolean[] {
@@ -290,6 +312,14 @@ export function getBonusRankingPoints(
       scoreBreakdown.autoBonusAchieved ?? false,
       scoreBreakdown.coralBonusAchieved ?? false,
       scoreBreakdown.bargeBonusAchieved ?? false,
+    ];
+  }
+
+  if (isScoreBreakdown2026Alliance(scoreBreakdown)) {
+    return [
+      scoreBreakdown.energizedAchieved ?? false,
+      scoreBreakdown.superchargedAchieved ?? false,
+      scoreBreakdown.traversalAchieved ?? false,
     ];
   }
 

@@ -7177,6 +7177,9 @@
               },
               {
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2025"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2026"
               }
             ],
             "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
