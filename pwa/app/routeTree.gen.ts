@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThanksRouteImport } from './routes/thanks'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
+import { Route as HallOfFameRouteImport } from './routes/hall-of-fame'
 import { Route as GamedayRouteImport } from './routes/gameday'
 import { Route as DonateRouteImport } from './routes/donate'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -47,6 +48,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const Match_suggestionRoute = Match_suggestionRouteImport.update({
   id: '/match_suggestion',
   path: '/match_suggestion',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const HallOfFameRoute = HallOfFameRouteImport.update({
+  id: '/hall-of-fame',
+  path: '/hall-of-fame',
   getParentRoute: () => rootRouteImport,
 } as any)
 const GamedayRoute = GamedayRouteImport.update({
@@ -169,6 +175,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
+  '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
@@ -195,6 +202,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
+  '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
@@ -222,6 +230,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
+  '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
@@ -250,6 +259,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/donate'
     | '/gameday'
+    | '/hall-of-fame'
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
@@ -276,6 +286,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/donate'
     | '/gameday'
+    | '/hall-of-fame'
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
@@ -302,6 +313,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/donate'
     | '/gameday'
+    | '/hall-of-fame'
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
@@ -329,6 +341,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRoute
   GamedayRoute: typeof GamedayRoute
+  HallOfFameRoute: typeof HallOfFameRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
   ThanksRoute: typeof ThanksRoute
@@ -369,6 +382,13 @@ declare module '@tanstack/react-router' {
       path: '/match_suggestion'
       fullPath: '/match_suggestion'
       preLoaderRoute: typeof Match_suggestionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/hall-of-fame': {
+      id: '/hall-of-fame'
+      path: '/hall-of-fame'
+      fullPath: '/hall-of-fame'
+      preLoaderRoute: typeof HallOfFameRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/gameday': {
@@ -529,6 +549,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   DonateRoute: DonateRoute,
   GamedayRoute: GamedayRoute,
+  HallOfFameRoute: HallOfFameRoute,
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
   ThanksRoute: ThanksRoute,
