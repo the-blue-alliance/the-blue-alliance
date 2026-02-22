@@ -10,6 +10,7 @@ import DateIcon from '~icons/lucide/calendar-days';
 import StatbotIcon from '~icons/lucide/chart-spline';
 import WebsiteIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
+import DistrictPointsIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import InsightsIcon from '~icons/lucide/scatter-chart';
 import AwardsIcon from '~icons/lucide/trophy';
@@ -23,6 +24,7 @@ import {
   EliminationAlliance,
   Event,
   EventCoprs,
+  EventDistrictPoints,
   Match,
   Media,
   Team,
@@ -32,6 +34,7 @@ import {
   getEventAlliancesOptions,
   getEventAwardsOptions,
   getEventCoprsOptions,
+  getEventDistrictPointsOptions,
   getEventMatchesOptions,
   getEventOptions,
   getEventRankingsOptions,
@@ -233,6 +236,10 @@ function EventPage() {
     getEventTeamMediaOptions({ path: { event_key: eventKey } }),
   );
 
+  const districtPointsQuery = useQuery(
+    getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
+  );
+
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
     [matches],
@@ -354,6 +361,14 @@ function EventPage() {
                 </InlineIcon>
               </TabsTrigger>
             )}
+          {districtPointsQuery.data && (
+            <TabsTrigger value="district-points">
+              <InlineIcon>
+                <DistrictPointsIcon />
+                District Points
+              </InlineIcon>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MediaIcon />
@@ -419,6 +434,15 @@ function EventPage() {
             </>
           )}
         </TabsContent>
+
+        {districtPointsQuery.data && (
+          <TabsContent value="district-points">
+            <DistrictPointsTab
+              districtPoints={districtPointsQuery.data}
+              year={event.year}
+            />
+          </TabsContent>
+        )}
 
         <TabsContent value="media">
           <MediaTab webcasts={event.webcasts} eventKey={event.key} />
@@ -830,6 +854,66 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
       </Card>
     </div>
   );
+}
+
+function DistrictPointsTab({
+  districtPoints,
+  year,
+}: {
+  districtPoints: EventDistrictPoints;
+  year: number;
+}) {
+  const columns: ColumnDef<{
+    teamKey: string;
+    qualPoints: number;
+    elimPoints: number;
+    alliancePoints: number;
+    awardPoints: number;
+    total: number;
+  }>[] = [
+    {
+      header: 'Team',
+      accessorFn: (row) => row.teamKey,
+      cell: (cell) => (
+        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
+          {cell.getValue<string>().substring(3)}
+        </TeamLink>
+      ),
+    },
+    {
+      header: 'Qual',
+      accessorFn: (row) => row.qualPoints,
+    },
+    {
+      header: 'Elim',
+      accessorFn: (row) => row.elimPoints,
+    },
+    {
+      header: 'Alliance',
+      accessorFn: (row) => row.alliancePoints,
+    },
+    {
+      header: 'Award',
+      accessorFn: (row) => row.awardPoints,
+    },
+    {
+      header: 'Total',
+      accessorFn: (row) => row.total,
+    },
+  ];
+
+  const data = Object.entries(districtPoints.points)
+    .map(([teamKey, points]) => ({
+      teamKey,
+      qualPoints: points.qual_points,
+      elimPoints: points.elim_points,
+      alliancePoints: points.alliance_points,
+      awardPoints: points.award_points,
+      total: points.total,
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  return <DataTable columns={columns} data={data} />;
 }
 
 function MediaTab({
