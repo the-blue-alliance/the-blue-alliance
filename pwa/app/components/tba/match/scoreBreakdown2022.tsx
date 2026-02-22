@@ -4,8 +4,14 @@ import {
   ConditionalRpAchieved,
   FoulDisplay,
 } from '~/components/tba/match/common';
+import {
+  ScoreBreakdownAllianceCell,
+  ScoreBreakdownLabelCell,
+  ScoreBreakdownRow,
+  ScoreBreakdownTable,
+} from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
+import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
 export default function ScoreBreakdown2022({
   scoreBreakdown,
@@ -15,344 +21,377 @@ export default function ScoreBreakdown2022({
   match: Match;
 }) {
   return (
-    <Table className="table-fixed overflow-hidden rounded-lg text-center">
-      <colgroup>
-        <col />
-        <col className="w-[45%]" />
-        <col />
-      </colgroup>
-      <TableBody>
-        {/* Taxi */}
-        <TableRow>
-          <TableCell
-            className="bg-alliance-red-dark whitespace-nowrap *:align-middle"
-          >
-            <ConditionalCheckmark
-              condition={scoreBreakdown.red.taxiRobot1 === 'Yes'}
-              teamKey={match.alliances.red.team_keys[0].substring(3)}
-            />
-            <ConditionalCheckmark
-              condition={scoreBreakdown.red.taxiRobot2 === 'Yes'}
-              teamKey={match.alliances.red.team_keys[1].substring(3)}
-            />
-            <ConditionalCheckmark
-              condition={scoreBreakdown.red.taxiRobot3 === 'Yes'}
-              teamKey={match.alliances.red.team_keys[2].substring(3)}
-            />
-            (+{scoreBreakdown.red.autoTaxiPoints})
-          </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Taxi
-          </TableCell>
-          <TableCell
-            className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
-          >
-            <ConditionalCheckmark
-              condition={scoreBreakdown.blue.taxiRobot1 === 'Yes'}
-              teamKey={match.alliances.blue.team_keys[0].substring(3)}
-            />
-            <ConditionalCheckmark
-              condition={scoreBreakdown.blue.taxiRobot2 === 'Yes'}
-              teamKey={match.alliances.blue.team_keys[1].substring(3)}
-            />
-            <ConditionalCheckmark
-              condition={scoreBreakdown.blue.taxiRobot3 === 'Yes'}
-              teamKey={match.alliances.blue.team_keys[2].substring(3)}
-            />
-            (+{scoreBreakdown.blue.autoTaxiPoints})
-          </TableCell>
-        </TableRow>
+    <ScoreBreakdownTable>
+      {/* Taxi */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.autoTaxiPoints}
+        blueValue={scoreBreakdown.blue.autoTaxiPoints}
+      >
+        <ScoreBreakdownAllianceCell
+          color="red"
+          shade="dark"
+          className="whitespace-nowrap *:align-middle"
+        >
+          <ConditionalCheckmark
+            condition={scoreBreakdown.red.taxiRobot1 === 'Yes'}
+            teamKey={match.alliances.red.team_keys[0]}
+          />
+          <ConditionalCheckmark
+            condition={scoreBreakdown.red.taxiRobot2 === 'Yes'}
+            teamKey={match.alliances.red.team_keys[1]}
+          />
+          <ConditionalCheckmark
+            condition={scoreBreakdown.red.taxiRobot3 === 'Yes'}
+            teamKey={match.alliances.red.team_keys[2]}
+          />
+          (+{scoreBreakdown.red.autoTaxiPoints})
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark">Taxi</ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell
+          color="blue"
+          shade="dark"
+          className="whitespace-nowrap *:align-middle"
+        >
+          <ConditionalCheckmark
+            condition={scoreBreakdown.blue.taxiRobot1 === 'Yes'}
+            teamKey={match.alliances.blue.team_keys[0]}
+          />
+          <ConditionalCheckmark
+            condition={scoreBreakdown.blue.taxiRobot2 === 'Yes'}
+            teamKey={match.alliances.blue.team_keys[1]}
+          />
+          <ConditionalCheckmark
+            condition={scoreBreakdown.blue.taxiRobot3 === 'Yes'}
+            teamKey={match.alliances.blue.team_keys[2]}
+          />
+          (+{scoreBreakdown.blue.autoTaxiPoints})
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Auto Cargo Lower */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.autoCargoLowerNear ?? 0}
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Auto Cargo Lower Hub
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.autoCargoLowerNear ?? 0}
-          </TableCell>
-        </TableRow>
+      {/* Auto Cargo Lower */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.autoCargoLowerNear ?? 0}
+        blueValue={scoreBreakdown.blue.autoCargoLowerNear ?? 0}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.autoCargoLowerNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Auto Cargo Lower Hub
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.autoCargoLowerNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Auto Cargo Upper */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.autoCargoUpperNear ?? 0}
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Auto Cargo Upper Hub
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.autoCargoUpperNear ?? 0}
-          </TableCell>
-        </TableRow>
+      {/* Auto Cargo Upper */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.autoCargoUpperNear ?? 0}
+        blueValue={scoreBreakdown.blue.autoCargoUpperNear ?? 0}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.autoCargoUpperNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Auto Cargo Upper Hub
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.autoCargoUpperNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Auto Cargo Points */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-dark">
-            {scoreBreakdown.red.autoCargoPoints}
-          </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Auto Cargo Points
-          </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
-            {scoreBreakdown.blue.autoCargoPoints}
-          </TableCell>
-        </TableRow>
+      {/* Auto Cargo Points */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.autoCargoPoints}
+        blueValue={scoreBreakdown.blue.autoCargoPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          {scoreBreakdown.red.autoCargoPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark">
+          Auto Cargo Points
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          {scoreBreakdown.blue.autoCargoPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Total Auto */}
-        <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
-            {scoreBreakdown.red.autoPoints}
-          </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Total Auto
-          </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
-            {scoreBreakdown.blue.autoPoints}
-          </TableCell>
-        </TableRow>
+      {/* Total Auto */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.autoPoints}
+        blueValue={scoreBreakdown.blue.autoPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          {scoreBreakdown.red.autoPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark" fontWeight="bold">
+          Total Auto
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          {scoreBreakdown.blue.autoPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Teleop Cargo Lower */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.teleopCargoLowerNear ?? 0}
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Teleop Cargo Lower Hub
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.teleopCargoLowerNear ?? 0}
-          </TableCell>
-        </TableRow>
+      {/* Teleop Cargo Lower */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.teleopCargoLowerNear ?? 0}
+        blueValue={scoreBreakdown.blue.teleopCargoLowerNear ?? 0}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.teleopCargoLowerNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Teleop Cargo Lower Hub
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.teleopCargoLowerNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Teleop Cargo Upper */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.teleopCargoUpperNear ?? 0}
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Teleop Cargo Upper Hub
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.teleopCargoUpperNear ?? 0}
-          </TableCell>
-        </TableRow>
+      {/* Teleop Cargo Upper */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.teleopCargoUpperNear ?? 0}
+        blueValue={scoreBreakdown.blue.teleopCargoUpperNear ?? 0}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.teleopCargoUpperNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Teleop Cargo Upper Hub
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.teleopCargoUpperNear ?? 0}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Teleop Cargo Points */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-dark">
-            {scoreBreakdown.red.teleopCargoPoints}
-          </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Teleop Cargo Points
-          </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
-            {scoreBreakdown.blue.teleopCargoPoints}
-          </TableCell>
-        </TableRow>
+      {/* Teleop Cargo Points */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.teleopCargoPoints}
+        blueValue={scoreBreakdown.blue.teleopCargoPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          {scoreBreakdown.red.teleopCargoPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark">
+          Teleop Cargo Points
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          {scoreBreakdown.blue.teleopCargoPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Robot 1 Endgame */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <EndgameRobotCell
-              endgame={scoreBreakdown.red.endgameRobot1}
-              teamKey={match.alliances.red.team_keys[0]}
-            />
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Robot 1 Endgame
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <EndgameRobotCell
-              endgame={scoreBreakdown.blue.endgameRobot1}
-              teamKey={match.alliances.blue.team_keys[0]}
-            />
-          </TableCell>
-        </TableRow>
+      {/* Robot 1 Endgame */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <EndgameRobotCell
+            endgame={scoreBreakdown.red.endgameRobot1}
+            teamKey={match.alliances.red.team_keys[0]}
+          />
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Robot 1 Endgame
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <EndgameRobotCell
+            endgame={scoreBreakdown.blue.endgameRobot1}
+            teamKey={match.alliances.blue.team_keys[0]}
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Robot 2 Endgame */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <EndgameRobotCell
-              endgame={scoreBreakdown.red.endgameRobot2}
-              teamKey={match.alliances.red.team_keys[1]}
-            />
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Robot 2 Endgame
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <EndgameRobotCell
-              endgame={scoreBreakdown.blue.endgameRobot2}
-              teamKey={match.alliances.blue.team_keys[1]}
-            />
-          </TableCell>
-        </TableRow>
+      {/* Robot 2 Endgame */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <EndgameRobotCell
+            endgame={scoreBreakdown.red.endgameRobot2}
+            teamKey={match.alliances.red.team_keys[1]}
+          />
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Robot 2 Endgame
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <EndgameRobotCell
+            endgame={scoreBreakdown.blue.endgameRobot2}
+            teamKey={match.alliances.blue.team_keys[1]}
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Robot 3 Endgame */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <EndgameRobotCell
-              endgame={scoreBreakdown.red.endgameRobot3}
-              teamKey={match.alliances.red.team_keys[2]}
-            />
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Robot 3 Endgame
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <EndgameRobotCell
-              endgame={scoreBreakdown.blue.endgameRobot3}
-              teamKey={match.alliances.blue.team_keys[2]}
-            />
-          </TableCell>
-        </TableRow>
+      {/* Robot 3 Endgame */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <EndgameRobotCell
+            endgame={scoreBreakdown.red.endgameRobot3}
+            teamKey={match.alliances.red.team_keys[2]}
+          />
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Robot 3 Endgame
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <EndgameRobotCell
+            endgame={scoreBreakdown.blue.endgameRobot3}
+            teamKey={match.alliances.blue.team_keys[2]}
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Endgame Points */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-dark">
-            {scoreBreakdown.red.endgamePoints}
-          </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Endgame Points
-          </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
-            {scoreBreakdown.blue.endgamePoints}
-          </TableCell>
-        </TableRow>
+      {/* Endgame Points */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.endgamePoints}
+        blueValue={scoreBreakdown.blue.endgamePoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          {scoreBreakdown.red.endgamePoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark">
+          Endgame Points
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          {scoreBreakdown.blue.endgamePoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Total Teleop */}
-        <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
-            {scoreBreakdown.red.teleopPoints}
-          </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Total Teleop
-          </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
-            {scoreBreakdown.blue.teleopPoints}
-          </TableCell>
-        </TableRow>
+      {/* Total Teleop */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.teleopPoints}
+        blueValue={scoreBreakdown.blue.teleopPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark">
+          {scoreBreakdown.red.teleopPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark" fontWeight="bold">
+          Total Teleop
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark">
+          {scoreBreakdown.blue.teleopPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Quintet Achieved */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <ConditionalRpAchieved
-              condition={scoreBreakdown.red.quintetAchieved ?? false}
-            />
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Quintet Achieved
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <ConditionalRpAchieved
-              condition={scoreBreakdown.blue.quintetAchieved ?? false}
-            />
-          </TableCell>
-        </TableRow>
+      {/* Quintet Achieved */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <ConditionalRpAchieved
+            condition={scoreBreakdown.red.quintetAchieved ?? false}
+          />
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Quintet Achieved
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <ConditionalRpAchieved
+            condition={scoreBreakdown.blue.quintetAchieved ?? false}
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Cargo Bonus RP */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <ConditionalRpAchieved
-              condition={scoreBreakdown.red.cargoBonusRankingPoint ?? false}
-            />
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Cargo Bonus RP
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <ConditionalRpAchieved
-              condition={scoreBreakdown.blue.cargoBonusRankingPoint ?? false}
-            />
-          </TableCell>
-        </TableRow>
+      {/* Cargo Bonus RP */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <ConditionalRpAchieved
+            condition={scoreBreakdown.red.cargoBonusRankingPoint ?? false}
+          />
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Cargo Bonus RP
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <ConditionalRpAchieved
+            condition={scoreBreakdown.blue.cargoBonusRankingPoint ?? false}
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Hangar Bonus RP */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <ConditionalRpAchieved
-              condition={scoreBreakdown.red.hangarBonusRankingPoint ?? false}
-            />
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Hangar Bonus RP
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <ConditionalRpAchieved
-              condition={scoreBreakdown.blue.hangarBonusRankingPoint ?? false}
-            />
-          </TableCell>
-        </TableRow>
+      {/* Hangar Bonus RP */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <ConditionalRpAchieved
+            condition={scoreBreakdown.red.hangarBonusRankingPoint ?? false}
+          />
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Hangar Bonus RP
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <ConditionalRpAchieved
+            condition={scoreBreakdown.blue.hangarBonusRankingPoint ?? false}
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Fouls */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <FoulDisplay
-              foulsReceived={scoreBreakdown.red.foulCount}
-              pointsPerFoul={4}
-              techFoulsReceived={scoreBreakdown.red.techFoulCount}
-              pointsPerTechFoul={8}
-              techOrMajor="tech"
-            />
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Fouls
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <FoulDisplay
-              foulsReceived={scoreBreakdown.blue.foulCount}
-              pointsPerFoul={4}
-              techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-              pointsPerTechFoul={8}
-              techOrMajor="tech"
-            />
-          </TableCell>
-        </TableRow>
+      {/* Fouls */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.foulPoints}
+        blueValue={scoreBreakdown.blue.foulPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          <FoulDisplay
+            foulsReceived={scoreBreakdown.blue.foulCount}
+            pointsPerFoul={POINTS_PER_FOUL[2022]}
+            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2022]}
+            techOrMajor="tech"
+          />
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">Fouls</ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          <FoulDisplay
+            foulsReceived={scoreBreakdown.red.foulCount}
+            pointsPerFoul={POINTS_PER_FOUL[2022]}
+            techFoulsReceived={scoreBreakdown.red.techFoulCount}
+            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2022]}
+            techOrMajor="tech"
+          />
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Adjustments */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.adjustPoints}
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Adjustments
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.adjustPoints}
-          </TableCell>
-        </TableRow>
+      {/* Adjustments */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.adjustPoints}
+        blueValue={scoreBreakdown.blue.adjustPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.adjustPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Adjustments
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.adjustPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* Total Score */}
-        <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
-            {scoreBreakdown.red.totalPoints}
-          </TableCell>
-          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Total Score
-          </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
-            {scoreBreakdown.blue.totalPoints}
-          </TableCell>
-        </TableRow>
+      {/* Total Score */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.totalPoints}
+        blueValue={scoreBreakdown.blue.totalPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="dark" fontWeight="bold">
+          {scoreBreakdown.red.totalPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="dark" fontWeight="bold">
+          Total Score
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="dark" fontWeight="bold">
+          {scoreBreakdown.blue.totalPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
 
-        {/* RP */}
-        <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            +{scoreBreakdown.red.rp} RP
-          </TableCell>
-          <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            RP
-          </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            +{scoreBreakdown.blue.rp} RP
-          </TableCell>
-        </TableRow>
-      </TableBody>
-    </Table>
+      {/* RP */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.rp ?? undefined}
+        blueValue={scoreBreakdown.blue.rp ?? undefined}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          +{scoreBreakdown.red.rp} RP
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">RP</ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          +{scoreBreakdown.blue.rp} RP
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+    </ScoreBreakdownTable>
   );
 }
 
