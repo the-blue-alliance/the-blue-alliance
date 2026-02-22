@@ -63,20 +63,52 @@ def test_seed_team_creates_media(local_client: Client, taskqueue_stub) -> None:
     assert ig_image.foreign_key == "B9ZUsERhIWi"
     assert team_ref in ig_image.references
 
-    # YouTube channel
+    # YouTube channel (social media - no year)
     yt_channel = Media.get_by_id(
         Media.render_key_name(MediaType.YOUTUBE_CHANNEL, "bobcatrobotics")
     )
     assert yt_channel is not None
     assert yt_channel.media_type_enum == MediaType.YOUTUBE_CHANNEL
     assert yt_channel.foreign_key == "bobcatrobotics"
+    assert yt_channel.year is None
     assert team_ref in yt_channel.references
 
-    # Instagram profile
+    # Instagram profile (social media - no year)
     ig_profile = Media.get_by_id(
         Media.render_key_name(MediaType.INSTAGRAM_PROFILE, "bobcatrobotics")
     )
     assert ig_profile is not None
     assert ig_profile.media_type_enum == MediaType.INSTAGRAM_PROFILE
     assert ig_profile.foreign_key == "bobcatrobotics"
+    assert ig_profile.year is None
     assert team_ref in ig_profile.references
+
+    # Facebook profile (social media - no year)
+    fb_profile = Media.get_by_id(
+        Media.render_key_name(MediaType.FACEBOOK_PROFILE, "thebluealliance")
+    )
+    assert fb_profile is not None
+    assert fb_profile.media_type_enum == MediaType.FACEBOOK_PROFILE
+    assert fb_profile.foreign_key == "thebluealliance"
+    assert fb_profile.year is None
+    assert team_ref in fb_profile.references
+
+    # Twitter profile (social media - no year)
+    tw_profile = Media.get_by_id(
+        Media.render_key_name(MediaType.TWITTER_PROFILE, "thebluealliance")
+    )
+    assert tw_profile is not None
+    assert tw_profile.media_type_enum == MediaType.TWITTER_PROFILE
+    assert tw_profile.foreign_key == "thebluealliance"
+    assert tw_profile.year is None
+    assert team_ref in tw_profile.references
+
+    # GitHub profile (social media - no year)
+    gh_profile = Media.get_by_id(
+        Media.render_key_name(MediaType.GITHUB_PROFILE, "the-blue-alliance")
+    )
+    assert gh_profile is not None
+    assert gh_profile.media_type_enum == MediaType.GITHUB_PROFILE
+    assert gh_profile.foreign_key == "the-blue-alliance"
+    assert gh_profile.year is None
+    assert team_ref in gh_profile.references

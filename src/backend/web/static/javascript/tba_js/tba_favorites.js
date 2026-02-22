@@ -144,7 +144,7 @@ function updateTeamlistFavoriteTeams(favoriteTeams) {
 
 function updateTeamFABFavoriteTeams(favoriteTeams) {
   $(".tba-fab-team").each(function() {
-    $(this).find(".fa-spin").remove();
+    $(this).find(".tba-spinner").remove();
     $(this).prop("disabled", false);
     if ($(this).attr("data-team") in favoriteTeams) {
       $(this).find(".not-favorite").hide();
@@ -181,7 +181,7 @@ function setupFavDeleteClick() {
 }
 
 function addSpinner(el) {
-  el.append("<i class='fa fa-refresh fa-spin'></i>");
+  el.append("<span class='tba-spinner'></span>");
   el.prop("disabled", true);
 }
 

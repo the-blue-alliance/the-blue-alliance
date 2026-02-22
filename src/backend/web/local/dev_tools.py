@@ -270,14 +270,30 @@ def seed_test_team() -> Response:
             id=Media.render_key_name(MediaType.YOUTUBE_CHANNEL, "bobcatrobotics"),
             media_type_enum=MediaType.YOUTUBE_CHANNEL,
             foreign_key="bobcatrobotics",
-            year=year,
             references=[team_ref],
         ),
         Media(
             id=Media.render_key_name(MediaType.INSTAGRAM_PROFILE, "bobcatrobotics"),
             media_type_enum=MediaType.INSTAGRAM_PROFILE,
             foreign_key="bobcatrobotics",
-            year=year,
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.FACEBOOK_PROFILE, "thebluealliance"),
+            media_type_enum=MediaType.FACEBOOK_PROFILE,
+            foreign_key="thebluealliance",
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.TWITTER_PROFILE, "thebluealliance"),
+            media_type_enum=MediaType.TWITTER_PROFILE,
+            foreign_key="thebluealliance",
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.GITHUB_PROFILE, "the-blue-alliance"),
+            media_type_enum=MediaType.GITHUB_PROFILE,
+            foreign_key="the-blue-alliance",
             references=[team_ref],
         ),
     ]
