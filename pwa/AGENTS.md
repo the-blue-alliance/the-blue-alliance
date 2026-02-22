@@ -75,6 +75,19 @@ tests/                 # Playwright E2E tests
 - Test names with `mobile` run on mobile viewports
 - Run with `npx playwright test` or `--ui` for interactive mode
 
+## PR Screenshots
+
+PRs that touch `pwa/` files can get before/after screenshots posted as a comment. To request screenshots, add a `## Screenshot Pages` section to the PR description:
+
+```markdown
+## Screenshot Pages
+- /match/2024mil_f1m2
+- /team/254/2024 Team 254 Page
+- /gameday
+```
+
+Each line is `- /path` optionally followed by a display name. If no name is given, the path is used. If no pages are listed, the workflow skips screenshot capture.
+
 ## Running
 
 ```bash
