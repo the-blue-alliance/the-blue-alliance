@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as WebcastsRouteImport } from './routes/webcasts'
 import { Route as ThanksRouteImport } from './routes/thanks'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
@@ -35,6 +36,11 @@ import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNu
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
 import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './routes/district.$districtAbbreviation.insights'
 
+const WebcastsRoute = WebcastsRouteImport.update({
+  id: '/webcasts',
+  path: '/webcasts',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ThanksRoute = ThanksRouteImport.update({
   id: '/thanks',
   path: '/thanks',
@@ -179,6 +185,7 @@ export interface FileRoutesByFullPath {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
@@ -206,6 +213,7 @@ export interface FileRoutesByTo {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
@@ -234,6 +242,7 @@ export interface FileRoutesById {
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
+  '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs_/v3': typeof ApidocsV3Route
   '/event/$eventKey': typeof EventEventKeyRoute
@@ -263,6 +272,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/webcasts'
     | '/account/mytba'
     | '/apidocs/v3'
     | '/event/$eventKey'
@@ -290,6 +300,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/webcasts'
     | '/account/mytba'
     | '/apidocs/v3'
     | '/event/$eventKey'
@@ -317,6 +328,7 @@ export interface FileRouteTypes {
     | '/match_suggestion'
     | '/privacy'
     | '/thanks'
+    | '/webcasts'
     | '/account/mytba'
     | '/apidocs_/v3'
     | '/event/$eventKey'
@@ -345,6 +357,7 @@ export interface RootRouteChildren {
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
   ThanksRoute: typeof ThanksRoute
+  WebcastsRoute: typeof WebcastsRoute
   AccountMytbaRoute: typeof AccountMytbaRoute
   ApidocsV3Route: typeof ApidocsV3Route
   EventEventKeyRoute: typeof EventEventKeyRoute
@@ -363,6 +376,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/webcasts': {
+      id: '/webcasts'
+      path: '/webcasts'
+      fullPath: '/webcasts'
+      preLoaderRoute: typeof WebcastsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/thanks': {
       id: '/thanks'
       path: '/thanks'
@@ -553,6 +573,7 @@ const rootRouteChildren: RootRouteChildren = {
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
   ThanksRoute: ThanksRoute,
+  WebcastsRoute: WebcastsRoute,
   AccountMytbaRoute: AccountMytbaRoute,
   ApidocsV3Route: ApidocsV3Route,
   EventEventKeyRoute: EventEventKeyRoute,
