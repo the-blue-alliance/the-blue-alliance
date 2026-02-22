@@ -1,4 +1,8 @@
-import { Match, MatchScoreBreakdown2016 } from '~/api/tba/read';
+import {
+  Match,
+  MatchScoreBreakdown2016,
+  MatchScoreBreakdown2016Alliance,
+} from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
@@ -11,6 +15,35 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
+
+const DEFENSE_NAMES: Record<string, string> = {
+  A_ChevalDeFrise: 'Cheval de Frise',
+  A_Portcullis: 'Portcullis',
+  B_Ramparts: 'Ramparts',
+  B_Moat: 'Moat',
+  C_SallyPort: 'Sally Port',
+  C_Drawbridge: 'Drawbridge',
+  D_RoughTerrain: 'Rough Terrain',
+  D_RockWall: 'Rock Wall',
+};
+
+function defenseName(
+  alliance: MatchScoreBreakdown2016Alliance,
+  position: 2 | 3 | 4 | 5,
+): string {
+  const key = `position${position}` as keyof MatchScoreBreakdown2016Alliance;
+  const value = alliance[key] as string | undefined;
+  return value ? (DEFENSE_NAMES[value] ?? value) : `Defense ${position}`;
+}
+
+function defenseCrossings(
+  alliance: MatchScoreBreakdown2016Alliance,
+  position: 1 | 2 | 3 | 4 | 5,
+): number {
+  const key =
+    `position${position}crossings` as keyof MatchScoreBreakdown2016Alliance;
+  return (alliance[key] as number) ?? 0;
+}
 
 export default function ScoreBreakdown2016({
   scoreBreakdown,
@@ -150,6 +183,94 @@ export default function ScoreBreakdown2016({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
+      {/* Defense 1 - Low Bar */}
+      <ScoreBreakdownRow
+        redValue={defenseCrossings(scoreBreakdown.red, 1)}
+        blueValue={defenseCrossings(scoreBreakdown.blue, 1)}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {defenseCrossings(scoreBreakdown.red, 1)}x Cross
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Defense 1 — Low Bar
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {defenseCrossings(scoreBreakdown.blue, 1)}x Cross
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Defense 2 */}
+      <ScoreBreakdownRow
+        redValue={defenseCrossings(scoreBreakdown.red, 2)}
+        blueValue={defenseCrossings(scoreBreakdown.blue, 2)}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {defenseName(scoreBreakdown.red, 2)} —{' '}
+          {defenseCrossings(scoreBreakdown.red, 2)}x Cross
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Defense 2
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {defenseName(scoreBreakdown.blue, 2)} —{' '}
+          {defenseCrossings(scoreBreakdown.blue, 2)}x Cross
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Defense 3 (Audience) */}
+      <ScoreBreakdownRow
+        redValue={defenseCrossings(scoreBreakdown.red, 3)}
+        blueValue={defenseCrossings(scoreBreakdown.blue, 3)}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {defenseName(scoreBreakdown.red, 3)} —{' '}
+          {defenseCrossings(scoreBreakdown.red, 3)}x Cross
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Defense 3
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {defenseName(scoreBreakdown.blue, 3)} —{' '}
+          {defenseCrossings(scoreBreakdown.blue, 3)}x Cross
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Defense 4 */}
+      <ScoreBreakdownRow
+        redValue={defenseCrossings(scoreBreakdown.red, 4)}
+        blueValue={defenseCrossings(scoreBreakdown.blue, 4)}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {defenseName(scoreBreakdown.red, 4)} —{' '}
+          {defenseCrossings(scoreBreakdown.red, 4)}x Cross
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Defense 4
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {defenseName(scoreBreakdown.blue, 4)} —{' '}
+          {defenseCrossings(scoreBreakdown.blue, 4)}x Cross
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Defense 5 */}
+      <ScoreBreakdownRow
+        redValue={defenseCrossings(scoreBreakdown.red, 5)}
+        blueValue={defenseCrossings(scoreBreakdown.blue, 5)}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {defenseName(scoreBreakdown.red, 5)} —{' '}
+          {defenseCrossings(scoreBreakdown.red, 5)}x Cross
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Defense 5
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {defenseName(scoreBreakdown.blue, 5)} —{' '}
+          {defenseCrossings(scoreBreakdown.blue, 5)}x Cross
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
       {/* Teleop Crossing Points */}
       <ScoreBreakdownRow
         redValue={scoreBreakdown.red.teleopCrossingPoints}
@@ -281,16 +402,16 @@ export default function ScoreBreakdown2016({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls / Tech Fouls */}
+      {/* Fouls / Tech Fouls — show opponent's committed fouls */}
       <ScoreBreakdownRow
         redValue={scoreBreakdown.red.foulPoints}
         blueValue={scoreBreakdown.blue.foulPoints}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
+            foulsReceived={scoreBreakdown.blue.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2016]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
+            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2016]}
             techOrMajor="tech"
           />
@@ -300,9 +421,9 @@ export default function ScoreBreakdown2016({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
+            foulsReceived={scoreBreakdown.red.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2016]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+            techFoulsReceived={scoreBreakdown.red.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2016]}
             techOrMajor="tech"
           />

@@ -317,9 +317,9 @@ export default function ScoreBreakdown2017({
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
+            foulsReceived={scoreBreakdown.blue.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2017]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
+            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2017]}
             techOrMajor="tech"
           />
@@ -329,9 +329,9 @@ export default function ScoreBreakdown2017({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
+            foulsReceived={scoreBreakdown.red.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2017]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+            techFoulsReceived={scoreBreakdown.red.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2017]}
             techOrMajor="tech"
           />

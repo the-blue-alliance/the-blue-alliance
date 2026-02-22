@@ -1,4 +1,8 @@
-import { Match, MatchScoreBreakdown2019 } from '~/api/tba/read';
+import {
+  Match,
+  MatchScoreBreakdown2019,
+  MatchScoreBreakdown2019Alliance,
+} from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
@@ -20,6 +24,70 @@ const ENDGAME_2019_POINTS: Record<string, number> = {
   None: 0,
   Unknown: 0,
 };
+
+type Bay2019 = MatchScoreBreakdown2019Alliance['bay1'];
+
+function countPanels(...bays: Bay2019[]): number {
+  return bays.filter((b) => b === 'Panel' || b === 'PanelAndCargo').length;
+}
+
+function countCargo(...bays: Bay2019[]): number {
+  return bays.filter((b) => b === 'PanelAndCargo').length;
+}
+
+function cargoShipPanels(a: MatchScoreBreakdown2019Alliance): number {
+  return countPanels(
+    a.bay1,
+    a.bay2,
+    a.bay3,
+    a.bay4,
+    a.bay5,
+    a.bay6,
+    a.bay7,
+    a.bay8,
+  );
+}
+
+function cargoShipCargo(a: MatchScoreBreakdown2019Alliance): number {
+  return countCargo(
+    a.bay1,
+    a.bay2,
+    a.bay3,
+    a.bay4,
+    a.bay5,
+    a.bay6,
+    a.bay7,
+    a.bay8,
+  );
+}
+
+function rocketPanels(
+  a: MatchScoreBreakdown2019Alliance,
+  rocket: 'Near' | 'Far',
+): number {
+  return countPanels(
+    a[`topLeftRocket${rocket}`],
+    a[`topRightRocket${rocket}`],
+    a[`midLeftRocket${rocket}`],
+    a[`midRightRocket${rocket}`],
+    a[`lowLeftRocket${rocket}`],
+    a[`lowRightRocket${rocket}`],
+  );
+}
+
+function rocketCargo(
+  a: MatchScoreBreakdown2019Alliance,
+  rocket: 'Near' | 'Far',
+): number {
+  return countCargo(
+    a[`topLeftRocket${rocket}`],
+    a[`topRightRocket${rocket}`],
+    a[`midLeftRocket${rocket}`],
+    a[`midRightRocket${rocket}`],
+    a[`lowLeftRocket${rocket}`],
+    a[`lowRightRocket${rocket}`],
+  );
+}
 
 export default function ScoreBreakdown2019({
   scoreBreakdown,
@@ -119,6 +187,78 @@ export default function ScoreBreakdown2019({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           {scoreBreakdown.blue.cargoPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Cargo Ship */}
+      <ScoreBreakdownRow
+        redValue={
+          cargoShipPanels(scoreBreakdown.red) +
+          cargoShipCargo(scoreBreakdown.red)
+        }
+        blueValue={
+          cargoShipPanels(scoreBreakdown.blue) +
+          cargoShipCargo(scoreBreakdown.blue)
+        }
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {cargoShipPanels(scoreBreakdown.red)} HP /{' '}
+          {cargoShipCargo(scoreBreakdown.red)} Cargo
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Cargo Ship
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {cargoShipPanels(scoreBreakdown.blue)} HP /{' '}
+          {cargoShipCargo(scoreBreakdown.blue)} Cargo
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Rocket 1 (Near) */}
+      <ScoreBreakdownRow
+        redValue={
+          rocketPanels(scoreBreakdown.red, 'Near') +
+          rocketCargo(scoreBreakdown.red, 'Near')
+        }
+        blueValue={
+          rocketPanels(scoreBreakdown.blue, 'Near') +
+          rocketCargo(scoreBreakdown.blue, 'Near')
+        }
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {rocketPanels(scoreBreakdown.red, 'Near')} HP /{' '}
+          {rocketCargo(scoreBreakdown.red, 'Near')} Cargo
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Rocket 1
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {rocketPanels(scoreBreakdown.blue, 'Near')} HP /{' '}
+          {rocketCargo(scoreBreakdown.blue, 'Near')} Cargo
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Rocket 2 (Far) */}
+      <ScoreBreakdownRow
+        redValue={
+          rocketPanels(scoreBreakdown.red, 'Far') +
+          rocketCargo(scoreBreakdown.red, 'Far')
+        }
+        blueValue={
+          rocketPanels(scoreBreakdown.blue, 'Far') +
+          rocketCargo(scoreBreakdown.blue, 'Far')
+        }
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {rocketPanels(scoreBreakdown.red, 'Far')} HP /{' '}
+          {rocketCargo(scoreBreakdown.red, 'Far')} Cargo
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Rocket 2
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {rocketPanels(scoreBreakdown.blue, 'Far')} HP /{' '}
+          {rocketCargo(scoreBreakdown.blue, 'Far')} Cargo
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
@@ -252,9 +392,9 @@ export default function ScoreBreakdown2019({
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
+            foulsReceived={scoreBreakdown.blue.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2019]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
+            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2019]}
             techOrMajor="tech"
           />
@@ -264,9 +404,9 @@ export default function ScoreBreakdown2019({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
+            foulsReceived={scoreBreakdown.red.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2019]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+            techFoulsReceived={scoreBreakdown.red.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2019]}
             techOrMajor="tech"
           />
