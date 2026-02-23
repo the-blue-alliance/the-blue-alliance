@@ -179,60 +179,41 @@ MANUAL_COMPONENTS = {
         ),
     },
     2026: {
-        "Hub Auto Count": lambda match, color: match.score_breakdown[color][
+        "Hub Auto Fuel Count": lambda match, color: match.score_breakdown[color][
             "hubScore"
         ].get("autoCount", 0),
-        "Hub Auto Points": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("autoPoints", 0),
-        "Hub Endgame Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("endgameCount", 0),
-        "Hub Endgame Points": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("endgamePoints", 0),
-        "Hub Shift 1 Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift1Count", 0),
-        "Hub Shift 1 Points": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift1Points", 0),
-        "Hub Shift 2 Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift2Count", 0),
-        "Hub Shift 2 Points": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift2Points", 0),
-        "Hub Shift 3 Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift3Count", 0),
-        "Hub Shift 3 Points": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift3Points", 0),
-        "Hub Shift 4 Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift4Count", 0),
-        "Hub Shift 4 Points": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift4Points", 0),
-        "Hub Teleop Count": lambda match, color: match.score_breakdown[color][
+        "Hub Teleop Fuel Count": lambda match, color: match.score_breakdown[color][
             "hubScore"
         ].get("teleopCount", 0),
-        "Hub Teleop Points": lambda match, color: match.score_breakdown[color][
+        "Hub Endgame Fuel Count": lambda match, color: match.score_breakdown[color][
             "hubScore"
-        ].get("teleopPoints", 0),
-        "Hub Total Count": lambda match, color: match.score_breakdown[color][
+        ].get("endgameCount", 0),
+        "Hub Total Fuel Count": lambda match, color: match.score_breakdown[color][
             "hubScore"
         ].get("totalCount", 0),
-        "Hub Total Points": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("totalPoints", 0),
-        "Hub Transition Count": lambda match, color: match.score_breakdown[color][
+        "Hub Transition Fuel Count": lambda match, color: match.score_breakdown[color][
             "hubScore"
         ].get("transitionCount", 0),
-        "Hub Transition Points": lambda match, color: match.score_breakdown[color][
+        "Hub Shift 1 Fuel Count": lambda match, color: match.score_breakdown[color][
             "hubScore"
-        ].get("transitionPoints", 0),
+        ].get("shift1Count", 0),
+        "Hub Shift 2 Fuel Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift2Count", 0),
+        "Hub Shift 3 Fuel Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift3Count", 0),
+        "Hub Shift 4 Fuel Count": lambda match, color: match.score_breakdown[color][
+            "hubScore"
+        ].get("shift4Count", 0),
+        "Hub First Active Shift Count": lambda match, color: (
+            match.score_breakdown[color]["hubScore"].get("shift1Count", 0)
+            + match.score_breakdown[color]["hubScore"].get("shift2Count", 0)
+        ),
+        "Hub Second Active Shift Count": lambda match, color: (
+            match.score_breakdown[color]["hubScore"].get("shift3Count", 0)
+            + match.score_breakdown[color]["hubScore"].get("shift4Count", 0)
+        ),
         "Hub Uncounted": lambda match, color: match.score_breakdown[color][
             "hubScore"
         ].get("uncounted", 0),
