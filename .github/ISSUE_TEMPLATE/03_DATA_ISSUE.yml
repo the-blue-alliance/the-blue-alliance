@@ -1,0 +1,42 @@
+name: Data Issue
+description: Report incorrect or missing data on The Blue Alliance.
+labels: ["data-issue"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report this data issue on The Blue Alliance!
+        Please be aware that we cannot update or change official data sourced from _FIRST_.
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Is there an existing data issue for this?
+      description: Please search to see if an issue already exists for this data issue.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: dropdown
+    is: data-issue-type
+    attributes:
+      label: Data Issue Type
+      description: Are you reporting missing data or incorrect data?
+      options:
+        - Missing Data
+        - Incorrect Data
+    validations:
+      required: true
+  - type: input
+    id: page-link
+    attributes:
+      label: Link to the Data Issue
+      description: Please provide a link to the page on The Blue Alliance (or API endpoint) where this issue exists.
+    validations:
+      required: false
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Summary"
+      description: Provide a brief explanation of missing or incorrect data
+      placeholder: Describe the issue with the data, how to correct it, and a link to the source of the correct data, if available.
+    validations:
+      required: true
