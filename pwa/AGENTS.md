@@ -81,6 +81,7 @@ PRs that touch `pwa/` files can get before/after screenshots posted as a comment
 
 ```markdown
 ## Screenshot Pages
+
 - /match/2024mil_f1m2
 - /team/254/2024 Team 254 Page
 - /gameday
@@ -91,10 +92,10 @@ Each line is `- /path` optionally followed by a display name. If no name is give
 ## Running
 
 ```bash
-npm run dev          # Development server
-npm run typecheck    # Type checking
-npm run lint         # Lint code
-npx playwright test  # E2E tests
+pnpm run dev              # Development server
+pnpm run typecheck        # Type checking
+pnpm run lint             # Lint code
+pnpm dlx playwright test  # E2E tests
 ```
 
 ## PR Screenshots
