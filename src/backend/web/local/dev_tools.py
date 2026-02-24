@@ -104,12 +104,20 @@ def seed_test_event() -> Response:
         matches.append(match)
 
     # Scheduled matches (qm16 - qm23)
+    # Q21, Q22, Q23 get predicted times that drift from schedule by 2, 5,
+    # and 10 minutes respectively, to test "(est.)" display in the app.
+    predicted_time_offsets = {21: 2, 22: 5, 23: 10}  # match_number -> minutes
     scheduled_start = now + datetime.timedelta(minutes=10)
     for i in range(NUM_COMPLETED + 1, NUM_COMPLETED + NUM_SCHEDULED + 1):
         red_teams, blue_teams = _teams_for_match(teams, i)
         match_time = scheduled_start + datetime.timedelta(
             minutes=(i - NUM_COMPLETED - 1) * MATCH_SPACING_MINUTES
         )
+        predicted_time = None
+        if i in predicted_time_offsets:
+            predicted_time = match_time + datetime.timedelta(
+                minutes=predicted_time_offsets[i]
+            )
         match = Match(
             id=Match.render_key_name(event_key, CompLevel.QM, 1, i),
             event=ndb.Key(Event, event_key),
@@ -135,6 +143,7 @@ def seed_test_event() -> Response:
                 }
             ),
             time=match_time,
+            predicted_time=predicted_time,
         )
         matches.append(match)
 
