@@ -411,7 +411,7 @@ wheels = [
 
 [[package]]
 name = "firebase-admin"
-version = "7.1.0"
+version = "7.2.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "cachecontrol" },
@@ -421,9 +421,9 @@ dependencies = [
     { name = "httpx", extra = ["http2"] },
     { name = "pyjwt", extra = ["crypto"] },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/aa/41/859f78701761bed7abdb8a7c050819c654dad17f96c658dcdf263d5a9641/firebase_admin-7.1.0.tar.gz", hash = "sha256:a163014a4368c43f7efa409948065f8856b51bd2ae5d82c24586e546d5fd4a26", size = 194786, upload-time = "2025-07-31T20:36:39.512Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/f0/b8/39f0278fbdbc962551a164e93e10cbba1a195231c93c08440f5f38deec16/firebase_admin-7.2.0.tar.gz", hash = "sha256:0c877c1316d7a213e1c91ae9be20b7b9e11c5889ae546a004e3ee4f119d940bb", size = 196213, upload-time = "2026-02-25T17:30:49.327Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/c4/16/eb9bf44cdc7af0317a70ae770ad4170b9fcfbb660ac32806742506be1246/firebase_admin-7.1.0-py3-none-any.whl", hash = "sha256:1913e783b7ad56f891e1aca86e6fdde6a8ec49b7a920dd451da155e8647506c8", size = 137140, upload-time = "2025-07-31T20:36:38.266Z" },
+    { url = "https://files.pythonhosted.org/packages/3e/82/6d1143f019dce79a884d1027b01dd9b122c4d862c197c3753999d298863d/firebase_admin-7.2.0-py3-none-any.whl", hash = "sha256:760b2138e49b4abeb3f0ea409e7ab5fbdaeca315b20750d968689d4bdd1d1b4e", size = 138000, upload-time = "2026-02-25T17:30:47.793Z" },
 ]
 
 [[package]]
@@ -1900,7 +1900,7 @@ typecheck = [
 requires-dist = [
     { name = "appengine-python-standard", specifier = "==1.1.10" },
     { name = "beautifulsoup4", specifier = "==4.14.3" },
-    { name = "firebase-admin", specifier = "==7.1.0" },
+    { name = "firebase-admin", specifier = "==7.2.0" },
     { name = "flask", specifier = "==3.1.3" },
     { name = "flask-caching", specifier = "==2.3.1" },
     { name = "flask-cors", specifier = "==6.0.2" },
