@@ -16,7 +16,7 @@ body:
         - label: I have searched the existing issues
           required: true
   - type: dropdown
-    is: data-issue-type
+    id: data-issue-type
     attributes:
       label: Data Issue Type
       description: Are you reporting missing data or incorrect data?
