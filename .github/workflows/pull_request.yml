@@ -311,6 +311,53 @@ jobs:
             echo "No changes detected in pwa/app/api."
           fi
 
+  pwa-playwright:
+    name: "[pwa] Playwright Tests"
+    strategy:
+      fail-fast: false
+      matrix:
+        shardIndex: [1, 2, 3, 4]
+        shardTotal: [4]
+    runs-on: ubuntu-24.04
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
+
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+        env:
+          TBA_API_READ_KEY: ${{ vars.TBA_E2E_READONLY_KEY }}
+          GCLOUD_PROJECT_ID: ${{ vars.GCLOUD_PROJECT_ID }}
+          FIREBASE_API_KEY: ${{ vars.FIREBASE_API_KEY }}
+
+      - name: Install Dependencies
+        working-directory: pwa
+        run: pnpm install --frozen-lockfile
+
+      - name: Install Playwright browsers
+        working-directory: pwa
+        run: pnpm exec playwright install --with-deps
+
+      - name: Build application
+        working-directory: pwa
+        run: pnpm run build
+
+      - name: Run Playwright tests
+        working-directory: pwa
+        run: pnpm exec playwright test --shard=${{ matrix.shardIndex }}/${{ matrix.shardTotal }}
+
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-24.04
