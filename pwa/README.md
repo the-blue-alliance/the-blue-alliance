@@ -171,9 +171,12 @@ Each line is `- /path` optionally followed by a display name. If no pages are li
 
 ## Playwright tests
 
-Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports.
+Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
 
 ```sh
+# Installs playwright binaries
+pnpm dlx playwright install
+
 # Runs the end-to-end tests.
 pnpm dlx playwright test
 

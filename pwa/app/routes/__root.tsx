@@ -98,6 +98,16 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   validateSearch: rootSearchSchema,
+  loader: () => ({
+    renderTime: new Date().toLocaleString('en-US', {
+      month: 'short',
+      day: 'numeric',
+      year: 'numeric',
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true,
+    }),
+  }),
   head: ({ matches }) => ({
     meta: [
       {
@@ -332,6 +342,7 @@ export const Route = createRootRouteWithContext<{
 const FULLSCREEN_ROUTES = ['/gameday'];
 
 function RootComponent() {
+  const { renderTime } = Route.useLoaderData();
   const { pathname } = useLocation();
   const isFullscreen = FULLSCREEN_ROUTES.some((route) =>
     pathname.startsWith(route),
@@ -379,7 +390,7 @@ function RootComponent() {
                     </div>
                   </div>
                 </TOCRendererProvider>
-                <Footer />
+                <Footer renderTime={renderTime} />
               </>
             )}
           </AuthContextProvider>
