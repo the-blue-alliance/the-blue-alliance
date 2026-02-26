@@ -98,7 +98,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Download all artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
       - name: Combine coverage
         if: steps.changes.outputs.python == 'true'
         run: |
