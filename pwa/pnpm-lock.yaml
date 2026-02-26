@@ -156,8 +156,8 @@ importers:
         specifier: 3.7.0
         version: 3.7.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@18.3.1)(react@19.2.4)(redux@5.0.1)
       srvx:
-        specifier: 0.11.7
-        version: 0.11.7
+        specifier: 0.11.8
+        version: 0.11.8
       tailwind-merge:
         specifier: 3.5.0
         version: 3.5.0
@@ -6945,8 +6945,8 @@ packages:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
 
-  srvx@0.11.7:
-    resolution: {integrity: sha512-p9qj9wkv/MqG1VoJpOsqXv1QcaVcYRk7ifsC6i3TEwDXFyugdhJN4J3KzQPZq2IJJ2ZCt7ASOB++85pEK38jRw==}
+  srvx@0.11.8:
+    resolution: {integrity: sha512-2n9t0YnAXPJjinytvxccNgs7rOA5gmE7Wowt/8Dy2dx2fDC6sBhfBpbrCvjYKALlVukPS/Uq3QwkolKNa7P/2Q==}
     engines: {node: '>=20.16.0'}
     hasBin: true
 
@@ -11489,7 +11489,7 @@ snapshots:
       pathe: 2.0.3
       picomatch: 4.0.3
       source-map: 0.7.6
-      srvx: 0.11.7
+      srvx: 0.11.8
       tinyglobby: 0.2.15
       ufo: 1.6.3
       vite: 7.3.1(@types/node@24.10.13)(jiti@2.6.1)(lightningcss@1.31.1)(terser@5.44.1)(tsx@4.21.0)(yaml@2.8.2)
@@ -13642,7 +13642,7 @@ snapshots:
   h3@2.0.1-rc.14:
     dependencies:
       rou3: 0.7.12
-      srvx: 0.11.7
+      srvx: 0.11.8
 
   has-bigints@1.1.0: {}
 
@@ -15675,7 +15675,7 @@ snapshots:
 
   split2@4.2.0: {}
 
-  srvx@0.11.7: {}
+  srvx@0.11.8: {}
 
   stable-hash-x@0.2.0: {}
 

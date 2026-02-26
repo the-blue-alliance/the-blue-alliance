@@ -71,7 +71,7 @@
     "react-dom": "19.2.4",
     "react-intersection-observer": "10.0.3",
     "recharts": "3.7.0",
-    "srvx": "0.11.7",
+    "srvx": "0.11.8",
     "tailwind-merge": "3.5.0",
     "vaul": "1.1.2",
     "workbox-window": "7.4.0",
