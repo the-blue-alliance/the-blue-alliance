@@ -40,7 +40,7 @@ jobs:
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -217,12 +217,12 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Archive production artifacts (build)
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: pwa-build
           path: pwa/build
       - name: Archive production artifacts (server.js)
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: pwa-server
           path: pwa/server.js
@@ -354,7 +354,7 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: web-build
           path: src/build
