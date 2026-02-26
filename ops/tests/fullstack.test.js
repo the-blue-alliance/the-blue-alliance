@@ -5,15 +5,35 @@ import "regenerator-runtime/runtime";
 jest.setTimeout(120000);
 setDefaultOptions({ timeout: 120000 });
 
+// Shared browser instance for all tests
+let sharedBrowser;
+
+beforeAll(async () => {
+  sharedBrowser = await puppeteer.launch({
+    headless: "new",
+    args: ["--no-sandbox", "--disable-setuid-sandbox"],
+  });
+});
+
+afterAll(async () => {
+  if (sharedBrowser) await sharedBrowser.close();
+});
+
 describe("Homepage", () => {
-  var page;
+  let page;
 
   beforeAll(async () => {
-    const browser = await puppeteer.launch({ headless: "new" });
-    page = await browser.newPage();
+    page = await sharedBrowser.newPage();
 
-    await page.goto("http://localhost:8080");
-    await page.waitForSelector(".navbar");
+    await page.goto("http://localhost:8080", {
+      waitUntil: "networkidle2",
+      timeout: 60000,
+    });
+    await page.waitForSelector(".navbar", { timeout: 30000 });
+  });
+
+  afterAll(async () => {
+    if (page) await page.close();
   });
 
   it('should be titled "The Blue Alliance"', async () => {
@@ -28,14 +48,20 @@ describe("Homepage", () => {
 });
 
 describe("GameDay", () => {
-  var page;
+  let page;
 
   beforeAll(async () => {
-    const browser = await puppeteer.launch({ headless: "new" });
-    page = await browser.newPage();
+    page = await sharedBrowser.newPage();
 
-    await page.goto("http://localhost:8080/gameday");
-    await page.waitForSelector(".gameday");
+    await page.goto("http://localhost:8080/gameday", {
+      waitUntil: "networkidle2",
+      timeout: 60000,
+    });
+    await page.waitForSelector(".gameday", { timeout: 30000 });
+  });
+
+  afterAll(async () => {
+    if (page) await page.close();
   });
 
   it('should be titled "GameDay - The Blue Alliance"', async () => {
@@ -48,14 +74,20 @@ describe("GameDay", () => {
 });
 
 describe("APIv3 Docs", () => {
-  var page;
+  let page;
 
   beforeAll(async () => {
-    const browser = await puppeteer.launch({ headless: "new" });
-    page = await browser.newPage();
+    page = await sharedBrowser.newPage();
 
-    await page.goto("http://localhost:8080/apidocs/v3");
-    await page.waitForSelector("#swagger_url");
+    await page.goto("http://localhost:8080/apidocs/v3", {
+      waitUntil: "networkidle2",
+      timeout: 60000,
+    });
+    await page.waitForSelector("#swagger_url", { timeout: 30000 });
+  });
+
+  afterAll(async () => {
+    if (page) await page.close();
   });
 
   it('should be titled "APIv3 - The Blue Alliance"', async () => {
@@ -70,14 +102,20 @@ describe("APIv3 Docs", () => {
 });
 
 describe("EventWizard2", () => {
-  var page;
+  let page;
 
   beforeAll(async () => {
-    const browser = await puppeteer.launch({ headless: "new" });
-    page = await browser.newPage();
+    page = await sharedBrowser.newPage();
 
-    await page.goto("http://localhost:8080/eventwizard");
-    await page.waitForSelector("#eventwizard");
+    await page.goto("http://localhost:8080/eventwizard", {
+      waitUntil: "networkidle2",
+      timeout: 60000,
+    });
+    await page.waitForSelector("#eventwizard", { timeout: 30000 });
+  });
+
+  afterAll(async () => {
+    if (page) await page.close();
   });
 
   it('should be titled "The Blue Alliance - EventWizard"', async () => {
