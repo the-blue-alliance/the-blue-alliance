@@ -1,12 +1,13 @@
 import SponsorsIcon from '~icons/lucide/anchor';
 import SourceIcon from '~icons/lucide/badge-check';
 import StatbotIcon from '~icons/lucide/chart-spline';
+import DistrictIcon from '~icons/lucide/globe';
 import LocationIcon from '~icons/lucide/map-pin';
 import RookieIcon from '~icons/lucide/sprout';
 
-import { Media, Team } from '~/api/tba/read';
+import { District, Media, Team } from '~/api/tba/read';
 import DetailEntity from '~/components/tba/detailEntity';
-import { TeamLocationLink } from '~/components/tba/links';
+import { DistrictLink, TeamLocationLink } from '~/components/tba/links';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
 import {
@@ -26,10 +27,12 @@ export default function TeamPageTeamInfo({
   team,
   maybeAvatar,
   socials,
+  district,
 }: {
   team: Team;
   maybeAvatar: Media | undefined; // undefined on team history page
   socials: Media[];
+  district?: District;
 }) {
   const sponsors = attemptToParseSponsors(team.name);
   const schoolName =
@@ -47,6 +50,16 @@ export default function TeamPageTeamInfo({
           <DetailEntity icon={<LocationIcon />}>
             <TeamLocationLink team={team} />
           </DetailEntity>
+
+          {district && (
+            <DetailEntity icon={<DistrictIcon />}>
+              Part of the{' '}
+              <DistrictLink district={district}>
+                {district.display_name}
+              </DistrictLink>{' '}
+              District
+            </DetailEntity>
+          )}
 
           {sponsors.length > 0 ? (
             <Accordion type="single" collapsible>

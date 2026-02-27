@@ -13,6 +13,7 @@ import {
   getEventAlliancesOptions,
   getEventDistrictPointsOptions,
   getTeamAwardsByYearOptions,
+  getTeamDistrictsOptions,
   getTeamEventsByYearOptions,
   getTeamEventsStatusesByYearOptions,
   getTeamMatchesByYearOptions,
@@ -224,6 +225,9 @@ function TeamPage(): React.JSX.Element {
   const { data: awards } = useSuspenseQuery(
     getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
   );
+  const { data: districts } = useSuspenseQuery(
+    getTeamDistrictsOptions({ path: { team_key: teamKey } }),
+  );
 
   // sort BEFORE launching queries that depend on it
   const sortedEvents = useMemo(
@@ -334,6 +338,7 @@ function TeamPage(): React.JSX.Element {
                     team={team}
                     socials={socials}
                     maybeAvatar={maybeAvatar}
+                    district={districts.find((d) => d.year === year)}
                   />
                 </div>
                 <FavoriteButton
