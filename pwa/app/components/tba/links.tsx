@@ -179,7 +179,7 @@ const DistrictLink = forwardRef<
       district: District;
     } & AnchorHTMLAttributes<HTMLAnchorElement>
   >
->(({ district, className, ...props }, ref) => {
+>(({ district, ...props }, ref) => {
   return (
     <Link
       to="/district/$districtAbbreviation/{-$year}"
