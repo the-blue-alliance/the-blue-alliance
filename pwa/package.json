@@ -38,7 +38,7 @@
     "@radix-ui/react-slot": "1.2.4",
     "@radix-ui/react-tabs": "1.1.13",
     "@radix-ui/react-tooltip": "1.2.8",
-    "@scalar/api-reference-react": "0.8.63",
+    "@scalar/api-reference-react": "0.8.64",
     "@scalar/react-renderer": "0.3.0",
     "@sentry/tanstackstart-react": "10.40.0",
     "@tanstack/react-query": "5.90.21",

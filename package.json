@@ -11,7 +11,7 @@
     "@mui/material": "^7.3.5",
     "classnames": "^2.5.1",
     "element-resize-event": "^3.0.6",
-    "firebase": "^12.9.0",
+    "firebase": "^12.10.0",
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
     "less-loader": "^12.3.1",
