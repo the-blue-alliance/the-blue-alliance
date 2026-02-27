@@ -120,6 +120,9 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
       )
       .catch(() => []);
+    const teamDistrictsQuery = queryClient
+      .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
+      .catch(() => []);
 
     // these need to be awaited so we can validate the year
     const [team, yearsParticipated] = await Promise.all([
@@ -151,6 +154,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       teamStatusesQuery,
       teamAwardsQuery,
       teamEventsQuery,
+      teamDistrictsQuery,
     ]);
 
     const endTime = Date.now();
