@@ -8,10 +8,7 @@ import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
 import StatbotIcon from '~icons/lucide/chart-spline';
-import {
-  default as DistrictIcon,
-  default as WebsiteIcon,
-} from '~icons/lucide/globe';
+import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import LocationIcon from '~icons/lucide/map-pin';
 import InsightsIcon from '~icons/lucide/scatter-chart';
@@ -257,7 +254,7 @@ function EventPage() {
 
       <div className="mb-4 space-y-1">
         {event.district && (
-          <DetailEntity icon={<DistrictIcon />}>
+          <DetailEntity icon={<GlobeIcon />}>
             <DistrictLink district={event.district}>
               {event.district.display_name}
             </DistrictLink>{' '}
@@ -276,7 +273,7 @@ function EventPage() {
           <EventLocationLink event={event} />
         </DetailEntity>
         {event.website && (
-          <DetailEntity icon={<WebsiteIcon />}>
+          <DetailEntity icon={<GlobeIcon />}>
             <a href={event.website} target="_blank" rel="noreferrer">
               View event&apos;s website
             </a>
