@@ -7,7 +7,7 @@ import {
   forwardRef,
 } from 'react';
 
-import { Event, Match, Team } from '~/api/tba/read';
+import { District, Event, Match, Team } from '~/api/tba/read';
 import {
   getEventQueryKey,
   getMatchQueryKey,
@@ -172,4 +172,33 @@ const MatchLink = forwardRef<
 });
 MatchLink.displayName = 'MatchLink';
 
-export { EventLink, EventLocationLink, TeamLocationLink, MatchLink, TeamLink };
+const DistrictLink = forwardRef<
+  HTMLAnchorElement,
+  PropsWithChildren<
+    {
+      district: District;
+    } & AnchorHTMLAttributes<HTMLAnchorElement>
+  >
+>(({ district, className, ...props }, ref) => {
+  return (
+    <Link
+      to="/district/$districtAbbreviation/{-$year}"
+      params={{
+        districtAbbreviation: district.abbreviation,
+        year: district.year.toString(),
+      }}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+DistrictLink.displayName = 'DistrictLink';
+
+export {
+  DistrictLink,
+  EventLink,
+  EventLocationLink,
+  MatchLink,
+  TeamLink,
+  TeamLocationLink,
+};
