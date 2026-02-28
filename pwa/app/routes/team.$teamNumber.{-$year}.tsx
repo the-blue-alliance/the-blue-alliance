@@ -13,6 +13,7 @@ import {
   getEventAlliancesOptions,
   getEventDistrictPointsOptions,
   getTeamAwardsByYearOptions,
+  getTeamDistrictsOptions,
   getTeamEventsByYearOptions,
   getTeamEventsStatusesByYearOptions,
   getTeamMatchesByYearOptions,
@@ -119,6 +120,9 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
       )
       .catch(() => []);
+    const teamDistrictsQuery = queryClient
+      .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
+      .catch(() => []);
 
     // these need to be awaited so we can validate the year
     const [team, yearsParticipated] = await Promise.all([
@@ -150,6 +154,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       teamStatusesQuery,
       teamAwardsQuery,
       teamEventsQuery,
+      teamDistrictsQuery,
     ]);
 
     const endTime = Date.now();
@@ -223,6 +228,9 @@ function TeamPage(): React.JSX.Element {
   );
   const { data: awards } = useSuspenseQuery(
     getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+  const { data: districts } = useSuspenseQuery(
+    getTeamDistrictsOptions({ path: { team_key: teamKey } }),
   );
 
   // sort BEFORE launching queries that depend on it
@@ -334,6 +342,7 @@ function TeamPage(): React.JSX.Element {
                     team={team}
                     socials={socials}
                     maybeAvatar={maybeAvatar}
+                    district={districts.find((d) => d.year === year)}
                   />
                 </div>
                 <FavoriteButton

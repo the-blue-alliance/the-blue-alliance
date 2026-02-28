@@ -8,7 +8,7 @@ import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
 import StatbotIcon from '~icons/lucide/chart-spline';
-import WebsiteIcon from '~icons/lucide/globe';
+import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import LocationIcon from '~icons/lucide/map-pin';
 import InsightsIcon from '~icons/lucide/scatter-chart';
@@ -48,6 +48,7 @@ import EliminationBracket from '~/components/tba/eliminationBracket';
 import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
+  DistrictLink,
   EventLocationLink,
   TeamLink,
   TeamLocationLink,
@@ -252,6 +253,17 @@ function EventPage() {
       </div>
 
       <div className="mb-4 space-y-1">
+        {event.district && (
+          <DetailEntity icon={<GlobeIcon />}>
+            <DistrictLink
+              districtAbbreviation={event.district.abbreviation}
+              year={event.district.year}
+            >
+              {event.district.display_name}
+            </DistrictLink>{' '}
+            Event
+          </DetailEntity>
+        )}
         <DetailEntity icon={<DateIcon />}>
           {getEventDateString(event, 'long')}
           {event.week !== null && (
@@ -264,7 +276,7 @@ function EventPage() {
           <EventLocationLink event={event} />
         </DetailEntity>
         {event.website && (
-          <DetailEntity icon={<WebsiteIcon />}>
+          <DetailEntity icon={<GlobeIcon />}>
             <a href={event.website} target="_blank" rel="noreferrer">
               View event&apos;s website
             </a>
