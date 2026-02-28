@@ -187,15 +187,15 @@ function DistrictPage() {
         {districtHistory[districtHistory.length - 1].display_name} {year}
       </h1>
 
-      <Tabs defaultValue={'overview'} className="mt-4">
+      <Tabs defaultValue={'events'} className="mt-4">
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
             [&>*]:basis-1/2 lg:[&>*]:basis-1"
         >
-          <TabsTrigger value="overview">Overview</TabsTrigger>
-          {hasRankings && <TabsTrigger value="rankings">Rankings</TabsTrigger>}
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="teams">Teams</TabsTrigger>
+          {hasRankings && <TabsTrigger value="rankings">Rankings</TabsTrigger>}
+          <TabsTrigger value="overview">Overview</TabsTrigger>
         </TabsList>
 
         <TabsContent value="overview">
