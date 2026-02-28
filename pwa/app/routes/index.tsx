@@ -6,7 +6,6 @@ import {
   getStatusOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import EventListTable from '~/components/tba/eventListTable';
-import { KickoffCountdown } from '~/components/tba/kickoffCountdown';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
@@ -34,22 +33,6 @@ function Home() {
 
   return (
     <div>
-      <div className="px-6 py-10 sm:py-16 lg:px-8">
-        <div className="mx-auto max-w-3xl text-center">
-          <h2 className="mt-2 text-4xl font-bold tracking-tight sm:text-5xl">
-            The Blue Alliance
-          </h2>
-          <p className="mx-auto mt-4 max-w-lg text-lg leading-6">
-            The Blue Alliance is the best way to scout, watch, and relive the{' '}
-            <em>FIRST</em> Robotics Competition.
-          </p>
-        </div>
-      </div>
-
-      <KickoffCountdown
-        kickoffDateTimeEST={new Date('2026-01-10T12:00:00-05:00')}
-      />
-
       {weekEvents.length > 0 && (
         <div>
           <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
