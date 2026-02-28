@@ -13,11 +13,12 @@ Vagrant.configure("2") do |config|
     rsync__exclude: [
       ".git/",
       "node_modules/",
-      "src/build/*",
+      # Only exclude build dir when not in CI (CI pre-builds webpack assets)
+      (ENV['CI'] == nil ? "src/build/*" : nil),
       "__pycache__",
       "venv/*",
       ".pyre/*",
-    ],
+    ].compact,
     rsync__auto: true
 
   ports = []
@@ -76,9 +77,16 @@ Vagrant.configure("2") do |config|
   config.ssh.shell = "bash -c 'BASH_ENV=/etc/profile exec bash'"
 
   # Provision dependencies
+  # Pass CI environment variable through provisioning script
+  provision_env = {}
+  if ENV['CI'] != nil
+    provision_env["CI"] = "true"
+  end
+  
   config.vm.provision "shell",
     inline: "cd /tba && ./ops/dev/vagrant/bootstrap-dev-container.sh",
-    privileged: false
+    privileged: false,
+    env: provision_env
 
   # Load in the datastore file, needs to run before devserver start
   #config.vm.provision "shell",
@@ -89,7 +97,8 @@ Vagrant.configure("2") do |config|
   config.vm.provision "shell",
     inline: "cd /tba && ./ops/dev/vagrant/start-devserver.sh",
     privileged: false,
-    run: "always"
+    run: "always",
+    env: provision_env
 
   # When the container halts, pull the datastore files
   #config.trigger.before [:halt, :destroy] do |trigger|

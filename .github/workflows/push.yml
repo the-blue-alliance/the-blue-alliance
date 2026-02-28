@@ -407,6 +407,23 @@ jobs:
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Prepare Docker build context
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: |
+          cp pyproject.toml ops/dev/docker/
+          cp uv.lock ops/dev/docker/
+          cp package.json ops/dev/docker/
+          cp package-lock.json ops/dev/docker/
+      - name: Pre-build Webpack Assets
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: |
+          python ./ops/build/do_compress.py
+          npm run build
+          echo "Verifying build directory:"
+          ls -la src/build/ | head -20
+          echo "Copying node_modules to build context:"
+          cp -r node_modules ops/dev/docker/
+          ls -la ops/dev/docker/ | head -30
       - name: Set up Docker Buildx
         id: buildx
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -430,7 +447,12 @@ jobs:
             BUILDKIT_INLINE_CACHE=1
       - name: Start Container
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: vagrant up
+        run: |
+          echo "Build directory before vagrant up:"
+          ls -la src/build/ | head -10 || echo "src/build not found"
+          vagrant up
+          echo "Checking build directory in container:"
+          vagrant ssh -- -t "ls -la /tba/src/build/ | head -10" || echo "Build dir not in container"
       - name: Test Vagrant Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_vagrant_startup.py

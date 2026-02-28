@@ -7,6 +7,13 @@ __pycache__/
 .pyre/
 .vagrant/
 
+# Dependency files temporarily copied to Docker build context during CI
+ops/dev/docker/pyproject.toml
+ops/dev/docker/uv.lock
+ops/dev/docker/package.json
+ops/dev/docker/package-lock.json
+ops/dev/docker/node_modules
+
 ci_screenshots.pickle
 ci_screenshots_message.md
 .coverage

@@ -69,6 +69,27 @@ RUN . $NVM_DIR/nvm.sh && npm install -g firebase-tools uglify-js@3.17.4
 RUN python -m pip config set global.break-system-packages true
 RUN pip install --upgrade setuptools uv
 
+# Create directory to store dependency files from image build
+# This allows the bootstrap script to compare if dependencies have changed
+RUN mkdir -p /image-build-context
+
+# Copy dependency lock files to track what was installed in the image
+# These will be compared at runtime to avoid reinstalling unchanged dependencies
+COPY pyproject.toml /image-build-context/pyproject.toml
+COPY uv.lock /image-build-context/uv.lock
+COPY package.json /image-build-context/package.json
+COPY package-lock.json /image-build-context/package-lock.json
+
+# Install Python dependencies from lock file
+RUN cd /image-build-context && \
+    uv export --no-dev --no-hashes --frozen -o /tmp/requirements.txt && \
+    pip install --ignore-installed -r /tmp/requirements.txt && \
+    rm /tmp/requirements.txt
+
+# Copy pre-installed node_modules from host
+# These will be copied to /tba/node_modules during bootstrap if unchanged
+COPY node_modules /image-build-context/node_modules
+
 # Clean up to reduce image size
 RUN apt-get clean && rm -rf /var/lib/apt/lists/*
 
