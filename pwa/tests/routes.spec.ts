@@ -43,6 +43,7 @@ const allRoutes = defineAllRoutes([
   '/team/$teamNumber/stats',
   '/teams/{-$pgNum}',
   '/thanks',
+  '/webcasts',
 ] as const);
 
 // Define test data for dynamic route parameters
