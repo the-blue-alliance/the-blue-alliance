@@ -7,7 +7,7 @@ import {
   forwardRef,
 } from 'react';
 
-import { District, Event, Match, Team } from '~/api/tba/read';
+import { Event, Match, Team } from '~/api/tba/read';
 import {
   getEventQueryKey,
   getMatchQueryKey,
@@ -176,16 +176,17 @@ const DistrictLink = forwardRef<
   HTMLAnchorElement,
   PropsWithChildren<
     {
-      district: District;
+      districtAbbreviation: string;
+      year?: number;
     } & AnchorHTMLAttributes<HTMLAnchorElement>
   >
->(({ district, ...props }, ref) => {
+>(({ districtAbbreviation, year, ...props }, ref) => {
   return (
     <Link
       to="/district/$districtAbbreviation/{-$year}"
       params={{
-        districtAbbreviation: district.abbreviation,
-        year: district.year.toString(),
+        districtAbbreviation,
+        year: year?.toString(),
       }}
       {...props}
       ref={ref}

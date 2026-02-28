@@ -54,7 +54,10 @@ export default function TeamPageTeamInfo({
           {district && (
             <DetailEntity icon={<DistrictIcon />}>
               Part of the{' '}
-              <DistrictLink district={district}>
+              <DistrictLink
+                districtAbbreviation={district.abbreviation}
+                year={district.year}
+              >
                 {district.display_name}
               </DistrictLink>{' '}
               District

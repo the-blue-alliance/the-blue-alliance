@@ -255,7 +255,10 @@ function EventPage() {
       <div className="mb-4 space-y-1">
         {event.district && (
           <DetailEntity icon={<GlobeIcon />}>
-            <DistrictLink district={event.district}>
+            <DistrictLink
+              districtAbbreviation={event.district.abbreviation}
+              year={event.district.year}
+            >
               {event.district.display_name}
             </DistrictLink>{' '}
             Event
