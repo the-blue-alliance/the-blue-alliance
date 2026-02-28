@@ -384,6 +384,12 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
+            docker:
+              - 'ops/dev/docker/**'
+              - 'pyproject.toml'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'uv.lock'
       # See https://github.com/puppeteer/puppeteer/issues/12818
       # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
       - name: Disable AppArmor
@@ -412,6 +418,13 @@ jobs:
           npm install -g capture-website-cli
       - name: Install Vagrant
         if: steps.changes.outputs.web == 'true'
+        uses: actions/cache@v4
+        id: vagrant-cache
+        with:
+          path: /usr/bin/vagrant
+          key: vagrant-${{ runner.os }}-${{ runner.arch }}
+      - name: Install Vagrant Binary
+        if: steps.changes.outputs.web == 'true' && steps.vagrant-cache.outputs.cache-hit != 'true'
         run: |
           wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
@@ -435,9 +448,12 @@ jobs:
           push: true
           tags: localhost:5000/tba-py3-dev:latest
           cache-from: |
-            type=gha
-            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-          cache-to: type=gha,mode=max
+            type=gha,scope=tba-dev-${{ hashFiles('ops/dev/docker/Dockerfile') }}
+            type=gha,scope=tba-dev
+            type=registry,ref=ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
+          cache-to: type=gha,mode=max,scope=tba-dev-${{ hashFiles('ops/dev/docker/Dockerfile') }}
+          build-args: |
+            BUILDKIT_INLINE_CACHE=1
       - name: Start Container
         if: steps.changes.outputs.web == 'true'
         run: vagrant up

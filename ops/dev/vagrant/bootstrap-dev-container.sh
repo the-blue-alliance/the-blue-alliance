@@ -4,34 +4,37 @@ set -e
 # Place for local datastore
 mkdir -p /datastore
 
-# Update system dependencies
-apt-get update && apt-get upgrade -y
-
-python -m pip config set global.break-system-packages true
-pip install --upgrade setuptools uv
-uv export --no-dev --no-hashes --frozen -o src/requirements.txt
-pip install --ignore-installed -r src/requirements.txt
-
 # Create empty keys file if one does not already exist
 if [ ! -f /tba/src/backend/web/static/javascript/tba_js/tba_keys.js ]; then
     cp /tba/src/backend/web/static/javascript/tba_js/tba_keys_template.js /tba/src/backend/web/static/javascript/tba_js/tba_keys.js
 fi
 
-# nodejs dependencies
-NVM_DIR="/nvm"
-# shellcheck source=/dev/null
-[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-nvm use default
-# skip puppeteer chromium install on aarch64
-if [ "$(uname -m)" = "aarch64" ]; then
-    export PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+# If dependencies changed since image was built, reinstall them
+# This handles the case where the image is outdated
+if [ -f /tba/package.json ]; then
+    echo "Checking for dependency updates..."
+
+    # Check if node_modules is missing or package-lock has changed
+    if [ ! -d /tba/node_modules ] || ! cmp -s /tba/package-lock.json /tmp/.image-package-lock.json 2>/dev/null; then
+        echo "Installing Node dependencies..."
+        NVM_DIR="/nvm"
+        # shellcheck source=/dev/null
+        [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
+        nvm use default
+        npm ci
+        cp /tba/package-lock.json /tmp/.image-package-lock.json 2>/dev/null || true
+    fi
+
+    # Check if Python dependencies changed
+    if ! cmp -s /tba/pyproject.toml /tmp/.image-pyproject.toml 2>/dev/null; then
+        echo "Installing Python dependencies..."
+        python -m pip config set global.break-system-packages true
+        pip install --upgrade setuptools uv
+        uv export --no-dev --no-hashes --frozen -o src/requirements.txt
+        pip install --ignore-installed -r src/requirements.txt
+        cp /tba/pyproject.toml /tmp/.image-pyproject.toml 2>/dev/null || true
+    fi
 fi
 
-echo "Running npm install... this may take a while..."
-npm ci
-
-# Install the Firebase tools for the Firebase emulator
-npm install -g firebase-tools
-npm install -g uglify-js@3.17.4
-
+# Always run webpack build (it's relatively fast and ensures assets are up-to-date)
 ./ops/build/run_buildweb.sh

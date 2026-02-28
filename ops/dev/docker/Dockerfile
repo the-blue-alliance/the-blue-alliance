@@ -59,6 +59,19 @@ RUN mkdir -p $NVM_DIR  \
     && nvm alias default $NODE_VERSION \
     && nvm use default --silent
 
+# Add node to PATH for all users
+ENV PATH="$NVM_DIR/versions/node/v$NODE_VERSION/bin:$PATH"
+
+# Install global npm packages that rarely change
+RUN . $NVM_DIR/nvm.sh && npm install -g firebase-tools uglify-js@3.17.4
+
+# Set up pip to allow system packages
+RUN python -m pip config set global.break-system-packages true
+RUN pip install --upgrade setuptools uv
+
+# Clean up to reduce image size
+RUN apt-get clean && rm -rf /var/lib/apt/lists/*
+
 # Configure ssh server
 RUN mkdir /var/run/sshd
 RUN echo 'root:tba' | chpasswd
