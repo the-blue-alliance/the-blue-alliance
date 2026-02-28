@@ -3,7 +3,7 @@ import { MoonIcon, SunIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
-import GithubIcon from '~icons/logos/github-icon';
+import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
 import { useTheme } from '~/lib/theme';
