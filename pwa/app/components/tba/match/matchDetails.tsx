@@ -8,6 +8,7 @@ import ScoreBreakdown2017 from '~/components/tba/match/scoreBreakdown2017';
 import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
 import ScoreBreakdown2019 from '~/components/tba/match/scoreBreakdown2019';
 import ScoreBreakdown2020 from '~/components/tba/match/scoreBreakdown2020';
+import ScoreBreakdown2022 from '~/components/tba/match/scoreBreakdown2022';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
@@ -21,6 +22,7 @@ import {
   isScoreBreakdown2018,
   isScoreBreakdown2019,
   isScoreBreakdown2020,
+  isScoreBreakdown2022,
   isScoreBreakdown2023,
   isScoreBreakdown2024,
   isScoreBreakdown2025,
@@ -134,6 +136,15 @@ export default function MatchDetails({
   if (isScoreBreakdown2023(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2023
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2022(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2022
         scoreBreakdown={match.score_breakdown}
         match={match}
       />
