@@ -107,7 +107,7 @@ import {
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
-import { PlayoffType } from '~/lib/api/PlayoffType';
+import { PlayoffType, TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -563,11 +563,7 @@ function ResultsTab({
     event.playoff_type === PlayoffType.DOUBLE_ELIM_4_TEAM;
 
   const showTraditionalBracket =
-    alliances.length > 0 &&
-    (event.playoff_type === PlayoffType.BRACKET_8_TEAM ||
-      event.playoff_type === PlayoffType.BRACKET_4_TEAM ||
-      event.playoff_type === PlayoffType.BRACKET_16_TEAM ||
-      event.playoff_type === PlayoffType.BRACKET_2_TEAM);
+    alliances.length > 0 && TRADITIONAL_BRACKET_TYPES.has(event.playoff_type);
 
   const tocItems = [
     { slug: 'qual-matches', label: 'Qualification Matches' },
