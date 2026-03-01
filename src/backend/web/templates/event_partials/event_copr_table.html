@@ -6,14 +6,14 @@
                         aria-expanded="false">
             <span id="coprSelector">Statistics</span> <span class="caret"></span>
         </button>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu" style="min-width: 260px;">
             <li>
                     <a href="#" id="copr_clear">Clear (reset to OPR)</a>
             </li>
             <li role="separator" class="divider"></li>
             {% for copr_item in copr_items %}
                     <li>
-                            <label class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}" for="checkbox_{{ copr_item[1] }}" style="display:block; padding:3px 12px; cursor:pointer;">
+                            <label class="copr-select" data-key="{{ copr_item[0] }}" data-name="{{ copr_item[2] }}" for="checkbox_{{ copr_item[1] }}" style="display:block; padding:1px 12px; cursor:pointer; font-weight: normal;">
                                     <input type="checkbox" id="checkbox_{{ copr_item[1] }}" style="margin-right:6px;">{{ copr_item[2] }}
                             </label>
                     </li>
@@ -139,6 +139,11 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
+        // Prevent dropdown from closing when clicking checkboxes/labels inside it
+        $(document).on('click.dropdown-persist', '.dropdown-menu', function(e) {
+            e.stopPropagation();
+        });
+
         // Initialize: wire up checkboxes and derive initial selection from current DOM state
         const checkboxNodes = document.querySelectorAll('.copr-select');
 

@@ -16,8 +16,10 @@ from backend.common.frc_api.types import (
     DistrictRankingListModelV2,
     EventRankingListModelV2,
     EventScheduleHybridModelV2,
+    RegionalRankingTeamDetailListModelV31,
     SeasonDistrictListModelV2,
     SeasonEventListModelV31,
+    SeasonEventListModelV33,
     SeasonTeamListModelV2,
     TeamAvatarListingsModelV2,
 )
@@ -32,6 +34,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
+from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.profiler import Span
@@ -60,6 +63,10 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_rankings_parser im
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
     FMSAPIHybridScheduleParser,
     FMSAPIMatchDetailsParser,
+)
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_regional_rankings_parser import (
+    FMSAPIRegionalRankingsParser,
+    TParsedRegionalAdvancement,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_root_parser import (
     FMSAPIRootParser,
@@ -159,9 +166,9 @@ class DatafeedFMSAPI:
     def get_event_list(
         self, year: Year
     ) -> Generator[Any, Any, Tuple[List[Event], List[District]]]:
-        event_list_response: TypedURLFetchResult[SeasonEventListModelV31] = (
-            yield self.api.event_list(year)
-        )
+        event_list_response: TypedURLFetchResult[
+            SeasonEventListModelV31 | SeasonEventListModelV33
+        ] = (yield self.api.event_list(year))
         result = self._parse(event_list_response, FMSAPIEventListParser(year))
         return result or ([], [])
 
@@ -175,9 +182,9 @@ class DatafeedFMSAPI:
 
         event = Event.get_by_id(event_key)
         api_event_short = self._get_event_short(year, event_short, event)
-        event_info_response: TypedURLFetchResult[SeasonEventListModelV31] = (
-            yield self.api.event_info(year, api_event_short)
-        )
+        event_info_response: TypedURLFetchResult[
+            SeasonEventListModelV31 | SeasonEventListModelV33
+        ] = (yield self.api.event_info(year, api_event_short))
         result = self._parse(
             event_info_response,
             FMSAPIEventListParser(year, short=event_short),
@@ -446,6 +453,35 @@ class DatafeedFMSAPI:
             page = page + 1
 
         return TParsedDistrictAdvancement(
+            advancement=advancement,
+            adjustments=adjustments,
+        )
+
+    @typed_tasklet
+    def get_regional_rankings(
+        self, year: Year
+    ) -> Generator[Any, Any, TParsedRegionalAdvancement]:
+        advancement: RegionalPoolAdvancement = {}
+        adjustments: Dict[TeamKey, int] = {}
+
+        more_pages = True
+        page = 1
+
+        parser = FMSAPIRegionalRankingsParser()
+        while more_pages:
+            api_result: TypedURLFetchResult[RegionalRankingTeamDetailListModelV31] = (
+                yield self.api.regional_rankings(year, page)
+            )
+            result = self._parse(api_result, parser)
+            if not result:
+                break
+
+            advancement_page, more_pages = result
+            advancement.update(advancement_page.advancement)
+            adjustments.update(advancement_page.adjustments)
+            page = page + 1
+
+        return TParsedRegionalAdvancement(
             advancement=advancement,
             adjustments=adjustments,
         )

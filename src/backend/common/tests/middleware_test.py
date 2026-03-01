@@ -10,6 +10,7 @@ from werkzeug.wrappers import Request
 
 from backend.common import middleware
 from backend.common.environment import Environment
+from backend.common.logging import logging_context
 from backend.common.middleware import (
     _set_secret_key,
     AfterResponseMiddleware,
@@ -133,6 +134,9 @@ def test_TraceRequestMiddleware_callable(app: Flask) -> None:
     middleware(environ, start_response)
 
     assert isinstance(trace_context.request, Request)
+    assert isinstance(logging_context.request, Request)
+    assert hasattr(logging_context.request, "logging_context")
+    assert isinstance(logging_context.request.logging_context, dict)
 
 
 def test_AfterResponseMiddleware_init(app: Flask) -> None:

@@ -43,14 +43,77 @@ export const Route = createFileRoute('/match/$matchKey')({
       };
     }
 
+    const { event, match } = loaderData;
+    const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
+    const title = matchTitleShort(match, playoffType);
+
+    const videos = match.videos
+      .filter((v) => v.type === 'youtube')
+      .map((v) => ({
+        '@type': 'VideoObject' as const,
+        name: `${title} - ${event.name} ${event.year}`,
+        url: `https://www.youtube.com/watch?v=${v.key}`,
+        thumbnailUrl: `https://img.youtube.com/vi/${v.key}/hqdefault.jpg`,
+      }));
+
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'SportsEvent',
+      name: `${title} - ${event.name} ${event.year}`,
+      description: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition`,
+      url: `https://www.thebluealliance.com/match/${match.key}`,
+      ...(match.actual_time && {
+        startDate: new Date(match.actual_time * 1000).toISOString(),
+      }),
+      location: {
+        '@type': 'Place',
+        name: event.location_name ?? event.name,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: event.city,
+          addressRegion: event.state_prov,
+          addressCountry: event.country,
+        },
+      },
+      ...(videos.length > 0 && {
+        subjectOf: videos.length === 1 ? videos[0] : videos,
+      }),
+      competitor: [
+        {
+          '@type': 'SportsTeam',
+          name: 'Red Alliance',
+          member: match.alliances.red.team_keys.map((key) => ({
+            '@type': 'SportsTeam',
+            name: `Team ${key.substring(3)}`,
+            url: `https://www.thebluealliance.com/team/${key.substring(3)}`,
+          })),
+        },
+        {
+          '@type': 'SportsTeam',
+          name: 'Blue Alliance',
+          member: match.alliances.blue.team_keys.map((key) => ({
+            '@type': 'SportsTeam',
+            name: `Team ${key.substring(3)}`,
+            url: `https://www.thebluealliance.com/team/${key.substring(3)}`,
+          })),
+        },
+      ],
+    };
+
     return {
       meta: [
         {
-          title: `${matchTitleShort(loaderData.match, loaderData.event.playoff_type ?? PlayoffType.CUSTOM)} - ${loaderData.event.name} (${loaderData.event.year}) - The Blue Alliance`,
+          title: `${title} - ${event.name} (${event.year}) - The Blue Alliance`,
         },
         {
           name: 'description',
-          content: `${matchTitleShort(loaderData.match, loaderData.event.playoff_type ?? PlayoffType.CUSTOM)} at the ${loaderData.event.year} ${loaderData.event.name} FIRST Robotics Competition in ${loaderData.event.city}, ${loaderData.event.state_prov}, ${loaderData.event.country}`,
+          content: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition in ${event.city}, ${event.state_prov}, ${event.country}`,
+        },
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(jsonLd),
         },
       ],
     };

@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
+from backend.common.environment import Environment
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
@@ -201,6 +202,7 @@ def api_auth_manage(key_type: Optional[str]) -> Response:
         "key_type": key_type,
         "include_expired": include_expired,
         "auths": auths,
+        "gcp_project_id": Environment.project(),
     }
 
     return render_template("admin/api_manage_auth.html", template_values)

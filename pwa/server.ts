@@ -73,5 +73,6 @@ app.use(async (req, res, next) => {
 
 const port = process.env.PORT || 3000;
 app.listen(port, () =>
+  // eslint-disable-next-line no-console
   console.log(`Express server listening at http://localhost:${port}`),
 );

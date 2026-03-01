@@ -1,5 +1,7 @@
+import json
 import unittest
 from typing import cast
+from unittest.mock import patch
 
 import pytest
 from google.appengine.ext import ndb
@@ -9,6 +11,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.futures import InstantFuture
 from backend.common.models.account import Account
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -17,6 +20,7 @@ from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
 from backend.common.suggestions.media_parser import MediaParser
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
+from backend.common.urlfetch import URLFetchResult
 
 
 @pytest.mark.usefixtures("ndb_context")
@@ -874,6 +878,119 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         )
         self.assertIsNotNone(suggestion.contents.get("webcast_dict"))
         self.assertEqual(suggestion.contents.get("webcast_date"), "2017-02-28")
+
+    def test_youtube_webcast_autofill_date(self) -> None:
+        event = Event(
+            id="2016test",
+            name="Test Event",
+            event_short="Test Event",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        )
+        event.put()
+
+        api_resp = {
+            "items": [
+                {
+                    "liveStreamingDetails": {
+                        "scheduledStartTime": "2016-03-15T18:00:00Z",
+                    }
+                }
+            ]
+        }
+        mock_urlfetch_result = URLFetchResult.mock_for_content(
+            "https://www.googleapis.com/youtube/v3/videos",
+            200,
+            json.dumps(api_resp),
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
+
+        with patch(
+            "backend.common.helpers.youtube_video_helper.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch",
+                return_value=mock_future,
+            ):
+                status = SuggestionCreator.createEventWebcastSuggestion(
+                    self.account.key,
+                    "https://www.youtube.com/watch?v=abc123",
+                    "",
+                    "2016test",
+                ).get_result()
+
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertIsNotNone(suggestion.contents.get("webcast_dict"))
+        self.assertEqual(suggestion.contents.get("webcast_date"), "2016-03-15")
+
+    def test_youtube_webcast_no_autofill_when_date_provided(self) -> None:
+        event = Event(
+            id="2016test",
+            name="Test Event",
+            event_short="Test Event",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        )
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=abc123",
+            "2016-04-01",
+            "2016test",
+        ).get_result()
+
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertEqual(suggestion.contents.get("webcast_date"), "2016-04-01")
+
+    def test_youtube_webcast_autofill_date_api_failure(self) -> None:
+        event = Event(
+            id="2016test",
+            name="Test Event",
+            event_short="Test Event",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        )
+        event.put()
+
+        mock_urlfetch_result = URLFetchResult.mock_for_content(
+            "https://www.googleapis.com/youtube/v3/videos",
+            200,
+            '{"items": []}',
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
+
+        with patch(
+            "backend.common.helpers.youtube_video_helper.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch",
+                return_value=mock_future,
+            ):
+                status = SuggestionCreator.createEventWebcastSuggestion(
+                    self.account.key,
+                    "https://www.youtube.com/watch?v=abc123",
+                    "",
+                    "2016test",
+                ).get_result()
+
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertIsNotNone(suggestion.contents.get("webcast_dict"))
+        self.assertIsNone(suggestion.contents.get("webcast_date"))
 
 
 class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):

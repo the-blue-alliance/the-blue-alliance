@@ -74,10 +74,7 @@ export function getRouter() {
       replaysOnErrorSampleRate: 1,
       profilesSampleRate: 1,
 
-      integrations: [
-        // eslint-disable-next-line import/namespace
-        Sentry.tanstackRouterBrowserTracingIntegration(router),
-      ],
+      integrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
       enabled: process.env.NODE_ENV === 'production',
     });
     void registerServiceWorker();

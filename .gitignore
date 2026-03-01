@@ -41,3 +41,4 @@ ui-debug.log
 firebase-debug.log
 
 database-debug.log
+*.egg-info/

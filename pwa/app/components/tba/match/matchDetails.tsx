@@ -5,19 +5,31 @@ import { Event, Match } from '~/api/tba/read';
 import { getMatchZebraOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
 import { ScoreBreakdown2015 } from '~/components/tba/match/scoreBreakdown2015';
+import ScoreBreakdown2016 from '~/components/tba/match/scoreBreakdown2016';
+import ScoreBreakdown2017 from '~/components/tba/match/scoreBreakdown2017';
 import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
+import ScoreBreakdown2019 from '~/components/tba/match/scoreBreakdown2019';
+import ScoreBreakdown2020 from '~/components/tba/match/scoreBreakdown2020';
+import ScoreBreakdown2022 from '~/components/tba/match/scoreBreakdown2022';
 import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
+import ScoreBreakdown2026 from '~/components/tba/match/scoreBreakdown2026';
 import ZebraMotionWorks from '~/components/tba/match/zebraMotionWorks';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
   isScoreBreakdown2015,
+  isScoreBreakdown2016,
+  isScoreBreakdown2017,
   isScoreBreakdown2018,
+  isScoreBreakdown2019,
+  isScoreBreakdown2020,
+  isScoreBreakdown2022,
   isScoreBreakdown2023,
   isScoreBreakdown2024,
   isScoreBreakdown2025,
+  isScoreBreakdown2026,
 } from '~/lib/rankingPoints';
 
 function formatMatchDate(timestamp: number, timezone: string): string {
@@ -101,6 +113,15 @@ export default function MatchDetails({
 
   let sbDiv = null;
 
+  if (isScoreBreakdown2026(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2026
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
   if (isScoreBreakdown2025(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2025
@@ -128,9 +149,54 @@ export default function MatchDetails({
     );
   }
 
+  if (isScoreBreakdown2022(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2022
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2020(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2020
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2019(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2019
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
   if (isScoreBreakdown2018(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2018
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2017(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2017
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2016(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2016
         scoreBreakdown={match.score_breakdown}
         match={match}
       />

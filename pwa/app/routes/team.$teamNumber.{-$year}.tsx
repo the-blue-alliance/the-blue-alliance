@@ -13,6 +13,7 @@ import {
   getEventAlliancesOptions,
   getEventDistrictPointsOptions,
   getTeamAwardsByYearOptions,
+  getTeamDistrictsOptions,
   getTeamEventsByYearOptions,
   getTeamEventsStatusesByYearOptions,
   getTeamMatchesByYearOptions,
@@ -61,6 +62,7 @@ import {
   calculateTeamRecordsFromMatches,
   getTeamsUnpenalizedHighScore,
 } from '~/lib/matchUtils';
+import { getImageMedia } from '~/lib/mediaUtils';
 import {
   MODEL_TYPE,
   addRecords,
@@ -119,6 +121,9 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
       )
       .catch(() => []);
+    const teamDistrictsQuery = queryClient
+      .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
+      .catch(() => []);
 
     // these need to be awaited so we can validate the year
     const [team, yearsParticipated] = await Promise.all([
@@ -150,6 +155,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       teamStatusesQuery,
       teamAwardsQuery,
       teamEventsQuery,
+      teamDistrictsQuery,
     ]);
 
     const endTime = Date.now();
@@ -179,16 +185,45 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       };
     }
 
+    const { team } = loaderData;
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'SportsTeam',
+      name: `Team ${team.team_number} - ${team.nickname}`,
+      url: `https://www.thebluealliance.com/team/${team.team_number}`,
+      location: {
+        '@type': 'Place',
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: team.city,
+          addressRegion: team.state_prov,
+          postalCode: team.postal_code,
+          addressCountry: team.country,
+        },
+      },
+      memberOf: {
+        '@type': 'SportsOrganization',
+        name: 'FIRST Robotics Competition',
+        url: 'https://www.firstinspires.org',
+      },
+    };
+
     return {
       meta: [
         {
-          title: `${loaderData.team.nickname} - Team ${loaderData.team.team_number} - The Blue Alliance`,
+          title: `${team.nickname} - Team ${team.team_number} - The Blue Alliance`,
         },
         {
           name: 'description',
           content:
-            `From ${loaderData.team.city}, ${loaderData.team.state_prov} ${loaderData.team.postal_code}, ${loaderData.team.country}.` +
+            `From ${team.city}, ${team.state_prov} ${team.postal_code}, ${team.country}.` +
             ' Team information, match results, and match videos from the FIRST Robotics Competition.',
+        },
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(jsonLd),
         },
       ],
     };
@@ -223,6 +258,9 @@ function TeamPage(): React.JSX.Element {
   );
   const { data: awards } = useSuspenseQuery(
     getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+  const { data: districts } = useSuspenseQuery(
+    getTeamDistrictsOptions({ path: { team_key: teamKey } }),
   );
 
   // sort BEFORE launching queries that depend on it
@@ -259,22 +297,7 @@ function TeamPage(): React.JSX.Element {
 
   yearsParticipated.sort((a, b) => b - a);
 
-  const robotPics = useMemo(
-    () =>
-      media
-        .filter((m) => m.type === 'imgur')
-        .sort((a, b) => {
-          if (a.preferred) {
-            return -1;
-          }
-          if (b.preferred) {
-            return 1;
-          }
-
-          return 0;
-        }),
-    [media],
-  );
+  const robotPics = useMemo(() => getImageMedia(media), [media]);
 
   const maybeAvatar = useMemo(
     () => media.find((m) => m.type === 'avatar'),
@@ -334,6 +357,7 @@ function TeamPage(): React.JSX.Element {
                     team={team}
                     socials={socials}
                     maybeAvatar={maybeAvatar}
+                    district={districts.find((d) => d.year === year)}
                   />
                 </div>
                 <FavoriteButton

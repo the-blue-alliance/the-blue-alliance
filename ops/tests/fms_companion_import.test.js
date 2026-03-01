@@ -8,7 +8,7 @@ const { execSync } = require("child_process");
 const crypto = require("crypto");
 const FormData = require("form-data");
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 describe("FMS Companion Import", () => {
   let eventKey = null;

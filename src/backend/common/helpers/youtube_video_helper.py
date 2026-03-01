@@ -87,6 +87,53 @@ class YouTubeVideoHelper(object):
 
     @classmethod
     @typed_tasklet
+    def get_scheduled_start_time(
+        cls, video_id: str
+    ) -> Generator[Any, Any, Optional[str]]:
+        """
+        Fetches the scheduledStartTime for a YouTube video from the YouTube API.
+        Returns the date in YYYY-MM-DD format, or None if not available.
+        """
+        yt_secret = GoogleApiSecret.secret_key()
+        if not yt_secret:
+            logging.warning(
+                "No Google API secret, unable to fetch YouTube video details"
+            )
+            raise ndb.Return(None)
+
+        url = f"https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={video_id}&key={yt_secret}"
+        try:
+            ndb_context = ndb.get_context()
+            urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
+            urlfetch_result = URLFetchResult(url, urlfetch_response)
+
+            if urlfetch_result.status_code != 200:
+                logging.warning(
+                    f"YouTube API returned status {urlfetch_result.status_code}"
+                )
+                raise ndb.Return(None)
+
+            data = cast(Optional[dict], urlfetch_result.json())
+            if not data or not data.get("items"):
+                raise ndb.Return(None)
+
+            live_details = data["items"][0].get("liveStreamingDetails", {})
+            scheduled_start_time = live_details.get("scheduledStartTime")
+            if not scheduled_start_time:
+                raise ndb.Return(None)
+
+            # Parse ISO 8601 datetime and return as YYYY-MM-DD
+            raise ndb.Return(scheduled_start_time[:10])
+        except ndb.Return:
+            raise
+        except Exception:
+            logging.exception(
+                "Failed to fetch YouTube video scheduled start time for %s", video_id
+            )
+            raise ndb.Return(None)
+
+    @classmethod
+    @typed_tasklet
     def videos_in_playlist(
         cls, playlist_id: str
     ) -> Generator[Any, Any, List[YouTubePlaylistItem]]:

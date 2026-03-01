@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, Generator, List, Optional, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -11,7 +11,13 @@ from tzlocal.windows_tz import win_tz as WINDOWS_TO_IANA
 from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
-from backend.common.frc_api.types import SeasonEventListModelV31, SeasonEventModelV31
+from backend.common.frc_api.types import (
+    SeasonEventListModelV31,
+    SeasonEventListModelV33,
+    SeasonEventModelV31,
+    SeasonEventModelV33,
+    WebcastDetailModelExtV33,
+)
 from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
@@ -24,7 +30,10 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class FMSAPIEventListParser(
-    ParserBase[SeasonEventListModelV31, Tuple[List[Event], List[District]]]
+    ParserBase[
+        SeasonEventListModelV33 | SeasonEventListModelV31,
+        Tuple[List[Event], List[District]],
+    ]
 ):
     DATE_FORMAT_STR = "%Y-%m-%dT%H:%M:%S"
 
@@ -88,17 +97,29 @@ class FMSAPIEventListParser(
     @staticmethod
     @typed_tasklet
     def _parse_webcasts_async(
-        webcast_urls: List[str],
-    ) -> Generator[Any, Any, List[Optional[Webcast]]]:
+        api_webcasts: list[str] | list[WebcastDetailModelExtV33],
+    ) -> Generator[Any, Any, List[Webcast]]:
         """Parse webcast URLs in parallel."""
-        webcast_futures = tuple(
-            WebcastParser.webcast_dict_from_url(url) for url in webcast_urls
-        )
-        webcasts = yield webcast_futures
-        raise ndb.Return(list(webcasts))
+        if api_webcasts and isinstance(api_webcasts[0], str):
+            webcast_futures = tuple(
+                WebcastParser.webcast_dict_from_url(cast(str, url))
+                for url in api_webcasts
+            )
+            webcasts = yield webcast_futures
+            return [w for w in webcasts if w is not None]
+
+        webcasts = []
+        if api_webcasts and isinstance(api_webcasts[0], dict):
+            for api_webcast in api_webcasts:
+                if w := WebcastParser.webcast_dict_from_api_response(
+                    cast(WebcastDetailModelExtV33, api_webcast)
+                ):
+                    webcasts.append(w)
+
+        raise ndb.Return(webcasts)
 
     def parse(
-        self, response: SeasonEventListModelV31
+        self, response: SeasonEventListModelV33 | SeasonEventListModelV31
     ) -> Tuple[List[Event], List[District]]:
         events: List[Event] = []
         districts: Dict[DistrictKey, District] = {}
@@ -108,7 +129,9 @@ class FMSAPIEventListParser(
         event_name_override = cmp_hack_sitevar["event_name_override"]
         events_to_change_dates = cmp_hack_sitevar["set_start_to_last_day"]
 
-        api_events: list[SeasonEventModelV31] = response["Events"] or []
+        api_events: list[SeasonEventModelV33] | list[SeasonEventModelV31] = (
+            response["Events"] or []
+        )
         for event in api_events:
             code = none_throws(event["code"]).lower()
 
@@ -161,8 +184,13 @@ class FMSAPIEventListParser(
             end = datetime.datetime.strptime(event["dateEnd"], self.DATE_FORMAT_STR)
             website = event.get("website")
 
-            api_webcasts = event.get("webcasts", []) or []
-            webcasts = self._parse_webcasts_async(api_webcasts).get_result()
+            api_webcasts: list[str] | list[WebcastDetailModelExtV33] = []
+            if resp_webcasts := event.get("webcasts"):
+                api_webcasts = resp_webcasts
+
+            webcasts: list[Webcast] = self._parse_webcasts_async(
+                api_webcasts
+            ).get_result()
 
             # Attempt to convert our API (Windows) timezone -> IANA timezone
             # We'll ensure it's capatiable with pytz as well, since that's what we use everywhere

@@ -6,6 +6,7 @@ from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
+from backend.common.logging import logging_context
 from backend.common.profiler import send_traces, Span, trace_context
 from backend.common.run_after_response import execute_callbacks, response_context
 
@@ -36,7 +37,7 @@ class AppspotRedirectMiddleware:
 
 class TraceRequestMiddleware:
     """
-    A middleware that gives trace_context access to the request
+    A middleware that gives trace_context and logging_context access to the request
     """
 
     app: Callable[[Any, Any], Any]
@@ -45,7 +46,12 @@ class TraceRequestMiddleware:
         self.app = app
 
     def __call__(self, environ: Any, start_response: Any):
-        trace_context.request = Request(environ)
+        request = Request(environ)
+        trace_context.request = request
+        # Initialize logging_context with the request and an empty logging_context dict
+        logging_context.request = request
+        if not hasattr(logging_context.request, "logging_context"):
+            logging_context.request.logging_context = {}
         return self.app(environ, start_response)
 
 
