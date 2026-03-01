@@ -103,7 +103,7 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
@@ -356,14 +356,15 @@ function EventPage() {
                 </InlineIcon>
               </TabsTrigger>
             )}
-          {districtPointsQuery.data && (
-            <TabsTrigger value="district-points">
-              <InlineIcon>
-                <DistrictPointsIcon />
-                District Points
-              </InlineIcon>
-            </TabsTrigger>
-          )}
+          {districtPointsQuery.data &&
+            DISTRICT_EVENT_TYPES.has(event.event_type) && (
+              <TabsTrigger value="district-points">
+                <InlineIcon>
+                  <DistrictPointsIcon />
+                  District Points
+                </InlineIcon>
+              </TabsTrigger>
+            )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MediaIcon />
@@ -428,14 +429,15 @@ function EventPage() {
           )}
         </TabsContent>
 
-        {districtPointsQuery.data && (
-          <TabsContent value="district-points">
-            <DistrictPointsTab
-              districtPoints={districtPointsQuery.data}
-              year={event.year}
-            />
-          </TabsContent>
-        )}
+        {districtPointsQuery.data &&
+          DISTRICT_EVENT_TYPES.has(event.event_type) && (
+            <TabsContent value="district-points">
+              <DistrictPointsTab
+                districtPoints={districtPointsQuery.data}
+                year={event.year}
+              />
+            </TabsContent>
+          )}
 
         <TabsContent value="media">
           <MediaTab webcasts={event.webcasts} eventKey={event.key} />
