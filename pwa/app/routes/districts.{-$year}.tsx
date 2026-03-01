@@ -1,8 +1,11 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
-import { getDistrictsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import {
+  getDistrictTeamsKeysOptions,
+  getDistrictsByYearOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { DistrictLink } from '~/components/tba/links';
 import {
   Select,
@@ -32,8 +35,18 @@ export const Route = createFileRoute('/districts/{-$year}')({
       throw notFound();
     }
 
-    await queryClient.ensureQueryData(
+    const districts = await queryClient.ensureQueryData(
       getDistrictsByYearOptions({ path: { year } }),
+    );
+
+    await Promise.all(
+      districts.map((district) =>
+        queryClient.ensureQueryData(
+          getDistrictTeamsKeysOptions({
+            path: { district_key: district.key },
+          }),
+        ),
+      ),
     );
 
     return { year };
@@ -83,6 +96,20 @@ function DistrictsPage() {
     [districts],
   );
 
+  const teamKeyResults = useSuspenseQueries({
+    queries: districts.map((district) =>
+      getDistrictTeamsKeysOptions({ path: { district_key: district.key } }),
+    ),
+  });
+
+  const teamCountByDistrict = useMemo(() => {
+    const map = new Map<string, number>();
+    districts.forEach((district, i) => {
+      map.set(district.key, teamKeyResults[i].data.length);
+    });
+    return map;
+  }, [districts, teamKeyResults]);
+
   return (
     <div className="py-8">
       <div className="mb-4 flex items-center gap-4">
@@ -116,6 +143,7 @@ function DistrictsPage() {
           <TableRow>
             <TableHead>District</TableHead>
             <TableHead>Key</TableHead>
+            <TableHead className="text-right">Teams</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -131,6 +159,9 @@ function DistrictsPage() {
               </TableCell>
               <TableCell className="font-mono text-muted-foreground">
                 {district.abbreviation}
+              </TableCell>
+              <TableCell className="text-right tabular-nums">
+                {teamCountByDistrict.get(district.key)}
               </TableCell>
             </TableRow>
           ))}
