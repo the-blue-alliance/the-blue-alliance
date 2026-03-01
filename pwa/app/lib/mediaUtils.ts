@@ -4,7 +4,7 @@ import { Media } from '~/api/tba/read';
 export const IMAGE_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
   'imgur',
   'cdphotothread',
-  'instagram-image',
+  'cd-thread',
   'external-link',
 ]);
 
@@ -21,8 +21,10 @@ export function getMediaImageUrl(media: Media): string | undefined {
       return `https://i.imgur.com/${media.foreign_key}m.jpg`;
     case 'cdphotothread':
       return media.direct_url;
-    case 'instagram-image':
-      return `https://www.thebluealliance.com/instagram_oembed/${media.foreign_key}`;
+    case 'cd-thread': {
+      const details = media.details as { image_url?: string } | undefined;
+      return details?.image_url;
+    }
     case 'external-link':
       return media.direct_url;
     default:
@@ -37,8 +39,10 @@ export function getMediaImageUrlFull(media: Media): string | undefined {
       return `https://i.imgur.com/${media.foreign_key}h.jpg`;
     case 'cdphotothread':
       return media.direct_url;
-    case 'instagram-image':
-      return `https://www.thebluealliance.com/instagram_oembed/${media.foreign_key}`;
+    case 'cd-thread': {
+      const details = media.details as { image_url?: string } | undefined;
+      return details?.image_url;
+    }
     case 'external-link':
       return media.direct_url;
     default:
@@ -57,8 +61,8 @@ export function getMediaLinkUrl(media: Media): string | undefined {
         ? `https://www.chiefdelphi.com/media/img/${details.image_partial}`
         : undefined;
     }
-    case 'instagram-image':
-      return `https://www.instagram.com/p/${media.foreign_key}`;
+    case 'cd-thread':
+      return `https://www.chiefdelphi.com/t/${media.foreign_key}`;
     case 'grabcad':
       return `https://grabcad.com/library/${media.foreign_key}`;
     case 'onshape':
