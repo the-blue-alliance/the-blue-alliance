@@ -12,6 +12,13 @@ import {
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
 import { EliminationAlliance, Event, Match } from '~/api/tba/read';
+import {
+  EliminationBracketPaths,
+  type PlayoffMatchHandle,
+  type SeriesResult,
+  type WinnerLink,
+  useAdvancementPaths,
+} from '~/components/tba/eliminationBracketPaths';
 import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { EventType } from '~/lib/api/EventType';
@@ -27,34 +34,16 @@ type MatchLabel4 =
   | 'Match 5'
   | 'Finals';
 
-type MatchResult = {
-  score: number;
-  won: boolean;
-};
-
-type SeriesResult = {
-  redTeams: string[];
-  blueTeams: string[];
-  redAllianceNumber: number | null;
-  blueAllianceNumber: number | null;
-  redResults: MatchResult[];
-  blueResults: MatchResult[];
-  redWon: boolean;
-  blueWon: boolean;
-  matchRedTeams: string[];
-  matchBlueTeams: string[];
-};
-
-type MatchHandle = {
-  card: HTMLDivElement | null;
-  redRow: HTMLDivElement | null;
-  blueRow: HTMLDivElement | null;
-  redAlliance: number | null;
-  blueAlliance: number | null;
-};
+const WINNER_LINKS: WinnerLink[] = [
+  { from: 'Match 1', to: 'Match 4' },
+  { from: 'Match 2', to: 'Match 4' },
+  { from: 'Match 3', to: 'Match 5' },
+  { from: 'Match 4', to: 'Finals' },
+  { from: 'Match 5', to: 'Finals' },
+];
 
 const BracketMatch = forwardRef<
-  MatchHandle,
+  PlayoffMatchHandle,
   {
     matchLabel: MatchLabel4;
     matches: Match[] | undefined;
@@ -286,6 +275,15 @@ export default function DoubleElim4TeamBracket({
   event: Event;
 }): JSX.Element {
   const [hoveredAlliance, setHoveredAlliance] = useState<number | null>(null);
+  const matchRefs = useRef<Record<MatchLabel4, PlayoffMatchHandle | null>>({
+    'Match 1': null,
+    'Match 2': null,
+    'Match 3': null,
+    'Match 4': null,
+    'Match 5': null,
+    Finals: null,
+  });
+  const containerRef = useRef<HTMLDivElement>(null);
 
   // Group SF matches by set_number, Finals separately
   const matchesBySet = useMemo(() => {
@@ -376,6 +374,26 @@ export default function DoubleElim4TeamBracket({
     };
   };
 
+  const matchLookup: Record<string, Match[] | undefined> = useMemo(
+    () => ({
+      'Match 1': matchesBySet[1],
+      'Match 2': matchesBySet[2],
+      'Match 3': matchesBySet[3],
+      'Match 4': matchesBySet[4],
+      'Match 5': matchesBySet[5],
+      Finals: finalsMatches,
+    }),
+    [matchesBySet, finalsMatches],
+  );
+
+  const { paths, svgSize } = useAdvancementPaths({
+    containerRef,
+    matchRefs,
+    winnerLinks: WINNER_LINKS,
+    matchLookup,
+    getSeriesResult,
+  });
+
   if (alliances.length === 0 || matches.length === 0) {
     return <></>;
   }
@@ -387,115 +405,139 @@ export default function DoubleElim4TeamBracket({
       </CardHeader>
 
       <div className="overflow-x-auto overflow-y-hidden">
-        <div className="flex min-w-max items-start justify-start gap-6 px-4">
-          {/* Upper Bracket */}
-          <div className="space-y-4">
-            <h2 className="text-center text-xl font-medium">Upper Bracket</h2>
-            <div className="flex items-start gap-8">
-              {/* Round 1 */}
-              <div className="flex flex-col items-center">
-                <h3 className="mb-4 text-center">Round 1</h3>
-                <div className="space-y-4">
-                  <BracketMatch
-                    matchLabel="Match 1"
-                    matches={matchesBySet[1]}
-                    event={event}
-                    hoveredAlliance={hoveredAlliance}
-                    setHoveredAlliance={setHoveredAlliance}
-                    getSeriesResult={getSeriesResult}
-                    getAllianceDisplayName={getAllianceDisplayName}
-                    showFullAlliance
-                  />
-                  <BracketMatch
-                    matchLabel="Match 2"
-                    matches={matchesBySet[2]}
-                    event={event}
-                    hoveredAlliance={hoveredAlliance}
-                    setHoveredAlliance={setHoveredAlliance}
-                    getSeriesResult={getSeriesResult}
-                    getAllianceDisplayName={getAllianceDisplayName}
-                    showFullAlliance
-                  />
+        <div ref={containerRef} className="relative isolate min-w-max px-4">
+          <div className="relative z-1 space-y-4">
+            {/* Upper Bracket */}
+            <div className="space-y-4">
+              <h2 className="text-center text-xl font-medium">Upper Bracket</h2>
+              <div className="flex items-start gap-8">
+                {/* Round 1 */}
+                <div className="flex flex-col items-center">
+                  <h3 className="mb-4 text-center">Round 1</h3>
+                  <div className="space-y-4">
+                    <BracketMatch
+                      ref={(node) => {
+                        matchRefs.current['Match 1'] = node;
+                      }}
+                      matchLabel="Match 1"
+                      matches={matchesBySet[1]}
+                      event={event}
+                      hoveredAlliance={hoveredAlliance}
+                      setHoveredAlliance={setHoveredAlliance}
+                      getSeriesResult={getSeriesResult}
+                      getAllianceDisplayName={getAllianceDisplayName}
+                      showFullAlliance
+                    />
+                    <BracketMatch
+                      ref={(node) => {
+                        matchRefs.current['Match 2'] = node;
+                      }}
+                      matchLabel="Match 2"
+                      matches={matchesBySet[2]}
+                      event={event}
+                      hoveredAlliance={hoveredAlliance}
+                      setHoveredAlliance={setHoveredAlliance}
+                      getSeriesResult={getSeriesResult}
+                      getAllianceDisplayName={getAllianceDisplayName}
+                      showFullAlliance
+                    />
+                  </div>
+                </div>
+
+                {/* Round 2 - Upper */}
+                <div className="flex flex-col items-center">
+                  <h3 className="mb-4 text-center">Round 2</h3>
+                  <div className="space-y-4">
+                    <div className="h-8"></div>
+                    <BracketMatch
+                      ref={(node) => {
+                        matchRefs.current['Match 4'] = node;
+                      }}
+                      matchLabel="Match 4"
+                      matches={matchesBySet[4]}
+                      event={event}
+                      hoveredAlliance={hoveredAlliance}
+                      setHoveredAlliance={setHoveredAlliance}
+                      getSeriesResult={getSeriesResult}
+                      getAllianceDisplayName={getAllianceDisplayName}
+                    />
+                  </div>
+                </div>
+
+                <div className="w-16"></div>
+
+                {/* Finals */}
+                <div className="flex flex-col items-center">
+                  <h3 className="mb-4 text-center font-bold">Finals</h3>
+                  <div className="space-y-4">
+                    <div className="h-8"></div>
+                    <BracketMatch
+                      ref={(node) => {
+                        matchRefs.current.Finals = node;
+                      }}
+                      matchLabel="Finals"
+                      matches={finalsMatches}
+                      event={event}
+                      hoveredAlliance={hoveredAlliance}
+                      setHoveredAlliance={setHoveredAlliance}
+                      getSeriesResult={getSeriesResult}
+                      getAllianceDisplayName={getAllianceDisplayName}
+                    />
+                  </div>
                 </div>
               </div>
+            </div>
 
-              {/* Round 2 - Upper */}
-              <div className="flex flex-col items-center">
-                <h3 className="mb-4 text-center">Round 2</h3>
-                <div className="space-y-4">
-                  <div className="h-8"></div>
-                  <BracketMatch
-                    matchLabel="Match 4"
-                    matches={matchesBySet[4]}
-                    event={event}
-                    hoveredAlliance={hoveredAlliance}
-                    setHoveredAlliance={setHoveredAlliance}
-                    getSeriesResult={getSeriesResult}
-                    getAllianceDisplayName={getAllianceDisplayName}
-                  />
+            {/* Lower Bracket */}
+            <div className="space-y-4">
+              <h2 className="text-center text-xl font-medium">Lower Bracket</h2>
+              <div className="ml-16 flex items-start gap-8">
+                {/* Round 2 - Lower */}
+                <div className="flex flex-col items-center">
+                  <h3 className="mb-4 text-center">Round 2</h3>
+                  <div className="space-y-4">
+                    <BracketMatch
+                      ref={(node) => {
+                        matchRefs.current['Match 3'] = node;
+                      }}
+                      matchLabel="Match 3"
+                      matches={matchesBySet[3]}
+                      event={event}
+                      hoveredAlliance={hoveredAlliance}
+                      setHoveredAlliance={setHoveredAlliance}
+                      getSeriesResult={getSeriesResult}
+                      getAllianceDisplayName={getAllianceDisplayName}
+                    />
+                  </div>
                 </div>
-              </div>
 
-              <div className="w-16"></div>
-
-              {/* Finals */}
-              <div className="flex flex-col items-center">
-                <h3 className="mb-4 text-center font-bold">Finals</h3>
-                <div className="space-y-4">
-                  <div className="h-8"></div>
-                  <BracketMatch
-                    matchLabel="Finals"
-                    matches={finalsMatches}
-                    event={event}
-                    hoveredAlliance={hoveredAlliance}
-                    setHoveredAlliance={setHoveredAlliance}
-                    getSeriesResult={getSeriesResult}
-                    getAllianceDisplayName={getAllianceDisplayName}
-                  />
+                {/* Round 3 - Lower */}
+                <div className="flex flex-col items-center">
+                  <h3 className="mb-4 text-center">Round 3</h3>
+                  <div className="space-y-4">
+                    <BracketMatch
+                      ref={(node) => {
+                        matchRefs.current['Match 5'] = node;
+                      }}
+                      matchLabel="Match 5"
+                      matches={matchesBySet[5]}
+                      event={event}
+                      hoveredAlliance={hoveredAlliance}
+                      setHoveredAlliance={setHoveredAlliance}
+                      getSeriesResult={getSeriesResult}
+                      getAllianceDisplayName={getAllianceDisplayName}
+                    />
+                  </div>
                 </div>
               </div>
             </div>
           </div>
-        </div>
 
-        {/* Lower Bracket */}
-        <div className="mt-6 px-4">
-          <div className="space-y-4">
-            <h2 className="text-center text-xl font-medium">Lower Bracket</h2>
-            <div className="ml-16 flex items-start gap-8">
-              {/* Round 2 - Lower */}
-              <div className="flex flex-col items-center">
-                <h3 className="mb-4 text-center">Round 2</h3>
-                <div className="space-y-4">
-                  <BracketMatch
-                    matchLabel="Match 3"
-                    matches={matchesBySet[3]}
-                    event={event}
-                    hoveredAlliance={hoveredAlliance}
-                    setHoveredAlliance={setHoveredAlliance}
-                    getSeriesResult={getSeriesResult}
-                    getAllianceDisplayName={getAllianceDisplayName}
-                  />
-                </div>
-              </div>
-
-              {/* Round 3 - Lower */}
-              <div className="flex flex-col items-center">
-                <h3 className="mb-4 text-center">Round 3</h3>
-                <div className="space-y-4">
-                  <BracketMatch
-                    matchLabel="Match 5"
-                    matches={matchesBySet[5]}
-                    event={event}
-                    hoveredAlliance={hoveredAlliance}
-                    setHoveredAlliance={setHoveredAlliance}
-                    getSeriesResult={getSeriesResult}
-                    getAllianceDisplayName={getAllianceDisplayName}
-                  />
-                </div>
-              </div>
-            </div>
-          </div>
+          <EliminationBracketPaths
+            paths={paths}
+            svgSize={svgSize}
+            hoveredAlliance={hoveredAlliance}
+          />
         </div>
       </div>
     </Card>
