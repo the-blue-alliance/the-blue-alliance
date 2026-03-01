@@ -7,17 +7,18 @@ import {
 
 import { cn } from '~/lib/utils';
 
-const Table = forwardRef<HTMLTableElement, HTMLAttributes<HTMLTableElement>>(
-  ({ className, ...props }, ref) => (
-    <div className="relative w-full overflow-auto">
-      <table
-        ref={ref}
-        className={cn('w-full caption-bottom text-sm', className)}
-        {...props}
-      />
-    </div>
-  ),
-);
+const Table = forwardRef<
+  HTMLTableElement,
+  HTMLAttributes<HTMLTableElement> & { wrapperClassName?: string }
+>(({ className, wrapperClassName, ...props }, ref) => (
+  <div className={cn('relative w-full overflow-auto', wrapperClassName)}>
+    <table
+      ref={ref}
+      className={cn('w-full caption-bottom text-sm', className)}
+      {...props}
+    />
+  </div>
+));
 Table.displayName = 'Table';
 
 const TableHeader = forwardRef<
