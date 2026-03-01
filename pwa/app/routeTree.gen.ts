@@ -29,6 +29,7 @@ import { Route as LocalDebugRouteImport } from './routes/local.debug'
 import { Route as InsightsChar123YearChar125RouteImport } from './routes/insights.{-$year}'
 import { Route as EventsChar123YearChar125RouteImport } from './routes/events.{-$year}'
 import { Route as EventEventKeyRouteImport } from './routes/event.$eventKey'
+import { Route as DistrictsChar123YearChar125RouteImport } from './routes/districts.{-$year}'
 import { Route as ApidocsV3RouteImport } from './routes/apidocs_.v3'
 import { Route as AccountMytbaRouteImport } from './routes/account.mytba'
 import { Route as TeamTeamNumberChar123YearChar125RouteImport } from './routes/team.$teamNumber.{-$year}'
@@ -140,6 +141,12 @@ const EventEventKeyRoute = EventEventKeyRouteImport.update({
   path: '/event/$eventKey',
   getParentRoute: () => rootRouteImport,
 } as any)
+const DistrictsChar123YearChar125Route =
+  DistrictsChar123YearChar125RouteImport.update({
+    id: '/districts/{-$year}',
+    path: '/districts/{-$year}',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ApidocsV3Route = ApidocsV3RouteImport.update({
   id: '/apidocs_/v3',
   path: '/apidocs/v3',
@@ -195,6 +202,7 @@ export interface FileRoutesByFullPath {
   '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
+  '/districts/{-$year}': typeof DistrictsChar123YearChar125Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
@@ -224,6 +232,7 @@ export interface FileRoutesByTo {
   '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs/v3': typeof ApidocsV3Route
+  '/districts/{-$year}': typeof DistrictsChar123YearChar125Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
@@ -254,6 +263,7 @@ export interface FileRoutesById {
   '/webcasts': typeof WebcastsRoute
   '/account/mytba': typeof AccountMytbaRoute
   '/apidocs_/v3': typeof ApidocsV3Route
+  '/districts/{-$year}': typeof DistrictsChar123YearChar125Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
@@ -285,6 +295,7 @@ export interface FileRouteTypes {
     | '/webcasts'
     | '/account/mytba'
     | '/apidocs/v3'
+    | '/districts/{-$year}'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
@@ -314,6 +325,7 @@ export interface FileRouteTypes {
     | '/webcasts'
     | '/account/mytba'
     | '/apidocs/v3'
+    | '/districts/{-$year}'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
@@ -343,6 +355,7 @@ export interface FileRouteTypes {
     | '/webcasts'
     | '/account/mytba'
     | '/apidocs_/v3'
+    | '/districts/{-$year}'
     | '/event/$eventKey'
     | '/events/{-$year}'
     | '/insights/{-$year}'
@@ -373,6 +386,7 @@ export interface RootRouteChildren {
   WebcastsRoute: typeof WebcastsRoute
   AccountMytbaRoute: typeof AccountMytbaRoute
   ApidocsV3Route: typeof ApidocsV3Route
+  DistrictsChar123YearChar125Route: typeof DistrictsChar123YearChar125Route
   EventEventKeyRoute: typeof EventEventKeyRoute
   EventsChar123YearChar125Route: typeof EventsChar123YearChar125Route
   InsightsChar123YearChar125Route: typeof InsightsChar123YearChar125Route
@@ -529,6 +543,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventEventKeyRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/districts/{-$year}': {
+      id: '/districts/{-$year}'
+      path: '/districts/{-$year}'
+      fullPath: '/districts/{-$year}'
+      preLoaderRoute: typeof DistrictsChar123YearChar125RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/apidocs_/v3': {
       id: '/apidocs_/v3'
       path: '/apidocs/v3'
@@ -597,6 +618,7 @@ const rootRouteChildren: RootRouteChildren = {
   WebcastsRoute: WebcastsRoute,
   AccountMytbaRoute: AccountMytbaRoute,
   ApidocsV3Route: ApidocsV3Route,
+  DistrictsChar123YearChar125Route: DistrictsChar123YearChar125Route,
   EventEventKeyRoute: EventEventKeyRoute,
   EventsChar123YearChar125Route: EventsChar123YearChar125Route,
   InsightsChar123YearChar125Route: InsightsChar123YearChar125Route,
