@@ -337,7 +337,10 @@ function EventGroupSection({
       id={group.slug}
       setInView={setInView}
     >
-      <h2 className="mt-5 text-2xl">
+      <h2
+        className="sticky top-14 z-1 mt-5 bg-background/95 py-2 text-2xl
+          shadow-[0_1px_0_0_var(--color-border)] backdrop-blur-xs"
+      >
         {group.groupName}{' '}
         <small className="text-muted-foreground">
           {pluralize(group.events.length, 'Event', 'Events')}

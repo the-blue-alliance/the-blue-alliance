@@ -17,50 +17,54 @@ import { getEventDateString, isEventWithinADay } from '~/lib/eventUtils';
 
 const DISTRICT_COLORS: Record<string, string> = {
   // California
-  ca: 'border-l-[#FAB604]',
+  ca: 'shadow-[inset_4px_0_0_0_#FAB604]',
   // Chesapeake
-  chs: 'border-l-[#2FA4A9]',
-  fch: 'border-l-[#2FA4A9]',
+  chs: 'shadow-[inset_4px_0_0_0_#2FA4A9]',
+  fch: 'shadow-[inset_4px_0_0_0_#2FA4A9]',
   // Indiana
-  fin: 'border-l-[#E04B4B]',
-  in: 'border-l-[#E04B4B]',
+  fin: 'shadow-[inset_4px_0_0_0_#E04B4B]',
+  in: 'shadow-[inset_4px_0_0_0_#E04B4B]',
   // Israel
-  isr: 'border-l-[#7DD3FC]',
+  isr: 'shadow-[inset_4px_0_0_0_#7DD3FC]',
   // Michigan
-  fim: 'border-l-[#94A3B8]',
+  fim: 'shadow-[inset_4px_0_0_0_#94A3B8]',
   // Mid-Atlantic
-  fma: 'border-l-[#9A8FD1]',
-  mar: 'border-l-[#9A8FD1]',
+  fma: 'shadow-[inset_4px_0_0_0_#9A8FD1]',
+  mar: 'shadow-[inset_4px_0_0_0_#9A8FD1]',
   // New England
-  ne: 'border-l-[#271380]',
+  ne: 'shadow-[inset_4px_0_0_0_#271380]',
   // North Carolina
-  fnc: 'border-l-[#7BA7D9]',
+  fnc: 'shadow-[inset_4px_0_0_0_#7BA7D9]',
   // Ontario
-  ont: 'border-l-[#4F6EF7]',
+  ont: 'shadow-[inset_4px_0_0_0_#4F6EF7]',
   // Pacific Northwest
-  pnw: 'border-l-[#3A9D7A]',
+  pnw: 'shadow-[inset_4px_0_0_0_#3A9D7A]',
   // Peachtree
-  pch: 'border-l-[#FDB4A0]',
+  pch: 'shadow-[inset_4px_0_0_0_#FDB4A0]',
   // South Carolina
-  fsc: 'border-l-[#4FA37A]',
+  fsc: 'shadow-[inset_4px_0_0_0_#4FA37A]',
   // Texas
-  fit: 'border-l-[#E36A2E]',
-  tx: 'border-l-[#E36A2E]',
+  fit: 'shadow-[inset_4px_0_0_0_#E36A2E]',
+  tx: 'shadow-[inset_4px_0_0_0_#E36A2E]',
   // Wisconsin
-  wi: 'border-l-[#5FAF8C]',
+  wi: 'shadow-[inset_4px_0_0_0_#5FAF8C]',
 };
 
 function getDistrictColorClass(
   districtAbbreviation: string | undefined,
 ): string {
   if (!districtAbbreviation) return '';
-  return DISTRICT_COLORS[districtAbbreviation.toLowerCase()] || '';
+  const shadow = DISTRICT_COLORS[districtAbbreviation.toLowerCase()];
+  return shadow ? `${shadow} [&>td:first-child]:pl-2` : '';
 }
 
 export default function EventListTable({ events }: { events: Event[] }) {
   return (
-    <Table className="w-full">
-      <TableHeader>
+    <Table className="w-full" wrapperClassName="overflow-visible">
+      <TableHeader
+        className="sticky top-[6.5rem] z-1 bg-background
+          shadow-[0_1px_0_0_var(--color-border)]"
+      >
         <TableRow>
           <TableHead>Event</TableHead>
           <TableHead>Webcast</TableHead>
@@ -74,10 +78,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
             event.district?.abbreviation,
           );
           return (
-            <TableRow
-              key={event.key}
-              className={districtColor ? `border-l-4 ${districtColor}` : ''}
-            >
+            <TableRow key={event.key} className={districtColor}>
               <TableCell className="w-8/12">
                 <Link
                   className="text-base"
