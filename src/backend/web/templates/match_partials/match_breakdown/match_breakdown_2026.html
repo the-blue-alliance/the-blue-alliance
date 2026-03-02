@@ -1,8 +1,8 @@
 {% macro tower_status(team, tower_result) %}
-{% if tower_result == 'Yes' %}
-<span class="glyphicon glyphicon-ok" rel="tooltip" title="{{team|digits}}"></span>
-{% else %}
+{% if tower_result == 'None' %}
 <span class="glyphicon glyphicon-remove" rel="tooltip" title="{{team|digits}}"></span>
+{% else %}
+<span class="glyphicon glyphicon-ok" rel="tooltip" title="{{team|digits}}"></span>
 {% endif %}
 {% endmacro %}
 
@@ -65,27 +65,17 @@
 
     {% if "hubScore" in match.score_breakdown.red %}
     <tr>
-        <td class="redScore" colspan="2">
+        <td class="red" colspan="2">
             {{match.score_breakdown.red.hubScore.autoPoints}}
         </td>
         <td>Auto Fuel</td>
-        <td class="blueScore" colspan="2">
+        <td class="blue" colspan="2">
             {{match.score_breakdown.blue.hubScore.autoPoints}}
         </td>
     </tr>
     {% endif %}
 
-    {% if "autoPoints" in match.score_breakdown.red %}
-    <tr>
-        <td class="red" colspan="2">
-            <b>{{match.score_breakdown.red.autoPoints}}</b>
-        </td>
-        <th>Auto Fuel</th>
-        <td class="blue" colspan="2">
-            <b>{{match.score_breakdown.blue.autoPoints}}</b>
-        </td>
-    </tr>
-    {% endif %}
+
     {% if "totalAutoPoints" in match.score_breakdown.red %}
     <tr class="key">
         <td class="redScore" colspan="2">
