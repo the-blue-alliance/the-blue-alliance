@@ -7,16 +7,14 @@
 {% endmacro %}
 
 {% macro endgame_tower(team, tower_result) %}
-{% if tower_result == 'Traversal' %}
-<span rel="tooltip" title="{{team|digits}}">Traversal (+15)</span>
-{% elif tower_result == 'High' %}
-<span rel="tooltip" title="{{team|digits}}">High (+10)</span>
-{% elif tower_result == 'Mid' %}
-<span rel="tooltip" title="{{team|digits}}">Mid (+6)</span>
-{% elif tower_result == 'Low' %}
-<span rel="tooltip" title="{{team|digits}}">Low (+4)</span>
+{% if tower_result == 'Level3' %}
+<span rel="tooltip" title="{{team|digits}}">Level 3 (+30)</span>
+{% elif tower_result == 'Level2' %}
+<span rel="tooltip" title="{{team|digits}}">Level 2 (+20)</span>
+{% elif tower_result == 'Level1' %}
+<span rel="tooltip" title="{{team|digits}}">Level 1 (+10)</span>
 {% else %}
-<span rel="tooltip" title="{{team|digits}}" class="glyphicon glyphicon-remove"></span>
+<span rel="tooltip" title="{{team|digits}}">None</span>
 {% endif %}
 {% endmacro %}
 
@@ -65,6 +63,29 @@
     </tr>
     {% endif %}
 
+    {% if "hubScore" in match.score_breakdown.red %}
+    <tr>
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.hubScore.autoPoints}}
+        </td>
+        <td>Auto Fuel</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.hubScore.autoPoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "autoPoints" in match.score_breakdown.red %}
+    <tr>
+        <td class="red" colspan="2">
+            <b>{{match.score_breakdown.red.autoPoints}}</b>
+        </td>
+        <th>Auto Fuel</th>
+        <td class="blue" colspan="2">
+            <b>{{match.score_breakdown.blue.autoPoints}}</b>
+        </td>
+    </tr>
+    {% endif %}
     {% if "totalAutoPoints" in match.score_breakdown.red %}
     <tr class="key">
         <td class="redScore" colspan="2">
@@ -81,9 +102,18 @@
     {% if "hubScore" in match.score_breakdown.red %}
     <tr>
         <td class="red" colspan="2">
+            {{match.score_breakdown.red.hubScore.transitionCount}}
+        </td>
+        <td>Transition Shift Fuel</td>
+        <td class="blue" colspan="2">
+            {{match.score_breakdown.blue.hubScore.transitionCount}}
+        </td>
+    </tr>
+    <tr>
+        <td class="red" colspan="2">
             {{match.score_breakdown.red.hubScore.shift1Count}}
         </td>
-        <td>Shift 1 Count</td>
+        <td>Shift 1 Fuel</td>
         <td class="blue" colspan="2">
             {{match.score_breakdown.blue.hubScore.shift1Count}}
         </td>
@@ -92,7 +122,7 @@
         <td class="red" colspan="2">
             {{match.score_breakdown.red.hubScore.shift2Count}}
         </td>
-        <td>Shift 2 Count</td>
+        <td>Shift 2 Fuel</td>
         <td class="blue" colspan="2">
             {{match.score_breakdown.blue.hubScore.shift2Count}}
         </td>
@@ -101,7 +131,7 @@
         <td class="red" colspan="2">
             {{match.score_breakdown.red.hubScore.shift3Count}}
         </td>
-        <td>Shift 3 Count</td>
+        <td>Shift 3 Fuel</td>
         <td class="blue" colspan="2">
             {{match.score_breakdown.blue.hubScore.shift3Count}}
         </td>
@@ -110,40 +140,25 @@
         <td class="red" colspan="2">
             {{match.score_breakdown.red.hubScore.shift4Count}}
         </td>
-        <td>Shift 4 Count</td>
+        <td>Shift 4 Fuel</td>
         <td class="blue" colspan="2">
             {{match.score_breakdown.blue.hubScore.shift4Count}}
         </td>
     </tr>
-    <tr class="key">
-        <td class="redScore" colspan="2">
-            {{match.score_breakdown.red.hubScore.shift1Points}} /
-            {{match.score_breakdown.red.hubScore.shift2Points}} /
-            {{match.score_breakdown.red.hubScore.shift3Points}} /
-            {{match.score_breakdown.red.hubScore.shift4Points}}
-        </td>
-        <td>Shift Points (1/2/3/4)</td>
-        <td class="blueScore" colspan="2">
-            {{match.score_breakdown.blue.hubScore.shift1Points}} /
-            {{match.score_breakdown.blue.hubScore.shift2Points}} /
-            {{match.score_breakdown.blue.hubScore.shift3Points}} /
-            {{match.score_breakdown.blue.hubScore.shift4Points}}
-        </td>
-    </tr>
     <tr>
         <td class="red" colspan="2">
-            {{match.score_breakdown.red.hubScore.teleopCount}}
+            {{match.score_breakdown.red.hubScore.endgameCount}}
         </td>
-        <td>Teleop Count</td>
+        <td>Endgame Fuel</td>
         <td class="blue" colspan="2">
-            {{match.score_breakdown.blue.hubScore.teleopCount}}
+            {{match.score_breakdown.blue.hubScore.endgameCount}}
         </td>
     </tr>
     <tr class="key">
         <td class="redScore" colspan="2">
             {{match.score_breakdown.red.hubScore.teleopPoints}}
         </td>
-        <td>Teleop Hub Points</td>
+        <td>Teleop Fuel Points</td>
         <td class="blueScore" colspan="2">
             {{match.score_breakdown.blue.hubScore.teleopPoints}}
         </td>
@@ -200,13 +215,25 @@
     {% endif %}
 
     {% if "totalTowerPoints" in match.score_breakdown.red %}
-    <tr class="key">
+      <tr class="key">
         <td class="redScore" colspan="2">
             {{match.score_breakdown.red.totalTowerPoints}}
         </td>
         <td>Total Tower Points</td>
         <td class="blueScore" colspan="2">
             {{match.score_breakdown.blue.totalTowerPoints}}
+        </td>
+    </tr>
+    {% endif %}
+
+    {% if "hubScore" in match.score_breakdown.red %}
+      <tr class="key">
+        <td class="redScore" colspan="2">
+            {{match.score_breakdown.red.hubScore.totalPoints}}
+        </td>
+        <td>Total Fuel Points</td>
+        <td class="blueScore" colspan="2">
+            {{match.score_breakdown.blue.hubScore.totalPoints}}
         </td>
     </tr>
     {% endif %}
@@ -345,66 +372,3 @@
     </tr>
     </tbody>
 </table>
-
-{% if "hubScore" in match.score_breakdown.red %}
-<h4>Hub Scoring Breakdown</h4>
-<table class="match-table">
-  <tbody>
-    <tr>
-      <td class="red">
-        {{match.score_breakdown.red.hubScore.autoPoints}}
-      </td>
-      <td>
-        Auto Points
-      </td>
-      <td class="blue">
-        {{match.score_breakdown.blue.hubScore.autoPoints}}
-      </td>
-    </tr>
-    <tr>
-      <td class="red">
-        {{match.score_breakdown.red.hubScore.transitionPoints}}
-      </td>
-      <td>
-        Transition Points
-      </td>
-      <td class="blue">
-        {{match.score_breakdown.blue.hubScore.transitionPoints}}
-      </td>
-    </tr>
-    <tr>
-      <td class="red">
-        {{match.score_breakdown.red.hubScore.endgameCount}}
-      </td>
-      <td>
-        Endgame Count
-      </td>
-      <td class="blue">
-        {{match.score_breakdown.blue.hubScore.endgameCount}}
-      </td>
-    </tr>
-    <tr>
-      <td class="red">
-        {{match.score_breakdown.red.hubScore.endgamePoints}}
-      </td>
-      <td>
-        Endgame Points
-      </td>
-      <td class="blue">
-        {{match.score_breakdown.blue.hubScore.endgamePoints}}
-      </td>
-    </tr>
-    <tr class="key">
-      <td class="redScore">
-        <b>{{match.score_breakdown.red.hubScore.totalPoints}}</b>
-      </td>
-      <th>
-        Total Hub Points
-      </th>
-      <td class="blueScore">
-        <b>{{match.score_breakdown.blue.hubScore.totalPoints}}</b>
-      </td>
-    </tr>
-  </tbody>
-</table>
-{% endif %}
