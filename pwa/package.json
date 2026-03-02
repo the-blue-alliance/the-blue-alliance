@@ -40,7 +40,7 @@
     "@radix-ui/react-tooltip": "1.2.8",
     "@scalar/api-reference-react": "0.8.64",
     "@scalar/react-renderer": "0.3.0",
-    "@sentry/tanstackstart-react": "10.40.0",
+    "@sentry/tanstackstart-react": "10.41.0",
     "@tanstack/react-query": "5.90.21",
     "@tanstack/react-query-devtools": "5.91.3",
     "@tanstack/react-router": "1.163.2",
