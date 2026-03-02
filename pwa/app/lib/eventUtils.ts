@@ -111,9 +111,9 @@ export function getCurrentWeekEvents(events: Event[]) {
   const now = new Date();
   const filteredEvents = [];
 
-  const diffFromWeekStart = now.getDay();
+  const diffFromMonday = (now.getDay() + 6) % 7;
   const closestStartMonday = new Date(now).setDate(
-    now.getDate() - diffFromWeekStart,
+    now.getDate() - diffFromMonday,
   );
 
   for (const event of events) {
