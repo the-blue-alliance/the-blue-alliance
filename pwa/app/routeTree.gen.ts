@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ThanksRouteImport } from './routes/thanks'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as MytbaRouteImport } from './routes/mytba'
 import { Route as Match_suggestionRouteImport } from './routes/match_suggestion'
 import { Route as GamedayRouteImport } from './routes/gameday'
 import { Route as DonateRouteImport } from './routes/donate'
@@ -42,6 +43,11 @@ const ThanksRoute = ThanksRouteImport.update({
 const PrivacyRoute = PrivacyRouteImport.update({
   id: '/privacy',
   path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MytbaRoute = MytbaRouteImport.update({
+  id: '/mytba',
+  path: '/mytba',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Match_suggestionRoute = Match_suggestionRouteImport.update({
@@ -170,6 +176,7 @@ export interface FileRoutesByFullPath {
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
+  '/mytba': typeof MytbaRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
   '/account/mytba': typeof AccountMytbaRoute
@@ -196,6 +203,7 @@ export interface FileRoutesByTo {
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
+  '/mytba': typeof MytbaRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
   '/account/mytba': typeof AccountMytbaRoute
@@ -223,6 +231,7 @@ export interface FileRoutesById {
   '/donate': typeof DonateRoute
   '/gameday': typeof GamedayRoute
   '/match_suggestion': typeof Match_suggestionRoute
+  '/mytba': typeof MytbaRoute
   '/privacy': typeof PrivacyRoute
   '/thanks': typeof ThanksRoute
   '/account/mytba': typeof AccountMytbaRoute
@@ -251,6 +260,7 @@ export interface FileRouteTypes {
     | '/donate'
     | '/gameday'
     | '/match_suggestion'
+    | '/mytba'
     | '/privacy'
     | '/thanks'
     | '/account/mytba'
@@ -277,6 +287,7 @@ export interface FileRouteTypes {
     | '/donate'
     | '/gameday'
     | '/match_suggestion'
+    | '/mytba'
     | '/privacy'
     | '/thanks'
     | '/account/mytba'
@@ -303,6 +314,7 @@ export interface FileRouteTypes {
     | '/donate'
     | '/gameday'
     | '/match_suggestion'
+    | '/mytba'
     | '/privacy'
     | '/thanks'
     | '/account/mytba'
@@ -330,6 +342,7 @@ export interface RootRouteChildren {
   DonateRoute: typeof DonateRoute
   GamedayRoute: typeof GamedayRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
+  MytbaRoute: typeof MytbaRoute
   PrivacyRoute: typeof PrivacyRoute
   ThanksRoute: typeof ThanksRoute
   AccountMytbaRoute: typeof AccountMytbaRoute
@@ -362,6 +375,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/mytba': {
+      id: '/mytba'
+      path: '/mytba'
+      fullPath: '/mytba'
+      preLoaderRoute: typeof MytbaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/match_suggestion': {
@@ -530,6 +550,7 @@ const rootRouteChildren: RootRouteChildren = {
   DonateRoute: DonateRoute,
   GamedayRoute: GamedayRoute,
   Match_suggestionRoute: Match_suggestionRoute,
+  MytbaRoute: MytbaRoute,
   PrivacyRoute: PrivacyRoute,
   ThanksRoute: ThanksRoute,
   AccountMytbaRoute: AccountMytbaRoute,
