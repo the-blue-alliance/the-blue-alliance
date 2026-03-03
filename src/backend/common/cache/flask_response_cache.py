@@ -19,7 +19,7 @@ class MemcacheFlaskResponseCache(BaseCache):
         t = type(value)
         if t == int:
             return str(value).encode("ascii")
-        return b"!" + zlib.compress(pickle.dumps(value))
+        return b"!" + zlib.compress(pickle.dumps(value, protocol=5))
 
     def load_object(self, value: bytes) -> Any:
         """The reversal of :meth:`dump_object`.  This might be called with
