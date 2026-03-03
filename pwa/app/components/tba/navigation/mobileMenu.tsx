@@ -32,6 +32,8 @@ export function MobileMenu() {
               to={to}
               className="flex w-full animate-navigation-item-fade-in
                 items-center gap-3 py-4 opacity-0 hover:no-underline"
+              activeProps={{ className: 'bg-white/15 rounded-md' }}
+              activeOptions={{ fuzzy: true }}
               style={{ animationDelay: `${index * 50}ms` }}
             >
               <Icon className="size-5 text-white/50" />

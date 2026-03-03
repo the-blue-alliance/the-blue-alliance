@@ -73,6 +73,8 @@ export function Navbar() {
                           to={to}
                           params={params}
                           className="hover:no-underline"
+                          activeProps={{ className: 'bg-white/15' }}
+                          activeOptions={{ fuzzy: true }}
                         >
                           <Icon className="text-inherit" />
                           <span>{title}</span>
