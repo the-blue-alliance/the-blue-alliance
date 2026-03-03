@@ -282,7 +282,10 @@ const CustomTooltip = ({
     ).teamKey.substring(3);
 
     return (
-      <div className="flex flex-col rounded-md bg-white shadow-xl">
+      <div
+        className="flex flex-col rounded-md bg-background text-foreground
+          shadow-xl"
+      >
         <div className="flex flex-col p-4">
           <div className="pb-2 text-xl">{teamKey}</div>
           <div className="">
