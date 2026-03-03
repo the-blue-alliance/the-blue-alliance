@@ -4,7 +4,6 @@ import {
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
@@ -52,7 +51,7 @@ export function TOCRendererProvider({
 function TOCRenderPortal({ children }: { children: React.ReactNode }) {
   const { setContent } = useContext(TOCRendererContext);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setContent(children);
   }, [children, setContent]);
 
