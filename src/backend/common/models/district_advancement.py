@@ -9,3 +9,8 @@ class TeamDistrictAdvancement(TypedDict):
 
 
 DistrictAdvancement = Dict[TeamKey, TeamDistrictAdvancement]
+
+
+class AdvancementCounts(TypedDict):
+    dcmp: int
+    cmp: int

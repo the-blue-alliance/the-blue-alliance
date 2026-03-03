@@ -52,6 +52,10 @@ export const zDistrict = z.object({
   display_name: z.string(),
   key: z.string(),
   year: z.int(),
+  official_advancement_counts: z.object({
+    dcmp: z.int(),
+    cmp: z.int(),
+  }),
 });
 
 export const zDistrictInsightRegionData = z.object({

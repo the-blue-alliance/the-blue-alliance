@@ -112,6 +112,19 @@ export type District = {
    * Year this district participated.
    */
   year: number;
+  /**
+   * The number of teams advancing to DCMP and CMP from this district, as specified in the FIRST manual.
+   */
+  official_advancement_counts: {
+    /**
+     * Number of teams advancing to the District Championship.
+     */
+    dcmp: number;
+    /**
+     * Number of teams advancing to the Championship.
+     */
+    cmp: number;
+  };
 };
 
 export type DistrictInsightRegionData = {
