@@ -18,6 +18,7 @@ import { MatchModal } from '~/components/tba/match/matchModal';
 import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
+import { Toaster } from '~/components/ui/sonner';
 import splashLandscape1136x640 from '~/images/apple-splash/apple-splash-landscape-1136x640.png?url&no-inline';
 import splashLandscape1334x750 from '~/images/apple-splash/apple-splash-landscape-1334x750.png?url&no-inline';
 import splashLandscape1792x828 from '~/images/apple-splash/apple-splash-landscape-1792x828.png?url&no-inline';
@@ -383,6 +384,7 @@ function RootComponent() {
               </>
             )}
           </AuthContextProvider>
+          <Toaster />
         </ThemeProvider>
         <TanStackRouterDevtools position="bottom-right" />
         <ReactQueryDevtools buttonPosition="bottom-left" />

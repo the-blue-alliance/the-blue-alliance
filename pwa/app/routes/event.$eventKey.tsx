@@ -8,6 +8,7 @@ import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
 import StatbotIcon from '~icons/lucide/chart-spline';
+import ScoutingIcon from '~icons/lucide/clipboard-list';
 import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
@@ -65,6 +66,7 @@ import {
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
+import ScoutingTab from '~/components/tba/scoutingTab';
 import { WebcastIcon } from '~/components/tba/socialBadges';
 import {
   TableOfContents,
@@ -429,6 +431,12 @@ function EventPage() {
               Media
             </InlineIcon>
           </TabsTrigger>
+          <TabsTrigger value="scouting">
+            <InlineIcon>
+              <ScoutingIcon />
+              Scouting
+            </InlineIcon>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="results">
@@ -501,6 +509,18 @@ function EventPage() {
 
         <TabsContent value="media">
           <MediaTab webcasts={event.webcasts} eventKey={event.key} />
+        </TabsContent>
+
+        <TabsContent value="scouting">
+          {teamsQuery.data && teamMediaQuery.data && (
+            <ScoutingTab
+              teams={teamsQuery.data}
+              media={teamMediaQuery.data}
+              matches={sortedMatches}
+              eventKey={event.key}
+              coprs={coprsQuery.data ?? undefined}
+            />
+          )}
         </TabsContent>
       </Tabs>
     </div>
