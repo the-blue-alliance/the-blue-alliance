@@ -193,6 +193,35 @@ class TestEventDetailsManipulator(unittest.TestCase):
         task = tasks[0]
         assert task.name == "2011ct_alliance_selection"
 
+    def test_postUpdateHook_notifications_emptyAllianceSelections(self):
+        import datetime
+
+        # Setup our event to be "now"
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        self.old_event_details.put()
+        new_event_details_no_alliances = EventDetails(
+            id="2011ct",
+            alliance_selections=[],
+            matchstats={},
+        )
+        EventDetailsManipulator.createOrUpdate(new_event_details_no_alliances)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            with patch.object(
+                TBANSHelper, "alliance_selection"
+            ) as mock_alliance_selection:
+                run_from_task(task)
+
+        # alliance_selections is empty - skip notification
+        mock_alliance_selection.assert_not_called()
+
     def test_postUpdateHook_notifications_notWithinADay(self):
         self.old_event_details.put()
         EventDetailsManipulator.createOrUpdate(self.new_event_details)
