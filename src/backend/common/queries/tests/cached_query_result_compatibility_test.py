@@ -146,10 +146,11 @@ def test_round_trip_cached_query_result() -> None:
     ]
     for t in team_list:
         t.put()
-    team_list = [Team.get_by_id(t.key.id()) for t in team_list]
+    team_list = [Team.get_by_id(str(t.key.id())) for t in team_list]
 
     cqr = CachedQueryResult(id="test_cache", result=team_list)
     cqr.put()
 
     loaded = CachedQueryResult.get_by_id("test_cache")
+    assert loaded is not None
     assert loaded.result == team_list
