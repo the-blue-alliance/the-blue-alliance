@@ -1,5 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { useMemo, useState } from 'react';
 
@@ -20,6 +20,13 @@ import TeamMatchStats from '~/components/tba/teamMatchStats';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Divider } from '~/components/ui/divider';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
@@ -115,11 +122,17 @@ function MatchStatsLoadingState({
 }
 
 function TeamStatsPage() {
+  const navigate = useNavigate();
   const { team, allEvents, allAwards, socials, media } = Route.useLoaderData();
 
   const [includeOffseasons, setIncludeOffseasons] = useState(false);
   const [minYear, setMinYear] = useState(allEvents[0].year);
   const [maxYear, setMaxYear] = useState(allEvents[allEvents.length - 1].year);
+
+  const yearsParticipated = useMemo(
+    () => uniq(allEvents.map((e) => e.year)).sort((a, b) => b - a),
+    [allEvents],
+  );
 
   const maybeAvatar = useMemo(() => {
     return media.find((m) => m.type === 'avatar');
@@ -182,57 +195,82 @@ function TeamStatsPage() {
   }, [allMatchesByYear, usedEvents, minYear, maxYear]);
 
   return (
-    <div>
-      <div className="mt-8 flex w-full flex-row justify-between">
-        <div>
-          <TeamPageTeamInfo
-            team={team}
-            maybeAvatar={maybeAvatar}
-            socials={socials}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-row items-center gap-2">
-            <Checkbox
-              checked={includeOffseasons}
-              onCheckedChange={(checked) =>
-                setIncludeOffseasons(
-                  checked === 'indeterminate' ? false : checked,
-                )
-              }
-            />
-            <span className="text-sm text-muted-foreground">
-              Include Offseasons
-            </span>
-          </div>
-          <DoubleSlider
-            min={allEvents[0].year}
-            max={allEvents[allEvents.length - 1].year}
-            value={[minYear, maxYear]}
-            onValueChange={(value) => {
-              setMinYear(value[0]);
-              setMaxYear(value[1]);
-            }}
-            minStepsBetweenThumbs={0}
-            step={1}
-          />
-        </div>
+    <div className="flex flex-wrap sm:flex-nowrap">
+      <div className="top-0 mr-4 pt-5 sm:sticky">
+        <Select
+          onValueChange={(value) => {
+            void navigate({
+              to: '/team/$teamNumber/{-$year}',
+              params: { teamNumber: String(team.team_number), year: value },
+            });
+          }}
+        >
+          <SelectTrigger className="w-[180px]">
+            <SelectValue placeholder="Stats" />
+          </SelectTrigger>
+          <SelectContent className="max-h-[30vh] overflow-y-auto">
+            <SelectItem value="history">History</SelectItem>
+            <SelectItem value="stats">Stats</SelectItem>
+            {yearsParticipated.map((y) => (
+              <SelectItem key={y} value={`${y}`}>
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
       </div>
-      <Divider className="my-4" />
-      <TeamAwardsSummary awards={usedAwards} events={usedEvents} />
-      <Divider className="my-4" />
-      {matchQueriesNumLoaded < matchQueries.length ? (
-        <MatchStatsLoadingState
-          numLoaded={matchQueriesNumLoaded}
-          total={matchQueries.length}
-        />
-      ) : (
-        <TeamMatchStats
-          teamKey={team.key}
-          matches={usedMatches}
-          events={usedEvents}
-        />
-      )}
+      <div className="w-full">
+        <div className="mt-8 flex w-full flex-row justify-between">
+          <div>
+            <TeamPageTeamInfo
+              team={team}
+              maybeAvatar={maybeAvatar}
+              socials={socials}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row items-center gap-2">
+              <Checkbox
+                checked={includeOffseasons}
+                onCheckedChange={(checked) =>
+                  setIncludeOffseasons(
+                    checked === 'indeterminate' ? false : checked,
+                  )
+                }
+              />
+              <span className="text-sm text-muted-foreground">
+                Include Offseasons
+              </span>
+            </div>
+            <DoubleSlider
+              min={allEvents[0].year}
+              max={allEvents[allEvents.length - 1].year}
+              value={[minYear, maxYear]}
+              onValueChange={(value) => {
+                setMinYear(value[0]);
+                setMaxYear(value[1]);
+              }}
+              minStepsBetweenThumbs={0}
+              step={1}
+            />
+          </div>
+        </div>
+        <Divider className="my-4" />
+        <TeamAwardsSummary awards={usedAwards} events={usedEvents} />
+        <Divider className="my-4" />
+        {matchQueriesNumLoaded < matchQueries.length ? (
+          <MatchStatsLoadingState
+            numLoaded={matchQueriesNumLoaded}
+            total={matchQueries.length}
+          />
+        ) : (
+          <TeamMatchStats
+            teamKey={team.key}
+            matches={usedMatches}
+            events={usedEvents}
+          />
+        )}
+      </div>
     </div>
   );
 }
