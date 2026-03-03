@@ -1,3 +1,4 @@
+import logging
 from typing import Optional
 
 from flask import Response
@@ -158,6 +159,13 @@ def event_teams_statuses(event_key: EventKey) -> Response:
     event_teams = EventEventTeamsQuery(event_key=event_key).fetch()
     statuses = {}
     for event_team in event_teams:
+        # Nullapalooza: corrupted EventTeam entities with null required fields
+        if event_team.team is None:
+            logging.error(
+                f"Corrupted EventTeam: team is None. "
+                f"EventTeam key={event_team.key}, event_key={event_key}"
+            )
+            continue
         status = event_team.status
         if status is not None:
             status_strings = event_team.status_strings

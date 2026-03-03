@@ -1,5 +1,6 @@
 import json
 import os
+from unittest.mock import patch
 
 from google.appengine.ext import ndb
 from werkzeug.test import Client
@@ -416,6 +417,49 @@ def test_event_teams_statuses(ndb_stub, api_client: Client) -> None:
         resp.json.get("frc604")["overall_status_str"]
         == "Team 604 is waiting for the event to begin."
     )
+
+
+# Nullapalooza: test that corrupted EventTeam entities with null team are skipped
+def test_event_teams_statuses_corrupted_null_team(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    # Simulate a corrupted EventTeam with team=None (bypasses required=True
+    # which is only enforced on put, not on read from Datastore)
+    corrupted = EventTeam(
+        id="2020casj_frcBAD",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frcBAD"),
+        year=2020,
+    )
+    corrupted.team = None  # type: ignore[assignment]
+
+    valid = EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    )
+
+    with patch("backend.api.handlers.event.EventEventTeamsQuery") as mock_query_cls:
+        mock_query_cls.return_value.fetch.return_value = [corrupted, valid]
+
+        resp = api_client.get(
+            "/api/v3/event/2020casj/teams/statuses",
+            headers={"X-TBA-Auth-Key": "test_auth_key"},
+        )
+
+    assert resp.status_code == 200
+    assert "frc254" in resp.json
+    assert "frcBAD" not in resp.json
 
 
 def test_event_matches(ndb_stub, api_client: Client) -> None:

@@ -1,4 +1,5 @@
 import datetime
+import logging
 from collections import defaultdict
 from typing import Any, cast, Dict, Generator, List, Optional, Tuple
 
@@ -411,8 +412,25 @@ class TeamRenderer:
                 team_key=team.key_name, year=year
             ).fetch_async()
 
+        # Nullapalooza: corrupted Event entities with null required fields
+        valid_events = []
+        for e in events:
+            if e is None:
+                logging.error(
+                    f"Missing Event entity in results for "
+                    f"team={team.key_name}, year={year}"
+                )
+                continue
+            if e.year is None:
+                logging.error(
+                    f"Corrupted Event: year is None. "
+                    f"Event key={e.key}, team={team.key_name}"
+                )
+                continue
+            valid_events.append(e)
+
         events_sorted = sorted(
-            events,
+            valid_events,
             key=lambda e: (
                 e.start_date if e.start_date else datetime.datetime(e.year, 12, 31)
             ),
