@@ -29,6 +29,10 @@ from backend.common.queries.database_query import CachedDatabaseQuery
 
 TModel = TypeVar("TModel", bound=CachedModel)
 
+# Maximum number of entity groups allowed in a single cross-group (XG) transaction.
+# This limit applies in both Cloud Datastore and the App Engine dev server.
+_MAX_XG_TRANSACTION_MODELS = 25
+
 
 @dataclass(frozen=True)
 class TUpdatedModel(Generic[TModel]):
@@ -204,15 +208,27 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
     @classmethod
     @ndb.transactional(xg=True)
-    def findOrSpawn(cls, new_models, auto_union=True, update_manual_attrs=True) -> Any:
-        new_models = listify(new_models)
+    def _findOrSpawnBatch(
+        cls, new_models: List[TModel], auto_union: bool, update_manual_attrs: bool
+    ) -> List[TModel]:
+        """Process up to _MAX_XG_TRANSACTION_MODELS models in a single XG transaction."""
         old_models = ndb.get_multi(
             [model.key for model in new_models], use_cache=False, use_memcache=False
         )
-        updated_models = [
+        return [
             cls.updateMergeBase(new_model, old_model, auto_union, update_manual_attrs)
             for (new_model, old_model) in zip(new_models, old_models)
         ]
+
+    @classmethod
+    def findOrSpawn(cls, new_models, auto_union=True, update_manual_attrs=True) -> Any:
+        new_models = listify(new_models)
+        updated_models = []
+        for i in range(0, len(new_models), _MAX_XG_TRANSACTION_MODELS):
+            batch = new_models[i : i + _MAX_XG_TRANSACTION_MODELS]
+            updated_models.extend(
+                cls._findOrSpawnBatch(batch, auto_union, update_manual_attrs)
+            )
         return delistify(updated_models)
 
     @classmethod
