@@ -6,7 +6,7 @@ from unittest import mock
 import pytest
 
 from backend.common.consts.event_type import EventType
-from backend.common.futures import InstantFuture
+from backend.common.futures import FailedFuture, InstantFuture
 from backend.common.models.event import Event
 from backend.common.sitevars.nexus_api_secret import (
     ContentType as NexusAPISecretsContentType,
@@ -194,3 +194,22 @@ def test_get_event_queue_status_different_api_short(
 
     endpoint = NexusEventQueueStatus(e).endpoint()
     assert endpoint == "/event/2019test"
+
+
+@mock.patch.object(_DatafeedNexus, "_fetch")
+def test_fetch_exception_logs_warning(
+    fetch_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    from google.appengine.runtime.apiproxy_errors import ApplicationError
+
+    fetch_mock.return_value = FailedFuture(ApplicationError(8, "Deadline exceeded"))
+
+    df = DummyDatafeedNexus()
+    with mock.patch("backend.tasks_io.datafeeds.datafeed_nexus.logging") as log_mock:
+        result = df.fetch_async().get_result()
+
+    assert result is None
+    log_mock.warning.assert_called_once()
+    warning_msg = log_mock.warning.call_args[0][0]
+    assert "Nexus datafeed fetch failed" in warning_msg
+    assert "Deadline exceeded" in warning_msg

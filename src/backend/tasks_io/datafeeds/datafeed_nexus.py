@@ -1,5 +1,10 @@
 import abc
-from typing import Any, Dict, Optional
+import logging
+from typing import Any, Dict, Generator, Optional
+
+from google.appengine.api import urlfetch_errors
+from google.appengine.ext import ndb
+from google.appengine.runtime import apiproxy_errors
 
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
@@ -26,6 +31,15 @@ class _DatafeedNexus(DatafeedBase[TAPIResponse, TReturn]):
             raise Exception(
                 f"Missing Nexus API key. Setup {NexusApiSecrets.key()} sitevar"
             )
+
+    @ndb.tasklet
+    def _gen(self) -> Generator[Any, Any, Optional[TReturn]]:
+        try:
+            result = yield super()._gen()
+            return result
+        except (apiproxy_errors.ApplicationError, urlfetch_errors.Error) as e:
+            logging.warning(f"Nexus datafeed fetch failed: {e}")
+            return None
 
     def headers(self) -> Dict[str, str]:
         return {
