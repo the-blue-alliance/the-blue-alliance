@@ -60,8 +60,8 @@ importers:
         specifier: 0.9.0
         version: 0.9.0(react@19.2.4)(tailwindcss@4.2.1)(typescript@5.9.3)
       '@scalar/react-renderer':
-        specifier: 0.3.0
-        version: 0.3.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.29(typescript@5.9.3))
+        specifier: 0.4.0
+        version: 0.4.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.29(typescript@5.9.3))
       '@sentry/tanstackstart-react':
         specifier: 10.42.0
         version: 10.42.0(react@19.2.4)(rollup@4.55.1)
@@ -2872,13 +2872,13 @@ packages:
     resolution: {integrity: sha512-+6e95lszNo/8+SLPFQCuZEzzxdgPe2xgK6ZkVf51s6E+xE9QSqtAPuBBSpHR7DHeAQmF1TrGFJ5vb6Egg85AUQ==}
     engines: {node: '>=22'}
 
-  '@scalar/react-renderer@0.3.0':
-    resolution: {integrity: sha512-wf0piY4QpahgOMOmlPKTcWnwPtJyfuRsL9Se8Uz22oic00Tm7MJfuSwQNqEq5vd6iJZ3JHfHFFJSDGBQ66cSxw==}
-    engines: {node: '>=20'}
+  '@scalar/react-renderer@0.4.0':
+    resolution: {integrity: sha512-jMcqO2sQa575bkCOaRtH1xwzS1YvzFzvW6uzTab2bgywG6hOIrEBKoL51F8ospajM2G1+AsUi2C3358Mu2uwdg==}
+    engines: {node: '>=22'}
     peerDependencies:
       react: ^19.0.0
       react-dom: ^19.0.0
-      vue: ^3.5.21
+      vue: ^3.5.26
 
   '@scalar/sidebar@0.8.0':
     resolution: {integrity: sha512-JsUBGii8wWFNs7ixiydmMzx7y61MggP4roH2ifHb7muME2K5/VujKm1CdN7spzVeU/xZq2QC9soVX6Doic0Yrw==}
@@ -10978,7 +10978,7 @@ snapshots:
       '@scalar/helpers': 0.3.0
       '@scalar/openapi-types': 0.6.0
 
-  '@scalar/react-renderer@0.3.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.29(typescript@5.9.3))':
+  '@scalar/react-renderer@0.4.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.29(typescript@5.9.3))':
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
