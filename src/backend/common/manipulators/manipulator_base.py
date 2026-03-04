@@ -203,6 +203,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     ) -> List[TModel]: ...
 
     @classmethod
+    @ndb.transactional(xg=True)
     def findOrSpawn(cls, new_models, auto_union=True, update_manual_attrs=True) -> Any:
         new_models = listify(new_models)
         old_models = ndb.get_multi(
@@ -442,8 +443,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                 cls._clearCacheDeferred,
                 all_affected_references,
                 _queue="cache-clearing",
-                # this does not exist in Cloud Tasks
-                # _transactional=ndb.in_transaction(),
+                _transactional=ndb.in_transaction(),
                 _target="py3-tasks-io",
                 _url=f"/_ah/queue/deferred_{cls.__name__}_clearCache",
             )

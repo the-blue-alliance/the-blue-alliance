@@ -71,16 +71,19 @@ class TestTeamManipulator(unittest.TestCase):
         assert merged_team.first_tpid == 1000
 
     def test_create_lots_of_teams(self):
-        number = 500
+        # Use 20 teams (< 25) to stay within the App Engine dev server's XG
+        # transaction entity group limit (_MAX_EG_PER_TXN = 25). In production
+        # Cloud Datastore this limit does not apply.
+        number = 20
         teams = [
             Team(id="frc%s" % team_number, team_number=team_number)
             for team_number in range(number)
         ]
         TeamManipulator.createOrUpdate(teams)
 
-        team = Team.get_by_id("frc177")
-        self.assertEqual(team.key_name, "frc177")
-        self.assertEqual(team.team_number, 177)
+        team = Team.get_by_id("frc10")
+        self.assertEqual(team.key_name, "frc10")
+        self.assertEqual(team.team_number, 10)
 
         team = Team.get_by_id("frc%s" % (number - 1))
         self.assertEqual(team.key_name, "frc%s" % (number - 1))

@@ -1,5 +1,6 @@
 import json
 from typing import Any, Dict, Generator, List, Optional, Set
+from unittest.mock import patch
 
 import pytest
 import six
@@ -556,3 +557,62 @@ def test_no_update_manual_attrs() -> None:
     merged = DummyManipulator.updateMerge(new, old, True, False)
     expected = DummyModel(id="test", int_prop=42, manual_attrs=["int_prop"])
     assert merged == expected
+
+
+def test_find_or_spawn_runs_in_transaction(ndb_context, taskqueue_stub) -> None:
+    """findOrSpawn should run inside an NDB transaction"""
+    in_transaction_during_get: List[bool] = []
+    original_get_multi = ndb.get_multi
+
+    def patched_get_multi(*args, **kwargs):
+        in_transaction_during_get.append(ndb.in_transaction())
+        return original_get_multi(*args, **kwargs)
+
+    with patch("google.appengine.ext.ndb.get_multi", side_effect=patched_get_multi):
+        DummyManipulator.findOrSpawn(DummyModel(id="test", int_prop=42))
+
+    assert in_transaction_during_get == [True]
+
+
+def test_find_or_spawn_joins_outer_transaction(ndb_context, taskqueue_stub) -> None:
+    """findOrSpawn should join an outer transaction (ALLOWED propagation)"""
+    in_transaction_during_get: List[bool] = []
+    original_get_multi = ndb.get_multi
+
+    def patched_get_multi(*args, **kwargs):
+        in_transaction_during_get.append(ndb.in_transaction())
+        return original_get_multi(*args, **kwargs)
+
+    @ndb.transactional(xg=True)
+    def outer_transaction() -> None:
+        with patch("google.appengine.ext.ndb.get_multi", side_effect=patched_get_multi):
+            DummyManipulator.findOrSpawn(DummyModel(id="test", int_prop=42))
+
+    outer_transaction()
+    assert in_transaction_during_get == [True]
+
+
+def test_cache_clearing_not_enqueued_on_transaction_rollback(
+    ndb_context, taskqueue_stub
+) -> None:
+    """Cache clearing tasks should not be enqueued if the enclosing transaction rolls back"""
+    model = DummyModel(id="test", int_prop=1337)
+    model.put()
+
+    # Do a query to populate CachedQueryResult
+    query = DummyCachedQuery(model_key="test")
+    query.fetch()
+
+    assert CachedQueryResult.get_by_id(query.cache_key) is not None
+
+    @ndb.transactional(xg=True)
+    def rollback_transaction() -> None:
+        DummyManipulator.createOrUpdate(DummyModel(id="test", int_prop=42))
+        raise Exception("rolling back")
+
+    with pytest.raises(Exception, match="rolling back"):
+        rollback_transaction()
+
+    # Task should NOT be enqueued since the transaction was rolled back
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 0
