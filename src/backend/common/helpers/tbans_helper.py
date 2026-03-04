@@ -1,5 +1,4 @@
 import datetime
-import itertools
 import logging
 import time
 from typing import List, Optional
@@ -619,9 +618,14 @@ class TBANSHelper:
     def _batch_send_subscriptions(
         cls, subscriptions: List[Subscription], notification: Notification
     ) -> None:
+        def batch(iterable, n=1):
+            la = len(iterable)
+            for ndx in range(0, la, n):
+                yield iterable[ndx : min(ndx + n, la)]
+
         BATCH_SIZE = 500
 
-        for batch in itertools.batched(subscriptions, BATCH_SIZE):
+        for batch in batch(subscriptions, BATCH_SIZE):
             defer_safe(
                 cls._send_subscriptions,
                 batch,
