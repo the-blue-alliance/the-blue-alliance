@@ -170,6 +170,18 @@ describe('isEventWithinDays', () => {
     vi.useRealTimers();
   });
 
+  test('includes the full last day of the event with zero days after', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-12T18:00:00Z'));
+    expect(isEventWithinDays(event, 0, 0)).toBe(true);
+    vi.useRealTimers();
+  });
+
   test('returns false when outside configured window', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
