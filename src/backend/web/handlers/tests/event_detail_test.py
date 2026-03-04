@@ -4,6 +4,7 @@ from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from werkzeug.test import Client
 
+from backend.common.models.event_details import EventDetails
 from backend.web.handlers.tests import helpers
 
 
@@ -198,3 +199,15 @@ def test_schema_org_sports_event_with_location(
     assert sports_event_schema["location"]["@type"] == "Place"
     assert "address" in sports_event_schema["location"]
     assert sports_event_schema["location"]["address"]["@type"] == "PostalAddress"
+
+
+def test_render_event_with_b_team_coprs(ndb_stub, web_client: Client) -> None:
+    """Test that event detail page handles B teams in COPR data without crashing."""
+    helpers.preseed_event("2020nyny")
+    EventDetails(
+        id="2020nyny",
+        coprs={"Cargo": {"frc6884B": 10.5, "frc254": 20.0}},
+    ).put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200

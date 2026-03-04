@@ -328,12 +328,12 @@ def event_detail(event_key: EventKey) -> Response:
             # Gather all team keys across all components, sorted by team number
             all_team_keys = sorted(
                 {tk for tsm in all_coprs.values() for tk in tsm},
-                key=lambda tk: int(tk.replace("frc", "")),
+                key=lambda tk: (int(re.sub(r"[^0-9]", "", tk)), tk),
             )
             copr_rows = []
             for team_key in all_team_keys:
                 row: OrderedDict = OrderedDict()
-                row["team_number"] = int(team_key.replace("frc", ""))
+                row["team_number"] = team_key.replace("frc", "")
                 for component in component_names:
                     value = all_coprs[component].get(team_key, 0.0)
                     row[component] = round(value * 100) / 100
