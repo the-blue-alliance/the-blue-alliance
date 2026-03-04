@@ -2,6 +2,7 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { Event } from '~/api/tba/read';
 import {
+  getCurrentWeekEvents,
   getEventDateString,
   getEventWeekString,
   isEventWithinDays,
@@ -191,6 +192,41 @@ describe('isEventWithinDays', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2024-04-15T12:00:00Z'));
     expect(isEventWithinDays(event, 1, 1)).toBe(false);
+    vi.useRealTimers();
+  });
+});
+
+describe('getCurrentWeekEvents', () => {
+  test('excludes previous Sunday but includes same-week events', () => {
+    // Set to Thursday April 11 at noon local time
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 3, 11, 12, 0, 0));
+
+    // Sunday April 7 — before Monday week start
+    const sundayBeforeEvent = {
+      start_date: '2024-04-07',
+      end_date: '2024-04-07',
+    } as Event;
+    // Thursday April 11 — clearly within the week
+    const thursdayEvent = {
+      start_date: '2024-04-11',
+      end_date: '2024-04-11',
+    } as Event;
+    // Next Wednesday April 17 — clearly after the Mon-Sun week
+    const nextWeekEvent = {
+      start_date: '2024-04-17',
+      end_date: '2024-04-17',
+    } as Event;
+
+    const result = getCurrentWeekEvents([
+      sundayBeforeEvent,
+      thursdayEvent,
+      nextWeekEvent,
+    ]);
+
+    expect(result).toContain(thursdayEvent);
+    expect(result).not.toContain(sundayBeforeEvent);
+    expect(result).not.toContain(nextWeekEvent);
     vi.useRealTimers();
   });
 });
