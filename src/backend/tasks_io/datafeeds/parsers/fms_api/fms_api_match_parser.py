@@ -238,6 +238,7 @@ class FMSAPIHybridScheduleParser(
 
             if existing_match and existing_match.alliances_json is None:
                 logging.error(f"Corrupt match! {existing_match.key.id()} has no alliances_json")
+                continue
 
             # Check if last existing match needs to be tiebroken
             if (
