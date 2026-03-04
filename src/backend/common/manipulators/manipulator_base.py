@@ -224,10 +224,9 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     def findOrSpawn(cls, new_models, auto_union=True, update_manual_attrs=True) -> Any:
         new_models = listify(new_models)
         updated_models = []
-        for i in range(0, len(new_models), _MAX_XG_TRANSACTION_MODELS):
-            batch = new_models[i : i + _MAX_XG_TRANSACTION_MODELS]
+        for batch in itertools.batched(new_models, _MAX_XG_TRANSACTION_MODELS):
             updated_models.extend(
-                cls._findOrSpawnBatch(batch, auto_union, update_manual_attrs)
+                cls._findOrSpawnBatch(list(batch), auto_union, update_manual_attrs)
             )
         return delistify(updated_models)
 
