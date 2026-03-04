@@ -8,6 +8,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
+import { match } from 'ts-pattern';
 
 import {
   Table,
@@ -62,11 +63,10 @@ export function DataTable<TData, TValue>({
                         onKeyDown={header.column.getToggleSortingHandler()}
                         title={
                           header.column.getCanSort()
-                            ? header.column.getNextSortingOrder() === 'asc'
-                              ? 'Sort ascending'
-                              : header.column.getNextSortingOrder() === 'desc'
-                                ? 'Sort descending'
-                                : 'Clear sort'
+                            ? match(header.column.getNextSortingOrder())
+                                .with('asc', () => 'Sort ascending')
+                                .with('desc', () => 'Sort descending')
+                                .otherwise(() => 'Clear sort')
                             : undefined
                         }
                       >

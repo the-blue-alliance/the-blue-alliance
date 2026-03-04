@@ -1,17 +1,15 @@
+import { match } from 'ts-pattern';
+
 import type { Webcast } from '~/api/tba/read';
 
 /**
  * Renders the appropriate embed for a webcast based on its type.
  */
 export function WebcastEmbed({ webcast }: { webcast: Webcast }) {
-  switch (webcast.type) {
-    case 'youtube':
-      return <YouTubeEmbed channel={webcast.channel} />;
-    case 'twitch':
-      return <TwitchEmbed channel={webcast.channel} />;
-    default:
-      return <UnsupportedEmbed type={webcast.type} />;
-  }
+  return match(webcast.type)
+    .with('youtube', () => <YouTubeEmbed channel={webcast.channel} />)
+    .with('twitch', () => <TwitchEmbed channel={webcast.channel} />)
+    .otherwise((type) => <UnsupportedEmbed type={type} />);
 }
 
 function YouTubeEmbed({ channel }: { channel: string }) {
