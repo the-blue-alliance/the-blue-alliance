@@ -322,9 +322,7 @@ def event_detail(event_key: EventKey) -> Response:
             if oprs_dict:
                 all_coprs = {"OPR": oprs_dict, **all_coprs}
         component_names = [
-            k
-            for k, tsm in all_coprs.items()
-            if any(v != 0 for v in tsm.values())
+            k for k, tsm in all_coprs.items() if any(v != 0 for v in tsm.values())
         ]
         if component_names:
             # Gather all team keys across all components, sorted by team number
