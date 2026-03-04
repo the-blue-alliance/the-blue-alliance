@@ -714,7 +714,10 @@ class TBANSHelper:
         )
 
         # We can only send to so many FCM clients at a time - send to our clients across several requests
-        for subclients in itertools.batched(clients, MAXIMUM_TOKENS):
+        for subclients in [
+            clients[i : i + MAXIMUM_TOKENS]
+            for i in range(0, len(clients), MAXIMUM_TOKENS)
+        ]:
             fcm_request = FCMRequest(
                 firebase_app,
                 notification,
