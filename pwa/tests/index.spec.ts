@@ -1,4 +1,8 @@
 import { expect, test } from '@playwright/test';
+import { skipWithoutApiKey } from 'tests/utils';
+
+// Skip all tests in this file if API key is not available
+test.beforeAll(skipWithoutApiKey);
 
 test('navbar is visible', async ({ page }) => {
   await page.goto('/');
