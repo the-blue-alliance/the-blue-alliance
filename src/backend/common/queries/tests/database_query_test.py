@@ -1,4 +1,6 @@
+import logging
 from typing import Any, Generator, Iterable, List, TypedDict
+from unittest.mock import patch
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -237,3 +239,31 @@ def test_clear_cache() -> None:
     # Deleting cache for these queries should leave no CachedQueryResults remaining
     CachedDummyModelRangeQuery.delete_cache_multi({cache_key})
     assert len(CachedQueryResult.query().fetch()) == 0
+
+
+def test_cached_query_put_exception_logs_cache_key(caplog) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    with caplog.at_level(logging.WARNING):
+        with patch.object(
+            CachedQueryResult, "put_async", side_effect=Exception("too large")
+        ):
+            result = query.fetch()
+    assert len(result) == 3
+    assert query.cache_key in caplog.text
+
+
+def test_cached_dict_query_put_exception_logs_cache_key(caplog) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    with caplog.at_level(logging.WARNING):
+        with patch.object(
+            CachedQueryResult, "put_async", side_effect=Exception("too large")
+        ):
+            result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+    assert query.dict_cache_key(ApiMajorVersion.API_V3) in caplog.text
