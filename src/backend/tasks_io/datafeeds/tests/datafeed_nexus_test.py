@@ -210,9 +210,7 @@ def test_fetch_exception_logs_warning(
         result = df.fetch_async().get_result()
 
     assert result is None
-    our_records = [
-        r for r in caplog.records if "datafeed_nexus" in r.pathname
-    ]
+    our_records = [r for r in caplog.records if "datafeed_nexus" in r.pathname]
     assert len(our_records) == 1
     assert our_records[0].levelno == logging.WARNING
     assert "Nexus datafeed fetch failed" in our_records[0].message
