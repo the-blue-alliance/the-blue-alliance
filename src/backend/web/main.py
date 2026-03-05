@@ -23,7 +23,7 @@ from backend.web.handlers.ajax import (
 )
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import district_detail, regional_detail
-from backend.web.handlers.embed import avatar_png, instagram_oembed
+from backend.web.handlers.embed import avatar_png, instagram_oembed, oembed_test
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
     event_agenda,
@@ -193,6 +193,7 @@ app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
 app.add_url_rule("/instagram_oembed/<media_key>", view_func=instagram_oembed)
 app.add_url_rule("/avatar/<int:year>/<team_key>.png", view_func=avatar_png)
+app.add_url_rule("/_test/oembed_api", view_func=oembed_test)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
