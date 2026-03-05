@@ -80,7 +80,7 @@ class CachedQueryResult(ndb.Model):
             models_to_check = [self.result]
 
         for model in models_to_check:
-            # Skip non-CachedModel objects
+            # Skip non-CachedModel objects and models without _properties
             if not hasattr(model, "_properties"):
                 continue
 

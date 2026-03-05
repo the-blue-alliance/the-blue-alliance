@@ -53,6 +53,10 @@ class CachedModel(ndb.Model):
         Validates that all required properties on the model are set.
         Logs an error with stack trace and model key if validation fails.
         """
+        # Skip validation if model doesn't have _properties attribute
+        if not hasattr(self, "_properties"):
+            return
+
         missing_properties: List[str] = []
 
         # Iterate through all properties and check if required ones are set
