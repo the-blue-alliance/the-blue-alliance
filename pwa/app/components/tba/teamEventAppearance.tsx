@@ -10,6 +10,7 @@ import {
   Team,
   TeamEventStatus,
 } from '~/api/tba/read';
+import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import { AwardBanner } from '~/components/tba/banner';
 import DetailEntity from '~/components/tba/detailEntity';
 import { EventLink, EventLocationLink, TeamLink } from '~/components/tba/links';
@@ -58,7 +59,8 @@ export default function TeamEventAppearance({
 
         <div className="mb-3 space-y-1">
           <DetailEntity icon={<DateIcon />}>
-            {getEventDateString(event, 'long')}{' '}
+            {getEventDateString(event, 'long')}
+            <AddToCalendarLinks event={event} />{' '}
             {event.week !== null && (
               <Badge variant={'secondary'}>Week {event.week + 1}</Badge>
             )}

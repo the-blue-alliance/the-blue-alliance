@@ -1,6 +1,30 @@
+import { CalendarEvent } from 'calendar-link';
+
 import { Event } from '~/api/tba/read/types.gen';
 import { EventType } from '~/lib/api/EventType';
 import { convertMsToDays } from '~/lib/utils';
+
+export function toCalendarEvent(event: Event): CalendarEvent {
+  const locationParts = [
+    event.location_name,
+    event.city,
+    event.state_prov,
+    event.country,
+  ].filter(Boolean);
+
+  const end = new Date(event.end_date + 'T00:00:00Z');
+  end.setUTCDate(end.getUTCDate() + 1);
+
+  return {
+    title: `${event.name} ${event.year}`,
+    start: new Date(event.start_date + 'T00:00:00Z'),
+    end,
+    allDay: true,
+    description: `https://www.thebluealliance.com/event/${event.key}`,
+    location: locationParts.join(', '),
+    url: `https://www.thebluealliance.com/event/${event.key}`,
+  };
+}
 
 export function isValidEventKey(key: string) {
   return /^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$/.test(key);

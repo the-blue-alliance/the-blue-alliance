@@ -42,6 +42,7 @@ import {
   getEventTeamsOptions,
   getEventTeamsStatusesOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
+import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
@@ -320,6 +321,7 @@ function EventPage() {
         )}
         <DetailEntity icon={<DateIcon />}>
           {getEventDateString(event, 'long')}
+          <AddToCalendarLinks event={event} />
           {event.week !== null && (
             <Badge className="mx-2 h-[1.5em] align-text-top">
               Week {event.week + 1}
