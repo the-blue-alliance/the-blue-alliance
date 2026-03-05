@@ -9,6 +9,7 @@ import {
   isEventActive,
   isEventWithinDays,
   isValidEventKey,
+  toCalendarEvent,
 } from '~/lib/eventUtils';
 
 describe.concurrent('isValidEventKey', () => {
@@ -50,6 +51,82 @@ describe.concurrent('getEventDateString', () => {
       end_date: '2024-04-01',
     };
     expect(getEventDateString(event, 'short')).toEqual('Mar 30 to Apr 1, 2024');
+  });
+});
+
+describe.concurrent('toCalendarEvent', () => {
+  test('sets title, allDay, description, url, and location', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      key: '2024cthar',
+      name: 'Hartford Regional',
+      year: 2024,
+      start_date: '2024-03-28',
+      end_date: '2024-03-30',
+      location_name: 'Hartford Convention Center',
+      city: 'Hartford',
+      state_prov: 'CT',
+      country: 'USA',
+    };
+    const cal = toCalendarEvent(event);
+    expect(cal.title).toBe('Hartford Regional 2024');
+    expect(cal.allDay).toBe(true);
+    expect(cal.description).toBe(
+      'https://www.thebluealliance.com/event/2024cthar',
+    );
+    expect(cal.url).toBe('https://www.thebluealliance.com/event/2024cthar');
+    expect(cal.location).toBe('Hartford Convention Center, Hartford, CT, USA');
+  });
+
+  test('start is midnight UTC on start_date', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      key: '2024cthar',
+      name: 'Hartford Regional',
+      year: 2024,
+      start_date: '2024-03-28',
+      end_date: '2024-03-30',
+      location_name: null,
+      city: null,
+      state_prov: null,
+      country: null,
+    };
+    const cal = toCalendarEvent(event);
+    expect(cal.start).toBe('2024-03-28T00:00:00Z');
+  });
+
+  test('end is midnight UTC the day after end_date', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      key: '2024cthar',
+      name: 'Hartford Regional',
+      year: 2024,
+      start_date: '2024-03-28',
+      end_date: '2024-03-30',
+      location_name: null,
+      city: null,
+      state_prov: null,
+      country: null,
+    };
+    const cal = toCalendarEvent(event);
+    expect(cal.end).toBe('2024-03-31T00:00:00Z');
+  });
+
+  test('null location parts are omitted', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      key: '2024test',
+      name: 'Test Regional',
+      year: 2024,
+      start_date: '2024-04-01',
+      end_date: '2024-04-03',
+      location_name: null,
+      city: 'Boston',
+      state_prov: null,
+      country: 'USA',
+    };
+    const cal = toCalendarEvent(event);
+    expect(cal.location).toBe('Boston, USA');
   });
 });
 
