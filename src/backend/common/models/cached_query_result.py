@@ -114,7 +114,9 @@ class CachedQueryResult(ndb.Model):
         Hook called before the entity is written to the datastore.
         Validates all required properties on models in the result field.
         """
-        # Only validate if this is a CachedQueryResult instance with the method
+        # Check if the method exists before calling. While _validate_result_properties
+        # is defined on CachedQueryResult, NDB's hook system can invoke this on different
+        # model types (especially when tests manipulate NDB's kind map).
         if hasattr(self, "_validate_result_properties"):
             self._validate_result_properties()
 
@@ -125,5 +127,7 @@ class CachedQueryResult(ndb.Model):
         Validates all required properties on models in the result field.
         """
         entity = future.get_result()
+        # Check if the method exists before calling. NDB's hook system can invoke
+        # this on different model types (especially when tests manipulate NDB's kind map).
         if entity and hasattr(entity, "_validate_result_properties"):
             entity._validate_result_properties()

@@ -84,7 +84,9 @@ class CachedModel(ndb.Model):
         Hook called before the entity is written to the datastore.
         Validates all required properties are set.
         """
-        # Only validate if this is a CachedModel instance with the method
+        # Check if the method exists before calling. While _validate_required_properties
+        # is defined on CachedModel, NDB's hook system can invoke this on different
+        # model types (especially when tests manipulate NDB's kind map).
         if hasattr(self, "_validate_required_properties"):
             self._validate_required_properties()
 
@@ -95,5 +97,7 @@ class CachedModel(ndb.Model):
         Validates all required properties are set on the retrieved entity.
         """
         entity = future.get_result()
+        # Check if the method exists before calling. NDB's hook system can invoke
+        # this on different model types (especially when tests manipulate NDB's kind map).
         if entity and hasattr(entity, "_validate_required_properties"):
             entity._validate_required_properties()
