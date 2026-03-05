@@ -33,6 +33,7 @@ const allRoutes = defineAllRoutes([
   '/event/$eventKey',
   '/events/{-$year}',
   '/gameday',
+  '/gameday/$eventCode',
   '/hall-of-fame',
   '/insights/{-$year}',
   '/local/debug',
@@ -52,6 +53,7 @@ const allRoutes = defineAllRoutes([
 // Only need to specify values for parameters, not list out every route manually
 const parameterValues: Record<string, string[]> = {
   $eventKey: ['2024mil'],
+  $eventCode: ['2024mil'],
   '{-$year}': ['', '2024'],
   $matchKey: ['2024mil_f1m2'],
   '{-$pgNum}': ['', '1'],
