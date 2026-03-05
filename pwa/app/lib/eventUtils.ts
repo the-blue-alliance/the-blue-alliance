@@ -118,12 +118,17 @@ export function getCurrentWeekEvents(events: Event[]) {
 
   for (const event of events) {
     const startDateMs = new Date(event.start_date).getTime();
+    const endDateMs = new Date(event.end_date).getTime();
 
     const timeOffsetDays = Math.floor(
       convertMsToDays(startDateMs - closestStartMonday),
     );
 
-    if (timeOffsetDays >= 0 && timeOffsetDays < 7) {
+    // Include events that start this week, or started before but are still ongoing
+    if (
+      (timeOffsetDays >= 0 && timeOffsetDays < 7) ||
+      (timeOffsetDays < 0 && endDateMs >= closestStartMonday)
+    ) {
       filteredEvents.push(event);
     }
   }

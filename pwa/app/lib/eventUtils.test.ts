@@ -229,4 +229,27 @@ describe('getCurrentWeekEvents', () => {
     expect(result).not.toContain(nextWeekEvent);
     vi.useRealTimers();
   });
+
+  test('includes ongoing events that started before the current week', () => {
+    // Set to Wednesday April 10 at noon local time
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 3, 10, 12, 0, 0));
+
+    // Started last week (April 3), ends this week (April 13) — still ongoing
+    const ongoingEvent = {
+      start_date: '2024-04-03',
+      end_date: '2024-04-13',
+    } as Event;
+    // Started and ended last week — fully over
+    const pastEvent = {
+      start_date: '2024-04-03',
+      end_date: '2024-04-06',
+    } as Event;
+
+    const result = getCurrentWeekEvents([ongoingEvent, pastEvent]);
+
+    expect(result).toContain(ongoingEvent);
+    expect(result).not.toContain(pastEvent);
+    vi.useRealTimers();
+  });
 });
