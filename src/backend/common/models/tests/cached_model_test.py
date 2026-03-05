@@ -60,34 +60,36 @@ def test_validate_required_properties_multiple_missing(ndb_stub, caplog) -> None
     assert "required_int" in error_message
 
 
-def test_pre_put_hook_validates(ndb_stub, caplog) -> None:
-    """Test that _pre_put_hook calls validation."""
+def test_pre_put_hook_raises_on_missing_properties(ndb_stub) -> None:
+    """Test that _pre_put_hook raises BadValueError when required properties are missing."""
     from google.appengine.api import datastore_errors
 
-    with caplog.at_level(logging.ERROR):
-        model = DummyModelWithRequiredProps(id="test_model", required_prop="value")
-        # NDB will raise BadValueError for missing required properties,
-        # but our hook should log an error first
-        with pytest.raises(datastore_errors.BadValueError):
-            model.put()
-
-    # Should log an error for missing required_int before NDB raises exception
-    assert len(caplog.records) == 1
-    assert "required_int" in caplog.records[0].message
-
-
-def test_pre_put_hook_allows_valid_model(ndb_stub, caplog) -> None:
-    """Test that _pre_put_hook allows models with all required properties."""
-    with caplog.at_level(logging.ERROR):
-        model = DummyModelWithRequiredProps(
-            id="test_model",
-            required_prop="value",
-            required_int=42,
-        )
+    model = DummyModelWithRequiredProps(id="test_model", required_prop="value")
+    # required_int is not set
+    with pytest.raises(datastore_errors.BadValueError) as exc_info:
         model.put()
 
-    # No errors should be logged
-    assert len(caplog.records) == 0
+    # Exception message should include model name, key, and missing property
+    error_msg = str(exc_info.value)
+    assert "DummyModelWithRequiredProps" in error_msg
+    assert "key:" in error_msg
+    assert "required_int" in error_msg
+
+
+def test_pre_put_hook_allows_valid_model(ndb_stub) -> None:
+    """Test that _pre_put_hook allows models with all required properties."""
+    model = DummyModelWithRequiredProps(
+        id="test_model",
+        required_prop="value",
+        required_int=42,
+    )
+    # Should not raise an exception
+    model.put()
+    # Verify the model was saved
+    retrieved = DummyModelWithRequiredProps.get_by_id("test_model")
+    assert retrieved is not None
+    assert retrieved.required_prop == "value"
+    assert retrieved.required_int == 42
 
 
 def test_post_get_hook_validates(ndb_stub, caplog) -> None:
