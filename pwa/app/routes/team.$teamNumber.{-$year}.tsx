@@ -371,8 +371,6 @@ function TeamPage(): React.JSX.Element {
             </div>
           </div>
 
-          <Separator className="my-4" />
-
           <StatsSection
             events={sortedEvents}
             team={team}
@@ -493,8 +491,13 @@ function StatsSection({
     [officialMatches, team.key],
   );
 
+  if (matches.length === 0) {
+    return null;
+  }
+
   return (
     <>
+      <Separator className="my-4" />
       <div className="">
         Team {team.team_number} was{' '}
         <span className="font-semibold">
