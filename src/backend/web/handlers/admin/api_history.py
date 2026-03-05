@@ -8,6 +8,7 @@ from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.environment import Environment
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
 from backend.common.helpers.fms_report_helper import FMSReportHelper
+from backend.common.helpers.trusted_api_logger import TrustedApiLogger
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.storage import get_files
@@ -17,7 +18,7 @@ from backend.web.profiled_render import render_template
 def api_history(event_key: EventKey) -> str:
     """
     Display API response history for an event from Cloud Storage.
-    Shows FRC API, FMS Reports, and Companion DB tabs.
+    Shows FRC API, FMS Reports, Companion DB, and Trusted API tabs.
     """
     event = Event.get_by_id(event_key)
     if not event:
@@ -101,11 +102,20 @@ def api_history(event_key: EventKey) -> str:
         FMSCompanionHelper.get_bucket(),
     )
 
+    # Get Trusted API request logs from trustedapi-requests bucket
+    trusted_api_bucket = TrustedApiLogger.get_bucket()
+    trusted_api_data = _get_storage_files(
+        event,
+        f"api/trusted/v1/event/{event_key}/",
+        trusted_api_bucket,
+    )
+
     template_values = {
         "event": event,
         "frc_api_data": frc_api_data,
         "fms_reports_data": fms_reports_data,
         "companion_db_data": companion_db_data,
+        "trusted_api_data": trusted_api_data,
     }
 
     return render_template("admin/api_history.html", template_values)
