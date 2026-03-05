@@ -116,6 +116,42 @@ class DummyManipulator(ManipulatorBase[DummyModel]):
         return old_model
 
 
+class DummyModelWithRequiredProp(CachedModel):
+    required_prop: Optional[str] = ndb.StringProperty(required=True)
+
+    _mutable_attrs: Set[str] = {
+        "required_prop",
+    }
+
+    def __init__(self, *args, **kwargs) -> None:
+        super().__init__(*args, **kwargs)
+        self._affected_references = {
+            "key": set(),
+        }
+
+
+class DummyRequiredManipulator(ManipulatorBase[DummyModelWithRequiredProp]):
+    update_merge_calls = 0
+
+    @classmethod
+    def getCacheKeysAndQueries(
+        cls, affected_refs: TAffectedReferences
+    ) -> List[TCacheKeyAndQuery]:
+        return []
+
+    @classmethod
+    def updateMerge(
+        cls,
+        new_model: DummyModelWithRequiredProp,
+        old_model: DummyModelWithRequiredProp,
+        auto_union: bool,
+        update_manual_attrs: bool,
+    ) -> DummyModelWithRequiredProp:
+        cls.update_merge_calls += 1
+        cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
+        return old_model
+
+
 @DummyManipulator.register_post_delete_hook
 def post_delete_hook(models: List[DummyModel]) -> None:
     DummyManipulator.delete_calls += 1
@@ -139,6 +175,7 @@ def reset_hook_call_counts():
     DummyManipulator.delete_hook_extra = None
     DummyManipulator.update_calls = 0
     DummyManipulator.update_hook_extra = None
+    DummyRequiredManipulator.update_merge_calls = 0
 
 
 def test_create_new_model(ndb_context, taskqueue_stub) -> None:
@@ -177,6 +214,30 @@ def test_update_model(ndb_context, taskqueue_stub) -> None:
 
     check = DummyModel.get_by_id("test")
     assert check == expected
+
+
+def test_find_or_spawn_corrupt_old_model_treated_as_create(
+    ndb_context, monkeypatch, taskqueue_stub
+) -> None:
+    new_model = DummyModelWithRequiredProp(id="test", required_prop="new-value")
+    corrupt_old_model = DummyModelWithRequiredProp(id="test")
+
+    monkeypatch.setattr(
+        ndb,
+        "get_multi",
+        lambda *_args, **_kwargs: [corrupt_old_model],
+    )
+
+    result = DummyRequiredManipulator.createOrUpdate(new_model)
+
+    assert result == new_model
+    assert result._is_new is True
+    assert result._dirty is False
+    assert DummyRequiredManipulator.update_merge_calls == 0
+
+    saved = DummyModelWithRequiredProp.get_by_id("test")
+    assert saved is not None
+    assert saved.required_prop == "new-value"
 
 
 def test_update_model_leaves_unknown_attrs(ndb_context, taskqueue_stub) -> None:
