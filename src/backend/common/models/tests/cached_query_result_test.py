@@ -1,5 +1,6 @@
 import logging
 
+import pytest
 from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
@@ -100,42 +101,40 @@ def test_validate_result_properties_none_result(ndb_stub, caplog) -> None:
     assert len(caplog.records) == 0
 
 
-def test_pre_put_hook_validates(ndb_stub, caplog) -> None:
-    """Test that _pre_put_hook logs validation errors.
+def test_pre_put_hook_raises_on_missing_properties(ndb_stub) -> None:
+    """Test that _pre_put_hook raises BadValueError when result models have missing properties."""
+    from google.appengine.api import datastore_errors
 
-    When a CachedQueryResult with models containing missing required properties
-    is put(), the _pre_put_hook should log an error. Note that NDB may also
-    raise an exception depending on the model type and how validation occurs.
-    """
-    with caplog.at_level(logging.ERROR):
-        model = DummyModelWithRequiredProps(id="test_model", required_prop="value")
-        result = CachedQueryResult(id="test_result", result=model)
-        # This should trigger validation through _pre_put_hook
-        try:
-            result.put()
-        except Exception:
-            # NDB might raise an exception for various reasons, but our hook
-            # should still have logged the validation error
-            pass
-
-    # Should log an error for missing required_int in the model
-    assert len(caplog.records) >= 1
-    assert any("required_int" in record.message for record in caplog.records)
-
-
-def test_pre_put_hook_allows_valid_result(ndb_stub, caplog) -> None:
-    """Test that _pre_put_hook allows valid results."""
-    with caplog.at_level(logging.ERROR):
-        model = DummyModelWithRequiredProps(
-            id="test_model",
-            required_prop="value",
-            required_int=42,
-        )
-        result = CachedQueryResult(id="test_result", result=model)
+    model = DummyModelWithRequiredProps(id="test_model", required_prop="value")
+    result = CachedQueryResult(id="test_result", result=model)
+    # required_int is not set in the model
+    with pytest.raises(datastore_errors.BadValueError) as exc_info:
         result.put()
 
-    # No errors should be logged
-    assert len(caplog.records) == 0
+    # Exception message should include model name, keys, and missing property
+    error_msg = str(exc_info.value)
+    assert "DummyModelWithRequiredProps" in error_msg
+    assert "model key:" in error_msg
+    assert "result key:" in error_msg
+    assert "required_int" in error_msg
+
+
+def test_pre_put_hook_allows_valid_result(ndb_stub) -> None:
+    """Test that _pre_put_hook allows results with valid models."""
+    model = DummyModelWithRequiredProps(
+        id="test_model",
+        required_prop="value",
+        required_int=42,
+    )
+    result = CachedQueryResult(id="test_result", result=model)
+    # Should not raise an exception
+    result.put()
+    # Verify the result was saved
+    retrieved = CachedQueryResult.get_by_id("test_result")
+    assert retrieved is not None
+    assert retrieved.result is not None
+    assert retrieved.result.required_prop == "value"
+    assert retrieved.result.required_int == 42
 
 
 def test_post_get_hook_allows_valid_result(ndb_stub, caplog) -> None:

@@ -82,13 +82,27 @@ class CachedModel(ndb.Model):
     def _pre_put_hook(self) -> None:
         """
         Hook called before the entity is written to the datastore.
-        Validates all required properties are set.
+        Raises BadValueError if any required properties are missing.
         """
-        # Check if the method exists before calling. While _validate_required_properties
-        # is defined on CachedModel, NDB's hook system can invoke this on different
-        # model types (especially when tests manipulate NDB's kind map).
-        if hasattr(self, "_validate_required_properties"):
-            self._validate_required_properties()
+        if not hasattr(self, "_properties"):
+            return
+
+        missing_properties: List[str] = []
+        # pyre-ignore[16]: _properties is an NDB internal attribute
+        for prop_name, prop in self._properties.items():
+            if hasattr(prop, "_required") and prop._required:
+                value = getattr(self, prop_name, None)
+                if value is None:
+                    missing_properties.append(prop_name)
+
+        if missing_properties:
+            from google.appengine.api import datastore_errors
+
+            model_key = self.key.urlsafe() if self.key else "No key (unsaved model)"
+            raise datastore_errors.BadValueError(
+                f"Required properties not set on {self.__class__.__name__} "
+                f"(key: {model_key}): {', '.join(missing_properties)}"
+            )
 
     @classmethod
     def _post_get_hook(cls, key: ndb.Key, future: Any) -> None:
