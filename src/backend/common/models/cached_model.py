@@ -84,7 +84,9 @@ class CachedModel(ndb.Model):
         Hook called before the entity is written to the datastore.
         Validates all required properties are set.
         """
-        self._validate_required_properties()
+        # Only validate if this is a CachedModel instance with the method
+        if hasattr(self, "_validate_required_properties"):
+            self._validate_required_properties()
 
     @classmethod
     def _post_get_hook(cls, key: ndb.Key, future: Any) -> None:
@@ -93,5 +95,5 @@ class CachedModel(ndb.Model):
         Validates all required properties are set on the retrieved entity.
         """
         entity = future.get_result()
-        if entity:
+        if entity and hasattr(entity, "_validate_required_properties"):
             entity._validate_required_properties()
