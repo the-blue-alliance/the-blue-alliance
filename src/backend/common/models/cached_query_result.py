@@ -85,7 +85,6 @@ class CachedQueryResult(ndb.Model):
                 continue
 
             missing_properties = []
-            # pyre-ignore[16]: _properties is an NDB internal attribute
             for prop_name, prop in model._properties.items():
                 # Check if property is required and value is None
                 if hasattr(prop, "_required") and prop._required:
