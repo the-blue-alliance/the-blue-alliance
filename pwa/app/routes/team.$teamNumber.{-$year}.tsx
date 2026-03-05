@@ -351,18 +351,18 @@ function TeamPage(): React.JSX.Element {
               sm:justify-between"
           >
             <div className="flex flex-col justify-between">
-              <div className="flex items-start">
-                <div className="flex-1">
-                  <TeamPageTeamInfo
-                    team={team}
-                    socials={socials}
-                    maybeAvatar={maybeAvatar}
-                    district={districts.find((d) => d.year === year)}
-                  />
-                </div>
-                <FavoriteButton
-                  modelKey={teamKey}
-                  modelType={MODEL_TYPE.TEAM}
+              <div>
+                <TeamPageTeamInfo
+                  team={team}
+                  socials={socials}
+                  maybeAvatar={maybeAvatar}
+                  district={districts.find((d) => d.year === year)}
+                  favoriteButton={
+                    <FavoriteButton
+                      modelKey={teamKey}
+                      modelType={MODEL_TYPE.TEAM}
+                    />
+                  }
                 />
               </div>
             </div>
