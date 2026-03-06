@@ -126,6 +126,19 @@ class CachedDatabaseQuery(
         with Span("{}._do_query".format(self.__class__.__name__)):
             cache_key = self.cache_key
             cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+
+            # Validate cached result for corruption and treat as cache miss if corrupted
+            if (
+                cached_query_result is not None
+                and cached_query_result._validate_result_properties()
+            ):
+                logging.error(
+                    "Corrupted cached result detected in _do_query; treating as cache miss. "
+                    "cache_key=%s",
+                    cache_key,
+                )
+                cached_query_result = None
+
             if cached_query_result is None:
                 query_result = yield self._query_async(*args, **kwargs)
                 if self.CACHE_WRITES_ENABLED:
@@ -139,6 +152,7 @@ class CachedDatabaseQuery(
                         )
                         logging.exception(e)
                 return query_result
+
             return cached_query_result.result
 
     @ndb.tasklet

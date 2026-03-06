@@ -64,13 +64,16 @@ class CachedQueryResult(ndb.Model):
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
 
-    def _validate_result_properties(self) -> None:
+    def _validate_result_properties(self) -> bool:
         """
         Validates that all required properties on models in the result field are set.
         Logs an error with stack trace and model key if validation fails.
+
+        Returns True when one or more models have missing required properties,
+        otherwise False.
         """
         if self.result is None:
-            return
+            return False
 
         # Handle both single model and list of models
         models_to_check = []
@@ -108,6 +111,9 @@ class CachedQueryResult(ndb.Model):
                     f"CachedQueryResult key: {cached_result_key}\n"
                     f"Stack trace:\n{stack_trace}"
                 )
+                return True
+
+        return False
 
     def _pre_put_hook(self) -> None:
         """

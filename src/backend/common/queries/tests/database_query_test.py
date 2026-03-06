@@ -6,12 +6,18 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.models.cached_model import CachedModel
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.queries.database_query import CachedDatabaseQuery, DatabaseQuery
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
 class DummyModel(ndb.Model):
+    int_prop = ndb.IntegerProperty()
+
+
+class DummyModelWithRequiredProp(CachedModel):
+    required_prop = ndb.StringProperty(required=True)
     int_prop = ndb.IntegerProperty()
 
 
@@ -69,6 +75,26 @@ class CachedDummyModelRangeQuery(
         models: Iterable[DummyModel] = yield DummyModel.query(
             DummyModel.int_prop >= min, DummyModel.int_prop <= max
         ).fetch_async()
+        return list(models)
+
+
+class CachedDummyModelWithRequiredPropQuery(
+    CachedDatabaseQuery[List[DummyModelWithRequiredProp], None]
+):
+    CACHE_KEY_FORMAT = "test_required_query_{min}_{max}"
+    DICT_CONVERTER = None
+    CACHE_WRITES_ENABLED = True
+
+    @ndb.tasklet
+    def _query_async(
+        self, min: int, max: int
+    ) -> Generator[Any, Any, List[DummyModelWithRequiredProp]]:
+        models: Iterable[DummyModelWithRequiredProp] = (
+            yield DummyModelWithRequiredProp.query(
+                DummyModelWithRequiredProp.int_prop >= min,
+                DummyModelWithRequiredProp.int_prop <= max,
+            ).fetch_async()
+        )
         return list(models)
 
 
@@ -267,3 +293,47 @@ def test_cached_dict_query_put_exception_logs_cache_key(caplog) -> None:
             result = query.fetch_dict(ApiMajorVersion.API_V3)
     assert len(result) == 3
     assert query.dict_cache_key(ApiMajorVersion.API_V3) in caplog.text
+
+
+def test_cached_query_corrupt_cache_treated_as_miss(caplog, monkeypatch) -> None:
+    # Create valid models in datastore
+    keys = ndb.put_multi(
+        [
+            DummyModelWithRequiredProp(
+                id=f"{i}", required_prop=f"value_{i}", int_prop=i
+            )
+            for i in range(0, 5)
+        ]
+    )
+    assert len(keys) == 5
+
+    query = CachedDummyModelWithRequiredPropQuery(min=0, max=2)
+    cache_key = query.cache_key
+
+    # First, populate the cache with valid data
+    result = query.fetch()
+    assert len(result) == 3
+
+    # Verify cache was populated
+    cached_result = CachedQueryResult.get_by_id(cache_key)
+    assert cached_result is not None
+
+    # Mock _validate_result_properties to return True (simulating corruption)
+    def mock_validate_corrupt(self):
+        return True
+
+    monkeypatch.setattr(
+        CachedQueryResult, "_validate_result_properties", mock_validate_corrupt
+    )
+
+    # Now fetch the query - should detect corruption and treat as cache miss
+    with caplog.at_level(logging.WARNING):
+        result = query.fetch()
+
+    # Should log a warning about corruption
+    assert "Corrupted cached result detected" in caplog.text
+    assert cache_key in caplog.text
+
+    # Should have refetched valid data from datastore
+    assert len(result) == 3
+    assert all(model.required_prop is not None for model in result)
