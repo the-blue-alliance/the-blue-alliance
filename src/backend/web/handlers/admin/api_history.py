@@ -108,6 +108,7 @@ def api_history(event_key: EventKey) -> str:
         event,
         f"api/trusted/v1/event/{event_key}/",
         trusted_api_bucket,
+        recursive=True,
     )
 
     template_values = {
@@ -122,7 +123,10 @@ def api_history(event_key: EventKey) -> str:
 
 
 def _get_storage_files(
-    event: Event, gcs_path: str, bucket: Optional[str] = None
+    event: Event,
+    gcs_path: str,
+    bucket: Optional[str] = None,
+    recursive: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Get files from Cloud Storage for a given path and bucket.
@@ -131,6 +135,7 @@ def _get_storage_files(
         event: Event model instance
         gcs_path: GCS directory path
         bucket: Storage bucket name (optional, defaults to project bucket)
+        recursive: Whether to search recursively in subdirectories
 
     Returns:
         List of file metadata dicts with timestamp, filename, path, and public_url
@@ -140,7 +145,7 @@ def _get_storage_files(
         bucket = f"{Environment.project()}.appspot.com"
 
     try:
-        file_paths = get_files(gcs_path, bucket=bucket)
+        file_paths = get_files(gcs_path, bucket=bucket, recursive=recursive)
         import logging
 
         logging.info(f"File paths: {file_paths}")
