@@ -209,8 +209,8 @@ def _get_storage_files(
                     f"http://localhost:8000/blobstore/blob/{blobkey}?display=inline"
                 )
             else:
-                # For production, use public GCS URL
-                public_url = f"https://storage.googleapis.com/{bucket}/{file_path}"
+                # For production, use authenticated GCS URL
+                public_url = f"https://storage.cloud.google.com/{bucket}/{file_path}"
 
             files.append(
                 {
