@@ -15,9 +15,5 @@ class ApiAuthAccessQuery(DatabaseQuery[List[ApiAuthAccess], None]):
     @typed_tasklet
     def _query_async(self, owner: Account) -> Generator[Any, Any, List[ApiAuthAccess]]:
         return (
-            yield (
-                ApiAuthAccess.query(ApiAuthAccess.owner == owner.key).fetch_async(
-                    use_cache=False, use_memcache=False
-                )
-            )
+            yield (ApiAuthAccess.query(ApiAuthAccess.owner == owner.key).fetch_async())
         )

@@ -17,10 +17,4 @@ class SubscriptionQuery(DatabaseQuery[List[Subscription], None]):
         self, account: Account, keys_only: bool = False
     ) -> Generator[Any, Any, List[Subscription]]:
         subscription_query = Subscription.query(ancestor=account.key)
-        return (
-            yield (
-                subscription_query.fetch_async(
-                    keys_only=keys_only, use_cache=False, use_memcache=False
-                )
-            )
-        )
+        return (yield (subscription_query.fetch_async(keys_only=keys_only)))

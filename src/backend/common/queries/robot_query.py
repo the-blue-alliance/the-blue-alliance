@@ -23,7 +23,5 @@ class TeamRobotsQuery(CachedDatabaseQuery[List[Robot], List[RobotDict]]):
 
     @typed_tasklet
     def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Robot]]:
-        robots = yield Robot.query(Robot.team == ndb.Key(Team, team_key)).fetch_async(
-            use_cache=False, use_memcache=False
-        )
+        robots = yield Robot.query(Robot.team == ndb.Key(Team, team_key)).fetch_async()
         return robots
