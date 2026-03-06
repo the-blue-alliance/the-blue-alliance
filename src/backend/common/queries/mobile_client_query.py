@@ -38,7 +38,9 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
             mobile_clients_query = mobile_clients_query.filter(
                 MobileClient.verified == True  # noqa: E712
             )
-        clients = yield mobile_clients_query.fetch_async()
+        clients = yield mobile_clients_query.fetch_async(
+            use_cache=False, use_memcache=False
+        )
         return list(clients)
 
     @staticmethod
@@ -49,6 +51,6 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
             messaging_id (string): The messaging_id to filter for.
         """
         to_delete = MobileClient.query(MobileClient.messaging_id == messaging_id).fetch(
-            keys_only=True
+            keys_only=True, use_cache=False, use_memcache=False
         )
         ndb.delete_multi(to_delete)

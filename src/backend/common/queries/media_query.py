@@ -30,7 +30,7 @@ class TeamSocialMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.year == None,  # noqa: E711
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -46,7 +46,7 @@ class TeamMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key)
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -64,7 +64,7 @@ class TeamYearMediaQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     ) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key), Media.year == year
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -81,7 +81,7 @@ class EventTeamsMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
-        ).fetch_async(keys_only=True)
+        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
         if not event_team_keys:
             return []
         team_keys = list(
@@ -92,7 +92,7 @@ class EventTeamsMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         )
         medias = yield Media.query(
             cast(ndb.KeyProperty, Media.references).IN(team_keys), Media.year == year
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -109,7 +109,7 @@ class EventTeamsPreferredMediasQuery(CachedDatabaseQuery[List[Media], List[Media
         year = int(event_key[:4])
         event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
-        ).fetch_async(keys_only=True)
+        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
         if not event_team_keys:
             return []
         team_keys = list(
@@ -121,7 +121,7 @@ class EventTeamsPreferredMediasQuery(CachedDatabaseQuery[List[Media], List[Media
         medias = yield Media.query(
             cast(ndb.KeyProperty, Media.preferred_references).IN(team_keys),
             Media.year == year,
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -137,7 +137,7 @@ class EventMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.references == ndb.Key(Event, event_key)
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -156,7 +156,7 @@ class TeamTagMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
         medias = yield Media.query(
             Media.references == ndb.Key(Team, team_key),
             Media.media_tag_enum == media_tag,
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -177,7 +177,7 @@ class TeamYearTagMediasQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
             Media.references == team_ndb_key,
             Media.year == year,
             Media.media_tag_enum == media_tag,
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
 
 
@@ -195,5 +195,5 @@ class MediaTypeYearQuery(CachedDatabaseQuery[List[Media], List[MediaDict]]):
     ) -> Generator[Any, Any, List[Media]]:
         medias = yield Media.query(
             Media.media_type_enum == media_type, Media.year == year
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return medias
