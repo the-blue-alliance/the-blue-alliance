@@ -146,19 +146,19 @@ def test_api_history_with_files(
 
     # Check that production GCS URLs are present
     assert (
-        "https://storage.googleapis.com/testbed-test.appspot.com/frc-api-response/v3.0/2020/alliances/nyny/2020-03-15 12:45:00.json"
+        "https://storage.cloud.google.com/testbed-test.appspot.com/frc-api-response/v3.0/2020/alliances/nyny/2020-03-15 12:45:00.json"
         in content
     )
     assert (
-        "https://storage.googleapis.com/testbed-test-eventwizard-fms-reports/fms_reports/2020nyny/team_list/team_list.2020-03-14T08:00:00.xlsx"
+        "https://storage.cloud.google.com/testbed-test-eventwizard-fms-reports/fms_reports/2020nyny/team_list/team_list.2020-03-14T08:00:00.xlsx"
         in content
     )
     assert (
-        "https://storage.googleapis.com/testbed-test-eventwizard-fms-companion/fms_companion/2020nyny/fms_companion.2020-03-15T14:30:00.db"
+        "https://storage.cloud.google.com/testbed-test-eventwizard-fms-companion/fms_companion/2020nyny/fms_companion.2020-03-15T14:30:00.db"
         in content
     )
     assert (
-        "https://storage.googleapis.com/testbed-test-trustedapi-requests/api/trusted/v1/event/2020nyny/team_list/update/2020-03-15T11:00:00.000000+00:00.json"
+        "https://storage.cloud.google.com/testbed-test-trustedapi-requests/api/trusted/v1/event/2020nyny/team_list/update/2020-03-15T11:00:00.000000+00:00.json"
         in content
     )
 
@@ -208,10 +208,10 @@ def test_api_history_with_files_dev_server(
     assert "http://localhost:8000/blobstore/blob/" in content
     assert "display=inline" in content
     # Production URLs should NOT be present
-    assert "https://storage.googleapis.com/" not in content
+    assert "https://storage.cloud.google.com/" not in content
     assert "display=inline" in content
     # Production URLs should NOT be present
-    assert "https://storage.googleapis.com/" not in content
+    assert "https://storage.cloud.google.com/" not in content
 
 
 @patch("backend.web.handlers.admin.api_history.get_files")
