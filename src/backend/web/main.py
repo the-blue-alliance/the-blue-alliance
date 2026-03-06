@@ -121,6 +121,16 @@ app.add_url_rule(
 )
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
+app.add_url_rule(
+    '/districts/<regex("[a-z]+"):district_abbrev>',
+    view_func=district_detail,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/districts/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
+)
+app.add_url_rule("/districts", view_func=event_list, defaults={"year": None})
+
 app.add_url_rule("/eventwizard_legacy", view_func=eventwizard)
 app.add_url_rule("/eventwizard", view_func=eventwizard2)
 
