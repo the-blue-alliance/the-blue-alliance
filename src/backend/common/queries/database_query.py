@@ -70,7 +70,7 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
 class CachedDatabaseQuery(
     DatabaseQuery, Generic[QueryReturn, DictQueryReturn], metaclass=abc.ABCMeta
 ):
-    DATABASE_QUERY_VERSION = 4
+    DATABASE_QUERY_VERSION = 5
     BASE_CACHE_KEY_FORMAT: str = (
         "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
     )
