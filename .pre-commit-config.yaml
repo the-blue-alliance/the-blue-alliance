@@ -25,7 +25,7 @@ repos:
     - id: py3-test
       name: "[py3] Testing"
       types: [file, python]
-      entry: make test ARGS='--relevant'
+      entry: make test-inline
       language: system
       pass_filenames: false
       stages: [pre-commit]
