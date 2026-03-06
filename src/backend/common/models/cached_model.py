@@ -41,13 +41,6 @@ class CachedModel(ndb.Model):
     # This will get updated with the attrs that actually change
     _updated_attrs: Optional[Set[str]] = None
 
-    def __init__(self, *args, **kwargs):
-        super(CachedModel, self).__init__(*args, **kwargs)
-
-        # The initialization path is different for models vs those created via
-        # constructors, so make sure we have a common set of properties defined
-        self._fix_up_properties()
-
     def _validate_required_properties(self) -> bool:
         """
         Validates that all required properties on the model are set.
