@@ -37,18 +37,21 @@ class MatchUpcomingNotification(Notification):
             else self.match.predicted_time
         )
         if scheduled_time:
-            time = scheduled_time.strftime("%H:%M")
-            # Add timezone, if possible
+            # Convert UTC time to event local time, if possible
             if self.event.timezone_id:
                 try:
                     import pytz
 
                     timezone = pytz.timezone(self.event.timezone_id)
-                    time += timezone.localize(scheduled_time).strftime(" %Z")
+                    local_time = pytz.utc.localize(scheduled_time).astimezone(timezone)
+                    time = local_time.strftime("%-H:%M %Z")
                 except Exception as e:
                     logging.warning(
-                        f"Unable to add timezone to event level notification: {e}"
+                        f"Unable to convert timezone for upcoming match notification: {e}"
                     )
+                    time = scheduled_time.strftime("%-H:%M")
+            else:
+                time = scheduled_time.strftime("%-H:%M")
             ending = ", scheduled for {}.".format(time)
         else:
             ending = "."
