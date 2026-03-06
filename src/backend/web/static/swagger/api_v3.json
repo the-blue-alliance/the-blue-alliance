@@ -5170,7 +5170,8 @@
           "abbreviation",
           "display_name",
           "key",
-          "year"
+          "year",
+          "official_advancement_counts"
         ],
         "type": "object",
         "properties": {
@@ -5189,6 +5190,24 @@
           "year": {
             "type": "integer",
             "description": "Year this district participated."
+          },
+          "official_advancement_counts": {
+            "type": "object",
+            "description": "The number of teams advancing to DCMP and CMP from this district, as specified in the FIRST manual.",
+            "required": [
+              "dcmp",
+              "cmp"
+            ],
+            "properties": {
+              "dcmp": {
+                "type": "integer",
+                "description": "Number of teams advancing to the District Championship."
+              },
+              "cmp": {
+                "type": "integer",
+                "description": "Number of teams advancing to the Championship."
+              }
+            }
           }
         }
       },

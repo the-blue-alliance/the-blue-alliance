@@ -4,32 +4,17 @@ from typing import Dict, List, Set
 from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
 
+from backend.common.consts.district_advancements import (
+    FIRST_MANUAL_DISTRICT_ADVANCEMENT_COUNTS,
+)
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.cached_model import CachedModel
-from backend.common.models.district_advancement import DistrictAdvancement
+from backend.common.models.district_advancement import (
+    AdvancementCounts,
+    DistrictAdvancement,
+)
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
-
-ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
-    "chs",
-    "fch",
-    "fim",
-    "fit",
-    "tx",
-    "in",
-    "fin",
-    "isr",
-    "mar",
-    "fma",
-    "nc",
-    "fnc",
-    "fsc",
-    "ne",
-    "ont",
-    "pnw",
-    "pch",
-    "ca",
-    "win",
-}
 
 
 class District(CachedModel):
@@ -85,6 +70,16 @@ class District(CachedModel):
     @property
     def render_name(self) -> str:
         return self.display_name if self.display_name else self.abbreviation.upper()
+
+    @property
+    def official_advancement_counts(self) -> AdvancementCounts:
+        # Returns the advancement counts as specified in the FIRST manual for the district
+        # If the district/year is not found, returns 0 for both dcmp and cmp
+
+        latest_code = RenamedDistricts.get_latest_code(self.abbreviation)
+        return FIRST_MANUAL_DISTRICT_ADVANCEMENT_COUNTS.get(self.year, {}).get(
+            latest_code, AdvancementCounts(dcmp=0, cmp=0)
+        )
 
     @classmethod
     def validate_key_name(self, district_key: str) -> bool:

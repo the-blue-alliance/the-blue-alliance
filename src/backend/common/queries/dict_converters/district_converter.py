@@ -33,6 +33,7 @@ class DistrictConverter(ConverterBase):
                 "year": district.year,
                 "abbreviation": district.abbreviation,
                 "display_name": district.display_name,
+                "official_advancement_counts": district.official_advancement_counts,
             }
         )
 

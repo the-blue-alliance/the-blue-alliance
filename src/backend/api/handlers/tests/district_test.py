@@ -145,12 +145,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "fim",
             "display_name": "Michigan",
             "key": "2019fim",
+            "official_advancement_counts": {"dcmp": 160, "cmp": 87},
             "year": 2019,
         },
         {
             "abbreviation": "fim",
             "display_name": "Michigan",
             "key": "2020fim",
+            "official_advancement_counts": {"dcmp": 200, "cmp": 90},
             "year": 2020,
         },
     ]
@@ -173,12 +175,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "mar",
             "display_name": "Mid-Atlantic",
             "key": "2014mar",
+            "official_advancement_counts": {"dcmp": 55, "cmp": 18},
             "year": 2014,
         },
         {
             "abbreviation": "fma",
             "display_name": "Mid-Atlantic",
             "key": "2024fma",
+            "official_advancement_counts": {"dcmp": 60, "cmp": 22},
             "year": 2024,
         },
     ]
@@ -194,12 +198,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "mar",
             "display_name": "Mid-Atlantic",
             "key": "2014mar",
+            "official_advancement_counts": {"dcmp": 55, "cmp": 18},
             "year": 2014,
         },
         {
             "abbreviation": "fma",
             "display_name": "Mid-Atlantic",
             "key": "2024fma",
+            "official_advancement_counts": {"dcmp": 60, "cmp": 22},
             "year": 2024,
         },
     ]
@@ -338,6 +344,8 @@ def test_district_list_year(ndb_stub, api_client: Client) -> None:
     district_keys = set([d["key"] for d in resp.json])
     assert "2020ne" in district_keys
     assert "2020fim" in district_keys
+    for d in resp.json:
+        assert "official_advancement_counts" in d
 
 
 def test_district_awards(ndb_stub, api_client: Client) -> None:
