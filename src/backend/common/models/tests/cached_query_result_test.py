@@ -24,9 +24,10 @@ def test_validate_result_properties_all_set(ndb_stub, caplog) -> None:
             required_int=42,
         )
         result = CachedQueryResult(id="test_result", result=model)
-        result._validate_result_properties()
+        has_missing_required_properties = result._validate_result_properties()
 
     # No errors should be logged
+    assert has_missing_required_properties is False
     assert len(caplog.records) == 0
 
 
@@ -36,9 +37,10 @@ def test_validate_result_properties_missing(ndb_stub, caplog) -> None:
         model = DummyModelWithRequiredProps(id="test_model", required_prop="value")
         # required_int is not set (None)
         result = CachedQueryResult(id="test_result", result=model)
-        result._validate_result_properties()
+        has_missing_required_properties = result._validate_result_properties()
 
     # Should log an error for missing required_int
+    assert has_missing_required_properties is True
     assert len(caplog.records) == 1
     error_message = caplog.records[0].message
     assert "Required properties not set" in error_message
@@ -65,9 +67,10 @@ def test_validate_result_properties_list_all_valid(ndb_stub, caplog) -> None:
             ),
         ]
         result = CachedQueryResult(id="test_result", result=models)
-        result._validate_result_properties()
+        has_missing_required_properties = result._validate_result_properties()
 
     # No errors should be logged
+    assert has_missing_required_properties is False
     assert len(caplog.records) == 0
 
 
@@ -83,9 +86,10 @@ def test_validate_result_properties_list_with_invalid(ndb_stub, caplog) -> None:
             DummyModelWithRequiredProps(id="model2", required_prop="value2"),
         ]
         result = CachedQueryResult(id="test_result", result=models)
-        result._validate_result_properties()
+        has_missing_required_properties = result._validate_result_properties()
 
     # Should log an error for the invalid model
+    assert has_missing_required_properties is True
     assert len(caplog.records) == 1
     error_message = caplog.records[0].message
     assert "required_int" in error_message
@@ -95,9 +99,10 @@ def test_validate_result_properties_none_result(ndb_stub, caplog) -> None:
     """Test validation handles None result gracefully."""
     with caplog.at_level(logging.ERROR):
         result = CachedQueryResult(id="test_result", result=None)
-        result._validate_result_properties()
+        has_missing_required_properties = result._validate_result_properties()
 
     # No errors should be logged for None result
+    assert has_missing_required_properties is False
     assert len(caplog.records) == 0
 
 
@@ -161,9 +166,10 @@ def test_validate_result_properties_non_cached_model(ndb_stub, caplog) -> None:
     with caplog.at_level(logging.ERROR):
         # Store a plain dict (not a model) in result
         result = CachedQueryResult(id="test_result", result={"key": "value"})
-        result._validate_result_properties()
+        has_missing_required_properties = result._validate_result_properties()
 
     # No errors should be logged (non-models are skipped)
+    assert has_missing_required_properties is False
     assert len(caplog.records) == 0
 
 
@@ -179,7 +185,8 @@ def test_validate_result_properties_mixed_types(ndb_stub, caplog) -> None:
             {"key": "value"},  # Non-model object
         ]
         result = CachedQueryResult(id="test_result", result=models)
-        result._validate_result_properties()
+        has_missing_required_properties = result._validate_result_properties()
 
     # No errors should be logged (only valid models are checked)
+    assert has_missing_required_properties is False
     assert len(caplog.records) == 0
