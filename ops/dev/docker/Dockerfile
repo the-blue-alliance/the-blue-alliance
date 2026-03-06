@@ -87,7 +87,7 @@ RUN python -m pip config set global.break-system-packages true \
 COPY pyproject.toml uv.lock /tmp/tba-deps/
 RUN cd /tmp/tba-deps \
     && uv export --no-dev --no-hashes --frozen -o requirements.txt \
-    && pip install -r requirements.txt \
+    && pip install --ignore-installed -r requirements.txt \
     && rm -rf /tmp/tba-deps
 
 # Pre-install Node dependencies (layer cached until package-lock.json changes)
