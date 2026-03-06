@@ -270,9 +270,16 @@ class MatchTimePredictionHelper:
                 if match.comp_level not in ELIM_LEVELS
                 else cls.as_local(cls.EPOCH, timezone)
             )
-            match.predicted_time = nexus_predicted_time or max(
-                cls.as_utc(predicted), cls.as_utc(none_throws(earliest_possible))
-            )
+            # Only use nexus prediction if we have actual match data from the current day to calibrate against.
+            # If no matches have been played on the current day, nexus predictions are unreliable.
+            if average_cycle_time is not None:
+                match.predicted_time = nexus_predicted_time or max(
+                    cls.as_utc(predicted), cls.as_utc(none_throws(earliest_possible))
+                )
+            else:
+                match.predicted_time = max(
+                    cls.as_utc(predicted), cls.as_utc(none_throws(earliest_possible))
+                )
             last = match
             last_comp_level = match.comp_level
 
