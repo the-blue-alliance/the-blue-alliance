@@ -41,7 +41,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
         assert match is not None
 
     def test_fcm_notification_predicted_time(self):
-        # Set times for testing
+        # Set times for testing (13:30 UTC = 8:30 EST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.event.timezone_id = "America/New_York"
@@ -51,7 +51,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:30 EST.$"
+            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 8:30 EST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
@@ -73,7 +73,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
         assert match is not None
 
     def test_fcm_notification_time(self):
-        # Set times for testing
+        # Set times for testing (13:00 UTC = 5:00 PST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.event.timezone_id = "America/Los_Angeles"
 
@@ -82,7 +82,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:00 PST.$"
+            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 5:00 PST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
@@ -119,7 +119,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
 
     def test_fcm_notification_short_name_predicted_time(self):
         self.notification.event.short_name = "Arizona North"
-        # Set times for testing
+        # Set times for testing (13:30 UTC = 6:30 MST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.event.timezone_id = "America/Phoenix"
@@ -129,14 +129,14 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:30 MST.$"
+            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 6:30 MST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
 
     def test_fcm_notification_short_name_time(self):
         self.notification.event.short_name = "Arizona North"
-        # Set times for testing
+        # Set times for testing (13:00 UTC = 6:00 MST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.event.timezone_id = "America/Phoenix"
 
@@ -145,7 +145,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:00 MST.$"
+            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 6:00 MST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
