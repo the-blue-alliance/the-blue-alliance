@@ -52,7 +52,7 @@ class TeamListQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         teams = (
             yield Team.query(Team.team_number >= start, Team.team_number < end)
             .order(Team.team_number)
-            .fetch_async()
+            .fetch_async(use_cache=False, use_memcache=False)
         )
         return list(teams)
 
@@ -68,7 +68,7 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     @typed_tasklet
     def _query_async(self, year: Year, page: int) -> List[Team]:
         event_team_keys_future = EventTeam.query(EventTeam.year == year).fetch_async(
-            keys_only=True
+            keys_only=True, use_cache=False, use_memcache=False
         )
         teams_future = TeamListQuery(page=page).fetch_async()
 
@@ -97,9 +97,11 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     ) -> Generator[Any, Any, List[Team]]:
         district_teams = yield DistrictTeam.query(
             DistrictTeam.district_key == ndb.Key(District, district_key)
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         team_keys = map(lambda district_team: district_team.team, district_teams)
-        teams = yield ndb.get_multi_async(team_keys)
+        teams = yield ndb.get_multi_async(
+            team_keys, use_cache=False, use_memcache=False
+        )
         return list(teams)
 
 
@@ -115,7 +117,7 @@ class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], List[str]]):
     def _query_async(self, year: Year) -> Generator[Any, Any, List[ndb.Key]]:
         regional_teams = yield RegionalPoolTeam.query(
             RegionalPoolTeam.year == year
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         team_keys = map(lambda t: t.team, regional_teams)
         return list(team_keys)
 
@@ -132,12 +134,14 @@ class EventTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Team]]:
         event_team_keys = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
-        ).fetch_async(keys_only=True)
+        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
         team_keys = map(
             lambda event_team_key: ndb.Key(Team, event_team_key.id().split("_")[1]),
             event_team_keys,
         )
-        teams = yield ndb.get_multi_async(team_keys)
+        teams = yield ndb.get_multi_async(
+            team_keys, use_cache=False, use_memcache=False
+        )
         return list(teams)
 
 
@@ -153,7 +157,7 @@ class EventEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
     def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[EventTeam]]:
         event_teams = yield EventTeam.query(
             EventTeam.event == ndb.Key(Event, event_key)
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return event_teams
 
 
@@ -169,6 +173,6 @@ class TeamParticipationQuery(CachedDatabaseQuery[Set[Year], None]):
     def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, Set[Year]]:
         event_teams = yield EventTeam.query(
             EventTeam.team == ndb.Key(Team, team_key)
-        ).fetch_async(keys_only=True)
+        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
         years = map(lambda event_team: int(event_team.id()[:4]), event_teams)
         return set(years)

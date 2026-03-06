@@ -29,7 +29,7 @@ class InsightsLeaderboardsYearQuery(
         insights = yield Insight.query(
             Insight.name.IN(insight_names),
             Insight.year == year,
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return insights
 
 
@@ -50,7 +50,7 @@ class InsightsNotablesYearQuery(CachedDatabaseQuery[List[Insight], List[InsightD
         insights = yield Insight.query(
             Insight.name.IN(insight_names),
             Insight.year == year,
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
         return insights
 
 
@@ -76,6 +76,6 @@ class DistrictInsightQuery(CachedDatabaseQuery[Insight, InsightDict]):
             Insight.name == insight_name,
             Insight.year == year,
             Insight.district_abbreviation == district_abbreviation,
-        ).fetch_async()
+        ).fetch_async(use_cache=False, use_memcache=False)
 
         return insight

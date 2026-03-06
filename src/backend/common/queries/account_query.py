@@ -12,4 +12,8 @@ class AccountQuery(DatabaseQuery[Optional[Account], None]):
     def _query_async(self, email: str) -> Generator[Any, Any, Optional[Account]]:
         if not email:
             return None
-        return (yield Account.query(Account.email == email).get_async())
+        return (
+            yield Account.query(Account.email == email).get_async(
+                use_cache=False, use_memcache=False
+            )
+        )

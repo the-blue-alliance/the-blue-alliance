@@ -37,4 +37,10 @@ class SuggestionQuery(DatabaseQuery[List[Suggestion], None]):
             params.append(Suggestion.author == author.key)
         if reviewer:
             params.append(Suggestion.reviewer == reviewer.key)
-        return (yield (Suggestion.query(*params).fetch_async(keys_only=keys_only)))
+        return (
+            yield (
+                Suggestion.query(*params).fetch_async(
+                    keys_only=keys_only, use_cache=False, use_memcache=False
+                )
+            )
+        )
