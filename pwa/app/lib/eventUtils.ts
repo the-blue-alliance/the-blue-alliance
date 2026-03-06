@@ -111,9 +111,9 @@ export function getCurrentWeekEvents(events: Event[]) {
   const now = new Date();
   const filteredEvents = [];
 
-  const diffFromWeekStart = now.getDay();
+  const diffFromMonday = (now.getDay() + 6) % 7;
   const closestStartMonday = new Date(now).setDate(
-    now.getDate() - diffFromWeekStart,
+    now.getDate() - diffFromMonday,
   );
 
   for (const event of events) {
@@ -179,7 +179,9 @@ export function isEventWithinDays(
   const endDate = getLocalMidnightOnDate(event.end_date);
   const now = new Date();
   const windowStart = startDate.getTime() - negativeDaysBefore * DAY_IN_MS;
-  const windowEnd = endDate.getTime() + positiveDaysAfter * 2 * DAY_IN_MS;
+  // endDate is midnight at the start of the last day, so +1 day to include
+  // the full last day, then positiveDaysAfter additional days beyond that.
+  const windowEnd = endDate.getTime() + (1 + positiveDaysAfter) * DAY_IN_MS;
   return now.getTime() >= windowStart && now.getTime() <= windowEnd;
 }
 

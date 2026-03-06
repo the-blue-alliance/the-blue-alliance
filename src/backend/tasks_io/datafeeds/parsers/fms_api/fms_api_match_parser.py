@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
-from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import DOUBLE_ELIM_TYPES
 from backend.common.frc_api.frc_api import TScoreDetailReturn, TScoreDetailUnion
@@ -235,10 +235,17 @@ class FMSAPIHybridScheduleParser(
                     )
                 )
                 existing_match = existing_match.tiebreak_match_key.get()
+
+            if existing_match and existing_match.alliances_json is None:
+                logging.error(
+                    f"Corrupt match! {existing_match.key.id()} has no alliances_json"
+                )
+                continue
+
             # Check if last existing match needs to be tiebroken
             if (
                 existing_match
-                and existing_match.comp_level != "qm"
+                and existing_match.comp_level in ELIM_LEVELS
                 and existing_match.has_been_played
                 and existing_match.winning_alliance == ""
                 and existing_match.actual_time != actual_time

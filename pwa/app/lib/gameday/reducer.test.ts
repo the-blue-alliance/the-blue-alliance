@@ -433,6 +433,52 @@ describe.concurrent('RESTORE_URL_STATE action', () => {
   });
 });
 
+describe.concurrent('LOAD_EVENT_WEBCASTS', () => {
+  test('sets layout and populates positions with event webcasts', () => {
+    const webcasts = [
+      createMockWebcast('2026tuis-0'),
+      createMockWebcast('2026tuis-1'),
+    ];
+    const state = gamedayReducer(initialState, {
+      type: 'LOAD_EVENT_WEBCASTS',
+      webcasts,
+      layoutId: 1, // Vertical Split (2 views)
+    });
+    expect(state.layoutId).toBe(1);
+    expect(state.positionToWebcast[0]).toBe('2026tuis-0');
+    expect(state.positionToWebcast[1]).toBe('2026tuis-1');
+    expect(state.positionToWebcast[2]).toBeNull();
+  });
+
+  test('caps webcasts at layout capacity', () => {
+    const webcasts = [
+      createMockWebcast('2026tuis-0'),
+      createMockWebcast('2026tuis-1'),
+      createMockWebcast('2026tuis-2'),
+    ];
+    // Layout 0 = Single View (1 view)
+    const state = gamedayReducer(initialState, {
+      type: 'LOAD_EVENT_WEBCASTS',
+      webcasts,
+      layoutId: 0,
+    });
+    expect(state.layoutId).toBe(0);
+    expect(state.positionToWebcast[0]).toBe('2026tuis-0');
+    expect(state.positionToWebcast[1]).toBeNull();
+  });
+
+  test('fills remaining positions with null', () => {
+    const webcasts = [createMockWebcast('2026tuis-0')];
+    const state = gamedayReducer(initialState, {
+      type: 'LOAD_EVENT_WEBCASTS',
+      webcasts,
+      layoutId: 0,
+    });
+    expect(state.positionToWebcast).toHaveLength(MAX_VIEWS);
+    expect(state.positionToWebcast.filter((p) => p !== null)).toHaveLength(1);
+  });
+});
+
 describe.concurrent('default case', () => {
   test('returns unchanged state for unknown action', () => {
     const unknownAction = {

@@ -351,18 +351,18 @@ function TeamPage(): React.JSX.Element {
               sm:justify-between"
           >
             <div className="flex flex-col justify-between">
-              <div className="flex items-start">
-                <div className="flex-1">
-                  <TeamPageTeamInfo
-                    team={team}
-                    socials={socials}
-                    maybeAvatar={maybeAvatar}
-                    district={districts.find((d) => d.year === year)}
-                  />
-                </div>
-                <FavoriteButton
-                  modelKey={teamKey}
-                  modelType={MODEL_TYPE.TEAM}
+              <div>
+                <TeamPageTeamInfo
+                  team={team}
+                  socials={socials}
+                  maybeAvatar={maybeAvatar}
+                  district={districts.find((d) => d.year === year)}
+                  favoriteButton={
+                    <FavoriteButton
+                      modelKey={teamKey}
+                      modelType={MODEL_TYPE.TEAM}
+                    />
+                  }
                 />
               </div>
             </div>
@@ -370,8 +370,6 @@ function TeamPage(): React.JSX.Element {
               <TeamRobotPicsCarousel media={robotPics} />
             </div>
           </div>
-
-          <Separator className="my-4" />
 
           <StatsSection
             events={sortedEvents}
@@ -493,8 +491,13 @@ function StatsSection({
     [officialMatches, team.key],
   );
 
+  if (matches.length === 0) {
+    return null;
+  }
+
   return (
     <>
+      <Separator className="my-4" />
       <div className="">
         Team {team.team_number} was{' '}
         <span className="font-semibold">

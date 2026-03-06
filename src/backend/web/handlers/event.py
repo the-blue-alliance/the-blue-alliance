@@ -311,6 +311,35 @@ def event_detail(event_key: EventKey) -> Response:
         for component, tsm in event.coprs.items():
             copr_leaders[component] = sort_and_limit_stats(tsm)
 
+    # Build Component OPR CSV
+    # Format: team_number, component1, component2, ...
+    # Filter out all-zero components
+    copr_csv = ""
+    if event.coprs is not None:
+        all_coprs = dict(event.coprs)
+        if event.matchstats is not None:
+            oprs_dict = event.matchstats.get("oprs") or {}
+            if oprs_dict:
+                all_coprs = {"OPR": oprs_dict, **all_coprs}
+        component_names = [
+            k for k, tsm in all_coprs.items() if any(v != 0 for v in tsm.values())
+        ]
+        if component_names:
+            # Gather all team keys across all components, sorted by team number
+            all_team_keys = sorted(
+                {tk for tsm in all_coprs.values() for tk in tsm},
+                key=lambda tk: (int(re.sub(r"[^0-9]", "", tk)), tk),
+            )
+            copr_rows = []
+            for team_key in all_team_keys:
+                row: OrderedDict = OrderedDict()
+                row["team_number"] = team_key.replace("frc", "")
+                for component in component_names:
+                    value = all_coprs[component].get(team_key, 0.0)
+                    row[component] = round(value * 100) / 100
+                copr_rows.append(row)
+            copr_csv = dicts_to_csv(copr_rows)
+
     # Container for (component, componentValidHtmlId, and componentHumanReadableName) elements
     copr_items: List[Tuple[Component, str, str]] = [
         (k, re.sub("[^0-9a-zA-Z]+", "_", k), convert_component_name(k))
@@ -430,6 +459,7 @@ def event_detail(event_key: EventKey) -> Response:
         "team_list_csv": team_list_csv,
         "schedule_csv": schedule_csv,
         "flat_schedule_csv": flat_schedule_csv,
+        "copr_csv": copr_csv,
     }
 
     return make_cached_response(

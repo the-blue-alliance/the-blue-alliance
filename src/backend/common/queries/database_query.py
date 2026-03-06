@@ -4,7 +4,6 @@ import abc
 import logging
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
-from google.appengine.api.datastore_errors import BadRequestError
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -134,7 +133,7 @@ class CachedDatabaseQuery(
                         yield CachedQueryResult(
                             id=cache_key, result=query_result
                         ).put_async()
-                    except BadRequestError as e:
+                    except Exception as e:
                         logging.warning(
                             f"CachedQueryResult.put_async() failed: {cache_key}"
                         )
@@ -166,8 +165,10 @@ class CachedDatabaseQuery(
                         yield CachedQueryResult(
                             id=cache_key, result_dict=converted_result
                         ).put_async()
-                    except BadRequestError as e:
-                        logging.warning("CachedQueryResult.put_async() failed!")
+                    except Exception as e:
+                        logging.warning(
+                            f"CachedQueryResult.put_async() failed: {cache_key}"
+                        )
                         logging.exception(e)
                 return converted_result
             return cached_query_result.result_dict
