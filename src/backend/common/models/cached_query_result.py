@@ -1,8 +1,6 @@
-import io
 import logging
 import pickle
 import traceback
-import zlib
 from typing import Any
 
 from google.appengine.ext import ndb

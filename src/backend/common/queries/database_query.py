@@ -23,7 +23,8 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
         self._query_args = kwargs
 
     @abc.abstractmethod
-    def _query_async(self) -> TypedFuture[QueryReturn]: ...
+    def _query_async(self) -> TypedFuture[QueryReturn]:
+        ...
 
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
