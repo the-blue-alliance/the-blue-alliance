@@ -438,6 +438,12 @@ jobs:
             -v "${{ github.workspace }}:/tba" \
             -v tba-node-modules:/tba/node_modules \
             -p 8080:8080 \
+            -p 4000:4000 \
+            -p 4400:4400 \
+            -p 4500:4500 \
+            -p 9000:9000 \
+            -p 9005:9005 \
+            -p 9099:9099 \
             --workdir /tba \
             localhost:5000/tba-py3-dev:latest \
             bash -c "./ops/dev/vagrant/bootstrap-dev-container.sh && ./ops/dev/vagrant/start-devserver.sh && sleep infinity"
