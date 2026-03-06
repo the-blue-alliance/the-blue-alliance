@@ -48,14 +48,17 @@ class CachedModel(ndb.Model):
         # constructors, so make sure we have a common set of properties defined
         self._fix_up_properties()
 
-    def _validate_required_properties(self) -> None:
+    def _validate_required_properties(self) -> bool:
         """
         Validates that all required properties on the model are set.
         Logs an error with stack trace and model key if validation fails.
+
+        Returns True when one or more required properties are missing,
+        otherwise False.
         """
         # Skip validation if model doesn't have _properties attribute
         if not hasattr(self, "_properties"):
-            return
+            return False
 
         missing_properties: List[str] = []
 
@@ -78,6 +81,9 @@ class CachedModel(ndb.Model):
                 f"Model key: {model_key}\n"
                 f"Stack trace:\n{stack_trace}"
             )
+            return True
+
+        return False
 
     def _pre_put_hook(self) -> None:
         """

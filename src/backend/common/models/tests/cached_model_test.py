@@ -22,9 +22,10 @@ def test_validate_required_properties_all_set(ndb_stub, caplog) -> None:
             required_prop="value",
             required_int=42,
         )
-        model._validate_required_properties()
+        has_missing_required_properties = model._validate_required_properties()
 
     # No errors should be logged
+    assert has_missing_required_properties is False
     assert len(caplog.records) == 0
 
 
@@ -33,9 +34,10 @@ def test_validate_required_properties_missing(ndb_stub, caplog) -> None:
     with caplog.at_level(logging.ERROR):
         model = DummyModelWithRequiredProps(id="test_model", required_prop="value")
         # required_int is not set (None)
-        model._validate_required_properties()
+        has_missing_required_properties = model._validate_required_properties()
 
     # Should log an error for missing required_int
+    assert has_missing_required_properties is True
     assert len(caplog.records) == 1
     error_message = caplog.records[0].message
     assert "Required properties not set" in error_message
@@ -50,9 +52,10 @@ def test_validate_required_properties_multiple_missing(ndb_stub, caplog) -> None
     with caplog.at_level(logging.ERROR):
         model = DummyModelWithRequiredProps(id="test_model")
         # Both required_prop and required_int are not set
-        model._validate_required_properties()
+        has_missing_required_properties = model._validate_required_properties()
 
     # Should log an error listing both missing properties
+    assert has_missing_required_properties is True
     assert len(caplog.records) == 1
     error_message = caplog.records[0].message
     assert "Required properties not set" in error_message
@@ -139,9 +142,10 @@ def test_validation_with_no_key(ndb_stub, caplog) -> None:
     """Test validation works even when model has no key (unsaved)."""
     with caplog.at_level(logging.ERROR):
         model = DummyModelWithRequiredProps(required_prop="value")
-        model._validate_required_properties()
+        has_missing_required_properties = model._validate_required_properties()
 
     # Should log error with "No key (unsaved model)"
+    assert has_missing_required_properties is True
     assert len(caplog.records) == 1
     error_message = caplog.records[0].message
     assert "No key (unsaved model)" in error_message
