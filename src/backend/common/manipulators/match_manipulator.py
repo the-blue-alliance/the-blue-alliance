@@ -64,7 +64,10 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     affected_stats_events: List[Event] = []
 
     for updated_model in updated_models:
-        event_key: EventKey = none_throws(updated_model.model.event.string_id())
+        # Match keys are formatted as "{event_key}_{match_type}{match_number}"
+        event_key: EventKey = none_throws(updated_model.model.key.string_id()).split(
+            "_"
+        )[0]
         MatchPostUpdateHooks.firebase_update(updated_model)
 
         # Only attrs that affect stats

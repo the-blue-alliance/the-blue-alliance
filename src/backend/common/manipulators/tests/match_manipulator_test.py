@@ -242,6 +242,42 @@ def test_updateHook_taskqueueThrows(
         run_from_task(task)
 
 
+def test_updateHook_enqueueStats_event_key_from_match_key(
+    ndb_context, taskqueue_stub
+) -> None:
+    # Verify that event key is derived from match key by splitting on '_',
+    # not from the match's event KeyProperty reference.
+    Event(
+        id="2023miket",
+        event_short="miket",
+        year=2023,
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    test_match = Match(
+        id="2023miket_qm5",
+        alliances_json="""{"blue": {"score": 30, "teams": ["frc1", "frc2", "frc3"]}, "red": {"score": 40, "teams": ["frc4", "frc5", "frc6"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2023miket"),
+        year=2023,
+        set_number=1,
+        match_number=5,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        run_from_task(task)
+
+    stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="stats")
+    assert len(stats_tasks) > 0
+
+    tasks_urls = [t.url for t in stats_tasks]
+    assert "/tasks/math/do/district_points_calc/2023miket" in tasks_urls
+    assert "/tasks/math/do/event_team_status/2023miket" in tasks_urls
+    assert "/tasks/math/do/playoff_advancement_update/2023miket" in tasks_urls
+
+
 def test_updateHook_enqueueStats(ndb_context, taskqueue_stub) -> None:
     Event(
         id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
