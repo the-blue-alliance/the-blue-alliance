@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import Any, Dict, List, Optional
 
@@ -156,17 +157,44 @@ def _get_storage_files(
             filename = file_path.split("/")[-1]
 
             # Extract timestamp from filename
-            # Two formats:
+            # Multiple formats:
             # 1. FRC API: "2020-03-15 10:30:00.json" -> timestamp is basename without extension
             # 2. FMS Reports: "team_list.2020-03-14T08:00:00.xlsx" -> timestamp is middle part
-            parts = filename.split(".")
-            if len(parts) >= 3:
-                # FMS format: name.timestamp.extension
-                # timestamp is everything between first and last part
-                timestamp = ".".join(parts[1:-1])
+            # 3. Trusted API: "2026-03-06T04:20:21.968325+00:00.json" -> ISO 8601 timestamp
+
+            # First, remove the extension
+            name_without_ext = os.path.splitext(filename)[0]
+
+            # Check if it contains a period (could be FMS format or ISO with microseconds)
+            if "." in name_without_ext:
+                # Try parsing as ISO 8601 first (Trusted API format)
+                try:
+                    dt = datetime.datetime.fromisoformat(name_without_ext)
+                    timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
+                except (ValueError, AttributeError):
+                    # Not ISO format, assume FMS format: name.timestamp
+                    parts = name_without_ext.split(".")
+                    if len(parts) >= 2:
+                        # FMS format: take everything after the first part
+                        raw_timestamp = ".".join(parts[1:])
+                        # Try to parse and format it
+                        try:
+                            dt = datetime.datetime.fromisoformat(raw_timestamp)
+                            timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
+                        except (ValueError, AttributeError):
+                            timestamp = raw_timestamp
+                    else:
+                        timestamp = name_without_ext
             else:
-                # FRC API format: timestamp.extension
-                timestamp = os.path.splitext(filename)[0]
+                # FRC API format: timestamp without extension
+                # Try to parse "2020-03-15 10:30:00" format
+                try:
+                    dt = datetime.datetime.strptime(
+                        name_without_ext, "%Y-%m-%d %H:%M:%S"
+                    )
+                    timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
+                except (ValueError, AttributeError):
+                    timestamp = name_without_ext
 
             # Generate URL based on environment
             if Environment.is_dev():
