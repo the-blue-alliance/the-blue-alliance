@@ -413,6 +413,10 @@ class ContributionCalculator:
                     means[color] = score_breakdown[color]["teleopCoralCount"]
                 elif self._stat == "barge_points":
                     means[color] = score_breakdown[color]["endGameBargePoints"]
+                elif self._stat == "totalAutoPoints":
+                    means[color] = score_breakdown[color]["totalAutoPoints"]
+                elif self._stat == "totalTeleopPoints":
+                    means[color] = score_breakdown[color]["totalTeleopPoints"]
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -867,6 +871,12 @@ class PredictionHelper:
                 ("auto_coral_scored", 0, 2**2),
                 ("coral_scored", 0, 10**2),
                 ("barge_points", 0, 10**2),
+            ]
+        elif event.year == 2026:
+            relevant_stats = [
+                ("score", 0, 20**2),
+                ("totalAutoPoints", 0, 10**2),
+                ("totalTeleopPoints", 0, 10**2),
             ]
         else:
             relevant_stats = []
