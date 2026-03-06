@@ -17,10 +17,4 @@ class FavoriteQuery(DatabaseQuery[List[Favorite], None]):
         self, account: Account, keys_only: bool = False
     ) -> Generator[Any, Any, List[Favorite]]:
         favorite_query = Favorite.query(ancestor=account.key)
-        return (
-            yield (
-                favorite_query.fetch_async(
-                    keys_only=keys_only, use_cache=False, use_memcache=False
-                )
-            )
-        )
+        return (yield (favorite_query.fetch_async(keys_only=keys_only)))

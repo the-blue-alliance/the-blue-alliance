@@ -28,7 +28,7 @@ class EventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.event == ndb.Key(Event, event_key)
-        ).fetch_async(use_cache=False, use_memcache=False)
+        ).fetch_async()
         return awards
 
 
@@ -44,7 +44,7 @@ class TeamAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key)
-        ).fetch_async(use_cache=False, use_memcache=False)
+        ).fetch_async()
         return awards
 
 
@@ -62,7 +62,7 @@ class TeamYearAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     ) -> Generator[Any, Any, List[Award]]:
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key), Award.year == year
-        ).fetch_async(use_cache=False, use_memcache=False)
+        ).fetch_async()
         return awards
 
 
@@ -81,7 +81,7 @@ class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         awards = yield Award.query(
             Award.team_list == ndb.Key(Team, team_key),
             Award.event == ndb.Key(Event, event_key),
-        ).fetch_async(use_cache=False, use_memcache=False)
+        ).fetch_async()
         return awards
 
 
@@ -107,5 +107,5 @@ class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]
             Award.team_list == ndb.Key(Team, team_key),
             Award.event_type_enum == event_type,
             Award.award_type_enum == award_type,
-        ).fetch_async(use_cache=False, use_memcache=False)
+        ).fetch_async()
         return awards

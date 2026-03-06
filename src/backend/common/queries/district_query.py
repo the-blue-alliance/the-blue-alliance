@@ -29,11 +29,7 @@ class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDic
     ) -> Generator[Any, Any, Optional[District]]:
         # Fetch all equivalent keys
         keys = RenamedDistricts.get_equivalent_keys(district_key)
-        districts = yield ndb.get_multi_async(
-            [ndb.Key(District, key) for key in keys],
-            use_cache=False,
-            use_memcache=False,
-        )
+        districts = yield ndb.get_multi_async([ndb.Key(District, key) for key in keys])
         for district in districts:
             if district:
                 # Return first key that exists
@@ -52,11 +48,9 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict
     @typed_tasklet
     def _query_async(self, year: Year) -> Generator[Any, Any, List[District]]:
         district_keys = yield District.query(District.year == year).fetch_async(
-            keys_only=True, use_cache=False, use_memcache=False
+            keys_only=True
         )
-        districts = yield ndb.get_multi_async(
-            district_keys, use_cache=False, use_memcache=False
-        )
+        districts = yield ndb.get_multi_async(district_keys)
         return list(districts)
 
 
@@ -76,10 +70,8 @@ class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict
             District.abbreviation.IN(
                 RenamedDistricts.get_equivalent_codes(abbreviation)
             )
-        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
-        districts = yield ndb.get_multi_async(
-            district_keys, use_cache=False, use_memcache=False
-        )
+        ).fetch_async(keys_only=True)
+        districts = yield ndb.get_multi_async(district_keys)
         return list(districts)
 
 
@@ -95,11 +87,9 @@ class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]
     def _query_async(self, team_key: TeamKey) -> Generator[Any, Any, List[District]]:
         district_team_keys = yield DistrictTeam.query(
             DistrictTeam.team == ndb.Key(Team, team_key)
-        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
+        ).fetch_async(keys_only=True)
         districts = yield ndb.get_multi_async(
-            [ndb.Key(District, dtk.id().split("_")[0]) for dtk in district_team_keys],
-            use_cache=False,
-            use_memcache=False,
+            [ndb.Key(District, dtk.id().split("_")[0]) for dtk in district_team_keys]
         )
         return list(filter(lambda x: x is not None, districts))
 
@@ -122,9 +112,7 @@ class DistrictAbbreviationQuery(
 
         district_keys = yield District.query(
             District.abbreviation.IN(all_abbreviations)
-        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
-        districts = yield ndb.get_multi_async(
-            district_keys, use_cache=False, use_memcache=False
-        )
+        ).fetch_async(keys_only=True)
+        districts = yield ndb.get_multi_async(district_keys)
 
         return list(sorted(districts, key=lambda x: x.year))

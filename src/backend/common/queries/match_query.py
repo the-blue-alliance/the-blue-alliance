@@ -40,7 +40,7 @@ class EventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Match]]:
         matches = yield Match.query(
             Match.event == ndb.Key(Event, event_key)
-        ).fetch_async(use_cache=False, use_memcache=False)
+        ).fetch_async()
         return matches
 
 
@@ -58,10 +58,8 @@ class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     ) -> Generator[Any, Any, List[Match]]:
         match_keys = yield Match.query(
             Match.team_key_names == team_key, Match.event == ndb.Key(Event, event_key)
-        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
-        matches = yield ndb.get_multi_async(
-            match_keys, use_cache=False, use_memcache=False
-        )
+        ).fetch_async(keys_only=True)
+        matches = yield ndb.get_multi_async(match_keys)
         return list(filter(None, matches))
 
 
@@ -79,8 +77,6 @@ class TeamYearMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     ) -> Generator[Any, Any, List[Match]]:
         match_keys = yield Match.query(
             Match.team_key_names == team_key, Match.year == year
-        ).fetch_async(keys_only=True, use_cache=False, use_memcache=False)
-        matches = yield ndb.get_multi_async(
-            match_keys, use_cache=False, use_memcache=False
-        )
+        ).fetch_async(keys_only=True)
+        matches = yield ndb.get_multi_async(match_keys)
         return list(filter(None, matches))
