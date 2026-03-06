@@ -59,7 +59,8 @@ Vagrant.configure("2") do |config|
     else
       if ENV['TBA_LOCAL_DOCKERFILE'] != nil
         # We can build the docker container from the local Dockerfile
-        d.build_dir = "ops/dev/docker"
+        d.build_dir = "."
+        d.dockerfile = "ops/dev/docker/Dockerfile"
       else
         # But by deafult, run with a prebuilt container image because it's faster
         d.image = "ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest"

@@ -80,5 +80,24 @@ EXPOSE 9099
 EXPOSE 8000
 EXPOSE 8080-8089
 
+# Pre-install Python dependencies (layer cached until lockfiles change)
+# Build context must be the repo root (context: ./ with file: ops/dev/docker/Dockerfile).
+RUN python -m pip config set global.break-system-packages true \
+    && pip install --upgrade setuptools uv
+COPY pyproject.toml uv.lock /tmp/tba-deps/
+RUN cd /tmp/tba-deps \
+    && uv export --no-dev --no-hashes --frozen -o requirements.txt \
+    && pip install -r requirements.txt \
+    && rm -rf /tmp/tba-deps
+
+# Pre-install Node dependencies (layer cached until package-lock.json changes)
+COPY package.json package-lock.json /tmp/tba-node-deps/
+RUN . $NVM_DIR/nvm.sh \
+    && cd /tmp/tba-node-deps \
+    && npm ci \
+    && npm install -g firebase-tools \
+    && npm install -g uglify-js@3.17.4 \
+    && rm -rf /tmp/tba-node-deps
+
 # Start SSH server
 CMD ["/usr/sbin/sshd", "-D"]
