@@ -1,4 +1,4 @@
-import { Link, useRouter } from '@tanstack/react-router';
+import { Link, useLocation, useRouter } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 
 import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
@@ -17,6 +17,7 @@ import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 export function Navbar() {
   const [selected, setSelected] = useState<string>('');
   const router = useRouter();
+  const { pathname } = useLocation();
 
   useEffect(() => {
     const unsubscribe = router.subscribe('onBeforeNavigate', () => {
@@ -84,7 +85,7 @@ export function Navbar() {
                 </ul>
                 <ul className="flex items-center gap-2">
                   <a
-                    href="https://www.thebluealliance.com"
+                    href={`https://www.thebluealliance.com${pathname}`}
                     className="rounded-md px-2.5 py-2 text-xs font-medium
                       text-white hover:bg-black/20 hover:no-underline
                       max-sm:hidden"
