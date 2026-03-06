@@ -1,3 +1,4 @@
+import six
 from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 
@@ -11,6 +12,7 @@ def _drain_deferred(
     assert len(tasks) == 1
 
     task = tasks[0]
+    six.ensure_text(task.payload)
     run_from_task(task)
 
 

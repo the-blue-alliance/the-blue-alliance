@@ -19,7 +19,7 @@ _DEFAULT_URL = "/_ah/queue/deferred_encoded"
 
 def _serialize(obj: Any, *args, **kwargs) -> bytes:
     curried = _curry_callable(obj, *args, **kwargs)
-    return pickle.dumps(curried)
+    return pickle.dumps(curried, protocol=2)
 
 
 @ndb.tasklet
