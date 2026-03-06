@@ -1,6 +1,6 @@
 from json import JSONDecodeError
 
-from flask import Blueprint, make_response, Response
+from flask import Blueprint, make_response, request, Response
 from flask_cors import CORS
 
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
@@ -20,6 +20,7 @@ from backend.api.handlers.trusted import (
     update_teams,
 )
 from backend.common.datafeed_parsers.exceptions import ParserInputException
+from backend.common.helpers.trusted_api_logger import TrustedApiLogger
 
 # Trusted API
 trusted_api = Blueprint("trusted_api", __name__, url_prefix="/api/trusted/v1")
@@ -94,6 +95,13 @@ trusted_api.add_url_rule(
     methods=["POST"],
     view_func=add_match_zebra_motionworks_info,
 )
+
+
+@trusted_api.after_request
+def log_request_to_storage(response: Response) -> Response:
+    """Log successful trusted API requests to cloud storage for audit purposes."""
+    TrustedApiLogger.log_request(request, response)
+    return response
 
 
 @trusted_api.errorhandler(JSONDecodeError)
