@@ -39,7 +39,8 @@ export const Route = createFileRoute('/events/{-$year}')({
   beforeLoad: ({ params }) => {
     if (params.year !== undefined && Number.isNaN(Number(params.year))) {
       throw redirect({
-        to: `/district/${params.year}`,
+        to: '/district/$districtAbbreviation/{-$year}',
+        params: { districtAbbreviation: params.year },
       });
     }
   },
