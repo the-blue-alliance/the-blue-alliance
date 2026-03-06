@@ -77,7 +77,9 @@ class DummyCachedQuery(CachedDatabaseQuery[ManipulatorDummyModel, None]):
     DICT_CONVERTER = DummyConverter
 
     @ndb.tasklet
-    def _query_async(self, model_key: str) -> Generator[Any, Any, ManipulatorDummyModel]:
+    def _query_async(
+        self, model_key: str
+    ) -> Generator[Any, Any, ManipulatorDummyModel]:
         model = yield ManipulatorDummyModel.get_by_id_async(model_key)
         return model
 
@@ -219,7 +221,9 @@ def test_update_model(ndb_context, taskqueue_stub) -> None:
 def test_find_or_spawn_corrupt_old_model_treated_as_create(
     ndb_context, monkeypatch, taskqueue_stub
 ) -> None:
-    new_model = ManipulatorDummyModelWithRequiredProp(id="test", required_prop="new-value")
+    new_model = ManipulatorDummyModelWithRequiredProp(
+        id="test", required_prop="new-value"
+    )
     corrupt_old_model = ManipulatorDummyModelWithRequiredProp(id="test")
 
     monkeypatch.setattr(
