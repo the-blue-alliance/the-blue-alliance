@@ -92,6 +92,8 @@ RUN cd /tmp/tba-deps \
 
 # Pre-install Node dependencies (layer cached until package-lock.json changes)
 COPY package.json package-lock.json /tmp/tba-node-deps/
+# Copy local file dependencies referenced in package.json
+COPY src/frontend/lib/ /tmp/tba-node-deps/src/frontend/lib/
 RUN . $NVM_DIR/nvm.sh \
     && cd /tmp/tba-node-deps \
     && npm ci --legacy-peer-deps \
