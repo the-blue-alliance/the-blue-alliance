@@ -1,3 +1,5 @@
+import { match as tsMatch } from 'ts-pattern';
+
 import { Event, Match, MatchAlliance, WltRecord } from '~/api/tba/read';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { median } from '~/lib/utils';
@@ -122,46 +124,29 @@ export function getAllianceMatchResult(
   alliance: AllianceColor,
   recycleRushStrategy: RecycleRushWLTStrategy,
 ): 'win' | 'loss' | 'tie' | undefined {
-  // match not played or only partially scored
   if (!matchHasBeenPlayed(match)) {
     return undefined;
   }
 
-  // no winner listed
-  if (match.winning_alliance === '') {
-    // if it's been played, there's no winner, and it's not 2015, it's a tie
-    if (!match.key.startsWith('2015')) {
-      return 'tie';
-    }
-
-    // if it's been played, there's no winner, but it is 2015
-    if (recycleRushStrategy === 'official') {
-      return 'tie';
-    }
-
-    if (recycleRushStrategy === 'score-based') {
-      if (
-        (match.alliances.red.score > match.alliances.blue.score &&
-          alliance === 'red') ||
-        (match.alliances.blue.score > match.alliances.red.score &&
-          alliance === 'blue')
-      ) {
-        return 'win';
-      }
-      if (
-        (match.alliances.red.score < match.alliances.blue.score &&
-          alliance === 'red') ||
-        (match.alliances.blue.score < match.alliances.red.score &&
-          alliance === 'blue')
-      ) {
-        return 'loss';
-      }
-
-      return 'tie';
-    }
+  if (match.winning_alliance !== '') {
+    return match.winning_alliance === alliance ? 'win' : 'loss';
   }
 
-  return match.winning_alliance === alliance ? 'win' : 'loss';
+  const is2015 = match.key.startsWith('2015');
+  const scoreLeader: AllianceColor | 'tie' =
+    match.alliances.red.score > match.alliances.blue.score
+      ? 'red'
+      : match.alliances.blue.score > match.alliances.red.score
+        ? 'blue'
+        : 'tie';
+
+  return tsMatch({ is2015, recycleRushStrategy, scoreLeader })
+    .with({ is2015: false }, () => 'tie' as const)
+    .with({ recycleRushStrategy: 'official' }, () => 'tie' as const)
+    .with({ recycleRushStrategy: 'score-based' }, ({ scoreLeader: leader }) =>
+      leader === alliance ? 'win' : leader === 'tie' ? 'tie' : 'loss',
+    )
+    .exhaustive();
 }
 
 export function getTeamMatchResults(

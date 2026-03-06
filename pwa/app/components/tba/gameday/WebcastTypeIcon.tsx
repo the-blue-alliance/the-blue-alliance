@@ -1,3 +1,5 @@
+import { match } from 'ts-pattern';
+
 import MonitorPlayIcon from '~icons/lucide/monitor-play';
 import TwitchIcon from '~icons/simple-icons/twitch';
 import YouTubeIcon from '~icons/simple-icons/youtube';
@@ -12,14 +14,10 @@ export function WebcastTypeIcon({
   type: WebcastType;
   className?: string;
 }) {
-  switch (type) {
-    case 'youtube':
-      return <YouTubeIcon className={cn('text-red-600', className)} />;
-    case 'twitch':
-      return <TwitchIcon className={cn('text-purple-600', className)} />;
-    default:
-      return (
-        <MonitorPlayIcon className={cn('text-muted-foreground', className)} />
-      );
-  }
+  const [Icon, colorClass] = match(type)
+    .with('youtube', () => [YouTubeIcon, 'text-red-600'] as const)
+    .with('twitch', () => [TwitchIcon, 'text-purple-600'] as const)
+    .otherwise(() => [MonitorPlayIcon, 'text-muted-foreground'] as const);
+
+  return <Icon className={cn(colorClass, className)} />;
 }

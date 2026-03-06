@@ -1,3 +1,5 @@
+import { P, match } from 'ts-pattern';
+
 import LogosTwitch from '~icons/logos/twitch';
 import LogosYoutubeIcon from '~icons/logos/youtube-icon';
 import MdiVideoOutline from '~icons/mdi/video-outline';
@@ -38,65 +40,37 @@ export function MediaIcon({
   media: Media;
   className?: string;
 }) {
-  switch (media.type) {
-    case 'youtube':
-    case 'youtube-channel':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<LogosYoutubeIcon />}
-          href={`https://www.youtube.com/${media.foreign_key}`}
-          label={media.foreign_key}
-        />
-      );
-    case 'facebook-profile':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<SimpleIconsFacebook />}
-          href={`https://www.facebook.com/${media.foreign_key}`}
-          label={media.foreign_key}
-        />
-      );
-    case 'github-profile':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<SimpleIconsGithub />}
-          href={`https://github.com/${media.foreign_key}`}
-          label={media.foreign_key}
-        />
-      );
-    case 'instagram-profile':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<SimpleIconsInstagram />}
-          href={`https://www.instagram.com/${media.foreign_key}`}
-          label={media.foreign_key}
-        />
-      );
-    case 'twitter-profile':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<SimpleIconsX />}
-          href={`https://x.com/${media.foreign_key}`}
-          label={media.foreign_key}
-        />
-      );
-    case 'gitlab-profile':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<SimpleIconsGitlab />}
-          href={`https://gitlab.com/${media.foreign_key}`}
-          label={media.foreign_key}
-        />
-      );
-    default:
-      return null;
-  }
+  const props = match(media.type)
+    .with(P.union('youtube', 'youtube-channel'), () => ({
+      icon: <LogosYoutubeIcon />,
+      href: `https://www.youtube.com/${media.foreign_key}`,
+    }))
+    .with('facebook-profile', () => ({
+      icon: <SimpleIconsFacebook />,
+      href: `https://www.facebook.com/${media.foreign_key}`,
+    }))
+    .with('github-profile', () => ({
+      icon: <SimpleIconsGithub />,
+      href: `https://github.com/${media.foreign_key}`,
+    }))
+    .with('instagram-profile', () => ({
+      icon: <SimpleIconsInstagram />,
+      href: `https://www.instagram.com/${media.foreign_key}`,
+    }))
+    .with('twitter-profile', () => ({
+      icon: <SimpleIconsX />,
+      href: `https://x.com/${media.foreign_key}`,
+    }))
+    .with('gitlab-profile', () => ({
+      icon: <SimpleIconsGitlab />,
+      href: `https://gitlab.com/${media.foreign_key}`,
+    }))
+    .otherwise(() => null);
+
+  if (!props) return null;
+  return (
+    <MediaBadge className={className} {...props} label={media.foreign_key} />
+  );
 }
 
 export function WebcastIcon({
@@ -106,33 +80,22 @@ export function WebcastIcon({
   webcast: Webcast;
   className?: string;
 }) {
-  switch (webcast.type) {
-    case 'youtube':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<LogosYoutubeIcon />}
-          href={`https://www.youtube.com/watch?v=${webcast.channel}`}
-          label={webcast.channel}
-        />
-      );
-    case 'twitch':
-      return (
-        <MediaBadge
-          className={className}
-          icon={<LogosTwitch />}
-          href={`https://www.twitch.tv/${webcast.channel}`}
-          label={webcast.channel}
-        />
-      );
-    default:
-      return (
-        <MediaBadge
-          className={className}
-          icon={<MdiVideoOutline />}
-          href={'#'}
-          label={webcast.type}
-        />
-      );
-  }
+  const props = match(webcast.type)
+    .with('youtube', () => ({
+      icon: <LogosYoutubeIcon />,
+      href: `https://www.youtube.com/watch?v=${webcast.channel}`,
+      label: webcast.channel,
+    }))
+    .with('twitch', () => ({
+      icon: <LogosTwitch />,
+      href: `https://www.twitch.tv/${webcast.channel}`,
+      label: webcast.channel,
+    }))
+    .otherwise(() => ({
+      icon: <MdiVideoOutline />,
+      href: '#',
+      label: webcast.type,
+    }));
+
+  return <MediaBadge className={className} {...props} />;
 }
