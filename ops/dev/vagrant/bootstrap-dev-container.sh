@@ -10,7 +10,9 @@ mkdir -p /datastore
 python -m pip config set global.break-system-packages true
 pip install --upgrade setuptools uv
 uv export --no-dev --no-hashes --frozen -o src/requirements.txt
-pip install -r src/requirements.txt
+# --ignore-installed is needed because some system packages (e.g. pyparsing)
+# were installed via apt and lack pip metadata, causing uninstall errors.
+pip install --ignore-installed -r src/requirements.txt
 
 # Create empty keys file if one does not already exist
 if [ ! -f /tba/src/backend/web/static/javascript/tba_js/tba_keys.js ]; then
@@ -32,7 +34,7 @@ echo "Running npm install... this may take a while..."
 npm ci
 
 # Install the Firebase tools for the Firebase emulator
-command -v firebase > /dev/null 2>&1 || npm install -g firebase-tools
-command -v uglifyjs > /dev/null 2>&1 || npm install -g uglify-js@3.17.4
+command -v firebase >/dev/null 2>&1 || npm install -g firebase-tools
+command -v uglifyjs >/dev/null 2>&1 || npm install -g uglify-js@3.17.4
 
 ./ops/build/run_buildweb.sh
