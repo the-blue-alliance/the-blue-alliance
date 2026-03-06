@@ -94,7 +94,7 @@ RUN cd /tmp/tba-deps \
 COPY package.json package-lock.json /tmp/tba-node-deps/
 RUN . $NVM_DIR/nvm.sh \
     && cd /tmp/tba-node-deps \
-    && npm ci \
+    && npm ci --legacy-peer-deps \
     && npm install -g firebase-tools \
     && npm install -g uglify-js@3.17.4 \
     && rm -rf /tmp/tba-node-deps
