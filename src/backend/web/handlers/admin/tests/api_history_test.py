@@ -128,21 +128,21 @@ def test_api_history_with_files(
     # Check that Trusted API section header is present
     assert "Trusted API Request Logs" in content
 
-    # Check that timestamps are displayed for alliance files
-    assert "2020-03-15 12:45:00" in content
-    assert "2020-03-15 10:30:00" in content
+    # Check that timestamps are displayed for alliance files (formatted)
+    assert "2020-03-15 12:45:00 PM UTC" in content
+    assert "2020-03-15 10:30:00 AM UTC" in content
 
-    # Check that FMS report timestamps are displayed
-    assert "2020-03-14T08:00:00" in content
-    assert "2020-03-15T09:00:00" in content
+    # Check that FMS report timestamps are displayed (formatted)
+    assert "2020-03-14 08:00:00 AM UTC" in content
+    assert "2020-03-15 09:00:00 AM UTC" in content
 
-    # Check that Companion DB timestamps are displayed
-    assert "2020-03-15T14:30:00" in content
-    assert "2020-03-14T09:15:00" in content
+    # Check that Companion DB timestamps are displayed (formatted)
+    assert "2020-03-15 02:30:00 PM UTC" in content
+    assert "2020-03-14 09:15:00 AM UTC" in content
 
-    # Check that Trusted API timestamps are displayed
-    assert "2020-03-15T11:00:00.000000+00:00" in content
-    assert "2020-03-15T12:00:00.000000+00:00" in content
+    # Check that Trusted API timestamps are displayed (formatted)
+    assert "2020-03-15 11:00:00 AM UTC" in content
+    assert "2020-03-15 12:00:00 PM UTC" in content
 
     # Check that production GCS URLs are present
     assert (
@@ -201,8 +201,8 @@ def test_api_history_with_files_dev_server(
     # Check that section headers are present
     assert "Alliance Selection" in content
 
-    # Check that timestamps are displayed
-    assert "2020-03-15 10:30:00" in content
+    # Check that timestamps are displayed (formatted)
+    assert "2020-03-15 10:30:00 AM UTC" in content
 
     # Check that dev blobstore URLs are present (not production GCS URLs)
     assert "http://localhost:8000/blobstore/blob/" in content
