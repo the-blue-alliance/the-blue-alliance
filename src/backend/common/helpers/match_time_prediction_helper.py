@@ -227,10 +227,17 @@ class MatchTimePredictionHelper:
                 if i == 0:
                     write_logs = False
                 # Use predicted = scheduled once we exhaust all unplayed matches on this day or move to a new comp level
-                match.predicted_time = nexus_predicted_time or cls.as_utc(
-                    none_throws(cls.as_local(match.time, timezone))
-                    + first_unplayed_timedelta
-                )
+                # Only use nexus prediction if we have actual match data from the current day to calibrate against.
+                if average_cycle_time is not None:
+                    match.predicted_time = nexus_predicted_time or cls.as_utc(
+                        none_throws(cls.as_local(match.time, timezone))
+                        + first_unplayed_timedelta
+                    )
+                else:
+                    # When no matches have been played today, use just the scheduled time
+                    match.predicted_time = cls.as_utc(
+                        none_throws(cls.as_local(match.time, timezone))
+                    )
                 continue
 
             # For the first iteration, base the predictions off the newest known actual start time
@@ -254,11 +261,15 @@ class MatchTimePredictionHelper:
                     seconds=int(average_cycle_time)
                 )
             else:
-                # Shift predicted time by the amouont the first match is behind
-                predicted = (
-                    none_throws(cls.as_local(match.time, timezone))
-                    + first_unplayed_timedelta
-                )
+                # When no matches have been played today, use just the scheduled time
+                # Otherwise, shift predicted time by the amount the first match is behind
+                if average_cycle_time is not None:
+                    predicted = (
+                        none_throws(cls.as_local(match.time, timezone))
+                        + first_unplayed_timedelta
+                    )
+                else:
+                    predicted = none_throws(cls.as_local(match.time, timezone))
 
             # Never predict a match to happen more than 15 minutes ahead of schedule or in the past
             # Except for playoff matches, which we allow to be any amount early (since all schedule

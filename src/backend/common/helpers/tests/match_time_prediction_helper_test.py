@@ -111,8 +111,10 @@ def test_nexus_prediction_ignored_when_no_matches_played_today(
     }
 
     # Predict times with no matches played yet
+    # Use is_live=True to properly exercise the buggy code path where
+    # first_unplayed_timedelta is computed based on current time
     MatchTimePredictionHelper.predict_future_matches(
-        "2019nyny", [], matches, timezone, False, nexus_queue_info
+        "2019nyny", [], matches, timezone, True, nexus_queue_info
     )
 
     # The predicted time should equal the scheduled time (or very close to it),
