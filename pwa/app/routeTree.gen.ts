@@ -36,6 +36,7 @@ import { Route as AccountMytbaRouteImport } from './routes/account.mytba'
 import { Route as TeamTeamNumberChar123YearChar125RouteImport } from './routes/team.$teamNumber.{-$year}'
 import { Route as TeamTeamNumberStatsRouteImport } from './routes/team.$teamNumber.stats'
 import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNumber.history'
+import { Route as EventsDistrictAbbrevYearRouteImport } from './routes/events.$districtAbbrev_.$year'
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
 import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './routes/district.$districtAbbreviation.insights'
 
@@ -179,6 +180,12 @@ const TeamTeamNumberHistoryRoute = TeamTeamNumberHistoryRouteImport.update({
   path: '/team/$teamNumber/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const EventsDistrictAbbrevYearRoute =
+  EventsDistrictAbbrevYearRouteImport.update({
+    id: '/events/$districtAbbrev_/$year',
+    path: '/events/$districtAbbrev/$year',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DistrictDistrictAbbreviationChar123YearChar125Route =
   DistrictDistrictAbbreviationChar123YearChar125RouteImport.update({
     id: '/district/$districtAbbreviation/{-$year}',
@@ -219,6 +226,7 @@ export interface FileRoutesByFullPath {
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  '/events/$districtAbbrev/$year': typeof EventsDistrictAbbrevYearRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
@@ -250,6 +258,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  '/events/$districtAbbrev/$year': typeof EventsDistrictAbbrevYearRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
@@ -282,6 +291,7 @@ export interface FileRoutesById {
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  '/events/$districtAbbrev_/$year': typeof EventsDistrictAbbrevYearRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
@@ -315,6 +325,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
+    | '/events/$districtAbbrev/$year'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
@@ -346,6 +357,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
+    | '/events/$districtAbbrev/$year'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
@@ -377,6 +389,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/{-$year}'
+    | '/events/$districtAbbrev_/$year'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
@@ -408,6 +421,7 @@ export interface RootRouteChildren {
   AccountIndexRoute: typeof AccountIndexRoute
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
   DistrictDistrictAbbreviationChar123YearChar125Route: typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  EventsDistrictAbbrevYearRoute: typeof EventsDistrictAbbrevYearRoute
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
   TeamTeamNumberStatsRoute: typeof TeamTeamNumberStatsRoute
   TeamTeamNumberChar123YearChar125Route: typeof TeamTeamNumberChar123YearChar125Route
@@ -604,6 +618,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamTeamNumberHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/events/$districtAbbrev_/$year': {
+      id: '/events/$districtAbbrev_/$year'
+      path: '/events/$districtAbbrev/$year'
+      fullPath: '/events/$districtAbbrev/$year'
+      preLoaderRoute: typeof EventsDistrictAbbrevYearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/district/$districtAbbreviation/{-$year}': {
       id: '/district/$districtAbbreviation/{-$year}'
       path: '/district/$districtAbbreviation/{-$year}'
@@ -660,6 +681,7 @@ const rootRouteChildren: RootRouteChildren = {
     DistrictDistrictAbbreviationInsightsRoute,
   DistrictDistrictAbbreviationChar123YearChar125Route:
     DistrictDistrictAbbreviationChar123YearChar125Route,
+  EventsDistrictAbbrevYearRoute: EventsDistrictAbbrevYearRoute,
   TeamTeamNumberHistoryRoute: TeamTeamNumberHistoryRoute,
   TeamTeamNumberStatsRoute: TeamTeamNumberStatsRoute,
   TeamTeamNumberChar123YearChar125Route: TeamTeamNumberChar123YearChar125Route,
