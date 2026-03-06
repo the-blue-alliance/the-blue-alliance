@@ -29,7 +29,7 @@ while time.time() - start_time < TIME_LIMIT:
     not_started = MODULE_NAMES.difference(started)
     if not_started:
         print(f"Not started modules: {not_started}")
-        time.sleep(5)
+        time.sleep(2)
         continue
     print(f"Started modules: {started}")
 
@@ -43,7 +43,7 @@ while time.time() - start_time < TIME_LIMIT:
     )
     if not m:
         print("Webpack not compiled")
-        time.sleep(5)
+        time.sleep(2)
         continue
     print(m.group(0))
 
