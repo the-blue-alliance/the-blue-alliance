@@ -479,8 +479,8 @@ def test_postUpdateHook_webhook_notification_on_breakdown_update(
 def test_postUpdateHook_no_webhook_on_breakdown_when_not_push_sent(
     ndb_context, taskqueue_stub
 ) -> None:
-    """When score_breakdown_json changes but push_sent is False, only the normal
-    match_score notification should be sent (not a separate webhook-only one)."""
+    """When score_breakdown_json changes but push_sent is False, no match_score
+    push-notification task should be enqueued."""
     event = Event(
         id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
     )
