@@ -71,6 +71,7 @@ def event_details_post_update_hook(
             event
             and event.within_a_day
             and "alliance_selections" in updated_model.updated_attrs
+            and updated_model.model.alliance_selections
         ):
             # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:

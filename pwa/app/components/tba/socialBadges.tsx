@@ -1,10 +1,10 @@
-import LogosFacebook from '~icons/logos/facebook';
-import LogosGithubIcon from '~icons/logos/github-icon';
-import LogosGitlab from '~icons/logos/gitlab';
-import LogosInstagramIcon from '~icons/logos/instagram-icon';
 import LogosTwitch from '~icons/logos/twitch';
 import LogosYoutubeIcon from '~icons/logos/youtube-icon';
 import MdiVideoOutline from '~icons/mdi/video-outline';
+import SimpleIconsFacebook from '~icons/simple-icons/facebook';
+import SimpleIconsGithub from '~icons/simple-icons/github';
+import SimpleIconsGitlab from '~icons/simple-icons/gitlab';
+import SimpleIconsInstagram from '~icons/simple-icons/instagram';
 import SimpleIconsX from '~icons/simple-icons/x';
 
 import { Media, Webcast } from '~/api/tba/read';
@@ -53,7 +53,7 @@ export function MediaIcon({
       return (
         <MediaBadge
           className={className}
-          icon={<LogosFacebook />}
+          icon={<SimpleIconsFacebook />}
           href={`https://www.facebook.com/${media.foreign_key}`}
           label={media.foreign_key}
         />
@@ -62,7 +62,7 @@ export function MediaIcon({
       return (
         <MediaBadge
           className={className}
-          icon={<LogosGithubIcon />}
+          icon={<SimpleIconsGithub />}
           href={`https://github.com/${media.foreign_key}`}
           label={media.foreign_key}
         />
@@ -71,7 +71,7 @@ export function MediaIcon({
       return (
         <MediaBadge
           className={className}
-          icon={<LogosInstagramIcon />}
+          icon={<SimpleIconsInstagram />}
           href={`https://www.instagram.com/${media.foreign_key}`}
           label={media.foreign_key}
         />
@@ -89,7 +89,7 @@ export function MediaIcon({
       return (
         <MediaBadge
           className={className}
-          icon={<LogosGitlab />}
+          icon={<SimpleIconsGitlab />}
           href={`https://gitlab.com/${media.foreign_key}`}
           label={media.foreign_key}
         />

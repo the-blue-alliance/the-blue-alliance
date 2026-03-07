@@ -7,7 +7,7 @@ from backend.common.models.keys import TeamKey
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class NexusAPIPitLocationParser(ParserBase[Dict[TeamKey, EventTeamPitLocation]]):
+class NexusAPIPitLocationParser(ParserBase[JSON, Dict[TeamKey, EventTeamPitLocation]]):
 
     def parse(self, response: JSON) -> Dict[TeamKey, EventTeamPitLocation]:
         if response == "No pits." or not isinstance(response, dict):

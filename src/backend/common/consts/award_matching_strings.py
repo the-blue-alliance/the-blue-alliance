@@ -55,6 +55,7 @@ AWARD_MATCHING_STRINGS: List[Tuple[AwardType, Tuple[List[str], List[str]]]] = [
         (["excellence in design", "animation"], []),
     ),
     (AwardType.DEANS_LIST, (["dean", "list"], [])),
+    (AwardType.DEANS_LIST, (["first leadership"], [])),
     (AwardType.BART_KAMEN_MEMORIAL, (["bart", "kamen", "memorial"], [])),
     (
         AwardType.DRIVING_TOMORROWS_TECHNOLOGY,

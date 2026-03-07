@@ -298,6 +298,32 @@ def test_webcasts() -> None:
     assert event.has_first_official_webcast is True
 
 
+def test_webcasts_sorted_chronologically() -> None:
+    event = Event(
+        start_date=datetime(2026, 3, 3),
+        end_date=datetime(2026, 3, 5),
+        webcast_json=json.dumps(
+            [
+                {"type": "twitch", "channel": "day2_stream", "date": "2026-03-04"},
+                {"type": "twitch", "channel": "day3_stream", "date": "2026-03-05"},
+                {"type": "twitch", "channel": "day1_stream", "date": "2026-03-03"},
+                {"type": "twitch", "channel": "firstinspires", "date": "2026-03-05"},
+                {"type": "youtube", "channel": "all_days"},
+            ]
+        ),
+    )
+    webcasts = event.webcast
+    assert len(webcasts) == 5
+    # firstinspires sorts first regardless of date
+    assert webcasts[0]["channel"] == "firstinspires"
+    # Then by date ascending
+    assert webcasts[1]["channel"] == "day1_stream"
+    assert webcasts[2]["channel"] == "day2_stream"
+    assert webcasts[3]["channel"] == "day3_stream"
+    # No-date webcasts sort last
+    assert webcasts[4]["channel"] == "all_days"
+
+
 def test_linked_district() -> None:
     District(
         id="2019ne",

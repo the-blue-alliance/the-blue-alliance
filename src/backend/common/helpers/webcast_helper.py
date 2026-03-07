@@ -5,6 +5,7 @@ from typing import Any, Generator, Optional, Tuple
 from google.appengine.ext import ndb
 
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.frc_api.types import WebcastDetailModelExtV33
 from backend.common.models.webcast import Webcast
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchResult
@@ -15,6 +16,40 @@ class WebcastParser:
     YOUTUBE_URL_PATTERNS = ["youtube.com/", "youtu.be/"]
     USTREAM_URL_PATTERNS = ["ustream.tv/"]
     LIVESTREAM_URL_PATTERNS = ["livestream.com/"]
+
+    @classmethod
+    def webcast_dict_from_api_response(
+        cls, api_webcast: WebcastDetailModelExtV33
+    ) -> Optional[Webcast]:
+        webcast_type: WebcastType | None = None
+        channel: str | None = None
+
+        match api_webcast["provider"]:
+            case "Twitch":
+                webcast_type = WebcastType.TWITCH
+                channel = api_webcast["channel"]
+            case "Youtube":
+                webcast_type = WebcastType.YOUTUBE
+                channel = api_webcast["slug"]
+            case _:
+                pass
+
+        if not webcast_type:
+            logging.warning(f"Unknown webcast provider: {api_webcast['provider']}")
+            return None
+
+        if not channel:
+            logging.warning(f"Missing channel information for webcast: {api_webcast}")
+            return None
+
+        w = Webcast(
+            type=webcast_type,
+            channel=channel,
+        )
+        if date := api_webcast.get("date"):
+            w["date"] = date
+
+        return w
 
     @classmethod
     @typed_tasklet

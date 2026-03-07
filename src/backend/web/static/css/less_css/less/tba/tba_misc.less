@@ -22,14 +22,15 @@
   padding-left: 20px;
   background-repeat: no-repeat;
   background-position: left center;
+  background-size: 16px 16px;
 }
 
 .hashtag-twitter {
-  background-image: url('/images/icons/twitter-16x16.png');
+  background-image: url('/images/icons/x.svg');
 }
 
 .hashtag-youtube {
-  background-image: url('/images/icons/youtube-16x16.png');
+  background-image: url('/images/icons/youtube.svg');
 }
 
 .hashtag-cd {
@@ -41,23 +42,19 @@
 }
 
 .hashtag-facebook {
-  background-image: url('/images/icons/facebook-16x16.png');
+  background-image: url('/images/icons/facebook.svg');
 }
 
 .hashtag-github {
-  background-image: url('/images/icons/github-16x16.png');
+  background-image: url('/images/icons/github.svg');
 }
 
 .hashtag-instagram {
-  background-image: url('/images/icons/instagram-16x16.png');
-}
-
-.hashtag-periscope {
-  background-image: url('/images/icons/periscope-16x16.png');
+  background-image: url('/images/icons/instagram.svg');
 }
 
 .hashtag-gitlab {
-  background-image: url('/images/icons/gitlab-16x16.png');
+  background-image: url('/images/icons/gitlab.svg');
 }
 
 .image-atc {
@@ -81,3 +78,14 @@
 .hall-of-fame {
   color: @TBAyellowDarker;
 }
+
+.tba-spinner {
+  display: inline-block;
+  width: 16px;
+  height: 16px;
+  border: 2px solid rgba(0,0,0,0.3);
+  border-top-color: #333;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }

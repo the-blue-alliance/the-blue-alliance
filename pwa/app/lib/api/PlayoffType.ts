@@ -30,6 +30,14 @@ export enum PlayoffType {
   CUSTOM = 8,
 }
 
+export const TRADITIONAL_BRACKET_TYPES = new Set<number | null>([
+  null, // Legacy events without playoff_type
+  PlayoffType.BRACKET_8_TEAM,
+  PlayoffType.BRACKET_4_TEAM,
+  PlayoffType.BRACKET_16_TEAM,
+  PlayoffType.BRACKET_2_TEAM,
+]);
+
 export const DOUBLE_ELIM_ROUND_MAPPING = new Map<number, number>([
   [1, 1],
   [2, 1],

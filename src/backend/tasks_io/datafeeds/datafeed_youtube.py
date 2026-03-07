@@ -1,3 +1,5 @@
+from typing import Any
+
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
@@ -7,7 +9,7 @@ from backend.tasks_io.datafeeds.parsers.youtube.youtube_stream_stauts_parser imp
 )
 
 
-class YoutubeWebcastStatus(DatafeedBase[Webcast]):
+class YoutubeWebcastStatus(DatafeedBase[Any, Webcast]):
     def __init__(self, webcast: Webcast) -> None:
         super().__init__()
         self.api_key = GoogleApiSecret.secret_key()

@@ -137,15 +137,16 @@ def test_update_event_info(
     webcasts = event.webcast
     assert len(webcasts) == 2
 
+    # Webcasts with a date sort before no-date webcasts
     webcast = webcasts[0]
-    assert webcast["type"] == "youtube"
-    assert webcast["channel"] == "abc12312312"
-    assert "date" not in webcast
-
-    webcast = webcasts[1]
     assert webcast["type"] == "youtube"
     assert webcast["channel"] == "cde456"
     assert webcast["date"] == "2024-01-03"
+
+    webcast = webcasts[1]
+    assert webcast["type"] == "youtube"
+    assert webcast["channel"] == "abc12312312"
+    assert "date" not in webcast
 
     assert event.remap_teams == {
         "frc9323": "frc1323B",

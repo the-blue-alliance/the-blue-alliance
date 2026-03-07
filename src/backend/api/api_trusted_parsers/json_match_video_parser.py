@@ -1,8 +1,12 @@
+import re
+
 from pyre_extensions import safe_json
 
 from backend.common.datafeed_parsers.exceptions import ParserInputException
 from backend.common.models.keys import EventKey, MatchKey
 from backend.common.models.match import Match
+
+YOUTUBE_VIDEO_ID_PATTERN = re.compile(r"^[0-9A-Za-z\-_]{11}$")
 
 
 class JSONMatchVideoParser:
@@ -24,6 +28,16 @@ class JSONMatchVideoParser:
         ]
         if bad_match_ids:
             raise ParserInputException(f"Invalid match IDs provided: {bad_match_ids}")
+
+        bad_video_ids = [
+            video_id
+            for video_id in video_dict.values()
+            if not YOUTUBE_VIDEO_ID_PATTERN.match(video_id)
+        ]
+        if bad_video_ids:
+            raise ParserInputException(
+                f"Invalid YouTube video IDs provided: {bad_video_ids}"
+            )
 
         return {
             f"{event_key}_{match_partial}": video_id

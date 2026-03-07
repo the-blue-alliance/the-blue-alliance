@@ -15,6 +15,7 @@ from backend.common.consts.fms_report_type import (
     FMSReportType,
     REQUIRED_REPORT_PERMISSOINS,
 )
+from backend.common.logging import set_logging_context
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
@@ -89,6 +90,9 @@ class TrustedApiAuthHelper:
                     401,
                 ),
             )
+
+        # Add auth ID to logging context for searchability in logs
+        set_logging_context("api_auth_key", auth_id)
 
         auth_sig = request.headers.get("X-TBA-Auth-Sig")
         if not auth_sig:
@@ -191,9 +195,17 @@ class TrustedApiAuthHelper:
                 and event.year == datetime.datetime.now().year
             )
         ):
-            return "Only allowed to edit events: {}".format(
-                ", ".join(allowed_event_keys)
-            )
+            if auth.all_official_events:
+                if allowed_event_keys:
+                    return "Only allowed to edit events: all current-season official events, {}".format(
+                        ", ".join(allowed_event_keys)
+                    )
+                else:
+                    return "Only allowed to edit events: all current-season official events"
+            else:
+                return "Only allowed to edit events: {}".format(
+                    ", ".join(allowed_event_keys)
+                )
 
         missing_auths = required_auth_types.difference(set(auth.auth_types_enum))
         if missing_auths != set():

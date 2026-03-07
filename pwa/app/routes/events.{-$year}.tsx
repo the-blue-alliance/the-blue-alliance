@@ -3,7 +3,10 @@ import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 
 import { Event } from '~/api/tba/read';
-import { getEventsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import {
+  getDistrictsByYearOptions,
+  getEventsByYearOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import EventListTable from '~/components/tba/eventListTable';
 import {
   TableOfContents,
@@ -36,6 +39,9 @@ export const Route = createFileRoute('/events/{-$year}')({
 
     await Promise.all([
       queryClient.ensureQueryData(getEventsByYearOptions({ path: { year } })),
+      queryClient.ensureQueryData(
+        getDistrictsByYearOptions({ path: { year } }),
+      ),
     ]);
 
     return { year };
@@ -167,6 +173,9 @@ function YearEventsPage() {
   const { data: events } = useSuspenseQuery({
     ...getEventsByYearOptions({ path: { year } }),
   });
+  const { data: districts } = useSuspenseQuery({
+    ...getDistrictsByYearOptions({ path: { year } }),
+  });
   const validYears = useValidYears();
   const [inView, setInView] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
@@ -224,6 +233,34 @@ function YearEventsPage() {
                 {y}
               </SelectItem>
             ))}
+          </SelectContent>
+        </Select>
+        <Select
+          defaultValue="all"
+          onValueChange={(value) => {
+            if (value !== 'all') {
+              void navigate({ to: `/district/${value}/${year}` });
+            }
+          }}
+        >
+          <SelectTrigger
+            className="w-[180px] max-lg:h-6 max-lg:w-36 max-lg:border-none"
+          >
+            <SelectValue />
+          </SelectTrigger>
+          <SelectContent className="max-h-[70vh] overflow-y-auto">
+            <SelectItem value="all">All Events</SelectItem>
+            {districts
+              .slice()
+              .sort((a, b) => a.display_name.localeCompare(b.display_name))
+              .map((district) => (
+                <SelectItem
+                  key={district.abbreviation}
+                  value={district.abbreviation}
+                >
+                  {district.display_name}
+                </SelectItem>
+              ))}
           </SelectContent>
         </Select>
       </TableOfContents>

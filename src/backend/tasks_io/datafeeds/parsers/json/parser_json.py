@@ -6,7 +6,7 @@ from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 TParsedResponse = TypeVar("TParsedResponse")
 
 
-class ParserJSON(ParserBase[TParsedResponse]):
+class ParserJSON(ParserBase[Dict[str, Any], TParsedResponse]):
     """
     Provides a basic structure for parsing pages.
     Parsers are not allowed to return Model objects, only dictionaries.

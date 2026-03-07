@@ -12,7 +12,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Type Check
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make typecheck
@@ -22,7 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Format & Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make lint
@@ -35,12 +35,12 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -52,9 +52,9 @@ jobs:
     steps:
       - uses: actions/checkout@v6
       - name: Set up uv
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Download all artifacts
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
       - name: Combine coverage
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: |
@@ -217,12 +217,12 @@ jobs:
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Archive production artifacts (build)
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: pwa-build
           path: pwa/build
       - name: Archive production artifacts (server.js)
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: pwa-server
           path: pwa/server.js
@@ -352,7 +352,7 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: web-build
           path: src/build
@@ -471,7 +471,7 @@ jobs:
               - 'pyproject.toml'
       - name: Set up uv
         if: steps.changes.outputs.default == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.default == 'true'
         uses: google-github-actions/auth@v3
@@ -516,10 +516,10 @@ jobs:
               - 'pyproject.toml'
       - name: Set up uv
         if: steps.changes.outputs.web == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Download production artifacts
         if: steps.changes.outputs.web == 'true'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: web-build
           path: src/build
@@ -561,7 +561,7 @@ jobs:
               - 'pyproject.toml'
       - name: Set up uv
         if: steps.changes.outputs.api == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Update env_variables.yaml
         if: steps.changes.outputs.api == 'true'
         run: ./ops/deploy/update_env_variables_yaml.sh
@@ -600,7 +600,7 @@ jobs:
               - 'pyproject.toml'
       - name: Set up uv
         if: steps.changes.outputs.tasks-io == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-io == 'true'
         uses: google-github-actions/auth@v3
@@ -634,7 +634,7 @@ jobs:
               - 'pyproject.toml'
       - name: Set up uv
         if: steps.changes.outputs.tasks-cpu == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: google-github-actions/auth@v3
@@ -671,13 +671,13 @@ jobs:
               - 'pwa/**'
       - name: Download production artifacts (build)
         if: steps.changes.outputs.pwa == 'true'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: pwa-build
           path: pwa/build
       - name: Download production artifacts (server.js)
         if: steps.changes.outputs.pwa == 'true'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
         with:
           name: pwa-server
           path: pwa

@@ -73,6 +73,7 @@ export function Navbar() {
                           to={to}
                           params={params}
                           className="hover:no-underline"
+                          activeProps={{ className: 'bg-white/15' }}
                         >
                           <Icon className="text-inherit" />
                           <span>{title}</span>
@@ -82,6 +83,14 @@ export function Navbar() {
                   ))}
                 </ul>
                 <ul className="flex items-center gap-2">
+                  <a
+                    href="https://www.thebluealliance.com"
+                    className="rounded-md px-2.5 py-2 text-xs font-medium
+                      text-white hover:bg-black/20 hover:no-underline
+                      max-sm:hidden"
+                  >
+                    Leave beta
+                  </a>
                   <SearchModal />
                   <MobileMenu />
                 </ul>

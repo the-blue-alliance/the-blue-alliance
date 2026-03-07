@@ -3,12 +3,30 @@ import {
   type MutableRefObject,
   type RefObject,
   useEffect,
-  useMemo,
   useState,
 } from 'react';
 
 import { Match } from '~/api/tba/read';
-import { MatchLabel, SeriesResult } from '~/components/tba/eliminationBracket';
+
+type MatchResult = {
+  score: number;
+  won: boolean;
+};
+
+export interface SeriesResult {
+  redTeams: string[];
+  blueTeams: string[];
+  redAllianceNumber: number | null;
+  blueAllianceNumber: number | null;
+  redResults: MatchResult[];
+  blueResults: MatchResult[];
+  redWon: boolean;
+  blueWon: boolean;
+  matchRedTeams: string[];
+  matchBlueTeams: string[];
+}
+
+export type WinnerLink = { from: string; to: string };
 
 export type PlayoffMatchHandle = {
   card: HTMLDivElement | null;
@@ -34,56 +52,21 @@ const desaturatedColors = {
   blue: 'var(--color-blue-300)',
 };
 
-const winnerLinks: { from: MatchLabel; to: MatchLabel }[] = [
-  { from: 'Match 1', to: 'Match 7' },
-  { from: 'Match 2', to: 'Match 7' },
-  { from: 'Match 3', to: 'Match 8' },
-  { from: 'Match 4', to: 'Match 8' },
-  { from: 'Match 5', to: 'Match 10' },
-  { from: 'Match 6', to: 'Match 9' },
-  { from: 'Match 7', to: 'Match 11' },
-  { from: 'Match 8', to: 'Match 11' },
-  { from: 'Match 9', to: 'Match 12' },
-  { from: 'Match 10', to: 'Match 12' },
-  { from: 'Match 12', to: 'Match 13' },
-  { from: 'Match 13', to: 'Finals' },
-  { from: 'Match 11', to: 'Finals' },
-];
-
 export function useAdvancementPaths({
   containerRef,
   matchRefs,
-  matchesBySet,
-  finalsMatches,
+  winnerLinks,
+  matchLookup,
   getSeriesResult,
 }: {
   containerRef: RefObject<HTMLDivElement | null>;
   matchRefs: MutableRefObject<Record<string, PlayoffMatchHandle | null>>;
-  matchesBySet: Record<number, Match[]>;
-  finalsMatches: Match[];
+  winnerLinks: WinnerLink[];
+  matchLookup: Record<string, Match[] | undefined>;
   getSeriesResult: (matches: Match[] | undefined) => SeriesResult | null;
 }): { paths: AdvancementPath[]; svgSize: { width: number; height: number } } {
   const [paths, setPaths] = useState<AdvancementPath[]>([]);
   const [svgSize, setSvgSize] = useState({ width: 0, height: 0 });
-  const matchLookup: Record<MatchLabel, Match[] | undefined> = useMemo(
-    () => ({
-      'Match 1': matchesBySet[1],
-      'Match 2': matchesBySet[2],
-      'Match 3': matchesBySet[3],
-      'Match 4': matchesBySet[4],
-      'Match 5': matchesBySet[5],
-      'Match 6': matchesBySet[6],
-      'Match 7': matchesBySet[7],
-      'Match 8': matchesBySet[8],
-      'Match 9': matchesBySet[9],
-      'Match 10': matchesBySet[10],
-      'Match 11': matchesBySet[11],
-      'Match 12': matchesBySet[12],
-      'Match 13': matchesBySet[13],
-      Finals: finalsMatches,
-    }),
-    [matchesBySet, finalsMatches],
-  );
 
   useEffect(() => {
     const computePaths = () => {
@@ -152,7 +135,7 @@ export function useAdvancementPaths({
     handle();
     window.addEventListener('resize', handle);
     return () => window.removeEventListener('resize', handle);
-  }, [containerRef, matchRefs, matchLookup, getSeriesResult]);
+  }, [containerRef, matchRefs, winnerLinks, matchLookup, getSeriesResult]);
 
   return { paths, svgSize };
 }

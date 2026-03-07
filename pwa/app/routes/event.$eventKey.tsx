@@ -8,8 +8,9 @@ import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
 import StatbotIcon from '~icons/lucide/chart-spline';
-import WebsiteIcon from '~icons/lucide/globe';
+import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
+import DistrictPointsIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import InsightsIcon from '~icons/lucide/scatter-chart';
 import AwardsIcon from '~icons/lucide/trophy';
@@ -23,6 +24,7 @@ import {
   EliminationAlliance,
   Event,
   EventCoprs,
+  EventDistrictPoints,
   Match,
   Media,
   Team,
@@ -32,6 +34,7 @@ import {
   getEventAlliancesOptions,
   getEventAwardsOptions,
   getEventCoprsOptions,
+  getEventDistrictPointsOptions,
   getEventMatchesOptions,
   getEventOptions,
   getEventRankingsOptions,
@@ -43,9 +46,12 @@ import AwardRecipientLink from '~/components/tba/awardRecipientLink';
 import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
+import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
 import EliminationBracket from '~/components/tba/eliminationBracket';
+import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
+  DistrictLink,
   EventLocationLink,
   TeamLink,
   TeamLocationLink,
@@ -65,6 +71,7 @@ import {
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
 import TeamAvatar from '~/components/tba/teamAvatar';
+import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -99,8 +106,8 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
-import { PlayoffType } from '~/lib/api/PlayoffType';
+import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { PlayoffType, TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -114,11 +121,16 @@ import {
 } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
 import {
+  getDefaultAutoComponentName,
+  getDefaultTeleopComponentName,
+} from '~/lib/oprUtils';
+import {
   RANKING_POINT_LABELS,
   getBonusRankingPoints,
 } from '~/lib/rankingPoints';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
+  MODEL_TYPE,
   camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
@@ -170,14 +182,54 @@ export const Route = createFileRoute('/event/$eventKey')({
       };
     }
 
+    const event = loaderData.event;
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'SportsEvent',
+      name: `${event.name} ${event.year}`,
+      description: `${event.year} ${event.name} FIRST Robotics Competition`,
+      startDate: event.start_date,
+      endDate: event.end_date,
+      url: `https://www.thebluealliance.com/event/${event.key}`,
+      ...(event.lat &&
+        event.lng && {
+          location: {
+            '@type': 'Place',
+            name: event.location_name ?? event.name,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: event.city,
+              addressRegion: event.state_prov,
+              addressCountry: event.country,
+            },
+            geo: {
+              '@type': 'GeoCoordinates',
+              latitude: event.lat,
+              longitude: event.lng,
+            },
+          },
+        }),
+      organizer: {
+        '@type': 'Organization',
+        name: 'FIRST',
+        url: 'https://www.firstinspires.org',
+      },
+    };
+
     return {
       meta: [
         {
-          title: `${loaderData.event.name} (${loaderData.event.year}) - The Blue Alliance`,
+          title: `${event.name} (${event.year}) - The Blue Alliance`,
         },
         {
           name: 'description',
-          content: `Videos and match results for the ${loaderData.event.year} ${loaderData.event.name} FIRST Robotics Competition.`,
+          content: `Videos and match results for the ${event.year} ${event.name} FIRST Robotics Competition.`,
+        },
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(jsonLd),
         },
       ],
     };
@@ -226,6 +278,10 @@ function EventPage() {
     getEventTeamMediaOptions({ path: { event_key: eventKey } }),
   );
 
+  const districtPointsQuery = useQuery(
+    getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
+  );
+
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
     [matches],
@@ -237,11 +293,25 @@ function EventPage() {
 
   return (
     <div className="py-8">
-      <h1 className="mb-2 text-3xl font-medium">
-        {event.name} {event.year}
-      </h1>
+      <div className="mb-2 flex items-center gap-2">
+        <h1 className="text-3xl font-medium">
+          {event.name} {event.year}
+        </h1>
+        <FavoriteButton modelKey={eventKey} modelType={MODEL_TYPE.EVENT} />
+      </div>
 
       <div className="mb-4 space-y-1">
+        {event.district && (
+          <DetailEntity icon={<GlobeIcon />}>
+            <DistrictLink
+              districtAbbreviation={event.district.abbreviation}
+              year={event.district.year}
+            >
+              {event.district.display_name}
+            </DistrictLink>{' '}
+            Event
+          </DetailEntity>
+        )}
         <DetailEntity icon={<DateIcon />}>
           {getEventDateString(event, 'long')}
           {event.week !== null && (
@@ -254,7 +324,7 @@ function EventPage() {
           <EventLocationLink event={event} />
         </DetailEntity>
         {event.website && (
-          <DetailEntity icon={<WebsiteIcon />}>
+          <DetailEntity icon={<GlobeIcon />}>
             <a href={event.website} target="_blank" rel="noreferrer">
               View event&apos;s website
             </a>
@@ -344,6 +414,15 @@ function EventPage() {
                 </InlineIcon>
               </TabsTrigger>
             )}
+          {districtPointsQuery.data &&
+            DISTRICT_EVENT_TYPES.has(event.event_type) && (
+              <TabsTrigger value="district-points">
+                <InlineIcon>
+                  <DistrictPointsIcon />
+                  District Points
+                </InlineIcon>
+              </TabsTrigger>
+            )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MediaIcon />
@@ -402,11 +481,23 @@ function EventPage() {
                     : { teams: {} }
                 }
                 coprs={coprsQuery.data}
+                defaultXCopr={getDefaultTeleopComponentName(event.year)}
+                defaultYCopr={getDefaultAutoComponentName(event.year)}
               />
               <ComponentsTable coprs={coprsQuery.data} year={event.year} />
             </>
           )}
         </TabsContent>
+
+        {districtPointsQuery.data &&
+          DISTRICT_EVENT_TYPES.has(event.event_type) && (
+            <TabsContent value="district-points">
+              <DistrictPointsTab
+                districtPoints={districtPointsQuery.data}
+                year={event.year}
+              />
+            </TabsContent>
+          )}
 
         <TabsContent value="media">
           <MediaTab webcasts={event.webcasts} eventKey={event.key} />
@@ -463,9 +554,16 @@ function ResultsTab({
       />
     ) : null;
 
-  const showBracket =
+  const showDoubleElim8Bracket =
     alliances.length > 0 &&
     event.playoff_type === PlayoffType.DOUBLE_ELIM_8_TEAM;
+
+  const showDoubleElim4Bracket =
+    alliances.length > 0 &&
+    event.playoff_type === PlayoffType.DOUBLE_ELIM_4_TEAM;
+
+  const showTraditionalBracket =
+    alliances.length > 0 && TRADITIONAL_BRACKET_TYPES.has(event.playoff_type);
 
   const tocItems = [
     { slug: 'qual-matches', label: 'Qualification Matches' },
@@ -502,9 +600,29 @@ function ResultsTab({
         </div>
       </div>
 
-      {showBracket && (
+      {showDoubleElim8Bracket && (
         <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
           <EliminationBracket
+            alliances={alliances}
+            matches={elims}
+            event={event}
+          />
+        </TableOfContentsSection>
+      )}
+
+      {showDoubleElim4Bracket && (
+        <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
+          <DoubleElim4TeamBracket
+            alliances={alliances}
+            matches={elims}
+            event={event}
+          />
+        </TableOfContentsSection>
+      )}
+
+      {showTraditionalBracket && (
+        <TableOfContentsSection id="playoff-bracket" setInView={setInView}>
+          <TraditionalBracket
             alliances={alliances}
             matches={elims}
             event={event}
@@ -804,6 +922,66 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
       </Card>
     </div>
   );
+}
+
+function DistrictPointsTab({
+  districtPoints,
+  year,
+}: {
+  districtPoints: EventDistrictPoints;
+  year: number;
+}) {
+  const columns: ColumnDef<{
+    teamKey: string;
+    qualPoints: number;
+    elimPoints: number;
+    alliancePoints: number;
+    awardPoints: number;
+    total: number;
+  }>[] = [
+    {
+      header: 'Team',
+      accessorFn: (row) => row.teamKey,
+      cell: (cell) => (
+        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
+          {cell.getValue<string>().substring(3)}
+        </TeamLink>
+      ),
+    },
+    {
+      header: 'Qual',
+      accessorFn: (row) => row.qualPoints,
+    },
+    {
+      header: 'Elim',
+      accessorFn: (row) => row.elimPoints,
+    },
+    {
+      header: 'Alliance',
+      accessorFn: (row) => row.alliancePoints,
+    },
+    {
+      header: 'Award',
+      accessorFn: (row) => row.awardPoints,
+    },
+    {
+      header: 'Total',
+      accessorFn: (row) => row.total,
+    },
+  ];
+
+  const data = Object.entries(districtPoints.points)
+    .map(([teamKey, points]) => ({
+      teamKey,
+      qualPoints: points.qual_points,
+      elimPoints: points.elim_points,
+      alliancePoints: points.alliance_points,
+      awardPoints: points.award_points,
+      total: points.total,
+    }))
+    .sort((a, b) => b.total - a.total);
+
+  return <DataTable columns={columns} data={data} />;
 }
 
 function MediaTab({

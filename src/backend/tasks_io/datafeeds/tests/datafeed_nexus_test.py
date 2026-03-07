@@ -1,12 +1,13 @@
 import datetime
 import json
+import logging
 from typing import Any, Optional
 from unittest import mock
 
 import pytest
 
 from backend.common.consts.event_type import EventType
-from backend.common.futures import InstantFuture
+from backend.common.futures import FailedFuture, InstantFuture
 from backend.common.models.event import Event
 from backend.common.sitevars.nexus_api_secret import (
     ContentType as NexusAPISecretsContentType,
@@ -27,13 +28,13 @@ from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class DummyDatafeedNexus(_DatafeedNexus[Any]):
+class DummyDatafeedNexus(_DatafeedNexus[Any, Any]):
 
     def endpoint(self) -> str:
         return "/"
 
     def parser(self):
-        class DummyParser(ParserBase[Any]):
+        class DummyParser(ParserBase[Any, Any]):
             def parse(self, response):
                 return response
 
@@ -194,3 +195,23 @@ def test_get_event_queue_status_different_api_short(
 
     endpoint = NexusEventQueueStatus(e).endpoint()
     assert endpoint == "/event/2019test"
+
+
+@mock.patch.object(_DatafeedNexus, "_fetch")
+def test_fetch_exception_logs_warning(
+    fetch_mock: mock.Mock, ndb_stub, nexus_api_secrets, caplog
+) -> None:
+    from google.appengine.runtime.apiproxy_errors import ApplicationError
+
+    fetch_mock.return_value = FailedFuture(ApplicationError(8, "Deadline exceeded"))
+
+    df = DummyDatafeedNexus()
+    with caplog.at_level(logging.WARNING):
+        result = df.fetch_async().get_result()
+
+    assert result is None
+    our_records = [r for r in caplog.records if "datafeed_nexus" in r.pathname]
+    assert len(our_records) == 1
+    assert our_records[0].levelno == logging.WARNING
+    assert "Nexus datafeed fetch failed" in our_records[0].message
+    assert "Deadline exceeded" in our_records[0].message

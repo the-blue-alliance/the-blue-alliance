@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import Response
+from flask import abort, Response
 
 from backend.api.handlers.decorators import (
     api_authenticated,
@@ -62,6 +62,8 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
     track_call_after_response("team", team_key, model_type)
 
     team = TeamQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
+    if team is None:
+        abort(404)
     if model_type is not None:
         team = filter_team_properties([team], model_type)[0]
     return profiled_jsonify(team)
@@ -190,14 +192,17 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
         status = event_team.status
         if status is not None:
             status_strings = event_team.status_strings
-            status.update(
-                {
+            status_dict = status.copy()
+            status_dict.update(
+                {  # pyre-ignore[55]
                     "alliance_status_str": status_strings["alliance"],
                     "playoff_status_str": status_strings["playoff"],
                     "overall_status_str": status_strings["overall"],
                 }
             )
-        statuses[event_team.event.id()] = status
+            statuses[event_team.event.id()] = status_dict
+        else:
+            statuses[event_team.event.id()] = status
     return profiled_jsonify(statuses)
 
 

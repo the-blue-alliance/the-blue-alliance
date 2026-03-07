@@ -20,12 +20,14 @@
     <th>Description</th>
     <th>User</th>
     <th>X-TBA-Auth-Key</th>
+    <th>View Logs</th>
   </tr>
   {% for auth in auths %}
   <tr>
     <td><a href="/admin/api_auth/edit/{{auth.key.id()}}">{{ auth.description }}</a></td>
     <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id() }}">{{ auth.owner.id() }} {% endif %}</a></td>
     <td>{{auth.key.id()}}</td>
+    <td>{% if gcp_project_id %}<a href="https://console.cloud.google.com/logs/query;query=labels.api_key%3D%22{{auth.key.id()}}%22?project={{gcp_project_id}}" target="_blank" class="btn btn-sm btn-primary">View Logs</a>{% endif %}</td>
   </tr>
   {% endfor %}
 </table>
@@ -37,12 +39,14 @@
     <th>Description</th>
     <th>User</th>
     <th>X-TBA-Auth-Key</th>
+    <th>View Logs</th>
   </tr>
   {% for auth in auths %}
   <tr>
     <td><a href="/admin/api_auth/edit/{{auth.key.id() }}">{{ auth.description }}</a></td>
     <td>{% if auth.owner %}<a href="/admin/user/{{ auth.owner.id() }}">{{ auth.owner.id() }} {% endif %}</a></td>
     <td>{{auth.key.id()}}</td>
+    <td>{% if gcp_project_id %}<a href="https://console.cloud.google.com/logs/query;query=labels.api_key%3D%22{{auth.key.id()}}%22?project={{gcp_project_id}}" target="_blank" class="btn btn-sm btn-primary">View Logs</a>{% endif %}</td>
   </tr>
   {% endfor %}
 </table>

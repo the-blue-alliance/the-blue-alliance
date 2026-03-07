@@ -218,7 +218,8 @@ def get_team_info(resp_data: str) -> TeamInfo:
     home_cmp = soup.find(id="team-home-cmp")
     hof = soup.find(id="team-hof")
     district = soup.find(id="team-district")
-    district = district.find("a") if district else None
+    if district is not None and district.name != "a":
+        district = district.find("a")
     social_media = soup.find(id="team-social-media")
     social_media = (
         [

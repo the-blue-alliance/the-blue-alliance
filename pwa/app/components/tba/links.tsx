@@ -22,7 +22,7 @@ const TeamLink = forwardRef<
       year?: number;
     } & AnchorHTMLAttributes<HTMLAnchorElement>
   >
->(({ teamOrKey, year, ...props }, ref) => {
+>(({ teamOrKey, year, className, ...props }, ref) => {
   const teamNumber: string =
     typeof teamOrKey === 'string'
       ? removeNonNumeric(teamOrKey)
@@ -34,6 +34,7 @@ const TeamLink = forwardRef<
     <Link
       to="/team/$teamNumber/{-$year}"
       params={{ teamNumber, year: yearSuffix }}
+      className={className ?? 'text-foreground hover:underline'}
       {...props}
       ref={ref}
     />
@@ -171,4 +172,34 @@ const MatchLink = forwardRef<
 });
 MatchLink.displayName = 'MatchLink';
 
-export { EventLink, EventLocationLink, TeamLocationLink, MatchLink, TeamLink };
+const DistrictLink = forwardRef<
+  HTMLAnchorElement,
+  PropsWithChildren<
+    {
+      districtAbbreviation: string;
+      year?: number;
+    } & AnchorHTMLAttributes<HTMLAnchorElement>
+  >
+>(({ districtAbbreviation, year, ...props }, ref) => {
+  return (
+    <Link
+      to="/district/$districtAbbreviation/{-$year}"
+      params={{
+        districtAbbreviation,
+        year: year?.toString(),
+      }}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+DistrictLink.displayName = 'DistrictLink';
+
+export {
+  DistrictLink,
+  EventLink,
+  EventLocationLink,
+  MatchLink,
+  TeamLink,
+  TeamLocationLink,
+};

@@ -139,7 +139,7 @@ def test_bad_match_id(ndb_stub, api_client: Client) -> None:
     setup_auth(access_types=[AuthType.MATCH_VIDEO])
     setup_matches()
 
-    request_body = json.dumps({"qm1": "aFZy8iibMD0", "qm2": "abc123"})
+    request_body = json.dumps({"qm1": "aFZy8iibMD0", "qm2": "RpSgUrsghv4"})
     response = api_client.post(
         REQUEST_PATH,
         headers=get_auth_headers(REQUEST_PATH, request_body),

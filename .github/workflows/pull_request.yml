@@ -25,7 +25,7 @@ jobs:
               - 'uv.lock'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Type Check
         if: steps.changes.outputs.python == 'true'
         run: make typecheck
@@ -44,7 +44,7 @@ jobs:
               - 'uv.lock'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Format & Lint
         if: steps.changes.outputs.python == 'true'
         run: make lint
@@ -67,13 +67,13 @@ jobs:
               - '.test_durations'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Run Tests
         if: steps.changes.outputs.python == 'true'
         run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -95,10 +95,10 @@ jobs:
               - '.test_durations'
       - name: Set up uv
         if: steps.changes.outputs.python == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Download all artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/download-artifact@v7
+        uses: actions/download-artifact@v8
       - name: Combine coverage
         if: steps.changes.outputs.python == 'true'
         run: |
@@ -419,7 +419,7 @@ jobs:
         run: python ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v6.0.0
+        uses: actions/upload-artifact@v7.0.0
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle

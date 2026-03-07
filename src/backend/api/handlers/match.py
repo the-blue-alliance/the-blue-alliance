@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import Response
+from flask import abort, Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
@@ -26,6 +26,8 @@ def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Respon
     track_call_after_response("match", match_key, model_type)
 
     match = MatchQuery(match_key=match_key).fetch_dict(ApiMajorVersion.API_V3)
+    if match is None:
+        abort(404)
     if model_type is not None:
         match = filter_match_properties([match], model_type)[0]
     return profiled_jsonify(match)

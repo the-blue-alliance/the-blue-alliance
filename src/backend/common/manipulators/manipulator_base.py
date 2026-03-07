@@ -205,12 +205,32 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
     @classmethod
     def findOrSpawn(cls, new_models, auto_union=True, update_manual_attrs=True) -> Any:
         new_models = listify(new_models)
-        old_models = ndb.get_multi(
+        old_models: List[Optional[TModel]] = ndb.get_multi(
             [model.key for model in new_models], use_cache=False, use_memcache=False
         )
+
+        validated_old_models: List[Optional[TModel]] = []
+        for old_model in old_models:
+            if old_model is None:
+                validated_old_models.append(None)
+                continue
+
+            if old_model._validate_required_properties():
+                model_key = old_model.key.urlsafe() if old_model.key else "No key"
+                logging.error(
+                    "Corrupted model detected in findOrSpawn; treating existing model as missing. "
+                    "model_class=%s model_key=%s",
+                    old_model.__class__.__name__,
+                    model_key,
+                )
+                validated_old_models.append(None)
+                continue
+
+            validated_old_models.append(old_model)
+
         updated_models = [
             cls.updateMergeBase(new_model, old_model, auto_union, update_manual_attrs)
-            for (new_model, old_model) in zip(new_models, old_models)
+            for (new_model, old_model) in zip(new_models, validated_old_models)
         ]
         return delistify(updated_models)
 
