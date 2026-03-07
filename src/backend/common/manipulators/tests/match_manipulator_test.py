@@ -497,7 +497,7 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_not_push_sent(
     )
     test_match.put()
 
-    # Update with score breakdown AND alliances_json change
+    # Update with score breakdown only (alliances_json is unchanged)
     updated_match = Match(
         id="2012ct_qm1",
         alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
@@ -522,7 +522,6 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_not_push_sent(
         with patch.object(Event, "now", return_value=True):
             run_from_task(task)
 
-    # The alliances_json didn't change (same scores), so no match_score notification either
     # Only score_breakdown_json changed, and push_sent is False, so no webhook-only notification
     # There should be no push-notifications tasks
     named_tasks = taskqueue_stub.get_filtered_tasks(
