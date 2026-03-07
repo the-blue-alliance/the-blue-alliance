@@ -7,7 +7,9 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from backend.common.futures import InstantFuture
 from backend.common.helpers.youtube_video_helper import (
+    YouTubeChannel,
     YouTubePlaylistItem,
+    YouTubeUpcomingStream,
     YouTubeVideoHelper,
 )
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
@@ -311,6 +313,65 @@ def test_get_scheduled_start_time_success(ndb_context, mock_google_api_secret) -
     assert result == "2023-03-15"
 
 
+def test_resolve_channel_name_no_secret(ndb_context) -> None:
+    result = YouTubeVideoHelper.resolve_channel_name("FIRST in Michigan").get_result()
+    assert result is None
+
+
+def test_resolve_channel_name_api_error(ndb_context, mock_google_api_secret) -> None:
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        403,
+        "{}",
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.resolve_channel_name(
+            "FIRST in Michigan"
+        ).get_result()
+    assert result is None
+
+
+def test_resolve_channel_name_not_found(ndb_context, mock_google_api_secret) -> None:
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        '{"items": []}',
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.resolve_channel_name("does-not-exist").get_result()
+    assert result is None
+
+
+def test_resolve_channel_name_success(ndb_context, mock_google_api_secret) -> None:
+    api_resp = {
+        "items": [
+            {
+                "id": {"channelId": "UCjX4WSaAFPgM2PYr-6P"},
+                "snippet": {"title": "FIRST in Michigan"},
+            }
+        ]
+    }
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        json.dumps(api_resp),
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.resolve_channel_name(
+            "FIRST in Michigan"
+        ).get_result()
+    assert result == YouTubeChannel(
+        channel_id="UCjX4WSaAFPgM2PYr-6P",
+        channel_name="FIRST in Michigan",
+    )
+
+
 def test_get_playlist_videos_no_secret(ndb_context) -> None:
     with pytest.raises(
         Exception, match="No Google API secret, unable to resolve playlist"
@@ -413,4 +474,181 @@ def test_get_playlist_videos_paginate(ndb_context, mock_google_api_secret) -> No
         video_id="TMAY0d6kNLc",
         video_title="frc2020ctwat f1m2",
         guessed_match_partial="f1m2",
+    )
+
+
+def test_get_upcoming_streams_no_secret(ndb_context) -> None:
+    with pytest.raises(
+        Exception, match="No Google API secret, unable to fetch upcoming streams"
+    ):
+        YouTubeVideoHelper.get_upcoming_streams("UC_channel_id").get_result()
+
+
+def test_get_upcoming_streams_api_error(ndb_context, mock_google_api_secret) -> None:
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        403,
+        "{}",
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        with pytest.raises(
+            Exception, match="Unable to call Youtube API for upcoming streams"
+        ):
+            YouTubeVideoHelper.get_upcoming_streams("UC_channel_id").get_result()
+
+
+def test_get_upcoming_streams_empty(ndb_context, mock_google_api_secret) -> None:
+    api_resp = {"items": []}
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        json.dumps(api_resp),
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        streams = YouTubeVideoHelper.get_upcoming_streams("UC_channel_id").get_result()
+    assert streams == []
+
+
+def test_get_upcoming_streams_success(ndb_context, mock_google_api_secret) -> None:
+    search_resp = {
+        "items": [
+            {
+                "id": {"videoId": "abc123"},
+                "snippet": {
+                    "title": "Upcoming Stream 1",
+                },
+            },
+            {
+                "id": {"videoId": "def456"},
+                "snippet": {
+                    "title": "Upcoming Stream 2",
+                },
+            },
+        ]
+    }
+    videos_resp = {
+        "items": [
+            {
+                "id": "abc123",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2026-03-15T18:00:00Z",
+                },
+            },
+            {
+                "id": "def456",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2026-03-16T19:00:00Z",
+                },
+            },
+        ]
+    }
+
+    mock_search_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        json.dumps(search_resp),
+    )
+    mock_videos_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/videos",
+        200,
+        json.dumps(videos_resp),
+    )
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+        mock_urlfetch.side_effect = [
+            InstantFuture(mock_search_result),
+            InstantFuture(mock_videos_result),
+        ]
+        streams = YouTubeVideoHelper.get_upcoming_streams("UC_channel_id").get_result()
+
+    assert len(streams) == 2
+    assert streams[0] == YouTubeUpcomingStream(
+        stream_id="abc123",
+        title="Upcoming Stream 1",
+        scheduled_start_time="2026-03-15T18:00:00Z",
+    )
+    assert streams[1] == YouTubeUpcomingStream(
+        stream_id="def456",
+        title="Upcoming Stream 2",
+        scheduled_start_time="2026-03-16T19:00:00Z",
+    )
+
+
+def test_get_upcoming_streams_pagination(ndb_context, mock_google_api_secret) -> None:
+    search_resp1 = {
+        "items": [
+            {
+                "id": {"videoId": "stream1"},
+                "snippet": {
+                    "title": "Stream 1",
+                },
+            }
+        ],
+        "nextPageToken": "nextPage",
+    }
+    search_resp2 = {
+        "items": [
+            {
+                "id": {"videoId": "stream2"},
+                "snippet": {
+                    "title": "Stream 2",
+                },
+            }
+        ],
+    }
+    videos_resp = {
+        "items": [
+            {
+                "id": "stream1",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2026-03-15T18:00:00Z",
+                },
+            },
+            {
+                "id": "stream2",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2026-03-16T19:00:00Z",
+                },
+            },
+        ]
+    }
+
+    mock_search_result1 = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        json.dumps(search_resp1),
+    )
+    mock_search_result2 = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        json.dumps(search_resp2),
+    )
+    mock_videos_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/videos",
+        200,
+        json.dumps(videos_resp),
+    )
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+        mock_urlfetch.side_effect = [
+            InstantFuture(mock_search_result1),
+            InstantFuture(mock_search_result2),
+            InstantFuture(mock_videos_result),
+        ]
+        streams = YouTubeVideoHelper.get_upcoming_streams("UC_channel_id").get_result()
+
+    assert len(streams) == 2
+    assert streams[0] == YouTubeUpcomingStream(
+        stream_id="stream1",
+        title="Stream 1",
+        scheduled_start_time="2026-03-15T18:00:00Z",
+    )
+    assert streams[1] == YouTubeUpcomingStream(
+        stream_id="stream2",
+        title="Stream 2",
+        scheduled_start_time="2026-03-16T19:00:00Z",
     )

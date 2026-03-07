@@ -7,7 +7,7 @@ help:
 	@echo "  make test ARGS='...'            - Run tests with custom arguments"
 	@echo "  make test-inline                - Run staged/related tests only (pre-commit)"
 	@echo "  make lint                       - Check code formatting (black + flake8)"
-	@echo "  make lint ARGS='--fix'          - Auto-fix formatting with black, then run flake8"
+	@echo "  make lint-fix                   - Auto-fix formatting with black, then run flake8"
 	@echo "  make typecheck                  - Run pyre type checker"
 	@echo "  make lint-bash                  - Check bash script formatting (shellcheck + shfmt)"
 	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
@@ -58,6 +58,9 @@ endif
 # Use ARGS='--fix' to auto-fix formatting issues
 lint:
 	uv run --group lint ./ops/lint_py3.sh $(ARGS)
+
+lint-fix:
+	uv run --group lint ./ops/lint_py3.sh --fix
 
 # Run bash linter (shellcheck + shfmt)
 # Use ARGS='--fix' to auto-fix formatting issues

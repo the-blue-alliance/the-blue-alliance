@@ -1,6 +1,7 @@
 import datetime
 import json
-from typing import List, Optional
+import logging
+from typing import Dict, List, Optional
 
 import pytz
 from flask import abort, Blueprint, request, url_for
@@ -9,8 +10,10 @@ from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
 from backend.common.consts.nexus_match_status import NexusMatchStatus
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
+from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.match_time_prediction_helper import (
@@ -18,6 +21,7 @@ from backend.common.helpers.match_time_prediction_helper import (
 )
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -25,12 +29,15 @@ from backend.common.manipulators.event_team_manipulator import EventTeamManipula
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import EventKey, Year
+from backend.common.models.keys import DistrictKey, EventKey, Year
 from backend.common.models.match import Match
+from backend.common.models.webcast import Webcast
+from backend.common.queries.event_query import DistrictEventsQuery
 from backend.common.queries.match_query import EventMatchesQuery
 from backend.common.sitevars.apistatus_down_events import ApiStatusDownEvents
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
@@ -41,8 +48,48 @@ blueprint = Blueprint("live_events", __name__)
 
 @blueprint.route("/tasks/do/update_live_events")
 def update_live_events() -> str:
-    events, special_webcasts = LiveEventHelper.get_live_events_with_current_webcasts()
+    week_events = EventHelper.week_events()
+    events, special_webcasts = LiveEventHelper.get_live_events_with_current_webcasts(
+        week_events
+    )
     FirebasePusher.update_live_events(events, special_webcasts)
+
+    # Try to find webcasts for events that don't have webcasts yet
+    # Regionals (and some districts that use webcast units) will publish
+    # their webcast info in advance. However, other districts will not.
+    # Here, we will try to find their upcoming streams
+    districts_to_find = set()
+    districts_with_youtube_channels = {
+        district.key_name
+        for district in District.query(
+            District.year == datetime.datetime.now().year
+        ).fetch(200)
+        if any(
+            channel.get("type") == WebcastType.YOUTUBE
+            and bool(channel.get("channel_id"))
+            for channel in (district.webcast_channels or [])
+        )
+    }
+    for event in week_events:
+        if (
+            event.within_a_day
+            and (event_district_key := event.event_district_key)
+            and event_district_key in districts_with_youtube_channels
+            and not event.current_webcasts
+        ):
+            districts_to_find.add(event_district_key)
+
+    if districts_to_find:
+        for district_key in districts_to_find:
+            taskqueue.add(
+                url=url_for(
+                    "live_events.find_event_webcasts", district_key=district_key
+                ),
+                method="GET",
+                queue_name="default",
+                target="py3-tasks-io",
+            )
+
     return ""
 
 
@@ -320,6 +367,98 @@ def update_event_webcast_status(event_key: EventKey) -> Response:
 
     WebcastOnlineHelper.add_online_status(event.webcast)
     return make_response(f"Updated event webcasts: {event.webcast}")
+
+
+@blueprint.route("/tasks/do/find_event_webcasts/<district_key>")
+def find_event_webcasts(district_key: DistrictKey) -> Response:
+    district = District.get_by_id(district_key)
+    if district is None:
+        abort(400)
+
+    youtube_channel_info = next(
+        (
+            channel
+            for channel in (district.webcast_channels or [])
+            if channel.get("type") == WebcastType.YOUTUBE
+            and bool(channel.get("channel_id"))
+        ),
+        None,
+    )
+    if youtube_channel_info is None:
+        abort(400)
+
+    youtube_channel_id = youtube_channel_info["channel_id"]
+
+    # Fetch district events and upcoming streams in parallel
+    district_events_future = DistrictEventsQuery(district_key).fetch_async()
+    upcoming_streams_future = YouTubeVideoHelper.get_upcoming_streams(
+        youtube_channel_id
+    )
+
+    district_events = district_events_future.get_result()
+    upcoming_streams = upcoming_streams_future.get_result()
+
+    future_events_without_webcasts = [
+        event
+        for event in district_events
+        if event.within_a_day and not event.current_webcasts
+    ]
+    event_to_streams: Dict[str, List] = {}
+    for stream in upcoming_streams:
+        matched_events = [
+            e
+            for e in future_events_without_webcasts
+            if e.short_name and e.short_name in stream["title"]
+        ]
+        if len(matched_events) == 0:
+            logging.info(f"Did not find an event match for stream {stream}")
+            continue
+        if len(matched_events) > 1:
+            # If there are multiple matched events, we can't be sure which one it is, so skip
+            logging.info(
+                f"Multiple matched events for stream {stream['stream_id']}: {[e.key_name for e in matched_events]}"
+            )
+            continue
+
+        event_key = matched_events[0].key_name
+        if event_key not in event_to_streams:
+            event_to_streams[event_key] = []
+        event_to_streams[event_key].append((matched_events[0], stream))
+
+    discovered_webcasts: List[str] = []
+    for event_key, event_stream_pairs in event_to_streams.items():
+        streams = [stream for _, stream in event_stream_pairs]
+        event = event_stream_pairs[0][0]
+        # Fetch start times for all streams in parallel
+        start_time_futures = [
+            YouTubeVideoHelper.get_scheduled_start_time(stream["stream_id"])
+            for stream in streams
+        ]
+        start_times = [future.get_result() for future in start_time_futures]
+
+        for stream, start_time in zip(streams, start_times):
+            if not start_time:
+                logging.info(f"Could not find start time for stream {stream}, skipping")
+                continue
+
+            new_webcast = Webcast(
+                type=WebcastType.YOUTUBE,
+                channel=stream["stream_id"],
+                date=start_time,
+            )
+
+            EventWebcastAdder.add_webcast(event, new_webcast)
+            discovered_webcasts.append(
+                f"{event.key_name}: {stream['stream_id']} ({start_time})"
+            )
+
+    if "X-Appengine-Taskname" not in request.headers:
+        if discovered_webcasts:
+            discovered_webcasts_str = "\n".join(discovered_webcasts)
+            return make_response(f"Discovered webcasts:\n{discovered_webcasts_str}")
+        return make_response("Discovered webcasts: none")
+
+    return make_response("")
 
 
 @blueprint.route("/tasks/do/update_firebase_event/<event_key>")

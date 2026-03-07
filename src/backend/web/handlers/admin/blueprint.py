@@ -32,6 +32,7 @@ from backend.web.handlers.admin.cache import (
     clear_model_cache,
 )
 from backend.web.handlers.admin.districts import (
+    district_add_webcast_channel_post,
     district_create,
     district_delete,
     district_delete_post,
@@ -239,6 +240,11 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/district/edit/<district_key>", methods=["GET"], view_func=district_edit
+)
+admin_routes.add_url_rule(
+    "/district/<district_key>/webcasts/add",
+    methods=["POST"],
+    view_func=district_add_webcast_channel_post,
 )
 
 admin_routes.add_url_rule("/event/create", view_func=event_create, methods=["GET"])
