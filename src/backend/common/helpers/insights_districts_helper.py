@@ -292,11 +292,11 @@ class InsightsDistrictsHelper:
         )
 
 
-def get_state_or_country_if_international(team: Team) -> str:
-    if team.country not in ["USA", "Canada"]:
-        return team.country
+def get_state_or_country_if_international(team_or_event: Team | Event) -> str:
+    if team_or_event.country not in ["USA", "Canada"]:
+        return team_or_event.country
 
-    return state_short_code_to_full_name(team.state_prov)
+    return state_short_code_to_full_name(team_or_event.state_prov)
 
 
 def state_short_code_to_full_name(state_short_code: str) -> str:
