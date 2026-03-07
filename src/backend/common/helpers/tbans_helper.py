@@ -1,7 +1,6 @@
 import datetime
 import logging
 import time
-from typing import List, Optional
 
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
@@ -17,10 +16,39 @@ from backend.common.consts.notification_type import (
     NotificationType,
 )
 from backend.common.helpers.deferred import defer_safe
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
+from backend.common.models.notifications.alliance_selection import (
+    AllianceSelectionNotification,
+)
+from backend.common.models.notifications.awards import AwardsNotification
+from backend.common.models.notifications.broadcast import BroadcastNotification
+from backend.common.models.notifications.district_points import (
+    DistrictPointsNotification,
+)
+from backend.common.models.notifications.event_level import EventLevelNotification
+from backend.common.models.notifications.event_schedule import (
+    EventScheduleNotification,
+)
+from backend.common.models.notifications.match_score import MatchScoreNotification
+from backend.common.models.notifications.match_upcoming import (
+    MatchUpcomingNotification,
+)
+from backend.common.models.notifications.match_video import MatchVideoNotification
+from backend.common.models.notifications.mytba import (
+    FavoritesUpdatedNotification,
+    SubscriptionsUpdatedNotification,
+)
 from backend.common.models.notifications.notification import Notification
+from backend.common.models.notifications.ping import PingNotification
+from backend.common.models.notifications.requests.fcm_request import (
+    FCMRequest,
+    MAXIMUM_TOKENS,
+)
+from backend.common.models.notifications.requests.webhook_request import WebhookRequest
+from backend.common.models.notifications.verification import VerificationNotification
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
 from backend.common.queries.mobile_client_query import MobileClientQuery
@@ -51,11 +79,7 @@ class TBANSHelper:
     """
 
     @classmethod
-    def alliance_selection(cls, event: Event, user_id: Optional[str] = None) -> None:
-        from backend.common.models.notifications.alliance_selection import (
-            AllianceSelectionNotification,
-        )
-
+    def alliance_selection(cls, event: Event, user_id: str | None = None) -> None:
         # Send to Event subscribers
         event_subscriptions_future = None
         if NotificationType.ALLIANCE_SELECTION in ENABLED_EVENT_NOTIFICATIONS:
@@ -114,11 +138,7 @@ class TBANSHelper:
     """
 
     @classmethod
-    def awards(cls, event: Event, user_id: Optional[str] = None) -> None:
-        from backend.common.models.notifications.awards import (
-            AwardsNotification,
-        )
-
+    def awards(cls, event: Event, user_id: str | None = None) -> None:
         # Send to Event subscribers
         event_subscriptions_future = None
         if NotificationType.AWARDS in ENABLED_EVENT_NOTIFICATIONS:
@@ -166,16 +186,12 @@ class TBANSHelper:
     @classmethod
     def broadcast(
         cls,
-        client_types: List[ClientType],
+        client_types: list[ClientType],
         title: str,
         message: str,
-        url: Optional[str] = None,
-        app_version: Optional[str] = None,
+        url: str | None = None,
+        app_version: str | None = None,
     ):
-        from backend.common.models.notifications.broadcast import (
-            BroadcastNotification,
-        )
-
         notification = BroadcastNotification(title, message, url, app_version)
 
         # Send to FCM clients
@@ -197,11 +213,7 @@ class TBANSHelper:
                     cls._defer_webhook(client, notification)
 
     @classmethod
-    def event_level(cls, match: Match, user_id: Optional[str] = None) -> None:
-        from backend.common.models.notifications.event_level import (
-            EventLevelNotification,
-        )
-
+    def event_level(cls, match: Match, user_id: str | None = None) -> None:
         # Send to Event subscribers
         event_subscriptions_future = None
         if NotificationType.LEVEL_STARTING in ENABLED_EVENT_NOTIFICATIONS:
@@ -218,11 +230,7 @@ class TBANSHelper:
             )
 
     @classmethod
-    def event_schedule(cls, event: Event, user_id: Optional[str] = None) -> None:
-        from backend.common.models.notifications.event_schedule import (
-            EventScheduleNotification,
-        )
-
+    def event_schedule(cls, event: Event, user_id: str | None = None) -> None:
         # Send to Event subscribers
         event_subscriptions_future = None
         if NotificationType.SCHEDULE_UPDATED in ENABLED_EVENT_NOTIFICATIONS:
@@ -240,12 +248,8 @@ class TBANSHelper:
             )
 
     @classmethod
-    def match_score(cls, match: Match, user_id: Optional[str] = None) -> None:
+    def match_score(cls, match: Match, user_id: str | None = None) -> None:
         event = match.event.get()
-
-        from backend.common.models.notifications.match_score import (
-            MatchScoreNotification,
-        )
 
         # Send to Event subscribers
         event_subscriptions_future = None
@@ -324,11 +328,7 @@ class TBANSHelper:
         cls.schedule_upcoming_match(next_match, user_id)
 
     @classmethod
-    def match_upcoming(cls, match: Match, user_id: Optional[str] = None) -> None:
-        from backend.common.models.notifications.match_upcoming import (
-            MatchUpcomingNotification,
-        )
-
+    def match_upcoming(cls, match: Match, user_id: str | None = None) -> None:
         # Send to Event subscribers
         event_subscriptions_future = None
         if NotificationType.UPCOMING_MATCH in ENABLED_EVENT_NOTIFICATIONS:
@@ -395,11 +395,7 @@ class TBANSHelper:
             cls.event_level(match, user_id)
 
     @classmethod
-    def match_video(cls, match: Match, user_id: Optional[str] = None) -> None:
-        from backend.common.models.notifications.match_video import (
-            MatchVideoNotification,
-        )
-
+    def match_video(cls, match: Match, user_id: str | None = None) -> None:
         # Send to Event subscribers
         event_subscriptions_future = None
         if NotificationType.MATCH_VIDEO in ENABLED_EVENT_NOTIFICATIONS:
@@ -461,24 +457,16 @@ class TBANSHelper:
 
     @classmethod
     def update_favorites(
-        cls, user_id: str, initiating_device_id: Optional[str] = None
+        cls, user_id: str, initiating_device_id: str | None = None
     ) -> None:
-        from backend.common.models.notifications.mytba import (
-            FavoritesUpdatedNotification,
-        )
-
         cls._send(
             [user_id], FavoritesUpdatedNotification(user_id, initiating_device_id)
         )
 
     @classmethod
     def update_subscriptions(
-        cls, user_id: str, initiating_device_id: Optional[str] = None
+        cls, user_id: str, initiating_device_id: str | None = None
     ) -> None:
-        from backend.common.models.notifications.mytba import (
-            SubscriptionsUpdatedNotification,
-        )
-
         cls._send(
             [user_id], SubscriptionsUpdatedNotification(user_id, initiating_device_id)
         )
@@ -495,15 +483,7 @@ class TBANSHelper:
     def _ping_client(client: MobileClient) -> tuple[bool, bool]:
         client_type = client.client_type
         if client_type in FCM_CLIENTS:
-            from backend.common.models.notifications.ping import (
-                PingNotification,
-            )
-
             notification = PingNotification()
-
-            from backend.common.models.notifications.requests.fcm_request import (
-                FCMRequest,
-            )
 
             fcm_request = FCMRequest(
                 firebase_app,
@@ -521,13 +501,7 @@ class TBANSHelper:
 
     @staticmethod
     def _ping_webhook(client: MobileClient) -> tuple[bool, bool]:
-        from backend.common.models.notifications.ping import PingNotification
-
         notification = PingNotification()
-
-        from backend.common.models.notifications.requests.webhook_request import (
-            WebhookRequest,
-        )
 
         webhook_request = WebhookRequest(
             notification, client.messaging_id, client.secret
@@ -536,9 +510,7 @@ class TBANSHelper:
         return webhook_request.send()
 
     @classmethod
-    def schedule_upcoming_match(
-        cls, match: Match, user_id: Optional[str] = None
-    ) -> None:
+    def schedule_upcoming_match(cls, match: Match, user_id: str | None = None) -> None:
         from google.appengine.api import taskqueue
 
         queue = taskqueue.Queue("push-notifications")
@@ -574,7 +546,7 @@ class TBANSHelper:
 
     @classmethod
     def schedule_upcoming_matches(
-        cls, event: Event, user_id: Optional[str] = None
+        cls, event: Event, user_id: str | None = None
     ) -> None:
         # Schedule `match_upcoming` notifications for Match 1 and Match 2
         # Match 3 (and onward) will be dispatched after Match 1 (or Match N - 2) has been played
@@ -599,24 +571,171 @@ class TBANSHelper:
     @staticmethod
     def verify_webhook(url: str, secret: str) -> str:
         """Immediately dispatch a Verification to a webhook"""
-        from backend.common.models.notifications.verification import (
-            VerificationNotification,
-        )
-
         notification = VerificationNotification(url, secret)
-
-        from backend.common.models.notifications.requests.webhook_request import (
-            WebhookRequest,
-        )
 
         webhook_request = WebhookRequest(notification, url, secret)
         webhook_request.send()
 
         return notification.verification_key
 
+    @staticmethod
+    def send_webhook_test(
+        client: MobileClient,
+        notification_type: NotificationType,
+        event_key: str | None = None,
+        team_key: str | None = None,
+        match_key: str | None = None,
+        district_key: str | None = None,
+    ) -> bool:
+        """
+        Send a single test notification directly to a specific webhook.
+
+        This method is used for webhook testing from the API docs page to send
+        exactly one notification to exactly one webhook, avoiding the issues with
+        the normal dispatch flow which sends to all devices and multiple notification
+        variants.
+
+        Args:
+            client: The MobileClient webhook to send to (must be a verified webhook)
+            notification_type: The type of notification to send
+            event_key: The event key (required for event-based notifications)
+            team_key: The team key (optional, for team-specific notifications)
+            match_key: The match key (required for match-based notifications)
+            district_key: The district key (required for district-based notifications)
+
+        Returns:
+            True if the notification was sent successfully, False otherwise
+        """
+        # Only send to verified webhook clients
+        if client.client_type != ClientType.WEBHOOK:
+            return False
+
+        if not client.verified:
+            return False
+
+        # Create the notification based on type
+        notification = TBANSHelper._create_test_notification(
+            notification_type,
+            event_key=event_key,
+            team_key=team_key,
+            match_key=match_key,
+            district_key=district_key,
+        )
+        if notification is None:
+            return False
+
+        webhook_request = WebhookRequest(
+            notification, client.messaging_id, client.secret
+        )
+        success, _ = webhook_request.send()
+
+        return success
+
+    @staticmethod
+    def _create_test_notification(
+        notification_type: NotificationType,
+        event_key: str | None = None,
+        team_key: str | None = None,
+        match_key: str | None = None,
+        district_key: str | None = None,
+    ) -> Notification | None:
+        """
+        Create a single notification instance for testing.
+
+        Returns None if required keys are missing or entities not found.
+        """
+        event = None
+        if event_key:
+            event = Event.get_by_id(event_key)
+
+        team = None
+        if team_key:
+            team = Team.get_by_id(team_key)
+
+        match = None
+        if match_key:
+            match = Match.get_by_id(match_key)
+
+        district = None
+        if district_key:
+            district = District.get_by_id(district_key)
+
+        if notification_type == NotificationType.ALLIANCE_SELECTION:
+            if event is None:
+                return None
+            return (
+                AllianceSelectionNotification(event, team)
+                if team
+                else AllianceSelectionNotification(event)
+            )
+
+        elif notification_type == NotificationType.AWARDS:
+            if event is None:
+                return None
+            return (
+                AwardsNotification(event, team) if team else AwardsNotification(event)
+            )
+
+        elif notification_type == NotificationType.BROADCAST:
+            return BroadcastNotification(
+                title="Test Broadcast",
+                message="This is a test broadcast notification from The Blue Alliance.",
+            )
+
+        elif notification_type == NotificationType.DISTRICT_POINTS_UPDATED:
+            if district is None:
+                return None
+            return DistrictPointsNotification(district)
+
+        elif notification_type == NotificationType.LEVEL_STARTING:
+            if match is None:
+                return None
+            return EventLevelNotification(match)
+
+        elif notification_type == NotificationType.MATCH_SCORE:
+            if match is None:
+                return None
+            return (
+                MatchScoreNotification(match, team)
+                if team
+                else MatchScoreNotification(match)
+            )
+
+        elif notification_type == NotificationType.UPCOMING_MATCH:
+            if match is None:
+                return None
+            return (
+                MatchUpcomingNotification(match, team)
+                if team
+                else MatchUpcomingNotification(match)
+            )
+
+        elif notification_type == NotificationType.MATCH_VIDEO:
+            if match is None:
+                return None
+            return (
+                MatchVideoNotification(match, team)
+                if team
+                else MatchVideoNotification(match)
+            )
+
+        elif notification_type == NotificationType.PING:
+            return PingNotification()
+
+        elif notification_type == NotificationType.SCHEDULE_UPDATED:
+            if event is None:
+                return None
+            return (
+                EventScheduleNotification(event, match)
+                if match
+                else EventScheduleNotification(event)
+            )
+
+        return None
+
     @classmethod
     def _batch_send_subscriptions(
-        cls, subscriptions: List[Subscription], notification: Notification
+        cls, subscriptions: list[Subscription], notification: Notification
     ) -> None:
         def batch(iterable, n=1):
             la = len(iterable)
@@ -637,7 +756,7 @@ class TBANSHelper:
 
     @classmethod
     def _send_subscriptions(
-        cls, subscriptions: List[Subscription], notification: Notification
+        cls, subscriptions: list[Subscription], notification: Notification
     ) -> None:
         # Convert subscriptions -> user IDs
         # Allows us to send in batches
@@ -645,7 +764,7 @@ class TBANSHelper:
         cls._send(users, notification)
 
     @classmethod
-    def _send(cls, user_ids: List[str], notification: Notification) -> None:
+    def _send(cls, user_ids: list[str], notification: Notification) -> None:
         fcm_clients_future = MobileClientQuery(
             user_ids, client_types=list(FCM_CLIENTS)
         ).fetch_async()
@@ -666,7 +785,7 @@ class TBANSHelper:
 
     @classmethod
     def _defer_fcm(
-        cls, clients: List[MobileClient], notification: Notification
+        cls, clients: list[MobileClient], notification: Notification
     ) -> None:
         defer_safe(
             cls._send_fcm,
@@ -691,7 +810,7 @@ class TBANSHelper:
     @classmethod
     def _send_fcm(
         cls,
-        clients: List[MobileClient],
+        clients: list[MobileClient],
         notification: Notification,
         backoff_iteration: int = 0,
     ) -> None:
@@ -711,11 +830,6 @@ class TBANSHelper:
             if client.client_type in FCM_CLIENTS
             and notification.should_send_to_client(client)
         ]
-
-        from backend.common.models.notifications.requests.fcm_request import (
-            FCMRequest,
-            MAXIMUM_TOKENS,
-        )
 
         # We can only send to so many FCM clients at a time - send to our clients across several requests
         for subclients in [
@@ -816,10 +930,6 @@ class TBANSHelper:
 
         if not notification.should_send_to_client(client):
             return
-
-        from backend.common.models.notifications.requests.webhook_request import (
-            WebhookRequest,
-        )
 
         webhook_request = WebhookRequest(
             notification, client.messaging_id, client.secret
