@@ -65,17 +65,10 @@ from backend.web.handlers.team import (
     team_history,
     team_list,
 )
-from backend.web.handlers.team_admin import (
-    blueprint as team_admin,
-)
-from backend.web.handlers.team_threads import (
-    team_threads,
-    team_threads_canonical,
-)
+from backend.web.handlers.team_admin import blueprint as team_admin
+from backend.web.handlers.team_threads import team_threads, team_threads_canonical
 from backend.web.handlers.webcasts import webcast_list
-from backend.web.handlers.webhooks import (
-    blueprint as webhooks,
-)
+from backend.web.handlers.webhooks import blueprint as webhooks
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -122,12 +115,12 @@ app.add_url_rule(
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
 app.add_url_rule(
-    '/districts/<regex("[a-z]+"):district_abbrev>',
+    '/district/<regex("[a-z]+"):district_abbrev>',
     view_func=district_detail,
     defaults={"year": None},
 )
 app.add_url_rule(
-    '/districts/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
+    '/district/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
 )
 app.add_url_rule("/districts", view_func=event_list, defaults={"year": None})
 
