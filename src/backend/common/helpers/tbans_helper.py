@@ -1,4 +1,5 @@
 import datetime
+import enum
 import logging
 import time
 
@@ -55,6 +56,23 @@ from backend.common.queries.mobile_client_query import MobileClientQuery
 
 MAXIMUM_BACKOFF = 32
 MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
+
+
+class _NotificationMode(enum.Flag):
+    """Controls which client types receive a notification.
+
+    Uses Flag so members compose with bitwise OR::
+
+        _NotificationMode.FCM | _NotificationMode.WEBHOOK == _NotificationMode.ALL
+
+    and can be tested with bitwise AND::
+
+        if mode & _NotificationMode.FCM:  # True for FCM and ALL
+    """
+
+    FCM = enum.auto()
+    WEBHOOK = enum.auto()
+    ALL = FCM | WEBHOOK  # pyre-ignore[8]
 
 
 def _firebase_app():
@@ -248,14 +266,46 @@ class TBANSHelper:
             )
 
     @classmethod
-    def match_score(cls, match: Match, user_id: str | None = None) -> None:
+    def match_score(
+        cls,
+        match_key: str,
+        user_id: str | None = None,
+        is_score_breakdown_update: bool = False,
+    ) -> None:
+        """Dispatch match score notifications.
+
+        Accepts a match key string (not a full Match object) so the
+        deferred task payload stays tiny and we always read the latest
+        data from Datastore when the task executes.
+
+        Args:
+            match_key: The string key name of the Match (e.g. "2024ct_qm1").
+            user_id: Optional user ID to restrict notifications to (for testing).
+            is_score_breakdown_update: When True, this notification is being sent
+                because a score breakdown was added to a match whose score was
+                already sent. Only webhook clients are notified and upcoming
+                match scheduling is skipped.
+        """
+        match = Match.get_by_id(match_key)
+        if match is None:
+            logging.warning(f"match_score: Match {match_key} not found in Datastore")
+            return
+
         event = match.event.get()
+
+        # Score breakdown updates only go to webhooks — mobile clients
+        # already received the initial push notification for this match.
+        mode = (
+            _NotificationMode.WEBHOOK
+            if is_score_breakdown_update
+            else _NotificationMode.ALL
+        )
 
         # Send to Event subscribers
         event_subscriptions_future = None
         if NotificationType.MATCH_SCORE in ENABLED_EVENT_NOTIFICATIONS:
             if user_id:
-                cls._send([user_id], MatchScoreNotification(match))
+                cls._send([user_id], MatchScoreNotification(match), mode)
             else:
                 event_subscriptions_future = Subscription.subscriptions_for_event(
                     event, NotificationType.MATCH_SCORE
@@ -271,7 +321,7 @@ class TBANSHelper:
                     continue
 
                 if user_id:
-                    cls._send([user_id], MatchScoreNotification(match, team))
+                    cls._send([user_id], MatchScoreNotification(match, team), mode)
                 elif team.key_name:
                     team_subscriptions_futures[team.key_name] = (
                         Subscription.subscriptions_for_team(
@@ -283,7 +333,7 @@ class TBANSHelper:
         match_subscriptions_future = None
         if NotificationType.MATCH_SCORE in ENABLED_MATCH_NOTIFICATIONS:
             if user_id:
-                cls._send([user_id], MatchScoreNotification(match))
+                cls._send([user_id], MatchScoreNotification(match), mode)
             else:
                 match_subscriptions_future = Subscription.subscriptions_for_match(
                     match, NotificationType.MATCH_SCORE
@@ -291,7 +341,9 @@ class TBANSHelper:
 
         if event_subscriptions_future:
             cls._batch_send_subscriptions(
-                event_subscriptions_future.get_result(), MatchScoreNotification(match)
+                event_subscriptions_future.get_result(),
+                MatchScoreNotification(match),
+                mode,
             )
 
         for team_key, team_subscriptions_future in team_subscriptions_futures.items():
@@ -303,14 +355,22 @@ class TBANSHelper:
             cls._batch_send_subscriptions(
                 team_subscriptions_future.get_result(),
                 MatchScoreNotification(match, team),
+                mode,
             )
 
         if match_subscriptions_future:
             cls._batch_send_subscriptions(
-                match_subscriptions_future.get_result(), MatchScoreNotification(match)
+                match_subscriptions_future.get_result(),
+                MatchScoreNotification(match),
+                mode,
             )
 
-        # Send UPCOMING_MATCH for the N + 2 match after this one
+        # Send UPCOMING_MATCH for the N + 2 match after this one.
+        # Skip for score breakdown updates — upcoming match scheduling
+        # was already handled by the initial match score notification.
+        if is_score_breakdown_update:
+            return
+
         if not event.matches:
             return
         from backend.common.helpers.match_helper import MatchHelper
@@ -735,7 +795,10 @@ class TBANSHelper:
 
     @classmethod
     def _batch_send_subscriptions(
-        cls, subscriptions: list[Subscription], notification: Notification
+        cls,
+        subscriptions: list[Subscription],
+        notification: Notification,
+        mode: _NotificationMode = _NotificationMode.ALL,
     ) -> None:
         def batch(iterable, n=1):
             la = len(iterable)
@@ -749,6 +812,7 @@ class TBANSHelper:
                 cls._send_subscriptions,
                 batch,
                 notification,
+                mode,
                 _target="py3-tasks-io",
                 _queue="push-notifications",
                 _url="/_ah/queue/deferred_notification_send",
@@ -756,32 +820,49 @@ class TBANSHelper:
 
     @classmethod
     def _send_subscriptions(
-        cls, subscriptions: list[Subscription], notification: Notification
+        cls,
+        subscriptions: list[Subscription],
+        notification: Notification,
+        mode: _NotificationMode = _NotificationMode.ALL,
     ) -> None:
         # Convert subscriptions -> user IDs
         # Allows us to send in batches
         users = list(set([sub.user_id for sub in subscriptions]))
-        cls._send(users, notification)
+        cls._send(users, notification, mode)
 
     @classmethod
-    def _send(cls, user_ids: list[str], notification: Notification) -> None:
-        fcm_clients_future = MobileClientQuery(
-            user_ids, client_types=list(FCM_CLIENTS)
-        ).fetch_async()
-        webhook_clients_future = MobileClientQuery(
-            user_ids, client_types=[ClientType.WEBHOOK]
-        ).fetch_async()
+    def _send(
+        cls,
+        user_ids: list[str],
+        notification: Notification,
+        mode: _NotificationMode = _NotificationMode.ALL,
+    ) -> None:
+        send_fcm = bool(mode & _NotificationMode.FCM)
+        send_webhooks = bool(mode & _NotificationMode.WEBHOOK)
+
+        fcm_clients_future = (
+            MobileClientQuery(user_ids, client_types=list(FCM_CLIENTS)).fetch_async()
+            if send_fcm
+            else None
+        )
+        webhook_clients_future = (
+            MobileClientQuery(user_ids, client_types=[ClientType.WEBHOOK]).fetch_async()
+            if send_webhooks
+            else None
+        )
 
         # Send to FCM clients
-        fcm_clients = fcm_clients_future.get_result()
-        if fcm_clients:
-            cls._defer_fcm(fcm_clients, notification)
+        if fcm_clients_future:
+            fcm_clients = fcm_clients_future.get_result()
+            if fcm_clients:
+                cls._defer_fcm(fcm_clients, notification)
 
         # Send to webhooks
-        webhook_clients = webhook_clients_future.get_result()
-        if webhook_clients:
-            for webhook in webhook_clients:
-                cls._defer_webhook(webhook, notification)
+        if webhook_clients_future:
+            webhook_clients = webhook_clients_future.get_result()
+            if webhook_clients:
+                for webhook in webhook_clients:
+                    cls._defer_webhook(webhook, notification)
 
     @classmethod
     def _defer_fcm(
