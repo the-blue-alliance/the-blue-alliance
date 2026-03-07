@@ -1,25 +1,31 @@
-from typing import Optional
+from typing import Any, Optional
 
-from flask import abort, Response
+from flask import abort
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
     filter_match_properties,
     ModelType,
 )
-from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
+from backend.api.handlers.helpers.profiled_jsonify import (
+    profiled_jsonify,
+    TypedFlaskResponse,
+)
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
 from backend.common.models.keys import MatchKey
 from backend.common.models.zebra_motionworks import ZebraMotionWorks
+from backend.common.queries.dict_converters.match_converter import MatchDict
 from backend.common.queries.match_query import MatchQuery
 
 
 @api_authenticated
 @validate_keys
 @cached_public
-def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Response:
+def match(
+    match_key: MatchKey, model_type: Optional[ModelType] = None
+) -> TypedFlaskResponse[MatchDict]:
     """
     Returns details about one match, specified by |match_key|.
     """
@@ -36,7 +42,7 @@ def match(match_key: MatchKey, model_type: Optional[ModelType] = None) -> Respon
 @api_authenticated
 @validate_keys
 @cached_public
-def zebra_motionworks(match_key: MatchKey) -> Response:
+def zebra_motionworks(match_key: MatchKey) -> TypedFlaskResponse[Any]:
     """
     Returns Zebra Motionworks data for a given match.
     """

@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Any, Optional
 
-from flask import abort, Response
+from flask import abort
 
 from backend.api.handlers.decorators import (
     api_authenticated,
@@ -12,7 +12,10 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
-from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
+from backend.api.handlers.helpers.profiled_jsonify import (
+    profiled_jsonify,
+    TypedFlaskResponse,
+)
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_tag import get_enum_from_url
@@ -27,6 +30,13 @@ from backend.common.queries.award_query import (
     TeamEventAwardsQuery,
     TeamYearAwardsQuery,
 )
+from backend.common.queries.dict_converters.award_converter import AwardDict
+from backend.common.queries.dict_converters.district_converter import DistrictDict
+from backend.common.queries.dict_converters.event_converter import EventDict
+from backend.common.queries.dict_converters.match_converter import MatchDict
+from backend.common.queries.dict_converters.media_converter import MediaDict
+from backend.common.queries.dict_converters.robot_converter import RobotDict
+from backend.common.queries.dict_converters.team_converter import TeamDict
 from backend.common.queries.district_query import TeamDistrictsQuery
 from backend.common.queries.event_query import (
     TeamEventsQuery,
@@ -55,7 +65,9 @@ from backend.common.queries.team_query import (
 @api_authenticated
 @validate_keys
 @cached_public
-def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
+def team(
+    team_key: TeamKey, model_type: Optional[ModelType] = None
+) -> TypedFlaskResponse[TeamDict]:
     """
     Returns details about one team, specified by |team_key|.
     """
@@ -72,7 +84,7 @@ def team(team_key: TeamKey, model_type: Optional[ModelType] = None) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def team_history(team_key: TeamKey) -> Response:
+def team_history(team_key: TeamKey) -> TypedFlaskResponse[Any]:
     track_call_after_response("team/history", team_key)
 
     events_future = TeamEventsQuery(team_key=team_key).fetch_dict_async(
@@ -92,7 +104,7 @@ def team_history(team_key: TeamKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def team_years_participated(team_key: TeamKey) -> Response:
+def team_years_participated(team_key: TeamKey) -> TypedFlaskResponse[list[int]]:
     """
     Returns a list of years the given Team participated in an event.
     """
@@ -106,7 +118,7 @@ def team_years_participated(team_key: TeamKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def team_history_districts(team_key: TeamKey) -> Response:
+def team_history_districts(team_key: TeamKey) -> TypedFlaskResponse[list[DistrictDict]]:
     """
     Returns a list of all DistrictTeam models associated with the given Team.
     """
@@ -121,7 +133,7 @@ def team_history_districts(team_key: TeamKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def team_history_robots(team_key: TeamKey) -> Response:
+def team_history_robots(team_key: TeamKey) -> TypedFlaskResponse[list[RobotDict]]:
     """
     Returns a list of all Robot models associated with the given Team.
     """
@@ -134,7 +146,7 @@ def team_history_robots(team_key: TeamKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def team_social_media(team_key: TeamKey) -> Response:
+def team_social_media(team_key: TeamKey) -> TypedFlaskResponse[list[MediaDict]]:
     """
     Returns a list of all social media models associated with the given Team.
     """
@@ -153,7 +165,7 @@ def team_events(
     team_key: TeamKey,
     year: Optional[int] = None,
     model_type: Optional[ModelType] = None,
-) -> Response:
+) -> TypedFlaskResponse[list[EventDict]]:
     """
     Returns a list of all event models associated with the given Team.
     Optionally only returns events from the specified year.
@@ -180,7 +192,7 @@ def team_events(
 @api_authenticated
 @validate_keys
 @cached_public
-def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
+def team_events_statuses_year(team_key: TeamKey, year: int) -> TypedFlaskResponse[dict]:
     """
     Returns a dict of { event_key: status_dict } for all events in the given year for the associated team.
     """
@@ -211,7 +223,7 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
 @cached_public
 def team_event_matches(
     team_key: TeamKey, event_key: EventKey, model_type: Optional[ModelType] = None
-) -> Response:
+) -> TypedFlaskResponse[list[MatchDict]]:
     """
     Returns a list of matches for a team at an event.
     """
@@ -231,7 +243,9 @@ def team_event_matches(
 @api_authenticated
 @validate_keys
 @cached_public
-def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
+def team_event_awards(
+    team_key: TeamKey, event_key: EventKey
+) -> TypedFlaskResponse[list[AwardDict]]:
     """
     Returns a list of awards for a team at an event.
     """
@@ -246,7 +260,9 @@ def team_event_awards(team_key: TeamKey, event_key: EventKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
+def team_event_status(
+    team_key: TeamKey, event_key: EventKey
+) -> TypedFlaskResponse[Any]:
     """
     Return the status for a team at an event.
     """
@@ -275,7 +291,7 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
 def team_awards(
     team_key: TeamKey,
     year: Optional[int] = None,
-) -> Response:
+) -> TypedFlaskResponse[list[AwardDict]]:
     """
     Returns a list of awards associated with the given Team.
     Optionally only returns events from the specified year.
@@ -298,7 +314,7 @@ def team_matches(
     team_key: TeamKey,
     year: int,
     model_type: Optional[ModelType] = None,
-) -> Response:
+) -> TypedFlaskResponse[list[MatchDict]]:
     """
     Returns a list of matches associated with the given Team in a given year.
     """
@@ -316,7 +332,9 @@ def team_matches(
 @api_authenticated
 @validate_keys
 @cached_public
-def team_media_year(team_key: TeamKey, year: int) -> Response:
+def team_media_year(
+    team_key: TeamKey, year: int
+) -> TypedFlaskResponse[list[MediaDict]]:
     """
     Returns a list of media associated with the given Team in a given year.
     """
@@ -333,7 +351,7 @@ def team_media_year(team_key: TeamKey, year: int) -> Response:
 @cached_public
 def team_media_tag(
     team_key: TeamKey, media_tag: str, year: Optional[int] = None
-) -> Response:
+) -> TypedFlaskResponse[list[MediaDict]]:
     """
     Returns a list of media associated with the given Team with a given tag.
     Optionally filters by year.
@@ -360,7 +378,9 @@ def team_media_tag(
 
 @api_authenticated
 @cached_public
-def team_list_all(model_type: Optional[ModelType] = None) -> Response:
+def team_list_all(
+    model_type: Optional[ModelType] = None,
+) -> TypedFlaskResponse[list[TeamDict]]:
     """
     Returns a list of all teams.
     """
@@ -390,7 +410,7 @@ def team_list_all(model_type: Optional[ModelType] = None) -> Response:
 @cached_public
 def team_list(
     page_num: int, year: Optional[int] = None, model_type: Optional[ModelType] = None
-) -> Response:
+) -> TypedFlaskResponse[list[TeamDict]]:
     """
     Returns a list of teams, paginated by team number in sets of 500.
     Optionally only returns teams that participated in the specified year.

@@ -1,6 +1,6 @@
-from typing import Optional
+from typing import Any, Optional
 
-from flask import abort, Response
+from flask import abort
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
@@ -8,7 +8,10 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
-from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
+from backend.api.handlers.helpers.profiled_jsonify import (
+    profiled_jsonify,
+    TypedFlaskResponse,
+)
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.event_type import EventType
@@ -16,6 +19,9 @@ from backend.common.decorators import cached_public
 from backend.common.models.insight import Insight
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey
 from backend.common.queries.award_query import EventAwardsQuery
+from backend.common.queries.dict_converters.district_converter import DistrictDict
+from backend.common.queries.dict_converters.event_converter import EventDict
+from backend.common.queries.dict_converters.team_converter import TeamDict
 from backend.common.queries.district_query import (
     DistrictAbbreviationQuery,
     DistrictQuery,
@@ -28,7 +34,9 @@ from backend.common.queries.team_query import DistrictTeamsQuery
 
 @api_authenticated
 @cached_public
-def district_history(district_abbreviation: DistrictAbbreviation) -> Response:
+def district_history(
+    district_abbreviation: DistrictAbbreviation,
+) -> TypedFlaskResponse[list[DistrictDict]]:
     """
     Returns a list of District objects with the given district abbreviation. Accounts for abbreviation changes.
     """
@@ -46,7 +54,7 @@ def district_history(district_abbreviation: DistrictAbbreviation) -> Response:
 @cached_public
 def district_events(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
-) -> Response:
+) -> TypedFlaskResponse[list[EventDict]]:
     """
     Returns a list of events for a given DistrictKey.
     """
@@ -65,7 +73,7 @@ def district_events(
 @cached_public
 def district_teams(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
-) -> Response:
+) -> TypedFlaskResponse[list[TeamDict]]:
     """
     Returns a list of teams for a given DistrictKey.
     """
@@ -82,7 +90,7 @@ def district_teams(
 @api_authenticated
 @validate_keys
 @cached_public
-def district_rankings(district_key: DistrictKey) -> Response:
+def district_rankings(district_key: DistrictKey) -> TypedFlaskResponse[Any]:
     """
     Returns the rankings a given DistrictKey.
     """
@@ -96,7 +104,7 @@ def district_rankings(district_key: DistrictKey) -> Response:
 
 @api_authenticated
 @cached_public
-def district_list_year(year: int) -> Response:
+def district_list_year(year: int) -> TypedFlaskResponse[list[DistrictDict]]:
     """
     Returns a list of all districts for a given year.
     """
@@ -109,7 +117,7 @@ def district_list_year(year: int) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def district_awards(district_key: DistrictKey) -> Response:
+def district_awards(district_key: DistrictKey) -> TypedFlaskResponse[list[dict]]:
     """
     Returns a list of awards for a given DistrictKey.
     """
@@ -137,7 +145,7 @@ def district_awards(district_key: DistrictKey) -> Response:
 @api_authenticated
 @validate_keys
 @cached_public
-def district_advancement(district_key: DistrictKey) -> Response:
+def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
     """
     Returns DCMP/CMP advancement information for a given DistrictKey
     """
@@ -151,7 +159,9 @@ def district_advancement(district_key: DistrictKey) -> Response:
 
 @api_authenticated
 @cached_public
-def dcmp_history(district_abbreviation: DistrictAbbreviation) -> Response:
+def dcmp_history(
+    district_abbreviation: DistrictAbbreviation,
+) -> TypedFlaskResponse[list[dict]]:
     """
     Returns DCMP awards/events for a given DistrictAbbreviation
     """
@@ -202,7 +212,9 @@ def dcmp_history(district_abbreviation: DistrictAbbreviation) -> Response:
 
 @api_authenticated
 @cached_public
-def district_insights(district_abbreviation: DistrictAbbreviation) -> Response:
+def district_insights(
+    district_abbreviation: DistrictAbbreviation,
+) -> TypedFlaskResponse[dict]:
     """
     Returns insights for a given DistrictAbbreviation.
     """
