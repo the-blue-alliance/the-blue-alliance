@@ -34,13 +34,12 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import DistrictAbbreviation, EventKey, Year
+from backend.common.models.keys import DistrictKey, EventKey, Year
 from backend.common.models.match import Match
 from backend.common.models.webcast import Webcast
 from backend.common.queries.event_query import DistrictEventsQuery
 from backend.common.queries.match_query import EventMatchesQuery
 from backend.common.sitevars.apistatus_down_events import ApiStatusDownEvents
-from backend.common.sitevars.district_webcast_channels import DistrictWebcastChannels
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
 from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
@@ -60,21 +59,31 @@ def update_live_events() -> str:
     # their webcast info in advance. However, other districts will not.
     # Here, we will try to find their upcoming streams
     districts_to_find = set()
-    supported_districts = DistrictWebcastChannels.get()["district_to_channels"]
+    districts_with_youtube_channels = {
+        district.key_name
+        for district in District.query(
+            District.year == datetime.datetime.now().year
+        ).fetch(200)
+        if any(
+            channel.get("type") == WebcastType.YOUTUBE
+            and bool(channel.get("channel_id"))
+            for channel in (district.webcast_channels or [])
+        )
+    }
     for event in week_events:
         if (
             event.within_a_day
-            and (event_district := event.event_district_abbrev)
-            and event_district in supported_districts
+            and (event_district_key := event.event_district_key)
+            and event_district_key in districts_with_youtube_channels
             and not event.current_webcasts
         ):
-            districts_to_find.add(event_district)
+            districts_to_find.add(event_district_key)
 
     if districts_to_find:
         for district_key in districts_to_find:
             taskqueue.add(
                 url=url_for(
-                    "live_events.find_event_webcasts", district_abbrev=district_key
+                    "live_events.find_event_webcasts", district_key=district_key
                 ),
                 method="GET",
                 queue_name="default",
@@ -360,25 +369,28 @@ def update_event_webcast_status(event_key: EventKey) -> Response:
     return make_response(f"Updated event webcasts: {event.webcast}")
 
 
-@blueprint.route("/tasks/do/find_event_webcasts/<district_abbrev>")
-def find_event_webcasts(district_abbrev: DistrictAbbreviation) -> Response:
-    supported_districts = DistrictWebcastChannels.get()["district_to_channels"]
-    district_channel_list = supported_districts.get(district_abbrev)
-    if not district_channel_list:
+@blueprint.route("/tasks/do/find_event_webcasts/<district_key>")
+def find_event_webcasts(district_key: DistrictKey) -> Response:
+    district = District.get_by_id(district_key)
+    if district is None:
         abort(400)
 
-    # For now, we only support the first channel in the list and only YouTube
-    district_channel_info = district_channel_list[0]
-    if district_channel_info["type"] != WebcastType.YOUTUBE:
+    youtube_channel_info = next(
+        (
+            channel
+            for channel in (district.webcast_channels or [])
+            if channel.get("type") == WebcastType.YOUTUBE
+            and bool(channel.get("channel_id"))
+        ),
+        None,
+    )
+    if youtube_channel_info is None:
         abort(400)
 
-    current_season = datetime.datetime.now().year
-    youtube_channel_id = district_channel_info["channel_id"]
+    youtube_channel_id = youtube_channel_info["channel_id"]
 
     # Fetch district events and upcoming streams in parallel
-    district_events_future = DistrictEventsQuery(
-        District.render_key_name(current_season, district_abbrev)
-    ).fetch_async()
+    district_events_future = DistrictEventsQuery(district_key).fetch_async()
     upcoming_streams_future = YouTubeVideoHelper.get_upcoming_streams(
         youtube_channel_id
     )
@@ -386,7 +398,7 @@ def find_event_webcasts(district_abbrev: DistrictAbbreviation) -> Response:
     district_events = district_events_future.get_result()
     upcoming_streams = upcoming_streams_future.get_result()
 
-    live_events_without_webcasts = [
+    future_events_without_webcasts = [
         event
         for event in district_events
         if event.within_a_day and not event.current_webcasts
@@ -395,10 +407,11 @@ def find_event_webcasts(district_abbrev: DistrictAbbreviation) -> Response:
     for stream in upcoming_streams:
         matched_events = [
             e
-            for e in live_events_without_webcasts
+            for e in future_events_without_webcasts
             if e.short_name and e.short_name in stream["title"]
         ]
         if len(matched_events) == 0:
+            logging.info(f"Did not find an event match for stream {stream}")
             continue
         if len(matched_events) > 1:
             # If there are multiple matched events, we can't be sure which one it is, so skip
@@ -412,6 +425,7 @@ def find_event_webcasts(district_abbrev: DistrictAbbreviation) -> Response:
             event_to_streams[event_key] = []
         event_to_streams[event_key].append((matched_events[0], stream))
 
+    discovered_webcasts: List[str] = []
     for event_key, event_stream_pairs in event_to_streams.items():
         streams = [stream for _, stream in event_stream_pairs]
         event = event_stream_pairs[0][0]
@@ -434,6 +448,15 @@ def find_event_webcasts(district_abbrev: DistrictAbbreviation) -> Response:
             )
 
             EventWebcastAdder.add_webcast(event, new_webcast)
+            discovered_webcasts.append(
+                f"{event.key_name}: {stream['stream_id']} ({start_time})"
+            )
+
+    if "X-Appengine-Taskname" not in request.headers:
+        if discovered_webcasts:
+            discovered_webcasts_str = "\n".join(discovered_webcasts)
+            return make_response(f"Discovered webcasts:\n{discovered_webcasts_str}")
+        return make_response("Discovered webcasts: none")
 
     return make_response("")
 

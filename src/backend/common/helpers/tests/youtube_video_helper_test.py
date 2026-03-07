@@ -7,6 +7,7 @@ from _pytest.monkeypatch import MonkeyPatch
 
 from backend.common.futures import InstantFuture
 from backend.common.helpers.youtube_video_helper import (
+    YouTubeChannel,
     YouTubePlaylistItem,
     YouTubeUpcomingStream,
     YouTubeVideoHelper,
@@ -310,6 +311,65 @@ def test_get_scheduled_start_time_success(ndb_context, mock_google_api_secret) -
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
         result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
     assert result == "2023-03-15"
+
+
+def test_resolve_channel_name_no_secret(ndb_context) -> None:
+    result = YouTubeVideoHelper.resolve_channel_name("FIRST in Michigan").get_result()
+    assert result is None
+
+
+def test_resolve_channel_name_api_error(ndb_context, mock_google_api_secret) -> None:
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        403,
+        "{}",
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.resolve_channel_name(
+            "FIRST in Michigan"
+        ).get_result()
+    assert result is None
+
+
+def test_resolve_channel_name_not_found(ndb_context, mock_google_api_secret) -> None:
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        '{"items": []}',
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.resolve_channel_name("does-not-exist").get_result()
+    assert result is None
+
+
+def test_resolve_channel_name_success(ndb_context, mock_google_api_secret) -> None:
+    api_resp = {
+        "items": [
+            {
+                "id": {"channelId": "UCjX4WSaAFPgM2PYr-6P"},
+                "snippet": {"title": "FIRST in Michigan"},
+            }
+        ]
+    }
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/search",
+        200,
+        json.dumps(api_resp),
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.resolve_channel_name(
+            "FIRST in Michigan"
+        ).get_result()
+    assert result == YouTubeChannel(
+        channel_id="UCjX4WSaAFPgM2PYr-6P",
+        channel_name="FIRST in Michigan",
+    )
 
 
 def test_get_playlist_videos_no_secret(ndb_context) -> None:

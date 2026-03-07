@@ -1,10 +1,19 @@
+from unittest.mock import patch
+
 import bs4
 from freezegun import freeze_time
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.futures import InstantFuture
+from backend.common.helpers.youtube_video_helper import (
+    YouTubeChannel,
+    YouTubeVideoHelper,
+)
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
+from backend.common.models.webcast import WebcastChannel
 from backend.web.handlers.tests import helpers
 
 
@@ -30,6 +39,159 @@ def test_district_list_none_for_year(web_client: Client, login_gae_admin) -> Non
     helpers.preseed_district("2020ne")
     resp = web_client.get("/admin/districts/2021")
     assert resp.status_code == 200
+
+
+def test_district_list_shows_fetch_upcoming_webcasts_button_when_configured(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_district("2020ne")
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    district.webcast_channels = [
+        WebcastChannel(
+            type=WebcastType.YOUTUBE,
+            channel="NE FIRST",
+            channel_id="UC123",
+        )
+    ]
+    district.put()
+
+    resp = web_client.get("/admin/districts/2020")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="/tasks/do/find_event_webcasts/2020ne") is not None
+
+
+def test_district_list_hides_fetch_upcoming_webcasts_button_when_not_configured(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    resp = web_client.get("/admin/districts/2020")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="/tasks/do/find_event_webcasts/2020ne") is None
+
+
+def test_district_details_webcasts_tab_shows_configured_channels(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_district("2020ne")
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    district.webcast_channels = [
+        WebcastChannel(
+            type=WebcastType.YOUTUBE,
+            channel="NE FIRST",
+            channel_id="UC123",
+        )
+    ]
+    district.put()
+
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+    assert b"Webcasts" in resp.data
+    assert b"NE FIRST" in resp.data
+    assert b"UC123" in resp.data
+
+
+def test_district_details_shows_fetch_upcoming_webcasts_button_when_configured(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_district("2020ne")
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    district.webcast_channels = [
+        WebcastChannel(
+            type=WebcastType.YOUTUBE,
+            channel="NE FIRST",
+            channel_id="UC123",
+        )
+    ]
+    district.put()
+
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="/tasks/do/find_event_webcasts/2020ne") is not None
+
+
+def test_district_details_hides_fetch_upcoming_webcasts_button_when_not_configured(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="/tasks/do/find_event_webcasts/2020ne") is None
+
+
+def test_district_add_webcast_channel_post(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    with patch.object(
+        YouTubeVideoHelper,
+        "resolve_channel_name",
+        return_value=InstantFuture(
+            YouTubeChannel(
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+                channel_name="FIRST in Michigan",
+            )
+        ),
+    ):
+        resp = web_client.post(
+            "/admin/district/2020ne/webcasts/add",
+            data={"channel_name": "FIRST in Michigan"},
+        )
+
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "/admin/district/2020ne?webcast_success=channel_added#webcasts"
+    )
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    assert district.webcast_channels == [
+        WebcastChannel(
+            type=WebcastType.YOUTUBE,
+            channel="FIRST in Michigan",
+            channel_id="UCjX4WSaAFPgM2PYr-6P",
+        )
+    ]
+
+
+def test_district_add_webcast_channel_post_channel_not_found(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    with patch.object(
+        YouTubeVideoHelper,
+        "resolve_channel_name",
+        return_value=InstantFuture(None),
+    ):
+        resp = web_client.post(
+            "/admin/district/2020ne/webcasts/add",
+            data={"channel_name": "Unknown Channel"},
+        )
+
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "/admin/district/2020ne?webcast_error=channel_not_found#webcasts"
+    )
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    assert district.webcast_channels == []
 
 
 def test_district_edit_bad_event(web_client: Client, login_gae_admin) -> None:

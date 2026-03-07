@@ -29,13 +29,19 @@ from backend.common.models.event_playoff_advancement import EventPlayoffAdvancem
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.team import Team
-from backend.common.models.webcast import Webcast
-from backend.common.sitevars.district_webcast_channels import (
-    ContentType as DistrictWebcastChannelsContent,
-    DistrictWebcastChannels,
-    WebcastChannel,
-)
+from backend.common.models.webcast import Webcast, WebcastChannel
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
+
+
+def set_district_webcast_channels(
+    district_abbrev: str, channels: list[WebcastChannel], year: int = 2026
+) -> None:
+    district_key = District.render_key_name(year, district_abbrev)
+    district = District.get_by_id(district_key)
+    if district is None:
+        district = District(id=district_key, year=year, abbreviation=district_abbrev)
+    district.webcast_channels = channels
+    district.put()
 
 
 @mock.patch.object(FirebasePusher, "update_live_events")
@@ -263,25 +269,25 @@ def test_update_live_events_enqueues_district_webcast_search(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
     # Setup district webcast channel configuration
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ],
-                "ne": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="NE FIRST",
-                        channel_id="UCkOjF9nNXPRqJmMhd",
-                    )
-                ],
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+    set_district_webcast_channels(
+        "ne",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="NE FIRST",
+                channel_id="UCkOjF9nNXPRqJmMhd",
+            )
+        ],
     )
 
     # Create events for this week
@@ -337,8 +343,8 @@ def test_update_live_events_enqueues_district_webcast_search(
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 2
     task_urls = {t.url for t in tasks}
-    assert "/tasks/do/find_event_webcasts/fim" in task_urls
-    assert "/tasks/do/find_event_webcasts/ne" in task_urls
+    assert "/tasks/do/find_event_webcasts/2026fim" in task_urls
+    assert "/tasks/do/find_event_webcasts/2026ne" in task_urls
 
 
 @mock.patch.object(FirebasePusher, "update_live_events")
@@ -352,18 +358,15 @@ def test_update_live_events_no_district_tasks_when_not_needed(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
     # Setup district webcast channel configuration
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Event with webcast - should not trigger district search
@@ -403,18 +406,15 @@ def test_update_live_events_no_district_tasks_for_unsupported_districts(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
     # Setup district webcast channel configuration with only 'fim'
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Event without webcast but in unsupported district
@@ -441,28 +441,23 @@ def test_update_live_events_no_district_tasks_for_unsupported_districts(
 
 
 def test_find_event_webcasts_district_not_supported(tasks_client: Client) -> None:
-    DistrictWebcastChannels.put(DistrictWebcastChannelsContent(district_to_channels={}))
-
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 400
 
 
 def test_find_event_webcasts_non_youtube_type(tasks_client: Client) -> None:
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.TWITCH,
-                        channel="firstinmichigan",
-                        channel_id="",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.TWITCH,
+                channel="firstinmichigan",
+                channel_id="",
+            )
+        ],
     )
 
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 400
 
 
@@ -491,18 +486,15 @@ def test_find_event_webcasts_successful_match(
     )
     event.put()
 
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Mock upcoming streams
@@ -518,8 +510,10 @@ def test_find_event_webcasts_successful_match(
     # Mock start time retrieval
     get_start_time_mock.return_value = InstantFuture("2026-03-15")
 
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
+    assert b"Discovered webcasts:" in resp.data
+    assert b"2026fim1: abc123 (2026-03-15)" in resp.data
 
     # Verify webcast was added
     add_webcast_mock.assert_called_once()
@@ -556,18 +550,15 @@ def test_find_event_webcasts_multiple_streams_for_event(
     )
     event.put()
 
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Mock multiple upcoming streams for the same event
@@ -591,7 +582,7 @@ def test_find_event_webcasts_multiple_streams_for_event(
         InstantFuture("2026-03-16"),
     ]
 
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
 
     # Verify both webcasts were added
@@ -635,18 +626,15 @@ def test_find_event_webcasts_multiple_event_match_skipped(
     )
     event2.put()
 
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Mock stream that matches both events (both have "Troy" in their short_name)
@@ -661,7 +649,7 @@ def test_find_event_webcasts_multiple_event_match_skipped(
         ]
     )
 
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
 
     # Verify no webcast was added due to ambiguity
@@ -694,18 +682,15 @@ def test_find_event_webcasts_no_matching_events(
     )
     event.put()
 
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Mock stream that doesn't match any event
@@ -719,11 +704,66 @@ def test_find_event_webcasts_no_matching_events(
         ]
     )
 
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
+    assert resp.data == b"Discovered webcasts: none"
 
     # Verify no webcast was added
     add_webcast_mock.assert_not_called()
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_no_output_in_taskqueue(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    ).put()
+
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    get_streams_mock.return_value = InstantFuture(
+        [
+            YouTubeUpcomingStream(
+                stream_id="abc123",
+                title="Troy District Event - Qualifications",
+                scheduled_start_time="",
+            )
+        ]
+    )
+    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+
+    resp = tasks_client.get(
+        "/tasks/do/find_event_webcasts/2026fim",
+        headers={"X-Appengine-Taskname": "test"},
+    )
+    assert resp.status_code == 200
+    assert resp.data == b""
+    add_webcast_mock.assert_called_once()
 
 
 @freeze_time("2026-03-15")
@@ -752,18 +792,15 @@ def test_find_event_webcasts_no_start_time_skipped(
     )
     event.put()
 
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Mock stream
@@ -779,7 +816,7 @@ def test_find_event_webcasts_no_start_time_skipped(
     # Mock start time retrieval returning None
     get_start_time_mock.return_value = InstantFuture(None)
 
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
 
     # Verify no webcast was added due to missing start time
@@ -810,18 +847,15 @@ def test_find_event_webcasts_no_live_events(
     )
     event.put()
 
-    DistrictWebcastChannels.put(
-        DistrictWebcastChannelsContent(
-            district_to_channels={
-                "fim": [
-                    WebcastChannel(
-                        type=WebcastType.YOUTUBE,
-                        channel="FIRST in Michigan",
-                        channel_id="UCjX4WSaAFPgM2PYr-6P",
-                    )
-                ]
-            }
-        )
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
     )
 
     # Mock streams
@@ -835,7 +869,7 @@ def test_find_event_webcasts_no_live_events(
         ]
     )
 
-    resp = tasks_client.get("/tasks/do/find_event_webcasts/fim")
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
 
     # Stream lookup should still be called, but no events to match

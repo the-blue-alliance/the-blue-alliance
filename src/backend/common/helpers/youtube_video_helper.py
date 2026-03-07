@@ -23,6 +23,11 @@ class YouTubeUpcomingStream(TypedDict):
     scheduled_start_time: str
 
 
+class YouTubeChannel(TypedDict):
+    channel_id: str
+    channel_name: str
+
+
 class YouTubeVideoHelper(object):
     # Patterns to extract YouTube video ID from various URL formats
     VIDEO_ID_PATTERNS = [
@@ -135,6 +140,66 @@ class YouTubeVideoHelper(object):
         except Exception:
             logging.exception(
                 "Failed to fetch YouTube video scheduled start time for %s", video_id
+            )
+            raise ndb.Return(None)
+
+    @classmethod
+    @typed_tasklet
+    def resolve_channel_name(
+        cls, channel_name: str
+    ) -> Generator[Any, Any, Optional[YouTubeChannel]]:
+        """
+        Resolves a YouTube channel name to a channel ID.
+        Returns channel metadata if found, else None.
+        """
+        yt_secret = GoogleApiSecret.secret_key()
+        if not yt_secret:
+            logging.warning("No Google API secret, unable to resolve YouTube channel")
+            raise ndb.Return(None)
+
+        params = {
+            "part": "snippet",
+            "type": "channel",
+            "q": channel_name,
+            "maxResults": "1",
+            "key": yt_secret,
+        }
+        query_string = urlparse.urlencode(params)
+        url = f"https://www.googleapis.com/youtube/v3/search?{query_string}"
+
+        try:
+            ndb_context = ndb.get_context()
+            urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
+            urlfetch_result = URLFetchResult(url, urlfetch_response)
+
+            if urlfetch_result.status_code != 200:
+                logging.warning(
+                    f"YouTube API returned status {urlfetch_result.status_code}"
+                )
+                raise ndb.Return(None)
+
+            data = cast(Optional[dict], urlfetch_result.json())
+            if not data or not data.get("items"):
+                raise ndb.Return(None)
+
+            first_item = data["items"][0]
+            resolved_channel_id = first_item.get("id", {}).get("channelId")
+            resolved_channel_name = first_item.get("snippet", {}).get("title")
+
+            if not resolved_channel_id:
+                raise ndb.Return(None)
+
+            raise ndb.Return(
+                YouTubeChannel(
+                    channel_id=resolved_channel_id,
+                    channel_name=resolved_channel_name or channel_name,
+                )
+            )
+        except ndb.Return:
+            raise
+        except Exception:
+            logging.exception(
+                "Failed to resolve YouTube channel name: %s", channel_name
             )
             raise ndb.Return(None)
 
@@ -298,27 +363,11 @@ class YouTubeVideoHelper(object):
                     logging.warning(
                         f"YouTube API videos endpoint returned status {urlfetch_result.status_code}"
                     )
-                    for stream in batch:
-                        streams.append(
-                            YouTubeUpcomingStream(
-                                stream_id=stream["stream_id"],
-                                title=stream["title"],
-                                scheduled_start_time="",
-                            )
-                        )
                     continue
 
                 videos_result = cast(Optional[dict], urlfetch_result.json())
                 if videos_result is None:
                     logging.warning("YouTube videos API returned no data")
-                    for stream in batch:
-                        streams.append(
-                            YouTubeUpcomingStream(
-                                stream_id=stream["stream_id"],
-                                title=stream["title"],
-                                scheduled_start_time="",
-                            )
-                        )
                     continue
 
                 scheduled_times: Dict[str, str] = {}
@@ -340,13 +389,5 @@ class YouTubeVideoHelper(object):
                     )
             except Exception:
                 logging.exception("Unable to fetch video details from YouTube API")
-                for stream in batch:
-                    streams.append(
-                        YouTubeUpcomingStream(
-                            stream_id=stream["stream_id"],
-                            title=stream["title"],
-                            scheduled_start_time="",
-                        )
-                    )
 
         raise ndb.Return(streams)
