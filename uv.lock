@@ -20,7 +20,7 @@ wheels = [
 
 [[package]]
 name = "appengine-python-standard"
-version = "1.1.10"
+version = "2.0.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -36,9 +36,9 @@ dependencies = [
     { name = "six" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/4f/8f/f5b94cb4b7003bcda2f2a81f4a38ed7f1b272dd65d6468564a7cf54c0168/appengine_python_standard-1.1.10.tar.gz", hash = "sha256:2682cafa4d4d409a290268e4ef5066ebe9486f8543384d56632ca38fe4a2fdf7", size = 837038, upload-time = "2025-03-05T06:42:44.564Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/cf/dc/61df8d214f8b8066f2de0d75d6c8f79da319ac1814b321a9d0e4d0952f9b/appengine_python_standard-2.0.0.tar.gz", hash = "sha256:bad2ba237504a5be6cea0c40a4a8de31a7591692e1b2ec3616b0bec581d896d5", size = 837406, upload-time = "2026-03-02T10:44:13.568Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/f9/c2/25ff8758838ffa2b6d71c516f253bd78a8ede3826700a1d8ad576fedb185/appengine_python_standard-1.1.10-py3-none-any.whl", hash = "sha256:3cadab50db5a83421627282e4b8213c31f8f66fe52077fd1448e8da96b8e184f", size = 993671, upload-time = "2025-03-05T06:42:42.697Z" },
+    { url = "https://files.pythonhosted.org/packages/1f/4e/4f940f556fe0824d53434df0a72e5c1b3ea5579cc541490600d63907e37d/appengine_python_standard-2.0.0-py3-none-any.whl", hash = "sha256:b8ef65875d6c8ed828f5241674e18136aea4282aa7b339878f0507ea504feb1b", size = 994360, upload-time = "2026-03-02T10:44:11.774Z" },
 ]
 
 [[package]]
@@ -1903,7 +1903,7 @@ webpack = [
 
 [package.metadata]
 requires-dist = [
-    { name = "appengine-python-standard", specifier = "==1.1.10" },
+    { name = "appengine-python-standard", specifier = "==2.0.0" },
     { name = "beautifulsoup4", specifier = "==4.14.3" },
     { name = "firebase-admin", specifier = "==7.2.0" },
     { name = "flask", specifier = "==3.1.3" },
