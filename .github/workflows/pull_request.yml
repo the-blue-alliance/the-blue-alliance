@@ -349,7 +349,7 @@ jobs:
               - 'pyproject.toml'
       - name: Set up uv
         if: steps.changes.outputs.buildweb == 'true'
-        uses: astral-sh/setup-uv@v6
+        uses: astral-sh/setup-uv@v7
       - name: Set up Node
         if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-node@v6
