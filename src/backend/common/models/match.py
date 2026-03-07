@@ -396,6 +396,17 @@ class Match(CachedModel):
         elif self.comp_level == "f":
             return "F%s" % self.match_number
         else:
+            event = self.event.get()
+            if event and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
+                match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
+                    (self.comp_level, self.set_number, 1)
+                )
+                return "M%s" % (match_num if match_num is not None else "?")
+            elif event and event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
+                match_num = DOUBLE_ELIM_4_MAPPING_INVERSE.get(
+                    (self.comp_level, self.set_number, self.match_number)
+                )
+                return "M%s" % (match_num if match_num is not None else "?")
             return "%s%s-%s" % (
                 self.comp_level.upper(),
                 self.set_number,
@@ -433,6 +444,13 @@ class Match(CachedModel):
 
     @property
     def full_name(self) -> str:
+        if self.comp_level not in (CompLevel.QM, CompLevel.F):
+            event = self.event.get()
+            if event and event.playoff_type in (
+                PlayoffType.DOUBLE_ELIM_8_TEAM,
+                PlayoffType.DOUBLE_ELIM_4_TEAM,
+            ):
+                return "Playoff"
         return "%s" % (comp_level.COMP_LEVELS_VERBOSE_FULL[self.comp_level])
 
     @property

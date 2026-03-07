@@ -1,3 +1,4 @@
+import json
 import re
 import unittest
 
@@ -47,6 +48,51 @@ class TestMatchScoreNotification(unittest.TestCase):
         team = Team.get_by_id("frc1")
         notification = MatchScoreNotification(self.match, team)
         assert notification.fcm_notification.title == "Team 1 TESTPRESENT Q1 Results"
+
+    def test_fcm_notification_double_elim(self):
+        import datetime
+
+        from google.appengine.ext import ndb
+
+        from backend.common.consts.comp_level import CompLevel
+        from backend.common.consts.event_type import EventType
+        from backend.common.consts.playoff_type import PlayoffType
+        from backend.common.manipulators.event_manipulator import EventManipulator
+        from backend.common.manipulators.match_manipulator import MatchManipulator
+        from backend.common.models.event import Event
+        from backend.common.models.match import Match
+
+        year = datetime.datetime.now().year
+        event = EventManipulator.createOrUpdate(
+            Event(
+                id="{}testde".format(year),
+                event_short="testde",
+                event_type_enum=EventType.REGIONAL,
+                name="Double Elim Test Event",
+                year=year,
+                playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+            )
+        )
+        alliances = {
+            "red": {"teams": ["frc1", "frc2", "frc3"], "score": 100},
+            "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+        }
+        match = MatchManipulator.createOrUpdate(
+            Match(
+                id="{}_sf1m1".format(event.key_name),
+                event=ndb.Key(Event, event.key_name),
+                year=year,
+                comp_level=CompLevel.SF,
+                set_number=1,
+                match_number=1,
+                team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+                alliances_json=json.dumps(alliances),
+            )
+        )
+        notification = MatchScoreNotification(match)
+        assert notification.fcm_notification is not None
+        # For double elim, title should use "M1" (Match 1) not "SF1-1"
+        assert notification.fcm_notification.title == "TESTDE M1 Results"
 
     def test_data_payload(self):
         payload = self.notification.data_payload
