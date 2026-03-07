@@ -49,9 +49,9 @@ endif
 # Run tests with coverage (CI only)
 test-ci:
 ifdef ARGS
-	uv run --frozen --group ci ./ops/test_py3.sh $(ARGS)
+	uv run --frozen --group ci ./ops/test_py3.sh --ci $(ARGS)
 else
-	uv run --frozen --group ci ./ops/test_py3.sh
+	uv run --frozen --group ci ./ops/test_py3.sh --ci
 endif
 
 # Run linter (black + flake8)
