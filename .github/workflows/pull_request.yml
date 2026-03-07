@@ -410,13 +410,6 @@ jobs:
         run: |
           npm ci
           npm install -g capture-website-cli
-      - name: Install Vagrant
-        if: steps.changes.outputs.web == 'true'
-        run: |
-          wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-          sudo apt update
-          sudo apt install vagrant
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
@@ -441,7 +434,21 @@ jobs:
           cache-to: type=gha,mode=max
       - name: Start Container
         if: steps.changes.outputs.web == 'true'
-        run: vagrant up
+        run: |
+          docker run -d --name tba-py3 \
+            -v "${{ github.workspace }}:/tba" \
+            -v tba-node-modules:/tba/node_modules \
+            -p 8080:8080 \
+            -p 4000:4000 \
+            -p 4400:4400 \
+            -p 4500:4500 \
+            -p 9000:9000 \
+            -p 9005:9005 \
+            -p 9099:9099 \
+            -e CI=true \
+            --workdir /tba \
+            localhost:5000/tba-py3-dev:latest \
+            bash -c "./ops/dev/vagrant/bootstrap-dev-container.sh && ./ops/dev/vagrant/start-devserver.sh && sleep infinity"
       - name: Test Vagrant Startup
         if: steps.changes.outputs.web == 'true'
         run: ./ops/test_vagrant_startup.py

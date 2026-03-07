@@ -91,6 +91,14 @@ fi
 
 runtime_version="python313"
 
+# In CI with Docker bind mounts, gunicorn control sockets trigger spurious
+# file-change restarts that can crash the dev_appserver. Disable automatic
+# restart since hot-reloading is not needed in CI.
+restart_flag=()
+if [ -n "$CI" ]; then
+    restart_flag=("--automatic_restart" "no")
+fi
+
 set -x
 dev_appserver.py \
     --runtime_python_path=/usr/bin/python3 \
@@ -100,6 +108,7 @@ dev_appserver.py \
     --runtime="$runtime_version" \
     --application="$application" \
     "${env[@]}" \
+    "${restart_flag[@]}" \
     --env_var HTTPLIB2_CA_CERTS="/usr/lib/google-cloud-sdk/platform/google_appengine/lib/httplib2/httplib2/cacerts.txt" \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
