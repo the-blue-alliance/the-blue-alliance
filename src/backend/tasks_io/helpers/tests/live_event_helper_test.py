@@ -65,7 +65,9 @@ def test_current_event_webcasts_no_live_info(status_fetch_mock: Mock) -> None:
         )
     )
 
-    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts()
+    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts(
+        Event.query().fetch()
+    )
 
     assert len(live_events) == 1
     assert "2025test" in live_events
@@ -94,7 +96,9 @@ def test_current_event_webcasts_with_live_info(status_fetch_mock: Mock) -> None:
         )
     )
 
-    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts()
+    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts(
+        Event.query().fetch()
+    )
 
     assert len(live_events) == 1
     assert "2025test" in live_events
@@ -125,7 +129,9 @@ def test_current_event_webcasts_with_live_info_current_date(
         )
     )
 
-    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts()
+    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts(
+        Event.query().fetch()
+    )
 
     assert len(live_events) == 1
     assert "2025test" in live_events
@@ -157,7 +163,9 @@ def test_current_event_webcasts_with_live_info_different_date(
         )
     )
 
-    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts()
+    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts(
+        Event.query().fetch()
+    )
 
     assert len(live_events) == 1
     assert "2025test" in live_events
@@ -178,7 +186,9 @@ def test_forced_live_events(status_fetch_mock: Mock) -> None:
         )
     )
 
-    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts()
+    live_events, _ = LiveEventHelper.get_live_events_with_current_webcasts(
+        Event.query().fetch()
+    )
 
     assert len(live_events) == 1
     assert "2025test" in live_events
@@ -207,5 +217,5 @@ def test_special_webcasts(special_webcast_mock: Mock, status_fetch_mock: Mock) -
     special_webcast_mock.return_value = InstantFuture([w])
     status_fetch_mock.return_value = InstantFuture(None)
 
-    _, special_webcasts = LiveEventHelper.get_live_events_with_current_webcasts()
+    _, special_webcasts = LiveEventHelper.get_live_events_with_current_webcasts([])
     assert special_webcasts == [w]

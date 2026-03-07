@@ -17,6 +17,12 @@ class YouTubePlaylistItem(TypedDict):
     guessed_match_partial: str
 
 
+class YouTubeUpcomingStream(TypedDict):
+    stream_id: str
+    title: str
+    scheduled_start_time: str
+
+
 class YouTubeVideoHelper(object):
     # Patterns to extract YouTube video ID from various URL formats
     VIDEO_ID_PATTERNS = [
@@ -204,3 +210,143 @@ class YouTubeVideoHelper(object):
                 for video in videos
             ]
         )
+
+    @classmethod
+    @typed_tasklet
+    def get_upcoming_streams(
+        cls, channel_id: str
+    ) -> Generator[Any, Any, List[YouTubeUpcomingStream]]:
+        """
+        Fetches all upcoming live streams for a given YouTube channel.
+        Returns a list of streams with stream_id, title, and scheduled_start_time.
+        """
+        yt_secret = GoogleApiSecret.secret_key()
+        if not yt_secret:
+            msg = "No Google API secret, unable to fetch upcoming streams"
+            logging.warning(msg)
+            raise Exception(msg)
+
+        stream_basics: List[Dict[str, str]] = []
+        next_page_token = ""
+        base_url = "https://www.googleapis.com/youtube/v3/search"
+        page_count = 0
+
+        while page_count < 10:  # Prevent runaway looping
+            try:
+                params = {
+                    "part": "snippet",
+                    "channelId": channel_id,
+                    "eventType": "upcoming",
+                    "type": "video",
+                    "order": "date",
+                    "maxResults": "50",
+                    "pageToken": next_page_token,
+                    "key": yt_secret,
+                }
+                query_string = "&".join(f"{k}={v}" for k, v in params.items() if v)
+                url = f"{base_url}?{query_string}"
+
+                ndb_context = ndb.get_context()
+                urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
+                urlfetch_result = URLFetchResult(url, urlfetch_response)
+
+                if urlfetch_result.status_code != 200:
+                    logging.error(
+                        f"YouTube API returned status {urlfetch_result.status_code}"
+                    )
+                    raise Exception(
+                        f"Unable to call Youtube API for upcoming streams: status {urlfetch_result.status_code}"
+                    )
+            except Exception:
+                logging.exception("Unable to call Youtube API for upcoming streams")
+                raise
+
+            search_result = cast(Optional[dict], urlfetch_result.json())
+            if search_result is None:
+                logging.error("YouTube API returned no data")
+                break
+
+            for item in search_result.get("items", []):
+                snippet = item.get("snippet", {})
+                video_id = item.get("id", {}).get("videoId")
+                if video_id:
+                    stream_basics.append(
+                        {
+                            "stream_id": video_id,
+                            "title": snippet.get("title", ""),
+                        }
+                    )
+
+            if "nextPageToken" not in search_result:
+                break
+
+            next_page_token = search_result["nextPageToken"]
+            page_count += 1
+
+        streams: List[YouTubeUpcomingStream] = []
+        for batch_start in range(0, len(stream_basics), 50):
+            batch = stream_basics[batch_start : batch_start + 50]
+            video_ids = ",".join(stream["stream_id"] for stream in batch)
+            videos_url = f"https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={video_ids}&key={yt_secret}"
+
+            try:
+                ndb_context = ndb.get_context()
+                urlfetch_response = yield ndb_context.urlfetch(videos_url, deadline=10)
+                urlfetch_result = URLFetchResult(videos_url, urlfetch_response)
+
+                if urlfetch_result.status_code != 200:
+                    logging.warning(
+                        f"YouTube API videos endpoint returned status {urlfetch_result.status_code}"
+                    )
+                    for stream in batch:
+                        streams.append(
+                            YouTubeUpcomingStream(
+                                stream_id=stream["stream_id"],
+                                title=stream["title"],
+                                scheduled_start_time="",
+                            )
+                        )
+                    continue
+
+                videos_result = cast(Optional[dict], urlfetch_result.json())
+                if videos_result is None:
+                    logging.warning("YouTube videos API returned no data")
+                    for stream in batch:
+                        streams.append(
+                            YouTubeUpcomingStream(
+                                stream_id=stream["stream_id"],
+                                title=stream["title"],
+                                scheduled_start_time="",
+                            )
+                        )
+                    continue
+
+                scheduled_times: Dict[str, str] = {}
+                for item in videos_result.get("items", []):
+                    found_video_id = item.get("id")
+                    live_details = item.get("liveStreamingDetails") or {}
+                    scheduled_start = live_details.get("scheduledStartTime", "")
+                    if found_video_id:
+                        scheduled_times[found_video_id] = scheduled_start
+
+                for stream in batch:
+                    stream_id = stream["stream_id"]
+                    streams.append(
+                        YouTubeUpcomingStream(
+                            stream_id=stream_id,
+                            title=stream["title"],
+                            scheduled_start_time=scheduled_times.get(stream_id, ""),
+                        )
+                    )
+            except Exception:
+                logging.exception("Unable to fetch video details from YouTube API")
+                for stream in batch:
+                    streams.append(
+                        YouTubeUpcomingStream(
+                            stream_id=stream["stream_id"],
+                            title=stream["title"],
+                            scheduled_start_time="",
+                        )
+                    )
+
+        raise ndb.Return(streams)

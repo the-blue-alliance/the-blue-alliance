@@ -3,7 +3,6 @@ from typing import Any, Dict, Generator, List, Tuple
 from google.appengine.ext import ndb
 
 from backend.common.futures import TypedFuture
-from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.special_webcast_helper import SpecialWebcastHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
@@ -20,10 +19,9 @@ class LiveEventHelper:
     @typed_toplevel
     def get_live_events_with_current_webcasts(
         cls,
+        week_events: list[Event],
     ) -> Generator[Any, Any, Tuple[Dict[EventKey, Event], List[TSpecialWebcast]]]:
-        week_events = EventHelper.week_events()
         events_by_key: Dict[EventKey, Event] = {}
-
         live_events: List[Event] = []
         webcast_status_futures: List[TypedFuture[None]] = []
         for event in week_events:
@@ -33,7 +31,7 @@ class LiveEventHelper:
                     webcast_status_futures.append(
                         WebcastOnlineHelper.add_online_status_async(webcast)
                     )
-                events_by_key[event.key.id()] = event
+                events_by_key[event.key_name] = event
             if event.within_a_day:
                 live_events.append(event)
 
@@ -48,7 +46,7 @@ class LiveEventHelper:
                     webcast_status_futures.append(
                         WebcastOnlineHelper.add_online_status_async(webcast)
                     )
-            events_by_key[event.key.id()] = event
+            events_by_key[event.key_name] = event
 
         special_webcasts: List[TSpecialWebcast] = (
             yield SpecialWebcastHelper.get_special_webcasts_with_online_status_async()
