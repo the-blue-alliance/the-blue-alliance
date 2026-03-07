@@ -3,7 +3,7 @@ name = "the-blue-alliance"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
-    "appengine-python-standard==1.1.10",
+    "appengine-python-standard==2.0.0",
     "beautifulsoup4==4.14.3",
     "firebase-admin==7.2.0",
     "Flask==3.1.3",
