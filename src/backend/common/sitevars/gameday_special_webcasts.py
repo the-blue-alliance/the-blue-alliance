@@ -1,3 +1,4 @@
+import datetime
 from typing import Dict, List, Optional, TypedDict
 
 from backend.common.models.webcast import Webcast
@@ -38,7 +39,17 @@ class GamedaySpecialWebcasts(Sitevar[ContentType]):
 
     @classmethod
     def webcasts(cls) -> List[WebcastType]:
-        return cls.get()["webcasts"]
+        today = datetime.date.today()
+        webcasts = []
+        for webcast in cls.get()["webcasts"]:
+            if "date" in webcast:
+                webcast_date = datetime.datetime.strptime(
+                    webcast["date"], "%Y-%m-%d"
+                ).date()
+                if today != webcast_date:
+                    continue
+            webcasts.append(webcast)
+        return webcasts
 
     @classmethod
     def get_alias(cls, alias) -> Optional[str]:

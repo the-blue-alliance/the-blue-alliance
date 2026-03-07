@@ -52,25 +52,69 @@ ops/                    # Build, deploy, and dev scripts
 - Configuration via `tba_dev_config.json` for local dev
 
 ## Development Setup
-**Recommended**: Use devcontainers or docker-compose for local development.
+**Recommended**: Use docker-compose for the local dev server, and `uv` for Python tooling (tests, linting).
 
-See docs/Setup/Setup-Guide-Beta.md for docker-compose or docs/Setup/Setup-Guide.md for vagrant setup.
+See docs/Setup/Setup-Guide.md for setup instructions.
 
 ```bash
-# Start dev environment with docker-compose
-docker-compose up
+# Start dev environment with docker-compose (always use --build)
+docker-compose up --build
 
 # Access shell in container
 docker-compose exec tba bash
 
-# Or use convenience script
-./ops/shell/run_local_shell.sh
+# View logs
+docker-compose logs -f tba
+docker-compose logs -f webpack
+```
+
+## Running Python Commands
+All Python dependencies are managed by `uv` and isolated in a virtual environment. Use one of these approaches:
+
+### Via `uv run` (preferred for one-off commands)
+`uv run` executes a command within the managed virtual environment, automatically syncing dependencies first if needed.
+
+```bash
+# Run a Python script with all dev dependencies available
+uv run --group dev python3 script.py
+
+# Run with a specific dependency group
+uv run --group test python3 -c "import pytest; print(pytest.__version__)"
+uv run --group typecheck pyre check
+```
+
+### Via `uv shell` (preferred for interactive sessions)
+Activate a shell with the virtual environment so all subsequent commands use the managed Python.
+
+```bash
+# Activate the uv-managed virtual environment
+source .venv/bin/activate
+
+# Now python3 and all installed packages are available directly
+python3 script.py
+pytest src/backend/common/models/tests/event_test.py
+```
+
+If the `.venv` doesn't exist yet, run `make sync` first to create it and install all dependencies.
+
+### Via `make` targets (preferred for standard workflows)
+The Makefile wraps `uv run` with the correct dependency groups. Use these for all standard dev tasks:
+
+```bash
+make test               # Run all tests
+make lint               # Run Python linters
+make typecheck          # Run pyre type checker
+make sync               # Sync/install all dev dependencies
+make freeze             # Generate src/requirements.txt for GAE deploy
 ```
 
 ## Testing & Linting
-Run tests via make:
+Tests and linting use `uv` for dependency management. Dependencies are synced automatically on first `make` invocation.
 
 ```bash
+# Sync all dev dependencies explicitly
+make sync
+
 # Run all tests
 make test
 

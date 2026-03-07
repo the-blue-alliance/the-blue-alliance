@@ -1,6 +1,6 @@
 import abc
 import logging
-from typing import Any, Dict, Generator, Generic, Optional, TypeVar
+from typing import Any, cast, Dict, Generator, Generic, Optional, TypeVar
 from urllib.parse import urlencode
 
 from google.appengine.ext import ndb
@@ -8,13 +8,18 @@ from google.appengine.ext.ndb.context import Context
 
 from backend.common.futures import TypedFuture
 from backend.common.profiler import Span
-from backend.common.urlfetch import URLFetchMethod, URLFetchResult
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase, TParsedResponse
+from backend.common.urlfetch import TypedURLFetchResult, URLFetchMethod, URLFetchResult
+from backend.tasks_io.datafeeds.parsers.parser_base import (
+    ParserBase,
+    TParsedResponse,
+    TParserInput,
+)
 
+TAPIResponse = TypeVar("TAPIResponse")
 TReturn = TypeVar("TReturn")
 
 
-class DatafeedBase(abc.ABC, Generic[TReturn]):
+class DatafeedBase(abc.ABC, Generic[TAPIResponse, TReturn]):
 
     ndb_context: Context
 
@@ -28,7 +33,7 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
         return {}
 
     @abc.abstractmethod
-    def parser(self) -> ParserBase[TReturn]: ...
+    def parser(self) -> ParserBase[TAPIResponse, TReturn]: ...
 
     @property
     def method(self) -> URLFetchMethod:
@@ -48,7 +53,7 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
         parser = self.parser()
         return self._parse(response, parser)
 
-    def _fetch(self) -> TypedFuture[URLFetchResult]:
+    def _fetch(self) -> TypedFuture[TypedURLFetchResult[TAPIResponse]]:
         url = self.url()
         headers = self.headers()
         return self._urlfetch(url, headers)
@@ -56,7 +61,7 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
     @ndb.tasklet
     def _urlfetch(
         self, url: str, headers: Dict[str, str]
-    ) -> Generator[Any, Any, URLFetchResult]:
+    ) -> Generator[Any, Any, TypedURLFetchResult[TAPIResponse]]:
         with Span(f"api_fetch:{type(self).__name__}"):
             if payload_data := self.payload():
                 payload = urlencode(payload_data).encode()
@@ -70,14 +75,20 @@ class DatafeedBase(abc.ABC, Generic[TReturn]):
                 method=self.method,
                 payload=payload,
             )
-            return URLFetchResult(url, resp)
+            resp = URLFetchResult(url, resp)
+            return cast(TypedURLFetchResult[TAPIResponse], resp)
 
     def _parse(
-        self, response: URLFetchResult, parser: ParserBase[TParsedResponse]
+        self,
+        response: TypedURLFetchResult[TParserInput],
+        parser: ParserBase[TParserInput, TParsedResponse],
     ) -> Optional[TParsedResponse]:
         if response.status_code == 200:
             with Span(f"api_parser:{type(parser).__name__}"):
-                return parser.parse(response.json())
+                resp_body = response.json()
+                if resp_body is None:
+                    return None
+                return parser.parse(resp_body)
         elif response.status_code == 404:
             return None
 

@@ -14,40 +14,20 @@ When running locally, TBA will export a bootstrap interface at [http://localhost
 
 (TODO not implemented yet)
 
-## Using the local Dockerfile
+## Rebuilding the Development Container
 
-By default Vagrant will look for the pre-built Docker container upstream when provisioning a development container. To use the local `Dockerfile`, set `TBA_LOCAL_DOCKERFILE` to be `true` and start the container normally.
-
-```
-$ TBA_LOCAL_DOCKERFILE=true vagrant up
-Bringing machine 'default' up with 'docker' provider...
-==> default: Creating and configuring docker networks...
-==> default: Building the container from a Dockerfile...
-```
-
-## Reprovisioning the Development Container
-
-If you run into issues, especially after not working with your dev instance for a while, try re-provisioning and restarting your development container.
+If you run into issues, especially after not working with your dev instance for a while, try rebuilding and restarting your containers.
 
 ```
-$ vagrant up --provision
+$ docker-compose down
+$ docker-compose up --build
 ```
 
-The Vagrant container may be out of date as well. In this situation, destroy and recreate your local Vagrant image. You should also be sure you have the most up to date base container image.
+If you want to start completely fresh (including wiping datastore data):
 
 ```
-$ vagrant halt
-$ vagrant destroy
-$ docker pull ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-$ vagrant up
-```
-
-If you have problems destroying your container via Vagrant, you can remove the container via Docker.
-
-```
-$ docker stop tba
-$ docker rm tba
-$ vagrant up
+$ docker-compose down --volumes
+$ docker-compose up --build
 ```
 
 ## Generating Type Checker Stubs

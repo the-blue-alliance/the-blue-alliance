@@ -53,9 +53,10 @@ def test_revoke_session_cookie_no_claims(secret_app: Flask) -> None:
     with secret_app.test_request_context("/"):
         session["session"] = "abc"
 
-        with patch.object(
-            backend_auth, "_decoded_claims", return_value=None
-        ), patch.object(auth, "revoke_refresh_tokens") as mock_revoke_refresh_tokens:
+        with (
+            patch.object(backend_auth, "_decoded_claims", return_value=None),
+            patch.object(auth, "revoke_refresh_tokens") as mock_revoke_refresh_tokens,
+        ):
             revoke_session_cookie()
         mock_revoke_refresh_tokens.assert_not_called()
 
@@ -68,9 +69,10 @@ def test_revoke_session_cookie(secret_app: Flask) -> None:
     with secret_app.test_request_context("/"):
         session["session"] = "abc"
 
-        with patch.object(
-            backend_auth, "_decoded_claims", return_value={"sub": sub}
-        ), patch.object(auth, "revoke_refresh_tokens") as mock_revoke_refresh_tokens:
+        with (
+            patch.object(backend_auth, "_decoded_claims", return_value={"sub": sub}),
+            patch.object(auth, "revoke_refresh_tokens") as mock_revoke_refresh_tokens,
+        ):
             revoke_session_cookie()
         mock_revoke_refresh_tokens.assert_called_with(sub, app=ANY)
 

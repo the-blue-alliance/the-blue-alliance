@@ -1,4 +1,3 @@
-const babelParser = require("@babel/eslint-parser");
 const react = require("eslint-plugin-react");
 const globals = require("globals");
 const js = require("@eslint/js");
@@ -26,7 +25,12 @@ module.exports = [
   ...compat.extends("plugin:prettier/recommended"),
   {
     languageOptions: {
-      parser: babelParser,
+      parserOptions: {
+        ecmaVersion: 2022,
+        ecmaFeatures: {
+          jsx: true,
+        },
+      },
 
       globals: {
         ...globals.jest,

@@ -93,10 +93,10 @@ Set the [`google_application_credentials` of the `tba_config.json`/`tba_config.l
 }
 ```
 
-If you're using the development container, make sure to sync your key file to the container. A [restart or reprovision of the development container](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Development-Runbook#reprovisioning-the-development-container) might be necessary in order to sync files + restart `dev_appserver.py`. Otherwise, you can kill + restart the `dev_appserver.sh` script in the tmux session manually.
+If you're using the development container, make sure to sync your key file to the container. A [restart of the development container](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Development-Runbook#rebuilding-the-development-container) might be necessary in order to restart `dev_appserver.py`.
 
 ```bash
-$ ./ops/dev/vagrant/dev_appserver.sh
+$ docker-compose down && docker-compose up --build
 ```
 
 ## Configure a Google App Engine instance

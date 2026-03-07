@@ -2,6 +2,7 @@ import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 
 import { getTeamsSimple } from '~/api/tba/read';
 import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import FavoriteTeamsSection from '~/components/tba/favoriteTeamsSection';
 import TeamListTable from '~/components/tba/teamListTable';
 import {
   Select,
@@ -95,11 +96,9 @@ function TeamsPage() {
         </div>
       </div>
       <div className="basis-full overflow-x-auto lg:basis-5/6 lg:py-8">
+        {pageNum === 1 && <FavoriteTeamsSection />}
         <h1 className="mb-3 text-3xl font-medium">
-          <i>FIRST</i> Robotics Teams {TeamPageNumberToRange(pageNum)}{' '}
-          <small className="text-xl text-muted-foreground">
-            {teams.length} Teams
-          </small>
+          <i>FIRST</i> Robotics Teams {TeamPageNumberToRange(pageNum)}
         </h1>
         <TeamListTable teams={teams} />
       </div>

@@ -16,6 +16,7 @@
     <th>Event Awards</th>
     <th>Match Video</th>
     <th>Zebra MotionWorks</th>
+    <th>View Logs</th>
   </tr>
   {% for auth in write_auths %}
   <tr>
@@ -43,6 +44,7 @@
     <td>{% if auth.can_edit_event_awards %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
     <td>{% if auth.can_edit_match_video %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
     <td>{% if auth.can_edit_zebra_motionworks %}<span class="glyphicon glyphicon-ok"><span>{% endif %}</td>
+    <td>{% if gcp_project_id %}<a href="https://console.cloud.google.com/logs/query;query=labels.api_auth_id%3D%22{{auth.key.id()}}%22?project={{gcp_project_id}}" target="_blank" class="btn btn-sm btn-primary">View Logs</a>{% endif %}</td>
   </tr>
   {% endfor %}
 </table>

@@ -1,4 +1,4 @@
-import { includeIgnoreFile } from '@eslint/compat';
+import { fixupPluginRules, includeIgnoreFile } from '@eslint/compat';
 import tsParser from '@typescript-eslint/parser';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
@@ -67,7 +67,7 @@ export default tseslint.config([
       pluginReact.configs.flat.recommended,
       pluginReact.configs.flat['jsx-runtime'],
     ],
-    settings: { react: { version: 'detect' } },
+    settings: { react: { version: '19' } }, // Avoids auto-detection crash
     languageOptions: { globals: globals.browser },
     rules: {
       'react/prop-types': 'off',
@@ -155,7 +155,7 @@ export default tseslint.config([
   {
     files: ['**/*.{ts,tsx,js}'],
     plugins: {
-      'no-relative-import-paths': noRelativeImportPaths,
+      'no-relative-import-paths': fixupPluginRules(noRelativeImportPaths),
     },
     rules: {
       'no-relative-import-paths/no-relative-import-paths': 'error',

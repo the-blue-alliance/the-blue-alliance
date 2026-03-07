@@ -56,9 +56,12 @@ def test_send(fcm_app):
         [messaging.SendResponse({"name": "abc"}, None)]
     )
     request = FCMRequest(fcm_app, notification=MockNotification(), tokens=["abc"])
-    with patch.object(
-        messaging, "send_each_for_multicast", return_value=batch_response
-    ) as mock_send, patch.object(request, "defer_track_notification") as mock_track:
+    with (
+        patch.object(
+            messaging, "send_each_for_multicast", return_value=batch_response
+        ) as mock_send,
+        patch.object(request, "defer_track_notification") as mock_track,
+    ):
         response = request.send()
     mock_send.assert_called_once()
     mock_track.assert_called_once_with(1)
@@ -70,9 +73,12 @@ def test_send_failed(fcm_app):
     request = FCMRequest(
         fcm_app, notification=MockNotification(), tokens=["abc", "def"]
     )
-    with patch.object(
-        messaging, "send_each_for_multicast", return_value=batch_response
-    ) as mock_send, patch.object(request, "defer_track_notification") as mock_track:
+    with (
+        patch.object(
+            messaging, "send_each_for_multicast", return_value=batch_response
+        ) as mock_send,
+        patch.object(request, "defer_track_notification") as mock_track,
+    ):
         response = request.send()
     mock_send.assert_called_once()
     mock_track.assert_not_called()
@@ -89,9 +95,12 @@ def test_send_failed_partial(fcm_app):
     request = FCMRequest(
         fcm_app, notification=MockNotification(), tokens=["abc", "def"]
     )
-    with patch.object(
-        messaging, "send_each_for_multicast", return_value=batch_response
-    ) as mock_send, patch.object(request, "defer_track_notification") as mock_track:
+    with (
+        patch.object(
+            messaging, "send_each_for_multicast", return_value=batch_response
+        ) as mock_send,
+        patch.object(request, "defer_track_notification") as mock_track,
+    ):
         response = request.send()
     mock_send.assert_called_once()
     mock_track.assert_called_once_with(1)

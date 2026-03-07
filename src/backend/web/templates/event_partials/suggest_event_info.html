@@ -9,7 +9,7 @@
             <td><p><strong>Example:</strong><br>nyny</p></td>
         </tr>
         <tr>
-            <td>FIRST Sync Code</td>
+            <td>FIRST Sync Code{% if event.first_code %} (<a href="https://frc-events.firstinspires.org/{{ event.year }}/{{ event.first_code }}" target="_blank">{{ event.first_code }}</a>){% endif %}</td>
             <td><input type="text" name="first_code" {% if event.first_code%}value="{{ event.first_code }}{% endif %}"/></td>
             <td><p><strong>Example:</strong><br>IRI</p></td>
         </tr>

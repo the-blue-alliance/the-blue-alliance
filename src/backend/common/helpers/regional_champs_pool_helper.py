@@ -221,8 +221,12 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 team = team_f
             bonus = cls._get_rookie_bonus(year, team.rookie_year)
 
-            team_totals[team.key_name]["rookie_bonus"] = bonus
-            team_totals[team.key_name]["point_total"] += bonus
+            # Rookie bonus is applied per event attended (up to 2 events)
+            num_events_attended = len(team_totals[team.key_name]["event_points"])
+            total_rookie_bonus = bonus * num_events_attended
+
+            team_totals[team.key_name]["rookie_bonus"] = total_rookie_bonus
+            team_totals[team.key_name]["point_total"] += total_rookie_bonus
 
             # For other adjustments made by HQ
             if adjustments and (team_adjustment := adjustments.get(team.key_name)):

@@ -1192,6 +1192,7 @@ export type Match = {
     | MatchScoreBreakdown2023
     | MatchScoreBreakdown2024
     | MatchScoreBreakdown2025
+    | MatchScoreBreakdown2026
     | null;
   /**
    * Array of video objects associated with this match.

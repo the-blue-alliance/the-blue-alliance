@@ -19,7 +19,7 @@ from backend.common.models.match import Match
 from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class NexusAPIQueueStatusParser(ParserBase[Optional[EventQueueStatus]]):
+class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
 
     MATCH_LABEL_PATTERN: re.Pattern = re.compile(
         r"(Practice|Qualification|Playoff|Final) (\d+)( Replay)?"

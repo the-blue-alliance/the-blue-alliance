@@ -1,4 +1,5 @@
 #!/bin/bash
+set -e
 
 if [ -n "$CI" ]; then
     echo "::add-matcher::./ops/problem_matchers/flake8_error.json"

@@ -40,8 +40,9 @@ def test_platform_config_unsupported_platform_type():
 def test_platform_config_unsupported_platform_payload_type():
     # Hack this test as if we'd added a new PlatformType but hadn't supported it properly
     config = PlatformConfig()
-    with patch.object(PlatformType, "validate"), pytest.raises(
-        TypeError, match="Unsupported PlatformPayload platform_type: -1"
+    with (
+        patch.object(PlatformType, "validate"),
+        pytest.raises(TypeError, match="Unsupported PlatformPayload platform_type: -1"),
     ):
         config.platform_config(-1)
 

@@ -1,0 +1,65 @@
+name: Bug Report
+description: File a bug report.
+labels: ["Bug"]
+type: Bug
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to report this bug to The Blue Alliance!
+        Provide a general summary of the issue in the Title above.
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Is there an existing issue for this?
+      description: Please search to see if an issue already exists for the bug you encountered.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected Behavior
+      description: A concise description of what you expected to happen.
+    validations:
+      required: false
+  - type: textarea
+    id: current
+    attributes:
+      label: Current Behavior
+      description: A concise description of what you're experiencing.
+    validations:
+      required: false
+  - type: textarea
+    id: possible-solution
+    attributes:
+      label: Possible Solution
+      description: Not obligatory, but suggest a fix/reason for the bug.
+    validations:
+      required: false
+  - type: textarea
+    id: steps-to-reproduce
+    attributes:
+      label: Steps To Reproduce
+      description: Steps to reproduce the behavior.
+      placeholder: |
+        1. In this environment...
+        1. On this page...
+        1. Click '...'
+        1. See error...
+    validations:
+      required: false
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: How has this issue affected you? What are you trying to accomplish?
+    validations:
+      required: false
+  - type: textarea
+    id: environment
+    attributes:
+      label: Environment
+      description: Include as many relevant details about the environment you experienced the bug in, eg. browser version, operating system, etc.
+    validations:
+      required: false

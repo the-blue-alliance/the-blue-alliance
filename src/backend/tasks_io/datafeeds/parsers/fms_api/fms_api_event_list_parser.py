@@ -1,15 +1,23 @@
 import datetime
 import json
 import logging
-from typing import Any, Dict, Generator, List, Optional, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Tuple
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from pytz import all_timezones_set as PYTZ_ALL_TIMEZONES
 from tzlocal.windows_tz import win_tz as WINDOWS_TO_IANA
 
 from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.frc_api.types import (
+    SeasonEventListModelV31,
+    SeasonEventListModelV33,
+    SeasonEventModelV31,
+    SeasonEventModelV33,
+    WebcastDetailModelExtV33,
+)
 from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
@@ -18,10 +26,15 @@ from backend.common.models.keys import DistrictKey, Year
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.tasklets import typed_tasklet
-from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
+from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
+class FMSAPIEventListParser(
+    ParserBase[
+        SeasonEventListModelV33 | SeasonEventListModelV31,
+        Tuple[List[Event], List[District]],
+    ]
+):
     DATE_FORMAT_STR = "%Y-%m-%dT%H:%M:%S"
 
     EVENT_TYPES = {
@@ -84,16 +97,30 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
     @staticmethod
     @typed_tasklet
     def _parse_webcasts_async(
-        webcast_urls: List[str],
-    ) -> Generator[Any, Any, List[Optional[Webcast]]]:
+        api_webcasts: list[str] | list[WebcastDetailModelExtV33],
+    ) -> Generator[Any, Any, List[Webcast]]:
         """Parse webcast URLs in parallel."""
-        webcast_futures = tuple(
-            WebcastParser.webcast_dict_from_url(url) for url in webcast_urls
-        )
-        webcasts = yield webcast_futures
-        raise ndb.Return(list(webcasts))
+        if api_webcasts and isinstance(api_webcasts[0], str):
+            webcast_futures = tuple(
+                WebcastParser.webcast_dict_from_url(cast(str, url))
+                for url in api_webcasts
+            )
+            webcasts = yield webcast_futures
+            return [w for w in webcasts if w is not None]
 
-    def parse(self, response: Dict[str, Any]) -> Tuple[List[Event], List[District]]:
+        webcasts = []
+        if api_webcasts and isinstance(api_webcasts[0], dict):
+            for api_webcast in api_webcasts:
+                if w := WebcastParser.webcast_dict_from_api_response(
+                    cast(WebcastDetailModelExtV33, api_webcast)
+                ):
+                    webcasts.append(w)
+
+        raise ndb.Return(webcasts)
+
+    def parse(
+        self, response: SeasonEventListModelV33 | SeasonEventListModelV31
+    ) -> Tuple[List[Event], List[District]]:
         events: List[Event] = []
         districts: Dict[DistrictKey, District] = {}
 
@@ -102,10 +129,13 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
         event_name_override = cmp_hack_sitevar["event_name_override"]
         events_to_change_dates = cmp_hack_sitevar["set_start_to_last_day"]
 
-        for event in response["Events"]:
-            code = event["code"].lower()
+        api_events: list[SeasonEventModelV33] | list[SeasonEventModelV31] = (
+            response["Events"] or []
+        )
+        for event in api_events:
+            code = none_throws(event["code"]).lower()
 
-            api_event_type = event["type"].lower()
+            api_event_type = none_throws(event["type"]).lower()
             event_type = (
                 EventType.PRESEASON
                 if code == "week0"
@@ -130,18 +160,21 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             if api_event_type in self.NON_OFFICIAL_EVENT_TYPES:
                 official = False
 
-            name = event["name"]
+            name = none_throws(event["name"])
             short_name = EventShortNameHelper.get_short_name(
                 name,
                 district_code=event["districtCode"],
                 event_type=event_type,
                 year=self.season,
             )
-            district_key = (
-                District.render_key_name(self.season, event["districtCode"].lower())
-                if event["districtCode"]
-                else None
-            )
+
+            if api_district_code := event["districtCode"]:
+                district_key = District.render_key_name(
+                    self.season, api_district_code.lower()
+                )
+            else:
+                district_key = None
+
             address = event.get("address")
             venue = event["venue"]
             city = event["city"]
@@ -150,8 +183,13 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             start = datetime.datetime.strptime(event["dateStart"], self.DATE_FORMAT_STR)
             end = datetime.datetime.strptime(event["dateEnd"], self.DATE_FORMAT_STR)
             website = event.get("website")
-            webcasts = self._parse_webcasts_async(
-                event.get("webcasts", [])
+
+            api_webcasts: list[str] | list[WebcastDetailModelExtV33] = []
+            if resp_webcasts := event.get("webcasts"):
+                api_webcasts = resp_webcasts
+
+            webcasts: list[Webcast] = self._parse_webcasts_async(
+                api_webcasts
             ).get_result()
 
             # Attempt to convert our API (Windows) timezone -> IANA timezone
@@ -225,11 +263,15 @@ class FMSAPIEventListParser(ParserJSON[Tuple[List[Event], List[District]]]):
             )
 
             # Build District Model
-            if district_key and district_key not in districts:
+            if (
+                (district_code := event["districtCode"])
+                and district_key
+                and district_key not in districts
+            ):
                 districts[district_key] = District(
                     id=district_key,
                     year=self.season,
-                    abbreviation=event["districtCode"].lower(),
+                    abbreviation=district_code.lower(),
                 )
 
         # Prep for division <-> parent associations

@@ -34,7 +34,11 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { AwardType } from '~/lib/api/AwardType';
 import { EventType } from '~/lib/api/EventType';
-import { getEventDateString, sortEvents } from '~/lib/eventUtils';
+import {
+  getCurrentWeekEvents,
+  getEventDateString,
+  sortEvents,
+} from '~/lib/eventUtils';
 import { sortTeams } from '~/lib/teamUtils';
 import {
   USA_STATE_ABBREVIATION_TO_FULL,
@@ -99,8 +103,15 @@ export const Route = createFileRoute(
             (r) => r.point_total > 0 && (r.event_points?.length ?? 0) > 0,
           );
 
+    const now = new Date();
+    const seasonIsComplete = events.data.every(
+      (e) => new Date(e.end_date) < now,
+    );
+
+    // If the season is done, show only the teams that were actually active (in the rankings)
+    // Otherwise, show all teams (since it may be mid-season and some may not have played yet, thus have no ranking)
     const actuallyActiveTeams =
-      actuallyActiveRankings === null
+      actuallyActiveRankings === null || !seasonIsComplete
         ? teams.data
         : teams.data.filter((team) =>
             actuallyActiveRankings.find((r) => r.team_key === team.key),
@@ -170,6 +181,20 @@ function DistrictPage() {
     (award) => award.event_key === parentDCMPEvent?.key,
   );
 
+  const thisWeekEvents = getCurrentWeekEvents(events);
+
+  const dcmpChairmanRecipients = dcmpAwards
+    .filter((award) => award.award_type === AwardType.CHAIRMANS)
+    .flatMap((award) => award.recipient_list)
+    .map((recipient) => recipient.team_key)
+    .filter((k): k is string => k !== null && k !== undefined);
+
+  const dcmpWinnerRecipients = parentDCMPAwards
+    .filter((award) => award.award_type === AwardType.WINNER)
+    .flatMap((award) => award.recipient_list)
+    .map((recipient) => recipient.team_key)
+    .filter((k): k is string => k !== null && k !== undefined);
+
   const teamsByLocation = groupBy(teams, (team) =>
     team.country === 'USA' ? team.state_prov : team.country,
   );
@@ -190,7 +215,7 @@ function DistrictPage() {
       <Tabs defaultValue={'overview'} className="mt-4">
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
-            [&>*]:basis-1/2 lg:[&>*]:basis-1"
+            *:basis-1/2 lg:*:basis-1"
         >
           <TabsTrigger value="overview">Overview</TabsTrigger>
           {hasRankings && <TabsTrigger value="rankings">Rankings</TabsTrigger>}
@@ -249,72 +274,142 @@ function DistrictPage() {
             </Table>
           )}
 
-          {parentDCMPEvent && (
+          {thisWeekEvents.length > 0 && (
             <>
               <Divider className="py-4">
-                <div className="text-xl">
-                  <EventLink eventOrKey={parentDCMPEvent.key}>DCMP</EventLink>
-                </div>
+                <div className="text-xl">This Week</div>
               </Divider>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Event</TableHead>
+                    <TableHead>Location</TableHead>
+                    <TableHead>Dates</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {thisWeekEvents.map((event) => (
+                    <TableRow key={event.key}>
+                      <TableCell>
+                        <EventLink eventOrKey={event.key}>
+                          {event.name}
+                        </EventLink>
+                      </TableCell>
+                      <TableCell>
+                        <EventLocationLink event={event} hideUSA hideVenue />
+                      </TableCell>
+                      <TableCell>
+                        {getEventDateString(event, 'short')}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </>
+          )}
 
-              <div className="gap-3 lg:grid lg:grid-cols-2">
-                <TitledCard
-                  cardTitle={joinComponents(
-                    dcmpAwards
-                      .filter(
-                        (award) => award.award_type === AwardType.CHAIRMANS,
-                      )
-                      .flatMap((award) => award.recipient_list)
-                      .map((recipient) => recipient.team_key?.substring(3))
-                      .sort((a, b) => Number(a) - Number(b))
-                      .map((teamNumber) => (
-                        <TeamLink
-                          teamOrKey={`frc${teamNumber}`}
-                          year={year}
-                          key={teamNumber}
-                        >
-                          {teamNumber}
-                        </TeamLink>
-                      )),
-                    <span className="font-medium">, </span>,
+          {parentDCMPEvent &&
+            (dcmpChairmanRecipients.length > 0 ||
+              dcmpWinnerRecipients.length > 0) && (
+              <>
+                <Divider className="py-4">
+                  <div className="text-xl">
+                    <EventLink eventOrKey={parentDCMPEvent.key}>DCMP</EventLink>
+                  </div>
+                </Divider>
+
+                <div className="gap-3 lg:grid lg:grid-cols-2">
+                  {dcmpChairmanRecipients.length > 0 && (
+                    <TitledCard
+                      cardTitle={joinComponents(
+                        dcmpChairmanRecipients
+                          .map((k) => k.substring(3))
+                          .sort((a, b) => Number(a) - Number(b))
+                          .map((teamNumber) => (
+                            <TeamLink
+                              teamOrKey={`frc${teamNumber}`}
+                              year={year}
+                              key={teamNumber}
+                            >
+                              {teamNumber}
+                            </TeamLink>
+                          )),
+                        <span className="font-medium">, </span>,
+                      )}
+                      cardSubtitle={
+                        <>
+                          {dcmpAwards
+                            .find(
+                              (award) =>
+                                award.award_type === AwardType.CHAIRMANS,
+                            )
+                            ?.name.replace('Regional', 'District Championship')}
+                        </>
+                      }
+                    />
                   )}
-                  cardSubtitle={
-                    <>
-                      {dcmpAwards
-                        .find(
-                          (award) => award.award_type === AwardType.CHAIRMANS,
-                        )
-                        ?.name.replace('Regional', 'District Championship')}
-                    </>
-                  }
-                />
-                <TitledCard
-                  cardTitle={joinComponents(
-                    parentDCMPAwards
-                      .filter((award) => award.award_type === AwardType.WINNER)
-                      .flatMap((award) => award.recipient_list)
-                      .map((recipient) => recipient.team_key?.substring(3))
-                      .sort((a, b) => Number(a) - Number(b))
-                      .map((teamNumber) => (
-                        <TeamLink
-                          teamOrKey={`frc${teamNumber}`}
-                          year={year}
-                          key={teamNumber}
-                        >
-                          {teamNumber}
-                        </TeamLink>
-                      )),
-                    <span className="font-medium">, </span>,
+                  {dcmpWinnerRecipients.length > 0 && (
+                    <TitledCard
+                      cardTitle={joinComponents(
+                        dcmpWinnerRecipients
+                          .map((k) => k.substring(3))
+                          .sort((a, b) => Number(a) - Number(b))
+                          .map((teamNumber) => (
+                            <TeamLink
+                              teamOrKey={`frc${teamNumber}`}
+                              year={year}
+                              key={teamNumber}
+                            >
+                              {teamNumber}
+                            </TeamLink>
+                          )),
+                        <span className="font-medium">, </span>,
+                      )}
+                      cardSubtitle={
+                        <>
+                          {dcmpAwards
+                            .find(
+                              (award) => award.award_type === AwardType.WINNER,
+                            )
+                            ?.name.replace('Regional', 'District Championship')}
+                        </>
+                      }
+                    />
                   )}
-                  cardSubtitle={
-                    <>
-                      {dcmpAwards
-                        .find((award) => award.award_type === AwardType.WINNER)
-                        ?.name.replace('Regional', 'District Championship')}
-                    </>
-                  }
-                />
-              </div>
+                </div>
+              </>
+            )}
+
+          {hasRankings && rankings !== null && rankings.length > 0 && (
+            <>
+              <Divider className="py-4">
+                <div className="text-xl">Top Teams</div>
+              </Divider>
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>Rank</TableHead>
+                    <TableHead>Team</TableHead>
+                    <TableHead>Points</TableHead>
+                  </TableRow>
+                </TableHeader>
+                <TableBody>
+                  {[...rankings]
+                    .sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+                    .slice(0, 25)
+                    .map((ranking) => (
+                      <TableRow key={ranking.team_key}>
+                        <TableCell>{ranking.rank}</TableCell>
+                        <TableCell>
+                          <TeamLink teamOrKey={ranking.team_key} year={year}>
+                            {ranking.team_key.substring(3)}
+                          </TeamLink>
+                        </TableCell>
+                        <TableCell>{ranking.point_total}</TableCell>
+                      </TableRow>
+                    ))}
+                </TableBody>
+              </Table>
             </>
           )}
         </TabsContent>

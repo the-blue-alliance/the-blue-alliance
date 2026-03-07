@@ -580,16 +580,20 @@ class Event(CachedModel):
             try:
                 self._webcast: List[Webcast] = json.loads(self.webcast_json)
 
-                # Sort firstinspires channels to the front, keep the order of the rest
+                # Sort firstinspires channels to the front, then by date ascending
+                # Webcasts without a date sort last (they apply to all days)
                 self._webcast = sorted(
                     self._webcast or [],
                     key=lambda w: (
-                        0
-                        if (
-                            w["type"] == "twitch"
-                            and w["channel"].startswith("firstinspires")
-                        )
-                        else 1
+                        (
+                            0
+                            if (
+                                w["type"] == "twitch"
+                                and w["channel"].startswith("firstinspires")
+                            )
+                            else 1
+                        ),
+                        w.get("date") or "9999-99-99",
                     ),
                 )
             except Exception:

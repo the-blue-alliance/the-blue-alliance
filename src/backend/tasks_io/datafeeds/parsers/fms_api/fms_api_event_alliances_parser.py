@@ -1,14 +1,15 @@
-from typing import Any, Dict, List, Optional
+from typing import List
 
+from backend.common.frc_api.types import AllianceListModelV2, AllianceModelV2
 from backend.common.models.alliance import EventAlliance, EventAllianceBackup
-from backend.tasks_io.datafeeds.parsers.json.parser_json import ParserJSON
+from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
-class FMSAPIEventAlliancesParser(ParserJSON[List[EventAlliance]]):
-    def parse(self, response: Dict[str, Any]) -> Optional[List[EventAlliance]]:
+class FMSAPIEventAlliancesParser(ParserBase[AllianceListModelV2, List[EventAlliance]]):
+    def parse(self, response: AllianceListModelV2) -> List[EventAlliance]:
         alliances = []
 
-        alliance_response = response["Alliances"]
+        alliance_response: list[AllianceModelV2] = response["Alliances"] or []
         for i in range(len(alliance_response)):
             alliance = alliance_response[i]
             alliance_number = i + 1
@@ -28,22 +29,20 @@ class FMSAPIEventAlliancesParser(ParserJSON[List[EventAlliance]]):
                 continue
 
             # If no name is specified (like in 2015), generate one
-            name = (
-                alliance["name"]
-                if alliance.get("name", None)
-                else "Alliance {}".format(alliance_number)
-            )
+            if api_name := alliance["name"]:
+                name = api_name
+            else:
+                name = "Alliance {}".format(alliance_number)
 
-            backup_replaced = (
-                "frc{}".format(alliance["backup"])
-                if alliance.get("backup", None)
-                else None
-            )
-            backup_replacement = (
-                "frc{}".format(alliance["backupReplaced"])
-                if alliance.get("backupReplaced", None)
-                else None
-            )
+            if api_backup := alliance["backup"]:
+                backup_replaced = "frc{}".format(api_backup)
+            else:
+                backup_replaced = None
+
+            if api_backup_replaced := alliance["backupReplaced"]:
+                backup_replacement = "frc{}".format(api_backup_replaced)
+            else:
+                backup_replacement = None
 
             if backup_replaced and backup_replacement:
                 backup: EventAllianceBackup = {
@@ -56,4 +55,4 @@ class FMSAPIEventAlliancesParser(ParserJSON[List[EventAlliance]]):
             else:
                 alliances.append(EventAlliance(picks=picks, declines=[], name=name))
 
-        return alliances if alliances else None
+        return alliances

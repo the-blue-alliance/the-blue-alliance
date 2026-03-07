@@ -67,6 +67,16 @@ def test_api_history_with_files(
             else:
                 return []
 
+        # Check Trusted API bucket
+        if bucket == "testbed-test-trustedapi-requests":
+            if "api/trusted/v1/event/2020nyny" in path:
+                return [
+                    "api/trusted/v1/event/2020nyny/team_list/update/2020-03-15T11:00:00.000000+00:00.json",
+                    "api/trusted/v1/event/2020nyny/matches/update/2020-03-15T12:00:00.000000+00:00.json",
+                ]
+            else:
+                return []
+
         # FRC API paths (no bucket or default bucket)
         if "alliances" in path:
             return [
@@ -115,35 +125,46 @@ def test_api_history_with_files(
     # Check that Companion DB section header is present
     assert "FMS Companion Database" in content
 
-    # Check that timestamps are displayed for alliance files
-    assert "2020-03-15 12:45:00" in content
-    assert "2020-03-15 10:30:00" in content
+    # Check that Trusted API section header is present
+    assert "Trusted API Request Logs" in content
 
-    # Check that FMS report timestamps are displayed
-    assert "2020-03-14T08:00:00" in content
-    assert "2020-03-15T09:00:00" in content
+    # Check that timestamps are displayed for alliance files (formatted)
+    assert "2020-03-15 12:45:00 PM UTC" in content
+    assert "2020-03-15 10:30:00 AM UTC" in content
 
-    # Check that Companion DB timestamps are displayed
-    assert "2020-03-15T14:30:00" in content
-    assert "2020-03-14T09:15:00" in content
+    # Check that FMS report timestamps are displayed (formatted)
+    assert "2020-03-14 08:00:00 AM UTC" in content
+    assert "2020-03-15 09:00:00 AM UTC" in content
+
+    # Check that Companion DB timestamps are displayed (formatted)
+    assert "2020-03-15 02:30:00 PM UTC" in content
+    assert "2020-03-14 09:15:00 AM UTC" in content
+
+    # Check that Trusted API timestamps are displayed (formatted)
+    assert "2020-03-15 11:00:00 AM UTC" in content
+    assert "2020-03-15 12:00:00 PM UTC" in content
 
     # Check that production GCS URLs are present
     assert (
-        "https://storage.googleapis.com/testbed-test.appspot.com/frc-api-response/v3.0/2020/alliances/nyny/2020-03-15 12:45:00.json"
+        "https://storage.cloud.google.com/testbed-test.appspot.com/frc-api-response/v3.0/2020/alliances/nyny/2020-03-15 12:45:00.json"
         in content
     )
     assert (
-        "https://storage.googleapis.com/testbed-test-eventwizard-fms-reports/fms_reports/2020nyny/team_list/team_list.2020-03-14T08:00:00.xlsx"
+        "https://storage.cloud.google.com/testbed-test-eventwizard-fms-reports/fms_reports/2020nyny/team_list/team_list.2020-03-14T08:00:00.xlsx"
         in content
     )
     assert (
-        "https://storage.googleapis.com/testbed-test-eventwizard-fms-companion/fms_companion/2020nyny/fms_companion.2020-03-15T14:30:00.db"
+        "https://storage.cloud.google.com/testbed-test-eventwizard-fms-companion/fms_companion/2020nyny/fms_companion.2020-03-15T14:30:00.db"
+        in content
+    )
+    assert (
+        "https://storage.cloud.google.com/testbed-test-trustedapi-requests/api/trusted/v1/event/2020nyny/team_list/update/2020-03-15T11:00:00.000000+00:00.json"
         in content
     )
 
     # Verify get_files was called multiple times for different endpoints
-    # 7 FRC API endpoints + 7 FMS Reports + 1 Companion DB = 15
-    assert mock_get_files.call_count == 15
+    # 7 FRC API endpoints + 7 FMS Reports + 1 Companion DB + 1 Trusted API = 16
+    assert mock_get_files.call_count == 16
 
 
 @patch("backend.web.handlers.admin.api_history.Environment.project")
@@ -180,17 +201,17 @@ def test_api_history_with_files_dev_server(
     # Check that section headers are present
     assert "Alliance Selection" in content
 
-    # Check that timestamps are displayed
-    assert "2020-03-15 10:30:00" in content
+    # Check that timestamps are displayed (formatted)
+    assert "2020-03-15 10:30:00 AM UTC" in content
 
     # Check that dev blobstore URLs are present (not production GCS URLs)
     assert "http://localhost:8000/blobstore/blob/" in content
     assert "display=inline" in content
     # Production URLs should NOT be present
-    assert "https://storage.googleapis.com/" not in content
+    assert "https://storage.cloud.google.com/" not in content
     assert "display=inline" in content
     # Production URLs should NOT be present
-    assert "https://storage.googleapis.com/" not in content
+    assert "https://storage.cloud.google.com/" not in content
 
 
 @patch("backend.web.handlers.admin.api_history.get_files")
@@ -235,7 +256,7 @@ def test_api_history_storage_error(
 
 
 def test_api_history_has_tabs(web_client: Client, login_gae_admin) -> None:
-    """Test that all three tabs are present in the template"""
+    """Test that all four tabs are present in the template"""
     helpers.preseed_event("2020nyny")
 
     resp = web_client.get("/admin/api_history/2020nyny")
@@ -245,3 +266,4 @@ def test_api_history_has_tabs(web_client: Client, login_gae_admin) -> None:
     assert "FRC API" in content
     assert "FMS Reports" in content
     assert "Companion DB" in content
+    assert "Trusted API" in content

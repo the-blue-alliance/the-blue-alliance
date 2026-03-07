@@ -1,6 +1,6 @@
 from json import JSONDecodeError
 
-from flask import Blueprint, make_response, Response
+from flask import Blueprint, make_response, request, Response
 from flask_cors import CORS
 
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
@@ -16,16 +16,18 @@ from backend.api.handlers.trusted import (
     update_event_info,
     update_event_matches,
     update_event_rankings,
+    update_event_webcasts,
     update_teams,
 )
 from backend.common.datafeed_parsers.exceptions import ParserInputException
+from backend.common.helpers.trusted_api_logger import TrustedApiLogger
 
 # Trusted API
 trusted_api = Blueprint("trusted_api", __name__, url_prefix="/api/trusted/v1")
 CORS(
     trusted_api,
     origins="*",
-    methods=["OPTIONS", "POST"],
+    methods=["OPTIONS", "POST", "PATCH", "DELETE"],
     allow_headers=["Content-Type", "X-TBA-Auth-Id", "X-TBA-Auth-Sig"],
 )
 trusted_api.add_url_rule(
@@ -84,10 +86,22 @@ trusted_api.add_url_rule(
     view_func=update_teams,
 )
 trusted_api.add_url_rule(
+    "/event/<string:event_key>/webcasts/update",
+    methods=["PATCH", "DELETE"],
+    view_func=update_event_webcasts,
+)
+trusted_api.add_url_rule(
     "/event/<string:event_key>/zebra_motionworks/add",
     methods=["POST"],
     view_func=add_match_zebra_motionworks_info,
 )
+
+
+@trusted_api.after_request
+def log_request_to_storage(response: Response) -> Response:
+    """Log successful trusted API requests to cloud storage for audit purposes."""
+    TrustedApiLogger.log_request(request, response)
+    return response
 
 
 @trusted_api.errorhandler(JSONDecodeError)
