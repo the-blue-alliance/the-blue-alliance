@@ -59,14 +59,6 @@ def compress_js(in_files, out_file):
     print("")
 
 
-def all_source_files():
-    """Return the deduplicated set of all source files across all bundles."""
-    files = set()
-    for in_files, _, _ in BUNDLES:
-        files.update(in_files)
-    return files
-
-
 def build(kind=None):
     for directory in ["src/build/javascript"]:
         if not os.path.exists(directory):
