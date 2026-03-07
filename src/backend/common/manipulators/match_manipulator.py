@@ -100,14 +100,28 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
 
         # Only dispatch push notifications if the event is currently happening
         if event and event.now:
+            # Determine what kind of change this update represents.
+            # These are checked against `updated_attrs`, the set of model
+            # fields that actually changed during the merge (empty for new
+            # models since there's no prior version to diff against).
+            is_new = updated_match.is_new
+            alliances_changed = "alliances_json" in updated_match.updated_attrs
+            breakdown_changed = "score_breakdown_json" in updated_match.updated_attrs
+            # Schedule-affecting attrs: alliance lineups, match time, or
+            # the human-readable time string.
+            schedule_attrs_changed = bool(
+                {"alliances_json", "time", "time_string"}
+                & set(updated_match.updated_attrs)
+            )
+
             if (
                 match.has_been_played
                 and not match.push_sent
-                and (
-                    updated_match.is_new
-                    or "alliances_json" in updated_match.updated_attrs
-                )
+                and (is_new or alliances_changed)
             ):
+                # Match has scores and we haven't sent a notification yet.
+                # Enqueue a match_score notification (possibly delayed to
+                # wait for score_breakdown data from the FRC API).
                 countdown = MatchPostUpdateHooks.match_score_notification_countdown(
                     match, event
                 )
@@ -129,11 +143,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     # would trigger a duplicate webhook-only notification.
                 except Exception:
                     pass
-            elif (
-                match.has_been_played
-                and match.push_sent
-                and "score_breakdown_json" in updated_match.updated_attrs
-            ):
+            elif match.has_been_played and match.push_sent and breakdown_changed:
                 # Score breakdown arrived after the initial match score
                 # notification was already *sent* (push_sent is only set
                 # to True from within the deferred task, not at enqueue
@@ -150,13 +160,10 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     )
                 except Exception:
                     pass
-            elif updated_match.is_new or {
-                "alliances_json",
-                "time",
-                "time_string",
-            } & set(updated_match.updated_attrs):
-                # The match has not been played and we're changing a property that affects the event's schedule
-                # So send a schedule update notification for the parent event
+            elif not match.has_been_played and (is_new or schedule_attrs_changed):
+                # Unplayed match with a schedule-affecting change (new
+                # match, team lineup swap, or time update).  Queue a
+                # schedule update notification for the parent event.
                 if event not in unplayed_match_events:
                     unplayed_match_events.append(event)
 

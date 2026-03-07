@@ -546,7 +546,10 @@ class TestTBANSHelper(unittest.TestCase):
             notifications = [call[0][1] for call in mock_send.call_args_list]
             for notification in notifications:
                 assert isinstance(notification, MatchScoreNotification)
-                assert notification.match == self.match
+                # Compare by key: match_score() sets push_sent=True after
+                # notifications are pickled, so full-object equality can
+                # differ on push_sent.
+                assert notification.match.key == self.match.key
             # Check frc7332 notification
             notification = notifications[1]
             assert notification.team == self.team

@@ -657,6 +657,165 @@ def test_postUpdateHook_no_duplicate_webhook_during_countdown(
     assert len(push_tasks_after) == 1  # Still just the original delayed task
 
 
+def test_postUpdateHook_schedule_notification_for_unplayed_match(
+    ndb_context, taskqueue_stub
+) -> None:
+    """When an unplayed match is updated with a schedule-affecting change,
+    event_schedule and schedule_upcoming_matches notifications should fire."""
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    # Create an unplayed match (scores are -1)
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    test_match.put()
+
+    # Update alliances_json (still unplayed – teams change but scores stay -1)
+    updated_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": -1, "teams": ["frc254", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator.createOrUpdate(updated_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    with patch.object(Event, "now", return_value=True):
+        run_from_task(tasks[0])
+
+    push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    task_names = [t.name for t in push_tasks]
+    assert "2012ct_event_schedule" in task_names
+    assert "2012ct_schedule_upcoming_matches" in task_names
+
+
+def test_postUpdateHook_no_schedule_notification_for_played_match(
+    ndb_context, taskqueue_stub
+) -> None:
+    """When a played match has its alliances_json updated (e.g. score correction),
+    schedule notifications must NOT be sent – only match_score should fire."""
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    # Create a played match (scores > -1)
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=False,
+    )
+    test_match.put()
+
+    # Score correction – alliances_json changes but match is still played
+    updated_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 60, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=False,
+    )
+    MatchManipulator.createOrUpdate(updated_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    with patch.object(Event, "now", return_value=True):
+        run_from_task(tasks[0])
+
+    push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    task_names = [t.name for t in push_tasks]
+    # Should get a match_score notification, NOT schedule notifications
+    assert "2012ct_qm1_match_score" in task_names
+    assert "2012ct_event_schedule" not in task_names
+    assert "2012ct_schedule_upcoming_matches" not in task_names
+
+
+def test_postUpdateHook_new_unplayed_match_sends_schedule_notification(
+    ndb_context, taskqueue_stub
+) -> None:
+    """A brand-new unplayed match should trigger schedule notifications."""
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    with patch.object(Event, "now", return_value=True):
+        run_from_task(tasks[0])
+
+    push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    task_names = [t.name for t in push_tasks]
+    assert "2012ct_event_schedule" in task_names
+    assert "2012ct_schedule_upcoming_matches" in task_names
+
+
+def test_postUpdateHook_new_played_match_no_schedule_notification(
+    ndb_context, taskqueue_stub
+) -> None:
+    """A brand-new match that already has scores should NOT trigger schedule
+    notifications – it should trigger match_score instead."""
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=False,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    with patch.object(Event, "now", return_value=True):
+        run_from_task(tasks[0])
+
+    push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    task_names = [t.name for t in push_tasks]
+    assert "2012ct_qm1_match_score" in task_names
+    assert "2012ct_event_schedule" not in task_names
+    assert "2012ct_schedule_upcoming_matches" not in task_names
+
+
 class TestMatchScoreNotificationCountdown:
     """Tests for MatchPostUpdateHooks.match_score_notification_countdown."""
 
