@@ -6,6 +6,7 @@ Bumping the Python version requires that Google App Engine supports the new Pyth
 2. Run `./ops/check_python_version.sh --update` to update all dependent files:
    - `pyproject.toml` (`requires-python`)
    - GAE service `.yaml` files (`runtime:` directive)
+   - GitHub Actions workflow files (`python-version:`)
 3. Verify the changes: `./ops/check_python_version.sh`
 
 ## Running One-Off Data Migrations/Cleanups

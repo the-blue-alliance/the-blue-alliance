@@ -35,6 +35,5 @@ npm ci
 
 # Install the Firebase tools for the Firebase emulator
 command -v firebase >/dev/null 2>&1 || npm install -g firebase-tools
-command -v uglifyjs >/dev/null 2>&1 || npm install -g uglify-js@3.17.4
 
 ./ops/build/run_buildweb.sh
