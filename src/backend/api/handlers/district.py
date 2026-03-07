@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import Response
+from flask import abort, Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
@@ -89,6 +89,8 @@ def district_rankings(district_key: DistrictKey) -> Response:
     track_call_after_response("district/rankings", district_key)
 
     district = DistrictQuery(district_key=district_key).fetch()
+    if district is None:
+        abort(404)
     return profiled_jsonify(district.rankings)
 
 
@@ -142,6 +144,8 @@ def district_advancement(district_key: DistrictKey) -> Response:
     track_call_after_response("district/advancement", district_key)
 
     district = DistrictQuery(district_key=district_key).fetch()
+    if district is None:
+        abort(404)
     return profiled_jsonify(district.advancement)
 
 

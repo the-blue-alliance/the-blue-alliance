@@ -1,6 +1,6 @@
 from typing import Optional
 
-from flask import Response
+from flask import abort, Response
 
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.add_alliance_status import add_alliance_status
@@ -39,6 +39,8 @@ def event(event_key: EventKey, model_type: Optional[ModelType] = None) -> Respon
     track_call_after_response("event", event_key, model_type)
 
     event = EventQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
+    if event is None:
+        abort(404)
     if model_type is not None:
         event = filter_event_properties([event], model_type)[0]
     return profiled_jsonify(event)
@@ -161,14 +163,17 @@ def event_teams_statuses(event_key: EventKey) -> Response:
         status = event_team.status
         if status is not None:
             status_strings = event_team.status_strings
-            status.update(
-                {
+            status_dict = status.copy()
+            status_dict.update(
+                {  # pyre-ignore[55]
                     "alliance_status_str": status_strings["alliance"],
                     "playoff_status_str": status_strings["playoff"],
                     "overall_status_str": status_strings["overall"],
                 }
             )
-        statuses[event_team.team.id()] = status
+            statuses[event_team.team.id()] = status_dict
+        else:
+            statuses[event_team.team.id()] = status
     return profiled_jsonify(statuses)
 
 
@@ -228,6 +233,8 @@ def event_playoff_advancement(event_key: EventKey) -> Response:
     event_future = EventQuery(event_key).fetch_async()
     matches_future = EventMatchesQuery(event_key).fetch_async()
     event = event_future.get_result()
+    if event is None:
+        abort(404)
     event.prep_details()
     matches = matches_future.get_result()
 

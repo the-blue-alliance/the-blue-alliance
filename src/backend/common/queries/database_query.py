@@ -56,7 +56,8 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
             return query_result
 
     def fetch_dict(self, version: ApiMajorVersion) -> DictQueryReturn:
-        return self.fetch_dict_async(version).get_result()
+        fut: TypedFuture[DictQueryReturn] = self.fetch_dict_async(version)
+        return fut.get_result()
 
     @ndb.tasklet
     def fetch_dict_async(
@@ -68,7 +69,9 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
 
 
 class CachedDatabaseQuery(
-    DatabaseQuery, Generic[QueryReturn, DictQueryReturn], metaclass=abc.ABCMeta
+    DatabaseQuery[QueryReturn, DictQueryReturn],
+    Generic[QueryReturn, DictQueryReturn],
+    metaclass=abc.ABCMeta,
 ):
     DATABASE_QUERY_VERSION = 5
     BASE_CACHE_KEY_FORMAT: str = (
