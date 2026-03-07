@@ -70,7 +70,7 @@ def apidocs_webhooks() -> str:
         webhooks = MobileClient.query(
             MobileClient.user_id == str(user.uid),
             MobileClient.client_type == ClientType.WEBHOOK,
-            MobileClient.verified is True,
+            MobileClient.verified == True,  # noqa: E712
             ancestor=user.account_key,
         ).fetch()
 
