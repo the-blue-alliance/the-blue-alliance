@@ -660,6 +660,37 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
             schedule_upcoming_match.assert_not_called()
 
+    def test_match_score_sets_push_sent(self):
+        """match_score should set push_sent=True after sending the initial notification."""
+        assert not self.match.push_sent
+
+        TBANSHelper.match_score(self.match.key_name)
+
+        updated_match = Match.get_by_id(self.match.key_name)
+        assert updated_match is not None
+        assert updated_match.push_sent
+
+    def test_match_score_does_not_reset_push_sent(self):
+        """match_score should not re-write push_sent when it is already True."""
+        self.match.push_sent = True
+        self.match.put()
+
+        TBANSHelper.match_score(self.match.key_name)
+
+        updated_match = Match.get_by_id(self.match.key_name)
+        assert updated_match is not None
+        assert updated_match.push_sent
+
+    def test_match_score_breakdown_update_does_not_set_push_sent(self):
+        """is_score_breakdown_update=True should NOT set push_sent."""
+        assert not self.match.push_sent
+
+        TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
+
+        updated_match = Match.get_by_id(self.match.key_name)
+        assert updated_match is not None
+        assert not updated_match.push_sent
+
     def test_match_upcoming_no_users(self):
         # Test send not called with no subscribed users
         with patch.object(TBANSHelper, "_send") as mock_send:

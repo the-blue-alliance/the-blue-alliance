@@ -378,8 +378,10 @@ def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
     task = tasks[0]
     assert task.name == "2012ct_qm1_match_score"
 
+    # push_sent is not set until the notification task actually executes
+    # (see TBANSHelper.match_score), so it should still be False here.
     test_match = none_throws(Match.get_by_id("2012ct_qm1"))
-    assert test_match.push_sent
+    assert not test_match.push_sent
 
 
 def test_postUpdateHook_notification_pushSent(ndb_context, taskqueue_stub) -> None:
@@ -580,6 +582,79 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_event_not_now(
     # No push-notifications tasks should be created since event is not "now"
     push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
     assert len(push_tasks) == 0
+
+
+def test_postUpdateHook_no_duplicate_webhook_during_countdown(
+    ndb_context, taskqueue_stub
+) -> None:
+    """Scores arrive first (with countdown delay), then breakdown arrives during
+    the delay window.  Only one push-notification task should be enqueued — the
+    original delayed match_score — and no webhook-only duplicate."""
+    event = Event(
+        id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
+    )
+    event.put()
+
+    # Step 1: Create a match with scores (no breakdown) → triggers delayed notification
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=False,
+    )
+    MatchManipulator.createOrUpdate(test_match)
+
+    # Run the post-update-hook task (enqueues the delayed push-notification)
+    hook_tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(hook_tasks) == 1
+    with patch.object(Event, "now", return_value=True):
+        run_from_task(hook_tasks[0])
+
+    # The delayed match_score task should be enqueued
+    push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    assert len(push_tasks) == 1
+    assert push_tasks[0].name == "2012ct_qm1_match_score"
+
+    # push_sent is NOT yet True — it will be set when the task actually executes
+    db_match = none_throws(Match.get_by_id("2012ct_qm1"))
+    assert not db_match.push_sent
+
+    # Step 2: Score breakdown arrives during the delay window
+    updated_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        score_breakdown_json=json.dumps(
+            {
+                "red": {"auto": 20, "teleop": 54},
+                "blue": {"auto": 30, "teleop": 27},
+            }
+        ),
+        comp_level="qm",
+        event=ndb.Key(Event, "2012ct"),
+        year=2012,
+        set_number=1,
+        match_number=1,
+        push_sent=False,
+    )
+    MatchManipulator.createOrUpdate(updated_match)
+
+    # Run the second post-update-hook
+    hook_tasks_2 = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(hook_tasks_2) == 2  # original + new
+    with patch.object(Event, "now", return_value=True):
+        run_from_task(hook_tasks_2[1])
+
+    # No additional push-notification tasks should have been enqueued.
+    # The webhook-only branch requires push_sent=True which is still False,
+    # and alliances_json didn't change so the initial branch also doesn't fire.
+    push_tasks_after = taskqueue_stub.get_filtered_tasks(
+        queue_names="push-notifications"
+    )
+    assert len(push_tasks_after) == 1  # Still just the original delayed task
 
 
 class TestMatchScoreNotificationCountdown:
