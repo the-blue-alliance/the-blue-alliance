@@ -2,7 +2,7 @@
 
 set -euo pipefail
 
-source ops/dev/vagrant/config.sh
+source ops/dev/scripts/config.sh
 
 API_URL="https://www.thebluealliance.com/api/v3"
 APIV3_KEY=$(get_config_prop apiv3_key)

@@ -54,17 +54,18 @@ ops/                    # Build, deploy, and dev scripts
 ## Development Setup
 **Recommended**: Use docker-compose for the local dev server, and `uv` for Python tooling (tests, linting).
 
-See docs/Setup/Setup-Guide-Beta.md for setup instructions.
+See docs/Setup/Setup-Guide.md for setup instructions.
 
 ```bash
-# Start dev environment with docker-compose
-docker-compose up
+# Start dev environment with docker-compose (always use --build)
+docker-compose up --build
 
 # Access shell in container
 docker-compose exec tba bash
 
-# Or use convenience script
-./ops/shell/run_local_shell.sh
+# View logs
+docker-compose logs -f tba
+docker-compose logs -f webpack
 ```
 
 ## Running Python Commands
