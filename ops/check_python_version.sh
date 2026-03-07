@@ -89,6 +89,30 @@ for yaml in "$REPO_ROOT"/src/*.yaml; do
     fi
 done
 
+# Check/update GitHub Actions workflow files
+for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
+    if [[ -f "$workflow" ]]; then
+        # Count mismatched python-version entries
+        MISMATCHES=$(grep -E "python-version:[[:space:]]*[\"']?[0-9.]+" "$workflow" | grep -Fcv -- "$PYTHON_VERSION" || true)
+        if [[ "$MISMATCHES" -gt 0 ]]; then
+            if [[ "$UPDATE_MODE" == true ]]; then
+                # Update all python-version entries (handles both quoted styles)
+                sed -i.bak -E "s/(python-version:[[:space:]]*[\"']?)[0-9.]+([\"']?)/\1$PYTHON_VERSION\2/g" "$workflow" && rm -f "$workflow.bak"
+                echo "UPDATED: $workflow ($MISMATCHES occurrences)"
+                UPDATED=$((UPDATED + 1))
+            else
+                echo "ERROR: $workflow has $MISMATCHES python-version entries not set to $PYTHON_VERSION"
+                ERRORS=$((ERRORS + 1))
+            fi
+        else
+            # Check if it has any python-version entries at all
+            if grep -q "python-version:" "$workflow"; then
+                echo "OK: $workflow"
+            fi
+        fi
+    fi
+done
+
 echo ""
 if [[ "$UPDATE_MODE" == true ]]; then
     echo "Updated $UPDATED file(s) to Python $PYTHON_VERSION"
