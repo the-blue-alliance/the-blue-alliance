@@ -526,10 +526,8 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_not_push_sent(
 
     # Only score_breakdown_json changed, and push_sent is False, so no webhook-only notification
     # There should be no push-notifications tasks
-    named_tasks = taskqueue_stub.get_filtered_tasks(
-        name="2012ct_qm1_match_score", queue_names="push-notifications"
-    )
-    assert len(named_tasks) == 0
+    push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+    assert len(push_tasks) == 0
 
 
 def test_postUpdateHook_no_webhook_on_breakdown_when_event_not_now(
