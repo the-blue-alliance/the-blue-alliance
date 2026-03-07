@@ -2,6 +2,7 @@
 import argparse
 import os
 import sys
+import threading
 import time
 
 SCRIPTS_MAIN = [
@@ -86,25 +87,47 @@ def watch():
 
     class CompressHandler(FileSystemEventHandler):
         def __init__(self):
-            self._last_rebuild = 0.0
+            self._timers: dict[str, threading.Timer] = {}
+            self._lock = threading.Lock()
 
-        def on_modified(self, event):
+        def _handle_event(self, event):
             if event.is_directory:
                 return
-            abs_path = os.path.abspath(event.src_path)
+            # For moved events (atomic saves), use the destination path
+            src_path = getattr(event, "dest_path", event.src_path)
+            abs_path = os.path.abspath(src_path)
             if abs_path not in file_to_bundles:
                 return
-            # Debounce: skip if we just rebuilt within the last second
-            now = time.time()
-            if now - self._last_rebuild < 1.0:
-                return
-            self._last_rebuild = now
             for in_files, out_file, label in file_to_bundles[abs_path]:
-                print(
-                    "\n[watch] %s changed, recompressing %s JavaScript..."
-                    % (os.path.basename(event.src_path), label)
-                )
-                compress_js(in_files, out_file)
+                self._schedule_rebuild(in_files, out_file, label, src_path)
+
+        def on_modified(self, event):
+            self._handle_event(event)
+
+        def on_created(self, event):
+            self._handle_event(event)
+
+        def on_moved(self, event):
+            self._handle_event(event)
+
+        def _schedule_rebuild(self, in_files, out_file, label, src_path):
+            """Debounce per-bundle: rebuild after a short quiet period."""
+            with self._lock:
+                if out_file in self._timers:
+                    self._timers[out_file].cancel()
+
+                def _rebuild():
+                    with self._lock:
+                        self._timers.pop(out_file, None)
+                    print(
+                        "\n[watch] %s changed, recompressing %s JavaScript..."
+                        % (os.path.basename(src_path), label)
+                    )
+                    compress_js(in_files, out_file)
+
+                timer = threading.Timer(0.3, _rebuild)
+                self._timers[out_file] = timer
+                timer.start()
 
     handler = CompressHandler()
     observer = Observer()
