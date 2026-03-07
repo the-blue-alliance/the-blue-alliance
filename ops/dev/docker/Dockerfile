@@ -1,5 +1,9 @@
 FROM python:3.13
 
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    curl \
+    gpg
+
 # Add Google Cloud SDK apt repository
 RUN curl -fsSL https://packages.cloud.google.com/apt/doc/apt-key.gpg \
     | gpg --dearmor -o /usr/share/keyrings/cloud.google.gpg \
