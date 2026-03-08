@@ -46,7 +46,7 @@ export const createClient = (config: Config = {}): Client => {
       ...options,
       fetch: options.fetch ?? _config.fetch ?? globalThis.fetch,
       headers: mergeHeaders(_config.headers, options.headers),
-      serializedBody: undefined as string | undefined,
+      serializedBody: undefined,
     };
 
     if (opts.security) {
@@ -61,9 +61,7 @@ export const createClient = (config: Config = {}): Client => {
     }
 
     if (opts.body !== undefined && opts.bodySerializer) {
-      opts.serializedBody = opts.bodySerializer(opts.body) as
-        | string
-        | undefined;
+      opts.serializedBody = opts.bodySerializer(opts.body);
     }
 
     // remove Content-Type header if body is empty to avoid sending invalid requests
@@ -183,16 +181,10 @@ export const createClient = (config: Config = {}): Client => {
         case 'arrayBuffer':
         case 'blob':
         case 'formData':
+        case 'json':
         case 'text':
           data = await response[parseAs]();
           break;
-        case 'json': {
-          // Some servers return 200 with no Content-Length and empty body.
-          // response.json() would throw; read as text and parse if non-empty.
-          const text = await response.text();
-          data = text ? JSON.parse(text) : {};
-          break;
-        }
         case 'stream':
           return opts.responseStyle === 'data'
             ? response.body
@@ -274,19 +266,12 @@ export const createClient = (config: Config = {}): Client => {
           }
           return request;
         },
-        serializedBody: getValidRequestBody(opts) as
-          | BodyInit
-          | null
-          | undefined,
         url,
       });
     };
 
-  const _buildUrl: Client['buildUrl'] = (options) =>
-    buildUrl({ ..._config, ...options });
-
   return {
-    buildUrl: _buildUrl,
+    buildUrl,
     connect: makeMethodFn('CONNECT'),
     delete: makeMethodFn('DELETE'),
     get: makeMethodFn('GET'),

@@ -7,7 +7,7 @@ import type {
 
 export type QuerySerializer = (query: Record<string, unknown>) => string;
 
-export type BodySerializer = (body: unknown) => unknown;
+export type BodySerializer = (body: any) => any;
 
 type QuerySerializerOptionsObject = {
   allowReserved?: boolean;
@@ -50,10 +50,12 @@ const serializeUrlSearchParamsPair = (
 };
 
 export const formDataBodySerializer = {
-  bodySerializer: (body: unknown): FormData => {
+  bodySerializer: <T extends Record<string, any> | Array<Record<string, any>>>(
+    body: T,
+  ): FormData => {
     const data = new FormData();
 
-    Object.entries(body as Record<string, unknown>).forEach(([key, value]) => {
+    Object.entries(body).forEach(([key, value]) => {
       if (value === undefined || value === null) {
         return;
       }
@@ -69,17 +71,19 @@ export const formDataBodySerializer = {
 };
 
 export const jsonBodySerializer = {
-  bodySerializer: (body: unknown): string =>
+  bodySerializer: <T>(body: T): string =>
     JSON.stringify(body, (_key, value) =>
       typeof value === 'bigint' ? value.toString() : value,
     ),
 };
 
 export const urlSearchParamsBodySerializer = {
-  bodySerializer: (body: unknown): string => {
+  bodySerializer: <T extends Record<string, any> | Array<Record<string, any>>>(
+    body: T,
+  ): string => {
     const data = new URLSearchParams();
 
-    Object.entries(body as Record<string, unknown>).forEach(([key, value]) => {
+    Object.entries(body).forEach(([key, value]) => {
       if (value === undefined || value === null) {
         return;
       }

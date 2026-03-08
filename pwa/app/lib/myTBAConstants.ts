@@ -6,7 +6,7 @@ export const SUBSCRIPTION_TYPE_DISPLAY_NAMES: Record<NotificationType, string> =
     match_score: 'Match Score',
     alliance_selection: 'Alliance Selection',
     awards_posted: 'Awards Posted',
-    match_video_added: 'Match Video Added',
+    match_video: 'Match Video',
   };
 
 export const SUBSCRIPTION_TYPES = Object.keys(
