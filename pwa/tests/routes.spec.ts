@@ -31,6 +31,7 @@ const allRoutes = defineAllRoutes([
   '/districts/{-$year}',
   '/donate',
   '/event/$eventKey',
+  '/events/$districtAbbreviation/$year',
   '/events/{-$year}',
   '/gameday',
   '/gameday/$eventCode',
