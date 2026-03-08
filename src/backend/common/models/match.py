@@ -17,9 +17,9 @@ from backend.common.consts.comp_level import COMP_LEVELS_VERBOSE, CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import (
     DOUBLE_ELIM_4_MAPPING_INVERSE,
+    DOUBLE_ELIM_INVERSE_MAPPINGS,
     DOUBLE_ELIM_MAPPING_INVERSE,
     DOUBLE_ELIM_TYPES,
-    LEGACY_DOUBLE_ELIM_MAPPING_INVERSE,
     PlayoffType,
 )
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -87,11 +87,11 @@ class Match(CachedModel):
     )
     event: ndb.Key = ndb.KeyProperty(kind=Event, required=True)
     year: Year = ndb.IntegerProperty(required=True)
-    match_number = ndb.IntegerProperty(required=True, indexed=False)
+    match_number: int = ndb.IntegerProperty(required=True, indexed=False)
     no_auto_update = ndb.BooleanProperty(
         default=False, indexed=False
     )  # Set to True after manual update
-    set_number = ndb.IntegerProperty(required=True, indexed=False)
+    set_number: int = ndb.IntegerProperty(required=True, indexed=False)
     # list of teams in Match, for indexing.
     team_key_names: List[TeamKey] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     time = ndb.DateTimeProperty()  # UTC time of scheduled start
@@ -393,38 +393,22 @@ class Match(CachedModel):
 
     @property
     def short_name(self) -> str:
+        event = self.event.get()
         if self.comp_level == "qm":
             return "Q%s" % self.match_number
         elif self.comp_level == "f":
             return "F%s" % self.match_number
-        else:
-            event = self.event.get()
-            if event and event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM:
-                match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
-                    (self.comp_level, self.set_number, 1)
-                )
-                if match_num is None:
-                    match_num = "?"
-                return "M%s" % match_num
-            elif event and event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
-                match_num = DOUBLE_ELIM_4_MAPPING_INVERSE.get(
-                    (self.comp_level, self.set_number, 1)
-                )
-                if match_num is None:
-                    match_num = "?"
-                return "M%s" % match_num
-            elif event and event.playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
-                match_num = LEGACY_DOUBLE_ELIM_MAPPING_INVERSE.get(
-                    (self.comp_level, self.set_number, 1)
-                )
-                if match_num is None:
-                    match_num = "?"
-                return "M%s" % match_num
-            return "%s%s-%s" % (
-                self.comp_level.upper(),
-                self.set_number,
-                self.match_number,
-            )
+        elif event and event.playoff_type in DOUBLE_ELIM_INVERSE_MAPPINGS:
+            # For double elimination brackets, don't show these matches as ex: `SF1-1`,
+            # instead show them as `M1`
+            inverse_mapping = DOUBLE_ELIM_INVERSE_MAPPINGS[event.playoff_type]
+            match_num = inverse_mapping.get((self.comp_level, self.set_number, 1))
+            return "M%s" % match_num
+        return "%s%s-%s" % (
+            self.comp_level.upper(),
+            self.set_number,
+            self.match_number,
+        )
 
     @property
     def has_video(self) -> bool:
