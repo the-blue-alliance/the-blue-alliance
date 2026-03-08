@@ -138,3 +138,54 @@ class TestDistrictManipulator(unittest.TestCase):
         district = District.get_by_id("2015ne")
         assert district is not None
         assert district.display_name == "New Name"
+
+    def test_update_webcast_unit_from_last_year_on_create(self) -> None:
+        District(
+            id="2015ne",
+            abbreviation="ne",
+            year=2015,
+            display_name="New England",
+            uses_official_webcast_unit=True,
+        ).put()
+
+        updated = DistrictManipulator.createOrUpdate(
+            District(id="2016ne", abbreviation="ne", year=2016)
+        )
+        # We didn't originally specify uses_official_webcast_unit
+        assert updated.uses_official_webcast_unit is False
+
+        # But the update hook should add it in from the prior year's
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            run_from_task(task)
+
+        district = District.get_by_id("2016ne")
+        assert district is not None
+        assert district.uses_official_webcast_unit is True
+
+    def test_no_webcast_unit_propagation_when_last_year_false(self) -> None:
+        District(
+            id="2015ne",
+            abbreviation="ne",
+            year=2015,
+            display_name="New England",
+            uses_official_webcast_unit=False,
+        ).put()
+
+        DistrictManipulator.createOrUpdate(
+            District(id="2016ne", abbreviation="ne", year=2016)
+        )
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        for task in tasks:
+            run_from_task(task)
+
+        district = District.get_by_id("2016ne")
+        assert district is not None
+        assert district.uses_official_webcast_unit is False
