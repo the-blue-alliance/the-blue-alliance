@@ -8,6 +8,10 @@
     <div class="alert alert-block alert-success">
         Added YouTube channel to district webcast configuration.
     </div>
+{% elif webcast_success == "channel_removed" %}
+    <div class="alert alert-block alert-success">
+        Removed YouTube channel from district webcast configuration.
+    </div>
 {% endif %}
 {% if webcast_error == "missing_channel_name" %}
     <div class="alert alert-block alert-danger">
@@ -20,6 +24,14 @@
 {% elif webcast_error == "channel_exists" %}
     <div class="alert alert-block alert-warning">
         That YouTube channel is already configured for this district.
+    </div>
+{% elif webcast_error == "channel_not_found_to_remove" %}
+    <div class="alert alert-block alert-danger">
+        Could not find that YouTube channel to remove.
+    </div>
+{% elif webcast_error == "missing_channel_id" %}
+    <div class="alert alert-block alert-danger">
+        Channel ID is required for removal.
     </div>
 {% endif %}
 <div class="btn-group">
@@ -138,15 +150,23 @@
                 <th>Type</th>
                 <th>Channel Name</th>
                 <th>Channel ID</th>
+                <th>Actions</th>
             </tr>
             {% for channel in configured_webcast_channels %}
                 <tr>
                     <td>{{ channel.type }}</td>
                     <td>{{ channel.channel }}</td>
                     <td>{{ channel.channel_id }}</td>
+                    <td>
+                        <form action="/admin/district/{{district.key_name}}/webcasts/remove" method="post" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="channel_id" value="{{ channel.channel_id }}"/>
+                            <button type="submit" class="btn btn-danger btn-xs" onclick="return confirm('Remove this channel?');"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+                        </form>
+                    </td>
                 </tr>
             {% else %}
-                <tr><td colspan="3">No configured webcast channels for this district.</td></tr>
+                <tr><td colspan="4">No configured webcast channels for this district.</td></tr>
             {% endfor %}
         </table>
 

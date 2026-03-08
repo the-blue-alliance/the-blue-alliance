@@ -108,6 +108,39 @@ def district_add_webcast_channel_post(district_key: DistrictKey) -> Response:
     )
 
 
+def district_remove_webcast_channel_post(district_key: DistrictKey) -> Response:
+    district = District.get_by_id(district_key)
+    if not district:
+        abort(404)
+
+    channel_id = (request.form.get("channel_id") or "").strip()
+    if not channel_id:
+        return redirect(
+            f"{url_for('admin.district_details', district_key=district_key, webcast_error='missing_channel_id')}#webcasts"
+        )
+
+    district_channels = list(district.webcast_channels or [])
+    original_count = len(district_channels)
+
+    district_channels = [
+        channel
+        for channel in district_channels
+        if channel.get("channel_id") != channel_id
+    ]
+
+    if len(district_channels) == original_count:
+        return redirect(
+            f"{url_for('admin.district_details', district_key=district_key, webcast_error='channel_not_found_to_remove')}#webcasts"
+        )
+
+    district.webcast_channels = district_channels
+    DistrictManipulator.createOrUpdate(district)
+
+    return redirect(
+        f"{url_for('admin.district_details', district_key=district_key, webcast_success='channel_removed')}#webcasts"
+    )
+
+
 def district_edit(district_key: DistrictKey) -> str:
     district = District.get_by_id(district_key)
     if district is None:

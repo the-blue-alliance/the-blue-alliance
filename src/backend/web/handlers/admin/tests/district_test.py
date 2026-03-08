@@ -194,6 +194,73 @@ def test_district_add_webcast_channel_post_channel_not_found(
     assert district.webcast_channels == []
 
 
+def test_district_remove_webcast_channel_post(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    helpers.preseed_district(
+        "2020ne",
+        webcast_channels=[
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            ),
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="Another Channel",
+                channel_id="UC_another",
+            ),
+        ],
+    )
+
+    resp = web_client.post(
+        "/admin/district/2020ne/webcasts/remove",
+        data={"channel_id": "UCjX4WSaAFPgM2PYr-6P"},
+    )
+
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "/admin/district/2020ne?webcast_success=channel_removed#webcasts"
+    )
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    assert len(district.webcast_channels) == 1
+    assert district.webcast_channels[0]["channel"] == "Another Channel"
+    assert district.webcast_channels[0]["channel_id"] == "UC_another"
+
+
+def test_district_remove_webcast_channel_post_channel_not_found(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    helpers.preseed_district(
+        "2020ne",
+        webcast_channels=[
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    resp = web_client.post(
+        "/admin/district/2020ne/webcasts/remove",
+        data={"channel_id": "UC_nonexistent"},
+    )
+
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "/admin/district/2020ne?webcast_error=channel_not_found_to_remove#webcasts"
+    )
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    assert len(district.webcast_channels) == 1
+
+
 def test_district_edit_bad_event(web_client: Client, login_gae_admin) -> None:
     resp = web_client.get("/admin/district/edit/2021asdf")
     assert resp.status_code == 404
