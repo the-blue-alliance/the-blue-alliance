@@ -20,11 +20,11 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.memcache import MemcacheClient
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
-from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.apiv3_key import Apiv3Key
 from backend.web.local.bootstrap import LocalDataBootstrap
 from backend.web.local.dev_tools import seed_test_event, seed_test_team
