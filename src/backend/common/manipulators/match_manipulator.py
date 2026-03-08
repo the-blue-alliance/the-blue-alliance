@@ -173,7 +173,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
             try:
                 defer_safe(
                     TBANSHelper.match_video,
-                    match,
+                    match.key_name,
                     _name=f"{match.key_name}_match_video",
                     _target="py3-tasks-io",
                     _queue="push-notifications",
@@ -190,7 +190,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
         try:
             defer_safe(
                 TBANSHelper.event_schedule,
-                event,
+                event.key_name,
                 _name=f"{event.key_name}_event_schedule",
                 _target="py3-tasks-io",
                 _queue="push-notifications",
@@ -203,7 +203,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
         try:
             defer_safe(
                 TBANSHelper.schedule_upcoming_matches,
-                event,
+                event.key_name,
                 _name=f"{event.key_name}_schedule_upcoming_matches",
                 _target="py3-tasks-io",
                 _queue="push-notifications",
