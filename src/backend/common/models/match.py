@@ -402,12 +402,16 @@ class Match(CachedModel):
                 match_num = DOUBLE_ELIM_MAPPING_INVERSE.get(
                     (self.comp_level, self.set_number, 1)
                 )
-                return "M%s" % (match_num if match_num is not None else "?")
+                if match_num is None:
+                    match_num = "?"
+                return "M%s" % match_num
             elif event and event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
                 match_num = DOUBLE_ELIM_4_MAPPING_INVERSE.get(
                     (self.comp_level, self.set_number, 1)
                 )
-                return "M%s" % (match_num if match_num is not None else "?")
+                if match_num is None:
+                    match_num = "?"
+                return "M%s" % match_num
             return "%s%s-%s" % (
                 self.comp_level.upper(),
                 self.set_number,
@@ -445,6 +449,9 @@ class Match(CachedModel):
 
     @property
     def full_name(self) -> str:
+        # For double elimination brackets, use "Playoff" instead of the
+        # comp-level-derived name (e.g. "Semifinals") for non-QM/non-Finals matches.
+        # Finals matches intentionally keep the "Finals" label.
         if self.comp_level not in (CompLevel.QM, CompLevel.F):
             event = self.event.get()
             if event and event.playoff_type in DOUBLE_ELIM_TYPES:
