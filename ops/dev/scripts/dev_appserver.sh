@@ -50,7 +50,7 @@ function assert_local_storage_path {
 if [ "$datastore_mode" == "local" ]; then
     echo "Starting with datastore emulator"
     if [ -z "$DATASTORE_EMULATOR_HOST" ]; then
-        echo "DATASTORE_EMULATOR_HOST must be set (provided by docker-compose)"
+        echo "DATASTORE_EMULATOR_HOST must be set (provided by docker compose)"
         exit 1
     fi
     env+=("--env_var=DATASTORE_EMULATOR_HOST=$DATASTORE_EMULATOR_HOST" "--env_var=DATASTORE_DATASET=test")
@@ -80,7 +80,7 @@ fi
 if [ -z "$auth_use_prod" ]; then
     echo "Running with Firebase auth emulator"
     if [ -z "$FIREBASE_AUTH_EMULATOR_HOST" ]; then
-        echo "FIREBASE_AUTH_EMULATOR_HOST must be set (provided by docker-compose)"
+        echo "FIREBASE_AUTH_EMULATOR_HOST must be set (provided by docker compose)"
         exit 1
     fi
     env+=("--env_var=FIREBASE_AUTH_EMULATOR_HOST=$FIREBASE_AUTH_EMULATOR_HOST")
@@ -93,7 +93,7 @@ fi
 if [ -z "$firebase_db_use_prod" ]; then
     echo "Running with Firebase realtime db emulator"
     if [ -z "$FIREBASE_DATABASE_EMULATOR_HOST" ]; then
-        echo "FIREBASE_DATABASE_EMULATOR_HOST must be set (provided by docker-compose)"
+        echo "FIREBASE_DATABASE_EMULATOR_HOST must be set (provided by docker compose)"
         exit 1
     fi
     env+=("--env_var=FIREBASE_DATABASE_EMULATOR_HOST=$FIREBASE_DATABASE_EMULATOR_HOST")
