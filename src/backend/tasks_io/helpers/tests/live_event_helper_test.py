@@ -26,12 +26,13 @@ def auto_add_ndb_stub(ndb_stub) -> None:
     pass
 
 
-class WebcastStatusMock:
+class WebcastStatusBatchMock:
     def __init__(self, status: WebcastOnlineStatus) -> None:
         self.status = status
 
-    def __call__(self, webcast: Webcast) -> InstantFuture[None]:
-        webcast.update(self.status)
+    def __call__(self, webcasts: list[Webcast]) -> InstantFuture[None]:
+        for webcast in webcasts:
+            webcast.update(self.status)
         return InstantFuture(None)
 
 
@@ -56,10 +57,10 @@ def create_event(webcast_date: Optional[datetime]) -> None:
 
 
 @freeze_time("2025-04-01")
-@patch.object(WebcastOnlineHelper, "add_online_status_async")
+@patch.object(WebcastOnlineHelper, "add_online_status_batch_async")
 def test_current_event_webcasts_no_live_info(status_fetch_mock: Mock) -> None:
     create_event(webcast_date=None)
-    status_fetch_mock.side_effect = WebcastStatusMock(
+    status_fetch_mock.side_effect = WebcastStatusBatchMock(
         WebcastOnlineStatus(
             status=WebcastStatus.UNKNOWN, stream_title=None, viewer_count=None
         )
@@ -85,10 +86,10 @@ def test_current_event_webcasts_no_live_info(status_fetch_mock: Mock) -> None:
 
 
 @freeze_time("2025-04-01")
-@patch.object(WebcastOnlineHelper, "add_online_status_async")
+@patch.object(WebcastOnlineHelper, "add_online_status_batch_async")
 def test_current_event_webcasts_with_live_info(status_fetch_mock: Mock) -> None:
     create_event(webcast_date=None)
-    status_fetch_mock.side_effect = WebcastStatusMock(
+    status_fetch_mock.side_effect = WebcastStatusBatchMock(
         WebcastOnlineStatus(
             status=WebcastStatus.ONLINE,
             stream_title="Test stream",
@@ -116,12 +117,12 @@ def test_current_event_webcasts_with_live_info(status_fetch_mock: Mock) -> None:
 
 
 @freeze_time("2025-04-01")
-@patch.object(WebcastOnlineHelper, "add_online_status_async")
+@patch.object(WebcastOnlineHelper, "add_online_status_batch_async")
 def test_current_event_webcasts_with_live_info_current_date(
     status_fetch_mock: Mock,
 ) -> None:
     create_event(webcast_date=datetime(2025, 4, 1))
-    status_fetch_mock.side_effect = WebcastStatusMock(
+    status_fetch_mock.side_effect = WebcastStatusBatchMock(
         WebcastOnlineStatus(
             status=WebcastStatus.ONLINE,
             stream_title="Test stream",
@@ -150,12 +151,12 @@ def test_current_event_webcasts_with_live_info_current_date(
 
 
 @freeze_time("2025-04-02")
-@patch.object(WebcastOnlineHelper, "add_online_status_async")
+@patch.object(WebcastOnlineHelper, "add_online_status_batch_async")
 def test_current_event_webcasts_with_live_info_different_date(
     status_fetch_mock: Mock,
 ) -> None:
     create_event(webcast_date=datetime(2025, 4, 1))
-    status_fetch_mock.side_effect = WebcastStatusMock(
+    status_fetch_mock.side_effect = WebcastStatusBatchMock(
         WebcastOnlineStatus(
             status=WebcastStatus.ONLINE,
             stream_title="Test stream",
@@ -174,11 +175,11 @@ def test_current_event_webcasts_with_live_info_different_date(
     assert webcasts == []
 
 
-@patch.object(WebcastOnlineHelper, "add_online_status_async")
+@patch.object(WebcastOnlineHelper, "add_online_status_batch_async")
 def test_forced_live_events(status_fetch_mock: Mock) -> None:
     create_event(webcast_date=None)
     ForcedLiveEvents.put(["2025test"])
-    status_fetch_mock.side_effect = WebcastStatusMock(
+    status_fetch_mock.side_effect = WebcastStatusBatchMock(
         WebcastOnlineStatus(
             status=WebcastStatus.ONLINE,
             stream_title="Test stream",
@@ -205,7 +206,7 @@ def test_forced_live_events(status_fetch_mock: Mock) -> None:
     ]
 
 
-@patch.object(WebcastOnlineHelper, "add_online_status_async")
+@patch.object(WebcastOnlineHelper, "add_online_status_batch_async")
 @patch.object(SpecialWebcastHelper, "get_special_webcasts_with_online_status_async")
 def test_special_webcasts(special_webcast_mock: Mock, status_fetch_mock: Mock) -> None:
     w = TSpecialWebcast(
