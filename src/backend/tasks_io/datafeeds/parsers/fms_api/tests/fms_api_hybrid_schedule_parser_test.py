@@ -460,3 +460,23 @@ def test_is_blank_match_deeply_nested_nonzero() -> None:
     }
     match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
     assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
+
+
+def test_is_blank_match_nested_dict_with_nonempty_list() -> None:
+    """Nested dict containing a non-empty list is not blank and must not raise TypeError."""
+    alliances = {
+        "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=0),
+        "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=0),
+    }
+    breakdown = {
+        "red": {
+            "totalPoints": 0,
+            "hubScore": {"autoCount": 0, "totalPoints": 0, "notes": ["detail"]},
+        },
+        "blue": {
+            "totalPoints": 0,
+            "hubScore": {"autoCount": 0, "totalPoints": 0, "notes": []},
+        },
+    }
+    match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
