@@ -14,7 +14,7 @@ Edit the fields specified in the file and save. If you're using the development 
 
 ## Rebuilding Web Resources (JavaScript, CSS, etc.)
 
-When using `docker-compose` for local development, the `webpack` service automatically watches for changes to JavaScript and CSS files and rebuilds them. This includes both webpack-managed assets and legacy concatenated JS bundles. No manual steps are needed — just edit the files and refresh your browser.
+When using `docker compose` for local development, the `webpack` service automatically watches for changes to JavaScript and CSS files and rebuilds them. This includes both webpack-managed assets and legacy concatenated JS bundles. No manual steps are needed — just edit the files and refresh your browser.
 
 For CI or manual one-shot builds outside of Docker, run the `run_buildweb.sh` script:
 
