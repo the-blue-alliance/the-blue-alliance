@@ -25,7 +25,6 @@ from backend.common.models.notifications.alliance_selection import (
     AllianceSelectionNotification,
 )
 from backend.common.models.notifications.awards import AwardsNotification
-from backend.common.models.notifications.broadcast import BroadcastNotification
 from backend.common.models.notifications.district_points import (
     DistrictPointsNotification,
 )
@@ -186,35 +185,6 @@ class TBANSHelper:
             cls._batch_send_subscriptions(
                 team_subscriptions_future.get_result(), AwardsNotification(event, team)
             )
-
-    @classmethod
-    def broadcast(
-        cls,
-        client_types: list[ClientType],
-        title: str,
-        message: str,
-        url: str | None = None,
-        app_version: str | None = None,
-    ):
-        notification = BroadcastNotification(title, message, url, app_version)
-
-        # Send to FCM clients
-        fcm_client_types = [ct for ct in client_types if ct in FCM_CLIENTS]
-        if fcm_client_types:
-            clients = MobileClient.query(
-                MobileClient.client_type.IN(fcm_client_types)
-            ).fetch()
-            if clients:
-                cls._defer_fcm(clients, notification)
-
-        # Send to webhooks
-        if ClientType.WEBHOOK in client_types:
-            clients = MobileClient.query(
-                MobileClient.client_type == ClientType.WEBHOOK
-            ).fetch()
-            if clients:
-                for client in clients:
-                    cls._defer_webhook(client, notification)
 
     @classmethod
     def event_level(cls, match_key: str) -> None:
@@ -717,12 +687,6 @@ class TBANSHelper:
                 return None
             return (
                 AwardsNotification(event, team) if team else AwardsNotification(event)
-            )
-
-        elif notification_type == NotificationType.BROADCAST:
-            return BroadcastNotification(
-                title="Test Broadcast",
-                message="This is a test broadcast notification from The Blue Alliance.",
             )
 
         elif notification_type == NotificationType.DISTRICT_POINTS_UPDATED:
