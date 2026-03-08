@@ -58,7 +58,13 @@ class FMSAPIHybridScheduleParser(
             if match.alliances[color]["score"] != 0:
                 return False
             for value in none_throws(match.score_breakdown)[color].values():
-                if value and value not in {
+                if isinstance(value, dict):
+                    # Nested dicts (e.g. 2026 hubScore) - check if any sub-value is non-blank
+                    if any(
+                        v and v not in {"Unknown", "None"} for v in value.values()
+                    ):
+                        return False
+                elif value and value not in {
                     "Unknown",
                     "None",
                 }:  # Nonzero, False, blank, None, etc.

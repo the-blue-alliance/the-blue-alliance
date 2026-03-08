@@ -5,7 +5,9 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.match_helper import MatchHelper
+from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
+from backend.common.models.match import Match
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
     FMSAPIHybridScheduleParser,
 )
@@ -300,3 +302,121 @@ def test_parse_foc_b05(ndb_stub, test_data_importer) -> None:
         for i, match in enumerate(clean_matches[CompLevel.F]):
             assert match.set_number == 1
             assert match.match_number == i + 1
+
+
+def _make_sf_match(alliances_json: str, score_breakdown_json: str) -> Match:
+    return Match(
+        id="2026mefal_sf1m1",
+        year=2026,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+        alliances_json=alliances_json,
+        score_breakdown_json=score_breakdown_json,
+    )
+
+
+def test_is_blank_match_qual_always_false() -> None:
+    """Qual matches are never considered blank."""
+    match = Match(
+        id="2026mefal_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+    )
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
+
+
+def test_is_blank_match_no_score_breakdown() -> None:
+    """Playoff matches with no score breakdown are not blank."""
+    match = Match(
+        id="2026mefal_sf1m1",
+        year=2026,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
+
+
+def test_is_blank_match_nonzero_score() -> None:
+    """Playoff match where an alliance has nonzero score is not blank."""
+    alliances = {
+        "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=534),
+        "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=0),
+    }
+    breakdown = {
+        "red": {"totalPoints": 534},
+        "blue": {"totalPoints": 0},
+    }
+    match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
+
+
+def test_is_blank_match_all_zero_flat_breakdown() -> None:
+    """Playoff match where both alliances have score=0 and all-zero breakdown is blank."""
+    alliances = {
+        "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=0),
+        "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=0),
+    }
+    breakdown = {
+        "red": {"totalPoints": 0, "autoPoints": 0, "teleopPoints": 0},
+        "blue": {"totalPoints": 0, "autoPoints": 0, "teleopPoints": 0},
+    }
+    match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is True
+
+
+def test_is_blank_match_all_zero_with_nested_dict() -> None:
+    """2026-style breakdown with hubScore nested dict of all zeros is still blank."""
+    hub_score_zero = {
+        "autoCount": 0,
+        "transitionCount": 0,
+        "shift1Count": 0,
+        "shift2Count": 0,
+        "shift3Count": 0,
+        "shift4Count": 0,
+        "endgameCount": 0,
+        "teleopCount": 0,
+        "totalCount": 0,
+        "uncounted": 0,
+        "autoPoints": 0,
+        "transitionPoints": 0,
+        "shift1Points": 0,
+        "shift2Points": 0,
+        "shift3Points": 0,
+        "shift4Points": 0,
+        "endgamePoints": 0,
+        "teleopPoints": 0,
+        "totalPoints": 0,
+    }
+    alliances = {
+        "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=0),
+        "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=0),
+    }
+    breakdown = {
+        "red": {"totalPoints": 0, "hubScore": hub_score_zero, "penalties": "None"},
+        "blue": {"totalPoints": 0, "hubScore": hub_score_zero, "penalties": "None"},
+    }
+    match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is True
+
+
+def test_is_blank_match_nonzero_nested_dict() -> None:
+    """2026-style breakdown with nonzero hubScore is not blank."""
+    hub_score_nonzero = {
+        "autoCount": 93,
+        "totalPoints": 524,
+    }
+    hub_score_zero = {"autoCount": 0, "totalPoints": 0}
+    alliances = {
+        "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=0),
+        "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=0),
+    }
+    breakdown = {
+        "red": {"totalPoints": 0, "hubScore": hub_score_nonzero},
+        "blue": {"totalPoints": 0, "hubScore": hub_score_zero},
+    }
+    match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
