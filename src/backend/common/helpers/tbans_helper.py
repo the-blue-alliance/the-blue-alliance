@@ -246,6 +246,12 @@ class TBANSHelper:
         if match is None:
             return
 
+        if not match.has_been_played:
+            logging.warning(
+                f"match_score: skipping notification for {match_key} — match has not been played"
+            )
+            return
+
         event = match.event.get()
 
         # Score breakdown updates only go to webhooks — mobile clients

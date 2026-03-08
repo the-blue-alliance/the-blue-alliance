@@ -110,11 +110,11 @@ class TestTBANSHelper(unittest.TestCase):
                 {
                     "red": {
                         "teams": ["frc1", "frc2", "frc7332"],
-                        "score": -1,
+                        "score": 25,
                     },
                     "blue": {
                         "teams": ["frc4", "frc5", "frc6"],
-                        "score": -1,
+                        "score": 17,
                     },
                 }
             ),
@@ -376,6 +376,35 @@ class TestTBANSHelper(unittest.TestCase):
             notification = mock_send.call_args[0][1]
             assert isinstance(notification, EventScheduleNotification)
             assert notification.event == self.event
+
+    def test_match_score_not_played(self):
+        """match_score should not send notifications when the match has not been played."""
+        unplayed_match = Match(
+            id=f"{self.event.key_name}_qm99",
+            event=self.event.key,
+            comp_level="qm",
+            set_number=1,
+            match_number=99,
+            team_key_names=["frc7332"],
+            alliances_json=json.dumps(
+                {
+                    "red": {
+                        "teams": ["frc1", "frc2", "frc7332"],
+                        "score": -1,
+                    },
+                    "blue": {
+                        "teams": ["frc4", "frc5", "frc6"],
+                        "score": -1,
+                    },
+                }
+            ),
+            year=2020,
+        )
+        unplayed_match.put()
+
+        with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
+            TBANSHelper.match_score(unplayed_match.key_name)
+            mock_send.assert_not_called()
 
     def test_match_score_match_not_found(self):
         with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
