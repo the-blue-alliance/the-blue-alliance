@@ -19,6 +19,7 @@ from backend.common.consts.playoff_type import (
     DOUBLE_ELIM_4_MAPPING_INVERSE,
     DOUBLE_ELIM_MAPPING_INVERSE,
     DOUBLE_ELIM_TYPES,
+    LEGACY_DOUBLE_ELIM_MAPPING_INVERSE,
     PlayoffType,
 )
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -407,6 +408,13 @@ class Match(CachedModel):
                 return "M%s" % match_num
             elif event and event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
                 match_num = DOUBLE_ELIM_4_MAPPING_INVERSE.get(
+                    (self.comp_level, self.set_number, 1)
+                )
+                if match_num is None:
+                    match_num = "?"
+                return "M%s" % match_num
+            elif event and event.playoff_type == PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM:
+                match_num = LEGACY_DOUBLE_ELIM_MAPPING_INVERSE.get(
                     (self.comp_level, self.set_number, 1)
                 )
                 if match_num is None:

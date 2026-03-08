@@ -282,3 +282,8 @@ DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
 DOUBLE_ELIM_4_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
     v: k for k, v in DOUBLE_ELIM_4_MAPPING.items()
 }
+
+
+LEGACY_DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
+    v: k for k, v in LEGACY_DOUBLE_ELIM_MAPPING.items()
+}

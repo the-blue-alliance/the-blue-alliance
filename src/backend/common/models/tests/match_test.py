@@ -282,6 +282,38 @@ def test_short_name_double_elim_4_team() -> None:
     assert match.short_name == "M1"
 
 
+def test_short_name_legacy_double_elim_8_team() -> None:
+    event = Event(
+        id="2017ct",
+        event_short="ct",
+        year=2017,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM,
+    )
+    event.put()
+    # set_number=1, comp_level=EF corresponds to Match 1 in the legacy bracket
+    match = Match(
+        id="2017ct_ef1m1",
+        event=ndb.Key(Event, "2017ct"),
+        year=2017,
+        comp_level=CompLevel.EF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.short_name == "M1"
+
+    # set_number=1, comp_level=SF corresponds to Match 11
+    match11 = Match(
+        id="2017ct_sf1m1",
+        event=ndb.Key(Event, "2017ct"),
+        year=2017,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match11.short_name == "M11"
+
+
 def test_full_name_double_elim() -> None:
     event = Event(
         id="2023ct",
