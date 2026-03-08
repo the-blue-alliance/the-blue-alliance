@@ -47,7 +47,6 @@ from backend.common.models.notifications.alliance_selection import (
     AllianceSelectionNotification,
 )
 from backend.common.models.notifications.awards import AwardsNotification
-from backend.common.models.notifications.broadcast import BroadcastNotification
 from backend.common.models.notifications.event_level import (
     EventLevelNotification,
 )
@@ -302,85 +301,6 @@ class TestTBANSHelper(unittest.TestCase):
             assert event_notification.event == self.event
             assert event_notification.team == frc_1
             assert len(event_notification.team_awards) == 1
-
-    def test_broadcast_none(self):
-        TBANSHelper.broadcast([], "Broadcast", "Test broadcast")
-
-        # Make sure we didn't send to FCM or webhooks
-        tasks = self.taskqueue_stub.GetTasks("push-notifications")
-        assert len(tasks) == 0
-
-    def test_broadcast_fcm_empty(self):
-        for client_type in FCM_CLIENTS:
-            TBANSHelper.broadcast([client_type], "Broadcast", "Test broadcast")
-
-            # Make sure we didn't send to FCM or webhooks
-            tasks = self.taskqueue_stub.GetTasks("push-notifications")
-            assert len(tasks) == 0
-
-    def test_broadcast_fcm(self):
-        for client_type in FCM_CLIENTS:
-            client = MobileClient(
-                parent=ndb.Key(Account, "user_id"),
-                user_id="user_id",
-                messaging_id="token",
-                client_type=client_type,
-                device_uuid="uuid",
-                display_name="Phone",
-            )
-            client_key = client.put()
-
-            TBANSHelper.broadcast([client_type], "Broadcast", "Test broadcast")
-
-            # Make sure we'll send to FCM clients
-            tasks = self.taskqueue_stub.get_filtered_tasks(
-                queue_names="push-notifications"
-            )
-            assert len(tasks) == 1
-
-            # Make sure our taskqueue tasks execute what we expect
-            with patch.object(TBANSHelper, "_send_fcm") as mock_send_fcm:
-                run_from_task(tasks[0])
-                mock_send_fcm.assert_called_once_with([client], ANY)
-                # Make sure the notification is a BroadcastNotification
-                notification = mock_send_fcm.call_args[0][1]
-                assert isinstance(notification, BroadcastNotification)
-
-            self.taskqueue_stub.FlushQueue("push-notifications")
-
-            client_key.delete()
-
-    def test_broadcast_webhook_empty(self):
-        TBANSHelper.broadcast([ClientType.WEBHOOK], "Broadcast", "Test broadcast")
-
-        # Make sure we didn't send to FCM or webhooks
-        tasks = self.taskqueue_stub.GetTasks("push-notifications")
-        assert len(tasks) == 0
-
-    def test_broadcast_webhook(self):
-        client = MobileClient(
-            parent=ndb.Key(Account, "user_id"),
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.WEBHOOK,
-            device_uuid="uuid",
-            display_name="Phone",
-        )
-        client.put()
-
-        TBANSHelper.broadcast([ClientType.WEBHOOK], "Broadcast", "Test broadcast")
-
-        # Make sure we'll send to FCM clients
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-        assert len(tasks) == 1
-
-        # Make sure our taskqueue tasks execute what we expect
-        with patch.object(TBANSHelper, "_send_webhook") as mock_send_webhook:
-            run_from_task(tasks[0])
-            mock_send_webhook.assert_called_once_with(client, ANY)
-            # Make sure the notification is a BroadcastNotification
-            notification = mock_send_webhook.call_args[0][1]
-            assert isinstance(notification, BroadcastNotification)
 
     def test_event_level_match_not_found(self):
         with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
@@ -1060,24 +980,6 @@ class TestTBANSHelper(unittest.TestCase):
             mock_send.assert_called_once()
             assert success
 
-    def test_send_webhook_test_broadcast_notification(self):
-        # Test that BROADCAST notifications work without any keys
-        client = MobileClient(
-            parent=ndb.Key(Account, "user_id"),
-            user_id="user_id",
-            messaging_id="https://example.com/webhook",
-            client_type=ClientType.WEBHOOK,
-            secret="secret",
-            verified=True,
-        )
-
-        with patch.object(
-            WebhookRequest, "send", return_value=(True, True)
-        ) as mock_send:
-            success = TBANSHelper.send_webhook_test(client, NotificationType.BROADCAST)
-            mock_send.assert_called_once()
-            assert success
-
     def test_send_webhook_test_with_team_key(self):
         # Test that team-specific notifications work
         client = MobileClient(
@@ -1146,11 +1048,6 @@ class TestTBANSHelper(unittest.TestCase):
         )
         assert notification is not None
         assert notification._type() == NotificationType.AWARDS
-
-    def test_create_test_notification_broadcast(self):
-        notification = TBANSHelper._create_test_notification(NotificationType.BROADCAST)
-        assert notification is not None
-        assert notification._type() == NotificationType.BROADCAST
 
     def test_create_test_notification_level_starting(self):
         notification = TBANSHelper._create_test_notification(
