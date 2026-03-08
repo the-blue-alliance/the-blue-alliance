@@ -405,7 +405,7 @@ class Match(CachedModel):
                 return "M%s" % (match_num if match_num is not None else "?")
             elif event and event.playoff_type == PlayoffType.DOUBLE_ELIM_4_TEAM:
                 match_num = DOUBLE_ELIM_4_MAPPING_INVERSE.get(
-                    (self.comp_level, self.set_number, self.match_number)
+                    (self.comp_level, self.set_number, 1)
                 )
                 return "M%s" % (match_num if match_num is not None else "?")
             return "%s%s-%s" % (
