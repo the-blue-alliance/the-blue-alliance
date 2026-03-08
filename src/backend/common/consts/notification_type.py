@@ -63,8 +63,8 @@ RENDER_NAMES: Dict[NotificationType, str] = {
     NotificationType.DISTRICT_POINTS_UPDATED: "District Points Updated",
     NotificationType.SCHEDULE_UPDATED: "Event Schedule Updated",
     NotificationType.FINAL_RESULTS: "Final Results",
-    NotificationType.MATCH_VIDEO: "Match Video Added",
-    NotificationType.EVENT_MATCH_VIDEO: "Match Video Added",
+    NotificationType.MATCH_VIDEO: "Match Video",
+    NotificationType.EVENT_MATCH_VIDEO: "Match Video",
 }
 
 

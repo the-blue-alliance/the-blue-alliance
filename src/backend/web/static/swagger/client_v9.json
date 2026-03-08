@@ -45,9 +45,9 @@
           "match_score",
           "alliance_selection",
           "awards_posted",
-          "match_video_added"
+          "match_video"
         ],
-        "description": "Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video_added=Match Video Added)"
+        "description": "Notification type (upcoming_match=Upcoming Match, match_score=Match Score, alliance_selection=Alliance Selection, awards_posted=Awards Posted, match_video=Match Video)"
       },
       "FavoriteCollection": {
         "type": "object",
