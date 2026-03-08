@@ -226,3 +226,39 @@ def test_rookie_bonus_per_event(setup_full_event) -> None:
     assert rankings["frc9001"]["rookie_bonus"] == 20
     # Total: 25 (event1) + 30 (event2) + 20 (rookie bonus) = 75
     assert rankings["frc9001"]["point_total"] == 75
+
+
+def test_single_event_bonus_includes_rookie_bonus(setup_full_event) -> None:
+    setup_full_event("2025mndu")
+
+    event_details = none_throws(EventDetails.get_by_id("2025mndu"))
+    regional_pool_points = none_throws(event_details.regional_champs_pool_points)
+    regional_pool_points["points"]["frc9002"] = TeamAtEventDistrictPoints(
+        alliance_points=10,
+        award_points=0,
+        elim_points=0,
+        qual_points=15,
+        total=25,
+    )
+    event_details.regional_champs_pool_points = regional_pool_points
+    event_details.put()
+
+    event = none_throws(Event.get_by_id("2025mndu"))
+    event.prep_details()
+
+    rookie_single_event = Team(
+        id="frc9002",
+        team_number=9002,
+        rookie_year=2025,
+    )
+    rookie_single_event.put()
+
+    rankings = RegionalChampsPoolHelper.calculate_rankings(
+        [event], [rookie_single_event], 2025, None
+    )
+
+    # E1 includes rookie bonus for regional events: 25 + 10
+    # E2 = round(0.6 * E1) + 14 = round(0.6 * 35) + 14 = 35
+    assert rankings["frc9002"]["rookie_bonus"] == 10
+    assert rankings["frc9002"]["single_event_bonus"] == 35
+    assert rankings["frc9002"]["point_total"] == 70
