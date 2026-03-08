@@ -57,8 +57,9 @@ class LiveEventHelper:
         # from helpers.bluezone_helper import BlueZoneHelper
         # bluezone_event = BlueZoneHelper.update_bluezone(live_events)
         # if bluezone_event:
-        #     for webcast in bluezone_event.webcast:
-        #         WebcastOnlineHelper.add_online_status_async(webcast)
+        #     yield WebcastOnlineHelper.add_online_status_batch_async(
+        #         bluezone_event.webcast
+        #     )
         #     events_by_key[bluezone_event.key_name] = bluezone_event
 
         return (events_by_key, special_webcasts)

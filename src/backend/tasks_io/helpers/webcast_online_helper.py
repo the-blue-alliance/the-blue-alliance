@@ -18,7 +18,6 @@ from backend.tasks_io.datafeeds.datafeed_twitch import (
     TwitchGetAccessToken,
     TwitchWebcastStatus,
 )
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatus
 from backend.tasks_io.datafeeds.datafeed_youtube_batch import YoutubeWebcastStatusBatch
 
 
@@ -26,37 +25,11 @@ class WebcastOnlineHelper:
     @classmethod
     @typed_toplevel
     def add_online_status(cls, webcasts: List[Webcast]) -> Generator[Any, Any, None]:
-        yield tuple(cls.add_online_status_async(webcast) for webcast in webcasts)
+        """Public API for updating webcast online status.
 
-    @classmethod
-    @typed_tasklet
-    def add_online_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
-        online_status_mc = WebcastOnlineStatusMemcache(webcast)
-        cached_webcast = yield online_status_mc.get_async()
-        if cached_webcast:
-            if "status" in cached_webcast:
-                webcast["status"] = cached_webcast.get("status", WebcastStatus.UNKNOWN)
-            if "stream_title" in cached_webcast:
-                webcast["stream_title"] = cached_webcast.get("stream_title")
-            if "viewer_count" in cached_webcast:
-                webcast["viewer_count"] = cached_webcast.get("viewer_count")
-
-            return
-
-        webcast["status"] = WebcastStatus.UNKNOWN
-        webcast["stream_title"] = None
-        webcast["viewer_count"] = None
-        if webcast["type"] == WebcastType.TWITCH:
-            yield cls._add_twitch_status_async(webcast)
-        elif webcast["type"] == WebcastType.YOUTUBE:
-            yield cls._add_youtube_status_async(webcast)
-        # elif webcast["type"] == WebcastType.USTREAM:
-        #    yield cls._add_ustream_status_async(webcast)
-        # Livestream charges for their API. Go figure.
-        # elif webcast['type'] == 'livestream':
-        #     yield cls._add_livestream_status_async(webcast)
-
-        yield online_status_mc.put_async(webcast)
+        Uses optimized batch processing internally to minimize API quota usage.
+        """
+        yield cls.add_online_status_batch_async(webcasts)
 
     @classmethod
     @typed_tasklet
@@ -90,11 +63,6 @@ class WebcastOnlineHelper:
 
     @classmethod
     @typed_tasklet
-    def _add_youtube_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
-        yield YoutubeWebcastStatus(webcast).fetch_async()
-
-    @classmethod
-    @typed_tasklet
     def _add_youtube_status_batch_async(
         cls, webcasts: List[Webcast]
     ) -> Generator[Any, Any, None]:
@@ -123,7 +91,7 @@ class WebcastOnlineHelper:
                     webcast.update(status_data)
 
     @classmethod
-    @typed_toplevel
+    @typed_tasklet
     def add_online_status_batch_async(
         cls, webcasts: List[Webcast]
     ) -> Generator[Any, Any, None]:
