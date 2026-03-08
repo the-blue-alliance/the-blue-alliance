@@ -314,8 +314,8 @@ class TBANSHelper:
 
         # Mark the match as having had its score notification sent.
         # We do this *after* sending (not at enqueue time) so that a
-        # score-breakdown update arriving during a countdown delay
-        # window won't trigger a duplicate webhook-only notification.
+        # score-breakdown update arriving before this task executes
+        # won't trigger a duplicate webhook-only notification.
         if not is_score_breakdown_update and not match.push_sent:
             from backend.common.manipulators.match_manipulator import (
                 MatchManipulator,

@@ -5,8 +5,6 @@ from google.appengine.api import taskqueue
 from pyre_extensions import none_throws
 
 from backend.common.cache_clearing import get_affected_queries
-from backend.common.consts.comp_level import CompLevel
-from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.firebase_pusher import FirebasePusher
@@ -19,12 +17,6 @@ from backend.common.models.match import Match
 
 if TYPE_CHECKING:
     from backend.common.models.event import Event
-
-# How many seconds to wait before dispatching the match_score notification.
-# This gives the FRC API time to return score_breakdown data so the
-# notification payload includes it.  Only applied for events where we are
-# actively syncing from the FRC API (official events with sync enabled).
-MATCH_SCORE_DELAY_SECONDS = 10
 
 
 class MatchManipulator(ManipulatorBase[Match]):
@@ -120,11 +112,6 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                 and (is_new or alliances_changed)
             ):
                 # Match has scores and we haven't sent a notification yet.
-                # Enqueue a match_score notification (possibly delayed to
-                # wait for score_breakdown data from the FRC API).
-                countdown = MatchPostUpdateHooks.match_score_notification_countdown(
-                    match, event
-                )
                 # Catch TaskAlreadyExistsError + TombstonedTaskError
                 try:
                     defer_safe(
@@ -134,7 +121,6 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                         _target="py3-tasks-io",
                         _queue="push-notifications",
                         _url="/_ah/queue/deferred_notification_send",
-                        _countdown=countdown,
                     )
                     # Note: push_sent is set to True inside
                     # TBANSHelper.match_score *after* the notification is
@@ -218,28 +204,6 @@ class MatchPostUpdateHooks:
     Since there are so many match update hooks, we can port them individually here
     and do a better job of batching so we don't have to iterate the same list a bunch
     """
-
-    @staticmethod
-    def match_score_notification_countdown(match: Match, event: "Event") -> int:
-        """Return the number of seconds to delay the match_score notification.
-
-        If the match already has a score_breakdown we send immediately (0).
-        Otherwise, for official events actively syncing from the FRC API, we
-        delay by MATCH_SCORE_DELAY_SECONDS so the breakdown has time to land
-        before the notification task executes.
-        """
-        if match.score_breakdown:
-            return 0
-
-        sync_type = (
-            EventSyncType.EVENT_QUAL_MATCHES
-            if match.comp_level == CompLevel.QM
-            else EventSyncType.EVENT_PLAYOFF_MATCHES
-        )
-        if event.is_sync_enabled(sync_type):
-            return MATCH_SCORE_DELAY_SECONDS
-
-        return 0
 
     @staticmethod
     def firebase_update(model: TUpdatedModel[Match]) -> None:
