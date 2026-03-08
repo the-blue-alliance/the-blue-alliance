@@ -47,6 +47,16 @@ class FMSAPIHybridScheduleParser(
         self.year = year
         self.event_short = event_short
 
+    @staticmethod
+    def _is_blank_breakdown_value(value: Any) -> bool:
+        """Recursively check if a score breakdown value is blank (zero, falsy, or sentinel string)."""
+        if isinstance(value, dict):
+            return all(
+                FMSAPIHybridScheduleParser._is_blank_breakdown_value(v)
+                for v in value.values()
+            )
+        return not value or value in {"Unknown", "None"}
+
     @classmethod
     def is_blank_match(cls, match: Match) -> bool:
         """
@@ -58,16 +68,7 @@ class FMSAPIHybridScheduleParser(
             if match.alliances[color]["score"] != 0:
                 return False
             for value in none_throws(match.score_breakdown)[color].values():
-                if isinstance(value, dict):
-                    # Nested dicts (e.g. 2026 hubScore) - check if any sub-value is non-blank
-                    if any(
-                        v and v not in {"Unknown", "None"} for v in value.values()
-                    ):
-                        return False
-                elif value and value not in {
-                    "Unknown",
-                    "None",
-                }:  # Nonzero, False, blank, None, etc.
+                if not cls._is_blank_breakdown_value(value):
                     return False
         return True
 

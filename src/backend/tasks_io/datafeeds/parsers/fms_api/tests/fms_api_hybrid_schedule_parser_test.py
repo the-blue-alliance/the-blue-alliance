@@ -420,3 +420,43 @@ def test_is_blank_match_nonzero_nested_dict() -> None:
     }
     match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
     assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
+
+
+def test_is_blank_match_deeply_nested_all_zero() -> None:
+    """Arbitrarily nested breakdown with all zeros/blanks is still blank."""
+    alliances = {
+        "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=0),
+        "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=0),
+    }
+    breakdown = {
+        "red": {
+            "totalPoints": 0,
+            "nested": {"level2": {"level3": 0, "level3b": "None"}, "flat": 0},
+        },
+        "blue": {
+            "totalPoints": 0,
+            "nested": {"level2": {"level3": 0, "level3b": "None"}, "flat": 0},
+        },
+    }
+    match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is True
+
+
+def test_is_blank_match_deeply_nested_nonzero() -> None:
+    """A nonzero value buried in arbitrary nesting makes the match non-blank."""
+    alliances = {
+        "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=0),
+        "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=0),
+    }
+    breakdown = {
+        "red": {
+            "totalPoints": 0,
+            "nested": {"level2": {"level3": 42}},
+        },
+        "blue": {
+            "totalPoints": 0,
+            "nested": {"level2": {"level3": 0}},
+        },
+    }
+    match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
+    assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
