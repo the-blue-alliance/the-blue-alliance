@@ -112,15 +112,24 @@ class YouTubeVideoHelper(object):
             )
             raise ndb.Return(None)
 
-        url = f"https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={video_id}&key={yt_secret}"
+        params = {
+            "part": "liveStreamingDetails",
+            "id": video_id,
+            "key": yt_secret,
+        }
+        query_string = urlparse.urlencode(params)
+        url = f"https://www.googleapis.com/youtube/v3/videos?{query_string}"
+
         try:
             ndb_context = ndb.get_context()
             urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
             urlfetch_result = URLFetchResult(url, urlfetch_response)
 
             if urlfetch_result.status_code != 200:
+                # Sanitize URL for logging (remove API key)
+                sanitized_url = url.replace(yt_secret, "***")
                 logging.warning(
-                    f"YouTube API returned status {urlfetch_result.status_code}"
+                    f"YouTube API returned status {urlfetch_result.status_code} for {sanitized_url}. Response: {urlfetch_result.content[:500] if urlfetch_result.content else 'No content'}"
                 )
                 raise ndb.Return(None)
 
@@ -173,8 +182,10 @@ class YouTubeVideoHelper(object):
             urlfetch_result = URLFetchResult(url, urlfetch_response)
 
             if urlfetch_result.status_code != 200:
+                # Sanitize URL for logging (remove API key)
+                sanitized_url = url.replace(yt_secret, "***")
                 logging.warning(
-                    f"YouTube API returned status {urlfetch_result.status_code}"
+                    f"YouTube API returned status {urlfetch_result.status_code} for {sanitized_url}. Response: {urlfetch_result.content[:500] if urlfetch_result.content else 'No content'}"
                 )
                 raise ndb.Return(None)
 
@@ -198,8 +209,11 @@ class YouTubeVideoHelper(object):
         except ndb.Return:
             raise
         except Exception:
+            sanitized_url = url.replace(yt_secret, "***")
             logging.exception(
-                "Failed to resolve YouTube channel name: %s", channel_name
+                "Failed to resolve YouTube channel name '%s' at %s",
+                channel_name,
+                sanitized_url,
             )
             raise ndb.Return(None)
 
@@ -219,17 +233,19 @@ class YouTubeVideoHelper(object):
         base_url = "https://www.googleapis.com/youtube/v3/playlistItems"
         i = 0
 
-        while i < 10:  # Precent runaway looping
+        while i < 10:  # Prevent runaway looping
+            url = ""  # Initialize to avoid uninitialized variable error
             try:
                 # Build URL with query parameters
                 params = {
                     "playlistId": playlist_id,
                     "part": "id,snippet",
                     "maxResults": "50",
-                    "pageToken": next_page_token,
                     "key": yt_secret,
                 }
-                query_string = "&".join(f"{k}={v}" for k, v in params.items() if v)
+                if next_page_token:
+                    params["pageToken"] = next_page_token
+                query_string = urlparse.urlencode(params)
                 url = f"{base_url}?{query_string}"
 
                 ndb_context = ndb.get_context()
@@ -237,14 +253,25 @@ class YouTubeVideoHelper(object):
                 urlfetch_result = URLFetchResult(url, urlfetch_response)
 
                 if urlfetch_result.status_code != 200:
-                    logging.error(
-                        f"YouTube API returned status {urlfetch_result.status_code}"
-                    )
+                    # Sanitize URL for logging (remove API key)
+                    sanitized_url = url.replace(yt_secret, "***")
+                    error_msg = f"YouTube API returned status {urlfetch_result.status_code} for {sanitized_url}. Response: {urlfetch_result.content[:500] if urlfetch_result.content else 'No content'}"
+                    logging.error(error_msg)
                     raise Exception(
-                        f"Unable to call Youtube API for videos in playlist: status {urlfetch_result.status_code}"
+                        f"Unable to call YouTube API for videos in playlist '{playlist_id}': status {urlfetch_result.status_code}"
                     )
-            except Exception:
-                logging.exception("Unable to call Youtube API for videos in playlist")
+            except Exception as e:
+                sanitized_url = (
+                    url.replace(yt_secret, "***")
+                    if url and yt_secret
+                    else url or base_url
+                )
+                logging.exception(
+                    "Unable to call YouTube API for videos in playlist '%s' at %s: %s",
+                    playlist_id,
+                    sanitized_url,
+                    str(e),
+                )
                 raise
 
             video_result = cast(Optional[dict], urlfetch_result.json())
@@ -297,6 +324,7 @@ class YouTubeVideoHelper(object):
         page_count = 0
 
         while page_count < 10:  # Prevent runaway looping
+            url = ""  # Initialize to avoid uninitialized variable error
             try:
                 params = {
                     "part": "snippet",
@@ -305,10 +333,11 @@ class YouTubeVideoHelper(object):
                     "type": "video",
                     "order": "date",
                     "maxResults": "50",
-                    "pageToken": next_page_token,
                     "key": yt_secret,
                 }
-                query_string = "&".join(f"{k}={v}" for k, v in params.items() if v)
+                if next_page_token:
+                    params["pageToken"] = next_page_token
+                query_string = urlparse.urlencode(params)
                 url = f"{base_url}?{query_string}"
 
                 ndb_context = ndb.get_context()
@@ -316,14 +345,25 @@ class YouTubeVideoHelper(object):
                 urlfetch_result = URLFetchResult(url, urlfetch_response)
 
                 if urlfetch_result.status_code != 200:
-                    logging.error(
-                        f"YouTube API returned status {urlfetch_result.status_code}"
-                    )
+                    # Sanitize URL for logging (remove API key)
+                    sanitized_url = url.replace(yt_secret, "***")
+                    error_msg = f"YouTube API returned status {urlfetch_result.status_code} for {sanitized_url}. Response: {urlfetch_result.content[:500] if urlfetch_result.content else 'No content'}"
+                    logging.error(error_msg)
                     raise Exception(
-                        f"Unable to call Youtube API for upcoming streams: status {urlfetch_result.status_code}"
+                        f"Unable to call YouTube API for upcoming streams in channel '{channel_id}': status {urlfetch_result.status_code}"
                     )
-            except Exception:
-                logging.exception("Unable to call Youtube API for upcoming streams")
+            except Exception as e:
+                sanitized_url = (
+                    url.replace(yt_secret, "***")
+                    if url and yt_secret
+                    else url or base_url
+                )
+                logging.exception(
+                    "Unable to call YouTube API for upcoming streams in channel '%s' at %s: %s",
+                    channel_id,
+                    sanitized_url,
+                    str(e),
+                )
                 raise
 
             search_result = cast(Optional[dict], urlfetch_result.json())
@@ -352,7 +392,13 @@ class YouTubeVideoHelper(object):
         for batch_start in range(0, len(stream_basics), 50):
             batch = stream_basics[batch_start : batch_start + 50]
             video_ids = ",".join(stream["stream_id"] for stream in batch)
-            videos_url = f"https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={video_ids}&key={yt_secret}"
+            params = {
+                "part": "liveStreamingDetails",
+                "id": video_ids,
+                "key": yt_secret,
+            }
+            query_string = urlparse.urlencode(params)
+            videos_url = f"https://www.googleapis.com/youtube/v3/videos?{query_string}"
 
             try:
                 ndb_context = ndb.get_context()
@@ -360,8 +406,10 @@ class YouTubeVideoHelper(object):
                 urlfetch_result = URLFetchResult(videos_url, urlfetch_response)
 
                 if urlfetch_result.status_code != 200:
+                    # Sanitize URL for logging (remove API key)
+                    sanitized_url = videos_url.replace(yt_secret, "***")
                     logging.warning(
-                        f"YouTube API videos endpoint returned status {urlfetch_result.status_code}"
+                        f"YouTube API videos endpoint returned status {urlfetch_result.status_code} for {sanitized_url}. Response: {urlfetch_result.content[:500] if urlfetch_result.content else 'No content'}"
                     )
                     continue
 
@@ -388,6 +436,12 @@ class YouTubeVideoHelper(object):
                         )
                     )
             except Exception:
-                logging.exception("Unable to fetch video details from YouTube API")
+                sanitized_url = (
+                    videos_url.replace(yt_secret, "***") if yt_secret else videos_url
+                )
+                logging.exception(
+                    "Unable to fetch video details from YouTube API at %s",
+                    sanitized_url,
+                )
 
         raise ndb.Return(streams)
