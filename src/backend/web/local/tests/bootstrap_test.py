@@ -278,20 +278,19 @@ def mock_event_predictions_url(
 
 
 def mock_event_district_points_url(
-    m: RequestsMocker, event_key: EventKey, district_points: object = None
+    m: RequestsMocker,
+    event_key: EventKey,
 ) -> None:
     m.register_uri(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/district_points",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
         status_code=200,
-        json=district_points,
+        json={},
     )
 
 
-def mock_districts_url(
-    m: RequestsMocker, year: Year, districts: List[Dict]
-) -> None:
+def mock_districts_url(m: RequestsMocker, year: Year, districts: List[Dict]) -> None:
     m.register_uri(
         "GET",
         f"https://www.thebluealliance.com/api/v3/districts/{year}",
