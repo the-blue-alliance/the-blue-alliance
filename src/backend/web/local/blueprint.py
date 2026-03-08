@@ -24,6 +24,7 @@ from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.memcache import MemcacheClient
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.sitevars.apiv3_key import Apiv3Key
 from backend.web.local.bootstrap import LocalDataBootstrap
 from backend.web.local.dev_tools import seed_test_event, seed_test_team
@@ -65,6 +66,7 @@ def bootstrap() -> str:
     apiv3_key = Apiv3Key.api_key()
     template_values = {
         "apiv3_key": apiv3_key,
+        "current_year": SeasonHelper.get_current_season(),
         "dev_auth_key": dev_auth_key,
         "status": request.args.get("status"),
         "view_url": request.args.get("url"),
