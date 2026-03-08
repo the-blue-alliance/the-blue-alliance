@@ -4,6 +4,8 @@ import logging
 import time
 
 import firebase_admin
+import requests.adapters
+from firebase_admin import messaging as fcm_messaging
 from firebase_admin.exceptions import FirebaseError
 
 from backend.common.consts.client_type import (
@@ -88,7 +90,30 @@ def _firebase_app():
         return firebase_admin.initialize_app(creds, name="tbans")
 
 
+def _configure_fcm_pool_size(app: firebase_admin.App) -> None:
+    """Expand the HTTP connection pool so send_each's threads don't block.
+
+    send_each spawns up to MAXIMUM_TOKENS threads that share a single
+    requests.Session whose default pool_maxsize is 10.  Mount a larger
+    adapter so every thread can have a connection.
+
+    NOTE: accesses firebase-admin private API (_get_messaging_service);
+    verified stable through firebase-admin 7.x.
+    """
+    svc = fcm_messaging._get_messaging_service(app)  # pyre-ignore[16]
+    if svc is None:
+        return
+    session = svc._client.session
+    if session is None:
+        return
+    adapter = requests.adapters.HTTPAdapter(
+        pool_maxsize=MAXIMUM_TOKENS, pool_connections=1
+    )
+    session.mount("https://", adapter)
+
+
 firebase_app = _firebase_app()
+_configure_fcm_pool_size(firebase_app)
 
 
 class TBANSHelper:
