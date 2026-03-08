@@ -54,6 +54,10 @@
                 <td>Elasticsearch Name</td>
                 <td> {{district.elasticsearch_name }}</td>
             </tr>
+            <tr>
+                <td>Uses Official Webcast Unit</td>
+                <td>{% if district.uses_official_webcast_unit %}<span class="glyphicon glyphicon-ok"></span> Yes{% else %}No{% endif %}</td>
+            </tr>
         </table>
 
         <h2>Tasks</h2>

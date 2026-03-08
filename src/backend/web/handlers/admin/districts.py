@@ -121,6 +121,7 @@ def district_edit_post(district_key: Optional[DistrictKey]) -> Response:
     year = int(request.form["year"])
     abbreviation = request.form["abbreviation"]
     display_name = request.form.get("display_name")
+    uses_official_webcast_unit = request.form.get("uses_official_webcast_unit") == "on"
 
     if district_key is None:
         district_key = District.render_key_name(year, abbreviation)
@@ -133,6 +134,7 @@ def district_edit_post(district_key: Optional[DistrictKey]) -> Response:
         year=year,
         abbreviation=abbreviation,
         display_name=display_name,
+        uses_official_webcast_unit=uses_official_webcast_unit,
     )
     DistrictManipulator.createOrUpdate(district)
 
