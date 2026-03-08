@@ -18,6 +18,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import (
     DOUBLE_ELIM_4_MAPPING_INVERSE,
     DOUBLE_ELIM_MAPPING_INVERSE,
+    DOUBLE_ELIM_TYPES,
     PlayoffType,
 )
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -446,10 +447,7 @@ class Match(CachedModel):
     def full_name(self) -> str:
         if self.comp_level not in (CompLevel.QM, CompLevel.F):
             event = self.event.get()
-            if event and event.playoff_type in (
-                PlayoffType.DOUBLE_ELIM_8_TEAM,
-                PlayoffType.DOUBLE_ELIM_4_TEAM,
-            ):
+            if event and event.playoff_type in DOUBLE_ELIM_TYPES:
                 return "Playoff"
         return "%s" % (comp_level.COMP_LEVELS_VERBOSE_FULL[self.comp_level])
 
