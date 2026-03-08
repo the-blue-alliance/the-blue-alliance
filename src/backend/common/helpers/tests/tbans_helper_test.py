@@ -33,6 +33,7 @@ from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import NotificationType
 from backend.common.helpers.deferred import run_from_task
 from backend.common.helpers.tbans_helper import (
+    _configure_fcm_pool_size,
     _firebase_app,
     _NotificationMode,
     TBANSHelper,
@@ -68,6 +69,9 @@ from backend.common.models.notifications.mytba import (
     SubscriptionsUpdatedNotification,
 )
 from backend.common.models.notifications.requests.fcm_request import FCMRequest
+from backend.common.models.notifications.requests.fcm_request import (
+    MAXIMUM_TOKENS,
+)
 from backend.common.models.notifications.requests.webhook_request import (
     WebhookRequest,
 )
@@ -143,6 +147,21 @@ class TestTBANSHelper(unittest.TestCase):
         assert app_two.name == "tbans"
         # Should be the same object
         assert app_one == app_two
+
+    def test_configure_fcm_pool_size(self):
+        from firebase_admin import messaging as fcm_messaging
+
+        from requests.adapters import HTTPAdapter
+
+        app = _firebase_app()
+        _configure_fcm_pool_size(app)
+        svc = fcm_messaging._get_messaging_service(app)
+        session = svc._client.session
+        assert session is not None
+        adapter = session.get_adapter("https://fcm.googleapis.com")
+        assert isinstance(adapter, HTTPAdapter)
+        assert adapter._pool_maxsize == MAXIMUM_TOKENS  # type: ignore[attr-defined]
+        assert adapter._pool_connections == 1  # type: ignore[attr-defined]
 
     def test_alliance_selection_no_users(self):
         # Test send not called with no subscribed users
