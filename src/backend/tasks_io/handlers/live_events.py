@@ -26,6 +26,10 @@ from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.memcache_models.district_webcast_last_updated_memcache import (
+    DistrictWebcastLastUpdatedData,
+    DistrictWebcastLastUpdatedMemcache,
+)
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
@@ -59,6 +63,14 @@ def update_live_events() -> str:
     # their webcast info in advance. However, other districts will not.
     # Here, we will try to find their upcoming streams
     districts_to_find = set()
+    district_webcast_last_updated_memcache = DistrictWebcastLastUpdatedMemcache()
+    cached_last_updated = district_webcast_last_updated_memcache.get()
+    district_last_updated: Dict[DistrictKey, int] = {}
+    if cached_last_updated is not None:
+        district_last_updated = dict(cached_last_updated["district_last_updated"])
+
+    current_time = datetime.datetime.now(tz=pytz.utc)
+    throttle_interval = datetime.timedelta(hours=1)
     districts_with_youtube_channels = {
         district.key_name
         for district in District.query(
@@ -79,8 +91,17 @@ def update_live_events() -> str:
         ):
             districts_to_find.add(event_district_key)
 
+    did_enqueue = False
     if districts_to_find:
         for district_key in districts_to_find:
+            last_updated = district_last_updated.get(district_key)
+            if last_updated is not None:
+                elapsed = current_time - datetime.datetime.fromtimestamp(
+                    last_updated, tz=pytz.utc
+                )
+                if elapsed <= throttle_interval:
+                    continue
+
             taskqueue.add(
                 url=url_for(
                     "live_events.find_event_webcasts", district_key=district_key
@@ -89,6 +110,13 @@ def update_live_events() -> str:
                 queue_name="default",
                 target="py3-tasks-io",
             )
+            district_last_updated[district_key] = int(current_time.timestamp())
+            did_enqueue = True
+
+    if did_enqueue:
+        district_webcast_last_updated_memcache.put(
+            DistrictWebcastLastUpdatedData(district_last_updated=district_last_updated)
+        )
 
     return ""
 

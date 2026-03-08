@@ -2,6 +2,7 @@ import datetime
 import json
 from unittest import mock
 
+import pytz
 from freezegun import freeze_time
 from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
@@ -21,6 +22,10 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.youtube_video_helper import (
     YouTubeUpcomingStream,
     YouTubeVideoHelper,
+)
+from backend.common.memcache_models.district_webcast_last_updated_memcache import (
+    DistrictWebcastLastUpdatedData,
+    DistrictWebcastLastUpdatedMemcache,
 )
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -345,6 +350,128 @@ def test_update_live_events_enqueues_district_webcast_search(
     task_urls = {t.url for t in tasks}
     assert "/tasks/do/find_event_webcasts/2026fim" in task_urls
     assert "/tasks/do/find_event_webcasts/2026ne" in task_urls
+
+    cache_data = DistrictWebcastLastUpdatedMemcache().get()
+    assert cache_data is not None
+    assert "2026fim" in cache_data["district_last_updated"]
+    assert "2026ne" in cache_data["district_last_updated"]
+
+
+@freeze_time("2026-03-15 12:00:00")
+@mock.patch.object(FirebasePusher, "update_live_events")
+@mock.patch.object(LiveEventHelper, "get_live_events_with_current_webcasts")
+@mock.patch.object(EventHelper, "week_events")
+def test_update_live_events_does_not_enqueue_district_webcast_search_within_hour(
+    week_events_mock: mock.Mock,
+    live_events_mock: mock.Mock,
+    firebase_mock: mock.Mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    event_without_webcast = Event(
+        id="2026fim2",
+        year=2026,
+        event_short="fim2",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    )
+    event_without_webcast.put()
+
+    week_events_mock.return_value = [event_without_webcast]
+    live_events_mock.return_value = ({}, [])
+
+    now_timestamp = int(datetime.datetime.now(tz=pytz.utc).timestamp())
+    one_hour_seconds = int(datetime.timedelta(hours=1).total_seconds())
+    existing_timestamp = now_timestamp - one_hour_seconds + 1
+    DistrictWebcastLastUpdatedMemcache().put(
+        DistrictWebcastLastUpdatedData(
+            district_last_updated={"2026fim": existing_timestamp}
+        )
+    )
+
+    resp = tasks_client.get("/tasks/do/update_live_events")
+    assert resp.status_code == 200
+
+    firebase_mock.assert_called_once()
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+    cache_data = DistrictWebcastLastUpdatedMemcache().get()
+    assert cache_data is not None
+    assert cache_data["district_last_updated"]["2026fim"] == existing_timestamp
+
+
+@freeze_time("2026-03-15 12:00:00")
+@mock.patch.object(FirebasePusher, "update_live_events")
+@mock.patch.object(LiveEventHelper, "get_live_events_with_current_webcasts")
+@mock.patch.object(EventHelper, "week_events")
+def test_update_live_events_enqueues_district_webcast_search_after_one_hour(
+    week_events_mock: mock.Mock,
+    live_events_mock: mock.Mock,
+    firebase_mock: mock.Mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    event_without_webcast = Event(
+        id="2026fim2",
+        year=2026,
+        event_short="fim2",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    )
+    event_without_webcast.put()
+
+    week_events_mock.return_value = [event_without_webcast]
+    live_events_mock.return_value = ({}, [])
+
+    now_timestamp = int(datetime.datetime.now(tz=pytz.utc).timestamp())
+    one_hour_seconds = int(datetime.timedelta(hours=1).total_seconds())
+    stale_timestamp = now_timestamp - one_hour_seconds - 1
+    DistrictWebcastLastUpdatedMemcache().put(
+        DistrictWebcastLastUpdatedData(
+            district_last_updated={"2026fim": stale_timestamp}
+        )
+    )
+
+    resp = tasks_client.get("/tasks/do/update_live_events")
+    assert resp.status_code == 200
+
+    firebase_mock.assert_called_once()
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    assert tasks[0].url == "/tasks/do/find_event_webcasts/2026fim"
+
+    cache_data = DistrictWebcastLastUpdatedMemcache().get()
+    assert cache_data is not None
+    assert cache_data["district_last_updated"]["2026fim"] == now_timestamp
 
 
 @mock.patch.object(FirebasePusher, "update_live_events")
