@@ -402,7 +402,9 @@ def test_get_playlist_videos_unauthorized(ndb_context, mock_google_api_secret) -
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        with pytest.raises(Exception, match="Unable to call Youtube API"):
+        with pytest.raises(
+            Exception, match="Unable to call YouTube API for videos in playlist"
+        ):
             YouTubeVideoHelper.videos_in_playlist("playlist_id").get_result()
 
 
@@ -494,7 +496,8 @@ def test_get_upcoming_streams_api_error(ndb_context, mock_google_api_secret) -> 
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
         with pytest.raises(
-            Exception, match="Unable to call Youtube API for upcoming streams"
+            Exception,
+            match="Unable to call YouTube API for upcoming streams in channel",
         ):
             YouTubeVideoHelper.get_upcoming_streams("UC_channel_id").get_result()
 
