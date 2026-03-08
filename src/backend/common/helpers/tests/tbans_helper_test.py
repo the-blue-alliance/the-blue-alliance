@@ -32,7 +32,11 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import NotificationType
 from backend.common.helpers.deferred import run_from_task
-from backend.common.helpers.tbans_helper import _firebase_app, TBANSHelper
+from backend.common.helpers.tbans_helper import (
+    _firebase_app,
+    _NotificationMode,
+    TBANSHelper,
+)
 from backend.common.models.account import Account
 from backend.common.models.award import Award
 from backend.common.models.district import District
@@ -470,7 +474,7 @@ class TestTBANSHelper(unittest.TestCase):
     def test_match_score_no_users(self):
         # Test send not called with no subscribed users
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.match_score(self.match)
+            TBANSHelper.match_score(self.match.key_name)
             mock_send.assert_not_called()
 
     def test_match_score_user_id(self):
@@ -491,7 +495,7 @@ class TestTBANSHelper(unittest.TestCase):
                 TBANSHelper, "schedule_upcoming_match"
             ) as schedule_upcoming_match,
         ):
-            TBANSHelper.match_score(self.match, "user_id")
+            TBANSHelper.match_score(self.match.key_name, "user_id")
             mock_send.assert_called()
             assert len(mock_send.call_args_list) == 3
             for call in mock_send.call_args_list:
@@ -525,7 +529,7 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.MATCH_SCORE],
         ).put()
 
-        TBANSHelper.match_score(self.match)
+        TBANSHelper.match_score(self.match.key_name)
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 3
 
@@ -542,7 +546,10 @@ class TestTBANSHelper(unittest.TestCase):
             notifications = [call[0][1] for call in mock_send.call_args_list]
             for notification in notifications:
                 assert isinstance(notification, MatchScoreNotification)
-                assert notification.match == self.match
+                # Compare by key: match_score() sets push_sent=True after
+                # notifications are pickled, so full-object equality can
+                # differ on push_sent.
+                assert notification.match.key == self.match.key
             # Check frc7332 notification
             notification = notifications[1]
             assert notification.team == self.team
@@ -565,12 +572,127 @@ class TestTBANSHelper(unittest.TestCase):
         with patch.object(
             TBANSHelper, "schedule_upcoming_match"
         ) as schedule_upcoming_match:
-            TBANSHelper.match_score(self.match)
+            TBANSHelper.match_score(self.match.key_name)
             schedule_upcoming_match.assert_called()
             assert len(schedule_upcoming_match.call_args_list) == 1
             assert len(schedule_upcoming_match.call_args) == 2
             assert schedule_upcoming_match.call_args[0][0] == next_matches.pop()
             assert schedule_upcoming_match.call_args[0][1] is None
+
+    def test_match_score_score_breakdown_update_no_users(self):
+        # Test send not called with no subscribed users
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
+            mock_send.assert_not_called()
+
+    def test_match_score_score_breakdown_update_user_id(self):
+        # Test send called with user id - should use _send with WEBHOOK mode
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.match_score(
+                self.match.key_name, "user_id", is_score_breakdown_update=True
+            )
+            mock_send.assert_called()
+            assert len(mock_send.call_args_list) == 3
+            for call in mock_send.call_args_list:
+                assert call[0][0] == ["user_id"]
+                assert call[0][2] == _NotificationMode.WEBHOOK
+
+    def test_match_score_score_breakdown_update(self):
+        # Insert subscriptions for Event, Team, and Match
+        Subscription(
+            parent=ndb.Key(Account, "user_id_1"),
+            user_id="user_id_1",
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.MATCH_SCORE],
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, "user_id_2"),
+            user_id="user_id_2",
+            model_key="frc7332",
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.MATCH_SCORE],
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, "user_id_3"),
+            user_id="user_id_3",
+            model_key=self.match.key_name,
+            model_type=ModelType.MATCH,
+            notification_types=[NotificationType.MATCH_SCORE],
+        ).put()
+
+        TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 3
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            for task in tasks:
+                run_from_task(task)
+
+            # Three calls - Event, Team frc7332, Match
+            mock_send.assert_called()
+            assert len(mock_send.call_args_list) == 3
+            # Verify WEBHOOK mode is passed through
+            for call in mock_send.call_args_list:
+                assert call[0][2] == _NotificationMode.WEBHOOK
+            assert [
+                x[0] for x in [call[0][0] for call in mock_send.call_args_list]
+            ] == ["user_id_1", "user_id_2", "user_id_3"]
+            notifications = [call[0][1] for call in mock_send.call_args_list]
+            for notification in notifications:
+                assert isinstance(notification, MatchScoreNotification)
+                assert notification.match == self.match
+            # Check frc7332 notification
+            notification = notifications[1]
+            assert notification.team == self.team
+
+    def test_match_score_score_breakdown_update_no_upcoming_match(self):
+        """is_score_breakdown_update=True should NOT schedule upcoming match notifications"""
+        match_creator = MatchTestCreator(self.event)
+        teams = [
+            Team(id="frc%s" % team_number, team_number=team_number)
+            for team_number in range(6)
+        ]
+        self.event._teams_future = ndb.Future()
+        self.event._teams_future.set_result(teams)
+        match_creator.createIncompleteQuals()
+
+        with patch.object(
+            TBANSHelper, "schedule_upcoming_match"
+        ) as schedule_upcoming_match:
+            TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
+            schedule_upcoming_match.assert_not_called()
+
+    def test_match_score_sets_push_sent(self):
+        """match_score should set push_sent=True after sending the initial notification."""
+        assert not self.match.push_sent
+
+        TBANSHelper.match_score(self.match.key_name)
+
+        updated_match = Match.get_by_id(self.match.key_name)
+        assert updated_match is not None
+        assert updated_match.push_sent
+
+    def test_match_score_does_not_reset_push_sent(self):
+        """match_score should not re-write push_sent when it is already True."""
+        self.match.push_sent = True
+        self.match.put()
+
+        TBANSHelper.match_score(self.match.key_name)
+
+        updated_match = Match.get_by_id(self.match.key_name)
+        assert updated_match is not None
+        assert updated_match.push_sent
+
+    def test_match_score_breakdown_update_does_not_set_push_sent(self):
+        """is_score_breakdown_update=True should NOT set push_sent."""
+        assert not self.match.push_sent
+
+        TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
+
+        updated_match = Match.get_by_id(self.match.key_name)
+        assert updated_match is not None
+        assert not updated_match.push_sent
 
     def test_match_upcoming_no_users(self):
         # Test send not called with no subscribed users
@@ -1362,6 +1484,40 @@ class TestTBANSHelper(unittest.TestCase):
             for webhook in expected_webhooks:
                 mock_webhook.assert_called_once_with(webhook, notification)
 
+    def test_send_webhook_only_empty(self):
+        notification = MockNotification()
+        with patch.object(TBANSHelper, "_defer_webhook") as mock_webhook:
+            TBANSHelper._send([], notification, _NotificationMode.WEBHOOK)
+            mock_webhook.assert_not_called()
+
+    def test_send_webhook_only(self):
+        # Create clients of various types
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="client_type_{}".format(client_type),
+                client_type=client_type,
+            )
+            for client_type in CLIENT_TYPE_NAMES.keys()
+        ]
+        for c in clients:
+            c.put()
+
+        expected_webhooks = [c for c in clients if c.client_type == ClientType.WEBHOOK]
+
+        notification = MockNotification()
+        with (
+            patch.object(TBANSHelper, "_defer_fcm") as mock_fcm,
+            patch.object(TBANSHelper, "_defer_webhook") as mock_webhook,
+        ):
+            TBANSHelper._send(["user_id"], notification, _NotificationMode.WEBHOOK)
+            # FCM should never be called
+            mock_fcm.assert_not_called()
+            # Only webhooks should be sent to
+            for webhook in expected_webhooks:
+                mock_webhook.assert_called_once_with(webhook, notification)
+
     def test_defer_fcm(self):
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),
@@ -1985,4 +2141,6 @@ class TestTBANSHelper(unittest.TestCase):
         notification = MockNotification()
         with patch.object(TBANSHelper, "_send") as mock_send:
             TBANSHelper._send_subscriptions([subscription], notification)
-            mock_send.assert_called_once_with(["user_id_1"], notification)
+            mock_send.assert_called_once_with(
+                ["user_id_1"], notification, _NotificationMode.ALL
+            )
