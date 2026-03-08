@@ -96,7 +96,7 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
             try:
                 defer_safe(
                     TBANSHelper.awards,
-                    event,
+                    event.key_name,
                     _name=f"{event.key_name}_awards",
                     _target="py3-tasks-io",
                     _queue="push-notifications",
