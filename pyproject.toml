@@ -35,6 +35,7 @@ test = [
     "freezegun==1.5.5",
     "pytest",
     "pytest-custom_exit_code",
+    "pytest-env",
     "pytest-split",
     "pytest-testmon",
     "requests-mock==1.12.1",
