@@ -74,6 +74,18 @@ def seed_test_event() -> Response:
         match_time = total_completed_time + datetime.timedelta(
             minutes=(i - 1) * MATCH_SPACING_MINUTES
         )
+        red_bonus_rp = random.randint(0, 2)
+        blue_bonus_rp = random.randint(0, 2)
+        red_rp = (
+            2 if red_score > blue_score else (1 if red_score == blue_score else 0)
+        ) + red_bonus_rp
+        blue_rp = (
+            2 if blue_score > red_score else (1 if red_score == blue_score else 0)
+        ) + blue_bonus_rp
+        score_breakdown = {
+            "red": {"totalPoints": red_score, "rp": red_rp},
+            "blue": {"totalPoints": blue_score, "rp": blue_rp},
+        }
         match = Match(
             id=Match.render_key_name(event_key, CompLevel.QM, 1, i),
             event=ndb.Key(Event, event_key),
@@ -98,6 +110,7 @@ def seed_test_event() -> Response:
                     },
                 }
             ),
+            score_breakdown_json=json.dumps(score_breakdown),
             time=match_time,
             actual_time=match_time,
         )
