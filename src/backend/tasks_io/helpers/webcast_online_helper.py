@@ -70,6 +70,7 @@ class WebcastOnlineHelper:
 
         YouTube API v3 supports querying up to 50 video IDs in a single request.
         This batching significantly reduces quota usage and API calls.
+        Gracefully handles API errors (e.g., 403 Forbidden) by leaving status as UNKNOWN.
         """
         if not webcasts:
             return
@@ -79,9 +80,14 @@ class WebcastOnlineHelper:
         for i in range(0, len(webcasts), batch_size):
             batch = webcasts[i : i + batch_size]
             # Fetch status data from API (returns Dict[video_id, WebcastOnlineStatus])
-            status_results: Dict[str, Any] = yield YoutubeWebcastStatusBatch(
+            # May return None if API returns an error (e.g., 403 Forbidden)
+            status_results: Optional[Dict[str, Any]] = yield YoutubeWebcastStatusBatch(
                 batch
             ).fetch_async()
+
+            # Skip merging if API request failed - leave status as UNKNOWN
+            if status_results is None:
+                continue
 
             # Merge results into webcast models
             for webcast in batch:
