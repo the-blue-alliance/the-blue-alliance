@@ -21,6 +21,7 @@ import {
   TeamLocationLink,
 } from '~/components/tba/links';
 import { Badge } from '~/components/ui/badge';
+import { Divider } from '~/components/ui/divider';
 import {
   Select,
   SelectContent,
@@ -28,7 +29,6 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { Divider } from '~/components/ui/divider';
 import {
   Table,
   TableBody,
@@ -177,9 +177,7 @@ function DistrictPage() {
 
   const hasRankings = rankings !== null;
 
-  const validYears = districtHistory
-    .map((d) => d.year)
-    .sort((a, b) => b - a);
+  const validYears = districtHistory.map((d) => d.year).sort((a, b) => b - a);
 
   const dcmpEvents = events.filter(
     (event) =>
@@ -247,6 +245,7 @@ function DistrictPage() {
             <SelectValue placeholder={year} />
           </SelectTrigger>
           <SelectContent className="max-h-[30vh] overflow-y-auto">
+            <SelectItem value="stats">Stats</SelectItem>
             {validYears.map((y) => (
               <SelectItem key={y} value={`${y}`}>
                 {y}
