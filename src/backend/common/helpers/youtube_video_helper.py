@@ -1,4 +1,3 @@
-import importlib
 import logging
 import re
 from typing import Any, cast, Dict, Generator, List, Optional, TypedDict
@@ -35,11 +34,6 @@ class YouTubeVideoHelper(object):
         r".*/embed/([a-zA-Z0-9_-]*)",  # Embed: youtube.com/embed/ID
         r".*/shorts/([a-zA-Z0-9_-]*)",  # Shorts: youtube.com/shorts/ID
     ]
-
-    @classmethod
-    def _youtube_datafeed_class(cls, class_name: str) -> Any:
-        module = importlib.import_module("backend.tasks_io.datafeeds.datafeed_youtube")
-        return getattr(module, class_name)
 
     @classmethod
     def parse_id_from_url(cls, youtube_url: str) -> Optional[str]:
@@ -109,11 +103,12 @@ class YouTubeVideoHelper(object):
         Fetches the scheduledStartTime for a YouTube video from the YouTube API.
         Returns the date in YYYY-MM-DD format, or None if not available.
         """
+        from backend.tasks_io.datafeeds.datafeed_youtube import (
+            YoutubeVideoDetailsDatafeed,
+        )
+
         try:
-            video_details_datafeed_cls = cls._youtube_datafeed_class(
-                "YoutubeVideoDetailsDatafeed"
-            )
-            datafeed = video_details_datafeed_cls(
+            datafeed = YoutubeVideoDetailsDatafeed(
                 video_id,
                 parts="liveStreamingDetails",
             )
@@ -161,11 +156,10 @@ class YouTubeVideoHelper(object):
         Resolves a YouTube channel name to a channel ID.
         Returns channel metadata if found, else None.
         """
+        from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeSearchDatafeed
+
         try:
-            youtube_search_datafeed_cls = cls._youtube_datafeed_class(
-                "YoutubeSearchDatafeed"
-            )
-            datafeed = youtube_search_datafeed_cls(
+            datafeed = YoutubeSearchDatafeed(
                 query=channel_name,
                 search_type="channel",
                 max_results=1,
@@ -215,17 +209,18 @@ class YouTubeVideoHelper(object):
     def videos_in_playlist(
         cls, playlist_id: str
     ) -> Generator[Any, Any, List[YouTubePlaylistItem]]:
-        videos: List[YouTubePlaylistItem] = []
-        youtube_playlist_datafeed_cls = cls._youtube_datafeed_class(
-            "YoutubePlaylistItemsDatafeed"
+        from backend.tasks_io.datafeeds.datafeed_youtube import (
+            YoutubePlaylistItemsDatafeed,
         )
+
+        videos: List[YouTubePlaylistItem] = []
 
         next_page_token = ""
         i = 0
 
         while i < 10:  # Prevent runaway looping
             try:
-                datafeed = youtube_playlist_datafeed_cls(
+                datafeed = YoutubePlaylistItemsDatafeed(
                     playlist_id,
                     max_results=50,
                     page_token=next_page_token,
@@ -286,86 +281,49 @@ class YouTubeVideoHelper(object):
         Fetches all upcoming live streams for a given YouTube channel.
         Returns a list of streams with stream_id, title, and scheduled_start_time.
         """
+        from backend.tasks_io.datafeeds.datafeed_youtube import (
+            YoutubeSearchDatafeed,
+            YoutubeVideoLiveDetailsBatchDatafeed,
+        )
+
         stream_basics: List[Dict[str, str]] = []
-        youtube_search_datafeed_cls = cls._youtube_datafeed_class(
-            "YoutubeSearchDatafeed"
-        )
-        youtube_live_details_batch_datafeed_cls = cls._youtube_datafeed_class(
-            "YoutubeVideoLiveDetailsBatchDatafeed"
-        )
-        next_page_token = ""
-        page_count = 0
+        try:
+            search_datafeed = YoutubeSearchDatafeed(
+                search_type="video",
+                max_results=50,
+                order="date",
+                channel_id=channel_id,
+                event_type="upcoming",
+            )
+            parsed_search_results = yield search_datafeed.fetch_all_pages_async()
+        except ValueError:
+            msg = "No Google API secret, unable to fetch upcoming streams"
+            logging.warning(msg)
+            raise Exception(msg)
+        except Exception as e:
+            logging.exception(
+                "Unable to call YouTube API for upcoming streams in channel '%s': %s",
+                channel_id,
+                str(e),
+            )
+            raise Exception(
+                f"Unable to call YouTube API for upcoming streams in channel '{channel_id}': {str(e)}"
+            ) from e
 
-        while page_count < 10:  # Prevent runaway looping
-            try:
-                search_datafeed = youtube_search_datafeed_cls(
-                    search_type="video",
-                    max_results=50,
-                    order="date",
-                    page_token=next_page_token,
-                    channel_id=channel_id,
-                    event_type="upcoming",
+        for item in parsed_search_results:
+            video_id = item.get("video_id")
+            if video_id:
+                stream_basics.append(
+                    {
+                        "stream_id": video_id,
+                        "title": item.get("title", ""),
+                    }
                 )
-            except ValueError:
-                msg = "No Google API secret, unable to fetch upcoming streams"
-                logging.warning(msg)
-                raise Exception(msg)
-
-            try:
-                search_response = yield search_datafeed._fetch()
-
-                if search_response.status_code != 200:
-                    error_msg = f"YouTube API returned status {search_response.status_code} for {search_response.url}. Response: {search_response.content[:500] if search_response.content else 'No content'}"
-                    logging.error(error_msg)
-                    raise Exception(
-                        f"Unable to call YouTube API for upcoming streams in channel '{channel_id}': status {search_response.status_code}"
-                    )
-            except Exception as e:
-                logging.exception(
-                    "Unable to call YouTube API for upcoming streams in channel '%s': %s",
-                    channel_id,
-                    str(e),
-                )
-                raise
-
-            search_result = cast(Optional[dict], search_response.json())
-            if search_result is None:
-                logging.error("YouTube API returned no data")
-                break
-
-            parsed_search_results = search_datafeed.parser().parse(search_result)
-            if parsed_search_results:
-                for item in parsed_search_results:
-                    video_id = item.get("video_id")
-                    if video_id:
-                        stream_basics.append(
-                            {
-                                "stream_id": video_id,
-                                "title": item.get("title", ""),
-                            }
-                        )
-            else:
-                for item in search_result.get("items", []):
-                    snippet = item.get("snippet", {})
-                    video_id = item.get("id", {}).get("videoId")
-                    if video_id:
-                        stream_basics.append(
-                            {
-                                "stream_id": video_id,
-                                "title": snippet.get("title", ""),
-                            }
-                        )
-
-            if "nextPageToken" not in search_result:
-                break
-
-            next_page_token = search_result["nextPageToken"]
-            page_count += 1
 
         streams: List[YouTubeUpcomingStream] = []
         for batch_start in range(0, len(stream_basics), 50):
             batch = stream_basics[batch_start : batch_start + 50]
-            batch_datafeed = youtube_live_details_batch_datafeed_cls(
+            batch_datafeed = YoutubeVideoLiveDetailsBatchDatafeed(
                 [stream["stream_id"] for stream in batch]
             )
 

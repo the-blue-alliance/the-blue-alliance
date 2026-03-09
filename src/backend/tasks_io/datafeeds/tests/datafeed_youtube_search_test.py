@@ -1,8 +1,13 @@
 """Tests for YouTube search API datafeeds and parser."""
 
+import json
 from unittest import mock
 
+import pytest
+
+from backend.common.futures import InstantFuture
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
+from backend.common.urlfetch import URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeSearchDatafeed
 from backend.tasks_io.datafeeds.parsers.youtube.youtube_search_parser import (
     YoutubeSearchParser,
@@ -295,3 +300,120 @@ class TestYoutubeSearchDatafeed:
             parser = datafeed.parser()
 
             assert isinstance(parser, YoutubeSearchParser)
+
+    def test_fetch_all_pages_async_single_page(self, ndb_context) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+
+            response = {
+                "items": [
+                    {
+                        "id": {"kind": "youtube#video", "videoId": "video_1"},
+                        "snippet": {"title": "Video 1"},
+                    }
+                ]
+            }
+            mock_result = URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/search",
+                200,
+                json.dumps(response),
+            )
+
+            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+                mock_fetch.return_value = InstantFuture(mock_result)
+                results = datafeed.fetch_all_pages_async().get_result()
+
+            assert len(results) == 1
+            assert results[0]["video_id"] == "video_1"
+            assert results[0]["title"] == "Video 1"
+            assert mock_fetch.call_count == 1
+
+    def test_fetch_all_pages_async_pagination(self, ndb_context) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+
+            response_1 = {
+                "items": [
+                    {
+                        "id": {"kind": "youtube#video", "videoId": "video_1"},
+                        "snippet": {"title": "Video 1"},
+                    }
+                ],
+                "nextPageToken": "NEXT_PAGE",
+            }
+            response_2 = {
+                "items": [
+                    {
+                        "id": {"kind": "youtube#video", "videoId": "video_2"},
+                        "snippet": {"title": "Video 2"},
+                    }
+                ]
+            }
+
+            mock_result_1 = URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/search",
+                200,
+                json.dumps(response_1),
+            )
+            mock_result_2 = URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/search",
+                200,
+                json.dumps(response_2),
+            )
+
+            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+                mock_fetch.side_effect = [
+                    InstantFuture(mock_result_1),
+                    InstantFuture(mock_result_2),
+                ]
+                results = datafeed.fetch_all_pages_async().get_result()
+
+            assert len(results) == 2
+            assert results[0]["video_id"] == "video_1"
+            assert results[1]["video_id"] == "video_2"
+            assert mock_fetch.call_count == 2
+
+    def test_fetch_all_pages_async_fallback_parser(self, ndb_context) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+
+            # Missing id.kind, so parser returns empty and fallback parser is used.
+            response = {
+                "items": [
+                    {
+                        "id": {"videoId": "video_fallback"},
+                        "snippet": {"title": "Fallback Video"},
+                    }
+                ]
+            }
+            mock_result = URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/search",
+                200,
+                json.dumps(response),
+            )
+
+            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+                mock_fetch.return_value = InstantFuture(mock_result)
+                results = datafeed.fetch_all_pages_async().get_result()
+
+            assert len(results) == 1
+            assert results[0]["video_id"] == "video_fallback"
+            assert results[0]["title"] == "Fallback Video"
+
+    def test_fetch_all_pages_async_non_200_raises(self, ndb_context) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+
+            mock_result = URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/search",
+                403,
+                "{}",
+            )
+
+            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+                mock_fetch.return_value = InstantFuture(mock_result)
+                with pytest.raises(
+                    Exception,
+                    match="Unable to call YouTube API for search",
+                ):
+                    datafeed.fetch_all_pages_async().get_result()

@@ -1,6 +1,9 @@
 import abc
-from typing import Any, Dict, List, Optional, TypeVar
+import logging
+from typing import Any, cast, Dict, Generator, List, Optional, TypeVar
 from urllib.parse import urlencode
+
+from google.appengine.ext import ndb
 
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.webcast import Webcast, WebcastOnlineStatus
@@ -140,6 +143,101 @@ class YoutubeSearchDatafeed(YoutubeApiBase[List[ParsedSearchResult]]):
 
     def parser(self) -> YoutubeSearchParser:
         return YoutubeSearchParser()
+
+    @ndb.tasklet
+    def fetch_all_pages_async(
+        self,
+        max_pages: int = 10,
+    ) -> Generator[Any, Any, List[ParsedSearchResult]]:
+        """Fetch and parse all pages for this search request.
+
+        Follows YouTube's `nextPageToken` chain up to `max_pages` pages.
+        """
+        all_results: List[ParsedSearchResult] = []
+        next_page_token = self.page_token
+        page_count = 0
+
+        while page_count < max_pages:
+            page_datafeed = YoutubeSearchDatafeed(
+                query=self.query,
+                search_type=self.search_type,
+                max_results=self.max_results,
+                order=self.order,
+                page_token=next_page_token,
+                channel_id=self.channel_id,
+                event_type=self.event_type,
+            )
+            response = yield page_datafeed._fetch()
+
+            if response.status_code != 200:
+                error_msg = f"YouTube API returned status {response.status_code} for {response.url}. Response: {response.content[:500] if response.content else 'No content'}"
+                logging.error(error_msg)
+                raise Exception(
+                    f"Unable to call YouTube API for search: status {response.status_code}"
+                )
+
+            response_data = cast(Optional[Dict[str, Any]], response.json())
+            if response_data is None:
+                logging.error("YouTube API returned no data")
+                break
+
+            parsed_results = page_datafeed.parser().parse(response_data)
+            if not parsed_results:
+                parsed_results = page_datafeed._fallback_parse_items(response_data)
+            all_results.extend(parsed_results)
+
+            next_page_token = cast(str, response_data.get("nextPageToken", ""))
+            if not next_page_token:
+                break
+
+            page_count += 1
+
+        raise ndb.Return(all_results)
+
+    def _fallback_parse_items(
+        self, response_data: Dict[str, Any]
+    ) -> List[ParsedSearchResult]:
+        """Fallback parser for partial API responses that omit some expected fields."""
+        parsed_results: List[ParsedSearchResult] = []
+
+        for item_any in response_data.get("items", []):
+            item = cast(Dict[str, Any], item_any)
+            item_id = cast(Dict[str, Any], item.get("id", {}))
+            snippet = cast(Dict[str, Any], item.get("snippet", {}))
+
+            title = snippet.get("title")
+            if not isinstance(title, str) or not title:
+                continue
+
+            parsed: ParsedSearchResult = {
+                "kind": str(item_id.get("kind", "")),
+                "title": title,
+            }
+
+            video_id = item_id.get("videoId")
+            if isinstance(video_id, str) and video_id:
+                parsed["video_id"] = video_id
+
+            channel_id = item_id.get("channelId")
+            if isinstance(channel_id, str) and channel_id:
+                parsed["channel_id"] = channel_id
+            else:
+                snippet_channel_id = snippet.get("channelId")
+                if isinstance(snippet_channel_id, str) and snippet_channel_id:
+                    parsed["channel_id"] = snippet_channel_id
+
+            playlist_id = item_id.get("playlistId")
+            if isinstance(playlist_id, str) and playlist_id:
+                parsed["playlist_id"] = playlist_id
+
+            description = snippet.get("description")
+            if isinstance(description, str) and description:
+                parsed["description"] = description
+
+            if any(key in parsed for key in ["video_id", "channel_id", "playlist_id"]):
+                parsed_results.append(parsed)
+
+        return parsed_results
 
 
 class YoutubePlaylistItemsDatafeed(YoutubeApiBase[List[ParsedPlaylistItem]]):
