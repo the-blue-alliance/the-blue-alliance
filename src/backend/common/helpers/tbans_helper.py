@@ -247,9 +247,6 @@ class TBANSHelper:
             return
 
         if not match.has_been_played:
-            logging.warning(
-                f"match_score: skipping notification for {match_key} — match has not been played"
-            )
             return
 
         event = match.event.get()
@@ -318,18 +315,6 @@ class TBANSHelper:
                 mode,
             )
 
-        # Mark the match as having had its score notification sent.
-        # We do this *after* sending (not at enqueue time) so that a
-        # score-breakdown update arriving before this task executes
-        # won't trigger a duplicate webhook-only notification.
-        if not is_score_breakdown_update and not match.push_sent:
-            from backend.common.manipulators.match_manipulator import (
-                MatchManipulator,
-            )
-
-            match.push_sent = True
-            MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
-
         # Send UPCOMING_MATCH for the N + 2 match after this one.
         # Skip for score breakdown updates — upcoming match scheduling
         # was already handled by the initial match score notification.
@@ -345,18 +330,29 @@ class TBANSHelper:
         # (I don't think we do because if a match gets replayed at EoD, we'll cancel/reschedule
         # for that match notification. If a match gets replayed back-to-back (which doesn't happen?)
         # sending a second notification is probably fine.
-        # If there are not 2 scheduled matches (end of Quals, end of Quarters, etc.) don't send
-        if len(next_matches) < 2:
-            return
-
-        next_match = next_matches.pop()
-        cls.schedule_upcoming_match(next_match.key_name)
+        # Schedule upcoming notifications for all next matches. Normally the
+        # 2nd (N+2) is the only new one — having N+1 re-scheduled is harmless
+        # (task-name dedup) and covers comp-level boundaries in double-elimination
+        # brackets where N+1/N+2 may not have existed when earlier matches scored.
+        for match in next_matches:
+            cls.schedule_upcoming_match(match.key_name)
 
     @classmethod
     def match_upcoming(cls, match_key: str) -> None:
         match = Match.get_by_id(match_key)
         if match is None:
             return
+
+        # Guard against duplicate sends — multiple code paths can schedule
+        # the same upcoming match (e.g. at comp-level boundaries in double
+        # elimination). push_sent is persisted so it survives across tasks.
+        if match.push_sent:
+            return
+
+        from backend.common.manipulators.match_manipulator import MatchManipulator
+
+        match.push_sent = True
+        MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
 
         # Send to Event subscribers
         event_subscriptions_future = None
@@ -528,38 +524,33 @@ class TBANSHelper:
 
     @classmethod
     def schedule_upcoming_match(cls, match_key: str) -> None:
-        from google.appengine.api import taskqueue
-
         match = Match.get_by_id(match_key)
         if match is None:
             return
 
-        queue = taskqueue.Queue("push-notifications")
-
-        task_name = "{}_match_upcoming".format(match_key)
-        # Cancel any previously-scheduled `match_upcoming` notifications for this match
-        queue.delete_tasks(taskqueue.Task(name=task_name))
-
         now = datetime.datetime.now(datetime.timezone.utc).replace(  # pyre-ignore[16]
             tzinfo=None
         )
-        # If we know when our match is starting, schedule to send Xmins before start of match.
-        # Otherwise, send immediately.
-        if match.time is None or match.time + MATCH_UPCOMING_MINUTES <= now:
-            cls.match_upcoming(match_key)
+
+        task_name = f"{match_key}_match_upcoming_{int(now.timestamp())}"
+
+        if match.time is not None and match.time + MATCH_UPCOMING_MINUTES > now:
+            eta = match.time + MATCH_UPCOMING_MINUTES
         else:
-            try:
-                defer_safe(
-                    cls.match_upcoming,
-                    match_key,
-                    _name=task_name,
-                    _target="py3-tasks-io",
-                    _queue="push-notifications",
-                    _url="/_ah/queue/deferred_notification_send",
-                    _eta=match.time + MATCH_UPCOMING_MINUTES,
-                )
-            except Exception:
-                pass
+            eta = now
+
+        try:
+            defer_safe(
+                cls.match_upcoming,
+                match_key,
+                _name=task_name,
+                _target="py3-tasks-io",
+                _queue="push-notifications",
+                _url="/_ah/queue/deferred_notification_send",
+                _eta=eta,
+            )
+        except Exception:
+            pass
 
     @classmethod
     def schedule_upcoming_matches(cls, event_key: str) -> None:
