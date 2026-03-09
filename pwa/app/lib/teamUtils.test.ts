@@ -36,7 +36,7 @@ describe.concurrent('attemptToParseSponsors', () => {
     const sponsors = attemptToParseSponsors(teamName);
 
     expect(sponsors.length).toEqual(2);
-    expect(sponsors).toEqual(['Company 1', 'Company 2']);
+    expect(sponsors).toEqual(['Company 1', 'Company 2&Public1 High School']);
   });
 
   test('Multiple schools, single sponsor', () => {
@@ -44,7 +44,7 @@ describe.concurrent('attemptToParseSponsors', () => {
     const sponsors = attemptToParseSponsors(teamName);
 
     expect(sponsors.length).toEqual(1);
-    expect(sponsors).toEqual(['Company 1']);
+    expect(sponsors).toEqual(['Company 1&Public1 High School']);
   });
 
   // There is no simple way to distinguish this case from the single school single sponsor case
@@ -87,6 +87,14 @@ describe.concurrent('attemptToParseSponsors', () => {
 
     expect(sponsors.length).toEqual(2);
     expect(sponsors).toEqual(['Company 1&2', 'Company 3']);
+  });
+
+  test("Last sponsor has '&' in name", () => {
+    const teamName = 'Company 1/Company 2 & 3&Public School';
+    const sponsors = attemptToParseSponsors(teamName);
+
+    expect(sponsors.length).toEqual(2);
+    expect(sponsors).toEqual(['Company 1', 'Company 2 & 3']);
   });
 
   test("Community team that has sponsors with '&' in name", () => {
