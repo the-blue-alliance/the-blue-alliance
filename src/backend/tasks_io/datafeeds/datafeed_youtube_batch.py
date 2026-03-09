@@ -36,7 +36,10 @@ class YoutubeWebcastStatusBatch(DatafeedBase[Any, Dict[str, WebcastOnlineStatus]
     def url(self) -> str:
         # Batch up to 50 video IDs per request (YouTube API limit)
         video_ids = ",".join(self.video_ids)
-        return f"https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id={video_ids}&key={self.api_key}"
+        return f"https://www.googleapis.com/youtube/v3/videos?part=snippet,liveStreamingDetails&id={video_ids}"
+
+    def headers(self) -> Dict[str, str]:
+        return {"X-goog-api-key": self.api_key}
 
     def parser(self) -> YoutubeStreamStatusBatchParser:
         return YoutubeStreamStatusBatchParser(self.video_ids)

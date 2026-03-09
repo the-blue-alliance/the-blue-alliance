@@ -105,7 +105,7 @@ class TestYoutubeStreamStatusBatchParser:
 @freeze_time("2025-04-01")
 @patch("backend.tasks_io.datafeeds.datafeed_youtube_batch.GoogleApiSecret.secret_key")
 def test_youtube_webcast_status_batch_url(api_key_mock: Mock) -> None:
-    """Test that YoutubeWebcastStatusBatch constructs the correct URL."""
+    """Test that YoutubeWebcastStatusBatch constructs URL and headers correctly."""
     api_key_mock.return_value = "test_api_key"
 
     webcasts = [
@@ -115,10 +115,12 @@ def test_youtube_webcast_status_batch_url(api_key_mock: Mock) -> None:
     ]
     batch = YoutubeWebcastStatusBatch(webcasts)
     url = batch.url()
+    headers = batch.headers()
 
     assert "video1,video2,video3" in url
-    assert "test_api_key" in url
     assert "part=snippet,liveStreamingDetails" in url
+    assert "key=" not in url
+    assert headers == {"X-goog-api-key": "test_api_key"}
 
 
 class TestYoutubeWebcastBatchMerge:
