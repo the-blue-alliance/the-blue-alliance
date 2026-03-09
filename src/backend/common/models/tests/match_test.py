@@ -10,6 +10,8 @@ from pyre_extensions.refinement import none_throws
 from backend.common.consts import comp_level
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.match import Match
@@ -225,6 +227,137 @@ def test_short_name() -> None:
 
     finals_match = get_base_finals_match()
     assert finals_match.short_name == "F3"
+
+
+def test_short_name_double_elim_8_team() -> None:
+    event = Event(
+        id="2023ct",
+        event_short="ct",
+        year=2023,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+    )
+    event.put()
+    # set_number=1 corresponds to Match 1 in the double elim bracket
+    match = Match(
+        id="2023ct_sf1m1",
+        event=ndb.Key(Event, "2023ct"),
+        year=2023,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.short_name == "M1"
+
+    # set_number=13 corresponds to Match 13 in the double elim bracket
+    match13 = Match(
+        id="2023ct_sf13m1",
+        event=ndb.Key(Event, "2023ct"),
+        year=2023,
+        comp_level=CompLevel.SF,
+        set_number=13,
+        match_number=1,
+    )
+    assert match13.short_name == "M13"
+
+
+def test_short_name_double_elim_4_team() -> None:
+    event = Event(
+        id="2024ct",
+        event_short="ct",
+        year=2024,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_4_TEAM,
+    )
+    event.put()
+    # set_number=1 corresponds to Match 1 in the 4-team double elim bracket
+    match = Match(
+        id="2024ct_sf1m1",
+        event=ndb.Key(Event, "2024ct"),
+        year=2024,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.short_name == "M1"
+
+
+def test_short_name_legacy_double_elim_8_team() -> None:
+    event = Event(
+        id="2017ct",
+        event_short="ct",
+        year=2017,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM,
+    )
+    event.put()
+    # set_number=1, comp_level=EF corresponds to Match 1 in the legacy bracket
+    match = Match(
+        id="2017ct_ef1m1",
+        event=ndb.Key(Event, "2017ct"),
+        year=2017,
+        comp_level=CompLevel.EF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.short_name == "M1"
+
+    # set_number=1, comp_level=SF corresponds to Match 11
+    match11 = Match(
+        id="2017ct_sf1m1",
+        event=ndb.Key(Event, "2017ct"),
+        year=2017,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match11.short_name == "M11"
+
+
+def test_full_name_double_elim() -> None:
+    event = Event(
+        id="2023ct",
+        event_short="ct",
+        year=2023,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+    )
+    event.put()
+    match = Match(
+        id="2023ct_sf1m1",
+        event=ndb.Key(Event, "2023ct"),
+        year=2023,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.full_name == "Playoff"
+
+
+def test_full_name_double_elim_4_team() -> None:
+    event = Event(
+        id="2024ct",
+        event_short="ct",
+        year=2024,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_4_TEAM,
+    )
+    event.put()
+    match = Match(
+        id="2024ct_sf1m1",
+        event=ndb.Key(Event, "2024ct"),
+        year=2024,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.full_name == "Playoff"
+
+
+def test_full_name_non_double_elim() -> None:
+    # Without event in datastore, falls back to standard behavior
+    match = get_base_elim_match()
+    assert match.full_name == "Semifinals"
 
 
 def test_tba_video() -> None:

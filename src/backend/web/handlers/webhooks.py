@@ -44,10 +44,10 @@ def webhook_add_post() -> Response:
         MobileClient.messaging_id == url,
         ancestor=user.account_key,
     )
+
+    verification_key = TBANSHelper.verify_webhook(url, secret)
     if query.count() == 0:
         # Webhook doesn't exist, add it
-        verification_key = TBANSHelper.verify_webhook(url, secret)
-
         client = MobileClient(
             parent=user.account_key,
             user_id=str(user.uid),
@@ -60,9 +60,11 @@ def webhook_add_post() -> Response:
         )
         client.put()
     else:
-        # Webhook already exists. Update the secret
+        # Webhook already exists. Update the secret and send new verification
         current = query.fetch()[0]
         current.secret = secret
+        current.verification_code = verification_key
+        current.verified = False
         current.put()
 
     return redirect(url_for("account.overview"))

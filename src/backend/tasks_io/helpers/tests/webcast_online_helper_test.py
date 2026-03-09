@@ -28,7 +28,7 @@ from backend.tasks_io.datafeeds.datafeed_twitch import (
     TwitchGetAccessToken,
     TwitchWebcastStatus,
 )
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatus
+from backend.tasks_io.datafeeds.datafeed_youtube_batch import YoutubeWebcastStatusBatch
 from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
 
@@ -92,20 +92,21 @@ def test_add_online_status_in_cache() -> None:
     assert webcast == webcast_with_status
 
 
-@mock.patch.object(YoutubeWebcastStatus, "fetch_async")
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
 def test_add_online_status_youtube(youtube_mock: mock.Mock) -> None:
     webcast = Webcast(
         type=WebcastType.YOUTUBE,
         channel="tbagameday",
     )
 
-    youtube_mock.side_effect = WebcastStatusMock(
-        webcast,
-        WebcastOnlineStatus(
-            status=WebcastStatus.ONLINE,
-            stream_title="A Stream",
-            viewer_count=1337,
-        ),
+    youtube_mock.return_value = InstantFuture(
+        {
+            "tbagameday": WebcastOnlineStatus(
+                status=WebcastStatus.ONLINE,
+                stream_title="A Stream",
+                viewer_count=1337,
+            )
+        }
     )
 
     WebcastOnlineHelper.add_online_status([webcast])

@@ -89,41 +89,59 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     for updated_match in updated_models:
         match = updated_match.model
         event = match.event.get()
-        # Only continue if the event is currently happening
+
+        # Only dispatch push notifications if the event is currently happening
         if event and event.now:
-            if match.has_been_played and not match.push_sent:
-                if (
-                    updated_match.is_new
-                    or "alliances_json" in updated_match.updated_attrs
-                ):
-                    # Catch TaskAlreadyExistsError + TombstonedTaskError
-                    try:
-                        defer_safe(
-                            TBANSHelper.match_score,
-                            match,
-                            _name=f"{match.key_name}_match_score",
-                            _target="py3-tasks-io",
-                            _queue="push-notifications",
-                            _url="/_ah/queue/deferred_notification_send",
-                        )
-                        # Update score sent boolean on Match object to make sure we only send a notification once
-                        match.push_sent = True
-                        MatchManipulator.createOrUpdate(
-                            match, run_post_update_hook=False
-                        )
-                    except Exception:
-                        pass
-            else:
-                if updated_match.is_new or (
-                    set(["alliances_json", "time", "time_string"]).intersection(
-                        set(updated_match.updated_attrs)
+            # Determine what kind of change this update represents.
+            # These are checked against `updated_attrs`, the set of model
+            # fields that actually changed during the merge (empty for new
+            # models since there's no prior version to diff against).
+            is_new = updated_match.is_new
+            alliances_changed = "alliances_json" in updated_match.updated_attrs
+            breakdown_changed = "score_breakdown_json" in updated_match.updated_attrs
+            # Schedule-affecting attrs: alliance lineups, match time, or
+            # the human-readable time string.
+            schedule_attrs_changed = bool(
+                {"alliances_json", "time", "time_string"}
+                & set(updated_match.updated_attrs)
+            )
+
+            if match.has_been_played and (is_new or alliances_changed):
+                # Match has scores — send the full match_score notification.
+                # The named task deduplicates: if this match's score was
+                # already enqueued the TaskAlreadyExistsError is caught.
+                try:
+                    defer_safe(
+                        TBANSHelper.match_score,
+                        match.key_name,
+                        _name=f"{match.key_name}_match_score",
+                        _target="py3-tasks-io",
+                        _queue="push-notifications",
+                        _url="/_ah/queue/deferred_notification_send",
                     )
-                    != set()
-                ):
-                    # The match has not been played and we're changing a property that affects the event's schedule
-                    # So send a schedule update notification for the parent event
-                    if event not in unplayed_match_events:
-                        unplayed_match_events.append(event)
+                except Exception:
+                    pass
+            elif match.has_been_played and breakdown_changed and not alliances_changed:
+                # Score breakdown arrived separately from the initial
+                # score.  Send a webhook-only notification so webhook
+                # consumers get the updated score breakdown data.
+                try:
+                    defer_safe(
+                        TBANSHelper.match_score,
+                        match.key_name,
+                        is_score_breakdown_update=True,
+                        _target="py3-tasks-io",
+                        _queue="push-notifications",
+                        _url="/_ah/queue/deferred_notification_send",
+                    )
+                except Exception:
+                    pass
+            elif not match.has_been_played and (is_new or schedule_attrs_changed):
+                # Unplayed match with a schedule-affecting change (new
+                # match, team lineup swap, or time update).  Queue a
+                # schedule update notification for the parent event.
+                if event not in unplayed_match_events:
+                    unplayed_match_events.append(event)
 
         # Try to send video notifications
         if "_video_added" in updated_match.updated_attrs:
@@ -131,7 +149,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
             try:
                 defer_safe(
                     TBANSHelper.match_video,
-                    match,
+                    match.key_name,
                     _name=f"{match.key_name}_match_video",
                     _target="py3-tasks-io",
                     _queue="push-notifications",
@@ -148,7 +166,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
         try:
             defer_safe(
                 TBANSHelper.event_schedule,
-                event,
+                event.key_name,
                 _name=f"{event.key_name}_event_schedule",
                 _target="py3-tasks-io",
                 _queue="push-notifications",
@@ -161,7 +179,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
         try:
             defer_safe(
                 TBANSHelper.schedule_upcoming_matches,
-                event,
+                event.key_name,
                 _name=f"{event.key_name}_schedule_upcoming_matches",
                 _target="py3-tasks-io",
                 _queue="push-notifications",

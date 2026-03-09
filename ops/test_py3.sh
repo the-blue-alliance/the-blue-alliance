@@ -63,5 +63,9 @@ elif [ "${1:-}" == "--relevant" ]; then
 elif [ "$#" -ge 1 ]; then
     pytest "$@"
 else
-    pytest src --cov-report=xml --cov=src
+    if python -c "import pytest_cov" 2>/dev/null; then
+        pytest src --cov-report=xml --cov=src
+    else
+        pytest src
+    fi
 fi

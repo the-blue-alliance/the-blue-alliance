@@ -1,7 +1,7 @@
 import json
 import re
 from datetime import datetime, timedelta
-from typing import Generator, List, NamedTuple, Optional, Tuple
+from typing import Any, Dict, Generator, List, NamedTuple, Optional, Tuple
 
 import bs4
 from google.appengine.ext import ndb
@@ -14,6 +14,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamNumber
 from backend.common.models.team import Team
+from backend.common.models.webcast import WebcastChannel
 
 
 class TeamCurrentEvent(NamedTuple):
@@ -101,14 +102,19 @@ def preseed_event(event_key: EventKey) -> Generator:
 
 
 @ndb.synctasklet
-def preseed_district(district_key: DistrictKey) -> Generator:
+def preseed_district(
+    district_key: DistrictKey, webcast_channels: Optional[List[WebcastChannel]] = None
+) -> Generator:
     year = int(district_key[:4])
-    yield District(
-        id=district_key,
-        year=year,
-        abbreviation=district_key[4:],
-        display_name=district_key[4:].upper(),
-    ).put_async()
+    district_kwargs: Dict[str, Any] = {
+        "id": district_key,
+        "year": year,
+        "abbreviation": district_key[4:],
+        "display_name": district_key[4:].upper(),
+    }
+    if webcast_channels is not None:
+        district_kwargs["webcast_channels"] = webcast_channels
+    yield District(**district_kwargs).put_async()
 
     yield ndb.put_multi_async(
         [
@@ -218,7 +224,8 @@ def get_team_info(resp_data: str) -> TeamInfo:
     home_cmp = soup.find(id="team-home-cmp")
     hof = soup.find(id="team-hof")
     district = soup.find(id="team-district")
-    district = district.find("a") if district else None
+    if district is not None and district.name != "a":
+        district = district.find("a")
     social_media = soup.find(id="team-social-media")
     social_media = (
         [

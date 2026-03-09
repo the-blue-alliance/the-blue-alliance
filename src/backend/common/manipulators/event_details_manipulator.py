@@ -77,7 +77,7 @@ def event_details_post_update_hook(
             try:
                 defer_safe(
                     TBANSHelper.alliance_selection,
-                    event,
+                    event.key_name,
                     _name=f"{event.key_name}_alliance_selection",
                     _target="py3-tasks-io",
                     _queue="push-notifications",

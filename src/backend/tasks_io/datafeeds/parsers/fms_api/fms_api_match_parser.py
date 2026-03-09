@@ -48,6 +48,15 @@ class FMSAPIHybridScheduleParser(
         self.event_short = event_short
 
     @classmethod
+    def _is_blank_breakdown_value(cls, value: Any) -> bool:
+        """Recursively check if a score breakdown value is blank (zero, falsy, or sentinel string)."""
+        if isinstance(value, dict):
+            return all(cls._is_blank_breakdown_value(v) for v in value.values())
+        if isinstance(value, list):
+            return all(cls._is_blank_breakdown_value(v) for v in value)
+        return not value or value in {"Unknown", "None"}
+
+    @classmethod
     def is_blank_match(cls, match: Match) -> bool:
         """
         Detect junk playoff matches like in 2017scmb
@@ -58,10 +67,7 @@ class FMSAPIHybridScheduleParser(
             if match.alliances[color]["score"] != 0:
                 return False
             for value in none_throws(match.score_breakdown)[color].values():
-                if value and value not in {
-                    "Unknown",
-                    "None",
-                }:  # Nonzero, False, blank, None, etc.
+                if not cls._is_blank_breakdown_value(value):
                     return False
         return True
 

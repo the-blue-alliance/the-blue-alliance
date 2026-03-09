@@ -4,6 +4,36 @@
 
 {% block content %}
 <h1>{{district.year}} {{district.display_name}} District</h1>
+{% if webcast_success == "channel_added" %}
+    <div class="alert alert-block alert-success">
+        Added YouTube channel to district webcast configuration.
+    </div>
+{% elif webcast_success == "channel_removed" %}
+    <div class="alert alert-block alert-success">
+        Removed YouTube channel from district webcast configuration.
+    </div>
+{% endif %}
+{% if webcast_error == "missing_channel_name" %}
+    <div class="alert alert-block alert-danger">
+        Channel name is required.
+    </div>
+{% elif webcast_error == "channel_not_found" %}
+    <div class="alert alert-block alert-danger">
+        Unable to resolve that YouTube channel name.
+    </div>
+{% elif webcast_error == "channel_exists" %}
+    <div class="alert alert-block alert-warning">
+        That YouTube channel is already configured for this district.
+    </div>
+{% elif webcast_error == "channel_not_found_to_remove" %}
+    <div class="alert alert-block alert-danger">
+        Could not find that YouTube channel to remove.
+    </div>
+{% elif webcast_error == "missing_channel_id" %}
+    <div class="alert alert-block alert-danger">
+        Channel ID is required for removal.
+    </div>
+{% endif %}
 <div class="btn-group">
   <a href="/admin/district/edit/{{district.key_name}}" class="btn btn-primary"><span class="glyphicon glyphicon-edit"></span>
     Edit</a>
@@ -19,6 +49,7 @@
       <li><a href="#events" data-toggle="tab">Events</a></li>
       <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
       <li><a href="#advancement" data-toggle="tab">Advancement</a></li>
+            <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
       <li><a href="#adjustments" data-toggle="tab">HQ Adjustments</a></li>
     </ul>
   </div>
@@ -35,12 +66,19 @@
                 <td>Elasticsearch Name</td>
                 <td> {{district.elasticsearch_name }}</td>
             </tr>
+            <tr>
+                <td>Uses Official Webcast Unit</td>
+                <td>{% if district.uses_official_webcast_unit %}<span class="glyphicon glyphicon-ok"></span> Yes{% else %}No{% endif %}</td>
+            </tr>
         </table>
 
         <h2>Tasks</h2>
         <div class="btn-group">
           <a href="/backend-tasks/get/district_rankings/{{district.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Details from FIRST</a>
           <a href="/tasks/math/do/district_rankings_calc/{{district.key_name}}" class="btn btn-warning"><span class="glyphicon glyphicon-stats"></span> Recompute Rankings</a>
+                    {% if district_has_youtube_channel | default(false) %}
+                        <a href="/tasks/do/find_event_webcasts/{{district.key_name}}" class="btn btn-info"><span class="glyphicon glyphicon-facetime-video"></span> Fetch Upcoming Webcasts</a>
+                    {% endif %}
         </div>
     </div>
     <div class="tab-pane" id="events">
@@ -104,6 +142,50 @@
                 <tr><td>No advancement found</td></tr>
             {% endfor %}
         </table>
+    </div>
+    <div class="tab-pane" id="webcasts">
+        <h3>Configured Channels</h3>
+        <table class="table table-striped table-hover">
+            <tr>
+                <th>Type</th>
+                <th>Channel Name</th>
+                <th>Channel ID</th>
+                <th>Actions</th>
+            </tr>
+            {% for channel in configured_webcast_channels %}
+                <tr>
+                    <td>{{ channel.type }}</td>
+                    <td>{{ channel.channel }}</td>
+                    <td>{{ channel.channel_id }}</td>
+                    <td>
+                        <form action="/admin/district/{{district.key_name}}/webcasts/remove" method="post" style="display: inline;">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="channel_id" value="{{ channel.channel_id }}"/>
+                            <button type="submit" class="btn btn-danger btn-xs" onclick="return confirm('Remove this channel?');"><span class="glyphicon glyphicon-remove"></span> Remove</button>
+                        </form>
+                    </td>
+                </tr>
+            {% else %}
+                <tr><td colspan="4">No configured webcast channels for this district.</td></tr>
+            {% endfor %}
+        </table>
+
+        <h3>Add YouTube Channel</h3>
+        <p>Enter a channel name and we will resolve and store the YouTube channel ID.</p>
+        <form action="/admin/district/{{district.key_name}}/webcasts/add" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="channel_name">YouTube Channel Name</label>
+                <input
+                    id="channel_name"
+                    name="channel_name"
+                    type="text"
+                    class="form-control"
+                    placeholder="e.g. FIRST in Michigan"
+                >
+            </div>
+            <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-plus"></span> Add Channel</button>
+        </form>
     </div>
     <div class="tab-pane" id="adjustments">
         <table class="table table-stripled table-hover">

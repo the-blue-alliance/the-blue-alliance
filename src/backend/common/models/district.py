@@ -8,6 +8,7 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.district_advancement import DistrictAdvancement
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
+from backend.common.models.webcast import WebcastChannel
 
 ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
     "chs",
@@ -57,6 +58,15 @@ class District(CachedModel):
     # other changes from FIRST to correct errors
     adjustments: Dict[TeamKey, int] = ndb.JsonProperty()
 
+    webcast_channels: List[WebcastChannel] = safe_cast(
+        List[WebcastChannel], ndb.JsonProperty(repeated=True)
+    )
+
+    # Whether the district uses FIRST's official webcast unit (aka, webcasts
+    # are managed by FIRST and published in advance). Districts that do not
+    # use the official unit may need TBA to discover webcasts from YouTube.
+    uses_official_webcast_unit: bool = ndb.BooleanProperty(default=False)
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
@@ -66,6 +76,8 @@ class District(CachedModel):
         "display_name",
         "elasticsearch_name",
         "rankings",
+        "uses_official_webcast_unit",
+        "webcast_channels",
     }
 
     def __init__(self, *args, **kw):

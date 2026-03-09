@@ -3,7 +3,7 @@ import type { ReactNode } from 'react';
 import SponsorsIcon from '~icons/lucide/anchor';
 import SourceIcon from '~icons/lucide/badge-check';
 import StatbotIcon from '~icons/lucide/chart-spline';
-import DistrictIcon from '~icons/lucide/globe';
+import DistrictIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import RookieIcon from '~icons/lucide/sprout';
 
