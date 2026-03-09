@@ -42,3 +42,5 @@ firebase-debug.log
 
 database-debug.log
 *.egg-info/
+
+src/gunicorn.ctl

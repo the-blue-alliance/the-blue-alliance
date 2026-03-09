@@ -22,7 +22,12 @@ from backend.web.handlers.ajax import (
     typeahead_handler,
 )
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
-from backend.web.handlers.district import district_detail, regional_detail
+from backend.web.handlers.district import (
+    district_detail,
+    district_redirect,
+    districts_redirect,
+    regional_detail,
+)
 from backend.web.handlers.embed import avatar_png, instagram_oembed, oembed_test
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
@@ -65,17 +70,10 @@ from backend.web.handlers.team import (
     team_history,
     team_list,
 )
-from backend.web.handlers.team_admin import (
-    blueprint as team_admin,
-)
-from backend.web.handlers.team_threads import (
-    team_threads,
-    team_threads_canonical,
-)
+from backend.web.handlers.team_admin import blueprint as team_admin
+from backend.web.handlers.team_threads import team_threads, team_threads_canonical
 from backend.web.handlers.webcasts import webcast_list
-from backend.web.handlers.webhooks import (
-    blueprint as webhooks,
-)
+from backend.web.handlers.webhooks import blueprint as webhooks
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -120,6 +118,17 @@ app.add_url_rule(
     '/events/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
 )
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
+
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>',
+    view_func=district_redirect,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>/<int:year>',
+    view_func=district_redirect,
+)
+app.add_url_rule("/districts", view_func=districts_redirect)
 
 app.add_url_rule("/eventwizard_legacy", view_func=eventwizard)
 app.add_url_rule("/eventwizard", view_func=eventwizard2)

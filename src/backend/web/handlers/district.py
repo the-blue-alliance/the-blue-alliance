@@ -4,7 +4,7 @@ from datetime import timedelta
 from operator import itemgetter
 from typing import List, Optional, Tuple
 
-from flask import abort
+from flask import abort, redirect
 from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
@@ -24,6 +24,18 @@ from backend.common.queries.district_query import (
 from backend.common.queries.event_query import DistrictEventsQuery, RegionalEventsQuery
 from backend.common.queries.team_query import DistrictTeamsQuery, EventTeamsQuery
 from backend.web.profiled_render import render_template
+
+
+def district_redirect(
+    district_abbrev: DistrictAbbreviation, year: Optional[Year]
+) -> Response:
+    if year is not None:
+        return redirect(f"/events/{district_abbrev}/{year}", code=301)
+    return redirect(f"/events/{district_abbrev}", code=301)
+
+
+def districts_redirect() -> Response:
+    return redirect("/events", code=301)
 
 
 @cached_public
