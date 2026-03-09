@@ -75,11 +75,19 @@ class AwardManipulator(ManipulatorBase[Award]):
 
 @AwardManipulator.register_post_update_hook
 def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
-    event_keys: Set[ndb.Key] = set()
+    # Group awards by event and collect team keys from new awards.
+    event_new_team_keys: dict[ndb.Key, Set[str]] = {}
     for updated_award in updated_models:
-        event_keys.add(none_throws(updated_award.model.event))
+        ek = none_throws(updated_award.model.event)
+        if ek not in event_new_team_keys:
+            event_new_team_keys[ek] = set()
+        if updated_award.is_new:
+            for tk in updated_award.model.team_list:
+                team_id = tk.string_id()
+                if team_id:
+                    event_new_team_keys[ek].add(team_id)
 
-    for event_key in event_keys:
+    for event_key, new_team_keys in event_new_team_keys.items():
         # Enqueue task to calculate district points
         taskqueue.add(
             url=f"/tasks/math/do/district_points_calc/{event_key.string_id()}",
@@ -92,12 +100,11 @@ def award_post_update_hook(updated_models: List[TUpdatedModel[Award]]) -> None:
         # Send push notifications if the awards post was within +/- 1 day of the Event
         event = event_key.get()
         if event and event.within_a_day:
-            # Catch TaskAlreadyExistsError + TombstonedTaskError
             try:
                 defer_safe(
                     TBANSHelper.awards,
                     event.key_name,
-                    _name=f"{event.key_name}_awards",
+                    new_award_team_keys=new_team_keys,
                     _target="py3-tasks-io",
                     _queue="push-notifications",
                     _url="/_ah/queue/deferred_notification_send",

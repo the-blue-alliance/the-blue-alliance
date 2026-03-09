@@ -211,13 +211,13 @@ class TestTBANSHelper(unittest.TestCase):
 
     def test_awards_event_not_found(self):
         with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
-            TBANSHelper.awards("2020nonexistent")
+            TBANSHelper.awards("2020nonexistent", new_award_team_keys=set())
             mock_send.assert_not_called()
 
     def test_awards_no_users(self):
         # Test send not called with no subscribed users
         with patch.object(TBANSHelper, "_send") as mock_send:
-            TBANSHelper.awards(self.event.key_name)
+            TBANSHelper.awards(self.event.key_name, new_award_team_keys=set())
             mock_send.assert_not_called()
 
     def test_awards(self):
@@ -268,7 +268,7 @@ class TestTBANSHelper(unittest.TestCase):
             notification_types=[NotificationType.AWARDS],
         ).put()
 
-        TBANSHelper.awards(self.event.key_name)
+        TBANSHelper.awards(self.event.key_name, new_award_team_keys={"frc7332", "frc1"})
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 3
 
@@ -300,6 +300,124 @@ class TestTBANSHelper(unittest.TestCase):
             assert event_notification.event == self.event
             assert event_notification.team == frc_1
             assert len(event_notification.team_awards) == 1
+
+    def test_awards_new_awards_sends_all_mode(self):
+        """When new_award_team_keys has team keys, FCM + webhooks fire for
+        matching teams and event-level; webhooks only for other teams."""
+        award = Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.INDUSTRIAL_DESIGN),
+            name_str="Industrial Design Award",
+            award_type_enum=AwardType.INDUSTRIAL_DESIGN,
+            event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, "frc7332")],
+            year=2020,
+        )
+        award.put()
+        winner_award = Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.WINNER),
+            name_str="Regional Event Winner",
+            award_type_enum=AwardType.WINNER,
+            event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, "frc7332"), ndb.Key(Team, "frc1")],
+            year=2020,
+        )
+        winner_award.put()
+        frc_1 = Team(id="frc1", team_number=1)
+        frc_1.put()
+
+        Subscription(
+            parent=ndb.Key(Account, "user_id_1"),
+            user_id="user_id_1",
+            model_key="frc1",
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.AWARDS],
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, "user_id_2"),
+            user_id="user_id_2",
+            model_key="frc7332",
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.AWARDS],
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, "user_id_3"),
+            user_id="user_id_3",
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.AWARDS],
+        ).put()
+
+        # Only frc7332 is in the new_award_team_keys set
+        with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_batch_send:
+            TBANSHelper.awards(self.event.key_name, new_award_team_keys={"frc7332"})
+
+            assert mock_batch_send.call_count == 3
+
+            calls = mock_batch_send.call_args_list
+            for call in calls:
+                assert isinstance(call[0][1], AwardsNotification)
+
+            # Event-level call has no team and uses ALL mode (new awards exist)
+            event_calls = [c for c in calls if c[0][1].team is None]
+            assert len(event_calls) == 1
+            assert event_calls[0][0][2] == _NotificationMode.ALL
+
+            # Look up team calls by team key name rather than list position,
+            # since team_awards() dict order is not guaranteed.
+            team_modes = {
+                c[0][1].team.key_name: c[0][2]
+                for c in calls
+                if c[0][1].team is not None
+            }
+            assert (
+                team_modes["frc7332"] == _NotificationMode.ALL
+            )  # in new_award_team_keys
+            assert (
+                team_modes["frc1"] == _NotificationMode.WEBHOOK
+            )  # not in new_award_team_keys
+
+    def test_awards_no_new_awards_webhook_only(self):
+        """When new_award_team_keys is empty, only webhooks fire."""
+        award = Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.INDUSTRIAL_DESIGN),
+            name_str="Industrial Design Award",
+            award_type_enum=AwardType.INDUSTRIAL_DESIGN,
+            event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, "frc7332")],
+            year=2020,
+        )
+        award.put()
+
+        Subscription(
+            parent=ndb.Key(Account, "user_id_2"),
+            user_id="user_id_2",
+            model_key="frc7332",
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.AWARDS],
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, "user_id_3"),
+            user_id="user_id_3",
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.AWARDS],
+        ).put()
+
+        with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_batch_send:
+            TBANSHelper.awards(self.event.key_name, new_award_team_keys=set())
+
+            assert mock_batch_send.call_count == 2
+
+            # Event-level: WEBHOOK only
+            event_call = mock_batch_send.call_args_list[0]
+            assert event_call[0][2] == _NotificationMode.WEBHOOK
+
+            # frc7332: WEBHOOK only
+            team_call = mock_batch_send.call_args_list[1]
+            assert team_call[0][2] == _NotificationMode.WEBHOOK
 
     def test_event_level_match_not_found(self):
         with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
