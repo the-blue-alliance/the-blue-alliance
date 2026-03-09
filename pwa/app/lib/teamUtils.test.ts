@@ -36,7 +36,7 @@ describe.concurrent('attemptToParseSponsors', () => {
     const sponsors = attemptToParseSponsors(teamName);
 
     expect(sponsors.length).toEqual(2);
-    expect(sponsors).toEqual(['Company 1', 'Company 2&Public1 High School']);
+    expect(sponsors).toEqual(['Company 1', 'Company 2']);
   });
 
   test('Multiple schools, single sponsor', () => {
@@ -89,12 +89,20 @@ describe.concurrent('attemptToParseSponsors', () => {
     expect(sponsors).toEqual(['Company 1&2', 'Company 3']);
   });
 
-  test("Last sponsor has '&' in name", () => {
+  test("Last sponsor has '&' in name (with spaces)", () => {
     const teamName = 'Company 1/Company 2 & 3&Public School';
     const sponsors = attemptToParseSponsors(teamName);
 
     expect(sponsors.length).toEqual(2);
     expect(sponsors).toEqual(['Company 1', 'Company 2 & 3']);
+  });
+
+  test("Last sponsor has '&' in name (no spaces)", () => {
+    const teamName = 'Company 1/Company 2&3&Public School';
+    const sponsors = attemptToParseSponsors(teamName);
+
+    expect(sponsors.length).toEqual(2);
+    expect(sponsors).toEqual(['Company 1', 'Company 2&3']);
   });
 
   test("Community team that has sponsors with '&' in name", () => {
