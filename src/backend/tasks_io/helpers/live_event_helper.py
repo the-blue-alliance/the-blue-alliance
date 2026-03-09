@@ -2,10 +2,10 @@ from typing import Any, Dict, Generator, List, Tuple
 
 from google.appengine.ext import ndb
 
-from backend.common.futures import TypedFuture
 from backend.common.helpers.special_webcast_helper import SpecialWebcastHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
+from backend.common.models.webcast import Webcast
 from backend.common.sitevars.forced_live_events import ForcedLiveEvents
 from backend.common.sitevars.gameday_special_webcasts import (
     WebcastType as TSpecialWebcast,
@@ -23,14 +23,12 @@ class LiveEventHelper:
     ) -> Generator[Any, Any, Tuple[Dict[EventKey, Event], List[TSpecialWebcast]]]:
         events_by_key: Dict[EventKey, Event] = {}
         live_events: List[Event] = []
-        webcast_status_futures: List[TypedFuture[None]] = []
+        all_webcasts: List[Webcast] = []
+
         for event in week_events:
             if event.now:
                 event._webcast = event.current_webcasts  # Only show current webcasts
-                for webcast in event.webcast:
-                    webcast_status_futures.append(
-                        WebcastOnlineHelper.add_online_status_async(webcast)
-                    )
+                all_webcasts.extend(event.webcast)
                 events_by_key[event.key_name] = event
             if event.within_a_day:
                 live_events.append(event)
@@ -42,29 +40,26 @@ class LiveEventHelper:
         )
         for event in forced_live_events:
             if event.webcast:
-                for webcast in event.webcast:
-                    webcast_status_futures.append(
-                        WebcastOnlineHelper.add_online_status_async(webcast)
-                    )
+                all_webcasts.extend(event.webcast)
             events_by_key[event.key_name] = event
 
         special_webcasts: List[TSpecialWebcast] = (
             yield SpecialWebcastHelper.get_special_webcasts_with_online_status_async()
         )
 
-        for webcast in special_webcasts:
-            webcast_status_futures.append(
-                WebcastOnlineHelper.add_online_status_async(webcast)
-            )
+        all_webcasts.extend(special_webcasts)
 
-        yield webcast_status_futures
+        # Batch process all webcasts together for efficiency
+        if all_webcasts:
+            yield WebcastOnlineHelper.add_online_status_batch_async(all_webcasts)
 
         # # Add in the Fake TBA BlueZone event (watch for circular imports)
         # from helpers.bluezone_helper import BlueZoneHelper
         # bluezone_event = BlueZoneHelper.update_bluezone(live_events)
         # if bluezone_event:
-        #     for webcast in bluezone_event.webcast:
-        #         WebcastOnlineHelper.add_online_status_async(webcast)
+        #     yield WebcastOnlineHelper.add_online_status_batch_async(
+        #         bluezone_event.webcast
+        #     )
         #     events_by_key[bluezone_event.key_name] = bluezone_event
 
         return (events_by_key, special_webcasts)
