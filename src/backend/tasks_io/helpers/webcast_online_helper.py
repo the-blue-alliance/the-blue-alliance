@@ -84,6 +84,13 @@ class WebcastOnlineHelper:
             ).fetch_async()
 
             # Merge results into webcast models
+            if status_results is None:
+                # API call failed (e.g., HTTP 403 quota exhausted)
+                # Remove status so these webcasts don't get cached with stale UNKNOWN status
+                for webcast in batch:
+                    webcast.pop("status", None)  # type: ignore[misc]
+                continue
+
             for webcast in batch:
                 video_id = webcast["channel"]
                 if video_id in status_results:

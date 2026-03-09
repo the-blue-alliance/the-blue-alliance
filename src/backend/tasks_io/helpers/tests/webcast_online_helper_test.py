@@ -116,6 +116,26 @@ def test_add_online_status_youtube(youtube_mock: mock.Mock) -> None:
     assert webcast["viewer_count"] == 1337
 
 
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
+def test_add_online_status_youtube_quota_exhausted(youtube_mock: mock.Mock) -> None:
+    webcast = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+    )
+
+    # Simulate a 403 quota-exhausted response (fetch_async returns None)
+    youtube_mock.return_value = InstantFuture(None)
+
+    WebcastOnlineHelper.add_online_status([webcast])
+
+    # Status should not be set (no update applied)
+    assert webcast.get("status") is None
+
+    # Webcast should NOT be cached when the API call fails
+    cache_data = WebcastOnlineStatusMemcache(webcast).get()
+    assert cache_data is None
+
+
 @freeze_time("2025-04-01 00:00:00")
 @mock.patch.object(TwitchWebcastStatus, "fetch_async")
 @mock.patch.object(TwitchGetAccessToken, "fetch_async")
