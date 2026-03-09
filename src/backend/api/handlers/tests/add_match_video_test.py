@@ -17,6 +17,7 @@ from backend.common.models.match import Match
 AUTH_ID = "tEsT_id_0"
 AUTH_SECRET = "321tEsTsEcReT"
 REQUEST_PATH = "/api/trusted/v1/event/2014casj/match_videos/add"
+DELETE_REQUEST_PATH = "/api/trusted/v1/event/2014casj/match_videos/delete"
 
 
 def setup_event() -> None:
@@ -172,3 +173,96 @@ def test_malformed_match_id(ndb_stub, api_client: Client) -> None:
     assert set(none_throws(Match.get_by_id("2014casj_qm1")).youtube_videos) == {
         "abcdef"
     }
+
+
+def test_delete_no_auth(ndb_stub, api_client: Client) -> None:
+    setup_event()
+
+    resp = api_client.delete(DELETE_REQUEST_PATH, data=json.dumps({}))
+    assert resp.status_code == 401
+
+
+def test_delete_video(ndb_stub, api_client: Client, taskqueue_stub) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    Match(
+        id="2014casj_qm1",
+        alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level=CompLevel.QM,
+        event=ndb.Key(Event, "2014casj"),
+        year=2014,
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc69", "frc571", "frc176", "frc3464", "frc20", "frc1073"],
+        youtube_videos=["aFZy8iibMD0", "RpSgUrsghv4"],
+    ).put()
+
+    request_body = json.dumps({"qm1": "aFZy8iibMD0"})
+
+    response = api_client.delete(
+        DELETE_REQUEST_PATH,
+        headers=get_auth_headers(DELETE_REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    assert none_throws(
+        Match.get_by_id("2014casj_qm1", use_cache=False)
+    ).youtube_videos == ["RpSgUrsghv4"]
+
+
+def test_delete_video_not_present(ndb_stub, api_client: Client, taskqueue_stub) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    setup_matches()
+
+    request_body = json.dumps({"sf1m1": "aFZy8iibMD0"})
+
+    response = api_client.delete(
+        DELETE_REQUEST_PATH,
+        headers=get_auth_headers(DELETE_REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    # sf1m1 has no videos, so nothing changes
+    assert none_throws(Match.get_by_id("2014casj_sf1m1")).youtube_videos == []
+
+
+def test_delete_bad_match_id(ndb_stub, api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    setup_matches()
+
+    request_body = json.dumps({"sf1m1": "aFZy8iibMD0", "qm2": "RpSgUrsghv4"})
+    response = api_client.delete(
+        DELETE_REQUEST_PATH,
+        headers=get_auth_headers(DELETE_REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 404
+
+    # make sure the valid match is unchanged
+    assert (
+        none_throws(Match.get_by_id("2014casj_sf1m1", use_cache=False)).youtube_videos
+        == []
+    )
+
+
+def test_delete_malformed_match_id(ndb_stub, api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    setup_matches()
+
+    request_body = json.dumps({"sf1m1": "aFZy8iibMD0", "zzz": "abc1234567a"})
+
+    response = api_client.delete(
+        DELETE_REQUEST_PATH,
+        headers=get_auth_headers(DELETE_REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 400, response.data
+    assert response.json["Error"] == "Invalid match IDs provided: ['zzz']"
+
+    # make sure the valid match is unchanged
+    assert none_throws(Match.get_by_id("2014casj_sf1m1")).youtube_videos == []
