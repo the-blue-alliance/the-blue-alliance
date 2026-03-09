@@ -18,7 +18,6 @@ from firebase_admin.messaging import (
     ThirdPartyAuthError,
     UnregisteredError,
 )
-from google.appengine.api.taskqueue import taskqueue
 from google.appengine.ext import ndb
 from google.appengine.ext import testbed
 
@@ -486,10 +485,48 @@ class TestTBANSHelper(unittest.TestCase):
         ) as schedule_upcoming_match:
             TBANSHelper.match_score(self.match.key_name)
             schedule_upcoming_match.assert_called()
-            assert len(schedule_upcoming_match.call_args_list) == 1
+            # Both N+1 and N+2 upcoming matches should be scheduled
+            assert len(schedule_upcoming_match.call_args_list) == 2
             assert (
-                schedule_upcoming_match.call_args[0][0] == next_matches.pop().key_name
+                schedule_upcoming_match.call_args_list[0][0][0]
+                == next_matches[0].key_name
             )
+            assert (
+                schedule_upcoming_match.call_args_list[1][0][0]
+                == next_matches[1].key_name
+            )
+
+    def test_match_score_match_upcoming_one_remaining(self):
+        """When only 1 upcoming match remains (e.g., comp-level boundary),
+        it should still be scheduled."""
+        from backend.common.helpers.match_helper import MatchHelper
+
+        # Create exactly 1 incomplete match after the played match
+        single_upcoming = Match(
+            id=f"{self.event.key_name}_qm2",
+            event=self.event.key,
+            comp_level="qm",
+            set_number=1,
+            match_number=2,
+            team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+            alliances_json=json.dumps(
+                {
+                    "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+                    "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+                }
+            ),
+            year=2020,
+        )
+        single_upcoming.put()
+
+        next_matches = MatchHelper.upcoming_matches(self.event.matches, num=2)
+        assert len(next_matches) == 1
+
+        with patch.object(
+            TBANSHelper, "schedule_upcoming_match"
+        ) as schedule_upcoming_match:
+            TBANSHelper.match_score(self.match.key_name)
+            schedule_upcoming_match.assert_called_once_with(single_upcoming.key_name)
 
     def test_match_score_score_breakdown_update_no_users(self):
         # Test send not called with no subscribed users
@@ -563,36 +600,24 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
             schedule_upcoming_match.assert_not_called()
 
-    def test_match_score_sets_push_sent(self):
-        """match_score should set push_sent=True after sending the initial notification."""
+    def test_match_upcoming_sets_push_sent(self):
+        """match_upcoming should set push_sent=True to prevent duplicate sends."""
         assert not self.match.push_sent
 
-        TBANSHelper.match_score(self.match.key_name)
+        TBANSHelper.match_upcoming(self.match.key_name)
 
         updated_match = Match.get_by_id(self.match.key_name)
         assert updated_match is not None
         assert updated_match.push_sent
 
-    def test_match_score_does_not_reset_push_sent(self):
-        """match_score should not re-write push_sent when it is already True."""
+    def test_match_upcoming_skips_if_push_sent(self):
+        """match_upcoming should not send if push_sent is already True."""
         self.match.push_sent = True
         self.match.put()
 
-        TBANSHelper.match_score(self.match.key_name)
-
-        updated_match = Match.get_by_id(self.match.key_name)
-        assert updated_match is not None
-        assert updated_match.push_sent
-
-    def test_match_score_breakdown_update_does_not_set_push_sent(self):
-        """is_score_breakdown_update=True should NOT set push_sent."""
-        assert not self.match.push_sent
-
-        TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
-
-        updated_match = Match.get_by_id(self.match.key_name)
-        assert updated_match is not None
-        assert not updated_match.push_sent
+        with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
+            TBANSHelper.match_upcoming(self.match.key_name)
+            mock_send.assert_not_called()
 
     def test_match_upcoming_match_not_found(self):
         with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
@@ -1212,21 +1237,35 @@ class TestTBANSHelper(unittest.TestCase):
             mock_match_upcoming.assert_not_called()
 
     def test_schedule_upcoming_match_send(self):
+        # Even when match time is in the past / None, the notification is
+        # dispatched via a deferred task (with eta=now). The task name includes
+        # a unix timestamp for observability.
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 0
+
+        TBANSHelper.schedule_upcoming_match(self.match.key_name)
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 1
+        assert "_match_upcoming_" in tasks[0].name
+
         with patch.object(TBANSHelper, "match_upcoming") as mock_match_upcoming:
-            TBANSHelper.schedule_upcoming_match(self.match.key_name)
+            run_from_task(tasks[0])
             mock_match_upcoming.assert_called_once_with(self.match.key_name)
 
     def test_schedule_upcoming_match_cancel(self):
-        # Schedule a dummy task with the same name as the task we're about to schedule
-        task_name = "{}_match_upcoming".format(self.match.key_name)
-        taskqueue.Task(name=task_name).add("push-notifications")
-        # Sanity check - make sure we have scheduled a task
+        # With timestamped task names there is no tombstone risk: each call
+        # gets a unique name so a second call (e.g. after match-time update)
+        # creates a new task. push_sent handles dedup at send time.
+        t0 = datetime(2020, 3, 1, 12, 0, 0)
+        t1 = t0 + timedelta(seconds=2)
+        with patch("backend.common.helpers.tbans_helper.datetime") as mock_dt:
+            mock_dt.datetime.now.return_value.replace.side_effect = [t0, t1]
+            mock_dt.timezone.utc = timezone.utc
+            TBANSHelper.schedule_upcoming_match(self.match.key_name)
+            TBANSHelper.schedule_upcoming_match(self.match.key_name)
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-        assert len(tasks) == 1
-        # Make sure after calling our schedule_upcoming_match we delete the previously-scheduled task
-        TBANSHelper.schedule_upcoming_match(self.match.key_name)
-        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-        assert len(tasks) == 0
+        assert len(tasks) == 2
 
     def test_schedule_upcoming_match_defer(self):
         # Sanity check - make sure there are no existing tasks in the queue
@@ -1242,11 +1281,29 @@ class TestTBANSHelper(unittest.TestCase):
 
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 1
+        assert "_match_upcoming_" in tasks[0].name
 
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "match_upcoming") as mockmatch_upcoming:
             run_from_task(tasks[0])
             mockmatch_upcoming.assert_called_once_with(self.match.key_name)
+
+    def test_schedule_upcoming_match_no_double_send(self):
+        """Two calls within the same second produce the same task name, so the
+        second call silently no-ops (TaskAlreadyExistsError) and only one task
+        is enqueued."""
+        fixed_now = datetime(2020, 3, 1, 12, 0, 0)
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 0
+
+        with patch("backend.common.helpers.tbans_helper.datetime") as mock_dt:
+            mock_dt.datetime.now.return_value.replace.return_value = fixed_now
+            mock_dt.timezone.utc = timezone.utc
+            TBANSHelper.schedule_upcoming_match(self.match.key_name)
+            TBANSHelper.schedule_upcoming_match(self.match.key_name)
+
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 1
 
     def test_verification(self):
         from backend.common.models.notifications.requests.webhook_request import (

@@ -358,7 +358,6 @@ def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=False,
     )
     MatchManipulator.createOrUpdate(test_match)
 
@@ -373,13 +372,10 @@ def test_postUpdateHook_notifications(ndb_context, taskqueue_stub) -> None:
     task = tasks[0]
     assert task.name == "2012ct_qm1_match_score"
 
-    # push_sent is not set until the notification task actually executes
-    # (see TBANSHelper.match_score), so it should still be False here.
-    test_match = none_throws(Match.get_by_id("2012ct_qm1"))
-    assert not test_match.push_sent
-
 
 def test_postUpdateHook_notification_pushSent(ndb_context, taskqueue_stub) -> None:
+    """push_sent is now used for upcoming match notifications, not match_score.
+    A match with push_sent=True should still get a match_score notification."""
     event = Event(
         id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
     )
@@ -406,20 +402,20 @@ def test_postUpdateHook_notification_pushSent(ndb_context, taskqueue_stub) -> No
     tasks = taskqueue_stub.get_filtered_tasks(
         name="2012ct_qm1_match_score", queue_names="push-notifications"
     )
-    assert len(tasks) == 0
+    assert len(tasks) == 1
 
 
 def test_postUpdateHook_webhook_notification_on_breakdown_update(
     ndb_context, taskqueue_stub
 ) -> None:
-    """When score_breakdown_json changes on a match that already had push_sent=True,
-    a webhook-only match score notification should be enqueued."""
+    """When score_breakdown_json changes on a played match without alliances_json
+    changing, a webhook-only match score notification should be enqueued."""
     event = Event(
         id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
     )
     event.put()
 
-    # Create initial match with scores and push_sent=True (simulates initial notification already sent)
+    # Create initial match with scores
     test_match = Match(
         id="2012ct_qm1",
         alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
@@ -428,7 +424,6 @@ def test_postUpdateHook_webhook_notification_on_breakdown_update(
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=True,
     )
     test_match.put()
 
@@ -447,7 +442,6 @@ def test_postUpdateHook_webhook_notification_on_breakdown_update(
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=True,
     )
     MatchManipulator.createOrUpdate(updated_match)
 
@@ -466,16 +460,12 @@ def test_postUpdateHook_webhook_notification_on_breakdown_update(
     )
     assert len(named_tasks) == 0
 
-    # push_sent should still be True (not reset)
-    test_match = none_throws(Match.get_by_id("2012ct_qm1"))
-    assert test_match.push_sent
 
-
-def test_postUpdateHook_no_webhook_on_breakdown_when_not_push_sent(
+def test_postUpdateHook_webhook_on_breakdown_regardless_of_push_sent(
     ndb_context, taskqueue_stub
 ) -> None:
-    """When score_breakdown_json changes but push_sent is False, no match_score
-    push-notification task should be enqueued."""
+    """When score_breakdown_json changes without alliances_json changing,
+    a webhook-only notification should be sent regardless of push_sent value."""
     event = Event(
         id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
     )
@@ -519,10 +509,9 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_not_push_sent(
         with patch.object(Event, "now", return_value=True):
             run_from_task(task)
 
-    # Only score_breakdown_json changed, and push_sent is False, so no webhook-only notification
-    # There should be no push-notifications tasks
+    # Breakdown-only update should now send webhook-only notification
     push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-    assert len(push_tasks) == 0
+    assert len(push_tasks) == 1
 
 
 def test_postUpdateHook_no_webhook_on_breakdown_when_event_not_now(
@@ -534,7 +523,7 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_event_not_now(
     )
     event.put()
 
-    # Create initial match with scores and push_sent=True
+    # Create initial match with scores
     test_match = Match(
         id="2012ct_qm1",
         alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
@@ -543,7 +532,6 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_event_not_now(
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=True,
     )
     test_match.put()
 
@@ -562,7 +550,6 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_event_not_now(
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=True,
     )
     MatchManipulator.createOrUpdate(updated_match)
 
@@ -580,9 +567,10 @@ def test_postUpdateHook_no_webhook_on_breakdown_when_event_not_now(
 def test_postUpdateHook_no_duplicate_webhook_during_countdown(
     ndb_context, taskqueue_stub
 ) -> None:
-    """Scores arrive first (with countdown delay), then breakdown arrives during
-    the delay window.  Only one push-notification task should be enqueued — the
-    original delayed match_score — and no webhook-only duplicate."""
+    """Scores arrive first, then breakdown arrives during the delay window.
+    The initial match_score task (named) should be present, plus a webhook-only
+    task for the breakdown.  The initial task will read the latest data
+    (including breakdown) when it executes."""
     event = Event(
         id="2012ct", event_short="ct", year=2012, event_type_enum=EventType.REGIONAL
     )
@@ -597,7 +585,6 @@ def test_postUpdateHook_no_duplicate_webhook_during_countdown(
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=False,
     )
     MatchManipulator.createOrUpdate(test_match)
 
@@ -611,10 +598,6 @@ def test_postUpdateHook_no_duplicate_webhook_during_countdown(
     push_tasks = taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
     assert len(push_tasks) == 1
     assert push_tasks[0].name == "2012ct_qm1_match_score"
-
-    # push_sent is NOT yet True — it will be set when the task actually executes
-    db_match = none_throws(Match.get_by_id("2012ct_qm1"))
-    assert not db_match.push_sent
 
     # Step 2: Score breakdown arrives during the delay window
     updated_match = Match(
@@ -631,7 +614,6 @@ def test_postUpdateHook_no_duplicate_webhook_during_countdown(
         year=2012,
         set_number=1,
         match_number=1,
-        push_sent=False,
     )
     MatchManipulator.createOrUpdate(updated_match)
 
@@ -641,13 +623,14 @@ def test_postUpdateHook_no_duplicate_webhook_during_countdown(
     with patch.object(Event, "now", return_value=True):
         run_from_task(hook_tasks_2[1])
 
-    # No additional push-notification tasks should have been enqueued.
-    # The webhook-only branch requires push_sent=True which is still False,
-    # and alliances_json didn't change so the initial branch also doesn't fire.
+    # The breakdown-only update adds a webhook-only task (alliances_json
+    # didn't change, only score_breakdown_json did).  The original named
+    # match_score task is still present and will include the breakdown
+    # when it runs because it reads fresh data from Datastore.
     push_tasks_after = taskqueue_stub.get_filtered_tasks(
         queue_names="push-notifications"
     )
-    assert len(push_tasks_after) == 1  # Still just the original delayed task
+    assert len(push_tasks_after) == 2
 
 
 def test_postUpdateHook_schedule_notification_for_unplayed_match(

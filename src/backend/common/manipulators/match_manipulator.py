@@ -106,13 +106,10 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                 & set(updated_match.updated_attrs)
             )
 
-            if (
-                match.has_been_played
-                and not match.push_sent
-                and (is_new or alliances_changed)
-            ):
-                # Match has scores and we haven't sent a notification yet.
-                # Catch TaskAlreadyExistsError + TombstonedTaskError
+            if match.has_been_played and (is_new or alliances_changed):
+                # Match has scores — send the full match_score notification.
+                # The named task deduplicates: if this match's score was
+                # already enqueued the TaskAlreadyExistsError is caught.
                 try:
                     defer_safe(
                         TBANSHelper.match_score,
@@ -122,18 +119,15 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                         _queue="push-notifications",
                         _url="/_ah/queue/deferred_notification_send",
                     )
-                    # Note: push_sent is set to True inside
-                    # TBANSHelper.match_score *after* the notification is
-                    # actually sent.  This avoids a race where a score-
-                    # breakdown update arriving during the countdown window
-                    # would trigger a duplicate webhook-only notification.
                 except Exception:
                     pass
-            elif match.has_been_played and match.push_sent and breakdown_changed:
-                # Score breakdown arrived after the initial match score
-                # notification was already *sent* (push_sent is only set
-                # to True from within the deferred task, not at enqueue
-                # time).  Send a webhook-only notification so webhook
+            elif (
+                match.has_been_played
+                and breakdown_changed
+                and not alliances_changed
+            ):
+                # Score breakdown arrived separately from the initial
+                # score.  Send a webhook-only notification so webhook
                 # consumers get the updated score breakdown data.
                 try:
                     defer_safe(

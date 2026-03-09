@@ -111,7 +111,7 @@ class Match(CachedModel):
     tba_videos: List[str] = ndb.StringProperty(repeated=True)  # pyre-ignore[8]
     push_sent = (
         ndb.BooleanProperty()
-    )  # has an upcoming match notification been sent for this match? None counts as False
+    )  # has an upcoming match notification been sent for this match? None/False = not yet
     tiebreak_match_key = ndb.KeyProperty(
         kind="Match"
     )  # Points to a match that was played to tiebreak this one
