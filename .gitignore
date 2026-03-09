@@ -37,6 +37,7 @@ tba_dev_config.local.json
 
 # Ignore Firebase config modules
 .firebaserc
+**/google-services.json
 ui-debug.log
 firebase-debug.log
 
