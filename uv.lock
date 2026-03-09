@@ -668,7 +668,7 @@ wheels = [
 
 [[package]]
 name = "google-cloud-logging"
-version = "3.13.0"
+version = "3.14.0"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "google-api-core", extra = ["grpc"] },
@@ -677,13 +677,14 @@ dependencies = [
     { name = "google-cloud-audit-log" },
     { name = "google-cloud-core" },
     { name = "grpc-google-iam-v1" },
+    { name = "grpcio" },
     { name = "opentelemetry-api" },
     { name = "proto-plus" },
     { name = "protobuf" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/7f/47/31ef0261802fe8b37c221392e1d6ff01d30b03dce5e20e77fc7d57ddf8a3/google_cloud_logging-3.13.0.tar.gz", hash = "sha256:3aae0573b1a1a4f59ecdf4571f4e7881b5823bd129fe469561c1c49a7fa8a4c1", size = 290169, upload-time = "2025-12-16T14:11:07.345Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/9d/ce/0d3539008dc33b436e7c5c644abc8f8a7ec5900911d14a8e34e145f0ebe5/google_cloud_logging-3.14.0.tar.gz", hash = "sha256:361e83cd692fecc7da10351f641c474591f586f234fc49394db4ba5c8c5994a7", size = 293452, upload-time = "2026-03-06T21:53:07.526Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/e1/5a/778dca2e375171af4085554cb3bc643627717a7e4e1539842ced3afd6ec4/google_cloud_logging-3.13.0-py3-none-any.whl", hash = "sha256:f215e1c76ee29239c6cacf02443dffa985663c74bf47c9818854694805c6019f", size = 230518, upload-time = "2025-12-16T14:11:05.894Z" },
+    { url = "https://files.pythonhosted.org/packages/7b/3e/01795fc20f1b5f8b1d1d22eeb425c9c3396046f1761c4f6b4cc7d8dcab90/google_cloud_logging-3.14.0-py3-none-any.whl", hash = "sha256:4767ebdb3b46a3052d5185a7d5cf02829d33ea12a0aab1d57221110d581b9e1a", size = 232961, upload-time = "2026-03-06T21:52:48.393Z" },
 ]
 
 [[package]]
@@ -1912,7 +1913,7 @@ requires-dist = [
     { name = "flask-wtf", specifier = "==1.2.2" },
     { name = "google-api-core", specifier = "==2.30.0" },
     { name = "google-api-python-client", specifier = "==2.192.0" },
-    { name = "google-cloud-logging", specifier = "==3.13.0" },
+    { name = "google-cloud-logging", specifier = "==3.14.0" },
     { name = "google-cloud-run", specifier = "==0.15.0" },
     { name = "grpcio", specifier = "==1.78.1" },
     { name = "gunicorn", specifier = "==25.1.0" },
