@@ -67,3 +67,46 @@ def test_parse_404(urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub) -> 
         result = df.fetch_async().get_result()
 
     assert result is None
+
+
+def test_parse_403_forbidden(
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    """Test that 403 Forbidden errors are handled gracefully.
+
+    When an API returns 403 Forbidden (access denied), the datafeed should
+    return None instead of crashing. This allows calling code to handle
+    gracefully (e.g., leave status as UNKNOWN).
+    """
+    df = DummyDatafeed()
+
+    with patch.object(df, "_fetch") as mock_fetch:
+        mock_fetch.return_value = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://example.com/test", 403, "Forbidden"
+            )
+        )
+        result = df.fetch_async().get_result()
+
+    assert result is None
+
+
+def test_parse_5xx_error(
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    """Test that 5xx server errors are handled gracefully.
+
+    When an API returns a 5xx error, the datafeed should return None
+    and log the warning.
+    """
+    df = DummyDatafeed()
+
+    with patch.object(df, "_fetch") as mock_fetch:
+        mock_fetch.return_value = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://example.com/test", 500, "Internal Server Error"
+            )
+        )
+        result = df.fetch_async().get_result()
+
+    assert result is None
