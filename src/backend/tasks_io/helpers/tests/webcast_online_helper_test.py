@@ -116,6 +116,56 @@ def test_add_online_status_youtube(youtube_mock: mock.Mock) -> None:
     assert webcast["viewer_count"] == 1337
 
 
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
+def test_add_online_status_youtube_api_forbidden_403(youtube_mock: mock.Mock) -> None:
+    """Test that 403 Forbidden errors are handled gracefully.
+
+    When YouTube API returns 403, fetch_async returns None.
+    The webcast status should remain UNKNOWN (not crash).
+    """
+    webcast = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+    )
+
+    # Simulate 403 Forbidden - fetch_async returns None
+    youtube_mock.return_value = InstantFuture(None)
+
+    WebcastOnlineHelper.add_online_status([webcast])
+
+    # Status should remain UNKNOWN, not crash or be set to anything else
+    assert webcast["status"] == WebcastStatus.UNKNOWN
+    assert webcast["stream_title"] is None
+    assert webcast["viewer_count"] is None
+
+
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
+def test_add_online_status_youtube_batch_partial_403(youtube_mock: mock.Mock) -> None:
+    """Test that multiple YouTube webcasts handle 403 gracefully.
+
+    When a batch of YouTube webcasts hits a 403 error, all should maintain UNKNOWN status.
+    """
+    webcast1 = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+    )
+    webcast2 = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday2",
+    )
+
+    # Simulate 403 Forbidden
+    youtube_mock.return_value = InstantFuture(None)
+
+    WebcastOnlineHelper.add_online_status([webcast1, webcast2])
+
+    # Both should have UNKNOWN status
+    assert webcast1["status"] == WebcastStatus.UNKNOWN
+    assert webcast2["status"] == WebcastStatus.UNKNOWN
+    assert webcast1["stream_title"] is None
+    assert webcast2["stream_title"] is None
+
+
 @freeze_time("2025-04-01 00:00:00")
 @mock.patch.object(TwitchWebcastStatus, "fetch_async")
 @mock.patch.object(TwitchGetAccessToken, "fetch_async")
