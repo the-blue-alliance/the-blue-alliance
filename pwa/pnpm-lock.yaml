@@ -156,8 +156,8 @@ importers:
         specifier: 3.8.0
         version: 3.8.0(@types/react@19.2.14)(react-dom@19.2.4(react@19.2.4))(react-is@18.3.1)(react@19.2.4)(redux@5.0.1)
       srvx:
-        specifier: 0.11.8
-        version: 0.11.8
+        specifier: 0.11.9
+        version: 0.11.9
       tailwind-merge:
         specifier: 3.5.0
         version: 3.5.0
@@ -7071,11 +7071,6 @@ packages:
   split2@4.2.0:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
-
-  srvx@0.11.8:
-    resolution: {integrity: sha512-2n9t0YnAXPJjinytvxccNgs7rOA5gmE7Wowt/8Dy2dx2fDC6sBhfBpbrCvjYKALlVukPS/Uq3QwkolKNa7P/2Q==}
-    engines: {node: '>=20.16.0'}
-    hasBin: true
 
   srvx@0.11.9:
     resolution: {integrity: sha512-97wWJS6F0KTKAhDlHVmBzMvlBOp5FiNp3XrLoodIgYJpXxgG5tE9rX4Pg7s46n2shI4wtEsMATTS1+rI3/ubzA==}
@@ -15994,8 +15989,6 @@ snapshots:
   space-separated-tokens@2.0.2: {}
 
   split2@4.2.0: {}
-
-  srvx@0.11.8: {}
 
   srvx@0.11.9: {}
 
