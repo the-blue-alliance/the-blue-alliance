@@ -11,14 +11,11 @@ OLD_TO_NEW_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
     "nc": "fnc",
     "in": "fin",
     "tx": "fit",
+    "chs": "fch",
 }
 
 NEW_TO_OLD_CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
-    # New to old
-    "fma": "mar",
-    "fnc": "nc",
-    "fin": "in",
-    "fit": "tx",
+    v: k for k, v in OLD_TO_NEW_CODE_MAP.items()
 }
 
 CODE_MAP: Dict[DistrictAbbreviation, DistrictAbbreviation] = {
