@@ -121,11 +121,7 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
                     )
                 except Exception:
                     pass
-            elif (
-                match.has_been_played
-                and breakdown_changed
-                and not alliances_changed
-            ):
+            elif match.has_been_played and breakdown_changed and not alliances_changed:
                 # Score breakdown arrived separately from the initial
                 # score.  Send a webhook-only notification so webhook
                 # consumers get the updated score breakdown data.
