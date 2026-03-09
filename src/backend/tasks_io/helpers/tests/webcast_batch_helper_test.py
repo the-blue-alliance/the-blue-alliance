@@ -6,7 +6,7 @@ from freezegun import freeze_time
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.webcast import Webcast, WebcastOnlineStatus
-from backend.tasks_io.datafeeds.datafeed_youtube_batch import YoutubeWebcastStatusBatch
+from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatusBatch
 from backend.tasks_io.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
     _BroadcastType,
     _StreamStatusResponseBatch,
@@ -103,7 +103,7 @@ class TestYoutubeStreamStatusBatchParser:
 
 
 @freeze_time("2025-04-01")
-@patch("backend.tasks_io.datafeeds.datafeed_youtube_batch.GoogleApiSecret.secret_key")
+@patch("backend.tasks_io.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key")
 def test_youtube_webcast_status_batch_url(api_key_mock: Mock) -> None:
     """Test that YoutubeWebcastStatusBatch constructs URL and headers correctly."""
     api_key_mock.return_value = "test_api_key"

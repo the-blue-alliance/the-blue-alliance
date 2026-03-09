@@ -18,7 +18,7 @@ from backend.tasks_io.datafeeds.datafeed_twitch import (
     TwitchGetAccessToken,
     TwitchWebcastStatus,
 )
-from backend.tasks_io.datafeeds.datafeed_youtube_batch import YoutubeWebcastStatusBatch
+from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatusBatch
 
 
 class WebcastOnlineHelper:
