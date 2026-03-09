@@ -142,10 +142,32 @@ class TBANSHelper:
             )
 
     @classmethod
-    def awards(cls, event_key: str) -> None:
+    def awards(
+        cls,
+        event_key: str,
+        new_award_team_keys: set[str],
+    ) -> None:
+        """Dispatch award notifications.
+
+        Args:
+            event_key: The event key string.
+            new_award_team_keys: Team key strings from new Award entities in
+                this update.
+                - non-empty set: send FCM + webhooks for matching teams and
+                  at the event level; webhooks only for other teams.
+                - empty set: no new awards, only existing awards were updated
+                  — send webhooks only so consumers stay in sync.
+        """
         event = Event.get_by_id(event_key)
         if event is None:
             return
+
+        # Determine notification mode.
+        # non-empty -> new awards exist for those teams, FCM + webhooks
+        # empty     -> update-only, webhooks only
+        event_mode = (
+            _NotificationMode.ALL if new_award_team_keys else _NotificationMode.WEBHOOK
+        )
 
         # Send to Event subscribers
         event_subscriptions_future = None
@@ -173,7 +195,9 @@ class TBANSHelper:
 
         if event_subscriptions_future:
             cls._batch_send_subscriptions(
-                event_subscriptions_future.get_result(), AwardsNotification(event)
+                event_subscriptions_future.get_result(),
+                AwardsNotification(event),
+                event_mode,
             )
 
         for team_key, team_subscriptions_future in team_subscriptions_futures.items():
@@ -182,8 +206,17 @@ class TBANSHelper:
             except Exception:
                 continue
 
+            # FCM only for teams with new awards;
+            # webhooks always fire so consumers stay in sync.
+            if team_key in new_award_team_keys:
+                team_mode = _NotificationMode.ALL
+            else:
+                team_mode = _NotificationMode.WEBHOOK
+
             cls._batch_send_subscriptions(
-                team_subscriptions_future.get_result(), AwardsNotification(event, team)
+                team_subscriptions_future.get_result(),
+                AwardsNotification(event, team),
+                team_mode,
             )
 
     @classmethod
