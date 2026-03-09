@@ -128,6 +128,40 @@ def add_match_video(event_key: EventKey) -> Response:
     return profiled_jsonify({"Success": "Match videos successfully updated"})
 
 
+@require_write_auth({AuthType.MATCH_VIDEO})
+@validate_keys
+def delete_match_video(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
+    match_key_to_video = JSONMatchVideoParser.parse(event_key, request.data)
+    match_keys = [ndb.Key(Match, k) for k in match_key_to_video.keys()]
+    match_futures: List[TypedFuture[Match]] = ndb.get_multi_async(match_keys)
+
+    nonexistent_matches = []
+    matches_to_put = []
+    for (match_key, youtube_id), match_future in zip(
+        match_key_to_video.items(), match_futures
+    ):
+        match = match_future.get_result()
+        if match is None:
+            nonexistent_matches.append(match_key)
+            continue
+
+        if youtube_id in match.youtube_videos:
+            match.youtube_videos.remove(youtube_id)
+            matches_to_put.append(match)
+
+    if nonexistent_matches:
+        return make_response(
+            profiled_jsonify({"Error": f"Matches {nonexistent_matches} do not exist!"}),
+            404,
+        )
+
+    if matches_to_put:
+        MatchManipulator.createOrUpdate(matches_to_put, auto_union=False)
+
+    return profiled_jsonify({"Success": "Match videos successfully deleted"})
+
+
 @require_write_auth({AuthType.EVENT_INFO})
 @validate_keys
 def update_event_info(event_key: EventKey) -> Response:

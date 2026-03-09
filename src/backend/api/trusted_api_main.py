@@ -10,6 +10,7 @@ from backend.api.handlers.trusted import (
     add_match_zebra_motionworks_info,
     delete_all_event_matches,
     delete_event_matches,
+    delete_match_video,
     get_event_info,
     update_event_alliances,
     update_event_awards,
@@ -69,6 +70,11 @@ trusted_api.add_url_rule(
     "/event/<string:event_key>/match_videos/add",
     methods=["POST"],
     view_func=add_match_video,
+)
+trusted_api.add_url_rule(
+    "/event/<string:event_key>/match_videos/delete",
+    methods=["DELETE"],
+    view_func=delete_match_video,
 )
 trusted_api.add_url_rule(
     "/event/<string:event_key>/media/add",

@@ -35,7 +35,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/EventInfo"
                 }
-              } 
+              }
             }
           },
           "400": {
@@ -403,7 +403,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "string",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "description": "YouTube video ID"
+                },
                 "example": {
                   "qm1": "aFZy8iibMD0",
                   "sf1m1": "RpSgUrsghv4"
@@ -525,6 +529,51 @@
             }
           },
           "description": "List of webcasts to remove",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/match_videos/delete": {
+      "delete": {
+        "tags": [
+          "Match Videos"
+        ],
+        "summary": "Delete match videos",
+        "description": "Remove YouTube videos from a match",
+        "operationId": "deleteMatchVideos",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "description": "YouTube video ID"
+                },
+                "example": {
+                  "qm1": "aFZy8iibMD0",
+                  "sf1m1": "RpSgUrsghv4"
+                }
+              }
+            }
+          },
+          "description": "Dict of {key: partial match key, value: youtube video id}",
           "required": true
         },
         "responses": {
