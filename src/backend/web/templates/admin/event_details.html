@@ -475,6 +475,11 @@
       <p>No online webcast data found</p>
     {% endif %}
     {% include "suggestions/partials/webcast_add_instructions_partial.html" %}
+    {% if request.args.get('webcast_url_error') %}
+    <div class="alert alert-danger">
+      <strong>Error:</strong> Could not determine webcast type from the provided URL. Please use a valid YouTube or Twitch URL, or specify the type and channel manually.
+    </div>
+    {% endif %}
     <form action="/admin/event/add_webcast/{{event.key_name}}" method="post">
       {% include "suggestions/partials/webcast_add_form_partial.html" %}
       <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-thumbs-up"></span> Add

@@ -24,6 +24,7 @@ from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -488,12 +489,26 @@ def event_add_webcast_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    webcast = Webcast(
-        type=WebcastType(request.form.get("webcast_type")),
-        channel=none_throws(request.form.get("webcast_channel")),
-    )
-    if request.form.get("webcast_file"):
-        webcast["file"] = none_throws(request.form.get("webcast_file"))
+    webcast_url = request.form.get("webcast_url", "").strip()
+    if webcast_url:
+        webcast = WebcastParser.webcast_dict_from_url(webcast_url).get_result()
+        if webcast is None:
+            return redirect(
+                url_for(
+                    "admin.event_detail",
+                    event_key=event.key_name,
+                    _anchor="webcasts",
+                    webcast_url_error=1,
+                )
+            )
+    else:
+        webcast = Webcast(
+            type=WebcastType(request.form.get("webcast_type")),
+            channel=none_throws(request.form.get("webcast_channel")),
+        )
+        if request.form.get("webcast_file"):
+            webcast["file"] = none_throws(request.form.get("webcast_file"))
+
     if request.form.get("webcast_date"):
         webcast["date"] = none_throws(request.form.get("webcast_date"))
 
