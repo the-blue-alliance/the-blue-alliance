@@ -892,9 +892,10 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         api_resp = {
             "items": [
                 {
+                    "id": "abc123",
                     "liveStreamingDetails": {
                         "scheduledStartTime": "2016-03-15T18:00:00Z",
-                    }
+                    },
                 }
             ]
         }

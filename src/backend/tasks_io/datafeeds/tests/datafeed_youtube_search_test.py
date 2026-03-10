@@ -46,6 +46,54 @@ class TestYoutubeSearchParser:
         assert result["title"] == "Example Channel"
         assert result["channel_id"] == "UCabc123"
 
+    def test_parse_channel_id_not_overwritten_by_snippet_channel_id(self) -> None:
+        """Test parser prefers ID block channelId over snippet channelId."""
+        response = {
+            "items": [
+                {
+                    "kind": "youtube#searchResult",
+                    "id": {
+                        "kind": "youtube#channel",
+                        "channelId": "UCidBlock",
+                    },
+                    "snippet": {
+                        "title": "Example Channel",
+                        "channelId": "UCsnippetBlock",
+                        "channelTitle": "Example Channel",
+                    },
+                }
+            ]
+        }
+
+        parser = YoutubeSearchParser()
+        results = parser.parse(response)
+
+        assert len(results) == 1
+        assert results[0]["channel_id"] == "UCidBlock"
+
+    def test_parse_channel_title_not_used_as_channel_id(self) -> None:
+        """Test parser does not use channelTitle as channel_id fallback."""
+        response = {
+            "items": [
+                {
+                    "kind": "youtube#searchResult",
+                    "id": {
+                        "kind": "youtube#channel",
+                    },
+                    "snippet": {
+                        "title": "Example Channel",
+                        "channelTitle": "Example Channel",
+                    },
+                }
+            ]
+        }
+
+        parser = YoutubeSearchParser()
+        results = parser.parse(response)
+
+        assert len(results) == 1
+        assert "channel_id" not in results[0]
+
     def test_parse_video_search_results(self) -> None:
         """Test parsing search results for videos."""
         response = {

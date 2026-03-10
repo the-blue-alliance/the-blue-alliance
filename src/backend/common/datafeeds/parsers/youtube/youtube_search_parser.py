@@ -109,11 +109,12 @@ class YoutubeSearchParser(ParserBase[Any, List[ParsedSearchResult]]):
         if channel_id := item_id.get("channelId"):
             result["channel_id"] = channel_id
 
+        if "channel_id" not in result:
+            if snippet_channel_id := snippet.get("channelId"):
+                result["channel_id"] = snippet_channel_id
+
         if playlist_id := item_id.get("playlistId"):
             result["playlist_id"] = playlist_id
-
-        if channel_title := snippet.get("channelTitle"):
-            result["channel_id"] = snippet.get("channelId", channel_title)
 
         if description := snippet.get("description"):
             result["description"] = description

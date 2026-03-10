@@ -295,9 +295,10 @@ def test_get_scheduled_start_time_success(ndb_context, mock_google_api_secret) -
     api_resp = {
         "items": [
             {
+                "id": "abc123",
                 "liveStreamingDetails": {
                     "scheduledStartTime": "2023-03-15T18:00:00Z",
-                }
+                },
             }
         ]
     }
@@ -350,7 +351,10 @@ def test_resolve_channel_name_success(ndb_context, mock_google_api_secret) -> No
     api_resp = {
         "items": [
             {
-                "id": {"channelId": "UCjX4WSaAFPgM2PYr-6P"},
+                "id": {
+                    "kind": "youtube#channel",
+                    "channelId": "UCjX4WSaAFPgM2PYr-6P",
+                },
                 "snippet": {"title": "FIRST in Michigan"},
             }
         ]

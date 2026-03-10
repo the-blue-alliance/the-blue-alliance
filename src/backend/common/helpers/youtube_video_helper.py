@@ -133,13 +133,9 @@ class YouTubeVideoHelper(object):
             )
 
             if not scheduled_start_time:
-                live_details = raw_data["items"][0].get("liveStreamingDetails", {})
-                scheduled_start_time = live_details.get("scheduledStartTime")
-
-            if not scheduled_start_time:
                 raise ndb.Return(None)
 
-            raise ndb.Return(scheduled_start_time[:10])
+            raise ndb.Return(scheduled_start_time)
         except ValueError:
             logging.warning(
                 "No Google API secret, unable to fetch YouTube video details"
@@ -183,9 +179,8 @@ class YouTubeVideoHelper(object):
                 resolved_channel_id = first_item.get("channel_id")
                 resolved_channel_name = first_item.get("title")
             else:
-                first_item = raw_data["items"][0]
-                resolved_channel_id = first_item.get("id", {}).get("channelId")
-                resolved_channel_name = first_item.get("snippet", {}).get("title")
+                resolved_channel_id = None
+                resolved_channel_name = None
 
             if not resolved_channel_id:
                 raise ndb.Return(None)
