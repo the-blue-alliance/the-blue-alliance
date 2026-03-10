@@ -26,6 +26,7 @@ from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancement
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -535,6 +536,42 @@ def event_remove_webcast_post(event_key: EventKey) -> Response:
     EventWebcastAdder.remove_webcast(
         event, webcast_index, webcast_type, webcast_channel, webcast_file
     )
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
+
+
+def event_update_webcast_date_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcast_type = WebcastType(request.form.get("type"))
+    webcast_channel = none_throws(request.form.get("channel"))
+    webcast_index = int(request.form.get("index")) - 1
+
+    if webcast_type != WebcastType.YOUTUBE:
+        abort(400)
+
+    webcasts = event.webcast
+    if not webcasts or webcast_index >= len(webcasts):
+        abort(400)
+
+    webcast = webcasts[webcast_index]
+    if webcast.get("channel") != webcast_channel:
+        abort(400)
+
+    scheduled_date = YouTubeVideoHelper.get_scheduled_start_time(
+        webcast_channel
+    ).get_result()
+
+    if scheduled_date:
+        webcast["date"] = scheduled_date
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
 
     return redirect(
         url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
