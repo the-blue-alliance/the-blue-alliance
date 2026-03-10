@@ -182,6 +182,7 @@ function computeLeaderboards(
   const impactWins = new Map<string, number>();
   const dcmpImpactWins = new Map<string, number>();
   const eiWins = new Map<string, number>();
+  const dcmpEiWins = new Map<string, number>();
   const wffaWins = new Map<string, number>();
 
   for (const { events, awards } of yearResults) {
@@ -253,6 +254,14 @@ function computeLeaderboards(
           eiWins.set(teamKey, (eiWins.get(teamKey) ?? 0) + 1);
         }
 
+        // DCMP Engineering Inspiration wins
+        if (
+          award.award_type === AwardType.ENGINEERING_INSPIRATION &&
+          dcmpEventKeys.has(award.event_key)
+        ) {
+          dcmpEiWins.set(teamKey, (dcmpEiWins.get(teamKey) ?? 0) + 1);
+        }
+
         // WFFA wins
         if (award.award_type === AwardType.WOODIE_FLOWERS) {
           wffaWins.set(teamKey, (wffaWins.get(teamKey) ?? 0) + 1);
@@ -277,6 +286,7 @@ function computeLeaderboards(
     impactWins: mapToRankings(impactWins),
     dcmpImpactWins: mapToRankings(dcmpImpactWins),
     eiWins: mapToRankings(eiWins),
+    dcmpEiWins: mapToRankings(dcmpEiWins),
     wffaWins: mapToRankings(wffaWins),
   };
 }
@@ -422,6 +432,12 @@ function DistrictStatsPage() {
             <Leaderboard
               title="Most District Engineering Inspiration Award Wins"
               rankings={leaderboards.eiWins}
+              keyType="team"
+              year={0}
+            />
+            <Leaderboard
+              title="Most District Championship Engineering Inspiration Award Wins"
+              rankings={leaderboards.dcmpEiWins}
               keyType="team"
               year={0}
             />
