@@ -22,8 +22,13 @@ from backend.web.handlers.ajax import (
     typeahead_handler,
 )
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
-from backend.web.handlers.district import district_detail, regional_detail
-from backend.web.handlers.embed import avatar_png, instagram_oembed
+from backend.web.handlers.district import (
+    district_detail,
+    district_redirect,
+    districts_redirect,
+    regional_detail,
+)
+from backend.web.handlers.embed import avatar_png, instagram_oembed, oembed_test
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
     event_agenda,
@@ -47,6 +52,7 @@ from backend.web.handlers.static import (
     brand,
     contact,
     donate,
+    faq,
     opr,
     privacy,
     swag,
@@ -64,17 +70,10 @@ from backend.web.handlers.team import (
     team_history,
     team_list,
 )
-from backend.web.handlers.team_admin import (
-    blueprint as team_admin,
-)
-from backend.web.handlers.team_threads import (
-    team_threads,
-    team_threads_canonical,
-)
+from backend.web.handlers.team_admin import blueprint as team_admin
+from backend.web.handlers.team_threads import team_threads, team_threads_canonical
 from backend.web.handlers.webcasts import webcast_list
-from backend.web.handlers.webhooks import (
-    blueprint as webhooks,
-)
+from backend.web.handlers.webhooks import blueprint as webhooks
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -120,6 +119,17 @@ app.add_url_rule(
 )
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
 
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>',
+    view_func=district_redirect,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>/<int:year>',
+    view_func=district_redirect,
+)
+app.add_url_rule("/districts", view_func=districts_redirect)
+
 app.add_url_rule("/eventwizard_legacy", view_func=eventwizard)
 app.add_url_rule("/eventwizard", view_func=eventwizard2)
 
@@ -150,6 +160,7 @@ app.add_url_rule("/search", view_func=search_handler)
 app.add_url_rule("/webcasts", view_func=webcast_list)
 # Static pages
 app.add_url_rule("/add-data", view_func=add_data)
+app.add_url_rule("/faq", view_func=faq)
 app.add_url_rule("/brand", view_func=brand)
 app.add_url_rule("/contact", view_func=contact)
 app.add_url_rule("/opr", view_func=opr)
@@ -191,6 +202,7 @@ app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
 app.add_url_rule("/instagram_oembed/<media_key>", view_func=instagram_oembed)
 app.add_url_rule("/avatar/<int:year>/<team_key>.png", view_func=avatar_png)
+app.add_url_rule("/_test/oembed_api", view_func=oembed_test)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)

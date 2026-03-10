@@ -10,8 +10,10 @@ from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.consts.media_type import MediaType, ROBOT_TYPES, SLUG_NAMES
 from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.account import Account
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey
@@ -201,6 +203,17 @@ class SuggestionCreator:
             webcast_dict = None
 
         if webcast_dict is not None:
+            # If YouTube webcast and no date provided, try to auto-fill from YouTube API
+            if webcast_dict["type"] == WebcastType.YOUTUBE and clean_date is None:
+                try:
+                    clean_date = yield YouTubeVideoHelper.get_scheduled_start_time(
+                        webcast_dict["channel"]
+                    )
+                except Exception:
+                    logging.exception(
+                        "Failed to auto-fill webcast date from YouTube API"
+                    )
+
             # Check if webcast already exists in event
             event = Event.get_by_id(event_key)
             if not event:

@@ -21,19 +21,37 @@ def test_malformed_header(api_client: Client) -> None:
 
 
 def test_valid_header(api_client: Client) -> None:
-    with api_client.application.test_request_context(  # pyre-ignore[16]
-        headers={"Authorization": "Bearer abc123"}
-    ), patch.object(auth, "_verify_id_token") as mock_verify_id_token:
-        mock_verify_id_token.return_value = {}
+    with (
+        api_client.application.test_request_context(  # pyre-ignore[16]
+            headers={"Authorization": "Bearer abc123"}
+        ),
+        patch.object(auth, "_verify_id_token") as mock_verify_id_token,
+    ):
+        mock_verify_id_token.return_value = {"uid": "abc123", "email": "test@tba.com"}
         user = ClientApiAuthHelper.get_current_user()
         assert user is not None
-        assert user._session_claims == {}
+        assert user._session_claims == {"uid": "abc123", "email": "test@tba.com"}
+
+
+def test_valid_header_no_email(api_client: Client) -> None:
+    with (
+        api_client.application.test_request_context(  # pyre-ignore[16]
+            headers={"Authorization": "Bearer abc123"}
+        ),
+        patch.object(auth, "_verify_id_token") as mock_verify_id_token,
+    ):
+        mock_verify_id_token.return_value = {"uid": "abc123"}
+        user = ClientApiAuthHelper.get_current_user()
+        assert user is None
 
 
 def test_invalid_header(api_client: Client) -> None:
-    with api_client.application.test_request_context(  # pyre-ignore[16]
-        headers={"Authorization": "Bearer abc123"}
-    ), patch.object(auth, "_verify_id_token") as mock_verify_id_token:
+    with (
+        api_client.application.test_request_context(  # pyre-ignore[16]
+            headers={"Authorization": "Bearer abc123"}
+        ),
+        patch.object(auth, "_verify_id_token") as mock_verify_id_token,
+    ):
         mock_verify_id_token.return_value = None
         user = ClientApiAuthHelper.get_current_user()
         assert user is None

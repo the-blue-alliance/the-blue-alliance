@@ -8,13 +8,13 @@
       <img class="team-avatar single blue" src='{{avatar.avatar_image_url}}'/>
     {% endif %}
     Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
-    {% if district_name %}<blockquote id="team-district"><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
   </div>
 </div>
 
 <div class="row">
   <div class="col-sm-6">
     <p>
+      {% if district_name %}<span class="glyphicon glyphicon-globe"></span> Part of the <a id="team-district" href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a><br>{% endif %}
       {% if team.city_state_country %}
         <span class="glyphicon glyphicon-map-marker"></span> From
         <a id="team-location" href="//maps.google.com/maps?q={{ team.city_state_country|urlencode }}" target="_blank" rel="noopener noreferrer">{{team.city_state_country}}</a>

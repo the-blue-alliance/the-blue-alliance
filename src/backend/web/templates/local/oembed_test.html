@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>oEmbed API Test</title>
+    <meta name="robots" content="noindex, nofollow">
+    <style>
+        body { font-family: sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+        h1 { color: #333; }
+        h2 { color: #555; margin-top: 40px; }
+        .embed-container { border: 1px solid #ddd; padding: 20px; border-radius: 8px; margin: 10px 0; }
+        .error { color: red; background: #fff0f0; padding: 10px; border-radius: 4px; }
+        .meta { font-size: 12px; color: #888; margin-bottom: 10px; }
+    </style>
+</head>
+<body>
+    <h1>oEmbed API Test</h1>
+    <p class="meta">Using access token from <code>instagram.secrets</code> sitevar</p>
+
+    <h2>Instagram (@meta)</h2>
+    <div class="embed-container">
+        {% if instagram_error %}
+            <div class="error">{{ instagram_error }}</div>
+        {% else %}
+            {{ instagram_html | safe }}
+        {% endif %}
+    </div>
+
+    <h2>Facebook (@meta reel)</h2>
+    <div class="embed-container">
+        {% if facebook_error %}
+            <div class="error">{{ facebook_error }}</div>
+        {% else %}
+            {{ facebook_html | safe }}
+        {% endif %}
+    </div>
+</body>
+</html>

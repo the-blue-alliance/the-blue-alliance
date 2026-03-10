@@ -11,11 +11,12 @@ def test_init():
     project = "tba-unit-tests"
     mock_bucket = Mock(spec=Bucket)
 
-    with patch.object(
-        storage.Client, "__init__", return_value=None
-    ) as mock_client_init, patch.object(
-        storage.Client, "get_bucket", return_value=mock_bucket
-    ) as mock_get_bucket:
+    with (
+        patch.object(storage.Client, "__init__", return_value=None) as mock_client_init,
+        patch.object(
+            storage.Client, "get_bucket", return_value=mock_bucket
+        ) as mock_get_bucket,
+    ):
         client = GCloudStorageClient(project)
 
     mock_client_init.assert_called_with(project=project, credentials=None)
@@ -32,8 +33,9 @@ def test_write():
     file_name = "some_file.json"
     file_content = "some_content"
 
-    with patch.object(storage.Client, "__init__", return_value=None), patch.object(
-        storage.Client, "get_bucket", return_value=mock_bucket
+    with (
+        patch.object(storage.Client, "__init__", return_value=None),
+        patch.object(storage.Client, "get_bucket", return_value=mock_bucket),
     ):
         client = GCloudStorageClient("tba-unit-tests")
 
@@ -50,8 +52,9 @@ def test_read_none():
     mock_bucket = Mock(spec=Bucket)
     mock_bucket.configure_mock(**{"get_blob.return_value": None})
 
-    with patch.object(storage.Client, "__init__", return_value=None), patch.object(
-        storage.Client, "get_bucket", return_value=mock_bucket
+    with (
+        patch.object(storage.Client, "__init__", return_value=None),
+        patch.object(storage.Client, "get_bucket", return_value=mock_bucket),
     ):
         client = GCloudStorageClient("tba-unit-tests")
 
@@ -76,8 +79,9 @@ def test_read():
     mock_bucket = Mock(spec=Bucket)
     mock_bucket.configure_mock(**{"get_blob.return_value": mock_blob})
 
-    with patch.object(storage.Client, "__init__", return_value=None), patch.object(
-        storage.Client, "get_bucket", return_value=mock_bucket
+    with (
+        patch.object(storage.Client, "__init__", return_value=None),
+        patch.object(storage.Client, "get_bucket", return_value=mock_bucket),
     ):
         client = GCloudStorageClient("tba-unit-tests")
 
@@ -94,8 +98,9 @@ def test_get_files():
 
     mock_bucket = Mock(spec=Bucket)
 
-    with patch.object(storage.Client, "__init__", return_value=None), patch.object(
-        storage.Client, "get_bucket", return_value=mock_bucket
+    with (
+        patch.object(storage.Client, "__init__", return_value=None),
+        patch.object(storage.Client, "get_bucket", return_value=mock_bucket),
     ):
         client = GCloudStorageClient("tba-unit-tests")
 

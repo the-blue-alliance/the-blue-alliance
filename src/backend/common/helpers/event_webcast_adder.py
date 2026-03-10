@@ -24,12 +24,12 @@ class EventWebcastAdder:
                 event.webcast_json = json.dumps(webcasts)
         else:
             event.webcast_json = json.dumps([webcast])
+
+        event._webcast = None
         event._dirty = True
 
         if update:
-            EventManipulator.createOrUpdate(event, auto_union=False)
-            # TODO port memcache
-            # MemcacheWebcastFlusher.flushEvent(event.key_name)
+            event = EventManipulator.createOrUpdate(event, auto_union=False)
 
         return event
 
@@ -41,10 +41,10 @@ class EventWebcastAdder:
         webcast_type: WebcastType,
         channel: str,
         file: Optional[str],
-    ) -> None:
+    ) -> Event | None:
         webcasts = event.webcast
         if not webcasts or index >= len(webcasts):
-            return
+            return None
 
         webcast = webcasts[index]
         if (
@@ -52,11 +52,11 @@ class EventWebcastAdder:
             or channel != webcast.get("channel")
             or file != webcast.get("file")
         ):
-            return
+            return None
 
         webcasts.pop(index)
         event.webcast_json = json.dumps(webcasts)
-        EventManipulator.createOrUpdate(event, auto_union=False)
 
-        # TODO port memcache
-        # MemcacheWebcastFlusher.flushEvent(event.key_name)
+        event._webcast = None
+        event._dirty = True
+        return EventManipulator.createOrUpdate(event, auto_union=False)

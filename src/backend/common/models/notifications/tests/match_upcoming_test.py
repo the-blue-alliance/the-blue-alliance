@@ -1,3 +1,4 @@
+import json
 import re
 import unittest
 from datetime import datetime
@@ -41,7 +42,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
         assert match is not None
 
     def test_fcm_notification_predicted_time(self):
-        # Set times for testing
+        # Set times for testing (13:30 UTC = 8:30 EST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.event.timezone_id = "America/New_York"
@@ -51,7 +52,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:30 EST.$"
+            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 8:30 EST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
@@ -73,7 +74,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
         assert match is not None
 
     def test_fcm_notification_time(self):
-        # Set times for testing
+        # Set times for testing (13:00 UTC = 5:00 PST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.event.timezone_id = "America/Los_Angeles"
 
@@ -82,7 +83,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:00 PST.$"
+            r"^Present Test Event Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 5:00 PST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
@@ -119,7 +120,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
 
     def test_fcm_notification_short_name_predicted_time(self):
         self.notification.event.short_name = "Arizona North"
-        # Set times for testing
+        # Set times for testing (13:30 UTC = 6:30 MST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.match.predicted_time = datetime(2017, 11, 28, 13, 30, 59)
         self.notification.event.timezone_id = "America/Phoenix"
@@ -129,14 +130,14 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:30 MST.$"
+            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 6:30 MST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
 
     def test_fcm_notification_short_name_time(self):
         self.notification.event.short_name = "Arizona North"
-        # Set times for testing
+        # Set times for testing (13:00 UTC = 6:00 MST)
         self.notification.match.time = datetime(2017, 11, 28, 13, 00, 59)
         self.notification.event.timezone_id = "America/Phoenix"
 
@@ -145,7 +146,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
             self.notification.fcm_notification.title == "TESTPRESENT Q1 Starting Soon"
         )
         match_regex = re.compile(
-            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 13:00 MST.$"
+            r"^Arizona North Regional Quals 1: \d+, \d+, \d+ will play \d+, \d+, \d+, scheduled for 6:00 MST.$"
         )
         match = re.match(match_regex, self.notification.fcm_notification.body)
         assert match is not None
@@ -267,3 +268,51 @@ class TestMatchUpcomingNotification(unittest.TestCase):
         assert payload["event_name"] == "Present Test Event"
         assert payload["team_keys"] is not None
         assert payload["webcast"] is not None
+
+    def test_fcm_notification_double_elim(self):
+        import datetime as dt
+
+        from google.appengine.ext import ndb
+
+        from backend.common.consts.comp_level import CompLevel
+        from backend.common.consts.event_type import EventType
+        from backend.common.consts.playoff_type import PlayoffType
+        from backend.common.manipulators.event_manipulator import EventManipulator
+        from backend.common.manipulators.match_manipulator import MatchManipulator
+        from backend.common.models.event import Event
+        from backend.common.models.match import Match
+
+        year = dt.datetime.now().year
+        event = EventManipulator.createOrUpdate(
+            Event(
+                id="{}testde".format(year),
+                event_short="testde",
+                event_type_enum=EventType.REGIONAL,
+                name="Double Elim Test Event",
+                year=year,
+                playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+            )
+        )
+        alliances = {
+            "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+            "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+        }
+        match = MatchManipulator.createOrUpdate(
+            Match(
+                id="{}_sf1m1".format(event.key_name),
+                event=ndb.Key(Event, event.key_name),
+                year=year,
+                comp_level=CompLevel.SF,
+                set_number=1,
+                match_number=1,
+                team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+                alliances_json=json.dumps(alliances),
+            )
+        )
+        notification = MatchUpcomingNotification(match)
+        notification.match.time = None
+        assert notification.fcm_notification is not None
+        # For double elim, title should use "M1" (Match 1) not "SF1-1"
+        assert notification.fcm_notification.title == "TESTDE M1 Starting Soon"
+        # Body uses verbose_name which should also say "Match 1" for double elim
+        assert "Match 1" in notification.fcm_notification.body

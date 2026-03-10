@@ -1,3 +1,4 @@
+import datetime
 import os
 from typing import Any, Dict, List, Optional
 
@@ -8,6 +9,7 @@ from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.environment import Environment
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
 from backend.common.helpers.fms_report_helper import FMSReportHelper
+from backend.common.helpers.trusted_api_logger import TrustedApiLogger
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.storage import get_files
@@ -17,7 +19,7 @@ from backend.web.profiled_render import render_template
 def api_history(event_key: EventKey) -> str:
     """
     Display API response history for an event from Cloud Storage.
-    Shows FRC API, FMS Reports, and Companion DB tabs.
+    Shows FRC API, FMS Reports, Companion DB, and Trusted API tabs.
     """
     event = Event.get_by_id(event_key)
     if not event:
@@ -101,18 +103,31 @@ def api_history(event_key: EventKey) -> str:
         FMSCompanionHelper.get_bucket(),
     )
 
+    # Get Trusted API request logs from trustedapi-requests bucket
+    trusted_api_bucket = TrustedApiLogger.get_bucket()
+    trusted_api_data = _get_storage_files(
+        event,
+        f"api/trusted/v1/event/{event_key}/",
+        trusted_api_bucket,
+        recursive=True,
+    )
+
     template_values = {
         "event": event,
         "frc_api_data": frc_api_data,
         "fms_reports_data": fms_reports_data,
         "companion_db_data": companion_db_data,
+        "trusted_api_data": trusted_api_data,
     }
 
     return render_template("admin/api_history.html", template_values)
 
 
 def _get_storage_files(
-    event: Event, gcs_path: str, bucket: Optional[str] = None
+    event: Event,
+    gcs_path: str,
+    bucket: Optional[str] = None,
+    recursive: bool = False,
 ) -> List[Dict[str, Any]]:
     """
     Get files from Cloud Storage for a given path and bucket.
@@ -121,6 +136,7 @@ def _get_storage_files(
         event: Event model instance
         gcs_path: GCS directory path
         bucket: Storage bucket name (optional, defaults to project bucket)
+        recursive: Whether to search recursively in subdirectories
 
     Returns:
         List of file metadata dicts with timestamp, filename, path, and public_url
@@ -130,7 +146,7 @@ def _get_storage_files(
         bucket = f"{Environment.project()}.appspot.com"
 
     try:
-        file_paths = get_files(gcs_path, bucket=bucket)
+        file_paths = get_files(gcs_path, bucket=bucket, recursive=recursive)
         import logging
 
         logging.info(f"File paths: {file_paths}")
@@ -141,17 +157,44 @@ def _get_storage_files(
             filename = file_path.split("/")[-1]
 
             # Extract timestamp from filename
-            # Two formats:
+            # Multiple formats:
             # 1. FRC API: "2020-03-15 10:30:00.json" -> timestamp is basename without extension
             # 2. FMS Reports: "team_list.2020-03-14T08:00:00.xlsx" -> timestamp is middle part
-            parts = filename.split(".")
-            if len(parts) >= 3:
-                # FMS format: name.timestamp.extension
-                # timestamp is everything between first and last part
-                timestamp = ".".join(parts[1:-1])
+            # 3. Trusted API: "2026-03-06T04:20:21.968325+00:00.json" -> ISO 8601 timestamp
+
+            # First, remove the extension
+            name_without_ext = os.path.splitext(filename)[0]
+
+            # Check if it contains a period (could be FMS format or ISO with microseconds)
+            if "." in name_without_ext:
+                # Try parsing as ISO 8601 first (Trusted API format)
+                try:
+                    dt = datetime.datetime.fromisoformat(name_without_ext)
+                    timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
+                except (ValueError, AttributeError):
+                    # Not ISO format, assume FMS format: name.timestamp
+                    parts = name_without_ext.split(".")
+                    if len(parts) >= 2:
+                        # FMS format: take everything after the first part
+                        raw_timestamp = ".".join(parts[1:])
+                        # Try to parse and format it
+                        try:
+                            dt = datetime.datetime.fromisoformat(raw_timestamp)
+                            timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
+                        except (ValueError, AttributeError):
+                            timestamp = raw_timestamp
+                    else:
+                        timestamp = name_without_ext
             else:
-                # FRC API format: timestamp.extension
-                timestamp = os.path.splitext(filename)[0]
+                # FRC API format: timestamp without extension
+                # Try to parse "2020-03-15 10:30:00" format
+                try:
+                    dt = datetime.datetime.strptime(
+                        name_without_ext, "%Y-%m-%d %H:%M:%S"
+                    )
+                    timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
+                except (ValueError, AttributeError):
+                    timestamp = name_without_ext
 
             # Generate URL based on environment
             if Environment.is_dev():
@@ -166,8 +209,8 @@ def _get_storage_files(
                     f"http://localhost:8000/blobstore/blob/{blobkey}?display=inline"
                 )
             else:
-                # For production, use public GCS URL
-                public_url = f"https://storage.googleapis.com/{bucket}/{file_path}"
+                # For production, use authenticated GCS URL
+                public_url = f"https://storage.cloud.google.com/{bucket}/{file_path}"
 
             files.append(
                 {

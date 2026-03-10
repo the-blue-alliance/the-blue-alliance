@@ -210,6 +210,7 @@ firedux.ref.child("live_events").on("value", (snapshot) => {
 });
 
 // Subscribe to the store to keep the url hash in sync
+let lastHash = "";
 store.subscribe(() => {
   const newParams = {};
 
@@ -250,7 +251,8 @@ store.subscribe(() => {
   }
 
   const query = queryString.stringify(newParams);
-  if (query) {
+  if (query && query !== lastHash) {
+    lastHash = query;
     location.replace(`#${query}`);
   }
 });

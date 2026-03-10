@@ -20,7 +20,7 @@ function defineAllRoutes<T extends readonly RoutePath[]>(
 const allRoutes = defineAllRoutes([
   '/',
   '/about',
-  '/account',
+  '/account/',
   '/account/mytba',
   '/add-data',
   '/apidocs',
@@ -28,26 +28,33 @@ const allRoutes = defineAllRoutes([
   '/contact',
   '/district/$districtAbbreviation/{-$year}',
   '/district/$districtAbbreviation/insights',
+  '/districts/{-$year}',
   '/donate',
   '/event/$eventKey',
+  '/events/$districtAbbreviation/$year',
   '/events/{-$year}',
   '/gameday',
+  '/gameday/$eventCode',
+  '/hall-of-fame',
   '/insights/{-$year}',
   '/local/debug',
   '/match_suggestion',
   '/match/$matchKey',
   '/privacy',
+  '/search',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
   '/team/$teamNumber/stats',
   '/teams/{-$pgNum}',
   '/thanks',
+  '/webcasts',
 ] as const);
 
 // Define test data for dynamic route parameters
 // Only need to specify values for parameters, not list out every route manually
 const parameterValues: Record<string, string[]> = {
   $eventKey: ['2024mil'],
+  $eventCode: ['2024mil'],
   '{-$year}': ['', '2024'],
   $matchKey: ['2024mil_f1m2'],
   '{-$pgNum}': ['', '1'],

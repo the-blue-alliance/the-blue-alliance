@@ -24,9 +24,10 @@ def test_write_mkdir():
 
     client = LocalStorageClient(tmp_path)
 
-    with patch.object(Path, "mkdir") as mock_mkdir, patch.object(
-        Path, "write_text"
-    ) as mock_write_text:
+    with (
+        patch.object(Path, "mkdir") as mock_mkdir,
+        patch.object(Path, "write_text") as mock_write_text,
+    ):
         client.write(file_name, file_content)
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)
@@ -40,9 +41,10 @@ def test_write(tmp_path):
 
     client = LocalStorageClient(tmp_path)
 
-    with patch.object(Path, "mkdir") as mock_mkdir, patch.object(
-        Path, "write_text"
-    ) as mock_write_text:
+    with (
+        patch.object(Path, "mkdir") as mock_mkdir,
+        patch.object(Path, "write_text") as mock_write_text,
+    ):
         client.write(file_name, file_content)
 
     mock_mkdir.assert_called_with(parents=True, exist_ok=True)

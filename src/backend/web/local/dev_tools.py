@@ -1,5 +1,7 @@
+import base64
 import datetime
 import json
+import os
 import random
 from typing import List
 
@@ -103,12 +105,20 @@ def seed_test_event() -> Response:
         matches.append(match)
 
     # Scheduled matches (qm16 - qm23)
+    # Q21, Q22, Q23 get predicted times that drift from schedule by 2, 5,
+    # and 10 minutes respectively, to test "(est.)" display in the app.
+    predicted_time_offsets = {21: 2, 22: 5, 23: 10}  # match_number -> minutes
     scheduled_start = now + datetime.timedelta(minutes=10)
     for i in range(NUM_COMPLETED + 1, NUM_COMPLETED + NUM_SCHEDULED + 1):
         red_teams, blue_teams = _teams_for_match(teams, i)
         match_time = scheduled_start + datetime.timedelta(
             minutes=(i - NUM_COMPLETED - 1) * MATCH_SPACING_MINUTES
         )
+        predicted_time = None
+        if i in predicted_time_offsets:
+            predicted_time = match_time + datetime.timedelta(
+                minutes=predicted_time_offsets[i]
+            )
         match = Match(
             id=Match.render_key_name(event_key, CompLevel.QM, 1, i),
             event=ndb.Key(Event, event_key),
@@ -134,6 +144,7 @@ def seed_test_event() -> Response:
                 }
             ),
             time=match_time,
+            predicted_time=predicted_time,
         )
         matches.append(match)
 
@@ -226,7 +237,26 @@ def seed_test_team() -> Response:
     TeamManipulator.createOrUpdate(team)
 
     team_ref = Media.create_reference("team", "frc2")
+    avatar_foreign_key = f"avatar_{year}_frc2"
+
+    # Load avatar image from test_data/reindeer_avatar.png
+    avatar_path = os.path.join(
+        os.path.dirname(__file__), "test_data", "reindeer_avatar.png"
+    )
+    avatar_b64 = ""
+    if os.path.exists(avatar_path):
+        with open(avatar_path, "rb") as f:
+            avatar_b64 = base64.b64encode(f.read()).decode("ascii")
+
     media_list = [
+        Media(
+            id=Media.render_key_name(MediaType.AVATAR, avatar_foreign_key),
+            media_type_enum=MediaType.AVATAR,
+            foreign_key=avatar_foreign_key,
+            year=year,
+            references=[team_ref],
+            details_json=json.dumps({"base64Image": avatar_b64}),
+        ),
         Media(
             id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, "dQw4w9WgXcQ"),
             media_type_enum=MediaType.YOUTUBE_VIDEO,
@@ -252,14 +282,30 @@ def seed_test_team() -> Response:
             id=Media.render_key_name(MediaType.YOUTUBE_CHANNEL, "bobcatrobotics"),
             media_type_enum=MediaType.YOUTUBE_CHANNEL,
             foreign_key="bobcatrobotics",
-            year=year,
             references=[team_ref],
         ),
         Media(
             id=Media.render_key_name(MediaType.INSTAGRAM_PROFILE, "bobcatrobotics"),
             media_type_enum=MediaType.INSTAGRAM_PROFILE,
             foreign_key="bobcatrobotics",
-            year=year,
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.FACEBOOK_PROFILE, "thebluealliance"),
+            media_type_enum=MediaType.FACEBOOK_PROFILE,
+            foreign_key="thebluealliance",
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.TWITTER_PROFILE, "thebluealliance"),
+            media_type_enum=MediaType.TWITTER_PROFILE,
+            foreign_key="thebluealliance",
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.GITHUB_PROFILE, "the-blue-alliance"),
+            media_type_enum=MediaType.GITHUB_PROFILE,
+            foreign_key="the-blue-alliance",
             references=[team_ref],
         ),
     ]

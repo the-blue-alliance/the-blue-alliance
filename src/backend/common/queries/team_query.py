@@ -66,21 +66,16 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         super().__init__(year=year, page=page)
 
     @typed_tasklet
-    def _query_async(self, year: Year, page: int) -> List[Team]:
-        event_team_keys_future = EventTeam.query(EventTeam.year == year).fetch_async(
-            keys_only=True
+    def _query_async(self, year: Year, page: int) -> Generator[Any, Any, List[Team]]:
+        event_team_keys, teams = yield (
+            EventTeam.query(EventTeam.year == year).fetch_async(keys_only=True),
+            TeamListQuery(page=page).fetch_async(),
         )
-        teams_future = TeamListQuery(page=page).fetch_async()
 
-        year_team_keys = set()
-        for et_key in event_team_keys_future.get_result():
-            team_key = et_key.id().split("_")[1]
-            year_team_keys.add(team_key)
+        year_team_keys = {et_key.id().split("_")[1] for et_key in event_team_keys}
 
-        teams = filter(
-            lambda team: team.key.id() in year_team_keys, teams_future.get_result()
-        )
-        return list(teams)
+        filtered_teams = filter(lambda team: team.key.id() in year_team_keys, teams)
+        return list(filtered_teams)
 
 
 class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):

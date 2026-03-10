@@ -12,7 +12,7 @@ def test_parse_event_rankings_none(test_data_importer, ndb_stub):
 
     rankings = FMSAPIEventRankingsParser(2015).parse(data)
 
-    assert rankings is None
+    assert rankings == []
 
 
 def test_parse_event_rankings_2015(test_data_importer, ndb_stub):

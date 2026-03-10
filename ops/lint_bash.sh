@@ -1,14 +1,14 @@
 #! /bin/bash
 set -e
 
-find ops -type f -iname "*.sh" -exec shellcheck --format=tty {} +
+find ops -type f -iname "*.sh" -not -path "*/node_modules/*" -exec shellcheck --format=tty {} +
 
 if ! type "shfmt" >/dev/null; then
-    echo "shfmt not found, install from https://github.com/mvdan/sh to use"
+    echo "shfmt not found"
 else
     if [ "$1" == "--fix" ]; then
-        shfmt -i 4 -w ops/
+        find ops -type f -iname "*.sh" -not -path "*/node_modules/*" -exec shfmt -i 4 -w {} +
     else
-        shfmt -i 4 -l -d ops/
+        find ops -type f -iname "*.sh" -not -path "*/node_modules/*" -exec shfmt -i 4 -l -d {} +
     fi
 fi

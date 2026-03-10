@@ -32,12 +32,140 @@ class EventInsightsHelper:
             2023: cls.calculate_event_insights_2023,
             2024: cls.calculate_event_insights_2024,
             2025: cls.calculate_event_insights_2025,
+            2026: cls.calculate_event_insights_2026,
         }
 
         if year in INSIGHTS_MAP:
             return INSIGHTS_MAP[year](matches)
         else:
             return None
+
+    @classmethod
+    def calculate_event_insights_2026(cls, matches: List[Match]) -> EventInsights:
+        qual_matches = []
+        playoff_matches = []
+        for match in matches:
+            if match.comp_level == CompLevel.QM:
+                qual_matches.append(match)
+            else:
+                playoff_matches.append(match)
+
+        qual_insights = cls._calculate_event_insights_2026_helper(qual_matches)
+        playoff_insights = cls._calculate_event_insights_2026_helper(playoff_matches)
+
+        return {
+            "qual": qual_insights,
+            "playoff": playoff_insights,
+        }
+
+    @classmethod
+    def _calculate_event_insights_2026_helper(
+        cls, matches: List[Match]
+    ) -> Optional[Dict[str, Any]]:
+        energized_rp_count = 0
+        supercharged_rp_count = 0
+        traversal_rp_count = 0
+        six_rp_count = 0
+        nine_rp_count = 0
+
+        total_scores = 0
+        total_win_margins = 0
+        total_winning_scores = 0
+
+        high_score: Tuple[int, str, str] = (0, "", "")
+
+        finished_matches = 0
+
+        for match in matches:
+            if not match.has_been_played:
+                continue
+
+            finished_matches += 1
+
+            red_score = match.alliances[AllianceColor.RED]["score"]
+            blue_score = match.alliances[AllianceColor.BLUE]["score"]
+            win_score = max(red_score, blue_score)
+
+            if win_score > high_score[0]:
+                high_score = (win_score, match.key_name, match.short_name)
+
+            if match.score_breakdown is None:
+                continue
+
+            red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
+            blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+
+            if red_sb.get("energizedAchieved"):
+                energized_rp_count += 1
+            if blue_sb.get("energizedAchieved"):
+                energized_rp_count += 1
+
+            if red_sb.get("superchargedAchieved"):
+                supercharged_rp_count += 1
+            if blue_sb.get("superchargedAchieved"):
+                supercharged_rp_count += 1
+
+            if red_sb.get("traversalAchieved"):
+                traversal_rp_count += 1
+            if blue_sb.get("traversalAchieved"):
+                traversal_rp_count += 1
+
+            red_all_rp = (
+                red_sb.get("energizedAchieved")
+                and red_sb.get("superchargedAchieved")
+                and red_sb.get("traversalAchieved")
+            )
+            blue_all_rp = (
+                blue_sb.get("energizedAchieved")
+                and blue_sb.get("superchargedAchieved")
+                and blue_sb.get("traversalAchieved")
+            )
+
+            if (red_score > blue_score and red_all_rp) or (
+                blue_score > red_score and blue_all_rp
+            ):
+                six_rp_count += 1
+                if red_all_rp and blue_all_rp:
+                    nine_rp_count += 1
+
+            total_scores += red_score + blue_score
+            total_win_margins += win_score - min(red_score, blue_score)
+            total_winning_scores += win_score
+
+        if finished_matches == 0:
+            return None
+
+        return {
+            "energized_rp_count": [
+                energized_rp_count,
+                finished_matches * 2,
+                100.0 * energized_rp_count / (finished_matches * 2),
+            ],
+            "supercharged_rp_count": [
+                supercharged_rp_count,
+                finished_matches * 2,
+                100.0 * supercharged_rp_count / (finished_matches * 2),
+            ],
+            "traversal_rp_count": [
+                traversal_rp_count,
+                finished_matches * 2,
+                100.0 * traversal_rp_count / (finished_matches * 2),
+            ],
+            "six_rp_count": [
+                six_rp_count,
+                finished_matches,
+                100.0 * six_rp_count / finished_matches,
+            ],
+            "nine_rp_count": [
+                nine_rp_count,
+                finished_matches,
+                100.0 * nine_rp_count / finished_matches,
+            ],
+            "average_score": total_scores / (finished_matches * 2),
+            "average_win_margin": total_win_margins / finished_matches,
+            "average_winning_score": total_winning_scores / finished_matches,
+            "high_score": high_score,
+        }
 
     @classmethod
     def calculate_event_insights_2025(cls, matches: List[Match]) -> EventInsights:

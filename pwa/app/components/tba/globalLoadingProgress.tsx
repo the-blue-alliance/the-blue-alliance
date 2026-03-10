@@ -47,7 +47,8 @@ export default function GlobalLoadingProgress() {
   }
   return (
     <Progress
-      className="fixed top-0 z-20 h-0.5 rounded-none"
+      className="fixed top-0 z-20 h-0.5 rounded-none
+        [&_[data-slot=progress-indicator]]:dark:bg-secondary-foreground"
       value={progress}
     />
   );

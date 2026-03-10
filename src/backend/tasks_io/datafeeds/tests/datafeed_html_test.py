@@ -61,9 +61,10 @@ def test_cookie(mock_parser, session_key: str) -> None:
 def test_raises(mock_parser, caplog) -> None:
     df = DatafeedHTML()
 
-    with patch(
-        "requests.get", side_effect=Exception("Mock error")
-    ) as mock_get, caplog.at_level(logging.INFO):
+    with (
+        patch("requests.get", side_effect=Exception("Mock error")) as mock_get,
+        caplog.at_level(logging.INFO),
+    ):
         results = df.parse(url="thebluealliance.com", parser=mock_parser)
 
     assert len(caplog.records) == 2
@@ -82,12 +83,12 @@ def test_parse(mock_parser, status_code: int, caplog) -> None:
     content = "content"
     expected = ([], True)
 
-    with patch(
-        "requests.get", return_value=Mock(status_code=status_code, content=content)
-    ), patch.object(
-        mock_parser, "parse", return_value=expected
-    ) as mock_parse, caplog.at_level(
-        logging.WARNING
+    with (
+        patch(
+            "requests.get", return_value=Mock(status_code=status_code, content=content)
+        ),
+        patch.object(mock_parser, "parse", return_value=expected) as mock_parse,
+        caplog.at_level(logging.WARNING),
     ):
         results = df.parse(url="thebluealliance.com", parser=mock_parser)
 

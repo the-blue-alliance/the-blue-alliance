@@ -4,7 +4,6 @@ import abc
 import logging
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
-from google.appengine.api.datastore_errors import BadRequestError
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -57,7 +56,8 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
             return query_result
 
     def fetch_dict(self, version: ApiMajorVersion) -> DictQueryReturn:
-        return self.fetch_dict_async(version).get_result()
+        fut: TypedFuture[DictQueryReturn] = self.fetch_dict_async(version)
+        return fut.get_result()
 
     @ndb.tasklet
     def fetch_dict_async(
@@ -69,9 +69,11 @@ class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
 
 
 class CachedDatabaseQuery(
-    DatabaseQuery, Generic[QueryReturn, DictQueryReturn], metaclass=abc.ABCMeta
+    DatabaseQuery[QueryReturn, DictQueryReturn],
+    Generic[QueryReturn, DictQueryReturn],
+    metaclass=abc.ABCMeta,
 ):
-    DATABASE_QUERY_VERSION = 4
+    DATABASE_QUERY_VERSION = 5
     BASE_CACHE_KEY_FORMAT: str = (
         "{}:{}:{}"  # (partial_cache_key, cache_version, database_query_version)
     )
@@ -127,6 +129,19 @@ class CachedDatabaseQuery(
         with Span("{}._do_query".format(self.__class__.__name__)):
             cache_key = self.cache_key
             cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+
+            # Validate cached result for corruption and treat as cache miss if corrupted
+            if (
+                cached_query_result is not None
+                and cached_query_result._validate_result_properties()
+            ):
+                logging.error(
+                    "Corrupted cached result detected in _do_query; treating as cache miss. "
+                    "cache_key=%s",
+                    cache_key,
+                )
+                cached_query_result = None
+
             if cached_query_result is None:
                 query_result = yield self._query_async(*args, **kwargs)
                 if self.CACHE_WRITES_ENABLED:
@@ -134,12 +149,13 @@ class CachedDatabaseQuery(
                         yield CachedQueryResult(
                             id=cache_key, result=query_result
                         ).put_async()
-                    except BadRequestError as e:
+                    except Exception as e:
                         logging.warning(
                             f"CachedQueryResult.put_async() failed: {cache_key}"
                         )
                         logging.exception(e)
                 return query_result
+
             return cached_query_result.result
 
     @ndb.tasklet
@@ -166,8 +182,10 @@ class CachedDatabaseQuery(
                         yield CachedQueryResult(
                             id=cache_key, result_dict=converted_result
                         ).put_async()
-                    except BadRequestError as e:
-                        logging.warning("CachedQueryResult.put_async() failed!")
+                    except Exception as e:
+                        logging.warning(
+                            f"CachedQueryResult.put_async() failed: {cache_key}"
+                        )
                         logging.exception(e)
                 return converted_result
             return cached_query_result.result_dict

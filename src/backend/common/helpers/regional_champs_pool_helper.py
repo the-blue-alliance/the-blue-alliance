@@ -115,7 +115,6 @@ class RegionalChampsPoolHelper(DistrictHelper):
         # aggregate points from first two regional events
         events_by_key: Dict[EventKey, Event] = {}
         team_attendance: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
-        single_event_teams: Set[TeamKey] = set()
         team_totals: Dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
             lambda: DistrictRankingTeamTotal(
                 event_points=[],
@@ -145,11 +144,6 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 team_attendance[team_key].append(event.key_name)
 
                 num_events = len(team_attendance[team_key])
-                if num_events == 1:
-                    single_event_teams.add(team_key)
-                else:
-                    single_event_teams.discard(team_key)
-
                 if num_events > 2:
                     continue
 
@@ -193,23 +187,6 @@ class RegionalChampsPoolHelper(DistrictHelper):
                         ],
                     )
 
-        # Single-Event regional teams are award additional points
-        # based on event 1 performance
-        # E2 points = 0.6 * (E1 points) + 14
-        # See section 12.3.1 of the 2025 game manual
-        for team_key in single_event_teams:
-            team_total = team_totals[team_key]
-            if len(team_total["event_points"]) != 1:
-                logging.warning(
-                    f"Team {team_key} has regional cmp point event count mismatch"
-                )
-                continue
-
-            first_event_points = team_total["event_points"][0][1]
-            bonus = round(0.6 * first_event_points["total"]) + 14
-            team_totals[team_key]["single_event_bonus"] = bonus
-            team_totals[team_key]["point_total"] += bonus
-
         if isinstance(teams, ndb.tasklets.Future):
             teams = teams.get_result()
 
@@ -219,15 +196,32 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 team = team_f.get_result()
             else:
                 team = team_f
-            bonus = cls._get_rookie_bonus(year, team.rookie_year)
+            team_total = team_totals[team.key_name]
+            rookie_bonus_per_event = cls._get_rookie_bonus(year, team.rookie_year)
 
-            team_totals[team.key_name]["rookie_bonus"] = bonus
-            team_totals[team.key_name]["point_total"] += bonus
+            # Rookie bonus is applied per event attended (up to 2 events)
+            num_events_attended = len(team_total["event_points"])
+            total_rookie_bonus = rookie_bonus_per_event * num_events_attended
+
+            # Single-Event regional teams are award additional points
+            # based on event 1 performance.
+            # E2 points = 0.6 * (E1 points) + 14
+            # Team age points are part of E1 points for regional events.
+            # See section 12.3.1 of the 2025 game manual.
+            if num_events_attended == 1:
+                first_event_points = team_total["event_points"][0][1]
+                first_event_total = first_event_points["total"] + rookie_bonus_per_event
+                single_event_bonus = round(0.6 * first_event_total) + 14
+                team_total["single_event_bonus"] = single_event_bonus
+                team_total["point_total"] += single_event_bonus
+
+            team_total["rookie_bonus"] = total_rookie_bonus
+            team_total["point_total"] += total_rookie_bonus
 
             # For other adjustments made by HQ
             if adjustments and (team_adjustment := adjustments.get(team.key_name)):
-                team_totals[team.key_name]["adjustments"] = team_adjustment
-                team_totals[team.key_name]["point_total"] += team_adjustment
+                team_total["adjustments"] = team_adjustment
+                team_total["point_total"] += team_adjustment
 
             valid_team_keys.add(team.key_name)
 

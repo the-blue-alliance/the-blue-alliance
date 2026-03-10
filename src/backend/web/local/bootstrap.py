@@ -235,6 +235,12 @@ class LocalDataBootstrap:
         event_predictions = cls.fetch_event_detail(key, "predictions", auth_token)
         cls.store_eventdetail(event, "predictions", event_predictions)
 
+        event_district_points = cls.fetch_event_detail(
+            key, "district_points", auth_token
+        )
+        if event_district_points:
+            cls.store_eventdetail(event, "district_points", event_district_points)
+
     @classmethod
     def update_team(cls, key: TeamKey, auth_token: str) -> None:
         team_data = cls.fetch_team(key, auth_token)
@@ -289,6 +295,11 @@ class LocalDataBootstrap:
             ]
             for event_key in event_keys:
                 defer_safe(cls.update_event, event_key, apiv3_key)
+
+            districts = cls.fetch_endpoint(f"districts/{key}", apiv3_key)
+            for district_data in districts:
+                defer_safe(cls.update_district, district_data, apiv3_key)
+
             return f"/events/{key}"
         elif key in ALL_KNOWN_DISTRICT_ABBREVIATIONS:
             # bootstrap all years for the given district abbr

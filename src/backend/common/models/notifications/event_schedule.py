@@ -30,18 +30,23 @@ class EventScheduleNotification(Notification):
     def fcm_notification(self) -> Optional[Any]:
         body = f"The {self.event.normalized_name} match schedule has been updated."
         if self.next_match and self.next_match.time:
-            time = self.next_match.time.strftime("%H:%M")
-            # Add timezone, if possible
+            # Convert UTC time to event local time, if possible
             if self.event.timezone_id:
                 try:
                     import pytz
 
                     timezone = pytz.timezone(self.event.timezone_id)
-                    time += timezone.localize(self.next_match.time).strftime(" %Z")
+                    local_time = pytz.utc.localize(self.next_match.time).astimezone(
+                        timezone
+                    )
+                    time = local_time.strftime("%-H:%M %Z")
                 except Exception as e:
                     logging.warning(
-                        f"Unable to add timezone to match schedule notification: {e}"
+                        f"Unable to convert timezone for match schedule notification: {e}"
                     )
+                    time = self.next_match.time.strftime("%-H:%M")
+            else:
+                time = self.next_match.time.strftime("%-H:%M")
 
             body += f" The next match starts at {time}."
 

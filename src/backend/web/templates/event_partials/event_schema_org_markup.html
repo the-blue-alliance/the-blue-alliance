@@ -12,7 +12,7 @@
   {% if event.venue_or_venue_from_address or event.city or event.state_prov or event.country %}
   "location": {
     "@type": "Place",
-    {% if event.venue_or_venue_from_address %}"name": "{{ event.venue_or_venue_from_address }}",{% endif %}
+    "name": "{{ event.venue_or_venue_from_address or [event.city, event.state_prov, event.country]|select|join(', ') }}",
     "address": {
       "@type": "PostalAddress"
       {% if event.city %}, "addressLocality": "{{ event.city }}"{% endif %}

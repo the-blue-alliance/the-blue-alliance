@@ -11,6 +11,7 @@ import {
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
 import { z } from 'zod';
 
+import { client as mobileClient } from '~/api/tba/mobile/client.gen';
 import { client } from '~/api/tba/read/client.gen';
 import { AuthContextProvider } from '~/components/tba/auth/auth';
 import { MatchModal } from '~/components/tba/match/matchModal';
@@ -78,6 +79,13 @@ client.setConfig({
     cacheableMethods: ['GET'],
   }),
 });
+
+// Point mobile API client at local backend when configured
+if (import.meta.env.VITE_TBA_MOBILE_API_BASE_URL) {
+  mobileClient.setConfig({
+    baseUrl: import.meta.env.VITE_TBA_MOBILE_API_BASE_URL,
+  });
+}
 
 // Search params schema for global modal state
 const rootSearchSchema = z.object({

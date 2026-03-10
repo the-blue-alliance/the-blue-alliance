@@ -14,6 +14,11 @@
 
 ## Screenshots (if appropriate):
 
+## Screenshot Pages
+<!--- For PRs that touch pwa/ files, list additional pages to screenshot. -->
+<!--- Each line: - /path Optional Display Name -->
+<!--- Example: - /match/2024mil_f1m2 Match Page -->
+
 ## Types of changes
 <!--- What types of changes does your code introduce? Put an `x` in all the boxes that apply: -->
 - [ ] Bug fix (non-breaking change which fixes an issue)

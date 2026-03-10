@@ -35,7 +35,7 @@
                 "schema": {
                   "$ref": "#/components/schemas/EventInfo"
                 }
-              } 
+              }
             }
           },
           "400": {
@@ -403,7 +403,11 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "string",
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "description": "YouTube video ID"
+                },
                 "example": {
                   "qm1": "aFZy8iibMD0",
                   "sf1m1": "RpSgUrsghv4"
@@ -453,6 +457,123 @@
             }
           },
           "description": "List of YouTube video IDs to add",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/webcasts/update": {
+      "patch": {
+        "tags": [
+          "Event Webcasts"
+        ],
+        "summary": "Add webcasts to an event",
+        "description": "Append new webcasts to an event's existing webcast list",
+        "operationId": "addEventWebcasts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebcastUpdate"
+              }
+            }
+          },
+          "description": "List of webcasts to add",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Event Webcasts"
+        ],
+        "summary": "Remove webcasts from an event",
+        "description": "Remove specified webcasts from an event's webcast list",
+        "operationId": "deleteEventWebcasts",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WebcastUpdate"
+              }
+            }
+          },
+          "description": "List of webcasts to remove",
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "$ref": "#/components/responses/successResponse"
+          },
+          "400": {
+            "$ref": "#/components/responses/invalidHeadersResponse"
+          },
+          "401": {
+            "$ref": "#/components/responses/invalidSigResponse"
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/match_videos/delete": {
+      "delete": {
+        "tags": [
+          "Match Videos"
+        ],
+        "summary": "Delete match videos",
+        "description": "Remove YouTube videos from a match",
+        "operationId": "deleteMatchVideos",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/eventKeyParam"
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "additionalProperties": {
+                  "type": "string",
+                  "description": "YouTube video ID"
+                },
+                "example": {
+                  "qm1": "aFZy8iibMD0",
+                  "sf1m1": "RpSgUrsghv4"
+                }
+              }
+            }
+          },
+          "description": "Dict of {key: partial match key, value: youtube video id}",
           "required": true
         },
         "responses": {
@@ -737,6 +858,51 @@
             "type": "string",
             "description": "The name for the match, to be shown on the event page",
             "example": "Quals 10"
+          }
+        }
+      },
+      "Webcast": {
+        "type": "object",
+        "properties": {
+          "url": {
+            "type": "string",
+            "description": "Optional URL that will be parsed to extract webcast type and channel. Either provide url OR type+channel+file",
+            "example": "https://youtu.be/abc123"
+          },
+          "type": {
+            "type": "string",
+            "description": "Type of webcast (e.g., youtube, twitch, livestream, http_stream). Required if url is not provided",
+            "example": "youtube"
+          },
+          "channel": {
+            "type": "string",
+            "description": "Channel identifier for the webcast. Required if url is not provided",
+            "example": "abc123"
+          },
+          "file": {
+            "type": "string",
+            "description": "Optional file identifier for certain webcast types",
+            "example": "stream.mp4"
+          },
+          "date": {
+            "type": "string",
+            "description": "Optional date in YYYY-MM-DD format for when the webcast aired",
+            "example": "2024-01-15"
+          }
+        }
+      },
+      "WebcastUpdate": {
+        "type": "object",
+        "required": [
+          "webcasts"
+        ],
+        "properties": {
+          "webcasts": {
+            "type": "array",
+            "description": "List of webcasts to add or remove",
+            "items": {
+              "$ref": "#/components/schemas/Webcast"
+            }
           }
         }
       }

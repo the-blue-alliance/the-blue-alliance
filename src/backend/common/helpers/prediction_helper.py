@@ -413,6 +413,12 @@ class ContributionCalculator:
                     means[color] = score_breakdown[color]["teleopCoralCount"]
                 elif self._stat == "barge_points":
                     means[color] = score_breakdown[color]["endGameBargePoints"]
+                elif self._stat == "totalAutoPoints":
+                    means[color] = score_breakdown[color]["totalAutoPoints"]
+                elif self._stat == "totalTeleopPoints":
+                    means[color] = score_breakdown[color]["totalTeleopPoints"]
+                elif self._stat == "endGameTowerPoints":
+                    means[color] = score_breakdown[color]["endGameTowerPoints"]
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -766,6 +772,31 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
                     prediction[color]["prob_barge_bonus"] = prob
+                # 2026
+                if stat == "totalAutoPoints":
+                    required_points = 15
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_energized_bonus"] = prob
+                if stat == "totalTeleopPoints":
+                    required_points = 30
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_supercharged_bonus"] = prob
+                if stat == "endGameTowerPoints":
+                    required_points = 15
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_traversal_bonus"] = prob
 
         # Prob win
         red_score = prediction["red"]["score"]
@@ -868,6 +899,13 @@ class PredictionHelper:
                 ("coral_scored", 0, 10**2),
                 ("barge_points", 0, 10**2),
             ]
+        elif event.year == 2026:
+            relevant_stats = [
+                ("score", 0, 20**2),
+                ("totalAutoPoints", 0, 10**2),
+                ("totalTeleopPoints", 0, 10**2),
+                ("endGameTowerPoints", 0, 10**2),
+            ]
         else:
             relevant_stats = []
 
@@ -929,7 +967,9 @@ class PredictionHelper:
                         brier_sums["score"] += pow(prediction["prob"] - 0, 2)
 
                     for color in ALLIANCE_COLORS:
-                        score_breakdown = none_throws(match.score_breakdown)
+                        if match.score_breakdown is None:
+                            continue
+                        score_breakdown = match.score_breakdown
                         color_prediction = prediction[str(color)]  # pyre-ignore[26]
                         if event.year == 2016:
                             if score_breakdown[color]["teleopDefensesBreached"]:
@@ -1159,6 +1199,19 @@ class PredictionHelper:
                             sampled_tiebreaker[alliance_color] = score_breakdown[
                                 alliance_color
                             ]["totalPoints"]
+                        elif match.year == 2026:
+                            sampled_rp1[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["energizedAchieved"]
+                            sampled_rp2[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["superchargedAchieved"]
+                            sampled_rp3[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["traversalAchieved"]
+                            sampled_tiebreaker[alliance_color] = score_breakdown[
+                                alliance_color
+                            ]["totalPoints"]
                 else:
                     prediction = qual_predictions[none_throws(match.key.string_id())]
                     if np.random.uniform(high=1) < prediction["prob"]:
@@ -1276,6 +1329,22 @@ class PredictionHelper:
                             sampled_rp3[alliance_color] = (
                                 np.random.uniform(high=1)
                                 < color_prediction["prob_barge_bonus"]
+                            )
+                            sampled_tiebreaker[alliance_color] = color_prediction[
+                                "score"
+                            ]
+                        elif match.year == 2026:
+                            sampled_rp1[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_energized_bonus"]
+                            )
+                            sampled_rp2[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_supercharged_bonus"]
+                            )
+                            sampled_rp3[alliance_color] = (
+                                np.random.uniform(high=1)
+                                < color_prediction["prob_traversal_bonus"]
                             )
                             sampled_tiebreaker[alliance_color] = color_prediction[
                                 "score"

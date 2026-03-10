@@ -6,6 +6,8 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.models.webcast import Webcast
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
     FMSAPIEventListParser,
@@ -636,3 +638,40 @@ def test_parse_2022_two_alliance_dcmp(test_data_importer):
 
     event = events[0]
     assert event.playoff_type == PlayoffType.BRACKET_2_TEAM
+
+
+def test_parse_2025_event_rich_webcasts(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2025nyny_v33.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, districts = FMSAPIEventListParser(2025).parse(data)
+    assert len(events) == 1
+    assert len(districts) == 0
+
+    event = events[0]
+    assert event.webcast == [
+        Webcast(
+            type=WebcastType.TWITCH,
+            channel="firstinspires12",
+        )
+    ]
+
+
+def test_parse_2026_event_rich_webcasts(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2026week0.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, districts = FMSAPIEventListParser(2026).parse(data)
+    assert len(events) == 1
+    assert len(districts) == 0
+
+    event = events[0]
+    assert event.webcast == [
+        Webcast(
+            type=WebcastType.YOUTUBE,
+            channel="eUdvSJ-mqtU",
+            date="2026-02-21",
+        )
+    ]

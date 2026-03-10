@@ -23,6 +23,20 @@ def test_register_no_auth(api_client: Client) -> None:
     assert resp["code"] == 401
 
 
+def test_register_no_account(
+    api_client: Client, mock_clientapi_auth_no_account: None
+) -> None:
+    """A user with a valid Firebase token but no email should be rejected."""
+    req = RegistrationRequest(
+        operating_system="web",
+        mobile_id="abc123",
+        device_uuid="asdf",
+        name="Test Device",
+    )
+    resp = make_clientapi_request(api_client, "/register", req)
+    assert resp["code"] == 401
+
+
 def test_register_new_client(api_client: Client, mock_clientapi_auth: User) -> None:
     req = RegistrationRequest(
         operating_system="web",
@@ -42,6 +56,31 @@ def test_register_new_client(api_client: Client, mock_clientapi_auth: User) -> N
     assert client.user_id == "1"
     assert client.messaging_id == "abc123"
     assert client.client_type == ClientType.WEB
+    assert client.device_uuid == "asdf"
+    assert client.display_name == "Test Device"
+
+
+def test_register_android_fcm_client(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    req = RegistrationRequest(
+        operating_system="android-fcm",
+        mobile_id="abc123",
+        device_uuid="asdf",
+        name="Test Device",
+    )
+    resp = make_clientapi_request(api_client, "/register", req)
+    assert resp["code"] == 200
+
+    user_clients = MobileClient.query(
+        MobileClient.user_id == str(none_throws(mock_clientapi_auth.account_key).id())
+    ).fetch()
+    assert len(user_clients) == 1
+
+    client = user_clients[0]
+    assert client.user_id == "1"
+    assert client.messaging_id == "abc123"
+    assert client.client_type == ClientType.OS_ANDROID_FCM
     assert client.device_uuid == "asdf"
     assert client.display_name == "Test Device"
 
