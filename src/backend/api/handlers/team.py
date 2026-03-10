@@ -291,7 +291,7 @@ def team_event_status(
         if pit_location:
             if status is None:
                 status = {}
-            status["pit_location"] = pit_location["location"]
+            status["pit_location"] = pit_location["location"]  # pyre-ignore[55]
     return profiled_jsonify(status)
 
 
