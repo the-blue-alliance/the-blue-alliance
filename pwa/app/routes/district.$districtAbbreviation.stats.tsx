@@ -180,6 +180,7 @@ function computeLeaderboards(
   const districtEventFinalsAppearances = new Map<string, number>();
   const blueBanners = new Map<string, number>();
   const impactWins = new Map<string, number>();
+  const dcmpImpactWins = new Map<string, number>();
   const eiWins = new Map<string, number>();
   const wffaWins = new Map<string, number>();
 
@@ -239,6 +240,14 @@ function computeLeaderboards(
           impactWins.set(teamKey, (impactWins.get(teamKey) ?? 0) + 1);
         }
 
+        // DCMPImpact/Chairman's wins
+        if (
+          award.award_type === AwardType.CHAIRMANS &&
+          dcmpEventKeys.has(award.event_key)
+        ) {
+          dcmpImpactWins.set(teamKey, (dcmpImpactWins.get(teamKey) ?? 0) + 1);
+        }
+
         // Engineering Inspiration wins
         if (award.award_type === AwardType.ENGINEERING_INSPIRATION) {
           eiWins.set(teamKey, (eiWins.get(teamKey) ?? 0) + 1);
@@ -266,6 +275,7 @@ function computeLeaderboards(
     mostMatchesPlayed: mapToRankings(mostMatchesPlayed),
     mostAwards: mapToRankings(mostAwards),
     impactWins: mapToRankings(impactWins),
+    dcmpImpactWins: mapToRankings(dcmpImpactWins),
     eiWins: mapToRankings(eiWins),
     wffaWins: mapToRankings(wffaWins),
   };
@@ -400,6 +410,12 @@ function DistrictStatsPage() {
             <Leaderboard
               title="Most District Impact Award Wins"
               rankings={leaderboards.impactWins}
+              keyType="team"
+              year={0}
+            />
+            <Leaderboard
+              title="Most District Championship Impact Award Wins"
+              rankings={leaderboards.dcmpImpactWins}
               keyType="team"
               year={0}
             />
