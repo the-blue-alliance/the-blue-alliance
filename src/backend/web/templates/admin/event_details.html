@@ -436,6 +436,11 @@
         <button class="btn btn-danger"
           form="remove_webcast_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}"><span
             class="glyphicon glyphicon-trash"></span> Remove</button>
+        {% if webcast.type == "youtube" %}
+        <button class="btn btn-info"
+          form="update_webcast_date_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}"><span
+            class="glyphicon glyphicon-calendar"></span> Update Date</button>
+        {% endif %}
       </li>
       <form id="remove_webcast_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}" method="post"
         action="/admin/event/remove_webcast/{{ event.key_name }}">
@@ -445,6 +450,15 @@
         <input type="hidden" name="index" value="{{ loop.index }}" />
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       </form>
+      {% if webcast.type == "youtube" %}
+      <form id="update_webcast_date_{{ webcast.type }}_{{ webcast.channel }}_{{ webcast.file }}" method="post"
+        action="/admin/event/update_webcast_date/{{ event.key_name }}">
+        <input type="hidden" name="type" value="{{ webcast.type }}" />
+        <input type="hidden" name="channel" value="{{ webcast.channel }}" />
+        <input type="hidden" name="index" value="{{ loop.index }}" />
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      </form>
+      {% endif %}
       {% else %}
       <p>No webcasts found</p>
       {% endfor %}

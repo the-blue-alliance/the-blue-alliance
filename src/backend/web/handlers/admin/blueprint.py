@@ -57,6 +57,7 @@ from backend.web.handlers.admin.event import (
     event_remove_webcast_post,
     event_update_location_get,
     event_update_location_post,
+    event_update_webcast_date_post,
 )
 from backend.web.handlers.admin.gameday import gameday_dashboard, gameday_dashboard_post
 from backend.web.handlers.admin.landing import (
@@ -287,6 +288,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/remove_webcast/<event_key>",
     view_func=event_remove_webcast_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/update_webcast_date/<event_key>",
+    view_func=event_update_webcast_date_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(
