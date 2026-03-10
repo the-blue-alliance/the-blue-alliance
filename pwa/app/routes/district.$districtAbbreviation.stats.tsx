@@ -375,7 +375,7 @@ function DistrictStatsPage() {
               year={0}
             />
             <Leaderboard
-              title="Most Matches Played"
+              title="Most District Matches Played"
               rankings={leaderboards.mostMatchesPlayed}
               keyType="team"
               year={0}
@@ -386,31 +386,31 @@ function DistrictStatsPage() {
         <TabsContent value="awards">
           <div className="grid gap-6 lg:grid-cols-2">
             <Leaderboard
-              title="Most Blue Banners"
+              title="Most District Blue Banners"
               rankings={leaderboards.blueBanners}
               keyType="team"
               year={0}
             />
             <Leaderboard
-              title="Most Awards"
+              title="Most District Awards"
               rankings={leaderboards.mostAwards}
               keyType="team"
               year={0}
             />
             <Leaderboard
-              title="Most Impact Award Wins"
+              title="Most District Impact Award Wins"
               rankings={leaderboards.impactWins}
               keyType="team"
               year={0}
             />
             <Leaderboard
-              title="Most Engineering Inspiration Award Wins"
+              title="Most District Engineering Inspiration Award Wins"
               rankings={leaderboards.eiWins}
               keyType="team"
               year={0}
             />
             <Leaderboard
-              title="Most Woodie Flowers Finalist Award Wins"
+              title="Most District Woodie Flowers Finalist Award Wins"
               rankings={leaderboards.wffaWins}
               keyType="team"
               year={0}
