@@ -50,6 +50,24 @@ from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 blueprint = Blueprint("live_events", __name__)
 
 
+def _has_unplayed_match_today(event: Event) -> bool:
+    """Return True if the event has at least one unplayed match scheduled for today."""
+    local_today = event.local_time().date()
+    for match in event.matches:
+        if not match.has_been_played and match.time is not None:
+            if event.timezone_id:
+                match_local_date = (
+                    pytz.utc.localize(match.time)
+                    .astimezone(pytz.timezone(event.timezone_id))
+                    .date()
+                )
+            else:
+                match_local_date = match.time.date()
+            if match_local_date == local_today:
+                return True
+    return False
+
+
 @blueprint.route("/tasks/do/update_live_events")
 def update_live_events() -> str:
     week_events = EventHelper.week_events()
@@ -84,10 +102,11 @@ def update_live_events() -> str:
     }
     for event in week_events:
         if (
-            event.within_a_day
+            event.now
             and (event_district_key := event.event_district_key)
             and event_district_key in districts_with_youtube_channels
             and not event.current_webcasts
+            and _has_unplayed_match_today(event)
         ):
             districts_to_find.add(event_district_key)
 
