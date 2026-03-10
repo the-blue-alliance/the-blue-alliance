@@ -1,5 +1,6 @@
 import { type VariantProps, cva } from 'class-variance-authority';
 import { type HTMLAttributes, type JSX } from 'react';
+import { match } from 'ts-pattern';
 
 import BiTrophy from '~icons/bi/trophy';
 
@@ -84,23 +85,22 @@ export default function AllianceSelectionTable(props: {
           {props.alliances.map((a, idx) => (
             <AllianceTableRow
               key={`alliance-${idx}`}
-              variant={
-                a.status?.level === 'f'
-                  ? a.status.status === 'won'
-                    ? 'winner'
-                    : 'finalist'
-                  : 'default'
-              }
+              variant={match(a.status)
+                .with({ level: 'f', status: 'won' }, () => 'winner' as const)
+                .with({ level: 'f' }, () => 'finalist' as const)
+                .otherwise(() => 'default' as const)}
             >
               <TableCell className="">
-                {a.status?.status === 'won' ? (
-                  <InlineIcon className="relative right-[1ch] justify-center">
-                    <BiTrophy />
-                    {extractAllianceNumber(a.name ?? `${idx + 1}`)}
-                  </InlineIcon>
-                ) : (
-                  <>{extractAllianceNumber(a.name ?? `${idx + 1}`)}</>
-                )}
+                {match(a.status?.status)
+                  .with('won', () => (
+                    <InlineIcon className="relative right-[1ch] justify-center">
+                      <BiTrophy />
+                      {extractAllianceNumber(a.name ?? `${idx + 1}`)}
+                    </InlineIcon>
+                  ))
+                  .otherwise(() => (
+                    <>{extractAllianceNumber(a.name ?? `${idx + 1}`)}</>
+                  ))}
               </TableCell>
 
               {[...Array(allianceSize).keys()].map((i) =>

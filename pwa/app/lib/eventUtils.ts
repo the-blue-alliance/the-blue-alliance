@@ -1,3 +1,5 @@
+import { P, match } from 'ts-pattern';
+
 import { Event } from '~/api/tba/read/types.gen';
 import { EventType } from '~/lib/api/EventType';
 import { convertMsToDays } from '~/lib/utils';
@@ -83,28 +85,16 @@ export function getEventWeekString(event: Event) {
   if (event.week === null) {
     return null;
   }
-  switch (event.year) {
-    case 2016:
-      return event.week === 0 ? 'Week 0.5' : `Week ${event.week}`;
-    case 2021: {
-      switch (event.week) {
-        case 0:
-          return 'Participation';
-        case 6:
-          return 'FIRST Innovation Challenge';
-        case 7:
-          return 'INFINITE RECHARGE At Home Challenge';
-        case 8:
-          return 'Game Design Challenge';
-        case 9:
-          return 'Awards';
-        default:
-          return null;
-      }
-    }
-    default:
-      return `Week ${event.week + 1}`;
-  }
+  return match([event.year, event.week] as [number, number])
+    .with([2016, 0], () => 'Week 0.5')
+    .with([2016, P.number], ([, week]) => `Week ${week}`)
+    .with([2021, 0], () => 'Participation')
+    .with([2021, 6], () => 'FIRST Innovation Challenge')
+    .with([2021, 7], () => 'INFINITE RECHARGE At Home Challenge')
+    .with([2021, 8], () => 'Game Design Challenge')
+    .with([2021, 9], () => 'Awards')
+    .with([2021, P.number], () => null)
+    .otherwise(([, week]) => `Week ${week + 1}`);
 }
 
 export function getCurrentWeekEvents(events: Event[]) {
