@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from '~/components/ui/select';
 import {
+  LEADERBOARD_NAME_TO_DISPLAY_NAME,
   NOTABLE_NAME_TO_DISPLAY_NAME,
   leaderboardFromNotable,
 } from '~/lib/insightUtils';
@@ -190,7 +191,14 @@ function SingleYearInsights({
         </h2>
         <div className="grid gap-6 lg:grid-cols-2">
           {leaderboards.map((l, i) => (
-            <Leaderboard leaderboard={l} key={i} year={year} />
+            <Leaderboard
+              title={LEADERBOARD_NAME_TO_DISPLAY_NAME[l.name] || l.name}
+              subtitle={l.year > 0 ? `${l.year}` : 'Overall'}
+              rankings={l.data.rankings}
+              keyType={l.data.key_type}
+              key={i}
+              year={year}
+            />
           ))}
         </div>
       </div>
@@ -278,7 +286,13 @@ function NotablesOverall({
 
         return (
           <Leaderboard
-            leaderboard={leaderboard}
+            title={
+              LEADERBOARD_NAME_TO_DISPLAY_NAME[leaderboard.name] ||
+              leaderboard.name
+            }
+            subtitle={leaderboard.year > 0 ? `${leaderboard.year}` : 'Overall'}
+            rankings={leaderboard.data.rankings}
+            keyType={leaderboard.data.key_type}
             key={i}
             contextTooltipMap={context}
             year={year}

@@ -5,7 +5,6 @@ import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 import MaterialSymbolsTrophy from '~icons/material-symbols/trophy';
 
-import { LeaderboardInsight } from '~/api/tba/read';
 import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
@@ -29,25 +28,34 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { LEADERBOARD_NAME_TO_DISPLAY_NAME } from '~/lib/insightUtils';
 import { cn, pluralize } from '~/lib/utils';
+
+export type LeaderboardKeyType = 'team' | 'event' | 'match';
+
+export interface LeaderboardRanking {
+  value: number;
+  keys: string[];
+}
 
 const MAX_KEYS_PER_ROW = 20;
 const PRE_EXPANDED_ROWS = 10;
 
 export function Leaderboard({
-  leaderboard,
+  title,
+  subtitle,
+  rankings,
+  keyType,
   contextTooltipMap,
   year,
 }: {
-  leaderboard: LeaderboardInsight;
+  title: string;
+  subtitle?: string;
+  rankings: LeaderboardRanking[];
+  keyType: LeaderboardKeyType;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
 }) {
   const [expanded, setExpanded] = useState(false);
-
-  const displayName =
-    LEADERBOARD_NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
 
   return (
     <Card
@@ -68,11 +76,13 @@ export function Leaderboard({
             </div>
             <div>
               <CardTitle className="text-lg leading-tight font-semibold">
-                {displayName}
+                {title}
               </CardTitle>
-              <CardDescription className="mt-0.5 text-sm">
-                {leaderboard.year > 0 ? leaderboard.year : 'Overall'}
-              </CardDescription>
+              {subtitle && (
+                <CardDescription className="mt-0.5 text-sm">
+                  {subtitle}
+                </CardDescription>
+              )}
             </div>
           </div>
           <Button
@@ -100,12 +110,12 @@ export function Leaderboard({
                 Count
               </TableHead>
               <TableHead className="h-10 text-left font-semibold capitalize">
-                {leaderboard.data.key_type}
+                {keyType}
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {leaderboard.data.rankings
+            {rankings
               .slice(0, expanded ? 100 : PRE_EXPANDED_ROWS)
               .map((r, i) => {
                 const rank = i + 1;
@@ -135,7 +145,7 @@ export function Leaderboard({
                     <TableCell className="py-3 pl-4 text-left">
                       <LeaderboardKeyList
                         cutoffSize={MAX_KEYS_PER_ROW}
-                        keyType={leaderboard.data.key_type}
+                        keyType={keyType}
                         keyVals={r.keys}
                         contextTooltipMap={contextTooltipMap}
                         year={year}
@@ -158,7 +168,7 @@ function LeaderboardKeyList({
   contextTooltipMap,
   year,
 }: {
-  keyType: LeaderboardInsight['data']['key_type'];
+  keyType: LeaderboardKeyType;
   keyVals: string[];
   cutoffSize: number;
   contextTooltipMap?: Record<string, ReactNode>;
@@ -219,7 +229,7 @@ function LeaderboardKeyLink({
   keyType,
   year,
 }: {
-  keyType: LeaderboardInsight['data']['key_type'];
+  keyType: LeaderboardKeyType;
   keyVal: string;
   year: number;
 }) {

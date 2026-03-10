@@ -9,8 +9,10 @@ import {
   getDistrictHistory,
   getDistrictInsights,
 } from '~/api/tba/read';
-import { TeamLink } from '~/components/tba/links';
-import { Divider } from '~/components/ui/divider';
+import {
+  Leaderboard,
+  type LeaderboardRanking,
+} from '~/components/tba/leaderboard';
 import {
   Select,
   SelectContent,
@@ -18,23 +20,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { AwardType, BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { EventType } from '~/lib/api/EventType';
 import { publicCacheControlHeaders } from '~/lib/utils';
-
-interface TeamStat {
-  teamKey: string;
-  value: number;
-}
 
 export const Route = createFileRoute('/district/$districtAbbreviation/stats')({
   loader: async ({ params }) => {
@@ -109,6 +98,29 @@ export const Route = createFileRoute('/district/$districtAbbreviation/stats')({
   component: DistrictStatsPage,
 });
 
+function mapToRankings(map: Map<string, number>): LeaderboardRanking[] {
+  // Group keys by value
+  const valueToKeys = new Map<number, string[]>();
+  for (const [key, value] of map.entries()) {
+    if (value <= 0) continue;
+    const existing = valueToKeys.get(value);
+    if (existing) {
+      existing.push(key);
+    } else {
+      valueToKeys.set(value, [key]);
+    }
+  }
+  // Sort by value descending, keys sorted by team number
+  return Array.from(valueToKeys.entries())
+    .sort(([a], [b]) => b - a)
+    .map(([value, keys]) => ({
+      value,
+      keys: keys.sort(
+        (a, b) => parseInt(a.substring(3)) - parseInt(b.substring(3)),
+      ),
+    }));
+}
+
 function computeLeaderboards(
   teamData: Record<
     string,
@@ -128,28 +140,32 @@ function computeLeaderboards(
   }>,
 ) {
   // Stats from team_data (insight API)
-  const dcmpAppearances: TeamStat[] = [];
-  const dcmpWins: TeamStat[] = [];
-  const districtEventWins: TeamStat[] = [];
-  const mostMatchesPlayed: TeamStat[] = [];
-  const mostAwards: TeamStat[] = [];
+  const dcmpAppearances = new Map<string, number>();
+  const dcmpWins = new Map<string, number>();
+  const districtEventWins = new Map<string, number>();
+  const mostMatchesPlayed = new Map<string, number>();
+  const mostAwards = new Map<string, number>();
+  const eventsAttended = new Map<string, number>();
 
   if (teamData) {
     for (const [teamKey, data] of Object.entries(teamData)) {
       if (data.dcmp_appearances > 0) {
-        dcmpAppearances.push({ teamKey, value: data.dcmp_appearances });
+        dcmpAppearances.set(teamKey, data.dcmp_appearances);
       }
       if (data.dcmp_wins > 0) {
-        dcmpWins.push({ teamKey, value: data.dcmp_wins });
+        dcmpWins.set(teamKey, data.dcmp_wins);
       }
       if (data.district_event_wins > 0) {
-        districtEventWins.push({ teamKey, value: data.district_event_wins });
+        districtEventWins.set(teamKey, data.district_event_wins);
       }
       if (data.total_matches_played > 0) {
-        mostMatchesPlayed.push({ teamKey, value: data.total_matches_played });
+        mostMatchesPlayed.set(teamKey, data.total_matches_played);
       }
       if (data.team_awards > 0) {
-        mostAwards.push({ teamKey, value: data.team_awards });
+        mostAwards.set(teamKey, data.team_awards);
+      }
+      if (data.district_seasons > 0) {
+        eventsAttended.set(teamKey, data.district_seasons);
       }
     }
   }
@@ -229,38 +245,21 @@ function computeLeaderboards(
     }
   }
 
-  // District seasons from insight team_data
-  const eventsAttendedStats: TeamStat[] = [];
-  if (teamData) {
-    for (const [teamKey, data] of Object.entries(teamData)) {
-      if (data.district_seasons > 0) {
-        eventsAttendedStats.push({ teamKey, value: data.district_seasons });
-      }
-    }
-  }
-
-  const mapToSorted = (map: Map<string, number>): TeamStat[] =>
-    Array.from(map.entries())
-      .filter(([, v]) => v > 0)
-      .map(([teamKey, value]) => ({ teamKey, value }))
-      .sort((a, b) => b.value - a.value);
-
-  const sortDesc = (arr: TeamStat[]) =>
-    [...arr].sort((a, b) => b.value - a.value);
-
   return {
-    dcmpAppearances: sortDesc(dcmpAppearances),
-    dcmpFinalsAppearances: mapToSorted(dcmpFinalsAppearances),
-    dcmpWins: sortDesc(dcmpWins),
-    eventsAttended: sortDesc(eventsAttendedStats),
-    districtEventFinalsAppearances: mapToSorted(districtEventFinalsAppearances),
-    districtEventWins: sortDesc(districtEventWins),
-    blueBanners: mapToSorted(blueBanners),
-    mostMatchesPlayed: sortDesc(mostMatchesPlayed),
-    mostAwards: sortDesc(mostAwards),
-    impactWins: mapToSorted(impactWins),
-    eiWins: mapToSorted(eiWins),
-    wffaWins: mapToSorted(wffaWins),
+    dcmpAppearances: mapToRankings(dcmpAppearances),
+    dcmpFinalsAppearances: mapToRankings(dcmpFinalsAppearances),
+    dcmpWins: mapToRankings(dcmpWins),
+    eventsAttended: mapToRankings(eventsAttended),
+    districtEventFinalsAppearances: mapToRankings(
+      districtEventFinalsAppearances,
+    ),
+    districtEventWins: mapToRankings(districtEventWins),
+    blueBanners: mapToRankings(blueBanners),
+    mostMatchesPlayed: mapToRankings(mostMatchesPlayed),
+    mostAwards: mapToRankings(mostAwards),
+    impactWins: mapToRankings(impactWins),
+    eiWins: mapToRankings(eiWins),
+    wffaWins: mapToRankings(wffaWins),
   };
 }
 
@@ -319,138 +318,92 @@ function DistrictStatsPage() {
         </TabsList>
 
         <TabsContent value="championships">
-          <div className="space-y-8">
-            <LeaderboardTable
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Leaderboard
               title="Most District Championship Appearances"
-              data={leaderboards.dcmpAppearances}
-              label="Appearances"
+              rankings={leaderboards.dcmpAppearances}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most District Championship Finals Appearances"
-              data={leaderboards.dcmpFinalsAppearances}
-              label="Finals Appearances"
+              rankings={leaderboards.dcmpFinalsAppearances}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most District Championship Wins"
-              data={leaderboards.dcmpWins}
-              label="Wins"
+              rankings={leaderboards.dcmpWins}
+              keyType="team"
+              year={0}
             />
           </div>
         </TabsContent>
 
         <TabsContent value="events">
-          <div className="space-y-8">
-            <LeaderboardTable
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Leaderboard
               title="Most District Seasons"
-              data={leaderboards.eventsAttended}
-              label="Seasons"
+              rankings={leaderboards.eventsAttended}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most District Event Finals Appearances"
-              data={leaderboards.districtEventFinalsAppearances}
-              label="Finals Appearances"
+              rankings={leaderboards.districtEventFinalsAppearances}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most District Event Wins"
-              data={leaderboards.districtEventWins}
-              label="Wins"
+              rankings={leaderboards.districtEventWins}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most Matches Played"
-              data={leaderboards.mostMatchesPlayed}
-              label="Matches"
+              rankings={leaderboards.mostMatchesPlayed}
+              keyType="team"
+              year={0}
             />
           </div>
         </TabsContent>
 
         <TabsContent value="awards">
-          <div className="space-y-8">
-            <LeaderboardTable
+          <div className="grid gap-6 lg:grid-cols-2">
+            <Leaderboard
               title="Most Blue Banners"
-              data={leaderboards.blueBanners}
-              label="Banners"
+              rankings={leaderboards.blueBanners}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most Awards"
-              data={leaderboards.mostAwards}
-              label="Awards"
+              rankings={leaderboards.mostAwards}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most Impact Award Wins"
-              data={leaderboards.impactWins}
-              label="Wins"
+              rankings={leaderboards.impactWins}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most Engineering Inspiration Award Wins"
-              data={leaderboards.eiWins}
-              label="Wins"
+              rankings={leaderboards.eiWins}
+              keyType="team"
+              year={0}
             />
-            <LeaderboardTable
+            <Leaderboard
               title="Most Woodie Flowers Finalist Award Wins"
-              data={leaderboards.wffaWins}
-              label="Wins"
+              rankings={leaderboards.wffaWins}
+              keyType="team"
+              year={0}
             />
           </div>
         </TabsContent>
       </Tabs>
-    </div>
-  );
-}
-
-function LeaderboardTable({
-  title,
-  data,
-  label,
-  limit = 25,
-}: {
-  title: string;
-  data: TeamStat[];
-  label: string;
-  limit?: number;
-}) {
-  if (data.length === 0) {
-    return null;
-  }
-
-  const displayData = data.slice(0, limit);
-
-  return (
-    <div>
-      <Divider className="py-4">
-        <div className="text-xl">{title}</div>
-      </Divider>
-      <Table>
-        <TableHeader>
-          <TableRow>
-            <TableHead className="w-16">Rank</TableHead>
-            <TableHead>Team</TableHead>
-            <TableHead className="text-right">{label}</TableHead>
-          </TableRow>
-        </TableHeader>
-        <TableBody>
-          {displayData.map((entry, index) => {
-            // Compute rank accounting for ties
-            const rank =
-              index === 0 || displayData[index - 1].value !== entry.value
-                ? index + 1
-                : '';
-
-            return (
-              <TableRow key={entry.teamKey}>
-                <TableCell className="tabular-nums">{rank}</TableCell>
-                <TableCell>
-                  <TeamLink teamOrKey={entry.teamKey}>
-                    {entry.teamKey.substring(3)}
-                  </TeamLink>
-                </TableCell>
-                <TableCell className="text-right tabular-nums">
-                  {entry.value}
-                </TableCell>
-              </TableRow>
-            );
-          })}
-        </TableBody>
-      </Table>
     </div>
   );
 }
