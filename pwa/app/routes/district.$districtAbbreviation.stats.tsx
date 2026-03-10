@@ -183,6 +183,7 @@ function computeLeaderboards(
   const dcmpImpactWins = new Map<string, number>();
   const eiWins = new Map<string, number>();
   const dcmpEiWins = new Map<string, number>();
+  const leadershipWins = new Map<string, number>();
   const wffaWins = new Map<string, number>();
 
   for (const { events, awards } of yearResults) {
@@ -262,6 +263,11 @@ function computeLeaderboards(
           dcmpEiWins.set(teamKey, (dcmpEiWins.get(teamKey) ?? 0) + 1);
         }
 
+        // Leadership wins
+        if (award.award_type === AwardType.DEANS_LIST) {
+          leadershipWins.set(teamKey, (leadershipWins.get(teamKey) ?? 0) + 1);
+        }
+
         // WFFA wins
         if (award.award_type === AwardType.WOODIE_FLOWERS) {
           wffaWins.set(teamKey, (wffaWins.get(teamKey) ?? 0) + 1);
@@ -287,6 +293,7 @@ function computeLeaderboards(
     dcmpImpactWins: mapToRankings(dcmpImpactWins),
     eiWins: mapToRankings(eiWins),
     dcmpEiWins: mapToRankings(dcmpEiWins),
+    leadershipWins: mapToRankings(leadershipWins),
     wffaWins: mapToRankings(wffaWins),
   };
 }
@@ -442,7 +449,13 @@ function DistrictStatsPage() {
               year={0}
             />
             <Leaderboard
-              title="Most District Woodie Flowers Finalist Award Wins"
+              title="Most Leadership Finalist Award Wins"
+              rankings={leaderboards.leadershipWins}
+              keyType="team"
+              year={0}
+            />
+            <Leaderboard
+              title="Most Woodie Flowers Finalist Award Wins"
               rankings={leaderboards.wffaWins}
               keyType="team"
               year={0}
