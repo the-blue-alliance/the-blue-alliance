@@ -214,14 +214,13 @@ class LocalDataBootstrap:
         event_statuses = cast(
             Dict, cls.fetch_event_detail(key, "teams/statuses", auth_token)
         )
-        pit_locations: Dict[str, Optional[EventTeamPitLocation]] = {}
-        for team_key, status in event_statuses.items():
-            pit_loc = status.get("pit_location") if status else None
-            if pit_loc:
-                pit_locations[team_key] = EventTeamPitLocation(location=pit_loc)
-
         for t in teams:
-            cls.store_eventteam(t, event, pit_locations.get(t.key_name))
+            status = event_statuses.get(t.key_name) or {}
+            pit_loc = status.get("pit_location")
+            cls.store_eventteam(
+                t, event,
+                EventTeamPitLocation(location=pit_loc) if pit_loc else None,
+            )
 
         # Fetch pit locations from teams/statuses endpoint
         event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)
