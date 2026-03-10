@@ -17,6 +17,7 @@ from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
@@ -171,14 +172,16 @@ def seed_test_event() -> Response:
 
     # Create EventTeam records
     team_numbers = {t.team_number for t in teams}
+    rows = "ABCDEFG"
     event_teams = [
         EventTeam(
             id=f"{event_key}_frc{num}",
             event=ndb.Key(Event, event_key),
             team=ndb.Key(Team, f"frc{num}"),
             year=year,
+            pit_location=EventTeamPitLocation(location=f"{rows[i // 6]}{(i % 6) + 1}"),
         )
-        for num in team_numbers
+        for i, num in enumerate(sorted(team_numbers))
     ]
     EventTeamManipulator.createOrUpdate(event_teams)
 

@@ -197,6 +197,11 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> Response:
                     "overall_status_str": status_strings["overall"],
                 }
             )
+        pit_location = event_team.pit_location
+        if pit_location:
+            if status is None:
+                status = {}
+            status["pit_location"] = pit_location["location"]
         statuses[event_team.event.id()] = status
     return profiled_jsonify(statuses)
 
@@ -261,6 +266,11 @@ def team_event_status(team_key: TeamKey, event_key: EventKey) -> Response:
                     "overall_status_str": status_strings["overall"],
                 }
             )
+        pit_location = event_team.pit_location
+        if pit_location:
+            if status is None:
+                status = {}
+            status["pit_location"] = pit_location["location"]
     return profiled_jsonify(status)
 
 

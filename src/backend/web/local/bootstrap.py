@@ -25,6 +25,7 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
+from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import (
     DistrictAbbreviation,
     DistrictKey,
@@ -204,6 +205,18 @@ class LocalDataBootstrap:
         event_teams = cls.fetch_event_detail(key, "teams", auth_token)
         teams = list(map(cls.store_team, event_teams))
         list(map(lambda t: cls.store_eventteam(t, event), teams))
+
+        # Fetch pit locations from teams/statuses endpoint
+        event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)
+        if event_statuses:
+            for team_key_str, status in event_statuses.items():
+                if status and "pit_location" in status:
+                    et = EventTeam.get_by_id(f"{key}_{team_key_str}")
+                    if et:
+                        et.pit_location = EventTeamPitLocation(
+                            location=status["pit_location"]
+                        )
+                        EventTeamManipulator.createOrUpdate(et)
 
         event_matches = cls.fetch_event_detail(key, "matches", auth_token)
         list(map(cls.store_match, event_matches))
