@@ -10,4 +10,7 @@ if [[ "$SERVICE" == src/*.yaml ]]; then
     uv export --no-dev --no-hashes --frozen -o src/requirements.txt
 fi
 
+# Bake the current commit SHA into the deploy for version tracking
+git rev-parse HEAD > src/COMMIT
+
 gcloud app deploy "$SERVICE" --version 1 --quiet

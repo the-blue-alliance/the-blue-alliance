@@ -2,6 +2,7 @@ from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.environment.environment import Environment
 from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account
 from backend.common.models.suggestion import Suggestion
@@ -139,10 +140,13 @@ def admin_home() -> str:
     # https://docs.cloud.google.com/appengine/docs/standard/services/ndb/queries?tab=python#order
     users = Account.query().order(-Account.created).fetch(5)  # pyre-ignore[16]
 
+    commit_sha = Environment.commit_sha()
+
     template_values = {
         "memcache_stats": memcache_stats,
         "users": users,
         "suggestions_count": suggestions_count,
+        "commit_sha": commit_sha,
     }
     return render_template("admin/index.html", template_values)
 

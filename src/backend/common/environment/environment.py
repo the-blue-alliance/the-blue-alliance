@@ -86,3 +86,38 @@ class Environment:
         if Environment.is_prod():
             return True
         return bool(os.environ.get("SAVE_FRC_API_RESPONSE", False))
+
+    _commit_sha: Optional[str] = None
+
+    @classmethod
+    def commit_sha(cls) -> Optional[str]:
+        if cls._commit_sha is not None:
+            return cls._commit_sha
+
+        # Try baked COMMIT file (production deploys)
+        commit_file = Path(__file__).resolve().parents[3] / "COMMIT"
+        try:
+            sha = commit_file.read_text().strip()
+            if sha:
+                cls._commit_sha = sha
+                return cls._commit_sha
+        except OSError:
+            pass
+
+        # Fall back to reading .git/HEAD directly (dev server)
+        # The repo is mounted into the container but git isn't installed
+        git_dir = Path(__file__).resolve().parents[4] / ".git"
+        try:
+            head = (git_dir / "HEAD").read_text().strip()
+            if head.startswith("ref: "):
+                ref_path = git_dir / head[5:]
+                sha = ref_path.read_text().strip()
+            else:
+                sha = head  # detached HEAD, already a SHA
+            if sha:
+                cls._commit_sha = sha
+                return cls._commit_sha
+        except OSError:
+            pass
+
+        return None
