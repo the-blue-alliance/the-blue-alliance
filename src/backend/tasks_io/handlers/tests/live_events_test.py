@@ -19,10 +19,7 @@ from backend.common.helpers.playoff_advancement_helper import (
     PlayoffAdvancementHelper,
 )
 from backend.common.helpers.season_helper import SeasonHelper
-from backend.common.helpers.youtube_video_helper import (
-    YouTubeUpcomingStream,
-    YouTubeVideoHelper,
-)
+from backend.common.helpers.youtube_video_helper import YouTubeUpcomingStream
 from backend.common.memcache_models.district_webcast_last_updated_memcache import (
     DistrictWebcastLastUpdatedData,
     DistrictWebcastLastUpdatedMemcache,
@@ -36,6 +33,7 @@ from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast, WebcastChannel
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
+from backend.tasks_io.helpers.youtube_helper import YouTubeTasksIOHelper
 
 
 def set_district_webcast_channels(
@@ -590,8 +588,8 @@ def test_find_event_webcasts_non_youtube_type(tasks_client: Client) -> None:
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
-@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+@mock.patch.object(YouTubeTasksIOHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeTasksIOHelper, "get_upcoming_streams")
 def test_find_event_webcasts_successful_match(
     get_streams_mock: mock.Mock,
     get_start_time_mock: mock.Mock,
@@ -654,8 +652,8 @@ def test_find_event_webcasts_successful_match(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
-@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+@mock.patch.object(YouTubeTasksIOHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeTasksIOHelper, "get_upcoming_streams")
 def test_find_event_webcasts_multiple_streams_for_event(
     get_streams_mock: mock.Mock,
     get_start_time_mock: mock.Mock,
@@ -718,8 +716,8 @@ def test_find_event_webcasts_multiple_streams_for_event(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
-@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+@mock.patch.object(YouTubeTasksIOHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeTasksIOHelper, "get_upcoming_streams")
 def test_find_event_webcasts_multiple_event_match_skipped(
     get_streams_mock: mock.Mock,
     get_start_time_mock: mock.Mock,
@@ -788,7 +786,7 @@ def test_find_event_webcasts_multiple_event_match_skipped(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+@mock.patch.object(YouTubeTasksIOHelper, "get_upcoming_streams")
 def test_find_event_webcasts_no_matching_events(
     get_streams_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
@@ -841,8 +839,8 @@ def test_find_event_webcasts_no_matching_events(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
-@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+@mock.patch.object(YouTubeTasksIOHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeTasksIOHelper, "get_upcoming_streams")
 def test_find_event_webcasts_no_output_in_taskqueue(
     get_streams_mock: mock.Mock,
     get_start_time_mock: mock.Mock,
@@ -895,8 +893,8 @@ def test_find_event_webcasts_no_output_in_taskqueue(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
-@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+@mock.patch.object(YouTubeTasksIOHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeTasksIOHelper, "get_upcoming_streams")
 def test_find_event_webcasts_no_start_time_skipped(
     get_streams_mock: mock.Mock,
     get_start_time_mock: mock.Mock,
@@ -954,7 +952,7 @@ def test_find_event_webcasts_no_start_time_skipped(
 
 
 @freeze_time("2026-03-15")
-@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+@mock.patch.object(YouTubeTasksIOHelper, "get_upcoming_streams")
 def test_find_event_webcasts_no_live_events(
     get_streams_mock: mock.Mock,
     tasks_client: Client,
