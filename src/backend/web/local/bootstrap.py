@@ -208,9 +208,7 @@ class LocalDataBootstrap:
         event_teams = cls.fetch_event_detail(key, "teams", auth_token)
         teams = list(map(cls.store_team, event_teams))
 
-        event_statuses = cast(
-            Dict, cls.fetch_event_detail(key, "teams/statuses", auth_token)
-        )
+        event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)
         for t in teams:
             pit_loc = (event_statuses.get(t.key_name) or {}).get("pit_location")
             cls.store_eventteam(t, event, pit_loc)
