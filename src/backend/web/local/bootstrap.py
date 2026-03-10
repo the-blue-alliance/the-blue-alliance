@@ -25,7 +25,6 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
-from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import (
     DistrictAbbreviation,
     DistrictKey,
@@ -103,16 +102,14 @@ class LocalDataBootstrap:
 
     @staticmethod
     def store_eventteam(
-        team: Team,
-        event: Event,
-        pit_location: Optional[EventTeamPitLocation] = None,
+        team: Team, event: Event, pit_location_str: Optional[str] = None
     ) -> EventTeam:
         eventteam = EventTeam(id="{}_{}".format(event.key_name, team.key_name))
         eventteam.event = event.key
         eventteam.team = team.key
         eventteam.year = event.year
-        if pit_location is not None:
-            eventteam.pit_location = pit_location
+        if pit_location_str:
+            eventteam.pit_location = {"location": pit_location_str}
 
         return EventTeamManipulator.createOrUpdate(eventteam)
 
@@ -215,12 +212,8 @@ class LocalDataBootstrap:
             Dict, cls.fetch_event_detail(key, "teams/statuses", auth_token)
         )
         for t in teams:
-            status = event_statuses.get(t.key_name) or {}
-            pit_loc = status.get("pit_location")
-            cls.store_eventteam(
-                t, event,
-                EventTeamPitLocation(location=pit_loc) if pit_loc else None,
-            )
+            pit_loc = (event_statuses.get(t.key_name) or {}).get("pit_location")
+            cls.store_eventteam(t, event, pit_loc)
 
         # Fetch pit locations from teams/statuses endpoint
         event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)
