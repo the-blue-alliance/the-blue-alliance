@@ -111,31 +111,41 @@ class Environment:
 
         # Fall back to reading .git/HEAD directly (dev server)
         # The repo is mounted into the container but git isn't installed
-        git_dir = Path(__file__).resolve().parents[4] / ".git"
-        try:
-            head = (git_dir / "HEAD").read_text().strip()
-            if head.startswith("ref: "):
-                ref = head[5:]
-                ref_path = git_dir / ref
-                sha = None
-                try:
-                    sha = ref_path.read_text().strip()
-                except OSError:
-                    # Ref may be in packed-refs instead of a loose file
-                    try:
-                        for line in (git_dir / "packed-refs").read_text().splitlines():
-                            if line.endswith(ref):
-                                sha = line.split()[0]
-                                break
-                    except OSError:
-                        pass
-            else:
-                sha = head  # detached HEAD, already a SHA
-            if sha:
-                cls._commit_info = (sha, None)
-                return cls._commit_info
-        except OSError:
-            pass
+        sha = cls._read_git_head()
+        if sha:
+            cls._commit_info = (sha, None)
+            return cls._commit_info
 
         cls._commit_info = (None, None)
         return cls._commit_info
+
+    @classmethod
+    def _read_git_head(cls) -> Optional[str]:
+        git_dir = Path(__file__).resolve().parents[4] / ".git"
+        try:
+            head = (git_dir / "HEAD").read_text().strip()
+        except OSError:
+            return None
+
+        if not head.startswith("ref: "):
+            return head  # detached HEAD, already a SHA
+
+        ref = head[5:]
+        # Try loose ref file first
+        try:
+            return (git_dir / ref).read_text().strip()
+        except OSError:
+            pass
+
+        # Fall back to packed-refs
+        try:
+            for packed_line in (git_dir / "packed-refs").read_text().splitlines():
+                if packed_line.startswith("#"):
+                    continue
+                parts = packed_line.split()
+                if len(parts) == 2 and parts[1] == ref:
+                    return parts[0]
+        except OSError:
+            pass
+
+        return None
