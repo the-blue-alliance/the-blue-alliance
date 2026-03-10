@@ -7,6 +7,8 @@ from freezegun import freeze_time
 from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
 
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.futures import InstantFuture
@@ -27,12 +29,14 @@ from backend.common.memcache_models.district_webcast_last_updated_memcache impor
     DistrictWebcastLastUpdatedData,
     DistrictWebcastLastUpdatedMemcache,
 )
+from backend.common.models.alliance import MatchAlliance
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_status import EventTeamStatus
+from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast, WebcastChannel
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
@@ -263,6 +267,7 @@ def test_calc_playoff_advancement(calc_mock: mock.Mock, tasks_client: Client) ->
     )
 
 
+@freeze_time("2026-03-15 12:00:00")
 @mock.patch.object(FirebasePusher, "update_live_events")
 @mock.patch.object(LiveEventHelper, "get_live_events_with_current_webcasts")
 @mock.patch.object(EventHelper, "week_events")
@@ -301,8 +306,8 @@ def test_update_live_events_enqueues_district_webcast_search(
         year=2026,
         event_short="fim1",
         event_type_enum=EventType.DISTRICT,
-        start_date=datetime.datetime.now(),
-        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        start_date=datetime.datetime(2026, 3, 15),
+        end_date=datetime.datetime(2026, 3, 16),
         district_key=ndb.Key(District, "2026fim"),
         webcast_json=json.dumps(
             [Webcast(type=WebcastType.YOUTUBE, channel="existing123")]
@@ -315,22 +320,54 @@ def test_update_live_events_enqueues_district_webcast_search(
         year=2026,
         event_short="fim2",
         event_type_enum=EventType.DISTRICT,
-        start_date=datetime.datetime.now(),
-        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        start_date=datetime.datetime(2026, 3, 15),
+        end_date=datetime.datetime(2026, 3, 16),
         district_key=ndb.Key(District, "2026fim"),
     )
     event_without_webcast.put()
+
+    Match(
+        id="2026fim2_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2026fim2"),
+        time=datetime.datetime(2026, 3, 15, 12, 0),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=[], score=-1),
+                AllianceColor.BLUE: MatchAlliance(teams=[], score=-1),
+            }
+        ),
+    ).put()
 
     event_without_webcast_ne = Event(
         id="2026ne1",
         year=2026,
         event_short="ne1",
         event_type_enum=EventType.DISTRICT,
-        start_date=datetime.datetime.now(),
-        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        start_date=datetime.datetime(2026, 3, 15),
+        end_date=datetime.datetime(2026, 3, 16),
         district_key=ndb.Key(District, "2026ne"),
     )
     event_without_webcast_ne.put()
+
+    Match(
+        id="2026ne1_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2026ne1"),
+        time=datetime.datetime(2026, 3, 15, 12, 0),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=[], score=-1),
+                AllianceColor.BLUE: MatchAlliance(teams=[], score=-1),
+            }
+        ),
+    ).put()
 
     week_events_mock.return_value = [
         event_with_webcast,
@@ -384,11 +421,27 @@ def test_update_live_events_does_not_enqueue_district_webcast_search_within_hour
         year=2026,
         event_short="fim2",
         event_type_enum=EventType.DISTRICT,
-        start_date=datetime.datetime.now(),
-        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        start_date=datetime.datetime(2026, 3, 15),
+        end_date=datetime.datetime(2026, 3, 16),
         district_key=ndb.Key(District, "2026fim"),
     )
     event_without_webcast.put()
+
+    Match(
+        id="2026fim2_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2026fim2"),
+        time=datetime.datetime(2026, 3, 15, 12, 0),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=[], score=-1),
+                AllianceColor.BLUE: MatchAlliance(teams=[], score=-1),
+            }
+        ),
+    ).put()
 
     week_events_mock.return_value = [event_without_webcast]
     live_events_mock.return_value = ({}, [])
@@ -442,11 +495,27 @@ def test_update_live_events_enqueues_district_webcast_search_after_one_hour(
         year=2026,
         event_short="fim2",
         event_type_enum=EventType.DISTRICT,
-        start_date=datetime.datetime.now(),
-        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        start_date=datetime.datetime(2026, 3, 15),
+        end_date=datetime.datetime(2026, 3, 16),
         district_key=ndb.Key(District, "2026fim"),
     )
     event_without_webcast.put()
+
+    Match(
+        id="2026fim2_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2026fim2"),
+        time=datetime.datetime(2026, 3, 15, 12, 0),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=[], score=-1),
+                AllianceColor.BLUE: MatchAlliance(teams=[], score=-1),
+            }
+        ),
+    ).put()
 
     week_events_mock.return_value = [event_without_webcast]
     live_events_mock.return_value = ({}, [])
@@ -563,6 +632,131 @@ def test_update_live_events_no_district_tasks_for_unsupported_districts(
     assert resp.status_code == 200
 
     # No tasks should be enqueued for unsupported district
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+@freeze_time("2026-03-15 12:00:00")
+@mock.patch.object(FirebasePusher, "update_live_events")
+@mock.patch.object(LiveEventHelper, "get_live_events_with_current_webcasts")
+@mock.patch.object(EventHelper, "week_events")
+def test_update_live_events_no_enqueue_when_event_not_now(
+    week_events_mock: mock.Mock,
+    live_events_mock: mock.Mock,
+    firebase_mock: mock.Mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    """Event that ended yesterday is within_a_day but not now - should not enqueue."""
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    # Event that ended yesterday - within_a_day but not now
+    event_ended_yesterday = Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime(2026, 3, 12),
+        end_date=datetime.datetime(2026, 3, 14),
+        timezone_id="America/New_York",
+        district_key=ndb.Key(District, "2026fim"),
+    )
+    event_ended_yesterday.put()
+
+    Match(
+        id="2026fim1_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2026fim1"),
+        time=datetime.datetime(2026, 3, 14, 12, 0),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=[], score=-1),
+                AllianceColor.BLUE: MatchAlliance(teams=[], score=-1),
+            }
+        ),
+    ).put()
+
+    week_events_mock.return_value = [event_ended_yesterday]
+    live_events_mock.return_value = ({}, [])
+
+    resp = tasks_client.get("/tasks/do/update_live_events")
+    assert resp.status_code == 200
+
+    # No tasks should be enqueued since event is not now
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+@freeze_time("2026-03-15 12:00:00")
+@mock.patch.object(FirebasePusher, "update_live_events")
+@mock.patch.object(LiveEventHelper, "get_live_events_with_current_webcasts")
+@mock.patch.object(EventHelper, "week_events")
+def test_update_live_events_no_enqueue_when_no_unplayed_matches_today(
+    week_events_mock: mock.Mock,
+    live_events_mock: mock.Mock,
+    firebase_mock: mock.Mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    """Event is now but all matches are played (or scheduled for a different day) - should not enqueue."""
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    event = Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime(2026, 3, 14),
+        end_date=datetime.datetime(2026, 3, 16),
+        district_key=ndb.Key(District, "2026fim"),
+    )
+    event.put()
+
+    # Only already-played match today
+    Match(
+        id="2026fim1_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2026fim1"),
+        time=datetime.datetime(2026, 3, 15, 10, 0),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=[], score=10),
+                AllianceColor.BLUE: MatchAlliance(teams=[], score=5),
+            }
+        ),
+    ).put()
+
+    week_events_mock.return_value = [event]
+    live_events_mock.return_value = ({}, [])
+
+    resp = tasks_client.get("/tasks/do/update_live_events")
+    assert resp.status_code == 200
+
+    # No tasks should be enqueued since there are no unplayed matches today
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 0
 
