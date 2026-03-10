@@ -16,7 +16,7 @@ from backend.common.tasklets import typed_tasklet
 
 
 class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDict]]):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_{district_key}"
     DICT_CONVERTER = DistrictConverter
 
@@ -55,7 +55,7 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict
 
 
 class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_history_{abbreviation}"
     DICT_CONVERTER = DistrictConverter
 
@@ -97,7 +97,7 @@ class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]
 class DistrictAbbreviationQuery(
     CachedDatabaseQuery[List[District], List[DistrictDict]]
 ):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_abbreviation_{abbreviation}"
     DICT_CONVERTER = DistrictConverter
 
