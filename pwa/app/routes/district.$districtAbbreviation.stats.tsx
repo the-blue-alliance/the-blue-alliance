@@ -279,7 +279,7 @@ function DistrictStatsPage() {
 
   return (
     <div>
-      <div className="mt-4 flex items-center gap-4">
+      <div className="mt-4 flex items-center justify-between gap-4">
         <h1 className="text-4xl font-medium">{displayName} Stats</h1>
         <Select
           onValueChange={(value) => {

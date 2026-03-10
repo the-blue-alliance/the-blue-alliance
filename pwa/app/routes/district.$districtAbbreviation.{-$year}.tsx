@@ -225,7 +225,7 @@ function DistrictPage() {
 
   return (
     <div>
-      <div className="mt-4 flex items-center gap-4">
+      <div className="mt-4 flex items-center justify-between gap-4">
         <h1 className="text-4xl font-medium">
           {districtHistory[districtHistory.length - 1].display_name} {year}
         </h1>
