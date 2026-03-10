@@ -6,21 +6,20 @@ from urllib.parse import urlencode
 from google.appengine.ext import ndb
 from google.appengine.ext.ndb.context import Context
 
-from backend.common.futures import TypedFuture
-from backend.common.profiler import Span
-from backend.common.urlfetch import TypedURLFetchResult, URLFetchMethod, URLFetchResult
-from backend.tasks_io.datafeeds.parsers.parser_base import (
+from backend.common.datafeeds.parsers.parser_base import (
     ParserBase,
     TParsedResponse,
     TParserInput,
 )
+from backend.common.futures import TypedFuture
+from backend.common.profiler import Span
+from backend.common.urlfetch import TypedURLFetchResult, URLFetchMethod, URLFetchResult
 
 TAPIResponse = TypeVar("TAPIResponse")
 TReturn = TypeVar("TReturn")
 
 
 class DatafeedBase(abc.ABC, Generic[TAPIResponse, TReturn]):
-
     ndb_context: Context
 
     def __init__(self) -> None:

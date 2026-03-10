@@ -11,6 +11,7 @@ from tzlocal.windows_tz import win_tz as WINDOWS_TO_IANA
 from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import (
     SeasonEventListModelV31,
     SeasonEventListModelV33,
@@ -26,7 +27,6 @@ from backend.common.models.keys import DistrictKey, Year
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.tasklets import typed_tasklet
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class FMSAPIEventListParser(

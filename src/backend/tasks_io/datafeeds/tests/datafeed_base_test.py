@@ -4,10 +4,10 @@ from unittest.mock import patch
 import pytest
 from google.appengine.ext import testbed
 
+from backend.common.datafeeds.datafeed_base import DatafeedBase
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.futures import InstantFuture
 from backend.common.urlfetch import URLFetchResult
-from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class DummyParser(ParserBase[Any, Any]):

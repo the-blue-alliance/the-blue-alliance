@@ -1,7 +1,7 @@
 import abc
 from typing import Optional, Tuple
 
-from backend.tasks_io.datafeeds.parsers.parser_base import (
+from backend.common.datafeeds.parsers.parser_base import (
     ParserBase,
     TParsedResponse,
     TParserInput,

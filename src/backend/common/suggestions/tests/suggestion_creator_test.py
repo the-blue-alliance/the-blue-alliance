@@ -892,9 +892,10 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         api_resp = {
             "items": [
                 {
+                    "id": "abc123",
                     "liveStreamingDetails": {
                         "scheduledStartTime": "2016-03-15T18:00:00Z",
-                    }
+                    },
                 }
             ]
         }
@@ -906,7 +907,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.common.helpers.youtube_video_helper.GoogleApiSecret.secret_key",
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
             return_value="test_key",
         ):
             with patch(
@@ -970,7 +971,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.common.helpers.youtube_video_helper.GoogleApiSecret.secret_key",
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
             return_value="test_key",
         ):
             with patch(

@@ -7,6 +7,11 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
+from backend.common.datafeeds.parsers.parser_base import (
+    ParserBase,
+    TParsedResponse,
+    TParserInput,
+)
 from backend.common.frc_api import FRCAPI
 from backend.common.frc_api.frc_api import TScoreDetailReturn
 from backend.common.frc_api.types import (
@@ -77,11 +82,6 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_avatar_parser impor
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
     FMSAPITeamDetailsParser,
-)
-from backend.tasks_io.datafeeds.parsers.parser_base import (
-    ParserBase,
-    TParsedResponse,
-    TParserInput,
 )
 
 
