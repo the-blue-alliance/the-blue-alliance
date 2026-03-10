@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import cast, Dict, List, Optional
+from typing import cast, Dict, List
 
 from google.appengine.ext import ndb
 from requests_mock.mocker import Mocker as RequestsMocker
@@ -306,14 +306,13 @@ def mock_event_district_points_url(
 def mock_event_teams_statuses_url(
     m: RequestsMocker,
     event_key: EventKey,
-    statuses: Optional[Dict] = None,
 ) -> None:
     m.register_uri(
         "GET",
         f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams/statuses",
         headers={"X-TBA-Auth-Key": "test_apiv3"},
         status_code=200,
-        json=statuses or {},
+        json={},
     )
 
 
