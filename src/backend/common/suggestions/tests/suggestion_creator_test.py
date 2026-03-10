@@ -907,7 +907,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.tasks_io.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
             return_value="test_key",
         ):
             with patch(
@@ -971,7 +971,7 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         mock_future = InstantFuture(mock_urlfetch_result)
 
         with patch(
-            "backend.tasks_io.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
             return_value="test_key",
         ):
             with patch(
