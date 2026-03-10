@@ -1498,6 +1498,7 @@ export const zTeamEventStatus = z.object({
   overall_status_str: z.string().optional(),
   next_match_key: z.string().nullish(),
   last_match_key: z.string().nullish(),
+  pit_location: z.string().nullish(),
 });
 
 export const zWebcast = z.object({

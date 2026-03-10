@@ -188,6 +188,11 @@ def event_teams_statuses(event_key: EventKey) -> TypedFlaskResponse[dict]:
             statuses[event_team.team.id()] = status_dict
         else:
             statuses[event_team.team.id()] = status
+        pit_location = event_team.pit_location
+        if pit_location:
+            if statuses[event_team.team.id()] is None:
+                statuses[event_team.team.id()] = {}
+            statuses[event_team.team.id()]["pit_location"] = pit_location["location"]
     return profiled_jsonify(statuses)
 
 

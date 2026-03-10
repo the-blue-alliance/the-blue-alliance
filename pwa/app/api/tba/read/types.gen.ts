@@ -2323,6 +2323,10 @@ export type TeamEventStatus = {
    * TBA match key for the last match the team played in at this event, or null.
    */
   last_match_key?: string | null;
+  /**
+   * The pit location for the team at this event, or null if not available.
+   */
+  pit_location?: string | null;
 };
 
 export type TeamEventStatusAlliance = {
