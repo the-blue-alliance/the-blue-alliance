@@ -415,14 +415,7 @@ def test_bootstrap_event(
         },
     )
     mock_event_district_points_url(requests_mock, event.key_name)
-    mock_event_teams_statuses_url(
-        requests_mock,
-        event.key_name,
-        {
-            "frc254": {"pit_location": "A1"},
-            "frc255": {"pit_location": "B2"},
-        },
-    )
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -437,12 +430,13 @@ def test_bootstrap_event(
     assert team2 == remove_auto_add_properties(stored_team2)
 
     stored_eventteam1 = EventTeam.get_by_id("2020nyny_frc254")
-    assert stored_eventteam1 is not None
-    assert stored_eventteam1.pit_location == {"location": "A1"}
-
+    assert make_eventteam("2020nyny", "frc254") == remove_auto_add_properties(
+        stored_eventteam1
+    )
     stored_eventteam2 = EventTeam.get_by_id("2020nyny_frc255")
-    assert stored_eventteam2 is not None
-    assert stored_eventteam2.pit_location == {"location": "B2"}
+    assert make_eventteam("2020nyny", "frc255") == remove_auto_add_properties(
+        stored_eventteam2
+    )
 
     stored_match = Match.get_by_id("2020nyny_qm1")
     assert match == remove_auto_add_properties(stored_match)
