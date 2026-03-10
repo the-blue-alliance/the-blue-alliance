@@ -140,13 +140,14 @@ def admin_home() -> str:
     # https://docs.cloud.google.com/appengine/docs/standard/services/ndb/queries?tab=python#order
     users = Account.query().order(-Account.created).fetch(5)  # pyre-ignore[16]
 
-    commit_sha = Environment.commit_sha()
+    commit_sha, commit_shortlog = Environment.commit_info()
 
     template_values = {
         "memcache_stats": memcache_stats,
         "users": users,
         "suggestions_count": suggestions_count,
         "commit_sha": commit_sha,
+        "commit_shortlog": commit_shortlog,
     }
     return render_template("admin/index.html", template_values)
 

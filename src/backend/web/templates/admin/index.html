@@ -66,7 +66,7 @@ $(function () {
             </div>
             <div class="panel-body">
                 {% if commit_sha %}
-                <p>Running commit: <a href="https://github.com/the-blue-alliance/the-blue-alliance/commit/{{commit_sha}}"><code>{{commit_sha[:12]}}</code></a></p>
+                <p>Running commit: <a href="https://github.com/the-blue-alliance/the-blue-alliance/commit/{{commit_sha}}"><code>{{commit_sha[:12]}}</code></a>{% if commit_shortlog %} {{commit_shortlog}}{% endif %}</p>
                 {% else %}
                 <p>Running commit: <em>unknown</em></p>
                 {% endif %}

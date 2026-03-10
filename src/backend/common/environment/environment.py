@@ -87,20 +87,25 @@ class Environment:
             return True
         return bool(os.environ.get("SAVE_FRC_API_RESPONSE", False))
 
-    _commit_sha: Optional[str] = None
+    _commit_info: Optional[tuple[Optional[str], Optional[str]]] = None
 
     @classmethod
-    def commit_sha(cls) -> Optional[str]:
-        if cls._commit_sha is not None:
-            return cls._commit_sha
+    def commit_info(cls) -> tuple[Optional[str], Optional[str]]:
+        """Returns (sha, shortlog) for the running code."""
+        if cls._commit_info is not None:
+            return cls._commit_info
 
         # Try baked COMMIT file (production deploys)
+        # Format: "<sha> <shortlog>"
         commit_file = Path(__file__).resolve().parents[3] / "COMMIT"
         try:
-            sha = commit_file.read_text().strip()
-            if sha:
-                cls._commit_sha = sha
-                return cls._commit_sha
+            line = commit_file.read_text().strip()
+            if line:
+                parts = line.split(" ", 1)
+                sha = parts[0]
+                shortlog = parts[1] if len(parts) > 1 else None
+                cls._commit_info = (sha, shortlog)
+                return cls._commit_info
         except OSError:
             pass
 
@@ -115,9 +120,10 @@ class Environment:
             else:
                 sha = head  # detached HEAD, already a SHA
             if sha:
-                cls._commit_sha = sha
-                return cls._commit_sha
+                cls._commit_info = (sha, None)
+                return cls._commit_info
         except OSError:
             pass
 
-        return None
+        cls._commit_info = (None, None)
+        return cls._commit_info
