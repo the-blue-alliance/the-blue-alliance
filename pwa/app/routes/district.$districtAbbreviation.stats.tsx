@@ -125,6 +125,7 @@ function computeLeaderboards(
   teamData: Record<
     string,
     {
+      cmp_appearances: number;
       dcmp_appearances: number;
       dcmp_wins: number;
       district_event_wins: number;
@@ -140,6 +141,7 @@ function computeLeaderboards(
   }>,
 ) {
   // Stats from team_data (insight API)
+  const cmpAppearances = new Map<string, number>();
   const dcmpAppearances = new Map<string, number>();
   const dcmpWins = new Map<string, number>();
   const districtEventWins = new Map<string, number>();
@@ -149,6 +151,9 @@ function computeLeaderboards(
 
   if (teamData) {
     for (const [teamKey, data] of Object.entries(teamData)) {
+      if (data.cmp_appearances > 0) {
+        cmpAppearances.set(teamKey, data.cmp_appearances);
+      }
       if (data.dcmp_appearances > 0) {
         dcmpAppearances.set(teamKey, data.dcmp_appearances);
       }
@@ -202,7 +207,8 @@ function computeLeaderboards(
 
         // DCMP finals appearances (finalist at DCMP)
         if (
-          award.award_type === AwardType.FINALIST &&
+          (award.award_type === AwardType.FINALIST ||
+            award.award_type === AwardType.WINNER) &&
           dcmpEventKeys.has(award.event_key)
         ) {
           dcmpFinalsAppearances.set(
@@ -213,7 +219,8 @@ function computeLeaderboards(
 
         // District event finals appearances (finalist at district events)
         if (
-          award.award_type === AwardType.FINALIST &&
+          (award.award_type === AwardType.FINALIST ||
+            award.award_type === AwardType.WINNER) &&
           districtEventKeys.has(award.event_key)
         ) {
           districtEventFinalsAppearances.set(
@@ -246,6 +253,7 @@ function computeLeaderboards(
   }
 
   return {
+    cmpAppearances: mapToRankings(cmpAppearances),
     dcmpAppearances: mapToRankings(dcmpAppearances),
     dcmpFinalsAppearances: mapToRankings(dcmpFinalsAppearances),
     dcmpWins: mapToRankings(dcmpWins),
@@ -319,6 +327,12 @@ function DistrictStatsPage() {
 
         <TabsContent value="championships">
           <div className="grid gap-6 lg:grid-cols-2">
+            <Leaderboard
+              title="Most Championship Appearances"
+              rankings={leaderboards.cmpAppearances}
+              keyType="team"
+              year={0}
+            />
             <Leaderboard
               title="Most District Championship Appearances"
               rankings={leaderboards.dcmpAppearances}
