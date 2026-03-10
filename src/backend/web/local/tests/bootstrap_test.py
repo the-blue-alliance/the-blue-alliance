@@ -303,19 +303,6 @@ def mock_event_district_points_url(
     )
 
 
-def mock_event_teams_statuses_url(
-    m: RequestsMocker,
-    event_key: EventKey,
-) -> None:
-    m.register_uri(
-        "GET",
-        f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams/statuses",
-        headers={"X-TBA-Auth-Key": "test_apiv3"},
-        status_code=200,
-        json={},
-    )
-
-
 def mock_districts_url(m: RequestsMocker, year: Year, districts: List[Dict]) -> None:
     m.register_uri(
         "GET",
@@ -414,7 +401,6 @@ def test_bootstrap_event(
         },
     )
     mock_event_district_points_url(requests_mock, event.key_name)
-    mock_event_teams_statuses_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -490,7 +476,6 @@ def test_bootstrap_year(
             },
         )
         mock_event_district_points_url(requests_mock, event.key_name)
-        mock_event_teams_statuses_url(requests_mock, event.key_name)
 
     mock_districts_url(requests_mock, 2020, [])
 
@@ -541,7 +526,6 @@ def test_bootstrap_event_with_district(
         },
     )
     mock_event_district_points_url(requests_mock, event.key_name)
-    mock_event_teams_statuses_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"

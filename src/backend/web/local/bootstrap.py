@@ -213,18 +213,6 @@ class LocalDataBootstrap:
             pit_loc = (event_statuses.get(t.key_name) or {}).get("pit_location")
             cls.store_eventteam(t, event, pit_loc)
 
-        # Fetch pit locations from teams/statuses endpoint
-        event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)
-        if event_statuses:
-            for team_key_str, status in event_statuses.items():
-                if status and "pit_location" in status:
-                    et = EventTeam.get_by_id(f"{key}_{team_key_str}")
-                    if et:
-                        et.pit_location = EventTeamPitLocation(
-                            location=status["pit_location"]
-                        )
-                        EventTeamManipulator.createOrUpdate(et)
-
         event_matches = cls.fetch_event_detail(key, "matches", auth_token)
         list(map(cls.store_match, event_matches))
 
