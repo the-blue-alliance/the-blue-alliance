@@ -115,8 +115,20 @@ class Environment:
         try:
             head = (git_dir / "HEAD").read_text().strip()
             if head.startswith("ref: "):
-                ref_path = git_dir / head[5:]
-                sha = ref_path.read_text().strip()
+                ref = head[5:]
+                ref_path = git_dir / ref
+                sha = None
+                try:
+                    sha = ref_path.read_text().strip()
+                except OSError:
+                    # Ref may be in packed-refs instead of a loose file
+                    try:
+                        for line in (git_dir / "packed-refs").read_text().splitlines():
+                            if line.endswith(ref):
+                                sha = line.split()[0]
+                                break
+                    except OSError:
+                        pass
             else:
                 sha = head  # detached HEAD, already a SHA
             if sha:
