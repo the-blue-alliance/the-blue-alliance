@@ -392,6 +392,9 @@ jobs:
       - name: Test Docker Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: python ./ops/test_docker_startup.py
+      - name: Pre-pull companion import image
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest
       - name: Test Ops Fullstack
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_ops.sh
