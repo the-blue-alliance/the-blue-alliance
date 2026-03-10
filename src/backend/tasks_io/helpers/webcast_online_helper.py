@@ -1,14 +1,8 @@
-import datetime
 from typing import Any, Dict, Generator, List, Optional
-
-from pyre_extensions import none_throws
 
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.datafeeds.datafeed_youtube import YoutubeWebcastStatusBatch
-from backend.common.memcache_models.twitch_oauth_token_memcache import (
-    TwitchOauthTokenMemcache,
-)
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
@@ -34,31 +28,13 @@ class WebcastOnlineHelper:
     @classmethod
     @typed_tasklet
     def _add_twitch_status_async(cls, webcast: Webcast) -> Generator[Any, Any, None]:
-        token_mc = TwitchOauthTokenMemcache()
-        maybe_twitch_token: Optional[TwitchAccessToken] = yield token_mc.get_async()
-        if maybe_twitch_token is not None:
-            now = datetime.datetime.now()
-            token_expiration = datetime.datetime.fromtimestamp(
-                maybe_twitch_token["expires_at"]
-            )
-            needs_refresh = now > token_expiration
-        else:
-            needs_refresh = True
+        """Fetch Twitch webcast status with automatic token management.
 
-        twitch_token: TwitchAccessToken
-        refresh_token = None
-        if maybe_twitch_token and needs_refresh:
-            refresh_token = maybe_twitch_token.get("refresh_token")
-
-        if needs_refresh:
-            twitch_token = yield TwitchGetAccessToken(
-                refresh_token=refresh_token
-            ).fetch_async()
-            token_mc.expires(twitch_token["expires_in"])
-            yield token_mc.put_async(twitch_token)
-        else:
-            twitch_token = none_throws(maybe_twitch_token)
-
+        Delegates token fetching, caching, and refresh to TwitchGetAccessToken.
+        """
+        twitch_token: TwitchAccessToken = (
+            yield TwitchGetAccessToken.get_cached_token_async()
+        )
         yield TwitchWebcastStatus(twitch_token, webcast).fetch_async()
 
     @classmethod
