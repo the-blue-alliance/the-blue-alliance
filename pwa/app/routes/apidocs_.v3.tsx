@@ -91,6 +91,10 @@ function ApiDocsV3(): React.JSX.Element {
   return (
     <>
       <ApiReferenceReact
+        style={{
+          "--scalar-custom-header-height": "calc(var(--spacing) * 14)"
+          /* this sets the vertical offset to the height of our header so that their header doesn't overlap with our header */
+        }}
         configuration={{
           url: 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance/refs/heads/main/src/backend/web/static/swagger/api_v3.json',
           hideClientButton: true,
