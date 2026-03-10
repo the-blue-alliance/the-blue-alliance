@@ -1,10 +1,15 @@
-from typing import Any, Dict, Optional
+import datetime
+from typing import Any, Dict, Generator, Optional
 
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.datafeeds.datafeed_base import DatafeedBase
+from backend.common.memcache_models.twitch_oauth_token_memcache import (
+    TwitchOauthTokenMemcache,
+)
 from backend.common.models.twitch_access_token import TwitchAccessToken
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.twitch_secrets import TwitchSecrets
+from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchMethod
 from backend.tasks_io.datafeeds.parsers.twitch.twitch_access_token_parser import (
     TwitchAccessTokenParser,
@@ -48,6 +53,41 @@ class TwitchGetAccessToken(DatafeedBase[Any, TwitchAccessToken]):
 
     def parser(self) -> TwitchAccessTokenParser:
         return TwitchAccessTokenParser(self.client_id)
+
+    @classmethod
+    @typed_tasklet
+    def get_cached_token_async(
+        cls,
+    ) -> Generator[Any, Any, TwitchAccessToken]:
+        """Get a Twitch access token, with automatic caching and refresh.
+
+        Manages token lifecycle including cache checks, expiration checks,
+        and automatic refresh when needed.
+        """
+        token_mc = TwitchOauthTokenMemcache()
+        maybe_token: Optional[TwitchAccessToken] = yield token_mc.get_async()
+
+        # Check if cached token is still valid
+        if maybe_token is not None:
+            now = datetime.datetime.now()
+            token_expiration = datetime.datetime.fromtimestamp(
+                maybe_token["expires_at"]
+            )
+            if now <= token_expiration:
+                # Token is still valid
+                return maybe_token
+
+        # Token is missing or expired, need to refresh
+        refresh_token = maybe_token.get("refresh_token") if maybe_token else None
+        new_token = yield TwitchGetAccessToken(
+            refresh_token=refresh_token
+        ).fetch_async()
+
+        # Cache the new token with expiration
+        token_mc.expires(new_token["expires_in"])
+        yield token_mc.put_async(new_token)
+
+        return new_token
 
 
 class TwitchWebcastStatus(DatafeedBase[Any, Webcast]):
