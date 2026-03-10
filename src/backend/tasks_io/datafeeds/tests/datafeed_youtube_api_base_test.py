@@ -4,9 +4,9 @@ from unittest import mock
 
 import pytest
 
+from backend.common.datafeeds.datafeed_youtube import YoutubeApiBase
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeApiBase
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class _MockYoutubeDatafeed(YoutubeApiBase):

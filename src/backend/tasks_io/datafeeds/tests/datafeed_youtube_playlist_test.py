@@ -1,11 +1,11 @@
 from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
-from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubePlaylistItemsDatafeed
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_playlist_items_parser import (
+from backend.common.datafeeds.datafeed_youtube import YoutubePlaylistItemsDatafeed
+from backend.common.datafeeds.parsers.youtube.youtube_playlist_items_parser import (
     YoutubePlaylistItemsParser,
 )
+from backend.common.sitevars.google_api_secret import GoogleApiSecret
 
 
 class TestYoutubePlaylistItemsDatafeed:

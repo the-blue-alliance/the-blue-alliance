@@ -10,6 +10,7 @@ from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import DOUBLE_ELIM_TYPES
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.frc_api import TScoreDetailReturn, TScoreDetailUnion
 from backend.common.frc_api.types import (
     EventScheduleHybridModelV2,
@@ -24,7 +25,6 @@ from backend.common.models.keys import MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.suggestions.media_parser import MediaParser
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 QF_SF_MAP = {
     1: (1, 3),  # in sf1, qf seeds 2 and 4 play. 0-indexed becomes 1, 3

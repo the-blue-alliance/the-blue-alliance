@@ -6,6 +6,7 @@ from pyre_extensions import JSON
 
 from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import (
@@ -16,7 +17,6 @@ from backend.common.models.event_queue_status import (
 )
 from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):

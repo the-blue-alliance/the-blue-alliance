@@ -1,13 +1,13 @@
 from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
-from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.tasks_io.datafeeds.datafeed_youtube import (
+from backend.common.datafeeds.datafeed_youtube import (
     YoutubeVideoLiveDetailsBatchDatafeed,
 )
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
+from backend.common.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
     YoutubeVideoLiveDetailsBatchParser,
 )
+from backend.common.sitevars.google_api_secret import GoogleApiSecret
 
 
 class TestYoutubeVideoLiveDetailsBatchDatafeed:

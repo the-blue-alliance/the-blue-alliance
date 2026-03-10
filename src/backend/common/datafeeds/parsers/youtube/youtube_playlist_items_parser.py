@@ -6,7 +6,7 @@ https://developers.google.com/youtube/v3/docs/playlistItems/list
 
 from typing import Any, cast, List, NotRequired, TypedDict
 
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 
 
 class _PlaylistItemSnippet(TypedDict):
@@ -98,7 +98,6 @@ class YoutubePlaylistItemsParser(ParserBase[Any, List[ParsedPlaylistItem]]):
             "title": title,
         }
 
-        # Extract video ID from resourceId
         resource_id = snippet.get("resourceId", {})
         if video_id := resource_id.get("videoId"):
             result["video_id"] = video_id
@@ -109,7 +108,6 @@ class YoutubePlaylistItemsParser(ParserBase[Any, List[ParsedPlaylistItem]]):
         if playlist_id := resource_id.get("playlistId"):
             result["playlist_id"] = playlist_id
 
-        # Add optional fields
         if position := snippet.get("position"):
             result["position"] = position
 

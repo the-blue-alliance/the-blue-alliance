@@ -1,5 +1,5 @@
 from backend.common.consts.webcast_status import WebcastStatus
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
+from backend.common.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
     YoutubeStreamStatusBatchParser,
 )
 

@@ -6,7 +6,7 @@ https://developers.google.com/youtube/v3/docs/search/list
 
 from typing import Any, cast, List, NotRequired, TypedDict
 
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 
 
 class _SearchResultId(TypedDict):
@@ -103,7 +103,6 @@ class YoutubeSearchParser(ParserBase[Any, List[ParsedSearchResult]]):
             "title": title,
         }
 
-        # Add type-specific IDs
         if video_id := item_id.get("videoId"):
             result["video_id"] = video_id
 
@@ -113,7 +112,6 @@ class YoutubeSearchParser(ParserBase[Any, List[ParsedSearchResult]]):
         if playlist_id := item_id.get("playlistId"):
             result["playlist_id"] = playlist_id
 
-        # Add optional snippet fields
         if channel_title := snippet.get("channelTitle"):
             result["channel_id"] = snippet.get("channelId", channel_title)
 

@@ -2,11 +2,11 @@
 
 from unittest import mock
 
-from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafeed
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_video_details_parser import (
+from backend.common.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafeed
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
     YoutubeVideoDetailsParser,
 )
+from backend.common.sitevars.google_api_secret import GoogleApiSecret
 
 
 class TestYoutubeVideoDetailsParser:

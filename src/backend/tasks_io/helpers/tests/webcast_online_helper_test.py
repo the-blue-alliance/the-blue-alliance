@@ -7,6 +7,7 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.datafeeds.datafeed_youtube import YoutubeWebcastStatusBatch
 from backend.common.futures import InstantFuture
 from backend.common.memcache_models.twitch_oauth_token_memcache import (
     TwitchOauthTokenMemcache,
@@ -28,7 +29,6 @@ from backend.tasks_io.datafeeds.datafeed_twitch import (
     TwitchGetAccessToken,
     TwitchWebcastStatus,
 )
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatusBatch
 from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
 

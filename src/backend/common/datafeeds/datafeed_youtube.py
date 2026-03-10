@@ -6,27 +6,27 @@ from urllib.parse import urlencode
 from google.appengine.ext import ndb
 
 from backend.common.consts.webcast_type import WebcastType
-from backend.common.models.webcast import Webcast, WebcastOnlineStatus
-from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_playlist_items_parser import (
+from backend.common.datafeeds.datafeed_base import DatafeedBase
+from backend.common.datafeeds.parsers.youtube.youtube_playlist_items_parser import (
     ParsedPlaylistItem,
     YoutubePlaylistItemsParser,
 )
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_search_parser import (
+from backend.common.datafeeds.parsers.youtube.youtube_search_parser import (
     ParsedSearchResult,
     YoutubeSearchParser,
 )
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
+from backend.common.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
     YoutubeStreamStatusBatchParser,
 )
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_video_details_parser import (
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
     ParsedVideoDetails,
     YoutubeVideoDetailsParser,
 )
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
+from backend.common.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
     YoutubeVideoLiveDetailsBatchParser,
 )
+from backend.common.models.webcast import Webcast, WebcastOnlineStatus
+from backend.common.sitevars.google_api_secret import GoogleApiSecret
 
 TReturn = TypeVar("TReturn")
 

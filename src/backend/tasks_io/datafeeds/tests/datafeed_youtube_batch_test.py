@@ -6,14 +6,14 @@ import pytest
 
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.datafeeds.datafeed_youtube import YoutubeWebcastStatusBatch
+from backend.common.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
+    YoutubeStreamStatusBatchParser,
+)
 from backend.common.futures import InstantFuture
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 from backend.common.urlfetch import URLFetchResult
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeWebcastStatusBatch
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
-    YoutubeStreamStatusBatchParser,
-)
 
 
 class TestYoutubeWebcastStatusBatch:

@@ -6,7 +6,7 @@ https://developers.google.com/youtube/v3/docs/videos/list
 
 from typing import Any, cast, List, NotRequired, Optional, TypedDict
 
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 
 
 class _VideoSnippet(TypedDict):
@@ -22,9 +22,9 @@ class _VideoSnippet(TypedDict):
 class _LiveStreamingDetails(TypedDict):
     """Live streaming details for a video."""
 
-    actualStartTime: NotRequired[str]  # ISO 8601 format
-    scheduledStartTime: NotRequired[str]  # ISO 8601 format
-    actualEndTime: NotRequired[str]  # ISO 8601 format
+    actualStartTime: NotRequired[str]
+    scheduledStartTime: NotRequired[str]
+    actualEndTime: NotRequired[str]
     concurrentViewers: NotRequired[str]
 
 
@@ -48,7 +48,7 @@ class ParsedVideoDetails(TypedDict):
 
     video_id: str
     title: str
-    scheduled_start_time: NotRequired[Optional[str]]  # ISO 8601 or YYYY-MM-DD
+    scheduled_start_time: NotRequired[Optional[str]]
     actual_start_time: NotRequired[Optional[str]]
     concurrent_viewers: NotRequired[Optional[int]]
 
@@ -59,16 +59,9 @@ class YoutubeVideoDetailsParser(ParserBase[Any, Optional[ParsedVideoDetails]]):
 
     Returns parsed details for the first (and typically only) video in the response.
     Returns None if no items are in the response.
-
-    See: https://developers.google.com/youtube/v3/docs/videos/list
     """
 
     def parse(self, response: Any) -> Optional[ParsedVideoDetails]:
-        """
-        Parse video details from API response.
-
-        Returns parsed video details, or None if no items found.
-        """
         response_data = cast(_VideosListResponse, response)
 
         items = response_data.get("items", [])
@@ -90,7 +83,6 @@ class YoutubeVideoDetailsParser(ParserBase[Any, Optional[ParsedVideoDetails]]):
         if live_details:
             scheduled_start = live_details.get("scheduledStartTime")
             if scheduled_start:
-                # Convert ISO 8601 to YYYY-MM-DD date format
                 result["scheduled_start_time"] = scheduled_start[:10]
 
             actual_start = live_details.get("actualStartTime")

@@ -6,7 +6,7 @@ https://developers.google.com/youtube/v3/docs/videos/list
 
 from typing import Any, cast, Dict, List, NotRequired, TypedDict
 
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 
 
 class _VideoLiveDetails(TypedDict):

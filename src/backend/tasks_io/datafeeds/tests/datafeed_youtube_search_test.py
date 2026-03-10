@@ -5,13 +5,13 @@ from unittest import mock
 
 import pytest
 
+from backend.common.datafeeds.datafeed_youtube import YoutubeSearchDatafeed
+from backend.common.datafeeds.parsers.youtube.youtube_search_parser import (
+    YoutubeSearchParser,
+)
 from backend.common.futures import InstantFuture
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 from backend.common.urlfetch import URLFetchResult
-from backend.tasks_io.datafeeds.datafeed_youtube import YoutubeSearchDatafeed
-from backend.tasks_io.datafeeds.parsers.youtube.youtube_search_parser import (
-    YoutubeSearchParser,
-)
 
 
 class TestYoutubeSearchParser:
