@@ -102,11 +102,17 @@ class LocalDataBootstrap:
         ZebraMotionWorks(id=match_key, event=ndb.Key(Event, event_key), data=data).put()
 
     @staticmethod
-    def store_eventteam(team: Team, event: Event) -> EventTeam:
+    def store_eventteam(
+        team: Team,
+        event: Event,
+        pit_location: Optional[EventTeamPitLocation] = None,
+    ) -> EventTeam:
         eventteam = EventTeam(id="{}_{}".format(event.key_name, team.key_name))
         eventteam.event = event.key
         eventteam.team = team.key
         eventteam.year = event.year
+        if pit_location is not None:
+            eventteam.pit_location = pit_location
 
         return EventTeamManipulator.createOrUpdate(eventteam)
 
@@ -204,7 +210,18 @@ class LocalDataBootstrap:
 
         event_teams = cls.fetch_event_detail(key, "teams", auth_token)
         teams = list(map(cls.store_team, event_teams))
-        list(map(lambda t: cls.store_eventteam(t, event), teams))
+
+        event_statuses = cast(
+            Dict, cls.fetch_event_detail(key, "teams/statuses", auth_token)
+        )
+        pit_locations: Dict[str, Optional[EventTeamPitLocation]] = {}
+        for team_key, status in event_statuses.items():
+            pit_loc = status.get("pit_location") if status else None
+            if pit_loc:
+                pit_locations[team_key] = EventTeamPitLocation(location=pit_loc)
+
+        for t in teams:
+            cls.store_eventteam(t, event, pit_locations.get(t.key_name))
 
         # Fetch pit locations from teams/statuses endpoint
         event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)

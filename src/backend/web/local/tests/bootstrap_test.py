@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import cast, Dict, List
+from typing import cast, Dict, List, Optional
 
 from google.appengine.ext import ndb
 from requests_mock.mocker import Mocker as RequestsMocker
@@ -303,6 +303,20 @@ def mock_event_district_points_url(
     )
 
 
+def mock_event_teams_statuses_url(
+    m: RequestsMocker,
+    event_key: EventKey,
+    statuses: Optional[Dict] = None,
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams/statuses",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=statuses or {},
+    )
+
+
 def mock_districts_url(m: RequestsMocker, year: Year, districts: List[Dict]) -> None:
     m.register_uri(
         "GET",
@@ -401,6 +415,14 @@ def test_bootstrap_event(
         },
     )
     mock_event_district_points_url(requests_mock, event.key_name)
+    mock_event_teams_statuses_url(
+        requests_mock,
+        event.key_name,
+        {
+            "frc254": {"pit_location": "A1"},
+            "frc255": {"pit_location": "B2"},
+        },
+    )
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -415,13 +437,12 @@ def test_bootstrap_event(
     assert team2 == remove_auto_add_properties(stored_team2)
 
     stored_eventteam1 = EventTeam.get_by_id("2020nyny_frc254")
-    assert make_eventteam("2020nyny", "frc254") == remove_auto_add_properties(
-        stored_eventteam1
-    )
+    assert stored_eventteam1 is not None
+    assert stored_eventteam1.pit_location == {"location": "A1"}
+
     stored_eventteam2 = EventTeam.get_by_id("2020nyny_frc255")
-    assert make_eventteam("2020nyny", "frc255") == remove_auto_add_properties(
-        stored_eventteam2
-    )
+    assert stored_eventteam2 is not None
+    assert stored_eventteam2.pit_location == {"location": "B2"}
 
     stored_match = Match.get_by_id("2020nyny_qm1")
     assert match == remove_auto_add_properties(stored_match)
@@ -476,6 +497,7 @@ def test_bootstrap_year(
             },
         )
         mock_event_district_points_url(requests_mock, event.key_name)
+        mock_event_teams_statuses_url(requests_mock, event.key_name)
 
     mock_districts_url(requests_mock, 2020, [])
 
@@ -526,6 +548,7 @@ def test_bootstrap_event_with_district(
         },
     )
     mock_event_district_points_url(requests_mock, event.key_name)
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
