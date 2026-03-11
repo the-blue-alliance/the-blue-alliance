@@ -54,6 +54,7 @@ import InlineIcon from '~/components/tba/inlineIcon';
 import {
   DistrictLink,
   EventLocationLink,
+  PitLocationLink,
   TeamLink,
   TeamLocationLink,
 } from '~/components/tba/links';
@@ -750,14 +751,12 @@ function TeamsTab({
                   {showPitLocations && (
                     <TableCell className="text-xs">
                       {pitLoc && firstEventCode ? (
-                        <a
-                          href={`https://frc.nexus/en/event/${year}${firstEventCode}/team/${t.team_number}/map`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="text-blue-600 underline dark:text-blue-400"
-                        >
-                          {pitLoc}
-                        </a>
+                        <PitLocationLink
+                          teamNumber={t.team_number}
+                          year={year}
+                          firstEventCode={firstEventCode}
+                          pitLocation={pitLoc}
+                        />
                       ) : (
                         (pitLoc ?? '--')
                       )}
