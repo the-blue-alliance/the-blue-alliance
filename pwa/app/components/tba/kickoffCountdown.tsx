@@ -79,14 +79,8 @@ export function KickoffCountdown({
   const year = kickoffDateTimeEST.getFullYear();
 
   return (
-    <div
-      className="mx-auto max-w-[600px] rounded-xl border border-border bg-card
-        p-6 text-card-foreground shadow-lg"
-    >
-      <h2
-        className="mb-4 text-center text-2xl font-bold text-foreground
-          sm:text-3xl"
-      >
+    <div className="mx-auto max-w-[600px] rounded-xl border border-border bg-card p-6 text-card-foreground shadow-lg">
+      <h2 className="mb-4 text-center text-2xl font-bold text-foreground sm:text-3xl">
         Kickoff {year}!
       </h2>
 
@@ -135,13 +129,11 @@ export function KickoffCountdown({
       <div className="mt-4 flex justify-center">
         <a
           href="/watch/kickoff"
-          className={`inline-flex items-center gap-2 rounded-lg px-6 py-3
-            text-lg font-semibold transition-colors hover:no-underline ${
-              isWithin24Hours
-                ? 'bg-primary text-primary-foreground hover:bg-primary/90'
-                : `pointer-events-none cursor-not-allowed bg-muted
-                  text-muted-foreground`
-            }`}
+          className={`inline-flex items-center gap-2 rounded-lg px-6 py-3 text-lg font-semibold transition-colors hover:no-underline ${
+            isWithin24Hours
+              ? 'bg-primary text-primary-foreground hover:bg-primary/90'
+              : `pointer-events-none cursor-not-allowed bg-muted text-muted-foreground`
+          }`}
           aria-disabled={!isWithin24Hours}
           tabIndex={isWithin24Hours ? undefined : -1}
         >
@@ -155,9 +147,7 @@ export function KickoffCountdown({
           href="https://www.firstinspires.org/robotics/frc/game-and-season"
           target="_blank"
           rel="noopener noreferrer"
-          className="inline-flex items-center justify-center gap-2 rounded-lg
-            bg-accent px-4 py-2 text-sm font-medium text-accent-foreground
-            transition-colors hover:bg-accent/80 hover:no-underline"
+          className="inline-flex items-center justify-center gap-2 rounded-lg bg-accent px-4 py-2 text-sm font-medium text-accent-foreground transition-colors hover:bg-accent/80 hover:no-underline"
         >
           <BiInfoCircleFill className="h-4 w-4" />
           <span>{year} FRC Game Resources</span>
@@ -178,24 +168,15 @@ function CountdownUnit({
 }) {
   return (
     <div className="flex flex-col items-center">
-      <div
-        className="flex h-16 w-16 items-center justify-center rounded-lg
-          bg-secondary sm:h-20 sm:w-20"
-      >
-        <span
-          className="font-mono text-3xl font-bold text-secondary-foreground
-            sm:text-4xl"
-        >
+      <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-secondary sm:h-20 sm:w-20">
+        <span className="font-mono text-3xl font-bold text-secondary-foreground sm:text-4xl">
           <ClientOnly fallback="--">{value}</ClientOnly>
         </span>
       </div>
       <span className="mt-1 text-xs font-medium text-muted-foreground sm:hidden">
         {label}
       </span>
-      <span
-        className="mt-1 hidden text-xs font-medium text-muted-foreground
-          sm:block"
-      >
+      <span className="mt-1 hidden text-xs font-medium text-muted-foreground sm:block">
         {fullLabel}
       </span>
     </div>

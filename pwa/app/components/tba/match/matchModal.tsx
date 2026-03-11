@@ -122,10 +122,7 @@ function MatchModalSpinner() {
         </CredenzaTitle>
       </CredenzaHeader>
       <CredenzaBody className="flex min-h-32 items-center justify-center">
-        <div
-          className="size-8 animate-spin rounded-full border-4 border-muted
-            border-t-primary"
-        />
+        <div className="size-8 animate-spin rounded-full border-4 border-muted border-t-primary" />
       </CredenzaBody>
     </>
   );

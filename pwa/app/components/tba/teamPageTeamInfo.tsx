@@ -74,9 +74,7 @@ export default function TeamPageTeamInfo({
           {sponsors.length > 0 ? (
             <Accordion type="single" collapsible>
               <AccordionItem value="item-1" className="border-0">
-                <AccordionTrigger
-                  className="justify-normal p-0 text-left font-normal"
-                >
+                <AccordionTrigger className="justify-normal p-0 text-left font-normal">
                   <DetailEntity icon={<SponsorsIcon />}>
                     {schoolName}
                     {sponsors.length > 0 &&

@@ -1,5 +1,4 @@
 import { ApiReferenceReact } from '@scalar/api-reference-react';
-import scalarCSS from '@scalar/api-reference-react/style.css?url';
 import { ReactRenderer } from '@scalar/react-renderer';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo } from 'react';
@@ -10,6 +9,8 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '~/components/ui/accordion';
+
+import scalarCSS from '@scalar/api-reference-react/style.css?url';
 
 export const Route = createFileRoute('/apidocs_/v3')({
   head: () => {
@@ -44,9 +45,7 @@ const ChangelogDisplay = ({ xChanges }: { xChanges: string }) => {
     <div className="my-4 rounded-lg bg-(--scalar-background-2) p-4">
       <Accordion type="single" collapsible>
         <AccordionItem value="changelog">
-          <AccordionTrigger
-            className="text-lg font-semibold text-(--scalar-color-1)"
-          >
+          <AccordionTrigger className="text-lg font-semibold text-(--scalar-color-1)">
             API Changelog
           </AccordionTrigger>
           <AccordionContent>

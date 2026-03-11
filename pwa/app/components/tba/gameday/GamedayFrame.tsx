@@ -18,9 +18,7 @@ export function GamedayFrame() {
   }
 
   return (
-    <div
-      className="flex h-screen w-screen flex-col overflow-hidden bg-neutral-950"
-    >
+    <div className="flex h-screen w-screen flex-col overflow-hidden bg-neutral-950">
       <GamedayToolbar />
 
       <div className="flex min-h-0 flex-1">

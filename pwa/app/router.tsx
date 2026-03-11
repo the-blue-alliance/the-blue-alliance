@@ -20,9 +20,7 @@ export function getRouter() {
       queryCacheLogger.info(
         {
           type: event.type,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           queryKey: event.query.queryKey[0]._id,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           path: event.query.queryKey[0].path,
         },
         'Query cache event',
@@ -36,9 +34,7 @@ export function getRouter() {
       queryCacheLogger.info(
         {
           type: event.type,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           queryKey: event.query.queryKey[0]._id,
-          // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
           path: event.query.queryKey[0].path,
         },
         'Query cache event',

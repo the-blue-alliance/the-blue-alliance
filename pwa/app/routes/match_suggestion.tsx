@@ -155,12 +155,10 @@ function TeamDetails({
       const response = await fetch(
         `https://api.statbotics.io/v3/team_year/${teamKey.substring(3)}/2025`,
       );
-      // eslint-disable-next-line
       return response.json();
     },
   });
 
-  // eslint-disable-next-line
   const epaBreakdown: {
     total_points: number;
     auto_coral: number;
@@ -168,8 +166,7 @@ function TeamDetails({
     processor_algae: number;
     net_algae: number;
     barge_points: number;
-  } | null = // eslint-disable-next-line
-    epaQuery.data ? epaQuery.data.epa.breakdown : null;
+  } | null = epaQuery.data ? epaQuery.data.epa.breakdown : null;
 
   if (
     !teamQuery.data ||

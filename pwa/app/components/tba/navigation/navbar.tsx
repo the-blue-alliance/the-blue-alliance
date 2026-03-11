@@ -39,18 +39,14 @@ export function Navbar() {
               <nav>
                 <Link
                   to="/"
-                  className="flex items-center gap-3 hover:no-underline
-                    max-md:flex-1"
+                  className="flex items-center gap-3 hover:no-underline max-md:flex-1"
                 >
                   <img
                     src={lamp}
                     className="size-6 max-w-none"
                     alt="The Blue Alliance Logo"
                   />
-                  <div
-                    className="text-xl font-medium tracking-tight
-                      whitespace-nowrap text-white"
-                  >
+                  <div className="text-xl font-medium tracking-tight whitespace-nowrap text-white">
                     <span className="sm:hidden md:block">
                       The Blue Alliance
                     </span>
@@ -58,16 +54,11 @@ export function Navbar() {
                   </div>
                 </Link>
                 {/* Desktop Menu Items */}
-                <ul
-                  className="flex list-none flex-row items-center gap-1 px-6
-                    max-sm:hidden"
-                >
+                <ul className="flex list-none flex-row items-center gap-1 px-6 max-sm:hidden">
                   {NAV_ITEMS_LIST.map(({ title, to, params, icon: Icon }) => (
                     <NavigationMenuItem key={title}>
                       <NavigationMenuLink
-                        className={`flex cursor-pointer items-center
-                        justify-start gap-2 bg-primary px-2.5 py-2 font-medium
-                        text-white hover:bg-black/20 hover:text-white`}
+                        className={`flex cursor-pointer items-center justify-start gap-2 bg-primary px-2.5 py-2 font-medium text-white hover:bg-black/20 hover:text-white`}
                         asChild
                       >
                         <Link
@@ -86,9 +77,7 @@ export function Navbar() {
                 <ul className="flex items-center gap-2">
                   <a
                     href={`https://www.thebluealliance.com${pathname}`}
-                    className="rounded-md px-2.5 py-2 text-xs font-medium
-                      text-white hover:bg-black/20 hover:no-underline
-                      max-sm:hidden"
+                    className="rounded-md px-2.5 py-2 text-xs font-medium text-white hover:bg-black/20 hover:no-underline max-sm:hidden"
                   >
                     Leave beta
                   </a>

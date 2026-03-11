@@ -52,6 +52,7 @@ import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?ur
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { ThemeProvider } from '~/lib/theme';
 import { createLogger } from '~/lib/utils';
+
 import appCss from '~/tailwind.css?url';
 
 const logger = createLogger('root');
@@ -379,11 +380,7 @@ function RootComponent() {
               <>
                 <Navbar />
                 <TOCRendererProvider>
-                  <div
-                    className="container mx-auto
-                      min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
-                      px-4 text-sm"
-                  >
+                  <div className="container mx-auto min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))] px-4 text-sm">
                     <div vaul-drawer-wrapper="" className="bg-background">
                       <Outlet />
                       <MatchModal />

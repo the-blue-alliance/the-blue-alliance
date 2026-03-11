@@ -22,9 +22,7 @@ export function LayoutSelector() {
                 <button
                   key={layoutId}
                   onClick={() => setLayout(layoutId)}
-                  className="flex w-full cursor-pointer items-center
-                    justify-between rounded-md px-3 py-2 text-left
-                    transition-colors hover:bg-accent"
+                  className="flex w-full cursor-pointer items-center justify-between rounded-md px-3 py-2 text-left transition-colors hover:bg-accent"
                 >
                   <span className="font-medium">{layout.name}</span>
                   <LayoutIcon layoutId={layoutId} className="h-6 w-10" />

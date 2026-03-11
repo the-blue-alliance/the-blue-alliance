@@ -25,15 +25,11 @@ export function GamedayToolbar() {
 
   return (
     <>
-      <header
-        className="flex h-10 shrink-0 items-center gap-2 border-b
-          border-slate-700 bg-primary px-4"
-      >
+      <header className="flex h-10 shrink-0 items-center gap-2 border-b border-slate-700 bg-primary px-4">
         {/* TBA branding */}
         <a
           href="/"
-          className="flex items-center gap-2 text-white no-underline
-            hover:no-underline"
+          className="flex items-center gap-2 text-white no-underline hover:no-underline"
         >
           <img src={TbaLamp} alt="TBA" className="size-6" />
           <span className="text-lg font-medium">
@@ -68,8 +64,7 @@ export function GamedayToolbar() {
       {/* Settings drawer */}
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
         <DrawerContent
-          className="fixed inset-y-0 right-0 left-auto mt-0 h-full w-80
-            rounded-t-none rounded-l-[10px] sm:w-96"
+          className="fixed inset-y-0 right-0 left-auto mt-0 h-full w-80 rounded-t-none rounded-l-[10px] sm:w-96"
           showHandle={false}
         >
           <DrawerHeader>
@@ -79,10 +74,7 @@ export function GamedayToolbar() {
             </DrawerDescription>
           </DrawerHeader>
 
-          <div
-            className="divide-y overflow-y-auto px-4 *:py-4 first:*:pt-0
-              last:*:pb-0"
-          >
+          <div className="divide-y overflow-y-auto px-4 *:py-4 first:*:pt-0 last:*:pb-0">
             {/* Layout selection */}
             <section>
               <h3 className="mb-2 text-sm font-semibold text-primary">
@@ -102,8 +94,7 @@ export function GamedayToolbar() {
                         setLayout(layoutId);
                         setDrawerOpen(false);
                       }}
-                      className={`flex cursor-pointer items-center gap-2
-                      rounded-md border p-2 transition-colors ${
+                      className={`flex cursor-pointer items-center gap-2 rounded-md border p-2 transition-colors ${
                         isSelected
                           ? 'border-primary bg-primary/10'
                           : 'border-border hover:bg-accent'
@@ -115,9 +106,7 @@ export function GamedayToolbar() {
                       />
                       <span className="truncate text-sm">{layout.name}</span>
                       {isSelected && (
-                        <CheckIcon
-                          className="ml-auto h-4 w-4 shrink-0 text-primary"
-                        />
+                        <CheckIcon className="ml-auto h-4 w-4 shrink-0 text-primary" />
                       )}
                     </button>
                   );
@@ -133,17 +122,14 @@ export function GamedayToolbar() {
               <div className="space-y-2">
                 <button
                   onClick={toggleChatSidebar}
-                  className="flex w-full cursor-pointer items-center
-                    justify-between rounded-md border border-border p-3
-                    transition-colors hover:bg-accent"
+                  className="flex w-full cursor-pointer items-center justify-between rounded-md border border-border p-3 transition-colors hover:bg-accent"
                 >
                   <div className="flex items-center gap-2">
                     <MessageSquareIcon className="h-4 w-4" />
                     <span>Twitch Chat</span>
                   </div>
                   <span
-                    className={`text-sm
-                      ${state.chatSidebarVisible ? 'text-green-600' : 'text-muted-foreground'}`}
+                    className={`text-sm ${state.chatSidebarVisible ? 'text-green-600' : 'text-muted-foreground'}`}
                   >
                     {state.chatSidebarVisible ? 'Visible' : 'Hidden'}
                   </span>

@@ -76,10 +76,7 @@ export default function SimpleMatchRowsWithBreaks({
   }
 
   return (
-    <div
-      className="flex flex-col divide-y *:odd:bg-neutral-50
-        dark:*:odd:bg-neutral-900"
-    >
+    <div className="flex flex-col divide-y *:odd:bg-neutral-50 dark:*:odd:bg-neutral-900">
       {divs}
     </div>
   );
@@ -103,16 +100,9 @@ export function MatchRow({
 
   /* Desktop: 1x11 grid, Mobile: 2x6 grid */
   return (
-    <div
-      className="mx-auto grid w-full max-w-6xl
-        grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2em_2em] gap-0.5 text-sm
-        xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
-    >
+    <div className="mx-auto grid w-full max-w-6xl grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2em_2em] gap-0.5 text-sm xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1">
       {/* Play Button */}
-      <div
-        className="row-span-2 flex items-center justify-center rounded-tl-lg
-          xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
-      >
+      <div className="row-span-2 flex items-center justify-center rounded-tl-lg xl:col-span-1 xl:row-span-1 xl:rounded-l-lg">
         {maybeVideoURL && (
           <Link
             to={maybeVideoURL}
@@ -126,10 +116,7 @@ export function MatchRow({
       </div>
 
       {/* Match Name */}
-      <div
-        className="row-span-2 flex items-center justify-center p-1.5
-          xl:col-span-2 xl:row-span-1"
-      >
+      <div className="row-span-2 flex items-center justify-center p-1.5 xl:col-span-2 xl:row-span-1">
         <MatchLink
           matchOrKey={match}
           event={event}
@@ -166,10 +153,7 @@ export function MatchRow({
       />
 
       {!isPlayed && (
-        <div
-          className="col-start-6 row-span-2 row-start-1 xl:col-span-2
-            xl:col-start-auto xl:row-span-1 xl:row-start-auto"
-        >
+        <div className="col-start-6 row-span-2 row-start-1 xl:col-span-2 xl:col-start-auto xl:row-span-1 xl:row-start-auto">
           <span className="flex h-full items-center justify-center text-center">
             {match.predicted_time &&
               new Date(match.predicted_time * 1000).toLocaleTimeString(
@@ -190,9 +174,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.red.score}
           allianceColor="red"
-          className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg
-            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
-            xl:rounded-l-lg"
+          className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5 xl:rounded-l-lg"
           winner={match.winning_alliance === 'red'}
           scoreBreakdown={match.score_breakdown?.red}
           year={year}
@@ -205,9 +187,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.blue.score}
           allianceColor="blue"
-          className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg
-            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
-            xl:rounded-r-lg"
+          className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5 xl:rounded-r-lg"
           winner={match.winning_alliance === 'blue'}
           scoreBreakdown={match.score_breakdown?.blue}
           year={year}
@@ -232,23 +212,14 @@ export function SimpleMatchRow({
   return (
     <div>
       {/* 3x4 grid with header row */}
-      <div
-        className="mx-auto grid w-full max-w-6xl grid-cols-[repeat(4,1fr)]
-          grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm"
-      >
+      <div className="mx-auto grid w-full max-w-6xl grid-cols-[repeat(4,1fr)] grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm">
         {/* Header: Teams */}
-        <div
-          className="col-span-3 col-start-1 row-start-1 flex items-center
-            justify-center text-sm font-semibold"
-        >
+        <div className="col-span-3 col-start-1 row-start-1 flex items-center justify-center text-sm font-semibold">
           Teams
         </div>
 
         {/* Header: Score */}
-        <div
-          className="col-start-4 row-start-1 flex items-center justify-center
-            text-sm font-semibold"
-        >
+        <div className="col-start-4 row-start-1 flex items-center justify-center text-sm font-semibold">
           Score
         </div>
 
@@ -277,10 +248,7 @@ export function SimpleMatchRow({
         />
 
         {!isPlayed && (
-          <div
-            className="col-start-4 row-span-2 row-start-2 flex items-center
-              justify-center text-center"
-          >
+          <div className="col-start-4 row-span-2 row-start-2 flex items-center justify-center text-center">
             <span>
               {match.predicted_time &&
                 new Date(match.predicted_time * 1000).toLocaleTimeString(
@@ -343,10 +311,7 @@ export function BreakRow({ className, text, ...props }: BreakRowProps) {
       className={cn('col-span-11 flex rounded-md bg-muted', className)}
       {...props}
     >
-      <span
-        className="flex h-8 w-full items-center justify-center text-xs
-          font-medium"
-      >
+      <span className="flex h-8 w-full items-center justify-center text-xs font-medium">
         {text}
       </span>
     </div>

@@ -59,23 +59,9 @@ updates:
         - "babel-plugin-react-compiler"
     linting:
       patterns:
-        - "@eslint/*"
-        - "eslint"
-        - "eslint-config-prettier"
-        - "eslint-import-resolver-typescript"
-        - "eslint-plugin-import"
-        - "eslint-plugin-jsx-a11y"
+        - "oxlint"
+        - "oxfmt"
         - "eslint-plugin-no-relative-import-paths"
-        - "eslint-plugin-react"
-        - "eslint-plugin-react-hooks"
-        - "globals"
-        - "typescript-eslint"
-        - "@typescript-eslint/*"
-        - "prettier"
-        - "prettier-plugin-classnames"
-        - "prettier-plugin-merge"
-        - "prettier-plugin-tailwindcss"
-        - "@trivago/prettier-plugin-sort-imports"
     sentry:
       patterns:
         - "@sentry/*"

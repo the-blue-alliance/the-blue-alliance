@@ -97,10 +97,7 @@ function DistrictInsightsPage() {
       </h1>
 
       <Tabs defaultValue="Growth">
-        <TabsList
-          className="flex h-auto flex-wrap items-center justify-evenly
-            *:basis-1/2 lg:*:basis-1"
-        >
+        <TabsList className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2 lg:*:basis-1">
           <TabsTrigger value="Growth">Growth</TabsTrigger>
           <TabsTrigger value="Team">Team Data</TabsTrigger>
         </TabsList>
@@ -128,10 +125,7 @@ function DistrictDataView({
 
   return (
     <div>
-      <div
-        className="flex flex-row flex-wrap gap-4 md:flex-nowrap [&>*]:w-full
-          md:[&>*]:w-1/2"
-      >
+      <div className="flex flex-row flex-wrap gap-4 md:flex-nowrap [&>*]:w-full md:[&>*]:w-1/2">
         <div className="flex flex-col">
           <h1 className="mb-2 text-center text-xl">Yearly Active Team Count</h1>
           <ChartContainer config={{}} className="min-h-[100px] w-full">

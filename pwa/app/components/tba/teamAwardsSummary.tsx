@@ -233,10 +233,7 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
                   <CardTitle className="text-base font-semibold">
                     {category.title}
                     {categoryCount > 0 && (
-                      <span
-                        className="ml-1 text-xs font-normal
-                          text-muted-foreground"
-                      >
+                      <span className="ml-1 text-xs font-normal text-muted-foreground">
                         ({categoryCount})
                       </span>
                     )}
@@ -267,8 +264,7 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
                         const content = (
                           <label
                             key={item.key}
-                            className="flex items-center justify-between gap-2
-                              text-sm"
+                            className="flex items-center justify-between gap-2 text-sm"
                           >
                             <span className="flex items-center gap-2">
                               <Checkbox
@@ -285,10 +281,7 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
                                 {item.label}
                               </span>
                             </span>
-                            <span
-                              className="ml-2 text-xs font-medium
-                                text-muted-foreground"
-                            >
+                            <span className="ml-2 text-xs font-medium text-muted-foreground">
                               {count}
                             </span>
                           </label>
@@ -315,8 +308,7 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
                                     <EventLink
                                       key={eventKey}
                                       eventOrKey={eventKey}
-                                      className="underline-offset-2
-                                        hover:underline"
+                                      className="underline-offset-2 hover:underline"
                                     >
                                       {name}
                                     </EventLink>

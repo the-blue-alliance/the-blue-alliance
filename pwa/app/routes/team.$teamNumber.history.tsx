@@ -148,10 +148,7 @@ function TeamHistoryPage(): React.JSX.Element {
       </div>
 
       <div className="mt-5 w-full">
-        <div
-          className="flex flex-wrap justify-center sm:flex-nowrap
-            sm:justify-between"
-        >
+        <div className="flex flex-wrap justify-center sm:flex-nowrap sm:justify-between">
           <div className="flex flex-col justify-between">
             <TeamPageTeamInfo
               maybeAvatar={undefined}

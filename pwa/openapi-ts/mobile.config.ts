@@ -1,5 +1,6 @@
-import { defineConfig } from '@hey-api/openapi-ts';
 import path from 'path';
+
+import { defineConfig } from '@hey-api/openapi-ts';
 
 export default defineConfig({
   input: path.resolve(

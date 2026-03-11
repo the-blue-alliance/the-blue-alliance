@@ -11,10 +11,7 @@ import {
   XAxis,
   YAxis,
 } from 'recharts';
-import {
-  NameType,
-  ValueType,
-} from 'recharts/types/component/DefaultTooltipContent';
+import { ValueType } from 'recharts/types/component/DefaultTooltipContent';
 
 import { EventColors, TeamWithColor } from '~/api/colors';
 import { EventCoprs } from '~/api/tba/read';
@@ -269,10 +266,7 @@ const CustomTooltip = ({
   xCopr,
   yCopr,
 }: React.ComponentProps<typeof Tooltip> &
-  Omit<
-    DefaultTooltipContentProps<ValueType, NameType>,
-    'accessibilityLayer'
-  > & {
+  Omit<DefaultTooltipContentProps<ValueType>, 'accessibilityLayer'> & {
     xCopr: string;
     yCopr: string;
   }) => {
@@ -282,10 +276,7 @@ const CustomTooltip = ({
     ).teamKey.substring(3);
 
     return (
-      <div
-        className="flex flex-col rounded-md bg-background text-foreground
-          shadow-xl"
-      >
+      <div className="flex flex-col rounded-md bg-background text-foreground shadow-xl">
         <div className="flex flex-col p-4">
           <div className="pb-2 text-xl">{teamKey}</div>
           <div className="">

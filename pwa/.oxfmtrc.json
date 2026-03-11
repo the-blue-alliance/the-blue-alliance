@@ -1,0 +1,31 @@
+{
+  "$schema": "./node_modules/oxfmt/configuration_schema.json",
+  "semi": true,
+  "singleQuote": true,
+  "trailingComma": "all",
+  "tabWidth": 2,
+  "printWidth": 80,
+  "sortImports": {
+    "customGroups": [
+      {
+        "groupName": "icons",
+        "elementNamePattern": ["~icons/**"]
+      }
+    ],
+    "groups": [
+      "builtin",
+      "external",
+      "icons",
+      ["internal", "subpath"],
+      ["parent", "sibling", "index"],
+      "style",
+      "unknown"
+    ]
+  },
+  "sortPackageJson": true,
+  "sortTailwindcss": {
+    "stylesheet": "./app/tailwind.css",
+    "functions": ["clsx", "cn", "cva"]
+  },
+  "ignorePatterns": ["app/routeTree.gen.ts", "pnpm-lock.yaml"]
+}

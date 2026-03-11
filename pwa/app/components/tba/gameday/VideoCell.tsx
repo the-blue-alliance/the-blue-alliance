@@ -55,8 +55,7 @@ export function VideoCell({
 
   return (
     <div
-      className="relative flex flex-col border border-neutral-700
-        bg-neutral-950"
+      className="relative flex flex-col border border-neutral-700 bg-neutral-950"
       style={{ gridArea }}
     >
       {webcast ? (
@@ -67,10 +66,7 @@ export function VideoCell({
           </div>
 
           {/* Toolbar */}
-          <div
-            className="flex h-10 shrink-0 items-center gap-1 border-t
-              border-neutral-800 bg-neutral-900 px-2"
-          >
+          <div className="flex h-10 shrink-0 items-center gap-1 border-t border-neutral-800 bg-neutral-900 px-2">
             <span className="mr-auto truncate text-sm text-white">
               {webcast.name}
             </span>
@@ -78,8 +74,7 @@ export function VideoCell({
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800
-                hover:text-white"
+              className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800 hover:text-white"
               onClick={handleSwapClick}
               title="Swap position"
             >
@@ -89,8 +84,7 @@ export function VideoCell({
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800
-                hover:text-white"
+              className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800 hover:text-white"
               onClick={() => setWebcastDialogOpen(true)}
               title="Change webcast"
             >
@@ -100,8 +94,7 @@ export function VideoCell({
             <Button
               variant="ghost"
               size="sm"
-              className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800
-                hover:text-white"
+              className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800 hover:text-white"
               onClick={() => removeWebcast(webcast.id)}
               title="Remove webcast"
             >

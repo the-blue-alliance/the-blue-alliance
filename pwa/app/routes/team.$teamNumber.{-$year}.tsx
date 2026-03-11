@@ -327,9 +327,7 @@ function TeamPage(): React.JSX.Element {
             });
           }}
         >
-          <SelectTrigger
-            className="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
-          >
+          <SelectTrigger className="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none">
             <SelectValue placeholder={year} />
           </SelectTrigger>
           <SelectContent className="max-h-[30vh] overflow-y-auto">
@@ -346,10 +344,7 @@ function TeamPage(): React.JSX.Element {
 
       <div className="mt-8 w-full">
         <TableOfContentsSection id="team-info" setInView={setInView}>
-          <div
-            className="flex flex-wrap justify-center sm:flex-nowrap
-              sm:justify-between"
-          >
+          <div className="flex flex-wrap justify-center sm:flex-nowrap sm:justify-between">
             <div className="flex flex-col justify-between">
               <div>
                 <TeamPageTeamInfo
@@ -528,9 +523,7 @@ function StatsSection({
           <div
             // The padding/margins make the separator not actually perfectly centered
             // left-47.5 looks significantly better than left-1/2
-            className={`relative flex flex-wrap *:w-full before:absolute
-            before:inset-y-0 before:left-[47.5%] before:hidden before:w-px
-            before:bg-neutral-200 sm:mt-0 lg:*:w-1/2 lg:before:block`}
+            className={`relative flex flex-wrap *:w-full before:absolute before:inset-y-0 before:left-[47.5%] before:hidden before:w-px before:bg-neutral-200 sm:mt-0 lg:*:w-1/2 lg:before:block`}
           >
             <div className="grid grid-cols-2 items-center gap-y-4">
               <Stat
@@ -692,7 +685,7 @@ function BlueBanners({ awards, events }: { awards: Award[]; events: Event[] }) {
         <AwardBanner
           key={`${a.award_type}-${a.event_key}`}
           award={a}
-          // eslint-disable-next-line @typescript-eslint/no-non-null-assertion
+          // oxlint-disable-next-line @typescript-eslint/no-non-null-assertion
           event={events.find((e) => e.key === a.event_key)!}
         />
       ))}

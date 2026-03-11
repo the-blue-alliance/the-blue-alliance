@@ -73,20 +73,16 @@ const BracketMatchCard = forwardRef<
     <div
       ref={cardRef}
       className={cn(
-        `min-w-40 overflow-hidden rounded-md border border-neutral-200
-        bg-background transition-all duration-200 dark:border-neutral-700`,
+        `min-w-40 overflow-hidden rounded-md border border-neutral-200 bg-background transition-all duration-200 dark:border-neutral-700`,
         {
-          [`border-transparent shadow-lg ring-2 ring-alliance-red/75
-          dark:border-transparent`]: isHighlighted && result.redWon,
-          [`border-transparent shadow-lg ring-2 ring-alliance-blue/75
-          dark:border-transparent`]: isHighlighted && result.blueWon,
+          [`border-transparent shadow-lg ring-2 ring-alliance-red/75 dark:border-transparent`]:
+            isHighlighted && result.redWon,
+          [`border-transparent shadow-lg ring-2 ring-alliance-blue/75 dark:border-transparent`]:
+            isHighlighted && result.blueWon,
         },
       )}
     >
-      <div
-        className="flex items-center justify-between border-b px-2 py-1 text-sm
-          font-bold"
-      >
+      <div className="flex items-center justify-between border-b px-2 py-1 text-sm font-bold">
         <div className="flex items-center gap-1">
           <span>{label}</span>
           {result.redAllianceNumber && result.blueAllianceNumber && (
@@ -96,8 +92,7 @@ const BracketMatchCard = forwardRef<
                 className={cn(
                   'text-alliance-red transition-all duration-200',
                   isRedHighlighted &&
-                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900
-                    dark:text-white`,
+                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900 dark:text-white`,
                 )}
               >
                 {getAllianceDisplayName(result.redAllianceNumber)}
@@ -107,8 +102,7 @@ const BracketMatchCard = forwardRef<
                 className={cn(
                   'text-alliance-blue transition-all duration-200',
                   isBlueHighlighted &&
-                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
-                    dark:text-white`,
+                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900 dark:text-white`,
                 )}
               >
                 {getAllianceDisplayName(result.blueAllianceNumber)}
@@ -131,10 +125,7 @@ const BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-red/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-red
-          data-[highlight=true]:text-white`}
+        className={`group flex cursor-pointer items-center justify-between bg-alliance-red/15 px-1 py-1 transition-colors duration-200 data-[highlight=true]:bg-alliance-red data-[highlight=true]:text-white`}
         data-highlight={isRedHighlighted}
         ref={redRowRef}
         onMouseEnter={() =>
@@ -152,8 +143,7 @@ const BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-red
-                    group-data-[highlight=true]:text-white`,
+                    `w-12 text-center text-sm text-alliance-red group-data-[highlight=true]:text-white`,
                     result.redWon && 'font-bold',
                   )}
                 >
@@ -186,10 +176,7 @@ const BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-blue/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-blue
-          data-[highlight=true]:text-white`}
+        className={`group flex cursor-pointer items-center justify-between bg-alliance-blue/15 px-1 py-1 transition-colors duration-200 data-[highlight=true]:bg-alliance-blue data-[highlight=true]:text-white`}
         data-highlight={isBlueHighlighted}
         ref={blueRowRef}
         onMouseEnter={() =>
@@ -207,8 +194,7 @@ const BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-blue
-                    group-data-[highlight=true]:text-white`,
+                    `w-12 text-center text-sm text-alliance-blue group-data-[highlight=true]:text-white`,
                     result.blueWon && 'font-bold',
                   )}
                 >
@@ -422,8 +408,7 @@ export default function TraditionalBracket({
       <div className="overflow-x-auto overflow-y-hidden">
         <div
           ref={containerRef}
-          className="relative isolate flex min-w-max items-start gap-8 px-4
-            pb-4"
+          className="relative isolate flex min-w-max items-start gap-8 px-4 pb-4"
         >
           <div className="relative z-1 flex items-start gap-8">
             {/* Eighth-Finals (16-team only) */}
