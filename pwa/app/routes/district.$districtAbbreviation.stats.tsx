@@ -228,12 +228,6 @@ function computeLeaderboards(
   const dcmpFinalsAppearances = new Map<string, number>();
   const districtEventFinalsAppearances = new Map<string, number>();
   const blueBanners = new Map<string, number>();
-  const impactWins = new Map<string, number>();
-  const dcmpImpactWins = new Map<string, number>();
-  const eiWins = new Map<string, number>();
-  const dcmpEiWins = new Map<string, number>();
-  const leadershipWins = new Map<string, number>();
-  const wffaWins = new Map<string, number>();
 
   // Track event keys for tooltip context
   const dcmpFinalsEvents = new Map<string, string[]>();
@@ -330,7 +324,6 @@ function computeLeaderboards(
 
         // Impact/Chairman's wins
         if (award.award_type === AwardType.CHAIRMANS) {
-          impactWins.set(teamKey, (impactWins.get(teamKey) ?? 0) + 1);
           const ev = impactEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           impactEvents.set(teamKey, ev);
@@ -341,7 +334,6 @@ function computeLeaderboards(
           award.award_type === AwardType.CHAIRMANS &&
           dcmpEventKeys.has(award.event_key)
         ) {
-          dcmpImpactWins.set(teamKey, (dcmpImpactWins.get(teamKey) ?? 0) + 1);
           const ev = dcmpImpactEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           dcmpImpactEvents.set(teamKey, ev);
@@ -349,7 +341,6 @@ function computeLeaderboards(
 
         // Engineering Inspiration wins
         if (award.award_type === AwardType.ENGINEERING_INSPIRATION) {
-          eiWins.set(teamKey, (eiWins.get(teamKey) ?? 0) + 1);
           const ev = eiEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           eiEvents.set(teamKey, ev);
@@ -360,7 +351,6 @@ function computeLeaderboards(
           award.award_type === AwardType.ENGINEERING_INSPIRATION &&
           dcmpEventKeys.has(award.event_key)
         ) {
-          dcmpEiWins.set(teamKey, (dcmpEiWins.get(teamKey) ?? 0) + 1);
           const ev = dcmpEiEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           dcmpEiEvents.set(teamKey, ev);
@@ -368,7 +358,6 @@ function computeLeaderboards(
 
         // Leadership wins
         if (award.award_type === AwardType.DEANS_LIST) {
-          leadershipWins.set(teamKey, (leadershipWins.get(teamKey) ?? 0) + 1);
           const ev = leadershipEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           leadershipEvents.set(teamKey, ev);
@@ -376,7 +365,6 @@ function computeLeaderboards(
 
         // WFFA wins
         if (award.award_type === AwardType.WOODIE_FLOWERS) {
-          wffaWins.set(teamKey, (wffaWins.get(teamKey) ?? 0) + 1);
           const ev = wffaEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           wffaEvents.set(teamKey, ev);
@@ -398,12 +386,6 @@ function computeLeaderboards(
     blueBanners: mapToRankings(blueBanners),
     mostMatchesPlayed: mapToRankings(mostMatchesPlayed),
     mostAwards: mapToRankings(mostAwards),
-    impactWins: mapToRankings(impactWins),
-    dcmpImpactWins: mapToRankings(dcmpImpactWins),
-    eiWins: mapToRankings(eiWins),
-    dcmpEiWins: mapToRankings(dcmpEiWins),
-    leadershipWins: mapToRankings(leadershipWins),
-    wffaWins: mapToRankings(wffaWins),
     // Tooltip maps
     dcmpFinalsTooltips: buildContextTooltipMap(
       dcmpFinalsEvents,
