@@ -47,7 +47,7 @@ const DISTRICT_COLORS: Record<string, string> = {
   fit: 'border-l-[#E36A2E]',
   tx: 'border-l-[#E36A2E]',
   // Wisconsin
-  wi: 'border-l-[#5FAF8C]',
+  win: 'border-l-[#E84393]',
 };
 
 function getDistrictColorClass(
