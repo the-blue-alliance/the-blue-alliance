@@ -61,7 +61,7 @@
     "jest-cli": "^30.3.0",
     "jest-environment-jsdom": "^30.3.0",
     "jest-puppeteer": "^11.0.0",
-    "less": "4.5.1",
+    "less": "4.6.3",
     "md5": "^2.3.0",
     "mini-css-extract-plugin": "^2.10.0",
     "node-fetch": "^2.7.0",
