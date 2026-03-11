@@ -1,5 +1,5 @@
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
-import { useMemo } from 'react';
+import { type ReactNode, useMemo } from 'react';
 
 import {
   Award,
@@ -13,6 +13,7 @@ import {
   Leaderboard,
   type LeaderboardRanking,
 } from '~/components/tba/leaderboard';
+import { EventLink } from '~/components/tba/links';
 import {
   Select,
   SelectContent,
@@ -98,6 +99,52 @@ export const Route = createFileRoute('/district/$districtAbbreviation/stats')({
   component: DistrictStatsPage,
 });
 
+function buildEventNameLookup(
+  yearResults: Array<{ events: Event[] }>,
+): Map<string, string> {
+  const lookup = new Map<string, string>();
+  for (const { events } of yearResults) {
+    for (const event of events) {
+      const displayName =
+        event.year.toString() +
+        ' ' +
+        (event.short_name !== null && event.short_name?.trim() !== ''
+          ? event.short_name
+          : event.name);
+      lookup.set(event.key, displayName);
+    }
+  }
+  return lookup;
+}
+
+function buildContextTooltipMap(
+  teamEventKeys: Map<string, string[]>,
+  eventNameLookup: Map<string, string>,
+): Record<string, ReactNode> {
+  const map: Record<string, ReactNode> = {};
+  for (const [teamKey, eventKeys] of teamEventKeys.entries()) {
+    const uniqueKeys = Array.from(new Set(eventKeys));
+    if (uniqueKeys.length === 0) continue;
+    map[teamKey] = (
+      <div className="flex flex-col gap-0.5">
+        {uniqueKeys.map((eventKey) => {
+          const name = eventNameLookup.get(eventKey) ?? eventKey;
+          return (
+            <EventLink
+              key={eventKey}
+              eventOrKey={eventKey}
+              className="underline-offset-2 hover:underline"
+            >
+              {name}
+            </EventLink>
+          );
+        })}
+      </div>
+    );
+  }
+  return map;
+}
+
 function mapToRankings(map: Map<string, number>): LeaderboardRanking[] {
   // Group keys by value
   const valueToKeys = new Map<number, string[]>();
@@ -175,6 +222,8 @@ function computeLeaderboards(
     }
   }
 
+  const eventNameLookup = buildEventNameLookup(yearResults);
+
   // Computed stats from awards + events data
   const dcmpFinalsAppearances = new Map<string, number>();
   const districtEventFinalsAppearances = new Map<string, number>();
@@ -185,6 +234,15 @@ function computeLeaderboards(
   const dcmpEiWins = new Map<string, number>();
   const leadershipWins = new Map<string, number>();
   const wffaWins = new Map<string, number>();
+
+  // Track event keys for tooltip context
+  const blueBannerEvents = new Map<string, string[]>();
+  const impactEvents = new Map<string, string[]>();
+  const dcmpImpactEvents = new Map<string, string[]>();
+  const eiEvents = new Map<string, string[]>();
+  const dcmpEiEvents = new Map<string, string[]>();
+  const leadershipEvents = new Map<string, string[]>();
+  const wffaEvents = new Map<string, string[]>();
 
   for (const { events, awards } of yearResults) {
     const dcmpEventKeys = new Set(
@@ -235,11 +293,17 @@ function computeLeaderboards(
         // Blue banners
         if (BLUE_BANNER_AWARDS.has(award.award_type)) {
           blueBanners.set(teamKey, (blueBanners.get(teamKey) ?? 0) + 1);
+          const bb = blueBannerEvents.get(teamKey) ?? [];
+          bb.push(award.event_key);
+          blueBannerEvents.set(teamKey, bb);
         }
 
         // Impact/Chairman's wins
         if (award.award_type === AwardType.CHAIRMANS) {
           impactWins.set(teamKey, (impactWins.get(teamKey) ?? 0) + 1);
+          const ev = impactEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          impactEvents.set(teamKey, ev);
         }
 
         // DCMPImpact/Chairman's wins
@@ -248,11 +312,17 @@ function computeLeaderboards(
           dcmpEventKeys.has(award.event_key)
         ) {
           dcmpImpactWins.set(teamKey, (dcmpImpactWins.get(teamKey) ?? 0) + 1);
+          const ev = dcmpImpactEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          dcmpImpactEvents.set(teamKey, ev);
         }
 
         // Engineering Inspiration wins
         if (award.award_type === AwardType.ENGINEERING_INSPIRATION) {
           eiWins.set(teamKey, (eiWins.get(teamKey) ?? 0) + 1);
+          const ev = eiEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          eiEvents.set(teamKey, ev);
         }
 
         // DCMP Engineering Inspiration wins
@@ -261,16 +331,25 @@ function computeLeaderboards(
           dcmpEventKeys.has(award.event_key)
         ) {
           dcmpEiWins.set(teamKey, (dcmpEiWins.get(teamKey) ?? 0) + 1);
+          const ev = dcmpEiEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          dcmpEiEvents.set(teamKey, ev);
         }
 
         // Leadership wins
         if (award.award_type === AwardType.DEANS_LIST) {
           leadershipWins.set(teamKey, (leadershipWins.get(teamKey) ?? 0) + 1);
+          const ev = leadershipEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          leadershipEvents.set(teamKey, ev);
         }
 
         // WFFA wins
         if (award.award_type === AwardType.WOODIE_FLOWERS) {
           wffaWins.set(teamKey, (wffaWins.get(teamKey) ?? 0) + 1);
+          const ev = wffaEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          wffaEvents.set(teamKey, ev);
         }
       }
     }
@@ -295,6 +374,14 @@ function computeLeaderboards(
     dcmpEiWins: mapToRankings(dcmpEiWins),
     leadershipWins: mapToRankings(leadershipWins),
     wffaWins: mapToRankings(wffaWins),
+    // Tooltip maps
+    blueBannerTooltips: buildContextTooltipMap(blueBannerEvents, eventNameLookup),
+    impactTooltips: buildContextTooltipMap(impactEvents, eventNameLookup),
+    dcmpImpactTooltips: buildContextTooltipMap(dcmpImpactEvents, eventNameLookup),
+    eiTooltips: buildContextTooltipMap(eiEvents, eventNameLookup),
+    dcmpEiTooltips: buildContextTooltipMap(dcmpEiEvents, eventNameLookup),
+    leadershipTooltips: buildContextTooltipMap(leadershipEvents, eventNameLookup),
+    wffaTooltips: buildContextTooltipMap(wffaEvents, eventNameLookup),
   };
 }
 
@@ -302,6 +389,7 @@ interface PerAwardLeaderboard {
   awardType: AwardType;
   name: string;
   rankings: LeaderboardRanking[];
+  contextTooltipMap: Record<string, ReactNode>;
 }
 
 function computePerAwardLeaderboards(
@@ -311,8 +399,11 @@ function computePerAwardLeaderboards(
     awards: Award[];
   }>,
 ): PerAwardLeaderboard[] {
-  // For each award_type, track: team -> count, and the most recent name
+  const eventNameLookup = buildEventNameLookup(yearResults);
+
+  // For each award_type, track: team -> count, team -> event keys, and the most recent name
   const awardTeamCounts = new Map<AwardType, Map<string, number>>();
+  const awardTeamEventKeys = new Map<AwardType, Map<string, string[]>>();
   const awardNames = new Map<AwardType, { name: string; year: number }>();
 
   for (const { awards } of yearResults) {
@@ -328,7 +419,6 @@ function computePerAwardLeaderboards(
       // Track the most recent name for this award type
       const existing = awardNames.get(award.award_type);
       if (!existing || award.year > existing.year) {
-        console.log('New Award Name', award.award_type, award.name, award.year);
         awardNames.set(award.award_type, {
           name: award.name,
           year: award.year,
@@ -345,6 +435,15 @@ function computePerAwardLeaderboards(
           awardTeamCounts.set(award.award_type, teamCounts);
         }
         teamCounts.set(teamKey, (teamCounts.get(teamKey) ?? 0) + 1);
+
+        let teamEvents = awardTeamEventKeys.get(award.award_type);
+        if (!teamEvents) {
+          teamEvents = new Map<string, string[]>();
+          awardTeamEventKeys.set(award.award_type, teamEvents);
+        }
+        const ev = teamEvents.get(teamKey) ?? [];
+        ev.push(award.event_key);
+        teamEvents.set(teamKey, ev);
       }
     }
   }
@@ -355,7 +454,14 @@ function computePerAwardLeaderboards(
     const name = awardNames.get(awardType)?.name ?? `Award ${awardType}`;
     const rankings = mapToRankings(teamCounts);
     if (rankings.length > 0) {
-      leaderboards.push({ awardType, name, rankings });
+      const teamEvents =
+        awardTeamEventKeys.get(awardType) ?? new Map<string, string[]>();
+      leaderboards.push({
+        awardType,
+        name,
+        rankings,
+        contextTooltipMap: buildContextTooltipMap(teamEvents, eventNameLookup),
+      });
     }
   }
 
@@ -494,6 +600,7 @@ function DistrictStatsPage() {
               rankings={leaderboards.blueBanners}
               keyType="team"
               year={0}
+              contextTooltipMap={leaderboards.blueBannerTooltips}
             />
             <Leaderboard
               title="Most District Awards"
@@ -506,36 +613,42 @@ function DistrictStatsPage() {
               rankings={leaderboards.impactWins}
               keyType="team"
               year={0}
+              contextTooltipMap={leaderboards.impactTooltips}
             />
             <Leaderboard
               title="Most District Championship Impact Award Wins"
               rankings={leaderboards.dcmpImpactWins}
               keyType="team"
               year={0}
+              contextTooltipMap={leaderboards.dcmpImpactTooltips}
             />
             <Leaderboard
               title="Most District Engineering Inspiration Award Wins"
               rankings={leaderboards.eiWins}
               keyType="team"
               year={0}
+              contextTooltipMap={leaderboards.eiTooltips}
             />
             <Leaderboard
               title="Most District Championship Engineering Inspiration Award Wins"
               rankings={leaderboards.dcmpEiWins}
               keyType="team"
               year={0}
+              contextTooltipMap={leaderboards.dcmpEiTooltips}
             />
             <Leaderboard
               title="Most Leadership Finalist Award Wins"
               rankings={leaderboards.leadershipWins}
               keyType="team"
               year={0}
+              contextTooltipMap={leaderboards.leadershipTooltips}
             />
             <Leaderboard
               title="Most Woodie Flowers Finalist Award Wins"
               rankings={leaderboards.wffaWins}
               keyType="team"
               year={0}
+              contextTooltipMap={leaderboards.wffaTooltips}
             />
             <hr className="col-span-full border-t" />
             {perAwardLeaderboards.map((lb) => (
@@ -545,6 +658,7 @@ function DistrictStatsPage() {
                 rankings={lb.rankings}
                 keyType="team"
                 year={0}
+                contextTooltipMap={lb.contextTooltipMap}
               />
             ))}
           </div>
