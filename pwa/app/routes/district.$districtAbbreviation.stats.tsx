@@ -22,7 +22,7 @@ import {
   SelectValue,
 } from '~/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { AwardType, BLUE_BANNER_AWARDS, SORT_ORDER } from '~/lib/api/AwardType';
+import { AwardType, BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { EventType } from '~/lib/api/EventType';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
@@ -375,18 +375,28 @@ function computeLeaderboards(
     leadershipWins: mapToRankings(leadershipWins),
     wffaWins: mapToRankings(wffaWins),
     // Tooltip maps
-    blueBannerTooltips: buildContextTooltipMap(blueBannerEvents, eventNameLookup),
+    blueBannerTooltips: buildContextTooltipMap(
+      blueBannerEvents,
+      eventNameLookup,
+    ),
     impactTooltips: buildContextTooltipMap(impactEvents, eventNameLookup),
-    dcmpImpactTooltips: buildContextTooltipMap(dcmpImpactEvents, eventNameLookup),
+    dcmpImpactTooltips: buildContextTooltipMap(
+      dcmpImpactEvents,
+      eventNameLookup,
+    ),
     eiTooltips: buildContextTooltipMap(eiEvents, eventNameLookup),
     dcmpEiTooltips: buildContextTooltipMap(dcmpEiEvents, eventNameLookup),
-    leadershipTooltips: buildContextTooltipMap(leadershipEvents, eventNameLookup),
+    leadershipTooltips: buildContextTooltipMap(
+      leadershipEvents,
+      eventNameLookup,
+    ),
     wffaTooltips: buildContextTooltipMap(wffaEvents, eventNameLookup),
   };
 }
 
 interface PerAwardLeaderboard {
   awardType: AwardType;
+  isDcmp: boolean;
   name: string;
   rankings: LeaderboardRanking[];
   contextTooltipMap: Record<string, ReactNode>;
@@ -401,12 +411,32 @@ function computePerAwardLeaderboards(
 ): PerAwardLeaderboard[] {
   const eventNameLookup = buildEventNameLookup(yearResults);
 
-  // For each award_type, track: team -> count, team -> event keys, and the most recent name
-  const awardTeamCounts = new Map<AwardType, Map<string, number>>();
-  const awardTeamEventKeys = new Map<AwardType, Map<string, string[]>>();
-  const awardNames = new Map<AwardType, { name: string; year: number }>();
+  // Awards that progress from district events to DCMP — track separately
+  const DCMP_PROGRESSION_AWARDS = new Set([
+    AwardType.CHAIRMANS,
+    AwardType.DEANS_LIST,
+    AwardType.ENGINEERING_INSPIRATION,
+    AwardType.ROOKIE_ALL_STAR,
+  ]);
 
-  for (const { awards } of yearResults) {
+  // For each award_type, track: team -> count, team -> event keys, and the most recent name
+  // For progression awards, use separate "dcmp_" prefixed keys
+  const awardTeamCounts = new Map<string, Map<string, number>>();
+  const awardTeamEventKeys = new Map<string, Map<string, string[]>>();
+  const awardNames = new Map<string, { name: string; year: number }>();
+  const awardTypeMap = new Map<string, AwardType>();
+
+  for (const { events, awards } of yearResults) {
+    const dcmpEventKeys = new Set(
+      events
+        .filter(
+          (e) =>
+            e.event_type === EventType.DISTRICT_CMP ||
+            e.event_type === EventType.DISTRICT_CMP_DIVISION,
+        )
+        .map((e) => e.key),
+    );
+
     for (const award of awards) {
       // Skip Winner/Finalist — already covered in other tabs
       if (
@@ -416,11 +446,32 @@ function computePerAwardLeaderboards(
         continue;
       }
 
-      // Track the most recent name for this award type
-      const existing = awardNames.get(award.award_type);
+      const isDcmpAward = dcmpEventKeys.has(award.event_key);
+      const hasProgression = DCMP_PROGRESSION_AWARDS.has(award.award_type);
+
+      // For progression awards, use separate keys for district vs DCMP
+      const leaderboardKey =
+        hasProgression && isDcmpAward
+          ? `dcmp_${award.award_type}`
+          : `${award.award_type}`;
+
+      awardTypeMap.set(leaderboardKey, award.award_type);
+
+      // Track the most recent name for this leaderboard
+      const existing = awardNames.get(leaderboardKey);
       if (!existing || award.year > existing.year) {
-        awardNames.set(award.award_type, {
-          name: award.name,
+        let displayName: string;
+        if (award.award_type === AwardType.DEANS_LIST) {
+          displayName = isDcmpAward
+            ? "Dean's List Finalist Award"
+            : "Dean's List Semi-Finalist Award";
+        } else {
+          const namePrefix =
+            hasProgression && isDcmpAward ? 'District Championship ' : '';
+          displayName = namePrefix + award.name;
+        }
+        awardNames.set(leaderboardKey, {
+          name: displayName,
           year: award.year,
         });
       }
@@ -429,17 +480,17 @@ function computePerAwardLeaderboards(
         const teamKey = recipient.team_key;
         if (!teamKey) continue;
 
-        let teamCounts = awardTeamCounts.get(award.award_type);
+        let teamCounts = awardTeamCounts.get(leaderboardKey);
         if (!teamCounts) {
           teamCounts = new Map<string, number>();
-          awardTeamCounts.set(award.award_type, teamCounts);
+          awardTeamCounts.set(leaderboardKey, teamCounts);
         }
         teamCounts.set(teamKey, (teamCounts.get(teamKey) ?? 0) + 1);
 
-        let teamEvents = awardTeamEventKeys.get(award.award_type);
+        let teamEvents = awardTeamEventKeys.get(leaderboardKey);
         if (!teamEvents) {
           teamEvents = new Map<string, string[]>();
-          awardTeamEventKeys.set(award.award_type, teamEvents);
+          awardTeamEventKeys.set(leaderboardKey, teamEvents);
         }
         const ev = teamEvents.get(teamKey) ?? [];
         ev.push(award.event_key);
@@ -450,14 +501,16 @@ function computePerAwardLeaderboards(
 
   // Build leaderboards, sorted by SORT_ORDER then award name
   const leaderboards: PerAwardLeaderboard[] = [];
-  for (const [awardType, teamCounts] of awardTeamCounts.entries()) {
-    const name = awardNames.get(awardType)?.name ?? `Award ${awardType}`;
+  for (const [leaderboardKey, teamCounts] of awardTeamCounts.entries()) {
+    const awardType = awardTypeMap.get(leaderboardKey) ?? AwardType.OTHER;
+    const name = awardNames.get(leaderboardKey)?.name ?? `Award ${awardType}`;
     const rankings = mapToRankings(teamCounts);
     if (rankings.length > 0) {
       const teamEvents =
-        awardTeamEventKeys.get(awardType) ?? new Map<string, string[]>();
+        awardTeamEventKeys.get(leaderboardKey) ?? new Map<string, string[]>();
       leaderboards.push({
         awardType,
+        isDcmp: leaderboardKey.startsWith('dcmp_'),
         name,
         rankings,
         contextTooltipMap: buildContextTooltipMap(teamEvents, eventNameLookup),
@@ -466,10 +519,17 @@ function computePerAwardLeaderboards(
   }
 
   leaderboards.sort((a, b) => {
-    const aOrder = SORT_ORDER[a.awardType] ?? 999;
-    const bOrder = SORT_ORDER[b.awardType] ?? 999;
+    // Custom display order overrides (lower = earlier)
+    const displayOrder = (at: AwardType) => {
+      if (at === AwardType.DEANS_LIST) return 3;
+      if (at === AwardType.WOODIE_FLOWERS) return 4;
+      return at;
+    };
+    const aOrder = displayOrder(a.awardType);
+    const bOrder = displayOrder(b.awardType);
     if (aOrder !== bOrder) return aOrder - bOrder;
-    return a.name.localeCompare(b.name);
+    if (a.isDcmp !== b.isDcmp) return a.isDcmp ? 1 : -1;
+    return 0;
   });
 
   return leaderboards;
@@ -532,7 +592,6 @@ function DistrictStatsPage() {
           <TabsTrigger value="championships">Championships</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="awards">Awards</TabsTrigger>
-          <TabsTrigger value="by-award">By Award</TabsTrigger>
         </TabsList>
 
         <TabsContent value="championships">
@@ -595,7 +654,7 @@ function DistrictStatsPage() {
 
         <TabsContent value="awards">
           <div className="grid gap-6 lg:grid-cols-2">
-            <Leaderboard
+            {/* <Leaderboard
               title="Most District Blue Banners"
               rankings={leaderboards.blueBanners}
               keyType="team"
@@ -650,10 +709,10 @@ function DistrictStatsPage() {
               year={0}
               contextTooltipMap={leaderboards.wffaTooltips}
             />
-            <hr className="col-span-full border-t" />
+            <hr className="col-span-full border-t" /> */}
             {perAwardLeaderboards.map((lb) => (
               <Leaderboard
-                key={lb.awardType}
+                key={lb.name}
                 title={`Most ${lb.name} Wins`}
                 rankings={lb.rankings}
                 keyType="team"
