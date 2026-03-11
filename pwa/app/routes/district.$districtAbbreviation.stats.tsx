@@ -21,7 +21,7 @@ import {
   SelectValue,
 } from '~/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { AwardType, BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
+import { AwardType, BLUE_BANNER_AWARDS, SORT_ORDER } from '~/lib/api/AwardType';
 import { EventType } from '~/lib/api/EventType';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
@@ -298,6 +298,77 @@ function computeLeaderboards(
   };
 }
 
+interface PerAwardLeaderboard {
+  awardType: AwardType;
+  name: string;
+  rankings: LeaderboardRanking[];
+}
+
+function computePerAwardLeaderboards(
+  yearResults: Array<{
+    year: number;
+    events: Event[];
+    awards: Award[];
+  }>,
+): PerAwardLeaderboard[] {
+  // For each award_type, track: team -> count, and the most recent name
+  const awardTeamCounts = new Map<AwardType, Map<string, number>>();
+  const awardNames = new Map<AwardType, { name: string; year: number }>();
+
+  for (const { awards } of yearResults) {
+    for (const award of awards) {
+      // Skip Winner/Finalist — already covered in other tabs
+      if (
+        award.award_type === AwardType.WINNER ||
+        award.award_type === AwardType.FINALIST
+      ) {
+        continue;
+      }
+
+      // Track the most recent name for this award type
+      const existing = awardNames.get(award.award_type);
+      if (!existing || award.year > existing.year) {
+        console.log('New Award Name', award.award_type, award.name, award.year);
+        awardNames.set(award.award_type, {
+          name: award.name,
+          year: award.year,
+        });
+      }
+
+      for (const recipient of award.recipient_list) {
+        const teamKey = recipient.team_key;
+        if (!teamKey) continue;
+
+        let teamCounts = awardTeamCounts.get(award.award_type);
+        if (!teamCounts) {
+          teamCounts = new Map<string, number>();
+          awardTeamCounts.set(award.award_type, teamCounts);
+        }
+        teamCounts.set(teamKey, (teamCounts.get(teamKey) ?? 0) + 1);
+      }
+    }
+  }
+
+  // Build leaderboards, sorted by SORT_ORDER then award name
+  const leaderboards: PerAwardLeaderboard[] = [];
+  for (const [awardType, teamCounts] of awardTeamCounts.entries()) {
+    const name = awardNames.get(awardType)?.name ?? `Award ${awardType}`;
+    const rankings = mapToRankings(teamCounts);
+    if (rankings.length > 0) {
+      leaderboards.push({ awardType, name, rankings });
+    }
+  }
+
+  leaderboards.sort((a, b) => {
+    const aOrder = SORT_ORDER[a.awardType] ?? 999;
+    const bOrder = SORT_ORDER[b.awardType] ?? 999;
+    if (aOrder !== bOrder) return aOrder - bOrder;
+    return a.name.localeCompare(b.name);
+  });
+
+  return leaderboards;
+}
+
 function DistrictStatsPage() {
   const { abbreviation, history, insights, yearResults } =
     Route.useLoaderData();
@@ -308,6 +379,11 @@ function DistrictStatsPage() {
   const leaderboards = useMemo(
     () => computeLeaderboards(insights.team_data, yearResults),
     [insights.team_data, yearResults],
+  );
+
+  const perAwardLeaderboards = useMemo(
+    () => computePerAwardLeaderboards(yearResults),
+    [yearResults],
   );
 
   const displayName = history[history.length - 1].display_name;
@@ -350,6 +426,7 @@ function DistrictStatsPage() {
           <TabsTrigger value="championships">Championships</TabsTrigger>
           <TabsTrigger value="events">Events</TabsTrigger>
           <TabsTrigger value="awards">Awards</TabsTrigger>
+          <TabsTrigger value="by-award">By Award</TabsTrigger>
         </TabsList>
 
         <TabsContent value="championships">
@@ -460,6 +537,16 @@ function DistrictStatsPage() {
               keyType="team"
               year={0}
             />
+            <hr className="col-span-full border-t" />
+            {perAwardLeaderboards.map((lb) => (
+              <Leaderboard
+                key={lb.awardType}
+                title={`Most ${lb.name} Wins`}
+                rankings={lb.rankings}
+                keyType="team"
+                year={0}
+              />
+            ))}
           </div>
         </TabsContent>
       </Tabs>
