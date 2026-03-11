@@ -1,3 +1,4 @@
+import { TZDate } from '@date-fns/tz';
 import { Link } from '@tanstack/react-router';
 
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
@@ -172,15 +173,15 @@ export function MatchRow({
         >
           <span className="flex h-full items-center justify-center text-center">
             {match.predicted_time &&
-              new Date(match.predicted_time * 1000).toLocaleTimeString(
-                'en-US',
-                {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  weekday: 'short',
-                  hour12: true,
-                },
-              )}
+              new TZDate(
+                match.predicted_time * 1000,
+                event.timezone ?? 'UTC',
+              ).toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                weekday: 'short',
+                hour12: true,
+              })}
           </span>
         </div>
       )}
@@ -222,9 +223,11 @@ export function MatchRow({
 export function SimpleMatchRow({
   match,
   year,
+  timezone,
 }: {
   match: Match;
   year: number;
+  timezone?: string | null;
 }) {
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
@@ -283,15 +286,15 @@ export function SimpleMatchRow({
           >
             <span>
               {match.predicted_time &&
-                new Date(match.predicted_time * 1000).toLocaleTimeString(
-                  'en-US',
-                  {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    weekday: 'short',
-                    hour12: true,
-                  },
-                )}
+                new TZDate(
+                  match.predicted_time * 1000,
+                  timezone ?? 'UTC',
+                ).toLocaleTimeString('en-US', {
+                  hour: '2-digit',
+                  minute: '2-digit',
+                  weekday: 'short',
+                  hour12: true,
+                })}
             </span>
           </div>
         )}

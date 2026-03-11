@@ -1,6 +1,26 @@
+import { TZDate } from '@date-fns/tz';
+import { addDays, parseISO, startOfWeek } from 'date-fns';
+
 import { Event } from '~/api/tba/read/types.gen';
 import { EventType } from '~/lib/api/EventType';
-import { convertMsToDays } from '~/lib/utils';
+
+/**
+ * Parse a YYYY-MM-DD date string as midnight in the event's timezone.
+ * Falls back to user-local time (parseISO) if no timezone is provided.
+ *
+ * Uses the TZDate integer constructor (year, month, day, tz) rather than
+ * the string form because the string form is affected by vitest fake timers.
+ */
+export function parseEventDate(
+  dateStr: string,
+  timezone: string | null | undefined,
+): Date {
+  if (timezone) {
+    const [year, month, day] = dateStr.split('-').map(Number);
+    return new TZDate(year, month - 1, day, timezone);
+  }
+  return parseISO(dateStr);
+}
 
 export function isValidEventKey(key: string) {
   return /^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$/.test(key);
@@ -8,10 +28,10 @@ export function isValidEventKey(key: string) {
 
 export function sortEventsComparator(a: Event, b: Event) {
   // First sort by date
-  const start_date_a = new Date(a.start_date);
-  const start_date_b = new Date(b.start_date);
-  const end_date_a = new Date(a.end_date);
-  const end_date_b = new Date(b.end_date);
+  const start_date_a = parseISO(a.start_date);
+  const start_date_b = parseISO(b.start_date);
+  const end_date_a = parseISO(a.end_date);
+  const end_date_b = parseISO(b.end_date);
   if (start_date_a < start_date_b) {
     return -1;
   }
@@ -50,16 +70,10 @@ export function sortEventsComparator(a: Event, b: Event) {
   return 0;
 }
 
-/** Returns a Date object at midnight in the user's timezone on the specified YYYY-MM-DD. */
-function getLocalMidnightOnDate(yyyymmdd: string) {
-  const date = new Date(yyyymmdd + 'T00:00:00Z');
-  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-}
-
 export function getEventDateString(event: Event, month: 'long' | 'short') {
-  // Local dates are needed since the toLocaleDateString depends on the user's local timezone.
-  const startDate = getLocalMidnightOnDate(event.start_date);
-  const endDate = getLocalMidnightOnDate(event.end_date);
+  // parseISO treats YYYY-MM-DD as local midnight, matching toLocaleDateString behavior.
+  const startDate = parseISO(event.start_date);
+  const endDate = parseISO(event.end_date);
 
   const endDateString = endDate.toLocaleDateString('default', {
     month: month,
@@ -109,29 +123,19 @@ export function getEventWeekString(event: Event) {
 
 export function getCurrentWeekEvents(events: Event[]) {
   const now = new Date();
-  const filteredEvents = [];
+  // startOfWeek gives midnight on Monday in local time, not "current time on Monday".
+  // This is consistent with parseISO which also gives local midnight for date strings.
+  const weekStart = startOfWeek(now, { weekStartsOn: 1 });
+  const weekEnd = addDays(weekStart, 7);
 
-  const diffFromMonday = (now.getDay() + 6) % 7;
-  const closestStartMonday = new Date(now).setDate(
-    now.getDate() - diffFromMonday,
-  );
+  const filteredEvents = events.filter((event) => {
+    const startDate = parseISO(event.start_date);
+    const endDate = parseISO(event.end_date);
+    // Include events that overlap with [weekStart, weekEnd):
+    // started before the end of this week AND ends on or after Monday.
+    return startDate < weekEnd && endDate >= weekStart;
+  });
 
-  for (const event of events) {
-    const startDateMs = new Date(event.start_date).getTime();
-    const endDateMs = new Date(event.end_date).getTime();
-
-    const timeOffsetDays = Math.floor(
-      convertMsToDays(startDateMs - closestStartMonday),
-    );
-
-    // Include events that start this week, or started before but are still ongoing
-    if (
-      (timeOffsetDays >= 0 && timeOffsetDays < 7) ||
-      (timeOffsetDays < 0 && endDateMs >= closestStartMonday)
-    ) {
-      filteredEvents.push(event);
-    }
-  }
   return sortEvents(filteredEvents);
 }
 
@@ -179,15 +183,16 @@ export function isEventWithinDays(
   if (event.start_date === null || event.end_date === null) {
     return false;
   }
-  const DAY_IN_MS = 24 * 60 * 60 * 1000;
-  const startDate = getLocalMidnightOnDate(event.start_date);
-  const endDate = getLocalMidnightOnDate(event.end_date);
+  // Dates are interpreted in the event's timezone so that, e.g., an event
+  // ending April 12 in New York ends at New York midnight, not the user's midnight.
+  const startDate = parseEventDate(event.start_date, event.timezone);
+  const endDate = parseEventDate(event.end_date, event.timezone);
   const now = new Date();
-  const windowStart = startDate.getTime() - negativeDaysBefore * DAY_IN_MS;
+  const windowStart = addDays(startDate, -negativeDaysBefore);
   // endDate is midnight at the start of the last day, so +1 day to include
   // the full last day, then positiveDaysAfter additional days beyond that.
-  const windowEnd = endDate.getTime() + (1 + positiveDaysAfter) * DAY_IN_MS;
-  return now.getTime() >= windowStart && now.getTime() <= windowEnd;
+  const windowEnd = addDays(endDate, 1 + positiveDaysAfter);
+  return now >= windowStart && now <= windowEnd;
 }
 
 export function isEventWithinADay(event: Event): boolean {

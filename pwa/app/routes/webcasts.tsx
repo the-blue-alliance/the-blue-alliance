@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { addDays } from 'date-fns';
 import { useMemo } from 'react';
 
 import { Event } from '~/api/tba/read';
@@ -17,7 +18,11 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
-import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
+import {
+  getEventDateString,
+  getEventWeekString,
+  parseEventDate,
+} from '~/lib/eventUtils';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/webcasts')({
@@ -82,9 +87,8 @@ function WebcastsPage() {
   const currentEvents = useMemo(
     () =>
       eventsWithWebcasts.filter((event) => {
-        const start = new Date(event.start_date);
-        const end = new Date(event.end_date);
-        end.setDate(end.getDate() + 1);
+        const start = parseEventDate(event.start_date, event.timezone);
+        const end = addDays(parseEventDate(event.end_date, event.timezone), 1);
         return now >= start && now <= end;
       }),
     [eventsWithWebcasts, now],
@@ -93,7 +97,7 @@ function WebcastsPage() {
   const upcomingEvents = useMemo(
     () =>
       eventsWithWebcasts.filter((event) => {
-        const start = new Date(event.start_date);
+        const start = parseEventDate(event.start_date, event.timezone);
         return start > now;
       }),
     [eventsWithWebcasts, now],
@@ -102,8 +106,7 @@ function WebcastsPage() {
   const pastEvents = useMemo(
     () =>
       eventsWithWebcasts.filter((event) => {
-        const end = new Date(event.end_date);
-        end.setDate(end.getDate() + 1);
+        const end = addDays(parseEventDate(event.end_date, event.timezone), 1);
         return end < now;
       }),
     [eventsWithWebcasts, now],

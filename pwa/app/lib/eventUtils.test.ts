@@ -1,4 +1,4 @@
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { Event } from '~/api/tba/read';
 import {
@@ -135,6 +135,25 @@ describe.concurrent('getEventWeekString', () => {
 });
 
 describe('isEventWithinDays', () => {
+  // All setSystemTime calls use the local Date constructor (not UTC strings) so
+  // the calendar date is the same in every timezone, matching parseISO behavior.
+
+  test('uses event timezone: event in New York is still active at 11pm EDT on its end date', () => {
+    // An event ending April 12 in New York ends at midnight April 13 EDT (04:00 UTC).
+    // At 03:00 UTC on April 13 it is still April 12 in New York, so the event
+    // should still be within the window.
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+      timezone: 'America/New_York',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T03:00:00Z')); // 11pm EDT April 12
+    expect(isEventWithinDays(event, 0, 0)).toBe(true);
+    vi.useRealTimers();
+  });
+
   test('includes current date within event range', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
@@ -142,7 +161,7 @@ describe('isEventWithinDays', () => {
       end_date: '2024-04-12',
     };
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2024-04-11T12:00:00Z'));
+    vi.setSystemTime(new Date(2024, 3, 11, 12, 0, 0)); // April 11 noon local
     expect(isEventWithinDays(event, 0, 0)).toBe(true);
     vi.useRealTimers();
   });
@@ -154,7 +173,7 @@ describe('isEventWithinDays', () => {
       end_date: '2024-04-12',
     };
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2024-04-09T12:00:00Z'));
+    vi.setSystemTime(new Date(2024, 3, 9, 12, 0, 0)); // April 9 noon local
     expect(isEventWithinDays(event, 1, 0)).toBe(true);
     vi.useRealTimers();
   });
@@ -166,7 +185,7 @@ describe('isEventWithinDays', () => {
       end_date: '2024-04-12',
     };
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2024-04-13T12:00:00Z'));
+    vi.setSystemTime(new Date(2024, 3, 13, 12, 0, 0)); // April 13 noon local
     expect(isEventWithinDays(event, 0, 1)).toBe(true);
     vi.useRealTimers();
   });
@@ -178,7 +197,7 @@ describe('isEventWithinDays', () => {
       end_date: '2024-04-12',
     };
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2024-04-12T18:00:00Z'));
+    vi.setSystemTime(new Date(2024, 3, 12, 18, 0, 0)); // April 12 6pm local
     expect(isEventWithinDays(event, 0, 0)).toBe(true);
     vi.useRealTimers();
   });
@@ -190,13 +209,30 @@ describe('isEventWithinDays', () => {
       end_date: '2024-04-12',
     };
     vi.useFakeTimers();
-    vi.setSystemTime(new Date('2024-04-15T12:00:00Z'));
+    vi.setSystemTime(new Date(2024, 3, 15, 12, 0, 0)); // April 15 noon local
     expect(isEventWithinDays(event, 1, 1)).toBe(false);
     vi.useRealTimers();
   });
 });
 
 describe('getCurrentWeekEvents', () => {
+  test('includes Monday event when today is Thursday at noon', () => {
+    // Bug: closestStartMonday was computed at current time-of-day (noon),
+    // not midnight. Monday events (midnight) < Monday noon, giving
+    // timeOffsetDays=-1, then end < closestStartMonday → wrongly excluded.
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 3, 11, 12, 0, 0)); // Thursday April 11, noon
+
+    const mondayEvent = {
+      start_date: '2024-04-08',
+      end_date: '2024-04-08',
+    } as Event;
+
+    const result = getCurrentWeekEvents([mondayEvent]);
+    expect(result).toContain(mondayEvent);
+    vi.useRealTimers();
+  });
+
   test('excludes previous Sunday but includes same-week events', () => {
     // Set to Thursday April 11 at noon local time
     vi.useFakeTimers();
@@ -251,5 +287,99 @@ describe('getCurrentWeekEvents', () => {
     expect(result).toContain(ongoingEvent);
     expect(result).not.toContain(pastEvent);
     vi.useRealTimers();
+  });
+});
+
+// These tests stub process.env.TZ to simulate different user locales.
+// getCurrentWeekEvents uses parseISO (user-local time) for event dates and
+// startOfWeek (user-local time) for week boundaries, so it is sensitive to
+// the user's timezone.
+describe('getCurrentWeekEvents user timezone sensitivity', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.useRealTimers();
+  });
+
+  test('Tokyo user (UTC+9) on Thursday noon still sees Monday event', () => {
+    vi.stubEnv('TZ', 'Asia/Tokyo');
+    vi.useFakeTimers();
+    // Thursday April 11, noon Tokyo time
+    vi.setSystemTime(new Date(2024, 3, 11, 12, 0, 0));
+
+    const mondayEvent = {
+      start_date: '2024-04-08',
+      end_date: '2024-04-08',
+    } as Event;
+
+    expect(getCurrentWeekEvents([mondayEvent])).toContain(mondayEvent);
+  });
+
+  test('LA user (UTC-7) on Thursday noon sees Sunday event in the same week', () => {
+    vi.stubEnv('TZ', 'America/Los_Angeles');
+    vi.useFakeTimers();
+    // Thursday April 11, noon LA time
+    vi.setSystemTime(new Date(2024, 3, 11, 12, 0, 0));
+
+    const sundayEvent = {
+      start_date: '2024-04-14',
+      end_date: '2024-04-14',
+    } as Event;
+
+    expect(getCurrentWeekEvents([sundayEvent])).toContain(sundayEvent);
+  });
+
+  test('LA user does not see next-Monday event as this week', () => {
+    vi.stubEnv('TZ', 'America/Los_Angeles');
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date(2024, 3, 11, 12, 0, 0)); // Thursday April 11
+
+    const nextMondayEvent = {
+      start_date: '2024-04-15',
+      end_date: '2024-04-15',
+    } as Event;
+
+    expect(getCurrentWeekEvents([nextMondayEvent])).not.toContain(
+      nextMondayEvent,
+    );
+  });
+});
+
+// isEventWithinDays uses event.timezone for date boundaries, so the result
+// should be the same regardless of the user's local timezone.
+describe('isEventWithinDays user timezone independence', () => {
+  afterEach(() => {
+    vi.unstubAllEnvs();
+    vi.useRealTimers();
+  });
+
+  test('Tokyo user and LA user see the same active/inactive result for a New York event', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+      timezone: 'America/New_York',
+    };
+
+    vi.useFakeTimers();
+    // 03:00 UTC = 23:00 EDT April 12 → event still active in New York
+    vi.setSystemTime(new Date('2024-04-13T03:00:00Z'));
+
+    vi.stubEnv('TZ', 'Asia/Tokyo'); // 12:00 noon April 13 in Tokyo
+    expect(isEventWithinDays(event, 0, 0)).toBe(true);
+    vi.unstubAllEnvs();
+
+    vi.stubEnv('TZ', 'America/Los_Angeles'); // 8pm April 12 in LA
+    expect(isEventWithinDays(event, 0, 0)).toBe(true);
+    vi.unstubAllEnvs();
+
+    // 05:00 UTC = 01:00 EDT April 13 → event ended in New York
+    vi.setSystemTime(new Date('2024-04-13T05:00:00Z'));
+
+    vi.stubEnv('TZ', 'Asia/Tokyo');
+    expect(isEventWithinDays(event, 0, 0)).toBe(false);
+    vi.unstubAllEnvs();
+
+    vi.stubEnv('TZ', 'America/Los_Angeles');
+    expect(isEventWithinDays(event, 0, 0)).toBe(false);
   });
 });

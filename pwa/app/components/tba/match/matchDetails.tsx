@@ -204,7 +204,11 @@ export default function MatchDetails({
     <div className="flex flex-col gap-4 md:flex-row">
       <div className="order-2 w-full md:order-1 md:w-lg">
         <div className="flex flex-col gap-2">
-          <SimpleMatchRow match={match} year={event.year} />
+          <SimpleMatchRow
+            match={match}
+            year={event.year}
+            timezone={event.timezone}
+          />
           {sbDiv}
           <div className="flex flex-col gap-2 rounded-lg border bg-muted/50 p-3">
             <div className="flex items-center justify-between">
