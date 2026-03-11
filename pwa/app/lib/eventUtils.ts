@@ -191,5 +191,5 @@ export function isEventWithinDays(
 }
 
 export function isEventWithinADay(event: Event): boolean {
-  return isEventWithinDays(event, -1, 1);
+  return isEventWithinDays(event, -1, 0);
 }

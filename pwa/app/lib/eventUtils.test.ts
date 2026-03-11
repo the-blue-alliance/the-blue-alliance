@@ -5,6 +5,7 @@ import {
   getCurrentWeekEvents,
   getEventDateString,
   getEventWeekString,
+  isEventWithinADay,
   isEventWithinDays,
   isValidEventKey,
 } from '~/lib/eventUtils';
@@ -192,6 +193,32 @@ describe('isEventWithinDays', () => {
     vi.useFakeTimers();
     vi.setSystemTime(new Date('2024-04-15T12:00:00Z'));
     expect(isEventWithinDays(event, 1, 1)).toBe(false);
+    vi.useRealTimers();
+  });
+});
+
+describe('isEventWithinADay', () => {
+  test('returns true on the last day of the event', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-12T18:00:00Z'));
+    expect(isEventWithinADay(event)).toBe(true);
+    vi.useRealTimers();
+  });
+
+  test('returns false the day after the event ends', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      start_date: '2024-04-10',
+      end_date: '2024-04-12',
+    };
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T12:00:00Z'));
+    expect(isEventWithinADay(event)).toBe(false);
     vi.useRealTimers();
   });
 });
