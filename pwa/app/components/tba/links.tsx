@@ -172,6 +172,30 @@ const MatchLink = forwardRef<
 });
 MatchLink.displayName = 'MatchLink';
 
+const PitLocationLink = ({
+  teamNumber,
+  year,
+  firstEventCode,
+  pitLocation,
+}: {
+  teamNumber: number;
+  year: number;
+  firstEventCode: string;
+  pitLocation: string;
+}) => {
+  return (
+    <a
+      href={`https://frc.nexus/en/event/${year}${firstEventCode}/team/${teamNumber}/map`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-600 underline dark:text-blue-400"
+    >
+      {pitLocation}
+    </a>
+  );
+};
+PitLocationLink.displayName = 'PitLocationLink';
+
 const DistrictLink = forwardRef<
   HTMLAnchorElement,
   PropsWithChildren<
@@ -200,6 +224,7 @@ export {
   EventLink,
   EventLocationLink,
   MatchLink,
+  PitLocationLink,
   TeamLink,
   TeamLocationLink,
 };

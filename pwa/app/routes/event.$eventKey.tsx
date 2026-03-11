@@ -40,6 +40,7 @@ import {
   getEventRankingsOptions,
   getEventTeamMediaOptions,
   getEventTeamsOptions,
+  getEventTeamsStatusesOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
@@ -53,6 +54,7 @@ import InlineIcon from '~/components/tba/inlineIcon';
 import {
   DistrictLink,
   EventLocationLink,
+  PitLocationLink,
   TeamLink,
   TeamLocationLink,
 } from '~/components/tba/links';
@@ -278,6 +280,10 @@ function EventPage() {
     getEventTeamMediaOptions({ path: { event_key: eventKey } }),
   );
 
+  const teamStatusesQuery = useQuery(
+    getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
+  );
+
   const districtPointsQuery = useQuery(
     getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
   );
@@ -460,6 +466,8 @@ function EventPage() {
               teams={teamsQuery.data}
               media={teamMediaQuery.data}
               year={event.year}
+              firstEventCode={event.first_event_code}
+              pitLocations={teamStatusesQuery.data}
             />
           )}
         </TabsContent>
@@ -675,12 +683,20 @@ function TeamsTab({
   teams,
   media,
   year,
+  firstEventCode,
+  pitLocations,
 }: {
   teams: Team[];
   media: Media[];
   year: number;
+  firstEventCode: string | null;
+  pitLocations?: { [key: string]: { pit_location?: string | null } | null };
 }) {
   teams.sort(sortTeamsComparator);
+
+  const showPitLocations = pitLocations
+    ? Object.values(pitLocations).some((s) => s?.pit_location)
+    : false;
 
   const teamChunks = splitIntoNChunks(teams, 2);
 
@@ -693,6 +709,7 @@ function TeamsTab({
               <TableHead className="w-[60px] text-center">Avatar</TableHead>
               <TableHead className="w-[30ch]">Team</TableHead>
               <TableHead>Location</TableHead>
+              {showPitLocations && <TableHead>Pit</TableHead>}
               <TableHead>Pic</TableHead>
             </TableRow>
           </TableHeader>
@@ -704,6 +721,7 @@ function TeamsTab({
 
               const maybeAvatar = teamMedia.find((m) => m.type === 'avatar');
               const maybeRobotPic = getTeamPreferredRobotPicMedium(teamMedia);
+              const pitLoc = pitLocations?.[t.key]?.pit_location;
 
               return (
                 <TableRow key={t.key}>
@@ -730,6 +748,20 @@ function TeamsTab({
                   <TableCell className={'text-xs'}>
                     <TeamLocationLink team={t} />
                   </TableCell>
+                  {showPitLocations && (
+                    <TableCell className="text-xs">
+                      {pitLoc && firstEventCode ? (
+                        <PitLocationLink
+                          teamNumber={t.team_number}
+                          year={year}
+                          firstEventCode={firstEventCode}
+                          pitLocation={pitLoc}
+                        />
+                      ) : (
+                        (pitLoc ?? '--')
+                      )}
+                    </TableCell>
+                  )}
                   {maybeRobotPic && (
                     <TableCell>
                       <Dialog>
