@@ -465,10 +465,12 @@ function computePerAwardLeaderboards(
           displayName = isDcmpAward
             ? "Dean's List Finalist Award"
             : "Dean's List Semi-Finalist Award";
+        } else if (hasProgression && isDcmpAward) {
+          displayName = award.name.startsWith('District Championship')
+            ? award.name
+            : 'District Championship ' + award.name;
         } else {
-          const namePrefix =
-            hasProgression && isDcmpAward ? 'District Championship ' : '';
-          displayName = namePrefix + award.name;
+          displayName = award.name;
         }
         awardNames.set(leaderboardKey, {
           name: displayName,
