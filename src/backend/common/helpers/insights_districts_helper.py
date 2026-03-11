@@ -20,6 +20,7 @@ from backend.common.queries.district_query import DistrictHistoryQuery
 from backend.common.queries.event_query import (
     CmpDivisionsInYearQuery,
     DistrictChampsInYearQuery,
+    DistrictCmpDivisionsInYearQuery,
     DistrictEventsQuery,
 )
 from backend.common.queries.team_query import DistrictTeamsQuery
@@ -90,6 +91,17 @@ class InsightsDistrictsHelper:
             partial_event_list = future.get_result()
             dcmp_event_list += partial_event_list
 
+        dcmp_division_event_futures = []
+        for district in history:
+            dcmp_division_event_futures.append(
+                DistrictCmpDivisionsInYearQuery(year=district.year).fetch_async()
+            )
+
+        dcmp_division_event_list: List[Event] = []
+        for future in dcmp_division_event_futures:
+            partial_event_list = future.get_result()
+            dcmp_division_event_list += partial_event_list
+
         cmp_event_futures = []
         for district in history:
             cmp_event_futures.append(
@@ -111,7 +123,7 @@ class InsightsDistrictsHelper:
         elims_record = defaultdict(lambda: WLTRecord(wins=0, losses=0, ties=0))
         district_event_per_year_count = defaultdict(lambda: defaultdict(int))
         total_matches_played = defaultdict(int)
-        dcmp_appearances = defaultdict(int)
+        dcmp_appearances_by_year: Dict[str, Set[int]] = defaultdict(set)
         cmp_appearances = defaultdict(int)
 
         for event in district_event_list:
@@ -171,7 +183,11 @@ class InsightsDistrictsHelper:
 
         for dcmp_event in dcmp_event_list:
             for team in dcmp_event.teams:
-                dcmp_appearances[team.key_name] += 1
+                dcmp_appearances_by_year[team.key_name].add(dcmp_event.year)
+
+        for dcmp_div_event in dcmp_division_event_list:
+            for team in dcmp_div_event.teams:
+                dcmp_appearances_by_year[team.key_name].add(dcmp_div_event.year)
 
         for cmp_event in cmp_event_list:
             for team in cmp_event.teams:
@@ -196,7 +212,7 @@ class InsightsDistrictsHelper:
                     ]
                 ),
                 total_matches_played=total_matches_played[k],
-                dcmp_appearances=dcmp_appearances[k],
+                dcmp_appearances=len(dcmp_appearances_by_year[k]),
                 cmp_appearances=cmp_appearances[k],
             )
             for k in years_participated.keys()
