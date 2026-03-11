@@ -654,7 +654,7 @@ function DistrictStatsPage() {
 
         <TabsContent value="awards">
           <div className="grid gap-6 lg:grid-cols-2">
-            {/* <Leaderboard
+            <Leaderboard
               title="Most District Blue Banners"
               rankings={leaderboards.blueBanners}
               keyType="team"
@@ -667,49 +667,6 @@ function DistrictStatsPage() {
               keyType="team"
               year={0}
             />
-            <Leaderboard
-              title="Most District Impact Award Wins"
-              rankings={leaderboards.impactWins}
-              keyType="team"
-              year={0}
-              contextTooltipMap={leaderboards.impactTooltips}
-            />
-            <Leaderboard
-              title="Most District Championship Impact Award Wins"
-              rankings={leaderboards.dcmpImpactWins}
-              keyType="team"
-              year={0}
-              contextTooltipMap={leaderboards.dcmpImpactTooltips}
-            />
-            <Leaderboard
-              title="Most District Engineering Inspiration Award Wins"
-              rankings={leaderboards.eiWins}
-              keyType="team"
-              year={0}
-              contextTooltipMap={leaderboards.eiTooltips}
-            />
-            <Leaderboard
-              title="Most District Championship Engineering Inspiration Award Wins"
-              rankings={leaderboards.dcmpEiWins}
-              keyType="team"
-              year={0}
-              contextTooltipMap={leaderboards.dcmpEiTooltips}
-            />
-            <Leaderboard
-              title="Most Leadership Finalist Award Wins"
-              rankings={leaderboards.leadershipWins}
-              keyType="team"
-              year={0}
-              contextTooltipMap={leaderboards.leadershipTooltips}
-            />
-            <Leaderboard
-              title="Most Woodie Flowers Finalist Award Wins"
-              rankings={leaderboards.wffaWins}
-              keyType="team"
-              year={0}
-              contextTooltipMap={leaderboards.wffaTooltips}
-            />
-            <hr className="col-span-full border-t" /> */}
             {perAwardLeaderboards.map((lb) => (
               <Leaderboard
                 key={lb.name}
