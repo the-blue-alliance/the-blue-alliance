@@ -7,6 +7,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Award, Event, Match, Team, WltRecord } from '~/api/tba/read';
 import {
@@ -76,7 +77,7 @@ import {
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
   loader: async ({ params, context: { queryClient } }) => {
-    const startTime = Date.now();
+    const startTime = Temporal.Now.instant().epochMilliseconds;
     const teamKey = `frc${params.teamNumber}`;
     const year = await parseParamsForYearElseDefault(queryClient, params);
 
@@ -158,7 +159,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       teamDistrictsQuery,
     ]);
 
-    const endTime = Date.now();
+    const endTime = Temporal.Now.instant().epochMilliseconds;
     const duration = endTime - startTime;
     Sentry.metrics.distribution('team.page.loader.duration', duration, {
       attributes: { team_number: params.teamNumber, year },

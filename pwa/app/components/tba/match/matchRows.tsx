@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { Temporal } from 'temporal-polyfill';
 
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
@@ -8,6 +9,7 @@ import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
 import TeamListSubgrid from '~/components/tba/match/teamListSubgrid';
 import { PlayoffType } from '~/lib/api/PlayoffType';
+import { EVENT_FALLBACK_TIMEZONE } from '~/lib/eventUtils';
 import { matchTitleShort } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
 
@@ -172,15 +174,16 @@ export function MatchRow({
         >
           <span className="flex h-full items-center justify-center text-center">
             {match.predicted_time &&
-              new Date(match.predicted_time * 1000).toLocaleTimeString(
-                'en-US',
-                {
+              Temporal.Instant.fromEpochMilliseconds(
+                match.predicted_time * 1000,
+              )
+                .toZonedDateTimeISO(event.timezone ?? EVENT_FALLBACK_TIMEZONE)
+                .toLocaleString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
                   weekday: 'short',
                   hour12: true,
-                },
-              )}
+                })}
           </span>
         </div>
       )}

@@ -73,6 +73,7 @@
     "recharts": "3.8.0",
     "srvx": "0.11.9",
     "tailwind-merge": "3.5.0",
+    "temporal-polyfill": "0.3.2",
     "vaul": "1.1.2",
     "workbox-window": "7.4.0",
     "zod": "4.3.6"

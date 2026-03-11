@@ -13,7 +13,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { getEventDateString, isEventWithinADay } from '~/lib/eventUtils';
+import { getEventDateString, isEventActive } from '~/lib/eventUtils';
 
 const DISTRICT_COLORS: Record<string, string> = {
   // California
@@ -69,7 +69,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
       </TableHeader>
       <TableBody>
         {events.map((event) => {
-          const withinADay = isEventWithinADay(event);
+          const withinADay = isEventActive(event);
           const districtColor = getDistrictColorClass(
             event.district?.abbreviation,
           );

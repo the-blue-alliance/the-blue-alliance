@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Event, Match } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
@@ -30,28 +31,26 @@ import {
 } from '~/lib/rankingPoints';
 
 function formatMatchDate(timestamp: number, timezone: string): string {
-  const date = new Date(timestamp * 1000);
-
-  return date.toLocaleString('en-US', {
-    timeZone: timezone,
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
+  return Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
+    .toZonedDateTimeISO(timezone)
+    .toLocaleString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
 }
 
 function formatMatchTime(
   timestamp: number,
   timezone: string,
 ): React.JSX.Element {
-  const date = new Date(timestamp * 1000);
-
-  const time = date.toLocaleString('en-US', {
-    timeZone: timezone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
+  const time = Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
+    .toZonedDateTimeISO(timezone)
+    .toLocaleString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
 
   return <span className="font-bold">{time}</span>;
 }

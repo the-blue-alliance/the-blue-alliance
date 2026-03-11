@@ -1,5 +1,6 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { groupBy, sumBy } from 'lodash-es';
+import { Temporal } from 'temporal-polyfill';
 
 import {
   Award,
@@ -103,9 +104,11 @@ export const Route = createFileRoute(
             (r) => r.point_total > 0 && (r.event_points?.length ?? 0) > 0,
           );
 
-    const now = new Date();
+    const today = Temporal.Now.plainDateISO();
     const seasonIsComplete = events.data.every(
-      (e) => new Date(e.end_date) < now,
+      (e) =>
+        Temporal.PlainDate.compare(Temporal.PlainDate.from(e.end_date), today) <
+        0,
     );
 
     // If the season is done, show only the teams that were actually active (in the rankings)

@@ -1,6 +1,38 @@
+import { Temporal } from 'temporal-polyfill';
+
 import { Event } from '~/api/tba/read/types.gen';
 import { EventType } from '~/lib/api/EventType';
-import { convertMsToDays } from '~/lib/utils';
+
+/** IANA timezone used when an event has no timezone field. */
+export const EVENT_FALLBACK_TIMEZONE = 'America/New_York';
+/** Hour (0–23) when events start each day in the event's local timezone. */
+export const EVENT_START_HOUR = 8;
+/** Hour (0–23) when events end each day in the event's local timezone. */
+export const EVENT_END_HOUR = 18;
+
+const EVENT_START_TIME = Temporal.PlainTime.from({ hour: EVENT_START_HOUR });
+const EVENT_END_TIME = Temporal.PlainTime.from({ hour: EVENT_END_HOUR });
+
+// Defaults to EVENT_FALLBACK_TIMEZONE, but may want to introduce some semi-intelligent guessing in the future.
+function getEventTz(event: Event): string {
+  return event.timezone ?? EVENT_FALLBACK_TIMEZONE;
+}
+
+/** Returns the instants when the event opens (8am start_date) and closes (6pm end_date). */
+function getEventActiveWindow(event: Event): {
+  start: Temporal.Instant;
+  end: Temporal.Instant;
+} {
+  const tz = getEventTz(event);
+  return {
+    start: Temporal.PlainDate.from(event.start_date)
+      .toZonedDateTime({ timeZone: tz, plainTime: EVENT_START_TIME })
+      .toInstant(),
+    end: Temporal.PlainDate.from(event.end_date)
+      .toZonedDateTime({ timeZone: tz, plainTime: EVENT_END_TIME })
+      .toInstant(),
+  };
+}
 
 export function isValidEventKey(key: string) {
   return /^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$/.test(key);
@@ -8,22 +40,17 @@ export function isValidEventKey(key: string) {
 
 export function sortEventsComparator(a: Event, b: Event) {
   // First sort by date
-  const start_date_a = new Date(a.start_date);
-  const start_date_b = new Date(b.start_date);
-  const end_date_a = new Date(a.end_date);
-  const end_date_b = new Date(b.end_date);
-  if (start_date_a < start_date_b) {
-    return -1;
-  }
-  if (start_date_a > start_date_b) {
-    return 1;
-  }
-  if (end_date_a < end_date_b) {
-    return -1;
-  }
-  if (end_date_a > end_date_b) {
-    return 1;
-  }
+  const startCompare = Temporal.PlainDate.compare(
+    Temporal.PlainDate.from(a.start_date),
+    Temporal.PlainDate.from(b.start_date),
+  );
+  if (startCompare !== 0) return startCompare;
+
+  const endCompare = Temporal.PlainDate.compare(
+    Temporal.PlainDate.from(a.end_date),
+    Temporal.PlainDate.from(b.end_date),
+  );
+  if (endCompare !== 0) return endCompare;
 
   // If one of the events is DCMP finals or CMP finals, put it last
   // e.g.: [2024necmp1, 2024necmp2, 2024necmp]
@@ -50,28 +77,22 @@ export function sortEventsComparator(a: Event, b: Event) {
   return 0;
 }
 
-/** Returns a Date object at midnight in the user's timezone on the specified YYYY-MM-DD. */
-function getLocalMidnightOnDate(yyyymmdd: string) {
-  const date = new Date(yyyymmdd + 'T00:00:00Z');
-  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-}
-
 export function getEventDateString(event: Event, month: 'long' | 'short') {
-  // Local dates are needed since the toLocaleDateString depends on the user's local timezone.
-  const startDate = getLocalMidnightOnDate(event.start_date);
-  const endDate = getLocalMidnightOnDate(event.end_date);
+  // PlainDate has no time or timezone component, so formatting is locale-only.
+  const startDate = Temporal.PlainDate.from(event.start_date);
+  const endDate = Temporal.PlainDate.from(event.end_date);
 
-  const endDateString = endDate.toLocaleDateString('default', {
+  const endDateString = endDate.toLocaleString('default', {
     month: month,
     day: 'numeric',
     year: 'numeric',
   });
 
-  if (startDate.getTime() === endDate.getTime()) {
+  if (Temporal.PlainDate.compare(startDate, endDate) === 0) {
     return endDateString;
   }
 
-  const startDateString = startDate.toLocaleDateString('default', {
+  const startDateString = startDate.toLocaleString('default', {
     month: month,
     day: 'numeric',
   });
@@ -108,31 +129,40 @@ export function getEventWeekString(event: Event) {
 }
 
 export function getCurrentWeekEvents(events: Event[]) {
-  const now = new Date();
+  // Build the user's week window as Instants so we can compare against the
+  // event's active window (8am–6pm in the event's timezone) correctly even
+  // when the two timezones are far apart.
+  const userTz = Temporal.Now.timeZoneId();
+  const today = Temporal.Now.plainDateISO(userTz);
+  // ISO day-of-week: 1 = Monday … 7 = Sunday
+  const monday = today.subtract({ days: today.dayOfWeek - 1 });
+  const weekStart = monday.toZonedDateTime(userTz).toInstant();
+  // Exclusive upper bound: next Monday at 00:00 in the user's timezone.
+  const weekEnd = monday.add({ days: 7 }).toZonedDateTime(userTz).toInstant();
+
   const filteredEvents = [];
-
-  const diffFromMonday = (now.getDay() + 6) % 7;
-  const closestStartMonday = new Date(now).setDate(
-    now.getDate() - diffFromMonday,
-  );
-
   for (const event of events) {
-    const startDateMs = new Date(event.start_date).getTime();
-    const endDateMs = new Date(event.end_date).getTime();
-
-    const timeOffsetDays = Math.floor(
-      convertMsToDays(startDateMs - closestStartMonday),
-    );
-
-    // Include events that start this week, or started before but are still ongoing
+    const { start: eventStart, end: eventEnd } = getEventActiveWindow(event);
+    // Include if the event's active window overlaps with the user's week at all.
     if (
-      (timeOffsetDays >= 0 && timeOffsetDays < 7) ||
-      (timeOffsetDays < 0 && endDateMs >= closestStartMonday)
+      Temporal.Instant.compare(eventStart, weekEnd) < 0 &&
+      Temporal.Instant.compare(eventEnd, weekStart) > 0
     ) {
       filteredEvents.push(event);
     }
   }
   return sortEvents(filteredEvents);
+}
+
+/**
+ * Returns true on any calendar day the event is scheduled, from midnight on
+ * start_date through midnight at the end of end_date (event's timezone).
+ * The window is intentionally wide so the Watch Now button is active even if
+ * the event runs early or late.
+ */
+export function isEventActive(event: Event): boolean {
+  if (!event.start_date || !event.end_date) return false;
+  return isEventWithinDays(event, 0, 0);
 }
 
 export function sortEvents(events: Event[]) {
@@ -179,15 +209,31 @@ export function isEventWithinDays(
   if (event.start_date === null || event.end_date === null) {
     return false;
   }
-  const DAY_IN_MS = 24 * 60 * 60 * 1000;
-  const startDate = getLocalMidnightOnDate(event.start_date);
-  const endDate = getLocalMidnightOnDate(event.end_date);
-  const now = new Date();
-  const windowStart = startDate.getTime() - negativeDaysBefore * DAY_IN_MS;
-  // endDate is midnight at the start of the last day, so +1 day to include
-  // the full last day, then positiveDaysAfter additional days beyond that.
-  const windowEnd = endDate.getTime() + (1 + positiveDaysAfter) * DAY_IN_MS;
-  return now.getTime() >= windowStart && now.getTime() <= windowEnd;
+  // Use the event's own timezone so that "midnight" refers to the event's
+  // local midnight, not the user's. Falls back to EVENT_FALLBACK_TIMEZONE.
+  const eventTimeZone = getEventTz(event);
+  const startDate = Temporal.PlainDate.from(event.start_date);
+  const endDate = Temporal.PlainDate.from(event.end_date);
+
+  // Window opens negativeDaysBefore days before midnight of start_date in the
+  // event's timezone.
+  const windowStart = startDate
+    .subtract({ days: negativeDaysBefore })
+    .toZonedDateTime(eventTimeZone)
+    .toInstant();
+
+  // endDate is the last calendar day. +1 moves to the next midnight (end of
+  // the last day), then positiveDaysAfter extends further.
+  const windowEnd = endDate
+    .add({ days: 1 + positiveDaysAfter })
+    .toZonedDateTime(eventTimeZone)
+    .toInstant();
+
+  const now = Temporal.Now.instant();
+  return (
+    Temporal.Instant.compare(now, windowStart) >= 0 &&
+    Temporal.Instant.compare(now, windowEnd) <= 0
+  );
 }
 
 export function isEventWithinADay(event: Event): boolean {
