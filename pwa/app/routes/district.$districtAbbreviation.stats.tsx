@@ -99,10 +99,12 @@ export const Route = createFileRoute('/district/$districtAbbreviation/stats')({
   component: DistrictStatsPage,
 });
 
-function buildEventNameLookup(
-  yearResults: Array<{ events: Event[] }>,
-): Map<string, string> {
-  const lookup = new Map<string, string>();
+function buildEventLookups(yearResults: Array<{ events: Event[] }>): {
+  nameLookup: Map<string, string>;
+  dateLookup: Map<string, string>;
+} {
+  const nameLookup = new Map<string, string>();
+  const dateLookup = new Map<string, string>();
   for (const { events } of yearResults) {
     for (const event of events) {
       const displayName =
@@ -111,19 +113,25 @@ function buildEventNameLookup(
         (event.short_name !== null && event.short_name?.trim() !== ''
           ? event.short_name
           : event.name);
-      lookup.set(event.key, displayName);
+      nameLookup.set(event.key, displayName);
+      dateLookup.set(event.key, event.start_date);
     }
   }
-  return lookup;
+  return { nameLookup, dateLookup };
 }
 
 function buildContextTooltipMap(
   teamEventKeys: Map<string, string[]>,
   eventNameLookup: Map<string, string>,
+  eventDateLookup: Map<string, string>,
 ): Record<string, ReactNode> {
   const map: Record<string, ReactNode> = {};
   for (const [teamKey, eventKeys] of teamEventKeys.entries()) {
-    const uniqueKeys = Array.from(new Set(eventKeys));
+    const uniqueKeys = Array.from(new Set(eventKeys)).sort((a, b) => {
+      const dateA = eventDateLookup.get(a) ?? '';
+      const dateB = eventDateLookup.get(b) ?? '';
+      return dateA.localeCompare(dateB);
+    });
     if (uniqueKeys.length === 0) continue;
     map[teamKey] = (
       <div className="flex flex-col gap-0.5">
@@ -220,7 +228,8 @@ function computeLeaderboards(
     }
   }
 
-  const eventNameLookup = buildEventNameLookup(yearResults);
+  const { nameLookup: eventNameLookup, dateLookup: eventDateLookup } =
+    buildEventLookups(yearResults);
 
   // Computed stats from awards + events data
   const dcmpFinalsAppearances = new Map<string, number>();
@@ -435,40 +444,68 @@ function computeLeaderboards(
     dcmpFinalsTooltips: buildContextTooltipMap(
       dcmpFinalsEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
     dcmpDivisionFinalsTooltips: buildContextTooltipMap(
       dcmpDivisionFinalsEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
     districtEventFinalsTooltips: buildContextTooltipMap(
       districtEventFinalsEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
-    dcmpWinTooltips: buildContextTooltipMap(dcmpWinEvents, eventNameLookup),
+    dcmpWinTooltips: buildContextTooltipMap(
+      dcmpWinEvents,
+      eventNameLookup,
+      eventDateLookup,
+    ),
     dcmpDivisionWinTooltips: buildContextTooltipMap(
       dcmpDivisionWinEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
     districtEventWinTooltips: buildContextTooltipMap(
       districtEventWinEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
     blueBannerTooltips: buildContextTooltipMap(
       blueBannerEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
-    impactTooltips: buildContextTooltipMap(impactEvents, eventNameLookup),
+    impactTooltips: buildContextTooltipMap(
+      impactEvents,
+      eventNameLookup,
+      eventDateLookup,
+    ),
     dcmpImpactTooltips: buildContextTooltipMap(
       dcmpImpactEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
-    eiTooltips: buildContextTooltipMap(eiEvents, eventNameLookup),
-    dcmpEiTooltips: buildContextTooltipMap(dcmpEiEvents, eventNameLookup),
+    eiTooltips: buildContextTooltipMap(
+      eiEvents,
+      eventNameLookup,
+      eventDateLookup,
+    ),
+    dcmpEiTooltips: buildContextTooltipMap(
+      dcmpEiEvents,
+      eventNameLookup,
+      eventDateLookup,
+    ),
     leadershipTooltips: buildContextTooltipMap(
       leadershipEvents,
       eventNameLookup,
+      eventDateLookup,
     ),
-    wffaTooltips: buildContextTooltipMap(wffaEvents, eventNameLookup),
+    wffaTooltips: buildContextTooltipMap(
+      wffaEvents,
+      eventNameLookup,
+      eventDateLookup,
+    ),
   };
 }
 
@@ -487,7 +524,8 @@ function computePerAwardLeaderboards(
     awards: Award[];
   }>,
 ): PerAwardLeaderboard[] {
-  const eventNameLookup = buildEventNameLookup(yearResults);
+  const { nameLookup: eventNameLookup, dateLookup: eventDateLookup } =
+    buildEventLookups(yearResults);
 
   // Awards that progress from district events to DCMP — track separately
   const DCMP_PROGRESSION_AWARDS = new Set([
@@ -593,7 +631,11 @@ function computePerAwardLeaderboards(
         isDcmp: leaderboardKey.startsWith('dcmp_'),
         name,
         rankings,
-        contextTooltipMap: buildContextTooltipMap(teamEvents, eventNameLookup),
+        contextTooltipMap: buildContextTooltipMap(
+          teamEvents,
+          eventNameLookup,
+          eventDateLookup,
+        ),
       });
     }
   }
