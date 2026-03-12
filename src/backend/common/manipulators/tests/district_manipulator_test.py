@@ -152,7 +152,7 @@ class TestDistrictManipulator(unittest.TestCase):
             District(id="2016ne", abbreviation="ne", year=2016)
         )
         # We didn't originally specify uses_official_webcast_unit
-        assert updated.uses_official_webcast_unit is False
+        assert updated.uses_official_webcast_unit is None
 
         # But the update hook should add it in from the prior year's
         tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
@@ -188,7 +188,7 @@ class TestDistrictManipulator(unittest.TestCase):
 
         district = District.get_by_id("2016ne")
         assert district is not None
-        assert district.uses_official_webcast_unit is False
+        assert district.uses_official_webcast_unit is None
 
     def test_update_webcast_channels_from_last_year_on_create(self) -> None:
         District(
@@ -270,3 +270,67 @@ class TestDistrictManipulator(unittest.TestCase):
         # Should still have the new channel, not the old one
         assert district.webcast_channels[0]["channel"] == "New Channel"
         assert district.webcast_channels[0]["channel_id"] == "UC_new"
+
+    def test_webcast_channels_not_wiped_by_empty_update(self) -> None:
+        """Regression test: FRC API updates produce a District with no webcast_channels
+        (empty list). The manipulator should NOT overwrite admin-set channels with [].
+        """
+        District(
+            id="2016ne",
+            abbreviation="ne",
+            year=2016,
+            display_name="New England",
+            webcast_channels=[
+                {
+                    "type": "youtube",
+                    "channel": "FIRST in Michigan",
+                    "channel_id": "UC1234567890",
+                }
+            ],
+        ).put()
+
+        # Simulate an FRC API update: new model has no webcast_channels set
+        DistrictManipulator.createOrUpdate(
+            District(
+                id="2016ne",
+                abbreviation="ne",
+                year=2016,
+                display_name="New England Updated",
+            )
+        )
+
+        district = District.get_by_id("2016ne")
+        assert district is not None
+        assert district.display_name == "New England Updated"
+        # webcast_channels must NOT have been wiped
+        assert district.webcast_channels is not None
+        assert len(district.webcast_channels) == 1
+        assert district.webcast_channels[0]["channel_id"] == "UC1234567890"
+
+    def test_uses_official_webcast_unit_not_wiped_by_empty_update(self) -> None:
+        """Regression test: FRC API updates create a District without uses_official_webcast_unit
+        (None). The manipulator should NOT overwrite an admin-set True value with None.
+        """
+        District(
+            id="2016ne",
+            abbreviation="ne",
+            year=2016,
+            display_name="New England",
+            uses_official_webcast_unit=True,
+        ).put()
+
+        # Simulate an FRC API update: new model has no uses_official_webcast_unit set
+        DistrictManipulator.createOrUpdate(
+            District(
+                id="2016ne",
+                abbreviation="ne",
+                year=2016,
+                display_name="New England Updated",
+            )
+        )
+
+        district = District.get_by_id("2016ne")
+        assert district is not None
+        assert district.display_name == "New England Updated"
+        # uses_official_webcast_unit must NOT have been wiped
+        assert district.uses_official_webcast_unit is True

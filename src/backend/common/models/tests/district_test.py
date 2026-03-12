@@ -42,13 +42,13 @@ def test_render_name_falls_back_to_code() -> None:
     assert d.render_name == "NE"
 
 
-def test_uses_official_webcast_unit_defaults_false() -> None:
+def test_uses_official_webcast_unit_defaults_none() -> None:
     d = District(
         id="2020ne",
         year=2020,
         abbreviation="ne",
     )
-    assert d.uses_official_webcast_unit is False
+    assert d.uses_official_webcast_unit is None
 
 
 def test_uses_official_webcast_unit_can_be_set() -> None:
