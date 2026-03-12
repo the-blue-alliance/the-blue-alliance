@@ -7,8 +7,9 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.datafeeds.datafeed_youtube import (
+    YoutubeChannelListForHandleDatafeed,
     YoutubePlaylistItemsDatafeed,
-    YoutubeSearchDatafeed,
+    YoutubeUpcomingStreamsDatafeed,
     YoutubeVideoDetailsDatafeed,
     YoutubeVideoLiveDetailsBatchDatafeed,
 )
@@ -151,19 +152,19 @@ class YouTubeVideoHelper(object):
 
     @classmethod
     @typed_tasklet
-    def resolve_channel_name(
-        cls, channel_name: str
+    def resolve_channel_id(
+        cls, channel_username: str
     ) -> Generator[Any, Any, Optional[YouTubeChannel]]:
         """
-        Resolves a YouTube channel name to a channel ID.
+        Resolves a YouTube channel username/handle to a channel ID.
         Returns channel metadata if found, else None.
         """
+        normalized_handle = channel_username.strip().lstrip("@")
+        if not normalized_handle:
+            raise ndb.Return(None)
+
         try:
-            datafeed = YoutubeSearchDatafeed(
-                query=channel_name,
-                search_type="channel",
-                max_results=1,
-            )
+            datafeed = YoutubeChannelListForHandleDatafeed(normalized_handle)
             response = yield datafeed._fetch()
 
             if response.status_code != 200:
@@ -174,21 +175,19 @@ class YouTubeVideoHelper(object):
                 raise ndb.Return(None)
 
             parsed_data = datafeed.parser().parse(raw_data)
-            if parsed_data:
-                first_item = parsed_data[0]
-                resolved_channel_id = first_item.get("channel_id")
-                resolved_channel_name = first_item.get("title")
-            else:
-                resolved_channel_id = None
-                resolved_channel_name = None
+            if not parsed_data:
+                raise ndb.Return(None)
 
+            first_item = parsed_data[0]
+            resolved_channel_id = first_item.get("channel_id")
+            resolved_channel_name = first_item.get("channel_name")
             if not resolved_channel_id:
                 raise ndb.Return(None)
 
             raise ndb.Return(
                 YouTubeChannel(
                     channel_id=resolved_channel_id,
-                    channel_name=resolved_channel_name or channel_name,
+                    channel_name=resolved_channel_name or channel_username,
                 )
             )
         except ValueError:
@@ -198,10 +197,19 @@ class YouTubeVideoHelper(object):
             raise
         except Exception:
             logging.exception(
-                "Failed to resolve YouTube channel name '%s'",
-                channel_name,
+                "Failed to resolve YouTube channel handle '%s'",
+                channel_username,
             )
             raise ndb.Return(None)
+
+    @classmethod
+    @typed_tasklet
+    def resolve_channel_name(
+        cls, channel_name: str
+    ) -> Generator[Any, Any, Optional[YouTubeChannel]]:
+        """Backward-compatible wrapper around handle-based channel resolution."""
+        resolved_channel = yield cls.resolve_channel_id(channel_name)
+        raise ndb.Return(resolved_channel)
 
     @classmethod
     @typed_tasklet
@@ -278,12 +286,10 @@ class YouTubeVideoHelper(object):
         """
         stream_basics: List[Dict[str, str]] = []
         try:
-            search_datafeed = YoutubeSearchDatafeed(
-                search_type="video",
+            search_datafeed = YoutubeUpcomingStreamsDatafeed(
+                channel_id=channel_id,
                 max_results=50,
                 order="date",
-                channel_id=channel_id,
-                event_type="upcoming",
             )
             parsed_search_results = yield search_datafeed.fetch_all_pages_async()
         except ValueError:

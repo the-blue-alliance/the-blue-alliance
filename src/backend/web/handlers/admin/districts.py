@@ -75,9 +75,7 @@ def district_add_webcast_channel_post(district_key: DistrictKey) -> Response:
             f"{url_for('admin.district_details', district_key=district_key, webcast_error='missing_channel_name')}#webcasts"
         )
 
-    resolved_channel = YouTubeVideoHelper.resolve_channel_name(
-        channel_name
-    ).get_result()
+    resolved_channel = YouTubeVideoHelper.resolve_channel_id(channel_name).get_result()
     if not resolved_channel:
         return redirect(
             f"{url_for('admin.district_details', district_key=district_key, webcast_error='channel_not_found')}#webcasts"

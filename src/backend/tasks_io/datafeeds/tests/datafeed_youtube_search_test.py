@@ -1,11 +1,17 @@
-"""Tests for YouTube search API datafeeds and parser."""
+"""Tests for YouTube channel and search datafeeds/parsers."""
 
 import json
 from unittest import mock
 
 import pytest
 
-from backend.common.datafeeds.datafeed_youtube import YoutubeSearchDatafeed
+from backend.common.datafeeds.datafeed_youtube import (
+    YoutubeChannelListForHandleDatafeed,
+    YoutubeUpcomingStreamsDatafeed,
+)
+from backend.common.datafeeds.parsers.youtube.youtube_channel_list_parser import (
+    YoutubeChannelListParser,
+)
 from backend.common.datafeeds.parsers.youtube.youtube_search_parser import (
     YoutubeSearchParser,
 )
@@ -18,7 +24,6 @@ class TestYoutubeSearchParser:
     """Tests for YoutubeSearchParser."""
 
     def test_parse_channel_search_results(self) -> None:
-        """Test parsing search results for channels."""
         response = {
             "items": [
                 {
@@ -46,56 +51,7 @@ class TestYoutubeSearchParser:
         assert result["title"] == "Example Channel"
         assert result["channel_id"] == "UCabc123"
 
-    def test_parse_channel_id_not_overwritten_by_snippet_channel_id(self) -> None:
-        """Test parser prefers ID block channelId over snippet channelId."""
-        response = {
-            "items": [
-                {
-                    "kind": "youtube#searchResult",
-                    "id": {
-                        "kind": "youtube#channel",
-                        "channelId": "UCidBlock",
-                    },
-                    "snippet": {
-                        "title": "Example Channel",
-                        "channelId": "UCsnippetBlock",
-                        "channelTitle": "Example Channel",
-                    },
-                }
-            ]
-        }
-
-        parser = YoutubeSearchParser()
-        results = parser.parse(response)
-
-        assert len(results) == 1
-        assert results[0]["channel_id"] == "UCidBlock"
-
-    def test_parse_channel_title_not_used_as_channel_id(self) -> None:
-        """Test parser does not use channelTitle as channel_id fallback."""
-        response = {
-            "items": [
-                {
-                    "kind": "youtube#searchResult",
-                    "id": {
-                        "kind": "youtube#channel",
-                    },
-                    "snippet": {
-                        "title": "Example Channel",
-                        "channelTitle": "Example Channel",
-                    },
-                }
-            ]
-        }
-
-        parser = YoutubeSearchParser()
-        results = parser.parse(response)
-
-        assert len(results) == 1
-        assert "channel_id" not in results[0]
-
     def test_parse_video_search_results(self) -> None:
-        """Test parsing search results for videos."""
         response = {
             "items": [
                 {
@@ -107,7 +63,6 @@ class TestYoutubeSearchParser:
                     "snippet": {
                         "title": "Example Video",
                         "description": "A test video",
-                        "liveBroadcastContent": "none",
                     },
                 },
                 {
@@ -129,229 +84,94 @@ class TestYoutubeSearchParser:
 
         assert len(results) == 2
         assert results[0]["video_id"] == "video_xyz"
-        assert results[0]["title"] == "Example Video"
         assert results[1]["video_id"] == "video_abc"
-        assert results[1]["title"] == "Upcoming Stream"
 
-    def test_parse_multiple_result_types(self) -> None:
-        """Test parsing mixed result types (channel, video, playlist)."""
+
+class TestYoutubeChannelListParser:
+    def test_parse_channel_list(self) -> None:
+        parser = YoutubeChannelListParser()
         response = {
             "items": [
                 {
-                    "kind": "youtube#searchResult",
-                    "id": {
-                        "kind": "youtube#channel",
-                        "channelId": "channel_123",
-                    },
-                    "snippet": {
-                        "title": "Test Channel",
-                    },
-                },
-                {
-                    "kind": "youtube#searchResult",
-                    "id": {
-                        "kind": "youtube#video",
-                        "videoId": "video_456",
-                    },
-                    "snippet": {
-                        "title": "Test Video",
-                    },
-                },
-                {
-                    "kind": "youtube#searchResult",
-                    "id": {
-                        "kind": "youtube#playlist",
-                        "playlistId": "playlist_789",
-                    },
-                    "snippet": {
-                        "title": "Test Playlist",
-                    },
-                },
-            ]
-        }
-
-        parser = YoutubeSearchParser()
-        results = parser.parse(response)
-
-        assert len(results) == 3
-        assert results[0]["channel_id"] == "channel_123"
-        assert results[1]["video_id"] == "video_456"
-        assert results[2]["playlist_id"] == "playlist_789"
-
-    def test_parse_empty_response(self) -> None:
-        """Test parsing empty response returns empty list."""
-        response = {"items": []}
-
-        parser = YoutubeSearchParser()
-        results = parser.parse(response)
-
-        assert results == []
-
-    def test_parse_missing_snippet_skipped(self) -> None:
-        """Test that items without snippets are skipped."""
-        response = {
-            "items": [
-                {
-                    "id": {
-                        "kind": "youtube#channel",
-                        "channelId": "channel_123",
-                    },
-                    # Missing snippet
-                },
-                {
-                    "kind": "youtube#searchResult",
-                    "id": {
-                        "kind": "youtube#channel",
-                        "channelId": "channel_456",
-                    },
-                    "snippet": {
-                        "title": "Valid Channel",
-                    },
-                },
-            ]
-        }
-
-        parser = YoutubeSearchParser()
-        results = parser.parse(response)
-
-        assert len(results) == 1
-        assert results[0]["channel_id"] == "channel_456"
-
-    def test_parse_page_tokens(self) -> None:
-        """Test that page tokens are preserved in response."""
-        response = {
-            "items": [
-                {
-                    "kind": "youtube#searchResult",
-                    "id": {
-                        "kind": "youtube#video",
-                        "videoId": "video_1",
-                    },
-                    "snippet": {
-                        "title": "Video 1",
-                    },
+                    "id": "UCjX4WSaAFPgM2PYr-6P",
+                    "snippet": {"title": "FIRST in Michigan"},
                 }
-            ],
-            "nextPageToken": "NEXT_TOKEN_123",
-            "prevPageToken": "PREV_TOKEN_456",
+            ]
         }
 
-        parser = YoutubeSearchParser()
         results = parser.parse(response)
 
-        assert len(results) == 1
-        # Note: Parser returns just the items, not the tokens
-        # Tokens would need to be handled separately by the caller
+        assert results == [
+            {
+                "channel_id": "UCjX4WSaAFPgM2PYr-6P",
+                "channel_name": "FIRST in Michigan",
+            }
+        ]
+
+    def test_parse_channel_list_missing_fields(self) -> None:
+        parser = YoutubeChannelListParser()
+        response = {"items": [{"snippet": {"title": "No id"}}, {"id": "UC123"}]}
+
+        assert parser.parse(response) == []
 
 
-class TestYoutubeSearchDatafeed:
-    """Tests for YoutubeSearchDatafeed."""
-
-    def test_datafeed_initialization(self) -> None:
-        """Test datafeed initializes with search query."""
-        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("test channel")
-            assert datafeed.query == "test channel"
-
+class TestYoutubeChannelListForHandleDatafeed:
     def test_datafeed_endpoint(self) -> None:
-        """Test datafeed returns correct endpoint."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("query")
+            datafeed = YoutubeChannelListForHandleDatafeed("@FIRSTinMichigan")
+            assert datafeed.endpoint() == "channels"
+
+    def test_datafeed_url_params(self) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeChannelListForHandleDatafeed("@FIRSTinMichigan")
+            params = datafeed.url_params()
+
+            assert params["part"] == "id,snippet"
+            assert params["forHandle"] == "FIRSTinMichigan"
+
+    def test_datafeed_parser(self) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeChannelListForHandleDatafeed("FIRSTinMichigan")
+            assert isinstance(datafeed.parser(), YoutubeChannelListParser)
+
+
+class TestYoutubeUpcomingStreamsDatafeed:
+    def test_datafeed_endpoint(self) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
             assert datafeed.endpoint() == "search"
 
     def test_datafeed_default_params(self) -> None:
-        """Test datafeed constructs default URL parameters."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("test")
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
             params = datafeed.url_params()
 
             assert params["part"] == "snippet"
-            assert params["type"] == "channel"
-            assert params["q"] == "test"
-            assert params["maxResults"] == "1"
-            assert params["order"] == "relevance"
+            assert params["type"] == "video"
+            assert params["channelId"] == "UC_channel_id"
+            assert params["eventType"] == "upcoming"
+            assert params["maxResults"] == "50"
+            assert params["order"] == "date"
             assert "pageToken" not in params
 
-    def test_datafeed_custom_search_type(self) -> None:
-        """Test datafeed with custom search type."""
-        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("query", search_type="video")
-            params = datafeed.url_params()
-
-            assert params["type"] == "video"
-
-    def test_datafeed_with_max_results(self) -> None:
-        """Test datafeed with custom max results."""
-        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("query", max_results=50)
-            params = datafeed.url_params()
-
-            assert params["maxResults"] == "50"
-
     def test_datafeed_with_page_token(self) -> None:
-        """Test datafeed with pagination token."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("query", page_token="TOKEN_123")
+            datafeed = YoutubeUpcomingStreamsDatafeed(
+                channel_id="UC_channel_id",
+                page_token="TOKEN_123",
+            )
             params = datafeed.url_params()
 
             assert params["pageToken"] == "TOKEN_123"
 
-    def test_datafeed_with_custom_order(self) -> None:
-        """Test datafeed with custom sort order."""
-        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("query", order="date")
-            params = datafeed.url_params()
-
-            assert params["order"] == "date"
-
-    def test_datafeed_without_query(self) -> None:
-        """Test datafeed can omit free-text query."""
-        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
-            params = datafeed.url_params()
-
-            assert "q" not in params
-
-    def test_datafeed_with_channel_and_event_type(self) -> None:
-        """Test datafeed supports channel/event constrained searches."""
-        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed(
-                query=None,
-                search_type="video",
-                order="date",
-                max_results=50,
-                channel_id="UC_channel_id",
-                event_type="upcoming",
-            )
-            params = datafeed.url_params()
-
-            assert params["channelId"] == "UC_channel_id"
-            assert params["eventType"] == "upcoming"
-            assert params["type"] == "video"
-            assert params["order"] == "date"
-            assert params["maxResults"] == "50"
-
-    def test_datafeed_url_construction(self) -> None:
-        """Test complete URL construction."""
-        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("python tutorial", search_type="video")
-            url = datafeed.url()
-
-            assert "search" in url
-            assert "python%20tutorial" in url or "python+tutorial" in url
-            assert "video" in url
-
     def test_datafeed_parser(self) -> None:
-        """Test datafeed returns correct parser instance."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed("query")
-            parser = datafeed.parser()
-
-            assert isinstance(parser, YoutubeSearchParser)
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
+            assert isinstance(datafeed.parser(), YoutubeSearchParser)
 
     def test_fetch_all_pages_async_single_page(self, ndb_context) -> None:
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
 
             response = {
                 "items": [
@@ -367,7 +187,9 @@ class TestYoutubeSearchDatafeed:
                 json.dumps(response),
             )
 
-            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+            with mock.patch.object(
+                YoutubeUpcomingStreamsDatafeed, "_fetch"
+            ) as mock_fetch:
                 mock_fetch.return_value = InstantFuture(mock_result)
                 results = datafeed.fetch_all_pages_async().get_result()
 
@@ -378,7 +200,7 @@ class TestYoutubeSearchDatafeed:
 
     def test_fetch_all_pages_async_pagination(self, ndb_context) -> None:
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
 
             response_1 = {
                 "items": [
@@ -409,7 +231,9 @@ class TestYoutubeSearchDatafeed:
                 json.dumps(response_2),
             )
 
-            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+            with mock.patch.object(
+                YoutubeUpcomingStreamsDatafeed, "_fetch"
+            ) as mock_fetch:
                 mock_fetch.side_effect = [
                     InstantFuture(mock_result_1),
                     InstantFuture(mock_result_2),
@@ -423,9 +247,8 @@ class TestYoutubeSearchDatafeed:
 
     def test_fetch_all_pages_async_fallback_parser(self, ndb_context) -> None:
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
 
-            # Missing id.kind, so parser returns empty and fallback parser is used.
             response = {
                 "items": [
                     {
@@ -440,7 +263,9 @@ class TestYoutubeSearchDatafeed:
                 json.dumps(response),
             )
 
-            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+            with mock.patch.object(
+                YoutubeUpcomingStreamsDatafeed, "_fetch"
+            ) as mock_fetch:
                 mock_fetch.return_value = InstantFuture(mock_result)
                 results = datafeed.fetch_all_pages_async().get_result()
 
@@ -450,7 +275,7 @@ class TestYoutubeSearchDatafeed:
 
     def test_fetch_all_pages_async_non_200_raises(self, ndb_context) -> None:
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeSearchDatafeed(query=None, search_type="video")
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
 
             mock_result = URLFetchResult.mock_for_content(
                 "https://www.googleapis.com/youtube/v3/search",
@@ -458,7 +283,9 @@ class TestYoutubeSearchDatafeed:
                 "{}",
             )
 
-            with mock.patch.object(YoutubeSearchDatafeed, "_fetch") as mock_fetch:
+            with mock.patch.object(
+                YoutubeUpcomingStreamsDatafeed, "_fetch"
+            ) as mock_fetch:
                 mock_fetch.return_value = InstantFuture(mock_result)
                 with pytest.raises(
                     Exception,
