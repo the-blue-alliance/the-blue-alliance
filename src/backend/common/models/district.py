@@ -1,5 +1,5 @@
 import re
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
@@ -65,7 +65,8 @@ class District(CachedModel):
     # Whether the district uses FIRST's official webcast unit (aka, webcasts
     # are managed by FIRST and published in advance). Districts that do not
     # use the official unit may need TBA to discover webcasts from YouTube.
-    uses_official_webcast_unit: bool = ndb.BooleanProperty(default=False)
+    # None means unset (FRC API updates won't overwrite an admin-configured value).
+    uses_official_webcast_unit: Optional[bool] = ndb.BooleanProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -77,6 +78,11 @@ class District(CachedModel):
         "elasticsearch_name",
         "rankings",
         "uses_official_webcast_unit",
+    }
+
+    # webcast_channels is TBA-admin-managed: only overwrite when incoming list is non-empty,
+    # so FRC API updates (which produce an empty list) don't wipe admin-set channels.
+    _list_attrs: Set[str] = {
         "webcast_channels",
     }
 
