@@ -7,6 +7,10 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.datafeeds.datafeed_base import DatafeedBase
+from backend.common.datafeeds.parsers.youtube.youtube_channel_list_parser import (
+    ParsedChannelListResult,
+    YoutubeChannelListParser,
+)
 from backend.common.datafeeds.parsers.youtube.youtube_playlist_items_parser import (
     ParsedPlaylistItem,
     YoutubePlaylistItemsParser,
@@ -101,25 +105,39 @@ class YoutubeVideoDetailsDatafeed(YoutubeApiBase[Optional[ParsedVideoDetails]]):
         return YoutubeVideoDetailsParser()
 
 
-class YoutubeSearchDatafeed(YoutubeApiBase[List[ParsedSearchResult]]):
+class YoutubeChannelListForHandleDatafeed(
+    YoutubeApiBase[List[ParsedChannelListResult]]
+):
+    def __init__(self, handle: str) -> None:
+        super().__init__()
+        self.handle = handle.lstrip("@")
+
+    def endpoint(self) -> str:
+        return "channels"
+
+    def url_params(self) -> Dict[str, str]:
+        return {
+            "part": "id,snippet",
+            "forHandle": self.handle,
+        }
+
+    def parser(self) -> YoutubeChannelListParser:
+        return YoutubeChannelListParser()
+
+
+class YoutubeUpcomingStreamsDatafeed(YoutubeApiBase[List[ParsedSearchResult]]):
     def __init__(
         self,
-        query: Optional[str] = None,
-        search_type: str = "channel",
-        max_results: int = 1,
-        order: str = "relevance",
+        channel_id: str,
+        max_results: int = 50,
+        order: str = "date",
         page_token: str = "",
-        channel_id: Optional[str] = None,
-        event_type: Optional[str] = None,
     ) -> None:
         super().__init__()
-        self.query = query
-        self.search_type = search_type
+        self.channel_id = channel_id
         self.max_results = max_results
         self.order = order
         self.page_token = page_token
-        self.channel_id = channel_id
-        self.event_type = event_type
 
     def endpoint(self) -> str:
         return "search"
@@ -127,16 +145,12 @@ class YoutubeSearchDatafeed(YoutubeApiBase[List[ParsedSearchResult]]):
     def url_params(self) -> Dict[str, str]:
         params = {
             "part": "snippet",
-            "type": self.search_type,
+            "type": "video",
             "maxResults": str(self.max_results),
             "order": self.order,
+            "channelId": self.channel_id,
+            "eventType": "upcoming",
         }
-        if self.query is not None:
-            params["q"] = self.query
-        if self.channel_id is not None:
-            params["channelId"] = self.channel_id
-        if self.event_type is not None:
-            params["eventType"] = self.event_type
         if self.page_token:
             params["pageToken"] = self.page_token
         return params
@@ -149,7 +163,7 @@ class YoutubeSearchDatafeed(YoutubeApiBase[List[ParsedSearchResult]]):
         self,
         max_pages: int = 10,
     ) -> Generator[Any, Any, List[ParsedSearchResult]]:
-        """Fetch and parse all pages for this search request.
+        """Fetch and parse all pages for this request.
 
         Follows YouTube's `nextPageToken` chain up to `max_pages` pages.
         """
@@ -158,14 +172,11 @@ class YoutubeSearchDatafeed(YoutubeApiBase[List[ParsedSearchResult]]):
         page_count = 0
 
         while page_count < max_pages:
-            page_datafeed = YoutubeSearchDatafeed(
-                query=self.query,
-                search_type=self.search_type,
+            page_datafeed = YoutubeUpcomingStreamsDatafeed(
+                channel_id=self.channel_id,
                 max_results=self.max_results,
                 order=self.order,
                 page_token=next_page_token,
-                channel_id=self.channel_id,
-                event_type=self.event_type,
             )
             response = yield page_datafeed._fetch()
 

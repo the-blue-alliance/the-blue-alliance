@@ -138,7 +138,7 @@ def test_district_add_webcast_channel_post(
 
     with patch.object(
         YouTubeVideoHelper,
-        "resolve_channel_name",
+        "resolve_channel_id",
         return_value=InstantFuture(
             YouTubeChannel(
                 channel_id="UCjX4WSaAFPgM2PYr-6P",
@@ -175,7 +175,7 @@ def test_district_add_webcast_channel_post_channel_not_found(
 
     with patch.object(
         YouTubeVideoHelper,
-        "resolve_channel_name",
+        "resolve_channel_id",
         return_value=InstantFuture(None),
     ):
         resp = web_client.post(
