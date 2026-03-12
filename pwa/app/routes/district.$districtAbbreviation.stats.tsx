@@ -673,13 +673,15 @@ function DistrictStatsPage() {
               year={0}
               contextTooltipMap={leaderboards.dcmpFinalsTooltips}
             />
-            <Leaderboard
-              title="Most District Championship Division Wins"
-              rankings={leaderboards.dcmpDivisionWins}
-              keyType="team"
-              year={0}
-              contextTooltipMap={leaderboards.dcmpDivisionWinTooltips}
-            />
+            {leaderboards.dcmpDivisionWins.length > 0 && (
+              <Leaderboard
+                title="Most District Championship Division Wins"
+                rankings={leaderboards.dcmpDivisionWins}
+                keyType="team"
+                year={0}
+                contextTooltipMap={leaderboards.dcmpDivisionWinTooltips}
+              />
+            )}
             <Leaderboard
               title="Most District Championship Wins"
               rankings={leaderboards.dcmpWins}
