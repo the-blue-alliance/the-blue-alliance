@@ -88,6 +88,7 @@ class WebcastOnlineHelper:
         # Separate by cache status and type
         youtube_webcasts: List[Webcast] = []
         other_webcasts: List[Webcast] = []
+        webcasts_to_cache: List[Webcast] = []
         webcast_status_futures: List[Any] = []
 
         # Check cache and separate webcasts
@@ -97,7 +98,7 @@ class WebcastOnlineHelper:
         cached_results: List[Optional[Webcast]] = yield cache_futures
 
         for webcast, cached_webcast in zip(webcasts, cached_results):
-            if cached_webcast:
+            if cached_webcast is not None:
                 # Apply cached status
                 if "status" in cached_webcast:
                     webcast["status"] = cached_webcast.get(
@@ -112,6 +113,7 @@ class WebcastOnlineHelper:
                 webcast["status"] = WebcastStatus.UNKNOWN
                 webcast["stream_title"] = None
                 webcast["viewer_count"] = None
+                webcasts_to_cache.append(webcast)
 
                 if webcast["type"] == WebcastType.YOUTUBE:
                     youtube_webcasts.append(webcast)
@@ -133,10 +135,11 @@ class WebcastOnlineHelper:
         if webcast_status_futures:
             yield webcast_status_futures
 
-        # Cache all results
+        # Cache only statuses we freshly computed (cache misses).
+        # Do not rewrite cache hits, or stale statuses can be refreshed indefinitely.
         cache_put_futures = [
             WebcastOnlineStatusMemcache(webcast).put_async(webcast)
-            for webcast in webcasts
+            for webcast in webcasts_to_cache
             if webcast.get("status") is not None
         ]
         if cache_put_futures:

@@ -92,6 +92,33 @@ def test_add_online_status_in_cache() -> None:
     assert webcast == webcast_with_status
 
 
+def test_add_online_status_in_cache_does_not_refresh_cache_ttl() -> None:
+    webcast = Webcast(
+        type=WebcastType.HTML5,
+        channel="test_stream.m4v",
+    )
+    webcast_with_status = Webcast(
+        type=WebcastType.HTML5,
+        channel="test_stream.m4v",
+        status=WebcastStatus.OFFLINE,
+        stream_title="Old Stream",
+        viewer_count=12,
+    )
+
+    WebcastOnlineStatusMemcache(webcast).put(webcast_with_status)
+
+    with mock.patch.object(
+        WebcastOnlineStatusMemcache,
+        "put_async",
+        return_value=InstantFuture(True),
+    ) as put_async_mock:
+        WebcastOnlineHelper.add_online_status([webcast])
+
+    # Cached entries should not be rewritten; otherwise stale statuses can persist forever.
+    put_async_mock.assert_not_called()
+    assert webcast == webcast_with_status
+
+
 @mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
 def test_add_online_status_youtube(youtube_mock: mock.Mock) -> None:
     webcast = Webcast(
