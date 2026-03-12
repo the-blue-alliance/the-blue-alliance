@@ -44,7 +44,7 @@ ci = [
     "pytest-cov",
 ]
 lint = [
-    "black==26.3.0",
+    "black==26.3.1",
     "flake8==7.3.0",
     "flake8-import-order",
     "flake8-tidy-imports",
