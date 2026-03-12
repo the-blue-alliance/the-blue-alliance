@@ -55,11 +55,11 @@ tests/                 # Playwright E2E tests
 ### Vite
 
 - **Icons**: Use `~icons/{collection}/{name}` - search at [icon-sets.iconify.design](https://icon-sets.iconify.design/)
-- **Env vars**: Required: `VITE_TBA_API_READ_KEY` (copy `default.env` to `.env`)
+- **Env vars**: Required: `VITE_TBA_API_READ_KEY` (copy `.env.example` to `.env`)
 
 ## Adding Environment Variables
 
-1. Add example to `default.env`
+1. Add example to `.env.example`
 2. Add type to `app/vite-env.d.ts`
 3. Add validator to `vite.config.ts`
 4. Reference with `import.meta.env.VITE_MY_VAR`
