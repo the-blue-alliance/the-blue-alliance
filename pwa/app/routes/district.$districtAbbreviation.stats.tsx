@@ -329,7 +329,7 @@ function computeLeaderboards(
           impactEvents.set(teamKey, ev);
         }
 
-        // DCMPImpact/Chairman's wins
+        // DCMP Impact/Chairman's wins
         if (
           award.award_type === AwardType.CHAIRMANS &&
           dcmpEventKeys.has(award.event_key)
@@ -624,7 +624,7 @@ function DistrictStatsPage() {
         <TabsContent value="championships">
           <div className="grid gap-6 lg:grid-cols-2">
             <Leaderboard
-              title="Most Championship Appearances"
+              title="Most World Championship Appearances"
               rankings={leaderboards.cmpAppearances}
               keyType="team"
               year={0}
