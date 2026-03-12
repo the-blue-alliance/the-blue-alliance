@@ -4,7 +4,7 @@
   "sideEffects": false,
   "type": "module",
   "scripts": {
-    "build": "npm run build:app && npm run build:server && npm run build:sw",
+    "build": "pnpm run build:app && pnpm run build:server && pnpm run build:sw",
     "build:app": "vite build",
     "build:server": "tsc --project tsconfig.server.json",
     "build:sw": "tsx scripts/generate-sw.ts",
