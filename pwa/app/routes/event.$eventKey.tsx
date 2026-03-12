@@ -452,6 +452,7 @@ function EventPage() {
               winners={
                 alliances.find((a) => a.status?.status === 'won')?.picks ?? []
               }
+              captains={alliances.map((a) => a.picks[0])}
             />
           </TabsContent>
         )}
