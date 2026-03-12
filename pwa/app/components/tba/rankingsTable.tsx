@@ -13,30 +13,50 @@ type RankingColumnType = ColumnDef<EventRanking['rankings'][number]>[];
 export default function RankingsTable({
   rankings,
   winners,
+  captains,
 }: {
   rankings: EventRanking;
   winners: string[];
+  captains: string[];
 }) {
   const standardCols: RankingColumnType = [
     { header: 'Rank', accessorKey: 'rank', sortDescFirst: false },
     {
       header: 'Team',
-      cell: ({ row }) => (
-        <Link
-          to="/team/$teamNumber/{-$year}"
-          params={{ teamNumber: row.original.team_key.substring(3) }}
-          className="whitespace-nowrap"
-        >
-          {winners.includes(row.original.team_key) ? (
-            <InlineIcon className="relative right-[1ch] justify-center">
-              <BiTrophy />
-              {row.original.team_key.substring(3)}
-            </InlineIcon>
-          ) : (
-            <>{row.original.team_key.substring(3)}</>
-          )}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const teamKey = row.original.team_key;
+        const teamNumber = teamKey.substring(3);
+        const isWinner = winners.includes(teamKey);
+        const isCaptain = captains.includes(teamKey);
+        return (
+          <Link
+            to="/team/$teamNumber/{-$year}"
+            params={{ teamNumber }}
+            className="whitespace-nowrap"
+          >
+            {isWinner ? (
+              <InlineIcon className="relative right-[1ch] justify-center">
+                <BiTrophy />
+                {teamNumber}
+                {isCaptain && (
+                  <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
+                    C
+                  </sup>
+                )}
+              </InlineIcon>
+            ) : isCaptain ? (
+              <>
+                {teamNumber}
+                <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
+                  C
+                </sup>
+              </>
+            ) : (
+              <>{teamNumber}</>
+            )}
+          </Link>
+        );
+      },
       accessorFn: (row) => Number(row.team_key.substring(3)),
       sortDescFirst: false,
     },
@@ -102,8 +122,8 @@ export default function RankingsTable({
       data={rankings.rankings}
       conditionalRowStyling={(row) =>
         cn({
-          [`bg-yellow-100 font-bold shadow-inner shadow-yellow-200
-          dark:bg-yellow-500/15 dark:shadow-yellow-500/10`]: winners.includes(
+          [`bg-yellow-100! font-bold shadow-inner shadow-yellow-200
+          dark:bg-yellow-500/15! dark:shadow-yellow-500/10`]: winners.includes(
             row.original.team_key,
           ),
         })
