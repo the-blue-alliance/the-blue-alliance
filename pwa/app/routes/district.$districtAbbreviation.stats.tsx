@@ -224,11 +224,13 @@ function computeLeaderboards(
 
   // Computed stats from awards + events data
   const dcmpFinalsAppearances = new Map<string, number>();
+  const dcmpDivisionFinalsAppearances = new Map<string, number>();
   const districtEventFinalsAppearances = new Map<string, number>();
   const blueBanners = new Map<string, number>();
 
   // Track event keys for tooltip context
   const dcmpFinalsEvents = new Map<string, string[]>();
+  const dcmpDivisionFinalsEvents = new Map<string, string[]>();
   const districtEventFinalsEvents = new Map<string, string[]>();
   const dcmpWinEvents = new Map<string, string[]>();
   const dcmpDivisionWinEvents = new Map<string, string[]>();
@@ -275,11 +277,11 @@ function computeLeaderboards(
         const teamKey = recipient.team_key;
         if (!teamKey) continue;
 
-        // DCMP finals appearances (finalist at DCMP)
+        // DCMP finals appearances (DISTRICT_CMP only)
         if (
           (award.award_type === AwardType.FINALIST ||
             award.award_type === AwardType.WINNER) &&
-          dcmpEventKeys.has(award.event_key)
+          dcmpOnlyEventKeys.has(award.event_key)
         ) {
           dcmpFinalsAppearances.set(
             teamKey,
@@ -288,6 +290,21 @@ function computeLeaderboards(
           const ev = dcmpFinalsEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           dcmpFinalsEvents.set(teamKey, ev);
+        }
+
+        // DCMP Division finals appearances (DISTRICT_CMP_DIVISION only)
+        if (
+          (award.award_type === AwardType.FINALIST ||
+            award.award_type === AwardType.WINNER) &&
+          dcmpDivisionEventKeys.has(award.event_key)
+        ) {
+          dcmpDivisionFinalsAppearances.set(
+            teamKey,
+            (dcmpDivisionFinalsAppearances.get(teamKey) ?? 0) + 1,
+          );
+          const ev = dcmpDivisionFinalsEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          dcmpDivisionFinalsEvents.set(teamKey, ev);
         }
 
         // DCMP wins (DISTRICT_CMP only)
@@ -403,6 +420,7 @@ function computeLeaderboards(
     cmpAppearances: mapToRankings(cmpAppearances),
     dcmpAppearances: mapToRankings(dcmpAppearances),
     dcmpFinalsAppearances: mapToRankings(dcmpFinalsAppearances),
+    dcmpDivisionFinalsAppearances: mapToRankings(dcmpDivisionFinalsAppearances),
     dcmpWins: mapToRankings(dcmpWins),
     dcmpDivisionWins: mapToRankings(dcmpDivisionWins),
     eventsAttended: mapToRankings(eventsAttended),
@@ -416,6 +434,10 @@ function computeLeaderboards(
     // Tooltip maps
     dcmpFinalsTooltips: buildContextTooltipMap(
       dcmpFinalsEvents,
+      eventNameLookup,
+    ),
+    dcmpDivisionFinalsTooltips: buildContextTooltipMap(
+      dcmpDivisionFinalsEvents,
       eventNameLookup,
     ),
     districtEventFinalsTooltips: buildContextTooltipMap(
@@ -666,6 +688,15 @@ function DistrictStatsPage() {
               keyType="team"
               year={0}
             />
+            {leaderboards.dcmpDivisionFinalsAppearances.length > 0 && (
+              <Leaderboard
+                title="Most District Championship Division Finals Appearances"
+                rankings={leaderboards.dcmpDivisionFinalsAppearances}
+                keyType="team"
+                year={0}
+                contextTooltipMap={leaderboards.dcmpDivisionFinalsTooltips}
+              />
+            )}
             <Leaderboard
               title="Most District Championship Finals Appearances"
               rankings={leaderboards.dcmpFinalsAppearances}
