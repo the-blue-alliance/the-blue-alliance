@@ -191,6 +191,7 @@ function computeLeaderboards(
   const cmpAppearances = new Map<string, number>();
   const dcmpAppearances = new Map<string, number>();
   const dcmpWins = new Map<string, number>();
+  const dcmpDivisionWins = new Map<string, number>();
   const districtEventWins = new Map<string, number>();
   const mostMatchesPlayed = new Map<string, number>();
   const mostAwards = new Map<string, number>();
@@ -203,9 +204,6 @@ function computeLeaderboards(
       }
       if (data.dcmp_appearances > 0) {
         dcmpAppearances.set(teamKey, data.dcmp_appearances);
-      }
-      if (data.dcmp_wins > 0) {
-        dcmpWins.set(teamKey, data.dcmp_wins);
       }
       if (data.district_event_wins > 0) {
         districtEventWins.set(teamKey, data.district_event_wins);
@@ -233,6 +231,7 @@ function computeLeaderboards(
   const dcmpFinalsEvents = new Map<string, string[]>();
   const districtEventFinalsEvents = new Map<string, string[]>();
   const dcmpWinEvents = new Map<string, string[]>();
+  const dcmpDivisionWinEvents = new Map<string, string[]>();
   const districtEventWinEvents = new Map<string, string[]>();
   const blueBannerEvents = new Map<string, string[]>();
   const impactEvents = new Map<string, string[]>();
@@ -250,6 +249,18 @@ function computeLeaderboards(
             e.event_type === EventType.DISTRICT_CMP ||
             e.event_type === EventType.DISTRICT_CMP_DIVISION,
         )
+        .map((e) => e.key),
+    );
+
+    const dcmpOnlyEventKeys = new Set(
+      events
+        .filter((e) => e.event_type === EventType.DISTRICT_CMP)
+        .map((e) => e.key),
+    );
+
+    const dcmpDivisionEventKeys = new Set(
+      events
+        .filter((e) => e.event_type === EventType.DISTRICT_CMP_DIVISION)
         .map((e) => e.key),
     );
 
@@ -279,14 +290,29 @@ function computeLeaderboards(
           dcmpFinalsEvents.set(teamKey, ev);
         }
 
-        // DCMP wins
+        // DCMP wins (DISTRICT_CMP only)
         if (
           award.award_type === AwardType.WINNER &&
-          dcmpEventKeys.has(award.event_key)
+          dcmpOnlyEventKeys.has(award.event_key)
         ) {
+          dcmpWins.set(teamKey, (dcmpWins.get(teamKey) ?? 0) + 1);
           const ev = dcmpWinEvents.get(teamKey) ?? [];
           ev.push(award.event_key);
           dcmpWinEvents.set(teamKey, ev);
+        }
+
+        // DCMP Division wins (DISTRICT_CMP_DIVISION only)
+        if (
+          award.award_type === AwardType.WINNER &&
+          dcmpDivisionEventKeys.has(award.event_key)
+        ) {
+          dcmpDivisionWins.set(
+            teamKey,
+            (dcmpDivisionWins.get(teamKey) ?? 0) + 1,
+          );
+          const ev = dcmpDivisionWinEvents.get(teamKey) ?? [];
+          ev.push(award.event_key);
+          dcmpDivisionWinEvents.set(teamKey, ev);
         }
 
         // District event finals appearances (finalist at district events)
@@ -378,6 +404,7 @@ function computeLeaderboards(
     dcmpAppearances: mapToRankings(dcmpAppearances),
     dcmpFinalsAppearances: mapToRankings(dcmpFinalsAppearances),
     dcmpWins: mapToRankings(dcmpWins),
+    dcmpDivisionWins: mapToRankings(dcmpDivisionWins),
     eventsAttended: mapToRankings(eventsAttended),
     districtEventFinalsAppearances: mapToRankings(
       districtEventFinalsAppearances,
@@ -396,6 +423,10 @@ function computeLeaderboards(
       eventNameLookup,
     ),
     dcmpWinTooltips: buildContextTooltipMap(dcmpWinEvents, eventNameLookup),
+    dcmpDivisionWinTooltips: buildContextTooltipMap(
+      dcmpDivisionWinEvents,
+      eventNameLookup,
+    ),
     districtEventWinTooltips: buildContextTooltipMap(
       districtEventWinEvents,
       eventNameLookup,
@@ -641,6 +672,13 @@ function DistrictStatsPage() {
               keyType="team"
               year={0}
               contextTooltipMap={leaderboards.dcmpFinalsTooltips}
+            />
+            <Leaderboard
+              title="Most District Championship Division Wins"
+              rankings={leaderboards.dcmpDivisionWins}
+              keyType="team"
+              year={0}
+              contextTooltipMap={leaderboards.dcmpDivisionWinTooltips}
             />
             <Leaderboard
               title="Most District Championship Wins"
