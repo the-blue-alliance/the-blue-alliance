@@ -1,12 +1,12 @@
 import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
+import babel from '@rolldown/plugin-babel';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
-import viteReact from '@vitejs/plugin-react';
+import react, { reactCompilerPreset } from '@vitejs/plugin-react';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
 import { defineConfig } from 'vite';
-import tsconfigPaths from 'vite-tsconfig-paths';
 
 function getCommitHash(): string {
   try {
@@ -29,8 +29,10 @@ const staticRoutes = [
 ];
 
 export default defineConfig({
+  resolve: {
+    tsconfigPaths: true,
+  },
   plugins: [
-    tsconfigPaths(),
     tanstackStart({
       srcDirectory: 'app',
       prerender: {
@@ -38,10 +40,10 @@ export default defineConfig({
         filter: ({ path }) => staticRoutes.includes(path),
       },
     }),
-    viteReact({
-      babel: {
-        plugins: ['babel-plugin-react-compiler'],
-      },
+    react(),
+    babel({
+      presets: [reactCompilerPreset()],
+      include: [/\.(ts|tsx|js|jsx)$/],
     }),
     tailwindcss(),
     Icons({
@@ -60,6 +62,18 @@ export default defineConfig({
     ValidateEnv({
       VITE_TBA_API_READ_KEY: Schema.string({
         message: 'Get your API key at https://www.thebluealliance.com/account',
+      }),
+      VITE_FIREBASE_API_KEY: Schema.string({
+        message: 'Copy your Firebase config from .env.example',
+      }),
+      VITE_FIREBASE_AUTH_DOMAIN: Schema.string({
+        message: 'Copy your Firebase config from .env.example',
+      }),
+      VITE_FIREBASE_PROJECT_ID: Schema.string({
+        message: 'Copy your Firebase config from .env.example',
+      }),
+      VITE_FIREBASE_DATABASE_URL: Schema.string({
+        message: 'Copy your Firebase config from .env.example',
       }),
     }),
   ],

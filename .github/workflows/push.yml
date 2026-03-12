@@ -5,6 +5,14 @@ on:
     branches:
       - main
 
+env:
+  VITE_TBA_API_READ_KEY: ${{ vars.VITE_TBA_API_READ_KEY }}
+  VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+  VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+  VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+  VITE_FIREBASE_DATABASE_URL: ${{ vars.VITE_FIREBASE_DATABASE_URL }}
+
+
 jobs:
   py3-type:
     name: "[py3] Type Check"
@@ -121,8 +129,6 @@ jobs:
           cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa install --frozen-lockfile
@@ -149,8 +155,6 @@ jobs:
           cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa install --frozen-lockfile
@@ -178,8 +182,6 @@ jobs:
       - name: Create dotenv
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
       - name: Run Test
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa test
@@ -208,10 +210,6 @@ jobs:
         run: pnpm --dir pwa install --frozen-lockfile
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-          GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Run Build
         run: pnpm --dir pwa run build
         env:
@@ -248,8 +246,6 @@ jobs:
 
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
 
       - name: Install Dependencies
         working-directory: pwa

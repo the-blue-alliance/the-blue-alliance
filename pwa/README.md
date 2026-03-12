@@ -21,7 +21,7 @@ pnpm i
 Make sure you have your TBA APIv3 Read Key set in `.env`:
 
 ```sh
-$ cp default.env .env
+$ cp .env.example .env
 VITE_TBA_API_READ_KEY="myKey"
 ```
 
@@ -148,7 +148,7 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 
 ## Adding environment variables
 
-1. Put some form of example in `default.env`
+1. Put some form of example in `.env.example`
 2. Add the environment variable to `app/vite-env.d.ts`
 3. Add a validator to `vite.config.ts`
 4. You can then reference it in code with `import.env.meta.VITE_MY_VAR`.
