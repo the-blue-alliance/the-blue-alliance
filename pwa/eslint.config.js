@@ -1,14 +1,14 @@
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+
 import { fixupPluginRules, includeIgnoreFile } from '@eslint/compat';
 import tsParser from '@typescript-eslint/parser';
-import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
 import jsxA11y from 'eslint-plugin-jsx-a11y';
 import noRelativeImportPaths from 'eslint-plugin-no-relative-import-paths';
 import pluginReact from 'eslint-plugin-react';
 import reactHooks from 'eslint-plugin-react-hooks';
 import globals from 'globals';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
 import tseslint from 'typescript-eslint';
 
 const __filename = fileURLToPath(import.meta.url);
@@ -161,7 +161,4 @@ export default tseslint.config([
       'no-relative-import-paths/no-relative-import-paths': 'error',
     },
   },
-
-  // Prettier
-  eslintConfigPrettier,
 ]);

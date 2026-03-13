@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-
 import MdiVideo from '~icons/mdi/video';
 
 import { Event } from '~/api/tba/read';

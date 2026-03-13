@@ -1,6 +1,5 @@
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-
 import TrashIcon from '~icons/lucide/trash-2';
 
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';

@@ -8,7 +8,6 @@ import {
   useState,
 } from 'react';
 import { InView, type PlainChildrenProps } from 'react-intersection-observer';
-
 import TableOfContentsIcon from '~icons/mdi/table-of-contents';
 
 import { Button } from '~/components/ui/button';
@@ -126,11 +125,7 @@ export function TableOfContents({
       )}
       {/* Mobile TOC - Sticky header */}
       <TOCRenderPortal>
-        <div
-          className="sticky inset-x-0 top-14 z-1 flex items-center
-            justify-between gap-8 border-b bg-background/80 px-4 py-1
-            text-muted-foreground backdrop-blur-xs transition-colors lg:hidden"
-        >
+        <div className="sticky inset-x-0 top-14 z-1 flex items-center justify-between gap-8 border-b bg-background/80 px-4 py-1 text-muted-foreground backdrop-blur-xs transition-colors lg:hidden">
           <div className="flex items-center gap-1">
             <Popover
               open={mobilePopoverOpen}

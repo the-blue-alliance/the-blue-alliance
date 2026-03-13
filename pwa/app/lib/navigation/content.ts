@@ -1,6 +1,5 @@
 import { LinkOptions } from '@tanstack/react-router';
 import { ElementType } from 'react';
-
 import EventsIcon from '~icons/lucide/calendar';
 import InsightsIcon from '~icons/lucide/chart-line';
 import DistrictsIcon from '~icons/lucide/globe';

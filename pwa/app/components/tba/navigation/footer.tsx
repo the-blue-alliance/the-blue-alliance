@@ -2,7 +2,6 @@ import { Link, LinkOptions } from '@tanstack/react-router';
 import { MoonIcon, SunIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
-
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
@@ -58,8 +57,7 @@ function ThemeToggle() {
 
   return (
     <button
-      className="group inline-flex cursor-pointer items-center rounded-full
-        border p-1"
+      className="group inline-flex cursor-pointer items-center rounded-full border p-1"
       aria-label="Toggle Theme"
       onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
     >
@@ -69,11 +67,7 @@ function ThemeToggle() {
             key={key}
             fill="currentColor"
             data-active={value === key}
-            className={`size-6.5 rounded-full p-1.5 text-muted-foreground
-            transition-colors group-hover:text-accent-foreground
-            data-[active=true]:bg-black/5
-            data-[active=true]:text-accent-foreground
-            dark:data-[active=true]:bg-accent`}
+            className={`size-6.5 rounded-full p-1.5 text-muted-foreground transition-colors group-hover:text-accent-foreground data-[active=true]:bg-black/5 data-[active=true]:text-accent-foreground dark:data-[active=true]:bg-accent`}
           />
         );
       })}
@@ -83,14 +77,8 @@ function ThemeToggle() {
 
 export const Footer = ({ renderTime }: { renderTime: string }) => {
   return (
-    <footer
-      className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
-        bg-neutral-50 dark:bg-neutral-900"
-    >
-      <div
-        className="mx-auto w-full px-4 sm:max-w-160 md:max-w-3xl md:px-8
-          lg:max-w-5xl"
-      >
+    <footer className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t bg-neutral-50 dark:bg-neutral-900">
+      <div className="mx-auto w-full px-4 sm:max-w-160 md:max-w-3xl md:px-8 lg:max-w-5xl">
         <div className="flex items-center gap-8">
           <div className="flex flex-1 flex-wrap gap-2 py-6 text-center text-sm">
             {links.map((link, index) => (
@@ -98,8 +86,7 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
                 {'href' in link ? (
                   <a
                     key={link.label}
-                    className="flex items-center gap-1 text-neutral-800
-                      hover:underline dark:text-neutral-200"
+                    className="flex items-center gap-1 text-neutral-800 hover:underline dark:text-neutral-200"
                     href={link.href}
                     target="_blank"
                     rel="noreferrer noopener"
@@ -112,8 +99,7 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
                 ) : (
                   <Link
                     key={link.label}
-                    className="flex items-center gap-1 text-neutral-800
-                      hover:underline dark:text-neutral-200"
+                    className="flex items-center gap-1 text-neutral-800 hover:underline dark:text-neutral-200"
                     to={link.to}
                   >
                     {link.icon && <link.icon className="size-3" />}
@@ -130,10 +116,7 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
           </div>
           <ThemeToggle />
         </div>
-        <div
-          className="relative isolate flex justify-between gap-0.5 border-t
-            border-neutral-600/10 py-5 text-sm max-md:flex-col md:items-center"
-        >
+        <div className="relative isolate flex justify-between gap-0.5 border-t border-neutral-600/10 py-5 text-sm max-md:flex-col md:items-center">
           <span>
             Thanks to our platinum sponsor
             <a

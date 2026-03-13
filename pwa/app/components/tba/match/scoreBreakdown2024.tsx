@@ -27,9 +27,7 @@ export default function ScoreBreakdown2024({
       <TableBody>
         {/* Auto Leave */}
         <TableRow>
-          <TableCell
-            className="bg-alliance-red-dark whitespace-nowrap *:align-middle"
-          >
+          <TableCell className="bg-alliance-red-dark whitespace-nowrap *:align-middle">
             <ConditionalCheckmark
               condition={scoreBreakdown.red.autoLineRobot1 === 'Yes'}
               teamKey={match.alliances.red.team_keys[0].substring(3)}
@@ -47,9 +45,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Auto Leave
           </TableCell>
-          <TableCell
-            className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
-          >
+          <TableCell className="bg-alliance-blue-dark whitespace-nowrap *:align-middle">
             <ConditionalCheckmark
               condition={scoreBreakdown.blue.autoLineRobot1 === 'Yes'}
               teamKey={match.alliances.blue.team_keys[0].substring(3)}
@@ -133,10 +129,7 @@ export default function ScoreBreakdown2024({
 
         {/* Teleop Speaker Note Count */}
         <TableRow>
-          <TableCell
-            className="flex flex-row items-center justify-center gap-4
-              bg-alliance-red-light"
-          >
+          <TableCell className="flex flex-row items-center justify-center gap-4 bg-alliance-red-light">
             <InlineIcon>
               <BiVolumeUp className="size-4" />
               {scoreBreakdown.red.teleopSpeakerNoteAmplifiedCount}
@@ -150,10 +143,7 @@ export default function ScoreBreakdown2024({
             Teleop Speaker Note Count
           </TableCell>
 
-          <TableCell
-            className="flex flex-row items-center justify-center gap-4
-              bg-alliance-blue-light"
-          >
+          <TableCell className="flex flex-row items-center justify-center gap-4 bg-alliance-blue-light">
             <InlineIcon>
               <BiVolumeUp className="size-4" />
               {scoreBreakdown.blue.teleopSpeakerNoteAmplifiedCount}

@@ -1,8 +1,9 @@
+import type { IncomingMessage, ServerResponse } from 'node:http';
+
 import * as Sentry from '@sentry/tanstackstart-react';
 import compression from 'compression';
 import express from 'express';
 import morgan from 'morgan';
-import type { IncomingMessage, ServerResponse } from 'node:http';
 import { toNodeHandler } from 'srvx/node';
 
 const isProd = process.env.NODE_ENV === 'production';

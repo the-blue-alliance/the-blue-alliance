@@ -61,7 +61,6 @@ updates:
       patterns:
         - "@eslint/*"
         - "eslint"
-        - "eslint-config-prettier"
         - "eslint-import-resolver-typescript"
         - "eslint-plugin-import"
         - "eslint-plugin-jsx-a11y"
@@ -71,11 +70,7 @@ updates:
         - "globals"
         - "typescript-eslint"
         - "@typescript-eslint/*"
-        - "prettier"
-        - "prettier-plugin-classnames"
-        - "prettier-plugin-merge"
-        - "prettier-plugin-tailwindcss"
-        - "@trivago/prettier-plugin-sort-imports"
+        - "oxfmt"
     sentry:
       patterns:
         - "@sentry/*"

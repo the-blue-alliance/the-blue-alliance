@@ -8,7 +8,6 @@ import {
   useRef,
   useState,
 } from 'react';
-
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
 import { EliminationAlliance, Event, Match } from '~/api/tba/read';
@@ -106,20 +105,16 @@ const PlayoffMatch = forwardRef<
     <div
       ref={cardRef}
       className={cn(
-        `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200
-        bg-background transition-all duration-200 dark:border-neutral-700`,
+        `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200 bg-background transition-all duration-200 dark:border-neutral-700`,
         {
-          [`border-transparent shadow-lg ring-2 ring-alliance-red/75
-          dark:border-transparent`]: isHighlighted && result.redWon,
-          [`border-transparent shadow-lg ring-2 ring-alliance-blue/75
-          dark:border-transparent`]: isHighlighted && result.blueWon,
+          [`border-transparent shadow-lg ring-2 ring-alliance-red/75 dark:border-transparent`]:
+            isHighlighted && result.redWon,
+          [`border-transparent shadow-lg ring-2 ring-alliance-blue/75 dark:border-transparent`]:
+            isHighlighted && result.blueWon,
         },
       )}
     >
-      <div
-        className="flex items-center justify-between border-b px-2 py-1 text-sm
-          font-bold"
-      >
+      <div className="flex items-center justify-between border-b px-2 py-1 text-sm font-bold">
         <div className="flex items-center gap-1">
           <span>{matchLabel}</span>
           {result.redAllianceNumber && result.blueAllianceNumber && (
@@ -129,8 +124,7 @@ const PlayoffMatch = forwardRef<
                 className={cn(
                   'text-alliance-red transition-all duration-200',
                   isRedHighlighted &&
-                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900
-                    dark:text-white`,
+                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900 dark:text-white`,
                 )}
               >
                 {getAllianceDisplayName(result.redAllianceNumber)}
@@ -140,8 +134,7 @@ const PlayoffMatch = forwardRef<
                 className={cn(
                   'text-alliance-blue transition-all duration-200',
                   isBlueHighlighted &&
-                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
-                    dark:text-white`,
+                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900 dark:text-white`,
                 )}
               >
                 {getAllianceDisplayName(result.blueAllianceNumber)}
@@ -166,10 +159,7 @@ const PlayoffMatch = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-red/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-red
-          data-[highlight=true]:text-white`}
+        className={`group flex cursor-pointer items-center justify-between bg-alliance-red/15 px-1 py-1 transition-colors duration-200 data-[highlight=true]:bg-alliance-red data-[highlight=true]:text-white`}
         data-highlight={isRedHighlighted}
         ref={redRowRef}
         onMouseEnter={() =>
@@ -189,8 +179,7 @@ const PlayoffMatch = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-red
-                    group-data-[highlight=true]:text-white`,
+                    `w-12 text-center text-sm text-alliance-red group-data-[highlight=true]:text-white`,
                     result.redWon && 'font-bold',
                     !teamPlayed &&
                       'underline decoration-current decoration-dotted',
@@ -225,10 +214,7 @@ const PlayoffMatch = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-blue/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-blue
-          data-[highlight=true]:text-white`}
+        className={`group flex cursor-pointer items-center justify-between bg-alliance-blue/15 px-1 py-1 transition-colors duration-200 data-[highlight=true]:bg-alliance-blue data-[highlight=true]:text-white`}
         data-highlight={isBlueHighlighted}
         ref={blueRowRef}
         onMouseEnter={() =>
@@ -248,8 +234,7 @@ const PlayoffMatch = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-blue
-                    group-data-[highlight=true]:text-white`,
+                    `w-12 text-center text-sm text-alliance-blue group-data-[highlight=true]:text-white`,
                     result.blueWon && 'font-bold',
                     !teamPlayed &&
                       'underline decoration-current decoration-dotted',
@@ -456,8 +441,7 @@ export default function EliminationBracket({
       <div className="overflow-x-auto overflow-y-hidden">
         <div
           ref={containerRef}
-          className="relative isolate flex min-w-max items-start justify-start
-            gap-6 px-4"
+          className="relative isolate flex min-w-max items-start justify-start gap-6 px-4"
         >
           {/* Bracket Layout */}
           <div className="relative z-1 space-y-4">

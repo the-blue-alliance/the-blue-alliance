@@ -63,10 +63,7 @@ export function WebcastSelectorDialog({
               {/* Special Webcasts */}
               {specialWebcasts.length > 0 && (
                 <>
-                  <div
-                    className="px-4 py-1.5 text-xs font-semibold tracking-wider
-                      text-primary uppercase"
-                  >
+                  <div className="px-4 py-1.5 text-xs font-semibold tracking-wider text-primary uppercase">
                     Special Webcasts
                   </div>
                   {specialWebcasts.map((webcast) => (
@@ -83,10 +80,7 @@ export function WebcastSelectorDialog({
               {regularWebcasts.length > 0 && (
                 <>
                   {specialWebcasts.length > 0 && <Separator className="my-2" />}
-                  <div
-                    className="px-4 py-1.5 text-xs font-semibold tracking-wider
-                      text-primary uppercase"
-                  >
+                  <div className="px-4 py-1.5 text-xs font-semibold tracking-wider text-primary uppercase">
                     Event Webcasts
                   </div>
                   {regularWebcasts.map((webcast) => (
@@ -106,10 +100,7 @@ export function WebcastSelectorDialog({
                     regularWebcasts.length > 0) && (
                     <Separator className="my-2" />
                   )}
-                  <div
-                    className="px-4 py-1.5 text-xs font-semibold tracking-wider
-                      text-muted-foreground uppercase"
-                  >
+                  <div className="px-4 py-1.5 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                     Offline Event Webcasts
                   </div>
                   {offlineRegularWebcasts.map((webcast) => (
@@ -130,10 +121,7 @@ export function WebcastSelectorDialog({
                     offlineRegularWebcasts.length > 0) && (
                     <Separator className="my-2" />
                   )}
-                  <div
-                    className="px-4 py-1.5 text-xs font-semibold tracking-wider
-                      text-muted-foreground uppercase"
-                  >
+                  <div className="px-4 py-1.5 text-xs font-semibold tracking-wider text-muted-foreground uppercase">
                     Offline Special Webcasts
                   </div>
                   {offlineSpecialWebcasts.map((webcast) => (
@@ -187,8 +175,7 @@ function WebcastItem({
   return (
     <button
       onClick={onClick}
-      className="flex w-full cursor-pointer items-center gap-3 px-4 py-2
-        text-left transition-colors hover:bg-accent"
+      className="flex w-full cursor-pointer items-center gap-3 px-4 py-2 text-left transition-colors hover:bg-accent"
     >
       <WebcastTypeIcon
         type={webcast.webcast.type}

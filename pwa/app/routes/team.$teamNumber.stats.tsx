@@ -3,7 +3,6 @@ import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
-
 import MdiCog from '~icons/mdi/cog';
 import MdiRobotExcited from '~icons/mdi/robot-excited';
 
@@ -98,13 +97,8 @@ function MatchStatsLoadingState({
     <div className="flex flex-col items-center justify-center py-16">
       <div className="relative mb-6">
         <MdiRobotExcited className="size-16 animate-bounce text-blue-500" />
-        <MdiCog
-          className="absolute -top-2 -right-4 size-8 animate-spin text-blue-400"
-        />
-        <MdiCog
-          className="absolute -bottom-1 -left-3 size-6 animate-spin
-            text-blue-300 direction-[reverse]"
-        />
+        <MdiCog className="absolute -top-2 -right-4 size-8 animate-spin text-blue-400" />
+        <MdiCog className="absolute -bottom-1 -left-3 size-6 animate-spin text-blue-300 direction-[reverse]" />
       </div>
       <div className="mb-3 text-lg font-medium text-foreground">
         Compiling match data...
