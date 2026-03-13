@@ -257,7 +257,8 @@ class EventInsightsHelper:
             "auto_win_conversion": [
                 auto_win_conversion,
                 finished_matches - undefined_auto_conversion_matches,
-                100.0 * auto_win_conversion / (finished_matches - undefined_auto_conversion_matches), 
+                0 if (finished_matches - undefined_auto_conversion_matches) == 0 else 
+                    100.0 * auto_win_conversion / (finished_matches - undefined_auto_conversion_matches), 
             ],
             "auto_fuel_scored": [
                 auto_fuel_scored,
