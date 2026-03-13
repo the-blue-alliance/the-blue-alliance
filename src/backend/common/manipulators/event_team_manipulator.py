@@ -6,7 +6,6 @@ from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.event_team import EventTeam
-from backend.common.models.team import Team
 
 
 class EventTeamManipulator(ManipulatorBase[EventTeam]):
@@ -33,33 +32,45 @@ class EventTeamManipulator(ManipulatorBase[EventTeam]):
         """
         cls._update_attrs(new_model, old_model, auto_union, update_manual_attrs)
         return old_model
-    
+
 
 def notify_team_changes(updated_models: List[EventTeam], removed: bool) -> None:
     events = set()
-    
+
     for updated_model in updated_models:
         events.add(updated_model.event.id())
-    
+
     for event in events:
-        
+
         try:
             defer_safe(
-               TBANSHelper.event_teams,
-                event,
-                added_teams=[model.team.get() for model in updated_models if model.event.id() == event and not removed],
-                removed_teams=[model.team.get() for model in updated_models if model.event.id() == event and removed],
+                TBANSHelper.event_teams,
+                event_key=event,
+                added_teams=[
+                    model.team.get()
+                    for model in updated_models
+                    if model.event.id() == event and not removed
+                ],
+                removed_teams=[
+                    model.team.get()
+                    for model in updated_models
+                    if model.event.id() == event and removed
+                ],
                 _target="py3-tasks-io",
                 _queue="push-notifications",
-                _url="/_ah/queue/deferred_notification_send", 
+                _url="/_ah/queue/deferred_notification_send",
             )
         except Exception:
             pass
 
+
 @EventTeamManipulator.register_post_update_hook
 def notify_additions(updated_models: List[TUpdatedModel[EventTeam]]) -> None:
-    event_teams = [updated_model.model for updated_model in updated_models if updated_model.is_new]
+    event_teams = [
+        updated_model.model for updated_model in updated_models if updated_model.is_new
+    ]
     notify_team_changes(event_teams, False)
+
 
 @EventTeamManipulator.register_post_delete_hook
 def notify_removals(update_models: List[EventTeam]) -> None:

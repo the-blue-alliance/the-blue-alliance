@@ -100,7 +100,9 @@ ENABLED_NOTIFICATIONS: Dict[NotificationType, str] = {
     ],
     NotificationType.AWARDS: RENDER_NAMES[NotificationType.AWARDS],
     NotificationType.SCHEDULE_UPDATED: RENDER_NAMES[NotificationType.SCHEDULE_UPDATED],
-    NotificationType.EVENT_TEAMS_UPDATED: RENDER_NAMES[NotificationType.EVENT_TEAMS_UPDATED],
+    NotificationType.EVENT_TEAMS_UPDATED: RENDER_NAMES[
+        NotificationType.EVENT_TEAMS_UPDATED
+    ],
 }
 
 
@@ -122,7 +124,7 @@ ENABLED_TEAM_NOTIFICATIONS: Set[NotificationType] = {
     NotificationType.ALLIANCE_SELECTION,
     NotificationType.AWARDS,
     NotificationType.MATCH_VIDEO,
-    NotificationType.EVENT_TEAMS_UPDATED
+    NotificationType.EVENT_TEAMS_UPDATED,
 }
 
 

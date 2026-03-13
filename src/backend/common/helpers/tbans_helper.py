@@ -33,7 +33,6 @@ from backend.common.models.notifications.event_level import EventLevelNotificati
 from backend.common.models.notifications.event_schedule import (
     EventScheduleNotification,
 )
-from backend.common.models.notifications.teams_updated import EventTeamsNotification
 from backend.common.models.notifications.match_score import MatchScoreNotification
 from backend.common.models.notifications.match_upcoming import (
     MatchUpcomingNotification,
@@ -50,6 +49,7 @@ from backend.common.models.notifications.requests.fcm_request import (
     MAXIMUM_TOKENS,
 )
 from backend.common.models.notifications.requests.webhook_request import WebhookRequest
+from backend.common.models.notifications.teams_updated import EventTeamsNotification
 from backend.common.models.notifications.verification import VerificationNotification
 from backend.common.models.subscription import Subscription
 from backend.common.models.team import Team
@@ -259,8 +259,13 @@ class TBANSHelper:
             )
 
     @classmethod
-    def event_teams(cls, event: str, added_teams: List[Team] = None, removed_teams: List[Team] = None) -> None:
-        event = Event.get_by_id(event)
+    def event_teams(
+        cls,
+        event_key: str,
+        added_teams: List[Team],
+        removed_teams: List[Team],
+    ) -> None:
+        event = Event.get_by_id(event_key)
         if event is None:
             return
 
@@ -270,11 +275,11 @@ class TBANSHelper:
             event_subscriptions_future = Subscription.subscriptions_for_event(
                 event, NotificationType.EVENT_TEAMS_UPDATED
             )
-            
+
         # Send to Team subscribers
         team_subscriptions_futures = {}
         if NotificationType.EVENT_TEAMS_UPDATED in ENABLED_TEAM_NOTIFICATIONS:
-             for team in [*(added_teams or []), *(removed_teams or [])]:
+            for team in [*added_teams, *removed_teams]:
                 if team:
                     team_subscriptions_futures[team.key_name] = (
                         Subscription.subscriptions_for_team(
@@ -285,15 +290,14 @@ class TBANSHelper:
         if event_subscriptions_future:
             cls._batch_send_subscriptions(
                 event_subscriptions_future.get_result(),
-                EventTeamsNotification(event, added_teams or [], removed_teams or []),
+                EventTeamsNotification(event, added_teams, removed_teams),
             )
-            
+
         for team_key, team_subscriptions_future in team_subscriptions_futures.items():
             cls._batch_send_subscriptions(
                 team_subscriptions_future.get_result(),
-                EventTeamsNotification(event, added_teams or [], removed_teams or []),
+                EventTeamsNotification(event, added_teams, removed_teams),
             )
-
 
     @classmethod
     def match_score(
@@ -806,12 +810,14 @@ class TBANSHelper:
                 if match
                 else EventScheduleNotification(event)
             )
-        
+
         elif notification_type == NotificationType.EVENT_TEAMS_UPDATED:
             if event is None:
                 return None
             added_teams = [event.teams[0]] if event.teams else []
-            return EventTeamsNotification(event, added_teams=added_teams, removed_teams=[])
+            return EventTeamsNotification(
+                event, added_teams=added_teams, removed_teams=[]
+            )
 
         return None
 
