@@ -4,6 +4,7 @@ from typing import Any, cast, Dict, List, Optional, Union
 import requests
 from google.appengine.ext import ndb
 
+from backend.common.consts.renamed_districts import ALL_KNOWN_DISTRICT_ABBREVIATIONS
 from backend.common.helpers.deferred import defer_safe
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.district_manipulator import DistrictManipulator
@@ -19,7 +20,7 @@ from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.award import Award
-from backend.common.models.district import ALL_KNOWN_DISTRICT_ABBREVIATIONS, District
+from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
