@@ -187,11 +187,13 @@ def test_updateHook_corrupted_null_event(
         id="2012ct_qm1",
         alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
         comp_level="qm",
-        event=None,
+        event=ndb.Key(Event, "2012ct"),
         year=2012,
         set_number=1,
         match_number=1,
     )
+    # Simulate corrupted entity — NDB required=True only validates on put()
+    test_match.event = None
     MatchManipulator._run_post_update_hook([test_match])
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
