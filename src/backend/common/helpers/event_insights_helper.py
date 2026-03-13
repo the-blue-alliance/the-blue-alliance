@@ -149,7 +149,7 @@ class EventInsightsHelper:
                 and red_score > blue_score
             ):
                 auto_win_conversion += 1
-            elif (blue_sb.get("totalAutoPoints") > blue_sb.get("totalAutoPoints")
+            elif (blue_sb.get("totalAutoPoints") > red_sb.get("totalAutoPoints")
                 and blue_score > red_score
             ):
                 auto_win_conversion += 1
