@@ -426,7 +426,7 @@ def find_event_webcasts(district_key: DistrictKey) -> Response:
         channel["channel_id"]
         for channel in (district.webcast_channels or [])
         if channel.get("type") == WebcastType.YOUTUBE
-        and bool(channel.get("channel_id"))
+        and channel.get("channel_id")
     ]
     if not youtube_channel_ids:
         abort(400)
