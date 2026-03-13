@@ -90,6 +90,7 @@
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.2.1",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
+    "@types/babel__core": "7.20.5",
     "@types/compression": "1.8.1",
     "@types/express": "5.0.6",
     "@types/morgan": "1.9.10",
