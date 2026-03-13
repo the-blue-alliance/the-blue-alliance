@@ -183,23 +183,16 @@ def test_updateHook_corrupted_null_event(
     mock_firebase, ndb_context, taskqueue_stub
 ) -> None:
     """Nullapalooza (#9236): corrupted Match with event=None should be skipped."""
-    test_match = Match(
-        id="2012ct_qm1",
-        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
-        comp_level="qm",
-        event=ndb.Key(Event, "2012ct"),
-        year=2012,
-        set_number=1,
-        match_number=1,
+    from backend.common.manipulators.match_manipulator import (
+        match_post_update_hook,
     )
-    # Simulate corrupted entity by patching .event to return None
-    with mock.patch.object(type(test_match), "event", new_callable=mock.PropertyMock, return_value=None):
-        MatchManipulator._run_post_update_hook([test_match])
 
-    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
-    assert len(tasks) == 1
-    for task in tasks:
-        run_from_task(task)
+    mock_model = mock.Mock()
+    mock_model.model.event = None
+    mock_model.model.key = ndb.Key(Match, "2012ct_qm1")
+
+    # Call the hook directly to avoid NDB serialization issues
+    match_post_update_hook([mock_model])
 
     mock_firebase.assert_not_called()
 
