@@ -76,9 +76,7 @@ class EventInsightsHelper:
         total_fuel_scored = 0
 
         auto_climb_count = 0
-        level1_climb_count = 1
-        level2_climb_count = 2
-        level3_climb_count = 3
+        endgame_climb_count = [0, 0, 0]
 
         total_scores = 0
         total_win_margins = 0
@@ -87,6 +85,41 @@ class EventInsightsHelper:
         high_score: Tuple[int, str, str] = (0, "", "")
 
         finished_matches = 0
+
+        def determine_auto_winner(red, blue) -> Optional[AllianceColor]:
+            # Compare total auto points
+            if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
+                return 'red'
+            if blue.get("totalAutoPoints") < red.get("totalAutoPoints"):
+                return 'blue'
+            
+            # Auto tied: compare shift 1 
+            if red.get("hubScore").get("shift1Count") > 0:
+                return 'blue'
+            if blue.get("hubScore").get("shift1Count") > 0:
+                return 'red'
+            
+            # No scoring in shift 1: compare shift 2 
+            if red.get("hubScore").get("shift2Count") > 0:
+                return 'red'
+            if blue.get("hubScore").get("shift2Count") > 0:
+                return 'blue'
+            
+            # No scoring in shift 2: compare shift 3
+            if red.get("hubScore").get("shift3Count") > 0:
+                return 'blue'
+            if blue.get("hubScore").get("shift3Count") > 0:
+                return 'red'
+            
+            # No scoring in shift 3: compare shift 4 
+            if red.get("hubScore").get("shift4Count") > 0:
+                return 'red'
+            if blue.get("hubScore").get("shift4Count") > 0:
+                return 'blue'
+            
+            # Fully tied
+            return None
+            
 
         for match in matches:
             if not match.has_been_played:
@@ -140,51 +173,15 @@ class EventInsightsHelper:
                 if red_all_rp and blue_all_rp:
                     nine_rp_count += 1
             
-            
-            if (red_score == blue_score):
-                # don't calculate auto win conversion
+
+            auto_winner = determine_auto_winner(red_sb, blue_sb)
+
+            if auto_winner == 'red' and red_score > blue_score:
+                auto_win_conversion += 1
+            if auto_winner == 'blue' and blue_score > red_score:
+                auto_win_conversion += 1
+            else:
                 undefined_auto_conversion_matches += 1
-                pass
-            if (red_sb.get("totalAutoPoints") > blue_sb.get("totalAutoPoints")
-                and red_score > blue_score
-            ):
-                auto_win_conversion += 1
-            elif (blue_sb.get("totalAutoPoints") > red_sb.get("totalAutoPoints")
-                and blue_score > red_score
-            ):
-                auto_win_conversion += 1
-            elif (red_sb.get("totalAutoPoints") == blue_sb.get("totalAutoPoints")):
-                if (((red_sb.get("hubScore").get("shift1Points") != 0 or
-                    blue_sb.get("hubScore").get("shift2Points") != 0 or
-                    red_sb.get("hubScore").get("shift3Points") != 0 or
-                    blue_sb.get("hubScore").get("shift4Points") != 0)) and
-                    ((blue_sb.get("hubScore").get("shift1Points") == 0 and
-                    red_sb.get("hubScore").get("shift2Points") == 0 and
-                    blue_sb.get("hubScore").get("shift3Points") == 0 and
-                    red_sb.get("hubScore").get("shift4Points") == 0))
-                ):
-                    # shift 1 MAY have been given to the blue alliance.
-                    # if neither team scored fuel in teleop, we cannot know 
-                    if (blue_score > red_score):
-                        auto_win_conversion += 1
-                elif (((blue_sb.get("hubScore").get("shift1Points") != 0 or
-                    red_sb.get("hubScore").get("shift2Points") != 0 or
-                    blue_sb.get("hubScore").get("shift3Points") != 0 or
-                    red_sb.get("hubScore").get("shift4Points") != 0)) and
-                    ((red_sb.get("hubScore").get("shift1Points") == 0 and
-                    blue_sb.get("hubScore").get("shift2Points") == 0 and
-                    red_sb.get("hubScore").get("shift3Points") == 0 and
-                    blue_sb.get("hubScore").get("shift4Points") == 0))
-                ):
-                    # shift 1 MAY have been given to the red alliance.
-                    # if neither team scored fuel in teleop, we cannot know 
-                    if (red_score > blue_score):
-                        auto_win_conversion += 1
-                else:
-                    # one of the above cases, where auto was a draw 
-                    # and neither team scored fuel in teleop.
-                    # we don't know which team was awarded first shift.
-                    undefined_auto_conversion_matches += 1
             
             if (red_sb.get("autoTowerRobot1") != "None" or
                 red_sb.get("autoTowerRobot1") != "None" or
@@ -206,20 +203,20 @@ class EventInsightsHelper:
             for i in range(3):
                 tower_level = red_sb.get("endGameTowerRobot{}".format(i + 1))
                 if tower_level == "Level1":
-                    level1_climb_count += 1
+                    endgame_climb_count[0] += 1
                 if tower_level == "Level2":
-                    level2_climb_count += 1
+                    endgame_climb_count[1] += 1
                 if tower_level == "Level3":
-                    level3_climb_count += 1
+                    endgame_climb_count[2] += 1
             
             for i in range(3):
                 tower_level = blue_sb.get("endGameTowerRobot{}".format(i + 1))
                 if tower_level == "Level1":
-                    level1_climb_count += 1
+                    endgame_climb_count[0] += 1
                 if tower_level == "Level2":
-                    level2_climb_count += 1
+                    endgame_climb_count[1] += 1
                 if tower_level == "Level3":
-                    level3_climb_count += 1
+                    endgame_climb_count[2] += 1
 
             total_scores += red_score + blue_score
             total_win_margins += win_score - min(red_score, blue_score)
@@ -281,19 +278,19 @@ class EventInsightsHelper:
                 100.0 * auto_climb_count / (finished_matches * 2), 
             ],
             "level1_climb_count": [
-                level1_climb_count,
+                endgame_climb_count[0],
                 finished_matches * 6,
-                100.0 * level1_climb_count / (finished_matches * 6), 
+                100.0 * endgame_climb_count[0] / (finished_matches * 6), 
             ],
             "level2_climb_count": [
-                level2_climb_count,
+                endgame_climb_count[1],
                 finished_matches * 6,
-                100.0 * level2_climb_count / (finished_matches * 6), 
+                100.0 * endgame_climb_count[1] / (finished_matches * 6), 
             ],
             "level3_climb_count": [
-                level3_climb_count,
+                endgame_climb_count[2],
                 finished_matches * 6,
-                100.0 * level3_climb_count / (finished_matches * 6), 
+                100.0 * endgame_climb_count[2] / (finished_matches * 6), 
             ],
             "average_score": total_scores / (finished_matches * 2),
             "average_win_margin": total_win_margins / finished_matches,
