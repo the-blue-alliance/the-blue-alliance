@@ -1,4 +1,5 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
+import { Temporal } from 'temporal-polyfill';
 
 import { getEvent, getMatch } from '~/api/tba/read';
 import { EventLink } from '~/components/tba/links';
@@ -63,7 +64,9 @@ export const Route = createFileRoute('/match/$matchKey')({
       description: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition`,
       url: `https://www.thebluealliance.com/match/${match.key}`,
       ...(match.actual_time && {
-        startDate: new Date(match.actual_time * 1000).toISOString(),
+        startDate: Temporal.Instant.fromEpochMilliseconds(
+          match.actual_time * 1000,
+        ).toString(),
       }),
       location: {
         '@type': 'Place',

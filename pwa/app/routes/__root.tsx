@@ -9,6 +9,7 @@ import {
   useLocation,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
@@ -99,7 +100,7 @@ export const Route = createRootRouteWithContext<{
 }>()({
   validateSearch: rootSearchSchema,
   loader: () => ({
-    renderTime: new Date().toLocaleString('en-US', {
+    renderTime: Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
       month: 'short',
       day: 'numeric',
       year: 'numeric',

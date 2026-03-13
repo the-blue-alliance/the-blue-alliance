@@ -1,18 +1,20 @@
 import { ClientOnly } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import BiInfoCircleFill from '~icons/bi/info-circle-fill';
 import BiPlayFill from '~icons/bi/play-fill';
 
-function calculateTimeRemaining(targetDate: Date): {
+function calculateTimeRemaining(target: Temporal.ZonedDateTime): {
   days: number;
   hours: number;
   minutes: number;
   seconds: number;
   totalMs: number;
 } {
-  const now = new Date();
-  const totalMs = targetDate.getTime() - now.getTime();
+  const totalMs =
+    target.toInstant().epochMilliseconds -
+    Temporal.Now.instant().epochMilliseconds;
 
   if (totalMs <= 0) {
     return { days: 0, hours: 0, minutes: 0, seconds: 0, totalMs: 0 };
@@ -33,7 +35,7 @@ function formatTimeUnit(value: number): string {
 export function KickoffCountdown({
   kickoffDateTimeEST,
 }: {
-  kickoffDateTimeEST: Date;
+  kickoffDateTimeEST: Temporal.ZonedDateTime;
 }) {
   const [timeRemaining, setTimeRemaining] = useState(() =>
     calculateTimeRemaining(kickoffDateTimeEST),
@@ -54,29 +56,32 @@ export function KickoffCountdown({
 
   const isKickoffTime = timeRemaining.totalMs <= 0;
   const isWithin24Hours = timeRemaining.totalMs <= 24 * 60 * 60 * 1000;
-  const kickoffDateEST = kickoffDateTimeEST.toLocaleDateString('en-US', {
-    month: 'long',
-    day: 'numeric',
-    year: 'numeric',
-    timeZone: 'America/New_York',
-  });
-  const kickoffTimeEST = kickoffDateTimeEST.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit',
-    timeZoneName: 'short',
-    timeZone: 'America/New_York',
-  });
-  const kickoffDate = kickoffDateTimeEST.toLocaleDateString('en-US', {
+  // EST display (fixed to event timezone)
+  const kickoffDateEST = kickoffDateTimeEST.toLocaleString('en-US', {
     month: 'long',
     day: 'numeric',
     year: 'numeric',
   });
-  const kickoffTime = kickoffDateTimeEST.toLocaleTimeString('en-US', {
+  const kickoffTimeEST = kickoffDateTimeEST.toLocaleString('en-US', {
     hour: 'numeric',
     minute: '2-digit',
     timeZoneName: 'short',
   });
-  const year = kickoffDateTimeEST.getFullYear();
+  // User's local timezone display
+  const kickoffLocal = kickoffDateTimeEST.withTimeZone(
+    Temporal.Now.timeZoneId(),
+  );
+  const kickoffDate = kickoffLocal.toLocaleString('en-US', {
+    month: 'long',
+    day: 'numeric',
+    year: 'numeric',
+  });
+  const kickoffTime = kickoffLocal.toLocaleString('en-US', {
+    hour: 'numeric',
+    minute: '2-digit',
+    timeZoneName: 'short',
+  });
+  const year = kickoffDateTimeEST.year;
 
   return (
     <div
