@@ -192,9 +192,9 @@ def test_updateHook_corrupted_null_event(
         set_number=1,
         match_number=1,
     )
-    # Simulate corrupted entity — NDB required=True only validates on put()
-    test_match.event = None
-    MatchManipulator._run_post_update_hook([test_match])
+    # Simulate corrupted entity by patching .event to return None
+    with mock.patch.object(type(test_match), "event", new_callable=mock.PropertyMock, return_value=None):
+        MatchManipulator._run_post_update_hook([test_match])
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
     assert len(tasks) == 1
