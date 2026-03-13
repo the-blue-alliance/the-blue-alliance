@@ -94,6 +94,8 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     unplayed_match_events = []
     for updated_match in updated_models:
         match = updated_match.model
+        if match.event is None:  # Nullapalooza
+            continue
         event = match.event.get()
 
         # Only dispatch push notifications if the event is currently happening
