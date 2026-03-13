@@ -61,7 +61,7 @@ jobs:
             --quiet
 
       - name: Post Preview URL Comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         env:
           PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
           PR_NUMBER: ${{ steps.meta.outputs.pr_number }}
@@ -139,7 +139,7 @@ jobs:
           || echo "Version $PR_VERSION not found, skipping."
 
       - name: Update PR Comment
-        uses: actions/github-script@v7
+        uses: actions/github-script@v8
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
