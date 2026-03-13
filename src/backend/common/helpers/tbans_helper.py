@@ -799,6 +799,14 @@ class TBANSHelper:
                 else MatchVideoNotification(match)
             )
 
+        elif notification_type == NotificationType.EVENT_TEAMS_UPDATED:
+            if event is None:
+                return None
+            added_teams = [event.teams[0]] if event.teams else []
+            return EventTeamsNotification(
+                event, added_teams=added_teams, removed_teams=[]
+            )
+
         elif notification_type == NotificationType.PING:
             return PingNotification()
 
@@ -809,14 +817,6 @@ class TBANSHelper:
                 EventScheduleNotification(event, match)
                 if match
                 else EventScheduleNotification(event)
-            )
-
-        elif notification_type == NotificationType.EVENT_TEAMS_UPDATED:
-            if event is None:
-                return None
-            added_teams = [event.teams[0]] if event.teams else []
-            return EventTeamsNotification(
-                event, added_teams=added_teams, removed_teams=[]
             )
 
         return None

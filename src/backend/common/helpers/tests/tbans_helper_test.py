@@ -718,6 +718,55 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper.match_score(self.match.key_name, is_score_breakdown_update=True)
             schedule_upcoming_match.assert_not_called()
 
+    def test_event_teams_event_not_found(self):
+        with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
+            TBANSHelper.event_teams("2020nonexistent", added_teams=[], removed_teams=[])
+            mock_send.assert_not_called()
+
+    def test_event_teams_no_users(self):
+        # Test send not called with no subscribed users
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            TBANSHelper.event_teams(
+                self.event.key_name, added_teams=[], removed_teams=[]
+            )
+            mock_send.assert_not_called()
+
+    def test_event_teams(self):
+        Subscription(
+            parent=ndb.Key(Account, "user_id_1"),
+            user_id="user_id_1",
+            model_key=self.event.key_name,
+            model_type=ModelType.EVENT,
+            notification_types=[NotificationType.EVENT_TEAMS_UPDATED],
+        ).put()
+        Subscription(
+            parent=ndb.Key(Account, "user_id_2"),
+            user_id="user_id_2",
+            model_key="frc2539",
+            model_type=ModelType.TEAM,
+            notification_types=[NotificationType.EVENT_TEAMS_UPDATED],
+        ).put()
+
+        TBANSHelper.event_teams(
+            self.event.key_name, added_teams=["frc2539"], removed_teams=[]
+        )
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 2
+
+        with patch.object(TBANSHelper, "_send") as mock_send:
+            for task in tasks:
+                run_from_task(task)
+
+            mock_send.assert_called()
+            assert len(mock_send.call_args_list) == 2
+            assert [
+                x[0] for x in [call[0][0] for call in mock_send.call_args_list]
+            ] == ["user_id_1", "user_id_2"]
+            notifications = [call[0][1] for call in mock_send.call_args_list]
+            for notification in notifications:
+                assert isinstance(notification, FavoritesUpdatedNotification)
+                assert notification.event.key_name == self.event.key_name
+
     def test_match_upcoming_sets_push_sent(self):
         """match_upcoming should set push_sent=True to prevent duplicate sends."""
         assert not self.match.push_sent
@@ -1241,6 +1290,13 @@ class TestTBANSHelper(unittest.TestCase):
         )
         assert notification is not None
         assert notification._type() == NotificationType.MATCH_VIDEO
+
+    def test_create_test_notification_event_teams_updated(self):
+        notification = TBANSHelper._create_test_notification(
+            NotificationType.EVENT_TEAMS_UPDATED, event_key=self.event.key_name
+        )
+        assert notification is not None
+        assert notification._type() == NotificationType.EVENT_TEAMS_UPDATED
 
     def test_create_test_notification_ping(self):
         notification = TBANSHelper._create_test_notification(NotificationType.PING)

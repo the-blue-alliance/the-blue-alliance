@@ -26,18 +26,18 @@ class EventTeamsNotification(Notification):
         body = f"The {self.event.normalized_name} team list has been updated. "
 
         if self.added_teams:
-            teams = ", ".join([team.team_number for team in self.added_teams])
+            teams = ", ".join([str(team.team_number) for team in self.added_teams])
             body += f"Teams added: {teams}. "
 
         if self.removed_teams:
-            teams = ", ".join([team.team_number for team in self.removed_teams])
+            teams = ", ".join([str(team.team_number) for team in self.removed_teams])
             body += f"Teams removed: {teams}. "
 
         from firebase_admin import messaging
 
         return messaging.Notification(
             title="{} Teams Updated".format(self.event.event_short.upper()),
-            body=body,
+            body=body.strip(),
         )
 
     @property
