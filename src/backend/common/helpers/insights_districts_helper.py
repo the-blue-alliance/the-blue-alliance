@@ -148,7 +148,7 @@ class InsightsDistrictsHelper:
                     if award.award_type_enum == AwardType.WINNER:
                         if award.event_type_enum == EventType.DISTRICT_CMP:
                             dcmp_wins[recipient.string_id()] += 1
-                        else:
+                        elif award.event_type_enum == EventType.DISTRICT:
                             district_event_wins[recipient.string_id()] += 1
 
             for match in event.matches:
