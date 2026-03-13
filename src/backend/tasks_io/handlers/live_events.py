@@ -422,28 +422,26 @@ def find_event_webcasts(district_key: DistrictKey) -> Response:
     if district is None:
         abort(400)
 
-    youtube_channel_info = next(
-        (
-            channel
-            for channel in (district.webcast_channels or [])
-            if channel.get("type") == WebcastType.YOUTUBE
-            and bool(channel.get("channel_id"))
-        ),
-        None,
-    )
-    if youtube_channel_info is None:
+    youtube_channel_ids = [
+        channel["channel_id"]
+        for channel in (district.webcast_channels or [])
+        if channel.get("type") == WebcastType.YOUTUBE
+        and bool(channel.get("channel_id"))
+    ]
+    if not youtube_channel_ids:
         abort(400)
 
-    youtube_channel_id = youtube_channel_info["channel_id"]
-
-    # Fetch district events and upcoming streams in parallel
+    # Fetch district events and upcoming streams from all channels in parallel
     district_events_future = DistrictEventsQuery(district_key).fetch_async()
-    upcoming_streams_future = YouTubeVideoHelper.get_upcoming_streams(
-        youtube_channel_id
-    )
+    upcoming_streams_futures = [
+        YouTubeVideoHelper.get_upcoming_streams(channel_id)
+        for channel_id in youtube_channel_ids
+    ]
 
     district_events = district_events_future.get_result()
-    upcoming_streams = upcoming_streams_future.get_result()
+    upcoming_streams = [
+        stream for future in upcoming_streams_futures for stream in future.get_result()
+    ]
 
     future_events_without_webcasts = [
         event

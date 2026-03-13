@@ -914,6 +914,100 @@ def test_find_event_webcasts_multiple_streams_for_event(
 @mock.patch.object(EventWebcastAdder, "add_webcast")
 @mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_multiple_youtube_channels(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    # Setup district and two events
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    event1 = Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    )
+    event1.put()
+    event2 = Event(
+        id="2026fim2",
+        year=2026,
+        event_short="fim2",
+        short_name="Lakeview",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    )
+    event2.put()
+
+    # District has two YouTube channels
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan Channel 1",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            ),
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan Channel 2",
+                channel_id="UCabc123XYZ",
+            ),
+        ],
+    )
+
+    # Each channel returns a stream for a different event
+    get_streams_mock.side_effect = [
+        InstantFuture(
+            [
+                YouTubeUpcomingStream(
+                    stream_id="stream_ch1",
+                    title="Troy District Event - Qualifications",
+                    scheduled_start_time="",
+                )
+            ]
+        ),
+        InstantFuture(
+            [
+                YouTubeUpcomingStream(
+                    stream_id="stream_ch2",
+                    title="Lakeview District Event - Qualifications",
+                    scheduled_start_time="",
+                )
+            ]
+        ),
+    ]
+    get_start_time_mock.side_effect = [
+        InstantFuture("2026-03-15"),
+        InstantFuture("2026-03-15"),
+    ]
+
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
+    assert resp.status_code == 200
+    assert b"Discovered webcasts:" in resp.data
+    assert b"2026fim1: stream_ch1" in resp.data
+    assert b"2026fim2: stream_ch2" in resp.data
+
+    # Verify get_upcoming_streams was called once per channel
+    assert get_streams_mock.call_count == 2
+    get_streams_mock.assert_any_call("UCjX4WSaAFPgM2PYr-6P")
+    get_streams_mock.assert_any_call("UCabc123XYZ")
+
+    # Verify both webcasts were added
+    assert add_webcast_mock.call_count == 2
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_multiple_event_match_skipped(
     get_streams_mock: mock.Mock,
     get_start_time_mock: mock.Mock,
