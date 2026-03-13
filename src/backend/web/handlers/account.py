@@ -1,4 +1,5 @@
 import datetime
+import logging
 
 from flask import (
     abort,
@@ -135,7 +136,10 @@ def delete() -> Response:
         revoke_session_cookie()
 
         # delete the user in firebase
-        delete_user(str(user.uid))
+        try:
+            delete_user(str(user.uid))
+        except Exception:
+            logging.warning(f"Firebase delete_user failed for uid {user.uid}")
         return redirect(url_for("index"))
     else:
         return make_response(render_template("account_delete.html"))
