@@ -206,7 +206,7 @@ export function Banner({
         />
       </svg>
       <span
-        className={cn('text-lg/5 font-bold', {
+        className={cn('text-lg/5 font-bold text-balance', {
           'text-sm/4': title && title.length > 25,
           'text-base/4': title && 20 <= title.length && title.length <= 25,
           'text-lg/5': title && title.length < 20,
@@ -214,7 +214,7 @@ export function Banner({
       >
         {formattedTitle}
       </span>
-      <span className="text-xs/4 font-bold">
+      <span className="text-xs/4 font-bold text-balance">
         <span className="mb-1 block text-xs">{year}</span>
         {description?.toUpperCase()}
       </span>
