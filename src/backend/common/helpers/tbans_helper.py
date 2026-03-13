@@ -32,6 +32,7 @@ from backend.common.models.notifications.event_level import EventLevelNotificati
 from backend.common.models.notifications.event_schedule import (
     EventScheduleNotification,
 )
+from backend.common.models.notifications.teams_updated import EventTeamsNotification
 from backend.common.models.notifications.match_score import MatchScoreNotification
 from backend.common.models.notifications.match_upcoming import (
     MatchUpcomingNotification,
@@ -254,6 +255,25 @@ class TBANSHelper:
             cls._batch_send_subscriptions(
                 event_subscriptions_future.get_result(),
                 EventScheduleNotification(event),
+            )
+
+    @classmethod
+    def event_teams(cls, event: str) -> None:
+        event = Event.get_by_id(event)
+        if event is None:
+            return
+
+        # Send to Event subscribers
+        event_subscriptions_future = None
+        if NotificationType.EVENT_TEAMS_UPDATED in ENABLED_EVENT_NOTIFICATIONS:
+            event_subscriptions_future = Subscription.subscriptions_for_event(
+                event, NotificationType.EVENT_TEAMS_UPDATED
+            )
+
+        if event_subscriptions_future:
+            cls._batch_send_subscriptions(
+                event_subscriptions_future.get_result(),
+                EventTeamsNotification(event),
             )
 
     @classmethod
