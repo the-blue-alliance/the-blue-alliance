@@ -1,8 +1,10 @@
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.location import Location
+from backend.common.queries.dict_converters.district_converter import DistrictConverter
 from backend.common.queries.dict_converters.event_converter import EventConverter
 
 
@@ -72,6 +74,13 @@ def test_eventConverter_v3_without_event_location(ndb_context) -> None:
         place_id="ChIJ9T_5iuTKj4ARe3GfygqMnbk",
         place_details={"url": "https://maps.google.com/?cid=12345"},
     )
+    district = District(
+        id="2025ne",
+        year=2025,
+        abbreviation="ne",
+        display_name="New England",
+    )
+    district.put()
     event = Event(
         id="2025test",
         event_type_enum=EventType.REGIONAL,
@@ -82,6 +91,7 @@ def test_eventConverter_v3_without_event_location(ndb_context) -> None:
         country="USA",
         postalcode="95120",
         normalized_location=location,
+        district_key=ndb.Key(District, "2025ne"),
     )
 
     converted = EventConverter.eventConverter_v3(event)
@@ -96,3 +106,4 @@ def test_eventConverter_v3_without_event_location(ndb_context) -> None:
     assert converted["lng"] is None
     assert converted["gmaps_place_id"] is None
     assert converted["gmaps_url"] is None
+    assert converted["district"] == DistrictConverter.districtConverter_v3(district)
