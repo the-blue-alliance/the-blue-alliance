@@ -68,6 +68,9 @@ class EventInsightsHelper:
         six_rp_count = 0
         nine_rp_count = 0
 
+        auto_win_conversion = 0
+        undefined_auto_conversion_matches = 0
+
         auto_fuel_scored = 0
         teleop_fuel_scored = 0
         total_fuel_scored = 0
@@ -137,6 +140,52 @@ class EventInsightsHelper:
                 if red_all_rp and blue_all_rp:
                     nine_rp_count += 1
             
+            
+            if (red_score == blue_score):
+                # don't calculate auto win conversion
+                undefined_auto_conversion_matches += 1
+                pass
+            if (red_sb.get("totalAutoPoints") > blue_sb.get("totalAutoPoints")
+                and red_score > blue_score
+            ):
+                auto_win_conversion += 1
+            elif (blue_sb.get("totalAutoPoints") > blue_sb.get("totalAutoPoints")
+                and blue_score > red_score
+            ):
+                auto_win_conversion += 1
+            elif (red_sb.get("totalAutoPoints") == blue_sb.get("totalAutoPoints")):
+                if (((red_sb.get("hubScore").get("shift1Points") != 0 or
+                    blue_sb.get("hubScore").get("shift2Points") != 0 or
+                    red_sb.get("hubScore").get("shift3Points") != 0 or
+                    blue_sb.get("hubScore").get("shift4Points") != 0)) and
+                    ((blue_sb.get("hubScore").get("shift1Points") == 0 and
+                    red_sb.get("hubScore").get("shift2Points") == 0 and
+                    blue_sb.get("hubScore").get("shift3Points") == 0 and
+                    red_sb.get("hubScore").get("shift4Points") == 0))
+                ):
+                    # shift 1 MAY have been given to the blue alliance.
+                    # if neither team scored fuel in teleop, we cannot know 
+                    if (blue_score > red_score):
+                        auto_win_conversion += 1
+                elif (((blue_sb.get("hubScore").get("shift1Points") != 0 or
+                    red_sb.get("hubScore").get("shift2Points") != 0 or
+                    blue_sb.get("hubScore").get("shift3Points") != 0 or
+                    red_sb.get("hubScore").get("shift4Points") != 0)) and
+                    ((red_sb.get("hubScore").get("shift1Points") == 0 and
+                    blue_sb.get("hubScore").get("shift2Points") == 0 and
+                    red_sb.get("hubScore").get("shift3Points") == 0 and
+                    blue_sb.get("hubScore").get("shift4Points") == 0))
+                ):
+                    # shift 1 MAY have been given to the red alliance.
+                    # if neither team scored fuel in teleop, we cannot know 
+                    if (red_score > blue_score):
+                        auto_win_conversion += 1
+                else:
+                    # one of the above cases, where auto was a draw 
+                    # and neither team scored fuel in teleop.
+                    # we don't know which team was awarded first shift.
+                    undefined_auto_conversion_matches += 1
+            
             if (red_sb.get("autoTowerRobot1") != "None" or
                 red_sb.get("autoTowerRobot1") != "None" or
                 red_sb.get("autoTowerRobot1") != "None"):
@@ -204,6 +253,11 @@ class EventInsightsHelper:
                 nine_rp_count,
                 finished_matches,
                 100.0 * nine_rp_count / finished_matches,
+            ],
+            "auto_win_conversion": [
+                auto_win_conversion,
+                finished_matches - undefined_auto_conversion_matches,
+                100.0 * auto_win_conversion / (finished_matches - undefined_auto_conversion_matches), 
             ],
             "auto_fuel_scored": [
                 auto_fuel_scored,
