@@ -357,7 +357,7 @@ jobs:
     concurrency: deploy-queues-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -385,7 +385,7 @@ jobs:
     concurrency: deploy-index-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -413,7 +413,7 @@ jobs:
     concurrency: deploy-default-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -458,7 +458,7 @@ jobs:
     concurrency: deploy-web-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -503,7 +503,7 @@ jobs:
     concurrency: deploy-api-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -542,7 +542,7 @@ jobs:
     concurrency: deploy-tasks-io-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -576,7 +576,7 @@ jobs:
     concurrency: deploy-tasks-cpu-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -615,7 +615,7 @@ jobs:
       - uses: actions/checkout@v6
         with:
           fetch-depth: 10 # Needed for Sentry release
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -663,7 +663,7 @@ jobs:
     concurrency: deploy-cron-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -700,7 +700,7 @@ jobs:
     concurrency: deploy-dispatch-${{ github.ref }}
     steps:
       - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
