@@ -532,7 +532,6 @@ function computePerAwardLeaderboards(
     AwardType.CHAIRMANS,
     AwardType.DEANS_LIST,
     AwardType.ENGINEERING_INSPIRATION,
-    AwardType.ROOKIE_ALL_STAR,
   ]);
 
   // For each award_type, track: team -> count, team -> event keys, and the most recent name
@@ -554,10 +553,14 @@ function computePerAwardLeaderboards(
     );
 
     for (const award of awards) {
-      // Skip Winner/Finalist — already covered in other tabs
       if (
+        // Skip Winner/Finalist — already covered in other tabs
         award.award_type === AwardType.WINNER ||
-        award.award_type === AwardType.FINALIST
+        award.award_type === AwardType.FINALIST ||
+        // Skip rookie-only awards — one-time awards don't make sense on a leaderboard
+        award.award_type === AwardType.ROOKIE_ALL_STAR ||
+        award.award_type === AwardType.ROOKIE_INSPIRATION ||
+        award.award_type === AwardType.HIGHEST_ROOKIE_SEED
       ) {
         continue;
       }
