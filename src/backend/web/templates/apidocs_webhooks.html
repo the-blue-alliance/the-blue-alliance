@@ -30,6 +30,7 @@
                 <!-- <li><a class="smooth-scroll" href="#media_posted">Media Posted</a></li> -->
                 <!-- <li><a class="smooth-scroll" href="#district_points">District Points Updated</a></li> -->
                 <li><a class="smooth-scroll" href="#schedule_updated">Event Schedule Updated</a></li>
+                <li><a class="smooth-scroll" href="#teams_updated">Event Teams Updated</a></li>
                 <!-- <li><a class="smooth-scroll" href="#final_results">Event Final Results</a></li> -->
                 <li><a class="smooth-scroll" href="#ping">Ping</a></li>
                 <li><a class="smooth-scroll" href="#broadcast">Broadcast</a></li>
@@ -490,6 +491,42 @@
             {"message_data": {"event_key": "2014necmp", "event_name": "New England FRC Region Championship", "first_match_time": 1397330280}, "message_type": "schedule_updated"}
             </pre>
             {% with type=types.starting_comp_level, event_key='2014necmp', match_key='2014necmp_f1m1' %}
+              {% include "apidocs_partials/apidocs_webhooks_test.html" %}
+            {% endwith %}
+
+
+        <h3 id="teams_updated">Event Teams Updated</h3>
+          <p>This notification is sent when new teams are registered for or removed from an event.</p>
+          <h4>Structure</h4>
+            <p>Message Key: <code>event_teams_updated</code></p>
+            <table class="table">
+              <caption><code>message_data</code> Fields</caption>
+              <thead>
+                <tr>
+                  <th>Key</th>
+                  <th>Description</th>
+                  <th>Examples</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr>
+                  <td><code>event_key</code></td>
+                  <td>TBA API key for the Event the alliance selection results were posted at</td>
+                  <td>2014necmp</td>
+                </tr>
+                <tr>
+                  <td><code>event_name</code></td>
+                  <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
+                  <td>New England FRC Region Championship</td>
+                </tr>
+              </tbody>
+            </table>
+
+          <h4>Example JSON</h4>
+            <pre class="example-json">
+            {"message_data": {"event_key": "2014necmp", "event_name": "New England FRC Region Championship"}, "message_type": "event_teams_updated"}
+            </pre>
+            {% with type=types.event_teams_updated, event_key='2014necmp', match_key='2014necmp_f1m1' %}
               {% include "apidocs_partials/apidocs_webhooks_test.html" %}
             {% endwith %}
 

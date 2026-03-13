@@ -787,6 +787,11 @@ class TBANSHelper:
                 if match
                 else EventScheduleNotification(event)
             )
+        
+        elif notification_type == NotificationType.EVENT_TEAMS_UPDATED:
+            if event is None:
+                return None
+            return EventTeamsNotification(event)
 
         return None
 
