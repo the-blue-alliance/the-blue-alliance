@@ -6,6 +6,7 @@ from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.manipulators.manipulator_base import ManipulatorBase, TUpdatedModel
 from backend.common.models.cached_model import TAffectedReferences
 from backend.common.models.event_team import EventTeam
+from backend.common.models.team import Team
 
 
 class EventTeamManipulator(ManipulatorBase[EventTeam]):
@@ -34,7 +35,7 @@ class EventTeamManipulator(ManipulatorBase[EventTeam]):
         return old_model
     
 
-def notify_team_changes(updated_models: List[EventTeam]) -> None:
+def notify_team_changes(updated_models: List[EventTeam], removed: bool) -> None:
     events = set()
     
     for updated_model in updated_models:
@@ -45,7 +46,9 @@ def notify_team_changes(updated_models: List[EventTeam]) -> None:
         try:
             defer_safe(
                TBANSHelper.event_teams,
-                event,  
+                event,
+                added_teams=[model.team.get() for model in updated_models if model.event.id() == event and not removed],
+                removed_teams=[model.team.get() for model in updated_models if model.event.id() == event and removed],
                 _target="py3-tasks-io",
                 _queue="push-notifications",
                 _url="/_ah/queue/deferred_notification_send", 
@@ -53,9 +56,11 @@ def notify_team_changes(updated_models: List[EventTeam]) -> None:
         except Exception:
             pass
 
+@EventTeamManipulator.register_post_update_hook
 def notify_additions(updated_models: List[TUpdatedModel[EventTeam]]) -> None:
     event_teams = [updated_model.model for updated_model in updated_models]
-    notify_team_changes(event_teams)
+    notify_team_changes(event_teams, False)
 
-EventTeamManipulator.register_post_update_hook(notify_additions)
-EventTeamManipulator.register_post_delete_hook(notify_team_changes)
+@EventTeamManipulator.register_post_delete_hook
+def notify_removals(update_models: List[EventTeam]) -> None:
+    notify_team_changes(update_models, True)

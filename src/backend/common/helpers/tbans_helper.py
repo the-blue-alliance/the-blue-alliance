@@ -2,6 +2,7 @@ import datetime
 import enum
 import logging
 import time
+from typing import List
 
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
@@ -258,7 +259,7 @@ class TBANSHelper:
             )
 
     @classmethod
-    def event_teams(cls, event: str) -> None:
+    def event_teams(cls, event: str, added_teams: List[Team] = None, removed_teams: List[Team] = None) -> None:
         event = Event.get_by_id(event)
         if event is None:
             return
@@ -269,12 +270,30 @@ class TBANSHelper:
             event_subscriptions_future = Subscription.subscriptions_for_event(
                 event, NotificationType.EVENT_TEAMS_UPDATED
             )
+            
+        # Send to Team subscribers
+        team_subscriptions_futures = {}
+        if NotificationType.EVENT_TEAMS_UPDATED in ENABLED_TEAM_NOTIFICATIONS:
+             for team in [*(added_teams or []), *(removed_teams or [])]:
+                if team:
+                    team_subscriptions_futures[team.key_name] = (
+                        Subscription.subscriptions_for_team(
+                            team, NotificationType.EVENT_TEAMS_UPDATED
+                        )
+                    )
 
         if event_subscriptions_future:
             cls._batch_send_subscriptions(
                 event_subscriptions_future.get_result(),
-                EventTeamsNotification(event),
+                EventTeamsNotification(event, added_teams or [], removed_teams or []),
             )
+            
+        for team_key, team_subscriptions_future in team_subscriptions_futures.items():
+            cls._batch_send_subscriptions(
+                team_subscriptions_future.get_result(),
+                EventTeamsNotification(event, added_teams or [], removed_teams or []),
+            )
+
 
     @classmethod
     def match_score(
@@ -791,7 +810,8 @@ class TBANSHelper:
         elif notification_type == NotificationType.EVENT_TEAMS_UPDATED:
             if event is None:
                 return None
-            return EventTeamsNotification(event)
+            added_teams = [event.teams[0]] if event.teams else []
+            return EventTeamsNotification(event, added_teams=added_teams, removed_teams=[])
 
         return None
 

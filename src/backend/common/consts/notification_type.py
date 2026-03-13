@@ -122,6 +122,7 @@ ENABLED_TEAM_NOTIFICATIONS: Set[NotificationType] = {
     NotificationType.ALLIANCE_SELECTION,
     NotificationType.AWARDS,
     NotificationType.MATCH_VIDEO,
+    NotificationType.EVENT_TEAMS_UPDATED
 }
 
 

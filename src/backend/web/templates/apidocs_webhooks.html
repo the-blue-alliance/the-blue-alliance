@@ -519,14 +519,24 @@
                   <td>Official name of event on record either provided by <em>FIRST</em> or organizers of offseason event</td>
                   <td>New England FRC Region Championship</td>
                 </tr>
+                <tr>
+                  <td><code>added_teams</code></td>
+                  <td>Teams that were added to the event, as a list of TBA API <a href="/apidocs/v3#model-Team">Team</a> objects.</td>
+                  <td></td>
+                </tr>
+                <tr>
+                  <td><code>removed_teams</code></td>
+                  <td>Teams that were removed from the event, as a list of TBA API Team objects.</td>
+                  <td></td>
+                </tr>
               </tbody>
             </table>
 
           <h4>Example JSON</h4>
             <pre class="example-json">
-            {"message_data": {"event_key": "2014necmp", "event_name": "New England FRC Region Championship"}, "message_type": "event_teams_updated"}
+            {"message_data": {"event_key":"2014necmp","event_name":"New England FRC Region Championship","added_teams":[{"key":"frc1058","team_number":1058,"nickname":"PVC Pirates","name":"Fleet Ready Corp./Londonderry STEM/SL Chasse Steel&Londonderry High School","website":"http://team1058.com/","rookie_year":2003,"motto":null,"school_name":"Londonderry High School","city":"Londonderry","state_prov":"New Hampshire","country":"USA","postal_code":null,"lat":null,"lng":null,"location_name":null,"address":null,"gmaps_place_id":null,"gmaps_url":null}],"removed_teams":[]}, "message_type": "event_teams_updated"}
             </pre>
-            {% with type=types.event_teams_updated, event_key='2014necmp', match_key='2014necmp_f1m1' %}
+            {% with type=types.event_teams_updated, event_key='2014necmp' %}
               {% include "apidocs_partials/apidocs_webhooks_test.html" %}
             {% endwith %}
 
