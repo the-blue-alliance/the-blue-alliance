@@ -179,6 +179,30 @@ class TestMatchManipulator(unittest.TestCase):
 
 
 @mock.patch.object(FirebasePusher, "update_match")
+def test_updateHook_corrupted_null_event(
+    mock_firebase, ndb_context, taskqueue_stub
+) -> None:
+    """Nullapalooza (#9236): corrupted Match with event=None should be skipped."""
+    test_match = Match(
+        id="2012ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=None,
+        year=2012,
+        set_number=1,
+        match_number=1,
+    )
+    MatchManipulator._run_post_update_hook([test_match])
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    assert len(tasks) == 1
+    for task in tasks:
+        run_from_task(task)
+
+    mock_firebase.assert_not_called()
+
+
+@mock.patch.object(FirebasePusher, "update_match")
 def test_updateHook(mock_firebase, ndb_context, taskqueue_stub) -> None:
     test_match = Match(
         id="2012ct_qm1",

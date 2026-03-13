@@ -2,8 +2,6 @@ import logging
 from typing import List, Set, TYPE_CHECKING
 
 from google.appengine.api import taskqueue
-from pyre_extensions import none_throws
-
 from backend.common.cache_clearing import get_affected_queries
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.deferred import defer_safe
@@ -64,7 +62,13 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     affected_stats_events: List[Event] = []
 
     for updated_model in updated_models:
-        event_key: EventKey = none_throws(updated_model.model.event.string_id())
+        # Nullapalooza: corrupted Match entities can have event=None
+        if updated_model.model.event is None:
+            logging.warning(
+                f"Corrupted Match: event is None for {updated_model.model.key}"
+            )
+            continue
+        event_key: EventKey = updated_model.model.event.string_id()
         MatchPostUpdateHooks.firebase_update(updated_model)
 
         # Only attrs that affect stats
