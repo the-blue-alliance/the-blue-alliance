@@ -58,7 +58,7 @@ def notify_team_changes(updated_models: List[EventTeam], removed: bool) -> None:
 
 @EventTeamManipulator.register_post_update_hook
 def notify_additions(updated_models: List[TUpdatedModel[EventTeam]]) -> None:
-    event_teams = [updated_model.model for updated_model in updated_models]
+    event_teams = [updated_model.model for updated_model in updated_models if updated_model.is_new]
     notify_team_changes(event_teams, False)
 
 @EventTeamManipulator.register_post_delete_hook
