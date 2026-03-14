@@ -36,3 +36,31 @@ def test_detail_insights(web_client: Client) -> None:
 def test_detail_insights_badyear(web_client: Client) -> None:
     resp = web_client.get("/insights/1000")
     assert resp.status_code == 404
+
+
+def test_detail_insights_2026_with_legacy_year_specific_data(
+    web_client: Client,
+) -> None:
+    legacy_2026_insights = {"backfill_pending": True}
+
+    Insight(
+        id=Insight.render_key_name(2026, "year_specific_by_week"),
+        year=2026,
+        name="year_specific_by_week",
+        data_json=json.dumps([]),
+    ).put()
+
+    Insight(
+        id=Insight.render_key_name(2026, "year_specific"),
+        year=2026,
+        name="year_specific",
+        data_json=json.dumps({"qual": legacy_2026_insights, "playoff": {}}),
+    ).put()
+
+    resp = web_client.get("/insights/2026")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert "Auto Win Conversion" in body
+    assert "Fuel Statistics" in body
+    assert "Tower Statistics" in body
