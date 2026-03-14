@@ -595,11 +595,13 @@ def test_get_upcoming_streams_success(ndb_context, mock_google_api_secret) -> No
         stream_id="abc123",
         title="Upcoming Stream 1",
         scheduled_start_time="2026-03-15T18:00:00Z",
+        live_broadcast_content="",
     )
     assert streams[1] == YouTubeUpcomingStream(
         stream_id="def456",
         title="Upcoming Stream 2",
         scheduled_start_time="2026-03-16T19:00:00Z",
+        live_broadcast_content="",
     )
 
 
@@ -671,9 +673,11 @@ def test_get_upcoming_streams_pagination(ndb_context, mock_google_api_secret) ->
         stream_id="stream1",
         title="Stream 1",
         scheduled_start_time="2026-03-15T18:00:00Z",
+        live_broadcast_content="",
     )
     assert streams[1] == YouTubeUpcomingStream(
         stream_id="stream2",
         title="Stream 2",
         scheduled_start_time="2026-03-16T19:00:00Z",
+        live_broadcast_content="",
     )
