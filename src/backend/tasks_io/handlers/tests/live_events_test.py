@@ -1258,7 +1258,8 @@ def test_find_event_webcasts_no_live_events(
     tasks_client: Client,
     ndb_stub,
 ) -> None:
-    # Setup district but no events within a day
+    # Setup district with a future event that already has a webcast
+    # (should not be in future_events_without_webcasts)
     District(id="2026fim", year=2026, abbreviation="fim").put()
     event = Event(
         id="2026fim1",
@@ -1269,6 +1270,7 @@ def test_find_event_webcasts_no_live_events(
         start_date=datetime.datetime.now() + datetime.timedelta(days=10),
         end_date=datetime.datetime.now() + datetime.timedelta(days=11),
         district_key=ndb.Key(District, "2026fim"),
+        webcast_json='[{"type": "youtube", "channel": "existingstream"}]',
     )
     event.put()
 
@@ -1300,6 +1302,64 @@ def test_find_event_webcasts_no_live_events(
 
     # Stream lookup should still be called, but no events to match
     get_streams_mock.assert_called_once()
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_future_event_without_webcasts(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    """Future event (>1 day away) with no webcasts should be included in the filter."""
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    event = Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now() + datetime.timedelta(days=10),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=11),
+        district_key=ndb.Key(District, "2026fim"),
+    )
+    event.put()
+
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    get_streams_mock.return_value = InstantFuture(
+        [
+            YouTubeUpcomingStream(
+                stream_id="abc123",
+                title="Troy District Event",
+                description="",
+                scheduled_start_time="",
+            )
+        ]
+    )
+    get_start_time_mock.return_value = InstantFuture("2026-03-25")
+
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
+    assert resp.status_code == 200
+    assert b"Discovered webcasts:" in resp.data
+    assert b"2026fim1: abc123 (2026-03-25)" in resp.data
+
+    add_webcast_mock.assert_called_once()
+    call_args = add_webcast_mock.call_args
+    assert call_args[0][0].key_name == "2026fim1"
 
 
 def _make_event(
