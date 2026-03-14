@@ -1,5 +1,4 @@
 import { useState } from 'react';
-
 import ChevronUpIcon from '~icons/lucide/chevron-up';
 import MessageSquareIcon from '~icons/lucide/message-square';
 
@@ -40,8 +39,7 @@ export function ChatSidebar() {
 
   return (
     <div
-      className="flex h-full flex-col border-l border-neutral-700 bg-neutral-950
-        max-md:hidden"
+      className="flex h-full flex-col border-l border-neutral-700 bg-neutral-950 max-md:hidden"
       style={{ width: SIDEBAR_WIDTH }}
     >
       {/* Chat iframe */}
@@ -54,10 +52,7 @@ export function ChatSidebar() {
             sandbox="allow-scripts allow-same-origin allow-popups"
           />
         ) : (
-          <div
-            className="flex h-full flex-col items-center justify-center
-              text-center text-neutral-400"
-          >
+          <div className="flex h-full flex-col items-center justify-center text-center text-neutral-400">
             <MessageSquareIcon className="mb-2 h-8 w-8" />
             <p>No chat selected</p>
             <p className="mt-1 text-sm">Select a chat below</p>
@@ -68,9 +63,7 @@ export function ChatSidebar() {
       {/* Chat selector bar */}
       <button
         onClick={() => setSelectorOpen(true)}
-        className="flex h-9 shrink-0 cursor-pointer items-center justify-between
-          border-t border-neutral-800 bg-primary px-3 text-white
-          transition-colors hover:bg-primary/90"
+        className="flex h-9 shrink-0 cursor-pointer items-center justify-between border-t border-neutral-800 bg-primary px-3 text-white transition-colors hover:bg-primary/90"
       >
         <span className="truncate text-sm font-medium">
           {currentChatInfo?.name ?? 'Select a chat'}

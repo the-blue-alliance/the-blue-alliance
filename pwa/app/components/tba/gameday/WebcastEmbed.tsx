@@ -44,10 +44,7 @@ function TwitchEmbed({ channel }: { channel: string }) {
 
 function UnsupportedEmbed({ type }: { type: string }) {
   return (
-    <div
-      className="flex h-full w-full flex-col items-center justify-center
-        bg-slate-800 text-white"
-    >
+    <div className="flex h-full w-full flex-col items-center justify-center bg-slate-800 text-white">
       <p className="text-lg">
         Webcast type &quot;{type}&quot; is not supported
       </p>

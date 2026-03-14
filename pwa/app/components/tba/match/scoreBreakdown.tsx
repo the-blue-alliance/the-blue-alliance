@@ -7,7 +7,6 @@ import {
   cloneElement,
   isValidElement,
 } from 'react';
-
 import MdiArrowLeft from '~icons/mdi/arrow-left';
 import MdiArrowRight from '~icons/mdi/arrow-right';
 

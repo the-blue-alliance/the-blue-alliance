@@ -3,7 +3,6 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { useMemo, useState } from 'react';
-
 import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
@@ -369,10 +368,7 @@ function EventPage() {
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
         className="mt-4"
       >
-        <TabsList
-          className="flex h-auto flex-wrap items-center justify-evenly
-            *:basis-1/2 lg:*:basis-1"
-        >
+        <TabsList className="flex h-auto flex-wrap items-center justify-evenly *:basis-1/2 lg:*:basis-1">
           {(matches.length > 0 || alliances.length > 0) && (
             <TabsTrigger value="results">
               <InlineIcon>
@@ -651,8 +647,7 @@ function AwardsTab({ awards }: { awards: Award[] }) {
           {awards.map((award) => (
             <div
               key={award.name}
-              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4
-                sm:px-4"
+              className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4 sm:px-4"
             >
               <dt className=":col-span-2 font-medium">{award.name}</dt>
               <dd className="text-muted-foreground sm:text-right">
@@ -732,10 +727,7 @@ function TeamsTab({
                     })}
                   >
                     {maybeAvatar && (
-                      <div
-                        className="flex h-full w-full items-center
-                          justify-center"
-                      >
+                      <div className="flex h-full w-full items-center justify-center">
                         <TeamAvatar media={maybeAvatar} />
                       </div>
                     )}
@@ -782,8 +774,7 @@ function TeamsTab({
                               <img
                                 src={maybeRobotPic}
                                 alt=""
-                                className="max-h-[80vh] w-3xl rounded-lg
-                                  object-cover"
+                                className="max-h-[80vh] w-3xl rounded-lg object-cover"
                                 loading="lazy"
                               />
                             </DialogDescription>

@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import { Fragment, type ReactNode, useState } from 'react';
-
 import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 import MaterialSymbolsTrophy from '~icons/material-symbols/trophy';
@@ -52,20 +51,11 @@ export function Leaderboard({
     LEADERBOARD_NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
 
   return (
-    <Card
-      className="overflow-hidden border-border/50 shadow-sm transition-shadow
-        hover:shadow-md"
-    >
-      <CardHeader
-        className="border-b bg-gradient-to-br from-muted/30 to-muted/10 px-6
-          pt-5 pb-4"
-      >
+    <Card className="overflow-hidden border-border/50 shadow-sm transition-shadow hover:shadow-md">
+      <CardHeader className="border-b bg-gradient-to-br from-muted/30 to-muted/10 px-6 pt-5 pb-4">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-lg
-                bg-primary/10"
-            >
+            <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-primary/10">
               <MaterialSymbolsTrophy className="h-5 w-5 text-primary" />
             </div>
             <div>
@@ -194,10 +184,7 @@ function LeaderboardKeyList({
               &nbsp;(and{' '}
               {pluralize(keyVals.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
-            <TooltipContent
-              className="max-w-[500px] text-center break-words
-                whitespace-normal"
-            >
+            <TooltipContent className="max-w-[500px] text-center break-words whitespace-normal">
               <p>
                 {keyVals.map((k, i) => (
                   <Fragment key={k}>

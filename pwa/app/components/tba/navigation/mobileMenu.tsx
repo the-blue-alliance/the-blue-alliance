@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-
 import MenuIcon from '~icons/lucide/menu';
 import XIcon from '~icons/lucide/x';
 
@@ -21,17 +20,13 @@ export function MobileMenu() {
         <MenuIcon className="size-5 group-data-[state=open]:hidden" />
         <XIcon className="hidden size-5 group-data-[state=open]:block" />
       </NavigationMenuTrigger>
-      <NavigationMenuContent
-        className="absolute inset-x-0 top-0 z-12 mt-0 flex max-h-[80svh]
-          flex-col overflow-auto px-4"
-      >
+      <NavigationMenuContent className="absolute inset-x-0 top-0 z-12 mt-0 flex max-h-[80svh] flex-col overflow-auto px-4">
         <ul className="grid divide-y divide-white/10">
           {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }, index) => (
             <Link
               key={title}
               to={to}
-              className="flex w-full animate-navigation-item-fade-in
-                items-center gap-3 py-4 opacity-0 hover:no-underline"
+              className="flex w-full animate-navigation-item-fade-in items-center gap-3 py-4 opacity-0 hover:no-underline"
               activeProps={{ className: 'bg-white/15 rounded-md' }}
               style={{ animationDelay: `${index * 50}ms` }}
             >

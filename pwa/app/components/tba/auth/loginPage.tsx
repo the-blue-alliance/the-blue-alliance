@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import { type JSX } from 'react';
-
 import BiBellFill from '~icons/bi/bell-fill';
 import BiStarFill from '~icons/bi/star-fill';
 

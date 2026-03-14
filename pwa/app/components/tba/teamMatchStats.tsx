@@ -683,8 +683,7 @@ export default function TeamMatchStats({
         />
         <label
           htmlFor="exclude-red-cards"
-          className="cursor-pointer text-sm leading-none font-medium
-            peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+          className="cursor-pointer text-sm leading-none font-medium peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
         >
           Use Original Score for Playoff Red Cards
         </label>

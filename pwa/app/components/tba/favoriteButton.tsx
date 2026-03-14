@@ -1,5 +1,4 @@
 import { useEffect, useState } from 'react';
-
 import BiStar from '~icons/bi/star';
 import BiStarFill from '~icons/bi/star-fill';
 

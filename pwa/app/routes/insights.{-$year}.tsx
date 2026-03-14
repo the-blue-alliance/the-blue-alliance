@@ -131,10 +131,7 @@ function SingleYearInsights({
     <div className="py-8">
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
-          <h1
-            className="bg-gradient-to-r from-foreground to-foreground/70
-              bg-clip-text text-4xl font-bold tracking-tight text-transparent"
-          >
+          <h1 className="bg-gradient-to-r from-foreground to-foreground/70 bg-clip-text text-4xl font-bold tracking-tight text-transparent">
             Insights
           </h1>
           <p className="mt-2 text-lg text-muted-foreground">
@@ -151,9 +148,7 @@ function SingleYearInsights({
             });
           }}
         >
-          <SelectTrigger
-            className="w-[180px] cursor-pointer border-border/50 shadow-sm"
-          >
+          <SelectTrigger className="w-[180px] cursor-pointer border-border/50 shadow-sm">
             <SelectValue placeholder="Overall" />
           </SelectTrigger>
           <SelectContent>
@@ -171,10 +166,7 @@ function SingleYearInsights({
 
       <div className="mb-8">
         <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
-          <span
-            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
-              from-primary to-primary/50"
-          />
+          <span className="inline-block h-1 w-8 rounded-full bg-gradient-to-r from-primary to-primary/50" />
           Notables
         </h2>
         {notableDiv}
@@ -182,10 +174,7 @@ function SingleYearInsights({
 
       <div>
         <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
-          <span
-            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
-              from-primary to-primary/50"
-          />
+          <span className="inline-block h-1 w-8 rounded-full bg-gradient-to-r from-primary to-primary/50" />
           Leaderboards
         </h2>
         <div className="grid gap-6 lg:grid-cols-2">

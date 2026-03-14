@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
-
 import BiTrophy from '~icons/bi/trophy';
 
 import { EventRanking } from '~/api/tba/read';
@@ -122,10 +121,8 @@ export default function RankingsTable({
       data={rankings.rankings}
       conditionalRowStyling={(row) =>
         cn({
-          [`bg-yellow-100! font-bold shadow-inner shadow-yellow-200
-          dark:bg-yellow-500/15! dark:shadow-yellow-500/10`]: winners.includes(
-            row.original.team_key,
-          ),
+          [`bg-yellow-100! font-bold shadow-inner shadow-yellow-200 dark:bg-yellow-500/15! dark:shadow-yellow-500/10`]:
+            winners.includes(row.original.team_key),
         })
       }
     />

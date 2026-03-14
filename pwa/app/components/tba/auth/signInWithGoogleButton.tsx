@@ -10,8 +10,7 @@ export default function SignInWithGoogleButton() {
       provider={provider}
       logo={GoogleLogo}
       text="Sign in with Google"
-      className="border bg-white text-black transition-colors duration-300
-        ease-in-out hover:bg-neutral-100 active:bg-neutral-200"
+      className="border bg-white text-black transition-colors duration-300 ease-in-out hover:bg-neutral-100 active:bg-neutral-200"
     />
   );
 }
