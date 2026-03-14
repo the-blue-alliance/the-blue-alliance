@@ -96,7 +96,7 @@ Set the [`google_application_credentials` of the `tba_config.json`/`tba_config.l
 If you're using the development container, make sure to sync your key file to the container. A [restart of the development container](https://github.com/the-blue-alliance/the-blue-alliance/wiki/Development-Runbook#rebuilding-the-development-container) might be necessary in order to restart `dev_appserver.py`.
 
 ```bash
-$ docker-compose down && docker-compose up --build
+$ docker compose down && docker compose up --build
 ```
 
 ## Configure a Google App Engine instance

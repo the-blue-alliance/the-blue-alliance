@@ -52,6 +52,10 @@ export const zDistrict = z.object({
   display_name: z.string(),
   key: z.string(),
   year: z.int(),
+  official_advancement_counts: z.object({
+    dcmp: z.int(),
+    cmp: z.int(),
+  }),
 });
 
 export const zDistrictInsightRegionData = z.object({
@@ -1498,6 +1502,7 @@ export const zTeamEventStatus = z.object({
   overall_status_str: z.string().optional(),
   next_match_key: z.string().nullish(),
   last_match_key: z.string().nullish(),
+  pit_location: z.string().nullish(),
 });
 
 export const zWebcast = z.object({

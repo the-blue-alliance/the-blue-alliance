@@ -21,7 +21,7 @@ pnpm i
 Make sure you have your TBA APIv3 Read Key set in `.env`:
 
 ```sh
-$ cp default.env .env
+$ cp .env.example .env
 VITE_TBA_API_READ_KEY="myKey"
 ```
 
@@ -148,7 +148,7 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 
 ## Adding environment variables
 
-1. Put some form of example in `default.env`
+1. Put some form of example in `.env.example`
 2. Add the environment variable to `app/vite-env.d.ts`
 3. Add a validator to `vite.config.ts`
 4. You can then reference it in code with `import.env.meta.VITE_MY_VAR`.
@@ -171,9 +171,12 @@ Each line is `- /path` optionally followed by a display name. If no pages are li
 
 ## Playwright tests
 
-Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports.
+Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
 
 ```sh
+# Installs playwright binaries
+pnpm dlx playwright install
+
 # Runs the end-to-end tests.
 pnpm dlx playwright test
 

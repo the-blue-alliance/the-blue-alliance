@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { Temporal } from 'temporal-polyfill';
 
 import {
   getEventsByYearOptions,
@@ -14,7 +15,9 @@ export const Route = createFileRoute('/')({
     const status = await queryClient.ensureQueryData(getStatusOptions({}));
     await queryClient.ensureQueryData(
       getEventsByYearOptions({
-        path: { year: status?.current_season ?? new Date().getFullYear() },
+        path: {
+          year: status?.current_season ?? Temporal.Now.plainDateISO().year,
+        },
       }),
     );
   },
@@ -26,7 +29,9 @@ function Home() {
   const { data: status } = useSuspenseQuery(getStatusOptions({}));
   const { data: events } = useSuspenseQuery(
     getEventsByYearOptions({
-      path: { year: status?.current_season ?? new Date().getFullYear() },
+      path: {
+        year: status?.current_season ?? Temporal.Now.plainDateISO().year,
+      },
     }),
   );
   const weekEvents = getCurrentWeekEvents(events);

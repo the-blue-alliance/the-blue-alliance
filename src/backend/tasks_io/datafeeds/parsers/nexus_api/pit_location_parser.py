@@ -2,9 +2,9 @@ from typing import cast, Dict
 
 from pyre_extensions import JSON
 
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import TeamKey
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class NexusAPIPitLocationParser(ParserBase[JSON, Dict[TeamKey, EventTeamPitLocation]]):

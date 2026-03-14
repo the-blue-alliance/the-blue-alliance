@@ -244,6 +244,7 @@
     {% endif %}
 
     <!-- Bonus RP -->
+     {% if match.comp_level == 'qm' %}
     {% if "energizedAchieved" in match.score_breakdown.red %}
     <tr>
         <td class="red" colspan="2">
@@ -279,7 +280,7 @@
         </td>
     </tr>
     {% endif %}
-
+    {% endif %}
     <!-- Fouls & Adjustments -->
     {% if "minorFoulCount" in match.score_breakdown.red %}
     <tr>
@@ -321,6 +322,7 @@
       <td class="blueScore" colspan="2"><b>{%if match.score_breakdown.blue.totalPoints%}{{match.score_breakdown.blue.totalPoints}}{%else%}0{%endif%}</b></td>
     </tr>
 
+    {% if match.comp_level == 'qm' %}
     <tr>
       <td class="red" colspan="2">
         {% if match.score_breakdown.red.energizedAchieved %}
@@ -360,5 +362,6 @@
         +{{match.score_breakdown.blue.rp}} RP
       </td>
     </tr>
+    {% endif %}
     </tbody>
 </table>

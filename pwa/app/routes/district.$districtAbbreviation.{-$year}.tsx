@@ -1,5 +1,6 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { groupBy, sumBy } from 'lodash-es';
+import { Temporal } from 'temporal-polyfill';
 
 import {
   Award,
@@ -22,6 +23,13 @@ import {
 } from '~/components/tba/links';
 import { Badge } from '~/components/ui/badge';
 import { Divider } from '~/components/ui/divider';
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
 import {
   Table,
   TableBody,
@@ -103,9 +111,11 @@ export const Route = createFileRoute(
             (r) => r.point_total > 0 && (r.event_points?.length ?? 0) > 0,
           );
 
-    const now = new Date();
+    const today = Temporal.Now.plainDateISO();
     const seasonIsComplete = events.data.every(
-      (e) => new Date(e.end_date) < now,
+      (e) =>
+        Temporal.PlainDate.compare(Temporal.PlainDate.from(e.end_date), today) <
+        0,
     );
 
     // If the season is done, show only the teams that were actually active (in the rankings)
@@ -157,10 +167,20 @@ export const Route = createFileRoute(
 });
 
 function DistrictPage() {
-  const { awards, districtHistory, events, rankings, teams, year } =
-    Route.useLoaderData();
+  const {
+    abbreviation,
+    awards,
+    districtHistory,
+    events,
+    rankings,
+    teams,
+    year,
+  } = Route.useLoaderData();
+  const navigate = useNavigate();
 
   const hasRankings = rankings !== null;
+
+  const validYears = districtHistory.map((d) => d.year).sort((a, b) => b - a);
 
   const dcmpEvents = events.filter(
     (event) =>
@@ -208,9 +228,35 @@ function DistrictPage() {
 
   return (
     <div>
-      <h1 className="mt-4 text-4xl font-medium">
-        {districtHistory[districtHistory.length - 1].display_name} {year}
-      </h1>
+      <div className="mt-4 flex items-center justify-between gap-4">
+        <h1 className="text-4xl font-medium">
+          {districtHistory[districtHistory.length - 1].display_name} {year}
+        </h1>
+        <Select
+          value={String(year)}
+          onValueChange={(value) => {
+            void navigate({
+              to: '/district/$districtAbbreviation/{-$year}',
+              params: {
+                districtAbbreviation: abbreviation,
+                year: value,
+              },
+            });
+          }}
+        >
+          <SelectTrigger className="w-30">
+            <SelectValue placeholder={year} />
+          </SelectTrigger>
+          <SelectContent className="max-h-[30vh] overflow-y-auto">
+            <SelectItem value="stats">Stats</SelectItem>
+            {validYears.map((y) => (
+              <SelectItem key={y} value={`${y}`}>
+                {y}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
+      </div>
 
       <Tabs defaultValue={'overview'} className="mt-4">
         <TabsList

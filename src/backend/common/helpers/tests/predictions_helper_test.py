@@ -69,6 +69,43 @@ def test_past_event_seeds_match_predictions(test_data_importer) -> None:
         "2016nyny",
     ],
 )
+def test_compute_match_predictions_with_none_score_breakdown(
+    event_key: EventKey, test_data_importer
+) -> None:
+    """Regression test: played matches with None score_breakdown should not crash."""
+    test_data_importer.import_event(__file__, f"data/{event_key}.json")
+    test_data_importer.import_match_list(__file__, f"data/{event_key}_matches.json")
+
+    matches = Match.query(Match.event == ndb.Key(Event, event_key)).fetch()
+
+    # Null out score_breakdown on all played matches
+    for match in matches:
+        if match.has_been_played:
+            match.score_breakdown_json = None
+            match._score_breakdown = None
+
+    sorted_matches = MatchHelper.play_order_sorted_matches(matches)
+    (
+        match_predictions,
+        match_prediction_stats,
+        stat_mean_vars,
+    ) = PredictionHelper.get_match_predictions(sorted_matches)
+
+    assert match_predictions is not None
+    assert match_prediction_stats is not None
+    assert stat_mean_vars is not None
+
+
+@pytest.mark.parametrize(
+    "event_key",
+    [
+        "2020scmb",
+        "2019nyny",
+        "2018nyny",
+        "2017nyny",
+        "2016nyny",
+    ],
+)
 def test_compute_rankings_predictions(event_key: EventKey, test_data_importer) -> None:
     test_data_importer.import_event(__file__, f"data/{event_key}.json")
     test_data_importer.import_match_list(__file__, f"data/{event_key}_matches.json")

@@ -9,11 +9,20 @@ from backend.common.models.user import User
 
 
 def test_add_webhook(login_user: User, web_client: Client):
-    response = web_client.post(
-        "/webhooks/add",
-        data={"url": "https://example.com/webhook", "name": "Test Webhook"},
-        follow_redirects=True,
-    )
+    with patch.object(TBANSHelper, "verify_webhook") as mock_verify_webhook:
+        mock_verify_webhook.return_value = "verification_key_123"
+
+        response = web_client.post(
+            "/webhooks/add",
+            data={"url": "https://example.com/webhook", "name": "Test Webhook"},
+            follow_redirects=True,
+        )
+
+        mock_verify_webhook.assert_called_once()
+        call_args = mock_verify_webhook.call_args
+        assert call_args[0][0] == "https://example.com/webhook"
+        # Second arg is the generated secret, just verify it's a non-empty string
+        assert len(call_args[0][1]) > 0
 
     client = MobileClient.query(
         MobileClient.messaging_id == "https://example.com/webhook",
@@ -22,6 +31,8 @@ def test_add_webhook(login_user: User, web_client: Client):
 
     assert response.status_code == 200
     assert client is not None
+    assert client.verification_code == "verification_key_123"
+    assert client.verified is False
 
 
 def test_add_webhook_already_exists(login_user: User, web_client: Client):
@@ -30,24 +41,37 @@ def test_add_webhook_already_exists(login_user: User, web_client: Client):
         user_id=str(login_user.uid),
         messaging_id="https://example.com/webhook",
         client_type=ClientType.WEBHOOK,
+        secret="old_secret",
         verification_code="abc",
-        verified=False,
+        verified=True,
     )
     client_key = client.put()
 
-    response = web_client.post(
-        "/webhooks/add",
-        data={"url": "https://example.com/webhook", "name": "Test Webhook"},
-        follow_redirects=True,
-    )
+    with patch.object(TBANSHelper, "verify_webhook") as mock_verify_webhook:
+        mock_verify_webhook.return_value = "new_verification_key"
+
+        response = web_client.post(
+            "/webhooks/add",
+            data={"url": "https://example.com/webhook", "name": "Test Webhook"},
+            follow_redirects=True,
+        )
+
+        # Verify that verification was sent with the new secret
+        mock_verify_webhook.assert_called_once()
+        call_args = mock_verify_webhook.call_args
+        assert call_args[0][0] == "https://example.com/webhook"
+        assert call_args[0][1] != "old_secret"  # New secret should be generated
 
     # Check that the existing webhook is updated
     assert response.status_code == 200
     assert MobileClient.query().count() == 1
 
     updated_webhook = client_key.get()
-    assert updated_webhook.verified is False
-    assert updated_webhook.secret != client.secret
+    assert updated_webhook.verified is False  # Should be reset to False
+    assert updated_webhook.secret != "old_secret"  # Secret should be updated
+    assert (
+        updated_webhook.verification_code == "new_verification_key"
+    )  # New verification code
 
 
 def test_add_webhook_incomplete_form(

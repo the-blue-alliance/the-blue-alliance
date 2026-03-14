@@ -2,12 +2,12 @@ from typing import List
 
 from pyre_extensions import none_throws
 
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import (
     SeasonDistrictListModelV2,
     SeasonDistrictModelV2,
 )
 from backend.common.models.district import District
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class FMSAPIDistrictListParser(ParserBase[SeasonDistrictListModelV2, List[District]]):

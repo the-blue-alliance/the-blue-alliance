@@ -16,3 +16,9 @@ class Webcast(WebcastOnlineStatus):
     channel: str
     file: NotRequired[str]
     date: NotRequired[str]
+
+
+class WebcastChannel(TypedDict):
+    type: WebcastType
+    channel: str
+    channel_id: str

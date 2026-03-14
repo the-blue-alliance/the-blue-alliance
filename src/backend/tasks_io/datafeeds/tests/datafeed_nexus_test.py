@@ -7,6 +7,7 @@ from unittest import mock
 import pytest
 
 from backend.common.consts.event_type import EventType
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.futures import FailedFuture, InstantFuture
 from backend.common.models.event import Event
 from backend.common.sitevars.nexus_api_secret import (
@@ -25,7 +26,6 @@ from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
 from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
     NexusAPIQueueStatusParser,
 )
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class DummyDatafeedNexus(_DatafeedNexus[Any, Any]):

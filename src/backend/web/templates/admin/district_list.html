@@ -42,6 +42,9 @@
         <td>
           <a href="/backend-tasks/get/district_rankings/{{district.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-refresh"></span> Refresh Advancement from FIRST</a>
           <a href="/tasks/math/do/district_rankings_calc/{{district.key_name}}" class="btn btn-default"><span class="glyphicon glyphicon-stats"></span> Recompute Rankings</a>
+          {% if (district_has_youtube_channel | default({})).get(district.abbreviation) %}
+            <a href="/tasks/do/find_event_webcasts/{{district.key_name}}" class="btn btn-info"><span class="glyphicon glyphicon-facetime-video"></span> Fetch Upcoming Webcasts</a>
+          {% endif %}
         </td>
     </tr>
     {% endfor %}

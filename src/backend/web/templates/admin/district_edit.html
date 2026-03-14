@@ -24,6 +24,10 @@
             <td><input type="text" name="display_name" value="{{district.display_name}}" /></td>
         </tr>
         <tr>
+            <td>Uses Official Webcast Unit</td>
+            <td><input type="checkbox" name="uses_official_webcast_unit" {% if district.uses_official_webcast_unit %}checked{% endif %} /></td>
+        </tr>
+        <tr>
             <td>Rankings</td>
             <td><textarea readonly>{{district.rankings}}</textarea><</td>
         </tr>

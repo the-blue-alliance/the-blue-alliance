@@ -23,6 +23,20 @@ def test_register_no_auth(api_client: Client) -> None:
     assert resp["code"] == 401
 
 
+def test_register_no_account(
+    api_client: Client, mock_clientapi_auth_no_account: None
+) -> None:
+    """A user with a valid Firebase token but no email should be rejected."""
+    req = RegistrationRequest(
+        operating_system="web",
+        mobile_id="abc123",
+        device_uuid="asdf",
+        name="Test Device",
+    )
+    resp = make_clientapi_request(api_client, "/register", req)
+    assert resp["code"] == 401
+
+
 def test_register_new_client(api_client: Client, mock_clientapi_auth: User) -> None:
     req = RegistrationRequest(
         operating_system="web",

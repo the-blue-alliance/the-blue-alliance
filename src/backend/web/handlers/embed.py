@@ -70,8 +70,8 @@ def instagram_oembed(media_key: str):
 
 def oembed_test():
     access_token = InstagramApiSecret.get()["api_key"]
-    instagram_url = "https://www.instagram.com/p/CbAabcyNUda/"
-    facebook_url = "https://www.facebook.com/thebluealliance/posts/pfbid0yVvTAw61qYufQZ1Pg288ioN6P3JAfCFMvgs5Cij6d7Ld2xSwVomxKRgR2CHM6bwVl"
+    instagram_url = "https://www.instagram.com/p/DVjWluEFN-r/"
+    facebook_url = "https://www.facebook.com/reel/26102042736113678"
 
     instagram_html = None
     instagram_error = None
@@ -95,7 +95,7 @@ def oembed_test():
 
     try:
         fb_response = requests.get(
-            "https://graph.facebook.com/v25.0/oembed_post",
+            "https://graph.facebook.com/v25.0/oembed_video",
             params={
                 "url": facebook_url,
                 "access_token": access_token,

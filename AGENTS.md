@@ -52,20 +52,20 @@ ops/                    # Build, deploy, and dev scripts
 - Configuration via `tba_dev_config.json` for local dev
 
 ## Development Setup
-**Recommended**: Use docker-compose for the local dev server, and `uv` for Python tooling (tests, linting).
+**Recommended**: Use docker compose for the local dev server, and `uv` for Python tooling (tests, linting).
 
 See docs/Setup/Setup-Guide.md for setup instructions.
 
 ```bash
-# Start dev environment with docker-compose (always use --build)
-docker-compose up --build
+# Start dev environment with docker compose (always use --build)
+docker compose up --build
 
 # Access shell in container
-docker-compose exec tba bash
+docker compose exec tba bash
 
 # View logs
-docker-compose logs -f tba
-docker-compose logs -f webpack
+docker compose logs -f tba
+docker compose logs -f webpack
 ```
 
 ## Running Python Commands

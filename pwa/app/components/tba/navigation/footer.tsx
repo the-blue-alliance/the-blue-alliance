@@ -40,7 +40,7 @@ const links: NavigationLink[] = [
   { label: 'Privacy Policy', to: '/privacy' },
 ];
 
-// Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
+// Commit hash is string-replaced at build time, so we need to ignore eslint and typescript errors.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const commitHash = __COMMIT_HASH__ as string;
@@ -81,16 +81,7 @@ function ThemeToggle() {
   );
 }
 
-export const Footer = () => {
-  const renderTime = new Date().toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  });
-
+export const Footer = ({ renderTime }: { renderTime: string }) => {
   return (
     <footer
       className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t

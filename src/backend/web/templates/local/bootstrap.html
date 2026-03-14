@@ -27,6 +27,12 @@
     {% endif %}
 
     <h1>Fetch Some Data!</h1>
+    {% if apiv3_key %}
+    <form method="post" style="margin-bottom: 15px;">
+        <input type="hidden" name="bootstrap_key" value="{{ current_year }}" />
+        <button type="submit" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-refresh"></span> Sync {{ current_year }}</button>
+    </form>
+    {% endif %}
     <div class="alert alert-info alert-dismissible">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4 class="alert-heading">Getting Started</h4>
@@ -39,7 +45,7 @@
             <ul>
                 <li>Team keys, in the format <pre>frc1234</pre></li>
                 <li>Event keys, in the format <pre>2019nyny</pre></li>
-                <li>A year (to load all events/teams from that year)</li>
+                <li>A year (to load all events, teams, and districts from that year)</li>
             </ul>
         </p>
     </div>

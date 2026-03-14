@@ -967,7 +967,9 @@ class PredictionHelper:
                         brier_sums["score"] += pow(prediction["prob"] - 0, 2)
 
                     for color in ALLIANCE_COLORS:
-                        score_breakdown = none_throws(match.score_breakdown)
+                        if match.score_breakdown is None:
+                            continue
+                        score_breakdown = match.score_breakdown
                         color_prediction = prediction[str(color)]  # pyre-ignore[26]
                         if event.year == 2016:
                             if score_breakdown[color]["teleopDefensesBreached"]:

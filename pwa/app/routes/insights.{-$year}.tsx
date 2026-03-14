@@ -190,7 +190,12 @@ function SingleYearInsights({
         </h2>
         <div className="grid gap-6 lg:grid-cols-2">
           {leaderboards.map((l, i) => (
-            <Leaderboard leaderboard={l} key={i} year={year} />
+            <Leaderboard
+              subtitle={l.year > 0 ? `${l.year}` : 'Overall'}
+              leaderboard={l}
+              key={i}
+              year={year}
+            />
           ))}
         </div>
       </div>
@@ -278,6 +283,7 @@ function NotablesOverall({
 
         return (
           <Leaderboard
+            subtitle={leaderboard.year > 0 ? `${leaderboard.year}` : 'Overall'}
             leaderboard={leaderboard}
             key={i}
             contextTooltipMap={context}

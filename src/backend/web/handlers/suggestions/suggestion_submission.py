@@ -8,6 +8,7 @@ from backend.common.consts.media_type import MediaType
 from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.team import Team
@@ -37,9 +38,16 @@ def suggest_webcast() -> str:
     if not event:
         abort(404)
 
+    uses_official_webcast_unit = False
+    if event.event_district_key:
+        district = District.get_by_id(event.event_district_key)
+        if district:
+            uses_official_webcast_unit = bool(district.uses_official_webcast_unit)
+
     template_values = {
         "status": request.args.get("status"),
         "event": event,
+        "uses_official_webcast_unit": uses_official_webcast_unit,
     }
     return render_template("suggestions/suggest_event_webcast.html", template_values)
 

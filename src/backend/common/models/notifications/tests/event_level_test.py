@@ -1,3 +1,4 @@
+import json
 import unittest
 from datetime import datetime
 
@@ -126,3 +127,53 @@ class TestEventLevelNotification(unittest.TestCase):
         assert payload["event_key"] == self.event.key_name
         assert payload["event_name"] == "Present Test Event"
         assert payload["scheduled_time"] is not None
+
+    def test_fcm_notification_double_elim(self):
+        import datetime as dt
+
+        from google.appengine.ext import ndb
+
+        from backend.common.consts.comp_level import CompLevel
+        from backend.common.consts.event_type import EventType
+        from backend.common.consts.playoff_type import PlayoffType
+        from backend.common.manipulators.event_manipulator import EventManipulator
+        from backend.common.manipulators.match_manipulator import MatchManipulator
+        from backend.common.models.event import Event
+        from backend.common.models.match import Match
+
+        year = dt.datetime.now().year
+        event = EventManipulator.createOrUpdate(
+            Event(
+                id="{}testde".format(year),
+                event_short="testde",
+                event_type_enum=EventType.REGIONAL,
+                name="Double Elim Test Event",
+                year=year,
+                playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+            )
+        )
+        alliances = {
+            "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+            "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+        }
+        match = MatchManipulator.createOrUpdate(
+            Match(
+                id="{}_sf1m1".format(event.key_name),
+                event=ndb.Key(Event, event.key_name),
+                year=year,
+                comp_level=CompLevel.SF,
+                set_number=1,
+                match_number=1,
+                team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+                alliances_json=json.dumps(alliances),
+            )
+        )
+        notification = EventLevelNotification(match)
+        notification.match.time = None
+        assert notification.fcm_notification is not None
+        # For double elim, full_name should return "Playoff" not "Semifinals"
+        assert notification.fcm_notification.title == "TESTDE Playoff Matches Starting"
+        assert (
+            notification.fcm_notification.body
+            == "Playoff matches at the Double Elim Test Event are starting."
+        )

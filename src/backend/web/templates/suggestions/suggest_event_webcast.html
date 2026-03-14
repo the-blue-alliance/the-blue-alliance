@@ -64,6 +64,11 @@
           </ul>
           <hr>
           <h3>{{event.year}} {{event.name}}</h3>
+          {% if uses_official_webcast_unit %}
+          <div class="alert alert-info">
+            <strong>Note:</strong> This event is part of a district that uses FIRST's official webcast unit. Webcasts are typically published automatically and do not need to be submitted manually. If the event is live and you don't see a webcast, it may take a few minutes to appear.
+          </div>
+          {% endif %}
           {% if event.webcasts %}
           <p>Webcasts on The Blue Alliance</p>
           {% for webcast in event.webcasts %}

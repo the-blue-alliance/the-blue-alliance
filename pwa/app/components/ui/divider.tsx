@@ -11,7 +11,7 @@ const Divider = forwardRef<HTMLSpanElement, ComponentPropsWithoutRef<'span'>>(
           to-transparent opacity-75"
       ></div>
 
-      <span className="relative z-10 bg-white px-6">{children}</span>
+      <span className="relative z-10 bg-background px-6">{children}</span>
     </span>
   ),
 );

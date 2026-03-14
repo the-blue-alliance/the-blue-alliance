@@ -215,6 +215,11 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> TypedFlaskRespons
             statuses[event_team.event.id()] = status_dict
         else:
             statuses[event_team.event.id()] = status
+        pit_location = event_team.pit_location
+        if pit_location:
+            if statuses[event_team.event.id()] is None:
+                statuses[event_team.event.id()] = {}
+            statuses[event_team.event.id()]["pit_location"] = pit_location["location"]
     return profiled_jsonify(statuses)
 
 
@@ -282,6 +287,11 @@ def team_event_status(
                     "overall_status_str": status_strings["overall"],
                 }
             )
+        pit_location = event_team.pit_location
+        if pit_location:
+            if status is None:
+                status = {}
+            status["pit_location"] = pit_location["location"]  # pyre-ignore[27]
     return profiled_jsonify(status)
 
 

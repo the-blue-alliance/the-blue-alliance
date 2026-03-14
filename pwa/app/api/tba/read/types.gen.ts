@@ -112,6 +112,19 @@ export type District = {
    * Year this district participated.
    */
   year: number;
+  /**
+   * The number of teams advancing to DCMP and CMP from this district, as specified in the FIRST manual.
+   */
+  official_advancement_counts: {
+    /**
+     * Number of teams advancing to the District Championship.
+     */
+    dcmp: number;
+    /**
+     * Number of teams advancing to the Championship.
+     */
+    cmp: number;
+  };
 };
 
 export type DistrictInsightRegionData = {
@@ -2323,6 +2336,10 @@ export type TeamEventStatus = {
    * TBA match key for the last match the team played in at this event, or null.
    */
   last_match_key?: string | null;
+  /**
+   * The pit location for the team at this event, or null if not available.
+   */
+  pit_location?: string | null;
 };
 
 export type TeamEventStatusAlliance = {

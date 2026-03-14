@@ -1,0 +1,70 @@
+name: PWA Preview Build
+
+on:
+  pull_request:
+    types: [labeled, synchronize]
+
+concurrency:
+  group: pwa-preview-build-${{ github.event.pull_request.number }}
+  cancel-in-progress: true
+
+env:
+  VITE_TBA_API_READ_KEY: ${{ vars.VITE_TBA_API_READ_KEY }}
+  VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+  VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+  VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+  VITE_FIREBASE_DATABASE_URL: ${{ vars.VITE_FIREBASE_DATABASE_URL }}
+
+jobs:
+  build:
+    name: Build PWA Preview
+    runs-on: ubuntu-24.04
+    if: "(github.event.action == 'labeled' && github.event.label.name == 'preview-pwa') || (github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'preview-pwa'))"
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: "10.24.0"
+
+      - name: Set up Node
+        uses: actions/setup-node@v6
+        with:
+          node-version: "24"
+          cache: "pnpm"
+          cache-dependency-path: "pwa/pnpm-lock.yaml"
+
+      - name: Install Dependencies
+        run: pnpm --dir pwa install --frozen-lockfile
+
+      - name: Create dotenv
+        run: ./ops/pwa/create_dotenv.sh --env
+
+      - name: Build
+        run: pnpm --dir pwa run build
+
+      - name: Save PR metadata
+        run: |
+          echo "${{ github.event.pull_request.number }}" > pr-number.txt
+          echo "${{ github.event.pull_request.head.sha }}" > pr-sha.txt
+
+      - name: Upload PR metadata
+        uses: actions/upload-artifact@v4
+        with:
+          name: pwa-preview-metadata
+          path: |
+            pr-number.txt
+            pr-sha.txt
+          retention-days: 1
+
+      - name: Remove node_modules
+        run: rm -rf pwa/node_modules
+
+      - name: Upload build artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: pwa-preview-build
+          path: pwa/
+          retention-days: 1

@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Badge } from '~/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
@@ -21,7 +22,7 @@ export const Route = createFileRoute('/local/debug')({
   loader: () => {
     const stats = getCacheStats();
     const entries = getCacheEntries();
-    const now = Date.now();
+    const now = Temporal.Now.instant().epochMilliseconds;
 
     // Parse cache entries to extract useful information
     const cacheEntries: CacheInfo[] = entries.map(
@@ -38,7 +39,9 @@ export const Route = createFileRoute('/local/debug')({
             : data;
 
         // Calculate expiry time
-        const expiresAt = new Date(now + remainingTTL).toISOString();
+        const expiresAt = Temporal.Instant.fromEpochMilliseconds(
+          Math.round(now + remainingTTL),
+        ).toString();
 
         return {
           key,
@@ -54,7 +57,7 @@ export const Route = createFileRoute('/local/debug')({
     return {
       stats,
       cacheEntries,
-      timestamp: new Date().toISOString(),
+      timestamp: Temporal.Now.instant().toString(),
     };
   },
   headers: publicCacheControlHeaders(),
@@ -97,12 +100,14 @@ function CacheEntryRow({
   loadTime: number;
 }): React.JSX.Element {
   const [timeRemaining, setTimeRemaining] = useState(
-    entry.remainingTTL - (Date.now() - loadTime),
+    entry.remainingTTL - (Temporal.Now.instant().epochMilliseconds - loadTime),
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const remaining = entry.remainingTTL - (Date.now() - loadTime);
+      const remaining =
+        entry.remainingTTL -
+        (Temporal.Now.instant().epochMilliseconds - loadTime);
       if (remaining <= 0) {
         setTimeRemaining(0);
         clearInterval(interval);
@@ -114,7 +119,9 @@ function CacheEntryRow({
     return () => clearInterval(interval);
   }, [entry.remainingTTL, loadTime]);
 
-  const expiryDate = new Date(entry.expiresAt);
+  const expiryDate = Temporal.Instant.from(entry.expiresAt).toZonedDateTimeISO(
+    Temporal.Now.timeZoneId(),
+  );
 
   return (
     <tr key={entry.key} className="border-b hover:bg-muted">
@@ -128,7 +135,7 @@ function CacheEntryRow({
       <td className="px-4 py-2 font-mono text-xs">
         <div>{formatTimeRemaining(timeRemaining)}</div>
         <div className="text-muted-foreground">
-          {expiryDate.toLocaleString()}
+          {expiryDate.toLocaleString('default')}
         </div>
       </td>
     </tr>
@@ -138,7 +145,7 @@ function CacheEntryRow({
 function LocalDebug(): React.JSX.Element {
   const loaderData = Route.useLoaderData();
   const { stats, cacheEntries, timestamp } = loaderData;
-  const loadTime = Date.parse(timestamp);
+  const loadTime = Temporal.Instant.from(timestamp).epochMilliseconds;
 
   return (
     <div className="container max-w-6xl py-8">
@@ -172,7 +179,10 @@ function LocalDebug(): React.JSX.Element {
             </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
-            Last updated: {new Date(timestamp).toLocaleString()}
+            Last updated:{' '}
+            {Temporal.Instant.from(timestamp)
+              .toZonedDateTimeISO(Temporal.Now.timeZoneId())
+              .toLocaleString('default')}
           </div>
         </CardContent>
       </Card>

@@ -1,6 +1,12 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  notFound,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Event } from '~/api/tba/read';
 import {
@@ -31,6 +37,14 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/events/{-$year}')({
+  beforeLoad: ({ params }) => {
+    if (params.year !== undefined && Number.isNaN(Number(params.year))) {
+      throw redirect({
+        to: '/district/$districtAbbreviation/{-$year}',
+        params: { districtAbbreviation: params.year },
+      });
+    }
+  },
   loader: async ({ params, context: { queryClient } }) => {
     const year = await parseParamsForYearElseDefault(queryClient, params);
     if (year === undefined) {
@@ -138,10 +152,9 @@ function groupBySections(events: Event[]): EventGroup[] {
       event.event_type == EventType.PRESEASON ||
       event.event_type == EventType.OFFSEASON
     ) {
-      const eventDate = new Date(event.start_date);
-      const monthName = eventDate.toLocaleDateString('default', {
-        month: 'long',
-      });
+      const monthName = Temporal.PlainDate.from(
+        event.start_date,
+      ).toLocaleString('default', { month: 'long' });
       const offseasonGroup = unofficialEventsByMonth.get(monthName);
       if (offseasonGroup) {
         offseasonGroup.events.push(event);

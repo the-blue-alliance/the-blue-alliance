@@ -6,12 +6,12 @@ from google.appengine.api import urlfetch_errors
 from google.appengine.ext import ndb
 from google.appengine.runtime import apiproxy_errors
 
+from backend.common.datafeeds.datafeed_base import DatafeedBase, TAPIResponse, TReturn
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import TeamKey
 from backend.common.sitevars.nexus_api_secret import NexusApiSecrets
-from backend.tasks_io.datafeeds.datafeed_base import DatafeedBase, TAPIResponse, TReturn
 from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
     NexusAPIPitLocationParser,
 )

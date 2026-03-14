@@ -416,9 +416,11 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             district_query.DistrictsInYearQuery(2016).cache_key,
             district_query.DistrictHistoryQuery("ne").cache_key,
             district_query.DistrictHistoryQuery("chs").cache_key,
+            district_query.DistrictHistoryQuery("fch").cache_key,
             district_query.DistrictQuery("2016ne").cache_key,
             district_query.DistrictAbbreviationQuery("ne").cache_key,
             district_query.DistrictAbbreviationQuery("chs").cache_key,
+            district_query.DistrictAbbreviationQuery("fch").cache_key,
             district_query.TeamDistrictsQuery("frc604").cache_key,
             # Necessary because APIv3 Event models include the District model
             event_query.EventQuery("2016necmp").cache_key,
@@ -450,6 +452,27 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             district_query.DistrictAbbreviationQuery("mar").cache_key,
             district_query.DistrictAbbreviationQuery("fma").cache_key,
             event_query.DistrictEventsQuery("2019mar").cache_key,
+        }
+
+    def test_renamed_chs_district_updated(self) -> None:
+        affected_refs = {
+            "key": {ndb.Key(District, "2019chs")},
+            "year": {2019},
+            "abbreviation": {"chs"},
+        }
+        cache_keys = {
+            q[0] for q in get_affected_queries.district_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            district_query.DistrictsInYearQuery(2019).cache_key,
+            district_query.DistrictHistoryQuery("chs").cache_key,
+            district_query.DistrictHistoryQuery("fch").cache_key,
+            district_query.DistrictQuery("2019chs").cache_key,
+            district_query.DistrictQuery("2019fch").cache_key,
+            district_query.DistrictAbbreviationQuery("chs").cache_key,
+            district_query.DistrictAbbreviationQuery("fch").cache_key,
+            event_query.DistrictEventsQuery("2019chs").cache_key,
         }
 
     def test_insight_updated(self) -> None:

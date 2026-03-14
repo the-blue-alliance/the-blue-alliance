@@ -19,15 +19,15 @@ When running locally, TBA will export a bootstrap interface at [http://localhost
 If you run into issues, especially after not working with your dev instance for a while, try rebuilding and restarting your containers.
 
 ```
-$ docker-compose down
-$ docker-compose up --build
+$ docker compose down
+$ docker compose up --build
 ```
 
 If you want to start completely fresh (including wiping datastore data):
 
 ```
-$ docker-compose down --volumes
-$ docker-compose up --build
+$ docker compose down --volumes
+$ docker compose up --build
 ```
 
 ## Generating Type Checker Stubs

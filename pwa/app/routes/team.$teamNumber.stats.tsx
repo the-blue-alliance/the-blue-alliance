@@ -2,6 +2,7 @@ import { useQueries } from '@tanstack/react-query';
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { useMemo, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import MdiCog from '~icons/mdi/cog';
 import MdiRobotExcited from '~icons/mdi/robot-excited';
@@ -43,7 +44,7 @@ export const Route = createFileRoute('/team/$teamNumber/stats')({
       getTeamMediaByYear({
         path: {
           team_key: `frc${params.teamNumber}`,
-          year: new Date().getFullYear(),
+          year: Temporal.Now.plainDateISO().year,
         },
       }),
     ]);

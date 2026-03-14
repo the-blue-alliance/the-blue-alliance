@@ -1,0 +1,164 @@
+name: PWA Preview Deploy
+
+on:
+  # Triggered after a successful PWA Preview Build run — downloads the pre-built artifact
+  # and deploys it. Secrets are available here; no fork code is executed.
+  workflow_run:
+    workflows: ["PWA Preview Build"]
+    types: [completed]
+
+  # Cleanup runs on PR close. pull_request_target gives access to secrets for fork PRs,
+  # and no fork code is checked out or executed.
+  pull_request_target:
+    types: [closed, unlabeled]
+
+jobs:
+  deploy-preview:
+    name: Deploy PWA Preview
+    runs-on: ubuntu-24.04
+    if: "github.event_name == 'workflow_run' && github.event.workflow_run.conclusion == 'success'"
+    permissions:
+      pull-requests: write
+
+    steps:
+      - name: Download PR metadata
+        uses: actions/download-artifact@v4
+        with:
+          name: pwa-preview-metadata
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Read PR metadata
+        id: meta
+        run: |
+          echo "pr_number=$(cat pr-number.txt)" >> $GITHUB_OUTPUT
+          echo "sha=$(cat pr-sha.txt)" >> $GITHUB_OUTPUT
+
+      - name: Download build artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: pwa-preview-build
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          path: pwa/
+
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+
+      - name: Deploy Preview
+        run: |
+          gcloud app deploy pwa/pwa-preview.yaml \
+            --version "pr-${{ steps.meta.outputs.pr_number }}" \
+            --no-promote \
+            --quiet
+
+      - name: Post Preview URL Comment
+        uses: actions/github-script@v7
+        env:
+          PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
+          PR_NUMBER: ${{ steps.meta.outputs.pr_number }}
+          PR_SHA: ${{ steps.meta.outputs.sha }}
+        with:
+          script: |
+            const prNumber = parseInt(process.env.PR_NUMBER);
+            const version = `pr-${prNumber}`;
+            const projectId = process.env.PROJECT_ID;
+            const previewUrl = `https://${version}-dot-pwa-dot-${projectId}.appspot.com`;
+            const sha = process.env.PR_SHA.substring(0, 7);
+            const body = [
+              '## PWA Preview Deployed',
+              '',
+              `**Preview URL:** ${previewUrl}`,
+              '',
+              `> Deployed from commit ${sha}`,
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existing = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('## PWA Preview Deployed')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: prNumber,
+                body,
+              });
+            }
+
+  cleanup-preview:
+    name: Cleanup PWA Preview
+    runs-on: ubuntu-24.04
+    if: "github.event_name == 'pull_request_target' && (github.event.action == 'closed' || (github.event.action == 'unlabeled' && github.event.label.name == 'preview-pwa')) && (github.event.action == 'unlabeled' || contains(github.event.pull_request.labels.*.name, 'preview-pwa'))"
+    permissions:
+      pull-requests: write
+    concurrency:
+      group: pwa-preview-cleanup-${{ github.event.pull_request.number }}
+      cancel-in-progress: false
+    env:
+      PR_VERSION: pr-${{ github.event.pull_request.number }}
+
+    steps:
+      - name: Authenticate to Google Cloud
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+
+      - name: Setup Google Cloud Platform
+        uses: google-github-actions/setup-gcloud@v3
+        with:
+          version: "latest"
+          project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+
+      - name: Delete Preview Version
+        run: |
+          gcloud app versions delete "$PR_VERSION" \
+            --service pwa \
+            --quiet \
+          || echo "Version $PR_VERSION not found, skipping."
+
+      - name: Update PR Comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const prNumber = context.payload.pull_request.number;
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: prNumber,
+            });
+
+            const existing = comments.find(
+              c => c.user.type === 'Bot' && c.body.includes('## PWA Preview Deployed')
+            );
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body: '## PWA Preview Deployed\n\n~~Preview URL~~ — Preview deleted (PR closed).',
+              });
+            }

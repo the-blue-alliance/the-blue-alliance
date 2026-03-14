@@ -20,6 +20,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.memcache import MemcacheClient
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -65,6 +66,7 @@ def bootstrap() -> str:
     apiv3_key = Apiv3Key.api_key()
     template_values = {
         "apiv3_key": apiv3_key,
+        "current_year": SeasonHelper.get_current_season(),
         "dev_auth_key": dev_auth_key,
         "status": request.args.get("status"),
         "view_url": request.args.get("url"),

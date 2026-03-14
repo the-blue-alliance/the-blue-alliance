@@ -4,6 +4,7 @@ import { type ClassValue, clsx } from 'clsx';
 import pino from 'pino';
 import { Fragment, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
+import { Temporal } from 'temporal-polyfill';
 
 import { WltRecord } from '~/api/tba/read';
 import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
@@ -85,20 +86,14 @@ export function timestampsAreOnDifferentDays(
   timestamp2: number,
   timezone: string | null,
 ): boolean {
-  const date1 = new Date(timestamp1 * 1000);
-  const date2 = new Date(timestamp2 * 1000);
-
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone ?? 'UTC',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
-  const formattedDate1 = formatter.format(date1);
-  const formattedDate2 = formatter.format(date2);
-
-  return formattedDate1 !== formattedDate2;
+  const tz = timezone ?? 'UTC';
+  const date1 = Temporal.Instant.fromEpochMilliseconds(timestamp1 * 1000)
+    .toZonedDateTimeISO(tz)
+    .toPlainDate();
+  const date2 = Temporal.Instant.fromEpochMilliseconds(timestamp2 * 1000)
+    .toZonedDateTimeISO(tz)
+    .toPlainDate();
+  return Temporal.PlainDate.compare(date1, date2) !== 0;
 }
 
 export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {

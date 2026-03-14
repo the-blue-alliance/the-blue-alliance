@@ -8,6 +8,7 @@ import {
   forwardRef,
   useState,
 } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import {
   Event,
@@ -29,7 +30,10 @@ import { TeamLink } from '~/components/tba/links';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
 import { PlayoffType } from '~/lib/api/PlayoffType';
-import { getCurrentWeekEvents } from '~/lib/eventUtils';
+import {
+  EVENT_FALLBACK_TIMEZONE,
+  getCurrentWeekEvents,
+} from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
 
@@ -302,15 +306,16 @@ function MatchSuggestionRow({
         <td className="border">
           {match.predicted_time && (
             <span>
-              {new Date(match.predicted_time * 1000).toLocaleTimeString(
-                'en-US',
-                {
+              {Temporal.Instant.fromEpochMilliseconds(
+                match.predicted_time * 1000,
+              )
+                .toZonedDateTimeISO(event.timezone ?? EVENT_FALLBACK_TIMEZONE)
+                .toLocaleString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
                   weekday: 'short',
                   hour12: true,
-                },
-              )}
+                })}
             </span>
           )}
         </td>

@@ -1,4 +1,5 @@
 import fuzzysort from 'fuzzysort';
+import { Temporal } from 'temporal-polyfill';
 
 import { SearchIndex } from '~/api/tba/read';
 
@@ -38,7 +39,7 @@ function searchEvents(
       // ...
       // Down to score * 1
       const eventYear = Number.parseInt(r.obj.key.slice(0, 4));
-      const currentYear = new Date().getFullYear();
+      const currentYear = Temporal.Now.plainDateISO().year;
       const yearDiff = currentYear - eventYear;
       const denominator = currentYear - 1992;
 

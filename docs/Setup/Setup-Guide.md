@@ -21,7 +21,7 @@ This section assumes a minimal setup and knowledge of Git/GitHub. For those that
 Before starting the containers, ensure Docker is running. Then start all services:
 
 ```
-$ docker-compose up --build
+$ docker compose up --build
 ```
 
 **Note:** Always use `--build` so Docker picks up any Dockerfile changes. This is fast when nothing has changed due to layer caching. The container automatically generates `src/requirements.txt` on startup, so there is no need to run `make freeze` manually.
@@ -30,7 +30,7 @@ After a little bit of installation and setup, a local instance of The Blue Allia
 
 ### Services
 
-`docker-compose` runs four services:
+`docker compose` runs four services:
 
 | Service | Description | Ports |
 | --- | --- | --- |
@@ -49,15 +49,15 @@ Changes are automatically synced to all containers via Docker bind mounts. When 
 
 ### Viewing Logs
 
-Each service outputs its own logs. Use `docker-compose logs` to view them:
+Each service outputs its own logs. Use `docker compose logs` to view them:
 
 ```bash
 # Follow all service logs
-$ docker-compose logs -f
+$ docker compose logs -f
 
 # Follow logs for a specific service
-$ docker-compose logs -f tba
-$ docker-compose logs -f webpack
+$ docker compose logs -f tba
+$ docker compose logs -f webpack
 ```
 
 ### Shell Access
@@ -65,17 +65,17 @@ $ docker-compose logs -f webpack
 You can open a shell inside the `tba` container:
 
 ```bash
-$ docker-compose exec tba bash
+$ docker compose exec tba bash
 ```
 
 ### Stopping
 
 ```bash
 # Stop all services
-$ docker-compose down
+$ docker compose down
 
 # Stop and remove volumes (resets datastore data)
-$ docker-compose down --volumes
+$ docker compose down --volumes
 ```
 
 ## Running Tests, Linting, and Type Checks

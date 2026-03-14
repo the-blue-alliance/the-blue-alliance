@@ -47,6 +47,20 @@ def district_post_update_hook(updated_models: List[TUpdatedModel[District]]) -> 
                 if not updated.model.display_name:
                     updated.model.display_name = last_year_district.display_name
                     update = True
+                if (
+                    not updated.model.uses_official_webcast_unit
+                    and last_year_district.uses_official_webcast_unit
+                ):
+                    updated.model.uses_official_webcast_unit = (
+                        last_year_district.uses_official_webcast_unit
+                    )
+                    update = True
+                if (
+                    not updated.model.webcast_channels
+                    and last_year_district.webcast_channels
+                ):
+                    updated.model.webcast_channels = last_year_district.webcast_channels
+                    update = True
                 if update:
                     DistrictManipulator.createOrUpdate(
                         updated.model, run_post_update_hook=False

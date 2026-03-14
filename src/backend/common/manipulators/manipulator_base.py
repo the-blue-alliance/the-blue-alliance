@@ -32,6 +32,26 @@ TModel = TypeVar("TModel", bound=CachedModel)
 
 @dataclass(frozen=True)
 class TUpdatedModel(Generic[TModel]):
+    """
+    Wraps a model that was just persisted to Datastore via ``createOrUpdate``,
+    along with metadata describing what changed. Instances are passed to
+    post-update hooks registered with ``register_post_update_hook``.
+
+    Attributes:
+        model: The post-merge CachedModel instance that was written to Datastore.
+            For newly created entities, this is the model as provided to
+            ``createOrUpdate``. For updates to existing entities, this is the
+            old model with new values merged in via ``updateMerge``.
+        updated_attrs: The set of NDB property names whose values changed during
+            the merge (populated by ``_update_attrs`` from the model's
+            ``_mutable_attrs``, ``_json_attrs``, ``_list_attrs``, and
+            ``_auto_union_attrs``). Empty for newly created models since no merge
+            occurs. May contain synthetic signals (e.g. ``"_video_added"``)
+            injected by specific manipulator subclasses.
+        is_new: True when the model was newly created (no prior version existed
+            in Datastore), False when updating an existing entity.
+    """
+
     model: TModel
     updated_attrs: Set[str]
     is_new: bool
