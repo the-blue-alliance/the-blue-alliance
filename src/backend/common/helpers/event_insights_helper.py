@@ -90,7 +90,7 @@ class EventInsightsHelper:
             # Compare total auto points
             if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
                 return 'red'
-            if blue.get("totalAutoPoints") < red.get("totalAutoPoints"):
+            if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
                 return 'blue'
             
             # Auto tied: compare shift 1 
@@ -175,13 +175,13 @@ class EventInsightsHelper:
             
 
             auto_winner = determine_auto_winner(red_sb, blue_sb)
-
-            if auto_winner == 'red' and red_score > blue_score:
-                auto_win_conversion += 1
-            if auto_winner == 'blue' and blue_score > red_score:
-                auto_win_conversion += 1
-            else:
+            
+            if (auto_winner is None) or (red_score == blue_score):
                 undefined_auto_conversion_matches += 1
+            elif (auto_winner == 'red') and (red_score > blue_score):
+                auto_win_conversion += 1
+            elif (auto_winner == 'blue') and (blue_score > red_score):
+                auto_win_conversion += 1
             
             if (red_sb.get("autoTowerRobot1") != "None" or
                 red_sb.get("autoTowerRobot1") != "None" or
