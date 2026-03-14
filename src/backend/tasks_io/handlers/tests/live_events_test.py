@@ -42,6 +42,7 @@ from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast, WebcastChannel
 from backend.tasks_io.handlers.live_events import _stream_matches_event
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
+from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
 
 def set_district_webcast_channels(
@@ -761,6 +762,44 @@ def test_update_live_events_no_enqueue_when_no_unplayed_matches_today(
     # No tasks should be enqueued since there are no unplayed matches today
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 0
+
+
+@mock.patch.object(WebcastOnlineHelper, "add_online_status")
+def test_update_event_webcast_status_default_not_forced(
+    add_online_status_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = tasks_client.get("/tasks/do/update_webcast_online_status/2026test")
+
+    assert resp.status_code == 200
+    add_online_status_mock.assert_called_once()
+    assert add_online_status_mock.call_args.kwargs == {"force": False}
+
+
+@mock.patch.object(WebcastOnlineHelper, "add_online_status")
+def test_update_event_webcast_status_force_true(
+    add_online_status_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = tasks_client.get("/tasks/do/update_webcast_online_status/2026test?force=1")
+
+    assert resp.status_code == 200
+    add_online_status_mock.assert_called_once()
+    assert add_online_status_mock.call_args.kwargs == {"force": True}
 
 
 def test_find_event_webcasts_district_not_supported(tasks_client: Client) -> None:

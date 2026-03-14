@@ -610,13 +610,19 @@ class Event(CachedModel):
 
         for webcast, with_status in zip(self.current_webcasts, statuses):
             if with_status is not None:
-                webcast.update(
-                    WebcastOnlineStatus(
-                        status=with_status["status"],
-                        stream_title=with_status["stream_title"],
-                        viewer_count=with_status["viewer_count"],
-                    )
-                )
+                patched_status: WebcastOnlineStatus = {}
+                if "status" in with_status:
+                    patched_status["status"] = with_status["status"]
+                if "stream_title" in with_status:
+                    patched_status["stream_title"] = with_status["stream_title"]
+                if "viewer_count" in with_status:
+                    patched_status["viewer_count"] = with_status["viewer_count"]
+                if "scheduled_start_time_utc" in with_status:
+                    patched_status["scheduled_start_time_utc"] = with_status[
+                        "scheduled_start_time_utc"
+                    ]
+
+                webcast.update(patched_status)
 
     @property
     def webcast_status(self) -> str:

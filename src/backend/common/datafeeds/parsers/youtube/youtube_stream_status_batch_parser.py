@@ -19,6 +19,7 @@ class _StreamDataSnippet(TypedDict):
 
 class _StreamDataLiveDetails(TypedDict):
     concurrentViewers: NotRequired[int]
+    scheduledStartTime: NotRequired[str]
 
 
 class _StreamDataResponseWithId(TypedDict):
@@ -85,7 +86,12 @@ class YoutubeStreamStatusBatchParser(ParserBase[Any, Dict[str, WebcastOnlineStat
         status_info["stream_title"] = snippet.get("title")
 
         live_details = stream_data.get("liveStreamingDetails")
-        if live_details and "concurrentViewers" in live_details:
-            status_info["viewer_count"] = int(live_details["concurrentViewers"])
+        if live_details:
+            if "concurrentViewers" in live_details:
+                status_info["viewer_count"] = int(live_details["concurrentViewers"])
+            if "scheduledStartTime" in live_details:
+                status_info["scheduled_start_time_utc"] = live_details[
+                    "scheduledStartTime"
+                ]
 
         return status_info

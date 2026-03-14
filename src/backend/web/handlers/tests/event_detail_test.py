@@ -2,9 +2,21 @@ import json
 
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.webcast_status import WebcastStatus
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
+from backend.common.models.alliance import MatchAlliance
+from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.match import Match
+from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
 
 
@@ -52,6 +64,52 @@ def test_render_full_regional(web_client: Client, setup_full_event) -> None:
 
     alliances_table = soup.find(id="event-alliances")
     assert len(alliances_table.find_all("tr")) > 1
+
+
+@freeze_time("2020-03-02")
+def test_render_event_offline_webcast_has_scheduled_start_tooltip(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+
+    Match(
+        id="2020nyny_qm1",
+        year=2020,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2020nyny"),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(
+                    teams=["frc1", "frc2", "frc3"], score=-1
+                ),
+                AllianceColor.BLUE: MatchAlliance(
+                    teams=["frc4", "frc5", "frc6"], score=-1
+                ),
+            }
+        ),
+    ).put()
+
+    webcast_status = Webcast(
+        type=WebcastType.TWITCH,
+        channel="firstinspires",
+        status=WebcastStatus.OFFLINE,
+        stream_title="Upcoming Stream",
+        viewer_count=None,
+        scheduled_start_time_utc="2020-03-02T18:00:00Z",
+    )
+    WebcastOnlineStatusMemcache(webcast_status).put(webcast_status)
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    offline_button = soup.select_one(".panel-heading a.tba-webcast-offline-tooltip")
+    assert offline_button is not None
+    assert offline_button.get("data-scheduled-start-utc") == "2020-03-02T18:00:00Z"
+    assert offline_button.get("title") == "scheduled to start at"
+    assert "tooltip" in offline_button.get("rel", [])
 
 
 def test_render_full_regional_round_robin(web_client: Client, setup_full_event) -> None:
