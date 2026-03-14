@@ -315,3 +315,18 @@ def test_update_date_button_shown_for_youtube(
         btn for btn in soup.find_all("button") if "Update Date" in btn.get_text()
     ]
     assert len(update_date_buttons) == 1
+
+
+def test_refresh_online_status_button_uses_force_param(
+    web_client: Client, login_gae_admin, setup_full_event
+) -> None:
+    setup_full_event("2019nyny")
+
+    resp = web_client.get("/admin/event/2019nyny")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    refresh_link = soup.find(
+        "a", href="/tasks/do/update_webcast_online_status/2019nyny?force=1"
+    )
+    assert refresh_link is not None

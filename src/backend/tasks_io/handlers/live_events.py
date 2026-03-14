@@ -415,7 +415,10 @@ def update_event_webcast_status(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    WebcastOnlineHelper.add_online_status(event.webcast)
+    force_str = request.args.get("force", "").lower()
+    force = force_str in {"1", "true", "yes", "on"}
+
+    WebcastOnlineHelper.add_online_status(event.webcast, force=force)
     return make_response(f"Updated event webcasts: {event.webcast}")
 
 
