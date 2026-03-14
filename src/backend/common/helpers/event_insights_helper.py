@@ -89,37 +89,36 @@ class EventInsightsHelper:
         def determine_auto_winner(red, blue) -> Optional[AllianceColor]:
             # Compare total auto points
             if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
-                return 'red'
+                return "red"
             if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
-                return 'blue'
-            
-            # Auto tied: compare shift 1 
+                return "blue"
+
+            # Auto tied: compare shift 1
             if red.get("hubScore").get("shift1Count") > 0:
-                return 'blue'
+                return "blue"
             if blue.get("hubScore").get("shift1Count") > 0:
-                return 'red'
-            
-            # No scoring in shift 1: compare shift 2 
+                return "red"
+
+            # No scoring in shift 1: compare shift 2
             if red.get("hubScore").get("shift2Count") > 0:
-                return 'red'
+                return "red"
             if blue.get("hubScore").get("shift2Count") > 0:
-                return 'blue'
-            
+                return "blue"
+
             # No scoring in shift 2: compare shift 3
             if red.get("hubScore").get("shift3Count") > 0:
-                return 'blue'
+                return "blue"
             if blue.get("hubScore").get("shift3Count") > 0:
-                return 'red'
-            
-            # No scoring in shift 3: compare shift 4 
+                return "red"
+
+            # No scoring in shift 3: compare shift 4
             if red.get("hubScore").get("shift4Count") > 0:
-                return 'red'
+                return "red"
             if blue.get("hubScore").get("shift4Count") > 0:
-                return 'blue'
-            
+                return "blue"
+
             # Fully tied
             return None
-            
 
         for match in matches:
             if not match.has_been_played:
@@ -172,34 +171,37 @@ class EventInsightsHelper:
                 six_rp_count += 1
                 if red_all_rp and blue_all_rp:
                     nine_rp_count += 1
-            
 
             auto_winner = determine_auto_winner(red_sb, blue_sb)
-            
+
             if (auto_winner is None) or (red_score == blue_score):
                 undefined_auto_conversion_matches += 1
-            elif (auto_winner == 'red') and (red_score > blue_score):
+            elif (auto_winner == "red") and (red_score > blue_score):
                 auto_win_conversion += 1
-            elif (auto_winner == 'blue') and (blue_score > red_score):
+            elif (auto_winner == "blue") and (blue_score > red_score):
                 auto_win_conversion += 1
-            
-            if (red_sb.get("autoTowerRobot1") != "None" or
-                red_sb.get("autoTowerRobot1") != "None" or
-                red_sb.get("autoTowerRobot1") != "None"):
+
+            if (
+                red_sb.get("autoTowerRobot1") != "None"
+                or red_sb.get("autoTowerRobot1") != "None"
+                or red_sb.get("autoTowerRobot1") != "None"
+            ):
                 auto_climb_count += 1
-            if (blue_sb.get("autoTowerRobot1") != "None" or
-                blue_sb.get("autoTowerRobot1") != "None" or
-                blue_sb.get("autoTowerRobot1") != "None"):
+            if (
+                blue_sb.get("autoTowerRobot1") != "None"
+                or blue_sb.get("autoTowerRobot1") != "None"
+                or blue_sb.get("autoTowerRobot1") != "None"
+            ):
                 auto_climb_count += 1
-            
+
             auto_fuel_scored += red_sb.get("hubScore").get("autoCount")
             auto_fuel_scored += blue_sb.get("hubScore").get("autoCount")
-            
+
             teleop_fuel_scored += red_sb.get("hubScore").get("teleopCount")
             teleop_fuel_scored += blue_sb.get("hubScore").get("teleopCount")
 
             total_fuel_scored = auto_fuel_scored + teleop_fuel_scored
-            
+
             for i in range(3):
                 tower_level = red_sb.get("endGameTowerRobot{}".format(i + 1))
                 if tower_level == "Level1":
@@ -208,7 +210,7 @@ class EventInsightsHelper:
                     endgame_climb_count[1] += 1
                 if tower_level == "Level3":
                     endgame_climb_count[2] += 1
-            
+
             for i in range(3):
                 tower_level = blue_sb.get("endGameTowerRobot{}".format(i + 1))
                 if tower_level == "Level1":
@@ -254,43 +256,48 @@ class EventInsightsHelper:
             "auto_win_conversion": [
                 auto_win_conversion,
                 finished_matches - undefined_auto_conversion_matches,
-                0 if (finished_matches - undefined_auto_conversion_matches) == 0 else 
-                    100.0 * auto_win_conversion / (finished_matches - undefined_auto_conversion_matches), 
+                (
+                    0
+                    if (finished_matches - undefined_auto_conversion_matches) == 0
+                    else 100.0
+                    * auto_win_conversion
+                    / (finished_matches - undefined_auto_conversion_matches)
+                ),
             ],
             "auto_fuel_scored": [
                 auto_fuel_scored,
                 auto_fuel_scored / (finished_matches * 2),
                 auto_fuel_scored / (finished_matches * 6),
-            ], 
+            ],
             "teleop_fuel_scored": [
                 teleop_fuel_scored,
                 teleop_fuel_scored / (finished_matches * 2),
                 teleop_fuel_scored / (finished_matches * 6),
-            ], 
+            ],
             "total_fuel_scored": [
                 total_fuel_scored,
                 total_fuel_scored / (finished_matches * 2),
                 total_fuel_scored / (finished_matches * 6),
-            ], 
+            ],
             "auto_climb_count": [
                 auto_climb_count,
                 finished_matches * 2,
-                100.0 * auto_climb_count / (finished_matches * 2), 
+                100.0 * auto_climb_count / (finished_matches * 2),
             ],
             "level1_climb_count": [
                 endgame_climb_count[0],
                 finished_matches * 6,
-                100.0 * endgame_climb_count[0] / (finished_matches * 6), 
+                100.0 * endgame_climb_count[0] / (finished_matches * 6),
             ],
             "level2_climb_count": [
                 endgame_climb_count[1],
                 finished_matches * 6,
-                100.0 * endgame_climb_count[1] / (finished_matches * 6), 
+                100.0 * endgame_climb_count[1] / (finished_matches * 6),
             ],
             "level3_climb_count": [
                 endgame_climb_count[2],
                 finished_matches * 6,
-                100.0 * endgame_climb_count[2] / (finished_matches * 6), 
+                100.0 * endgame_climb_count[2] / (finished_matches * 6),
             ],
             "average_score": total_scores / (finished_matches * 2),
             "average_win_margin": total_win_margins / finished_matches,
