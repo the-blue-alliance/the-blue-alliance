@@ -1,7 +1,9 @@
+import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import { Event, Match } from '~/api/tba/read';
+import { getMatchZebraOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
 import { ScoreBreakdown2015 } from '~/components/tba/match/scoreBreakdown2015';
 import ScoreBreakdown2016 from '~/components/tba/match/scoreBreakdown2016';
@@ -14,6 +16,7 @@ import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
 import ScoreBreakdown2026 from '~/components/tba/match/scoreBreakdown2026';
+import ZebraMotionWorks from '~/components/tba/match/zebraMotionWorks';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
@@ -94,6 +97,10 @@ export default function MatchDetails({
   event: Event;
 }) {
   const [showUserTimezone, setShowUserTimezone] = useState(false);
+
+  const { data: zebraData } = useQuery(
+    getMatchZebraOptions({ path: { match_key: match.key } }),
+  );
 
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const eventTimezone = event.timezone ?? 'UTC';
@@ -259,6 +266,7 @@ export default function MatchDetails({
               )}
             </div>
           </div>
+          {zebraData && <ZebraMotionWorks zebra={zebraData} />}
         </div>
       </div>
       <div className="order-1 flex w-full flex-col gap-2 md:order-2 md:w-xl">
