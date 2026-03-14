@@ -1,5 +1,6 @@
 import datetime
 import json
+from typing import Optional
 from unittest import mock
 
 import pytz
@@ -39,6 +40,7 @@ from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast, WebcastChannel
+from backend.tasks_io.handlers.live_events import _stream_matches_event
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
 
 
@@ -824,6 +826,7 @@ def test_find_event_webcasts_successful_match(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event - Qualifications",
+                description="",
                 scheduled_start_time="",
             )
         ]
@@ -888,11 +891,13 @@ def test_find_event_webcasts_multiple_streams_for_event(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event - Qualifications",
+                description="",
                 scheduled_start_time="",
             ),
             YouTubeUpcomingStream(
                 stream_id="def456",
                 title="Troy District Event - Playoffs",
+                description="",
                 scheduled_start_time="",
             ),
         ]
@@ -970,6 +975,7 @@ def test_find_event_webcasts_multiple_youtube_channels(
                 YouTubeUpcomingStream(
                     stream_id="stream_ch1",
                     title="Troy District Event - Qualifications",
+                    description="",
                     scheduled_start_time="",
                 )
             ]
@@ -979,6 +985,7 @@ def test_find_event_webcasts_multiple_youtube_channels(
                 YouTubeUpcomingStream(
                     stream_id="stream_ch2",
                     title="Lakeview District Event - Qualifications",
+                    description="",
                     scheduled_start_time="",
                 )
             ]
@@ -1059,6 +1066,7 @@ def test_find_event_webcasts_multiple_event_match_skipped(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="2026 FIM Troy and Troy Albany District Events",  # Contains both "Troy" and "Troy Albany"
+                description="",
                 scheduled_start_time="",
             )
         ]
@@ -1114,6 +1122,7 @@ def test_find_event_webcasts_no_matching_events(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Unrelated Stream Title",
+                description="",
                 scheduled_start_time="",
             )
         ]
@@ -1166,6 +1175,7 @@ def test_find_event_webcasts_no_output_in_taskqueue(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event - Qualifications",
+                description="",
                 scheduled_start_time="",
             )
         ]
@@ -1224,6 +1234,7 @@ def test_find_event_webcasts_no_start_time_skipped(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event",
+                description="",
                 scheduled_start_time="",
             )
         ]
@@ -1281,6 +1292,7 @@ def test_find_event_webcasts_no_live_events(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event",
+                description="",
                 scheduled_start_time="",
             )
         ]
@@ -1334,6 +1346,7 @@ def test_find_event_webcasts_future_event_without_webcasts(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event",
+                description="",
                 scheduled_start_time="",
             )
         ]
@@ -1352,3 +1365,176 @@ def test_find_event_webcasts_future_event_without_webcasts(
     assert added_webcast["type"] == WebcastType.YOUTUBE
     assert added_webcast["channel"] == "abc123"
     assert added_webcast["date"] == "2026-03-25"
+
+
+def _make_event(
+    key: str = "2026fim1",
+    event_short: str = "fim1",
+    short_name: Optional[str] = "Troy",
+) -> Event:
+    year = int(key[:4])
+    return Event(
+        id=key,
+        year=year,
+        event_short=event_short,
+        short_name=short_name,
+        event_type_enum=EventType.DISTRICT,
+    )
+
+
+def _make_stream(
+    title: str = "",
+    description: str = "",
+) -> YouTubeUpcomingStream:
+    return YouTubeUpcomingStream(
+        stream_id="abc123",
+        title=title,
+        description=description,
+        scheduled_start_time="",
+    )
+
+
+def test_stream_matches_event_title_contains_short_name() -> None:
+    event = _make_event(short_name="Troy")
+    stream = _make_stream(title="Troy District Event - Qualifications")
+    assert _stream_matches_event(stream, event) is True
+
+
+def test_stream_matches_event_description_contains_short_name() -> None:
+    event = _make_event(short_name="Troy")
+    stream = _make_stream(title="FIRST in Michigan Stream", description="Troy District")
+    assert _stream_matches_event(stream, event) is True
+
+
+def test_stream_matches_event_description_contains_upper_event_code() -> None:
+    event = _make_event(event_short="fim1", short_name=None)
+    stream = _make_stream(title="FIRST in Michigan Stream", description="FIM1 District")
+    assert _stream_matches_event(stream, event) is True
+
+
+def test_stream_matches_event_no_match() -> None:
+    event = _make_event(event_short="fim1", short_name="Troy")
+    stream = _make_stream(title="Unrelated Stream", description="Something else")
+    assert _stream_matches_event(stream, event) is False
+
+
+def test_stream_matches_event_no_short_name_no_match() -> None:
+    event = _make_event(event_short="fim1", short_name=None)
+    stream = _make_stream(title="Troy District Event", description="")
+    assert _stream_matches_event(stream, event) is False
+
+
+def test_stream_matches_event_lower_event_code_not_matched() -> None:
+    """Upper-cased event code must match; lower case in description should not match."""
+    event = _make_event(event_short="fim1", short_name=None)
+    stream = _make_stream(title="", description="fim1 district event")
+    # "fim1".upper() == "FIM1" which is NOT in "fim1 district event"
+    assert _stream_matches_event(stream, event) is False
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_match_by_description_short_name(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    """A stream that does not mention the event in its title but does in its description should still match."""
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    ).put()
+
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    get_streams_mock.return_value = InstantFuture(
+        [
+            YouTubeUpcomingStream(
+                stream_id="abc123",
+                title="FIRST in Michigan FRC District Event",
+                description="Troy District Event - Qualifications",
+                scheduled_start_time="",
+            )
+        ]
+    )
+    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
+    assert resp.status_code == 200
+    assert b"2026fim1: abc123 (2026-03-15)" in resp.data
+    add_webcast_mock.assert_called_once()
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_match_by_description_event_code(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    """A stream whose description contains the upper-cased event code should match."""
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    ).put()
+
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    get_streams_mock.return_value = InstantFuture(
+        [
+            YouTubeUpcomingStream(
+                stream_id="abc123",
+                title="FIRST in Michigan FRC District Event",
+                description="FIM1 District Event Livestream",
+                scheduled_start_time="",
+            )
+        ]
+    )
+    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
+    assert resp.status_code == 200
+    assert b"2026fim1: abc123 (2026-03-15)" in resp.data
+    add_webcast_mock.assert_called_once()
+    call_args = add_webcast_mock.call_args
+    assert call_args[0][0].key_name == "2026fim1"
