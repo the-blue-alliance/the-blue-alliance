@@ -1360,7 +1360,10 @@ def test_find_event_webcasts_future_event_without_webcasts(
     add_webcast_mock.assert_called_once()
     call_args = add_webcast_mock.call_args
     assert call_args[0][0].key_name == "2026fim1"
-
+    added_webcast = call_args[0][1]
+    assert added_webcast["type"] == WebcastType.YOUTUBE
+    assert added_webcast["channel"] == "abc123"
+    assert added_webcast["date"] == "2026-03-25"
 
 def _make_event(
     key: str = "2026fim1",
@@ -1531,3 +1534,7 @@ def test_find_event_webcasts_match_by_description_event_code(
     assert resp.status_code == 200
     assert b"2026fim1: abc123 (2026-03-15)" in resp.data
     add_webcast_mock.assert_called_once()
+    added_webcast = call_args[0][1]
+    assert added_webcast["type"] == WebcastType.YOUTUBE
+    assert added_webcast["channel"] == "abc123"
+    assert added_webcast["date"] == "2026-03-25"
