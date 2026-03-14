@@ -27,6 +27,7 @@ class YouTubeUpcomingStream(TypedDict):
     title: str
     description: str
     scheduled_start_time: str
+    live_broadcast_content: str
 
 
 class YouTubeChannel(TypedDict):
@@ -314,6 +315,9 @@ class YouTubeVideoHelper(object):
                     {
                         "stream_id": video_id,
                         "title": item.get("title", ""),
+                        "live_broadcast_content": item.get(
+                            "live_broadcast_content", ""
+                        ),
                         "description": item.get("description", ""),
                     }
                 )
@@ -349,6 +353,9 @@ class YouTubeVideoHelper(object):
                             title=stream["title"],
                             description=stream["description"],
                             scheduled_start_time=scheduled_times.get(stream_id, ""),
+                            live_broadcast_content=stream.get(
+                                "live_broadcast_content", ""
+                            ),
                         )
                     )
             except Exception:

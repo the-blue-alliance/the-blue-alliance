@@ -828,6 +828,7 @@ def test_find_event_webcasts_successful_match(
                 title="Troy District Event - Qualifications",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -893,12 +894,14 @@ def test_find_event_webcasts_multiple_streams_for_event(
                 title="Troy District Event - Qualifications",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             ),
             YouTubeUpcomingStream(
                 stream_id="def456",
                 title="Troy District Event - Playoffs",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             ),
         ]
     )
@@ -977,6 +980,7 @@ def test_find_event_webcasts_multiple_youtube_channels(
                     title="Troy District Event - Qualifications",
                     description="",
                     scheduled_start_time="",
+                    live_broadcast_content="",
                 )
             ]
         ),
@@ -987,6 +991,7 @@ def test_find_event_webcasts_multiple_youtube_channels(
                     title="Lakeview District Event - Qualifications",
                     description="",
                     scheduled_start_time="",
+                    live_broadcast_content="",
                 )
             ]
         ),
@@ -1068,6 +1073,7 @@ def test_find_event_webcasts_multiple_event_match_skipped(
                 title="2026 FIM Troy and Troy Albany District Events",  # Contains both "Troy" and "Troy Albany"
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1124,6 +1130,7 @@ def test_find_event_webcasts_no_matching_events(
                 title="Unrelated Stream Title",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1177,6 +1184,7 @@ def test_find_event_webcasts_no_output_in_taskqueue(
                 title="Troy District Event - Qualifications",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1236,6 +1244,7 @@ def test_find_event_webcasts_no_start_time_skipped(
                 title="Troy District Event",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1294,6 +1303,7 @@ def test_find_event_webcasts_no_live_events(
                 title="Troy District Event",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1348,6 +1358,7 @@ def test_find_event_webcasts_future_event_without_webcasts(
                 title="Troy District Event",
                 description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1391,6 +1402,7 @@ def _make_stream(
         title=title,
         description=description,
         scheduled_start_time="",
+        live_broadcast_content="",
     )
 
 
@@ -1474,6 +1486,7 @@ def test_find_event_webcasts_match_by_description_short_name(
                 title="FIRST in Michigan FRC District Event",
                 description="Troy District Event - Qualifications",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1527,6 +1540,7 @@ def test_find_event_webcasts_match_by_description_event_code(
                 title="FIRST in Michigan FRC District Event",
                 description="FIM1 District Event Livestream",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )

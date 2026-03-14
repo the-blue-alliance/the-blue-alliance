@@ -48,10 +48,10 @@ class YoutubeApiBase(DatafeedBase[Any, TReturn]):
     def endpoint(self) -> str: ...
 
     @abc.abstractmethod
-    def url_params(self) -> Dict[str, str]: ...
+    def url_params(self) -> Dict[str, Any]: ...
 
     def url(self) -> str:
-        params = urlencode(self.url_params(), safe=",")
+        params = urlencode(self.url_params(), doseq=True, safe=",")
         return f"{self.BASE_URL}/{self.endpoint()}?{params}"
 
     def headers(self) -> Dict[str, str]:
@@ -142,14 +142,14 @@ class YoutubeUpcomingStreamsDatafeed(YoutubeApiBase[List[ParsedSearchResult]]):
     def endpoint(self) -> str:
         return "search"
 
-    def url_params(self) -> Dict[str, str]:
-        params = {
+    def url_params(self) -> Dict[str, Any]:
+        params: Dict[str, Any] = {
             "part": "snippet",
             "type": "video",
             "maxResults": str(self.max_results),
             "order": self.order,
             "channelId": self.channel_id,
-            "eventType": "upcoming",
+            "eventType": ["upcoming", "live"],
         }
         if self.page_token:
             params["pageToken"] = self.page_token

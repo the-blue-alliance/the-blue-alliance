@@ -55,6 +55,7 @@ class ParsedSearchResult(TypedDict):
     video_id: NotRequired[str]
     playlist_id: NotRequired[str]
     description: NotRequired[str]
+    live_broadcast_content: NotRequired[str]  # "none", "upcoming", "live"
 
 
 class YoutubeSearchParser(ParserBase[Any, List[ParsedSearchResult]]):
@@ -118,5 +119,8 @@ class YoutubeSearchParser(ParserBase[Any, List[ParsedSearchResult]]):
 
         if description := snippet.get("description"):
             result["description"] = description
+
+        if live_broadcast_content := snippet.get("liveBroadcastContent"):
+            result["live_broadcast_content"] = live_broadcast_content
 
         return result
