@@ -69,6 +69,7 @@ from backend.common.models.notifications.requests.fcm_request import FCMRequest
 from backend.common.models.notifications.requests.webhook_request import (
     WebhookRequest,
 )
+from backend.common.models.notifications.teams_updated import EventTeamsNotification
 from backend.common.models.notifications.tests.mocks.notifications.mock_notification import (
     MockNotification,
 )
@@ -727,7 +728,7 @@ class TestTBANSHelper(unittest.TestCase):
         # Test send not called with no subscribed users
         with patch.object(TBANSHelper, "_send") as mock_send:
             TBANSHelper.event_teams(
-                self.event.key_name, added_teams=[], removed_teams=[]
+                self.event.key_name, added_teams=[self.team], removed_teams=[]
             )
             mock_send.assert_not_called()
 
@@ -742,13 +743,13 @@ class TestTBANSHelper(unittest.TestCase):
         Subscription(
             parent=ndb.Key(Account, "user_id_2"),
             user_id="user_id_2",
-            model_key="frc2539",
+            model_key=self.team.key_name,
             model_type=ModelType.TEAM,
             notification_types=[NotificationType.EVENT_TEAMS_UPDATED],
         ).put()
 
         TBANSHelper.event_teams(
-            self.event.key_name, added_teams=["frc2539"], removed_teams=[]
+            self.event.key_name, added_teams=[self.team], removed_teams=[]
         )
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 2
@@ -764,7 +765,7 @@ class TestTBANSHelper(unittest.TestCase):
             ] == ["user_id_1", "user_id_2"]
             notifications = [call[0][1] for call in mock_send.call_args_list]
             for notification in notifications:
-                assert isinstance(notification, FavoritesUpdatedNotification)
+                assert isinstance(notification, EventTeamsNotification)
                 assert notification.event.key_name == self.event.key_name
 
     def test_match_upcoming_sets_push_sent(self):
