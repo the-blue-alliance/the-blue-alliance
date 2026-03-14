@@ -51,7 +51,7 @@ jobs:
           echo "${{ github.event.pull_request.head.sha }}" > pr-sha.txt
 
       - name: Upload PR metadata
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pwa-preview-metadata
           path: |
@@ -63,7 +63,7 @@ jobs:
         run: rm -rf pwa/node_modules
 
       - name: Upload build artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: pwa-preview-build
           path: pwa/
