@@ -156,7 +156,7 @@
                 <tr>
                     <td>{{ channel.type }}</td>
                     <td>{{ channel.channel }}</td>
-                    <td>{{ channel.channel_id }}</td>
+                    <td><a href="https://www.youtube.com/channel/{{ channel.channel_id }}" target="_blank" rel="noopener noreferrer">{{ channel.channel_id }}</a></td>
                     <td>
                         <form action="/admin/district/{{district.key_name}}/webcasts/remove" method="post" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>

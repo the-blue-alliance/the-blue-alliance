@@ -95,6 +95,8 @@ def test_district_details_webcasts_tab_shows_configured_channels(
     assert b"Webcasts" in resp.data
     assert b"NE FIRST" in resp.data
     assert b"UC123" in resp.data
+    assert b'href="https://www.youtube.com/channel/UC123"' in resp.data
+    assert b'target="_blank"' in resp.data
 
 
 def test_district_details_shows_fetch_upcoming_webcasts_button_when_configured(
