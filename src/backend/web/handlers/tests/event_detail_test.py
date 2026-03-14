@@ -36,6 +36,27 @@ def test_render_event(ndb_stub, web_client: Client) -> None:
     assert soup.find(id="event-name").string == "Test Event 2020"
 
 
+def test_render_2026_event_with_legacy_insight_data(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2026test")
+
+    legacy_2026_insights = {"backfill_pending": True}
+
+    EventDetails(
+        id="2026test",
+        insights={"qual": legacy_2026_insights, "playoff": {}},
+    ).put()
+
+    resp = web_client.get("/event/2026test")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert "Auto Win Conversion" in body
+    assert "Fuel Statistics" in body
+    assert "Tower Statistics" in body
+
+
 @freeze_time("2020-03-02")
 def test_render_short_cache(ndb_stub, web_client: Client) -> None:
     helpers.preseed_event("2020nyny")

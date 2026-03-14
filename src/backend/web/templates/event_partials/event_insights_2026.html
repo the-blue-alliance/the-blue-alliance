@@ -1,5 +1,23 @@
 <div class="row">
   <div class="col-xs-12">
+    {% set energized_rp_count = event_insights.get("energized_rp_count", [0, 0, 0]) %}
+    {% set supercharged_rp_count = event_insights.get("supercharged_rp_count", [0, 0, 0]) %}
+    {% set traversal_rp_count = event_insights.get("traversal_rp_count", [0, 0, 0]) %}
+    {% set six_rp_count = event_insights.get("six_rp_count", [0, 0, 0]) %}
+    {% set nine_rp_count = event_insights.get("nine_rp_count", [0, 0, 0]) %}
+    {% set auto_win_conversion = event_insights.get("auto_win_conversion", [0, 0, 0]) %}
+    {% set auto_fuel_scored = event_insights.get("auto_fuel_scored", [0, 0, 0]) %}
+    {% set teleop_fuel_scored = event_insights.get("teleop_fuel_scored", [0, 0, 0]) %}
+    {% set total_fuel_scored = event_insights.get("total_fuel_scored", [0, 0, 0]) %}
+    {% set auto_climb_count = event_insights.get("auto_climb_count", [0, 0, 0]) %}
+    {% set level1_climb_count = event_insights.get("level1_climb_count", [0, 0, 0]) %}
+    {% set level2_climb_count = event_insights.get("level2_climb_count", [0, 0, 0]) %}
+    {% set level3_climb_count = event_insights.get("level3_climb_count", [0, 0, 0]) %}
+    {% set high_score = event_insights.get("high_score", [0, "", "--"]) %}
+    {% set average_score = event_insights.get("average_score", 0.0) %}
+    {% set average_winning_score = event_insights.get("average_winning_score", 0.0) %}
+    {% set average_win_margin = event_insights.get("average_win_margin", 0.0) %}
+
     <h3>Bonus Objective Statistics</h3>
 
     <table class="table table-condensed table-striped text-right">
@@ -15,44 +33,44 @@
       <tbody>
         <tr>
           <td>Energized RP</td>
-          <td>{{event_insights.energized_rp_count[0]}}</td>
-          <td>{{event_insights.energized_rp_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.energized_rp_count[2])}}%</td>
+          <td>{{energized_rp_count[0]}}</td>
+          <td>{{energized_rp_count[1]}}</td>
+          <td>{{'%0.2f' | format(energized_rp_count[2])}}%</td>
         </tr>
 
         <tr>
           <td>Supercharged RP</td>
-          <td>{{event_insights.supercharged_rp_count[0]}}</td>
-          <td>{{event_insights.supercharged_rp_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.supercharged_rp_count[2])}}%</td>
+          <td>{{supercharged_rp_count[0]}}</td>
+          <td>{{supercharged_rp_count[1]}}</td>
+          <td>{{'%0.2f' | format(supercharged_rp_count[2])}}%</td>
         </tr>
 
         <tr>
           <td>Traversal RP</td>
-          <td>{{event_insights.traversal_rp_count[0]}}</td>
-          <td>{{event_insights.traversal_rp_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.traversal_rp_count[2])}}%</td>
+          <td>{{traversal_rp_count[0]}}</td>
+          <td>{{traversal_rp_count[1]}}</td>
+          <td>{{'%0.2f' | format(traversal_rp_count[2])}}%</td>
         </tr>
 
         <tr>
           <td>6 RP</td>
-          <td>{{event_insights.six_rp_count[0]}}</td>
-          <td>{{event_insights.six_rp_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.six_rp_count[2])}}%</td>
+          <td>{{six_rp_count[0]}}</td>
+          <td>{{six_rp_count[1]}}</td>
+          <td>{{'%0.2f' | format(six_rp_count[2])}}%</td>
         </tr>
 
         <tr>
           <td>9 RP</td>
-          <td>{{event_insights.nine_rp_count[0]}}</td>
-          <td>{{event_insights.nine_rp_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.nine_rp_count[2])}}%</td>
+          <td>{{nine_rp_count[0]}}</td>
+          <td>{{nine_rp_count[1]}}</td>
+          <td>{{'%0.2f' | format(nine_rp_count[2])}}%</td>
         </tr>
 
         <tr>
           <td><abbr title="Matches won by the alliance whose HUB was inactive in Shift 1">Auto Win Conversion</abbr></td>
-          <td>{{event_insights.auto_win_conversion[0]}}</td>
-          <td>{{event_insights.auto_win_conversion[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.auto_win_conversion[2])}}%</td>
+          <td>{{auto_win_conversion[0]}}</td>
+          <td>{{auto_win_conversion[1]}}</td>
+          <td>{{'%0.2f' | format(auto_win_conversion[2])}}%</td>
           </td>
         </tr>
       </tbody>
@@ -72,23 +90,23 @@
       <tbody>
         <tr>
           <td>Auto Fuel Scored</td>
-          <td>{{event_insights.auto_fuel_scored[0]}}</td>
-          <td>{{'%0.1f' | format(event_insights.auto_fuel_scored[1])}}</td>
-          <td>{{'%0.1f' | format(event_insights.auto_fuel_scored[2])}}</td>
+          <td>{{auto_fuel_scored[0]}}</td>
+          <td>{{'%0.1f' | format(auto_fuel_scored[1])}}</td>
+          <td>{{'%0.1f' | format(auto_fuel_scored[2])}}</td>
         </tr>
 
         <tr>
           <td>Teleop Fuel Scored</td>
-          <td>{{event_insights.teleop_fuel_scored[0]}}</td>
-          <td>{{'%0.1f' | format(event_insights.teleop_fuel_scored[1])}}</td>
-          <td>{{'%0.1f' | format(event_insights.teleop_fuel_scored[2])}}</td>
+          <td>{{teleop_fuel_scored[0]}}</td>
+          <td>{{'%0.1f' | format(teleop_fuel_scored[1])}}</td>
+          <td>{{'%0.1f' | format(teleop_fuel_scored[2])}}</td>
         </tr>
 
         <tr>
           <td>Total Fuel Scored</td>
-          <td>{{event_insights.total_fuel_scored[0]}}</td>
-          <td>{{'%0.1f' | format(event_insights.total_fuel_scored[1])}}</td>
-          <td>{{'%0.1f' | format(event_insights.total_fuel_scored[2])}}</td>
+          <td>{{total_fuel_scored[0]}}</td>
+          <td>{{'%0.1f' | format(total_fuel_scored[1])}}</td>
+          <td>{{'%0.1f' | format(total_fuel_scored[2])}}</td>
         </tr>
       </tbody>
     </table>
@@ -107,28 +125,28 @@
 
         <tr>
           <td>Auto Climb</td>
-          <td>{{event_insights.auto_climb_count[0]}}</td>
-          <td>{{event_insights.auto_climb_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.auto_climb_count[2])}}%</td>
+          <td>{{auto_climb_count[0]}}</td>
+          <td>{{auto_climb_count[1]}}</td>
+          <td>{{'%0.2f' | format(auto_climb_count[2])}}%</td>
         </tr>
 
         <tr>
           <td>Level 1 Climb</td>
-          <td>{{event_insights.level1_climb_count[0]}}</td>
-          <td>{{event_insights.level1_climb_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.level1_climb_count[2])}}%</td>
+          <td>{{level1_climb_count[0]}}</td>
+          <td>{{level1_climb_count[1]}}</td>
+          <td>{{'%0.2f' | format(level1_climb_count[2])}}%</td>
 
         <tr>
           <td>Level 2 Climb</td>
-          <td>{{event_insights.level2_climb_count[0]}}</td>
-          <td>{{event_insights.level2_climb_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.level2_climb_count[2])}}%</td>
+          <td>{{level2_climb_count[0]}}</td>
+          <td>{{level2_climb_count[1]}}</td>
+          <td>{{'%0.2f' | format(level2_climb_count[2])}}%</td>
 
         <tr>
           <td><abbr title="May be higher due to G420 violations">Level 3 Climb</abbr></td>
-          <td>{{event_insights.level3_climb_count[0]}}</td>
-          <td>{{event_insights.level3_climb_count[1]}}</td>
-          <td>{{'%0.2f' | format(event_insights.level3_climb_count[2])}}%</td>
+          <td>{{level3_climb_count[0]}}</td>
+          <td>{{level3_climb_count[1]}}</td>
+          <td>{{'%0.2f' | format(level3_climb_count[2])}}%</td>
         </tr>
       </tbody>
     </table>
@@ -140,28 +158,28 @@
           <tr>
             <td>High Score</td>
             <td>
-              {{event_insights.high_score[0]}} in
-              <a href="/match/{{event_insights.high_score[1]}}"
-                >{{event_insights.high_score[2]}}</a
+              {{high_score[0]}} in
+              <a href="/match/{{high_score[1]}}"
+                >{{high_score[2]}}</a
               >
             </td>
           </tr>
           <tr>
             <td>Average Match Score</td>
-            <td>{{'%0.2f' | format(event_insights.average_score|float)}}</td>
+            <td>{{'%0.2f' | format(average_score|float)}}</td>
           </tr>
 
           <tr>
             <td>Average Winning Score</td>
             <td>
-              {{'%0.2f' | format(event_insights.average_winning_score|float)}}
+              {{'%0.2f' | format(average_winning_score|float)}}
             </td>
           </tr>
 
           <tr>
             <td>Average Win Margin</td>
             <td>
-              {{'%0.2f' | format(event_insights.average_win_margin|float)}}
+              {{'%0.2f' | format(average_win_margin|float)}}
             </td>
           </tr>
         </tbody>
