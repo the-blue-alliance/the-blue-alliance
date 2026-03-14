@@ -445,7 +445,8 @@ def find_event_webcasts(district_key: DistrictKey) -> Response:
     future_events_without_webcasts = [
         event
         for event in district_events
-        if event.within_a_day and not event.current_webcasts
+        if (event.within_a_day and not event.current_webcasts)
+        or (event.future and len(event.webcast) == 0)
     ]
     event_to_streams: Dict[str, List] = {}
     for stream in upcoming_streams:
