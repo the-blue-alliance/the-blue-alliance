@@ -5,7 +5,7 @@ import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 import MaterialSymbolsTrophy from '~icons/material-symbols/trophy';
 
-import { LeaderboardInsight } from '~/api/tba/read';
+import { type LeaderboardInsight } from '~/api/tba/read';
 import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
@@ -36,10 +36,12 @@ const MAX_KEYS_PER_ROW = 20;
 const PRE_EXPANDED_ROWS = 10;
 
 export function Leaderboard({
+  subtitle,
   leaderboard,
   contextTooltipMap,
   year,
 }: {
+  subtitle?: string;
   leaderboard: LeaderboardInsight;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
@@ -70,9 +72,11 @@ export function Leaderboard({
               <CardTitle className="text-lg leading-tight font-semibold">
                 {displayName}
               </CardTitle>
-              <CardDescription className="mt-0.5 text-sm">
-                {leaderboard.year > 0 ? leaderboard.year : 'Overall'}
-              </CardDescription>
+              {subtitle && (
+                <CardDescription className="mt-0.5 text-sm">
+                  {subtitle}
+                </CardDescription>
+              )}
             </div>
           </div>
           <Button
