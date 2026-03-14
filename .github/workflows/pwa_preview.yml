@@ -22,7 +22,7 @@ jobs:
 
     steps:
       - name: Download PR metadata
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: pwa-preview-metadata
           run-id: ${{ github.event.workflow_run.id }}
@@ -35,7 +35,7 @@ jobs:
           echo "sha=$(cat pr-sha.txt)" >> $GITHUB_OUTPUT
 
       - name: Download build artifact
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v8
         with:
           name: pwa-preview-build
           run-id: ${{ github.event.workflow_run.id }}
