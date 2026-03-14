@@ -21,7 +21,10 @@ from backend.common.helpers.match_time_prediction_helper import (
 )
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
-from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
+from backend.common.helpers.youtube_video_helper import (
+    YouTubeUpcomingStream,
+    YouTubeVideoHelper,
+)
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -416,6 +419,28 @@ def update_event_webcast_status(event_key: EventKey) -> Response:
     return make_response(f"Updated event webcasts: {event.webcast}")
 
 
+def _stream_matches_event(stream: YouTubeUpcomingStream, event: Event) -> bool:
+    """Returns True if the given stream matches the given event.
+
+    A stream is considered a match if the event's short name appears in the
+    stream title or description, or if the upper-cased event code appears in
+    the stream description.
+    """
+    title = stream["title"]
+    description = stream["description"]
+
+    if event.short_name:
+        if event.short_name in title:
+            return True
+        if event.short_name in description:
+            return True
+
+    if event.event_short and event.event_short.upper() in description:
+        return True
+
+    return False
+
+
 @blueprint.route("/tasks/do/find_event_webcasts/<district_key>")
 def find_event_webcasts(district_key: DistrictKey) -> Response:
     district = District.get_by_id(district_key)
@@ -452,7 +477,7 @@ def find_event_webcasts(district_key: DistrictKey) -> Response:
         matched_events = [
             e
             for e in future_events_without_webcasts
-            if e.short_name and e.short_name in stream["title"]
+            if _stream_matches_event(stream, e)
         ]
         if len(matched_events) == 0:
             logging.info(f"Did not find an event match for stream {stream}")

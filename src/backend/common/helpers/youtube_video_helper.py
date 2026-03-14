@@ -25,6 +25,7 @@ class YouTubePlaylistItem(TypedDict):
 class YouTubeUpcomingStream(TypedDict):
     stream_id: str
     title: str
+    description: str
     scheduled_start_time: str
 
 
@@ -313,6 +314,7 @@ class YouTubeVideoHelper(object):
                     {
                         "stream_id": video_id,
                         "title": item.get("title", ""),
+                        "description": item.get("description", ""),
                     }
                 )
 
@@ -345,6 +347,7 @@ class YouTubeVideoHelper(object):
                         YouTubeUpcomingStream(
                             stream_id=stream_id,
                             title=stream["title"],
+                            description=stream["description"],
                             scheduled_start_time=scheduled_times.get(stream_id, ""),
                         )
                     )
