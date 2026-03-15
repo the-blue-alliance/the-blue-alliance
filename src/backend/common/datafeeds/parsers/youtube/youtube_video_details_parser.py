@@ -4,6 +4,7 @@ Follows YouTube Data API v3 schema:
 https://developers.google.com/youtube/v3/docs/videos/list
 """
 
+from datetime import datetime
 from typing import Any, cast, Dict, List, NotRequired, Optional, TypedDict
 
 from backend.common.datafeeds.parsers.parser_base import ParserBase
@@ -53,6 +54,19 @@ class ParsedVideoDetails(TypedDict):
     concurrent_viewers: NotRequired[Optional[int]]
 
 
+def _parse_timestamp(timestamp: str) -> Optional[str]:
+    """Parse an ISO 8601 timestamp and return it formatted as YYYY-MM-DD.
+
+    Handles the Z (UTC) suffix and timezone offsets.
+    Returns None if the timestamp cannot be parsed.
+    """
+    try:
+        dt = datetime.fromisoformat(timestamp.replace("Z", "+00:00"))
+        return dt.strftime("%Y-%m-%d")
+    except (ValueError, AttributeError):
+        return None
+
+
 def _parse_video_item(item: _VideoItem) -> Optional[ParsedVideoDetails]:
     """Parse a single video API item into ParsedVideoDetails, or None if invalid."""
     video_id = item.get("id", "")
@@ -69,11 +83,11 @@ def _parse_video_item(item: _VideoItem) -> Optional[ParsedVideoDetails]:
     if live_details:
         scheduled_start = live_details.get("scheduledStartTime")
         if scheduled_start:
-            result["scheduled_start_time"] = scheduled_start[:10]
+            result["scheduled_start_time"] = _parse_timestamp(scheduled_start)
 
         actual_start = live_details.get("actualStartTime")
         if actual_start:
-            result["actual_start_time"] = actual_start[:10]
+            result["actual_start_time"] = _parse_timestamp(actual_start)
 
         viewers_str = live_details.get("concurrentViewers")
         if viewers_str:
