@@ -487,6 +487,57 @@ def test_cleanup_youtube_webcasts_no_date_unchanged(
     assert "date" not in youtube_webcasts[0]
 
 
+def test_cleanup_youtube_webcasts_removes_duplicates(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        webcast_json=json.dumps(
+            [
+                {"type": "youtube", "channel": "abc123defgh", "date": "2020-01-01"},
+                {"type": "youtube", "channel": "abc123defgh", "date": "2020-02-01"},
+                {"type": "twitch", "channel": "firstinspires"},
+            ]
+        ),
+    ).put()
+
+    with patch(
+        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_video_details_batch"
+    ) as mock_batch:
+        mock_future = ndb.Future()
+        mock_future.set_result(
+            {
+                "abc123defgh": {
+                    "video_id": "abc123defgh",
+                    "title": "",
+                    "scheduled_start_time": "2020-03-01",
+                }
+            }
+        )
+        mock_batch.return_value = mock_future
+
+        resp = web_client.post(
+            "/admin/event/cleanup_youtube_webcasts/2020nyny",
+            data={"csrf_token": "test"},
+        )
+
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    webcasts = event.webcast
+    youtube_webcasts = [w for w in webcasts if w["type"] == "youtube"]
+    assert len(youtube_webcasts) == 1
+    assert youtube_webcasts[0]["date"] == "2020-03-01"
+    twitch_webcasts = [w for w in webcasts if w["type"] == "twitch"]
+    assert len(twitch_webcasts) == 1
+
+
 def test_cleanup_youtube_webcasts_button_shown(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:
