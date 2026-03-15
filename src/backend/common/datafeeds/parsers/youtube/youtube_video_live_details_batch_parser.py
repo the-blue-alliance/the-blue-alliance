@@ -4,22 +4,12 @@ Follows YouTube Data API v3 schema:
 https://developers.google.com/youtube/v3/docs/videos/list
 """
 
-from typing import Any, cast, Dict, List, NotRequired, Optional, TypedDict
+from typing import Any, cast, Dict, List, Optional
 
 from backend.common.datafeeds.parsers.parser_base import ParserBase
-
-
-class _VideoLiveDetails(TypedDict):
-    scheduledStartTime: NotRequired[str]
-
-
-class _VideoLiveDetailsItem(TypedDict):
-    id: str
-    liveStreamingDetails: NotRequired[_VideoLiveDetails]
-
-
-class _VideosLiveDetailsResponse(TypedDict):
-    items: List[_VideoLiveDetailsItem]
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    VideosListResponse,
+)
 
 
 class YoutubeVideoLiveDetailsBatchParser(ParserBase[Any, Dict[str, Optional[str]]]):
@@ -28,7 +18,7 @@ class YoutubeVideoLiveDetailsBatchParser(ParserBase[Any, Dict[str, Optional[str]
         self.video_ids = video_ids
 
     def parse(self, response: Any) -> Dict[str, Optional[str]]:
-        response_data = cast(_VideosLiveDetailsResponse, response)
+        response_data = cast(VideosListResponse, response)
 
         # Initialize all video IDs as None (not found in YouTube API)
         result: Dict[str, Optional[str]] = {

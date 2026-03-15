@@ -9,7 +9,7 @@ from typing import Any, cast, List, NotRequired, Optional, TypedDict
 from backend.common.datafeeds.parsers.parser_base import ParserBase
 
 
-class _VideoSnippet(TypedDict):
+class VideoSnippet(TypedDict):
     """Video snippet information."""
 
     title: str
@@ -19,7 +19,7 @@ class _VideoSnippet(TypedDict):
     publishedAt: NotRequired[str]
 
 
-class _LiveStreamingDetails(TypedDict):
+class LiveStreamingDetails(TypedDict):
     """Live streaming details for a video."""
 
     actualStartTime: NotRequired[str]
@@ -28,18 +28,18 @@ class _LiveStreamingDetails(TypedDict):
     concurrentViewers: NotRequired[str]
 
 
-class _VideoItem(TypedDict):
+class VideoItem(TypedDict):
     """A single item from the videos list response."""
 
     id: str
-    snippet: NotRequired[_VideoSnippet]
-    liveStreamingDetails: NotRequired[_LiveStreamingDetails]
+    snippet: NotRequired[VideoSnippet]
+    liveStreamingDetails: NotRequired[LiveStreamingDetails]
 
 
-class _VideosListResponse(TypedDict):
+class VideosListResponse(TypedDict):
     """Response from videos.list API call."""
 
-    items: List[_VideoItem]
+    items: List[VideoItem]
     nextPageToken: NotRequired[str]
 
 
@@ -62,7 +62,7 @@ class YoutubeVideoDetailsParser(ParserBase[Any, Optional[ParsedVideoDetails]]):
     """
 
     def parse(self, response: Any) -> Optional[ParsedVideoDetails]:
-        response_data = cast(_VideosListResponse, response)
+        response_data = cast(VideosListResponse, response)
 
         items = response_data.get("items", [])
         if not items:
