@@ -7,6 +7,7 @@ from werkzeug.wrappers import Response
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.helpers.match_suggestion_accepter import MatchSuggestionAccepter
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.suggestion import Suggestion
@@ -55,8 +56,21 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBase[Match]):
         ]
         events = [event_future.get_result() for event_future in event_futures]
 
+        uses_official_webcast_unit_list = []
+        for event in events:
+            uses_official_webcast_unit = False
+            if event and event.event_district_key:
+                district = District.get_by_id(event.event_district_key)
+                if district:
+                    uses_official_webcast_unit = bool(
+                        district.uses_official_webcast_unit
+                    )
+            uses_official_webcast_unit_list.append(uses_official_webcast_unit)
+
         template_values = {
-            "suggestions_and_events": list(zip(suggestions, events)),
+            "suggestions_and_events": list(
+                zip(suggestions, events, uses_official_webcast_unit_list)
+            ),
         }
 
         return render_template(

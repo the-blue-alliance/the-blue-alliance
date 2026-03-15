@@ -51,6 +51,7 @@
       <li><a href="#advancement" data-toggle="tab">Advancement</a></li>
             <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
       <li><a href="#adjustments" data-toggle="tab">HQ Adjustments</a></li>
+      <li><a href="#api" data-toggle="tab">API</a></li>
     </ul>
   </div>
 </div>
@@ -200,6 +201,13 @@
                 </tr>
             {% endfor %}
         </table>
+    </div>
+    <div class="tab-pane" id="api">
+        <h2>Write API Keys</h2>
+        <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
+
+        <p>Currently Issued Keys</p>
+        {% include "admin/partials/api_write_table.html" %}
     </div>
 </div>
 

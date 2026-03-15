@@ -6,6 +6,7 @@ from backend.api.handlers.eventwizard_internal import (
     add_fms_companion_db,
     add_fms_report_archive,
     get_cloudrun_job_status,
+    get_playlist_videos,
 )
 
 # Eventwizard Internal API
@@ -29,6 +30,12 @@ eventwizard_api.add_url_rule(
     "/event/<string:event_key>/fms_companion_db",
     methods=["POST"],
     view_func=add_fms_companion_db,
+)
+
+eventwizard_api.add_url_rule(
+    "/_playlist/<string:event_key>/<string:playlist_id>",
+    methods=["POST"],
+    view_func=get_playlist_videos,
 )
 
 eventwizard_api.add_url_rule(

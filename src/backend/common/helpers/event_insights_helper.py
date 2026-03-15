@@ -89,33 +89,33 @@ class EventInsightsHelper:
         def determine_auto_winner(red, blue) -> Optional[AllianceColor]:
             # Compare total auto points
             if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
-                return "red"
+                return AllianceColor.RED
             if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
-                return "blue"
+                return AllianceColor.BLUE
 
             # Auto tied: compare shift 1
             if red.get("hubScore").get("shift1Count") > 0:
-                return "blue"
+                return AllianceColor.BLUE
             if blue.get("hubScore").get("shift1Count") > 0:
-                return "red"
+                return AllianceColor.RED
 
             # No scoring in shift 1: compare shift 2
             if red.get("hubScore").get("shift2Count") > 0:
-                return "red"
+                return AllianceColor.RED
             if blue.get("hubScore").get("shift2Count") > 0:
-                return "blue"
+                return AllianceColor.BLUE
 
             # No scoring in shift 2: compare shift 3
             if red.get("hubScore").get("shift3Count") > 0:
-                return "blue"
+                return AllianceColor.BLUE
             if blue.get("hubScore").get("shift3Count") > 0:
-                return "red"
+                return AllianceColor.RED
 
             # No scoring in shift 3: compare shift 4
             if red.get("hubScore").get("shift4Count") > 0:
-                return "red"
+                return AllianceColor.RED
             if blue.get("hubScore").get("shift4Count") > 0:
-                return "blue"
+                return AllianceColor.BLUE
 
             # Fully tied
             return None
@@ -176,9 +176,9 @@ class EventInsightsHelper:
 
             if (auto_winner is None) or (red_score == blue_score):
                 undefined_auto_conversion_matches += 1
-            elif (auto_winner == "red") and (red_score > blue_score):
+            elif (auto_winner == AllianceColor.RED) and (red_score > blue_score):
                 auto_win_conversion += 1
-            elif (auto_winner == "blue") and (blue_score > red_score):
+            elif (auto_winner == AllianceColor.BLUE) and (blue_score > red_score):
                 auto_win_conversion += 1
 
             if (

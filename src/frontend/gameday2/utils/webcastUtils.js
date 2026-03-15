@@ -11,4 +11,5 @@ export const webcastPropType = PropTypes.shape({
   name: PropTypes.string.isRequired,
   type: PropTypes.string.isRequired,
   channel: PropTypes.string.isRequired,
+  scheduledStartTimeUtc: PropTypes.string,
 });

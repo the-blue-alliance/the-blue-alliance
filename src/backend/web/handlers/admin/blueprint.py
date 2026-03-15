@@ -45,6 +45,7 @@ from backend.web.handlers.admin.districts import (
 )
 from backend.web.handlers.admin.event import (
     event_add_webcast_post,
+    event_cleanup_youtube_webcasts_post,
     event_create,
     event_delete,
     event_delete_matches,
@@ -296,6 +297,11 @@ admin_routes.add_url_rule(
     methods=["POST"],
 )
 admin_routes.add_url_rule(
+    "/event/cleanup_youtube_webcasts/<event_key>",
+    view_func=event_cleanup_youtube_webcasts_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
     "/event/delete_matches/<event_key>/<comp_level>/<to_delete>",
     view_func=event_delete_matches,
     methods=["GET"],
@@ -368,17 +374,17 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule("/media", view_func=media_dashboard)
 admin_routes.add_url_rule("/media/add_media", methods=["POST"], view_func=media_add)
 admin_routes.add_url_rule(
-    "/media/delete_reference/<media_key_name>",
+    "/media/delete_reference/<path:media_key_name>",
     methods=["POST"],
     view_func=media_delete_reference,
 )
 admin_routes.add_url_rule(
-    "/media/make_preferred/<media_key_name>",
+    "/media/make_preferred/<path:media_key_name>",
     methods=["POST"],
     view_func=media_make_preferred,
 )
 admin_routes.add_url_rule(
-    "/media/remove_preferred/<media_key_name>",
+    "/media/remove_preferred/<path:media_key_name>",
     methods=["POST"],
     view_func=media_remove_preferred,
 )

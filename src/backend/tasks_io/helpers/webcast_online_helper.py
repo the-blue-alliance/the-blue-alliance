@@ -18,12 +18,14 @@ from backend.tasks_io.datafeeds.datafeed_twitch import (
 class WebcastOnlineHelper:
     @classmethod
     @typed_toplevel
-    def add_online_status(cls, webcasts: List[Webcast]) -> Generator[Any, Any, None]:
+    def add_online_status(
+        cls, webcasts: List[Webcast], force: bool = False
+    ) -> Generator[Any, Any, None]:
         """Public API for updating webcast online status.
 
         Uses optimized batch processing internally to minimize API quota usage.
         """
-        yield cls.add_online_status_batch_async(webcasts)
+        yield cls.add_online_status_batch_async(webcasts, force=force)
 
     @classmethod
     @typed_tasklet
@@ -75,12 +77,14 @@ class WebcastOnlineHelper:
     @classmethod
     @typed_tasklet
     def add_online_status_batch_async(
-        cls, webcasts: List[Webcast]
+        cls, webcasts: List[Webcast], force: bool = False
     ) -> Generator[Any, Any, None]:
         """Process webcasts with optimized batching for YouTube.
 
         Separates YouTube and non-YouTube webcasts, batches YouTube requests
         into a single API call, and processes other types individually.
+
+        If force=True, cached statuses are ignored and fresh statuses are fetched.
         """
         if not webcasts:
             return
@@ -95,10 +99,10 @@ class WebcastOnlineHelper:
         cache_futures = [
             WebcastOnlineStatusMemcache(webcast).get_async() for webcast in webcasts
         ]
-        cached_results: List[Optional[Webcast]] = yield cache_futures
+        cached_results = yield cache_futures
 
         for webcast, cached_webcast in zip(webcasts, cached_results):
-            if cached_webcast is not None:
+            if cached_webcast is not None and not force:
                 # Apply cached status
                 if "status" in cached_webcast:
                     webcast["status"] = cached_webcast.get(
@@ -108,11 +112,16 @@ class WebcastOnlineHelper:
                     webcast["stream_title"] = cached_webcast.get("stream_title")
                 if "viewer_count" in cached_webcast:
                     webcast["viewer_count"] = cached_webcast.get("viewer_count")
+                if "scheduled_start_time_utc" in cached_webcast:
+                    webcast["scheduled_start_time_utc"] = cached_webcast.get(
+                        "scheduled_start_time_utc"
+                    )
             else:
                 # Not cached - need to fetch
                 webcast["status"] = WebcastStatus.UNKNOWN
                 webcast["stream_title"] = None
                 webcast["viewer_count"] = None
+                webcast["scheduled_start_time_utc"] = None
                 webcasts_to_cache.append(webcast)
 
                 if webcast["type"] == WebcastType.YOUTUBE:

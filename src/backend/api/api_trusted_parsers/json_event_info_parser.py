@@ -10,6 +10,7 @@ from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.datafeed_parsers.exceptions import ParserInputException
 from backend.common.helpers.webcast_helper import WebcastParser
+from backend.common.models.event import Event
 from backend.common.models.keys import TeamKey
 from backend.common.models.webcast import Webcast
 
@@ -41,8 +42,10 @@ class EventInfoParsed(TypedDict, total=False):
 
 
 class JSONEventInfoParser:
-    @staticmethod
-    def _parse_webcast(webcast: _WebcastUrlDict) -> Webcast:
+    def __init__(self, event: Event) -> None:
+        self._event = event
+
+    def _parse_webcast(self, webcast: _WebcastUrlDict) -> Webcast:
         if url := webcast.get("url"):
             parsed_webcast = WebcastParser.webcast_dict_from_url(url).get_result()
             if not parsed_webcast:
@@ -56,23 +59,39 @@ class JSONEventInfoParser:
 
         if date := webcast.get("date"):
             try:
-                datetime.strptime(date, "%Y-%m-%d")
+                parsed_date = datetime.strptime(date, "%Y-%m-%d")
             except ValueError as e:
                 raise ParserInputException(f"Invalid webcast date: {date!r}: {e}")
             parsed_webcast["date"] = date
 
+            if self._event.start_date and self._event.end_date:
+                webcast_date = parsed_date.date()
+                if not (
+                    self._event.start_date.date()
+                    <= webcast_date
+                    <= self._event.end_date.date()
+                ):
+                    raise ParserInputException(
+                        f"Webcast date {date!r} is not within the event's date range "
+                        f"({self._event.start_date.date()} to {self._event.end_date.date()})"
+                    )
+
+        if parsed_webcast.get("type") == WebcastType.YOUTUBE and not parsed_webcast.get(
+            "date"
+        ):
+            raise ParserInputException(
+                "YouTube webcasts must have the 'date' field set"
+            )
+
         return parsed_webcast
 
-    @staticmethod
-    def parse[T: (str, bytes)](info_json: T) -> EventInfoParsed:
+    def parse[T: (str, bytes)](self, info_json: T) -> EventInfoParsed:
         # pyre validation doesn't support non-total TypedDict
         info_dict = safe_json.loads(info_json, EventInfoInput, validate=False)
 
         parsed_info: EventInfoParsed = {}
         if webcasts := info_dict.get("webcasts"):
-            parsed_info["webcasts"] = [
-                JSONEventInfoParser._parse_webcast(w) for w in webcasts
-            ]
+            parsed_info["webcasts"] = [self._parse_webcast(w) for w in webcasts]
 
         if remap_teams := info_dict.get("remap_teams"):
             for temp_team, remapped_team in remap_teams.items():
