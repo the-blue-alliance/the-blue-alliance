@@ -1332,6 +1332,48 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         self.assertEqual(status, "success")
         mock_add_webcast.assert_not_called()
 
+    def test_youtube_webcast_auto_approve_skips_duplicate(self) -> None:
+        """Auto-approve skips add_webcast if webcast with same type/channel/date already exists."""
+        event = self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        # Pre-populate the event with the same webcast
+        import json as _json
+
+        event.webcast_json = _json.dumps(
+            [{"type": "youtube", "channel": "abc123", "date": "2016-03-15"}]
+        )
+        event.put()
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCfirstinmichigan",
+            title="Troy District Event - Qualifications",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        # Still returns SUCCESS but does not call add_webcast for the duplicate
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+
 
 class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):
     def setUp(self) -> None:

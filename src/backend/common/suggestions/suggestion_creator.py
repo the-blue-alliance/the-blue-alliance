@@ -279,9 +279,16 @@ class SuggestionCreator:
                             webcast = Webcast(
                                 type=WebcastType.YOUTUBE,
                                 channel=webcast_dict["channel"],
+                                date=api_date,
                             )
-                            webcast["date"] = api_date
-                            EventWebcastAdder.add_webcast(event, webcast)
+                            already_exists = any(
+                                w.get("type") == WebcastType.YOUTUBE
+                                and w.get("channel") == webcast_dict["channel"]
+                                and w.get("date") == api_date
+                                for w in event.webcast
+                            )
+                            if not already_exists:
+                                EventWebcastAdder.add_webcast(event, webcast)
                             raise ndb.Return(SuggestionCreationStatus.SUCCESS)
 
             suggestion_id = Suggestion.render_webcast_key_name(event_key, webcast_dict)
