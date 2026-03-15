@@ -42,6 +42,9 @@ class SuggestionDict(TypedDict, total=False):
     webcast_dict: Webcast
     webcast_url: str
     webcast_date: Optional[str]
+    stream_title: Optional[str]
+    stream_description: Optional[str]
+    stream_scheduled_start_time: Optional[str]
 
     # For match videos
     youtube_videos: List[str]

@@ -211,8 +211,10 @@ class SuggestionCreator:
             youtube_video_details = None
             if webcast_dict["type"] == WebcastType.YOUTUBE:
                 try:
-                    video_details_batch = yield YouTubeVideoHelper.get_video_details_batch(
-                        [webcast_dict["channel"]]
+                    video_details_batch = (
+                        yield YouTubeVideoHelper.get_video_details_batch(
+                            [webcast_dict["channel"]]
+                        )
                     )
                     youtube_video_details = video_details_batch.get(
                         webcast_dict["channel"]
@@ -249,7 +251,10 @@ class SuggestionCreator:
 
                 if district_youtube_channel_ids:
                     video_channel_id = youtube_video_details.get("channel_id")
-                    if video_channel_id and video_channel_id in district_youtube_channel_ids:
+                    if (
+                        video_channel_id
+                        and video_channel_id in district_youtube_channel_ids
+                    ):
                         # Validate the YouTube API's scheduled start date against the
                         # event's date range. Only auto-approve when the date is within
                         # range AND the stream title/description matches the event.
@@ -279,9 +284,7 @@ class SuggestionCreator:
                             EventWebcastAdder.add_webcast(event, webcast)
                             raise ndb.Return(SuggestionCreationStatus.SUCCESS)
 
-            suggestion_id = Suggestion.render_webcast_key_name(
-                event_key, webcast_dict
-            )
+            suggestion_id = Suggestion.render_webcast_key_name(event_key, webcast_dict)
             suggestion = Suggestion.get_by_id(suggestion_id)
             # Check if suggestion exists
             if (
@@ -298,17 +301,21 @@ class SuggestionCreator:
                     "webcast_dict": webcast_dict,
                     "webcast_url": clean_url,
                     "webcast_date": clean_date,
-                    "stream_title": youtube_video_details.get("title", "")
-                    if youtube_video_details
-                    else None,
-                    "stream_description": youtube_video_details.get("description")
-                    if youtube_video_details
-                    else None,
-                    "stream_scheduled_start_time": youtube_video_details.get(
-                        "scheduled_start_time"
-                    )
-                    if youtube_video_details
-                    else None,
+                    "stream_title": (
+                        youtube_video_details.get("title", "")
+                        if youtube_video_details
+                        else None
+                    ),
+                    "stream_description": (
+                        youtube_video_details.get("description")
+                        if youtube_video_details
+                        else None
+                    ),
+                    "stream_scheduled_start_time": (
+                        youtube_video_details.get("scheduled_start_time")
+                        if youtube_video_details
+                        else None
+                    ),
                 }
                 suggestion.put()
                 raise ndb.Return(SuggestionCreationStatus.SUCCESS)

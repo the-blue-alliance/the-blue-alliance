@@ -1331,6 +1331,9 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
 
         self.assertEqual(status, "success")
         mock_add_webcast.assert_not_called()
+
+
+class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):
     def setUp(self) -> None:
         super().setUp()
         event = Event(
