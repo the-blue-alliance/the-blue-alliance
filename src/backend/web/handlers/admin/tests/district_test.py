@@ -5,12 +5,14 @@ from freezegun import freeze_time
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.common.consts.auth_type import AuthType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.futures import InstantFuture
 from backend.common.helpers.youtube_video_helper import (
     YouTubeChannel,
     YouTubeVideoHelper,
 )
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.webcast import WebcastChannel
@@ -367,3 +369,77 @@ def test_delete_district_bad_key(
 ) -> None:
     resp = web_client.post("/admin/district/delete/2020ne")
     assert resp.status_code == 404
+
+
+def test_district_details_api_tab_shows_no_keys_when_none(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="#api") is not None
+
+
+def test_district_details_api_tab_shows_issued_keys(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        description="Test Key",
+        secret="test_secret",
+        auth_types_enum=[AuthType.EVENT_INFO],
+        district_list=[ndb.Key(District, "2020ne")],
+    ).put()
+
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="#api") is not None
+    assert b"test_auth_key" in resp.data
+    assert b"Test Key" in resp.data
+
+
+def test_district_details_api_tab_only_shows_keys_for_district(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    helpers.preseed_district("2020ne")
+    helpers.preseed_district("2020fim")
+
+    ApiAuthAccess(
+        id="ne_key",
+        description="NE Key",
+        secret="ne_secret",
+        auth_types_enum=[AuthType.EVENT_INFO],
+        district_list=[ndb.Key(District, "2020ne")],
+    ).put()
+    ApiAuthAccess(
+        id="fim_key",
+        description="FIM Key",
+        secret="fim_secret",
+        auth_types_enum=[AuthType.EVENT_INFO],
+        district_list=[ndb.Key(District, "2020fim")],
+    ).put()
+
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+
+    assert b"ne_key" in resp.data
+    assert b"fim_key" not in resp.data
+
+
+def test_district_details_api_tab_has_issue_key_link(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_district("2020ne")
+
+    resp = web_client.get("/admin/district/2020ne")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="/admin/api_auth/add") is not None
