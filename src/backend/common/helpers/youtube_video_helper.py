@@ -154,6 +154,44 @@ class YouTubeVideoHelper(object):
 
     @classmethod
     @typed_tasklet
+    def get_video_details_batch(
+        cls, video_ids: List[str]
+    ) -> Generator[Any, Any, Dict[str, Optional[str]]]:
+        """
+        Fetches live streaming details for multiple YouTube video IDs in a single request.
+        Returns a dict mapping video_id to:
+        - None if the video doesn't exist in YouTube (invalid/deleted)
+        - "" if the video exists but has no scheduled start time
+        - "YYYY-MM-DD" if the video exists with a scheduled start time
+        """
+        empty: Dict[str, Optional[str]] = {v: None for v in video_ids}
+        if not video_ids:
+            raise ndb.Return(empty)
+        try:
+            datafeed = YoutubeVideoLiveDetailsBatchDatafeed(video_ids)
+            response = yield datafeed._fetch()
+
+            if response.status_code != 200:
+                raise ndb.Return(empty)
+
+            raw_data = cast(Optional[dict], response.json())
+            if not raw_data:
+                raise ndb.Return(empty)
+
+            raise ndb.Return(datafeed.parser().parse(raw_data))
+        except ValueError:
+            logging.warning(
+                "No Google API secret, unable to fetch YouTube video details"
+            )
+            raise ndb.Return(empty)
+        except ndb.Return:
+            raise
+        except Exception:
+            logging.exception("Failed to fetch YouTube video details batch")
+            raise ndb.Return(empty)
+
+    @classmethod
+    @typed_tasklet
     def resolve_channel_id(
         cls, channel_username: str
     ) -> Generator[Any, Any, Optional[YouTubeChannel]]:
@@ -352,7 +390,7 @@ class YouTubeVideoHelper(object):
                             stream_id=stream_id,
                             title=stream["title"],
                             description=stream["description"],
-                            scheduled_start_time=scheduled_times.get(stream_id, ""),
+                            scheduled_start_time=scheduled_times.get(stream_id) or "",
                             live_broadcast_content=stream.get(
                                 "live_broadcast_content", ""
                             ),

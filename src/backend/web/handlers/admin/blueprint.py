@@ -45,6 +45,7 @@ from backend.web.handlers.admin.districts import (
 )
 from backend.web.handlers.admin.event import (
     event_add_webcast_post,
+    event_cleanup_youtube_webcasts_post,
     event_create,
     event_delete,
     event_delete_matches,
@@ -293,6 +294,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/update_webcast_date/<event_key>",
     view_func=event_update_webcast_date_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/cleanup_youtube_webcasts/<event_key>",
+    view_func=event_cleanup_youtube_webcasts_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(

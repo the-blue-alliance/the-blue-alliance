@@ -66,6 +66,6 @@ class TestYoutubeVideoLiveDetailsBatchParser:
 
         result = parser.parse(response)
 
-        assert result["video1"] == "2026-03-15T18:00:00Z"
-        assert result["video2"] == "2026-03-16T19:00:00Z"
-        assert result["video3"] == ""
+        assert result["video1"] == "2026-03-15"
+        assert result["video2"] == "2026-03-16"
+        assert result["video3"] is None

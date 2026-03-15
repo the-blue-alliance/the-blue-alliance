@@ -280,7 +280,7 @@ class YoutubePlaylistItemsDatafeed(YoutubeApiBase[List[ParsedPlaylistItem]]):
         return YoutubePlaylistItemsParser()
 
 
-class YoutubeVideoLiveDetailsBatchDatafeed(YoutubeApiBase[Dict[str, str]]):
+class YoutubeVideoLiveDetailsBatchDatafeed(YoutubeApiBase[Dict[str, Optional[str]]]):
     def __init__(self, video_ids: List[str]) -> None:
         super().__init__()
         self.video_ids = video_ids
