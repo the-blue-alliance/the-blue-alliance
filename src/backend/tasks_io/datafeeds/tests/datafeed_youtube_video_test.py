@@ -40,6 +40,8 @@ class TestYoutubeVideoDetailsParser:
         details = result["video_123"]
         assert details["video_id"] == "video_123"
         assert details["title"] == "Test Video Title"
+        assert details["channel_id"] == "channel_456"
+        assert details["description"] == "Test description"
         assert details["scheduled_start_time"] == "2024-03-08"
         assert details["actual_start_time"] == "2024-03-08"
         assert details["concurrent_viewers"] == 1234

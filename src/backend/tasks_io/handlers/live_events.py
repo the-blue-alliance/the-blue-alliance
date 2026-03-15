@@ -47,6 +47,9 @@ from backend.common.models.webcast import Webcast
 from backend.common.queries.event_query import DistrictEventsQuery
 from backend.common.queries.match_query import EventMatchesQuery
 from backend.common.sitevars.apistatus_down_events import ApiStatusDownEvents
+from backend.common.helpers.webcast_event_matching import (
+    stream_matches_event as _stream_matches_event_helper,
+)
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
 from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
@@ -425,23 +428,9 @@ def update_event_webcast_status(event_key: EventKey) -> Response:
 def _stream_matches_event(stream: YouTubeUpcomingStream, event: Event) -> bool:
     """Returns True if the given stream matches the given event.
 
-    A stream is considered a match if the event's short name appears in the
-    stream title or description, or if the upper-cased event code appears in
-    the stream description.
+    Delegates to the shared helper in webcast_event_matching.
     """
-    title = stream["title"]
-    description = stream["description"]
-
-    if event.short_name:
-        if event.short_name in title:
-            return True
-        if event.short_name in description:
-            return True
-
-    if event.event_short and event.event_short.upper() in description:
-        return True
-
-    return False
+    return _stream_matches_event_helper(stream["title"], stream["description"], event)
 
 
 @blueprint.route("/tasks/do/find_event_webcasts/<district_key>")
