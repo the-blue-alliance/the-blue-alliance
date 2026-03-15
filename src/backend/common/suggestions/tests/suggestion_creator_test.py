@@ -1135,6 +1135,45 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         webcast_arg = mock_add_webcast.call_args[0][1]
         self.assertEqual(webcast_arg.get("date"), "2016-03-15")
 
+    def test_youtube_webcast_no_auto_approve_date_outside_event_range(self) -> None:
+        """No auto-approval when stream's scheduled date is outside the event's date range."""
+        self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        # Scheduled start time is far outside the event's 2016-03-14 to 2016-03-16 range
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCfirstinmichigan",
+            title="Troy District Event - Qualifications",
+            scheduled_start_time="2016-05-01T18:00:00Z",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        # Should fall through to normal suggestion (not auto-approved)
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
     def test_youtube_webcast_no_auto_approve_different_channel(self) -> None:
         """No auto-approval when video channel does not match the district channel."""
         self._make_district_event_with_youtube_channel(

@@ -250,30 +250,32 @@ class SuggestionCreator:
                 if district_youtube_channel_ids:
                     video_channel_id = youtube_video_details.get("channel_id")
                     if video_channel_id and video_channel_id in district_youtube_channel_ids:
-                        if WebcastParser.stream_matches_event(youtube_video_details, event):
+                        # Validate the YouTube API's scheduled start date against the
+                        # event's date range. Only auto-approve when the date is within
+                        # range AND the stream title/description matches the event.
+                        api_date = youtube_video_details.get("scheduled_start_time")
+                        api_date_in_range = False
+                        if api_date and event.start_date and event.end_date:
+                            try:
+                                api_date_obj = datetime.strptime(
+                                    api_date, "%Y-%m-%d"
+                                ).date()
+                                api_date_in_range = (
+                                    event.start_date.date()
+                                    <= api_date_obj
+                                    <= event.end_date.date()
+                                )
+                            except ValueError:
+                                pass
+
+                        if api_date_in_range and WebcastParser.stream_matches_event(
+                            youtube_video_details, event
+                        ):
                             webcast = Webcast(
                                 type=WebcastType.YOUTUBE,
                                 channel=webcast_dict["channel"],
                             )
-                            # Always use the YouTube API's scheduled start date, validated
-                            # against event dates
-                            api_date = youtube_video_details.get("scheduled_start_time")
-                            if api_date:
-                                use_api_date = True
-                                if event.start_date and event.end_date:
-                                    try:
-                                        api_date_obj = datetime.strptime(
-                                            api_date, "%Y-%m-%d"
-                                        ).date()
-                                        use_api_date = (
-                                            event.start_date.date()
-                                            <= api_date_obj
-                                            <= event.end_date.date()
-                                        )
-                                    except ValueError:
-                                        use_api_date = False
-                                if use_api_date:
-                                    webcast["date"] = api_date
+                            webcast["date"] = api_date
                             EventWebcastAdder.add_webcast(event, webcast)
                             raise ndb.Return(SuggestionCreationStatus.SUCCESS)
 
