@@ -47,9 +47,10 @@ from backend.common.models.webcast import Webcast
 from backend.common.queries.event_query import DistrictEventsQuery
 from backend.common.queries.match_query import EventMatchesQuery
 from backend.common.sitevars.apistatus_down_events import ApiStatusDownEvents
-from backend.common.helpers.webcast_event_matching import (
-    stream_matches_event as _stream_matches_event_helper,
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    ParsedVideoDetails,
 )
+from backend.common.helpers.webcast_helper import WebcastParser
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
 from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
@@ -425,12 +426,6 @@ def update_event_webcast_status(event_key: EventKey) -> Response:
     return make_response(f"Updated event webcasts: {event.webcast}")
 
 
-def _stream_matches_event(stream: YouTubeUpcomingStream, event: Event) -> bool:
-    """Returns True if the given stream matches the given event.
-
-    Delegates to the shared helper in webcast_event_matching.
-    """
-    return _stream_matches_event_helper(stream["title"], stream["description"], event)
 
 
 @blueprint.route("/tasks/do/find_event_webcasts/<district_key>")
@@ -470,7 +465,14 @@ def find_event_webcasts(district_key: DistrictKey) -> Response:
         matched_events = [
             e
             for e in future_events_without_webcasts
-            if _stream_matches_event(stream, e)
+            if WebcastParser.stream_matches_event(
+                ParsedVideoDetails(
+                    video_id=stream["stream_id"],
+                    title=stream["title"],
+                    description=stream["description"],
+                ),
+                e,
+            )
         ]
         if len(matched_events) == 0:
             logging.info(f"Did not find an event match for stream {stream}")

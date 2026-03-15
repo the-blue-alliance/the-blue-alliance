@@ -12,7 +12,6 @@ from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
-from backend.common.helpers.webcast_event_matching import stream_matches_event
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -251,17 +250,32 @@ class SuggestionCreator:
                 if district_youtube_channel_ids:
                     video_channel_id = youtube_video_details.get("channel_id")
                     if video_channel_id and video_channel_id in district_youtube_channel_ids:
-                        title = youtube_video_details.get("title", "")
-                        description = youtube_video_details.get("description", "")
-                        if stream_matches_event(title, description, event):
+                        if WebcastParser.stream_matches_event(youtube_video_details, event):
                             webcast = Webcast(
                                 type=WebcastType.YOUTUBE,
                                 channel=webcast_dict["channel"],
                             )
-                            if clean_date:
-                                webcast["date"] = clean_date
+                            # Always use the YouTube API's scheduled start date, validated
+                            # against event dates
+                            api_date = youtube_video_details.get("scheduled_start_time")
+                            if api_date:
+                                use_api_date = True
+                                if event.start_date and event.end_date:
+                                    try:
+                                        api_date_obj = datetime.strptime(
+                                            api_date, "%Y-%m-%d"
+                                        ).date()
+                                        use_api_date = (
+                                            event.start_date.date()
+                                            <= api_date_obj
+                                            <= event.end_date.date()
+                                        )
+                                    except ValueError:
+                                        use_api_date = False
+                                if use_api_date:
+                                    webcast["date"] = api_date
                             EventWebcastAdder.add_webcast(event, webcast)
-                            raise ndb.Return(SuggestionCreationStatus.WEBCAST_EXISTS)
+                            raise ndb.Return(SuggestionCreationStatus.SUCCESS)
 
             suggestion_id = Suggestion.render_webcast_key_name(
                 event_key, webcast_dict
@@ -282,6 +296,17 @@ class SuggestionCreator:
                     "webcast_dict": webcast_dict,
                     "webcast_url": clean_url,
                     "webcast_date": clean_date,
+                    "stream_title": youtube_video_details.get("title", "")
+                    if youtube_video_details
+                    else None,
+                    "stream_description": youtube_video_details.get("description")
+                    if youtube_video_details
+                    else None,
+                    "stream_scheduled_start_time": youtube_video_details.get(
+                        "scheduled_start_time"
+                    )
+                    if youtube_video_details
+                    else None,
                 }
                 suggestion.put()
                 raise ndb.Return(SuggestionCreationStatus.SUCCESS)

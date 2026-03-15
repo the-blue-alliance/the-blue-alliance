@@ -40,7 +40,10 @@ from backend.common.models.event_team_status import EventTeamStatus
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast, WebcastChannel
-from backend.tasks_io.handlers.live_events import _stream_matches_event
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    ParsedVideoDetails,
+)
+from backend.common.helpers.webcast_helper import WebcastParser
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
 from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
@@ -1448,31 +1451,46 @@ def _make_stream(
 def test_stream_matches_event_title_contains_short_name() -> None:
     event = _make_event(short_name="Troy")
     stream = _make_stream(title="Troy District Event - Qualifications")
-    assert _stream_matches_event(stream, event) is True
+    assert WebcastParser.stream_matches_event(
+        ParsedVideoDetails(video_id=stream["stream_id"], title=stream["title"], description=stream["description"]),
+        event,
+    ) is True
 
 
 def test_stream_matches_event_description_contains_short_name() -> None:
     event = _make_event(short_name="Troy")
     stream = _make_stream(title="FIRST in Michigan Stream", description="Troy District")
-    assert _stream_matches_event(stream, event) is True
+    assert WebcastParser.stream_matches_event(
+        ParsedVideoDetails(video_id=stream["stream_id"], title=stream["title"], description=stream["description"]),
+        event,
+    ) is True
 
 
 def test_stream_matches_event_description_contains_upper_event_code() -> None:
     event = _make_event(event_short="fim1", short_name=None)
     stream = _make_stream(title="FIRST in Michigan Stream", description="FIM1 District")
-    assert _stream_matches_event(stream, event) is True
+    assert WebcastParser.stream_matches_event(
+        ParsedVideoDetails(video_id=stream["stream_id"], title=stream["title"], description=stream["description"]),
+        event,
+    ) is True
 
 
 def test_stream_matches_event_no_match() -> None:
     event = _make_event(event_short="fim1", short_name="Troy")
     stream = _make_stream(title="Unrelated Stream", description="Something else")
-    assert _stream_matches_event(stream, event) is False
+    assert WebcastParser.stream_matches_event(
+        ParsedVideoDetails(video_id=stream["stream_id"], title=stream["title"], description=stream["description"]),
+        event,
+    ) is False
 
 
 def test_stream_matches_event_no_short_name_no_match() -> None:
     event = _make_event(event_short="fim1", short_name=None)
     stream = _make_stream(title="Troy District Event", description="")
-    assert _stream_matches_event(stream, event) is False
+    assert WebcastParser.stream_matches_event(
+        ParsedVideoDetails(video_id=stream["stream_id"], title=stream["title"], description=stream["description"]),
+        event,
+    ) is False
 
 
 def test_stream_matches_event_lower_event_code_not_matched() -> None:
@@ -1480,7 +1498,10 @@ def test_stream_matches_event_lower_event_code_not_matched() -> None:
     event = _make_event(event_short="fim1", short_name=None)
     stream = _make_stream(title="", description="fim1 district event")
     # "fim1".upper() == "FIM1" which is NOT in "fim1 district event"
-    assert _stream_matches_event(stream, event) is False
+    assert WebcastParser.stream_matches_event(
+        ParsedVideoDetails(video_id=stream["stream_id"], title=stream["title"], description=stream["description"]),
+        event,
+    ) is False
 
 
 @freeze_time("2026-03-15")

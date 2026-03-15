@@ -669,7 +669,7 @@ class TestApiWriteSuggestionCreator(SuggestionCreatorTest):
 class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
     def test_bad_event(self) -> None:
         status = SuggestionCreator.createEventWebcastSuggestion(
-            self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
+            self.account.key, "http://twitch.tv/frcgamesense", "", "2016doesnotexist"
         ).get_result()
         self.assertEqual(status, "bad_event")
 
@@ -931,6 +931,11 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         suggestion = cast(Suggestion, suggestions[0])
         self.assertIsNotNone(suggestion.contents.get("webcast_dict"))
         self.assertEqual(suggestion.contents.get("webcast_date"), "2016-03-15")
+        self.assertEqual(suggestion.contents.get("stream_title"), "")
+        self.assertIsNone(suggestion.contents.get("stream_description"))
+        self.assertEqual(
+            suggestion.contents.get("stream_scheduled_start_time"), "2016-03-15"
+        )
 
     def test_youtube_webcast_no_autofill_when_date_provided(self) -> None:
         event = Event(
@@ -1002,6 +1007,8 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         event_short_name: str = "Troy",
     ) -> Event:
         """Helper to create a district and event with a configured YouTube channel."""
+        from datetime import datetime as _dt
+
         District(
             id="2016fim",
             year=2016,
@@ -1022,6 +1029,8 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
             year=2016,
             event_type_enum=EventType.DISTRICT,
             district_key=ndb.Key(District, "2016fim"),
+            start_date=_dt(2016, 3, 14),
+            end_date=_dt(2016, 3, 16),
         )
         event.put()
         return event
@@ -1080,14 +1089,17 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
                         "2016fim1",
                     ).get_result()
 
-        self.assertEqual(status, "webcast_exists")
+        self.assertEqual(status, "success")
         mock_add_webcast.assert_called_once()
+        # Verify the API date was used (event spans 2016-03-14 to 2016-03-16)
+        webcast_arg = mock_add_webcast.call_args[0][1]
+        self.assertEqual(webcast_arg.get("date"), "2016-03-15")
         # No pending suggestion should be created
         suggestions = Suggestion.query().fetch()
         self.assertEqual(len(suggestions), 0)
 
     def test_youtube_webcast_auto_approve_with_explicit_date(self) -> None:
-        """Auto-approve when channel matches, title matches, and a date is provided."""
+        """Auto-approve uses YouTube API date (not user-provided) when within event dates."""
         self._make_district_event_with_youtube_channel(
             channel_id="UCfirstinmichigan", event_short_name="Troy"
         )
@@ -1113,12 +1125,15 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
                     status = SuggestionCreator.createEventWebcastSuggestion(
                         self.account.key,
                         "https://www.youtube.com/watch?v=abc123",
-                        "2016-03-15",
+                        "2016-04-01",  # user-provided date overridden by API date
                         "2016fim1",
                     ).get_result()
 
-        self.assertEqual(status, "webcast_exists")
+        self.assertEqual(status, "success")
         mock_add_webcast.assert_called_once()
+        # Verify the webcast passed to add_webcast uses the API date "2016-03-15"
+        webcast_arg = mock_add_webcast.call_args[0][1]
+        self.assertEqual(webcast_arg.get("date"), "2016-03-15")
 
     def test_youtube_webcast_no_auto_approve_different_channel(self) -> None:
         """No auto-approval when video channel does not match the district channel."""
