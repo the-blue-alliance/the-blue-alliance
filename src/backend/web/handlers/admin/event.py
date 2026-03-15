@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Optional
+from typing import Optional, Set
 
 from flask import abort, redirect, request, url_for
 from google.appengine.api import taskqueue
@@ -594,6 +594,7 @@ def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
     video_details = YouTubeVideoHelper.get_video_details_batch(video_ids).get_result()
 
     changed = False
+    seen_video_ids: Set[str] = set()
     # Iterate in reverse so that removals by index don't shift later indices
     for i in range(len(webcasts) - 1, -1, -1):
         webcast = webcasts[i]
@@ -604,7 +605,12 @@ def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
             # Video doesn't exist in YouTube - remove the webcast
             webcasts.pop(i)
             changed = True
+        elif video_id in seen_video_ids:
+            # Duplicate stream ID - remove the webcast
+            webcasts.pop(i)
+            changed = True
         else:
+            seen_video_ids.add(video_id)
             details = video_details[video_id]
             date = details.get("scheduled_start_time")
             if date and webcast.get("date") != date:
