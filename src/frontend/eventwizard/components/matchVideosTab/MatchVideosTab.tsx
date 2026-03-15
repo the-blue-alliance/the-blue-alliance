@@ -35,9 +35,9 @@ export interface MatchVideosTabProps {
     path: string,
     body: string
   ) => Promise<Response>;
-  makeApiV3Request: <T = unknown>(
+  makeApiV3Request: (
     path: string
-  ) => Promise<T>;
+  ) => Promise<Response>;
 }
 
 const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
@@ -61,12 +61,19 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     setStatusMessage("Loading matches...");
 
     try {
-      const data = await makeApiV3Request<Match[]>(
+      const response = await makeApiV3Request(
         `/api/v3/event/${selectedEvent}/matches`
       );
+      const data = await response.json();
+
+      if (!Array.isArray(data)) {
+        throw new Error("Unexpected matches response format");
+      }
+
+      const matchesFromApi = data as Match[];
 
       // Sort matches by comp_level and match_number
-      const sortedMatches = data.sort((a, b) => {
+      const sortedMatches = [...matchesFromApi].sort((a, b) => {
         const compLevelDiff =
           COMP_LEVELS_PLAY_ORDER[a.comp_level] -
           COMP_LEVELS_PLAY_ORDER[b.comp_level];
@@ -83,10 +90,10 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
 
       setMatches(sortedMatches);
       setStatusMessage(`Loaded ${sortedMatches.length} matches`);
-      setLoading(false);
     } catch (error) {
       setStatusMessage(`Error loading matches: ${error}`);
       setMatches([]);
+    } finally {
       setLoading(false);
     }
   };

@@ -7,8 +7,14 @@ import MatchVideosTab from "../MatchVideosTab";
 
 describe("MatchVideosTab", () => {
   const mockMakeTrustedRequest = jest.fn();
-  const mockMakeApiV3Request = jest.fn<Promise<unknown>, [string]>();
+  const mockMakeApiV3Request = jest.fn<Promise<Response>, [string]>();
   const selectedEvent = "2024nytr";
+
+  const makeApiV3JsonResponse = (payload: unknown): Response =>
+    ({
+      ok: true,
+      json: async () => payload,
+    } as Response);
 
   beforeEach(() => {
     jest.clearAllMocks();
@@ -58,8 +64,8 @@ describe("MatchVideosTab", () => {
   });
 
   describe("Fetching Matches", () => {
-    it("calls makeApiV3Request when Fetch Matches is clicked", () => {
-      mockMakeApiV3Request.mockResolvedValue([]);
+    it("calls makeApiV3Request when Fetch Matches is clicked", async () => {
+      mockMakeApiV3Request.mockResolvedValue(makeApiV3JsonResponse([]));
       render(
         <MatchVideosTab
           selectedEvent={selectedEvent}
@@ -71,9 +77,11 @@ describe("MatchVideosTab", () => {
       const btn = screen.getByRole("button", { name: /Fetch Matches/i });
       fireEvent.click(btn);
 
-      expect(mockMakeApiV3Request).toHaveBeenCalledWith(
-        `/api/v3/event/${selectedEvent}/matches`
-      );
+      await waitFor(() => {
+        expect(mockMakeApiV3Request).toHaveBeenCalledWith(
+          `/api/v3/event/${selectedEvent}/matches`
+        );
+      });
     });
 
     it("displays matches after successful fetch", async () => {
@@ -102,7 +110,9 @@ describe("MatchVideosTab", () => {
         },
       ];
 
-      mockMakeApiV3Request.mockResolvedValue(mockMatches);
+      mockMakeApiV3Request.mockResolvedValue(
+        makeApiV3JsonResponse(mockMatches)
+      );
 
       render(
         <MatchVideosTab
@@ -124,6 +134,30 @@ describe("MatchVideosTab", () => {
       expect(screen.getByText("No videos")).toBeInTheDocument();
       expect(screen.getByText("abc123")).toBeInTheDocument();
     });
+
+    it("shows an error when matches response is not an array", async () => {
+      mockMakeApiV3Request.mockResolvedValue(
+        makeApiV3JsonResponse({ matches: [] })
+      );
+
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      const btn = screen.getByRole("button", { name: /Fetch Matches/i });
+      fireEvent.click(btn);
+
+      await waitFor(() => {
+        expect(screen.getByText(/Error loading matches:/)).toBeInTheDocument();
+        expect(
+          screen.getByText(/Unexpected matches response format/)
+        ).toBeInTheDocument();
+      });
+    });
   });
 
   describe("Adding Videos", () => {
@@ -142,7 +176,9 @@ describe("MatchVideosTab", () => {
         },
       ];
 
-      mockMakeApiV3Request.mockResolvedValue(mockMatches);
+      mockMakeApiV3Request.mockResolvedValue(
+        makeApiV3JsonResponse(mockMatches)
+      );
 
       render(
         <MatchVideosTab
@@ -227,7 +263,9 @@ describe("MatchVideosTab", () => {
         },
       ];
 
-      mockMakeApiV3Request.mockResolvedValue(mockMatches);
+      mockMakeApiV3Request.mockResolvedValue(
+        makeApiV3JsonResponse(mockMatches)
+      );
 
       render(
         <MatchVideosTab
@@ -257,7 +295,9 @@ describe("MatchVideosTab", () => {
         },
       ];
 
-      mockMakeApiV3Request.mockResolvedValue(mockMatches);
+      mockMakeApiV3Request.mockResolvedValue(
+        makeApiV3JsonResponse(mockMatches)
+      );
 
       render(
         <MatchVideosTab
