@@ -140,6 +140,48 @@ class TestYoutubeVideoDetailsParser:
         assert result["video_1"]["scheduled_start_time"] == "2024-03-08"
         assert "scheduled_start_time" not in result["video_2"]
 
+    def test_parse_invalid_timestamp(self) -> None:
+        """Test that an unparseable timestamp results in None for the time field."""
+        response = {
+            "items": [
+                {
+                    "id": "video_123",
+                    "snippet": {"title": "Test"},
+                    "liveStreamingDetails": {
+                        "scheduledStartTime": "not-a-timestamp",
+                        "actualStartTime": "also-invalid",
+                    },
+                }
+            ]
+        }
+
+        parser = YoutubeVideoDetailsParser()
+        result = parser.parse(response)
+
+        assert "video_123" in result
+        assert result["video_123"]["scheduled_start_time"] is None
+        assert result["video_123"]["actual_start_time"] is None
+
+    def test_parse_timestamp_with_timezone_offset(self) -> None:
+        """Test that timestamps with timezone offsets are correctly parsed."""
+        response = {
+            "items": [
+                {
+                    "id": "video_123",
+                    "snippet": {"title": "Test"},
+                    "liveStreamingDetails": {
+                        "scheduledStartTime": "2024-03-08T20:30:00+05:30",
+                    },
+                }
+            ]
+        }
+
+        parser = YoutubeVideoDetailsParser()
+        result = parser.parse(response)
+
+        assert "video_123" in result
+        assert result["video_123"]["scheduled_start_time"] == "2024-03-08"
+
     def test_parse_absent_video_not_in_result(self) -> None:
         """Test that a video ID not in the response is absent from the result dict."""
         response = {
