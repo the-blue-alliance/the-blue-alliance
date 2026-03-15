@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from typing import Dict, List, Optional
 
 import pytest
@@ -22,6 +23,8 @@ def setup_event(
     official: bool | None = None,
     playoff_type: PlayoffType | None = None,
     manual_attrs: list[str] | None = None,
+    start_date: datetime | None = None,
+    end_date: datetime | None = None,
 ) -> None:
     Event(
         id="2014casj",
@@ -31,6 +34,8 @@ def setup_event(
         official=official,
         playoff_type=playoff_type,
         manual_attrs=manual_attrs if manual_attrs is not None else [],
+        start_date=start_date,
+        end_date=end_date,
     ).put()
 
 
@@ -104,7 +109,7 @@ def test_update_event_info(
         "first_event_code": "abc123",
         "playoff_type": int(PlayoffType.ROUND_ROBIN_6_TEAM),
         "webcasts": [
-            {"url": "https://youtu.be/abc12312312"},
+            {"url": "https://youtu.be/abc12312312", "date": "2024-01-02"},
             {"type": "youtube", "channel": "cde456", "date": "2024-01-03"},
         ],
         "remap_teams": {
@@ -137,16 +142,16 @@ def test_update_event_info(
     webcasts = event.webcast
     assert len(webcasts) == 2
 
-    # Webcasts with a date sort before no-date webcasts
+    # Webcasts sorted by date ascending
     webcast = webcasts[0]
     assert webcast["type"] == "youtube"
-    assert webcast["channel"] == "cde456"
-    assert webcast["date"] == "2024-01-03"
+    assert webcast["channel"] == "abc12312312"
+    assert webcast["date"] == "2024-01-02"
 
     webcast = webcasts[1]
     assert webcast["type"] == "youtube"
-    assert webcast["channel"] == "abc12312312"
-    assert "date" not in webcast
+    assert webcast["channel"] == "cde456"
+    assert webcast["date"] == "2024-01-03"
 
     assert event.remap_teams == {
         "frc9323": "frc1323B",
@@ -167,6 +172,7 @@ def test_update_event_info(
         {"type": "youtube", "channel": "cde456", "date": "tomorrow"},
         {"type": "youtube", "channel": "cde456", "date": "2024-03-37"},
         {"robot": "robot"},
+        {"type": "youtube", "channel": "cde456"},  # YouTube without date
     ],
 )
 def test_invalid_webcasts_date(
@@ -190,6 +196,40 @@ def test_invalid_webcasts_date(
     assert event is not None
     assert event.webcast == []
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 0
+
+
+@pytest.mark.parametrize(
+    "out_of_range_date",
+    [
+        "2014-02-01",  # Before event start date
+        "2014-05-01",  # After event end date
+    ],
+)
+def test_youtube_webcast_date_outside_event_range(
+    out_of_range_date: str,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    api_client: Client,
+) -> None:
+    setup_event(
+        start_date=datetime(2014, 3, 1),
+        end_date=datetime(2014, 3, 5),
+    )
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request = {
+        "webcasts": [{"type": "youtube", "channel": "abc123", "date": out_of_range_date}]
+    }
+    request_body = json.dumps(request)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 400
+
+    event: Optional[Event] = Event.get_by_id("2014casj")
+    assert event is not None
+    assert event.webcast == []
 
 
 def test_invalid_remap_teams_lowercase(
