@@ -39,19 +39,27 @@ def test_parse_webcast_with_url() -> None:
 
 
 def test_parse_webcast_with_youtube_url() -> None:
-    data = {"webcasts": [{"url": "https://www.youtube.com/watch?v=abc123"}]}
+    data = {
+        "webcasts": [
+            {"url": "https://www.youtube.com/watch?v=abc123", "date": "2024-03-15"}
+        ]
+    }
     parsed = JSONEventInfoParser.parse(json.dumps(data))
     assert len(none_throws(parsed.get("webcasts"))) == 1
     webcast = none_throws(parsed.get("webcasts"))[0]
     assert webcast["type"] == "youtube"
     assert webcast["channel"] == "abc123"
+    assert webcast["date"] == "2024-03-15"
 
 
 def test_parse_multiple_webcasts() -> None:
     data = {
         "webcasts": [
             {"type": "twitch", "channel": "firstinspires"},
-            {"url": "https://www.youtube.com/watch?v=abc123"},
+            {
+                "url": "https://www.youtube.com/watch?v=abc123",
+                "date": "2024-03-15",
+            },
         ]
     }
     parsed = JSONEventInfoParser.parse(json.dumps(data))
@@ -69,6 +77,30 @@ def test_parse_webcast_with_date() -> None:
     parsed = JSONEventInfoParser.parse(json.dumps(data))
     assert len(none_throws(parsed.get("webcasts"))) == 1
     assert none_throws(parsed.get("webcasts"))[0].get("date") == "2024-03-15"
+
+
+def test_parse_webcast_youtube_without_date_raises_exception() -> None:
+    data = {"webcasts": [{"url": "https://www.youtube.com/watch?v=abc123"}]}
+    with pytest.raises(ParserInputException, match="YouTube webcasts must have the 'date' field set"):
+        JSONEventInfoParser.parse(json.dumps(data))
+
+
+def test_parse_webcast_youtube_type_without_date_raises_exception() -> None:
+    data = {"webcasts": [{"type": "youtube", "channel": "abc123"}]}
+    with pytest.raises(ParserInputException, match="YouTube webcasts must have the 'date' field set"):
+        JSONEventInfoParser.parse(json.dumps(data))
+
+
+def test_parse_webcast_youtube_with_date_succeeds() -> None:
+    data = {
+        "webcasts": [{"type": "youtube", "channel": "abc123", "date": "2024-03-15"}]
+    }
+    parsed = JSONEventInfoParser.parse(json.dumps(data))
+    assert len(none_throws(parsed.get("webcasts"))) == 1
+    webcast = none_throws(parsed.get("webcasts"))[0]
+    assert webcast["type"] == "youtube"
+    assert webcast["channel"] == "abc123"
+    assert webcast["date"] == "2024-03-15"
 
 
 def test_parse_webcast_invalid_date_format_raises_exception() -> None:

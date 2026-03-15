@@ -61,6 +61,13 @@ class JSONEventInfoParser:
                 raise ParserInputException(f"Invalid webcast date: {date!r}: {e}")
             parsed_webcast["date"] = date
 
+        if parsed_webcast.get("type") == WebcastType.YOUTUBE and not parsed_webcast.get(
+            "date"
+        ):
+            raise ParserInputException(
+                "YouTube webcasts must have the 'date' field set"
+            )
+
         return parsed_webcast
 
     @staticmethod
