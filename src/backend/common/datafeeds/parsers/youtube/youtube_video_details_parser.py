@@ -49,6 +49,8 @@ class ParsedVideoDetails(TypedDict):
 
     video_id: str
     title: str
+    channel_id: NotRequired[Optional[str]]
+    description: NotRequired[str]
     scheduled_start_time: NotRequired[Optional[str]]
     actual_start_time: NotRequired[Optional[str]]
     concurrent_viewers: NotRequired[Optional[int]]
@@ -78,6 +80,12 @@ def _parse_video_item(item: _VideoItem) -> Optional[ParsedVideoDetails]:
     snippet = item.get("snippet")
     if snippet:
         result["title"] = snippet.get("title", "")
+        channel_id = snippet.get("channelId")
+        if channel_id:
+            result["channel_id"] = channel_id
+        description = snippet.get("description")
+        if description:
+            result["description"] = description
 
     live_details = item.get("liveStreamingDetails")
     if live_details:
