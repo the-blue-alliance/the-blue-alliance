@@ -122,9 +122,7 @@ def test_parse_webcast_date_outside_event_range_raises_exception() -> None:
             {"type": "twitch", "channel": "firstinspires", "date": "2024-01-01"}
         ]
     }
-    with pytest.raises(
-        ParserInputException, match="not within the event's date range"
-    ):
+    with pytest.raises(ParserInputException, match="not within the event's date range"):
         _make_parser(
             start_date=datetime(2024, 3, 14), end_date=datetime(2024, 3, 16)
         ).parse(json.dumps(data))
@@ -392,4 +390,3 @@ def test_parse_multiple_fields() -> None:
     assert parsed.get("remap_teams") == {"frc9999": "frc254"}
     assert parsed.get("timezone") == "America/Los_Angeles"
     assert parsed.get("sync_disabled_flags") == EventSyncType.EVENT_ALLIANCES
-

@@ -217,7 +217,9 @@ def test_youtube_webcast_date_outside_event_range(
     setup_auth(access_types=[AuthType.EVENT_INFO])
 
     request = {
-        "webcasts": [{"type": "youtube", "channel": "abc123", "date": out_of_range_date}]
+        "webcasts": [
+            {"type": "youtube", "channel": "abc123", "date": out_of_range_date}
+        ]
     }
     request_body = json.dumps(request)
     response = api_client.post(

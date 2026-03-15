@@ -91,9 +91,7 @@ class JSONEventInfoParser:
 
         parsed_info: EventInfoParsed = {}
         if webcasts := info_dict.get("webcasts"):
-            parsed_info["webcasts"] = [
-                self._parse_webcast(w) for w in webcasts
-            ]
+            parsed_info["webcasts"] = [self._parse_webcast(w) for w in webcasts]
 
         if remap_teams := info_dict.get("remap_teams"):
             for temp_team, remapped_team in remap_teams.items():
