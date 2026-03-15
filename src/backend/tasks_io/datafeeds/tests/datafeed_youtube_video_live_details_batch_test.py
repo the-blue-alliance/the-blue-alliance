@@ -4,8 +4,8 @@ from urllib.parse import parse_qs, urlparse
 from backend.common.datafeeds.datafeed_youtube import (
     YoutubeVideoDetailsDatafeed,
 )
-from backend.common.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
-    YoutubeVideoLiveDetailsBatchParser,
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    YoutubeVideoDetailsParser,
 )
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 
@@ -41,22 +41,24 @@ class TestYoutubeVideoDetailsDatafeedBatch:
             datafeed = YoutubeVideoDetailsDatafeed(["video1", "video2"])
             parser = datafeed.parser()
 
-            assert isinstance(parser, YoutubeVideoLiveDetailsBatchParser)
+            assert isinstance(parser, YoutubeVideoDetailsParser)
 
 
-class TestYoutubeVideoLiveDetailsBatchParser:
+class TestYoutubeVideoDetailsParserBatch:
     def test_parse_live_details(self) -> None:
-        parser = YoutubeVideoLiveDetailsBatchParser(["video1", "video2", "video3"])
+        parser = YoutubeVideoDetailsParser()
         response = {
             "items": [
                 {
                     "id": "video1",
+                    "snippet": {"title": "Stream 1"},
                     "liveStreamingDetails": {
                         "scheduledStartTime": "2026-03-15T18:00:00Z",
                     },
                 },
                 {
                     "id": "video2",
+                    "snippet": {"title": "Stream 2"},
                     "liveStreamingDetails": {
                         "scheduledStartTime": "2026-03-16T19:00:00Z",
                     },
@@ -66,6 +68,6 @@ class TestYoutubeVideoLiveDetailsBatchParser:
 
         result = parser.parse(response)
 
-        assert result["video1"] == "2026-03-15"
-        assert result["video2"] == "2026-03-16"
-        assert result["video3"] is None
+        assert result["video1"]["scheduled_start_time"] == "2026-03-15"
+        assert result["video2"]["scheduled_start_time"] == "2026-03-16"
+        assert "video3" not in result

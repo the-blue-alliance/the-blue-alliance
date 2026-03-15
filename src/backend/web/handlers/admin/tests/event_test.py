@@ -389,7 +389,7 @@ def test_cleanup_youtube_webcasts_removes_invalid(
         "backend.web.handlers.admin.event.YouTubeVideoHelper.get_video_details_batch"
     ) as mock_batch:
         mock_future = ndb.Future()
-        mock_future.set_result({"invalid_id": None})
+        mock_future.set_result({})
         mock_batch.return_value = mock_future
 
         resp = web_client.post(
@@ -425,7 +425,15 @@ def test_cleanup_youtube_webcasts_updates_date(
         "backend.web.handlers.admin.event.YouTubeVideoHelper.get_video_details_batch"
     ) as mock_batch:
         mock_future = ndb.Future()
-        mock_future.set_result({"abc123defgh": "2020-03-01"})
+        mock_future.set_result(
+            {
+                "abc123defgh": {
+                    "video_id": "abc123defgh",
+                    "title": "",
+                    "scheduled_start_time": "2020-03-01",
+                }
+            }
+        )
         mock_batch.return_value = mock_future
 
         resp = web_client.post(
@@ -460,7 +468,9 @@ def test_cleanup_youtube_webcasts_no_date_unchanged(
         "backend.web.handlers.admin.event.YouTubeVideoHelper.get_video_details_batch"
     ) as mock_batch:
         mock_future = ndb.Future()
-        mock_future.set_result({"abc123defgh": ""})
+        mock_future.set_result(
+            {"abc123defgh": {"video_id": "abc123defgh", "title": ""}}
+        )
         mock_batch.return_value = mock_future
 
         resp = web_client.post(

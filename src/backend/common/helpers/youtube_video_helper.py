@@ -12,6 +12,9 @@ from backend.common.datafeeds.datafeed_youtube import (
     YoutubeUpcomingStreamsDatafeed,
     YoutubeVideoDetailsDatafeed,
 )
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    ParsedVideoDetails,
+)
 from backend.common.tasklets import typed_tasklet
 
 
@@ -118,7 +121,8 @@ class YouTubeVideoHelper(object):
         try:
             datafeed = YoutubeVideoDetailsDatafeed([video_id])
             result = yield datafeed.fetch_async()
-            raise ndb.Return(result.get(video_id) if result else None)
+            details = result.get(video_id) if result else None
+            raise ndb.Return(details.get("scheduled_start_time") if details else None)
         except ValueError:
             logging.warning(
                 "No Google API secret, unable to fetch YouTube video details"
@@ -136,19 +140,18 @@ class YouTubeVideoHelper(object):
     @typed_tasklet
     def get_video_details_batch(
         cls, video_ids: List[str]
-    ) -> Generator[Any, Any, Dict[str, Optional[str]]]:
+    ) -> Generator[Any, Any, Dict[str, ParsedVideoDetails]]:
         """
-        Fetches live streaming details for multiple YouTube video IDs in a single request.
-        Returns a dict mapping video_id to:
-        - None if the video doesn't exist in YouTube (invalid/deleted)
-        - "" if the video exists but has no scheduled start time
-        - "YYYY-MM-DD" if the video exists with a scheduled start time
+        Fetches details for multiple YouTube video IDs in a single request.
+        Returns a dict mapping video_id to ParsedVideoDetails for every video
+        present in the YouTube API response. Video IDs absent from the result
+        were not found (deleted/invalid).
         """
         if not video_ids:
             raise ndb.Return({})
         datafeed = YoutubeVideoDetailsDatafeed(video_ids)
         result = yield datafeed.fetch_async()
-        raise ndb.Return(result if result is not None else {v: None for v in video_ids})
+        raise ndb.Return(result if result is not None else {})
 
     @classmethod
     @typed_tasklet
@@ -328,19 +331,23 @@ class YouTubeVideoHelper(object):
             )
 
             try:
-                scheduled_times = yield batch_datafeed.fetch_async()
+                video_details = yield batch_datafeed.fetch_async()
 
-                if scheduled_times is None:
+                if video_details is None:
                     continue
 
                 for stream in batch:
                     stream_id = stream["stream_id"]
+                    details = video_details.get(stream_id)
                     streams.append(
                         YouTubeUpcomingStream(
                             stream_id=stream_id,
                             title=stream["title"],
                             description=stream["description"],
-                            scheduled_start_time=scheduled_times.get(stream_id) or "",
+                            scheduled_start_time=(
+                                details.get("scheduled_start_time") if details else None
+                            )
+                            or "",
                             live_broadcast_content=stream.get(
                                 "live_broadcast_content", ""
                             ),

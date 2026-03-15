@@ -600,15 +600,17 @@ def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
         if webcast.get("type") != WebcastType.YOUTUBE:
             continue
         video_id = webcast["channel"]
-        date = video_details.get(video_id)
-        if date is None:
+        if video_id not in video_details:
             # Video doesn't exist in YouTube - remove the webcast
             webcasts.pop(i)
             changed = True
-        elif date and webcast.get("date") != date:
-            # Video exists and has a scheduled start time - update the date
-            webcast["date"] = date
-            changed = True
+        else:
+            details = video_details[video_id]
+            date = details.get("scheduled_start_time")
+            if date and webcast.get("date") != date:
+                # Video exists and has a scheduled start time - update the date
+                webcast["date"] = date
+                changed = True
 
     if changed:
         event.webcast_json = json.dumps(webcasts)
