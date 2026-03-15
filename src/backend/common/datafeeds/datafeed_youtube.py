@@ -26,9 +26,6 @@ from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser impor
     ParsedVideoDetails,
     YoutubeVideoDetailsParser,
 )
-from backend.common.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
-    YoutubeVideoLiveDetailsBatchParser,
-)
 from backend.common.models.webcast import Webcast, WebcastOnlineStatus
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 
@@ -82,23 +79,18 @@ class YoutubeWebcastStatusBatch(YoutubeApiBase[Dict[str, WebcastOnlineStatus]]):
         return YoutubeStreamStatusBatchParser(self.video_ids)
 
 
-class YoutubeVideoDetailsDatafeed(YoutubeApiBase[Optional[ParsedVideoDetails]]):
-    def __init__(
-        self,
-        video_id: str,
-        parts: str = "snippet,liveStreamingDetails",
-    ) -> None:
+class YoutubeVideoDetailsDatafeed(YoutubeApiBase[Dict[str, ParsedVideoDetails]]):
+    def __init__(self, video_ids: List[str]) -> None:
         super().__init__()
-        self.video_id = video_id
-        self.parts = parts
+        self.video_ids = video_ids
 
     def endpoint(self) -> str:
         return "videos"
 
     def url_params(self) -> Dict[str, str]:
         return {
-            "part": self.parts,
-            "id": self.video_id,
+            "part": "snippet,liveStreamingDetails",
+            "id": ",".join(self.video_ids),
         }
 
     def parser(self) -> YoutubeVideoDetailsParser:
@@ -278,21 +270,3 @@ class YoutubePlaylistItemsDatafeed(YoutubeApiBase[List[ParsedPlaylistItem]]):
 
     def parser(self) -> YoutubePlaylistItemsParser:
         return YoutubePlaylistItemsParser()
-
-
-class YoutubeVideoLiveDetailsBatchDatafeed(YoutubeApiBase[Dict[str, str]]):
-    def __init__(self, video_ids: List[str]) -> None:
-        super().__init__()
-        self.video_ids = video_ids
-
-    def endpoint(self) -> str:
-        return "videos"
-
-    def url_params(self) -> Dict[str, str]:
-        return {
-            "part": "liveStreamingDetails",
-            "id": ",".join(self.video_ids),
-        }
-
-    def parser(self) -> YoutubeVideoLiveDetailsBatchParser:
-        return YoutubeVideoLiveDetailsBatchParser(self.video_ids)

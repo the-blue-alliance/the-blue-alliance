@@ -576,3 +576,48 @@ def event_update_webcast_date_post(event_key: EventKey) -> Response:
     return redirect(
         url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
     )
+
+
+def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcasts = event.webcast
+    youtube_webcasts = [w for w in webcasts if w.get("type") == WebcastType.YOUTUBE]
+    if not youtube_webcasts:
+        return redirect(
+            url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+        )
+
+    video_ids = [w["channel"] for w in youtube_webcasts]
+    video_details = YouTubeVideoHelper.get_video_details_batch(video_ids).get_result()
+
+    changed = False
+    # Iterate in reverse so that removals by index don't shift later indices
+    for i in range(len(webcasts) - 1, -1, -1):
+        webcast = webcasts[i]
+        if webcast.get("type") != WebcastType.YOUTUBE:
+            continue
+        video_id = webcast["channel"]
+        if video_id not in video_details:
+            # Video doesn't exist in YouTube - remove the webcast
+            webcasts.pop(i)
+            changed = True
+        else:
+            details = video_details[video_id]
+            date = details.get("scheduled_start_time")
+            if date and webcast.get("date") != date:
+                # Video exists and has a scheduled start time - update the date
+                webcast["date"] = date
+                changed = True
+
+    if changed:
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )

@@ -464,6 +464,10 @@
       {% endfor %}
     </ul>
     <h2>Webcast Online Status</h2>
+    <form action="/admin/event/cleanup_youtube_webcasts/{{event.key_name}}" method="post" style="display:inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button type="submit" class="btn btn-warning"><span class="glyphicon glyphicon-wrench"></span> Clean up YouTube webcasts</button>
+    </form>
     <a href="/tasks/do/update_webcast_online_status/{{event.key_name}}?force=1"><button class="btn btn-info"><span class="glyphicon glyphicon-refresh"></span> Refresh Online Status</button></a>
     {% if webcast_online_status %}
     <p>Fetched from memcache:</p>

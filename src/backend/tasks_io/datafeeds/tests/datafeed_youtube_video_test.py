@@ -36,12 +36,13 @@ class TestYoutubeVideoDetailsParser:
         parser = YoutubeVideoDetailsParser()
         result = parser.parse(response)
 
-        assert result is not None
-        assert result["video_id"] == "video_123"
-        assert result["title"] == "Test Video Title"
-        assert result["scheduled_start_time"] == "2024-03-08"
-        assert result["actual_start_time"] == "2024-03-08"
-        assert result["concurrent_viewers"] == 1234
+        assert "video_123" in result
+        details = result["video_123"]
+        assert details["video_id"] == "video_123"
+        assert details["title"] == "Test Video Title"
+        assert details["scheduled_start_time"] == "2024-03-08"
+        assert details["actual_start_time"] == "2024-03-08"
+        assert details["concurrent_viewers"] == 1234
 
     def test_parse_video_without_live_details(self) -> None:
         """Test parsing a video without live streaming details."""
@@ -60,23 +61,24 @@ class TestYoutubeVideoDetailsParser:
         parser = YoutubeVideoDetailsParser()
         result = parser.parse(response)
 
-        assert result is not None
-        assert result["video_id"] == "video_123"
-        assert result["title"] == "Regular Video"
-        assert "scheduled_start_time" not in result
-        assert "concurrent_viewers" not in result
+        assert "video_123" in result
+        details = result["video_123"]
+        assert details["video_id"] == "video_123"
+        assert details["title"] == "Regular Video"
+        assert "scheduled_start_time" not in details
+        assert "concurrent_viewers" not in details
 
     def test_parse_empty_response(self) -> None:
-        """Test parsing empty response returns None."""
+        """Test parsing empty response returns empty dict."""
         response = {"items": []}
 
         parser = YoutubeVideoDetailsParser()
         result = parser.parse(response)
 
-        assert result is None
+        assert result == {}
 
     def test_parse_missing_required_fields(self) -> None:
-        """Test parsing item without ID returns None."""
+        """Test parsing item without ID is skipped."""
         response = {
             "items": [
                 {
@@ -90,7 +92,7 @@ class TestYoutubeVideoDetailsParser:
         parser = YoutubeVideoDetailsParser()
         result = parser.parse(response)
 
-        assert result is None
+        assert result == {}
 
     def test_parse_invalid_concurrent_viewers(self) -> None:
         """Test that invalid concurrent viewers value is ignored."""
@@ -109,46 +111,90 @@ class TestYoutubeVideoDetailsParser:
         parser = YoutubeVideoDetailsParser()
         result = parser.parse(response)
 
-        assert result is not None
-        assert "concurrent_viewers" not in result
+        assert "video_123" in result
+        assert "concurrent_viewers" not in result["video_123"]
+
+    def test_parse_multiple_videos(self) -> None:
+        """Test parsing multiple video items returns all of them."""
+        response = {
+            "items": [
+                {
+                    "id": "video_1",
+                    "snippet": {"title": "Video 1"},
+                    "liveStreamingDetails": {
+                        "scheduledStartTime": "2024-03-08T15:00:00Z",
+                    },
+                },
+                {
+                    "id": "video_2",
+                    "snippet": {"title": "Video 2"},
+                },
+            ]
+        }
+
+        parser = YoutubeVideoDetailsParser()
+        result = parser.parse(response)
+
+        assert "video_1" in result
+        assert "video_2" in result
+        assert result["video_1"]["scheduled_start_time"] == "2024-03-08"
+        assert "scheduled_start_time" not in result["video_2"]
+
+    def test_parse_absent_video_not_in_result(self) -> None:
+        """Test that a video ID not in the response is absent from the result dict."""
+        response = {
+            "items": [
+                {
+                    "id": "video_1",
+                    "snippet": {"title": "Video 1"},
+                },
+            ]
+        }
+
+        parser = YoutubeVideoDetailsParser()
+        result = parser.parse(response)
+
+        assert "video_1" in result
+        assert "video_2" not in result
 
 
 class TestYoutubeVideoDetailsDatafeed:
     """Tests for YoutubeVideoDetailsDatafeed."""
 
     def test_datafeed_initialization(self) -> None:
-        """Test datafeed initializes with video ID."""
+        """Test datafeed initializes with video IDs."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123")
-            assert datafeed.video_id == "video_123"
+            datafeed = YoutubeVideoDetailsDatafeed(["video_123"])
+            assert datafeed.video_ids == ["video_123"]
 
     def test_datafeed_endpoint(self) -> None:
         """Test datafeed returns correct endpoint."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_123"])
             assert datafeed.endpoint() == "videos"
 
     def test_datafeed_url_params(self) -> None:
         """Test datafeed constructs correct URL parameters."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_456")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_456"])
             params = datafeed.url_params()
 
             assert params["part"] == "snippet,liveStreamingDetails"
             assert params["id"] == "video_456"
 
-    def test_datafeed_custom_parts(self) -> None:
-        """Test datafeed with custom parts parameter."""
+    def test_datafeed_url_params_multiple(self) -> None:
+        """Test datafeed constructs correct URL parameters for multiple IDs."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123", parts="snippet")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_1", "video_2"])
             params = datafeed.url_params()
 
-            assert params["part"] == "snippet"
+            assert params["part"] == "snippet,liveStreamingDetails"
+            assert params["id"] == "video_1,video_2"
 
     def test_datafeed_url_construction(self) -> None:
         """Test complete URL construction."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_789")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_789"])
             url = datafeed.url()
 
             assert "videos" in url
@@ -158,7 +204,7 @@ class TestYoutubeVideoDetailsDatafeed:
     def test_datafeed_parser(self) -> None:
         """Test datafeed returns correct parser instance."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_123"])
             parser = datafeed.parser()
 
             assert isinstance(parser, YoutubeVideoDetailsParser)
