@@ -25,7 +25,7 @@
                 </div>
             </div><br>
 
-            {% for suggestion, event in suggestions_and_events %}
+            {% for suggestion, event, uses_official_webcast_unit in suggestions_and_events %}
             <div class="row" class="suggestion-item">
                 <div class="well">
                     <div class="col-xs-2">
@@ -33,6 +33,11 @@
                         <div class="alert alert-danger" role="alert">
                           This is a FIRST webcasted event.
                           Please ensure this isn't a stream-ripped video.
+                        </div>
+                        {% endif %}
+                        {% if uses_official_webcast_unit %}
+                        <div class="alert alert-warning">
+                            <strong><span class="glyphicon glyphicon-warning-sign"></span> Official Webcast Unit:</strong> This event is part of a district that uses FIRST's official webcast unit. Webcasts are typically published automatically and should not need to be added manually.
                         </div>
                         {% endif %}
                         <label class="radio text-success">
