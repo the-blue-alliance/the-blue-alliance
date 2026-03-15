@@ -11,7 +11,6 @@ from backend.common.datafeeds.datafeed_youtube import (
     YoutubePlaylistItemsDatafeed,
     YoutubeUpcomingStreamsDatafeed,
     YoutubeVideoDetailsDatafeed,
-    YoutubeVideoLiveDetailsBatchDatafeed,
 )
 from backend.common.tasklets import typed_tasklet
 
@@ -117,28 +116,9 @@ class YouTubeVideoHelper(object):
         Returns the date in YYYY-MM-DD format, or None if not available.
         """
         try:
-            datafeed = YoutubeVideoDetailsDatafeed(
-                video_id,
-                parts="liveStreamingDetails",
-            )
-            response = yield datafeed._fetch()
-
-            if response.status_code != 200:
-                raise ndb.Return(None)
-
-            raw_data = cast(Optional[dict], response.json())
-            if not raw_data or not raw_data.get("items"):
-                raise ndb.Return(None)
-
-            parsed_data = datafeed.parser().parse(raw_data)
-            scheduled_start_time = (
-                parsed_data.get("scheduled_start_time") if parsed_data else None
-            )
-
-            if not scheduled_start_time:
-                raise ndb.Return(None)
-
-            raise ndb.Return(scheduled_start_time)
+            datafeed = YoutubeVideoDetailsDatafeed([video_id])
+            result = yield datafeed.fetch_async()
+            raise ndb.Return(result.get(video_id) if result else None)
         except ValueError:
             logging.warning(
                 "No Google API secret, unable to fetch YouTube video details"
@@ -164,31 +144,11 @@ class YouTubeVideoHelper(object):
         - "" if the video exists but has no scheduled start time
         - "YYYY-MM-DD" if the video exists with a scheduled start time
         """
-        empty: Dict[str, Optional[str]] = {v: None for v in video_ids}
         if not video_ids:
-            raise ndb.Return(empty)
-        try:
-            datafeed = YoutubeVideoLiveDetailsBatchDatafeed(video_ids)
-            response = yield datafeed._fetch()
-
-            if response.status_code != 200:
-                raise ndb.Return(empty)
-
-            raw_data = cast(Optional[dict], response.json())
-            if not raw_data:
-                raise ndb.Return(empty)
-
-            raise ndb.Return(datafeed.parser().parse(raw_data))
-        except ValueError:
-            logging.warning(
-                "No Google API secret, unable to fetch YouTube video details"
-            )
-            raise ndb.Return(empty)
-        except ndb.Return:
-            raise
-        except Exception:
-            logging.exception("Failed to fetch YouTube video details batch")
-            raise ndb.Return(empty)
+            raise ndb.Return({})
+        datafeed = YoutubeVideoDetailsDatafeed(video_ids)
+        result = yield datafeed.fetch_async()
+        raise ndb.Return(result if result is not None else {v: None for v in video_ids})
 
     @classmethod
     @typed_tasklet
@@ -363,25 +323,15 @@ class YouTubeVideoHelper(object):
         streams: List[YouTubeUpcomingStream] = []
         for batch_start in range(0, len(stream_basics), 50):
             batch = stream_basics[batch_start : batch_start + 50]
-            batch_datafeed = YoutubeVideoLiveDetailsBatchDatafeed(
+            batch_datafeed = YoutubeVideoDetailsDatafeed(
                 [stream["stream_id"] for stream in batch]
             )
 
             try:
-                videos_response = yield batch_datafeed._fetch()
+                scheduled_times = yield batch_datafeed.fetch_async()
 
-                if videos_response.status_code != 200:
-                    logging.warning(
-                        f"YouTube API videos endpoint returned status {videos_response.status_code} for {videos_response.url}. Response: {videos_response.content[:500] if videos_response.content else 'No content'}"
-                    )
+                if scheduled_times is None:
                     continue
-
-                videos_result = cast(Optional[dict], videos_response.json())
-                if videos_result is None:
-                    logging.warning("YouTube videos API returned no data")
-                    continue
-
-                scheduled_times = batch_datafeed.parser().parse(videos_result)
 
                 for stream in batch:
                     stream_id = stream["stream_id"]

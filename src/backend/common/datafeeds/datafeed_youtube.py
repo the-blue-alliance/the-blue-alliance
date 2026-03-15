@@ -22,10 +22,6 @@ from backend.common.datafeeds.parsers.youtube.youtube_search_parser import (
 from backend.common.datafeeds.parsers.youtube.youtube_stream_status_batch_parser import (
     YoutubeStreamStatusBatchParser,
 )
-from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
-    ParsedVideoDetails,
-    YoutubeVideoDetailsParser,
-)
 from backend.common.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
     YoutubeVideoLiveDetailsBatchParser,
 )
@@ -82,27 +78,22 @@ class YoutubeWebcastStatusBatch(YoutubeApiBase[Dict[str, WebcastOnlineStatus]]):
         return YoutubeStreamStatusBatchParser(self.video_ids)
 
 
-class YoutubeVideoDetailsDatafeed(YoutubeApiBase[Optional[ParsedVideoDetails]]):
-    def __init__(
-        self,
-        video_id: str,
-        parts: str = "snippet,liveStreamingDetails",
-    ) -> None:
+class YoutubeVideoDetailsDatafeed(YoutubeApiBase[Dict[str, Optional[str]]]):
+    def __init__(self, video_ids: List[str]) -> None:
         super().__init__()
-        self.video_id = video_id
-        self.parts = parts
+        self.video_ids = video_ids
 
     def endpoint(self) -> str:
         return "videos"
 
     def url_params(self) -> Dict[str, str]:
         return {
-            "part": self.parts,
-            "id": self.video_id,
+            "part": "snippet,liveStreamingDetails",
+            "id": ",".join(self.video_ids),
         }
 
-    def parser(self) -> YoutubeVideoDetailsParser:
-        return YoutubeVideoDetailsParser()
+    def parser(self) -> YoutubeVideoLiveDetailsBatchParser:
+        return YoutubeVideoLiveDetailsBatchParser(self.video_ids)
 
 
 class YoutubeChannelListForHandleDatafeed(
@@ -278,21 +269,3 @@ class YoutubePlaylistItemsDatafeed(YoutubeApiBase[List[ParsedPlaylistItem]]):
 
     def parser(self) -> YoutubePlaylistItemsParser:
         return YoutubePlaylistItemsParser()
-
-
-class YoutubeVideoLiveDetailsBatchDatafeed(YoutubeApiBase[Dict[str, Optional[str]]]):
-    def __init__(self, video_ids: List[str]) -> None:
-        super().__init__()
-        self.video_ids = video_ids
-
-    def endpoint(self) -> str:
-        return "videos"
-
-    def url_params(self) -> Dict[str, str]:
-        return {
-            "part": "liveStreamingDetails",
-            "id": ",".join(self.video_ids),
-        }
-
-    def parser(self) -> YoutubeVideoLiveDetailsBatchParser:
-        return YoutubeVideoLiveDetailsBatchParser(self.video_ids)

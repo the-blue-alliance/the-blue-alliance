@@ -6,6 +6,9 @@ from backend.common.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafee
 from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
     YoutubeVideoDetailsParser,
 )
+from backend.common.datafeeds.parsers.youtube.youtube_video_live_details_batch_parser import (
+    YoutubeVideoLiveDetailsBatchParser,
+)
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 
 
@@ -117,38 +120,39 @@ class TestYoutubeVideoDetailsDatafeed:
     """Tests for YoutubeVideoDetailsDatafeed."""
 
     def test_datafeed_initialization(self) -> None:
-        """Test datafeed initializes with video ID."""
+        """Test datafeed initializes with video IDs."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123")
-            assert datafeed.video_id == "video_123"
+            datafeed = YoutubeVideoDetailsDatafeed(["video_123"])
+            assert datafeed.video_ids == ["video_123"]
 
     def test_datafeed_endpoint(self) -> None:
         """Test datafeed returns correct endpoint."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_123"])
             assert datafeed.endpoint() == "videos"
 
     def test_datafeed_url_params(self) -> None:
         """Test datafeed constructs correct URL parameters."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_456")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_456"])
             params = datafeed.url_params()
 
             assert params["part"] == "snippet,liveStreamingDetails"
             assert params["id"] == "video_456"
 
-    def test_datafeed_custom_parts(self) -> None:
-        """Test datafeed with custom parts parameter."""
+    def test_datafeed_url_params_multiple(self) -> None:
+        """Test datafeed constructs correct URL parameters for multiple IDs."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123", parts="snippet")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_1", "video_2"])
             params = datafeed.url_params()
 
-            assert params["part"] == "snippet"
+            assert params["part"] == "snippet,liveStreamingDetails"
+            assert params["id"] == "video_1,video_2"
 
     def test_datafeed_url_construction(self) -> None:
         """Test complete URL construction."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_789")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_789"])
             url = datafeed.url()
 
             assert "videos" in url
@@ -158,7 +162,7 @@ class TestYoutubeVideoDetailsDatafeed:
     def test_datafeed_parser(self) -> None:
         """Test datafeed returns correct parser instance."""
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
-            datafeed = YoutubeVideoDetailsDatafeed("video_123")
+            datafeed = YoutubeVideoDetailsDatafeed(["video_123"])
             parser = datafeed.parser()
 
-            assert isinstance(parser, YoutubeVideoDetailsParser)
+            assert isinstance(parser, YoutubeVideoLiveDetailsBatchParser)
