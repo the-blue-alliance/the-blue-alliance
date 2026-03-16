@@ -89,6 +89,23 @@ def test_instagram_success_media_reviewer(
     assert urlparse(resp.headers["Location"]).path == THUMBNAIL_URL
 
 
+def test_instagram_missing_thumbnail_url(web_client: Client, requests_mock: Mocker):
+    media = create_media()
+
+    requests_mock.get(
+        re.compile(".*instagram_oembed.*"),
+        json={"html": "<blockquote>some html</blockquote>"},
+    )
+
+    resp = web_client.get(
+        f"/instagram_oembed/{media.foreign_key}",
+        headers={"Referer": "thebluealliance.com"},
+    )
+
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/images/instagram_blank.png"
+
+
 def test_instagram_invalid_width(web_client: Client):
     media = create_media()
 

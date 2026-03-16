@@ -65,7 +65,14 @@ def instagram_oembed(media_key: str):
         )
         return redirect("/images/instagram_blank.png")
 
-    return redirect(response.json()["thumbnail_url"])
+    thumbnail_url = response.json().get("thumbnail_url")
+    if not thumbnail_url:
+        logging.warning(
+            f"Instagram oembed response missing thumbnail_url ({instagram_url}): {response.json()}"
+        )
+        return redirect("/images/instagram_blank.png")
+
+    return redirect(thumbnail_url)
 
 
 def oembed_test():
