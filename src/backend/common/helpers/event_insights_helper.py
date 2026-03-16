@@ -181,18 +181,11 @@ class EventInsightsHelper:
             elif (auto_winner == AllianceColor.BLUE) and (blue_score > red_score):
                 auto_win_conversion += 1
 
-            if (
-                red_sb.get("autoTowerRobot1") != "None"
-                or red_sb.get("autoTowerRobot1") != "None"
-                or red_sb.get("autoTowerRobot1") != "None"
-            ):
-                auto_climb_count += 1
-            if (
-                blue_sb.get("autoTowerRobot1") != "None"
-                or blue_sb.get("autoTowerRobot1") != "None"
-                or blue_sb.get("autoTowerRobot1") != "None"
-            ):
-                auto_climb_count += 1
+            for i in range(3):
+                if red_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
+                    auto_climb_count += 1
+                if blue_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
+                    auto_climb_count += 1
 
             auto_fuel_scored += red_sb.get("hubScore").get("autoCount")
             auto_fuel_scored += blue_sb.get("hubScore").get("autoCount")
@@ -281,7 +274,7 @@ class EventInsightsHelper:
             ],
             "auto_climb_count": [
                 auto_climb_count,
-                finished_matches * 2,
+                finished_matches * 4,
                 100.0 * auto_climb_count / (finished_matches * 2),
             ],
             "level1_climb_count": [
