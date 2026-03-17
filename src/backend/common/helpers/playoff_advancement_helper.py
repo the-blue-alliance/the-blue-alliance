@@ -289,14 +289,20 @@ class PlayoffAdvancementHelper:
                     continue
 
                 winner = match.winning_alliance
-                
-                bracket_table[comp_level][set_key]["results"] = (
-                    bracket_table[comp_level][set_key]["results"] + [{
-                        "red_score": match.alliances.get(AllianceColor.RED, {}).get("score", -1),
-                        "blue_score": match.alliances.get(AllianceColor.BLUE, {}).get("score", -1),
+
+                bracket_table[comp_level][set_key]["results"] = bracket_table[
+                    comp_level
+                ][set_key]["results"] + [
+                    {
+                        "red_score": match.alliances.get(AllianceColor.RED, {}).get(
+                            "score", -1
+                        ),
+                        "blue_score": match.alliances.get(AllianceColor.BLUE, {}).get(
+                            "score", -1
+                        ),
                         "winner": match.winning_alliance,
-                    }]
-                )
+                    }
+                ]
 
                 if not winner or winner == "":
                     # if the match is a tie
