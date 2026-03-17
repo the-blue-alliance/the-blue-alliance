@@ -16,7 +16,7 @@
                 </span>
               </td>
               {% if match.red_record.wins + match.red_record.losses + match.red_record.ties > 0 %}
-                <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_record.wins }}</td>
+                <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.get("red_scores", "?")[0] }}</td>
               {% endif %}
             </tr>
           {% else %}
@@ -37,7 +37,7 @@
                 </span>
               </td>
               {% if match.blue_record.wins + match.blue_record.losses + match.blue_record.ties > 0 %}
-                <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_record.wins }}</td>
+                <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.get("blue_scores", "?")[0] }}</td>
               {% endif %}
             </tr>
           {% else %}
@@ -58,6 +58,7 @@
   </div>
 {% endmacro %}
 
+{{ bracket_table }}
 <div id="double-elim-bracket-wrapper">
   <table id="double-elim-bracket-table">
     <tr class="gap-row"></tr>
