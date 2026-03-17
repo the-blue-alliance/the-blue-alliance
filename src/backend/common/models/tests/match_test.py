@@ -247,7 +247,7 @@ def test_short_name_double_elim_8_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match.short_name == "M1"
+    assert match.short_name == "Playoff M1"
 
     # set_number=13 corresponds to Match 13 in the double elim bracket
     match13 = Match(
@@ -258,7 +258,7 @@ def test_short_name_double_elim_8_team() -> None:
         set_number=13,
         match_number=1,
     )
-    assert match13.short_name == "M13"
+    assert match13.short_name == "Playoff M13"
 
 
 def test_short_name_double_elim_4_team() -> None:
@@ -279,7 +279,7 @@ def test_short_name_double_elim_4_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match.short_name == "M1"
+    assert match.short_name == "Playoff M1"
 
 
 def test_short_name_legacy_double_elim_8_team() -> None:
@@ -300,7 +300,7 @@ def test_short_name_legacy_double_elim_8_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match.short_name == "M1"
+    assert match.short_name == "Playoff M1"
 
     # set_number=1, comp_level=SF corresponds to Match 11
     match11 = Match(
@@ -311,7 +311,7 @@ def test_short_name_legacy_double_elim_8_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match11.short_name == "M11"
+    assert match11.short_name == "Playoff M11"
 
 
 def test_full_name_double_elim() -> None:
