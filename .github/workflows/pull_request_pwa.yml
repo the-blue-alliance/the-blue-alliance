@@ -28,7 +28,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
@@ -60,7 +60,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
@@ -89,7 +89,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
@@ -124,7 +124,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
@@ -153,7 +153,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
@@ -200,7 +200,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
