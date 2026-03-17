@@ -15,9 +15,8 @@
                   {% for team in match.red_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
                 </span>
               </td>
-              {% for match_idx in range(match.red_scores|length) %}
-              {% set won_game = match.red_scores[match_idx] > match.blue_scores[match_idx] %}
-                <td class="redScore {% if won_game %}winner{% endif %}">{{ match.get("red_scores", "?")[match_idx] }}</td>
+              {% for game in match.results %}
+                <td class="redScore {% if game.winner == 'red' %}winner{% endif %}">{{ game.get("red_score", "?") }}</td>
               {% endfor %}
             </tr>
           {% else %}
@@ -37,9 +36,8 @@
                   {% for team in match.blue_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
                 </span>
               </td>
-              {% for match_idx in range(match.blue_scores|length) %}
-              {% set won_game = match.blue_scores[match_idx] > match.red_scores[match_idx] %}
-                <td class="blueScore {% if won_game %}winner{% endif %}">{{ match.get("blue_scores", "?")[match_idx] }}</td>
+              {% for game in match.results %}
+                <td class="blueScore {% if game.winner == 'blue' %}winner{% endif %}">{{ game.get("blue_score", "?") }}</td>
               {% endfor %}
             </tr>
           {% else %}

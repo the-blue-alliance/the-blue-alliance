@@ -243,18 +243,12 @@ class PlayoffAdvancementHelper:
                         "blue_record": {"wins": 0, "losses": 0, "ties": 0},
                         "red_name": None,
                         "blue_name": None,
-                        "red_scores": [],
-                        "blue_scores": [],
+                        "results": [],
                     }
                 for color in [AllianceColor.RED, AllianceColor.BLUE]:
                     alliance = copy.copy(match.alliances[color]["teams"])
                     bracket_table[comp_level][set_key][f"{color}_name"] = (
                         cls._alliance_name(alliance, alliance_selections)
-                    )
-                    bracket_table[comp_level][set_key][f"{color}_scores"] = (
-                        bracket_table[comp_level][set_key][f"{color}_scores"] + [
-                            match.alliances.get(color, {}).get("score", -1)
-                        ]
                     )
                     for i, complete_alliance in enumerate(
                         complete_alliances
@@ -315,6 +309,14 @@ class PlayoffAdvancementHelper:
                 loser = OPPONENT[winner]
                 bracket_table[comp_level][set_key][f"{loser}_record"]["losses"] = (
                     bracket_table[comp_level][set_key][f"{loser}_record"]["losses"] + 1
+                )
+
+                bracket_table[comp_level][set_key]["results"] = (
+                    bracket_table[comp_level][set_key]["results"] + [{
+                        "red_score": match.alliances.get(AllianceColor.RED, {}).get("score", -1),
+                        "blue_score": match.alliances.get(AllianceColor.BLUE, {}).get("score", -1),
+                        "winner": match.winning_alliance,
+                    }]
                 )
 
                 n = 2
