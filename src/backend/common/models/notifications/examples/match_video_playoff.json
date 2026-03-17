@@ -1,0 +1,14 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "CTHAR Match Video",
+            "body": "Video for CTHAR Playoff Match 1 has been posted."
+        },
+        "data": {
+            "notification_type": "match_video",
+            "event_key": "2024cthar",
+            "match_key": "2024cthar_sf1m1"
+        }
+    }
+}
