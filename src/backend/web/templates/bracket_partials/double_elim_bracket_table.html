@@ -15,9 +15,10 @@
                   {% for team in match.red_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
                 </span>
               </td>
-              {% if match.red_record.wins + match.red_record.losses + match.red_record.ties > 0 %}
-                <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.get("red_scores", "?")[0] }}</td>
-              {% endif %}
+              {% for match_idx in range(match.red_scores|length) %}
+              {% set won_game = match.red_scores[match_idx] > match.blue_scores[match_idx] %}
+                <td class="redScore {% if won_game %}winner{% endif %}">{{ match.get("red_scores", "?")[match_idx] }}</td>
+              {% endfor %}
             </tr>
           {% else %}
             <tr>
@@ -36,9 +37,10 @@
                   {% for team in match.blue_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
                 </span>
               </td>
-              {% if match.blue_record.wins + match.blue_record.losses + match.blue_record.ties > 0 %}
-                <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.get("blue_scores", "?")[0] }}</td>
-              {% endif %}
+              {% for match_idx in range(match.blue_scores|length) %}
+              {% set won_game = match.blue_scores[match_idx] > match.red_scores[match_idx] %}
+                <td class="blueScore {% if won_game %}winner{% endif %}">{{ match.get("blue_scores", "?")[match_idx] }}</td>
+              {% endfor %}
             </tr>
           {% else %}
             <tr>
