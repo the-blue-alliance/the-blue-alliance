@@ -74,6 +74,7 @@ import {
 } from '~/components/tba/tableOfContents';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
+import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -1024,11 +1025,33 @@ function MediaTab({
   webcasts: Webcast[];
   eventKey: string;
 }) {
+  const youtubeWebcasts = webcasts.filter((w) => w.type === 'youtube');
+  const otherWebcasts = webcasts.filter((w) => w.type !== 'youtube');
+
   return (
-    <div>
+    <div className="space-y-4">
       <h1 className="text-2xl font-bold">Webcasts</h1>
       {webcasts.length > 0 ? (
-        webcasts.map((w) => <WebcastIcon webcast={w} key={w.channel} />)
+        <>
+          {youtubeWebcasts.length > 0 && (
+            <div className="grid gap-4 sm:grid-cols-2">
+              {youtubeWebcasts.map((w) => (
+                <YoutubeEmbed
+                  videoId={w.channel}
+                  title={w.channel}
+                  key={w.channel}
+                />
+              ))}
+            </div>
+          )}
+          {otherWebcasts.length > 0 && (
+            <div className="flex flex-wrap gap-2">
+              {otherWebcasts.map((w) => (
+                <WebcastIcon webcast={w} key={w.channel} />
+              ))}
+            </div>
+          )}
+        </>
       ) : (
         <Button variant="secondary" asChild>
           <a
