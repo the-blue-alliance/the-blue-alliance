@@ -18,6 +18,7 @@ from backend.common.helpers.insights_leaderboard_team_helper import (
     InsightsLeaderboardTeamCalculator,
 )
 from backend.common.helpers.insights_notable_helper import InsightsNotableHelper
+from backend.common.helpers.insights_streak_helper import InsightsStreakCalculator
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
 from backend.common.models.insight import Insight, LeaderboardKeyType
@@ -205,6 +206,54 @@ def do_notables_year_insights(year: Year) -> Response:
         InsightManipulator.createOrUpdate(insights)
 
     return make_response(repr(insights))
+
+
+@blueprint.route("/backend-tasks-b2/do/math/insights/streaks/<int:year>")
+def do_streak_year_insights(year: Year) -> Response:
+    insights = InsightsStreakCalculator.make_insights(year)
+
+    if len(insights) > 0:
+        InsightManipulator.createOrUpdate(insights)
+
+    return make_response(repr(insights))
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights/streaks/<int:year>")
+@blueprint.route(
+    "/backend-tasks-b2/enqueue/math/insights/streaks", defaults={"year": None}
+)
+def enqueue_streak_year_insights(year: Optional[Year] = None) -> Response:
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    taskqueue.add(
+        url=url_for("insights.do_streak_year_insights", year=year),
+        method="GET",
+        target="py3-tasks-cpu",
+        queue_name="backend-tasks",
+    )
+
+    return make_response(f"enqueued streak insights for year {escape(str(year))}")
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights/streaks/all")
+def enqueue_all_streak_insights() -> Response:
+    for year in SeasonHelper.get_valid_years():
+        taskqueue.add(
+            url=url_for("insights.do_streak_year_insights", year=year),
+            method="GET",
+            target="py3-tasks-cpu",
+            queue_name="backend-tasks",
+        )
+
+    taskqueue.add(
+        url=url_for("insights.do_streak_year_insights", year=0),
+        method="GET",
+        target="py3-tasks-cpu",
+        queue_name="backend-tasks",
+    )
+
+    return make_response("enqueued streak insights for all years")
 
 
 @blueprint.route("/backend-tasks-b2/enqueue/math/overallinsights/<kind>")

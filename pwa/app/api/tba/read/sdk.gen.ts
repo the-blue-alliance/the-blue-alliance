@@ -116,6 +116,9 @@ import type {
   GetInsightsNotablesYearData,
   GetInsightsNotablesYearErrors,
   GetInsightsNotablesYearResponses,
+  GetInsightsStreaksYearData,
+  GetInsightsStreaksYearErrors,
+  GetInsightsStreaksYearResponses,
   GetMatchData,
   GetMatchErrors,
   GetMatchResponses,
@@ -320,6 +323,8 @@ import {
   zGetInsightsLeaderboardsYearResponse,
   zGetInsightsNotablesYearData,
   zGetInsightsNotablesYearResponse,
+  zGetInsightsStreaksYearData,
+  zGetInsightsStreaksYearResponse,
   zGetMatchData,
   zGetMatchResponse,
   zGetMatchSimpleData,
@@ -1201,6 +1206,26 @@ export const getInsightsNotablesYear = <ThrowOnError extends boolean = false>(
       await zGetInsightsNotablesYearResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/insights/notables/{year}',
+    ...options,
+  });
+
+/**
+ * Gets a list of `StreakInsight` objects from a specific year. Use year=0 for overall.
+ */
+export const getInsightsStreaksYear = <ThrowOnError extends boolean = false>(
+  options: Options<GetInsightsStreaksYearData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetInsightsStreaksYearResponses,
+    GetInsightsStreaksYearErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await zGetInsightsStreaksYearData.parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInsightsStreaksYearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/insights/streaks/{year}',
     ...options,
   });
 

@@ -14,6 +14,7 @@ from backend.common.models.keys import (
 from backend.common.models.wlt import WLTRecord
 
 LeaderboardKeyType = Literal["team"] | Literal["event"] | Literal["match"]
+StreakType = Literal["event"] | Literal["match"] | Literal["year"]
 InsightEnumId: TypeAlias = int
 
 
@@ -70,6 +71,9 @@ class Insight(CachedModel):
     TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK = 43
     DISTRICT_INSIGHTS_TEAM_DATA = 44
     DISTRICT_INSIGHT_DISTRICT_DATA = 45
+    TYPED_STREAK_CONSECUTIVE_EVENT_WINS = 50
+    TYPED_STREAK_CONSECUTIVE_MATCH_WINS = 51
+    TYPED_STREAK_CONSECUTIVE_IMPACT_WINS = 52
     YEAR_SPECIFIC_BY_WEEK = 999
     YEAR_SPECIFIC = 1000
 
@@ -123,6 +127,9 @@ class Insight(CachedModel):
         TYPED_LEADERBOARD_LONGEST_QUALIFYING_EVENT_STREAK: "typed_leaderboard_longest_qualifying_event_streak",
         DISTRICT_INSIGHTS_TEAM_DATA: "district_insights_team_data",
         DISTRICT_INSIGHT_DISTRICT_DATA: "district_insights_district_data",
+        TYPED_STREAK_CONSECUTIVE_EVENT_WINS: "streak_consecutive_event_wins",
+        TYPED_STREAK_CONSECUTIVE_MATCH_WINS: "streak_consecutive_match_wins",
+        TYPED_STREAK_CONSECUTIVE_IMPACT_WINS: "streak_consecutive_impact_wins",
     }
 
     TYPED_LEADERBOARD_KEY_TYPES: Dict[int, LeaderboardKeyType] = {
@@ -149,6 +156,12 @@ class Insight(CachedModel):
         TYPED_NOTABLES_HALL_OF_FAME,
         TYPED_NOTABLES_DCMP_WINNER,
         TYPED_NOTABLES_CMP_FINALS_APPEARANCES,
+    }
+
+    STREAK_INSIGHTS: Dict[int, "StreakType"] = {
+        TYPED_STREAK_CONSECUTIVE_EVENT_WINS: "event",
+        TYPED_STREAK_CONSECUTIVE_MATCH_WINS: "match",
+        TYPED_STREAK_CONSECUTIVE_IMPACT_WINS: "year",
     }
 
     name = ndb.StringProperty(required=True)  # general name used for sorting
@@ -245,6 +258,27 @@ class NotablesInsight(TypedDict):
     """This is the type that should be returned over the API!"""
 
     data: NotablesData
+    name: str
+    year: int
+
+
+class StreakEntry(TypedDict):
+    team_key: TeamKey
+    streak_length: int
+    is_active: bool
+    first: str  # First context in streak (event key, match key, or year)
+    last: str  # Last context in streak
+
+
+class StreakData(TypedDict):
+    entries: List[StreakEntry]
+    streak_type: StreakType
+
+
+class StreakInsight(TypedDict):
+    """This is the type that should be returned over the API!"""
+
+    data: StreakData
     name: str
     year: int
 

@@ -800,6 +800,23 @@ export const zNotablesInsight = z.object({
   year: z.int(),
 });
 
+export const zStreakInsight = z.object({
+  data: z.object({
+    entries: z.array(
+      z.object({
+        team_key: z.string(),
+        streak_length: z.int(),
+        is_active: z.boolean(),
+        first: z.string(),
+        last: z.string(),
+      }),
+    ),
+    streak_type: z.enum(['event', 'match', 'year']),
+  }),
+  name: z.string(),
+  year: z.int(),
+});
+
 export const zPosition2016 = z.enum([
   '',
   'A_ChevalDeFrise',
@@ -2345,6 +2362,24 @@ export const zGetInsightsNotablesYearData = z.object({
  * Successful response
  */
 export const zGetInsightsNotablesYearResponse = z.array(zNotablesInsight);
+
+export const zGetInsightsStreaksYearData = z.object({
+  body: z.never().optional(),
+  path: z.object({
+    year: z.int(),
+  }),
+  query: z.never().optional(),
+  headers: z
+    .object({
+      'If-None-Match': z.string().optional(),
+    })
+    .optional(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetInsightsStreaksYearResponse = z.array(zStreakInsight);
 
 export const zGetMatchData = z.object({
   body: z.never().optional(),

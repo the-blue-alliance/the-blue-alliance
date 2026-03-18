@@ -12,6 +12,8 @@ from backend.common.models.insight import (
     LeaderboardData,
     LeaderboardKeyType,
     LeaderboardRanking,
+    StreakData,
+    StreakEntry,
 )
 from backend.common.models.keys import Year
 from backend.common.models.match import Match
@@ -136,6 +138,86 @@ def make_leaderboard_from_dict_counts(
 
     return create_insight(
         data=leaderboard_data,
+        name=Insight.INSIGHT_NAMES[insight_type],
+        year=year,
+    )
+
+
+CompletedStreak = Tuple[int, str, str]  # (length, first, last)
+
+
+@dataclass
+class StreakState:
+    active_streak: int = 0
+    active_first: str = ""
+    active_last: str = ""
+    completed_streaks: List[CompletedStreak] = None  # type: ignore[assignment]
+
+    def __post_init__(self) -> None:
+        if self.completed_streaks is None:
+            self.completed_streaks = []
+
+    def increment(self, context: str) -> None:
+        if self.active_streak == 0:
+            self.active_first = context
+        self.active_last = context
+        self.active_streak += 1
+
+    def finalize(self) -> None:
+        if self.active_streak >= 2:
+            self.completed_streaks.append(
+                (self.active_streak, self.active_first, self.active_last)
+            )
+        self.active_streak = 0
+        self.active_first = ""
+        self.active_last = ""
+
+
+def make_streak_insight(
+    streak_states: Dict[str, StreakState],
+    insight_type: int,
+    year: int,
+) -> Optional[Insight]:
+    entries: List[StreakEntry] = []
+
+    for team_key, state in streak_states.items():
+        if state.active_streak > 0:
+            entries.append(
+                StreakEntry(
+                    team_key=team_key,
+                    streak_length=state.active_streak,
+                    is_active=True,
+                    first=state.active_first,
+                    last=state.active_last,
+                )
+            )
+        for length, first, last in state.completed_streaks:
+            entries.append(
+                StreakEntry(
+                    team_key=team_key,
+                    streak_length=length,
+                    is_active=False,
+                    first=first,
+                    last=last,
+                )
+            )
+
+    if not entries:
+        return None
+
+    # Sort by streak_length descending, then by team number ascending
+    entries.sort(key=lambda e: (-e["streak_length"], int(e["team_key"][3:])))
+
+    # Take top 25
+    entries = entries[:25]
+
+    streak_data = StreakData(
+        entries=entries,
+        streak_type=Insight.STREAK_INSIGHTS[insight_type],
+    )
+
+    return create_insight(
+        data=streak_data,
         name=Insight.INSIGHT_NAMES[insight_type],
         year=year,
     )

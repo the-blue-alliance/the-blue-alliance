@@ -2095,6 +2095,39 @@ export type NotablesInsight = {
   year: number;
 };
 
+export type StreakInsight = {
+  data: {
+    entries: Array<{
+      /**
+       * TBA team key, e.g. `frc254`.
+       */
+      team_key: string;
+      /**
+       * Length of the streak.
+       */
+      streak_length: number;
+      /**
+       * True if the streak is still ongoing.
+       */
+      is_active: boolean;
+      /**
+       * First context in the streak. Event key for event streaks, match key for match streaks, or year string for year streaks.
+       */
+      first: string;
+      /**
+       * Last context in the streak. Event key for event streaks, match key for match streaks, or year string for year streaks.
+       */
+      last: string;
+    }>;
+    /**
+     * The unit of the streak: 'event' for consecutive events, 'match' for consecutive matches, 'year' for consecutive years.
+     */
+    streak_type: 'event' | 'match' | 'year';
+  };
+  name: string;
+  year: number;
+};
+
 export type Position2016 =
   | ''
   | 'A_ChevalDeFrise'
@@ -4472,6 +4505,53 @@ export type GetInsightsNotablesYearResponses = {
 
 export type GetInsightsNotablesYearResponse =
   GetInsightsNotablesYearResponses[keyof GetInsightsNotablesYearResponses];
+
+export type GetInsightsStreaksYearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/insights/streaks/{year}';
+};
+
+export type GetInsightsStreaksYearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetInsightsStreaksYearError =
+  GetInsightsStreaksYearErrors[keyof GetInsightsStreaksYearErrors];
+
+export type GetInsightsStreaksYearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<StreakInsight>;
+};
+
+export type GetInsightsStreaksYearResponse =
+  GetInsightsStreaksYearResponses[keyof GetInsightsStreaksYearResponses];
 
 export type GetMatchData = {
   body?: never;

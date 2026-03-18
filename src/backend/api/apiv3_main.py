@@ -28,6 +28,7 @@ from backend.api.handlers.event import (
 from backend.api.handlers.insights import (
     insights_leaderboards_year,
     insights_notables_year,
+    insights_streaks_year,
 )
 from backend.api.handlers.match import match, zebra_motionworks
 from backend.api.handlers.media import media_tags
@@ -257,6 +258,7 @@ api_v3.add_url_rule(
     "/insights/leaderboards/<int:year>", view_func=insights_leaderboards_year
 )
 api_v3.add_url_rule("/insights/notables/<int:year>", view_func=insights_notables_year)
+api_v3.add_url_rule("/insights/streaks/<int:year>", view_func=insights_streaks_year)
 
 # Search
 api_v3.add_url_rule("/search_index", view_func=search_index)

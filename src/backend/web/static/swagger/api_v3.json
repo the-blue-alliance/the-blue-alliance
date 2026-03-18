@@ -2465,6 +2465,66 @@
         ]
       }
     },
+    "/insights/streaks/{year}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `StreakInsight` objects from a specific year. Use year=0 for overall.",
+        "operationId": "getInsightsStreaksYear",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/StreakInsight"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/match/{match_key}": {
       "get": {
         "tags": [
@@ -9669,6 +9729,75 @@
             },
             "required": [
               "entries"
+            ]
+          },
+          "name": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          }
+        },
+        "required": [
+          "data",
+          "name",
+          "year"
+        ]
+      },
+      "StreakInsight": {
+        "type": "object",
+        "properties": {
+          "data": {
+            "type": "object",
+            "properties": {
+              "entries": {
+                "type": "array",
+                "items": {
+                  "type": "object",
+                  "properties": {
+                    "team_key": {
+                      "type": "string",
+                      "description": "TBA team key, e.g. `frc254`."
+                    },
+                    "streak_length": {
+                      "type": "integer",
+                      "description": "Length of the streak."
+                    },
+                    "is_active": {
+                      "type": "boolean",
+                      "description": "True if the streak is still ongoing."
+                    },
+                    "first": {
+                      "type": "string",
+                      "description": "First context in the streak. Event key for event streaks, match key for match streaks, or year string for year streaks."
+                    },
+                    "last": {
+                      "type": "string",
+                      "description": "Last context in the streak. Event key for event streaks, match key for match streaks, or year string for year streaks."
+                    }
+                  },
+                  "required": [
+                    "team_key",
+                    "streak_length",
+                    "is_active",
+                    "first",
+                    "last"
+                  ]
+                }
+              },
+              "streak_type": {
+                "type": "string",
+                "enum": [
+                  "event",
+                  "match",
+                  "year"
+                ],
+                "description": "The unit of the streak: 'event' for consecutive events, 'match' for consecutive matches, 'year' for consecutive years."
+              }
+            },
+            "required": [
+              "entries",
+              "streak_type"
             ]
           },
           "name": {

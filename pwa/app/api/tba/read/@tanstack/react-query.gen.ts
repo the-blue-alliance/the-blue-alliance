@@ -42,6 +42,7 @@ import {
   getEventsByYearSimple,
   getInsightsLeaderboardsYear,
   getInsightsNotablesYear,
+  getInsightsStreaksYear,
   getMatch,
   getMatchSimple,
   getMatchTimeseries,
@@ -200,6 +201,9 @@ import type {
   GetInsightsNotablesYearData,
   GetInsightsNotablesYearError,
   GetInsightsNotablesYearResponse,
+  GetInsightsStreaksYearData,
+  GetInsightsStreaksYearError,
+  GetInsightsStreaksYearResponse,
   GetMatchData,
   GetMatchError,
   GetMatchResponse,
@@ -1438,6 +1442,34 @@ export const getInsightsNotablesYearOptions = (
       return data;
     },
     queryKey: getInsightsNotablesYearQueryKey(options),
+  });
+
+export const getInsightsStreaksYearQueryKey = (
+  options: Options<GetInsightsStreaksYearData>,
+) => createQueryKey('getInsightsStreaksYear', options);
+
+/**
+ * Gets a list of `StreakInsight` objects from a specific year. Use year=0 for overall.
+ */
+export const getInsightsStreaksYearOptions = (
+  options: Options<GetInsightsStreaksYearData>,
+) =>
+  queryOptions<
+    GetInsightsStreaksYearResponse,
+    GetInsightsStreaksYearError,
+    GetInsightsStreaksYearResponse,
+    ReturnType<typeof getInsightsStreaksYearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInsightsStreaksYear({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInsightsStreaksYearQueryKey(options),
   });
 
 export const getMatchQueryKey = (options: Options<GetMatchData>) =>

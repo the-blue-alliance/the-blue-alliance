@@ -135,6 +135,12 @@ cron:
     schedule: every day 01:00
     timezone: America/Los_Angeles
 
+  # Streak Insights
+  - description: Streak Overall Insights Calculation
+    url: /backend-tasks-b2/enqueue/math/insights/streaks/0
+    schedule: every day 01:00
+    timezone: America/Los_Angeles
+
   # District Insights
   - description: District Insights Calculation
     url: /backend-tasks-b2/enqueue/math/insights/districts/0

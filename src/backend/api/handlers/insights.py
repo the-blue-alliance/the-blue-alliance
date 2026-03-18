@@ -8,6 +8,7 @@ from backend.common.decorators import cached_public
 from backend.common.queries.insight_query import (
     InsightsLeaderboardsYearQuery,
     InsightsNotablesYearQuery,
+    InsightsStreaksYearQuery,
 )
 
 
@@ -29,4 +30,13 @@ def insights_notables_year(year: int) -> Response:
     track_call_after_response("insights/notables", str(year))
 
     insights = InsightsNotablesYearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
+    return profiled_jsonify(insights)
+
+
+@api_authenticated
+@cached_public
+def insights_streaks_year(year: int) -> Response:
+    track_call_after_response("insights/streaks", str(year))
+
+    insights = InsightsStreaksYearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
     return profiled_jsonify(insights)
