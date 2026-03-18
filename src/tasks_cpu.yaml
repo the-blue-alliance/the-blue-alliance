@@ -2,6 +2,8 @@ service: py3-tasks-cpu
 runtime: python313
 entrypoint: gunicorn -t 0 -b :$PORT backend.tasks_cpu.main:app
 app_engine_apis: true
+skip_files:
+  - ^.*gunicorn\.ctl$
 
 instance_class: B4_1G
 basic_scaling:
