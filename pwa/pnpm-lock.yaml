@@ -60,8 +60,8 @@ importers:
         specifier: 0.9.10
         version: 0.9.10(react@19.2.4)(tailwindcss@4.2.1)(typescript@5.9.3)
       '@scalar/react-renderer':
-        specifier: 0.4.0
-        version: 0.4.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.30(typescript@5.9.3))
+        specifier: 0.4.1
+        version: 0.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.30(typescript@5.9.3))
       '@sentry/tanstackstart-react':
         specifier: 10.44.0
         version: 10.44.0(react@19.2.4)(rollup@2.80.0)
@@ -2616,8 +2616,8 @@ packages:
     resolution: {integrity: sha512-bfwT2xuE1ZmyOhBQtt26cWDTyLZXbfZC3TiJAhlrn+wNHeCbTwVoj3BBGVUAAbhsbrm/4OB4ABwEfn/MB2Q2fg==}
     engines: {node: '>=22'}
 
-  '@scalar/react-renderer@0.4.0':
-    resolution: {integrity: sha512-jMcqO2sQa575bkCOaRtH1xwzS1YvzFzvW6uzTab2bgywG6hOIrEBKoL51F8ospajM2G1+AsUi2C3358Mu2uwdg==}
+  '@scalar/react-renderer@0.4.1':
+    resolution: {integrity: sha512-4b3oH8HcUVn8Liwz3E/CTbCnDQ6F1O6dbdsQHVAnu2GP0353JigUDdfjECmzwTIJTTrAAqWLIVdoa0heoq0l3Q==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^19.0.0
@@ -10563,7 +10563,7 @@ snapshots:
       '@scalar/helpers': 0.4.1
       '@scalar/openapi-types': 0.6.0
 
-  '@scalar/react-renderer@0.4.0(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.30(typescript@5.9.3))':
+  '@scalar/react-renderer@0.4.1(react-dom@19.2.4(react@19.2.4))(react@19.2.4)(vue@3.5.30(typescript@5.9.3))':
     dependencies:
       react: 19.2.4
       react-dom: 19.2.4(react@19.2.4)
