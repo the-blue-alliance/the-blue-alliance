@@ -163,7 +163,7 @@ function TeamHistoryPage(): React.JSX.Element {
 
         <Separator className="my-4" />
 
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row">
           <Table className="w-auto">
             <TableHeader>
               <TableRow>
@@ -220,7 +220,7 @@ function TeamHistoryPage(): React.JSX.Element {
               ))}
             </TableBody>
           </Table>
-          <div>
+          <div className="flex justify-center sm:block">
             {bannerAwards.length > 0 && (
               <div className="flex w-96 flex-row flex-wrap justify-center gap-2">
                 {bannerAwards.map((a) => {
