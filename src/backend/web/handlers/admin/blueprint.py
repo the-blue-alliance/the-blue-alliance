@@ -73,6 +73,8 @@ from backend.web.handlers.admin.match import (
     match_edit,
     match_edit_post,
     match_override_score_breakdown,
+    match_youtube_video_add_post,
+    match_youtube_video_delete_post,
 )
 from backend.web.handlers.admin.media import (
     media_add,
@@ -337,6 +339,16 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/match/delete/<match_key>", view_func=match_delete_post, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/match/youtube/add/<match_key>",
+    view_func=match_youtube_video_add_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/match/youtube/delete/<match_key>",
+    view_func=match_youtube_video_delete_post,
+    methods=["POST"],
 )
 admin_routes.add_url_rule(
     "/regional_champs_pool",

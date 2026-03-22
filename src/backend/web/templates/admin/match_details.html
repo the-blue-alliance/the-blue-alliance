@@ -49,7 +49,31 @@
     </tr>
     <tr>
         <td>Youtube Videos</td>
-        <td>{{ match.youtube_videos }}</td>
+        <td>
+            <table class="table table-condensed table-bordered" style="margin-bottom: 8px">
+                {% for video_id in match.youtube_videos %}
+                <tr>
+                    <td><a href="https://www.youtube.com/watch?v={{ video_id }}" target="_blank">{{ video_id }}</a></td>
+                    <td style="width: 1px; white-space: nowrap">
+                        <form method="POST" action="/admin/match/youtube/delete/{{ match.key_name }}" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <input type="hidden" name="youtube_id" value="{{ video_id }}">
+                            <button type="submit" class="btn btn-xs btn-danger">Delete</button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr><td><em>No YouTube videos</em></td></tr>
+                {% endfor %}
+            </table>
+            <form method="POST" action="/admin/match/youtube/add/{{ match.key_name }}" class="form-inline">
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                <div class="form-group">
+                    <input type="text" name="youtube_id" class="form-control input-sm" placeholder="YouTube Video ID" style="width: 200px">
+                </div>
+                <button type="submit" class="btn btn-sm btn-success">Add Video</button>
+            </form>
+        </td>
     </tr>
     <tr>
         <td>Created - Updated</td>
