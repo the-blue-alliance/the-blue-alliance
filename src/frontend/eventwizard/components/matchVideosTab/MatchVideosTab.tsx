@@ -39,7 +39,8 @@ export interface MatchVideosTabProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string
+    body: string,
+    method?: string
   ) => Promise<Response>;
   makeApiV3Request: (
     path: string
@@ -56,6 +57,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
   const [statusMessage, setStatusMessage] = useState<string>("");
   const [newVideoIds, setNewVideoIds] = useState<Record<string, string>>({});
   const [addingVideos, setAddingVideos] = useState<Record<string, boolean>>({});
+  const [deletingVideos, setDeletingVideos] = useState<Record<string, boolean>>({});
   const [playlistUrl, setPlaylistUrl] = useState<string>("");
   const [loadingPlaylist, setLoadingPlaylist] = useState<boolean>(false);
   const [playlistVideoTitles, setPlaylistVideoTitles] = useState<
@@ -322,6 +324,45 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     }
   };
 
+  const deleteVideo = async (match: Match, videoId: string): Promise<void> => {
+    const matchKey = match.key;
+    const deletingKey = `${matchKey}:${videoId}`;
+    const partialMatchKey = matchKey.replace(`${selectedEvent}_`, "");
+
+    setDeletingVideos((prev) => ({ ...prev, [deletingKey]: true }));
+    setStatusMessage(`Deleting video from ${formatMatchName(match)}...`);
+
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/match_videos/delete`,
+        JSON.stringify({ [partialMatchKey]: videoId }),
+        "DELETE"
+      );
+      setMatches((prevMatches) =>
+        prevMatches.map((m) => {
+          if (m.key !== matchKey) {
+            return m;
+          }
+          return {
+            ...m,
+            videos: m.videos.filter(
+              (v) => !(v.type === "youtube" && v.key === videoId)
+            ),
+          };
+        })
+      );
+      setStatusMessage(`Successfully deleted video from ${formatMatchName(match)}!`);
+    } catch (error) {
+      setStatusMessage(`Error deleting video: ${error}`);
+    } finally {
+      setDeletingVideos((prev) => {
+        const next = { ...prev };
+        delete next[deletingKey];
+        return next;
+      });
+    }
+  };
+
   const addVideo = async (match: Match): Promise<void> => {
     const matchKey = match.key;
     const videoId = newVideoIds[matchKey]?.trim();
@@ -495,8 +536,10 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
                         <ul style={{ margin: 0, paddingLeft: "20px" }}>
                           {match.videos.map((video, idx) => {
                             const videoId = extractVideoId(video);
-                            return videoId ? (
-                              <li key={idx}>
+                            if (!videoId) return null;
+                            const deletingKey = `${match.key}:${videoId}`;
+                            return (
+                              <li key={idx} style={{ display: "flex", alignItems: "center", gap: "6px", marginBottom: "2px" }}>
                                 <a
                                   href={`https://www.youtube.com/watch?v=${videoId}`}
                                   target="_blank"
@@ -504,8 +547,16 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
                                 >
                                   {videoId}
                                 </a>
+                                <button
+                                  className="btn btn-danger btn-xs"
+                                  onClick={() => deleteVideo(match, videoId)}
+                                  disabled={!!deletingVideos[deletingKey]}
+                                  aria-label={`Delete video ${videoId}`}
+                                >
+                                  {deletingVideos[deletingKey] ? "..." : "\u00d7"}
+                                </button>
                               </li>
-                            ) : null;
+                            );
                           })}
                         </ul>
                       ) : (

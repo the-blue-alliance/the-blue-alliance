@@ -250,6 +250,88 @@ describe("MatchVideosTab", () => {
     });
   });
 
+  describe("Deleting Videos", () => {
+    const mockMatchWithVideo = {
+      key: "2024nytr_qm1",
+      comp_level: "qm",
+      set_number: 1,
+      match_number: 1,
+      alliances: { red: { team_keys: [] }, blue: { team_keys: [] } },
+      videos: [{ type: "youtube", key: "existingVid1" }],
+    };
+
+    beforeEach(async () => {
+      mockMakeApiV3Request.mockResolvedValue(
+        makeApiV3JsonResponse([mockMatchWithVideo])
+      );
+
+      render(
+        <MatchVideosTab
+          selectedEvent={selectedEvent}
+          makeTrustedRequest={mockMakeTrustedRequest}
+          makeApiV3Request={mockMakeApiV3Request}
+        />
+      );
+
+      fireEvent.click(screen.getByRole("button", { name: /Fetch Matches/i }));
+      await waitFor(() => {
+        expect(screen.getByText("Qualification 1")).toBeInTheDocument();
+        expect(screen.getByText("existingVid1")).toBeInTheDocument();
+      });
+    });
+
+    it("shows delete button for each existing video", () => {
+      const deleteBtn = screen.getByRole("button", {
+        name: /Delete video existingVid1/i,
+      });
+      expect(deleteBtn).toBeInTheDocument();
+      expect(deleteBtn).toBeEnabled();
+    });
+
+    it("calls delete endpoint with DELETE method when delete button is clicked", async () => {
+      mockMakeTrustedRequest.mockResolvedValue(makeTrustedJsonResponse({}));
+
+      fireEvent.click(
+        screen.getByRole("button", { name: /Delete video existingVid1/i })
+      );
+
+      await waitFor(() => {
+        expect(mockMakeTrustedRequest).toHaveBeenCalledWith(
+          `/api/trusted/v1/event/${selectedEvent}/match_videos/delete`,
+          JSON.stringify({ qm1: "existingVid1" }),
+          "DELETE"
+        );
+      });
+    });
+
+    it("removes video from UI after successful deletion", async () => {
+      mockMakeTrustedRequest.mockResolvedValue(makeTrustedJsonResponse({}));
+
+      fireEvent.click(
+        screen.getByRole("button", { name: /Delete video existingVid1/i })
+      );
+
+      await waitFor(() => {
+        expect(screen.queryByText("existingVid1")).not.toBeInTheDocument();
+        expect(screen.getByText("No videos")).toBeInTheDocument();
+      });
+    });
+
+    it("shows success status after deletion", async () => {
+      mockMakeTrustedRequest.mockResolvedValue(makeTrustedJsonResponse({}));
+
+      fireEvent.click(
+        screen.getByRole("button", { name: /Delete video existingVid1/i })
+      );
+
+      await waitFor(() => {
+        expect(
+          screen.getByText(/Successfully deleted video from Qualification 1/)
+        ).toBeInTheDocument();
+      });
+    });
+  });
+
   describe("Playlist Autofill", () => {
     it("autofills video IDs from playlist by guessed match partial", async () => {
       const mockMatches = [
