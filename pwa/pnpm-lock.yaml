@@ -135,8 +135,8 @@ importers:
         specifier: 11.2.7
         version: 11.2.7
       lucide-react:
-        specifier: 0.577.0
-        version: 0.577.0(react@19.2.4)
+        specifier: 1.0.1
+        version: 1.0.1(react@19.2.4)
       morgan:
         specifier: 1.10.1
         version: 1.10.1
@@ -184,8 +184,8 @@ importers:
         specifier: 0.94.4
         version: 0.94.4(magicast@0.5.2)(typescript@5.9.3)
       '@iconify/json':
-        specifier: 2.2.452
-        version: 2.2.452
+        specifier: 2.2.454
+        version: 2.2.454
       '@julr/vite-plugin-validate-env':
         specifier: 2.2.2
         version: 2.2.2(vite@8.0.1(@types/node@24.12.0)(esbuild@0.27.4)(jiti@2.6.1)(terser@5.46.0)(tsx@4.21.0)(yaml@2.8.2))
@@ -1477,8 +1477,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify/json@2.2.452':
-    resolution: {integrity: sha512-3gUSKSQ3UHRpuvk0GL5WdD3n+WR9MhvxjJ3cFjoBb44kD8yKC/esyxeOZfXdilRmJFvs1y8+j5DM6SIwCtMbXw==}
+  '@iconify/json@2.2.454':
+    resolution: {integrity: sha512-U1c0+LBtcF4YDQGOVZpoA4w96hBcIVHFjBcg60pFdnF+CApRjnlIp27Jf1g7BaZlJ+vYcExyc/1EjUyZrY8MFQ==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -5673,8 +5673,8 @@ packages:
   lru-memoizer@2.3.0:
     resolution: {integrity: sha512-GXn7gyHAMhO13WSKrIiNfztwxodVsP8IoZ3XfrJV4yH2x0/OeTO/FIaAHTY5YekdGgW94njfuKmyyt1E0mR6Ug==}
 
-  lucide-react@0.577.0:
-    resolution: {integrity: sha512-4LjoFv2eEPwYDPg/CUdBJQSDfPyzXCRrVW1X7jrx/trgxnxkHFjnVZINbzvzxjN70dxychOfg+FTYwBiS3pQ5A==}
+  lucide-react@1.0.1:
+    resolution: {integrity: sha512-lih7tKEczCYOQjVEzpFuxEuNzlwf+1yhvlMlEkGWJM3va8Pugv8bYXc/pRtcjPncaP7k84X0Pt/71ufxvqEPtQ==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -9115,7 +9115,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@iconify/json@2.2.452':
+  '@iconify/json@2.2.454':
     dependencies:
       '@iconify/types': 2.0.0
       pathe: 2.0.3
@@ -14083,7 +14083,7 @@ snapshots:
       lodash.clonedeep: 4.5.0
       lru-cache: 6.0.0
 
-  lucide-react@0.577.0(react@19.2.4):
+  lucide-react@1.0.1(react@19.2.4):
     dependencies:
       react: 19.2.4
 
