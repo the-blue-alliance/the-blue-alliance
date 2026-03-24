@@ -8,7 +8,10 @@ from backend.common.consts.ranking_sort_orders import (
 )
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.cached_model import CachedModel
-from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_district_points import (
+    EventDistrictPoints,
+    EventRegionalChampsPoolPoints,
+)
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.event_matchstats import EventComponentOPRs, EventMatchstats
 from backend.common.models.event_playoff_advancement import EventPlayoffAdvancement
@@ -35,8 +38,8 @@ class EventDetails(CachedModel):
         ndb.JsonProperty()
     )  # Formatted as: [{'picks': [captain, pick1, pick2, 'frc123', ...], 'declines':[decline1, decline2, ...] }, {'picks': [], 'declines': []}, ... ]
     district_points: EventDistrictPoints = cast(EventDistrictPoints, ndb.JsonProperty())
-    regional_champs_pool_points: EventDistrictPoints = cast(
-        EventDistrictPoints, ndb.JsonProperty()
+    regional_champs_pool_points: EventRegionalChampsPoolPoints = cast(
+        EventRegionalChampsPoolPoints, ndb.JsonProperty()
     )
     matchstats: EventMatchstats = cast(
         EventMatchstats, ndb.JsonProperty()

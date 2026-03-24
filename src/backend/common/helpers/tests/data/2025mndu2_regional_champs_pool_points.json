@@ -5,14 +5,16 @@
       "award_points": 8,
       "elim_points": 0,
       "qual_points": 9,
-      "total": 17
+      "total": 27,
+      "rookie_bonus": 10
     },
     "frc10474": {
       "alliance_points": 0,
       "award_points": 0,
       "elim_points": 0,
       "qual_points": 12,
-      "total": 12
+      "total": 22,
+      "rookie_bonus": 10
     },
     "frc111": {
       "alliance_points": 15,

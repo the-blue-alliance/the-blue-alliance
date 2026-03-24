@@ -1,7 +1,7 @@
 import heapq
 import logging
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, NamedTuple, Optional, Set, Union
+from typing import cast, DefaultDict, Dict, List, NamedTuple, Optional, Set, Union
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -16,10 +16,12 @@ from backend.common.helpers.district_helper import (
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
+    EventRegionalChampsPoolPoints,
     TeamAtEventDistrictPoints,
     TeamAtEventDistrictPointTiebreakers,
+    TeamAtEventRegionalChampsPoolPoints,
 )
-from backend.common.models.keys import EventKey, TeamKey, Year
+from backend.common.models.keys import TeamKey, Year
 from backend.common.models.team import Team
 
 
@@ -32,7 +34,7 @@ class RegionalChampsPoolTiebreakers(NamedTuple):
 class RegionalChampsPoolHelper(DistrictHelper):
 
     @classmethod
-    def calculate_event_points(cls, event: Event) -> EventDistrictPoints:
+    def calculate_event_points(cls, event: Event) -> EventRegionalChampsPoolPoints:
         event.prep_awards()
         event.prep_matches()
 
@@ -102,7 +104,20 @@ class RegionalChampsPoolHelper(DistrictHelper):
             )
             district_points["points"][team]["total"] += total_points
 
-        return district_points
+        # Team age points are awarded at each regional event attended.
+        rookie_points = cls._get_event_level_rookie_bonus_points(
+            event, set(district_points["points"].keys()), multiplier=1
+        )
+        regional_points = cast(EventRegionalChampsPoolPoints, district_points)
+        for team_key, rookie_bonus in rookie_points.items():
+            team_points = cast(
+                TeamAtEventRegionalChampsPoolPoints,
+                regional_points["points"][team_key],
+            )
+            team_points["rookie_bonus"] = rookie_bonus
+            team_points["total"] += rookie_bonus
+
+        return regional_points
 
     @classmethod
     def calculate_rankings(
@@ -113,8 +128,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
         adjustments: Optional[Dict[TeamKey, int]],
     ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two regional events
-        events_by_key: Dict[EventKey, Event] = {}
-        team_attendance: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
+        team_attendance: DefaultDict[TeamKey, List[str]] = defaultdict(list)
         team_totals: Dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
             lambda: DistrictRankingTeamTotal(
                 event_points=[],
@@ -133,7 +147,6 @@ class RegionalChampsPoolHelper(DistrictHelper):
         )
 
         for event in events:
-            events_by_key[event.key_name] = event
             event_regional_points = event.regional_champs_pool_points
             if event_regional_points is None:
                 continue
@@ -197,26 +210,26 @@ class RegionalChampsPoolHelper(DistrictHelper):
             else:
                 team = team_f
             team_total = team_totals[team.key_name]
-            rookie_bonus_per_event = cls._get_rookie_bonus(year, team.rookie_year)
-
-            # Rookie bonus is applied per event attended (up to 2 events)
             num_events_attended = len(team_total["event_points"])
-            total_rookie_bonus = rookie_bonus_per_event * num_events_attended
+            total_rookie_bonus = sum(
+                cast(TeamAtEventRegionalChampsPoolPoints, event_points).get(
+                    "rookie_bonus", 0
+                )
+                for _, event_points in team_total["event_points"]
+            )
 
             # Single-Event regional teams are award additional points
             # based on event 1 performance.
             # E2 points = 0.6 * (E1 points) + 14
-            # Team age points are part of E1 points for regional events.
+            # Team age points are included in event-level totals.
             # See section 12.3.1 of the 2025 game manual.
             if num_events_attended == 1:
                 first_event_points = team_total["event_points"][0][1]
-                first_event_total = first_event_points["total"] + rookie_bonus_per_event
-                single_event_bonus = round(0.6 * first_event_total) + 14
+                single_event_bonus = round(0.6 * first_event_points["total"]) + 14
                 team_total["single_event_bonus"] = single_event_bonus
                 team_total["point_total"] += single_event_bonus
 
             team_total["rookie_bonus"] = total_rookie_bonus
-            team_total["point_total"] += total_rookie_bonus
 
             # For other adjustments made by HQ
             if adjustments and (team_adjustment := adjustments.get(team.key_name)):

@@ -387,6 +387,30 @@ class DistrictHelper:
         return bonus
 
     @classmethod
+    def _get_event_level_rookie_bonus_points(
+        cls,
+        event: Event,
+        team_keys: Set[TeamKey],
+        multiplier: int = 1,
+    ) -> Dict[TeamKey, int]:
+        rookie_points: Dict[TeamKey, int] = {}
+
+        for team_key in team_keys:
+            team = Team.get_by_id(team_key)
+            if team is None:
+                continue
+
+            rookie_bonus = (
+                cls._get_rookie_bonus(event.year, team.rookie_year) * multiplier
+            )
+            if rookie_bonus <= 0:
+                continue
+
+            rookie_points[team_key] = rookie_bonus
+
+        return rookie_points
+
+    @classmethod
     def _get_alliance_number_from_teams(
         cls,
         alliance_selections: List[EventAlliance],

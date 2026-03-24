@@ -5,7 +5,8 @@
       "award_points": 8,
       "elim_points": 0,
       "qual_points": 8,
-      "total": 16
+      "total": 26,
+      "rookie_bonus": 10
     },
     "frc1306": {
       "alliance_points": 6,
@@ -369,14 +370,16 @@
       "award_points": 0,
       "elim_points": 0,
       "qual_points": 10,
-      "total": 10
+      "total": 15,
+      "rookie_bonus": 5
     },
     "frc9578": {
       "alliance_points": 0,
       "award_points": 0,
       "elim_points": 0,
       "qual_points": 11,
-      "total": 11
+      "total": 16,
+      "rookie_bonus": 5
     }
   },
   "tiebreakers": {

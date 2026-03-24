@@ -29,3 +29,11 @@ class TeamAtEventDistrictPointTiebreakers(TypedDict):
 class EventDistrictPoints(TypedDict):
     points: Dict[TeamKey, TeamAtEventDistrictPoints]
     tiebreakers: Dict[TeamKey, TeamAtEventDistrictPointTiebreakers]
+
+
+class TeamAtEventRegionalChampsPoolPoints(TeamAtEventDistrictPoints, total=False):
+    rookie_bonus: int
+
+
+class EventRegionalChampsPoolPoints(EventDistrictPoints):
+    pass

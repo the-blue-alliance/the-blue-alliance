@@ -25,7 +25,10 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
-from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_district_points import (
+    EventDistrictPoints,
+    EventRegionalChampsPoolPoints,
+)
 from backend.common.models.event_playoff_advancement import (
     TBracketTable,
     TPlayoffAdvancement,
@@ -252,7 +255,7 @@ class Event(CachedModel):
             return self.details.district_points
 
     @property
-    def regional_champs_pool_points(self) -> Optional[EventDistrictPoints]:
+    def regional_champs_pool_points(self) -> Optional[EventRegionalChampsPoolPoints]:
         if self.event_type_enum != EventType.REGIONAL or self.details is None:
             return None
 

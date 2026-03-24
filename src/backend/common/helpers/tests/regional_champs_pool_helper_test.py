@@ -1,4 +1,5 @@
 import json
+from typing import cast
 
 import pytest
 from pyre_extensions import none_throws
@@ -10,7 +11,9 @@ from backend.common.helpers.regional_champs_pool_helper import (
 )
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
-from backend.common.models.event_district_points import TeamAtEventDistrictPoints
+from backend.common.models.event_district_points import (
+    TeamAtEventRegionalChampsPoolPoints,
+)
 from backend.common.models.team import Team
 
 
@@ -39,6 +42,31 @@ def test_calc_event_points(
         expected_event_points = json.load(f)
 
     assert event_points == expected_event_points
+
+
+def test_calc_event_points_includes_event_level_rookie_bonus(setup_full_event) -> None:
+    setup_full_event("2025mndu")
+
+    # Use an attending team and make it a rookie for this season
+    rookie_team = none_throws(Team.get_by_id("frc2847"))
+    rookie_team.rookie_year = 2025
+    rookie_team.put()
+
+    event = none_throws(Event.get_by_id("2025mndu"))
+    event_points = RegionalChampsPoolHelper.calculate_event_points(event)
+    breakdown = cast(
+        TeamAtEventRegionalChampsPoolPoints,
+        event_points["points"]["frc2847"],
+    )
+
+    assert breakdown["rookie_bonus"] == 10
+    assert breakdown["total"] == (
+        breakdown["qual_points"]
+        + breakdown["elim_points"]
+        + breakdown["alliance_points"]
+        + breakdown["award_points"]
+        + breakdown["rookie_bonus"]
+    )
 
 
 def test_calc_multi_event_rankings_all_teams_filtered(setup_full_event) -> None:
@@ -74,7 +102,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
         event_points=[
             (
                 events[0],
-                TeamAtEventDistrictPoints(
+                TeamAtEventRegionalChampsPoolPoints(
                     alliance_points=15,
                     award_points=5,
                     elim_points=30,
@@ -99,7 +127,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
         event_points=[
             (
                 events[1],
-                TeamAtEventDistrictPoints(
+                TeamAtEventRegionalChampsPoolPoints(
                     alliance_points=14,
                     award_points=45,
                     elim_points=20,
@@ -141,7 +169,7 @@ def test_hq_adjustments(setup_full_event) -> None:
         event_points=[
             (
                 events[0],
-                TeamAtEventDistrictPoints(
+                TeamAtEventRegionalChampsPoolPoints(
                     alliance_points=15,
                     award_points=5,
                     elim_points=30,
@@ -179,12 +207,13 @@ def test_rookie_bonus_per_event(setup_full_event) -> None:
     event1_details = EventDetails.get_by_id("2025mndu")
     if event1_details and event1_details.regional_champs_pool_points:
         event1_details.regional_champs_pool_points["points"]["frc9001"] = (
-            TeamAtEventDistrictPoints(
+            TeamAtEventRegionalChampsPoolPoints(
+                rookie_bonus=10,
                 alliance_points=10,
                 award_points=0,
                 elim_points=0,
                 qual_points=15,
-                total=25,
+                total=35,
             )
         )
         event1_details.put()
@@ -192,12 +221,13 @@ def test_rookie_bonus_per_event(setup_full_event) -> None:
     event2_details = EventDetails.get_by_id("2025mndu2")
     if event2_details and event2_details.regional_champs_pool_points:
         event2_details.regional_champs_pool_points["points"]["frc9001"] = (
-            TeamAtEventDistrictPoints(
+            TeamAtEventRegionalChampsPoolPoints(
+                rookie_bonus=10,
                 alliance_points=12,
                 award_points=0,
                 elim_points=0,
                 qual_points=18,
-                total=30,
+                total=40,
             )
         )
         event2_details.put()
@@ -224,7 +254,7 @@ def test_rookie_bonus_per_event(setup_full_event) -> None:
 
     # Rookie team attending 2 events should get 10 points per event = 20
     assert rankings["frc9001"]["rookie_bonus"] == 20
-    # Total: 25 (event1) + 30 (event2) + 20 (rookie bonus) = 75
+    # Total: 35 (event1 incl team age) + 40 (event2 incl team age) = 75
     assert rankings["frc9001"]["point_total"] == 75
 
 
@@ -233,12 +263,13 @@ def test_single_event_bonus_includes_rookie_bonus(setup_full_event) -> None:
 
     event_details = none_throws(EventDetails.get_by_id("2025mndu"))
     regional_pool_points = none_throws(event_details.regional_champs_pool_points)
-    regional_pool_points["points"]["frc9002"] = TeamAtEventDistrictPoints(
+    regional_pool_points["points"]["frc9002"] = TeamAtEventRegionalChampsPoolPoints(
+        rookie_bonus=10,
         alliance_points=10,
         award_points=0,
         elim_points=0,
         qual_points=15,
-        total=25,
+        total=35,
     )
     event_details.regional_champs_pool_points = regional_pool_points
     event_details.put()
@@ -257,7 +288,7 @@ def test_single_event_bonus_includes_rookie_bonus(setup_full_event) -> None:
         [event], [rookie_single_event], 2025, None
     )
 
-    # E1 includes rookie bonus for regional events: 25 + 10
+    # E1 already includes team age points for regional events: 35
     # E2 = round(0.6 * E1) + 14 = round(0.6 * 35) + 14 = 35
     assert rankings["frc9002"]["rookie_bonus"] == 10
     assert rankings["frc9002"]["single_event_bonus"] == 35

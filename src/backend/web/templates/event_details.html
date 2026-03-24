@@ -398,6 +398,7 @@
                 <th>Playoff Points</th>
                 <th>Alliance Points</th>
                 <th>Award Points</th>
+                <th>Team Age Points</th>
                 <th>Total Points</th>
               </tr>
             </thead>
@@ -410,6 +411,7 @@
                 <td>{{breakdown.elim_points}}</td>
                 <td>{{breakdown.alliance_points}}</td>
                 <td>{{breakdown.award_points}}</td>
+                <td>{{breakdown.rookie_bonus or 0}}</td>
                 <td><strong>{{breakdown.total}}<strong></td>
               </tr>
               {% endfor %}
