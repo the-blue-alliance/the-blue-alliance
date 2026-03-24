@@ -270,37 +270,16 @@
 <p>Fan-out one task per district abbreviation (avoids timeouts on large datasets).</p>
 <div class="row">
     <div class="col-sm-6">
-        <span class="help-block">Enqueue all district insights for a specific year</span>
-        <form class="form-inline">
-            <div class="input-group">
-                <input class="form-control" id="enqueue_district_insights_year" type="text" placeholder="2026">
-                <span class="input-group-btn" id="enqueue_district_insights_year_submit">
-                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
-                </span>
-            </div>
-        </form>
-        <script>
-        $("#enqueue_district_insights_year_submit").click(function() {
-            window.location = "/backend-tasks-b2/enqueue/math/insights/districts/" + $("#enqueue_district_insights_year").val();
-        });
-        </script>
+        <span class="help-block">Enqueue all district insights for {{ current_year }}</span>
+        <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/insights/districts/{{ current_year }}">Enqueue All Districts {{ current_year }} <span class="glyphicon glyphicon-fast-forward"></span></a>
     </div>
     <div class="col-sm-6">
-        <span class="help-block">Enqueue insights for a single district abbreviation + year</span>
-        <form class="form-inline">
-            <div class="input-group">
-                <input class="form-control" id="enqueue_district_insights_abbrev" type="text" placeholder="fim">
-                <input class="form-control" id="enqueue_district_insights_abbrev_year" type="text" placeholder="2026">
-                <span class="input-group-btn" id="enqueue_district_insights_abbrev_submit">
-                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
-                </span>
-            </div>
-        </form>
-        <script>
-        $("#enqueue_district_insights_abbrev_submit").click(function() {
-            window.location = "/backend-tasks-b2/do/math/insights/districts/" + $("#enqueue_district_insights_abbrev_year").val() + "/" + $("#enqueue_district_insights_abbrev").val();
-        });
-        </script>
+        <span class="help-block">Enqueue insights for a single district ({{ current_year }})</span>
+        {% for district in districts %}
+        <a class="btn btn-warning btn-xs" href="/backend-tasks-b2/do/math/insights/districts/{{ current_year }}/{{ district.abbreviation }}">{{ district.abbreviation.upper() }}</a>
+        {% else %}
+        <span class="text-muted">No districts found for {{ current_year }}</span>
+        {% endfor %}
     </div>
 </div>
 

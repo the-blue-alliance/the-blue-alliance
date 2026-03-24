@@ -8,7 +8,6 @@ from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
 from backend.common.consts.insight_type import InsightType
-from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.insights_helper import InsightsHelper
 from backend.common.helpers.insights_leaderboard_event_helper import (
     InsightsLeaderboardEventHelper,
@@ -23,7 +22,8 @@ from backend.common.helpers.insights_notable_helper import InsightsNotableHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
 from backend.common.models.insight import Insight, LeaderboardKeyType
-from backend.common.models.keys import Year
+from backend.common.models.keys import DistrictAbbreviation, Year
+from backend.common.queries.district_query import DistrictsInYearQuery
 
 blueprint = Blueprint("insights", __name__)
 
@@ -300,12 +300,13 @@ def enqueue_district_insights(year: Optional[Year] = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
-    for abbrev in RenamedDistricts.get_latest_codes():
+    districts = DistrictsInYearQuery(year).fetch()
+    for district in districts:
         taskqueue.add(
             url=url_for(
                 "insights.do_district_insights_for_abbreviation",
                 year=year,
-                abbrev=abbrev,
+                abbrev=district.abbreviation,
             ),
             method="GET",
             target="py3-tasks-cpu",
@@ -314,7 +315,7 @@ def enqueue_district_insights(year: Optional[Year] = None) -> Response:
 
     if "X-Appengine-Taskname" not in request.headers:
         return make_response(
-            f"enqueued district insights for {len(RenamedDistricts.get_latest_codes())} districts in year {year}"
+            f"enqueued district insights for {len(districts)} districts in year {year}"
         )
 
     return make_response("")
@@ -325,8 +326,6 @@ def do_district_insights_for_abbreviation(abbrev: str, year: Year) -> Response:
     """
     Calculates district insights for a single district abbreviation.
     """
-    from backend.common.models.keys import DistrictAbbreviation
-
     start = time.perf_counter()
     logging.info(
         "District insights task start district=%s year=%s task=%s",

@@ -3,6 +3,7 @@ from google.appengine.api import users as gae_login
 
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.environment.environment import Environment
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account
 from backend.common.models.suggestion import Suggestion
@@ -159,7 +160,19 @@ def admin_home() -> str:
 
 @admin_routes.route("/tasks")
 def task_launcher() -> str:
-    return render_template("admin/tasks.html")
+    from backend.common.queries.district_query import DistrictsInYearQuery
+
+    current_year = SeasonHelper.get_current_season()
+    districts = sorted(
+        DistrictsInYearQuery(current_year).fetch(), key=lambda d: d.abbreviation
+    )
+    return render_template(
+        "admin/tasks.html",
+        {
+            "current_year": current_year,
+            "districts": districts,
+        },
+    )
 
 
 # More complex endpoints should be split out into their own files
