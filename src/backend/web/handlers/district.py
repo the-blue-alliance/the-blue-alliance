@@ -14,6 +14,7 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
 from backend.common.models.event_team import EventTeam
+from backend.common.models.insight import Insight
 from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.queries.district_query import (
@@ -175,6 +176,62 @@ def district_detail(
     return make_cached_response(
         render_template("district_details.html", template_values),
         ttl=timedelta(minutes=15) if current_year else timedelta(days=1),
+    )
+
+
+@cached_public
+def district_insights(
+    district_abbrev: DistrictAbbreviation, year: Optional[Year]
+) -> Response:
+    history = DistrictHistoryQuery(district_abbrev).fetch()
+    if len(history) == 0:
+        abort(404)
+
+    valid_years = sorted([district.year for district in history], reverse=True)
+
+    if year is None:
+        year = valid_years[0]
+
+    if year not in valid_years:
+        abort(404)
+
+    latest_district = sorted(history, key=lambda district: district.year)[-1]
+
+    template_values = {
+        "selected_year": year,
+        "valid_years": valid_years,
+        "year_specific_insights_template": "event_partials/event_insights_{}.html".format(
+            year
+        ),
+        "insights_overview_url": f"/district/{district_abbrev}/insights",
+        "insights_base_path": f"/district/{district_abbrev}/insights",
+        "page_title": f"{year} {latest_district.display_name} District Insights - The Blue Alliance",
+        "meta_description": f"FIRST Robotics Competition (FRC) insights from {year} for the {latest_district.display_name} District.",
+        "heading": f"{year} {latest_district.display_name} District Insights",
+    }
+
+    insights = ndb.get_multi(
+        [
+            ndb.Key(
+                Insight,
+                Insight.render_key_name(year, insight_name, district_abbrev),
+            )
+            for insight_name in Insight.INSIGHT_NAMES.values()
+        ]
+    )
+    last_updated = None
+    for insight in insights:
+        if insight:
+            template_values[insight.name] = insight
+            if last_updated is None:
+                last_updated = insight.updated
+            else:
+                last_updated = max(last_updated, insight.updated)
+    template_values["last_updated"] = last_updated
+
+    return make_cached_response(
+        render_template("insights_details.html", template_values),
+        ttl=timedelta(days=1),
     )
 
 

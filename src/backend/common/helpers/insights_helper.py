@@ -1,10 +1,11 @@
 import itertools
+import logging
 import math
+import time
 from collections import defaultdict
-from typing import Dict, List, NamedTuple
+from typing import Any, cast, Dict, List, NamedTuple, Optional
 
 import numpy as np
-from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -16,7 +17,6 @@ from backend.common.consts.event_type import (
     SEASON_EVENT_TYPES,
 )
 from backend.common.consts.renamed_districts import RenamedDistricts
-from backend.common.futures import TypedFuture
 from backend.common.helpers.event_helper import (
     EventHelper,
     OFFSEASON_EVENTS_LABEL,
@@ -29,11 +29,14 @@ from backend.common.helpers.insights_helper_utils import (
     sort_counter_dict,
 )
 from backend.common.models.award import Award
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.insight import Insight
-from backend.common.models.keys import Year
+from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.models.match import Match
 from backend.common.models.team import Team
+from backend.common.queries.district_query import DistrictHistoryQuery
+from backend.common.queries.event_query import DistrictEventsQuery
 
 
 class EventMatches(NamedTuple):
@@ -56,11 +59,14 @@ class InsightsHelper(object):
         """
         Calculate match insights for a given year. Returns a list of Insights.
         """
-        # Only fetch from DB once
-        official_events = (
-            Event.query(Event.year == year).order(Event.start_date).fetch(1000)
+        return self._doMatchInsightsForEvents(
+            year=year,
+            events=Event.query(Event.year == year).order(Event.start_date).fetch(1000),
         )
-        events_by_week = EventHelper.group_by_week(official_events)
+
+    @classmethod
+    def _buildWeekEventMatches(cls, events: List[Event]) -> List[WeekEventMatches]:
+        events_by_week = EventHelper.group_by_week(EventHelper.sorted_events(events))
         week_event_matches = (
             []
         )  # Tuples of: (week, events) where events are tuples of (event, matches)
@@ -76,42 +82,84 @@ class InsightsHelper(object):
                 WeekEventMatches(week=week, event_matches=event_matches)
             )
 
-        insights = []
-        insights += self._calculateHighscoreMatchesByWeek(week_event_matches, year)
-        insights += self._calculateHighscoreMatches(week_event_matches, year)
-        insights += self._calculateMatchAveragesByWeek(week_event_matches, year)
-        insights += self._calculateMatchWinningMarginByWeek(week_event_matches, year)
-        insights += self._calculateScoreDistribution(week_event_matches, year)
-        insights += self._calculateWinningMarginDistribution(week_event_matches, year)
-        insights += self._calculateNumMatches(week_event_matches, year)
-        insights += self._calculateYearSpecific(week_event_matches, year)
-        insights += self._calculateMatchesByTeam(week_event_matches, year)
+        return week_event_matches
 
-        return insights
+    @classmethod
+    def _scopeInsightsToDistrict(
+        cls,
+        insights: List[Insight],
+        district_abbreviation: Optional[DistrictAbbreviation],
+    ) -> List[Insight]:
+        if district_abbreviation is None:
+            return insights
+
+        return [
+            create_insight(
+                data=insight.data,
+                name=insight.name,
+                year=insight.year,
+                district_abbreviation=district_abbreviation,
+            )
+            for insight in insights
+        ]
+
+    @classmethod
+    def _doMatchInsightsForEvents(
+        cls,
+        year: Year,
+        events: List[Event],
+        district_abbreviation: Optional[DistrictAbbreviation] = None,
+    ) -> List[Insight]:
+        week_event_matches = cls._buildWeekEventMatches(events)
+
+        insights = []
+        insights += cls._calculateHighscoreMatchesByWeek(week_event_matches, year)
+        insights += cls._calculateHighscoreMatches(week_event_matches, year)
+        insights += cls._calculateMatchAveragesByWeek(week_event_matches, year)
+        insights += cls._calculateMatchWinningMarginByWeek(week_event_matches, year)
+        insights += cls._calculateScoreDistribution(week_event_matches, year)
+        insights += cls._calculateWinningMarginDistribution(week_event_matches, year)
+        insights += cls._calculateNumMatches(week_event_matches, year)
+        insights += cls._calculateYearSpecific(week_event_matches, year)
+        insights += cls._calculateMatchesByTeam(week_event_matches, year)
+
+        return cls._scopeInsightsToDistrict(insights, district_abbreviation)
 
     @classmethod
     def doAwardInsights(self, year: Year) -> List[Insight]:
         """
         Calculate award insights for a given year. Returns a list of Insights.
         """
-        award_futures = ndb.get_multi_async(
-            Award.query(
-                Award.year == year, Award.event_type_enum.IN(SEASON_EVENT_TYPES)
-            )
-            .fetch_async(10000, keys_only=True)
-            .get_result()
+        return self._doAwardInsightsForEvents(
+            year=year,
+            events=Event.query(
+                Event.event_type_enum.IN(SEASON_EVENT_TYPES),
+                Event.year == year,
+            ).fetch(),
         )
+
+    @classmethod
+    def _doAwardInsightsForEvents(
+        cls,
+        year: Year,
+        events: List[Event],
+        district_abbreviation: Optional[DistrictAbbreviation] = None,
+    ) -> List[Insight]:
+        for event in events:
+            event.prep_awards()
+
+        awards: List[Award] = []
+        for event in events:
+            awards.extend(event.awards)
 
         insights = []
-        insights += self._calculateBlueBanners(award_futures, year)
-        insights += self._calculateChampionshipStats(award_futures, year)
-        insights += self._calculateRegionalStats(award_futures, year)
-        insights += self._calculateSuccessfulElimTeamups(award_futures, year)
-        insights += self._calculateSuccessfulElimTeamups(
-            award_futures, year, isEinstein=True
-        )
+        insights += cls._calculateBlueBanners(awards, year)
+        insights += cls._calculateChampionshipStats(awards, year)
+        insights += cls._calculateRegionalStats(awards, year)
+        insights += cls._calculateSuccessfulElimTeamups(awards, year)
+        insights += cls._calculateSuccessfulElimTeamups(awards, year, isEinstein=True)
 
-        return insights
+        return cls._scopeInsightsToDistrict(insights, district_abbreviation)
 
     @classmethod
     def doPredictionInsights(self, year: Year) -> List[Insight]:
@@ -119,10 +167,25 @@ class InsightsHelper(object):
         Calculate aggregate prediction stats for all season events for a year.
         """
 
-        events = Event.query(
-            Event.event_type_enum.IN(SEASON_EVENT_TYPES),
-            Event.year == (int(year)),
-        ).fetch()
+        return self._doPredictionInsightsForEvents(
+            year=year,
+            events=Event.query(
+                Event.event_type_enum.IN(SEASON_EVENT_TYPES),
+                Event.year == (int(year)),
+            ).fetch(),
+        )
+
+    @classmethod
+    def _doPredictionInsightsForEvents(
+        cls,
+        year: Year,
+        events: List[Event],
+        district_abbreviation: Optional[DistrictAbbreviation] = None,
+    ) -> List[Insight]:
+        """
+        Calculate aggregate prediction stats for the provided events.
+        """
+
         for event in events:
             event.prep_details()
             event.prep_matches()
@@ -152,26 +215,33 @@ class InsightsHelper(object):
                             if is_cmp:
                                 total_matches_count_cmp[level] += 1
 
-                            predicted_match = predictions["match_predictions"][
-                                level
-                            ].get(match.key.id())
+                            match_predictions = cast(
+                                Dict[str, Dict[str, Dict[str, Any]]],
+                                predictions.get("match_predictions", {}),
+                            )
+                            match_key = match.key.id()
+                            if not isinstance(match_key, str):
+                                continue
+                            predicted_match = match_predictions.get(level, {}).get(
+                                match_key
+                            )
                             if (
                                 predicted_match
                                 and match.winning_alliance
-                                == predicted_match["winning_alliance"]
+                                == predicted_match.get("winning_alliance")
                             ):
                                 correct_matches_count[level] += 1
                                 if is_cmp:
                                     correct_matches_count_cmp[level] += 1
 
                 for level in ["qual", "playoff"]:
-                    if predictions.get("match_prediction_stats"):
-                        bs = (
-                            predictions.get("match_prediction_stats", {})
-                            .get(level, {})
-                            .get("brier_scores", {})
+                    prediction_stats = predictions.get("match_prediction_stats")
+                    if prediction_stats is not None:
+                        stats = cast(
+                            Dict[str, Dict[str, Dict[str, float]]], prediction_stats
                         )
-                        if bs:
+                        bs = stats.get(level, {}).get("brier_scores")
+                        if bs and "win_loss" in bs:
                             brier_scores[level].append(bs["win_loss"])
                             if is_cmp:
                                 brier_scores_cmp[level].append(bs["win_loss"])
@@ -196,33 +266,156 @@ class InsightsHelper(object):
             data[level]["correct_matches_count_cmp"] = correct_matches_count_cmp[level]
             data[level]["total_matches_count_cmp"] = total_matches_count_cmp[level]
 
-        return [
-            create_insight(data, Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], year)
-        ]
+        return cls._scopeInsightsToDistrict(
+            [
+                create_insight(
+                    data,
+                    Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS],
+                    year,
+                )
+            ],
+            district_abbreviation,
+        )
+
+    @classmethod
+    def _doDistrictInsightsForDistrictSeason(
+        cls,
+        district_abbreviation: DistrictAbbreviation,
+        district: District,
+    ) -> List[Insight]:
+        start = time.perf_counter()
+        district_events = DistrictEventsQuery(district_key=district.key_name).fetch()
+        logging.info(
+            "District insights step=fetch_events district=%s year=%s events=%s elapsed=%.3fs",
+            district_abbreviation,
+            district.year,
+            len(district_events),
+            time.perf_counter() - start,
+        )
+
+        insights: List[Insight] = []
+        match_start = time.perf_counter()
+        insights.extend(
+            cls._doMatchInsightsForEvents(
+                year=district.year,
+                events=district_events,
+                district_abbreviation=district_abbreviation,
+            )
+        )
+        logging.info(
+            "District insights step=match district=%s year=%s insight_count=%s elapsed=%.3fs",
+            district_abbreviation,
+            district.year,
+            len(insights),
+            time.perf_counter() - match_start,
+        )
+
+        award_start = time.perf_counter()
+        insights.extend(
+            cls._doAwardInsightsForEvents(
+                year=district.year,
+                events=district_events,
+                district_abbreviation=district_abbreviation,
+            )
+        )
+        logging.info(
+            "District insights step=award district=%s year=%s insight_count=%s elapsed=%.3fs",
+            district_abbreviation,
+            district.year,
+            len(insights),
+            time.perf_counter() - award_start,
+        )
+
+        prediction_start = time.perf_counter()
+        insights.extend(
+            cls._doPredictionInsightsForEvents(
+                year=district.year,
+                events=district_events,
+                district_abbreviation=district_abbreviation,
+            )
+        )
+        logging.info(
+            "District insights step=prediction district=%s year=%s insight_count=%s elapsed=%.3fs total=%.3fs",
+            district_abbreviation,
+            district.year,
+            len(insights),
+            time.perf_counter() - prediction_start,
+            time.perf_counter() - start,
+        )
+
+        return insights
+
+    @classmethod
+    def doDistrictInsightsForAbbreviation(
+        cls,
+        district_abbreviation: DistrictAbbreviation,
+        year: Optional[Year] = None,
+    ) -> List[Insight]:
+        """
+        Calculate all district insights for a single district abbreviation.
+        """
+        insights: List[Insight] = []
+
+        if year is not None:
+            district_history = DistrictHistoryQuery(district_abbreviation).fetch()
+            district = next(
+                (district for district in district_history if district.year == year),
+                None,
+            )
+            if district is None:
+                return insights
+
+            insights.extend(
+                cls._doDistrictInsightsForDistrictSeason(
+                    district_abbreviation=district_abbreviation,
+                    district=district,
+                )
+            )
+            return insights
+
+        insights.append(
+            create_insight(
+                data=InsightsDistrictsHelper.make_insight_team_data(
+                    district_abbreviation
+                ),
+                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+                year=0,
+                district_abbreviation=district_abbreviation,
+            )
+        )
+        insights.append(
+            create_insight(
+                data=InsightsDistrictsHelper.make_insight_district_data(
+                    district_abbreviation
+                ),
+                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+                year=0,
+                district_abbreviation=district_abbreviation,
+            )
+        )
+
+        district_history = DistrictHistoryQuery(district_abbreviation).fetch()
+        for district in district_history:
+            insights.extend(
+                cls._doDistrictInsightsForDistrictSeason(
+                    district_abbreviation=district_abbreviation,
+                    district=district,
+                )
+            )
+
+        return insights
 
     @classmethod
     def doDistrictInsights(cls) -> List[Insight]:
         """
-        Calculate district insights for a given year. Returns a list of Insights.
+        Calculate district insights for all districts. Returns a list of Insights.
         """
-
-        return [
-            create_insight(
-                data=InsightsDistrictsHelper.make_insight_team_data(abbr),
-                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
-                year=0,
-                district_abbreviation=abbr,
+        insights: List[Insight] = []
+        for district_abbreviation in RenamedDistricts.get_latest_codes():
+            insights.extend(
+                cls.doDistrictInsightsForAbbreviation(district_abbreviation)
             )
-            for abbr in RenamedDistricts.get_latest_codes()
-        ] + [
-            create_insight(
-                data=InsightsDistrictsHelper.make_insight_district_data(abbr),
-                name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
-                year=0,
-                district_abbreviation=abbr,
-            )
-            for abbr in RenamedDistricts.get_latest_codes()
-        ]
+        return insights
 
     @classmethod
     def _generateMatchData(self, match: Match, event: Event) -> Dict:
@@ -713,16 +906,13 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateBlueBanners(
-        self, award_futures: List[TypedFuture[Award]], year: Year
-    ) -> List[Insight]:
+    def _calculateBlueBanners(self, awards: List[Award], year: Year) -> List[Insight]:
         """
         Returns an Insight where the data is a dict:
         Key: number of blue banners, Value: list of teams with that number of blue banners
         """
         blue_banner_winners = defaultdict(int)
-        for award_future in award_futures:
-            award = award_future.get_result()
+        for award in awards:
             if award.award_type_enum in BLUE_BANNER_AWARDS and award.count_banner:
                 for team_key in award.team_list:
                     team_key_name = team_key.id()
@@ -741,7 +931,7 @@ class InsightsHelper(object):
 
     @classmethod
     def _calculateChampionshipStats(
-        self, award_futures: List[TypedFuture[Award]], year: Year
+        self, awards: List[Award], year: Year
     ) -> List[Insight]:
         """
         Returns a list of Insights where, depending on the Insight, the data
@@ -752,8 +942,7 @@ class InsightsHelper(object):
         world_finalists = []
         division_winners = []
         division_finalists = []
-        for award_future in award_futures:
-            award = award_future.get_result()
+        for award in awards:
             for team_key in award.team_list:
                 team_key_name = team_key.id()
                 if award.event_type_enum == EventType.CMP_FINALS:
@@ -816,9 +1005,7 @@ class InsightsHelper(object):
         return insights
 
     @classmethod
-    def _calculateRegionalStats(
-        self, award_futures: List[TypedFuture[Award]], year: Year
-    ) -> List[Insight]:
+    def _calculateRegionalStats(self, awards: List[Award], year: Year) -> List[Insight]:
         """
         Returns a list of Insights where, depending on the Insight, the data
         is either a list of teams or a dict:
@@ -826,8 +1013,7 @@ class InsightsHelper(object):
         """
         rca_winners = []
         regional_winners = defaultdict(int)
-        for award_future in award_futures:
-            award = award_future.get_result()
+        for award in awards:
             if award.event_type_enum in CMP_EVENT_TYPES:
                 continue
             for team_key in award.team_list:
@@ -865,7 +1051,7 @@ class InsightsHelper(object):
     @classmethod
     def _calculateSuccessfulElimTeamups(
         self,
-        award_futures: List[TypedFuture[Award]],
+        awards: List[Award],
         year: Year,
         isEinstein: bool = False,
     ) -> List[Insight]:
@@ -873,8 +1059,7 @@ class InsightsHelper(object):
         Returns an Insight where the data is a list of list of teams that won an event together
         """
         successful_elim_teamups = []
-        for award_future in award_futures:
-            award = award_future.get_result()
+        for award in awards:
             if award.award_type_enum == AwardType.WINNER and (
                 not isEinstein or award.event_type_enum == EventType.CMP_FINALS
             ):

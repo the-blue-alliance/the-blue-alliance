@@ -61,6 +61,7 @@ from backend.web.handlers.admin.event import (
     event_update_webcast_date_post,
 )
 from backend.web.handlers.admin.gameday import gameday_dashboard, gameday_dashboard_post
+from backend.web.handlers.admin.insights import insights_list
 from backend.web.handlers.admin.landing import (
     landing_edit,
 )
@@ -369,6 +370,9 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
 )
+admin_routes.add_url_rule("/insights", view_func=insights_list, defaults={"year": None})
+admin_routes.add_url_rule("/insights/<int:year>", view_func=insights_list)
+
 admin_routes.add_url_rule("/gameday", methods=["GET"], view_func=gameday_dashboard)
 admin_routes.add_url_rule(
     "/gameday", methods=["POST"], view_func=gameday_dashboard_post

@@ -1,3 +1,4 @@
+import json
 import re
 from typing import List
 
@@ -13,6 +14,7 @@ from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
+from backend.common.models.insight import Insight
 from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests import helpers
 
@@ -231,3 +233,31 @@ def test_district_detail_rankings(
         assert context["rankings"] == rankings
     else:
         assert context["rankings"] is None
+
+
+def test_district_insights_page(ndb_stub, web_client: Client) -> None:
+    District(
+        id="2024fim",
+        year=2024,
+        abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+
+    Insight(
+        id=Insight.render_key_name(
+            2024,
+            Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
+            "fim",
+        ),
+        year=2024,
+        district_abbreviation="fim",
+        name=Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
+        data_json=json.dumps([[1, ["frc254"]]]),
+    ).put()
+
+    resp = web_client.get("/district/fim/insights")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert "2024 Michigan District Insights" in body
+    assert "Top Blue Banner Winners" in body

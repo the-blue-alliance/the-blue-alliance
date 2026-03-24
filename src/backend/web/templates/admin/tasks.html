@@ -221,7 +221,7 @@
 <h2>Other Cron Tasks</h2>
 
 <h3>Calculate Year Insights</h3>
-<p>Generate Insights by year or overall</p>
+<p>Generate Insights by year or overall. <a href="/admin/insights" class="btn btn-xs btn-default">View stored insights &rarr;</a></p>
 <div class="row">
     <div class="col-sm-6">
         <span class="help-block">Enqueue Award Insights</span>
@@ -263,6 +263,44 @@
     </div>
     <div class="col-sm-6">
         <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/overallinsights/matches">Enqueue Overall Match Insights</a>
+    </div>
+</div>
+
+<h3>Calculate District Insights</h3>
+<p>Fan-out one task per district abbreviation (avoids timeouts on large datasets).</p>
+<div class="row">
+    <div class="col-sm-6">
+        <span class="help-block">Enqueue all district insights for a specific year</span>
+        <form class="form-inline">
+            <div class="input-group">
+                <input class="form-control" id="enqueue_district_insights_year" type="text" placeholder="2026">
+                <span class="input-group-btn" id="enqueue_district_insights_year_submit">
+                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+                </span>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_district_insights_year_submit").click(function() {
+            window.location = "/backend-tasks-b2/enqueue/math/insights/districts/" + $("#enqueue_district_insights_year").val();
+        });
+        </script>
+    </div>
+    <div class="col-sm-6">
+        <span class="help-block">Enqueue insights for a single district abbreviation + year</span>
+        <form class="form-inline">
+            <div class="input-group">
+                <input class="form-control" id="enqueue_district_insights_abbrev" type="text" placeholder="fim">
+                <input class="form-control" id="enqueue_district_insights_abbrev_year" type="text" placeholder="2026">
+                <span class="input-group-btn" id="enqueue_district_insights_abbrev_submit">
+                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+                </span>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_district_insights_abbrev_submit").click(function() {
+            window.location = "/backend-tasks-b2/do/math/insights/districts/" + $("#enqueue_district_insights_abbrev_year").val() + "/" + $("#enqueue_district_insights_abbrev").val();
+        });
+        </script>
     </div>
 </div>
 

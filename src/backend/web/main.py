@@ -24,6 +24,7 @@ from backend.web.handlers.ajax import (
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
 from backend.web.handlers.district import (
     district_detail,
+    district_insights,
     district_redirect,
     districts_redirect,
     regional_detail,
@@ -123,6 +124,15 @@ app.add_url_rule(
     '/district/<regex("[a-z]+"):district_abbrev>',
     view_func=district_redirect,
     defaults={"year": None},
+)
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>/insights',
+    view_func=district_insights,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>/insights/<int:year>',
+    view_func=district_insights,
 )
 app.add_url_rule(
     '/district/<regex("[a-z]+"):district_abbrev>/<int:year>',

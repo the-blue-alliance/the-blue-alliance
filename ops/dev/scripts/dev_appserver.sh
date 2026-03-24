@@ -114,6 +114,7 @@ dev_appserver.py \
     --application="$application" \
     "${env[@]}" \
     --env_var HTTPLIB2_CA_CERTS="/usr/lib/google-cloud-sdk/platform/google_appengine/lib/httplib2/httplib2/cacerts.txt" \
+    --env_var GUNICORN_CMD_ARGS="--no-control-socket" \
     --env_var TBA_LOG_LEVEL="$tba_log_level" \
     --env_var NDB_LOG_LEVEL="$ndb_log_level" \
     --env_var STORAGE_MODE="$storage_mode" \
