@@ -16,8 +16,16 @@ const scoreCellVariants = cva('relative flex items-center justify-center', {
     },
   },
   compoundVariants: [
-    { winner: true, allianceColor: 'red', className: 'bg-alliance-red-cell-winner' },
-    { winner: true, allianceColor: 'blue', className: 'bg-alliance-blue-cell-winner' },
+    {
+      winner: true,
+      allianceColor: 'red',
+      className: 'bg-alliance-red-cell-winner',
+    },
+    {
+      winner: true,
+      allianceColor: 'blue',
+      className: 'bg-alliance-blue-cell-winner',
+    },
   ],
   defaultVariants: {
     winner: false,
