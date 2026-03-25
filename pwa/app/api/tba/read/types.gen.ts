@@ -560,49 +560,6 @@ export type EventDistrictPoints = {
   };
 };
 
-export type EventRegionalChampsPoolPoints = {
-  /**
-   * Regional champs pool points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as its value.
-   */
-  points: {
-    [key: string]: {
-      /**
-       * Total points awarded at this event.
-       */
-      total: number;
-      /**
-       * Points awarded for alliance selection
-       */
-      alliance_points: number;
-      /**
-       * Points awarded for elimination match performance.
-       */
-      elim_points: number;
-      /**
-       * Points awarded for event awards.
-       */
-      award_points: number;
-      /**
-       * Points awarded for qualification match performance.
-       */
-      qual_points: number;
-      /**
-       * Team age points awarded at this regional event.
-       */
-      rookie_bonus?: number;
-    };
-  };
-  /**
-   * Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as its value.
-   */
-  tiebreakers?: {
-    [key: string]: {
-      highest_qual_scores?: Array<number>;
-      qual_wins?: number;
-    };
-  };
-};
-
 /**
  * A year-specific event insight object expressed as a JSON string, separated in to `qual` and `playoff` fields. See also Event_Insights_2016, Event_Insights_2017, etc.
  */
@@ -3383,7 +3340,7 @@ export type GetEventAdvancementPointsResponses = {
   /**
    * Successful response
    */
-  200: EventRegionalChampsPoolPoints | null;
+  200: EventDistrictPoints | null;
 };
 
 export type GetEventAdvancementPointsResponse =

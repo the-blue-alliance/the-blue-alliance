@@ -123,7 +123,6 @@ export type {
   EventOprs,
   EventPredictions,
   EventRanking,
-  EventRegionalChampsPoolPoints,
   EventSimple,
   GetDistrictAdvancementData,
   GetDistrictAdvancementError,

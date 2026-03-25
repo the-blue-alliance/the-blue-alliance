@@ -949,7 +949,7 @@
                 "schema": {
                   "oneOf": [
                     {
-                      "$ref": "#/components/schemas/Event_Regional_Champs_Pool_Points"
+                      "$ref": "#/components/schemas/Event_District_Points"
                     },
                     {
                       "type": "null"
@@ -6058,72 +6058,6 @@
               }
             },
             "description": "Points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as its value."
-          },
-          "tiebreakers": {
-            "type": "object",
-            "additionalProperties": {
-              "type": "object",
-              "properties": {
-                "highest_qual_scores": {
-                  "type": "array",
-                  "items": {
-                    "type": "integer"
-                  }
-                },
-                "qual_wins": {
-                  "type": "integer"
-                }
-              }
-            },
-            "description": "Tiebreaker values for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the tiebreaker elements as its value."
-          }
-        }
-      },
-      "Event_Regional_Champs_Pool_Points": {
-        "required": [
-          "points"
-        ],
-        "type": "object",
-        "properties": {
-          "points": {
-            "type": "object",
-            "additionalProperties": {
-              "required": [
-                "alliance_points",
-                "award_points",
-                "elim_points",
-                "qual_points",
-                "total"
-              ],
-              "type": "object",
-              "properties": {
-                "total": {
-                  "type": "integer",
-                  "description": "Total points awarded at this event."
-                },
-                "alliance_points": {
-                  "type": "integer",
-                  "description": "Points awarded for alliance selection"
-                },
-                "elim_points": {
-                  "type": "integer",
-                  "description": "Points awarded for elimination match performance."
-                },
-                "award_points": {
-                  "type": "integer",
-                  "description": "Points awarded for event awards."
-                },
-                "qual_points": {
-                  "type": "integer",
-                  "description": "Points awarded for qualification match performance."
-                },
-                "rookie_bonus": {
-                  "type": "integer",
-                  "description": "Team age points awarded at this regional event."
-                }
-              }
-            },
-            "description": "Regional champs pool points gained for each team at the event. Stored as a key-value pair with the team key as the key, and an object describing the points as its value."
           },
           "tiebreakers": {
             "type": "object",
