@@ -280,11 +280,11 @@ importers:
         specifier: 3.8.1
         version: 3.8.1
       prettier-plugin-classnames:
-        specifier: 0.10.0
-        version: 0.10.0(prettier@3.8.1)
+        specifier: 0.10.1
+        version: 0.10.1(prettier@3.8.1)
       prettier-plugin-merge:
-        specifier: 0.10.0
-        version: 0.10.0(prettier@3.8.1)
+        specifier: 0.10.1
+        version: 0.10.1(prettier@3.8.1)
       prettier-plugin-tailwindcss:
         specifier: 0.7.2
         version: 0.7.2(@trivago/prettier-plugin-sort-imports@6.0.2(@vue/compiler-sfc@3.5.31)(prettier@3.8.1))(prettier@3.8.1)
@@ -6284,8 +6284,8 @@ packages:
     resolution: {integrity: sha512-vkcDPrRZo1QZLbn5RLGPpg/WmIQ65qoWWhcGKf/b5eplkkarX0m9z8ppCat4mlOqUsWpyNuYgO3VRyrYHSzX5g==}
     engines: {node: '>= 0.8.0'}
 
-  prettier-plugin-classnames@0.10.0:
-    resolution: {integrity: sha512-s6lBfiLW/f2pavoi8Aak91KN8Zx5cdN2GEAlzQ+hosPpwntxXRdrroPc+UZRjFm0gsGJe5+J0P5PwAShFa2a8g==}
+  prettier-plugin-classnames@0.10.1:
+    resolution: {integrity: sha512-Jz3rqyNCTPfwlg2be8ZIfY/UM5y1VfVZ5iIFVNvdl72brru1p6vlCds+VAt83VrlDxPkjGiKnAx6MMB4OxqjBQ==}
     engines: {node: '>=18'}
     peerDependencies:
       '@prettier/plugin-oxc': '*'
@@ -6300,8 +6300,8 @@ packages:
       prettier-plugin-svelte:
         optional: true
 
-  prettier-plugin-merge@0.10.0:
-    resolution: {integrity: sha512-OWF0lOnjH16U2iiviF5+6s77n863c6Wff8hAcCNH2bDgOxr+HlPEM6xsVnnaHd7xCrscgJxhMcBaYot/6D/o3g==}
+  prettier-plugin-merge@0.10.1:
+    resolution: {integrity: sha512-dwz+TLE6sAIaoiZTS7mixu6JF85IfvccWrFMcaA4tpmu51TerUEW/WlI1u9h5ewU8Zxu89q08KKNHKCOe17iAQ==}
     engines: {node: '>=18'}
     peerDependencies:
       prettier: ^3
@@ -14887,12 +14887,12 @@ snapshots:
 
   prelude-ls@1.2.1: {}
 
-  prettier-plugin-classnames@0.10.0(prettier@3.8.1):
+  prettier-plugin-classnames@0.10.1(prettier@3.8.1):
     dependencies:
       prettier: 3.8.1
       zod: 3.22.4
 
-  prettier-plugin-merge@0.10.0(prettier@3.8.1):
+  prettier-plugin-merge@0.10.1(prettier@3.8.1):
     dependencies:
       diff: 5.2.2
       prettier: 3.8.1
