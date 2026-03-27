@@ -44,6 +44,7 @@ def test_fetch_instagram_oembed_html_with_hidecaption(requests_mock: Mocker):
         json={"html": OEMBED_HTML},
     )
     fetch_instagram_oembed_html("abc123", hidecaption=True)
+    assert requests_mock.last_request is not None
     assert "hidecaption=true" in requests_mock.last_request.url
 
 
@@ -53,6 +54,7 @@ def test_fetch_instagram_oembed_html_without_hidecaption(requests_mock: Mocker):
         json={"html": OEMBED_HTML},
     )
     fetch_instagram_oembed_html("abc123")
+    assert requests_mock.last_request is not None
     assert "hidecaption" not in requests_mock.last_request.url
 
 
@@ -63,6 +65,7 @@ def test_fetch_instagram_oembed_html_with_omitscript(requests_mock: Mocker):
     )
     result = fetch_instagram_oembed_html("abc123", omitscript=True)
     assert result == OEMBED_HTML
+    assert requests_mock.last_request is not None
     assert "omitscript=true" in requests_mock.last_request.url
 
 

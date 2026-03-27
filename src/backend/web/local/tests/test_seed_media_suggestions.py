@@ -51,9 +51,11 @@ def test_seed_media_suggestions_creates_pending_suggestions(
     assert len(suggestions) == 3
 
     # Verify all have the right target key and author
+    account = Account.get_by_id("dev-suggestion-author")
+    assert account is not None
     for suggestion in suggestions:
         assert suggestion.contents["reference_key"] == "frc2"
-        assert suggestion.author == Account.get_by_id("dev-suggestion-author").key
+        assert suggestion.author == account.key
 
 
 @freeze_time("2025-03-15")
