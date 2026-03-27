@@ -275,7 +275,7 @@ class EventInsightsHelper:
             "auto_climb_count": [
                 auto_climb_count,
                 finished_matches * 4,
-                100.0 * auto_climb_count / (finished_matches * 2),
+                100.0 * auto_climb_count / (finished_matches * 4),
             ],
             "level1_climb_count": [
                 endgame_climb_count[0],
