@@ -15,7 +15,7 @@ dependencies = [
     "google-cloud-logging==3.15.0",
     "google-cloud-run==0.16.0",
     "grpcio==1.78.0",
-    "gunicorn==25.2.0",
+    "gunicorn==25.3.0",
     "Jinja2==3.1.6",
     "MarkupSafe==3.0.3",
     "numpy==2.4.3",
