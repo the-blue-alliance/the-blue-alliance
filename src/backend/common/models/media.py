@@ -172,22 +172,6 @@ class Media(CachedModel):
         return "https://www.instagram.com/p/{}".format(self.foreign_key)
 
     @property
-    def instagram_direct_url(self) -> str:
-        return self.instagram_url_helper(658)
-
-    @property
-    def instagram_direct_url_med(self) -> str:
-        return self.instagram_url_helper(320)
-
-    @property
-    def instagram_direct_url_sm(self) -> str:
-        return self.instagram_url_helper(320)
-
-    def instagram_url_helper(self, size) -> str:
-        # The Oembed API supports widths between 320px and 658px
-        return f"/instagram_oembed/{self.foreign_key}?width={size}"
-
-    @property
     def view_image_url(self) -> str:
         if self.media_type_enum == MediaType.CD_PHOTO_THREAD:
             return self.cdphotothread_image_url
@@ -220,7 +204,7 @@ class Media(CachedModel):
                 "300x300", "600x340"
             )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
-            return self.instagram_direct_url
+            return self.instagram_url
         else:
             return ""
 
@@ -255,7 +239,7 @@ class Media(CachedModel):
         elif self.media_type_enum == MediaType.ONSHAPE:
             return none_throws(self.details)["model_image"]
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
-            return self.instagram_direct_url_med
+            return self.instagram_url
         else:
             return ""
 
@@ -274,7 +258,7 @@ class Media(CachedModel):
                 "300x300", "300x170"
             )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
-            return self.instagram_direct_url_sm
+            return self.instagram_url
         else:
             return ""
 

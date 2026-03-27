@@ -1,6 +1,7 @@
 import base64
 import datetime
 import json
+import logging
 import os
 import random
 from typing import List
@@ -17,12 +18,17 @@ from backend.common.manipulators.event_team_manipulator import EventTeamManipula
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
+from backend.common.models.account import Account
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
+from backend.common.suggestions.suggestion_creator import (
+    SuggestionCreationStatus,
+    SuggestionCreator,
+)
 
 NUM_COMPLETED = 15
 NUM_SCHEDULED = 8
@@ -312,6 +318,53 @@ def seed_test_team() -> Response:
     MediaManipulator.createOrUpdate(media_list)
 
     return redirect("/team/2")
+
+
+def seed_media_suggestions() -> Response:
+    now = datetime.datetime.now()
+    year = str(now.year)
+
+    # Create/reuse a dev account as the suggestion author
+    account = Account.get_or_insert(
+        "dev-suggestion-author",
+        email="dev@thebluealliance.com",
+        nickname="Dev User",
+        registered=True,
+    )
+
+    # Ensure team frc2 exists
+    team = Team.get_by_id("frc2")
+    if not team:
+        team = Team(
+            id="frc2",
+            team_number=2,
+            nickname="The Reindeer",
+        )
+        TeamManipulator.createOrUpdate(team)
+
+    # Real media from production TBA teams.
+    # Use keys distinct from seed_test_team to avoid media_exists conflicts.
+    media_urls = [
+        "https://www.youtube.com/watch?v=gUJUAoHRq8I",  # frc1678 2025 reveal
+        "https://imgur.com/MZ3lWM4",  # frc254 2025 robot photo
+        "https://www.instagram.com/p/C4bhT7FsmAW/",  # frc254 2024 robot photo
+    ]
+
+    created = 0
+    for url in media_urls:
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            account.key,
+            url,
+            "frc2",
+            year,
+        ).get_result()
+        if status == SuggestionCreationStatus.SUCCESS:
+            created += 1
+        else:
+            logging.info(f"Suggestion not created for {url}: {status}")
+
+    logging.info(f"Created {created}/{len(media_urls)} media suggestions")
+    return redirect("/suggest/team/media/review")
 
 
 def _teams_for_match(teams: List[Team], match_number: int) -> tuple:

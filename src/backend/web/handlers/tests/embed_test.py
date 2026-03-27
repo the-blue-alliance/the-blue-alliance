@@ -1,27 +1,15 @@
 import json
 import re
-from urllib.parse import urlparse
 
 from google.appengine.ext import ndb
 from requests_mock import Mocker
 from werkzeug import Client
 
-from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.media_type import MediaType
-from backend.common.models.account import Account
 from backend.common.models.media import Media
+from backend.web.handlers.embed import fetch_instagram_oembed_html
 
-THUMBNAIL_URL = "scontent.cdninstagram.com/abc"
-
-
-def create_media() -> Media:
-    media = Media(
-        media_type_enum=MediaType.INSTAGRAM_IMAGE,
-        foreign_key="abc",
-        id=Media.render_key_name(MediaType.INSTAGRAM_IMAGE, "abc"),
-    )
-    media.put()
-    return media
+OEMBED_HTML = '<blockquote class="instagram-media">test</blockquote>'
 
 
 def create_avatar() -> Media:
@@ -41,63 +29,60 @@ def create_avatar() -> Media:
     return avatar
 
 
-def test_instagram_no_media_key(web_client: Client):
-    resp = web_client.get("/instagram_oembed/")
-    assert resp.status_code == 404
-
-
-def test_instagram_no_referer(web_client: Client):
-    media = create_media()
-
-    resp = web_client.get(f"/instagram_oembed/{media.foreign_key}")
-    assert resp.status_code == 403
-
-
-def test_instagram_success(web_client: Client, requests_mock: Mocker):
-    media = create_media()
-
+def test_fetch_instagram_oembed_html_success(requests_mock: Mocker):
     requests_mock.get(
         re.compile(".*instagram_oembed.*"),
-        json={"thumbnail_url": THUMBNAIL_URL},
+        json={"html": OEMBED_HTML},
     )
-
-    resp = web_client.get(
-        f"/instagram_oembed/{media.foreign_key}",
-        headers={"Referer": "thebluealliance.com"},
-    )
-
-    assert resp.status_code == 302
-    assert urlparse(resp.headers["Location"]).path == THUMBNAIL_URL
+    result = fetch_instagram_oembed_html("abc123")
+    assert result == OEMBED_HTML
 
 
-def test_instagram_success_media_reviewer(
-    login_user: Account, requests_mock, web_client
-):
-    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
-
+def test_fetch_instagram_oembed_html_with_hidecaption(requests_mock: Mocker):
     requests_mock.get(
         re.compile(".*instagram_oembed.*"),
-        json={"thumbnail_url": THUMBNAIL_URL},
+        json={"html": OEMBED_HTML},
     )
+    fetch_instagram_oembed_html("abc123", hidecaption=True)
+    assert "hidecaption=true" in requests_mock.last_request.url
 
-    resp = web_client.get(
-        "/instagram_oembed/abc",
-        headers={"Referer": "thebluealliance.com"},
+
+def test_fetch_instagram_oembed_html_without_hidecaption(requests_mock: Mocker):
+    requests_mock.get(
+        re.compile(".*instagram_oembed.*"),
+        json={"html": OEMBED_HTML},
     )
+    fetch_instagram_oembed_html("abc123")
+    assert "hidecaption" not in requests_mock.last_request.url
 
-    assert resp.status_code == 302
-    assert urlparse(resp.headers["Location"]).path == THUMBNAIL_URL
 
-
-def test_instagram_invalid_width(web_client: Client):
-    media = create_media()
-
-    resp = web_client.get(
-        f"/instagram_oembed/{media.foreign_key}?width=invalid",
-        headers={"Referer": "thebluealliance.com"},
+def test_fetch_instagram_oembed_html_with_omitscript(requests_mock: Mocker):
+    requests_mock.get(
+        re.compile(".*instagram_oembed.*"),
+        json={"html": OEMBED_HTML},
     )
+    result = fetch_instagram_oembed_html("abc123", omitscript=True)
+    assert result == OEMBED_HTML
+    assert "omitscript=true" in requests_mock.last_request.url
 
-    assert resp.status_code == 400
+
+def test_fetch_instagram_oembed_html_api_failure(requests_mock: Mocker):
+    requests_mock.get(
+        re.compile(".*instagram_oembed.*"),
+        status_code=400,
+        json={"error": "bad request"},
+    )
+    result = fetch_instagram_oembed_html("abc123")
+    assert result is None
+
+
+def test_fetch_instagram_oembed_html_network_error(requests_mock: Mocker):
+    requests_mock.get(
+        re.compile(".*instagram_oembed.*"),
+        exc=ConnectionError("network error"),
+    )
+    result = fetch_instagram_oembed_html("abc123")
+    assert result is None
 
 
 def test_nonexistent_avatar(web_client: Client):
