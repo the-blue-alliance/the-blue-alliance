@@ -360,7 +360,7 @@ class Match(CachedModel):
             replay_suffix = ""
             if self.match_number > 1:
                 replay_suffix = f" (Play {self.match_number})"
-            return f"Match {match_num}{replay_suffix}"
+            return f"Playoff Match {match_num}{replay_suffix}"
 
         elif (
             self.comp_level != "qm"
@@ -374,7 +374,7 @@ class Match(CachedModel):
             )
             if match_num is None:
                 match_num = "?"
-            return f"Match {match_num}"
+            return f"Playoff Match {match_num}"
         elif (
             self.comp_level == "qm"
             or self.comp_level == "f"
@@ -400,10 +400,10 @@ class Match(CachedModel):
             return "F%s" % self.match_number
         elif event and event.playoff_type in DOUBLE_ELIM_INVERSE_MAPPINGS:
             # For double elimination brackets, don't show these matches as ex: `SF1-1`,
-            # instead show them as `M1`
+            # instead show them as `Playoff M1`
             inverse_mapping = DOUBLE_ELIM_INVERSE_MAPPINGS[event.playoff_type]
             match_num = inverse_mapping.get((self.comp_level, self.set_number, 1))
-            return "M%s" % match_num
+            return "Playoff M%s" % match_num
         return "%s%s-%s" % (
             self.comp_level.upper(),
             self.set_number,

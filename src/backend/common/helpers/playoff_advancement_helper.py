@@ -243,6 +243,7 @@ class PlayoffAdvancementHelper:
                         "blue_record": {"wins": 0, "losses": 0, "ties": 0},
                         "red_name": None,
                         "blue_name": None,
+                        "results": [],
                     }
                 for color in [AllianceColor.RED, AllianceColor.BLUE]:
                     alliance = copy.copy(match.alliances[color]["teams"])
@@ -288,6 +289,21 @@ class PlayoffAdvancementHelper:
                     continue
 
                 winner = match.winning_alliance
+
+                bracket_table[comp_level][set_key]["results"] = bracket_table[
+                    comp_level
+                ][set_key]["results"] + [
+                    {
+                        "red_score": match.alliances.get(AllianceColor.RED, {}).get(
+                            "score", -1
+                        ),
+                        "blue_score": match.alliances.get(AllianceColor.BLUE, {}).get(
+                            "score", -1
+                        ),
+                        "winner": match.winning_alliance,
+                    }
+                ]
+
                 if not winner or winner == "":
                     # if the match is a tie
                     bracket_table[comp_level][set_key]["red_record"]["ties"] = (

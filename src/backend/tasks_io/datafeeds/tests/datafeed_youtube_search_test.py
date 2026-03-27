@@ -149,10 +149,18 @@ class TestYoutubeUpcomingStreamsDatafeed:
             assert params["part"] == "snippet"
             assert params["type"] == "video"
             assert params["channelId"] == "UC_channel_id"
-            assert params["eventType"] == "upcoming"
+            assert params["eventType"] == ["upcoming", "live"]
             assert params["maxResults"] == "50"
             assert params["order"] == "date"
             assert "pageToken" not in params
+
+    def test_datafeed_url_contains_both_event_types(self) -> None:
+        with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):
+            datafeed = YoutubeUpcomingStreamsDatafeed(channel_id="UC_channel_id")
+            url = datafeed.url()
+
+            assert "eventType=upcoming" in url
+            assert "eventType=live" in url
 
     def test_datafeed_with_page_token(self) -> None:
         with mock.patch.object(GoogleApiSecret, "secret_key", return_value="test_key"):

@@ -44,12 +44,16 @@
   --color-alliance-red: #f44336;
   --color-alliance-red-light: --alpha(var(--color-alliance-red) / 10%);
   --color-alliance-red-dark: --alpha(var(--color-alliance-red) / 20%);
+  --color-alliance-red-cell: --alpha(var(--color-alliance-red) / 15%);
+  --color-alliance-red-cell-winner: --alpha(var(--color-alliance-red) / 15%);
 
   /* Blue Alliance */
   --color-first-avatar-blue: #0066b3;
   --color-alliance-blue: #007cff;
   --color-alliance-blue-light: --alpha(var(--color-alliance-blue) / 10%);
   --color-alliance-blue-dark: --alpha(var(--color-alliance-blue) / 20%);
+  --color-alliance-blue-cell: --alpha(var(--color-alliance-blue) / 15%);
+  --color-alliance-blue-cell-winner: --alpha(var(--color-alliance-blue) / 15%);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -193,6 +197,27 @@
     --chart-3: 30 80% 55%;
     --chart-4: 280 65% 60%;
     --chart-5: 340 75% 55%;
+
+    --color-alliance-red-cell: color-mix(
+      in srgb,
+      var(--color-alliance-red) 15%,
+      hsl(var(--background))
+    );
+    --color-alliance-red-cell-winner: color-mix(
+      in srgb,
+      var(--color-alliance-red) 25%,
+      hsl(var(--background))
+    );
+    --color-alliance-blue-cell: color-mix(
+      in srgb,
+      var(--color-alliance-blue) 15%,
+      hsl(var(--background))
+    );
+    --color-alliance-blue-cell-winner: color-mix(
+      in srgb,
+      var(--color-alliance-blue) 25%,
+      hsl(var(--background))
+    );
   }
 }
 

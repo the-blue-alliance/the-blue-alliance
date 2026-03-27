@@ -91,8 +91,8 @@ class TestMatchScoreNotification(unittest.TestCase):
         )
         notification = MatchScoreNotification(match)
         assert notification.fcm_notification is not None
-        # For double elim, title should use "M1" (Match 1) not "SF1-1"
-        assert notification.fcm_notification.title == "TESTDE M1 Results"
+        # For double elim, title should use "Playoff M1" not "SF1-1"
+        assert notification.fcm_notification.title == "TESTDE Playoff M1 Results"
 
     def test_data_payload(self):
         payload = self.notification.data_payload

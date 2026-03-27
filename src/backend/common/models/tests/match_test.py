@@ -247,7 +247,7 @@ def test_short_name_double_elim_8_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match.short_name == "M1"
+    assert match.short_name == "Playoff M1"
 
     # set_number=13 corresponds to Match 13 in the double elim bracket
     match13 = Match(
@@ -258,7 +258,7 @@ def test_short_name_double_elim_8_team() -> None:
         set_number=13,
         match_number=1,
     )
-    assert match13.short_name == "M13"
+    assert match13.short_name == "Playoff M13"
 
 
 def test_short_name_double_elim_4_team() -> None:
@@ -279,7 +279,7 @@ def test_short_name_double_elim_4_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match.short_name == "M1"
+    assert match.short_name == "Playoff M1"
 
 
 def test_short_name_legacy_double_elim_8_team() -> None:
@@ -300,7 +300,7 @@ def test_short_name_legacy_double_elim_8_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match.short_name == "M1"
+    assert match.short_name == "Playoff M1"
 
     # set_number=1, comp_level=SF corresponds to Match 11
     match11 = Match(
@@ -311,7 +311,82 @@ def test_short_name_legacy_double_elim_8_team() -> None:
         set_number=1,
         match_number=1,
     )
-    assert match11.short_name == "M11"
+    assert match11.short_name == "Playoff M11"
+
+
+def test_verbose_name_double_elim_8_team() -> None:
+    event = Event(
+        id="2023ct",
+        event_short="ct",
+        year=2023,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+    )
+    event.put()
+    # set_number=1 corresponds to Match 1 in the double elim bracket
+    match = Match(
+        id="2023ct_sf1m1",
+        event=ndb.Key(Event, "2023ct"),
+        year=2023,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.verbose_name == "Playoff Match 1"
+
+    # Replay: match_number=2 should add " (Play 2)" suffix
+    replay = Match(
+        id="2023ct_sf1m2",
+        event=ndb.Key(Event, "2023ct"),
+        year=2023,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=2,
+    )
+    assert replay.verbose_name == "Playoff Match 1 (Play 2)"
+
+    # Finals should not get the "Playoff" prefix
+    finals_match = Match(
+        id="2023ct_f1m1",
+        event=ndb.Key(Event, "2023ct"),
+        year=2023,
+        comp_level=CompLevel.F,
+        set_number=1,
+        match_number=1,
+    )
+    assert finals_match.verbose_name == "Finals 1"
+
+
+def test_verbose_name_double_elim_4_team() -> None:
+    event = Event(
+        id="2024ct",
+        event_short="ct",
+        year=2024,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_4_TEAM,
+    )
+    event.put()
+    # set_number=1 corresponds to Match 1 in the 4-team double elim bracket
+    match = Match(
+        id="2024ct_sf1m1",
+        event=ndb.Key(Event, "2024ct"),
+        year=2024,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.verbose_name == "Playoff Match 1"
+
+    # Finals should not get the "Playoff" prefix
+    finals_match = Match(
+        id="2024ct_f1m1",
+        event=ndb.Key(Event, "2024ct"),
+        year=2024,
+        comp_level=CompLevel.F,
+        set_number=1,
+        match_number=1,
+    )
+    assert finals_match.verbose_name == "Finals 1"
 
 
 def test_full_name_double_elim() -> None:

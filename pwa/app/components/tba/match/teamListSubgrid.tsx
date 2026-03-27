@@ -11,14 +11,26 @@ import { cn } from '~/lib/utils';
 const teamListSubgridVariants = cva('flex items-center justify-center', {
   variants: {
     allianceColor: {
-      red: 'bg-alliance-red/15',
-      blue: 'bg-alliance-blue/15',
+      red: 'bg-alliance-red-cell',
+      blue: 'bg-alliance-blue-cell',
     },
     winner: {
       true: 'font-semibold',
       false: '',
     },
   },
+  compoundVariants: [
+    {
+      winner: true,
+      allianceColor: 'red',
+      className: 'bg-alliance-red-cell-winner',
+    },
+    {
+      winner: true,
+      allianceColor: 'blue',
+      className: 'bg-alliance-blue-cell-winner',
+    },
+  ],
   defaultVariants: {
     allianceColor: undefined,
     winner: false,

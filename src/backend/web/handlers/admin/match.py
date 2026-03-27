@@ -157,3 +157,35 @@ def match_override_score_breakdown() -> Response:
     MatchManipulator.createOrUpdate(match)
 
     return redirect(url_for("admin.event_detail", event_key=match.event_key_name))
+
+
+def match_youtube_video_add_post(match_key: MatchKey) -> Response:
+    if not Match.validate_key_name(match_key):
+        abort(404)
+
+    match = Match.get_by_id(match_key)
+    if not match:
+        abort(404)
+
+    youtube_id = request.form.get("youtube_id", "").strip()
+    if youtube_id and youtube_id not in match.youtube_videos:
+        match.youtube_videos = list(match.youtube_videos) + [youtube_id]
+        MatchManipulator.createOrUpdate(match, auto_union=False)
+
+    return redirect(url_for("admin.match_detail", match_key=match_key))
+
+
+def match_youtube_video_delete_post(match_key: MatchKey) -> Response:
+    if not Match.validate_key_name(match_key):
+        abort(404)
+
+    match = Match.get_by_id(match_key)
+    if not match:
+        abort(404)
+
+    youtube_id = request.form.get("youtube_id", "").strip()
+    if youtube_id in match.youtube_videos:
+        match.youtube_videos = [v for v in match.youtube_videos if v != youtube_id]
+        MatchManipulator.createOrUpdate(match, auto_union=False)
+
+    return redirect(url_for("admin.match_detail", match_key=match_key))

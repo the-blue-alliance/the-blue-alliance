@@ -11,16 +11,19 @@ from backend.common.consts.media_type import MediaType, ROBOT_TYPES, SLUG_NAMES
 from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.account import Account
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
+from backend.common.models.webcast import Webcast
 from backend.common.suggestions.media_parser import MediaParser
 from backend.common.tasklets import typed_tasklet
 
@@ -203,16 +206,27 @@ class SuggestionCreator:
             webcast_dict = None
 
         if webcast_dict is not None:
-            # If YouTube webcast and no date provided, try to auto-fill from YouTube API
-            if webcast_dict["type"] == WebcastType.YOUTUBE and clean_date is None:
+            # For YouTube webcasts, fetch video details for date autofill
+            # and to check if the stream can be auto-approved
+            youtube_video_details = None
+            if webcast_dict["type"] == WebcastType.YOUTUBE:
                 try:
-                    clean_date = yield YouTubeVideoHelper.get_scheduled_start_time(
+                    video_details_batch = (
+                        yield YouTubeVideoHelper.get_video_details_batch(
+                            [webcast_dict["channel"]]
+                        )
+                    )
+                    youtube_video_details = video_details_batch.get(
                         webcast_dict["channel"]
                     )
                 except Exception:
                     logging.exception(
-                        "Failed to auto-fill webcast date from YouTube API"
+                        "Failed to fetch YouTube video details for %s",
+                        webcast_dict["channel"],
                     )
+
+                if youtube_video_details and clean_date is None:
+                    clean_date = youtube_video_details.get("scheduled_start_time")
 
             # Check if webcast already exists in event
             event = Event.get_by_id(event_key)
@@ -220,31 +234,100 @@ class SuggestionCreator:
                 raise ndb.Return(SuggestionCreationStatus.BAD_EVENT)
             if event.webcast and webcast_dict in event.webcast:
                 raise ndb.Return(SuggestionCreationStatus.WEBCAST_EXISTS)
-            else:
-                suggestion_id = Suggestion.render_webcast_key_name(
-                    event_key, webcast_dict
+
+            # Auto-approve if video is from a known district YouTube channel
+            # and the stream title/description matches the event
+            if youtube_video_details and webcast_dict["type"] == WebcastType.YOUTUBE:
+                district_youtube_channel_ids: List[str] = []
+                if event.event_district_key:
+                    district = District.get_by_id(event.event_district_key)
+                    if district:
+                        district_youtube_channel_ids = [
+                            channel["channel_id"]
+                            for channel in (district.webcast_channels or [])
+                            if channel.get("type") == WebcastType.YOUTUBE
+                            and channel.get("channel_id")
+                        ]
+
+                if district_youtube_channel_ids:
+                    video_channel_id = youtube_video_details.get("channel_id")
+                    if (
+                        video_channel_id
+                        and video_channel_id in district_youtube_channel_ids
+                    ):
+                        # Validate the YouTube API's scheduled start date against the
+                        # event's date range. Only auto-approve when the date is within
+                        # range AND the stream title/description matches the event.
+                        api_date = youtube_video_details.get("scheduled_start_time")
+                        api_date_in_range = False
+                        if api_date and event.start_date and event.end_date:
+                            try:
+                                api_date_obj = datetime.strptime(
+                                    api_date, "%Y-%m-%d"
+                                ).date()
+                                api_date_in_range = (
+                                    event.start_date.date()
+                                    <= api_date_obj
+                                    <= event.end_date.date()
+                                )
+                            except ValueError:
+                                pass
+
+                        if api_date_in_range and WebcastParser.stream_matches_event(
+                            youtube_video_details, event
+                        ):
+                            webcast = Webcast(
+                                type=WebcastType.YOUTUBE,
+                                channel=webcast_dict["channel"],
+                                date=api_date,
+                            )
+                            already_exists = any(
+                                w.get("type") == WebcastType.YOUTUBE
+                                and w.get("channel") == webcast_dict["channel"]
+                                and w.get("date") == api_date
+                                for w in event.webcast
+                            )
+                            if not already_exists:
+                                EventWebcastAdder.add_webcast(event, webcast)
+                            raise ndb.Return(SuggestionCreationStatus.SUCCESS)
+
+            suggestion_id = Suggestion.render_webcast_key_name(event_key, webcast_dict)
+            suggestion = Suggestion.get_by_id(suggestion_id)
+            # Check if suggestion exists
+            if (
+                not suggestion
+                or suggestion.review_state != SuggestionState.REVIEW_PENDING
+            ):
+                suggestion = Suggestion(
+                    id=suggestion_id,
+                    author=author_account_key,
+                    target_model="event",
+                    target_key=event_key,
                 )
-                suggestion = Suggestion.get_by_id(suggestion_id)
-                # Check if suggestion exists
-                if (
-                    not suggestion
-                    or suggestion.review_state != SuggestionState.REVIEW_PENDING
-                ):
-                    suggestion = Suggestion(
-                        id=suggestion_id,
-                        author=author_account_key,
-                        target_model="event",
-                        target_key=event_key,
-                    )
-                    suggestion.contents = {
-                        "webcast_dict": webcast_dict,
-                        "webcast_url": clean_url,
-                        "webcast_date": clean_date,
-                    }
-                    suggestion.put()
-                    raise ndb.Return(SuggestionCreationStatus.SUCCESS)
-                else:
-                    raise ndb.Return(SuggestionCreationStatus.SUGGESTION_EXISTS)
+                suggestion.contents = {
+                    "webcast_dict": webcast_dict,
+                    "webcast_url": clean_url,
+                    "webcast_date": clean_date,
+                    "stream_title": (
+                        youtube_video_details.get("title", "")
+                        if youtube_video_details
+                        else None
+                    ),
+                    "stream_description": (
+                        youtube_video_details.get("description")
+                        if youtube_video_details
+                        else None
+                    ),
+                    "stream_scheduled_start_time": (
+                        youtube_video_details.get("scheduled_start_time")
+                        if youtube_video_details
+                        else None
+                    ),
+                }
+                suggestion.put()
+                raise ndb.Return(SuggestionCreationStatus.SUCCESS)
+            else:
+                raise ndb.Return(SuggestionCreationStatus.SUGGESTION_EXISTS)
         else:  # Can't parse URL -- could be an obscure webcast. Save URL and let a human deal with it.
             contents: SuggestionDict = {
                 "webcast_url": webcast_url,

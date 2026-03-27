@@ -2,6 +2,7 @@ from datetime import datetime
 from typing import Optional
 
 from flask import abort, redirect, request, url_for
+from google.appengine.ext import ndb
 from werkzeug import Response
 
 from backend.common.consts.webcast_type import WebcastType
@@ -11,6 +12,7 @@ from backend.common.manipulators.district_manipulator import DistrictManipulator
 from backend.common.manipulators.district_team_manipulator import (
     DistrictTeamManipulator,
 )
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -49,6 +51,9 @@ def district_details(district_key: DistrictKey) -> str:
         abort(404)
 
     events = Event.query(Event.district_key == district.key).fetch_async()
+    api_keys = ApiAuthAccess.query(
+        ApiAuthAccess.district_list == ndb.Key(District, district_key)
+    ).fetch_async()
     district_has_youtube_channel = any(
         channel.get("type") == WebcastType.YOUTUBE and bool(channel.get("channel_id"))
         for channel in (district.webcast_channels or [])
@@ -56,6 +61,7 @@ def district_details(district_key: DistrictKey) -> str:
     template_values = {
         "district": district,
         "events": events.get_result(),
+        "write_auths": api_keys.get_result(),
         "configured_webcast_channels": district.webcast_channels or [],
         "district_has_youtube_channel": district_has_youtube_channel,
         "webcast_success": request.args.get("webcast_success"),

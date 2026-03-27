@@ -1,0 +1,14 @@
+{
+    "message": {
+        "token": "bk3RNwTe3H0:CI2k_HHwgIpoDKCIZvvDMExUdFQ3P1...",
+        "notification": {
+            "title": "MIKET Playoff M1 Results",
+            "body": "1, 245, 2145 beat 27, 7784, 33 scoring 85-72"
+        },
+        "data": {
+            "notification_type": "match_score",
+            "event_key": "2024miket",
+            "match_key": "2024miket_sf1m1"
+        }
+    }
+}

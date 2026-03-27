@@ -29,6 +29,7 @@ from backend.common.queries.district_query import (
 )
 from backend.common.queries.event_query import DistrictEventsQuery
 from backend.common.queries.insight_query import DistrictInsightQuery
+from backend.common.queries.insight_query import DistrictInsightsYearQuery
 from backend.common.queries.team_query import DistrictTeamsQuery
 
 
@@ -232,11 +233,25 @@ def district_insights(
         district_abbreviation=district_abbreviation,
     ).fetch_dict(ApiMajorVersion.API_V3)
 
+    district_history = DistrictAbbreviationQuery(
+        abbreviation=district_abbreviation
+    ).fetch()
+    seasonal_insights = {}
+    for district in district_history:
+        yearly_insights = DistrictInsightsYearQuery(
+            district_abbreviation=district_abbreviation,
+            year=district.year,
+        ).fetch_dict(ApiMajorVersion.API_V3)
+        seasonal_insights[str(district.year)] = {
+            insight["name"]: insight["data"] for insight in yearly_insights
+        }
+
     return profiled_jsonify(
         {
             "team_data": None if len(team_insight) == 0 else team_insight[0]["data"],
             "district_data": (
                 None if len(district_insight) == 0 else district_insight[0]["data"]
             ),
+            "seasonal_insights": seasonal_insights,
         }
     )

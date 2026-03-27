@@ -731,3 +731,24 @@ def test_delete_post(login_user, web_client: FlaskClient) -> None:
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/"
+
+
+def test_delete_post_firebase_user_not_found(
+    login_user, web_client: FlaskClient
+) -> None:
+    """Account deletion should succeed even if the Firebase user is already gone."""
+    with (
+        patch.object(
+            backend.web.handlers.account, "revoke_session_cookie"
+        ) as mock_revoke_session_cookie,
+        patch.object(AccountDeletionHelper, "delete_account") as mock_delete_account,
+        patch.object(auth, "_delete_user", side_effect=Exception("user not found")),
+    ):
+        response = web_client.post("/account/delete")
+
+    assert mock_revoke_session_cookie.called
+    assert mock_delete_account.called
+
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/"

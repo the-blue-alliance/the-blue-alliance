@@ -1,8 +1,9 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
-import { MoonIcon, SunIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
+import MoonIcon from '~icons/lucide/moon';
+import SunIcon from '~icons/lucide/sun';
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';

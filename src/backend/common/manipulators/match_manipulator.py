@@ -64,6 +64,12 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     affected_stats_events: List[Event] = []
 
     for updated_model in updated_models:
+        # Nullapalooza: corrupted Match entities can have event=None
+        if updated_model.model.event is None:
+            logging.warning(
+                f"Corrupted Match: event is None for {updated_model.model.key}"
+            )
+            continue
         event_key: EventKey = none_throws(updated_model.model.event.string_id())
         MatchPostUpdateHooks.firebase_update(updated_model)
 
@@ -88,6 +94,8 @@ def match_post_update_hook(updated_models: List[TUpdatedModel[Match]]) -> None:
     unplayed_match_events = []
     for updated_match in updated_models:
         match = updated_match.model
+        if match.event is None:  # Nullapalooza
+            continue
         event = match.event.get()
 
         # Only dispatch push notifications if the event is currently happening

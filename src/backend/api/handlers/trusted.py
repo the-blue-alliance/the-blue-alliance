@@ -166,8 +166,8 @@ def delete_match_video(event_key: EventKey) -> Response:
 @validate_keys
 def update_event_info(event_key: EventKey) -> Response:
     event_key = EventCodeExceptions.resolve(event_key)
-    parsed_info = JSONEventInfoParser.parse(request.data)
     event: Event = none_throws(Event.get_by_id(event_key))
+    parsed_info = JSONEventInfoParser(event).parse(request.data)
 
     if "webcasts" in parsed_info:
         EventWebcastAdder.add_webcast(

@@ -3,6 +3,7 @@ from google.appengine.api import users as gae_login
 
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.environment.environment import Environment
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account
 from backend.common.models.suggestion import Suggestion
@@ -45,6 +46,7 @@ from backend.web.handlers.admin.districts import (
 )
 from backend.web.handlers.admin.event import (
     event_add_webcast_post,
+    event_cleanup_youtube_webcasts_post,
     event_create,
     event_delete,
     event_delete_matches,
@@ -60,6 +62,7 @@ from backend.web.handlers.admin.event import (
     event_update_webcast_date_post,
 )
 from backend.web.handlers.admin.gameday import gameday_dashboard, gameday_dashboard_post
+from backend.web.handlers.admin.insights import insights_list
 from backend.web.handlers.admin.landing import (
     landing_edit,
 )
@@ -72,6 +75,8 @@ from backend.web.handlers.admin.match import (
     match_edit,
     match_edit_post,
     match_override_score_breakdown,
+    match_youtube_video_add_post,
+    match_youtube_video_delete_post,
 )
 from backend.web.handlers.admin.media import (
     media_add,
@@ -155,7 +160,19 @@ def admin_home() -> str:
 
 @admin_routes.route("/tasks")
 def task_launcher() -> str:
-    return render_template("admin/tasks.html")
+    from backend.common.queries.district_query import DistrictsInYearQuery
+
+    current_year = SeasonHelper.get_current_season()
+    districts = sorted(
+        DistrictsInYearQuery(current_year).fetch(), key=lambda d: d.abbreviation
+    )
+    return render_template(
+        "admin/tasks.html",
+        {
+            "current_year": current_year,
+            "districts": districts,
+        },
+    )
 
 
 # More complex endpoints should be split out into their own files
@@ -296,6 +313,11 @@ admin_routes.add_url_rule(
     methods=["POST"],
 )
 admin_routes.add_url_rule(
+    "/event/cleanup_youtube_webcasts/<event_key>",
+    view_func=event_cleanup_youtube_webcasts_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
     "/event/delete_matches/<event_key>/<comp_level>/<to_delete>",
     view_func=event_delete_matches,
     methods=["GET"],
@@ -333,6 +355,16 @@ admin_routes.add_url_rule(
     "/match/delete/<match_key>", view_func=match_delete_post, methods=["POST"]
 )
 admin_routes.add_url_rule(
+    "/match/youtube/add/<match_key>",
+    view_func=match_youtube_video_add_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/match/youtube/delete/<match_key>",
+    view_func=match_youtube_video_delete_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
     "/regional_champs_pool",
     view_func=regional_champs_pool_list,
     defaults={"year": None},
@@ -351,6 +383,9 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
 )
+admin_routes.add_url_rule("/insights", view_func=insights_list, defaults={"year": None})
+admin_routes.add_url_rule("/insights/<int:year>", view_func=insights_list)
+
 admin_routes.add_url_rule("/gameday", methods=["GET"], view_func=gameday_dashboard)
 admin_routes.add_url_rule(
     "/gameday", methods=["POST"], view_func=gameday_dashboard_post
@@ -368,17 +403,17 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule("/media", view_func=media_dashboard)
 admin_routes.add_url_rule("/media/add_media", methods=["POST"], view_func=media_add)
 admin_routes.add_url_rule(
-    "/media/delete_reference/<media_key_name>",
+    "/media/delete_reference/<path:media_key_name>",
     methods=["POST"],
     view_func=media_delete_reference,
 )
 admin_routes.add_url_rule(
-    "/media/make_preferred/<media_key_name>",
+    "/media/make_preferred/<path:media_key_name>",
     methods=["POST"],
     view_func=media_make_preferred,
 )
 admin_routes.add_url_rule(
-    "/media/remove_preferred/<media_key_name>",
+    "/media/remove_preferred/<path:media_key_name>",
     methods=["POST"],
     view_func=media_remove_preferred,
 )

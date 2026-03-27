@@ -221,7 +221,7 @@
 <h2>Other Cron Tasks</h2>
 
 <h3>Calculate Year Insights</h3>
-<p>Generate Insights by year or overall</p>
+<p>Generate Insights by year or overall. <a href="/admin/insights" class="btn btn-xs btn-default">View stored insights &rarr;</a></p>
 <div class="row">
     <div class="col-sm-6">
         <span class="help-block">Enqueue Award Insights</span>
@@ -263,6 +263,23 @@
     </div>
     <div class="col-sm-6">
         <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/overallinsights/matches">Enqueue Overall Match Insights</a>
+    </div>
+</div>
+
+<h3>Calculate District Insights</h3>
+<p>Fan-out one task per district abbreviation (avoids timeouts on large datasets).</p>
+<div class="row">
+    <div class="col-sm-6">
+        <span class="help-block">Enqueue all district insights for {{ current_year }}</span>
+        <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/insights/districts/{{ current_year }}">Enqueue All Districts {{ current_year }} <span class="glyphicon glyphicon-fast-forward"></span></a>
+    </div>
+    <div class="col-sm-6">
+        <span class="help-block">Enqueue insights for a single district ({{ current_year }})</span>
+        {% for district in districts %}
+        <a class="btn btn-warning btn-xs" href="/backend-tasks-b2/do/math/insights/districts/{{ current_year }}/{{ district.abbreviation }}">{{ district.abbreviation.upper() }}</a>
+        {% else %}
+        <span class="text-muted">No districts found for {{ current_year }}</span>
+        {% endfor %}
     </div>
 </div>
 

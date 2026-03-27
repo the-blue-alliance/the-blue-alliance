@@ -227,6 +227,58 @@ def test_parser_parse_live_without_details() -> None:
     assert "viewer_count" not in result["video1"]
 
 
+def test_parser_parse_scheduled_start_time() -> None:
+    """Test parsing scheduled start time from liveStreamingDetails."""
+    parser = YoutubeStreamStatusBatchParser(["video1"])
+
+    response = {
+        "items": [
+            {
+                "id": "video1",
+                "snippet": {
+                    "liveBroadcastContent": "upcoming",
+                    "title": "Upcoming Stream",
+                },
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2026-03-14T14:00:00Z",
+                },
+            }
+        ]
+    }
+
+    result = parser.parse(response)
+
+    assert result["video1"]["status"] == WebcastStatus.OFFLINE
+    assert result["video1"]["stream_title"] == "Upcoming Stream"
+    assert result["video1"]["scheduled_start_time_utc"] == "2026-03-14T14:00:00Z"
+    assert "viewer_count" not in result["video1"]
+
+
+def test_parser_parse_no_scheduled_start_time() -> None:
+    """Test that scheduled_start_time_utc is absent when not in liveStreamingDetails."""
+    parser = YoutubeStreamStatusBatchParser(["video1"])
+
+    response = {
+        "items": [
+            {
+                "id": "video1",
+                "snippet": {
+                    "liveBroadcastContent": "live",
+                    "title": "Live Stream",
+                },
+                "liveStreamingDetails": {
+                    "concurrentViewers": 42,
+                },
+            }
+        ]
+    }
+
+    result = parser.parse(response)
+
+    assert result["video1"]["status"] == WebcastStatus.ONLINE
+    assert "scheduled_start_time_utc" not in result["video1"]
+
+
 def test_parser_parse_missing_snippet() -> None:
     """Test parsing when snippet is missing."""
     parser = YoutubeStreamStatusBatchParser(["video1"])

@@ -11,6 +11,9 @@ from werkzeug.wrappers import Response
 
 from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    ParsedVideoDetails,
+)
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
@@ -21,6 +24,7 @@ from backend.common.helpers.match_time_prediction_helper import (
 )
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -412,7 +416,10 @@ def update_event_webcast_status(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    WebcastOnlineHelper.add_online_status(event.webcast)
+    force_str = request.args.get("force", "").lower()
+    force = force_str in {"1", "true", "yes", "on"}
+
+    WebcastOnlineHelper.add_online_status(event.webcast, force=force)
     return make_response(f"Updated event webcasts: {event.webcast}")
 
 
@@ -445,14 +452,22 @@ def find_event_webcasts(district_key: DistrictKey) -> Response:
     future_events_without_webcasts = [
         event
         for event in district_events
-        if event.within_a_day and not event.current_webcasts
+        if (event.within_a_day and not event.current_webcasts)
+        or (event.future and len(event.webcast) == 0)
     ]
     event_to_streams: Dict[str, List] = {}
     for stream in upcoming_streams:
         matched_events = [
             e
             for e in future_events_without_webcasts
-            if e.short_name and e.short_name in stream["title"]
+            if WebcastParser.stream_matches_event(
+                ParsedVideoDetails(
+                    video_id=stream["stream_id"],
+                    title=stream["title"],
+                    description=stream["description"],
+                ),
+                e,
+            )
         ]
         if len(matched_events) == 0:
             logging.info(f"Did not find an event match for stream {stream}")

@@ -1,4 +1,5 @@
 import logging
+import time
 from html import escape
 from typing import Optional
 
@@ -21,7 +22,8 @@ from backend.common.helpers.insights_notable_helper import InsightsNotableHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
 from backend.common.models.insight import Insight, LeaderboardKeyType
-from backend.common.models.keys import Year
+from backend.common.models.keys import DistrictAbbreviation, Year
+from backend.common.queries.district_query import DistrictsInYearQuery
 
 blueprint = Blueprint("insights", __name__)
 
@@ -280,6 +282,96 @@ def enqueue_all_insights_of_kind(kind: str) -> Response:
     ):  # Only write out if not in taskqueue
         return make_response(
             render_template("math/all_insights_enqueue.html", kind=kind)
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights/districts/<int:year>")
+@blueprint.route(
+    "/backend-tasks-b2/enqueue/math/insights/districts",
+    defaults={"year": None},
+)
+def enqueue_district_insights(year: Optional[Year] = None) -> Response:
+    """
+    Enqueues one district-insights task per district abbreviation, so each
+    task is small enough to complete within the request deadline.
+    """
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    districts = DistrictsInYearQuery(year).fetch()
+    for district in districts:
+        taskqueue.add(
+            url=url_for(
+                "insights.do_district_insights_for_abbreviation",
+                year=year,
+                abbrev=district.abbreviation,
+            ),
+            method="GET",
+            target="py3-tasks-cpu",
+            queue_name="backend-tasks",
+        )
+
+    if "X-Appengine-Taskname" not in request.headers:
+        return make_response(
+            f"enqueued district insights for {len(districts)} districts in year {year}"
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/do/math/insights/districts/<int:year>/<abbrev>")
+def do_district_insights_for_abbreviation(abbrev: str, year: Year) -> Response:
+    """
+    Calculates district insights for a single district abbreviation.
+    """
+    start = time.perf_counter()
+    logging.info(
+        "District insights task start district=%s year=%s task=%s",
+        abbrev,
+        year,
+        request.headers.get("X-Appengine-Taskname", "manual"),
+    )
+
+    insights = InsightsHelper.doDistrictInsightsForAbbreviation(
+        DistrictAbbreviation(abbrev), year=year
+    )
+
+    logging.info(
+        "District insights task computed district=%s year=%s insights=%s elapsed=%.3fs",
+        abbrev,
+        year,
+        len(insights),
+        time.perf_counter() - start,
+    )
+
+    if insights:
+        write_start = time.perf_counter()
+        InsightManipulator.createOrUpdate(insights)
+        logging.info(
+            "District insights task wrote district=%s year=%s insights=%s elapsed=%.3fs total=%.3fs",
+            abbrev,
+            year,
+            len(insights),
+            time.perf_counter() - write_start,
+            time.perf_counter() - start,
+        )
+    else:
+        logging.info(
+            "District insights task empty district=%s year=%s total=%.3fs",
+            abbrev,
+            year,
+            time.perf_counter() - start,
+        )
+
+    if "X-Appengine-Taskname" not in request.headers:
+        return make_response(
+            render_template(
+                "math/year_insights_do.html",
+                kind=f"districts/{year}/{abbrev}",
+                insights=insights,
+            )
         )
 
     return make_response("")

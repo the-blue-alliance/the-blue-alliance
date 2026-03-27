@@ -19,6 +19,24 @@ import WebcastSelectionDialogItem from "./WebcastSelectionDialogItem";
 import { webcastPropType } from "../utils/webcastUtils";
 import PlatformIcon from "./PlatformIcon";
 
+export const getScheduledStartTimeLabel = (scheduledStartTimeUtc) => {
+  if (!scheduledStartTimeUtc) {
+    return null;
+  }
+
+  const scheduledStartTime = new Date(scheduledStartTimeUtc);
+  if (Number.isNaN(scheduledStartTime.getTime())) {
+    return null;
+  }
+
+  const localTime = scheduledStartTime.toLocaleTimeString([], {
+    hour: "numeric",
+    minute: "2-digit",
+  });
+
+  return `⏲\n${localTime}`;
+};
+
 export default class WebcastSelectionDialog extends React.Component {
   static propTypes = {
     open: PropTypes.bool.isRequired,
@@ -68,6 +86,9 @@ export default class WebcastSelectionDialog extends React.Component {
       );
       let rightIcon = <HelpIcon />;
       let secondaryText = null;
+      const scheduledStartTimeLabel = getScheduledStartTimeLabel(
+        webcast.scheduledStartTimeUtc || webcast.scheduled_start_time_utc
+      );
       if (webcast.status === "online") {
         rightIcon = (
           <div
@@ -93,11 +114,35 @@ export default class WebcastSelectionDialog extends React.Component {
             <VideocamIcon style={{ color: green[500] }} />
           </div>
         );
-        if (webcast.streamTitle) {
-          secondaryText = webcast.streamTitle;
-        }
       } else if (webcast.status === "offline") {
-        rightIcon = <VideocamOffIcon />;
+        if (scheduledStartTimeLabel) {
+          rightIcon = (
+            <div
+              style={{
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "flex-end",
+                width: 140,
+              }}
+            >
+              <small
+                style={{
+                  textAlign: "center",
+                  marginRight: 8,
+                  whiteSpace: "pre-line",
+                }}
+              >
+                {scheduledStartTimeLabel}
+              </small>
+            </div>
+          );
+        } else {
+          rightIcon = <VideocamOffIcon />;
+        }
+      }
+
+      if (webcast.streamTitle) {
+        secondaryText = webcast.streamTitle;
       }
 
       if (

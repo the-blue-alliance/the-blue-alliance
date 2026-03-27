@@ -51,6 +51,7 @@
       <li><a href="#advancement" data-toggle="tab">Advancement</a></li>
             <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
       <li><a href="#adjustments" data-toggle="tab">HQ Adjustments</a></li>
+      <li><a href="#api" data-toggle="tab">API</a></li>
     </ul>
   </div>
 </div>
@@ -156,7 +157,7 @@
                 <tr>
                     <td>{{ channel.type }}</td>
                     <td>{{ channel.channel }}</td>
-                    <td>{{ channel.channel_id }}</td>
+                    <td><a href="https://www.youtube.com/channel/{{ channel.channel_id }}" target="_blank" rel="noopener noreferrer">{{ channel.channel_id }}</a></td>
                     <td>
                         <form action="/admin/district/{{district.key_name}}/webcasts/remove" method="post" style="display: inline;">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -200,6 +201,13 @@
                 </tr>
             {% endfor %}
         </table>
+    </div>
+    <div class="tab-pane" id="api">
+        <h2>Write API Keys</h2>
+        <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
+
+        <p>Currently Issued Keys</p>
+        {% include "admin/partials/api_write_table.html" %}
     </div>
 </div>
 

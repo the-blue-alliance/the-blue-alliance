@@ -1,5 +1,6 @@
 import datetime
 import json
+from typing import Optional
 from unittest import mock
 
 import pytz
@@ -11,6 +12,9 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    ParsedVideoDetails,
+)
 from backend.common.futures import InstantFuture
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
@@ -21,6 +25,7 @@ from backend.common.helpers.playoff_advancement_helper import (
     PlayoffAdvancementHelper,
 )
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.youtube_video_helper import (
     YouTubeUpcomingStream,
     YouTubeVideoHelper,
@@ -40,6 +45,7 @@ from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast, WebcastChannel
 from backend.tasks_io.helpers.live_event_helper import LiveEventHelper
+from backend.tasks_io.helpers.webcast_online_helper import WebcastOnlineHelper
 
 
 def set_district_webcast_channels(
@@ -761,6 +767,44 @@ def test_update_live_events_no_enqueue_when_no_unplayed_matches_today(
     assert len(tasks) == 0
 
 
+@mock.patch.object(WebcastOnlineHelper, "add_online_status")
+def test_update_event_webcast_status_default_not_forced(
+    add_online_status_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = tasks_client.get("/tasks/do/update_webcast_online_status/2026test")
+
+    assert resp.status_code == 200
+    add_online_status_mock.assert_called_once()
+    assert add_online_status_mock.call_args.kwargs == {"force": False}
+
+
+@mock.patch.object(WebcastOnlineHelper, "add_online_status")
+def test_update_event_webcast_status_force_true(
+    add_online_status_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = tasks_client.get("/tasks/do/update_webcast_online_status/2026test?force=1")
+
+    assert resp.status_code == 200
+    add_online_status_mock.assert_called_once()
+    assert add_online_status_mock.call_args.kwargs == {"force": True}
+
+
 def test_find_event_webcasts_district_not_supported(tasks_client: Client) -> None:
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 400
@@ -824,7 +868,9 @@ def test_find_event_webcasts_successful_match(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event - Qualifications",
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -888,12 +934,16 @@ def test_find_event_webcasts_multiple_streams_for_event(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event - Qualifications",
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             ),
             YouTubeUpcomingStream(
                 stream_id="def456",
                 title="Troy District Event - Playoffs",
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             ),
         ]
     )
@@ -970,7 +1020,9 @@ def test_find_event_webcasts_multiple_youtube_channels(
                 YouTubeUpcomingStream(
                     stream_id="stream_ch1",
                     title="Troy District Event - Qualifications",
+                    description="",
                     scheduled_start_time="",
+                    live_broadcast_content="",
                 )
             ]
         ),
@@ -979,7 +1031,9 @@ def test_find_event_webcasts_multiple_youtube_channels(
                 YouTubeUpcomingStream(
                     stream_id="stream_ch2",
                     title="Lakeview District Event - Qualifications",
+                    description="",
                     scheduled_start_time="",
+                    live_broadcast_content="",
                 )
             ]
         ),
@@ -1059,7 +1113,9 @@ def test_find_event_webcasts_multiple_event_match_skipped(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="2026 FIM Troy and Troy Albany District Events",  # Contains both "Troy" and "Troy Albany"
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1114,7 +1170,9 @@ def test_find_event_webcasts_no_matching_events(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Unrelated Stream Title",
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1166,7 +1224,9 @@ def test_find_event_webcasts_no_output_in_taskqueue(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event - Qualifications",
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1224,7 +1284,9 @@ def test_find_event_webcasts_no_start_time_skipped(
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event",
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
@@ -1248,7 +1310,65 @@ def test_find_event_webcasts_no_live_events(
     tasks_client: Client,
     ndb_stub,
 ) -> None:
-    # Setup district but no events within a day
+    # Setup district with a future event that already has a webcast
+    # (should not be in future_events_without_webcasts)
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    event = Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now() + datetime.timedelta(days=10),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=11),
+        district_key=ndb.Key(District, "2026fim"),
+        webcast_json='[{"type": "youtube", "channel": "existingstream"}]',
+    )
+    event.put()
+
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    # Mock streams
+    get_streams_mock.return_value = InstantFuture(
+        [
+            YouTubeUpcomingStream(
+                stream_id="abc123",
+                title="Troy District Event",
+                description="",
+                scheduled_start_time="",
+                live_broadcast_content="",
+            )
+        ]
+    )
+
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
+    assert resp.status_code == 200
+
+    # Stream lookup should still be called, but no events to match
+    get_streams_mock.assert_called_once()
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_future_event_without_webcasts(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    """Future event (>1 day away) with no webcasts should be included in the filter."""
     District(id="2026fim", year=2026, abbreviation="fim").put()
     event = Event(
         id="2026fim1",
@@ -1273,19 +1393,264 @@ def test_find_event_webcasts_no_live_events(
         ],
     )
 
-    # Mock streams
     get_streams_mock.return_value = InstantFuture(
         [
             YouTubeUpcomingStream(
                 stream_id="abc123",
                 title="Troy District Event",
+                description="",
                 scheduled_start_time="",
+                live_broadcast_content="",
             )
         ]
     )
+    get_start_time_mock.return_value = InstantFuture("2026-03-25")
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
+    assert b"Discovered webcasts:" in resp.data
+    assert b"2026fim1: abc123 (2026-03-25)" in resp.data
 
-    # Stream lookup should still be called, but no events to match
-    get_streams_mock.assert_called_once()
+    add_webcast_mock.assert_called_once()
+    call_args = add_webcast_mock.call_args
+    assert call_args[0][0].key_name == "2026fim1"
+    added_webcast = call_args[0][1]
+    assert added_webcast["type"] == WebcastType.YOUTUBE
+    assert added_webcast["channel"] == "abc123"
+    assert added_webcast["date"] == "2026-03-25"
+
+
+def _make_event(
+    key: str = "2026fim1",
+    event_short: str = "fim1",
+    short_name: Optional[str] = "Troy",
+) -> Event:
+    year = int(key[:4])
+    return Event(
+        id=key,
+        year=year,
+        event_short=event_short,
+        short_name=short_name,
+        event_type_enum=EventType.DISTRICT,
+    )
+
+
+def _make_stream(
+    title: str = "",
+    description: str = "",
+) -> YouTubeUpcomingStream:
+    return YouTubeUpcomingStream(
+        stream_id="abc123",
+        title=title,
+        description=description,
+        scheduled_start_time="",
+        live_broadcast_content="",
+    )
+
+
+def test_stream_matches_event_title_contains_short_name() -> None:
+    event = _make_event(short_name="Troy")
+    stream = _make_stream(title="Troy District Event - Qualifications")
+    assert (
+        WebcastParser.stream_matches_event(
+            ParsedVideoDetails(
+                video_id=stream["stream_id"],
+                title=stream["title"],
+                description=stream["description"],
+            ),
+            event,
+        )
+        is True
+    )
+
+
+def test_stream_matches_event_description_contains_short_name() -> None:
+    event = _make_event(short_name="Troy")
+    stream = _make_stream(title="FIRST in Michigan Stream", description="Troy District")
+    assert (
+        WebcastParser.stream_matches_event(
+            ParsedVideoDetails(
+                video_id=stream["stream_id"],
+                title=stream["title"],
+                description=stream["description"],
+            ),
+            event,
+        )
+        is True
+    )
+
+
+def test_stream_matches_event_description_contains_upper_event_code() -> None:
+    event = _make_event(event_short="fim1", short_name=None)
+    stream = _make_stream(title="FIRST in Michigan Stream", description="FIM1 District")
+    assert (
+        WebcastParser.stream_matches_event(
+            ParsedVideoDetails(
+                video_id=stream["stream_id"],
+                title=stream["title"],
+                description=stream["description"],
+            ),
+            event,
+        )
+        is True
+    )
+
+
+def test_stream_matches_event_no_match() -> None:
+    event = _make_event(event_short="fim1", short_name="Troy")
+    stream = _make_stream(title="Unrelated Stream", description="Something else")
+    assert (
+        WebcastParser.stream_matches_event(
+            ParsedVideoDetails(
+                video_id=stream["stream_id"],
+                title=stream["title"],
+                description=stream["description"],
+            ),
+            event,
+        )
+        is False
+    )
+
+
+def test_stream_matches_event_no_short_name_no_match() -> None:
+    event = _make_event(event_short="fim1", short_name=None)
+    stream = _make_stream(title="Troy District Event", description="")
+    assert (
+        WebcastParser.stream_matches_event(
+            ParsedVideoDetails(
+                video_id=stream["stream_id"],
+                title=stream["title"],
+                description=stream["description"],
+            ),
+            event,
+        )
+        is False
+    )
+
+
+def test_stream_matches_event_lower_event_code_not_matched() -> None:
+    """Upper-cased event code must match; lower case in description should not match."""
+    event = _make_event(event_short="fim1", short_name=None)
+    stream = _make_stream(title="", description="fim1 district event")
+    # "fim1".upper() == "FIM1" which is NOT in "fim1 district event"
+    assert (
+        WebcastParser.stream_matches_event(
+            ParsedVideoDetails(
+                video_id=stream["stream_id"],
+                title=stream["title"],
+                description=stream["description"],
+            ),
+            event,
+        )
+        is False
+    )
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_match_by_description_short_name(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    """A stream that does not mention the event in its title but does in its description should still match."""
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    ).put()
+
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    get_streams_mock.return_value = InstantFuture(
+        [
+            YouTubeUpcomingStream(
+                stream_id="abc123",
+                title="FIRST in Michigan FRC District Event",
+                description="Troy District Event - Qualifications",
+                scheduled_start_time="",
+                live_broadcast_content="",
+            )
+        ]
+    )
+    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
+    assert resp.status_code == 200
+    assert b"2026fim1: abc123 (2026-03-15)" in resp.data
+    add_webcast_mock.assert_called_once()
+
+
+@freeze_time("2026-03-15")
+@mock.patch.object(EventWebcastAdder, "add_webcast")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
+def test_find_event_webcasts_match_by_description_event_code(
+    get_streams_mock: mock.Mock,
+    get_start_time_mock: mock.Mock,
+    add_webcast_mock: mock.Mock,
+    tasks_client: Client,
+    ndb_stub,
+) -> None:
+    """A stream whose description contains the upper-cased event code should match."""
+    District(id="2026fim", year=2026, abbreviation="fim").put()
+    Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        short_name="Troy",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime.now(),
+        end_date=datetime.datetime.now() + datetime.timedelta(days=1),
+        district_key=ndb.Key(District, "2026fim"),
+    ).put()
+
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    get_streams_mock.return_value = InstantFuture(
+        [
+            YouTubeUpcomingStream(
+                stream_id="abc123",
+                title="FIRST in Michigan FRC District Event",
+                description="FIM1 District Event Livestream",
+                scheduled_start_time="",
+                live_broadcast_content="",
+            )
+        ]
+    )
+    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+
+    resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
+    assert resp.status_code == 200
+    assert b"2026fim1: abc123 (2026-03-15)" in resp.data
+    add_webcast_mock.assert_called_once()
+    call_args = add_webcast_mock.call_args
+    assert call_args[0][0].key_name == "2026fim1"

@@ -179,6 +179,25 @@ class TestMatchManipulator(unittest.TestCase):
 
 
 @mock.patch.object(FirebasePusher, "update_match")
+def test_updateHook_corrupted_null_event(
+    mock_firebase, ndb_context, taskqueue_stub
+) -> None:
+    """Nullapalooza (#9236): corrupted Match with event=None should be skipped."""
+    from backend.common.manipulators.match_manipulator import (
+        match_post_update_hook,
+    )
+
+    mock_model = mock.Mock()
+    mock_model.model.event = None
+    mock_model.model.key = ndb.Key(Match, "2012ct_qm1")
+
+    # Call the hook directly to avoid NDB serialization issues
+    match_post_update_hook([mock_model])
+
+    mock_firebase.assert_not_called()
+
+
+@mock.patch.object(FirebasePusher, "update_match")
 def test_updateHook(mock_firebase, ndb_context, taskqueue_stub) -> None:
     test_match = Match(
         id="2012ct_qm1",

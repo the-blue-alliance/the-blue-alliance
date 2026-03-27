@@ -88,8 +88,9 @@ updates:
     icons:
       patterns:
         - "@iconify/json"
-        - "lucide-react"
         - "unplugin-icons"
+        - "@svgr/core"
+        - "@svgr/plugin-jsx"
     react:
       patterns:
         - "react"

@@ -312,7 +312,7 @@ class TestMatchUpcomingNotification(unittest.TestCase):
         notification = MatchUpcomingNotification(match)
         notification.match.time = None
         assert notification.fcm_notification is not None
-        # For double elim, title should use "M1" (Match 1) not "SF1-1"
-        assert notification.fcm_notification.title == "TESTDE M1 Starting Soon"
-        # Body uses verbose_name which should also say "Match 1" for double elim
-        assert "Match 1" in notification.fcm_notification.body
+        # For double elim, title should use "Playoff M1" not "SF1-1"
+        assert notification.fcm_notification.title == "TESTDE Playoff M1 Starting Soon"
+        # Body uses verbose_name which should also say "Playoff Match 1" for double elim
+        assert "Playoff Match 1" in notification.fcm_notification.body

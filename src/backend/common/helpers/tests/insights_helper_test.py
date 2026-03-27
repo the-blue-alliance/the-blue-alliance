@@ -1,6 +1,11 @@
-from typing import Dict, List
+from types import SimpleNamespace
+from typing import cast, Dict, List
+from unittest import mock
 
 from backend.common.helpers.insights_helper import InsightsHelper
+from backend.common.helpers.insights_helper_utils import create_insight
+from backend.common.models.event import Event
+from backend.common.models.insight import Insight
 
 
 def call_calc_streaks(division_winners_map: Dict[str, List[int]]) -> Dict[str, int]:
@@ -98,3 +103,179 @@ def test_empty_overall_input_map():
     data = {}
     expected = {}
     assert call_calc_streaks(data) == expected
+
+
+def test_do_prediction_insights_for_events_scopes_to_district() -> None:
+    fake_event = SimpleNamespace(
+        event_type_enum=1,
+        prep_details=mock.Mock(),
+        prep_matches=mock.Mock(),
+        details=SimpleNamespace(
+            predictions={
+                "match_predictions": {
+                    "qual": {
+                        "2024fim_qm1": {"winning_alliance": "red"},
+                    },
+                    "playoff": {},
+                },
+                "match_prediction_stats": {
+                    "qual": {"brier_scores": {"win_loss": 0.25}},
+                    "playoff": {"brier_scores": {"win_loss": 0.5}},
+                },
+            }
+        ),
+        matches=[
+            SimpleNamespace(
+                has_been_played=True,
+                comp_level="qm",
+                key=SimpleNamespace(id=lambda: "2024fim_qm1"),
+                winning_alliance="red",
+            )
+        ],
+    )
+
+    insights = InsightsHelper._doPredictionInsightsForEvents(
+        year=2024,
+        events=cast(List[Event], [fake_event]),
+        district_abbreviation="fim",
+    )
+
+    assert len(insights) == 1
+    assert insights[0].district_abbreviation == "fim"
+    assert insights[0].name == Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS]
+    assert insights[0].data == {
+        "qual": {
+            "mean_brier_score": 0.25,
+            "correct_matches_count": 1,
+            "total_matches_count": 1,
+            "mean_brier_score_cmp": None,
+            "correct_matches_count_cmp": 0,
+            "total_matches_count_cmp": 0,
+        },
+        "playoff": {
+            "mean_brier_score": 0.5,
+            "correct_matches_count": 0,
+            "total_matches_count": 0,
+            "mean_brier_score_cmp": None,
+            "correct_matches_count_cmp": 0,
+            "total_matches_count_cmp": 0,
+        },
+    }
+
+
+@mock.patch("backend.common.helpers.insights_helper.DistrictEventsQuery")
+@mock.patch("backend.common.helpers.insights_helper.DistrictHistoryQuery")
+@mock.patch("backend.common.helpers.insights_helper.InsightsDistrictsHelper")
+@mock.patch("backend.common.helpers.insights_helper.RenamedDistricts.get_latest_codes")
+@mock.patch.object(InsightsHelper, "_doPredictionInsightsForEvents")
+@mock.patch.object(InsightsHelper, "_doAwardInsightsForEvents")
+@mock.patch.object(InsightsHelper, "_doMatchInsightsForEvents")
+def test_do_district_insights_includes_season_style_stats(
+    match_helper: mock.Mock,
+    award_helper: mock.Mock,
+    prediction_helper: mock.Mock,
+    latest_codes: mock.Mock,
+    district_helpers: mock.Mock,
+    district_history_query: mock.Mock,
+    district_events_query: mock.Mock,
+) -> None:
+    latest_codes.return_value = ["fim"]
+    district_helpers.make_insight_team_data.return_value = {"frc1": {}}
+    district_helpers.make_insight_district_data.return_value = {"district": {}}
+
+    district = SimpleNamespace(year=2024, key_name="2024fim")
+    district_history_query.return_value.fetch.return_value = [district]
+    district_events = [SimpleNamespace(key_name="2024miket")]
+    district_events_query.return_value.fetch.return_value = district_events
+
+    match_helper.return_value = [
+        create_insight(
+            data={"matches": 1},
+            name=Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+            year=2024,
+            district_abbreviation="fim",
+        )
+    ]
+    award_helper.return_value = [
+        create_insight(
+            data=["frc1"],
+            name=Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
+            year=2024,
+            district_abbreviation="fim",
+        )
+    ]
+    prediction_helper.return_value = [
+        create_insight(
+            data={"qual": {}},
+            name=Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS],
+            year=2024,
+            district_abbreviation="fim",
+        )
+    ]
+
+    insights = InsightsHelper.doDistrictInsights()
+
+    assert {
+        (insight.name, insight.year, insight.district_abbreviation)
+        for insight in insights
+    } >= {
+        (
+            Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+            0,
+            "fim",
+        ),
+        (
+            Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+            0,
+            "fim",
+        ),
+        (Insight.INSIGHT_NAMES[Insight.NUM_MATCHES], 2024, "fim"),
+        (Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS], 2024, "fim"),
+        (Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS], 2024, "fim"),
+    }
+
+    match_helper.assert_called_once_with(
+        year=2024,
+        events=district_events,
+        district_abbreviation="fim",
+    )
+    award_helper.assert_called_once_with(
+        year=2024,
+        events=district_events,
+        district_abbreviation="fim",
+    )
+    prediction_helper.assert_called_once_with(
+        year=2024,
+        events=district_events,
+        district_abbreviation="fim",
+    )
+
+
+@mock.patch("backend.common.helpers.insights_helper.DistrictHistoryQuery")
+@mock.patch("backend.common.helpers.insights_helper.InsightsDistrictsHelper")
+@mock.patch.object(InsightsHelper, "_doDistrictInsightsForDistrictSeason")
+def test_do_district_insights_for_abbreviation_year_skips_overall_aggregates(
+    season_helper: mock.Mock,
+    district_helpers: mock.Mock,
+    district_history_query: mock.Mock,
+) -> None:
+    district = SimpleNamespace(year=2026, key_name="2026fim")
+    district_history_query.return_value.fetch.return_value = [district]
+
+    season_insight = create_insight(
+        data={"matches": 1},
+        name=Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+        year=2026,
+        district_abbreviation="fim",
+    )
+    season_helper.return_value = [season_insight]
+
+    insights = InsightsHelper.doDistrictInsightsForAbbreviation("fim", year=2026)
+
+    assert insights == [season_insight]
+    district_helpers.make_insight_team_data.assert_not_called()
+    district_helpers.make_insight_district_data.assert_not_called()
+    season_helper.assert_called_once_with(
+        district_abbreviation="fim",
+        district=district,
+    )

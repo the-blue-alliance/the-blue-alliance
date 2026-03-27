@@ -67,6 +67,7 @@ def test_add_online_status_not_in_cache() -> None:
     assert webcast.get("status") == WebcastStatus.UNKNOWN
     assert webcast.get("stream_title") is None
     assert webcast.get("viewer_count") is None
+    assert webcast.get("scheduled_start_time_utc") is None
 
     # Check we write the updated dict back to cache
     cache_data = WebcastOnlineStatusMemcache(webcast).get()
@@ -90,6 +91,74 @@ def test_add_online_status_in_cache() -> None:
 
     WebcastOnlineHelper.add_online_status([webcast])
     assert webcast == webcast_with_status
+
+
+def test_add_online_status_in_cache_with_scheduled_start_time() -> None:
+    webcast = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+    )
+    webcast_with_status = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+        status=WebcastStatus.OFFLINE,
+        stream_title="Upcoming Stream",
+        viewer_count=None,
+        scheduled_start_time_utc="2026-03-14T14:00:00Z",
+    )
+
+    WebcastOnlineStatusMemcache(webcast).put(webcast_with_status)
+
+    WebcastOnlineHelper.add_online_status([webcast])
+    assert webcast["scheduled_start_time_utc"] == "2026-03-14T14:00:00Z"
+    assert webcast == webcast_with_status
+
+
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
+def test_add_online_status_force_ignores_cache_and_refetches(
+    youtube_mock: mock.Mock,
+) -> None:
+    webcast = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+    )
+    stale_cached_webcast = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+        status=WebcastStatus.OFFLINE,
+        stream_title="Old Stream",
+        viewer_count=12,
+        scheduled_start_time_utc="2026-03-14T14:00:00Z",
+    )
+    fresh_status = WebcastOnlineStatus(
+        status=WebcastStatus.ONLINE,
+        stream_title="New Stream",
+        viewer_count=1337,
+        scheduled_start_time_utc="2026-03-14T15:00:00Z",
+    )
+
+    WebcastOnlineStatusMemcache(webcast).put(stale_cached_webcast)
+    youtube_mock.return_value = InstantFuture({"tbagameday": fresh_status})
+
+    with mock.patch.object(
+        WebcastOnlineStatusMemcache,
+        "get_async",
+        return_value=InstantFuture(stale_cached_webcast),
+    ) as get_async_mock:
+        WebcastOnlineHelper.add_online_status([webcast], force=True)
+
+    get_async_mock.assert_called_once()
+    assert webcast["status"] == WebcastStatus.ONLINE
+    assert webcast["stream_title"] == "New Stream"
+    assert webcast["viewer_count"] == 1337
+    assert webcast["scheduled_start_time_utc"] == "2026-03-14T15:00:00Z"
+
+    refreshed_cache_data = WebcastOnlineStatusMemcache(webcast).get()
+    assert refreshed_cache_data is not None
+    assert refreshed_cache_data["status"] == WebcastStatus.ONLINE
+    assert refreshed_cache_data["stream_title"] == "New Stream"
+    assert refreshed_cache_data["viewer_count"] == 1337
+    assert refreshed_cache_data["scheduled_start_time_utc"] == "2026-03-14T15:00:00Z"
 
 
 def test_add_online_status_in_cache_does_not_refresh_cache_ttl() -> None:
@@ -141,6 +210,33 @@ def test_add_online_status_youtube(youtube_mock: mock.Mock) -> None:
     assert webcast["status"] == WebcastStatus.ONLINE
     assert webcast["stream_title"] == "A Stream"
     assert webcast["viewer_count"] == 1337
+    assert webcast.get("scheduled_start_time_utc") is None
+
+
+@mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
+def test_add_online_status_youtube_with_scheduled_start_time(
+    youtube_mock: mock.Mock,
+) -> None:
+    webcast = Webcast(
+        type=WebcastType.YOUTUBE,
+        channel="tbagameday",
+    )
+
+    youtube_mock.return_value = InstantFuture(
+        {
+            "tbagameday": WebcastOnlineStatus(
+                status=WebcastStatus.OFFLINE,
+                stream_title="Upcoming Stream",
+                scheduled_start_time_utc="2026-03-14T14:00:00Z",
+            )
+        }
+    )
+
+    WebcastOnlineHelper.add_online_status([webcast])
+
+    assert webcast["status"] == WebcastStatus.OFFLINE
+    assert webcast["stream_title"] == "Upcoming Stream"
+    assert webcast["scheduled_start_time_utc"] == "2026-03-14T14:00:00Z"
 
 
 @mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
@@ -164,6 +260,7 @@ def test_add_online_status_youtube_api_forbidden_403(youtube_mock: mock.Mock) ->
     assert webcast["status"] == WebcastStatus.UNKNOWN
     assert webcast["stream_title"] is None
     assert webcast["viewer_count"] is None
+    assert webcast["scheduled_start_time_utc"] is None
 
 
 @mock.patch.object(YoutubeWebcastStatusBatch, "fetch_async")
@@ -191,6 +288,8 @@ def test_add_online_status_youtube_batch_partial_403(youtube_mock: mock.Mock) ->
     assert webcast2["status"] == WebcastStatus.UNKNOWN
     assert webcast1["stream_title"] is None
     assert webcast2["stream_title"] is None
+    assert webcast1["scheduled_start_time_utc"] is None
+    assert webcast2["scheduled_start_time_utc"] is None
 
 
 @freeze_time("2025-04-01 00:00:00")

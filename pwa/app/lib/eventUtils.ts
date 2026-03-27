@@ -1,3 +1,4 @@
+import { CalendarEvent } from 'calendar-link';
 import { Temporal } from 'temporal-polyfill';
 
 import { Event } from '~/api/tba/read/types.gen';
@@ -31,6 +32,32 @@ function getEventActiveWindow(event: Event): {
     end: Temporal.PlainDate.from(event.end_date)
       .toZonedDateTime({ timeZone: tz, plainTime: EVENT_END_TIME })
       .toInstant(),
+  };
+}
+
+export function toCalendarEvent(event: Event): CalendarEvent {
+  const locationParts = [
+    event.location_name,
+    event.city,
+    event.state_prov,
+    event.country,
+  ].filter(Boolean);
+
+  return {
+    title: `${event.name} ${event.year}`,
+    start: Temporal.PlainDate.from(event.start_date)
+      .toZonedDateTime('UTC')
+      .toInstant()
+      .toString(),
+    end: Temporal.PlainDate.from(event.end_date)
+      .add({ days: 1 })
+      .toZonedDateTime('UTC')
+      .toInstant()
+      .toString(),
+    allDay: true,
+    description: `https://www.thebluealliance.com/event/${event.key}`,
+    location: locationParts.join(', '),
+    url: `https://www.thebluealliance.com/event/${event.key}`,
   };
 }
 

@@ -1,8 +1,10 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { deleteUser, updateProfile } from 'firebase/auth';
-import { Mail, User } from 'lucide-react';
 import { useState } from 'react';
+
+import MailIcon from '~icons/lucide/mail';
+import UserIcon from '~icons/lucide/user';
 
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
 import { useAuth } from '~/components/tba/auth/auth';
@@ -84,11 +86,11 @@ function Account() {
           <div className="flex items-center gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-foreground">
-                <User className="h-4 w-4 text-muted-foreground" />
+                <UserIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{user.displayName}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
+                <MailIcon className="h-4 w-4" />
                 <span className="text-sm">{user.email}</span>
               </div>
             </div>
