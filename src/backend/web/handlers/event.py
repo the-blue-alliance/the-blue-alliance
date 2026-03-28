@@ -37,6 +37,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_matchstats import Component, TeamStatMap
 from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
+from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
 
@@ -374,6 +375,20 @@ def event_detail(event_key: EventKey) -> Response:
             DistrictPointTiebreakersSortingHelper.sorted_points(points)
         )
 
+    regional_champs_pool_advancement = None
+    if is_regional_cmp_pool_eligible:
+        regional_champs_pool = RegionalChampsPool.get_by_id(
+            RegionalChampsPool.render_key_name(event.year)
+        )
+        regional_champs_pool_advancement = (
+            regional_champs_pool.advancement if regional_champs_pool else None
+        )
+
+    events_by_key = {
+        event.key_name: event
+        for event in event_query.EventListQuery(event.year).fetch()
+    }
+
     event_insights = event.details.insights if event.details else None
     event_insights_template = None
     if event_insights:
@@ -439,6 +454,8 @@ def event_detail(event_key: EventKey) -> Response:
         ),
         "district_points_sorted": district_points_sorted,
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
+        "regional_champs_pool_advancement": regional_champs_pool_advancement,
+        "events_by_key": events_by_key,
         "event_insights_qual": event_insights["qual"] if event_insights else None,
         "event_insights_playoff": event_insights["playoff"] if event_insights else None,
         "event_insights_template": event_insights_template,

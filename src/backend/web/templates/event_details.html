@@ -400,6 +400,7 @@
                 <th>Award Points</th>
                 <th>Team Age Points</th>
                 <th>Total Points</th>
+                <th>CMP Advancement</th>
               </tr>
             </thead>
             <tbody>
@@ -413,6 +414,16 @@
                 <td>{{breakdown.award_points}}</td>
                 <td>{{breakdown.rookie_bonus or 0}}</td>
                 <td><strong>{{breakdown.total}}<strong></td>
+                <td>
+                  {% if regional_champs_pool_advancement and team_key in regional_champs_pool_advancement %}
+                    {% with team_advancement = regional_champs_pool_advancement[team_key] %}
+                      {% if team_advancement.cmp_status == "PreQualified" %}<span class="label label-info">Pre-Qualified</span>{% endif %}
+                      {% if team_advancement.cmp_status == "EventQualified" %}<a href="/event/{{team_advancement.qualifying_event}}"><span class="label label-warning">{{team_advancement.qualifying_award_name}} at {{events_by_key[team_advancement.qualifying_event].short_name or events_by_key[team_advancement.qualifying_event].name}}</span></a>{% endif %}
+                      {% if team_advancement.cmp_status == "PoolQualified" %}<span class="label label-success">Regional Pool Week {{team_advancement.qualifying_pool_week}}</span>{% endif %}
+                      {% if team_advancement.cmp_status == "Declined" %}<span class="label label-default">Declined</span>{% endif %}
+                    {% endwith %}
+                  {%endif%}
+                </td>
               </tr>
               {% endfor %}
             </tbody>

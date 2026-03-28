@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
@@ -7,6 +8,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.webcast_online_status_memcache import (
@@ -16,6 +18,7 @@ from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match
+from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
 
@@ -208,6 +211,72 @@ def test_render_regional_cmp_points(web_client: Client, test_data_importer) -> N
 
     regional_point_tab = soup.find("a", {"href": "#cmp-points"})
     assert regional_point_tab is not None
+
+
+def test_render_regional_cmp_points_advancement_badges(
+    ndb_stub, web_client: Client
+) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 3),
+    ).put()
+    Event(
+        id="2025casj",
+        event_short="casj",
+        year=2025,
+        name="Silicon Valley Regional",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 8),
+        end_date=datetime(2025, 3, 10),
+    ).put()
+
+    EventDetails(
+        id="2025nyny",
+        regional_champs_pool_points={
+            "points": {
+                "frc254": {
+                    "qual_points": 10,
+                    "elim_points": 8,
+                    "alliance_points": 4,
+                    "award_points": 2,
+                    "total": 24,
+                }
+            },
+            "tiebreakers": {"frc254": {"qual_wins": 0, "highest_qual_scores": []}},
+        },
+    ).put()
+
+    RegionalChampsPool(
+        id=RegionalChampsPool.render_key_name(2025),
+        year=2025,
+        rankings=[],
+        adjustments={},
+        advancement={
+            "frc254": {
+                "cmp": True,
+                "cmp_status": "EventQualified",
+                "qualifying_event": "2025casj",
+                "qualifying_award_name": "Winner",
+            }
+        },
+    ).put()
+
+    resp = web_client.get("/event/2025nyny")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    cmp_points_tab = soup.find(id="cmp-points")
+    assert cmp_points_tab is not None
+    assert cmp_points_tab.find("th", string="CMP Advancement") is not None
+
+    advancement_badge = cmp_points_tab.find("span", {"class": "label label-warning"})
+    assert advancement_badge is not None
+    assert advancement_badge.get_text(strip=True) == "Winner at Silicon Valley Regional"
 
 
 def test_schema_org_sports_event(ndb_stub, web_client: Client) -> None:
