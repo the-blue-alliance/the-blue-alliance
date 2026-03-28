@@ -50,6 +50,7 @@
       <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
       <li><a href="#advancement" data-toggle="tab">Advancement</a></li>
             <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
+      <li><a href="#home_dcmp" data-toggle="tab">Home DCMP</a></li>
       <li><a href="#adjustments" data-toggle="tab">HQ Adjustments</a></li>
       <li><a href="#api" data-toggle="tab">API</a></li>
     </ul>
@@ -201,6 +202,63 @@
                 </tr>
             {% endfor %}
         </table>
+    </div>
+    <div class="tab-pane" id="home_dcmp">
+        {% if home_dcmp_success %}
+            <div class="alert alert-block alert-success">
+                Updated home DCMP for {{ home_dcmp_success }} team(s).
+            </div>
+        {% endif %}
+        {% if home_dcmp_error %}
+            <div class="alert alert-block alert-danger">
+                Errors:<br/>
+                {% for err in home_dcmp_error.split('||') %}
+                    {{ err }}<br/>
+                {% endfor %}
+            </div>
+        {% endif %}
+
+        <h3>Current Home DCMP Assignments</h3>
+        {% if home_dcmp_assignments %}
+        <table class="table table-striped table-hover">
+            <tr>
+                <th>Team</th>
+                <th>Home DCMP Event Key</th>
+            </tr>
+            {% for team_key, event_key in home_dcmp_assignments %}
+                <tr>
+                    <td><a href="/admin/team/{{team_key[3:]}}">{{team_key}}</a></td>
+                    <td><a href="/admin/event/{{event_key}}">{{event_key}}</a></td>
+                </tr>
+            {% endfor %}
+        </table>
+        {% else %}
+            <p>No home DCMP assignments for this district.</p>
+        {% endif %}
+
+        <h3>Set Home DCMP via CSV</h3>
+        <p>Enter one <code>team_number,event_code</code> pair per line. The event code should
+        be the short code without the year (e.g. <code>casf</code> for <code>{{district.year}}casf</code>).
+        Lines starting with <code>#</code> are ignored.</p>
+        <form action="/admin/district/{{district.key_name}}/home_dcmp" method="post">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                <label for="csv_data">CSV Data (team_number,event_code)</label>
+                <textarea
+                    id="csv_data"
+                    name="csv_data"
+                    class="form-control"
+                    rows="10"
+                    placeholder="254,casf
+1678,cala
+# This is a comment"
+                >{% for team_key, event_key in home_dcmp_assignments %}{{team_key[3:]}},{{event_key[4:]}}
+{% endfor %}</textarea>
+            </div>
+            <button type="submit" class="btn btn-primary">
+                <span class="glyphicon glyphicon-ok"></span> Save Home DCMP Assignments
+            </button>
+        </form>
     </div>
     <div class="tab-pane" id="api">
         <h2>Write API Keys</h2>
