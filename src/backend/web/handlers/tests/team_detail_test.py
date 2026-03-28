@@ -193,7 +193,6 @@ def test_schema_org_sports_team(web_client: Client, ndb_stub) -> None:
     )
 
 
-
 def test_schema_org_sports_team_full_data(web_client: Client, setup_full_team) -> None:
     """Test schema.org markup with full team data."""
     resp = web_client.get("/team/148/2019")
