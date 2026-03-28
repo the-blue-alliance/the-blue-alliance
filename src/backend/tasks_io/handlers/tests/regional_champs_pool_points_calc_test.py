@@ -5,6 +5,9 @@ from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.regional_champs_pool_helper import RegionalChampsPoolHelper
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
@@ -57,6 +60,29 @@ def test_regional_pool_calc_non_regional(
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 0
+
+
+@mock.patch.object(RegionalChampsPoolHelper, "calculate_event_points")
+@mock.patch.object(EventDetailsManipulator, "createOrUpdate")
+def test_regional_pool_calc_disables_event_details_post_update_hook(
+    create_or_update_mock: mock.Mock,
+    calc_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2025test",
+        year=2025,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    points = EventDistrictPoints(points={}, tiebreakers={})
+    calc_mock.return_value = points
+
+    resp = tasks_client.get("/tasks/math/do/regional_champs_pool_points_calc/2025test")
+
+    assert resp.status_code == 200
+    create_or_update_mock.assert_called_once()
+    assert create_or_update_mock.call_args.kwargs["run_post_update_hook"] is False
 
 
 @mock.patch.object(RegionalChampsPoolHelper, "calculate_event_points")
