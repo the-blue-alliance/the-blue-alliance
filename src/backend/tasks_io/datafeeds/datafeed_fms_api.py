@@ -232,6 +232,10 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_awards(self, event: Event) -> Generator[Any, Any, List[Award]]:
         awards: List[Award] = []
+        # key_name requires both year and event_short to be set
+        event_key_name: Optional[EventKey] = (
+            event.key_name if event.year and event.event_short else None
+        )
 
         # 8 subdivisions from 2015-2021 have awards listed under 4 divisions
         if (
@@ -258,7 +262,7 @@ class DatafeedFMSAPI:
                 self._parse(
                     api_awards_response,
                     FMSAPIAwardsParser(event, valid_team_nums),
-                    event_key=event.key_name,
+                    event_key=event_key_name,
                 )
                 or []
             )
@@ -275,7 +279,7 @@ class DatafeedFMSAPI:
             self._parse(
                 api_awards_response,
                 FMSAPIAwardsParser(event),
-                event_key=event.key_name,
+                event_key=event_key_name,
             )
             or []
         )
