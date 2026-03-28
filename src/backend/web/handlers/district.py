@@ -159,7 +159,7 @@ def district_detail(
         has_adjustments = False
 
     # Identify DCMP events; if there are multiple, build per-team home DCMP mapping
-    _dcmp_types = {EventType.DISTRICT_CMP, EventType.DISTRICT_CMP_DIVISION}
+    _dcmp_types = {EventType.DISTRICT_CMP}
     dcmp_events = sorted(
         [e for e in events if e.event_type_enum in _dcmp_types],
         key=EventHelper.start_date_or_distant_future,
