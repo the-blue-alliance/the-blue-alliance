@@ -1,5 +1,5 @@
 import json
-from typing import Dict, Optional
+from typing import Optional
 
 from flask import redirect, request
 from google.appengine.ext import ndb
@@ -7,13 +7,12 @@ from pyre_extensions.refinement import none_throws
 from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
-from backend.common.consts.media_type import IMAGE_TYPES, MediaType
+from backend.common.consts.media_type import IMAGE_TYPES
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.suggestions.media_creator import MediaCreator
-from backend.web.handlers.embed import fetch_instagram_oembed_html
 from backend.web.handlers.suggestions.suggestion_review_base import (
     SuggestionsReviewBase,
 )
@@ -90,27 +89,11 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
             suggestions, list(references), list(existing_preferred)
         )
 
-        # Fetch oEmbed HTML for Instagram image suggestions
-        instagram_oembed_html: Dict[str, str] = {}
-        has_instagram = False
-        for suggestion in suggestions:
-            if suggestion.contents.get("media_type_enum") == MediaType.INSTAGRAM_IMAGE:
-                has_instagram = True
-                foreign_key = suggestion.contents.get("foreign_key", "")
-                if foreign_key:
-                    html = fetch_instagram_oembed_html(
-                        foreign_key, omitscript=True, hidecaption=True
-                    )
-                    if html:
-                        instagram_oembed_html[suggestion.key.id()] = html
-
         template_values = {
             "suggestions_and_references_and_preferred": list(
                 suggestions_and_references_and_preferred
             ),
             "max_preferred": Media.MAX_PREFERRED,
-            "instagram_oembed_html": instagram_oembed_html,
-            "has_instagram": has_instagram,
         }
 
         return render_template(

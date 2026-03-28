@@ -1,15 +1,10 @@
 import json
-import re
 
 from google.appengine.ext import ndb
-from requests_mock import Mocker
 from werkzeug import Client
 
 from backend.common.consts.media_type import MediaType
 from backend.common.models.media import Media
-from backend.web.handlers.embed import fetch_instagram_oembed_html
-
-OEMBED_HTML = '<blockquote class="instagram-media">test</blockquote>'
 
 
 def create_avatar() -> Media:
@@ -27,65 +22,6 @@ def create_avatar() -> Media:
     )
     avatar.put()
     return avatar
-
-
-def test_fetch_instagram_oembed_html_success(requests_mock: Mocker):
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        json={"html": OEMBED_HTML},
-    )
-    result = fetch_instagram_oembed_html("abc123")
-    assert result == OEMBED_HTML
-
-
-def test_fetch_instagram_oembed_html_with_hidecaption(requests_mock: Mocker):
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        json={"html": OEMBED_HTML},
-    )
-    fetch_instagram_oembed_html("abc123", hidecaption=True)
-    assert requests_mock.last_request is not None
-    assert "hidecaption=true" in requests_mock.last_request.url
-
-
-def test_fetch_instagram_oembed_html_without_hidecaption(requests_mock: Mocker):
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        json={"html": OEMBED_HTML},
-    )
-    fetch_instagram_oembed_html("abc123")
-    assert requests_mock.last_request is not None
-    assert "hidecaption" not in requests_mock.last_request.url
-
-
-def test_fetch_instagram_oembed_html_with_omitscript(requests_mock: Mocker):
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        json={"html": OEMBED_HTML},
-    )
-    result = fetch_instagram_oembed_html("abc123", omitscript=True)
-    assert result == OEMBED_HTML
-    assert requests_mock.last_request is not None
-    assert "omitscript=true" in requests_mock.last_request.url
-
-
-def test_fetch_instagram_oembed_html_api_failure(requests_mock: Mocker):
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        status_code=400,
-        json={"error": "bad request"},
-    )
-    result = fetch_instagram_oembed_html("abc123")
-    assert result is None
-
-
-def test_fetch_instagram_oembed_html_network_error(requests_mock: Mocker):
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        exc=ConnectionError("network error"),
-    )
-    result = fetch_instagram_oembed_html("abc123")
-    assert result is None
 
 
 def test_nonexistent_avatar(web_client: Client):

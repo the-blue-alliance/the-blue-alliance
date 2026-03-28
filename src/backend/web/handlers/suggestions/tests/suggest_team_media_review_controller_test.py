@@ -5,7 +5,6 @@ from urllib.parse import urlparse
 import pytest
 from bs4 import BeautifulSoup
 from google.appengine.ext import ndb
-from requests_mock import Mocker
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
@@ -252,17 +251,10 @@ def test_reject_suggestion(
     assert medias == []
 
 
-def test_instagram_suggestion_renders_oembed(
+def test_instagram_suggestion_renders_embed(
     login_user_with_permission,
     web_client: Client,
-    requests_mock: Mocker,
 ) -> None:
-    oembed_html = '<blockquote class="instagram-media" data-instgrm-permalink="https://www.instagram.com/p/abc123/">test</blockquote>'
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        json={"html": oembed_html},
-    )
-
     status = SuggestionCreator.createTeamMediaSuggestion(
         login_user_with_permission.account_key,
         "https://www.instagram.com/p/abc123/",
@@ -275,40 +267,7 @@ def test_instagram_suggestion_renders_oembed(
     assert response.status_code == 200
     soup = BeautifulSoup(response.data, "html.parser")
 
-    # Verify oEmbed HTML is rendered in the page
-    blockquote = soup.find("blockquote", class_="instagram-media")
-    assert blockquote is not None
-
-    # Verify embed.js script is included
-    embed_script = soup.find("script", attrs={"src": re.compile("instagram.com/embed")})
-    assert embed_script is not None
-
-
-def test_instagram_suggestion_falls_back_to_client_embed(
-    login_user_with_permission,
-    web_client: Client,
-    requests_mock: Mocker,
-) -> None:
-    # oEmbed API fails — should fall back to client-side blockquote
-    requests_mock.get(
-        re.compile(".*instagram_oembed.*"),
-        status_code=400,
-        json={"error": "bad request"},
-    )
-
-    status = SuggestionCreator.createTeamMediaSuggestion(
-        login_user_with_permission.account_key,
-        "https://www.instagram.com/p/abc123/",
-        "frc1124",
-        "2024",
-    ).get_result()
-    assert status[0] == SuggestionCreationStatus.SUCCESS
-
-    response = web_client.get("/suggest/team/media/review")
-    assert response.status_code == 200
-    soup = BeautifulSoup(response.data, "html.parser")
-
-    # Verify client-side blockquote fallback is rendered
+    # Verify Instagram embed blockquote is rendered
     blockquote = soup.find("blockquote", class_="instagram-media")
     assert blockquote is not None
     assert (
