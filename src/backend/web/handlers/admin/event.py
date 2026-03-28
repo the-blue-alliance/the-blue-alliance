@@ -174,6 +174,7 @@ def event_detail(event_key: EventKey) -> str:
         "match_stats": match_stats,
         "deleted_count": request.args.get("deleted"),
         "district_points_sorted": district_points_sorted,
+        "is_regional_cmp_pool_eligible": is_regional_cmp_pool_eligible,
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "webcast_online_status": webcast_online_status,
         "nexus_queue_status": nexus_queue_status,

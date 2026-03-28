@@ -9,6 +9,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 from backend.web.handlers.tests import helpers
 
 
@@ -61,6 +62,79 @@ def test_event_detail(web_client: Client, login_gae_admin, setup_full_event) -> 
     setup_full_event("2019nyny")
     resp = web_client.get("/admin/event/2019nyny")
     assert resp.status_code == 200
+
+
+def test_event_detail_regional_champs_points_tab_and_task(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 5),
+    ).put()
+    EventDetails(
+        id="2025nyny",
+        regional_champs_pool_points={
+            "points": {
+                "frc1": {
+                    "qual_points": 3,
+                    "elim_points": 4,
+                    "alliance_points": 5,
+                    "award_points": 6,
+                    "rookie_bonus": 10,
+                    "total": 28,
+                }
+            },
+            "tiebreakers": {"frc1": {"qual_wins": 0, "highest_qual_scores": []}},
+        },
+    ).put()
+
+    resp = web_client.get("/admin/event/2025nyny")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    points_tab = soup.find("a", href="#district-points")
+    assert points_tab is not None
+    assert points_tab.get_text(strip=True) == "Regional Champs Points"
+
+    recompute_ra_points_button = soup.find(
+        "a", href="/tasks/math/do/regional_champs_pool_points_calc/2025nyny"
+    )
+    assert recompute_ra_points_button is not None
+
+    assert soup.find("th", string="Rookie Bonus") is not None
+    assert soup.find("td", string="10") is not None
+
+
+def test_event_detail_non_eligible_regional_points_tab_and_task(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2024nyny",
+        event_short="nyny",
+        year=2024,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2024, 3, 1),
+        end_date=datetime(2024, 3, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2024nyny")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    points_tab = soup.find("a", href="#district-points")
+    assert points_tab is not None
+    assert points_tab.get_text(strip=True) == "District Points"
+
+    recompute_ra_points_button = soup.find(
+        "a", href="/tasks/math/do/regional_champs_pool_points_calc/2024nyny"
+    )
+    assert recompute_ra_points_button is None
 
 
 def test_invalid_event_delete(

@@ -30,7 +30,7 @@
       <li><a href="#advancement" data-toggle="tab">Playoff Advancement</a></li>
       <li><a href="#awards" data-toggle="tab">Awards</a></li>
       <li><a href="#matches" data-toggle="tab">Matches</a></li>
-      <li><a href="#district-points" data-toggle="tab">District Points</a></li>
+      <li><a href="#district-points" data-toggle="tab">{% if is_regional_cmp_pool_eligible %}Regional Champs Points{% else %}District Points{% endif %}</a></li>
       <li><a href="#media" data-toggle="tab">Media</a></li>
     </ul>
   </div>
@@ -226,8 +226,10 @@
           class="glyphicon glyphicon-stats"></span> MatchStats</a>
       <a href="/tasks/math/do/predict_match_times/{{event.key_name}}" class="btn btn-warning"><span
           class="glyphicon glyphicon-time"></span> Match Time Predictions</a>
+      {% if is_regional_cmp_pool_eligible %}
       <a href="/tasks/math/do/regional_champs_pool_points_calc/{{event.key_name}}"
         class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> Regional Champs Pool Points</a>
+      {% endif %}
     </div>
     <h2>Remap Teams</h2>
     <div>
@@ -758,6 +760,7 @@
           <th>Elim Points</th>
           <th>Alliance Points</th>
           <th>Award Points</th>
+          <th>Rookie Bonus</th>
           <th>Total Points</th>
         </tr>
         {% for team_key, points in regional_champs_pool_points_sorted %}
@@ -767,6 +770,7 @@
             <td>{{points.elim_points}}</td>
             <td>{{points.alliance_points}}</td>
             <td>{{points.award_points}}</td>
+            <td>{{points.rookie_bonus|default(0)}}</td>
             <td>{{points.total}}</td>
           </tr>
         {% endfor %}
