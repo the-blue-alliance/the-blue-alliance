@@ -73,6 +73,7 @@ from backend.web.handlers.team import (
 )
 from backend.web.handlers.team_admin import blueprint as team_admin
 from backend.web.handlers.team_threads import team_threads, team_threads_canonical
+from backend.web.handlers.webcast_mod import blueprint as webcast_mod_blueprint
 from backend.web.handlers.webcasts import webcast_list
 from backend.web.handlers.webhooks import blueprint as webhooks
 from backend.web.jinja2_filters import register_template_filters
@@ -218,6 +219,7 @@ app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
 app.register_blueprint(suggestion_review_blueprint)
 app.register_blueprint(team_admin)
+app.register_blueprint(webcast_mod_blueprint)
 app.register_blueprint(webhooks)
 
 app.register_error_handler(404, handle_404)

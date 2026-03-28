@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+
+{% block title %}Webcast Moderator - The Blue Alliance{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <h1>Webcast Moderator</h1>
+    <p class="text-muted">Active events, current webcast metadata, and cached online status.</p>
+  </div>
+
+  {% if event_rows %}
+  <table class="table table-striped table-hover" id="active-webcast-events">
+    <thead>
+      <tr>
+        <th>Event</th>
+        <th>Dates</th>
+        <th>Webcasts</th>
+        <th></th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for row in event_rows %}
+      {% set event = row.event %}
+      <tr id="event-{{ event.key_name }}">
+        <td>
+          <strong>{{ event.name }}</strong><br>
+          <small>{{ event.key_name }}</small><br>
+          <small>{{ event.city }}, {{ event.state_prov or event.country }}</small>
+        </td>
+        <td>
+          {{ event.start_date|strftime("%b %d") }} - {{ event.end_date|strftime("%b %d, %Y") }}
+        </td>
+        <td>
+          {% if row.webcasts %}
+          <ul class="list-unstyled">
+            {% for webcast in row.webcasts %}
+            <li>
+              <span class="label label-info" style="margin-right: 5px;">{{ webcast.type|upper }}</span>
+              {% if webcast.type == 'youtube' %}
+                <a href="https://www.youtube.com/c/{{ webcast.channel }}" target="_blank" rel="noopener noreferrer">{{ webcast.channel }}</a>
+              {% elif webcast.type == 'twitch' %}
+                <a href="https://www.twitch.tv/{{ webcast.channel }}" target="_blank" rel="noopener noreferrer">{{ webcast.channel }}</a>
+              {% else %}
+                {{ webcast.channel }}
+              {% endif %}
+              {% if webcast.get("file") %}<span class="text-muted">/ {{ webcast.file }}</span>{% endif %}
+              {% if webcast.get("date") %}<span class="text-muted">({{ webcast.date }})</span>{% endif %}
+              <span class="label label-{% if webcast.status.value == 'online' %}success{% elif webcast.status.value == 'offline' %}default{% else %}warning{% endif %}">
+                {{ webcast.status.value }}
+              </span>
+              {% if webcast.get("stream_title") %}
+              <div><small>{{ webcast.stream_title }}</small></div>
+              {% endif %}
+            </li>
+            {% endfor %}
+          </ul>
+          {% else %}
+          <span class="text-muted">No webcasts</span>
+          {% endif %}
+        </td>
+        <td class="text-right">
+          <a class="btn btn-default btn-sm" href="/mod/webcast/{{ event.key_name }}">Manage</a>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="alert alert-info">No active events found.</div>
+  {% endif %}
+</div>
+{% endblock %}

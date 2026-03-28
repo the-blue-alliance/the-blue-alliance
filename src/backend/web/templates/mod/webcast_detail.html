@@ -1,0 +1,94 @@
+{% extends "base.html" %}
+
+{% block title %}Manage {{ event.key_name }} Webcasts - The Blue Alliance{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="page-header">
+    <a class="btn btn-default pull-right" href="/mod/webcasts">Back to active events</a>
+    <h1>{{ event.name }}</h1>
+    <p class="text-muted">{{ event.key_name }}{% if event.city %} · {{ event.city }}, {{ event.state_prov or event.country }}{% endif %}</p>
+  </div>
+
+  <div id="webcasts">
+    <h2>Existing Webcasts</h2>
+    {% if webcasts %}
+    <table class="table table-striped table-hover" id="webcast-list">
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Type</th>
+          <th>Channel</th>
+          <th>Date</th>
+          <th>Status</th>
+          <th>Details</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for webcast in webcasts %}
+        <tr id="webcast-row-{{ loop.index }}">
+          <td>{{ loop.index }}</td>
+          <td>
+            <span class="label label-info">{{ webcast.type|upper }}</span>
+          </td>
+          <td>
+            {% if webcast.type == 'youtube' %}
+              <a href="https://www.youtube.com/c/{{ webcast.channel }}" target="_blank" rel="noopener noreferrer">{{ webcast.channel }}</a>
+            {% elif webcast.type == 'twitch' %}
+              <a href="https://www.twitch.tv/{{ webcast.channel }}" target="_blank" rel="noopener noreferrer">{{ webcast.channel }}</a>
+            {% else %}
+              {{ webcast.channel }}
+            {% endif %}
+            {% if webcast.get("file") %}
+            <div><small class="text-muted">File: {{ webcast.file }}</small></div>
+            {% endif %}
+          </td>
+          <td>{{ webcast.get("date", "—") }}</td>
+          <td>
+            <span class="label label-{% if webcast.status.value == 'online' %}success{% elif webcast.status.value == 'offline' %}default{% else %}warning{% endif %}">
+              {{ webcast.status.value }}
+            </span>
+          </td>
+          <td>
+            {% if webcast.get("stream_title") %}<div>{{ webcast.stream_title }}</div>{% endif %}
+            {% if webcast.get("viewer_count") is not none %}<div><small>Viewers: {{ webcast.viewer_count }}</small></div>{% endif %}
+            {% if webcast.get("scheduled_start_time_utc") %}<div><small>Scheduled: {{ webcast.scheduled_start_time_utc }}</small></div>{% endif %}
+          </td>
+          <td class="text-right">
+            <form action="/mod/webcast/{{ event.key_name }}/remove" method="post" style="display:inline">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="index" value="{{ loop.index }}" />
+              <input type="hidden" name="type" value="{{ webcast.type }}" />
+              <input type="hidden" name="channel" value="{{ webcast.channel }}" />
+              {% if webcast.get("file") %}
+              <input type="hidden" name="file" value="{{ webcast.file }}" />
+              {% endif %}
+              <button class="btn btn-danger btn-sm" type="submit">Remove</button>
+            </form>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+    {% else %}
+    <div class="alert alert-info">This event does not have any webcasts yet.</div>
+    {% endif %}
+  </div>
+
+  <div id="add-webcast" style="margin-top: 30px;">
+    <h2>Add Webcast</h2>
+    {% include "suggestions/partials/webcast_add_instructions_partial.html" %}
+    {% if request.args.get('webcast_url_error') %}
+    <div class="alert alert-danger">
+      <strong>Error:</strong> Could not determine webcast type from that URL.
+    </div>
+    {% endif %}
+    <form action="/mod/webcast/{{ event.key_name }}/add" method="post" id="add-webcast-form">
+      {% include "suggestions/partials/webcast_add_form_partial.html" %}
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button class="btn btn-primary" type="submit">Add Webcast</button>
+    </form>
+  </div>
+</div>
+{% endblock %}
