@@ -8,6 +8,9 @@ from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.memcache_models.event_sync_status_memcache import (
+    EventSyncStatusMemcache,
+)
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.web.handlers.tests import helpers
@@ -135,6 +138,42 @@ def test_event_detail_non_eligible_regional_points_tab_and_task(
         "a", href="/tasks/math/do/regional_champs_pool_points_calc/2024nyny"
     )
     assert recompute_ra_points_button is None
+
+
+def test_event_detail_sync_status_tab_and_data(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 5),
+    ).put()
+
+    EventSyncStatusMemcache("2025nyny").put(
+        {
+            "tasks.get.fmsapi_matches": {
+                "last_success_time": "2026-03-28T12:34:56+00:00",
+                "num_consecutive_failures": 2,
+            }
+        }
+    )
+
+    resp = web_client.get("/admin/event/2025nyny")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    sync_tab = soup.find("a", href="#sync-status")
+    assert sync_tab is not None
+
+    sync_pane = soup.find("div", id="sync-status")
+    assert sync_pane is not None
+    assert "tasks.get.fmsapi_matches" in sync_pane.get_text()
+    assert "2026-03-28T12:34:56+00:00" in sync_pane.get_text()
+    assert "2" in sync_pane.get_text()
 
 
 def test_invalid_event_delete(

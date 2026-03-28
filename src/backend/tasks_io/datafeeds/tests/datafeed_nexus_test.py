@@ -9,6 +9,9 @@ import pytest
 from backend.common.consts.event_type import EventType
 from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.futures import FailedFuture, InstantFuture
+from backend.common.memcache_models.event_sync_status_memcache import (
+    EventSyncStatusMemcache,
+)
 from backend.common.models.event import Event
 from backend.common.sitevars.nexus_api_secret import (
     ContentType as NexusAPISecretsContentType,
@@ -39,6 +42,9 @@ class DummyDatafeedNexus(_DatafeedNexus[Any, Any]):
                 return response
 
         return DummyParser()
+
+    def event_key(self) -> Optional[str]:
+        return "2019casj"
 
 
 @pytest.fixture()
@@ -215,3 +221,49 @@ def test_fetch_exception_logs_warning(
     assert our_records[0].levelno == logging.WARNING
     assert "Nexus datafeed fetch failed" in our_records[0].message
     assert "Deadline exceeded" in our_records[0].message
+
+
+@mock.patch.object(_DatafeedNexus, "_fetch")
+def test_fetch_records_sync_status_success(
+    fetch_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    response = URLFetchResult.mock_for_content(
+        "https://frc.nexus/api/v1/",
+        200,
+        json.dumps({"ok": True}),
+    )
+    fetch_mock.return_value = InstantFuture(response)
+
+    with mock.patch.object(
+        DummyDatafeedNexus,
+        "_request_endpoint",
+        return_value="tasks.get.nexus_pit_locations",
+    ):
+        DummyDatafeedNexus().fetch_async().get_result()
+
+    status = EventSyncStatusMemcache("2019casj").get()
+    assert status is not None
+    assert status["tasks.get.nexus_pit_locations"]["num_consecutive_failures"] == 0
+    assert status["tasks.get.nexus_pit_locations"]["last_success_time"] is not None
+
+
+@mock.patch.object(_DatafeedNexus, "_fetch")
+def test_fetch_records_sync_status_failure(
+    fetch_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    from google.appengine.runtime.apiproxy_errors import ApplicationError
+
+    fetch_mock.return_value = FailedFuture(ApplicationError(8, "Deadline exceeded"))
+
+    with mock.patch.object(
+        DummyDatafeedNexus,
+        "_request_endpoint",
+        return_value="tasks.get.nexus_pit_locations",
+    ):
+        cache = EventSyncStatusMemcache("2019casj")
+        cache.record_success("tasks.get.nexus_pit_locations")
+        DummyDatafeedNexus().fetch_async().get_result()
+
+    status = EventSyncStatusMemcache("2019casj").get()
+    assert status is not None
+    assert status["tasks.get.nexus_pit_locations"]["num_consecutive_failures"] == 1

@@ -36,6 +36,10 @@ from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
+from backend.common.memcache_models.event_sync_status_memcache import (
+    EventSyncStatus,
+    EventSyncStatusMemcache,
+)
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
@@ -144,6 +148,7 @@ def event_detail(event_key: EventKey) -> str:
     webcast_online_status = [w for w in webcast_online_status if w is not None]
 
     nexus_queue_status = EventNexusQueueStatusMemcache(event.key_name).get()
+    sync_status: EventSyncStatus = EventSyncStatusMemcache(event.key_name).get() or {}
 
     template_values = {
         "event": event,
@@ -178,6 +183,7 @@ def event_detail(event_key: EventKey) -> str:
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "webcast_online_status": webcast_online_status,
         "nexus_queue_status": nexus_queue_status,
+        "sync_status": sorted(sync_status.items()),
         "event_sync_types": dict(EventSyncType.__members__.items()),
     }
 
