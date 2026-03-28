@@ -45,6 +45,35 @@
             {% include "suggestions/pending_suggestion_rows_partial.html" %}
         </div>
     </div>
+
+    {% if user.is_admin or media_permission in user.permissions %}
+    <div class="row" id="review-media-tools">
+      <div class="col-xs-12 col-sm-6">
+        <h3>Review Media Tools</h3>
+        <p><a class="btn btn-default" id="webcast-dashboard-link" href="/mod/webcasts">Webcast Dashboard</a></p>
+        <div id="manage-team-media-form" class="form-inline">
+          <div class="form-group">
+            <label class="sr-only" for="manage-team-media-team-number">Manage Team Media</label>
+            <input
+              class="form-control"
+              id="manage-team-media-team-number"
+              type="text"
+              inputmode="numeric"
+              pattern="[0-9]+"
+              placeholder="Manage Team Media"
+              required
+            />
+          </div>
+          <button
+            type="button"
+            class="btn btn-primary"
+            id="manage-team-media-button"
+            onclick="window.location.href='/mod?team=' + encodeURIComponent(document.getElementById('manage-team-media-team-number').value) + '&year={{ current_year }}';"
+          >Go</button>
+        </div>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
 </div>

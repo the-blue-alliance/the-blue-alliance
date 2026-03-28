@@ -6,6 +6,7 @@ from werkzeug.wrappers import Response
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -52,14 +53,10 @@ def _parse_webcast_index_or_400(webcast_index_raw: Optional[str]) -> int:
     raise AssertionError("unreachable")
 
 
-def _copy_webcast(webcast: Webcast) -> Webcast:
-    return webcast.copy()
-
-
 def _get_webcasts_with_status(webcasts: List[Webcast]) -> List[Webcast]:
     webcast_list: List[Webcast] = []
     for webcast in webcasts:
-        webcast_with_status = _copy_webcast(webcast)
+        webcast_with_status = webcast.copy()
         cached_status = WebcastOnlineStatusMemcache(webcast).get()
         if cached_status is not None:
             webcast_with_status.update(cached_status)
@@ -67,11 +64,6 @@ def _get_webcasts_with_status(webcasts: List[Webcast]) -> List[Webcast]:
             webcast_with_status["status"] = WebcastStatus.UNKNOWN
         webcast_list.append(webcast_with_status)
     return webcast_list
-
-
-def _get_active_events() -> List[Event]:
-    events = Event.query().order(Event.start_date).fetch(500)
-    return [event for event in events if event.within_a_day]
 
 
 def _parse_new_webcast() -> Optional[Webcast]:
@@ -109,7 +101,7 @@ def _parse_new_webcast() -> Optional[Webcast]:
 @blueprint.route("/webcasts", methods=["GET"])
 @require_permission(AccountPermission.REVIEW_MEDIA)
 def webcast_list() -> str:
-    events = _get_active_events()
+    events = EventHelper.events_within_a_day()
     event_rows = [
         {"event": event, "webcasts": _get_webcasts_with_status(event.webcast or [])}
         for event in events

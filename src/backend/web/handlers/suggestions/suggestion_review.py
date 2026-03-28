@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask import Blueprint, request
 from werkzeug.wrappers import Response
 
@@ -116,6 +118,7 @@ def suggest_review_home() -> Response:
         "apiwrite_permission": AccountPermission.REVIEW_APIWRITE,
         "cad_permission": AccountPermission.REVIEW_DESIGNS,
         "event_media_permission": AccountPermission.REVIEW_EVENT_MEDIA,
+        "current_year": datetime.now().year,
         "status": request.args.get("status"),
     }
 
