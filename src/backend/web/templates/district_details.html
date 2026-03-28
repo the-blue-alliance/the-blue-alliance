@@ -204,7 +204,15 @@
                   </td>
                 {% endif %}
                 <td><strong>{{item.point_total}}</strong></td>
-                <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].dcmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
+                <td>
+                  {% if advancement and item.team_key in advancement and advancement[item.team_key].dcmp %}
+                    {% if dcmp_events|length > 1 and item.team_key in home_dcmp_per_team and home_dcmp_per_team[item.team_key] in events_by_key %}
+                      <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{events_by_key[home_dcmp_per_team[item.team_key]].short_name or events_by_key[home_dcmp_per_team[item.team_key]].name}}"></span>
+                    {% else %}
+                      <span class="glyphicon glyphicon-ok"></span>
+                    {% endif %}
+                  {% endif %}
+                </td>
                 <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].cmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
               </tr>
               {% endfor %}
