@@ -4,6 +4,7 @@ from unittest import mock
 from unittest.mock import patch
 
 import pytest
+from google.appengine.api import urlfetch_errors
 from google.appengine.ext import testbed
 
 from backend.common.frc_api import FRCAPI
@@ -233,6 +234,26 @@ def test_get(
 
     called_headers = {h.Key: h.Value for h in called_request.header}
     assert called_headers == expected_headers
+
+
+def test_get_deadline_exceeded_returns_408(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+
+    api = FRCAPI("zach", save_response=True)
+
+    with patch.object(
+        urlfetch_stub,
+        "_Dynamic_Fetch",
+        side_effect=urlfetch_errors.DeadlineExceededError("deadline exceeded"),
+    ):
+        response = api.root().get_result()
+
+    assert response.status_code == 408
+    assert response.content == b""
+    assert cloud_storage_get_files("frc-api-response/v3.0/") == []
 
 
 def _mock_frc_api(

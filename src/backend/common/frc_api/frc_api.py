@@ -15,7 +15,9 @@ from typing import (
     Union,
 )
 
+from google.appengine.api import urlfetch_errors
 from google.appengine.ext import ndb
+from google.appengine.runtime import apiproxy_errors
 from pyre_extensions import JSON, none_throws
 
 from backend.common.environment import Environment
@@ -273,7 +275,17 @@ class FRCAPI:
         }
 
         with Span(f"frc_api_fetch:{endpoint}"):
-            r = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
+            try:
+                r = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
+            except (
+                apiproxy_errors.DeadlineExceededError,
+                urlfetch_errors.DeadlineExceededError,
+            ) as e:
+                logging.warning(f"FRC API fetch deadline exceeded for {url}: {e}")
+                return TypedURLFetchResult.typed_mock_for_content(
+                    url, 408, "", return_type
+                )
+
             response = TypedURLFetchResult(url, r, return_type)
             if response.status_code == 200:
                 with Span(f"maybe_save_fmsapi_response:{response.url}"):
