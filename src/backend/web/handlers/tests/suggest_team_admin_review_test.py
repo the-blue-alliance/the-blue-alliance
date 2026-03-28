@@ -8,6 +8,7 @@ import pytest
 from flask.testing import FlaskClient
 from google.appengine.ext import ndb
 
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.media import Media
@@ -27,6 +28,72 @@ def test_login_redirect(web_client):
 
     assert resp.status_code == 302
     assert urlparse(resp.headers["Location"]).path == "/account/login"
+
+
+def test_mod_admin_can_view_with_forced_team_year(login_admin, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_admin.has_permission.return_value = False
+
+    resp = web_client.get(f"/mod?team=1124&year={datetime.datetime.now().year}")
+
+    assert resp.status_code == 200
+
+
+def test_mod_review_permission_can_view_with_forced_team_year(login_user, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_user.has_permission.return_value = True
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    resp = web_client.get(f"/mod?team=1124&year={datetime.datetime.now().year}")
+
+    assert resp.status_code == 200
+
+
+def test_mod_post_admin_can_set_team_info(login_admin, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_admin.has_permission.return_value = False
+
+    resp = web_client.post(
+        "/mod",
+        data={
+            "team_number": 1124,
+            "action": "set_team_info",
+            "robot_name": "",
+        },
+    )
+
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/mod"
+
+
+def test_mod_post_review_permission_can_set_team_info(login_user, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_user.has_permission.return_value = True
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    resp = web_client.post(
+        "/mod",
+        data={
+            "team_number": 1124,
+            "action": "set_team_info",
+            "robot_name": "",
+        },
+    )
+
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/mod"
 
 
 @pytest.fixture(autouse=True)
@@ -69,6 +136,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         self.account = login_user
         self.web_client = web_client
         self.now = datetime.datetime.now()
+        self.account.has_permission.return_value = False
 
         self.team = Team(
             id="frc1124",
