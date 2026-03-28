@@ -508,8 +508,8 @@ class DatafeedFMSAPI:
                     return None
                 return parser.parse(resp_body)
 
-        elif response.status_code // 100 == 5:
-            # 5XX error - something is wrong with the server
+        elif response.status_code // 100 == 5 or response.status_code == 408:
+            # 5XX error or 408 - something is wrong with the server or request timed out
             ApiStatusFMSApiDown.set_down(True)
 
         logging.warning(
