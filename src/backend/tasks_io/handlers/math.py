@@ -128,7 +128,7 @@ def event_district_points_calc(event_key: EventKey) -> Response:
 
     district_points = DistrictHelper.calculate_event_points(event)
     event_details = EventDetails(id=event_key, district_points=district_points)
-    EventDetailsManipulator.createOrUpdate(event_details)
+    EventDetailsManipulator.createOrUpdate(event_details, run_post_update_hook=False)
 
     # Enqueue task to update rankings
     if event.district_key:
@@ -175,7 +175,7 @@ def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
     event_details = EventDetails(
         id=event_key, regional_champs_pool_points=regional_pool_points
     )
-    EventDetailsManipulator.createOrUpdate(event_details)
+    EventDetailsManipulator.createOrUpdate(event_details, run_post_update_hook=False)
 
     taskqueue.add(
         url=url_for("math.regional_champs_pool_rankings_calc", year=event.year),

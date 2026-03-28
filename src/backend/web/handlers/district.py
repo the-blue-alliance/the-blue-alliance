@@ -2,20 +2,23 @@ import datetime
 import logging
 from datetime import timedelta
 from operator import itemgetter
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
 from flask import abort, redirect
 from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
+from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
 from backend.common.models.insight import Insight
-from backend.common.models.keys import DistrictAbbreviation, Year
+from backend.common.models.keys import DistrictAbbreviation, EventKey, TeamKey, Year
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.queries.district_query import (
     DistrictHistoryQuery,
@@ -155,6 +158,23 @@ def district_detail(
     else:
         has_adjustments = False
 
+    # Identify DCMP events; if there are multiple, build per-team home DCMP mapping
+    _dcmp_types = {EventType.DISTRICT_CMP}
+    dcmp_events = sorted(
+        [e for e in events if e.event_type_enum in _dcmp_types],
+        key=EventHelper.start_date_or_distant_future,
+    )
+    home_dcmp_per_team: Dict[TeamKey, EventKey] = {}
+    if len(dcmp_events) > 1:
+        district_team_objs = DistrictTeam.query(
+            DistrictTeam.district_key == ndb.Key(District, district.key_name)
+        ).fetch()
+        home_dcmp_per_team = {
+            dt.team.id(): dt.home_dcmp_event_key
+            for dt in district_team_objs
+            if dt.home_dcmp_event_key
+        }
+
     template_values = {
         "explicit_year": explicit_year,
         "year": year,
@@ -171,6 +191,8 @@ def district_detail(
         "teams_a": teams_a,
         "teams_b": teams_b,
         "live_events_with_teams": live_events_with_teams,
+        "dcmp_events": dcmp_events,
+        "home_dcmp_per_team": home_dcmp_per_team,
     }
 
     return make_cached_response(

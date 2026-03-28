@@ -68,7 +68,14 @@
         <li><a href="#teams" role="tab" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% endif %}
         {% if rankings %}
+        {% if dcmp_events|length > 1 %}
+        <li><a href="#rankings" role="tab" data-toggle="tab">Rankings (Overall)</a></li>
+        {% for dcmp in dcmp_events %}
+        <li><a href="#rankings-{{dcmp.key_name}}" role="tab" data-toggle="tab">Rankings ({{dcmp.short_name or dcmp.name}})</a></li>
+        {% endfor %}
+        {% else %}
         <li><a href="#rankings" role="tab" data-toggle="tab">Rankings</a></li>
+        {% endif %}
         {% endif %}
         {% if live_events_with_teams %}
         <li><a href="#active-teams" role="tab" data-toggle="tab">Active Teams</a></li>
@@ -197,7 +204,15 @@
                   </td>
                 {% endif %}
                 <td><strong>{{item.point_total}}</strong></td>
-                <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].dcmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
+                <td>
+                  {% if advancement and item.team_key in advancement and advancement[item.team_key].dcmp %}
+                    {% if dcmp_events|length > 1 and item.team_key in home_dcmp_per_team and home_dcmp_per_team[item.team_key] in events_by_key %}
+                      <span class="glyphicon glyphicon-ok" rel="tooltip" title="{{events_by_key[home_dcmp_per_team[item.team_key]].short_name or events_by_key[home_dcmp_per_team[item.team_key]].name}}"></span>
+                    {% else %}
+                      <span class="glyphicon glyphicon-ok"></span>
+                    {% endif %}
+                  {% endif %}
+                </td>
                 <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].cmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
               </tr>
               {% endfor %}
@@ -205,11 +220,105 @@
           </table>
 
           {% if year == 2015 %}
-            <p>* District rankings are not official and are calculated using the <a href="http://archive.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf">2015 FRC Standard District Points Ranking System (PDF)</a></p>
+            <p>* District rankings are not official and are calculated using the <a href="http://archive.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf">2015 FRC Standard District Points Ranking System (PDF)</a> - <i>Details on <a href="https://frc-events.firstinspires.org/{{year}}/district/{{district_abbrev|upper}}" target="_blank" rel="noopener noreferrer">firstinspires.org</a></i></p>
           {% else %}
-            <p>* District rankings are not official and are calculated using the <a href="https://frc-events.firstinspires.org/{{year}}/districts">FRC Standard District Points Ranking System</a></p>
+            <p>* District rankings are not official and are calculated using the <a href="https://frc-events.firstinspires.org/{{year}}/districts">FRC Standard District Points Ranking System</a> - <i>Details on <a href="https://frc-events.firstinspires.org/{{year}}/district/{{district_abbrev|upper}}" target="_blank" rel="noopener noreferrer">firstinspires.org</a></i></p>
           {% endif %}
         </div>
+
+        {% for dcmp in dcmp_events %}
+        {% if dcmp_events|length > 1 %}
+        <div class="tab-pane" id="rankings-{{dcmp.key_name}}">
+          <table class="table table-striped table-condensed table-center">
+            <thead>
+              <tr>
+                <th>Rank</th>
+                <th>Team</th>
+                <th>Event 1</th>
+                <th>Event 2</th>
+                <th>District Champ</th>
+                <th>Rookie Bonus</th>
+                {% if year == 2022 %}<th>Other Bonus</th>{% endif %}
+                {% if has_adjustments %}<th>Adjustments</th>{% endif %}
+                <th>Total Points</th>
+                <th>Qualified for DCMP</th>
+                <th>Qualified for CMP</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% set ns = namespace(rank=0) %}
+              {% for item in rankings %}
+              {% if home_dcmp_per_team.get(item.team_key) == dcmp.key_name %}
+              {% set ns.rank = ns.rank + 1 %}
+              <tr>
+                <td>{{ns.rank}}</td>
+                <td><a href="/team/{{item.team_key|digits}}/{{year}}">{{item.team_key|digits}}</a></td>
+                <td>
+                  {% if item.event_points[0] %}
+                  {{item.event_points[0].total}} <a href="/event/{{item.event_points[0].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[0].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.event_points[1] %}
+                  {{item.event_points[1].total}} <a href="/event/{{item.event_points[1].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[1].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.event_points[2] %}
+                  {{item.event_points[2].total}} <a href="/event/{{item.event_points[2].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[2].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% if item.event_points[3] %}
+                  + {{item.event_points[3].total}} <a href="/event/{{item.event_points[3].event_key}}" rel="tooltip" title="{{events_by_key[item.event_points[3].event_key].short_name}}"><span class="glyphicon glyphicon glyphicon-chevron-right"></span></a>
+                  {% endif %}
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                <td>
+                  {% if item.rookie_bonus %}
+                  {{item.rookie_bonus}}
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                {% if year == 2022 %}
+                <td>
+                  {% if item.other_bonus %}
+                  {{item.other_bonus}}
+                  {% else %}
+                  --
+                  {% endif %}
+                </td>
+                {% endif %}
+                {% if has_adjustments %}
+                  <td>
+                    {% if item.adjustments %}
+                      {{ item.adjustments }}
+                    {% else %}
+                      --
+                    {% endif %}
+                  </td>
+                {% endif %}
+                <td><strong>{{item.point_total}}</strong></td>
+                <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].dcmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
+                <td>{% if advancement and item.team_key in advancement and advancement[item.team_key].cmp %}<span class="glyphicon glyphicon-ok"><span>{%endif%}</td>
+              </tr>
+              {% endif %}
+              {% endfor %}
+            </tbody>
+          </table>
+
+          {% if year == 2015 %}
+            <p>* District rankings are not official and are calculated using the <a href="http://archive.usfirst.org/sites/default/files/uploadedFiles/Robotics_Programs/FRC/Game_and_Season__Info/2015/FRC_District_Standard_Points_Ranking_System_2015%20Summary.pdf">2015 FRC Standard District Points Ranking System (PDF)</a> - <i>Details on <a href="https://frc-events.firstinspires.org/{{year}}/district/{{district_abbrev|upper}}" target="_blank" rel="noopener noreferrer">firstinspires.org</a></i></p>
+          {% else %}
+            <p>* District rankings are not official and are calculated using the <a href="https://frc-events.firstinspires.org/{{year}}/districts">FRC Standard District Points Ranking System</a> - <i>Details on <a href="https://frc-events.firstinspires.org/{{year}}/district/{{district_abbrev|upper}}" target="_blank" rel="noopener noreferrer">firstinspires.org</a></i></p>
+          {% endif %}
+        </div>
+        {% endif %}
+        {% endfor %}
         {% endif %}
 
         {% if live_events_with_teams %}

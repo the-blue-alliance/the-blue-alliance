@@ -6,6 +6,9 @@ from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.district_helper import DistrictHelper
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
@@ -179,6 +182,31 @@ def test_calc_skips_offseason_override(tasks_client: Client) -> None:
         "/tasks/math/do/district_points_calc/2020test?allow-offseason=true"
     )
     assert resp.status_code == 200
+
+
+@mock.patch.object(DistrictHelper, "calculate_event_points")
+@mock.patch.object(EventDetailsManipulator, "createOrUpdate")
+def test_calc_disables_event_details_post_update_hook(
+    create_or_update_mock: mock.Mock,
+    calc_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2020test",
+        year=2020,
+        event_short="event",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    points = EventDistrictPoints(points={}, tiebreakers={})
+    calc_mock.return_value = points
+
+    resp = tasks_client.get(
+        "/tasks/math/do/district_points_calc/2020test?allow-offseason=true"
+    )
+
+    assert resp.status_code == 200
+    create_or_update_mock.assert_called_once()
+    assert create_or_update_mock.call_args.kwargs["run_post_update_hook"] is False
 
 
 @mock.patch.object(DistrictHelper, "calculate_event_points")
