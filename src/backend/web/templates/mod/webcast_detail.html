@@ -34,7 +34,7 @@
           </td>
           <td>
             {% if webcast.type == 'youtube' %}
-              <a href="https://www.youtube.com/c/{{ webcast.channel }}" target="_blank" rel="noopener noreferrer">{{ webcast.channel }}</a>
+              <a href="https://www.youtube.com/watch?v={{ webcast.channel }}" target="_blank" rel="noopener noreferrer">{{ webcast.channel }}</a>
             {% elif webcast.type == 'twitch' %}
               <a href="https://www.twitch.tv/{{ webcast.channel }}" target="_blank" rel="noopener noreferrer">{{ webcast.channel }}</a>
             {% else %}
