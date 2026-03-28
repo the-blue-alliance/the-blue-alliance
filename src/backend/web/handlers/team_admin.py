@@ -6,6 +6,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.auth import current_user
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.robot_manipulator import RobotManipulator
@@ -48,7 +49,17 @@ def team_mod():
     # team/year combination
     forced_team = request.args.get("team")
     forced_year = request.args.get("year")
-    if user.is_admin and forced_team and forced_year:
+    import logging
+
+    logging.info(f"USER: {user.__dict__}")
+    logging.info(f"IS ADMIN {user.is_admin}")
+    logging.info(f"IS MOD {user.has_permission(AccountPermission.REVIEW_MEDIA)}")
+    logging.info(f"REQ: {request.args}")
+    if (
+        (user.is_admin or user.has_permission(AccountPermission.REVIEW_MEDIA))
+        and forced_team
+        and forced_year
+    ):
         existing_access.append(
             TeamAdminAccess(
                 team_number=int(forced_team),
@@ -140,13 +151,20 @@ def team_mod_post():
     if not team:
         return abort(400)
 
-    user = none_throws(current_user()).account_key
+    user = none_throws(current_user())
     now = datetime.now()
-    existing_access = TeamAdminAccess.query(
-        TeamAdminAccess.account == user,
-        TeamAdminAccess.team_number == team_number,
-        TeamAdminAccess.expiration > now,
-    ).fetch()
+    if user.is_admin or user.has_permission(AccountPermission.REVIEW_MEDIA):
+        existing_access = TeamAdminAccess(
+            account=user.account_key,
+            team_number=team_number,
+            year=now.year,
+        )
+    else:
+        existing_access = TeamAdminAccess.query(
+            TeamAdminAccess.account == user.account_key,
+            TeamAdminAccess.team_number == team_number,
+            TeamAdminAccess.expiration > now,
+        ).fetch()
     if not existing_access:
         return abort(403)
 
