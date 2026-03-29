@@ -194,7 +194,7 @@ def test_add_invalid_webcast_url_redirects_with_error(
     assert response.status_code == 302
     parsed = urlparse(response.headers["Location"])
     assert parsed.path == f"/mod/webcast/{event_key}"
-    assert parse_qs(parsed.query)["webcast_url_error"] == ["1"]
+    assert parse_qs(parsed.query)["status"] == ["invalid_webcast_url"]
 
 
 def test_remove_webcast(
@@ -260,7 +260,10 @@ def test_update_webcast_date_invalid_format(
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == f"/mod/webcast/{event_key}"
+    assert parse_qs(parsed.query)["status"] == ["invalid_webcast_date_format"]
 
 
 def test_update_webcast_date_out_of_event_range(
@@ -279,7 +282,26 @@ def test_update_webcast_date_out_of_event_range(
         },
     )
 
-    assert response.status_code == 400
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == f"/mod/webcast/{event_key}"
+    assert parse_qs(parsed.query)["status"] == ["webcast_date_out_of_range"]
+
+
+def test_webcast_detail_renders_status_error_message(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+
+    response = web_client.get(
+        f"/mod/webcast/{event_key}?status=invalid_webcast_date_format"
+    )
+
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, "html.parser")
+    status_message = soup.find(id="webcast-status-message")
+    assert status_message is not None
+    assert "Webcast date must be in YYYY-MM-DD format." in status_message.get_text()
 
 
 @mock.patch(
@@ -342,7 +364,7 @@ def test_remove_webcast_creates_audit_log(
     }
 
 
-def test_remove_webcast_bad_request_does_not_create_audit_log(
+def test_remove_webcast_bad_request_redirects_with_status_and_audits(
     login_user_with_permission, web_client: Client
 ) -> None:
     event_key = f"{datetime.now().year}casj"
@@ -355,8 +377,11 @@ def test_remove_webcast_bad_request_does_not_create_audit_log(
         },
     )
 
-    assert response.status_code == 400
-    assert AuditLogEntry.query().count() == 0
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == f"/mod/webcast/{event_key}"
+    assert parse_qs(parsed.query)["status"] == ["missing_webcast_channel"]
+    assert AuditLogEntry.query().count() == 1
 
 
 def test_post_requires_permission(login_user, web_client: Client) -> None:

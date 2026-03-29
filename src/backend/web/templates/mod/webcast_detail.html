@@ -4,6 +4,26 @@
 
 {% block content %}
 <div class="container">
+  {% set status = request.args.get('status') %}
+  {% set status_messages = {
+    'invalid_webcast_url': 'Could not determine webcast type from that URL.',
+    'missing_webcast_channel': 'Webcast channel is required.',
+    'invalid_webcast_type': 'Webcast type is invalid.',
+    'invalid_webcast_index': 'Webcast index is invalid.',
+    'missing_webcast_date': 'Webcast date is required.',
+    'invalid_webcast_date_format': 'Webcast date must be in YYYY-MM-DD format.',
+    'webcast_date_out_of_range': 'Webcast date must fall within the event date range.',
+    'webcast_remove_mismatch': 'Could not remove webcast because form data did not match the selected webcast.',
+    'webcast_update_mismatch': 'Could not update webcast date because form data did not match the selected webcast.',
+    'no_webcasts': 'This event has no webcasts to update.',
+    'no_youtube_webcasts': 'This event has no YouTube webcasts to update.'
+  } %}
+  {% if status and status_messages.get(status) %}
+  <div class="alert alert-danger" id="webcast-status-message">
+    <strong>Error:</strong> {{ status_messages.get(status) }}
+  </div>
+  {% endif %}
+
   <div class="page-header">
     <a class="btn btn-default pull-right" href="/mod/webcasts">Back to active events</a>
     <h1>{{ event.name }}</h1>
@@ -106,11 +126,6 @@
   <div id="add-webcast" style="margin-top: 30px;">
     <h2>Add Webcast</h2>
     {% include "suggestions/partials/webcast_add_instructions_partial.html" %}
-    {% if request.args.get('webcast_url_error') %}
-    <div class="alert alert-danger">
-      <strong>Error:</strong> Could not determine webcast type from that URL.
-    </div>
-    {% endif %}
     <form action="/mod/webcast/{{ event.key_name }}/add" method="post" id="add-webcast-form">
       {% include "suggestions/partials/webcast_add_form_partial.html" %}
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

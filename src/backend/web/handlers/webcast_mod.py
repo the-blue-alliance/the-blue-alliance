@@ -35,26 +35,48 @@ def _get_event_or_404(event_key: EventKey) -> Event:
 
 def _parse_webcast_type_or_400(webcast_type_raw: Optional[str]) -> WebcastType:
     if not webcast_type_raw:
-        abort(400)
+        raise ValueError("invalid_webcast_type")
 
     try:
         return WebcastType(webcast_type_raw)
     except ValueError:
-        abort(400)
+        raise ValueError("invalid_webcast_type")
 
     raise AssertionError("unreachable")
 
 
 def _parse_webcast_index_or_400(webcast_index_raw: Optional[str]) -> int:
     if not webcast_index_raw:
-        abort(400)
+        raise ValueError("invalid_webcast_index")
 
     try:
         return int(webcast_index_raw) - 1
     except (TypeError, ValueError):
-        abort(400)
+        raise ValueError("invalid_webcast_index")
 
     raise AssertionError("unreachable")
+
+
+def _redirect_webcast_detail(
+    event_key: EventKey, *, status: Optional[str] = None, anchor: str = "webcasts"
+) -> Response:
+    if status is not None:
+        return redirect(
+            url_for(
+                "webcast_mod.webcast_detail",
+                event_key=event_key,
+                _anchor=anchor,
+                status=status,
+            )
+        )
+
+    return redirect(
+        url_for(
+            "webcast_mod.webcast_detail",
+            event_key=event_key,
+            _anchor=anchor,
+        )
+    )
 
 
 def _get_webcasts_with_status(webcasts: List[Webcast]) -> List[Webcast]:
@@ -93,7 +115,7 @@ def _parse_new_webcast() -> Optional[Webcast]:
     else:
         webcast_channel = request.form.get("webcast_channel", "").strip()
         if not webcast_channel:
-            abort(400)
+            raise ValueError("missing_webcast_channel")
 
         webcast_type = _parse_webcast_type_or_400(request.form.get("webcast_type"))
 
@@ -144,24 +166,25 @@ def webcast_detail(event_key: EventKey) -> str:
 @audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
 def webcast_add(event_key: EventKey) -> Response:
     event = _get_event_or_404(event_key)
-    webcast = _parse_new_webcast()
+    try:
+        webcast = _parse_new_webcast()
+    except ValueError as exc:
+        return _redirect_webcast_detail(
+            event.key_name,
+            status=str(exc),
+            anchor="add-webcast",
+        )
+
     if webcast is None:
-        return redirect(
-            url_for(
-                "webcast_mod.webcast_detail",
-                event_key=event.key_name,
-                webcast_url_error=1,
-                _anchor="add-webcast",
-            )
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="invalid_webcast_url",
+            anchor="add-webcast",
         )
 
     EventWebcastAdder.add_webcast(event, webcast)
 
-    return redirect(
-        url_for(
-            "webcast_mod.webcast_detail", event_key=event.key_name, _anchor="webcasts"
-        )
-    )
+    return _redirect_webcast_detail(event.key_name, anchor="webcasts")
 
 
 @blueprint.route("/webcast/<event_key>/remove", methods=["POST"])
@@ -172,21 +195,34 @@ def webcast_remove(event_key: EventKey) -> Response:
 
     webcast_channel = request.form.get("channel", "").strip()
     if not webcast_channel:
-        abort(400)
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="missing_webcast_channel",
+            anchor="webcasts",
+        )
 
-    webcast_type = _parse_webcast_type_or_400(request.form.get("type"))
-    webcast_index = _parse_webcast_index_or_400(request.form.get("index"))
+    try:
+        webcast_type = _parse_webcast_type_or_400(request.form.get("type"))
+        webcast_index = _parse_webcast_index_or_400(request.form.get("index"))
+    except ValueError as exc:
+        return _redirect_webcast_detail(
+            event.key_name,
+            status=str(exc),
+            anchor="webcasts",
+        )
 
     webcast_file = request.form.get("file", "").strip() or None
-    EventWebcastAdder.remove_webcast(
+    removed = EventWebcastAdder.remove_webcast(
         event, webcast_index, webcast_type, webcast_channel, webcast_file
     )
-
-    return redirect(
-        url_for(
-            "webcast_mod.webcast_detail", event_key=event.key_name, _anchor="webcasts"
+    if removed is None:
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="webcast_remove_mismatch",
+            anchor="webcasts",
         )
-    )
+
+    return _redirect_webcast_detail(event.key_name, anchor="webcasts")
 
 
 @blueprint.route("/webcast/<event_key>/update_date", methods=["POST"])
@@ -197,26 +233,70 @@ def webcast_update_date(event_key: EventKey) -> Response:
 
     webcast_channel = request.form.get("channel", "").strip()
     if not webcast_channel:
-        abort(400)
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="missing_webcast_channel",
+            anchor="webcasts",
+        )
 
-    webcast_type = _parse_webcast_type_or_400(request.form.get("type"))
-    webcast_index = _parse_webcast_index_or_400(request.form.get("index"))
+    try:
+        webcast_type = _parse_webcast_type_or_400(request.form.get("type"))
+        webcast_index = _parse_webcast_index_or_400(request.form.get("index"))
+    except ValueError as exc:
+        return _redirect_webcast_detail(
+            event.key_name,
+            status=str(exc),
+            anchor="webcasts",
+        )
+
     webcast_date = request.form.get("date", "").strip()
 
-    if not webcast_date or not _is_date_within_event_range(event, webcast_date):
-        abort(400)
+    if not webcast_date:
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="missing_webcast_date",
+            anchor="webcasts",
+        )
+
+    try:
+        datetime.strptime(webcast_date, "%Y-%m-%d")
+    except ValueError:
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="invalid_webcast_date_format",
+            anchor="webcasts",
+        )
+
+    if not _is_date_within_event_range(event, webcast_date):
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="webcast_date_out_of_range",
+            anchor="webcasts",
+        )
 
     webcasts = event.webcast
     if not webcasts or webcast_index >= len(webcasts):
-        abort(400)
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="invalid_webcast_index",
+            anchor="webcasts",
+        )
 
     webcast = webcasts[webcast_index]
     if webcast.get("type") != webcast_type or webcast.get("channel") != webcast_channel:
-        abort(400)
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="webcast_update_mismatch",
+            anchor="webcasts",
+        )
 
     webcast_file = request.form.get("file", "").strip()
     if webcast.get("file", "") != webcast_file:
-        abort(400)
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="webcast_update_mismatch",
+            anchor="webcasts",
+        )
 
     if webcast.get("date") != webcast_date:
         webcast["date"] = webcast_date
@@ -225,11 +305,7 @@ def webcast_update_date(event_key: EventKey) -> Response:
         event._dirty = True
         EventManipulator.createOrUpdate(event, auto_union=False)
 
-    return redirect(
-        url_for(
-            "webcast_mod.webcast_detail", event_key=event.key_name, _anchor="webcasts"
-        )
-    )
+    return _redirect_webcast_detail(event.key_name, anchor="webcasts")
 
 
 @blueprint.route("/webcast/<event_key>/update_all_dates", methods=["POST"])
@@ -240,12 +316,10 @@ def webcast_update_all_dates(event_key: EventKey) -> Response:
 
     webcasts = event.webcast
     if not webcasts:
-        return redirect(
-            url_for(
-                "webcast_mod.webcast_detail",
-                event_key=event.key_name,
-                _anchor="webcasts",
-            )
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="no_webcasts",
+            anchor="webcasts",
         )
 
     youtube_video_ids = [
@@ -254,12 +328,10 @@ def webcast_update_all_dates(event_key: EventKey) -> Response:
         if webcast.get("type") == WebcastType.YOUTUBE and webcast.get("channel")
     ]
     if not youtube_video_ids:
-        return redirect(
-            url_for(
-                "webcast_mod.webcast_detail",
-                event_key=event.key_name,
-                _anchor="webcasts",
-            )
+        return _redirect_webcast_detail(
+            event.key_name,
+            status="no_youtube_webcasts",
+            anchor="webcasts",
         )
 
     date_by_video_id = YouTubeVideoHelper.get_scheduled_start_times(
@@ -288,8 +360,4 @@ def webcast_update_all_dates(event_key: EventKey) -> Response:
         event._dirty = True
         EventManipulator.createOrUpdate(event, auto_union=False)
 
-    return redirect(
-        url_for(
-            "webcast_mod.webcast_detail", event_key=event.key_name, _anchor="webcasts"
-        )
-    )
+    return _redirect_webcast_detail(event.key_name, anchor="webcasts")
