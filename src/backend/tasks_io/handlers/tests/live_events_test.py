@@ -828,11 +828,11 @@ def test_find_event_webcasts_non_youtube_type(tasks_client: Client) -> None:
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_successful_match(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -875,7 +875,7 @@ def test_find_event_webcasts_successful_match(
         ]
     )
     # Mock start time retrieval
-    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+    get_start_times_mock.return_value = InstantFuture({"abc123": "2026-03-15"})
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
@@ -894,11 +894,11 @@ def test_find_event_webcasts_successful_match(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_multiple_streams_for_event(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -948,10 +948,9 @@ def test_find_event_webcasts_multiple_streams_for_event(
         ]
     )
     # Mock start time retrieval for both streams
-    get_start_time_mock.side_effect = [
-        InstantFuture("2026-03-15"),
-        InstantFuture("2026-03-16"),
-    ]
+    get_start_times_mock.return_value = InstantFuture(
+        {"abc123": "2026-03-15", "def456": "2026-03-16"}
+    )
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
@@ -962,11 +961,11 @@ def test_find_event_webcasts_multiple_streams_for_event(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_multiple_youtube_channels(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -1038,9 +1037,9 @@ def test_find_event_webcasts_multiple_youtube_channels(
             ]
         ),
     ]
-    get_start_time_mock.side_effect = [
-        InstantFuture("2026-03-15"),
-        InstantFuture("2026-03-15"),
+    get_start_times_mock.side_effect = [
+        InstantFuture({"stream_ch1": "2026-03-15"}),
+        InstantFuture({"stream_ch2": "2026-03-15"}),
     ]
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
@@ -1060,11 +1059,11 @@ def test_find_event_webcasts_multiple_youtube_channels(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_multiple_event_match_skipped(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -1187,11 +1186,11 @@ def test_find_event_webcasts_no_matching_events(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_no_output_in_taskqueue(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -1230,7 +1229,7 @@ def test_find_event_webcasts_no_output_in_taskqueue(
             )
         ]
     )
-    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+    get_start_times_mock.return_value = InstantFuture({"abc123": "2026-03-15"})
 
     resp = tasks_client.get(
         "/tasks/do/find_event_webcasts/2026fim",
@@ -1243,11 +1242,11 @@ def test_find_event_webcasts_no_output_in_taskqueue(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_no_start_time_skipped(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -1291,7 +1290,7 @@ def test_find_event_webcasts_no_start_time_skipped(
         ]
     )
     # Mock start time retrieval returning None
-    get_start_time_mock.return_value = InstantFuture(None)
+    get_start_times_mock.return_value = InstantFuture({})
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
@@ -1359,11 +1358,11 @@ def test_find_event_webcasts_no_live_events(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_future_event_without_webcasts(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -1404,7 +1403,7 @@ def test_find_event_webcasts_future_event_without_webcasts(
             )
         ]
     )
-    get_start_time_mock.return_value = InstantFuture("2026-03-25")
+    get_start_times_mock.return_value = InstantFuture({"abc123": "2026-03-25"})
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
@@ -1548,11 +1547,11 @@ def test_stream_matches_event_lower_event_code_not_matched() -> None:
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_match_by_description_short_name(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -1592,7 +1591,7 @@ def test_find_event_webcasts_match_by_description_short_name(
             )
         ]
     )
-    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+    get_start_times_mock.return_value = InstantFuture({"abc123": "2026-03-15"})
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200
@@ -1602,11 +1601,11 @@ def test_find_event_webcasts_match_by_description_short_name(
 
 @freeze_time("2026-03-15")
 @mock.patch.object(EventWebcastAdder, "add_webcast")
-@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_time")
+@mock.patch.object(YouTubeVideoHelper, "get_scheduled_start_times")
 @mock.patch.object(YouTubeVideoHelper, "get_upcoming_streams")
 def test_find_event_webcasts_match_by_description_event_code(
     get_streams_mock: mock.Mock,
-    get_start_time_mock: mock.Mock,
+    get_start_times_mock: mock.Mock,
     add_webcast_mock: mock.Mock,
     tasks_client: Client,
     ndb_stub,
@@ -1646,7 +1645,7 @@ def test_find_event_webcasts_match_by_description_event_code(
             )
         ]
     )
-    get_start_time_mock.return_value = InstantFuture("2026-03-15")
+    get_start_times_mock.return_value = InstantFuture({"abc123": "2026-03-15"})
 
     resp = tasks_client.get("/tasks/do/find_event_webcasts/2026fim")
     assert resp.status_code == 200

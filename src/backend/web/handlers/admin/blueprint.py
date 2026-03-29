@@ -59,6 +59,7 @@ from backend.web.handlers.admin.event import (
     event_list,
     event_remap_teams_post,
     event_remove_webcast_post,
+    event_update_all_webcast_dates_post,
     event_update_location_get,
     event_update_location_post,
     event_update_webcast_date_post,
@@ -318,6 +319,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/update_webcast_date/<event_key>",
     view_func=event_update_webcast_date_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/update_all_webcast_dates/<event_key>",
+    view_func=event_update_all_webcast_dates_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(

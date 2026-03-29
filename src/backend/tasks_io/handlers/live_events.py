@@ -488,14 +488,12 @@ def find_event_webcasts(district_key: DistrictKey) -> Response:
     for event_key, event_stream_pairs in event_to_streams.items():
         streams = [stream for _, stream in event_stream_pairs]
         event = event_stream_pairs[0][0]
-        # Fetch start times for all streams in parallel
-        start_time_futures = [
-            YouTubeVideoHelper.get_scheduled_start_time(stream["stream_id"])
-            for stream in streams
-        ]
-        start_times = [future.get_result() for future in start_time_futures]
+        start_times_by_stream_id = YouTubeVideoHelper.get_scheduled_start_times(
+            [stream["stream_id"] for stream in streams]
+        ).get_result()
 
-        for stream, start_time in zip(streams, start_times):
+        for stream in streams:
+            start_time = start_times_by_stream_id.get(stream["stream_id"])
             if not start_time:
                 logging.info(f"Could not find start time for stream {stream}, skipping")
                 continue

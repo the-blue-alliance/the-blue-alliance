@@ -569,12 +569,55 @@ def event_update_webcast_date_post(event_key: EventKey) -> Response:
     if webcast.get("channel") != webcast_channel:
         abort(400)
 
-    scheduled_date = YouTubeVideoHelper.get_scheduled_start_time(
-        webcast_channel
+    scheduled_dates = YouTubeVideoHelper.get_scheduled_start_times(
+        [webcast_channel]
     ).get_result()
+    scheduled_date = scheduled_dates.get(webcast_channel)
 
     if scheduled_date:
         webcast["date"] = scheduled_date
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
+
+
+def event_update_all_webcast_dates_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcasts = event.webcast
+    youtube_webcasts = [w for w in webcasts if w.get("type") == WebcastType.YOUTUBE]
+    if not youtube_webcasts:
+        return redirect(
+            url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+        )
+
+    video_ids = [w["channel"] for w in youtube_webcasts]
+    scheduled_dates = YouTubeVideoHelper.get_scheduled_start_times(
+        video_ids
+    ).get_result()
+
+    changed = False
+    for webcast in webcasts:
+        if webcast.get("type") != WebcastType.YOUTUBE:
+            continue
+
+        video_id = webcast.get("channel")
+        if not video_id:
+            continue
+
+        scheduled_date = scheduled_dates.get(video_id)
+        if scheduled_date and webcast.get("date") != scheduled_date:
+            webcast["date"] = scheduled_date
+            changed = True
+
+    if changed:
         event.webcast_json = json.dumps(webcasts)
         event._webcast = None
         event._dirty = True

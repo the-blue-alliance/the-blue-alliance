@@ -1,3 +1,5 @@
+import json
+from datetime import datetime
 from typing import List, Optional
 
 from flask import abort, Blueprint, redirect, request, url_for
@@ -11,6 +13,7 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
+from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
@@ -67,6 +70,20 @@ def _get_webcasts_with_status(webcasts: List[Webcast]) -> List[Webcast]:
     return webcast_list
 
 
+def _is_date_within_event_range(event: Event, webcast_date: str) -> bool:
+    try:
+        webcast_day = datetime.strptime(webcast_date, "%Y-%m-%d").date()
+    except ValueError:
+        return False
+
+    if event.start_date is None or event.end_date is None:
+        return False
+
+    event_start_date = event.start_date.date()
+    event_end_date = event.end_date.date()
+    return event_start_date <= webcast_day <= event_end_date
+
+
 def _parse_new_webcast() -> Optional[Webcast]:
     webcast_url = request.form.get("webcast_url", "").strip()
     if webcast_url:
@@ -86,9 +103,10 @@ def _parse_new_webcast() -> Optional[Webcast]:
             webcast["file"] = webcast_file
 
     if webcast["type"] == WebcastType.YOUTUBE and "date" not in webcast:
-        scheduled_date = YouTubeVideoHelper.get_scheduled_start_time(
-            webcast["channel"]
+        scheduled_dates = YouTubeVideoHelper.get_scheduled_start_times(
+            [webcast["channel"]]
         ).get_result()
+        scheduled_date = scheduled_dates.get(webcast["channel"])
         if scheduled_date:
             webcast["date"] = scheduled_date
 
@@ -163,6 +181,112 @@ def webcast_remove(event_key: EventKey) -> Response:
     EventWebcastAdder.remove_webcast(
         event, webcast_index, webcast_type, webcast_channel, webcast_file
     )
+
+    return redirect(
+        url_for(
+            "webcast_mod.webcast_detail", event_key=event.key_name, _anchor="webcasts"
+        )
+    )
+
+
+@blueprint.route("/webcast/<event_key>/update_date", methods=["POST"])
+@require_permission(AccountPermission.REVIEW_MEDIA)
+@audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
+def webcast_update_date(event_key: EventKey) -> Response:
+    event = _get_event_or_404(event_key)
+
+    webcast_channel = request.form.get("channel", "").strip()
+    if not webcast_channel:
+        abort(400)
+
+    webcast_type = _parse_webcast_type_or_400(request.form.get("type"))
+    webcast_index = _parse_webcast_index_or_400(request.form.get("index"))
+    webcast_date = request.form.get("date", "").strip()
+
+    if not webcast_date or not _is_date_within_event_range(event, webcast_date):
+        abort(400)
+
+    webcasts = event.webcast
+    if not webcasts or webcast_index >= len(webcasts):
+        abort(400)
+
+    webcast = webcasts[webcast_index]
+    if webcast.get("type") != webcast_type or webcast.get("channel") != webcast_channel:
+        abort(400)
+
+    webcast_file = request.form.get("file", "").strip()
+    if webcast.get("file", "") != webcast_file:
+        abort(400)
+
+    if webcast.get("date") != webcast_date:
+        webcast["date"] = webcast_date
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
+
+    return redirect(
+        url_for(
+            "webcast_mod.webcast_detail", event_key=event.key_name, _anchor="webcasts"
+        )
+    )
+
+
+@blueprint.route("/webcast/<event_key>/update_all_dates", methods=["POST"])
+@require_permission(AccountPermission.REVIEW_MEDIA)
+@audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
+def webcast_update_all_dates(event_key: EventKey) -> Response:
+    event = _get_event_or_404(event_key)
+
+    webcasts = event.webcast
+    if not webcasts:
+        return redirect(
+            url_for(
+                "webcast_mod.webcast_detail",
+                event_key=event.key_name,
+                _anchor="webcasts",
+            )
+        )
+
+    youtube_video_ids = [
+        webcast["channel"]
+        for webcast in webcasts
+        if webcast.get("type") == WebcastType.YOUTUBE and webcast.get("channel")
+    ]
+    if not youtube_video_ids:
+        return redirect(
+            url_for(
+                "webcast_mod.webcast_detail",
+                event_key=event.key_name,
+                _anchor="webcasts",
+            )
+        )
+
+    date_by_video_id = YouTubeVideoHelper.get_scheduled_start_times(
+        youtube_video_ids
+    ).get_result()
+
+    changed = False
+    for webcast in webcasts:
+        if webcast.get("type") != WebcastType.YOUTUBE:
+            continue
+        video_id = webcast.get("channel")
+        if not video_id:
+            continue
+
+        webcast_date = date_by_video_id.get(video_id)
+        if webcast_date is None or not _is_date_within_event_range(event, webcast_date):
+            continue
+
+        if webcast.get("date") != webcast_date:
+            webcast["date"] = webcast_date
+            changed = True
+
+    if changed:
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
 
     return redirect(
         url_for(

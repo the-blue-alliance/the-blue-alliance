@@ -466,6 +466,10 @@
   <div class="tab-pane" id="webcasts">
     <h2>Event Webcasts</h2>
     <p>Current webcasts:</p>
+    <form action="/admin/event/update_all_webcast_dates/{{event.key_name}}" method="post" style="display:inline">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button type="submit" class="btn btn-info"><span class="glyphicon glyphicon-calendar"></span> Update All Dates</button>
+    </form>
     <ul>
       {% for webcast in event.webcast %}
       <li>{{ webcast }}

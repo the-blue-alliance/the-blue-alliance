@@ -228,12 +228,12 @@ def mock_google_api_secret(monkeypatch: MonkeyPatch) -> None:
     monkeypatch.setattr(GoogleApiSecret, "secret_key", mock_secret)
 
 
-def test_get_scheduled_start_time_no_secret(ndb_context) -> None:
-    result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result is None
+def test_get_scheduled_start_times_no_secret(ndb_context) -> None:
+    result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {}
 
 
-def test_get_scheduled_start_time_api_error(
+def test_get_scheduled_start_times_api_error(
     ndb_context, mock_google_api_secret
 ) -> None:
     mock_urlfetch_result = URLFetchResult.mock_for_content(
@@ -244,11 +244,13 @@ def test_get_scheduled_start_time_api_error(
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result is None
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {}
 
 
-def test_get_scheduled_start_time_no_items(ndb_context, mock_google_api_secret) -> None:
+def test_get_scheduled_start_times_no_items(
+    ndb_context, mock_google_api_secret
+) -> None:
     mock_urlfetch_result = URLFetchResult.mock_for_content(
         "https://www.googleapis.com/youtube/v3/videos",
         200,
@@ -257,11 +259,11 @@ def test_get_scheduled_start_time_no_items(ndb_context, mock_google_api_secret) 
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result is None
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {}
 
 
-def test_get_scheduled_start_time_no_live_details(
+def test_get_scheduled_start_times_no_live_details(
     ndb_context, mock_google_api_secret
 ) -> None:
     mock_urlfetch_result = URLFetchResult.mock_for_content(
@@ -272,11 +274,11 @@ def test_get_scheduled_start_time_no_live_details(
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result is None
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {}
 
 
-def test_get_scheduled_start_time_no_scheduled_time(
+def test_get_scheduled_start_times_no_scheduled_time(
     ndb_context, mock_google_api_secret
 ) -> None:
     mock_urlfetch_result = URLFetchResult.mock_for_content(
@@ -287,11 +289,13 @@ def test_get_scheduled_start_time_no_scheduled_time(
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result is None
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {}
 
 
-def test_get_scheduled_start_time_success(ndb_context, mock_google_api_secret) -> None:
+def test_get_scheduled_start_times_single_success(
+    ndb_context, mock_google_api_secret
+) -> None:
     api_resp = {
         "items": [
             {
@@ -310,11 +314,11 @@ def test_get_scheduled_start_time_success(ndb_context, mock_google_api_secret) -
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result == "2023-03-15"
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {"abc123": "2023-03-15"}
 
 
-def test_get_scheduled_start_time_prefers_later_actual_date(
+def test_get_scheduled_start_times_prefers_later_actual_date(
     ndb_context, mock_google_api_secret
 ) -> None:
     api_resp = {
@@ -336,11 +340,11 @@ def test_get_scheduled_start_time_prefers_later_actual_date(
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result == "2023-03-16"
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {"abc123": "2023-03-16"}
 
 
-def test_get_scheduled_start_time_keeps_scheduled_for_earlier_actual_date(
+def test_get_scheduled_start_times_keep_scheduled_for_earlier_actual_date(
     ndb_context, mock_google_api_secret
 ) -> None:
     api_resp = {
@@ -362,8 +366,48 @@ def test_get_scheduled_start_time_keeps_scheduled_for_earlier_actual_date(
     mock_future = InstantFuture(mock_urlfetch_result)
 
     with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
-        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
-    assert result == "2023-03-16"
+        result = YouTubeVideoHelper.get_scheduled_start_times(["abc123"]).get_result()
+    assert result == {"abc123": "2023-03-16"}
+
+
+def test_get_scheduled_start_times_success(ndb_context, mock_google_api_secret) -> None:
+    api_resp = {
+        "items": [
+            {
+                "id": "abc123",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2023-03-15T18:00:00Z",
+                },
+            },
+            {
+                "id": "def456",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2023-03-15T23:00:00Z",
+                    "actualStartTime": "2023-03-16T00:05:00Z",
+                },
+            },
+            {
+                "id": "ghi789",
+                "liveStreamingDetails": {},
+            },
+        ]
+    }
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/videos",
+        200,
+        json.dumps(api_resp),
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.get_scheduled_start_times(
+            ["abc123", "def456", "ghi789", "missing"]
+        ).get_result()
+
+    assert result == {
+        "abc123": "2023-03-15",
+        "def456": "2023-03-16",
+    }
 
 
 def test_resolve_channel_id_no_secret(ndb_context) -> None:

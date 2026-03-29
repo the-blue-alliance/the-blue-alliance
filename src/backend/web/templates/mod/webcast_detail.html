@@ -12,6 +12,12 @@
 
   <div id="webcasts">
     <h2>Existing Webcasts</h2>
+    <form action="/mod/webcast/{{ event.key_name }}/update_all_dates" method="post" style="margin-bottom: 15px;">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      <button class="btn btn-info btn-sm" type="submit">
+        <span class="glyphicon glyphicon-calendar"></span> Update All Dates
+      </button>
+    </form>
     {% if webcasts %}
     <table class="table table-striped table-hover" id="webcast-list">
       <thead>
@@ -44,7 +50,28 @@
             <div><small class="text-muted">File: {{ webcast.file }}</small></div>
             {% endif %}
           </td>
-          <td>{{ webcast.get("date", "—") }}</td>
+          <td>
+            <form action="/mod/webcast/{{ event.key_name }}/update_date" method="post" class="form-inline" style="margin: 0;">
+              <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+              <input type="hidden" name="index" value="{{ loop.index }}" />
+              <input type="hidden" name="type" value="{{ webcast.type }}" />
+              <input type="hidden" name="channel" value="{{ webcast.channel }}" />
+              {% if webcast.get("file") %}
+              <input type="hidden" name="file" value="{{ webcast.file }}" />
+              {% else %}
+              <input type="hidden" name="file" value="" />
+              {% endif %}
+              <input
+                class="form-control input-sm"
+                type="text"
+                name="date"
+                value="{{ webcast.get('date', '') }}"
+                placeholder="YYYY-MM-DD"
+                style="width: 140px;"
+              />
+              <button class="btn btn-default btn-sm" type="submit">Save</button>
+            </form>
+          </td>
           <td>
             <span class="label label-{% if webcast.status.value == 'online' %}success{% elif webcast.status.value == 'offline' %}default{% else %}warning{% endif %}">
               {{ webcast.status.value }}

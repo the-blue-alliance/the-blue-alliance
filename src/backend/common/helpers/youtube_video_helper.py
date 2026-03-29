@@ -112,19 +112,33 @@ class YouTubeVideoHelper(object):
 
     @classmethod
     @typed_tasklet
-    def get_scheduled_start_time(
-        cls, video_id: str
-    ) -> Generator[Any, Any, Optional[str]]:
+    def get_scheduled_start_times(
+        cls, video_ids: List[str]
+    ) -> Generator[Any, Any, Dict[str, str]]:
         """
-        Fetches the scheduledStartTime for a YouTube video from the YouTube API.
-        Returns the date in YYYY-MM-DD format, or None if not available.
+        Fetches scheduled start times for multiple YouTube videos.
+        Returns a dict of video_id -> start_date (YYYY-MM-DD) for videos with a
+        usable start date.
         """
+        if not video_ids:
+            raise ndb.Return({})
+
         try:
-            datafeed = YoutubeVideoDetailsDatafeed([video_id])
-            result = yield datafeed.fetch_async()
-            details = result.get(video_id) if result else None
+            video_details = yield cls.get_video_details_batch(video_ids)
+        except ValueError:
+            logging.warning(
+                "No Google API secret, unable to fetch YouTube video details"
+            )
+            raise ndb.Return({})
+        except Exception:
+            logging.exception("Failed to fetch YouTube video scheduled start times")
+            raise ndb.Return({})
+
+        scheduled_start_times: Dict[str, str] = {}
+        for video_id in video_ids:
+            details = video_details.get(video_id)
             if details is None:
-                raise ndb.Return(None)
+                continue
 
             scheduled_start_time = details.get("scheduled_start_time")
             actual_start_time = details.get("actual_start_time")
@@ -136,7 +150,8 @@ class YouTubeVideoHelper(object):
                     )
                     actual_start_datetime = datetime.fromisoformat(actual_start_time)
                     if actual_start_datetime.date() > scheduled_start_datetime.date():
-                        raise ndb.Return(actual_start_time)
+                        scheduled_start_times[video_id] = actual_start_time
+                        continue
                 except ValueError:
                     logging.warning(
                         "Unable to parse YouTube start times for %s (scheduled=%s, actual=%s)",
@@ -145,19 +160,10 @@ class YouTubeVideoHelper(object):
                         actual_start_time,
                     )
 
-            raise ndb.Return(scheduled_start_time)
-        except ValueError:
-            logging.warning(
-                "No Google API secret, unable to fetch YouTube video details"
-            )
-            raise ndb.Return(None)
-        except ndb.Return:
-            raise
-        except Exception:
-            logging.exception(
-                "Failed to fetch YouTube video scheduled start time for %s", video_id
-            )
-            raise ndb.Return(None)
+            if scheduled_start_time is not None:
+                scheduled_start_times[video_id] = scheduled_start_time
+
+        raise ndb.Return(scheduled_start_times)
 
     @classmethod
     @typed_tasklet

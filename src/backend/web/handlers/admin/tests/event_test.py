@@ -341,10 +341,10 @@ def test_update_webcast_date_success(
     ).put()
 
     with patch(
-        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_scheduled_start_time"
+        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_scheduled_start_times"
     ) as mock_get_date:
         mock_future = ndb.Future()
-        mock_future.set_result("2020-03-01")
+        mock_future.set_result({"abc123defgh": "2020-03-01"})
         mock_get_date.return_value = mock_future
 
         resp = web_client.post(
@@ -381,10 +381,10 @@ def test_update_webcast_date_no_date_returned(
     ).put()
 
     with patch(
-        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_scheduled_start_time"
+        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_scheduled_start_times"
     ) as mock_get_date:
         mock_future = ndb.Future()
-        mock_future.set_result(None)
+        mock_future.set_result({})
         mock_get_date.return_value = mock_future
 
         resp = web_client.post(
@@ -432,6 +432,66 @@ def test_update_date_button_shown_for_youtube(
         btn for btn in soup.find_all("button") if "Update Date" in btn.get_text()
     ]
     assert len(update_date_buttons) == 1
+
+    update_all_date_buttons = [
+        btn for btn in soup.find_all("button") if "Update All Dates" in btn.get_text()
+    ]
+    assert len(update_all_date_buttons) == 1
+
+
+def test_update_all_webcast_dates_success(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        webcast_json=json.dumps(
+            [
+                {"type": "youtube", "channel": "abc123defgh"},
+                {"type": "youtube", "channel": "xyz987"},
+                {"type": "twitch", "channel": "firstinspires"},
+            ]
+        ),
+    ).put()
+
+    with patch(
+        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_scheduled_start_times"
+    ) as mock_get_dates:
+        mock_future = ndb.Future()
+        mock_future.set_result(
+            {
+                "abc123defgh": "2020-03-01",
+                "xyz987": "2020-03-02",
+            }
+        )
+        mock_get_dates.return_value = mock_future
+
+        resp = web_client.post(
+            "/admin/event/update_all_webcast_dates/2020nyny",
+            data={"csrf_token": "test"},
+        )
+
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    webcasts = event.webcast
+    youtube_webcasts = [w for w in webcasts if w["type"] == "youtube"]
+    twitch_webcasts = [w for w in webcasts if w["type"] == "twitch"]
+    assert len(youtube_webcasts) == 2
+    assert len(twitch_webcasts) == 1
+    assert any(
+        w["channel"] == "abc123defgh" and w["date"] == "2020-03-01"
+        for w in youtube_webcasts
+    )
+    assert any(
+        w["channel"] == "xyz987" and w["date"] == "2020-03-02" for w in youtube_webcasts
+    )
+    assert "date" not in twitch_webcasts[0]
 
 
 def test_refresh_online_status_button_uses_force_param(
