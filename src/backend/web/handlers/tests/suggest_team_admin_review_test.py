@@ -11,6 +11,7 @@ from google.appengine.ext import ndb
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.suggestion import Suggestion
@@ -73,6 +74,21 @@ def test_mod_post_admin_can_set_team_info(login_admin, web_client):
 
     assert resp.status_code == 302
     assert urlparse(resp.headers["Location"]).path == "/mod"
+
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.account == login_admin.account_key
+    assert entry.endpoint == "team_admin.team_mod_post"
+    assert entry.target_key is not None
+    assert entry.target_key.kind() == "Team"
+    assert entry.target_key.id() == "frc1124"
+    assert entry.url_args == {}
+    assert entry.form_params == {
+        "team_number": ["1124"],
+        "action": ["set_team_info"],
+        "robot_name": [""],
+    }
 
 
 def test_mod_post_review_permission_can_set_team_info(login_user, web_client):

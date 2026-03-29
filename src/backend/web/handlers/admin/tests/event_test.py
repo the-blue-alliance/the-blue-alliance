@@ -66,6 +66,10 @@ def test_event_detail(web_client: Client, login_gae_admin, setup_full_event) -> 
     resp = web_client.get("/admin/event/2019nyny")
     assert resp.status_code == 200
 
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    audit_logs_link = soup.find("a", href="/admin/audit_logs?key=Event:2019nyny")
+    assert audit_logs_link is not None
+
 
 def test_event_detail_regional_champs_points_tab_and_task(
     web_client: Client, login_gae_admin

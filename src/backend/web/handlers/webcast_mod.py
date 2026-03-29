@@ -1,6 +1,7 @@
 from typing import List, Optional
 
 from flask import abort, Blueprint, redirect, request, url_for
+from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
@@ -16,7 +17,7 @@ from backend.common.memcache_models.webcast_online_status_memcache import (
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.models.webcast import Webcast
-from backend.web.decorators import require_permission
+from backend.web.decorators import audit_post_mutation, require_permission
 from backend.web.profiled_render import render_template
 
 blueprint = Blueprint("webcast_mod", __name__, url_prefix="/mod")
@@ -122,6 +123,7 @@ def webcast_detail(event_key: EventKey) -> str:
 
 @blueprint.route("/webcast/<event_key>/add", methods=["POST"])
 @require_permission(AccountPermission.REVIEW_MEDIA)
+@audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
 def webcast_add(event_key: EventKey) -> Response:
     event = _get_event_or_404(event_key)
     webcast = _parse_new_webcast()
@@ -146,6 +148,7 @@ def webcast_add(event_key: EventKey) -> Response:
 
 @blueprint.route("/webcast/<event_key>/remove", methods=["POST"])
 @require_permission(AccountPermission.REVIEW_MEDIA)
+@audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
 def webcast_remove(event_key: EventKey) -> Response:
     event = _get_event_or_404(event_key)
 

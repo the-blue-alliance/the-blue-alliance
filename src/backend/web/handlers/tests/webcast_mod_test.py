@@ -14,6 +14,7 @@ from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.event import Event
 from backend.common.models.webcast import Webcast
 
@@ -200,6 +201,7 @@ def test_remove_webcast(
             "index": "2",
             "type": "twitch",
             "channel": "frc0",
+            "csrf_token": "ignore-me",
         },
     )
 
@@ -209,6 +211,56 @@ def test_remove_webcast(
     webcasts = event.webcast or []
     assert len(webcasts) == 1
     assert webcasts[0]["channel"] == "abc123"
+
+
+def test_remove_webcast_creates_audit_log(
+    login_user_with_permission, web_client: Client, taskqueue_stub
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/remove",
+        data={
+            "index": "2",
+            "type": "twitch",
+            "channel": "frc0",
+        },
+    )
+
+    assert response.status_code == 302
+
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+
+    entry = entries[0]
+    assert entry.account == login_user_with_permission.account_key
+    assert entry.endpoint == "webcast_mod.webcast_remove"
+    assert entry.target_key is not None
+    assert entry.target_key.kind() == "Event"
+    assert entry.target_key.id() == event_key
+    assert entry.url_args == {"event_key": event_key}
+    assert entry.form_params == {
+        "index": ["2"],
+        "type": ["twitch"],
+        "channel": ["frc0"],
+    }
+
+
+def test_remove_webcast_bad_request_does_not_create_audit_log(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/remove",
+        data={
+            "index": "2",
+            "type": "twitch",
+        },
+    )
+
+    assert response.status_code == 400
+    assert AuditLogEntry.query().count() == 0
 
 
 def test_post_requires_permission(login_user, web_client: Client) -> None:

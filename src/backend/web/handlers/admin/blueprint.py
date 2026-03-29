@@ -17,6 +17,7 @@ from backend.web.handlers.admin.api_auth import (
 )
 from backend.web.handlers.admin.api_history import api_history
 from backend.web.handlers.admin.apistatus import apistatus_get, apistatus_post
+from backend.web.handlers.admin.audit_logs import audit_logs
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
 from backend.web.handlers.admin.awards import (
     award_dashboard,
@@ -204,6 +205,7 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/api_history/<event_key>", view_func=api_history, methods=["GET"]
 )
+admin_routes.add_url_rule("/audit_logs", view_func=audit_logs, methods=["GET"])
 admin_routes.add_url_rule("/apistatus", view_func=apistatus_get, methods=["GET"])
 admin_routes.add_url_rule("/apistatus", view_func=apistatus_post, methods=["POST"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])

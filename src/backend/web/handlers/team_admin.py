@@ -1,5 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
+from typing import Optional
 
 from flask import abort, Blueprint, redirect, request, url_for
 from google.appengine.ext import ndb
@@ -16,7 +17,7 @@ from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.queries.media_query import TeamSocialMediaQuery
-from backend.web.decorators import require_login
+from backend.web.decorators import audit_post_mutation, require_login
 from backend.web.profiled_render import render_template
 
 blueprint = Blueprint("team_admin", __name__, url_prefix="/")
@@ -32,6 +33,13 @@ SUGGESTION_REVIEW_URL = {
     "social-media": "/suggest/team/social/review",
     "robot": "/suggest/cad/review",
 }
+
+
+def _get_team_key_from_form() -> Optional[ndb.Key]:
+    team_number = request.form.get("team_number", "").strip()
+    if not team_number.isdigit():
+        return None
+    return ndb.Key(Team, f"frc{team_number}")
 
 
 @blueprint.route("/mod", methods=["GET"])
@@ -142,6 +150,7 @@ def team_mod():
 
 @blueprint.route("/mod", methods=["POST"])
 @require_login
+@audit_post_mutation(target_key_getter=lambda: _get_team_key_from_form())
 def team_mod_post():
     team_number = request.form.get("team_number")
     if not team_number:
@@ -246,6 +255,7 @@ def team_admin_redeem():
 
 @require_login
 @blueprint.route("/mod/redeem", methods=["POST"])
+@audit_post_mutation(target_key_getter=lambda: _get_team_key_from_form())
 def team_admin_redeem_post():
     user = none_throws(current_user()).account_key
 

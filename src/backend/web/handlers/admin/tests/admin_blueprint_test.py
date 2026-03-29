@@ -1,9 +1,11 @@
 import re
 
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.account import Account
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.suggestion import Suggestion
 
 
@@ -85,3 +87,29 @@ def test_admin_home_shows_recent_users(
     assert resp.status_code == 200
     assert b"User One" in resp.data
     assert b"User Two" in resp.data
+
+
+def test_audit_logs_page_requires_admin(web_client: Client) -> None:
+    resp = web_client.get("/admin/audit_logs")
+    assert resp.status_code == 401
+
+
+def test_audit_logs_page_lookup_by_kind_id(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    target_key = ndb.Key("Team", "frc1124")
+    account_key = Account(id="auditor", email="auditor@example.com").put()
+    AuditLogEntry(
+        account=account_key,
+        endpoint="team_admin.team_mod_post",
+        target_key=target_key,
+        url_args={},
+        form_params={"team_number": ["1124"]},
+    ).put()
+
+    resp = web_client.get("/admin/audit_logs?key=Team:frc1124")
+    assert resp.status_code == 200
+    assert b"team_admin.team_mod_post" in resp.data
+    assert b"Team:frc1124" in resp.data
+    assert b"auditor@example.com" in resp.data
+    assert b"/admin/user/auditor" in resp.data

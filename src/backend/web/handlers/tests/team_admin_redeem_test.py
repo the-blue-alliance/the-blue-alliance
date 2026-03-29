@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.models.account import Account
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.models.user import User
@@ -99,6 +100,20 @@ def test_redeem_code(login_user: User, web_client: Client, captured_templates):
 
     access = access_key.get()
     assert login_user.account_key == access.account
+
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.account == login_user.account_key
+    assert entry.endpoint == "team_admin.team_admin_redeem_post"
+    assert entry.target_key is not None
+    assert entry.target_key.kind() == "Team"
+    assert entry.target_key.id() == "frc1124"
+    assert entry.url_args == {}
+    assert entry.form_params == {
+        "team_number": ["1124"],
+        "auth_code": ["abc123"],
+    }
 
 
 def test_redeem_code_with_whitespace(

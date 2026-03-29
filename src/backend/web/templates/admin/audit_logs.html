@@ -1,0 +1,41 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Audit Logs{% endblock %}
+
+{% block content %}
+<h2>Audit Logs</h2>
+
+<form method="get" action="/admin/audit_logs" class="form-inline" style="margin-bottom: 16px;">
+  <div class="form-group">
+    <label for="key">Object Key</label>
+    <input
+      type="text"
+      class="form-control"
+      id="key"
+      name="key"
+      value="{{ lookup_key_raw }}"
+      style="width: 420px; margin-left: 8px;"
+      placeholder="Kind:id or urlsafe key"
+    >
+  </div>
+  <button type="submit" class="btn btn-primary">Lookup</button>
+</form>
+
+{% if error %}
+  <div class="alert alert-danger">{{ error }}</div>
+{% endif %}
+
+{% if target_key %}
+  <p>
+    Showing logs for key:
+    <code>{{ target_key.kind() }}:{{ target_key.id() }}</code>
+  </p>
+
+  {% if logs %}
+    {% set show_account_column = True %}
+    {% include "admin/audit_log_table.html" %}
+  {% else %}
+    <div class="alert alert-info">No audit logs found for this object key.</div>
+  {% endif %}
+{% endif %}
+{% endblock %}
