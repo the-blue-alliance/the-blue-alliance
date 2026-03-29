@@ -49,12 +49,7 @@ def team_mod():
     # team/year combination
     forced_team = request.args.get("team")
     forced_year = request.args.get("year")
-    import logging
 
-    logging.info(f"USER: {user.__dict__}")
-    logging.info(f"IS ADMIN {user.is_admin}")
-    logging.info(f"IS MOD {user.has_permission(AccountPermission.REVIEW_MEDIA)}")
-    logging.info(f"REQ: {request.args}")
     if (
         (user.is_admin or user.has_permission(AccountPermission.REVIEW_MEDIA))
         and forced_team
@@ -154,12 +149,14 @@ def team_mod_post():
     user = none_throws(current_user())
     now = datetime.now()
     if user.is_admin or user.has_permission(AccountPermission.REVIEW_MEDIA):
+        has_permissions = True
         existing_access = TeamAdminAccess(
             account=user.account_key,
             team_number=team_number,
             year=now.year,
         )
     else:
+        has_permissions = False
         existing_access = TeamAdminAccess.query(
             TeamAdminAccess.account == user.account_key,
             TeamAdminAccess.team_number == team_number,
@@ -210,7 +207,12 @@ def team_mod_post():
     else:
         return abort(400)
 
-    return redirect(url_for(".team_mod"))
+    if has_permissions:
+        return redirect(
+            url_for(".team_mod", team=team_number, year=existing_access.year)
+        )
+    else:
+        return redirect(url_for(".team_mod"))
 
 
 def get_media_and_team_ref(media_key_name, team_number):
