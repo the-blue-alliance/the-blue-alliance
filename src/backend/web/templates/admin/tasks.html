@@ -336,6 +336,26 @@
     </div>
 </div>
 
+<h3>Calculate Event Matchstats</h3>
+<p>Enqueue OPR/DPR/CCWM, predictions, and insights calculations for all events in a year.</p>
+<div class="row">
+    <div class="col-sm-6">
+        <form class="form-inline">
+            <div class="input-group">
+                <input class="form-control" id="enqueue_event_matchstats_year" type="text" placeholder="2017">
+                <span class="input-group-btn" id="enqueue_event_matchstats_year_submit">
+                    <button class="btn btn-warning" type="button">Go <span class="glyphicon glyphicon-fast-forward"></span></button>
+                </span>
+            </div>
+        </form>
+        <script>
+        $("#enqueue_event_matchstats_year_submit").click(function() {
+            window.location = "/tasks/math/enqueue/event_matchstats/" + $("#enqueue_event_matchstats_year").val();
+        });
+        </script>
+    </div>
+</div>
+
 <hr>
 
 <h2>Special Tasks<h2>
