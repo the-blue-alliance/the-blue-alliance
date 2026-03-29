@@ -1,5 +1,6 @@
 import logging
 import re
+from datetime import datetime
 from typing import Any, cast, Dict, Generator, List, Optional, TypedDict
 from urllib import parse as urlparse
 
@@ -122,7 +123,29 @@ class YouTubeVideoHelper(object):
             datafeed = YoutubeVideoDetailsDatafeed([video_id])
             result = yield datafeed.fetch_async()
             details = result.get(video_id) if result else None
-            raise ndb.Return(details.get("scheduled_start_time") if details else None)
+            if details is None:
+                raise ndb.Return(None)
+
+            scheduled_start_time = details.get("scheduled_start_time")
+            actual_start_time = details.get("actual_start_time")
+
+            if scheduled_start_time is not None and actual_start_time is not None:
+                try:
+                    scheduled_start_datetime = datetime.fromisoformat(
+                        scheduled_start_time
+                    )
+                    actual_start_datetime = datetime.fromisoformat(actual_start_time)
+                    if actual_start_datetime.date() > scheduled_start_datetime.date():
+                        raise ndb.Return(actual_start_time)
+                except ValueError:
+                    logging.warning(
+                        "Unable to parse YouTube start times for %s (scheduled=%s, actual=%s)",
+                        video_id,
+                        scheduled_start_time,
+                        actual_start_time,
+                    )
+
+            raise ndb.Return(scheduled_start_time)
         except ValueError:
             logging.warning(
                 "No Google API secret, unable to fetch YouTube video details"

@@ -314,6 +314,58 @@ def test_get_scheduled_start_time_success(ndb_context, mock_google_api_secret) -
     assert result == "2023-03-15"
 
 
+def test_get_scheduled_start_time_prefers_later_actual_date(
+    ndb_context, mock_google_api_secret
+) -> None:
+    api_resp = {
+        "items": [
+            {
+                "id": "abc123",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2023-03-15T23:00:00Z",
+                    "actualStartTime": "2023-03-16T00:05:00Z",
+                },
+            }
+        ]
+    }
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/videos",
+        200,
+        json.dumps(api_resp),
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
+    assert result == "2023-03-16"
+
+
+def test_get_scheduled_start_time_keeps_scheduled_for_earlier_actual_date(
+    ndb_context, mock_google_api_secret
+) -> None:
+    api_resp = {
+        "items": [
+            {
+                "id": "abc123",
+                "liveStreamingDetails": {
+                    "scheduledStartTime": "2023-03-16T00:05:00Z",
+                    "actualStartTime": "2023-03-15T23:00:00Z",
+                },
+            }
+        ]
+    }
+    mock_urlfetch_result = URLFetchResult.mock_for_content(
+        "https://www.googleapis.com/youtube/v3/videos",
+        200,
+        json.dumps(api_resp),
+    )
+    mock_future = InstantFuture(mock_urlfetch_result)
+
+    with patch("google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future):
+        result = YouTubeVideoHelper.get_scheduled_start_time("abc123").get_result()
+    assert result == "2023-03-16"
+
+
 def test_resolve_channel_id_no_secret(ndb_context) -> None:
     result = YouTubeVideoHelper.resolve_channel_id("FIRSTinMichigan").get_result()
     assert result is None
