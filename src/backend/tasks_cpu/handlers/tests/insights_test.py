@@ -131,8 +131,45 @@ def test_enqueue_district_insights_no_output_in_taskqueue(
     assert len(resp.data) == 0
 
 
+def test_enqueue_district_insights_year_zero(
+    tasks_cpu_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    from backend.common.consts.renamed_districts import RenamedDistricts
+
+    expected_abbrevs = set(RenamedDistricts.get_latest_codes())
+
+    resp = tasks_cpu_client.get("/backend-tasks-b2/enqueue/math/insights/districts/0")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="backend-tasks")
+    assert len(tasks) == len(expected_abbrevs)
+    enqueued_abbrevs = {task.url.split("/")[-1] for task in tasks}
+    assert enqueued_abbrevs == expected_abbrevs
+    for task in tasks:
+        assert task.url.startswith("/backend-tasks-b2/do/math/insights/districts/0/")
+
+
+def test_enqueue_district_insights_year_zero_no_output_in_taskqueue(
+    tasks_cpu_client: Client,
+) -> None:
+    resp = tasks_cpu_client.get(
+        "/backend-tasks-b2/enqueue/math/insights/districts/0",
+        headers={"X-Appengine-Taskname": "test"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.data) == 0
+
+
 def test_do_district_insights_for_abbreviation(tasks_cpu_client: Client) -> None:
     resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/insights/districts/2026/fim")
+    assert resp.status_code == 200
+
+
+def test_do_district_insights_for_abbreviation_year_zero(
+    tasks_cpu_client: Client,
+) -> None:
+    resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/insights/districts/0/fim")
     assert resp.status_code == 200
 
 

@@ -8,6 +8,7 @@ from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
 from backend.common.consts.insight_type import InsightType
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.insights_helper import InsightsHelper
 from backend.common.helpers.insights_leaderboard_event_helper import (
     InsightsLeaderboardEventHelper,
@@ -300,6 +301,29 @@ def enqueue_district_insights(year: Optional[Year] = None) -> Response:
     if year is None:
         year = SeasonHelper.get_current_season()
 
+    if year == 0:
+        # year=0 means compute overall/all-time aggregate insights for every
+        # known district abbreviation.
+        abbreviations = RenamedDistricts.get_latest_codes()
+        for abbrev in abbreviations:
+            taskqueue.add(
+                url=url_for(
+                    "insights.do_district_insights_for_abbreviation",
+                    year=0,
+                    abbrev=abbrev,
+                ),
+                method="GET",
+                target="py3-tasks-cpu",
+                queue_name="backend-tasks",
+            )
+
+        if "X-Appengine-Taskname" not in request.headers:
+            return make_response(
+                f"enqueued overall district insights for {len(abbreviations)} district abbreviations"
+            )
+
+        return make_response("")
+
     districts = DistrictsInYearQuery(year).fetch()
     for district in districts:
         taskqueue.add(
@@ -335,7 +359,7 @@ def do_district_insights_for_abbreviation(abbrev: str, year: Year) -> Response:
     )
 
     insights = InsightsHelper.doDistrictInsightsForAbbreviation(
-        DistrictAbbreviation(abbrev), year=year
+        DistrictAbbreviation(abbrev), year=year if year != 0 else None
     )
 
     logging.info(
