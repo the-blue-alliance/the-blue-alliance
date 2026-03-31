@@ -279,3 +279,198 @@ def test_do_district_insights_for_abbreviation_year_skips_overall_aggregates(
         district_abbreviation="fim",
         district=district,
     )
+
+
+def test_do_overall_award_insights_does_not_double_count_district_blue_banners(
+    ndb_stub,
+) -> None:
+    """
+    doOverallAwardInsights aggregates BLUE_BANNERS from per-year insights.
+    District-scoped insights (district_abbreviation set) must be excluded,
+    otherwise banners from district events are double-counted: once in the
+    global per-year insight and once in the district-scoped per-year insight.
+    """
+    # Global per-year insight: frc1 won 3 banners in 2024
+    global_insight = create_insight(
+        data=[(3, ["frc1"])],
+        name=Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
+        year=2024,
+    )
+    global_insight.put()
+
+    # District-scoped per-year insight: frc1 won 2 of those 3 banners at FIM events.
+    # These are already included in the global insight above.
+    district_insight = create_insight(
+        data=[(2, ["frc1"])],
+        name=Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
+        year=2024,
+        district_abbreviation="fim",
+    )
+    district_insight.put()
+
+    insights = InsightsHelper.doOverallAwardInsights()
+
+    blue_banner_insight = next(
+        (i for i in insights if i.name == Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS]),
+        None,
+    )
+    assert blue_banner_insight is not None
+    frc1_count = next(
+        (count for count, teams in blue_banner_insight.data if "frc1" in teams),
+        None,
+    )
+    # Should be 3 (from global insight only), not 5 (3+2 double-count)
+    assert frc1_count == 3
+
+
+def test_do_overall_award_insights_does_not_double_count_district_regional_winners(
+    ndb_stub,
+) -> None:
+    """
+    REGIONAL_DISTRICT_WINNERS includes district event winners (not CMP).
+    District-scoped insights must be excluded from the all-time aggregation.
+    """
+    create_insight(
+        data=[(2, ["frc1"])],
+        name=Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS],
+        year=2024,
+    ).put()
+
+    create_insight(
+        data=[(1, ["frc1"])],
+        name=Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS],
+        year=2024,
+        district_abbreviation="fim",
+    ).put()
+
+    insights = InsightsHelper.doOverallAwardInsights()
+
+    regional_insight = next(
+        (
+            i
+            for i in insights
+            if i.name == Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS]
+        ),
+        None,
+    )
+    assert regional_insight is not None
+    frc1_count = next(
+        (count for count, teams in regional_insight.data if "frc1" in teams),
+        None,
+    )
+    # Should be 2 (from global insight only), not 3 (2+1 double-count)
+    assert frc1_count == 2
+
+
+def test_do_overall_award_insights_does_not_double_count_district_rca_winners(
+    ndb_stub,
+) -> None:
+    """
+    RCA_WINNERS includes Chairman's at district championships.
+    District-scoped insights must be excluded from the all-time aggregation.
+    """
+    create_insight(
+        data=["frc1"],
+        name=Insight.INSIGHT_NAMES[Insight.RCA_WINNERS],
+        year=2024,
+    ).put()
+
+    create_insight(
+        data=["frc1"],
+        name=Insight.INSIGHT_NAMES[Insight.RCA_WINNERS],
+        year=2024,
+        district_abbreviation="fim",
+    ).put()
+
+    insights = InsightsHelper.doOverallAwardInsights()
+
+    rca_insight = next(
+        (i for i in insights if i.name == Insight.INSIGHT_NAMES[Insight.RCA_WINNERS]),
+        None,
+    )
+    assert rca_insight is not None
+    frc1_count = next(
+        (count for count, teams in rca_insight.data if "frc1" in teams),
+        None,
+    )
+    # Should be 1 (from global insight only), not 2 (double-count)
+    assert frc1_count == 1
+
+
+def test_do_overall_award_insights_does_not_double_count_district_elim_teamups(
+    ndb_stub,
+) -> None:
+    """
+    SUCCESSFUL_ELIM_TEAMUPS includes winners from district events.
+    District-scoped insights must be excluded from the all-time aggregation.
+    """
+    create_insight(
+        data=[["frc1", "frc2", "frc3"]],
+        name=Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
+        year=2024,
+    ).put()
+
+    create_insight(
+        data=[["frc1", "frc2", "frc3"]],
+        name=Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
+        year=2024,
+        district_abbreviation="fim",
+    ).put()
+
+    insights = InsightsHelper.doOverallAwardInsights()
+
+    teamup_insight = next(
+        (
+            i
+            for i in insights
+            if i.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS]
+        ),
+        None,
+    )
+    assert teamup_insight is not None
+    # Find the count for the frc1+frc2 pair; should be 1 (global only), not 2 (double-count)
+    frc1_frc2_count = next(
+        (
+            count
+            for count, pairs in teamup_insight.data
+            if ["frc1", "frc2"] in pairs
+            or any("frc1" in p and "frc2" in p for p in pairs)
+        ),
+        None,
+    )
+    assert frc1_frc2_count == 1
+
+
+def test_do_overall_match_insights_does_not_include_district_num_matches(
+    ndb_stub,
+) -> None:
+    """
+    NUM_MATCHES is produced for district events too.
+    District-scoped insights must be excluded from the all-time aggregation,
+    otherwise a year appears multiple times in the historical data.
+    """
+    create_insight(
+        data=100,
+        name=Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+        year=2024,
+    ).put()
+
+    create_insight(
+        data=40,
+        name=Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+        year=2024,
+        district_abbreviation="fim",
+    ).put()
+
+    insights = InsightsHelper.doOverallMatchInsights()
+
+    num_matches_insight = next(
+        (i for i in insights if i.name == Insight.INSIGHT_NAMES[Insight.NUM_MATCHES]),
+        None,
+    )
+    assert num_matches_insight is not None
+    year_2024_entries = [
+        (year, count) for year, count in num_matches_insight.data if year == 2024
+    ]
+    # Should be exactly one entry for 2024 (the global insight with count=100)
+    assert year_2024_entries == [(2024, 100)]
