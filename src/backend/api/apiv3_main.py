@@ -165,7 +165,7 @@ api_v3.add_url_rule(
 )
 
 # Regional Advancement
-api_v3.add_url_rule("/regional_advancement/<int:year>/", view_func=regional_advancement)
+api_v3.add_url_rule("/regional_advancement/<int:year>", view_func=regional_advancement)
 api_v3.add_url_rule(
     "/regional_advancement/<int:year>/rankings", view_func=regional_rankings
 )
