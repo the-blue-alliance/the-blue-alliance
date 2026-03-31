@@ -13,6 +13,7 @@ import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import InsightsIcon from '~icons/lucide/scatter-chart';
+import ChampsQualPointsIcon from '~icons/lucide/star';
 import AwardsIcon from '~icons/lucide/trophy';
 import LiveWebcastIcon from '~icons/lucide/video';
 import MediaIcon from '~icons/mdi/folder-media-outline';
@@ -27,6 +28,7 @@ import {
   EventDistrictPoints,
   Match,
   Media,
+  RegionalAdvancement,
   Team,
   Webcast,
 } from '~/api/tba/read';
@@ -41,6 +43,8 @@ import {
   getEventTeamMediaOptions,
   getEventTeamsOptions,
   getEventTeamsStatusesOptions,
+  getRegionalAdvancementOptions,
+  getRegionalChampsPoolPointsOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
@@ -54,6 +58,7 @@ import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   DistrictLink,
+  EventLink,
   EventLocationLink,
   PitLocationLink,
   TeamLink,
@@ -110,7 +115,11 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import {
+  DISTRICT_EVENT_TYPES,
+  EventType,
+  SEASON_EVENT_TYPES,
+} from '~/lib/api/EventType';
 import { PlayoffType, TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
@@ -290,6 +299,15 @@ function EventPage() {
     getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
   );
 
+  const regionalChampsPoolPointsQuery = useQuery(
+    getRegionalChampsPoolPointsOptions({ path: { event_key: eventKey } }),
+  );
+
+  const regionalAdvancementQuery = useQuery({
+    ...getRegionalAdvancementOptions({ path: { year: event.year } }),
+    enabled: event.event_type === EventType.REGIONAL,
+  });
+
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
     [matches],
@@ -432,6 +450,14 @@ function EventPage() {
                 </InlineIcon>
               </TabsTrigger>
             )}
+          {event.event_type === EventType.REGIONAL && (
+            <TabsTrigger value="champs-qual-points">
+              <InlineIcon>
+                <ChampsQualPointsIcon />
+                Champs Qual Points
+              </InlineIcon>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MediaIcon />
@@ -510,6 +536,19 @@ function EventPage() {
               />
             </TabsContent>
           )}
+
+        {event.event_type === EventType.REGIONAL && (
+          <TabsContent value="champs-qual-points">
+            <ChampsQualPointsTab
+              teams={teamsQuery.data ?? []}
+              champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
+              advancement={regionalAdvancementQuery.data ?? null}
+              eventKey={eventKey}
+              eventWeek={event.week}
+              year={event.year}
+            />
+          </TabsContent>
+        )}
 
         <TabsContent value="media">
           <MediaTab webcasts={event.webcasts} eventKey={event.key} />
@@ -1016,6 +1055,147 @@ function DistrictPointsTab({
       total: points.total,
     }))
     .sort((a, b) => b.total - a.total);
+
+  return <DataTable columns={columns} data={data} />;
+}
+
+function ChampsQualPointsTab({
+  teams,
+  champsPoolPoints,
+  advancement,
+  eventKey,
+  eventWeek,
+  year,
+}: {
+  teams: Team[];
+  champsPoolPoints: EventDistrictPoints | null;
+  advancement: { [key: string]: RegionalAdvancement } | null;
+  eventKey: string;
+  eventWeek: number | null;
+  year: number;
+}) {
+  type RowData = {
+    teamKey: string;
+    qualPoints: number;
+    elimPoints: number;
+    alliancePoints: number;
+    awardPoints: number;
+    total: number;
+    advancement: RegionalAdvancement | null;
+  };
+
+  const hasPoints = champsPoolPoints !== null;
+
+  const columns: ColumnDef<RowData>[] = [
+    {
+      header: 'Team',
+      accessorFn: (row) => row.teamKey,
+      cell: (cell) => (
+        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
+          {cell.getValue<string>().substring(3)}
+        </TeamLink>
+      ),
+    },
+    ...(hasPoints
+      ? ([
+          { header: 'Qual', accessorFn: (row) => row.qualPoints },
+          { header: 'Playoff', accessorFn: (row) => row.elimPoints },
+          { header: 'Alliance', accessorFn: (row) => row.alliancePoints },
+          { header: 'Award', accessorFn: (row) => row.awardPoints },
+          { header: 'Total', accessorFn: (row) => row.total },
+        ] satisfies ColumnDef<RowData>[])
+      : []),
+    {
+      header: 'CMP Advancement',
+      accessorFn: (row) => row.advancement,
+      cell: (cell) => {
+        const adv = cell.getValue<RegionalAdvancement | null>();
+        if (!adv) return null;
+        if (adv.cmp_status === 'PreQualified') {
+          return (
+            <Badge variant="secondary" className="whitespace-nowrap">
+              Pre-Qualified
+            </Badge>
+          );
+        }
+        if (adv.cmp_status === 'EventQualified') {
+          if (eventWeek !== null && adv.qualifying_pool_week !== undefined) {
+            if (adv.qualifying_pool_week != eventWeek + 1) {
+              return (
+                <Badge variant="secondary" className="whitespace-nowrap">
+                  {adv.qualifying_event ? (
+                    <EventLink eventOrKey={adv.qualifying_event}>
+                      {adv.qualifying_event} (W{adv.qualifying_pool_week})
+                    </EventLink>
+                  ) : (
+                    `Wk ${adv.qualifying_pool_week}`
+                  )}
+                </Badge>
+              );
+            }
+          } else if (adv.qualifying_event !== eventKey) {
+            return (
+              <Badge variant="secondary" className="whitespace-nowrap">
+                {adv.qualifying_event ? (
+                  <EventLink eventOrKey={adv.qualifying_event}>
+                    {adv.qualifying_event}
+                  </EventLink>
+                ) : (
+                  'Qualified'
+                )}
+              </Badge>
+            );
+          }
+          return (
+            <Badge variant="default" className="whitespace-nowrap">
+              {adv.qualifying_award_name ?? 'Event Qualified'}
+            </Badge>
+          );
+        }
+        if (adv.cmp_status === 'PoolQualified') {
+          const isPast =
+            eventWeek !== null &&
+            adv.qualifying_pool_week !== undefined &&
+            adv.qualifying_pool_week < eventWeek + 1;
+          return (
+            <Badge
+              variant={isPast ? 'secondary' : 'default'}
+              className="whitespace-nowrap"
+            >
+              Wk {adv.qualifying_pool_week} Pool
+            </Badge>
+          );
+        }
+        if (adv.cmp_status === 'Declined') {
+          return (
+            <Badge variant="secondary" className="whitespace-nowrap">
+              Declined
+            </Badge>
+          );
+        }
+        return null;
+      },
+    },
+  ];
+
+  const data = teams
+    .map((team) => {
+      const points = champsPoolPoints?.points[team.key];
+      return {
+        teamKey: team.key,
+        qualPoints: points?.qual_points ?? 0,
+        elimPoints: points?.elim_points ?? 0,
+        alliancePoints: points?.alliance_points ?? 0,
+        awardPoints: points?.award_points ?? 0,
+        total: points?.total ?? 0,
+        advancement: advancement?.[team.key] ?? null,
+      };
+    })
+    .sort((a, b) =>
+      hasPoints
+        ? b.total - a.total
+        : parseInt(a.teamKey.substring(3)) - parseInt(b.teamKey.substring(3)),
+    );
 
   return <DataTable columns={columns} data={data} />;
 }
