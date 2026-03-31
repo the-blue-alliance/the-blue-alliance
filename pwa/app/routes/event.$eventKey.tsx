@@ -116,6 +116,7 @@ import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
   getEventDateString,
+  hasEventEnded,
   isValidEventKey,
 } from '~/lib/eventUtils';
 import {
@@ -295,7 +296,8 @@ function EventPage() {
     [matches],
   );
 
-  const shouldPreviewAwardsTab = SEASON_EVENT_TYPES.has(event.event_type);
+  const shouldPreviewAwardsTab =
+    SEASON_EVENT_TYPES.has(event.event_type) && hasEventEnded(event);
   const shouldPreviewInsightsTab = matches.length > 0;
   const shouldPreviewRankingsTab = matches.length > 0;
 

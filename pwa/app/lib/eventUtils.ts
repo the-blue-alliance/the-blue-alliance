@@ -266,3 +266,19 @@ export function isEventWithinDays(
 export function isEventWithinADay(event: Event): boolean {
   return isEventWithinDays(event, -1, 1);
 }
+
+/**
+ * Returns true if the event's last day (end_date) is today or in the past.
+ * "Today" is evaluated in both the event's timezone and the user's timezone —
+ * the condition is met when end_date has been reached in either.
+ */
+export function hasEventEnded(event: Event): boolean {
+  if (!event.end_date) return false;
+  const endDate = Temporal.PlainDate.from(event.end_date);
+  const eventTz = getEventTz(event);
+  const todayInEventTz = Temporal.Now.plainDateISO(eventTz);
+  if (Temporal.PlainDate.compare(endDate, todayInEventTz) <= 0) return true;
+  const userTz = Temporal.Now.timeZoneId();
+  const todayInUserTz = Temporal.Now.plainDateISO(userTz);
+  return Temporal.PlainDate.compare(endDate, todayInUserTz) <= 0;
+}

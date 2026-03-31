@@ -6,6 +6,7 @@ import {
   getCurrentWeekEvents,
   getEventDateString,
   getEventWeekString,
+  hasEventEnded,
   isEventActive,
   isEventWithinDays,
   isValidEventKey,
@@ -507,6 +508,67 @@ describe('getCurrentWeekEvents 8am-6pm window', () => {
     } as Event;
 
     expect(getCurrentWeekEvents([noTzEvent])).toContain(noTzEvent);
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+});
+
+describe('hasEventEnded', () => {
+  function makeEvent(end_date: string, timezone?: string): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { end_date, timezone };
+  }
+
+  test('returns true when end_date is in the past', () => {
+    vi.useFakeTimers();
+    // April 15 in both event tz and user tz — end_date April 12 is past
+    vi.setSystemTime(new Date('2024-04-15T14:00:00Z'));
+    expect(hasEventEnded(makeEvent('2024-04-12', 'America/New_York'))).toBe(
+      true,
+    );
+    vi.useRealTimers();
+  });
+
+  test('returns true when end_date is today in event timezone', () => {
+    vi.useFakeTimers();
+    // April 12 12:00 Eastern = April 12 16:00 UTC — today in event tz is April 12
+    vi.setSystemTime(new Date('2024-04-12T16:00:00Z'));
+    expect(hasEventEnded(makeEvent('2024-04-12', 'America/New_York'))).toBe(
+      true,
+    );
+    vi.useRealTimers();
+  });
+
+  test('returns false when end_date has not yet arrived in either timezone', () => {
+    vi.useFakeTimers();
+    // April 10 in both timezones — end_date April 12 is in the future
+    vi.setSystemTime(new Date('2024-04-10T14:00:00Z'));
+    expect(hasEventEnded(makeEvent('2024-04-12', 'America/New_York'))).toBe(
+      false,
+    );
+    vi.useRealTimers();
+  });
+
+  test('returns true when end_date is today in user timezone but not yet in event timezone', () => {
+    vi.useFakeTimers();
+    vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue('Pacific/Auckland'); // UTC+12
+    // April 12 08:00 UTC = April 12 20:00 Auckland (today=Apr12) but April 11 23:00 Hawaii (today=Apr11)
+    vi.setSystemTime(new Date('2024-04-12T08:00:00Z'));
+    expect(hasEventEnded(makeEvent('2024-04-12', 'Pacific/Honolulu'))).toBe(
+      true,
+    );
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
+  test('returns true when end_date is today in event timezone but not yet in user timezone', () => {
+    vi.useFakeTimers();
+    vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue('Pacific/Honolulu'); // UTC-10
+    // April 12 08:00 UTC = April 12 20:00 Auckland (event today=Apr12) but April 11 22:00 Hawaii (user today=Apr11)
+    vi.setSystemTime(new Date('2024-04-12T08:00:00Z'));
+    expect(hasEventEnded(makeEvent('2024-04-12', 'Pacific/Auckland'))).toBe(
+      true,
+    );
     vi.restoreAllMocks();
     vi.useRealTimers();
   });
