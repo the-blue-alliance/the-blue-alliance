@@ -5,6 +5,7 @@ from typing import Any, Dict, List, Optional
 from flask import abort
 from google.appengine.api.blobstore import blobstore_stub
 
+from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.environment import Environment
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
@@ -25,34 +26,39 @@ def api_history(event_key: EventKey) -> str:
     if not event:
         abort(404)
 
+    # Resolve special event codes (e.g. "arpky" -> "arc") for FRC API paths
+    frc_event_code = EVENT_CODE_EXCEPTIONS.get(event.event_short, (event.event_short,))[
+        0
+    ]
+
     # Get FRC API histories for various endpoints (uses default project bucket)
     frc_api_data = {
         "alliances": _get_storage_files(
-            event, f"frc-api-response/v3.0/{event.year}/alliances/{event.event_short}/"
+            event, f"frc-api-response/v3.0/{event.year}/alliances/{frc_event_code}/"
         ),
         "event_details": _get_storage_files(
             event,
-            f"frc-api-response/v3.0/{event.year}/events?eventCode={event.event_short}/",
+            f"frc-api-response/v3.0/{event.year}/events?eventCode={frc_event_code}/",
         ),
         "schedule_qual": _get_storage_files(
             event,
-            f"frc-api-response/v3.0/{event.year}/schedule/{event.event_short}/qual/hybrid/",
+            f"frc-api-response/v3.0/{event.year}/schedule/{frc_event_code}/qual/hybrid/",
         ),
         "schedule_playoff": _get_storage_files(
             event,
-            f"frc-api-response/v3.0/{event.year}/schedule/{event.event_short}/playoff/hybrid/",
+            f"frc-api-response/v3.0/{event.year}/schedule/{frc_event_code}/playoff/hybrid/",
         ),
         "scores_qual": _get_storage_files(
             event,
-            f"frc-api-response/v3.0/{event.year}/scores/{event.event_short}/qual/",
+            f"frc-api-response/v3.0/{event.year}/scores/{frc_event_code}/qual/",
         ),
         "scores_playoff": _get_storage_files(
             event,
-            f"frc-api-response/v3.0/{event.year}/scores/{event.event_short}/playoff/",
+            f"frc-api-response/v3.0/{event.year}/scores/{frc_event_code}/playoff/",
         ),
         "awards": _get_storage_files(
             event,
-            f"frc-api-response/v3.0/{event.year}/awards/event/{event.event_short}/",
+            f"frc-api-response/v3.0/{event.year}/awards/event/{frc_event_code}/",
         ),
     }
 

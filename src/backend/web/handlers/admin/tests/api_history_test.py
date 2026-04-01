@@ -255,6 +255,42 @@ def test_api_history_storage_error(
     assert "No responses found" in content
 
 
+@patch("backend.web.handlers.admin.api_history.Environment.project")
+@patch("backend.web.handlers.admin.api_history.Environment.is_dev")
+@patch("backend.web.handlers.admin.api_history.get_files")
+def test_api_history_event_code_exception(
+    mock_get_files: Mock,
+    mock_is_dev: Mock,
+    mock_project: Mock,
+    web_client: Client,
+    login_gae_admin,
+) -> None:
+    """Test that FRC API paths use the resolved event code for events with code exceptions"""
+    helpers.preseed_event("2020arpky")
+    mock_is_dev.return_value = False
+    mock_project.return_value = "testbed-test"
+    mock_get_files.return_value = []
+
+    resp = web_client.get("/admin/api_history/2020arpky")
+    assert resp.status_code == 200
+
+    # Collect all FRC API path calls (no bucket = default project bucket)
+    frc_api_calls = [
+        call
+        for call in mock_get_files.call_args_list
+        if call.kwargs.get("bucket") is None
+        or call.kwargs.get("bucket") == "testbed-test.appspot.com"
+    ]
+
+    # All FRC API paths should use the resolved code "arc", not the raw event_short "arpky"
+    for call in frc_api_calls:
+        path = call.args[0] if call.args else call.kwargs.get("path", "")
+        assert (
+            "arpky" not in path
+        ), f"Expected resolved code 'arc' but found 'arpky' in path: {path}"
+        assert "arc" in path, f"Expected resolved code 'arc' in path: {path}"
+
+
 def test_api_history_has_tabs(web_client: Client, login_gae_admin) -> None:
     """Test that all four tabs are present in the template"""
     helpers.preseed_event("2020nyny")
