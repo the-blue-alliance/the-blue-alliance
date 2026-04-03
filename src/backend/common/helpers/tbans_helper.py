@@ -6,10 +6,7 @@ import time
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
 
-from backend.common.consts.client_type import (
-    ClientType,
-    FCM_CLIENTS,
-)
+from backend.common.consts.client_type import ClientType, FCM_CLIENTS
 from backend.common.consts.notification_type import (
     ENABLED_EVENT_NOTIFICATIONS,
     ENABLED_MATCH_NOTIFICATIONS,
@@ -29,13 +26,9 @@ from backend.common.models.notifications.district_points import (
     DistrictPointsNotification,
 )
 from backend.common.models.notifications.event_level import EventLevelNotification
-from backend.common.models.notifications.event_schedule import (
-    EventScheduleNotification,
-)
+from backend.common.models.notifications.event_schedule import EventScheduleNotification
 from backend.common.models.notifications.match_score import MatchScoreNotification
-from backend.common.models.notifications.match_upcoming import (
-    MatchUpcomingNotification,
-)
+from backend.common.models.notifications.match_upcoming import MatchUpcomingNotification
 from backend.common.models.notifications.match_video import MatchVideoNotification
 from backend.common.models.notifications.mytba import (
     FavoritesUpdatedNotification,
@@ -565,7 +558,7 @@ class TBANSHelper:
             tzinfo=None
         )
 
-        task_name = f"{match_key}_match_upcoming_{int(now.timestamp())}"
+        task_name = f"{match_key}_match_upcoming"
 
         if match.time is not None and match.time + MATCH_UPCOMING_MINUTES > now:
             eta = match.time + MATCH_UPCOMING_MINUTES
@@ -907,8 +900,8 @@ class TBANSHelper:
 
             # Handle our failed sends - this might include logging/alerting, removing old clients, or retrying sends
             from firebase_admin.exceptions import (
-                InvalidArgumentError,
                 InternalError,
+                InvalidArgumentError,
                 UnavailableError,
             )
             from firebase_admin.messaging import (

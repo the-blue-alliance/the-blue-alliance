@@ -18,14 +18,10 @@ from firebase_admin.messaging import (
     ThirdPartyAuthError,
     UnregisteredError,
 )
-from google.appengine.ext import ndb
-from google.appengine.ext import testbed
+from google.appengine.ext import ndb, testbed
 
 from backend.common.consts.award_type import AwardType
-from backend.common.consts.client_type import (
-    ClientType,
-    FCM_CLIENTS,
-)
+from backend.common.consts.client_type import ClientType, FCM_CLIENTS
 from backend.common.consts.client_type import NAMES as CLIENT_TYPE_NAMES
 from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
@@ -46,29 +42,17 @@ from backend.common.models.notifications.alliance_selection import (
     AllianceSelectionNotification,
 )
 from backend.common.models.notifications.awards import AwardsNotification
-from backend.common.models.notifications.event_level import (
-    EventLevelNotification,
-)
-from backend.common.models.notifications.event_schedule import (
-    EventScheduleNotification,
-)
-from backend.common.models.notifications.match_score import (
-    MatchScoreNotification,
-)
-from backend.common.models.notifications.match_upcoming import (
-    MatchUpcomingNotification,
-)
-from backend.common.models.notifications.match_video import (
-    MatchVideoNotification,
-)
+from backend.common.models.notifications.event_level import EventLevelNotification
+from backend.common.models.notifications.event_schedule import EventScheduleNotification
+from backend.common.models.notifications.match_score import MatchScoreNotification
+from backend.common.models.notifications.match_upcoming import MatchUpcomingNotification
+from backend.common.models.notifications.match_video import MatchVideoNotification
 from backend.common.models.notifications.mytba import (
     FavoritesUpdatedNotification,
     SubscriptionsUpdatedNotification,
 )
 from backend.common.models.notifications.requests.fcm_request import FCMRequest
-from backend.common.models.notifications.requests.webhook_request import (
-    WebhookRequest,
-)
+from backend.common.models.notifications.requests.webhook_request import WebhookRequest
 from backend.common.models.notifications.tests.mocks.notifications.mock_notification import (
     MockNotification,
 )
@@ -1356,8 +1340,7 @@ class TestTBANSHelper(unittest.TestCase):
 
     def test_schedule_upcoming_match_send(self):
         # Even when match time is in the past / None, the notification is
-        # dispatched via a deferred task (with eta=now). The task name includes
-        # a unix timestamp for observability.
+        # dispatched via a deferred task (with eta=now).
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 0
 
@@ -1365,7 +1348,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 1
-        assert "_match_upcoming_" in tasks[0].name
+        assert tasks[0].name.endswith("_match_upcoming")
 
         with patch.object(TBANSHelper, "match_upcoming") as mock_match_upcoming:
             run_from_task(tasks[0])
@@ -1383,7 +1366,7 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper.schedule_upcoming_match(self.match.key_name)
             TBANSHelper.schedule_upcoming_match(self.match.key_name)
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
-        assert len(tasks) == 2
+        assert len(tasks) == 1
 
     def test_schedule_upcoming_match_defer(self):
         # Sanity check - make sure there are no existing tasks in the queue
@@ -1399,7 +1382,7 @@ class TestTBANSHelper(unittest.TestCase):
 
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
         assert len(tasks) == 1
-        assert "_match_upcoming_" in tasks[0].name
+        assert tasks[0].name.endswith("_match_upcoming")
 
         # Make sure our taskqueue tasks execute what we expect
         with patch.object(TBANSHelper, "match_upcoming") as mockmatch_upcoming:
