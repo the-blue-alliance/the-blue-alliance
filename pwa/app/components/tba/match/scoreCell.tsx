@@ -4,34 +4,37 @@ import { Match } from '~/api/tba/read';
 import RpDots from '~/components/tba/rpDot';
 import { cn } from '~/lib/utils';
 
-const scoreCellVariants = cva('relative flex items-center justify-center', {
-  variants: {
-    winner: {
-      true: 'font-semibold',
-      false: '',
+const scoreCellVariants = cva(
+  'relative flex items-center justify-center tabular-nums',
+  {
+    variants: {
+      winner: {
+        true: 'font-semibold',
+        false: '',
+      },
+      allianceColor: {
+        red: 'bg-alliance-red-cell',
+        blue: 'bg-alliance-blue-cell',
+      },
     },
-    allianceColor: {
-      red: 'bg-alliance-red-cell',
-      blue: 'bg-alliance-blue-cell',
+    compoundVariants: [
+      {
+        winner: true,
+        allianceColor: 'red',
+        className: 'bg-alliance-red-cell-winner',
+      },
+      {
+        winner: true,
+        allianceColor: 'blue',
+        className: 'bg-alliance-blue-cell-winner',
+      },
+    ],
+    defaultVariants: {
+      winner: false,
+      allianceColor: undefined,
     },
   },
-  compoundVariants: [
-    {
-      winner: true,
-      allianceColor: 'red',
-      className: 'bg-alliance-red-cell-winner',
-    },
-    {
-      winner: true,
-      allianceColor: 'blue',
-      className: 'bg-alliance-blue-cell-winner',
-    },
-  ],
-  defaultVariants: {
-    winner: false,
-    allianceColor: undefined,
-  },
-});
+);
 
 interface ScoreCellProps
   extends

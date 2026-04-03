@@ -152,6 +152,20 @@ test.describe('/team/604/2024', () => {
     await expect(sunsetSection.getByText('Finalist')).toBeVisible();
   });
 
+  test('Watch all videos button', async ({ page }) => {
+    const buttons = page.getByRole('link', { name: 'Watch All Videos' });
+    const count = await buttons.count();
+    expect(count).toBeGreaterThan(0);
+
+    for (let i = 0; i < count; i++) {
+      const href = await buttons.nth(i).getAttribute('href');
+      expect(href).toMatch(
+        /^https:\/\/www\.youtube\.com\/watch_videos\?video_ids=[\w,-]+&title=.+$/,
+      );
+      await expect(buttons.nth(i)).toHaveAttribute('target', '_blank');
+    }
+  });
+
   test('Stats summary', async ({ page }) => {
     await expect(page.locator('body')).toContainText(
       'Team 604 was 58-10-1 in official play and 78-21-1 overall in 2024.',

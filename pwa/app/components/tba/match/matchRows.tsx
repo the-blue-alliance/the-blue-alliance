@@ -108,7 +108,7 @@ export function MatchRow({
     <div
       className="mx-auto grid w-full max-w-6xl
         grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2em_2em] gap-0.5 text-sm
-        xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
+        tabular-nums xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
     >
       {/* Play Button */}
       <div
@@ -237,7 +237,7 @@ export function SimpleMatchRow({
       {/* 3x4 grid with header row */}
       <div
         className="mx-auto grid w-full max-w-6xl grid-cols-[repeat(4,1fr)]
-          grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm"
+          grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm tabular-nums"
       >
         {/* Header: Teams */}
         <div
