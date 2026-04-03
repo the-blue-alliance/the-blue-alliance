@@ -171,6 +171,11 @@ cron:
     url: /tasks/enqueue/update_all_team_search_index
     schedule: every monday 04:00
 
+  - description: Daily Parquet Export
+    url: /tasks/enqueue/parquet_export/dispatch
+    schedule: every day 04:00
+    timezone: America/Los_Angeles
+
   - description: Archive Old API Keys
     url: /tasks/do/archive_api_keys
     schedule: 1 of jan 1:00

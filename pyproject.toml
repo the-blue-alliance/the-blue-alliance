@@ -28,6 +28,9 @@ dependencies = [
     "typing-extensions==4.15.0",
     "tzlocal==5.3.1",
     "Werkzeug==3.1.6",
+    "boto3==1.38.29",
+    "pandas==2.3.0",
+    "pyarrow==20.0.0",
 ]
 
 [dependency-groups]
