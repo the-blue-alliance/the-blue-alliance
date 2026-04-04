@@ -737,6 +737,18 @@ class TestTBANSHelper(unittest.TestCase):
             TBANSHelper.match_upcoming(self.match.key_name)
             mock_send.assert_not_called()
 
+    def test_match_upcoming_duplicate_sends_only_once(self):
+        """Two concurrent calls to match_upcoming should only send once."""
+        assert not self.match.push_sent
+
+        with patch.object(TBANSHelper, "_batch_send_subscriptions"):
+            TBANSHelper.match_upcoming(self.match.key_name)
+            TBANSHelper.match_upcoming(self.match.key_name)
+
+        updated_match = Match.get_by_id(self.match.key_name)
+        assert updated_match is not None
+        assert updated_match.push_sent
+
     def test_match_upcoming_match_not_found(self):
         with patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send:
             TBANSHelper.match_upcoming("2020nonexistent_qm99")
@@ -789,7 +801,9 @@ class TestTBANSHelper(unittest.TestCase):
             notifications = [call[0][1] for call in mock_send.call_args_list]
             for notification in notifications:
                 assert isinstance(notification, MatchUpcomingNotification)
-                assert notification.match == self.match
+                # Compare by key: match_upcoming() sets push_sent=True after
+                # claiming, which updates the `updated` auto-now field.
+                assert notification.match.key == self.match.key
             # Check frc7332 notification
             notification = notifications[1]
             assert notification.team == self.team

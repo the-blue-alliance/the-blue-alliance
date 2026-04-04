@@ -5,6 +5,7 @@ import time
 
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
+from google.appengine.ext import ndb
 
 from backend.common.consts.client_type import (
     ClientType,
@@ -370,22 +371,26 @@ class TBANSHelper:
         for match in next_matches:
             cls.schedule_upcoming_match(match.key_name)
 
-    @classmethod
-    def match_upcoming(cls, match_key: str) -> None:
+    @staticmethod
+    @ndb.transactional()
+    def _claim_upcoming_send(match_key: str) -> Match | None:
+        """Atomically check and claim the right to send an upcoming match
+        notification. Returns the Match if this caller won the race,
+        or None if the notification was already sent (push_sent=True)."""
         match = Match.get_by_id(match_key)
         if match is None:
-            return
-
-        # Guard against duplicate sends — multiple code paths can schedule
-        # the same upcoming match (e.g. at comp-level boundaries in double
-        # elimination). push_sent is persisted so it survives across tasks.
+            return None
         if match.push_sent:
-            return
-
-        from backend.common.manipulators.match_manipulator import MatchManipulator
-
+            return None
         match.push_sent = True
-        MatchManipulator.createOrUpdate(match, run_post_update_hook=False)
+        match.put()
+        return match
+
+    @classmethod
+    def match_upcoming(cls, match_key: str) -> None:
+        match = cls._claim_upcoming_send(match_key)
+        if match is None:
+            return
 
         # Send to Event subscribers
         event_subscriptions_future = None
