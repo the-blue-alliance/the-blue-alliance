@@ -187,6 +187,11 @@ def team_details(team_key: TeamKey) -> Response:
     ).fetch()
     et_years = {et_key.year for et_key in et_keys}
 
+    # The API confirmed this team is in a district for this year, so
+    # treat it as a valid year even if EventTeams don't exist yet
+    if district_team:
+        et_years.add(district_team.year)
+
     for dt_key in dt_keys:
         if dt_key.year not in et_years:
             keys_to_delete.add(dt_key.key)

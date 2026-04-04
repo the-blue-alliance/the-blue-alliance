@@ -264,6 +264,34 @@ def test_fetch_team_removes_bad_district_teams(api_mock, tasks_client: Client) -
     assert Robot.query().fetch() == []
 
 
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_keeps_district_team_without_eventteams(
+    api_mock, tasks_client: Client
+) -> None:
+    # Simulate the race condition: a team is in a district but has no EventTeam
+    # records yet (e.g., their events haven't been synced). The rolling team
+    # details cron should NOT delete the DistrictTeam for the current year.
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc6921", team_number=6921),
+            DistrictTeam(
+                id="2026fma_frc6921",
+                team=ndb.Key(Team, "frc6921"),
+                year=2026,
+                district_key=ndb.Key(District, "2026fma"),
+            ),
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc6921")
+    assert resp.status_code == 200
+
+    # DistrictTeam should be preserved even without EventTeam records
+    assert Team.get_by_id("frc6921") is not None
+    assert DistrictTeam.get_by_id("2026fma_frc6921") is not None
+
+
 def test_fetch_team_avatar_bad_key(tasks_client: Client) -> None:
     resp = tasks_client.get("/backend-tasks/get/team_avatar/asdf")
     assert resp.status_code == 400
