@@ -24,6 +24,7 @@ class NotificationType(enum.IntEnum):
     BROADCAST = 10  # Gives functionality for admins to send to many devices
     MATCH_VIDEO = 11
     EVENT_MATCH_VIDEO = 12  # Not user exposed
+    EVENT_TEAMS_UPDATED = 13
 
     # These aren't notifications, but used for upstream API calls
     UPDATE_FAVORITES = 100
@@ -50,6 +51,7 @@ TYPE_NAMES: Dict[NotificationType, str] = {
     NotificationType.UPDATE_FAVORITES: "update_favorites",
     NotificationType.UPDATE_SUBSCRIPTIONS: "update_subscriptions",
     NotificationType.VERIFICATION: "verification",
+    NotificationType.EVENT_TEAMS_UPDATED: "event_teams_updated",
 }
 
 
@@ -65,6 +67,7 @@ RENDER_NAMES: Dict[NotificationType, str] = {
     NotificationType.FINAL_RESULTS: "Final Results",
     NotificationType.MATCH_VIDEO: "Match Video Added",
     NotificationType.EVENT_MATCH_VIDEO: "Match Video Added",
+    NotificationType.EVENT_TEAMS_UPDATED: "Event Teams Updated",
 }
 
 
@@ -83,6 +86,7 @@ TYPES: Dict[str, NotificationType] = {
     "update_favorites": NotificationType.UPDATE_FAVORITES,
     "update_subscriptions": NotificationType.UPDATE_SUBSCRIPTIONS,
     "verification": NotificationType.VERIFICATION,
+    "event_teams_updated": NotificationType.EVENT_TEAMS_UPDATED,
 }
 
 
@@ -96,6 +100,9 @@ ENABLED_NOTIFICATIONS: Dict[NotificationType, str] = {
     ],
     NotificationType.AWARDS: RENDER_NAMES[NotificationType.AWARDS],
     NotificationType.SCHEDULE_UPDATED: RENDER_NAMES[NotificationType.SCHEDULE_UPDATED],
+    NotificationType.EVENT_TEAMS_UPDATED: RENDER_NAMES[
+        NotificationType.EVENT_TEAMS_UPDATED
+    ],
 }
 
 
@@ -107,6 +114,7 @@ ENABLED_EVENT_NOTIFICATIONS: Set[NotificationType] = {
     NotificationType.AWARDS,
     NotificationType.SCHEDULE_UPDATED,
     NotificationType.MATCH_VIDEO,
+    NotificationType.EVENT_TEAMS_UPDATED,
 }
 
 
@@ -116,6 +124,7 @@ ENABLED_TEAM_NOTIFICATIONS: Set[NotificationType] = {
     NotificationType.ALLIANCE_SELECTION,
     NotificationType.AWARDS,
     NotificationType.MATCH_VIDEO,
+    NotificationType.EVENT_TEAMS_UPDATED,
 }
 
 

@@ -1,9 +1,13 @@
 import unittest
 
+from typing import Optional
+
 import pytest
 from google.appengine.ext import ndb
+from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
+from backend.common.helpers.deferred import run_from_task
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
@@ -16,6 +20,12 @@ from backend.common.models.team import Team
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 class TestTeamManipulator(unittest.TestCase):
+    taskqueue_stub: Optional[testbed.taskqueue_stub.TaskQueueServiceStub] = None
+
+    @pytest.fixture(autouse=True)
+    def store_taskqueue_stub(self, taskqueue_stub):
+        self.taskqueue_stub = taskqueue_stub
+
     def setUp(self):
         self.old_team = EventTeam(
             id="2010cmp_frc177",
@@ -66,3 +76,66 @@ class TestTeamManipulator(unittest.TestCase):
         self.assertMergedEventTeam(
             EventTeamManipulator.updateMerge(self.new_team, self.old_team)
         )
+
+    def test_postUpdateHook_notifications(self):
+        EventTeamManipulator.createOrUpdate(self.old_team)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names=["post-update-hooks"]
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            run_from_task(task)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names=["push-notifications"]
+        )
+        assert len(tasks) == 1
+
+    def test_postUpdateHook_ignore_updates(self):
+        self.old_team.put()
+
+        self.old_team.status = EventTeamStatus(
+            qual=None,
+            playoff=None,
+            alliance=EventTeamStatusAlliance(
+                name=None,
+                number=1,
+                pick=1,
+                backup=None,
+            ),
+        )
+
+        EventTeamManipulator.createOrUpdate(self.old_team)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names=["post-update-hooks"]
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            run_from_task(task)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names=["push-notifications"]
+        )
+        assert len(tasks) == 0
+
+    def test_postDeleteHook_notifications(self):
+        self.old_team.put()
+
+        EventTeamManipulator.delete(self.old_team)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names=["post-update-hooks"]
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            run_from_task(task)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names=["push-notifications"]
+        )
+        assert len(tasks) == 1
