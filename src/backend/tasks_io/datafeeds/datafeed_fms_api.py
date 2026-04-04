@@ -289,7 +289,7 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_event_alliances(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, List[EventAlliance]]:
+    ) -> Generator[Any, Any, Optional[List[EventAlliance]]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -298,16 +298,14 @@ class DatafeedFMSAPI:
         api_response: TypedURLFetchResult[AllianceListModelV2] = (
             yield self.api.alliances(year, api_event_short)
         )
-        alliances = (
-            self._parse(api_response, FMSAPIEventAlliancesParser(), event_key=event_key)
-            or []
+        return self._parse(
+            api_response, FMSAPIEventAlliancesParser(), event_key=event_key
         )
-        return alliances
 
     @typed_tasklet
     def get_event_rankings(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, List[EventRanking]]:
+    ) -> Generator[Any, Any, Optional[List[EventRanking]]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -316,10 +314,9 @@ class DatafeedFMSAPI:
         api_response: TypedURLFetchResult[EventRankingListModelV2] = (
             yield self.api.rankings(year, api_event_short)
         )
-        result = self._parse(
+        return self._parse(
             api_response, FMSAPIEventRankingsParser(year), event_key=event_key
         )
-        return result or []
 
     @typed_tasklet
     def get_event_matches(

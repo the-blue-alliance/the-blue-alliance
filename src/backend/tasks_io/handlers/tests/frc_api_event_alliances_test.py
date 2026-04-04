@@ -173,6 +173,26 @@ def test_get_no_alliances(fmsapi_event_alliances_mock, tasks_client: Client) -> 
 
 
 @mock.patch.object(DatafeedFMSAPI, "get_event_alliances")
+def test_get_none_alliances_does_not_overwrite_existing(
+    fmsapi_event_alliances_mock, tasks_client: Client
+) -> None:
+    create_event(official=True)
+    existing_alliances = [EventAlliance(picks=["frc254", "frc971", "frc118"])]
+    EventDetails(id="2020nyny", alliance_selections=existing_alliances).put()
+
+    fmsapi_event_alliances_mock.return_value = InstantFuture(None)
+
+    resp = tasks_client.get("/tasks/get/fmsapi_event_alliances/2020nyny")
+    assert resp.status_code == 200
+    assert b"Failed to fetch alliances" in resp.data
+
+    # Existing alliances should be preserved when API returns None (failure)
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == existing_alliances
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_alliances")
 def test_get_no_events_no_output_in_taskqueue(
     fmsapi_event_alliances_mock, tasks_client: Client
 ) -> None:

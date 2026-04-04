@@ -601,17 +601,20 @@ def event_alliances(event_key: EventKey) -> Response:
 
     alliance_selections = df.get_event_alliances(event_key).get_result()
 
-    if event and event.remap_teams:
-        EventRemapTeamsHelper.remapteams_alliances(
-            alliance_selections, event.remap_teams
-        )
+    if alliance_selections is not None:
+        if event and event.remap_teams:
+            EventRemapTeamsHelper.remapteams_alliances(
+                alliance_selections, event.remap_teams
+            )
 
-    event_details = EventDetails(id=event_key, alliance_selections=alliance_selections)
-    EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
+        event_details = EventDetails(
+            id=event_key, alliance_selections=alliance_selections
+        )
+        EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
 
     template_values = {
         "alliance_selections": alliance_selections,
-        "event_name": event_details.key.id(),
+        "event_name": event_key,
     }
 
     if (
@@ -675,13 +678,14 @@ def event_rankings(event_key: EventKey) -> Response:
 
     rankings2 = df.get_event_rankings(event_key).get_result()
 
-    if event and event.remap_teams:
-        EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
+    if rankings2 is not None:
+        if event and event.remap_teams:
+            EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
 
-    event_details = EventDetails(id=event_key, rankings2=rankings2)
-    EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
+        event_details = EventDetails(id=event_key, rankings2=rankings2)
+        EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
 
-    template_values = {"rankings": rankings2, "event_name": event_details.key.id()}
+    template_values = {"rankings": rankings2, "event_name": event_key}
 
     if (
         "X-Appengine-Taskname" not in request.headers
