@@ -113,3 +113,23 @@ def test_audit_logs_page_lookup_by_kind_id(
     assert b"Team:frc1124" in resp.data
     assert b"auditor@example.com" in resp.data
     assert b"/admin/user/auditor" in resp.data
+
+
+def test_audit_logs_page_lookup_by_match_key(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    target_key = ndb.Key("Match", "2012cmp_qm1")
+    account_key = Account(id="auditor", email="auditor@example.com").put()
+    AuditLogEntry(
+        account=account_key,
+        endpoint="suggestion_review.suggest_match_video_review",
+        target_key=target_key,
+        url_args={},
+        form_params={},
+    ).put()
+
+    resp = web_client.get("/admin/audit_logs?key=Match:2012cmp_qm1")
+    assert resp.status_code == 200
+    assert b"suggestion_review.suggest_match_video_review" in resp.data
+    assert b"Match:2012cmp_qm1" in resp.data
+    assert b"auditor@example.com" in resp.data
