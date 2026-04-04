@@ -11,6 +11,7 @@ from werkzeug.test import Client
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
@@ -273,3 +274,56 @@ def test_review_no_official_webcast_unit_warning_for_non_district(
         if "Official Webcast Unit" in div.get_text()
     ]
     assert len(warnings) == 0
+
+
+def test_accept_creates_audit_log(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+
+    form_fields["verdict"] = "accept"
+    response = web_client.post(
+        "/suggest/event/webcast/review",
+        data=form_fields,
+    )
+    assert response.status_code == 302
+
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.account == login_user_with_permission.account_key
+    assert entry.endpoint == "suggestion_review.suggest_event_webcast_review"
+    assert entry.target_key == ndb.Key("Event", "2016necmp")
+
+
+def test_reject_creates_audit_log(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+) -> None:
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+
+    form_fields["verdict"] = "reject"
+    response = web_client.post(
+        "/suggest/event/webcast/review",
+        data=form_fields,
+    )
+    assert response.status_code == 302
+
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.account == login_user_with_permission.account_key
+    assert entry.endpoint == "suggestion_review.suggest_event_webcast_review"
+    assert entry.target_key == ndb.Key("Event", "2016necmp")

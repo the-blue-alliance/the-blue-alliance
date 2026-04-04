@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask import redirect, request
 from pyre_extensions.refinement import none_throws
 from werkzeug.wrappers import Response
@@ -21,6 +23,10 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
 
     def __init__(self, *args, **kw):
         super(SuggestEventWebcastReviewController, self).__init__(*args, **kw)
+
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        return "Event"
 
     def create_target_model(self, suggestion: Suggestion) -> Event:
         webcast = Webcast(

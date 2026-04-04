@@ -24,6 +24,10 @@ class SuggestEventMediaReviewController(SuggestionsReviewBase[Media]):
     def __init__(self, *args, **kw) -> None:
         super().__init__(*args, **kw)
 
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        return "Team"
+
     """
     View the list of suggestions.
     """

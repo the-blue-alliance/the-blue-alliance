@@ -22,6 +22,10 @@ class SuggestSocialMediaReviewController(SuggestionsReviewBase[Media]):
     def __init__(self, *args, **kw) -> None:
         super(SuggestSocialMediaReviewController, self).__init__(*args, **kw)
 
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        return "Team"
+
     def create_target_model(self, suggestion: Suggestion) -> Optional[Media]:
         # Create a basic Media from this suggestion
         return MediaCreator.from_suggestion(suggestion)

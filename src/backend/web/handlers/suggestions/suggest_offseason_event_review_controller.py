@@ -4,6 +4,7 @@ from difflib import SequenceMatcher
 from typing import List, Optional, Tuple, Union
 
 from flask import redirect, request
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
 
@@ -34,6 +35,10 @@ class SuggestOffseasonEventReviewController(
 
     def __init__(self, *args, **kw):
         super().__init__(*args, **kw)
+
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        return None
 
     def create_target_model(
         self, suggestion: Suggestion
@@ -112,6 +117,15 @@ The Blue Alliance Admins\
 
     def was_create_success(self, ret: Optional[SuggestOffseasonTargetModel]) -> bool:
         return ret is not None and ret.status == "success"
+
+    def _get_accepted_audit_target_key(
+        self,
+        suggestion: Suggestion,
+        ret: Optional[SuggestOffseasonTargetModel],
+    ) -> Optional[ndb.Key]:
+        if ret and ret.event_key:
+            return ndb.Key(Event, ret.event_key)
+        return None
 
     def get(self) -> Response:
         super().get()

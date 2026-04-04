@@ -27,6 +27,10 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
         self.preferred_keys = []
         super(SuggestTeamMediaReviewController, self).__init__(*args, **kw)
 
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        return "Team"
+
     """
     View the list of suggestions.
     """

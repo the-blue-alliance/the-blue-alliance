@@ -24,6 +24,10 @@ class SuggestMatchVideoReviewController(SuggestionsReviewBase[Match]):
     def __init__(self, *args, **kw):
         super(SuggestMatchVideoReviewController, self).__init__(*args, **kw)
 
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        return "Match"
+
     def create_target_model(self, suggestion: Suggestion) -> Optional[Match]:
         target_key = request.form.get(
             "key-{}".format(suggestion.key.id()), suggestion.target_key
