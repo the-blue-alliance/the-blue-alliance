@@ -6,9 +6,13 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
+from backend.common.game_specific.registry import _REGISTRY
 from backend.common.helpers.rankings_helper import RankingsHelper
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+
+NO_RECORD_YEARS = [y for y, g in _REGISTRY.items() if not g.record_in_rankings()]
+QUAL_AVERAGE_YEARS = [y for y, g in _REGISTRY.items() if g.qual_average_in_rankings()]
 
 
 def _create_test_event(event_key: str, event_type: EventType = EventType.REGIONAL):
@@ -25,7 +29,7 @@ def _create_test_event(event_key: str, event_type: EventType = EventType.REGIONA
     e.put()
 
 
-@pytest.mark.parametrize("year", RankingsHelper.NO_RECORD_YEARS)
+@pytest.mark.parametrize("year", NO_RECORD_YEARS)
 def test_build_ranking_no_record(year: int) -> None:
     ranking = RankingsHelper.build_ranking(
         year,
@@ -58,7 +62,7 @@ def test_build_ranking_record() -> None:
     assert ranking["record"] == {"losses": 2, "ties": 3, "wins": 1}
 
 
-@pytest.mark.parametrize("year", RankingsHelper.QUAL_AVERAGE_YEARS)
+@pytest.mark.parametrize("year", QUAL_AVERAGE_YEARS)
 def test_build_ranking_qual_average(year: int) -> None:
     qual_average = 39.18
     ranking = RankingsHelper.build_ranking(

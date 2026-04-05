@@ -1,11 +1,16 @@
 from typing import Dict, Set
 
+from backend.common.game_specific.registry import get_game
 from backend.common.models.keys import Year
 
 """
 Valid breakdowns are those used for seeding. Varies by year.
 For 2014, seeding outlined in Section 5.3.4 in the 2014 manual.
 For 2016+, valid breakdowns match those provided by the FRC API.
+
+The per-year sets below are the source of truth; they live in each season's
+SeasonGameConfig.valid_score_breakdown_keys().  This module delegates to the
+registry and keeps the raw dicts only as documentation / migration reference.
 """
 VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
     2014: set(["auto", "assist", "truss+catch", "teleop_goal+foul"]),
@@ -491,5 +496,4 @@ class ScoreBreakdownKeys:
         """
         Return all valid score breakdown keys for the given year.
         """
-        # return a copy
-        return set(VALID_BREAKDOWNS.get(year, set()))
+        return get_game(year).valid_score_breakdown_keys()

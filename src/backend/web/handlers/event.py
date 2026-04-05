@@ -19,6 +19,7 @@ from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
+from backend.common.game_specific.registry import get_game
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
     DistrictPointTiebreakersSortingHelper,
@@ -449,9 +450,9 @@ def event_detail(event_key: EventKey) -> Response:
         "bracket_table": bracket_table or {},
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
-        "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-            event.year, []
-        ),
+        "playoff_advancement_tiebreakers": get_game(
+            event.year
+        ).round_robin_tiebreaker_names(),
         "district_points_sorted": district_points_sorted,
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "regional_champs_pool_advancement": regional_champs_pool_advancement,

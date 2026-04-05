@@ -27,6 +27,7 @@ from backend.common.consts.event_type import (
     EventType,
     SEASON_EVENT_TYPES,
 )
+from backend.common.game_specific.registry import get_game
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.event import Event
@@ -842,72 +843,7 @@ class PredictionHelper:
         }
         event_key = matches[0].event
         event = event_key.get()
-        relevant_stats: List[Tuple[str, int, int]]
-        if event.year == 2016:
-            relevant_stats = [
-                ("score", 20, 10**2),
-                ("auto_points", 20, 10**2),
-                ("crossings", 0, 1**2),
-                ("boulders", 0, 1**2),
-            ]
-        elif event.year == 2017:
-            relevant_stats = [
-                ("score", 50, 30**2),
-                ("pressure", 0, 1**2),
-                ("gears", 0, 1**2),
-            ]
-        elif event.year == 2018:
-            relevant_stats = [
-                ("score", 50, 30**2),
-                ("auto_points", 0, 1**2),
-                ("endgame_points", 0, 1**2),
-            ]
-        elif event.year == 2019:
-            relevant_stats = [
-                ("score", 10, 20**2),
-                ("rocket_pieces_scored", 1, 3**2),
-                ("hab_climb_points", 2, 3**2),
-            ]
-        elif event.year == 2020:
-            relevant_stats = [
-                ("score", 0, 50**2),
-                ("power_cells_scored", 0, 20**2),
-                ("endgame_points", 0, 20**2),
-            ]
-        elif event.year == 2022:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("cargo_scored", 0, 10**2),
-                ("endgame_points", 0, 10**2),
-            ]
-        elif event.year == 2023:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("links", 0, 3**2),
-                ("charge_station_points", 0, 10**2),
-            ]
-        elif event.year == 2024:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("note_scored", 0, 10**2),
-                ("stage_points", 0, 10**2),
-            ]
-        elif event.year == 2025:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("auto_coral_scored", 0, 2**2),
-                ("coral_scored", 0, 10**2),
-                ("barge_points", 0, 10**2),
-            ]
-        elif event.year == 2026:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("totalAutoPoints", 0, 10**2),
-                ("totalTeleopPoints", 0, 10**2),
-                ("endGameTowerPoints", 0, 10**2),
-            ]
-        else:
-            relevant_stats = []
+        relevant_stats = get_game(event.year).get_prediction_relevant_stats()
 
         contribution_calculators = [
             ContributionCalculator(event, matches, s, m, v)
