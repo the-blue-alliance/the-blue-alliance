@@ -54,6 +54,10 @@ export function getRouter() {
     scrollRestoration: ({ location }) => {
       return location.pathname !== '/apidocs/v3';
     },
+    // Scalar updates window.location.hash as you scroll through API docs; without
+    // this, TanStack Router's hashScrollIntoView causes the page to snap/jump.
+    // TableOfContents uses e.preventDefault() so it's unaffected by this setting.
+    defaultHashScrollIntoView: false,
     caseSensitive: true,
     defaultErrorComponent: ErrorComponent,
     defaultNotFoundComponent: NotFoundComponent,
@@ -83,12 +87,29 @@ export function getRouter() {
   return router;
 }
 
+function isChunkLoadError(error: Error): boolean {
+  return (
+    error instanceof TypeError &&
+    (error.message.includes('error loading dynamically imported module') ||
+      error.message.includes('Failed to fetch dynamically imported module') ||
+      error.message.includes('Importing a module script failed'))
+  );
+}
+
 function ErrorComponent({ error }: { error: Error }) {
   routerLogger.error(error, 'Router error');
 
   useEffect(() => {
+    if (isChunkLoadError(error)) {
+      window.location.reload();
+      return;
+    }
     Sentry.captureException(error);
   }, [error]);
+
+  if (isChunkLoadError(error)) {
+    return null;
+  }
 
   return (
     <div className="py-8">

@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '~/components/ui/accordion';
+import { useTheme } from '~/lib/theme';
 
 export const Route = createFileRoute('/apidocs_/v3')({
   head: () => {
@@ -23,6 +24,7 @@ export const Route = createFileRoute('/apidocs_/v3')({
           content: 'Read API (v3) documentation for The Blue Alliance',
         },
       ],
+      links: [{ rel: 'stylesheet', href: scalarCSS }],
     };
   },
   component: ApiDocsV3,
@@ -88,21 +90,37 @@ const XChangesPlugin = () => {
 };
 
 function ApiDocsV3(): React.JSX.Element {
+  const { resolvedTheme } = useTheme();
   return (
-    <>
-      <ApiReferenceReact
-        configuration={{
-          url: 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance/refs/heads/main/src/backend/web/static/swagger/api_v3.json',
-          hideClientButton: true,
-          hideDarkModeToggle: true,
-          showDeveloperTools: 'never',
-          operationsSorter: 'alpha',
-          plugins: [XChangesPlugin()],
-          searchHotKey: 'l', // to not conflict with the navbar search hotkey
-          telemetry: false,
-        }}
-      />
-      <link rel="stylesheet" href={scalarCSS} />
-    </>
+    // key forces a remount when the theme changes; Scalar's Vue internals don't
+    // treat darkMode as reactive after initialization, so updateConfiguration
+    // won't apply theme changes without a full remount.
+    <ApiReferenceReact
+      key={resolvedTheme}
+      configuration={{
+        url: 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance/refs/heads/main/src/backend/web/static/swagger/api_v3.json',
+        hideClientButton: true,
+        hideDarkModeToggle: true,
+        darkMode: resolvedTheme === 'dark',
+        showDeveloperTools: 'localhost',
+        operationsSorter: 'alpha',
+        plugins: [XChangesPlugin()],
+        searchHotKey: 'l', // to not conflict with the navbar search hotkey
+        telemetry: false,
+        agent: { disabled: true },
+        mcp: { disabled: true },
+        authentication: {
+          preferredSecurityScheme: 'apiKey',
+          securitySchemes: {
+            apiKey: {
+              value: '',
+            },
+          },
+        },
+        defaultOpenAllTags: true,
+        persistAuth: true,
+        showOperationId: true,
+      }}
+    />
   );
 }

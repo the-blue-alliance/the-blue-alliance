@@ -1,3 +1,6 @@
+/* Declare Scalar CSS layers before Tailwind to prevent cascade conflicts.
+   See: https://scalar.com/products/api-references/integrations/react */
+@layer scalar-base, scalar-theme, scalar-config, theme, base, components, utilities;
 @import 'tailwindcss';
 @import 'tw-animate-css';
 
@@ -59,7 +62,7 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-sm: calc(var(--radius) - 4px);
 
-  --header-height: 4rem;
+  --header-height: calc(var(--spacing) * 14);
   --footer-inset-top: 4rem;
   --footer-min-height: calc(8rem + 2px); /* we have 2 borders of 1px each */
 
@@ -145,6 +148,7 @@
 
 @layer base {
   :root {
+    --scalar-custom-header-height: var(--header-height);
     --background: 0 0% 100%;
     --foreground: 0 0% 3.9%;
     --card: 0 0% 100%;
