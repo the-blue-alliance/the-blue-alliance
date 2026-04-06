@@ -1,6 +1,5 @@
 import DateIcon from '~icons/lucide/calendar-days';
 import LocationIcon from '~icons/lucide/map-pin';
-import VideoIcon from '~icons/lucide/video';
 
 import {
   Award,
@@ -27,20 +26,6 @@ import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-
-function buildYoutubePlaylistUrl(
-  matches: Match[],
-  title: string,
-): string | undefined {
-  const videoIds = matches
-    .flatMap((m) => m.videos)
-    .filter((v) => v.type === 'youtube')
-    .map((v) => v.key.split('?')[0]);
-
-  if (videoIds.length === 0) return undefined;
-
-  return `https://www.youtube.com/watch_videos?video_ids=${videoIds.join(',')}&title=${encodeURIComponent(title)}`;
-}
 
 function StatChip({
   label,
@@ -105,11 +90,6 @@ export default function TeamEventAppearance({
 
   matches.sort(sortMatchComparator);
 
-  const playlistUrl = buildYoutubePlaylistUrl(
-    matches,
-    `${event.name} - Team ${team.team_number}`,
-  );
-
   return (
     <div className="relative" id={event.key}>
       <div className="flex flex-wrap gap-x-8">
@@ -133,19 +113,6 @@ export default function TeamEventAppearance({
                 hideUSA={true}
               />
             </DetailEntity>
-            {playlistUrl && (
-              <DetailEntity icon={<VideoIcon />}>
-                <a
-                  className="text-sm text-muted-foreground transition-colors
-                    hover:text-foreground hover:underline"
-                  href={playlistUrl}
-                  rel="noopener noreferrer"
-                  target="_blank"
-                >
-                  Watch All Videos
-                </a>
-              </DetailEntity>
-            )}
           </div>
           <TeamStatus
             event={event}

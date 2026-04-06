@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { Temporal } from 'temporal-polyfill';
 
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
+import YoutubeIcon from '~icons/mdi/youtube';
 
 import { Event, Match } from '~/api/tba/read';
 import { MatchLink } from '~/components/tba/links';
@@ -12,6 +13,37 @@ import { PlayoffType } from '~/lib/api/PlayoffType';
 import { EVENT_FALLBACK_TIMEZONE } from '~/lib/eventUtils';
 import { matchTitleShort } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
+
+interface PlaylistEntry {
+  url: string;
+  label: string;
+}
+
+// 50 is an artificial limit imposed by YouTube; not in our control
+function buildYoutubePlaylistUrls(
+  matches: Match[],
+  title: string,
+  chunkSize: number = 50,
+): PlaylistEntry[] {
+  const videoIds = matches
+    .flatMap((m) => m.videos)
+    .filter((v) => v.type === 'youtube')
+    .map((v) => v.key.split('?')[0]);
+
+  if (videoIds.length === 0) return [];
+
+  const entries: PlaylistEntry[] = [];
+  for (let i = 0; i < videoIds.length; i += chunkSize) {
+    const chunk = videoIds.slice(i, i + chunkSize);
+    const url = `https://www.youtube.com/watch_videos?video_ids=${chunk.join(',')}&title=${encodeURIComponent(title)}`;
+    const label =
+      videoIds.length <= chunkSize
+        ? 'Watch All Videos'
+        : `Videos ${i + 1}–${Math.min(i + chunkSize, videoIds.length)}`;
+    entries.push({ url, label });
+  }
+  return entries;
+}
 
 export default function SimpleMatchRowsWithBreaks({
   matches,
@@ -24,6 +56,8 @@ export default function SimpleMatchRowsWithBreaks({
   breakers: ShouldInsertBreakCallback[];
   focusTeamKey?: string;
 }) {
+  const playlistUrls = buildYoutubePlaylistUrls(matches, event.name);
+  let firstBreakRowSeen = false;
   const divs = [];
 
   for (let i = 0; i < matches.length; i++) {
@@ -39,10 +73,13 @@ export default function SimpleMatchRowsWithBreaks({
       });
 
       if (result.shouldBreak && result.whereToInsertBreak === 'before') {
+        const isFirst = !firstBreakRowSeen;
+        firstBreakRowSeen = true;
         divs.push(
           <BreakRow
             key={`break-before-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            playlists={isFirst ? playlistUrls : undefined}
           />,
         );
       }
@@ -67,10 +104,13 @@ export default function SimpleMatchRowsWithBreaks({
       });
 
       if (result.shouldBreak && result.whereToInsertBreak === 'after') {
+        const isFirst = !firstBreakRowSeen;
+        firstBreakRowSeen = true;
         divs.push(
           <BreakRow
             key={`break-after-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            playlists={isFirst ? playlistUrls : undefined}
           />,
         );
       }
@@ -339,19 +379,42 @@ function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
 
 interface BreakRowProps extends React.HTMLAttributes<HTMLDivElement> {
   text: string;
+  playlists?: PlaylistEntry[];
 }
-export function BreakRow({ className, text, ...props }: BreakRowProps) {
+export function BreakRow({
+  className,
+  text,
+  playlists,
+  ...props
+}: BreakRowProps) {
   return (
     <div
       className={cn('col-span-11 flex rounded-md bg-muted', className)}
       {...props}
     >
-      <span
-        className="flex h-8 w-full items-center justify-center text-xs
+      <div
+        className="relative flex h-8 w-full items-center justify-center text-xs
           font-medium"
       >
-        {text}
-      </span>
+        <span>{text}</span>
+        {playlists && playlists.length > 0 && (
+          <div className="absolute right-2 flex items-center gap-3">
+            {playlists.map(({ url, label }) => (
+              <a
+                key={url}
+                href={url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center gap-1 text-muted-foreground
+                  transition-colors hover:text-foreground"
+              >
+                <YoutubeIcon className="size-3.5" />
+                {label}
+              </a>
+            ))}
+          </div>
+        )}
+      </div>
     </div>
   );
 }
