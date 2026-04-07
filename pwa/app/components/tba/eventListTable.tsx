@@ -14,6 +14,8 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { getEventDateString, isEventActive } from '~/lib/eventUtils';
+import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
+import { cn } from '~/lib/utils';
 
 const DISTRICT_COLORS: Record<string, string> = {
   // California
@@ -58,6 +60,8 @@ function getDistrictColorClass(
 }
 
 export default function EventListTable({ events }: { events: Event[] }) {
+  const isEventOnline = useOnlineEventWebcasts();
+
   return (
     <Table className="w-full">
       <TableHeader>
@@ -70,6 +74,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
       <TableBody>
         {events.map((event) => {
           const withinADay = isEventActive(event);
+          const isOnline = isEventOnline(event);
           const districtColor = getDistrictColorClass(
             event.district?.abbreviation,
           );
@@ -93,28 +98,34 @@ export default function EventListTable({ events }: { events: Event[] }) {
               <TableCell className="mt-2 flex justify-center md:mt-1">
                 {event.webcasts.length > 0 && (
                   <Button
-                    asChild
-                    variant={withinADay ? 'success' : 'secondary'}
-                    disabled={!withinADay}
-                    className={
-                      !withinADay ? 'pointer-events-none opacity-50' : ''
-                    }
+                    asChild={isOnline || withinADay}
+                    variant={isOnline ? 'success' : 'secondary'}
+                    disabled={!isOnline && !withinADay}
+                    className={cn({
+                      'pointer-events-none opacity-50':
+                        !isOnline && !withinADay,
+                    })}
                   >
-                    <a
-                      href={`/gameday/${event.key}`}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="hover:no-underline"
-                      aria-disabled={!withinADay}
-                      tabIndex={withinADay ? undefined : -1}
-                    >
+                    {isOnline || withinADay ? (
+                      <a
+                        href={`/gameday/${event.key}`}
+                        target="_blank"
+                        rel="noreferrer"
+                        className="hover:no-underline"
+                      >
+                        <InlineIcon iconSize="large">
+                          <MdiVideo />
+                          <span className="hidden md:contents">
+                            {isOnline ? 'Watch Now' : 'Offline'}
+                          </span>
+                        </InlineIcon>
+                      </a>
+                    ) : (
                       <InlineIcon iconSize="large">
                         <MdiVideo />
-                        <span className="hidden md:contents">
-                          {withinADay ? 'Watch Now' : 'Offline'}
-                        </span>
+                        <span className="hidden md:contents">Offline</span>
                       </InlineIcon>
-                    </a>
+                    )}
                   </Button>
                 )}
               </TableCell>

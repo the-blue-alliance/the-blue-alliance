@@ -1,5 +1,6 @@
+import { useQuery, useQueryClient } from '@tanstack/react-query';
 import { type Database, onValue, ref } from 'firebase/database';
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useMemo } from 'react';
 
 import {
   type FirebaseLiveEvent,
@@ -17,6 +18,15 @@ async function getDatabase(): Promise<Database> {
   return database;
 }
 
+export const FIREBASE_LIVE_EVENTS_QUERY_KEY = [
+  'firebase',
+  'live_events',
+] as const;
+export const FIREBASE_SPECIAL_WEBCASTS_QUERY_KEY = [
+  'firebase',
+  'special_webcasts',
+] as const;
+
 interface UseFirebaseWebcastsResult {
   webcasts: Record<string, WebcastWithMeta>;
   isLoading: boolean;
@@ -26,61 +36,38 @@ interface UseFirebaseWebcastsResult {
  * Hook that subscribes to Firebase Realtime Database for live webcasts.
  * Listens to both `live_events` and `special_webcasts` paths and merges them
  * into a single webcasts map.
+ *
+ * Firebase data is piped into TanStack Query's cache via setQueryData so it
+ * is visible in the ReactQueryDevtools panel.
  */
 export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
-  const [liveEvents, setLiveEvents] = useState<FirebaseLiveEvent[] | null>(
-    null,
-  );
-  const [specialWebcasts, setSpecialWebcasts] = useState<
-    FirebaseSpecialWebcast[] | null
-  >(null);
-  const [isLoading, setIsLoading] = useState(true);
+  const queryClient = useQueryClient();
 
   useEffect(() => {
     // Don't run on server
     if (typeof window === 'undefined') return;
 
-    let liveEventsLoaded = false;
-    let specialWebcastsLoaded = false;
     let unsubscribeLiveEvents: (() => void) | null = null;
     let unsubscribeSpecialWebcasts: (() => void) | null = null;
-
-    const checkLoading = () => {
-      if (liveEventsLoaded && specialWebcastsLoaded) {
-        setIsLoading(false);
-      }
-    };
 
     // Initialize Firebase subscriptions
     void getDatabase().then((database) => {
       // Subscribe to live_events
       const liveEventsRef = ref(database, 'live_events');
       unsubscribeLiveEvents = onValue(liveEventsRef, (snapshot) => {
-        const data = snapshot.val() as Record<string, FirebaseLiveEvent> | null;
-        if (data) {
-          const events: FirebaseLiveEvent[] = Object.values(data);
-          setLiveEvents(events.filter((event) => event.webcasts?.length > 0));
-        } else {
-          setLiveEvents([]);
-        }
-        liveEventsLoaded = true;
-        checkLoading();
+        queryClient.setQueryData(
+          FIREBASE_LIVE_EVENTS_QUERY_KEY,
+          snapshot.val() as Record<string, FirebaseLiveEvent> | null,
+        );
       });
 
       // Subscribe to special_webcasts
       const specialWebcastsRef = ref(database, 'special_webcasts');
       unsubscribeSpecialWebcasts = onValue(specialWebcastsRef, (snapshot) => {
-        const data = snapshot.val() as Record<
-          string,
-          FirebaseSpecialWebcast
-        > | null;
-        if (data) {
-          setSpecialWebcasts(Object.values(data));
-        } else {
-          setSpecialWebcasts([]);
-        }
-        specialWebcastsLoaded = true;
-        checkLoading();
+        queryClient.setQueryData(
+          FIREBASE_SPECIAL_WEBCASTS_QUERY_KEY,
+          snapshot.val() as Record<string, FirebaseSpecialWebcast> | null,
+        );
       });
     });
 
@@ -88,15 +75,32 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
       unsubscribeLiveEvents?.();
       unsubscribeSpecialWebcasts?.();
     };
-  }, []);
+  }, [queryClient]);
+
+  // Read from TQ cache — data is populated by the effect above via setQueryData.
+  // enabled: false means TQ never fetches on its own; isPending is true until
+  // setQueryData is called for the first time (i.e. Firebase hasn't responded yet).
+  const { data: liveEventsData, isPending: liveEventsPending } =
+    useQuery<Record<string, FirebaseLiveEvent> | null>({
+      queryKey: [...FIREBASE_LIVE_EVENTS_QUERY_KEY],
+      enabled: false,
+      staleTime: Infinity,
+    });
+
+  const { data: specialWebcastsData, isPending: specialWebcastsPending } =
+    useQuery<Record<string, FirebaseSpecialWebcast> | null>({
+      queryKey: [...FIREBASE_SPECIAL_WEBCASTS_QUERY_KEY],
+      enabled: false,
+      staleTime: Infinity,
+    });
 
   // Merge live events and special webcasts into a single map
   const webcasts = useMemo(() => {
     const result: Record<string, WebcastWithMeta> = {};
 
     // Process special webcasts first
-    if (specialWebcasts) {
-      specialWebcasts.forEach((webcast) => {
+    if (specialWebcastsData) {
+      Object.values(specialWebcastsData).forEach((webcast) => {
         const id = getWebcastId(webcast.key_name, 0);
         result[id] = {
           id,
@@ -115,37 +119,39 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
     }
 
     // Process live events
-    if (liveEvents) {
-      liveEvents.forEach((event) => {
-        event.webcasts?.forEach((webcast, index) => {
-          let name = event.short_name || event.name;
-          if (event.webcasts.length > 1) {
-            name = `${name} ${index + 1}`;
-          }
+    if (liveEventsData) {
+      Object.values(liveEventsData)
+        .filter((event) => event.webcasts?.length > 0)
+        .forEach((event) => {
+          event.webcasts.forEach((webcast, index) => {
+            let name = event.short_name || event.name;
+            if (event.webcasts.length > 1) {
+              name = `${name} ${index + 1}`;
+            }
 
-          const id = getWebcastId(event.key, index);
-          result[id] = {
-            id,
-            name,
-            webcast: {
-              type: webcast.type,
-              channel: webcast.channel,
-              file: webcast.file,
-              status: webcast.status,
-              stream_title: webcast.stream_title,
-              viewer_count: webcast.viewer_count,
-            },
-            isSpecial: false,
-          };
+            const id = getWebcastId(event.key, index);
+            result[id] = {
+              id,
+              name,
+              webcast: {
+                type: webcast.type,
+                channel: webcast.channel,
+                file: webcast.file,
+                status: webcast.status,
+                stream_title: webcast.stream_title,
+                viewer_count: webcast.viewer_count,
+              },
+              isSpecial: false,
+            };
+          });
         });
-      });
     }
 
     return result;
-  }, [liveEvents, specialWebcasts]);
+  }, [liveEventsData, specialWebcastsData]);
 
   return {
     webcasts,
-    isLoading,
+    isLoading: liveEventsPending || specialWebcastsPending,
   };
 }
