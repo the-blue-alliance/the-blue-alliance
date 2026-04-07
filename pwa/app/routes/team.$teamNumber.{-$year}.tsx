@@ -45,6 +45,7 @@ import {
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
 import TeamEventAppearance from '~/components/tba/teamEventAppearance';
+import TeamMediaGallery from '~/components/tba/teamMediaGallery';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
 import { Badge } from '~/components/ui/badge';
@@ -82,7 +83,7 @@ import {
   calculateTeamRecordsFromMatches,
   getTeamsUnpenalizedHighScore,
 } from '~/lib/matchUtils';
-import { getImageMedia } from '~/lib/mediaUtils';
+import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
 import {
   MODEL_TYPE,
   addRecords,
@@ -367,6 +368,7 @@ function TeamPage(): React.JSX.Element {
   yearsParticipated.sort((a, b) => b - a);
 
   const robotPics = useMemo(() => getImageMedia(media), [media]);
+  const embedMedia = useMemo(() => getEmbedMedia(media), [media]);
 
   const maybeAvatar = useMemo(
     () => media.find((m) => m.type === 'avatar'),
@@ -495,6 +497,13 @@ function TeamPage(): React.JSX.Element {
               <Separator className="my-4" />
             </TableOfContentsSection>
           ))}
+
+          {embedMedia.length > 0 && (
+            <div>
+              <h2 className="mb-4 text-xl font-semibold">Media</h2>
+              <TeamMediaGallery media={media} />
+            </div>
+          )}
         </div>
       </div>
     </div>

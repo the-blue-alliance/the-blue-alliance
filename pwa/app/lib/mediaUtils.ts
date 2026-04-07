@@ -8,6 +8,13 @@ export const IMAGE_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
   'external-link',
 ]);
 
+/** Media types that represent embeddable images (shown in the media gallery). */
+export const EMBED_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
+  'imgur',
+  'instagram-image',
+  'cd-thread',
+]);
+
 /** Media types that represent CAD models. */
 export const CAD_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
   'grabcad',
@@ -16,51 +23,35 @@ export const CAD_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
 
 /** Returns the image URL for a media item, handling type-specific URL formats. */
 export function getMediaImageUrl(media: Media): string | undefined {
-  switch (media.type) {
-    case 'imgur':
-      return `https://i.imgur.com/${media.foreign_key}m.jpg`;
-    case 'cdphotothread':
-      return media.direct_url;
-    case 'cd-thread': {
-      const details = media.details as { image_url?: string } | undefined;
-      return details?.image_url;
-    }
-    case 'external-link':
-      return media.direct_url;
-    default:
-      return media.direct_url;
+  if (
+    media.type === 'cd-thread' &&
+    media.details &&
+    'image_url' in media.details
+  ) {
+    return media.details.image_url ?? undefined;
   }
+  return media.direct_url || undefined;
 }
 
-/** Returns the full-size image URL (for lightbox/detail views). */
-export function getMediaImageUrlFull(media: Media): string | undefined {
-  switch (media.type) {
-    case 'imgur':
-      return `https://i.imgur.com/${media.foreign_key}h.jpg`;
-    case 'cdphotothread':
-      return media.direct_url;
-    case 'cd-thread': {
-      const details = media.details as { image_url?: string } | undefined;
-      return details?.image_url;
-    }
-    case 'external-link':
-      return media.direct_url;
-    default:
-      return media.direct_url;
-  }
+/** Returns all embeddable image media (imgur + instagram-image). */
+export function getEmbedMedia(media: Media[]): Media[] {
+  return media.filter((m) => EMBED_MEDIA_TYPES.has(m.type));
 }
 
 /** Returns the link URL for a media item (where clicking should navigate). */
 export function getMediaLinkUrl(media: Media): string | undefined {
   switch (media.type) {
     case 'imgur':
-      return `https://imgur.com/${media.foreign_key}`;
-    case 'cdphotothread': {
-      const details = media.details as { image_partial?: string } | undefined;
-      return details?.image_partial
-        ? `https://www.chiefdelphi.com/media/img/${details.image_partial}`
-        : undefined;
-    }
+      return media.view_url || `https://imgur.com/${media.foreign_key}`;
+    case 'instagram-image':
+      return (
+        media.view_url || `https://www.instagram.com/p/${media.foreign_key}/`
+      );
+    case 'cdphotothread':
+      if (media.details && 'image_partial' in media.details) {
+        return `https://www.chiefdelphi.com/media/img/${media.details.image_partial}`;
+      }
+      return undefined;
     case 'cd-thread':
       return `https://www.chiefdelphi.com/t/${media.foreign_key}`;
     case 'grabcad':
@@ -76,9 +67,8 @@ export function getMediaLinkUrl(media: Media): string | undefined {
 
 /** Returns the display name for a CAD model media item. */
 export function getCadModelName(media: Media): string {
-  if (media.type === 'grabcad') {
-    const details = media.details as { model_name?: string } | undefined;
-    return details?.model_name ?? 'GrabCAD Model';
+  if (media.details && 'model_name' in media.details) {
+    return media.details.model_name;
   }
   return 'CAD Model';
 }
@@ -97,13 +87,8 @@ export function getImageMedia(media: Media[]): Media[] {
 export function getTeamPreferredRobotPicMedium(
   media: Media[],
 ): string | undefined {
-  const maybePreferredImg = media.filter(
+  const preferred = media.find(
     (m) => IMAGE_MEDIA_TYPES.has(m.type) && m.preferred,
   );
-
-  if (maybePreferredImg.length === 0) {
-    return undefined;
-  }
-
-  return getMediaImageUrl(maybePreferredImg[0]);
+  return preferred ? getMediaImageUrl(preferred) : undefined;
 }
