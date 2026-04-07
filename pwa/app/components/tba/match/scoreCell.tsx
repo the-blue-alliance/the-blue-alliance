@@ -44,6 +44,7 @@ interface ScoreCellProps
   scoreBreakdown?: NonNullable<Match['score_breakdown']>['red'];
   year?: number;
   compLevel: Match['comp_level'];
+  focused?: boolean;
 }
 
 export default function ScoreCell({
@@ -53,12 +54,17 @@ export default function ScoreCell({
   scoreBreakdown,
   year,
   compLevel,
+  focused,
   className,
   ...props
 }: ScoreCellProps) {
   return (
     <div
-      className={cn(scoreCellVariants({ winner, allianceColor }), className)}
+      className={cn(
+        scoreCellVariants({ winner, allianceColor }),
+        focused && 'underline',
+        className,
+      )}
       {...props}
     >
       {scoreBreakdown && year && compLevel === 'qm' && (

@@ -142,6 +142,13 @@ export function MatchRow({
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+  const focusedAlliance = focusTeamKey
+    ? match.alliances.red.team_keys.includes(focusTeamKey)
+      ? 'red'
+      : match.alliances.blue.team_keys.includes(focusTeamKey)
+        ? 'blue'
+        : null
+    : null;
 
   /* Desktop: 1x11 grid, Mobile: 2x6 grid */
   return (
@@ -240,6 +247,7 @@ export function MatchRow({
           scoreBreakdown={match.score_breakdown?.red}
           year={year}
           compLevel={match.comp_level}
+          focused={focusedAlliance === 'red'}
         />
       )}
 
@@ -255,6 +263,7 @@ export function MatchRow({
           scoreBreakdown={match.score_breakdown?.blue}
           year={year}
           compLevel={match.comp_level}
+          focused={focusedAlliance === 'blue'}
         />
       )}
     </div>
