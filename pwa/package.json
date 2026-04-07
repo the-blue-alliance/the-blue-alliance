@@ -82,7 +82,7 @@
     "@eslint/compat": "2.0.4",
     "@eslint/js": "10.0.1",
     "@hey-api/openapi-ts": "0.95.0",
-    "@iconify/json": "2.2.459",
+    "@iconify/json": "2.2.460",
     "@julr/vite-plugin-validate-env": "2.2.2",
     "@playwright/test": "1.59.1",
     "@rolldown/plugin-babel": "0.2.2",
