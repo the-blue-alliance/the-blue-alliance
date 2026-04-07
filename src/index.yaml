@@ -118,6 +118,12 @@ indexes:
       - name: name
       - name: year
 
+  - kind: Insight
+    properties:
+      - name: name
+      - name: district_abbreviation
+      - name: year
+
   - kind: Match
     properties:
       - name: event
