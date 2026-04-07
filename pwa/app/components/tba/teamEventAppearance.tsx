@@ -140,8 +140,8 @@ export default function TeamEventAppearance({
 
       {SEASON_EVENT_TYPES.has(event.event_type) && bannerAwards.length > 0 && (
         <div
-          className="absolute top-0 right-0 -mr-46 hidden lg:flex lg:flex-col
-            lg:gap-2"
+          className="absolute top-0 right-0 -mr-46 hidden min-[1550px]:flex
+            min-[1550px]:flex-col min-[1550px]:gap-2"
         >
           {bannerAwards.map((a) => (
             <AwardBanner key={a.award_type} award={a} event={event} />
