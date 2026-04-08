@@ -2,6 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import {
   camelCaseToHumanReadable,
+  hasAnyMatches,
   median,
   removeNonNumeric,
   slugify,
@@ -47,5 +48,17 @@ describe.concurrent('splitIntoNChunks', () => {
       [1, 2, 3],
       [4, 5],
     ]);
+  });
+});
+
+describe.concurrent('hasAnyMatches', () => {
+  test('returns true when any value is nonzero', () => {
+    expect(hasAnyMatches({ wins: 1, losses: 0, ties: 0 })).toEqual(true);
+    expect(hasAnyMatches({ wins: 0, losses: 2, ties: 0 })).toEqual(true);
+    expect(hasAnyMatches({ wins: 0, losses: 0, ties: 3 })).toEqual(true);
+  });
+
+  test('returns false for an empty record', () => {
+    expect(hasAnyMatches({ wins: 0, losses: 0, ties: 0 })).toEqual(false);
   });
 });

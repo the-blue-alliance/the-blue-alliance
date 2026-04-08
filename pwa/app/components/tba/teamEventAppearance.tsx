@@ -7,6 +7,7 @@ import {
   Event,
   EventDistrictPoints,
   Match,
+  RegionalAdvancement,
   Team,
   TeamEventStatus,
 } from '~/api/tba/read';
@@ -23,7 +24,11 @@ import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
 import { Separator } from '~/components/ui/separator';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import {
+  DISTRICT_EVENT_TYPES,
+  EventType,
+  SEASON_EVENT_TYPES,
+} from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
 
@@ -51,14 +56,14 @@ function Section({
   title,
   children,
 }: {
-  title: string;
+  title: React.ReactNode;
   children: React.ReactNode;
 }) {
   return (
     <div className="space-y-2">
       <h3
-        className="text-sm font-medium tracking-wide text-muted-foreground
-          uppercase"
+        className="flex items-center gap-2 text-sm font-medium tracking-wide
+          text-muted-foreground uppercase"
       >
         {title}
       </h3>
@@ -74,7 +79,9 @@ export default function TeamEventAppearance({
   team,
   awards,
   maybeDistrictPoints,
+  maybeRegionalPoolPoints,
   maybeAlliances,
+  teamRegionalAdvancement,
 }: {
   event: Event;
   matches: Match[];
@@ -82,7 +89,9 @@ export default function TeamEventAppearance({
   team: Team;
   awards: Award[];
   maybeDistrictPoints: EventDistrictPoints | null;
+  maybeRegionalPoolPoints: EventDistrictPoints | null;
   maybeAlliances: EliminationAlliance[] | null;
+  teamRegionalAdvancement?: RegionalAdvancement;
 }): React.JSX.Element {
   const bannerAwards = awards.filter((a) =>
     BLUE_BANNER_AWARDS.has(a.award_type),
@@ -120,7 +129,9 @@ export default function TeamEventAppearance({
             team={team}
             awards={awards}
             maybeDistrictPoints={maybeDistrictPoints}
+            maybeRegionalPoolPoints={maybeRegionalPoolPoints}
             maybeAlliances={maybeAlliances}
+            teamRegionalAdvancement={teamRegionalAdvancement}
           />
         </div>
 
@@ -158,21 +169,30 @@ function TeamStatus({
   team,
   awards,
   maybeDistrictPoints,
+  maybeRegionalPoolPoints,
   maybeAlliances,
+  teamRegionalAdvancement,
 }: {
   event: Event;
   status: TeamEventStatus | null;
   team: Team;
   awards: Award[];
   maybeDistrictPoints: EventDistrictPoints | null;
+  maybeRegionalPoolPoints: EventDistrictPoints | null;
   maybeAlliances: EliminationAlliance[] | null;
+  teamRegionalAdvancement?: RegionalAdvancement;
 }) {
   const hasRank = status?.qual?.ranking?.rank;
   const hasRecord = status?.qual?.ranking?.record;
   const hasAlliance =
     status?.alliance && maybeAlliances && maybeAlliances.length > 0;
   const hasAwards = awards.length > 0;
-  const hasDistrictPoints = maybeDistrictPoints?.points[team.key];
+  const hasDistrictPoints =
+    DISTRICT_EVENT_TYPES.has(event.event_type) &&
+    maybeDistrictPoints?.points[team.key];
+  const hasRegionalPoolPoints =
+    event.event_type === EventType.REGIONAL &&
+    maybeRegionalPoolPoints?.points[team.key];
 
   const sections = [];
 
@@ -261,6 +281,44 @@ function TeamStatus({
       <Section key="district" title="District Points">
         <DistrictPointsTable
           districtPoints={maybeDistrictPoints.points[team.key]}
+        />
+      </Section>,
+    );
+  }
+
+  // Regional Pool Points section
+  if (hasRegionalPoolPoints) {
+    // If qualifying_event is set, the team got their pool invite at a specific event.
+    // Otherwise (PoolQualified), match by week number instead.
+    const poolWeek = teamRegionalAdvancement?.qualifying_pool_week;
+    const qualifiedAtEvent =
+      teamRegionalAdvancement?.qualifying_event === event.key;
+    const qualifiedAtWeek =
+      teamRegionalAdvancement?.qualifying_event === undefined &&
+      event.week !== null &&
+      event.week + 1 === poolWeek;
+    const qualifiedViaPoolHere =
+      poolWeek !== undefined && (qualifiedAtEvent || qualifiedAtWeek);
+
+    sections.push(
+      <Section
+        key="regional-pool"
+        title={
+          <>
+            Regional Pool Points
+            {qualifiedViaPoolHere && (
+              <Badge
+                variant="success"
+                className="ml-auto tracking-normal normal-case"
+              >
+                Qualified
+              </Badge>
+            )}
+          </>
+        }
+      >
+        <DistrictPointsTable
+          districtPoints={maybeRegionalPoolPoints.points[team.key]}
         />
       </Section>,
     );

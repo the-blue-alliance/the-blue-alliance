@@ -4,6 +4,7 @@ import { createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { useEffect } from 'react';
 
+import { ApiError } from '~/lib/apiError';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
 import { routeTree } from '~/routeTree.gen';
@@ -12,7 +13,25 @@ const queryCacheLogger = createLogger('queryCache');
 const routerLogger = createLogger('router');
 
 export function getRouter() {
-  const queryClient = new QueryClient();
+  // Don't retry 4xx responses — they indicate a client or data error (e.g. 404
+  // "not found") that won't resolve on retry. Retrying them causes unnecessary
+  // background re-renders for the full exponential-backoff window (~10s).
+  const queryClient = new QueryClient({
+    defaultOptions: {
+      queries: {
+        retry: (failureCount, error) => {
+          if (
+            error instanceof ApiError &&
+            error.status >= 400 &&
+            error.status < 500
+          ) {
+            return false;
+          }
+          return failureCount < 3;
+        },
+      },
+    },
+  });
   queryClient.getQueryCache().subscribe((event) => {
     // Only log "added" events (new queries) and "updated" events when query completes successfully
     // This reduces noise from intermediate state transitions (loading states)

@@ -140,6 +140,10 @@ export function addRecords(record1: WltRecord, record2: WltRecord): WltRecord {
   };
 }
 
+export function hasAnyMatches(record: WltRecord): boolean {
+  return record.wins + record.losses + record.ties > 0;
+}
+
 export function winrateFromRecord(record: WltRecord): number {
   return record.wins / Math.max(1, record.wins + record.losses + record.ties);
 }

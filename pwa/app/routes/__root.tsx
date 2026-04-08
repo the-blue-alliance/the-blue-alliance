@@ -9,6 +9,7 @@ import {
   useLocation,
 } from '@tanstack/react-router';
 import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
+import { useEffect } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
@@ -50,6 +51,7 @@ import splashPortrait1668x2224 from '~/images/apple-splash/apple-splash-portrait
 import splashPortrait1668x2388 from '~/images/apple-splash/apple-splash-portrait-1668x2388.png?url&no-inline';
 import splashPortrait2048x2732 from '~/images/apple-splash/apple-splash-portrait-2048x2732.png?url&no-inline';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
+import { ApiError } from '~/lib/apiError';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { ThemeProvider } from '~/lib/theme';
 import { createLogger } from '~/lib/utils';
@@ -70,6 +72,15 @@ client.interceptors.request.use((request) => {
   );
 
   return request;
+});
+
+// Attach the HTTP status code to thrown errors so the QueryClient's retry
+// function can distinguish 4xx "client error" failures from transient ones.
+client.interceptors.error.use((_error, response) => {
+  return new ApiError(
+    response.statusText || String(response.status),
+    response.status,
+  );
 });
 
 // Configure network cache middleware
@@ -345,6 +356,12 @@ const FULLSCREEN_ROUTES = ['/gameday'];
 function RootComponent() {
   const { renderTime } = Route.useLoaderData();
   const { pathname } = useLocation();
+
+  // Set data-hydrated on <body> after React mounts so Playwright tests can
+  // wait for full client-side hydration before interacting with the page.
+  useEffect(() => {
+    document.body.setAttribute('data-hydrated', 'true');
+  }, []);
   const isFullscreen = FULLSCREEN_ROUTES.some((route) =>
     pathname.startsWith(route),
   );

@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/tanstackstart-react';
-import { useQueries, useSuspenseQuery } from '@tanstack/react-query';
+import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   createFileRoute,
   notFound,
@@ -9,10 +9,24 @@ import {
 import { useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
-import { Award, Event, Match, Team, WltRecord } from '~/api/tba/read';
 import {
+  Award,
+  District,
+  DistrictRanking,
+  Event,
+  Match,
+  RegionalAdvancement,
+  RegionalRanking,
+  Team,
+  WltRecord,
+} from '~/api/tba/read';
+import {
+  getDistrictRankingsOptions,
   getEventAlliancesOptions,
   getEventDistrictPointsOptions,
+  getRegionalAdvancementOptions,
+  getRegionalChampsPoolPointsOptions,
+  getRegionalRankingsOptions,
   getTeamAwardsByYearOptions,
   getTeamDistrictsOptions,
   getTeamEventsByYearOptions,
@@ -25,6 +39,7 @@ import {
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { AwardBanner } from '~/components/tba/banner';
 import FavoriteButton from '~/components/tba/favoriteButton';
+import { DistrictLink } from '~/components/tba/links';
 import {
   TableOfContents,
   TableOfContentsSection,
@@ -56,7 +71,11 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import {
+  DISTRICT_EVENT_TYPES,
+  EventType,
+  SEASON_EVENT_TYPES,
+} from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import {
@@ -68,6 +87,7 @@ import {
   MODEL_TYPE,
   addRecords,
   doThrowNotFound,
+  hasAnyMatches,
   parseParamsForYearElseDefault,
   pluralize,
   publicCacheControlHeaders,
@@ -264,6 +284,40 @@ function TeamPage(): React.JSX.Element {
     getTeamDistrictsOptions({ path: { team_key: teamKey } }),
   );
 
+  const currentDistrict = districts.find((d) => d.year === year);
+
+  const { data: districtRankings } = useQuery({
+    ...getDistrictRankingsOptions({
+      path: { district_key: currentDistrict?.key ?? '' },
+    }),
+    enabled: !!currentDistrict,
+  });
+
+  const teamDistrictRanking = districtRankings?.find(
+    (r) => r.team_key === teamKey,
+  );
+
+  const { data: regionalRankings } = useQuery({
+    ...getRegionalRankingsOptions({ path: { year } }),
+    enabled: !currentDistrict,
+  });
+
+  const teamRegionalRanking = regionalRankings?.find(
+    (r) => r.team_key === teamKey,
+  );
+
+  const hasRegionalEvents = events.some(
+    (e) => e.event_type === EventType.REGIONAL,
+  );
+
+  const { data: regionalAdvancement } = useQuery({
+    ...getRegionalAdvancementOptions({ path: { year } }),
+    enabled: hasRegionalEvents,
+  });
+
+  const teamRegionalAdvancement: RegionalAdvancement | undefined =
+    regionalAdvancement?.[teamKey];
+
   // sort BEFORE launching queries that depend on it
   const sortedEvents = useMemo(
     () => events.sort(sortEventsComparator),
@@ -271,9 +325,23 @@ function TeamPage(): React.JSX.Element {
   );
 
   const eventDistrictPtsQueries = useQueries({
-    queries: sortedEvents.map((e) =>
-      getEventDistrictPointsOptions({ path: { event_key: e.key } }),
-    ),
+    queries: sortedEvents.map((e) => ({
+      ...getEventDistrictPointsOptions({ path: { event_key: e.key } }),
+      enabled: DISTRICT_EVENT_TYPES.has(e.event_type),
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          sortedEvents[index].key,
+          result.data ?? null,
+        ]),
+      ),
+  });
+  const regionalPoolPtsQueries = useQueries({
+    queries: sortedEvents.map((e) => ({
+      ...getRegionalChampsPoolPointsOptions({ path: { event_key: e.key } }),
+      enabled: e.event_type === EventType.REGIONAL,
+    })),
     combine: (results) =>
       Object.fromEntries(
         results.map((result, index) => [
@@ -378,6 +446,9 @@ function TeamPage(): React.JSX.Element {
             matches={matches}
             awards={awards}
             year={year}
+            district={currentDistrict}
+            districtRanking={teamDistrictRanking}
+            regionalRanking={teamRegionalRanking}
           />
 
           {awards.filter((a) => BLUE_BANNER_AWARDS.has(a.award_type)).length >
@@ -417,7 +488,9 @@ function TeamPage(): React.JSX.Element {
                 team={team}
                 awards={awards.filter((a) => a.event_key === e.key)}
                 maybeDistrictPoints={eventDistrictPtsQueries[e.key]}
+                maybeRegionalPoolPoints={regionalPoolPtsQueries[e.key]}
                 maybeAlliances={eventAlliancesQueries[e.key]}
+                teamRegionalAdvancement={teamRegionalAdvancement}
               />
               <Separator className="my-4" />
             </TableOfContentsSection>
@@ -434,12 +507,18 @@ function StatsSection({
   matches,
   awards,
   year,
+  district,
+  districtRanking,
+  regionalRanking,
 }: {
   events: Event[];
   team: Team;
   matches: Match[];
   awards: Award[];
   year: number;
+  district?: District;
+  districtRanking?: DistrictRanking;
+  regionalRanking?: RegionalRanking;
 }) {
   const [showTable, setShowTable] = useState(false);
 
@@ -482,6 +561,7 @@ function StatsSection({
 
   const officialRecord = addRecords(officialQuals, officialPlayoff);
   const unofficialRecord = addRecords(unofficialQuals, unofficialPlayoff);
+  const hasUnofficialMatches = hasAnyMatches(unofficialRecord);
 
   const combinedQuals = addRecords(officialQuals, unofficialQuals);
   const combinedPlayoff = addRecords(officialPlayoff, unofficialPlayoff);
@@ -505,15 +585,49 @@ function StatsSection({
           {officialRecord.wins}-{officialRecord.losses}
           {officialRecord.ties > 0 ? `-${officialRecord.ties}` : ''}
         </span>{' '}
-        in official play and{' '}
-        <span className="font-semibold">
-          {officialRecord.wins + unofficialRecord.wins}-
-          {officialRecord.losses + unofficialRecord.losses}
-          {officialRecord.ties + unofficialRecord.ties > 0
-            ? `-${officialRecord.ties + unofficialRecord.ties}`
-            : ''}
-        </span>{' '}
-        overall in {year}.
+        {hasUnofficialMatches ? (
+          <>
+            in official play and{' '}
+            <span className="font-semibold">
+              {officialRecord.wins + unofficialRecord.wins}-
+              {officialRecord.losses + unofficialRecord.losses}
+              {officialRecord.ties + unofficialRecord.ties > 0
+                ? `-${officialRecord.ties + unofficialRecord.ties}`
+                : ''}
+            </span>{' '}
+            overall in {year}.
+          </>
+        ) : (
+          <>overall in {year}.</>
+        )}
+        {district && districtRanking && (
+          <>
+            {' '}
+            In the{' '}
+            <DistrictLink
+              districtAbbreviation={district.abbreviation}
+              year={year}
+              className="underline"
+            >
+              {district.display_name} district
+            </DistrictLink>
+            , they ranked{' '}
+            <span className="font-semibold">#{districtRanking.rank}</span> with{' '}
+            <span className="font-semibold">{districtRanking.point_total}</span>{' '}
+            points.
+          </>
+        )}
+        {!district && regionalRanking && (
+          <>
+            {' '}
+            In the regional pool, they ranked{' '}
+            <span className="font-semibold">
+              #{regionalRanking.rank}
+            </span> with{' '}
+            <span className="font-semibold">{regionalRanking.point_total}</span>{' '}
+            points.
+          </>
+        )}
         <Badge
           className="ml-2 cursor-pointer"
           onClick={() => {

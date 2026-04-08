@@ -3,6 +3,7 @@ import { expect, test } from '@playwright/test';
 test.describe('/team/604/2024', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/team/604/2024');
+    await page.locator('body[data-hydrated]').waitFor();
   });
 
   test('Header', async ({ page }) => {
@@ -291,5 +292,27 @@ test.describe('/team/604/2024', () => {
     await expect(page.locator('body')).toContainText(
       'Team 604 was 58-10-1 in official play and 78-21-1 overall in 2024.',
     );
+  });
+
+  test('no district rank shown for non-district team', async ({ page }) => {
+    await expect(page.locator('body')).not.toContainText(', they ranked #');
+  });
+});
+
+test.describe('/team/2713/2024', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/team/2713/2024');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('District rank shown for district team', async ({ page }) => {
+    await expect(page.locator('body')).toContainText('In the');
+    const districtLink = page.getByRole('link', {
+      name: 'New England district',
+    });
+    await expect(districtLink).toBeVisible();
+    await expect(districtLink).toHaveAttribute('href', '/district/ne/2024');
+    await expect(page.locator('body')).toContainText('with');
+    await expect(page.locator('body')).toContainText('points.');
   });
 });
