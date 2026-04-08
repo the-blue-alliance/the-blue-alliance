@@ -1094,10 +1094,11 @@ class InsightsHelper(object):
         year_num_matches = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
             Insight.year != 0,
-            Insight.district_abbreviation == None,  # noqa: E711
         ).fetch(1000)
         num_matches = []
         for insight in year_num_matches:
+            if insight.district_abbreviation is not None:
+                continue
             num_matches.append((insight.year, insight.data))
 
         # Creating Insights
@@ -1157,10 +1158,11 @@ class InsightsHelper(object):
         year_regional_winners = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.REGIONAL_DISTRICT_WINNERS],
             Insight.year != 0,
-            Insight.district_abbreviation == None,  # noqa: E711
         ).fetch(1000)
         regional_winners = defaultdict(int)
         for insight in year_regional_winners:
+            if insight.district_abbreviation is not None:
+                continue
             for number, team_list in insight.data:
                 for team in team_list:
                     regional_winners[team] += number
@@ -1168,10 +1170,11 @@ class InsightsHelper(object):
         year_blue_banners = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.BLUE_BANNERS],
             Insight.year != 0,
-            Insight.district_abbreviation == None,  # noqa: E711
         ).fetch(1000)
         blue_banners = defaultdict(int)
         for insight in year_blue_banners:
+            if insight.district_abbreviation is not None:
+                continue
             for number, team_list in insight.data:
                 for team in team_list:
                     blue_banners[team] += number
@@ -1179,10 +1182,11 @@ class InsightsHelper(object):
         year_rca_winners = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.RCA_WINNERS],
             Insight.year != 0,
-            Insight.district_abbreviation == None,  # noqa: E711
         ).fetch(1000)
         rca_winners = defaultdict(int)
         for insight in year_rca_winners:
+            if insight.district_abbreviation is not None:
+                continue
             for team in insight.data:
                 rca_winners[team] += 1
 
@@ -1209,10 +1213,11 @@ class InsightsHelper(object):
         year_successful_elim_teamups = Insight.query(
             Insight.name == Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_ELIM_TEAMUPS],
             Insight.year != 0,
-            Insight.district_abbreviation == None,  # noqa: E711
         ).fetch(1000)
         successful_elim_teamups = defaultdict(int)
         for insight in year_successful_elim_teamups:
+            if insight.district_abbreviation is not None:
+                continue
             for teams in insight.data:
                 for pairs in itertools.combinations(teams, 2):
                     successful_elim_teamups[tuple(sorted(pairs))] += 1
