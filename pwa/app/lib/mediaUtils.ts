@@ -23,12 +23,8 @@ export const CAD_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
 
 /** Returns the image URL for a media item, handling type-specific URL formats. */
 export function getMediaImageUrl(media: Media): string | undefined {
-  if (
-    media.type === 'cd-thread' &&
-    media.details &&
-    'image_url' in media.details
-  ) {
-    return media.details.image_url ?? undefined;
+  if (media.type === 'cd-thread') {
+    return media.details?.image_url ?? undefined;
   }
   return media.direct_url || undefined;
 }
@@ -48,10 +44,9 @@ export function getMediaLinkUrl(media: Media): string | undefined {
         media.view_url || `https://www.instagram.com/p/${media.foreign_key}/`
       );
     case 'cdphotothread':
-      if (media.details && 'image_partial' in media.details) {
-        return `https://www.chiefdelphi.com/media/img/${media.details.image_partial}`;
-      }
-      return undefined;
+      return media.details?.image_partial
+        ? `https://www.chiefdelphi.com/media/img/${media.details.image_partial}`
+        : undefined;
     case 'cd-thread':
       return `https://www.chiefdelphi.com/t/${media.foreign_key}`;
     case 'grabcad':
@@ -67,8 +62,8 @@ export function getMediaLinkUrl(media: Media): string | undefined {
 
 /** Returns the display name for a CAD model media item. */
 export function getCadModelName(media: Media): string {
-  if (media.details && 'model_name' in media.details) {
-    return media.details.model_name;
+  if (media.type === 'grabcad' || media.type === 'onshape') {
+    return media.details?.model_name ?? 'CAD Model';
   }
   return 'CAD Model';
 }

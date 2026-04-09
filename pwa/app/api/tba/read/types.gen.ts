@@ -2510,7 +2510,47 @@ export type MatchAlliance = {
 /**
  * The `Media` object contains a reference for most any media associated with a team or event on TBA.
  */
-export type Media = {
+export type Media =
+  | ({
+      type: 'avatar';
+    } & MediaAvatar)
+  | ({
+      type: 'cdphotothread';
+    } & MediaCdPhotoThread)
+  | ({
+      type: 'cd-thread';
+    } & MediaCdThread)
+  | ({
+      type: 'grabcad';
+    } & MediaGrabCad)
+  | ({
+      type:
+        | 'youtube'
+        | 'imgur'
+        | 'facebook-profile'
+        | 'youtube-channel'
+        | 'twitter-profile'
+        | 'github-profile'
+        | 'instagram-profile'
+        | 'periscope-profile'
+        | 'gitlab-profile'
+        | 'instagram-image'
+        | 'external-link';
+    } & MediaNoDetails)
+  | ({
+      type: 'onshape';
+    } & MediaOnshape);
+
+export type MediaAvatar = MediaBase & MediaAvatarExtras;
+
+export type MediaAvatarExtras = {
+  type?: 'avatar';
+  details?: {
+    base64Image: string;
+  };
+};
+
+export type MediaBase = {
   /**
    * String type of the media element.
    */
@@ -2536,46 +2576,6 @@ export type Media = {
    */
   foreign_key: string;
   /**
-   * If required, a JSON dict of additional media information.
-   */
-  details?:
-    | {
-        [key: string]: never;
-      }
-    | {
-        base64Image: string;
-      }
-    | {
-        author_id: number;
-        author_name: string;
-        author_url: string;
-        height: number | null;
-        html: string;
-        media_id: string;
-        provider_name: string;
-        provider_url: string;
-        thumbnail_height: number;
-        thumbnail_url: string;
-        thumbnail_width: number;
-        title: string;
-        type: string;
-        version: string;
-        width: number;
-      }
-    | {
-        model_created: string;
-        model_description: string | null;
-        model_image: string;
-        model_name: string;
-      }
-    | {
-        image_partial: string;
-      }
-    | {
-        thread_title: string;
-        image_url: string | null;
-      };
-  /**
    * True if the media is of high quality.
    */
   preferred?: boolean;
@@ -2591,6 +2591,57 @@ export type Media = {
    * The URL that leads to the full web page for the media, if one exists.
    */
   view_url?: string;
+};
+
+export type MediaCdPhotoThread = MediaBase & {
+  type?: 'cdphotothread';
+  details?: {
+    image_partial: string;
+  };
+};
+
+export type MediaCdThread = MediaBase & {
+  type?: 'cd-thread';
+  details?: {
+    thread_title: string;
+    image_url: string | null;
+  };
+};
+
+export type MediaGrabCad = MediaBase & {
+  type?: 'grabcad';
+  details?: {
+    model_created: string;
+    model_description: string | null;
+    model_image: string;
+    model_name: string;
+  };
+};
+
+export type MediaNoDetails = MediaBase & {
+  type?:
+    | 'youtube'
+    | 'imgur'
+    | 'facebook-profile'
+    | 'youtube-channel'
+    | 'twitter-profile'
+    | 'github-profile'
+    | 'instagram-profile'
+    | 'periscope-profile'
+    | 'gitlab-profile'
+    | 'instagram-image'
+    | 'external-link';
+  details?: {};
+};
+
+export type MediaOnshape = MediaBase & {
+  type?: 'onshape';
+  details?: {
+    model_created: string;
+    model_description: string | null;
+    model_image: string;
+    model_name: string;
+  };
 };
 
 export enum MobilityRobot2023 {

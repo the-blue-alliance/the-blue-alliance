@@ -7,6 +7,7 @@ import { Temporal } from 'temporal-polyfill';
 import MdiCog from '~icons/mdi/cog';
 import MdiRobotExcited from '~icons/mdi/robot-excited';
 
+import { MediaAvatar } from '~/api/tba/read';
 import { getTeamMatchesByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import {
   getTeam,
@@ -136,7 +137,7 @@ function TeamStatsPage() {
   );
 
   const maybeAvatar = useMemo(() => {
-    return media.find((m) => m.type === 'avatar');
+    return media.find((m): m is MediaAvatar => m.type === 'avatar');
   }, [media]);
 
   const usedEvents = useMemo(() => {

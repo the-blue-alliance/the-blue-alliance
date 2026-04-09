@@ -16,6 +16,7 @@ import {
   Event,
   EventType,
   Match,
+  MediaAvatar,
   RegionalAdvancement,
   RegionalRanking,
   Team,
@@ -368,7 +369,7 @@ function TeamPage(): React.JSX.Element {
   const embedMedia = useMemo(() => getEmbedMedia(media), [media]);
 
   const maybeAvatar = useMemo(
-    () => media.find((m) => m.type === 'avatar'),
+    () => media.find((m): m is MediaAvatar => m.type === 'avatar'),
     [media],
   );
 

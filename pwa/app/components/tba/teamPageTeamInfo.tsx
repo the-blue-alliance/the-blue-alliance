@@ -7,7 +7,7 @@ import DistrictIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import RookieIcon from '~icons/lucide/sprout';
 
-import { District, Media, Team } from '~/api/tba/read';
+import { District, Media, MediaAvatar, Team } from '~/api/tba/read';
 import DetailEntity from '~/components/tba/detailEntity';
 import { DistrictLink, TeamLocationLink } from '~/components/tba/links';
 import TeamAvatar from '~/components/tba/teamAvatar';
@@ -33,7 +33,7 @@ export default function TeamPageTeamInfo({
   favoriteButton,
 }: {
   team: Team;
-  maybeAvatar: Media | undefined; // undefined on team history page
+  maybeAvatar: MediaAvatar | undefined; // undefined on team history page
   socials: Media[];
   district?: District;
   favoriteButton?: ReactNode;

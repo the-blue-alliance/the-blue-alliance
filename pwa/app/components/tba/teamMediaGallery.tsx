@@ -95,12 +95,16 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
   );
 }
 
-function CdThreadEmbed({ media }: { media: Media }): React.JSX.Element | null {
+type CdThreadMedia = Extract<Media, { type: 'cd-thread' }>;
+
+function CdThreadEmbed({
+  media,
+}: {
+  media: CdThreadMedia;
+}): React.JSX.Element | null {
   const details = media.details;
-  const imageUrl =
-    details && 'image_url' in details ? details.image_url : undefined;
-  const threadTitle =
-    details && 'thread_title' in details ? details.thread_title : undefined;
+  const imageUrl = details?.image_url;
+  const threadTitle = details?.thread_title;
   const linkUrl = getMediaLinkUrl(media);
 
   if (!imageUrl || !linkUrl) return null;
