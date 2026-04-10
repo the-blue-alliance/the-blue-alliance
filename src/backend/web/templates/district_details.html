@@ -80,6 +80,9 @@
         {% if live_events_with_teams %}
         <li><a href="#active-teams" role="tab" data-toggle="tab">Active Teams</a></li>
         {% endif %}
+        {% if year_specific and (year_specific.data.qual or year_specific.data.playoff) %}
+        <li><a href="#insights" role="tab" data-toggle="tab">Insights</a></li>
+        {% endif %}
       </ul>
 
       <div class="tab-content">
@@ -324,6 +327,29 @@
         {% if live_events_with_teams %}
         <div class="tab-pane" id="active-teams">
           {% include "live_teams_partial.html" %}
+        </div>
+        {% endif %}
+
+        {% if year_specific and (year_specific.data.qual or year_specific.data.playoff) %}
+        <div class="tab-pane" id="insights">
+          <p class="pull-right"><a class="btn btn-primary" href="/district/{{district_abbrev}}/insights/{{year}}"><span class="glyphicon glyphicon-align-left"></span> All Insights</a></p>
+          <h3>Year Specific Statistics</h3>
+          <div class="row">
+            {% if year_specific.data.qual %}
+            <div class="col-sm-6">
+              <h4>Qualification</h4>
+              {% set event_insights = year_specific.data.qual %}
+              {% include year_specific_insights_template ignore missing %}
+            </div>
+            {% endif %}
+            {% if year_specific.data.playoff %}
+            <div class="col-sm-6">
+              <h4>Playoff</h4>
+              {% set event_insights = year_specific.data.playoff %}
+              {% include year_specific_insights_template ignore missing %}
+            </div>
+            {% endif %}
+          </div>
         </div>
         {% endif %}
       </div>

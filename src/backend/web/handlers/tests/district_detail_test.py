@@ -261,3 +261,49 @@ def test_district_insights_page(ndb_stub, web_client: Client) -> None:
     body = resp.get_data(as_text=True)
     assert "2024 Michigan District Insights" in body
     assert "Top Blue Banner Winners" in body
+
+
+def test_district_detail_insights_tab(ndb_stub, web_client: Client) -> None:
+    District(
+        id="2015fim",
+        year=2015,
+        abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+
+    Insight(
+        id=Insight.render_key_name(
+            2015,
+            Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC],
+            "fim",
+        ),
+        year=2015,
+        district_abbreviation="fim",
+        name=Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC],
+        data_json=json.dumps({"qual": {"some_stat": [1, 2, 50.0]}, "playoff": {}}),
+    ).put()
+
+    resp = web_client.get("/events/fim/2015")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert 'href="#insights"' in body
+    assert "All Insights" in body
+    assert "/district/fim/insights/2015" in body
+
+
+def test_district_detail_no_insights_tab_when_no_insight(
+    ndb_stub, web_client: Client
+) -> None:
+    District(
+        id="2015fim",
+        year=2015,
+        abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+
+    resp = web_client.get("/events/fim/2015")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert 'href="#insights"' not in body

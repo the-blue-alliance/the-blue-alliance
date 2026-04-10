@@ -69,6 +69,14 @@ def district_detail(
     # needed for valid_districts
     districts_in_year_future = DistrictsInYearQuery(district.year).fetch_async()
 
+    # needed for insights tab
+    year_specific_insight_future = ndb.Key(
+        Insight,
+        Insight.render_key_name(
+            year, Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC], district_abbrev
+        ),
+    ).get_async()
+
     # needed for active team statuses
     live_events = []
     live_eventteams_futures = []
@@ -193,6 +201,10 @@ def district_detail(
         "live_events_with_teams": live_events_with_teams,
         "dcmp_events": dcmp_events,
         "home_dcmp_per_team": home_dcmp_per_team,
+        "year_specific": year_specific_insight_future.get_result(),
+        "year_specific_insights_template": "event_partials/event_insights_{}.html".format(
+            year
+        ),
     }
 
     return make_cached_response(
