@@ -36,7 +36,7 @@ jobs:
       - name: Parse screenshot pages from PR body
         if: steps.check-key.outputs.skip != 'true'
         id: pages
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const pr = await github.rest.pulls.get({
@@ -208,7 +208,7 @@ jobs:
 
       - name: Post comment on PR
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');
