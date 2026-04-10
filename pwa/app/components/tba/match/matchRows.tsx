@@ -10,7 +10,6 @@ import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
 import TeamListSubgrid from '~/components/tba/match/teamListSubgrid';
 import { PlayoffType } from '~/lib/api/PlayoffType';
-import { EVENT_FALLBACK_TIMEZONE } from '~/lib/eventUtils';
 import { matchTitleShort } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
 
@@ -224,7 +223,7 @@ export function MatchRow({
               Temporal.Instant.fromEpochMilliseconds(
                 match.predicted_time * 1000,
               )
-                .toZonedDateTimeISO(event.timezone ?? EVENT_FALLBACK_TIMEZONE)
+                .toZonedDateTimeISO(Temporal.Now.timeZoneId())
                 .toLocaleString('en-US', {
                   hour: '2-digit',
                   minute: '2-digit',
