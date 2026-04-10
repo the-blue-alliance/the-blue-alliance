@@ -140,10 +140,10 @@ export default function CoprScatterChart({
           <ScatterChart
             data={data}
             margin={{
-              left: 0,
-              right: 0,
-              bottom: 10,
-              top: 10,
+              left: 20,
+              right: 20,
+              bottom: 20,
+              top: 20,
             }}
           >
             {generateGridPoints(
