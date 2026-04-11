@@ -47,6 +47,7 @@ from backend.web.handlers.match import match_detail
 from backend.web.handlers.match_suggestion import match_suggestion
 from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.search import search_handler
+from backend.web.handlers.short import short_event_or_district, short_team
 from backend.web.handlers.static import (
     add_data,
     bigquery,
@@ -212,6 +213,16 @@ app.add_url_rule("/_/remap_teams/<event_key>", view_func=event_remap_teams_handl
 app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
 app.add_url_rule("/avatar/<int:year>/<team_key>.png", view_func=avatar_png)
+
+# Short routes: /<team_number> and /<event_or_district_key>
+app.add_url_rule(
+    '/<regex("[0-9]{1,5}"):team_number>',
+    view_func=short_team,
+)
+app.add_url_rule(
+    '/<regex("[0-9]{4}[a-z][a-z0-9]*"):short_key>',
+    view_func=short_event_or_district,
+)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
