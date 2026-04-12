@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { Temporal } from 'temporal-polyfill';
 
+import ChevronDownIcon from '~icons/lucide/chevron-down';
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 import YoutubeIcon from '~icons/mdi/youtube';
 
@@ -9,6 +10,12 @@ import { MatchLink } from '~/components/tba/links';
 import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
 import TeamListSubgrid from '~/components/tba/match/teamListSubgrid';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { matchTitleShort } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
@@ -406,20 +413,46 @@ export function BreakRow({
       >
         <span>{text}</span>
         {playlists && playlists.length > 0 && (
-          <div className="absolute right-2 flex items-center gap-3">
-            {playlists.map(({ url, label }) => (
+          <div className="absolute right-2 flex items-center">
+            {playlists.length === 1 ? (
               <a
-                key={url}
-                href={url}
+                href={playlists[0].url}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="flex items-center gap-1 text-muted-foreground
                   transition-colors hover:text-foreground"
               >
                 <YoutubeIcon className="size-3.5" />
-                {label}
+                {playlists[0].label}
               </a>
-            ))}
+            ) : (
+              <DropdownMenu>
+                <DropdownMenuTrigger
+                  className="flex cursor-pointer items-center gap-1
+                    text-muted-foreground transition-colors
+                    hover:text-foreground"
+                >
+                  <YoutubeIcon className="size-3.5" />
+                  Watch Videos
+                  <ChevronDownIcon className="size-3" />
+                </DropdownMenuTrigger>
+                <DropdownMenuContent align="end">
+                  {playlists.map(({ url, label }) => (
+                    <DropdownMenuItem key={url} asChild>
+                      <a
+                        href={url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex cursor-pointer items-center gap-2"
+                      >
+                        <YoutubeIcon className="size-3.5" />
+                        {label}
+                      </a>
+                    </DropdownMenuItem>
+                  ))}
+                </DropdownMenuContent>
+              </DropdownMenu>
+            )}
           </div>
         )}
       </div>
