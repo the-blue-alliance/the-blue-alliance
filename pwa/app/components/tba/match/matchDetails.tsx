@@ -14,6 +14,7 @@ import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
 import ScoreBreakdown2026 from '~/components/tba/match/scoreBreakdown2026';
+import ScoreByShift2026 from '~/components/tba/match/scoreByShift2026';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
@@ -107,10 +108,16 @@ export default function MatchDetails({
 
   if (isScoreBreakdown2026(match.score_breakdown)) {
     sbDiv = (
-      <ScoreBreakdown2026
-        scoreBreakdown={match.score_breakdown}
-        match={match}
-      />
+      <>
+        <ScoreBreakdown2026
+          scoreBreakdown={match.score_breakdown}
+          match={match}
+        />
+        <ScoreByShift2026
+          scoreBreakdown={match.score_breakdown}
+          match={match}
+        />
+      </>
     );
   }
 
