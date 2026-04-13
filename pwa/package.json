@@ -83,7 +83,7 @@
   "devDependencies": {
     "@eslint/compat": "2.0.5",
     "@eslint/js": "10.0.1",
-    "@hey-api/openapi-ts": "0.95.0",
+    "@hey-api/openapi-ts": "0.96.0",
     "@iconify/json": "2.2.462",
     "@julr/vite-plugin-validate-env": "2.2.2",
     "@playwright/test": "1.59.1",
