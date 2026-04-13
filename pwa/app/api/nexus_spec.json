@@ -1,0 +1,4439 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "v1.5.0",
+    "title": "Nexus API",
+    "description": "Get live event data with accurate match timing estimates. Visit [frc.nexus/api](https://frc.nexus/api) to get your API key or to register your webhook URLs.<br /><br />**Availability**<br />Live event status is only available for events that are using Nexus to manage queuing. Match status and times will not be accurate for events not using Nexus for queuing.<br /><br />**Timestamps**<br />All timestamps are represented using [Unix time in milliseconds](https://currentmillis.com). Most timestamps are computed dynamically and could change every time you receive a new status.<br /><br />**Attribution**<br />Include a link back to [frc.nexus](https://frc.nexus) in any projects in which you utilize Nexus data.",
+    "x-logo": {
+      "url": "https://frc.nexus/en/assets/images/icon.svg"
+    }
+  },
+  "servers": [
+    {
+      "url": "https://frc.nexus/api/v1"
+    }
+  ],
+  "paths": {
+    "/event/{eventKey}": {
+      "parameters": [
+        {
+          "name": "eventKey",
+          "description": "The event you want to fetch the status of.",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/EventKey"
+          },
+          "examples": {
+            "realEvent": {
+              "value": "2024casf",
+              "summary": "The year & event code of a real event. Get event codes from frc.events or thebluealliance.com."
+            },
+            "demoEvent": {
+              "value": "demo1234",
+              "summary": "Your demo event key for testing. Get your demo event key from frc.nexus/api."
+            }
+          }
+        }
+      ],
+      "get": {
+        "operationId": "pullLiveEventStatus",
+        "summary": "Live event status (pull)",
+        "responses": {
+          "200": {
+            "description": "Live event status",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventStatus"
+                },
+                "examples": {
+                  "EventStatusEmpty": {
+                    "$ref": "#/components/examples/EventStatusEmpty"
+                  },
+                  "EventStatusPrePractice": {
+                    "$ref": "#/components/examples/EventStatusPrePractice"
+                  },
+                  "EventStatusMidPractice": {
+                    "$ref": "#/components/examples/EventStatusMidPractice"
+                  },
+                  "EventStatusPreQualifications": {
+                    "$ref": "#/components/examples/EventStatusPreQualifications"
+                  },
+                  "EventStatusMidQualifications": {
+                    "$ref": "#/components/examples/EventStatusMidQualifications"
+                  },
+                  "EventStatusPrePlayoffs": {
+                    "$ref": "#/components/examples/EventStatusPrePlayoffs"
+                  },
+                  "EventStatusPostAlliances": {
+                    "$ref": "#/components/examples/EventStatusPostAlliances"
+                  },
+                  "EventStatusMidPlayoffs": {
+                    "$ref": "#/components/examples/EventStatusMidPlayoffs"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing API key. Get your API key from [frc.nexus/api](https://frc.nexus/api) and include it in the `Nexus-Api-Key` header."
+          },
+          "403": {
+            "description": "Invalid API key. Ensure the key you're using matches your key at [frc.nexus/api](https://frc.nexus/api). If abuse was detected, your API key may have been disabled. Email contact@frc.nexus for support."
+          },
+          "404": {
+            "description": "`eventKey` does not exist."
+          },
+          "500": {
+            "description": "An unknown server error occurred. Try again later or email contact@frc.nexus for support."
+          }
+        },
+        "x-codeSamples": [
+          {
+            "lang": "cURL",
+            "source": "curl -i -X GET \\\n  \"https://frc.nexus/api/v1/event/{eventKey}\" \\\n  --header \"Nexus-Api-Key: YOUR_API_KEY_HERE\""
+          },
+          {
+            "lang": "Node.js",
+            "source": "import fetch from 'node-fetch';\n\nasync function run() {\n  const eventKey = 'YOUR_eventKey_PARAMETER';\n  const response = await fetch(`https://frc.nexus/api/v1/event/${eventKey}`, {\n    method: 'GET',\n    headers: {\n      'Nexus-Api-Key': 'YOUR_API_KEY_HERE',\n    },\n  });\n\n  if (!response.ok) {\n    const errorMessage = await response.text();\n    console.error('Error getting live event status:', errorMessage);\n    return;\n  }\n\n  const data = await response.json();\n  console.log('Successfully got live event status', data);\n\n  // Get information about a specific team's next match.\n  const myTeamNumber = '100';\n  const myMatches = data.matches.filter(m => m.redTeams?.includes(myTeamNumber) || m.blueTeams?.includes(myTeamNumber));\n  const myNextMatch = myMatches.find(m => m.status !== 'On field');\n\n  if (myNextMatch) {\n    console.log(`Team ${myTeamNumber}'s next match is ${myNextMatch.label} (${myNextMatch.status})!`);\n\n    const allianceColor = myNextMatch.redTeams?.includes(myTeamNumber) ? 'red' : 'blue';\n    console.log(`Put on the ${allianceColor} bumpers`);\n\n    const estimatedQueueTime = myNextMatch.times.estimatedQueueTime;\n    if (estimatedQueueTime) {\n      console.log(`We will be queued at ~${new Date(estimatedQueueTime).toLocaleTimeString()}`);\n    }\n  } else {\n    console.log(`Team ${myTeamNumber} doesn't have any future matches scheduled yet`);\n  }\n\n  // Get announcements and parts requests.\n  data.announcements.forEach(announcement => console.log(`Event announcement: ${announcement.announcement}`));\n  data.partsRequests.forEach(partsRequest =>\n    console.log(`Parts request for team ${partsRequest.requestedByTeam}: ${partsRequest.parts}`),\n  );\n}\n\nrun();"
+          },
+          {
+            "lang": "Python",
+            "source": "import datetime\nimport requests\nimport sys\n\nevent_key = \"YOUR_eventKey_PARAMETER\"\nurl = \"https://frc.nexus/api/v1/event/\" + event_key\n\nheaders = {\"Nexus-Api-Key\": \"YOUR_API_KEY_HERE\"}\n\nresponse = requests.get(url, headers=headers)\n\nif not response.ok:\n  error_message = response.text\n  print(\"Error getting live event status: {}\".format(error_message))\n  sys.exit()\n\ndata = response.json()\nprint(\"Successfully got live event status\")\nprint(data)\n\n# Get information about a specific team's next match.\nmy_team_number = \"100\"\nmy_matches = filter(lambda m: my_team_number in m.get('redTeams', []) + m.get('blueTeams', []), data['matches'])\nmy_next_match = next(filter(lambda m: not m['status'] == 'On field', my_matches), None)\n\nif my_next_match:\n  print(\"Team {}'s next match is {} ({})!\".format(my_team_number, my_next_match['label'], my_next_match['status']))\n\n  alliance_color = 'red' if my_team_number in my_next_match.get('redTeams', []) else 'blue'\n  print(\"Put on the {} bumpers\".format(alliance_color))\n\n  estimated_queue_time = my_next_match['times'].get('estimatedQueueTime', None)\n  if estimated_queue_time:\n    print(\"We will be queued at ~{}\".format(datetime.datetime.fromtimestamp(estimated_queue_time / 1000)))\nelse:\n  print(\"Team {} doesn't have any future matches scheduled yet\".format(my_team_number))\n\n# Get announcements and parts requests.\nfor announcement in data['announcements']:\n  print(\"Event announcement: {}\".format(announcement['announcement']))\n\nfor parts_request in data['partsRequests']:\n  print(\"Parts request for team {}: {}\".format(parts_request['requestedByTeam'], parts_request['parts']))"
+          },
+          {
+            "lang": "Java",
+            "source": "import java.net.*;\nimport java.net.http.*;\nimport java.util.*;\n\npublic class App {\n  public static void main(String[] args) throws Exception {\n    var httpClient = HttpClient.newBuilder().build();\n\n    var host = \"https://frc.nexus\";\n    var eventKey = \"YOUR_eventKey_PARAMETER\";\n    var path = \"/api/v1/event/\" + eventKey;\n    var request = HttpRequest.newBuilder()\n      .GET()\n      .uri(URI.create(host + path))\n      .header(\"Nexus-Api-Key\", \"YOUR_API_KEY_HERE\")\n      .build();\n\n    var response = httpClient.send(request, HttpResponse.BodyHandlers.ofString());\n\n    System.out.println(response.body());\n  }\n}"
+          }
+        ]
+      }
+    },
+    "/event/{eventKey}/pits": {
+      "parameters": [
+        {
+          "name": "eventKey",
+          "description": "The event you want to fetch the pits for.",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/EventKey"
+          },
+          "examples": {
+            "realEvent": {
+              "value": "2024casf",
+              "summary": "The year & event code of a real event. Get event codes from frc.events or thebluealliance.com."
+            },
+            "demoEvent": {
+              "value": "demo1234",
+              "summary": "Your demo event key for testing. Get your demo event key from frc.nexus/api."
+            }
+          }
+        }
+      ],
+      "get": {
+        "operationId": "pullPitAddresses",
+        "summary": "Pit addresses (pull)",
+        "description": "Get the mapping from team number to pit addresses.",
+        "responses": {
+          "200": {
+            "description": "Team number to pit address map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PitAddresses"
+                },
+                "examples": {
+                  "PitAddresses": {
+                    "$ref": "#/components/examples/PitAddresses"
+                  },
+                  "PitAddressesEmpty": {
+                    "$ref": "#/components/examples/PitAddressesEmpty"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing API key. Get your API key from [frc.nexus/api](https://frc.nexus/api) and include it in the `Nexus-Api-Key` header."
+          },
+          "403": {
+            "description": "Invalid API key. Ensure the key you're using matches your key at [frc.nexus/api](https://frc.nexus/api). If abuse was detected, your API key may have been disabled. Email contact@frc.nexus for support."
+          },
+          "404": {
+            "description": "`eventKey` does not exist."
+          },
+          "500": {
+            "description": "An unknown server error occurred. Try again later or email contact@frc.nexus for support."
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/map": {
+      "parameters": [
+        {
+          "name": "eventKey",
+          "description": "The event you want to fetch the map for.",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/EventKey"
+          },
+          "examples": {
+            "realEvent": {
+              "value": "2024casf",
+              "summary": "The year & event code of a real event. Get event codes from frc.events or thebluealliance.com."
+            },
+            "demoEvent": {
+              "value": "demo1234",
+              "summary": "Your demo event key for testing. Get your demo event key from frc.nexus/api."
+            }
+          }
+        }
+      ],
+      "get": {
+        "operationId": "pullPitMap",
+        "summary": "Pit map (pull)",
+        "description": "Get raw map data that can be used to render your own version of a pit map.",
+        "responses": {
+          "200": {
+            "description": "Pit map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PitMap"
+                },
+                "examples": {
+                  "PitMapSimple": {
+                    "$ref": "#/components/examples/PitMapSimple"
+                  },
+                  "PitMapWithAngles": {
+                    "$ref": "#/components/examples/PitMapWithAngles"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing API key. Get your API key from [frc.nexus/api](https://frc.nexus/api) and include it in the `Nexus-Api-Key` header."
+          },
+          "403": {
+            "description": "Invalid API key. Ensure the key you're using matches your key at [frc.nexus/api](https://frc.nexus/api). If abuse was detected, your API key may have been disabled. Email contact@frc.nexus for support."
+          },
+          "404": {
+            "description": "`eventKey` does not exist or does not have a pit map."
+          },
+          "500": {
+            "description": "An unknown server error occurred. Try again later or email contact@frc.nexus for support."
+          }
+        }
+      }
+    },
+    "/event/{eventKey}/inspection": {
+      "parameters": [
+        {
+          "name": "eventKey",
+          "description": "The event you want to fetch inspection status for.",
+          "in": "path",
+          "required": true,
+          "schema": {
+            "$ref": "#/components/schemas/EventKey"
+          },
+          "examples": {
+            "realEvent": {
+              "value": "2024casf",
+              "summary": "The year & event code of a real event. Get event codes from frc.events or thebluealliance.com."
+            },
+            "demoEvent": {
+              "value": "demo1234",
+              "summary": "Your demo event key for testing. Get your demo event key from frc.nexus/api."
+            }
+          }
+        }
+      ],
+      "get": {
+        "operationId": "getInspectionStatus",
+        "summary": "Inspection status (pull)",
+        "description": "Get the mapping from team number to inspection status.",
+        "responses": {
+          "200": {
+            "description": "Team number to inspection status map",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/InspectionStatuses"
+                },
+                "examples": {
+                  "InspectionStatus": {
+                    "$ref": "#/components/examples/InspectionStatus"
+                  },
+                  "InspectionStatusDemo": {
+                    "$ref": "#/components/examples/InspectionStatusDemo"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing API key. Get your API key from [frc.nexus/api](https://frc.nexus/api) and include it in the `Nexus-Api-Key` header."
+          },
+          "403": {
+            "description": "Invalid API key. Ensure the key you're using matches your key at [frc.nexus/api](https://frc.nexus/api). If abuse was detected, your API key may have been disabled. Email contact@frc.nexus for support."
+          },
+          "404": {
+            "description": "`eventKey` does not exist or the event has not started inspection in Nexus."
+          },
+          "500": {
+            "description": "An unknown server error occurred. Try again later or email contact@frc.nexus for support."
+          }
+        }
+      }
+    },
+    "/events": {
+      "parameters": [],
+      "get": {
+        "operationId": "pullEvents",
+        "summary": "Events (pull)",
+        "responses": {
+          "200": {
+            "description": "Event object",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Events"
+                },
+                "examples": {
+                  "Events": {
+                    "$ref": "#/components/examples/Events"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing API key. Get your API key from [frc.nexus/api](https://frc.nexus/api) and include it in the `Nexus-Api-Key` header."
+          },
+          "403": {
+            "description": "Invalid API key. Ensure the key you're using matches your key at [frc.nexus/api](https://frc.nexus/api). If abuse was detected, your API key may have been disabled. Email contact@frc.nexus for support."
+          },
+          "404": {
+            "description": "No events."
+          },
+          "500": {
+            "description": "An unknown server error occurred. Try again later or email contact@frc.nexus for support."
+          }
+        }
+      }
+    }
+  },
+  "webhooks": {
+    "Live event status": {
+      "post": {
+        "summary": "Live event status (push)",
+        "operationId": "pushLiveEventStatus",
+        "requestBody": {
+          "description": "Register your webhook at [frc.nexus/api](https://frc.nexus/api).<br /><br />A POST request is made to each webhook when any of the following happens:\n- a match status is updated\n- a break time is updated\n- a team is added to a playoff alliance\n- an announcement is posted or removed\n- a parts request is posted or removed\n\nNote that some of these events frequently happen multiple times within a short period of time. Build your application to handle repeated requests and ensure you always use the data with the most recent `dataAsOfTime`.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventStatus"
+              },
+              "examples": {
+                "EventStatusEmpty": {
+                  "$ref": "#/components/examples/EventStatusEmpty"
+                },
+                "EventStatusPrePractice": {
+                  "$ref": "#/components/examples/EventStatusPrePractice"
+                },
+                "EventStatusMidPractice": {
+                  "$ref": "#/components/examples/EventStatusMidPractice"
+                },
+                "EventStatusPreQualifications": {
+                  "$ref": "#/components/examples/EventStatusPreQualifications"
+                },
+                "EventStatusMidQualifications": {
+                  "$ref": "#/components/examples/EventStatusMidQualifications"
+                },
+                "EventStatusPrePlayoffs": {
+                  "$ref": "#/components/examples/EventStatusPrePlayoffs"
+                },
+                "EventStatusPostAlliances": {
+                  "$ref": "#/components/examples/EventStatusPostAlliances"
+                },
+                "EventStatusMidPlayoffs": {
+                  "$ref": "#/components/examples/EventStatusMidPlayoffs"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Nexus-Token",
+            "description": "The token from [frc.nexus/api](https://frc.nexus/api) that can be used to verify that Nexus is the caller of your webhook.",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a 200 status to indicate that the data was received successfully."
+          },
+          "default": {
+            "description": "All other response codes are considered errors and do not result in retries.<br /><br />Webhooks that consistently fail to return a 200 status will be automatically disabled."
+          }
+        },
+        "security": []
+      }
+    },
+    "Match status": {
+      "post": {
+        "summary": "Match status (push)",
+        "operationId": "pushMatchStatus",
+        "requestBody": {
+          "description": "Register your webhook for a specific team number at [frc.nexus/api](https://frc.nexus/api).<br /><br />A POST request is made to each webhook when the match status is updated for a match which includes the specified team number. Multiple status updates could happen quickly so ensure you always use the data with the most recent `dataAsOfTime`.",
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MatchStatus"
+              },
+              "examples": {
+                "MatchStatusPractice": {
+                  "$ref": "#/components/examples/MatchStatusPractice"
+                },
+                "MatchStatusQualification": {
+                  "$ref": "#/components/examples/MatchStatusQualification"
+                },
+                "MatchStatusPlayoff": {
+                  "$ref": "#/components/examples/MatchStatusPlayoff"
+                },
+                "MatchStatusReplay": {
+                  "$ref": "#/components/examples/MatchStatusReplay"
+                }
+              }
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "Nexus-Token",
+            "description": "The token from [frc.nexus/api](https://frc.nexus/api) that can be used to verify that Nexus is the caller of your webhook.",
+            "in": "header",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Return a 200 status to indicate that the data was received successfully."
+          },
+          "default": {
+            "description": "All other response codes are considered errors and do not result in retries.<br /><br />Webhooks that consistently fail to return a 200 status will be automatically disabled."
+          }
+        },
+        "security": []
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "PitAddresses": {
+        "type": "object",
+        "additionalProperties": {
+          "x-additionalPropertiesName": "teamNumber",
+          "$ref": "#/components/schemas/PitAddress"
+        }
+      },
+      "InspectionStatuses": {
+        "type": "object",
+        "additionalProperties": {
+          "x-additionalPropertiesName": "teamNumber",
+          "$ref": "#/components/schemas/InspectionStatus"
+        }
+      },
+      "InspectionStatus": {
+        "description": "A team's inspection status.",
+        "type": "object",
+        "properties": {
+          "inspected": {
+            "type": "boolean",
+            "description": "Whether the team has passed an initial, complete inspection."
+          },
+          "status": {
+            "type": ["string", "null"],
+            "enum": [
+              "hold",
+              "in-progress",
+              "complete",
+              "reinspection",
+              "queued",
+              "not-started"
+            ],
+            "description": "The current inspection status of the team. Not set for demo events. This value is cached and may be a couple minutes out of date."
+          },
+          "queuePosition": {
+            "type": ["number", "null"],
+            "description": "The current position of this team in the inspection queue. Not set for demo events. This value is cached and may be a couple minutes out of date."
+          }
+        }
+      },
+      "Events": {
+        "type": "object",
+        "additionalProperties": {
+          "x-additionalPropertiesName": "eventKey",
+          "$ref": "#/components/schemas/EventSummary"
+        }
+      },
+      "EventSummary": {
+        "description": "High level details of an event that is registered for Nexus. Note: being registered for Nexus does not guarantee the event will use any particular feature of Nexus, if at all. Events will not be listed after they have concluded.",
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "The name of this event."
+          },
+          "start": {
+            "type": "number",
+            "description": "The timestamp (Unix time in milliseconds) at which this event is scheduled to start."
+          },
+          "end": {
+            "type": "number",
+            "description": "The timestamp (Unix time in milliseconds) at which this event is scheduled to end."
+          }
+        }
+      },
+      "EventKey": {
+        "description": "The unique identifier of the event. For official events, the event key will match the event code as displayed on [frc.events](http://frc.events). Offseason events may use event keys derived from either [frc.events](http://frc.events) or [thebluealliance.com](https://thebluealliance.com), or will be arbitrary. Examples: `2024casf`, `demo1234`",
+        "type": "string"
+      },
+      "PitAddress": {
+        "description": "A pit address is an arbitrary string usually in the form of letter + number. They are sometimes useful for finding where a team's pit is located within a venue. Examples: `A1`, `C12`",
+        "type": "string"
+      },
+      "PitMap": {
+        "type": "object",
+        "properties": {
+          "size": {
+            "type": "object",
+            "description": "The size of the map.",
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "The width of the map. 10 units is approximately 1 foot."
+              },
+              "y": {
+                "type": "number",
+                "description": "The height of the map. 10 units is approximately 1 foot."
+              }
+            }
+          },
+          "pits": {
+            "type": "object",
+            "description": "The pits.",
+            "additionalProperties": {
+              "x-additionalPropertiesName": "pitAddress",
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MapElement"
+                },
+                {
+                  "type": "object",
+                  "description": "A single pit.",
+                  "properties": {
+                    "team": {
+                      "type": ["string", "null"],
+                      "description": "The team number assigned to this pit, if any."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "areas": {
+            "type": ["object", "null"],
+            "description": "Notable areas in or near the pit area, such as `Pit admin`.",
+            "additionalProperties": {
+              "x-additionalPropertiesName": "areaId",
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MapElement"
+                },
+                {
+                  "type": "object",
+                  "description": "A single area.",
+                  "properties": {
+                    "label": {
+                      "type": "string",
+                      "description": "The label of this area. Examples: `Pit admin`, `Inspection`, `Spare parts`, `EMT`, `Radio config`, `Concessions`, `Machine shop`, `Restrooms`"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "labels": {
+            "type": ["object", "null"],
+            "description": "Arbitrary text labels.",
+            "additionalProperties": {
+              "x-additionalPropertiesName": "labelId",
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MapElement"
+                },
+                {
+                  "type": "object",
+                  "description": "A single label.",
+                  "properties": {
+                    "label": {
+                      "type": "string",
+                      "description": "The text of this label. Examples: `Field`, `Practice field`, `Main gym`, `Auxiliary pits`"
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "arrows": {
+            "type": ["object", "null"],
+            "description": "Arrows that can indicate entrances, exits, and paths.",
+            "additionalProperties": {
+              "x-additionalPropertiesName": "arrowId",
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MapElement"
+                },
+                {
+                  "type": "object",
+                  "description": "A single label.",
+                  "properties": {
+                    "type": {
+                      "type": "string",
+                      "enum": ["single", "double"],
+                      "description": "Whether this arrow points in a single direction or in both directions. At an angle of 0°, a single arrow points up and a double arrow points up & down."
+                    }
+                  }
+                }
+              ]
+            }
+          },
+          "walls": {
+            "type": ["object", "null"],
+            "description": "Walls that may surround or divide pit areas. May also be used to indicate areas that are inaccessible by teams.",
+            "additionalProperties": {
+              "x-additionalPropertiesName": "wallId",
+              "allOf": [
+                {
+                  "$ref": "#/components/schemas/MapElement"
+                },
+                {
+                  "type": "object",
+                  "description": "A single wall."
+                }
+              ]
+            }
+          }
+        }
+      },
+      "MapElement": {
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "object",
+            "description": "The position of the center of this element.",
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "The position of the center of this element on the horizontal axis. 10 units is approximately 1 foot."
+              },
+              "y": {
+                "type": "number",
+                "description": "The position of the center of this element on the vertical axis. 10 units is approximately 1 foot."
+              }
+            }
+          },
+          "size": {
+            "type": "object",
+            "description": "The size of this element.",
+            "properties": {
+              "x": {
+                "type": "number",
+                "description": "The width of this element. 10 units is approximately 1 foot."
+              },
+              "y": {
+                "type": "number",
+                "description": "The height of this element. 10 units is approximately 1 foot."
+              }
+            }
+          },
+          "angle": {
+            "type": ["number", "null"],
+            "description": "The angle in degrees that this element is rotated about its center."
+          }
+        }
+      },
+      "EventStatus": {
+        "type": "object",
+        "properties": {
+          "eventKey": {
+            "$ref": "#/components/schemas/EventKey"
+          },
+          "dataAsOfTime": {
+            "type": "number",
+            "description": "The timestamp (Unix time in milliseconds) at which this event status snapshot was generated by Nexus."
+          },
+          "nowQueuing": {
+            "type": ["string", "null"],
+            "description": "The human-friendly label for the latest match that is queuing. Null if the event is not currently queuing a match. Examples: `Practice 1`, `Qualification 24`, `Qualification 24 Replay`, `Playoff 8`, `Final 1`"
+          },
+          "matches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Match"
+            },
+            "description": "All scheduled matches for this event, sorted by play order (practice matches first, then qualifications, then playoffs). This array is empty if the event has not yet scheduled any matches. This array can include scheduled match replays which are indicated by the `replayOf` property."
+          },
+          "announcements": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Announcement"
+            },
+            "description": "Current announcements that are posted for this event. This array is empty if there are no current announcements."
+          },
+          "partsRequests": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PartsRequest"
+            },
+            "description": "Current parts requests that are posted for this event. This array is empty if there are no current parts requests."
+          }
+        }
+      },
+      "MatchStatus": {
+        "type": "object",
+        "properties": {
+          "eventKey": {
+            "$ref": "#/components/schemas/EventKey"
+          },
+          "dataAsOfTime": {
+            "type": "number",
+            "description": "The timestamp (Unix time in milliseconds) at which this event status snapshot was generated by Nexus."
+          },
+          "match": {
+            "$ref": "#/components/schemas/Match",
+            "description": "The updated match."
+          }
+        }
+      },
+      "Match": {
+        "type": "object",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "The human-friendly label for a match. Examples: `Practice 1`, `Qualification 24`, `Qualification 24 Replay`, `Playoff 8`, `Final 1`"
+          },
+          "status": {
+            "type": "string",
+            "enum": ["Queuing soon", "Now queuing", "On deck", "On field"],
+            "description": "The current queuing status of this match. Typically, matches transition from `Queuing soon` -> `Now queuing` -> `On deck` -> `On field`. However, any state transition is possible and some events skip the `Now queuing` state entirely."
+          },
+          "redTeams": {
+            "$ref": "#/components/schemas/Teams"
+          },
+          "blueTeams": {
+            "$ref": "#/components/schemas/Teams"
+          },
+          "times": {
+            "type": "object",
+            "description": "Timestamps for key match status changes based on lead queuer input.",
+            "properties": {
+              "scheduledStartTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which this match was originally scheduled to start. Not set for playoffs and whenever scheduled match times are not available."
+              },
+              "estimatedQueueTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which this match is estimated to be `Now queuing`. If the status of this match is not `Queuing soon`, then this timestamp is equivalent to `actualQueueTime`."
+              },
+              "estimatedOnDeckTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which this match is estimated to be `On deck`. If the status of this match is `On deck` or `On field`, then this timestamp is equivalent to `actualOnDeckTime`."
+              },
+              "estimatedOnFieldTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which this match is estimated to be `On field`. If the status of this match is `On field`, then this timestamp is equivalent to `actualOnFieldTime`."
+              },
+              "estimatedStartTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which this match is estimated to start (\"3 - 2 - 1 - Go!\")."
+              },
+              "actualQueueTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which the status of this match was set to `Now queuing`. If the status of this match is `Queuing soon`, then this is null."
+              },
+              "actualOnDeckTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which the status of this match was set to `On deck`. If the status of this match is `Queuing soon` or `Now queuing`, then this is null."
+              },
+              "actualOnFieldTime": {
+                "type": ["number", "null"],
+                "description": "The timestamp (Unix time in milliseconds) at which the status of this match was set to `On field`. If the status of this match is not `On field`, then this is null."
+              }
+            }
+          },
+          "breakAfter": {
+            "type": ["string", "null"],
+            "enum": [
+              "Break",
+              "Lunch",
+              "End of day",
+              "Alliance selection",
+              "Awards break"
+            ],
+            "description": "The label for a break that begins after this match is played. Null if there is no break after this match."
+          },
+          "replayOf": {
+            "type": ["string", "null"],
+            "description": "The match this match is a replay of. Null if this match is not a replay"
+          }
+        }
+      },
+      "Teams": {
+        "type": ["array", "null"],
+        "description": "An array of team numbers in station number order. A team number is null if there is no team assigned to that station (applicable to practice matches). The entire array is null if the alliance is undecided (applicable to playoffs). There can be up to 4 teams in the case of a backup team in playoffs.",
+        "items": {
+          "type": ["string", "null"]
+        }
+      },
+      "Announcement": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "A unique identifier for this announcement."
+          },
+          "announcement": {
+            "type": "string",
+            "description": "The announcement text."
+          },
+          "postedTime": {
+            "type": "number",
+            "description": "The timestamp (Unix time in milliseconds) at which this announcement was posted."
+          }
+        }
+      },
+      "PartsRequest": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "A unique identifier for this parts request."
+          },
+          "parts": {
+            "type": "string",
+            "description": "The parts requested."
+          },
+          "requestedByTeam": {
+            "type": "string",
+            "description": "The team number requesting the parts."
+          },
+          "postedTime": {
+            "type": "number",
+            "description": "The timestamp (Unix time in milliseconds) at which this parts request was posted."
+          }
+        }
+      }
+    },
+    "securitySchemes": {
+      "Nexus-Api-Key": {
+        "type": "apiKey",
+        "in": "header",
+        "name": "Nexus-Api-Key"
+      }
+    },
+    "examples": {
+      "PitAddressesEmpty": {
+        "summary": "Event with no pit addresses assigned",
+        "value": {}
+      },
+      "PitAddresses": {
+        "summary": "Event with pit addresses assigned",
+        "value": {
+          "100": "A1",
+          "200": "A2",
+          "300": "B1",
+          "400": "B2"
+        }
+      },
+      "InspectionStatus": {
+        "summary": "Inspections status for a small event",
+        "value": {
+          "100": {
+            "inspected": true,
+            "status": "inspected"
+          },
+          "200": {
+            "inspected": false,
+            "status": "queued",
+            "queuePosition": 1
+          },
+          "300": {
+            "inspected": false,
+            "status": "not-started"
+          },
+          "400": {
+            "inspected": true,
+            "status": "reinspection",
+            "queuePosition": 2
+          },
+          "500": {
+            "inspected": false,
+            "status": "hold"
+          }
+        }
+      },
+      "InspectionStatusDemo": {
+        "summary": "Inspections status for a demo event",
+        "value": {
+          "100": {
+            "inspected": true
+          },
+          "200": {
+            "inspected": false
+          },
+          "300": {
+            "inspected": false
+          },
+          "400": {
+            "inspected": true
+          },
+          "500": {
+            "inspected": false
+          }
+        }
+      },
+      "Events": {
+        "summary": "Event summary object",
+        "value": {
+          "2025inind": {
+            "end": 1752357600000,
+            "name": "Indiana Robotics Invitational",
+            "start": 1752145200000
+          },
+          "2025wimuk": {
+            "end": 1753657200000,
+            "name": "Mukwonago Robotics Offseason Competition",
+            "start": 1753531200000
+          },
+          "2025xxmel": {
+            "end": 1752393600000,
+            "name": "Melbourne Robotics Tournament",
+            "start": 1752181200000
+          }
+        }
+      },
+      "EventStatusEmpty": {
+        "summary": "Before match schedule is released",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716591216610,
+          "matches": [],
+          "announcements": [],
+          "partsRequests": []
+        }
+      },
+      "EventStatusPrePractice": {
+        "summary": "Pre-practice matches",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716591544982,
+          "matches": [
+            {
+              "label": "Practice 1",
+              "status": "Queuing soon",
+              "redTeams": ["1000", "1200", "2100"],
+              "blueTeams": ["3300", "2700", "1300"],
+              "times": {
+                "estimatedQueueTime": 1716597900000,
+                "estimatedOnDeckTime": 1716597900000,
+                "estimatedOnFieldTime": 1716598380000,
+                "estimatedStartTime": 1716598800000
+              }
+            },
+            {
+              "label": "Practice 2",
+              "status": "Queuing soon",
+              "redTeams": ["2200", "1500", "2400"],
+              "blueTeams": ["3500", "900", "1100"],
+              "times": {
+                "estimatedQueueTime": 1716597900000,
+                "estimatedOnDeckTime": 1716598380000,
+                "estimatedOnFieldTime": 1716598980000,
+                "estimatedStartTime": 1716599400000
+              }
+            },
+            {
+              "label": "Practice 3",
+              "status": "Queuing soon",
+              "redTeams": ["800", "700", "1700"],
+              "blueTeams": ["3600", "3400", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716598380000,
+                "estimatedOnDeckTime": 1716598980000,
+                "estimatedOnFieldTime": 1716599580000,
+                "estimatedStartTime": 1716600000000
+              }
+            },
+            {
+              "label": "Practice 4",
+              "status": "Queuing soon",
+              "redTeams": ["1800", "600", "3100"],
+              "blueTeams": ["200", "300", "2000"],
+              "times": {
+                "estimatedQueueTime": 1716598980000,
+                "estimatedOnDeckTime": 1716599580000,
+                "estimatedOnFieldTime": 1716600180000,
+                "estimatedStartTime": 1716600600000
+              }
+            },
+            {
+              "label": "Practice 5",
+              "status": "Queuing soon",
+              "redTeams": ["3200", "2800", "2600"],
+              "blueTeams": ["500", "3000", "100"],
+              "times": {
+                "estimatedQueueTime": 1716599580000,
+                "estimatedOnDeckTime": 1716600180000,
+                "estimatedOnFieldTime": 1716600780000,
+                "estimatedStartTime": 1716601200000
+              }
+            },
+            {
+              "label": "Practice 6",
+              "status": "Queuing soon",
+              "redTeams": ["1400", "1600", "1900"],
+              "blueTeams": ["2900", "2500", "400"],
+              "times": {
+                "estimatedQueueTime": 1716600180000,
+                "estimatedOnDeckTime": 1716600780000,
+                "estimatedOnFieldTime": 1716601380000,
+                "estimatedStartTime": 1716601800000
+              }
+            }
+          ],
+          "announcements": [],
+          "partsRequests": []
+        }
+      },
+      "EventStatusMidPractice": {
+        "summary": "Mid-practice matches with announcement & parts request",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716591812134,
+          "nowQueuing": "Practice 4",
+          "matches": [
+            {
+              "label": "Practice 1",
+              "status": "On field",
+              "redTeams": ["1000", "1200", "2100"],
+              "blueTeams": ["3300", "2700", "1300"],
+              "times": {
+                "estimatedQueueTime": 1716591692461,
+                "estimatedOnDeckTime": 1716591692461,
+                "estimatedOnFieldTime": 1716591699570,
+                "estimatedStartTime": 1716592119570,
+                "actualQueueTime": 1716591692461,
+                "actualOnDeckTime": 1716591692461,
+                "actualOnFieldTime": 1716591699570
+              }
+            },
+            {
+              "label": "Practice 2",
+              "status": "On field",
+              "redTeams": ["2200", "1500", "2400"],
+              "blueTeams": ["3500", null, "1100"],
+              "times": {
+                "estimatedQueueTime": 1716591692995,
+                "estimatedOnDeckTime": 1716591699673,
+                "estimatedOnFieldTime": 1716591741945,
+                "estimatedStartTime": 1716592161945,
+                "actualQueueTime": 1716591692995,
+                "actualOnDeckTime": 1716591699673,
+                "actualOnFieldTime": 1716591741945
+              }
+            },
+            {
+              "label": "Practice 3",
+              "status": "On deck",
+              "redTeams": ["800", "700", "1700"],
+              "blueTeams": ["3600", "3400", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716591700213,
+                "estimatedOnDeckTime": 1716591742045,
+                "estimatedOnFieldTime": 1716592342045,
+                "estimatedStartTime": 1716592762045,
+                "actualQueueTime": 1716591700213,
+                "actualOnDeckTime": 1716591742045
+              }
+            },
+            {
+              "label": "Practice 4",
+              "status": "Now queuing",
+              "redTeams": ["1800", "600", "3100"],
+              "blueTeams": ["200", "300", "2000"],
+              "times": {
+                "estimatedQueueTime": 1716591742580,
+                "estimatedOnDeckTime": 1716592342045,
+                "estimatedOnFieldTime": 1716592942045,
+                "estimatedStartTime": 1716593362045,
+                "actualQueueTime": 1716591742580
+              }
+            },
+            {
+              "label": "Practice 5",
+              "status": "Queuing soon",
+              "redTeams": ["3200", "2800", "2600"],
+              "blueTeams": ["500", "3000", "100"],
+              "times": {
+                "estimatedQueueTime": 1716592342045,
+                "estimatedOnDeckTime": 1716592942045,
+                "estimatedOnFieldTime": 1716593542045,
+                "estimatedStartTime": 1716593962045
+              }
+            },
+            {
+              "label": "Practice 6",
+              "status": "Queuing soon",
+              "redTeams": ["1400", "1600", "1900"],
+              "blueTeams": ["2900", "2500", "400"],
+              "times": {
+                "estimatedQueueTime": 1716592942045,
+                "estimatedOnDeckTime": 1716593542045,
+                "estimatedOnFieldTime": 1716594142045,
+                "estimatedStartTime": 1716594562045
+              }
+            }
+          ],
+          "announcements": [
+            {
+              "id": "-Nygq0xDAKWOEyB3wA8z",
+              "postedTime": 1716591796096,
+              "announcement": "Practice matches will continue until 7:00pm"
+            }
+          ],
+          "partsRequests": [
+            {
+              "id": "-Nygq434Arm0UaaiZAN6",
+              "postedTime": 1716591808821,
+              "parts": "Bumper materials (noodles, fabric, numbers)",
+              "requestedByTeam": "100"
+            }
+          ]
+        }
+      },
+      "EventStatusPreQualifications": {
+        "summary": "Pre-qualification matches",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716596840420,
+          "matches": [
+            {
+              "label": "Practice 1",
+              "status": "On field",
+              "redTeams": ["1000", "1200", "2100"],
+              "blueTeams": ["3300", "2700", "1300"],
+              "times": {
+                "estimatedQueueTime": 1716591692461,
+                "estimatedOnDeckTime": 1716591692461,
+                "estimatedOnFieldTime": 1716591699570,
+                "estimatedStartTime": 1716592119570,
+                "actualQueueTime": 1716591692461,
+                "actualOnDeckTime": 1716591692461,
+                "actualOnFieldTime": 1716591699570
+              }
+            },
+            {
+              "label": "Practice 2",
+              "status": "On field",
+              "redTeams": ["2200", "1500", "2400"],
+              "blueTeams": ["3500", null, "1100"],
+              "times": {
+                "estimatedQueueTime": 1716591692995,
+                "estimatedOnDeckTime": 1716591699673,
+                "estimatedOnFieldTime": 1716591741945,
+                "estimatedStartTime": 1716592161945,
+                "actualQueueTime": 1716591692995,
+                "actualOnDeckTime": 1716591699673,
+                "actualOnFieldTime": 1716591741945
+              }
+            },
+            {
+              "label": "Practice 3",
+              "status": "On field",
+              "redTeams": ["800", "700", "1700"],
+              "blueTeams": ["3600", "3400", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716591700213,
+                "estimatedOnDeckTime": 1716591742045,
+                "estimatedOnFieldTime": 1716596373351,
+                "estimatedStartTime": 1716596793351,
+                "actualQueueTime": 1716591700213,
+                "actualOnDeckTime": 1716591742045,
+                "actualOnFieldTime": 1716596373351
+              }
+            },
+            {
+              "label": "Practice 4",
+              "status": "On field",
+              "redTeams": ["1800", "600", "3100"],
+              "blueTeams": ["200", "300", "2000"],
+              "times": {
+                "estimatedQueueTime": 1716591742580,
+                "estimatedOnDeckTime": 1716596373452,
+                "estimatedOnFieldTime": 1716596380157,
+                "estimatedStartTime": 1716596800157,
+                "actualQueueTime": 1716591742580,
+                "actualOnDeckTime": 1716596373452,
+                "actualOnFieldTime": 1716596380157
+              }
+            },
+            {
+              "label": "Practice 5",
+              "status": "On field",
+              "redTeams": ["3200", "2800", "2600"],
+              "blueTeams": ["500", "3000", "100"],
+              "times": {
+                "estimatedQueueTime": 1716596373978,
+                "estimatedOnDeckTime": 1716596380255,
+                "estimatedOnFieldTime": 1716596395853,
+                "estimatedStartTime": 1716596815853,
+                "actualQueueTime": 1716596373978,
+                "actualOnDeckTime": 1716596380255,
+                "actualOnFieldTime": 1716596395853
+              }
+            },
+            {
+              "label": "Practice 6",
+              "status": "On field",
+              "redTeams": ["1400", "1600", "1900"],
+              "blueTeams": ["2900", "2500", "400"],
+              "times": {
+                "estimatedQueueTime": 1716596380784,
+                "estimatedOnDeckTime": 1716596395948,
+                "estimatedOnFieldTime": 1716596401902,
+                "estimatedStartTime": 1716596821902,
+                "actualQueueTime": 1716596380784,
+                "actualOnDeckTime": 1716596395948,
+                "actualOnFieldTime": 1716596401902
+              }
+            },
+            {
+              "label": "Qualification 1",
+              "status": "Queuing soon",
+              "redTeams": ["2600", "3500", "2400"],
+              "blueTeams": ["1400", "900", "3300"],
+              "times": {
+                "estimatedQueueTime": 1716651900000,
+                "estimatedOnDeckTime": 1716651900000,
+                "estimatedOnFieldTime": 1716652530000,
+                "estimatedStartTime": 1716652800000
+              }
+            },
+            {
+              "label": "Qualification 2",
+              "status": "Queuing soon",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716651900000,
+                "estimatedOnDeckTime": 1716652530000,
+                "estimatedOnFieldTime": 1716652980000,
+                "estimatedStartTime": 1716653250000
+              }
+            },
+            {
+              "label": "Qualification 3",
+              "status": "Queuing soon",
+              "redTeams": ["600", "1100", "1600"],
+              "blueTeams": ["100", "3200", "300"],
+              "times": {
+                "estimatedQueueTime": 1716652530000,
+                "estimatedOnDeckTime": 1716652980000,
+                "estimatedOnFieldTime": 1716653430000,
+                "estimatedStartTime": 1716653700000
+              }
+            },
+            {
+              "label": "Qualification 4",
+              "status": "Queuing soon",
+              "redTeams": ["1300", "400", "2100"],
+              "blueTeams": ["2700", "2000", "1200"],
+              "times": {
+                "estimatedQueueTime": 1716652980000,
+                "estimatedOnDeckTime": 1716653430000,
+                "estimatedOnFieldTime": 1716653880000,
+                "estimatedStartTime": 1716654150000
+              }
+            },
+            {
+              "label": "Qualification 5",
+              "status": "Queuing soon",
+              "redTeams": ["3100", "1800", "2900"],
+              "blueTeams": ["3600", "2200", "1000"],
+              "times": {
+                "estimatedQueueTime": 1716653430000,
+                "estimatedOnDeckTime": 1716653880000,
+                "estimatedOnFieldTime": 1716654330000,
+                "estimatedStartTime": 1716654600000
+              }
+            },
+            {
+              "label": "Qualification 6",
+              "status": "Queuing soon",
+              "redTeams": ["200", "800", "3000"],
+              "blueTeams": ["3400", "2300", "1900"],
+              "times": {
+                "estimatedQueueTime": 1716653880000,
+                "estimatedOnDeckTime": 1716654330000,
+                "estimatedOnFieldTime": 1716654780000,
+                "estimatedStartTime": 1716655050000
+              },
+              "breakAfter": "Lunch"
+            },
+            {
+              "label": "Qualification 7",
+              "status": "Queuing soon",
+              "redTeams": ["2900", "1500", "1000"],
+              "blueTeams": ["1300", "2100", "800"],
+              "times": {
+                "estimatedQueueTime": 1716666300000,
+                "estimatedOnDeckTime": 1716666300000,
+                "estimatedOnFieldTime": 1716666930000,
+                "estimatedStartTime": 1716667200000
+              }
+            },
+            {
+              "label": "Qualification 8",
+              "status": "Queuing soon",
+              "redTeams": ["1600", "700", "2600"],
+              "blueTeams": ["3600", "300", "900"],
+              "times": {
+                "estimatedQueueTime": 1716666300000,
+                "estimatedOnDeckTime": 1716666930000,
+                "estimatedOnFieldTime": 1716667380000,
+                "estimatedStartTime": 1716667650000
+              }
+            },
+            {
+              "label": "Qualification 9",
+              "status": "Queuing soon",
+              "redTeams": ["2200", "3300", "1800"],
+              "blueTeams": ["2400", "1400", "3400"],
+              "times": {
+                "estimatedQueueTime": 1716666930000,
+                "estimatedOnDeckTime": 1716667380000,
+                "estimatedOnFieldTime": 1716667830000,
+                "estimatedStartTime": 1716668100000
+              }
+            },
+            {
+              "label": "Qualification 10",
+              "status": "Queuing soon",
+              "redTeams": ["3500", "1200", "1100"],
+              "blueTeams": ["2000", "500", "3000"],
+              "times": {
+                "estimatedQueueTime": 1716667380000,
+                "estimatedOnDeckTime": 1716667830000,
+                "estimatedOnFieldTime": 1716668280000,
+                "estimatedStartTime": 1716668550000
+              }
+            },
+            {
+              "label": "Qualification 11",
+              "status": "Queuing soon",
+              "redTeams": ["100", "1700", "3100"],
+              "blueTeams": ["2700", "1900", "600"],
+              "times": {
+                "estimatedQueueTime": 1716667830000,
+                "estimatedOnDeckTime": 1716668280000,
+                "estimatedOnFieldTime": 1716668730000,
+                "estimatedStartTime": 1716669000000
+              }
+            },
+            {
+              "label": "Qualification 12",
+              "status": "Queuing soon",
+              "redTeams": ["3200", "2300", "200"],
+              "blueTeams": ["2500", "400", "2800"],
+              "times": {
+                "estimatedQueueTime": 1716668280000,
+                "estimatedOnDeckTime": 1716668730000,
+                "estimatedOnFieldTime": 1716669180000,
+                "estimatedStartTime": 1716669450000
+              },
+              "breakAfter": "Alliance selection"
+            }
+          ],
+          "announcements": [],
+          "partsRequests": []
+        }
+      },
+      "EventStatusMidQualifications": {
+        "summary": "Mid-qualification matches with replay",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716598570773,
+          "nowQueuing": "Qualification 6",
+          "matches": [
+            {
+              "label": "Practice 1",
+              "status": "On field",
+              "redTeams": ["1000", "1200", "2100"],
+              "blueTeams": ["3300", "2700", "1300"],
+              "times": {
+                "estimatedQueueTime": 1716591692461,
+                "estimatedOnDeckTime": 1716591692461,
+                "estimatedOnFieldTime": 1716591699570,
+                "estimatedStartTime": 1716592119570,
+                "actualQueueTime": 1716591692461,
+                "actualOnDeckTime": 1716591692461,
+                "actualOnFieldTime": 1716591699570
+              }
+            },
+            {
+              "label": "Practice 2",
+              "status": "On field",
+              "redTeams": ["2200", "1500", "2400"],
+              "blueTeams": ["3500", null, "1100"],
+              "times": {
+                "estimatedQueueTime": 1716591692995,
+                "estimatedOnDeckTime": 1716591699673,
+                "estimatedOnFieldTime": 1716591741945,
+                "estimatedStartTime": 1716592161945,
+                "actualQueueTime": 1716591692995,
+                "actualOnDeckTime": 1716591699673,
+                "actualOnFieldTime": 1716591741945
+              }
+            },
+            {
+              "label": "Practice 3",
+              "status": "On field",
+              "redTeams": ["800", "700", "1700"],
+              "blueTeams": ["3600", "3400", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716591700213,
+                "estimatedOnDeckTime": 1716591742045,
+                "estimatedOnFieldTime": 1716596373351,
+                "estimatedStartTime": 1716596793351,
+                "actualQueueTime": 1716591700213,
+                "actualOnDeckTime": 1716591742045,
+                "actualOnFieldTime": 1716596373351
+              }
+            },
+            {
+              "label": "Practice 4",
+              "status": "On field",
+              "redTeams": ["1800", "600", "3100"],
+              "blueTeams": ["200", "300", "2000"],
+              "times": {
+                "estimatedQueueTime": 1716591742580,
+                "estimatedOnDeckTime": 1716596373452,
+                "estimatedOnFieldTime": 1716596380157,
+                "estimatedStartTime": 1716596800157,
+                "actualQueueTime": 1716591742580,
+                "actualOnDeckTime": 1716596373452,
+                "actualOnFieldTime": 1716596380157
+              }
+            },
+            {
+              "label": "Practice 5",
+              "status": "On field",
+              "redTeams": ["3200", "2800", "2600"],
+              "blueTeams": ["500", "3000", "100"],
+              "times": {
+                "estimatedQueueTime": 1716596373978,
+                "estimatedOnDeckTime": 1716596380255,
+                "estimatedOnFieldTime": 1716596395853,
+                "estimatedStartTime": 1716596815853,
+                "actualQueueTime": 1716596373978,
+                "actualOnDeckTime": 1716596380255,
+                "actualOnFieldTime": 1716596395853
+              }
+            },
+            {
+              "label": "Practice 6",
+              "status": "On field",
+              "redTeams": ["1400", "1600", "1900"],
+              "blueTeams": ["2900", "2500", "400"],
+              "times": {
+                "estimatedQueueTime": 1716596380784,
+                "estimatedOnDeckTime": 1716596395948,
+                "estimatedOnFieldTime": 1716596401902,
+                "estimatedStartTime": 1716596821902,
+                "actualQueueTime": 1716596380784,
+                "actualOnDeckTime": 1716596395948,
+                "actualOnFieldTime": 1716596401902
+              }
+            },
+            {
+              "label": "Qualification 1",
+              "status": "On field",
+              "redTeams": ["2600", "3500", "2400"],
+              "blueTeams": ["1400", "900", "3300"],
+              "times": {
+                "estimatedQueueTime": 1716598502665,
+                "estimatedOnDeckTime": 1716598502665,
+                "estimatedOnFieldTime": 1716598509686,
+                "estimatedStartTime": 1716598779686,
+                "actualQueueTime": 1716598502665,
+                "actualOnDeckTime": 1716598502665,
+                "actualOnFieldTime": 1716598509686
+              }
+            },
+            {
+              "label": "Qualification 2",
+              "status": "On field",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716598502997,
+                "estimatedOnDeckTime": 1716598509762,
+                "estimatedOnFieldTime": 1716598516683,
+                "estimatedStartTime": 1716598786683,
+                "actualQueueTime": 1716598502997,
+                "actualOnDeckTime": 1716598509762,
+                "actualOnFieldTime": 1716598516683
+              }
+            },
+            {
+              "label": "Qualification 3",
+              "status": "On field",
+              "redTeams": ["600", "1100", "1600"],
+              "blueTeams": ["100", "3200", "300"],
+              "times": {
+                "estimatedQueueTime": 1716598510160,
+                "estimatedOnDeckTime": 1716598516760,
+                "estimatedOnFieldTime": 1716598523367,
+                "estimatedStartTime": 1716598793367,
+                "actualQueueTime": 1716598510160,
+                "actualOnDeckTime": 1716598516760,
+                "actualOnFieldTime": 1716598523367
+              }
+            },
+            {
+              "label": "Qualification 4",
+              "status": "On field",
+              "redTeams": ["1300", "400", "2100"],
+              "blueTeams": ["2700", "2000", "1200"],
+              "times": {
+                "estimatedQueueTime": 1716598517163,
+                "estimatedOnDeckTime": 1716598523427,
+                "estimatedOnFieldTime": 1716598530022,
+                "estimatedStartTime": 1716598800022,
+                "actualQueueTime": 1716598517163,
+                "actualOnDeckTime": 1716598523427,
+                "actualOnFieldTime": 1716598530022
+              }
+            },
+            {
+              "label": "Qualification 5",
+              "status": "On deck",
+              "redTeams": ["3100", "1800", "2900"],
+              "blueTeams": ["3600", "2200", "1000"],
+              "times": {
+                "estimatedQueueTime": 1716598523749,
+                "estimatedOnDeckTime": 1716598530095,
+                "estimatedOnFieldTime": 1716598980095,
+                "estimatedStartTime": 1716599250095,
+                "actualQueueTime": 1716598523749,
+                "actualOnDeckTime": 1716598530095
+              }
+            },
+            {
+              "label": "Qualification 6",
+              "status": "Now queuing",
+              "redTeams": ["200", "800", "3000"],
+              "blueTeams": ["3400", "2300", "1900"],
+              "times": {
+                "estimatedQueueTime": 1716598530482,
+                "estimatedOnDeckTime": 1716598980095,
+                "estimatedOnFieldTime": 1716599430095,
+                "estimatedStartTime": 1716599700095,
+                "actualQueueTime": 1716598530482
+              },
+              "breakAfter": "Lunch"
+            },
+            {
+              "label": "Qualification 2 Replay",
+              "status": "Queuing soon",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716666300000,
+                "estimatedOnDeckTime": 1716666300000,
+                "estimatedOnFieldTime": 1716666930000,
+                "estimatedStartTime": 1716667200000
+              },
+              "replayOf": "Qualification 2"
+            },
+            {
+              "label": "Qualification 7",
+              "status": "Queuing soon",
+              "redTeams": ["2900", "1500", "1000"],
+              "blueTeams": ["1300", "2100", "800"],
+              "times": {
+                "estimatedQueueTime": 1716666300000,
+                "estimatedOnDeckTime": 1716666930000,
+                "estimatedOnFieldTime": 1716667380000,
+                "estimatedStartTime": 1716667650000
+              }
+            },
+            {
+              "label": "Qualification 8",
+              "status": "Queuing soon",
+              "redTeams": ["1600", "700", "2600"],
+              "blueTeams": ["3600", "300", "900"],
+              "times": {
+                "estimatedQueueTime": 1716666930000,
+                "estimatedOnDeckTime": 1716667380000,
+                "estimatedOnFieldTime": 1716667830000,
+                "estimatedStartTime": 1716668100000
+              }
+            },
+            {
+              "label": "Qualification 9",
+              "status": "Queuing soon",
+              "redTeams": ["2200", "3300", "1800"],
+              "blueTeams": ["2400", "1400", "3400"],
+              "times": {
+                "estimatedQueueTime": 1716667380000,
+                "estimatedOnDeckTime": 1716667830000,
+                "estimatedOnFieldTime": 1716668280000,
+                "estimatedStartTime": 1716668550000
+              }
+            },
+            {
+              "label": "Qualification 10",
+              "status": "Queuing soon",
+              "redTeams": ["3500", "1200", "1100"],
+              "blueTeams": ["2000", "500", "3000"],
+              "times": {
+                "estimatedQueueTime": 1716667830000,
+                "estimatedOnDeckTime": 1716668280000,
+                "estimatedOnFieldTime": 1716668730000,
+                "estimatedStartTime": 1716669000000
+              }
+            },
+            {
+              "label": "Qualification 11",
+              "status": "Queuing soon",
+              "redTeams": ["100", "1700", "3100"],
+              "blueTeams": ["2700", "1900", "600"],
+              "times": {
+                "estimatedQueueTime": 1716668280000,
+                "estimatedOnDeckTime": 1716668730000,
+                "estimatedOnFieldTime": 1716669180000,
+                "estimatedStartTime": 1716669450000
+              }
+            },
+            {
+              "label": "Qualification 12",
+              "status": "Queuing soon",
+              "redTeams": ["3200", "2300", "200"],
+              "blueTeams": ["2500", "400", "2800"],
+              "times": {
+                "estimatedQueueTime": 1716668730000,
+                "estimatedOnDeckTime": 1716669180000,
+                "estimatedOnFieldTime": 1716669630000,
+                "estimatedStartTime": 1716669900000
+              },
+              "breakAfter": "Alliance selection"
+            }
+          ],
+          "announcements": [
+            {
+              "id": "-NyhEoWll5K7ss4k3ps-",
+              "postedTime": 1716598556809,
+              "announcement": "A replay of Qualification 2 will be the first match played after lunch"
+            }
+          ],
+          "partsRequests": []
+        }
+      },
+      "EventStatusPrePlayoffs": {
+        "summary": "Pre-playoffs and pre-alliance selection",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716598748643,
+          "matches": [
+            {
+              "label": "Practice 1",
+              "status": "On field",
+              "redTeams": ["1000", "1200", "2100"],
+              "blueTeams": ["3300", "2700", "1300"],
+              "times": {
+                "estimatedQueueTime": 1716591692461,
+                "estimatedOnDeckTime": 1716591692461,
+                "estimatedOnFieldTime": 1716591699570,
+                "estimatedStartTime": 1716592119570,
+                "actualQueueTime": 1716591692461,
+                "actualOnDeckTime": 1716591692461,
+                "actualOnFieldTime": 1716591699570
+              }
+            },
+            {
+              "label": "Practice 2",
+              "status": "On field",
+              "redTeams": ["2200", "1500", "2400"],
+              "blueTeams": ["3500", null, "1100"],
+              "times": {
+                "estimatedQueueTime": 1716591692995,
+                "estimatedOnDeckTime": 1716591699673,
+                "estimatedOnFieldTime": 1716591741945,
+                "estimatedStartTime": 1716592161945,
+                "actualQueueTime": 1716591692995,
+                "actualOnDeckTime": 1716591699673,
+                "actualOnFieldTime": 1716591741945
+              }
+            },
+            {
+              "label": "Practice 3",
+              "status": "On field",
+              "redTeams": ["800", "700", "1700"],
+              "blueTeams": ["3600", "3400", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716591700213,
+                "estimatedOnDeckTime": 1716591742045,
+                "estimatedOnFieldTime": 1716596373351,
+                "estimatedStartTime": 1716596793351,
+                "actualQueueTime": 1716591700213,
+                "actualOnDeckTime": 1716591742045,
+                "actualOnFieldTime": 1716596373351
+              }
+            },
+            {
+              "label": "Practice 4",
+              "status": "On field",
+              "redTeams": ["1800", "600", "3100"],
+              "blueTeams": ["200", "300", "2000"],
+              "times": {
+                "estimatedQueueTime": 1716591742580,
+                "estimatedOnDeckTime": 1716596373452,
+                "estimatedOnFieldTime": 1716596380157,
+                "estimatedStartTime": 1716596800157,
+                "actualQueueTime": 1716591742580,
+                "actualOnDeckTime": 1716596373452,
+                "actualOnFieldTime": 1716596380157
+              }
+            },
+            {
+              "label": "Practice 5",
+              "status": "On field",
+              "redTeams": ["3200", "2800", "2600"],
+              "blueTeams": ["500", "3000", "100"],
+              "times": {
+                "estimatedQueueTime": 1716596373978,
+                "estimatedOnDeckTime": 1716596380255,
+                "estimatedOnFieldTime": 1716596395853,
+                "estimatedStartTime": 1716596815853,
+                "actualQueueTime": 1716596373978,
+                "actualOnDeckTime": 1716596380255,
+                "actualOnFieldTime": 1716596395853
+              }
+            },
+            {
+              "label": "Practice 6",
+              "status": "On field",
+              "redTeams": ["1400", "1600", "1900"],
+              "blueTeams": ["2900", "2500", "400"],
+              "times": {
+                "estimatedQueueTime": 1716596380784,
+                "estimatedOnDeckTime": 1716596395948,
+                "estimatedOnFieldTime": 1716596401902,
+                "estimatedStartTime": 1716596821902,
+                "actualQueueTime": 1716596380784,
+                "actualOnDeckTime": 1716596395948,
+                "actualOnFieldTime": 1716596401902
+              }
+            },
+            {
+              "label": "Qualification 1",
+              "status": "On field",
+              "redTeams": ["2600", "3500", "2400"],
+              "blueTeams": ["1400", "900", "3300"],
+              "times": {
+                "estimatedQueueTime": 1716598502665,
+                "estimatedOnDeckTime": 1716598502665,
+                "estimatedOnFieldTime": 1716598509686,
+                "estimatedStartTime": 1716598779686,
+                "actualQueueTime": 1716598502665,
+                "actualOnDeckTime": 1716598502665,
+                "actualOnFieldTime": 1716598509686
+              }
+            },
+            {
+              "label": "Qualification 2",
+              "status": "On field",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716598502997,
+                "estimatedOnDeckTime": 1716598509762,
+                "estimatedOnFieldTime": 1716598516683,
+                "estimatedStartTime": 1716598786683,
+                "actualQueueTime": 1716598502997,
+                "actualOnDeckTime": 1716598509762,
+                "actualOnFieldTime": 1716598516683
+              }
+            },
+            {
+              "label": "Qualification 3",
+              "status": "On field",
+              "redTeams": ["600", "1100", "1600"],
+              "blueTeams": ["100", "3200", "300"],
+              "times": {
+                "estimatedQueueTime": 1716598510160,
+                "estimatedOnDeckTime": 1716598516760,
+                "estimatedOnFieldTime": 1716598523367,
+                "estimatedStartTime": 1716598793367,
+                "actualQueueTime": 1716598510160,
+                "actualOnDeckTime": 1716598516760,
+                "actualOnFieldTime": 1716598523367
+              }
+            },
+            {
+              "label": "Qualification 4",
+              "status": "On field",
+              "redTeams": ["1300", "400", "2100"],
+              "blueTeams": ["2700", "2000", "1200"],
+              "times": {
+                "estimatedQueueTime": 1716598517163,
+                "estimatedOnDeckTime": 1716598523427,
+                "estimatedOnFieldTime": 1716598530022,
+                "estimatedStartTime": 1716598800022,
+                "actualQueueTime": 1716598517163,
+                "actualOnDeckTime": 1716598523427,
+                "actualOnFieldTime": 1716598530022
+              }
+            },
+            {
+              "label": "Qualification 5",
+              "status": "On field",
+              "redTeams": ["3100", "1800", "2900"],
+              "blueTeams": ["3600", "2200", "1000"],
+              "times": {
+                "estimatedQueueTime": 1716598523749,
+                "estimatedOnDeckTime": 1716598530095,
+                "estimatedOnFieldTime": 1716598651267,
+                "estimatedStartTime": 1716598921267,
+                "actualQueueTime": 1716598523749,
+                "actualOnDeckTime": 1716598530095,
+                "actualOnFieldTime": 1716598651267
+              }
+            },
+            {
+              "label": "Qualification 6",
+              "status": "On field",
+              "redTeams": ["200", "800", "3000"],
+              "blueTeams": ["3400", "2300", "1900"],
+              "times": {
+                "estimatedQueueTime": 1716598530482,
+                "estimatedOnDeckTime": 1716598651339,
+                "estimatedOnFieldTime": 1716598657361,
+                "estimatedStartTime": 1716598927361,
+                "actualQueueTime": 1716598530482,
+                "actualOnDeckTime": 1716598651339,
+                "actualOnFieldTime": 1716598657361
+              },
+              "breakAfter": "Lunch"
+            },
+            {
+              "label": "Qualification 2 Replay",
+              "status": "On field",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716598664848,
+                "estimatedOnDeckTime": 1716598664848,
+                "estimatedOnFieldTime": 1716598671277,
+                "estimatedStartTime": 1716598941277,
+                "actualQueueTime": 1716598664848,
+                "actualOnDeckTime": 1716598664848,
+                "actualOnFieldTime": 1716598671277
+              },
+              "replayOf": "Qualification 2"
+            },
+            {
+              "label": "Qualification 7",
+              "status": "On field",
+              "redTeams": ["2900", "1500", "1000"],
+              "blueTeams": ["1300", "2100", "800"],
+              "times": {
+                "estimatedQueueTime": 1716598665239,
+                "estimatedOnDeckTime": 1716598671454,
+                "estimatedOnFieldTime": 1716598677942,
+                "estimatedStartTime": 1716598947942,
+                "actualQueueTime": 1716598665239,
+                "actualOnDeckTime": 1716598671454,
+                "actualOnFieldTime": 1716598677942
+              }
+            },
+            {
+              "label": "Qualification 8",
+              "status": "On field",
+              "redTeams": ["1600", "700", "2600"],
+              "blueTeams": ["3600", "300", "900"],
+              "times": {
+                "estimatedQueueTime": 1716598671841,
+                "estimatedOnDeckTime": 1716598678001,
+                "estimatedOnFieldTime": 1716598684446,
+                "estimatedStartTime": 1716598954446,
+                "actualQueueTime": 1716598671841,
+                "actualOnDeckTime": 1716598678001,
+                "actualOnFieldTime": 1716598684446
+              }
+            },
+            {
+              "label": "Qualification 9",
+              "status": "On field",
+              "redTeams": ["2200", "3300", "1800"],
+              "blueTeams": ["2400", "1400", "3400"],
+              "times": {
+                "estimatedQueueTime": 1716598678325,
+                "estimatedOnDeckTime": 1716598684518,
+                "estimatedOnFieldTime": 1716598691021,
+                "estimatedStartTime": 1716598961021,
+                "actualQueueTime": 1716598678325,
+                "actualOnDeckTime": 1716598684518,
+                "actualOnFieldTime": 1716598691021
+              }
+            },
+            {
+              "label": "Qualification 10",
+              "status": "On field",
+              "redTeams": ["3500", "1200", "1100"],
+              "blueTeams": ["2000", "500", "3000"],
+              "times": {
+                "estimatedQueueTime": 1716598684909,
+                "estimatedOnDeckTime": 1716598691093,
+                "estimatedOnFieldTime": 1716598698554,
+                "estimatedStartTime": 1716598968554,
+                "actualQueueTime": 1716598684909,
+                "actualOnDeckTime": 1716598691093,
+                "actualOnFieldTime": 1716598698554
+              }
+            },
+            {
+              "label": "Qualification 11",
+              "status": "On field",
+              "redTeams": ["100", "1700", "3100"],
+              "blueTeams": ["2700", "1900", "600"],
+              "times": {
+                "estimatedQueueTime": 1716598691479,
+                "estimatedOnDeckTime": 1716598698618,
+                "estimatedOnFieldTime": 1716598738907,
+                "estimatedStartTime": 1716599008907,
+                "actualQueueTime": 1716598691479,
+                "actualOnDeckTime": 1716598698618,
+                "actualOnFieldTime": 1716598738907
+              }
+            },
+            {
+              "label": "Qualification 12",
+              "status": "On field",
+              "redTeams": ["3200", "2300", "200"],
+              "blueTeams": ["2500", "400", "2800"],
+              "times": {
+                "estimatedQueueTime": 1716598698946,
+                "estimatedOnDeckTime": 1716598738968,
+                "estimatedOnFieldTime": 1716598744863,
+                "estimatedStartTime": 1716599014863,
+                "actualQueueTime": 1716598698946,
+                "actualOnDeckTime": 1716598738968,
+                "actualOnFieldTime": 1716598744863
+              },
+              "breakAfter": "Alliance selection"
+            },
+            {
+              "label": "Playoff 1",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716668100000,
+                "estimatedOnDeckTime": 1716668100000,
+                "estimatedOnFieldTime": 1716668640000,
+                "estimatedStartTime": 1716669000000
+              }
+            },
+            {
+              "label": "Playoff 2",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716668100000,
+                "estimatedOnDeckTime": 1716668640000,
+                "estimatedOnFieldTime": 1716669180000,
+                "estimatedStartTime": 1716669540000
+              }
+            },
+            {
+              "label": "Playoff 3",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716668640000,
+                "estimatedOnDeckTime": 1716669180000,
+                "estimatedOnFieldTime": 1716669720000,
+                "estimatedStartTime": 1716670080000
+              }
+            },
+            {
+              "label": "Playoff 4",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716669180000,
+                "estimatedOnDeckTime": 1716669720000,
+                "estimatedOnFieldTime": 1716670260000,
+                "estimatedStartTime": 1716670620000
+              }
+            },
+            {
+              "label": "Playoff 5",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716669720000,
+                "estimatedOnDeckTime": 1716670260000,
+                "estimatedOnFieldTime": 1716670800000,
+                "estimatedStartTime": 1716671160000
+              }
+            },
+            {
+              "label": "Playoff 6",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716670800000,
+                "estimatedOnDeckTime": 1716670800000,
+                "estimatedOnFieldTime": 1716671340000,
+                "estimatedStartTime": 1716671700000
+              }
+            },
+            {
+              "label": "Playoff 7",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716670800000,
+                "estimatedOnDeckTime": 1716671340000,
+                "estimatedOnFieldTime": 1716671880000,
+                "estimatedStartTime": 1716672240000
+              }
+            },
+            {
+              "label": "Playoff 8",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716671340000,
+                "estimatedOnDeckTime": 1716671880000,
+                "estimatedOnFieldTime": 1716672420000,
+                "estimatedStartTime": 1716672780000
+              }
+            },
+            {
+              "label": "Playoff 9",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716672420000,
+                "estimatedOnDeckTime": 1716672420000,
+                "estimatedOnFieldTime": 1716672960000,
+                "estimatedStartTime": 1716673320000
+              }
+            },
+            {
+              "label": "Playoff 10",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716672960000,
+                "estimatedOnDeckTime": 1716672960000,
+                "estimatedOnFieldTime": 1716673500000,
+                "estimatedStartTime": 1716673860000
+              },
+              "breakAfter": "Break"
+            },
+            {
+              "label": "Playoff 11",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716673500000,
+                "estimatedOnDeckTime": 1716673500000,
+                "estimatedOnFieldTime": 1716673860000,
+                "estimatedStartTime": 1716674220000
+              }
+            },
+            {
+              "label": "Playoff 12",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716673500000,
+                "estimatedOnDeckTime": 1716673860000,
+                "estimatedOnFieldTime": 1716674400000,
+                "estimatedStartTime": 1716674760000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Playoff 13",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716674940000,
+                "estimatedOnDeckTime": 1716674940000,
+                "estimatedOnFieldTime": 1716675840000,
+                "estimatedStartTime": 1716676200000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 1",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716676380000,
+                "estimatedOnDeckTime": 1716676380000,
+                "estimatedOnFieldTime": 1716677280000,
+                "estimatedStartTime": 1716677640000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 2",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716677820000,
+                "estimatedOnDeckTime": 1716677820000,
+                "estimatedOnFieldTime": 1716678720000,
+                "estimatedStartTime": 1716679080000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 3",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716679260000,
+                "estimatedOnDeckTime": 1716679260000,
+                "estimatedOnFieldTime": 1716680160000,
+                "estimatedStartTime": 1716680520000
+              }
+            }
+          ],
+          "announcements": [],
+          "partsRequests": []
+        }
+      },
+      "EventStatusPostAlliances": {
+        "summary": "Pre-playoffs and post-alliance selection",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716598833201,
+          "matches": [
+            {
+              "label": "Practice 1",
+              "status": "On field",
+              "redTeams": ["1000", "1200", "2100"],
+              "blueTeams": ["3300", "2700", "1300"],
+              "times": {
+                "estimatedQueueTime": 1716591692461,
+                "estimatedOnDeckTime": 1716591692461,
+                "estimatedOnFieldTime": 1716591699570,
+                "estimatedStartTime": 1716592119570,
+                "actualQueueTime": 1716591692461,
+                "actualOnDeckTime": 1716591692461,
+                "actualOnFieldTime": 1716591699570
+              }
+            },
+            {
+              "label": "Practice 2",
+              "status": "On field",
+              "redTeams": ["2200", "1500", "2400"],
+              "blueTeams": ["3500", null, "1100"],
+              "times": {
+                "estimatedQueueTime": 1716591692995,
+                "estimatedOnDeckTime": 1716591699673,
+                "estimatedOnFieldTime": 1716591741945,
+                "estimatedStartTime": 1716592161945,
+                "actualQueueTime": 1716591692995,
+                "actualOnDeckTime": 1716591699673,
+                "actualOnFieldTime": 1716591741945
+              }
+            },
+            {
+              "label": "Practice 3",
+              "status": "On field",
+              "redTeams": ["800", "700", "1700"],
+              "blueTeams": ["3600", "3400", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716591700213,
+                "estimatedOnDeckTime": 1716591742045,
+                "estimatedOnFieldTime": 1716596373351,
+                "estimatedStartTime": 1716596793351,
+                "actualQueueTime": 1716591700213,
+                "actualOnDeckTime": 1716591742045,
+                "actualOnFieldTime": 1716596373351
+              }
+            },
+            {
+              "label": "Practice 4",
+              "status": "On field",
+              "redTeams": ["1800", "600", "3100"],
+              "blueTeams": ["200", "300", "2000"],
+              "times": {
+                "estimatedQueueTime": 1716591742580,
+                "estimatedOnDeckTime": 1716596373452,
+                "estimatedOnFieldTime": 1716596380157,
+                "estimatedStartTime": 1716596800157,
+                "actualQueueTime": 1716591742580,
+                "actualOnDeckTime": 1716596373452,
+                "actualOnFieldTime": 1716596380157
+              }
+            },
+            {
+              "label": "Practice 5",
+              "status": "On field",
+              "redTeams": ["3200", "2800", "2600"],
+              "blueTeams": ["500", "3000", "100"],
+              "times": {
+                "estimatedQueueTime": 1716596373978,
+                "estimatedOnDeckTime": 1716596380255,
+                "estimatedOnFieldTime": 1716596395853,
+                "estimatedStartTime": 1716596815853,
+                "actualQueueTime": 1716596373978,
+                "actualOnDeckTime": 1716596380255,
+                "actualOnFieldTime": 1716596395853
+              }
+            },
+            {
+              "label": "Practice 6",
+              "status": "On field",
+              "redTeams": ["1400", "1600", "1900"],
+              "blueTeams": ["2900", "2500", "400"],
+              "times": {
+                "estimatedQueueTime": 1716596380784,
+                "estimatedOnDeckTime": 1716596395948,
+                "estimatedOnFieldTime": 1716596401902,
+                "estimatedStartTime": 1716596821902,
+                "actualQueueTime": 1716596380784,
+                "actualOnDeckTime": 1716596395948,
+                "actualOnFieldTime": 1716596401902
+              }
+            },
+            {
+              "label": "Qualification 1",
+              "status": "On field",
+              "redTeams": ["2600", "3500", "2400"],
+              "blueTeams": ["1400", "900", "3300"],
+              "times": {
+                "estimatedQueueTime": 1716598502665,
+                "estimatedOnDeckTime": 1716598502665,
+                "estimatedOnFieldTime": 1716598509686,
+                "estimatedStartTime": 1716598779686,
+                "actualQueueTime": 1716598502665,
+                "actualOnDeckTime": 1716598502665,
+                "actualOnFieldTime": 1716598509686
+              }
+            },
+            {
+              "label": "Qualification 2",
+              "status": "On field",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716598502997,
+                "estimatedOnDeckTime": 1716598509762,
+                "estimatedOnFieldTime": 1716598516683,
+                "estimatedStartTime": 1716598786683,
+                "actualQueueTime": 1716598502997,
+                "actualOnDeckTime": 1716598509762,
+                "actualOnFieldTime": 1716598516683
+              }
+            },
+            {
+              "label": "Qualification 3",
+              "status": "On field",
+              "redTeams": ["600", "1100", "1600"],
+              "blueTeams": ["100", "3200", "300"],
+              "times": {
+                "estimatedQueueTime": 1716598510160,
+                "estimatedOnDeckTime": 1716598516760,
+                "estimatedOnFieldTime": 1716598523367,
+                "estimatedStartTime": 1716598793367,
+                "actualQueueTime": 1716598510160,
+                "actualOnDeckTime": 1716598516760,
+                "actualOnFieldTime": 1716598523367
+              }
+            },
+            {
+              "label": "Qualification 4",
+              "status": "On field",
+              "redTeams": ["1300", "400", "2100"],
+              "blueTeams": ["2700", "2000", "1200"],
+              "times": {
+                "estimatedQueueTime": 1716598517163,
+                "estimatedOnDeckTime": 1716598523427,
+                "estimatedOnFieldTime": 1716598530022,
+                "estimatedStartTime": 1716598800022,
+                "actualQueueTime": 1716598517163,
+                "actualOnDeckTime": 1716598523427,
+                "actualOnFieldTime": 1716598530022
+              }
+            },
+            {
+              "label": "Qualification 5",
+              "status": "On field",
+              "redTeams": ["3100", "1800", "2900"],
+              "blueTeams": ["3600", "2200", "1000"],
+              "times": {
+                "estimatedQueueTime": 1716598523749,
+                "estimatedOnDeckTime": 1716598530095,
+                "estimatedOnFieldTime": 1716598651267,
+                "estimatedStartTime": 1716598921267,
+                "actualQueueTime": 1716598523749,
+                "actualOnDeckTime": 1716598530095,
+                "actualOnFieldTime": 1716598651267
+              }
+            },
+            {
+              "label": "Qualification 6",
+              "status": "On field",
+              "redTeams": ["200", "800", "3000"],
+              "blueTeams": ["3400", "2300", "1900"],
+              "times": {
+                "estimatedQueueTime": 1716598530482,
+                "estimatedOnDeckTime": 1716598651339,
+                "estimatedOnFieldTime": 1716598657361,
+                "estimatedStartTime": 1716598927361,
+                "actualQueueTime": 1716598530482,
+                "actualOnDeckTime": 1716598651339,
+                "actualOnFieldTime": 1716598657361
+              },
+              "breakAfter": "Lunch"
+            },
+            {
+              "label": "Qualification 2 Replay",
+              "status": "On field",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716598664848,
+                "estimatedOnDeckTime": 1716598664848,
+                "estimatedOnFieldTime": 1716598671277,
+                "estimatedStartTime": 1716598941277,
+                "actualQueueTime": 1716598664848,
+                "actualOnDeckTime": 1716598664848,
+                "actualOnFieldTime": 1716598671277
+              },
+              "replayOf": "Qualification 2"
+            },
+            {
+              "label": "Qualification 7",
+              "status": "On field",
+              "redTeams": ["2900", "1500", "1000"],
+              "blueTeams": ["1300", "2100", "800"],
+              "times": {
+                "estimatedQueueTime": 1716598665239,
+                "estimatedOnDeckTime": 1716598671454,
+                "estimatedOnFieldTime": 1716598677942,
+                "estimatedStartTime": 1716598947942,
+                "actualQueueTime": 1716598665239,
+                "actualOnDeckTime": 1716598671454,
+                "actualOnFieldTime": 1716598677942
+              }
+            },
+            {
+              "label": "Qualification 8",
+              "status": "On field",
+              "redTeams": ["1600", "700", "2600"],
+              "blueTeams": ["3600", "300", "900"],
+              "times": {
+                "estimatedQueueTime": 1716598671841,
+                "estimatedOnDeckTime": 1716598678001,
+                "estimatedOnFieldTime": 1716598684446,
+                "estimatedStartTime": 1716598954446,
+                "actualQueueTime": 1716598671841,
+                "actualOnDeckTime": 1716598678001,
+                "actualOnFieldTime": 1716598684446
+              }
+            },
+            {
+              "label": "Qualification 9",
+              "status": "On field",
+              "redTeams": ["2200", "3300", "1800"],
+              "blueTeams": ["2400", "1400", "3400"],
+              "times": {
+                "estimatedQueueTime": 1716598678325,
+                "estimatedOnDeckTime": 1716598684518,
+                "estimatedOnFieldTime": 1716598691021,
+                "estimatedStartTime": 1716598961021,
+                "actualQueueTime": 1716598678325,
+                "actualOnDeckTime": 1716598684518,
+                "actualOnFieldTime": 1716598691021
+              }
+            },
+            {
+              "label": "Qualification 10",
+              "status": "On field",
+              "redTeams": ["3500", "1200", "1100"],
+              "blueTeams": ["2000", "500", "3000"],
+              "times": {
+                "estimatedQueueTime": 1716598684909,
+                "estimatedOnDeckTime": 1716598691093,
+                "estimatedOnFieldTime": 1716598698554,
+                "estimatedStartTime": 1716598968554,
+                "actualQueueTime": 1716598684909,
+                "actualOnDeckTime": 1716598691093,
+                "actualOnFieldTime": 1716598698554
+              }
+            },
+            {
+              "label": "Qualification 11",
+              "status": "On field",
+              "redTeams": ["100", "1700", "3100"],
+              "blueTeams": ["2700", "1900", "600"],
+              "times": {
+                "estimatedQueueTime": 1716598691479,
+                "estimatedOnDeckTime": 1716598698618,
+                "estimatedOnFieldTime": 1716598738907,
+                "estimatedStartTime": 1716599008907,
+                "actualQueueTime": 1716598691479,
+                "actualOnDeckTime": 1716598698618,
+                "actualOnFieldTime": 1716598738907
+              }
+            },
+            {
+              "label": "Qualification 12",
+              "status": "On field",
+              "redTeams": ["3200", "2300", "200"],
+              "blueTeams": ["2500", "400", "2800"],
+              "times": {
+                "estimatedQueueTime": 1716598698946,
+                "estimatedOnDeckTime": 1716598738968,
+                "estimatedOnFieldTime": 1716598744863,
+                "estimatedStartTime": 1716599014863,
+                "actualQueueTime": 1716598698946,
+                "actualOnDeckTime": 1716598738968,
+                "actualOnFieldTime": 1716598744863
+              },
+              "breakAfter": "Alliance selection"
+            },
+            {
+              "label": "Playoff 1",
+              "status": "Queuing soon",
+              "redTeams": ["400", "3000", "2400"],
+              "blueTeams": ["1700", "1900", "2100"],
+              "times": {
+                "estimatedQueueTime": 1716668100000,
+                "estimatedOnDeckTime": 1716668100000,
+                "estimatedOnFieldTime": 1716668640000,
+                "estimatedStartTime": 1716669000000
+              }
+            },
+            {
+              "label": "Playoff 2",
+              "status": "Queuing soon",
+              "redTeams": ["700", "1200", "800"],
+              "blueTeams": ["1000", "1100", "3100"],
+              "times": {
+                "estimatedQueueTime": 1716668100000,
+                "estimatedOnDeckTime": 1716668640000,
+                "estimatedOnFieldTime": 1716669180000,
+                "estimatedStartTime": 1716669540000
+              }
+            },
+            {
+              "label": "Playoff 3",
+              "status": "Queuing soon",
+              "redTeams": ["2600", "1600", "200"],
+              "blueTeams": ["100", "1800", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716668640000,
+                "estimatedOnDeckTime": 1716669180000,
+                "estimatedOnFieldTime": 1716669720000,
+                "estimatedStartTime": 1716670080000
+              }
+            },
+            {
+              "label": "Playoff 4",
+              "status": "Queuing soon",
+              "redTeams": ["2200", "600", "500"],
+              "blueTeams": ["3500", "2800", "2700"],
+              "times": {
+                "estimatedQueueTime": 1716669180000,
+                "estimatedOnDeckTime": 1716669720000,
+                "estimatedOnFieldTime": 1716670260000,
+                "estimatedStartTime": 1716670620000
+              }
+            },
+            {
+              "label": "Playoff 5",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716669720000,
+                "estimatedOnDeckTime": 1716670260000,
+                "estimatedOnFieldTime": 1716670800000,
+                "estimatedStartTime": 1716671160000
+              }
+            },
+            {
+              "label": "Playoff 6",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716670800000,
+                "estimatedOnDeckTime": 1716670800000,
+                "estimatedOnFieldTime": 1716671340000,
+                "estimatedStartTime": 1716671700000
+              }
+            },
+            {
+              "label": "Playoff 7",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716670800000,
+                "estimatedOnDeckTime": 1716671340000,
+                "estimatedOnFieldTime": 1716671880000,
+                "estimatedStartTime": 1716672240000
+              }
+            },
+            {
+              "label": "Playoff 8",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716671340000,
+                "estimatedOnDeckTime": 1716671880000,
+                "estimatedOnFieldTime": 1716672420000,
+                "estimatedStartTime": 1716672780000
+              }
+            },
+            {
+              "label": "Playoff 9",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716672420000,
+                "estimatedOnDeckTime": 1716672420000,
+                "estimatedOnFieldTime": 1716672960000,
+                "estimatedStartTime": 1716673320000
+              }
+            },
+            {
+              "label": "Playoff 10",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716672960000,
+                "estimatedOnDeckTime": 1716672960000,
+                "estimatedOnFieldTime": 1716673500000,
+                "estimatedStartTime": 1716673860000
+              },
+              "breakAfter": "Break"
+            },
+            {
+              "label": "Playoff 11",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716673500000,
+                "estimatedOnDeckTime": 1716673500000,
+                "estimatedOnFieldTime": 1716673860000,
+                "estimatedStartTime": 1716674220000
+              }
+            },
+            {
+              "label": "Playoff 12",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716673500000,
+                "estimatedOnDeckTime": 1716673860000,
+                "estimatedOnFieldTime": 1716674400000,
+                "estimatedStartTime": 1716674760000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Playoff 13",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716674940000,
+                "estimatedOnDeckTime": 1716674940000,
+                "estimatedOnFieldTime": 1716675840000,
+                "estimatedStartTime": 1716676200000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 1",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716676380000,
+                "estimatedOnDeckTime": 1716676380000,
+                "estimatedOnFieldTime": 1716677280000,
+                "estimatedStartTime": 1716677640000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 2",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716677820000,
+                "estimatedOnDeckTime": 1716677820000,
+                "estimatedOnFieldTime": 1716678720000,
+                "estimatedStartTime": 1716679080000
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 3",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716679260000,
+                "estimatedOnDeckTime": 1716679260000,
+                "estimatedOnFieldTime": 1716680160000,
+                "estimatedStartTime": 1716680520000
+              }
+            }
+          ],
+          "announcements": [],
+          "partsRequests": []
+        }
+      },
+      "EventStatusMidPlayoffs": {
+        "summary": "Mid-playoffs with backup team",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716598996815,
+          "nowQueuing": "Playoff 5",
+          "matches": [
+            {
+              "label": "Practice 1",
+              "status": "On field",
+              "redTeams": ["1000", "1200", "2100"],
+              "blueTeams": ["3300", "2700", "1300"],
+              "times": {
+                "estimatedQueueTime": 1716591692461,
+                "estimatedOnDeckTime": 1716591692461,
+                "estimatedOnFieldTime": 1716591699570,
+                "estimatedStartTime": 1716592119570,
+                "actualQueueTime": 1716591692461,
+                "actualOnDeckTime": 1716591692461,
+                "actualOnFieldTime": 1716591699570
+              }
+            },
+            {
+              "label": "Practice 2",
+              "status": "On field",
+              "redTeams": ["2200", "1500", "2400"],
+              "blueTeams": ["3500", null, "1100"],
+              "times": {
+                "estimatedQueueTime": 1716591692995,
+                "estimatedOnDeckTime": 1716591699673,
+                "estimatedOnFieldTime": 1716591741945,
+                "estimatedStartTime": 1716592161945,
+                "actualQueueTime": 1716591692995,
+                "actualOnDeckTime": 1716591699673,
+                "actualOnFieldTime": 1716591741945
+              }
+            },
+            {
+              "label": "Practice 3",
+              "status": "On field",
+              "redTeams": ["800", "700", "1700"],
+              "blueTeams": ["3600", "3400", "2300"],
+              "times": {
+                "estimatedQueueTime": 1716591700213,
+                "estimatedOnDeckTime": 1716591742045,
+                "estimatedOnFieldTime": 1716596373351,
+                "estimatedStartTime": 1716596793351,
+                "actualQueueTime": 1716591700213,
+                "actualOnDeckTime": 1716591742045,
+                "actualOnFieldTime": 1716596373351
+              }
+            },
+            {
+              "label": "Practice 4",
+              "status": "On field",
+              "redTeams": ["1800", "600", "3100"],
+              "blueTeams": ["200", "300", "2000"],
+              "times": {
+                "estimatedQueueTime": 1716591742580,
+                "estimatedOnDeckTime": 1716596373452,
+                "estimatedOnFieldTime": 1716596380157,
+                "estimatedStartTime": 1716596800157,
+                "actualQueueTime": 1716591742580,
+                "actualOnDeckTime": 1716596373452,
+                "actualOnFieldTime": 1716596380157
+              }
+            },
+            {
+              "label": "Practice 5",
+              "status": "On field",
+              "redTeams": ["3200", "2800", "2600"],
+              "blueTeams": ["500", "3000", "100"],
+              "times": {
+                "estimatedQueueTime": 1716596373978,
+                "estimatedOnDeckTime": 1716596380255,
+                "estimatedOnFieldTime": 1716596395853,
+                "estimatedStartTime": 1716596815853,
+                "actualQueueTime": 1716596373978,
+                "actualOnDeckTime": 1716596380255,
+                "actualOnFieldTime": 1716596395853
+              }
+            },
+            {
+              "label": "Practice 6",
+              "status": "On field",
+              "redTeams": ["1400", "1600", "1900"],
+              "blueTeams": ["2900", "2500", "400"],
+              "times": {
+                "estimatedQueueTime": 1716596380784,
+                "estimatedOnDeckTime": 1716596395948,
+                "estimatedOnFieldTime": 1716596401902,
+                "estimatedStartTime": 1716596821902,
+                "actualQueueTime": 1716596380784,
+                "actualOnDeckTime": 1716596395948,
+                "actualOnFieldTime": 1716596401902
+              }
+            },
+            {
+              "label": "Qualification 1",
+              "status": "On field",
+              "redTeams": ["2600", "3500", "2400"],
+              "blueTeams": ["1400", "900", "3300"],
+              "times": {
+                "estimatedQueueTime": 1716598502665,
+                "estimatedOnDeckTime": 1716598502665,
+                "estimatedOnFieldTime": 1716598509686,
+                "estimatedStartTime": 1716598779686,
+                "actualQueueTime": 1716598502665,
+                "actualOnDeckTime": 1716598502665,
+                "actualOnFieldTime": 1716598509686
+              }
+            },
+            {
+              "label": "Qualification 2",
+              "status": "On field",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716598502997,
+                "estimatedOnDeckTime": 1716598509762,
+                "estimatedOnFieldTime": 1716598516683,
+                "estimatedStartTime": 1716598786683,
+                "actualQueueTime": 1716598502997,
+                "actualOnDeckTime": 1716598509762,
+                "actualOnFieldTime": 1716598516683
+              }
+            },
+            {
+              "label": "Qualification 3",
+              "status": "On field",
+              "redTeams": ["600", "1100", "1600"],
+              "blueTeams": ["100", "3200", "300"],
+              "times": {
+                "estimatedQueueTime": 1716598510160,
+                "estimatedOnDeckTime": 1716598516760,
+                "estimatedOnFieldTime": 1716598523367,
+                "estimatedStartTime": 1716598793367,
+                "actualQueueTime": 1716598510160,
+                "actualOnDeckTime": 1716598516760,
+                "actualOnFieldTime": 1716598523367
+              }
+            },
+            {
+              "label": "Qualification 4",
+              "status": "On field",
+              "redTeams": ["1300", "400", "2100"],
+              "blueTeams": ["2700", "2000", "1200"],
+              "times": {
+                "estimatedQueueTime": 1716598517163,
+                "estimatedOnDeckTime": 1716598523427,
+                "estimatedOnFieldTime": 1716598530022,
+                "estimatedStartTime": 1716598800022,
+                "actualQueueTime": 1716598517163,
+                "actualOnDeckTime": 1716598523427,
+                "actualOnFieldTime": 1716598530022
+              }
+            },
+            {
+              "label": "Qualification 5",
+              "status": "On field",
+              "redTeams": ["3100", "1800", "2900"],
+              "blueTeams": ["3600", "2200", "1000"],
+              "times": {
+                "estimatedQueueTime": 1716598523749,
+                "estimatedOnDeckTime": 1716598530095,
+                "estimatedOnFieldTime": 1716598651267,
+                "estimatedStartTime": 1716598921267,
+                "actualQueueTime": 1716598523749,
+                "actualOnDeckTime": 1716598530095,
+                "actualOnFieldTime": 1716598651267
+              }
+            },
+            {
+              "label": "Qualification 6",
+              "status": "On field",
+              "redTeams": ["200", "800", "3000"],
+              "blueTeams": ["3400", "2300", "1900"],
+              "times": {
+                "estimatedQueueTime": 1716598530482,
+                "estimatedOnDeckTime": 1716598651339,
+                "estimatedOnFieldTime": 1716598657361,
+                "estimatedStartTime": 1716598927361,
+                "actualQueueTime": 1716598530482,
+                "actualOnDeckTime": 1716598651339,
+                "actualOnFieldTime": 1716598657361
+              },
+              "breakAfter": "Lunch"
+            },
+            {
+              "label": "Qualification 2 Replay",
+              "status": "On field",
+              "redTeams": ["700", "1500", "2800"],
+              "blueTeams": ["1700", "2500", "500"],
+              "times": {
+                "estimatedQueueTime": 1716598664848,
+                "estimatedOnDeckTime": 1716598664848,
+                "estimatedOnFieldTime": 1716598671277,
+                "estimatedStartTime": 1716598941277,
+                "actualQueueTime": 1716598664848,
+                "actualOnDeckTime": 1716598664848,
+                "actualOnFieldTime": 1716598671277
+              },
+              "replayOf": "Qualification 2"
+            },
+            {
+              "label": "Qualification 7",
+              "status": "On field",
+              "redTeams": ["2900", "1500", "1000"],
+              "blueTeams": ["1300", "2100", "800"],
+              "times": {
+                "estimatedQueueTime": 1716598665239,
+                "estimatedOnDeckTime": 1716598671454,
+                "estimatedOnFieldTime": 1716598677942,
+                "estimatedStartTime": 1716598947942,
+                "actualQueueTime": 1716598665239,
+                "actualOnDeckTime": 1716598671454,
+                "actualOnFieldTime": 1716598677942
+              }
+            },
+            {
+              "label": "Qualification 8",
+              "status": "On field",
+              "redTeams": ["1600", "700", "2600"],
+              "blueTeams": ["3600", "300", "900"],
+              "times": {
+                "estimatedQueueTime": 1716598671841,
+                "estimatedOnDeckTime": 1716598678001,
+                "estimatedOnFieldTime": 1716598684446,
+                "estimatedStartTime": 1716598954446,
+                "actualQueueTime": 1716598671841,
+                "actualOnDeckTime": 1716598678001,
+                "actualOnFieldTime": 1716598684446
+              }
+            },
+            {
+              "label": "Qualification 9",
+              "status": "On field",
+              "redTeams": ["2200", "3300", "1800"],
+              "blueTeams": ["2400", "1400", "3400"],
+              "times": {
+                "estimatedQueueTime": 1716598678325,
+                "estimatedOnDeckTime": 1716598684518,
+                "estimatedOnFieldTime": 1716598691021,
+                "estimatedStartTime": 1716598961021,
+                "actualQueueTime": 1716598678325,
+                "actualOnDeckTime": 1716598684518,
+                "actualOnFieldTime": 1716598691021
+              }
+            },
+            {
+              "label": "Qualification 10",
+              "status": "On field",
+              "redTeams": ["3500", "1200", "1100"],
+              "blueTeams": ["2000", "500", "3000"],
+              "times": {
+                "estimatedQueueTime": 1716598684909,
+                "estimatedOnDeckTime": 1716598691093,
+                "estimatedOnFieldTime": 1716598698554,
+                "estimatedStartTime": 1716598968554,
+                "actualQueueTime": 1716598684909,
+                "actualOnDeckTime": 1716598691093,
+                "actualOnFieldTime": 1716598698554
+              }
+            },
+            {
+              "label": "Qualification 11",
+              "status": "On field",
+              "redTeams": ["100", "1700", "3100"],
+              "blueTeams": ["2700", "1900", "600"],
+              "times": {
+                "estimatedQueueTime": 1716598691479,
+                "estimatedOnDeckTime": 1716598698618,
+                "estimatedOnFieldTime": 1716598738907,
+                "estimatedStartTime": 1716599008907,
+                "actualQueueTime": 1716598691479,
+                "actualOnDeckTime": 1716598698618,
+                "actualOnFieldTime": 1716598738907
+              }
+            },
+            {
+              "label": "Qualification 12",
+              "status": "On field",
+              "redTeams": ["3200", "2300", "200"],
+              "blueTeams": ["2500", "400", "2800"],
+              "times": {
+                "estimatedQueueTime": 1716598698946,
+                "estimatedOnDeckTime": 1716598738968,
+                "estimatedOnFieldTime": 1716598744863,
+                "estimatedStartTime": 1716599014863,
+                "actualQueueTime": 1716598698946,
+                "actualOnDeckTime": 1716598738968,
+                "actualOnFieldTime": 1716598744863
+              },
+              "breakAfter": "Alliance selection"
+            },
+            {
+              "label": "Playoff 1",
+              "status": "On field",
+              "redTeams": ["400", "2400", "3000"],
+              "blueTeams": ["1700", "1900", "2100"],
+              "times": {
+                "estimatedQueueTime": 1716598887533,
+                "estimatedOnDeckTime": 1716598887533,
+                "estimatedOnFieldTime": 1716598894942,
+                "estimatedStartTime": 1716599254942,
+                "actualQueueTime": 1716598887533,
+                "actualOnDeckTime": 1716598887533,
+                "actualOnFieldTime": 1716598894942
+              }
+            },
+            {
+              "label": "Playoff 2",
+              "status": "On field",
+              "redTeams": ["700", "800", "1200"],
+              "blueTeams": ["1000", "1100", "3100"],
+              "times": {
+                "estimatedQueueTime": 1716598887842,
+                "estimatedOnDeckTime": 1716598895017,
+                "estimatedOnFieldTime": 1716598915359,
+                "estimatedStartTime": 1716599275359,
+                "actualQueueTime": 1716598887842,
+                "actualOnDeckTime": 1716598895017,
+                "actualOnFieldTime": 1716598915359
+              }
+            },
+            {
+              "label": "Playoff 3",
+              "status": "On field",
+              "redTeams": ["200", "1600", "2600"],
+              "blueTeams": ["100", "1800", "2300", "3600"],
+              "times": {
+                "estimatedQueueTime": 1716598895406,
+                "estimatedOnDeckTime": 1716598915417,
+                "estimatedOnFieldTime": 1716598932762,
+                "estimatedStartTime": 1716599292762,
+                "actualQueueTime": 1716598895406,
+                "actualOnDeckTime": 1716598915417,
+                "actualOnFieldTime": 1716598932762
+              }
+            },
+            {
+              "label": "Playoff 4",
+              "status": "On field",
+              "redTeams": ["500", "600", "2200"],
+              "blueTeams": ["2700", "2800", "3500"],
+              "times": {
+                "estimatedQueueTime": 1716598915725,
+                "estimatedOnDeckTime": 1716598932837,
+                "estimatedOnFieldTime": 1716598946138,
+                "estimatedStartTime": 1716599306138,
+                "actualQueueTime": 1716598915725,
+                "actualOnDeckTime": 1716598932837,
+                "actualOnFieldTime": 1716598946138
+              }
+            },
+            {
+              "label": "Playoff 5",
+              "status": "On deck",
+              "redTeams": ["1700", "1900", "2100"],
+              "blueTeams": ["1000", "1100", "3100"],
+              "times": {
+                "estimatedQueueTime": 1716598933240,
+                "estimatedOnDeckTime": 1716598946212,
+                "estimatedOnFieldTime": 1716599486212,
+                "estimatedStartTime": 1716599846212,
+                "actualQueueTime": 1716598933240,
+                "actualOnDeckTime": 1716598946212
+              }
+            },
+            {
+              "label": "Playoff 6",
+              "status": "Queuing soon",
+              "redTeams": ["100", "1800", "2300", "3600"],
+              "times": {
+                "estimatedQueueTime": 1716599486212,
+                "estimatedOnDeckTime": 1716599486212,
+                "estimatedOnFieldTime": 1716600026212,
+                "estimatedStartTime": 1716600386212
+              }
+            },
+            {
+              "label": "Playoff 7",
+              "status": "Queuing soon",
+              "redTeams": ["400", "2400", "3000"],
+              "blueTeams": ["700", "800", "1200"],
+              "times": {
+                "estimatedQueueTime": 1716599486212,
+                "estimatedOnDeckTime": 1716600026212,
+                "estimatedOnFieldTime": 1716600566212,
+                "estimatedStartTime": 1716600926212
+              }
+            },
+            {
+              "label": "Playoff 8",
+              "status": "Queuing soon",
+              "redTeams": ["200", "1600", "2600"],
+              "times": {
+                "estimatedQueueTime": 1716600026212,
+                "estimatedOnDeckTime": 1716600566212,
+                "estimatedOnFieldTime": 1716601106212,
+                "estimatedStartTime": 1716601466212
+              }
+            },
+            {
+              "label": "Playoff 9",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716601106212,
+                "estimatedOnDeckTime": 1716601106212,
+                "estimatedOnFieldTime": 1716601646212,
+                "estimatedStartTime": 1716602006212
+              }
+            },
+            {
+              "label": "Playoff 10",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716601646212,
+                "estimatedOnDeckTime": 1716601646212,
+                "estimatedOnFieldTime": 1716602186212,
+                "estimatedStartTime": 1716602546212
+              },
+              "breakAfter": "Break"
+            },
+            {
+              "label": "Playoff 11",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716602186212,
+                "estimatedOnDeckTime": 1716602186212,
+                "estimatedOnFieldTime": 1716602546212,
+                "estimatedStartTime": 1716602906212
+              }
+            },
+            {
+              "label": "Playoff 12",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716602186212,
+                "estimatedOnDeckTime": 1716602546212,
+                "estimatedOnFieldTime": 1716603086212,
+                "estimatedStartTime": 1716603446212
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Playoff 13",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716603626212,
+                "estimatedOnDeckTime": 1716603626212,
+                "estimatedOnFieldTime": 1716604526212,
+                "estimatedStartTime": 1716604886212
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 1",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716605066212,
+                "estimatedOnDeckTime": 1716605066212,
+                "estimatedOnFieldTime": 1716605966212,
+                "estimatedStartTime": 1716606326212
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 2",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716606506212,
+                "estimatedOnDeckTime": 1716606506212,
+                "estimatedOnFieldTime": 1716607406212,
+                "estimatedStartTime": 1716607766212
+              },
+              "breakAfter": "Awards break"
+            },
+            {
+              "label": "Final 3",
+              "status": "Queuing soon",
+              "times": {
+                "estimatedQueueTime": 1716607946212,
+                "estimatedOnDeckTime": 1716607946212,
+                "estimatedOnFieldTime": 1716608846212,
+                "estimatedStartTime": 1716609206212
+              }
+            }
+          ],
+          "announcements": [],
+          "partsRequests": []
+        }
+      },
+      "MatchStatusPractice": {
+        "summary": "Now queuing notification for a practice match",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716591216610,
+          "match": {
+            "label": "Practice 4",
+            "status": "Now queuing",
+            "redTeams": ["1800", "600", "3100"],
+            "blueTeams": ["200", "300", "2000"],
+            "times": {
+              "estimatedQueueTime": 1716591742580,
+              "estimatedOnDeckTime": 1716592342045,
+              "estimatedOnFieldTime": 1716592942045,
+              "estimatedStartTime": 1716593362045,
+              "actualQueueTime": 1716591742580
+            }
+          }
+        }
+      },
+      "MatchStatusQualification": {
+        "summary": "On deck notification for a qualification match",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716591216610,
+          "match": {
+            "label": "Qualification 5",
+            "status": "On deck",
+            "redTeams": ["3100", "1800", "2900"],
+            "blueTeams": ["3600", "2200", "1000"],
+            "times": {
+              "estimatedQueueTime": 1716598523749,
+              "estimatedOnDeckTime": 1716598530095,
+              "estimatedOnFieldTime": 1716598980095,
+              "estimatedStartTime": 1716599250095,
+              "actualQueueTime": 1716598523749,
+              "actualOnDeckTime": 1716598530095
+            }
+          }
+        }
+      },
+      "MatchStatusReplay": {
+        "summary": "On deck notification for a qualification match replay",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716591216610,
+          "match": {
+            "label": "Qualification 5 Replay",
+            "status": "On deck",
+            "redTeams": ["3100", "1800", "2900"],
+            "blueTeams": ["3600", "2200", "1000"],
+            "times": {
+              "estimatedQueueTime": 1716598523749,
+              "estimatedOnDeckTime": 1716598530095,
+              "estimatedOnFieldTime": 1716598980095,
+              "estimatedStartTime": 1716599250095,
+              "actualQueueTime": 1716598523749,
+              "actualOnDeckTime": 1716598530095
+            },
+            "replayOf": "Qualification 5"
+          }
+        }
+      },
+      "MatchStatusPlayoff": {
+        "summary": "On field notification for a playoff match",
+        "value": {
+          "eventKey": "2024casf",
+          "dataAsOfTime": 1716591216610,
+          "match": {
+            "label": "Playoff 2",
+            "status": "On field",
+            "redTeams": ["700", "800", "1200"],
+            "blueTeams": ["1000", "1100", "3100"],
+            "times": {
+              "estimatedQueueTime": 1716598887842,
+              "estimatedOnDeckTime": 1716598895017,
+              "estimatedOnFieldTime": 1716598915359,
+              "estimatedStartTime": 1716599275359,
+              "actualQueueTime": 1716598887842,
+              "actualOnDeckTime": 1716598895017,
+              "actualOnFieldTime": 1716598915359
+            }
+          }
+        }
+      },
+      "PitMapWithAngles": {
+        "summary": "A complex pit map with many elements at an angle.",
+        "description": "[View this example rendered in Nexus](https://guides.frc.nexus/assets/images/example-pit-maps/api-complex.png)",
+        "value": {
+          "areas": {
+            "a0": {
+              "angle": -12.1937,
+              "label": "Inspection",
+              "position": {
+                "x": 1568.5757,
+                "y": 413.0272
+              },
+              "size": {
+                "x": 170,
+                "y": 200
+              }
+            },
+            "a1": {
+              "angle": -10.9301,
+              "label": "Pit admin",
+              "position": {
+                "x": 1067.6665,
+                "y": 1002.9542
+              },
+              "size": {
+                "x": 240,
+                "y": 130
+              }
+            },
+            "a2": {
+              "angle": -11.7209,
+              "label": "Radio config",
+              "position": {
+                "x": 1580.6394,
+                "y": 603.5208
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            "a3": {
+              "angle": -10.2705,
+              "label": "Concessions",
+              "position": {
+                "x": 255.5911,
+                "y": 883.4365
+              },
+              "size": {
+                "x": 200,
+                "y": 230
+              }
+            }
+          },
+          "arrows": {
+            "r0": {
+              "angle": -11.5741,
+              "position": {
+                "x": 1288.1374,
+                "y": 934.9822
+              },
+              "size": {
+                "x": 46,
+                "y": 86
+              },
+              "type": "double"
+            }
+          },
+          "labels": {
+            "l0": {
+              "angle": -10.8487,
+              "label": "Field",
+              "position": {
+                "x": 1309.4127,
+                "y": 1050.4699
+              },
+              "size": {
+                "x": 55,
+                "y": 55
+              }
+            }
+          },
+          "pits": {
+            "A1": {
+              "angle": -11.1558,
+              "position": {
+                "x": 1063.3314,
+                "y": 602.5344
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "100"
+            },
+            "A2": {
+              "angle": -11.1558,
+              "position": {
+                "x": 965.2209,
+                "y": 621.8823
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "200"
+            },
+            "A3": {
+              "angle": -11.1558,
+              "position": {
+                "x": 867.1105,
+                "y": 641.2301
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "300"
+            },
+            "A4": {
+              "angle": -11.1558,
+              "position": {
+                "x": 769,
+                "y": 660.5779
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "400"
+            },
+            "A5": {
+              "angle": -11.1558,
+              "position": {
+                "x": 670.8895,
+                "y": 679.9257
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "500"
+            },
+            "A6": {
+              "angle": -11.1558,
+              "position": {
+                "x": 572.7791,
+                "y": 699.2736
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "600"
+            },
+            "A7": {
+              "angle": -11.1558,
+              "position": {
+                "x": 474.6686,
+                "y": 718.6214
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "700"
+            },
+            "B1": {
+              "position": {
+                "x": 1210,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "800"
+            },
+            "B2": {
+              "position": {
+                "x": 1110,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "900"
+            },
+            "B3": {
+              "position": {
+                "x": 1010,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1000"
+            },
+            "B4": {
+              "position": {
+                "x": 910,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1100"
+            },
+            "B5": {
+              "position": {
+                "x": 612,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1200"
+            },
+            "B6": {
+              "position": {
+                "x": 512,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1300"
+            },
+            "B7": {
+              "position": {
+                "x": 412,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1400"
+            },
+            "B8": {
+              "position": {
+                "x": 312,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1500"
+            },
+            "B9": {
+              "position": {
+                "x": 212,
+                "y": 397
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1600"
+            },
+            "C1": {
+              "position": {
+                "x": 1210,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1700"
+            },
+            "C2": {
+              "position": {
+                "x": 1110,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1800"
+            },
+            "C3": {
+              "position": {
+                "x": 1010,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1900"
+            },
+            "C4": {
+              "position": {
+                "x": 910,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2000"
+            },
+            "C5": {
+              "position": {
+                "x": 612,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2100"
+            },
+            "C6": {
+              "position": {
+                "x": 512,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2200"
+            },
+            "C7": {
+              "position": {
+                "x": 412,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2300"
+            },
+            "C8": {
+              "position": {
+                "x": 312,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2400"
+            },
+            "C9": {
+              "position": {
+                "x": 212,
+                "y": 297
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2500"
+            },
+            "D1": {
+              "position": {
+                "x": 1110,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2600"
+            },
+            "D2": {
+              "position": {
+                "x": 1010,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2700"
+            },
+            "D3": {
+              "position": {
+                "x": 910,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2800"
+            },
+            "D4": {
+              "position": {
+                "x": 810,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2900"
+            },
+            "D5": {
+              "position": {
+                "x": 475,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3000"
+            },
+            "D6": {
+              "position": {
+                "x": 375,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3100"
+            },
+            "D7": {
+              "position": {
+                "x": 275,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3200"
+            },
+            "D8": {
+              "position": {
+                "x": 175,
+                "y": 91
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3300"
+            }
+          },
+          "size": {
+            "x": 1815,
+            "y": 1090
+          },
+          "walls": {
+            "w0": {
+              "angle": -11.6372,
+              "position": {
+                "x": 1580.6394,
+                "y": 259.2953
+              },
+              "size": {
+                "x": 280,
+                "y": 20
+              }
+            },
+            "w1": {
+              "angle": -10.3142,
+              "position": {
+                "x": 1210,
+                "y": 85.3519
+              },
+              "size": {
+                "x": 20,
+                "y": 160
+              }
+            },
+            "w10": {
+              "angle": -11.6372,
+              "position": {
+                "x": 249,
+                "y": 699.7227
+              },
+              "size": {
+                "x": 300,
+                "y": 20
+              }
+            },
+            "w11": {
+              "angle": -10.3142,
+              "position": {
+                "x": 419.0381,
+                "y": 846.4365
+              },
+              "size": {
+                "x": 20,
+                "y": 370
+              }
+            },
+            "w12": {
+              "angle": -11.255,
+              "position": {
+                "x": 827.1245,
+                "y": 945.1049
+              },
+              "size": {
+                "x": 790,
+                "y": 20
+              }
+            },
+            "w13": {
+              "angle": -10.3142,
+              "position": {
+                "x": 1355.6857,
+                "y": 934.9822
+              },
+              "size": {
+                "x": 20,
+                "y": 190
+              }
+            },
+            "w2": {
+              "angle": -10.3142,
+              "position": {
+                "x": 1353,
+                "y": 85.3519
+              },
+              "size": {
+                "x": 20,
+                "y": 160
+              }
+            },
+            "w3": {
+              "position": {
+                "x": 245,
+                "y": 10
+              },
+              "size": {
+                "x": 490,
+                "y": 20
+              }
+            },
+            "w4": {
+              "angle": -13.5598,
+              "position": {
+                "x": 62.5253,
+                "y": 225.9271
+              },
+              "size": {
+                "x": 20,
+                "y": 450
+              }
+            },
+            "w5": {
+              "position": {
+                "x": 1013.7713,
+                "y": 10
+              },
+              "size": {
+                "x": 670,
+                "y": 20
+              }
+            },
+            "w6": {
+              "angle": -10.3142,
+              "position": {
+                "x": 1222.2405,
+                "y": 964.9822
+              },
+              "size": {
+                "x": 20,
+                "y": 190
+              }
+            },
+            "w7": {
+              "angle": -11.6372,
+              "position": {
+                "x": 1570.8189,
+                "y": 802.9885
+              },
+              "size": {
+                "x": 490,
+                "y": 20
+              }
+            },
+            "w8": {
+              "angle": -10.3142,
+              "position": {
+                "x": 1756.4009,
+                "y": 494.6075
+              },
+              "size": {
+                "x": 20,
+                "y": 550
+              }
+            },
+            "w9": {
+              "angle": -10.3142,
+              "position": {
+                "x": 1442,
+                "y": 226.6705
+              },
+              "size": {
+                "x": 20,
+                "y": 140
+              }
+            }
+          }
+        }
+      },
+      "PitMapSimple": {
+        "summary": "A simple pit map with straight rows of pits.",
+        "description": "[View this example rendered in Nexus](https://guides.frc.nexus/assets/images/example-pit-maps/api-simple.png)",
+        "value": {
+          "areas": {
+            "a0": {
+              "label": "Spare parts",
+              "position": {
+                "x": 770,
+                "y": 170
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            "a1": {
+              "label": "Inspection",
+              "position": {
+                "x": 590,
+                "y": 70
+              },
+              "size": {
+                "x": 140,
+                "y": 100
+              }
+            },
+            "a2": {
+              "label": "Pit admin",
+              "position": {
+                "x": 371,
+                "y": 70
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            "a3": {
+              "label": "EMT",
+              "position": {
+                "x": 470,
+                "y": 70
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            }
+          },
+          "arrows": {
+            "r0": {
+              "angle": 180,
+              "position": {
+                "x": 173,
+                "y": 1130
+              },
+              "size": {
+                "x": 46,
+                "y": 86
+              },
+              "type": "single"
+            },
+            "r1": {
+              "position": {
+                "x": 570,
+                "y": 1130
+              },
+              "size": {
+                "x": 46,
+                "y": 86
+              },
+              "type": "single"
+            },
+            "r2": {
+              "angle": -90,
+              "position": {
+                "x": 46,
+                "y": 1249.2708
+              },
+              "size": {
+                "x": 46,
+                "y": 86
+              },
+              "type": "single"
+            },
+            "r3": {
+              "angle": 90,
+              "position": {
+                "x": 794,
+                "y": 1228.2708
+              },
+              "size": {
+                "x": 46,
+                "y": 86
+              },
+              "type": "single"
+            }
+          },
+          "labels": {
+            "l0": {
+              "label": "Field",
+              "position": {
+                "x": 135.7671,
+                "y": 1249.0404
+              },
+              "size": {
+                "x": 55,
+                "y": 55
+              }
+            },
+            "l1": {
+              "label": "Practice field",
+              "position": {
+                "x": 685,
+                "y": 1230
+              },
+              "size": {
+                "x": 95,
+                "y": 95
+              }
+            }
+          },
+          "pits": {
+            "A1": {
+              "position": {
+                "x": 70,
+                "y": 1020
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "100"
+            },
+            "A2": {
+              "position": {
+                "x": 70,
+                "y": 920
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "200"
+            },
+            "A3": {
+              "position": {
+                "x": 70,
+                "y": 820
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "300"
+            },
+            "A4": {
+              "position": {
+                "x": 70,
+                "y": 720
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "400"
+            },
+            "A5": {
+              "position": {
+                "x": 70,
+                "y": 620
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "500"
+            },
+            "A6": {
+              "position": {
+                "x": 70,
+                "y": 520
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "600"
+            },
+            "A7": {
+              "position": {
+                "x": 70,
+                "y": 420
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "700"
+            },
+            "A8": {
+              "position": {
+                "x": 70,
+                "y": 320
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "800"
+            },
+            "A9": {
+              "position": {
+                "x": 70,
+                "y": 220
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "900"
+            },
+            "B1": {
+              "position": {
+                "x": 270,
+                "y": 970
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1700"
+            },
+            "B2": {
+              "position": {
+                "x": 270,
+                "y": 870
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1600"
+            },
+            "B3": {
+              "position": {
+                "x": 270,
+                "y": 770
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1500"
+            },
+            "B4": {
+              "position": {
+                "x": 270,
+                "y": 670
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1400"
+            },
+            "B5": {
+              "position": {
+                "x": 270,
+                "y": 570
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1300"
+            },
+            "B6": {
+              "position": {
+                "x": 270,
+                "y": 470
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1200"
+            },
+            "B7": {
+              "position": {
+                "x": 270,
+                "y": 370
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1100"
+            },
+            "B8": {
+              "position": {
+                "x": 270,
+                "y": 270
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1000"
+            },
+            "C1": {
+              "position": {
+                "x": 370,
+                "y": 970
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1800"
+            },
+            "C2": {
+              "position": {
+                "x": 370,
+                "y": 870
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "1900"
+            },
+            "C3": {
+              "position": {
+                "x": 370,
+                "y": 770
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2000"
+            },
+            "C4": {
+              "position": {
+                "x": 370,
+                "y": 670
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2100"
+            },
+            "C5": {
+              "position": {
+                "x": 370,
+                "y": 570
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2200"
+            },
+            "C6": {
+              "position": {
+                "x": 370,
+                "y": 470
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2300"
+            },
+            "C7": {
+              "position": {
+                "x": 370,
+                "y": 370
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2400"
+            },
+            "C8": {
+              "position": {
+                "x": 370,
+                "y": 270
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2500"
+            },
+            "D1": {
+              "position": {
+                "x": 570,
+                "y": 970
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3300"
+            },
+            "D2": {
+              "position": {
+                "x": 570,
+                "y": 870
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3200"
+            },
+            "D3": {
+              "position": {
+                "x": 570,
+                "y": 770
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3100"
+            },
+            "D4": {
+              "position": {
+                "x": 570,
+                "y": 670
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3000"
+            },
+            "D5": {
+              "position": {
+                "x": 570,
+                "y": 570
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2900"
+            },
+            "D6": {
+              "position": {
+                "x": 570,
+                "y": 470
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2800"
+            },
+            "D7": {
+              "position": {
+                "x": 570,
+                "y": 370
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2700"
+            },
+            "D8": {
+              "position": {
+                "x": 570,
+                "y": 270
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "2600"
+            },
+            "E1": {
+              "position": {
+                "x": 770,
+                "y": 970
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3400"
+            },
+            "E2": {
+              "position": {
+                "x": 770,
+                "y": 870
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3500"
+            },
+            "E3": {
+              "position": {
+                "x": 770,
+                "y": 770
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              },
+              "team": "3600"
+            },
+            "E4": {
+              "position": {
+                "x": 770,
+                "y": 670
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            "E5": {
+              "position": {
+                "x": 770,
+                "y": 570
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            "E6": {
+              "position": {
+                "x": 770,
+                "y": 470
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            "E7": {
+              "position": {
+                "x": 770,
+                "y": 370
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            },
+            "E8": {
+              "position": {
+                "x": 770,
+                "y": 270
+              },
+              "size": {
+                "x": 100,
+                "y": 100
+              }
+            }
+          },
+          "size": {
+            "x": 840,
+            "y": 1293
+          },
+          "walls": {
+            "w0": {
+              "position": {
+                "x": 740,
+                "y": 70
+              },
+              "size": {
+                "x": 160,
+                "y": 100
+              }
+            },
+            "w1": {
+              "position": {
+                "x": 830,
+                "y": 570
+              },
+              "size": {
+                "x": 20,
+                "y": 1140
+              }
+            },
+            "w2": {
+              "position": {
+                "x": 10,
+                "y": 570
+              },
+              "size": {
+                "x": 20,
+                "y": 1140
+              }
+            },
+            "w3": {
+              "position": {
+                "x": 420,
+                "y": 1130
+              },
+              "size": {
+                "x": 840,
+                "y": 20
+              }
+            },
+            "w4": {
+              "position": {
+                "x": 420,
+                "y": 10
+              },
+              "size": {
+                "x": 840,
+                "y": 20
+              }
+            },
+            "w5": {
+              "position": {
+                "x": 120,
+                "y": 70
+              },
+              "size": {
+                "x": 200,
+                "y": 100
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "Nexus-Api-Key": []
+    }
+  ]
+}

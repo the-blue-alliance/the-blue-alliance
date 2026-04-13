@@ -149,6 +149,11 @@ import {
 } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
 import {
+  type NexusMatchStatus,
+  buildNexusStatusMap,
+  getNexusEventStatusOptions,
+} from '~/lib/nexus';
+import {
   getDefaultAutoComponentName,
   getDefaultTeleopComponentName,
 } from '~/lib/oprUtils';
@@ -183,6 +188,9 @@ export const Route = createFileRoute('/event/$eventKey')({
         getEventAlliancesOptions({ path: { event_key: params.eventKey } }),
       )
       .catch(() => []);
+    const nexusQuery = queryClient
+      .ensureQueryData(getNexusEventStatusOptions(params.eventKey))
+      .catch(() => null);
 
     const event = await queryClient
       .ensureQueryData(
@@ -217,7 +225,7 @@ export const Route = createFileRoute('/event/$eventKey')({
         .catch(() => undefined);
     }
 
-    await Promise.all([matchesQuery, alliancesQuery]);
+    await Promise.all([matchesQuery, alliancesQuery, nexusQuery]);
 
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
@@ -388,6 +396,11 @@ function EventPage() {
     .map((q) => q.data)
     .filter((e): e is NonNullable<typeof e> => e !== undefined);
 
+  const { data: nexusStatus } = useQuery(getNexusEventStatusOptions(eventKey));
+  const nexusStatusByKey = useMemo(
+    () => buildNexusStatusMap(eventKey, nexusStatus),
+    [eventKey, nexusStatus],
+  );
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
     [matches],
@@ -634,6 +647,7 @@ function EventPage() {
             event={event}
             sortedMatches={sortedMatches}
             alliances={alliances}
+            nexusStatusByKey={nexusStatusByKey}
           />
         </TabsContent>
 
@@ -737,10 +751,12 @@ function ResultsTab({
   event,
   sortedMatches,
   alliances,
+  nexusStatusByKey,
 }: {
   event: Event;
   sortedMatches: Match[];
   alliances: EliminationAlliance[];
+  nexusStatusByKey?: Record<string, NexusMatchStatus>;
 }) {
   const [inView, setInView] = useState<Set<string>>(new Set());
 
@@ -763,6 +779,7 @@ function ResultsTab({
         START_OF_QUALS_BREAKER,
         CHANGE_IN_COMP_LEVEL_BREAKER,
       ]}
+      nexusStatusByKey={nexusStatusByKey}
     />
   );
 
@@ -777,6 +794,7 @@ function ResultsTab({
           CHANGE_IN_COMP_LEVEL_BREAKER,
           CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER,
         ]}
+        nexusStatusByKey={nexusStatusByKey}
       />
     ) : null;
 

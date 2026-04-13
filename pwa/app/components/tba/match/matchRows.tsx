@@ -1,6 +1,9 @@
 import { Link } from '@tanstack/react-router';
 import { Temporal } from 'temporal-polyfill';
 
+import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
+import PlayArrowIcon from '~icons/ic/baseline-play-arrow';
+import PendingIcon from '~icons/ic/outline-pending';
 import ChevronDownIcon from '~icons/lucide/chevron-down';
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 import YoutubeIcon from '~icons/mdi/youtube';
@@ -16,8 +19,14 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { PlayoffType } from '~/lib/api/PlayoffType';
 import { matchTitleShort } from '~/lib/matchUtils';
+import type { NexusMatchStatus } from '~/lib/nexus';
 import { cn } from '~/lib/utils';
 
 interface PlaylistEntry {
@@ -56,11 +65,13 @@ export default function SimpleMatchRowsWithBreaks({
   event,
   breakers,
   focusTeamKey,
+  nexusStatusByKey,
 }: {
   matches: Match[];
   event: Event;
   breakers: ShouldInsertBreakCallback[];
   focusTeamKey?: string;
+  nexusStatusByKey?: Record<string, NexusMatchStatus>;
 }) {
   const playlistUrls = buildYoutubePlaylistUrls(matches, event.name);
   let firstBreakRowSeen = false;
@@ -98,6 +109,7 @@ export default function SimpleMatchRowsWithBreaks({
         year={event.year}
         key={match.key}
         focusTeamKey={focusTeamKey}
+        nexusStatus={nexusStatusByKey?.[match.key]}
       />,
     );
 
@@ -133,16 +145,40 @@ export default function SimpleMatchRowsWithBreaks({
   );
 }
 
+const NEXUS_STATUS_ICONS: Record<NexusMatchStatus, React.ReactNode> = {
+  'On field': <PlayArrowIcon className="size-5 text-green-600" />,
+  'On deck': <PendingIcon className="size-5 text-blue-500" />,
+  'Now queuing': <HourglassIcon className="size-5 text-orange-500" />,
+};
+
+function NexusStatusIconWithTooltip({ status }: { status: NexusMatchStatus }) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <span
+          className="mx-2 inline-flex items-center justify-center"
+          aria-label={`Nexus status: ${status}`}
+        >
+          {NEXUS_STATUS_ICONS[status]}
+        </span>
+      </TooltipTrigger>
+      <TooltipContent sideOffset={6}>{status}</TooltipContent>
+    </Tooltip>
+  );
+}
+
 export function MatchRow({
   match,
   event,
   year,
   focusTeamKey,
+  nexusStatus,
 }: {
   match: Match;
   event: Event;
   year: number;
   focusTeamKey?: string;
+  nexusStatus?: NexusMatchStatus;
 }) {
   const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
@@ -168,7 +204,7 @@ export function MatchRow({
         className="row-span-2 flex items-center justify-center rounded-tl-lg
           xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
       >
-        {maybeVideoURL && (
+        {maybeVideoURL ? (
           <Link
             to={maybeVideoURL}
             target="_blank"
@@ -177,7 +213,9 @@ export function MatchRow({
           >
             <PlayCircleIcon />
           </Link>
-        )}
+        ) : nexusStatus ? (
+          <NexusStatusIconWithTooltip status={nexusStatus} />
+        ) : null}
       </div>
 
       {/* Match Name */}
