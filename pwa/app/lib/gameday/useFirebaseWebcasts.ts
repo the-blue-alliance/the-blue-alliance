@@ -80,9 +80,13 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   // Read from TQ cache — data is populated by the effect above via setQueryData.
   // enabled: false means TQ never fetches on its own; isPending is true until
   // setQueryData is called for the first time (i.e. Firebase hasn't responded yet).
+  // TanStack Query v5 requires a queryFn even when enabled: false. These queries
+  // are never fetched — data is written exclusively via setQueryData in the
+  // Firebase subscription above. The queryFn placeholder satisfies the requirement.
   const { data: liveEventsData, isPending: liveEventsPending } =
     useQuery<Record<string, FirebaseLiveEvent> | null>({
       queryKey: [...FIREBASE_LIVE_EVENTS_QUERY_KEY],
+      queryFn: () => null,
       enabled: false,
       staleTime: Infinity,
     });
@@ -90,6 +94,7 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   const { data: specialWebcastsData, isPending: specialWebcastsPending } =
     useQuery<Record<string, FirebaseSpecialWebcast> | null>({
       queryKey: [...FIREBASE_SPECIAL_WEBCASTS_QUERY_KEY],
+      queryFn: () => null,
       enabled: false,
       staleTime: Infinity,
     });

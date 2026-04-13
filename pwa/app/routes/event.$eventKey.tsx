@@ -718,7 +718,7 @@ function AwardsTab({ awards }: { awards: Award[] }) {
               className="grid grid-cols-1 gap-1 py-2 sm:grid-cols-3 sm:gap-4
                 sm:px-4"
             >
-              <dt className=":col-span-2 font-medium">{award.name}</dt>
+              <dt className="font-medium sm:col-span-2">{award.name}</dt>
               <dd className="text-muted-foreground sm:text-right">
                 {award.recipient_list
                   .sort((a, b) =>
