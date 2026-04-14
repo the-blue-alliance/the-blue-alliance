@@ -8,6 +8,20 @@ from backend.common.models.team import Team
 from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 
 
+def test_unauthenticated(tasks_client: Client) -> None:
+    resp = tasks_client.get("/tasks/admin/do/post_division_tasks/2020event")
+    assert resp.status_code == 401
+
+
+def test_taskqueue_header_bypasses_auth(tasks_client: Client) -> None:
+    resp = tasks_client.get(
+        "/tasks/admin/do/post_division_tasks/2020event",
+        headers={"X-AppEngine-QueueName": "admin"},
+    )
+    # Not 401 - task queue requests are allowed through (404 because event doesn't exist)
+    assert resp.status_code == 404
+
+
 def test_invalid_key(tasks_client: Client, login_gae_admin) -> None:
     resp = tasks_client.get("/tasks/admin/do/post_division_tasks/asdf")
     assert resp.status_code == 400

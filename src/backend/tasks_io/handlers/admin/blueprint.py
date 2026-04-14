@@ -1,4 +1,4 @@
-from flask import abort, Blueprint
+from flask import abort, Blueprint, request
 from google.appengine.api import users as gae_login
 
 from backend.tasks_io.handlers.admin.tasks import (
@@ -16,8 +16,13 @@ admin_routes = Blueprint("admin", __name__, url_prefix="/tasks/admin")
 @admin_routes.before_request
 def require_gae_admin() -> None:
     """
-    Ensure that only admins can access this blueprint
+    Ensure that only admins can access this blueprint.
+    Requests originating from the task queue are identified by the
+    X-AppEngine-QueueName header (set by GAE, stripped from external requests)
+    and are allowed through without a user admin check.
     """
+    if request.headers.get("X-AppEngine-QueueName"):
+        return
     if not gae_login.is_current_user_admin():
         abort(401)
 
