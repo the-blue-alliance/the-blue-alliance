@@ -35,11 +35,11 @@ def admin_post_division_tasks(event_key: EventKey) -> str:
     # Update the CMP reg hacks sitevar to disable event team fetch for parent event
     reg_sitevar = ChampsRegistrationHacks.get()
 
-    new_divisions_to_skip = reg_sitevar["divisions_to_skip"]
+    new_divisions_to_skip = list(reg_sitevar["divisions_to_skip"])
     if event_key not in new_divisions_to_skip:
         new_divisions_to_skip.append(event_key)
 
-    new_start_day_to_last = reg_sitevar["set_start_to_last_day"]
+    new_start_day_to_last = list(reg_sitevar["set_start_to_last_day"])
     if event_key not in new_start_day_to_last:
         new_start_day_to_last.append(event_key)
 
@@ -53,9 +53,15 @@ def admin_post_division_tasks(event_key: EventKey) -> str:
     )
 
     # Delete event teams from the parent event
-    existing_event_team_keys = set(
-        EventTeam.query(EventTeam.event == event.key).fetch(1000, keys_only=True)
-    )
+    existing_event_team_keys_query = EventTeam.query(EventTeam.event == event.key)
+    existing_event_team_keys = set()
+    cursor = None
+    more = True
+    while more:
+        keys, cursor, more = existing_event_team_keys_query.fetch_page(
+            1000, start_cursor=cursor, keys_only=True
+        )
+        existing_event_team_keys.update(keys)
     EventTeamManipulator.delete_keys(existing_event_team_keys)
 
     # Re-enqueue event details fetch for the parent event
