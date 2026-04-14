@@ -522,17 +522,16 @@ def event_details(event_key: EventKey) -> Response:
     if event.parent_event is not None and any(
         et._is_new for et in event_teams if et is not None
     ):
-        parent_event_keys = {event.parent_event.string_id()}
-        for parent_key in parent_event_keys:
-            logging.info(
-                f"New teams found for division {event_key}, enqueueing post_division_tasks for {parent_key}"
-            )
-            taskqueue.add(
-                queue_name="admin",
-                target="py3-tasks-io",
-                url=f"/tasks/admin/do/post_division_tasks/{parent_key}",
-                method="GET",
-            )
+        parent_key = event.parent_event.string_id()
+        logging.info(
+            f"New teams found for division {event_key}, enqueueing post_division_tasks for {parent_key}"
+        )
+        taskqueue.add(
+            queue_name="admin",
+            target="py3-tasks-io",
+            url=f"/tasks/admin/do/post_division_tasks/{parent_key}",
+            method="GET",
+        )
 
     if event.year >= 2018:
         avatars, keys_to_delete = event_team_avatars_future.get_result()
