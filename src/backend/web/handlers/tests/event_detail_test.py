@@ -359,3 +359,108 @@ def test_render_event_with_b_team_coprs(ndb_stub, web_client: Client) -> None:
 
     resp = web_client.get("/event/2020nyny")
     assert resp.status_code == 200
+
+
+@freeze_time("2020-02-23")
+def test_render_short_cache_event_with_divisions_within_7_days(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events with divisions should use short cache within 7 days before start."""
+    division_key = ndb.Key(Event, "2020nynyd1")
+    Event(
+        id="2020nynyd1",
+        event_short="nynyd1",
+        year=2020,
+        name="Test Division 1",
+        event_type_enum=EventType.CMP_DIVISION,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event 2020",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        divisions=[division_key],
+    ).put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert "max-age=61" in resp.headers["Cache-Control"]
+
+
+@freeze_time("2020-02-23")
+def test_render_short_cache_event_with_parent_within_7_days(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events with a parent should use short cache within 7 days before start."""
+    parent_key = ndb.Key(Event, "2020nyny")
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event 2020",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    Event(
+        id="2020nynyd1",
+        event_short="nynyd1",
+        year=2020,
+        name="Test Division 1",
+        event_type_enum=EventType.CMP_DIVISION,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        parent_event=parent_key,
+    ).put()
+
+    resp = web_client.get("/event/2020nynyd1")
+    assert resp.status_code == 200
+    assert "max-age=61" in resp.headers["Cache-Control"]
+
+
+@freeze_time("2020-02-10")
+def test_render_long_cache_event_with_divisions_beyond_7_days(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events with divisions should NOT use short cache more than 7 days before start."""
+    division_key = ndb.Key(Event, "2020nynyd1")
+    Event(
+        id="2020nynyd1",
+        event_short="nynyd1",
+        year=2020,
+        name="Test Division 1",
+        event_type_enum=EventType.CMP_DIVISION,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event 2020",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        divisions=[division_key],
+    ).put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert "max-age=21600" in resp.headers["Cache-Control"]
+
+
+@freeze_time("2020-02-10")
+def test_render_long_cache_event_without_divisions_beyond_a_day(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events without divisions/parent should use long cache when not within_a_day."""
+    helpers.preseed_event("2020nyny")
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert "max-age=21600" in resp.headers["Cache-Control"]
