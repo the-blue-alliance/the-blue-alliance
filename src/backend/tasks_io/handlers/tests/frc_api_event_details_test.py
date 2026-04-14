@@ -240,3 +240,127 @@ def test_get_event_details_skip_eventteams(
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 1
     assert tasks[0].url == "/tasks/math/do/eventteam_update/2019casj?allow_deletes=True"
+
+
+def create_division_event(
+    year: Year = 2019, parent_event_key: str = "2019cmp"
+) -> Event:
+    parent_key = ndb.Key(Event, parent_event_key)
+    e = Event(
+        id=f"{year}cmptx",
+        year=year,
+        event_short="cmptx",
+        start_date=datetime.datetime(year, 4, 1),
+        end_date=datetime.datetime(year, 4, 3),
+        event_type_enum=EventType.CMP_DIVISION,
+        parent_event=parent_key,
+    )
+    return e
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_division_new_teams_enqueues_post_division_tasks(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    event_mock.return_value = InstantFuture(([create_division_event()], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2019cmptx")
+    assert resp.status_code == 200
+
+    # Make sure we enqueue post_division_tasks for the parent event
+    admin_tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert len(admin_tasks) == 1
+    assert admin_tasks[0].url == "/tasks/admin/do/post_division_tasks/2019cmp"
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_division_no_new_teams_no_post_division_tasks(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    # Pre-create an existing EventTeam so no new team is added
+    EventTeam(
+        id="2019cmptx_frc254",
+        event=ndb.Key(Event, "2019cmptx"),
+        team=ndb.Key(Team, "frc254"),
+        year=2019,
+    ).put()
+
+    event_mock.return_value = InstantFuture(([create_division_event()], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2019cmptx")
+    assert resp.status_code == 200
+
+    # No post_division_tasks should be enqueued since no new teams were added
+    admin_tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert len(admin_tasks) == 0
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_non_division_new_teams_no_post_division_tasks(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    event_mock.return_value = InstantFuture(([create_event()], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
+    assert resp.status_code == 200
+
+    # No post_division_tasks should be enqueued since this is not a division event
+    admin_tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert len(admin_tasks) == 0
