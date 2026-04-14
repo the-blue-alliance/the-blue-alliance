@@ -366,6 +366,20 @@ class Event(CachedModel):
         return self.withinDays(-1, 1)
 
     @property
+    def should_use_short_cache(self) -> bool:
+        """Returns True if the event page should use the short cache timer (61s).
+
+        Events with divisions or a parent event use the short cache timer for
+        7 days before the event starts through 1 day after. All other events
+        use the short cache timer only when within_a_day.
+        """
+        if self.within_a_day:
+            return True
+        if bool(self.divisions or self.parent_event):
+            return self.withinDays(-7, 1)
+        return False
+
+    @property
     def past(self) -> bool:
         return self.end_date.date() < self.local_time().date() and not self.now
 

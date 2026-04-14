@@ -479,12 +479,9 @@ def event_detail(event_key: EventKey) -> Response:
         "copr_csv": copr_csv,
     }
 
-    use_short_cache = event.within_a_day or (
-        bool(event.divisions or event.parent_event) and event.withinDays(-7, 1)
-    )
     return make_cached_response(
         render_template("event_details.html", template_values),
-        ttl=timedelta(seconds=61) if use_short_cache else timedelta(hours=6),
+        ttl=timedelta(seconds=61) if event.should_use_short_cache else timedelta(hours=6),
     )
 
 
@@ -586,9 +583,7 @@ def event_insights(event_key: EventKey) -> Response:
         "last_played_match_num": last_played_match_num,
     }
 
-    use_short_cache = event.within_a_day or (
-        bool(event.divisions or event.parent_event) and event.withinDays(-7, 1)
-    )
+    use_short_cache = event.should_use_short_cache
     return make_cached_response(
         render_template("event_insights.html", template_values),
         ttl=timedelta(seconds=61) if use_short_cache else timedelta(hours=6),
@@ -611,9 +606,7 @@ def event_rss(event_key: EventKey) -> Response:
         "datetime": datetime.now(),
     }
 
-    use_short_cache = event.within_a_day or (
-        bool(event.divisions or event.parent_event) and event.withinDays(-7, 1)
-    )
+    use_short_cache = event.should_use_short_cache
     response = make_cached_response(
         render_template("event_rss.xml", template_values),
         ttl=timedelta(seconds=61) if use_short_cache else timedelta(hours=6),
