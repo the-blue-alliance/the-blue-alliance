@@ -238,6 +238,7 @@
     <div>
       <form action="/admin/event/divisions_released/{{event.key_name}}" method="POST">
         <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-flag"></span> Divisions Released</button>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
       </form>
     </div>
     {% endif %}
