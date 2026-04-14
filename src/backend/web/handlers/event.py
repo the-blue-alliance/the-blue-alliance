@@ -481,7 +481,11 @@ def event_detail(event_key: EventKey) -> Response:
 
     return make_cached_response(
         render_template("event_details.html", template_values),
-        ttl=timedelta(seconds=61) if event.should_use_short_cache else timedelta(hours=6),
+        ttl=(
+            timedelta(seconds=61)
+            if event.should_use_short_cache
+            else timedelta(hours=6)
+        ),
     )
 
 
@@ -586,7 +590,7 @@ def event_insights(event_key: EventKey) -> Response:
     use_short_cache = event.should_use_short_cache
     return make_cached_response(
         render_template("event_insights.html", template_values),
-        ttl=timedelta(seconds=61) if use_short_cache else timedelta(hours=6),
+        ttl=(timedelta(seconds=61) if use_short_cache else timedelta(hours=6)),
     )
 
 
@@ -609,7 +613,7 @@ def event_rss(event_key: EventKey) -> Response:
     use_short_cache = event.should_use_short_cache
     response = make_cached_response(
         render_template("event_rss.xml", template_values),
-        ttl=timedelta(seconds=61) if use_short_cache else timedelta(hours=6),
+        ttl=(timedelta(seconds=61) if use_short_cache else timedelta(hours=6)),
     )
     response.headers["content-type"] = "application/xml; charset=UTF-8"
 
