@@ -54,6 +54,7 @@ from backend.web.handlers.admin.event import (
     event_delete_matches,
     event_detail,
     event_detail_post,
+    event_divisions_released_post,
     event_edit,
     event_edit_post,
     event_list,
@@ -329,6 +330,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/cleanup_youtube_webcasts/<event_key>",
     view_func=event_cleanup_youtube_webcasts_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/divisions_released/<event_key>",
+    view_func=event_divisions_released_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(

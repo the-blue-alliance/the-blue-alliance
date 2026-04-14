@@ -628,6 +628,34 @@ def event_update_all_webcast_dates_post(event_key: EventKey) -> Response:
     )
 
 
+def event_divisions_released_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    if not event.divisions:
+        abort(400)
+
+    # Enqueue team fetches for all divisions
+    for division_key in event.divisions:
+        taskqueue.add(
+            queue_name="datafeed",
+            target="py3-tasks-io",
+            url=f"/backend-tasks/get/event_details/{division_key.string_id()}",
+            method="GET",
+        )
+
+    # Enqueue post_division_tasks for the parent event
+    taskqueue.add(
+        queue_name="admin",
+        target="py3-tasks-io",
+        url=f"/tasks/admin/do/post_division_tasks/{event_key}",
+        method="GET",
+    )
+
+    return redirect(url_for("admin.event_detail", event_key=event_key))
+
+
 def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
     event = Event.get_by_id(event_key)
     if not event:

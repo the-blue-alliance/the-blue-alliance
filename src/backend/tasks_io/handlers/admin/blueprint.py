@@ -1,7 +1,10 @@
 from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
-from backend.tasks_io.handlers.admin.tasks import admin_clear_eventteams
+from backend.tasks_io.handlers.admin.tasks import (
+    admin_clear_eventteams,
+    admin_post_division_tasks,
+)
 
 """
 This is a special interface available to TBA admins to manage data
@@ -26,4 +29,7 @@ def test_admin_task_view() -> str:
 
 admin_routes.add_url_rule(
     "/do/clear_eventteams/<event_key>", view_func=admin_clear_eventteams
+)
+admin_routes.add_url_rule(
+    "/do/post_division_tasks/<event_key>", view_func=admin_post_division_tasks
 )

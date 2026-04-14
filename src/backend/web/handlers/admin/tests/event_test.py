@@ -738,3 +738,125 @@ def test_cleanup_youtube_webcasts_button_shown(
         if "Clean up YouTube webcasts" in btn.get_text()
     ]
     assert len(cleanup_buttons) == 1
+
+
+def test_divisions_released_not_found(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    resp = web_client.post(
+        "/admin/event/divisions_released/2020cmptx",
+        data={"csrf_token": "test"},
+    )
+    assert resp.status_code == 404
+
+
+def test_divisions_released_no_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2020cmptx",
+        event_short="cmptx",
+        year=2020,
+        event_type_enum=EventType.CMP_FINALS,
+    ).put()
+    resp = web_client.post(
+        "/admin/event/divisions_released/2020cmptx",
+        data={"csrf_token": "test"},
+    )
+    assert resp.status_code == 400
+
+
+def test_divisions_released_enqueues_tasks(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    div1 = Event(
+        id="2020cmpmo",
+        event_short="cmpmo",
+        year=2020,
+        event_type_enum=EventType.CMP_DIVISION,
+    )
+    div1.put()
+    div2 = Event(
+        id="2020cmptx",
+        event_short="cmptx",
+        year=2020,
+        event_type_enum=EventType.CMP_DIVISION,
+    )
+    div2.put()
+    Event(
+        id="2020cmp",
+        event_short="cmp",
+        year=2020,
+        event_type_enum=EventType.CMP_FINALS,
+        divisions=[div1.key, div2.key],
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/divisions_released/2020cmp",
+        data={"csrf_token": "test"},
+    )
+    assert resp.status_code == 302
+
+    # Should have enqueued team fetches for all divisions
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    task_urls = [t.url for t in tasks]
+    assert "/backend-tasks/get/event_details/2020cmpmo" in task_urls
+    assert "/backend-tasks/get/event_details/2020cmptx" in task_urls
+
+    # Should have enqueued post_division_tasks
+    admin_tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert any(
+        "/tasks/admin/do/post_division_tasks/2020cmp" in t.url for t in admin_tasks
+    )
+
+
+def test_divisions_released_button_shown_when_has_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    div = Event(
+        id="2020cmpmo",
+        event_short="cmpmo",
+        year=2020,
+        event_type_enum=EventType.CMP_DIVISION,
+        start_date=datetime(2020, 4, 1),
+        end_date=datetime(2020, 4, 5),
+    )
+    div.put()
+    Event(
+        id="2020cmp",
+        event_short="cmp",
+        year=2020,
+        event_type_enum=EventType.CMP_FINALS,
+        divisions=[div.key],
+        start_date=datetime(2020, 4, 1),
+        end_date=datetime(2020, 4, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2020cmp")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    buttons = [
+        btn for btn in soup.find_all("button") if "Divisions Released" in btn.get_text()
+    ]
+    assert len(buttons) == 1
+
+
+def test_divisions_released_button_not_shown_without_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2020nyny")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    buttons = [
+        btn for btn in soup.find_all("button") if "Divisions Released" in btn.get_text()
+    ]
+    assert len(buttons) == 0

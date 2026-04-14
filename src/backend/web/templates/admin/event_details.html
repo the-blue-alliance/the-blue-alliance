@@ -233,6 +233,14 @@
         class="btn btn-warning"><span class="glyphicon glyphicon-tasks"></span> Regional Champs Pool Points</a>
       {% endif %}
     </div>
+    {% if event.divisions %}
+    <h2>Division Tasks</h2>
+    <div>
+      <form action="/admin/event/divisions_released/{{event.key_name}}" method="POST">
+        <button type="submit" class="btn btn-danger"><span class="glyphicon glyphicon-flag"></span> Divisions Released</button>
+      </form>
+    </div>
+    {% endif %}
     <h2>Remap Teams</h2>
     <div>
       <p>Change all matches, awards and alliance selections for one team to another</p>
