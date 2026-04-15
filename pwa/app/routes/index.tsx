@@ -41,7 +41,7 @@ function Home() {
       {weekEvents.length > 0 && (
         <div>
           <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
-          <EventListTable events={weekEvents} />
+          <EventListTable events={weekEvents} enableGrouping />
         </div>
       )}
     </div>

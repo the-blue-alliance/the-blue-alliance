@@ -13,7 +13,11 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { getEventDateString, isEventActive } from '~/lib/eventUtils';
+import {
+  getEventDateString,
+  groupEventsByParent,
+  isEventActive,
+} from '~/lib/eventUtils';
 import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
 import { cn } from '~/lib/utils';
 
@@ -59,8 +63,17 @@ function getDistrictColorClass(
   return DISTRICT_COLORS[districtAbbreviation.toLowerCase()] || '';
 }
 
-export default function EventListTable({ events }: { events: Event[] }) {
+export default function EventListTable({
+  events,
+  enableGrouping = false,
+}: {
+  events: Event[];
+  enableGrouping?: boolean;
+}) {
   const isEventOnline = useOnlineEventWebcasts();
+  const items = enableGrouping ? groupEventsByParent(events) : events;
+  // Build a set of all division keys so we can identify division rows on the fly.
+  const allDivisionKeys = new Set(items.flatMap((e) => e.division_keys));
 
   return (
     <Table className="w-full">
@@ -72,7 +85,11 @@ export default function EventListTable({ events }: { events: Event[] }) {
         </TableRow>
       </TableHeader>
       <TableBody>
-        {events.map((event) => {
+        {items.map((event, idx) => {
+          const isDivision = allDivisionKeys.has(event.key);
+          // Used to restore the bottom border after suppressing it between sibling divisions.
+          const isLastDivision =
+            isDivision && !allDivisionKeys.has(items[idx + 1]?.key);
           const withinADay = isEventActive(event);
           const isOnline = isEventOnline(event);
           const districtColor = getDistrictColorClass(
@@ -81,18 +98,28 @@ export default function EventListTable({ events }: { events: Event[] }) {
           return (
             <TableRow
               key={event.key}
-              className={districtColor ? `border-l-4 ${districtColor}` : ''}
+              className={cn(
+                districtColor ? `border-l-4 ${districtColor}` : '',
+                {
+                  'bg-muted/40': isDivision,
+                  'border-b border-b-border/40': isDivision && !isLastDivision,
+                },
+              )}
             >
               <TableCell className="w-8/12">
-                <Link
-                  className="text-base"
-                  to="/event/$eventKey"
-                  params={{ eventKey: event.key }}
-                >
-                  {event.name}
-                </Link>
-                <div className="text-sm text-neutral-600">
-                  {event.city}, {event.state_prov}, {event.country}
+                <div className={cn({ 'pl-4': isDivision })}>
+                  <Link
+                    className="text-base"
+                    to="/event/$eventKey"
+                    params={{ eventKey: event.key }}
+                  >
+                    {event.name}
+                  </Link>
+                  {!isDivision && (
+                    <div className="text-sm text-neutral-600">
+                      {event.city}, {event.state_prov}, {event.country}
+                    </div>
+                  )}
                 </div>
               </TableCell>
               <TableCell className="mt-2 flex justify-center md:mt-1">

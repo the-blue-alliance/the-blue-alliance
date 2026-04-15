@@ -6,12 +6,77 @@ import {
   getCurrentWeekEvents,
   getEventDateString,
   getEventWeekString,
+  groupEventsByParent,
   hasEventEnded,
   isEventActive,
   isEventWithinDays,
   isValidEventKey,
   toCalendarEvent,
 } from '~/lib/eventUtils';
+
+describe.concurrent('groupEventsByParent', () => {
+  function makeEvent(
+    key: string,
+    start_date: string,
+    division_keys: string[] = [],
+  ): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { key, start_date, end_date: start_date, division_keys };
+  }
+
+  test('standalone events pass through unchanged', () => {
+    const a = makeEvent('2024cthar', '2024-04-10');
+    const b = makeEvent('2024mabos', '2024-04-11');
+    expect(groupEventsByParent([a, b]).map((e) => e.key)).toEqual([
+      '2024cthar',
+      '2024mabos',
+    ]);
+  });
+
+  test('division events appear immediately after their parent, sorted by key', () => {
+    const parent = makeEvent('2024cmp', '2024-04-17', [
+      '2024cmptx',
+      '2024cmpmi',
+    ]);
+    const div1 = makeEvent('2024cmptx', '2024-04-17');
+    const div2 = makeEvent('2024cmpmi', '2024-04-17');
+    expect(groupEventsByParent([parent, div1, div2]).map((e) => e.key)).toEqual(
+      ['2024cmp', '2024cmpmi', '2024cmptx'],
+    );
+  });
+
+  test('group is sorted before a later standalone event', () => {
+    // Parent starts Apr 17, but its division starts Apr 15 — group should
+    // sort before a standalone event starting Apr 16.
+    const standalone = makeEvent('2024other', '2024-04-16');
+    const parent = makeEvent('2024cmp', '2024-04-17', ['2024cmpnew']);
+    const division = makeEvent('2024cmpnew', '2024-04-15');
+    expect(
+      groupEventsByParent([standalone, parent, division]).map((e) => e.key),
+    ).toEqual(['2024cmp', '2024cmpnew', '2024other']);
+  });
+
+  test('standalone event sorts before a group that starts later', () => {
+    const standalone = makeEvent('2024early', '2024-04-10');
+    const parent = makeEvent('2024cmp', '2024-04-17', ['2024cmpnew']);
+    const division = makeEvent('2024cmpnew', '2024-04-17');
+    expect(
+      groupEventsByParent([parent, division, standalone]).map((e) => e.key),
+    ).toEqual(['2024early', '2024cmp', '2024cmpnew']);
+  });
+
+  test('division not present in the event list is silently omitted', () => {
+    const parent = makeEvent('2024cmp', '2024-04-17', [
+      '2024cmpnew',
+      '2024cmpmissing',
+    ]);
+    const division = makeEvent('2024cmpnew', '2024-04-17');
+    expect(groupEventsByParent([parent, division]).map((e) => e.key)).toEqual([
+      '2024cmp',
+      '2024cmpnew',
+    ]);
+  });
+});
 
 describe.concurrent('isValidEventKey', () => {
   test.each(['2010ct', '2014onto2', '202121fim', '2022dc305'])(

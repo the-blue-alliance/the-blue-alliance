@@ -196,6 +196,43 @@ export function sortEvents(events: Event[]) {
   return events.sort((a, b) => sortEventsComparator(a, b));
 }
 
+/**
+ * Returns events ordered so that each parent event is immediately followed by
+ * its division events (from division_keys). Each group is sorted by its
+ * earliest start_date so a group whose divisions start earlier sorts before a
+ * later standalone event. Divisions within a group are sorted by event key.
+ */
+export function groupEventsByParent(events: Event[]): Event[] {
+  const eventMap = new Map(events.map((e) => [e.key, e]));
+  const divisionKeys = new Set(events.flatMap((e) => e.division_keys));
+
+  const groups: Array<{ parent: Event; divisions: Event[] }> = [];
+  for (const event of events) {
+    if (divisionKeys.has(event.key)) continue;
+    const divisions = event.division_keys
+      .map((key) => eventMap.get(key))
+      .filter((e): e is Event => e !== undefined)
+      .sort((a, b) => a.key.localeCompare(b.key));
+    groups.push({ parent: event, divisions });
+  }
+
+  groups.sort((a, b) => {
+    const aMin = [a.parent, ...a.divisions].reduce(
+      (min, e) => (e.start_date < min ? e.start_date : min),
+      a.parent.start_date,
+    );
+    const bMin = [b.parent, ...b.divisions].reduce(
+      (min, e) => (e.start_date < min ? e.start_date : min),
+      b.parent.start_date,
+    );
+    if (aMin < bMin) return -1;
+    if (aMin > bMin) return 1;
+    return sortEventsComparator(a.parent, b.parent);
+  });
+
+  return groups.flatMap(({ parent, divisions }) => [parent, ...divisions]);
+}
+
 // Common division names and their shortforms for Einstein events
 export const DIVISION_SHORTFORMS: Record<string, string> = {
   Newton: 'New',
