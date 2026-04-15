@@ -146,6 +146,35 @@ def test_accept_suggestion_normalize_event_short_and_first_code(
     assert event.first_code == "FRCTEST"
 
 
+def test_accept_suggestion_strips_first_code_whitespace(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+    assert form_fields != {}
+
+    form_fields["event_short"] = "test"
+    form_fields["first_code"] = " frctest "
+    form_fields["verdict"] = "accept"
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    event = Event.get_by_id("2016test")
+    assert event is not None
+    assert event.first_code == "FRCTEST"
+    assert event.official is True
+
+
 def test_reject_suggestion(
     login_user_with_permission, web_client: Client, ndb_stub
 ) -> None:

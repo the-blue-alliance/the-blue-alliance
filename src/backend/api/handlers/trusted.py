@@ -181,8 +181,11 @@ def update_event_info(event_key: EventKey) -> Response:
         defer_safe(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
 
     if "first_event_code" in parsed_info:
-        event.official = parsed_info["first_event_code"] is not None
-        event.first_code = parsed_info["first_event_code"]
+        first_code = parsed_info["first_event_code"]
+        if isinstance(first_code, str):
+            first_code = first_code.strip() or None
+        event.official = first_code is not None
+        event.first_code = first_code
 
     if "playoff_type" in parsed_info:
         playoff_type = parsed_info["playoff_type"]

@@ -441,7 +441,7 @@ def submit_offseason() -> Response:
         city=request.form.get("venue_city", ""),
         state=request.form.get("venue_state", ""),
         country=request.form.get("venue_country", ""),
-        first_code=request.form.get("first_code"),
+        first_code=(request.form.get("first_code") or "").strip() or None,
     )
     if status != "success":
         # Don't completely wipe form data if validation fails
