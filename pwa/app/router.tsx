@@ -106,29 +106,12 @@ export function getRouter() {
   return router;
 }
 
-function isChunkLoadError(error: Error): boolean {
-  return (
-    error instanceof TypeError &&
-    (error.message.includes('error loading dynamically imported module') ||
-      error.message.includes('Failed to fetch dynamically imported module') ||
-      error.message.includes('Importing a module script failed'))
-  );
-}
-
 function ErrorComponent({ error }: { error: Error }) {
   routerLogger.error(error, 'Router error');
 
   useEffect(() => {
-    if (isChunkLoadError(error)) {
-      window.location.reload();
-      return;
-    }
     Sentry.captureException(error);
   }, [error]);
-
-  if (isChunkLoadError(error)) {
-    return null;
-  }
 
   return (
     <div className="py-8">
