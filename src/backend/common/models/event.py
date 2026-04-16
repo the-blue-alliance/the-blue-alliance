@@ -4,7 +4,7 @@ import datetime
 import json
 import re
 import typing
-from typing import Any, cast, Dict, Generator, List, Optional, Set
+from typing import Any, cast, Dict, Generator, List, Optional, Set, TypedDict
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -43,6 +43,18 @@ if typing.TYPE_CHECKING:
     from backend.common.models.award import Award
     from backend.common.models.match import Match
     from backend.common.models.team import Team
+
+
+class EventNameOverride(TypedDict):
+    name: str
+    short_name: str
+
+
+class EventSyncOverrides(TypedDict, total=False):
+    event_sync_disable: bool
+    set_start_day_to_last: bool
+    skip_eventteams: bool
+    event_name_override: EventNameOverride
 
 
 class Event(CachedModel):
@@ -137,6 +149,9 @@ class Event(CachedModel):
     remap_teams: Dict[TeamKey, TeamKey] = (
         ndb.JsonProperty()
     )  # Map of temporary "off-season demo" team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
+    sync_overrides: Optional[EventSyncOverrides] = cast(
+        Optional[EventSyncOverrides], ndb.JsonProperty(indexed=False)
+    )
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -169,6 +184,7 @@ class Event(CachedModel):
         "website",
         "year",
         "remap_teams",
+        "sync_overrides",
     }
 
     _allow_none_attrs: Set[str] = {
@@ -364,6 +380,24 @@ class Event(CachedModel):
     @property
     def within_a_day(self) -> bool:
         return self.withinDays(-1, 1)
+
+    def should_skip_eventteams(self) -> bool:
+        config: EventSyncOverrides = self.sync_overrides or {}
+        if config.get("skip_eventteams", False):
+            return True
+
+        # For events that have divisions (like DCMP or Einstein), the FRC API returns
+        # team registrations. Once the event starts though, we want the registrations
+        # to only be for the division, and let the "finals" event only include teams
+        # who play a match or win an award
+        if (
+            self.event_type_enum in [EventType.DISTRICT_CMP, EventType.CMP_FINALS]
+            and len(self.divisions) > 0
+            and (self.now or self.past)
+        ):
+            return True
+
+        return False
 
     @property
     def should_use_short_cache(self) -> bool:

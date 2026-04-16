@@ -49,7 +49,6 @@ from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
@@ -462,7 +461,7 @@ def event_details(event_key: EventKey) -> Response:
         teams = [teams]
 
     # Build EventTeams
-    skip_eventteams = ChampsRegistrationHacks.should_skip_eventteams(event)
+    skip_eventteams = event.should_skip_eventteams()
     event_teams = (
         [
             EventTeam(

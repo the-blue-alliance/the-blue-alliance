@@ -1,14 +1,12 @@
 import datetime
 import json
 
-
 from google.appengine.ext import ndb
 
-from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
+from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.webcast import Webcast
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
     FMSAPIEventListParser,
 )
@@ -268,42 +266,19 @@ def test_parse_2017_event(test_data_importer):
     assert event.website == "http://www.firstsv.org"
 
 
-def test_parse_2017_events_with_cmp_hacks(test_data_importer):
-    hack_sitevar = {
-        "event_name_override": [
-            {
-                "event": "2017cmpmo",
-                "name": "FIRST Championship Event",
-                "short_name": "Championship",
-            },
-            {
-                "event": "2017cmptx",
-                "name": "FIRST Championship Event",
-                "short_name": "Championship",
-            },
-        ],
-        "set_start_to_last_day": ["2017cmptx", "2017cmpmo"],
-        "divisions_to_skip": ["2017arc", "2017cars", "2017cur", "2017dal", "2017dar"],
-    }
-    ChampsRegistrationHacks.put(hack_sitevar)
-
+def test_parse_2017_events_bootstrap_default_sync_overrides(test_data_importer):
     path = test_data_importer._get_path(__file__, "data/2017_event_list.json")
     with open(path, "r") as f:
         data = json.load(f)
 
     events, districts = FMSAPIEventListParser(2017).parse(data)
-    assert len(events) == 160
+    assert len(events) == 165
     assert len(districts) == 10
-
-    non_einstein_types = CMP_EVENT_TYPES
-    non_einstein_types.remove(EventType.CMP_FINALS)
-    for key in hack_sitevar["divisions_to_skip"]:
-        assert not list(filter(lambda e: e.key_name == key, events))
 
     einstein_stl = next(e for e in events if e.key_name == "2017cmpmo")
     assert einstein_stl is not None
-    assert einstein_stl.name == "FIRST Championship Event (St. Louis)"
-    assert einstein_stl.short_name == "Championship (St. Louis)"
+    assert einstein_stl.name == "Einstein Field (St. Louis)"
+    assert einstein_stl.short_name == "Einstein (St. Louis)"
     assert einstein_stl.start_date == datetime.datetime(
         year=2017, month=4, day=29, hour=0, minute=0, second=0
     )
@@ -313,14 +288,101 @@ def test_parse_2017_events_with_cmp_hacks(test_data_importer):
 
     einstein_hou = next(e for e in events if e.key_name == "2017cmptx")
     assert einstein_hou is not None
-    assert einstein_hou.name == "FIRST Championship Event (Houston)"
-    assert einstein_hou.short_name == "Championship (Houston)"
+    assert einstein_hou.name == "Einstein Field (Houston)"
+    assert einstein_hou.short_name == "Einstein (Houston)"
     assert einstein_hou.start_date == datetime.datetime(
         year=2017, month=4, day=22, hour=0, minute=0, second=0
     )
     assert einstein_hou.end_date == datetime.datetime(
         year=2017, month=4, day=22, hour=23, minute=59, second=59
     )
+
+    assert einstein_stl.sync_overrides.get("skip_eventteams") is True
+    assert einstein_stl.sync_overrides.get("set_start_day_to_last") is True
+    assert einstein_hou.sync_overrides.get("skip_eventteams") is True
+    assert einstein_hou.sync_overrides.get("set_start_day_to_last") is True
+
+
+def test_parse_bootstrap_past_division_parent_defaults() -> None:
+    events, _ = FMSAPIEventListParser(2010).parse(
+        {
+            "Events": [
+                {
+                    "code": "testcmp",
+                    "type": "districtchampionship",
+                    "name": "Test District Championship",
+                    "districtCode": "ne",
+                    "address": "123 Main St",
+                    "venue": "Test Venue",
+                    "city": "Test City",
+                    "stateprov": "MA",
+                    "country": "USA",
+                    "dateStart": "2010-04-15T00:00:00",
+                    "dateEnd": "2010-04-17T23:59:59",
+                    "website": None,
+                    "webcasts": [],
+                    "timezone": None,
+                    "allianceCount": "EightAlliance",
+                },
+                {
+                    "code": "testcmp1",
+                    "type": "districtchampionshipdivision",
+                    "name": "Test District Championship Division 1",
+                    "districtCode": "ne",
+                    "address": "123 Main St",
+                    "venue": "Test Venue",
+                    "city": "Test City",
+                    "stateprov": "MA",
+                    "country": "USA",
+                    "dateStart": "2010-04-15T00:00:00",
+                    "dateEnd": "2010-04-17T23:59:59",
+                    "website": None,
+                    "webcasts": [],
+                    "timezone": None,
+                    "allianceCount": "EightAlliance",
+                }
+            ]
+        }
+    )
+
+    event = next(e for e in events if e.key_name == "2010testcmp")
+    assert event.sync_overrides.get("skip_eventteams") is True
+    assert event.sync_overrides.get("set_start_day_to_last") is True
+    assert event.start_date == datetime.datetime(2010, 4, 17, 0, 0, 0)
+
+
+def test_parse_bootstrap_default_cmp_finals_name_override() -> None:
+    events, _ = FMSAPIEventListParser(2016).parse(
+        {
+            "Events": [
+                {
+                    "code": "cmp",
+                    "type": "championship",
+                    "name": "FIRST Championship",
+                    "districtCode": None,
+                    "address": "123 Main St",
+                    "venue": "Test Venue",
+                    "city": "St. Louis",
+                    "stateprov": "MO",
+                    "country": "USA",
+                    "dateStart": "2016-04-27T00:00:00",
+                    "dateEnd": "2016-04-30T23:59:59",
+                    "website": None,
+                    "webcasts": [],
+                    "timezone": None,
+                    "allianceCount": "EightAlliance",
+                }
+            ]
+        }
+    )
+
+    event = events[0]
+    assert event.name == "Einstein Field"
+    assert event.short_name == "Einstein"
+    assert event.sync_overrides.get("event_name_override") == {
+        "name": "Einstein Field",
+        "short_name": "Einstein",
+    }
 
 
 def test_parse_2017_official_offseason(test_data_importer):

@@ -18,7 +18,6 @@ from backend.common.models.keys import Year
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
@@ -204,7 +203,7 @@ def test_get_event_details_clears_eventteams(
 
 
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
-@mock.patch.object(ChampsRegistrationHacks, "should_skip_eventteams", return_value=True)
+@mock.patch.object(Event, "should_skip_eventteams", return_value=True)
 @mock.patch.object(
     DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
 )
