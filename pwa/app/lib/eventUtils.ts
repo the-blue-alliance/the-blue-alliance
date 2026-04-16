@@ -2,7 +2,11 @@ import { CalendarEvent } from 'calendar-link';
 import { Temporal } from 'temporal-polyfill';
 
 import { Event } from '~/api/tba/read/types.gen';
-import { EventType } from '~/lib/api/EventType';
+import {
+  CMP_EVENT_TYPES,
+  EventType,
+  SEASON_EVENT_TYPES,
+} from '~/lib/api/EventType';
 
 /** IANA timezone used when an event has no timezone field. */
 export const EVENT_FALLBACK_TIMEZONE = 'America/New_York';
@@ -320,6 +324,44 @@ export function isEventWithinADay(event: Event): boolean {
  * "Today" is evaluated in both the event's timezone and the user's timezone —
  * the condition is met when end_date has been reached in either.
  */
+/**
+ * Returns the public agenda PDF URL for a season event, or null if not
+ * applicable (offseason, preseason, or unlabeled events have no agenda).
+ */
+export function getPublicAgendaUrl(event: Event): string | null {
+  if (!SEASON_EVENT_TYPES.has(event.event_type)) {
+    return null;
+  }
+
+  if (CMP_EVENT_TYPES.has(event.event_type)) {
+    return `https://www.firstinspires.org/hubfs/web/event/${event.year}/cmp/frc/public-schedule.pdf`;
+  }
+
+  const eventCode =
+    event.event_type === EventType.DISTRICT_CMP_DIVISION &&
+    event.parent_event_key
+      ? event.parent_event_key.substring(4)
+      : event.event_code;
+
+  return `https://info.firstinspires.org/hubfs/web/event/frc/${event.year}/${event.year}_${eventCode.toUpperCase()}_Agenda.pdf`;
+}
+
+/**
+ * Strips the parent event name prefix from a division name, along with any
+ * leading separator characters (spaces, dashes, en-dashes, em-dashes).
+ * e.g. "FIRST Championship - Newton Division" with parent "FIRST Championship"
+ * → "Newton Division"
+ */
+export function stripParentPrefix(
+  name: string,
+  parentName: string | undefined,
+): string {
+  if (parentName && name.startsWith(parentName)) {
+    return name.slice(parentName.length).replace(/^[\s–—-]+/, '');
+  }
+  return name;
+}
+
 export function hasEventEnded(event: Event): boolean {
   if (!event.end_date) return false;
   const endDate = Temporal.PlainDate.from(event.end_date);

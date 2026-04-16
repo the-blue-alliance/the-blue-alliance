@@ -1,9 +1,10 @@
-import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { useMemo, useState } from 'react';
 
+import ParentEventIcon from '~icons/lucide/arrow-up-right';
 import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
@@ -13,6 +14,7 @@ import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
+import AgendaIcon from '~icons/lucide/paperclip';
 import InsightsIcon from '~icons/lucide/scatter-chart';
 import ChampsQualPointsIcon from '~icons/lucide/star';
 import AwardsIcon from '~icons/lucide/trophy';
@@ -41,6 +43,7 @@ import {
   getEventMatchesOptions,
   getEventOptions,
   getEventRankingsOptions,
+  getEventSimpleOptions,
   getEventTeamMediaOptions,
   getEventTeamsOptions,
   getEventTeamsStatusesOptions,
@@ -102,6 +105,12 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from '~/components/ui/dropdown-menu';
+import {
   Select,
   SelectContent,
   SelectItem,
@@ -127,8 +136,11 @@ import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
   getEventDateString,
+  getPublicAgendaUrl,
   hasEventEnded,
+  isEventWithinADay,
   isValidEventKey,
+  stripParentPrefix,
 } from '~/lib/eventUtils';
 import {
   calculateMedianTurnaroundTime,
@@ -177,6 +189,33 @@ export const Route = createFileRoute('/event/$eventKey')({
         getEventOptions({ path: { event_key: params.eventKey } }),
       )
       .catch(doThrowNotFound);
+
+    // Greedily kick off parent/division event fetches so the dropdowns
+    // render immediately and populate client-side as data arrives.
+    if (event.parent_event_key) {
+      void queryClient
+        .ensureQueryData(
+          getEventOptions({ path: { event_key: event.parent_event_key } }),
+        )
+        .then((parentEvent) => {
+          // Also kick off sibling division fetches
+          for (const key of parentEvent.division_keys) {
+            if (key !== params.eventKey) {
+              void queryClient
+                .ensureQueryData(
+                  getEventSimpleOptions({ path: { event_key: key } }),
+                )
+                .catch(() => undefined);
+            }
+          }
+        })
+        .catch(() => undefined);
+    }
+    for (const key of event.division_keys) {
+      void queryClient
+        .ensureQueryData(getEventSimpleOptions({ path: { event_key: key } }))
+        .catch(() => undefined);
+    }
 
     await Promise.all([matchesQuery, alliancesQuery]);
 
@@ -311,6 +350,44 @@ function EventPage() {
     enabled: event.event_type === EventType.REGIONAL,
   });
 
+  // For division events: fetch the parent event (to get its name and division_keys)
+  const parentEventQuery = useQuery({
+    ...getEventOptions({
+      path: { event_key: event.parent_event_key ?? '' },
+    }),
+    enabled: event.parent_event_key !== null,
+  });
+
+  // Sibling division keys = parent's division_keys minus this event
+  const siblingDivisionKeys = useMemo(
+    () =>
+      (parentEventQuery.data?.division_keys ?? []).filter(
+        (k) => k !== eventKey,
+      ),
+    [parentEventQuery.data, eventKey],
+  );
+
+  const siblingDivisionQueries = useQueries({
+    queries: siblingDivisionKeys.map((key) =>
+      getEventSimpleOptions({ path: { event_key: key } }),
+    ),
+  });
+
+  const siblingEvents = siblingDivisionQueries
+    .map((q) => q.data)
+    .filter((e): e is NonNullable<typeof e> => e !== undefined);
+
+  // For parent events: fetch each division event
+  const ownDivisionQueries = useQueries({
+    queries: event.division_keys.map((key) =>
+      getEventSimpleOptions({ path: { event_key: key } }),
+    ),
+  });
+
+  const ownDivisionEvents = ownDivisionQueries
+    .map((q) => q.data)
+    .filter((e): e is NonNullable<typeof e> => e !== undefined);
+
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
     [matches],
@@ -329,6 +406,62 @@ function EventPage() {
         </h1>
         <FavoriteButton modelKey={eventKey} modelType={MODEL_TYPE.EVENT} />
       </div>
+      {event.parent_event_key && (
+        <div className="mb-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="cursor-pointer py-1.5">
+                Other Divisions
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {siblingEvents.map((e) => (
+                <DropdownMenuItem
+                  key={e.key}
+                  asChild
+                  className="cursor-pointer"
+                >
+                  <Link
+                    to="/event/$eventKey"
+                    params={{ eventKey: e.key }}
+                    className="text-foreground"
+                  >
+                    {stripParentPrefix(e.name, parentEventQuery.data?.name)}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
+      {event.division_keys.length > 0 && (
+        <div className="mb-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="outline" className="cursor-pointer py-1.5">
+                Event Divisions
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              {ownDivisionEvents.map((e) => (
+                <DropdownMenuItem
+                  key={e.key}
+                  asChild
+                  className="cursor-pointer"
+                >
+                  <Link
+                    to="/event/$eventKey"
+                    params={{ eventKey: e.key }}
+                    className="text-foreground"
+                  >
+                    {stripParentPrefix(e.name, event.name)}
+                  </Link>
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        </div>
+      )}
 
       <div className="mb-4 space-y-1">
         {event.district && (
@@ -340,6 +473,14 @@ function EventPage() {
               {event.district.display_name}
             </DistrictLink>{' '}
             Event
+          </DetailEntity>
+        )}
+        {event.parent_event_key && (
+          <DetailEntity icon={<ParentEventIcon />}>
+            Winners advance to{' '}
+            <EventLink eventOrKey={event.parent_event_key}>
+              {parentEventQuery.data?.name ?? event.parent_event_key}
+            </EventLink>
           </DetailEntity>
         )}
         <DetailEntity icon={<DateIcon />}>
@@ -373,6 +514,18 @@ function EventPage() {
             </a>
           </DetailEntity>
         )}
+        {(!hasEventEnded(event) || isEventWithinADay(event)) &&
+          getPublicAgendaUrl(event) && (
+            <DetailEntity icon={<AgendaIcon />}>
+              <a
+                href={getPublicAgendaUrl(event) ?? ''}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Public Agenda
+              </a>
+            </DetailEntity>
+          )}
         <DetailEntity icon={<StatbotIcon />}>
           <a
             href={`https://www.statbotics.io/event/${event.key}`}

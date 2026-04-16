@@ -17,6 +17,7 @@ import {
   getEventDateString,
   groupEventsByParent,
   isEventActive,
+  stripParentPrefix,
 } from '~/lib/eventUtils';
 import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
 import { cn } from '~/lib/utils';
@@ -129,15 +130,10 @@ export default function EventListTable({
                   params={{ eventKey: event.key }}
                 >
                   {isDivision
-                    ? (() => {
-                        const parentName = divisionParentName.get(event.key);
-                        if (parentName && event.name.startsWith(parentName)) {
-                          return event.name
-                            .slice(parentName.length)
-                            .replace(/^[\s–—-]+/, '');
-                        }
-                        return event.name;
-                      })()
+                    ? stripParentPrefix(
+                        event.name,
+                        divisionParentName.get(event.key),
+                      )
                     : event.name}
                 </Link>
                 {!isDivision && (

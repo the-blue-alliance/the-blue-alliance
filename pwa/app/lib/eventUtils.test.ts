@@ -2,15 +2,18 @@ import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
 import { Event } from '~/api/tba/read';
+import { EventType } from '~/lib/api/EventType';
 import {
   getCurrentWeekEvents,
   getEventDateString,
   getEventWeekString,
+  getPublicAgendaUrl,
   groupEventsByParent,
   hasEventEnded,
   isEventActive,
   isEventWithinDays,
   isValidEventKey,
+  stripParentPrefix,
   toCalendarEvent,
 } from '~/lib/eventUtils';
 
@@ -75,6 +78,60 @@ describe.concurrent('groupEventsByParent', () => {
       '2024cmp',
       '2024cmpnew',
     ]);
+  });
+});
+
+describe.concurrent('stripParentPrefix', () => {
+  test('strips matching prefix and space separator', () => {
+    expect(
+      stripParentPrefix(
+        'FIRST Championship Newton Division',
+        'FIRST Championship',
+      ),
+    ).toBe('Newton Division');
+  });
+
+  test('strips matching prefix and dash separator', () => {
+    expect(
+      stripParentPrefix(
+        'FIRST Championship - Newton Division',
+        'FIRST Championship',
+      ),
+    ).toBe('Newton Division');
+  });
+
+  test('strips matching prefix and en-dash separator', () => {
+    expect(
+      stripParentPrefix(
+        'FIRST Championship – Newton Division',
+        'FIRST Championship',
+      ),
+    ).toBe('Newton Division');
+  });
+
+  test('strips matching prefix and em-dash separator', () => {
+    expect(
+      stripParentPrefix(
+        'FIRST Championship — Newton Division',
+        'FIRST Championship',
+      ),
+    ).toBe('Newton Division');
+  });
+
+  test('returns name unchanged when prefix does not match', () => {
+    expect(stripParentPrefix('Newton Division', 'FIRST Championship')).toBe(
+      'Newton Division',
+    );
+  });
+
+  test('returns name unchanged when parentName is undefined', () => {
+    expect(stripParentPrefix('Newton Division', undefined)).toBe(
+      'Newton Division',
+    );
+  });
+
+  test('returns name unchanged when parentName is empty string', () => {
+    expect(stripParentPrefix('Newton Division', '')).toBe('Newton Division');
   });
 });
 
@@ -732,5 +789,86 @@ describe('isEventActive', () => {
       true,
     );
     vi.useRealTimers();
+  });
+});
+
+describe.concurrent('getPublicAgendaUrl', () => {
+  function makeEvent(
+    event_type: EventType,
+    event_code: string,
+    year: number,
+    parent_event_key: string | null = null,
+  ): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { event_type, event_code, year, parent_event_key };
+  }
+
+  test('regional event returns per-event agenda URL', () => {
+    const event = makeEvent(EventType.REGIONAL, 'cthar', 2024);
+    expect(getPublicAgendaUrl(event)).toBe(
+      'https://info.firstinspires.org/hubfs/web/event/frc/2024/2024_CTHAR_Agenda.pdf',
+    );
+  });
+
+  test('district event returns per-event agenda URL', () => {
+    const event = makeEvent(EventType.DISTRICT, 'nyny', 2025);
+    expect(getPublicAgendaUrl(event)).toBe(
+      'https://info.firstinspires.org/hubfs/web/event/frc/2025/2025_NYNY_Agenda.pdf',
+    );
+  });
+
+  test('district championship event returns per-event agenda URL', () => {
+    const event = makeEvent(EventType.DISTRICT_CMP, 'necmp', 2024);
+    expect(getPublicAgendaUrl(event)).toBe(
+      'https://info.firstinspires.org/hubfs/web/event/frc/2024/2024_NECMP_Agenda.pdf',
+    );
+  });
+
+  test('district championship division uses parent event code in URL', () => {
+    const event = makeEvent(
+      EventType.DISTRICT_CMP_DIVISION,
+      'necmp1',
+      2024,
+      '2024necmp',
+    );
+    expect(getPublicAgendaUrl(event)).toBe(
+      'https://info.firstinspires.org/hubfs/web/event/frc/2024/2024_NECMP_Agenda.pdf',
+    );
+  });
+
+  test('district championship division falls back to own event_code when parent_event_key is null', () => {
+    const event = makeEvent(EventType.DISTRICT_CMP_DIVISION, 'necmp1', 2024);
+    expect(getPublicAgendaUrl(event)).toBe(
+      'https://info.firstinspires.org/hubfs/web/event/frc/2024/2024_NECMP1_Agenda.pdf',
+    );
+  });
+
+  test('CMP division returns shared CMP schedule URL', () => {
+    const event = makeEvent(EventType.CMP_DIVISION, 'new', 2024);
+    expect(getPublicAgendaUrl(event)).toBe(
+      'https://www.firstinspires.org/hubfs/web/event/2024/cmp/frc/public-schedule.pdf',
+    );
+  });
+
+  test('CMP finals returns shared CMP schedule URL', () => {
+    const event = makeEvent(EventType.CMP_FINALS, 'cmp', 2024);
+    expect(getPublicAgendaUrl(event)).toBe(
+      'https://www.firstinspires.org/hubfs/web/event/2024/cmp/frc/public-schedule.pdf',
+    );
+  });
+
+  test('offseason event returns null', () => {
+    const event = makeEvent(EventType.OFFSEASON, 'offseason', 2024);
+    expect(getPublicAgendaUrl(event)).toBeNull();
+  });
+
+  test('preseason event returns null', () => {
+    const event = makeEvent(EventType.PRESEASON, 'preseason', 2024);
+    expect(getPublicAgendaUrl(event)).toBeNull();
+  });
+
+  test('event_code is uppercased in the URL', () => {
+    const event = makeEvent(EventType.REGIONAL, 'milwi', 2024);
+    expect(getPublicAgendaUrl(event)).toContain('MILWI');
   });
 });
