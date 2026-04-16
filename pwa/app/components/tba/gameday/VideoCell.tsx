@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import ArrowsLeftRightIcon from '~icons/lucide/arrow-left-right';
@@ -72,7 +73,19 @@ export function VideoCell({
               border-neutral-800 bg-neutral-900 px-2"
           >
             <span className="mr-auto truncate text-sm text-white">
-              {webcast.name}
+              {webcast.isSpecial ? (
+                webcast.name
+              ) : (
+                <Link
+                  to="/event/$eventKey"
+                  params={{
+                    eventKey: webcast.id.split('-').slice(0, -1).join('-'),
+                  }}
+                  className="truncate text-sm text-white hover:underline"
+                >
+                  {webcast.name}
+                </Link>
+              )}
             </span>
 
             <Button
