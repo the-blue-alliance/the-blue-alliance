@@ -74,6 +74,10 @@ export default function EventListTable({
   const items = enableGrouping ? groupEventsByParent(events) : events;
   // Build a set of all division keys so we can identify division rows on the fly.
   const allDivisionKeys = new Set(items.flatMap((e) => e.division_keys));
+  // Map each division key to its parent event name for display trimming.
+  const divisionParentName = new Map(
+    items.flatMap((e) => e.division_keys.map((key) => [key, e.name])),
+  );
 
   return (
     <Table className="w-full">
@@ -99,28 +103,48 @@ export default function EventListTable({
             <TableRow
               key={event.key}
               className={cn(
-                districtColor ? `border-l-4 ${districtColor}` : '',
+                !isDivision && districtColor
+                  ? `border-l-4 ${districtColor}`
+                  : '',
                 {
                   'bg-muted/40': isDivision,
                   'border-b border-b-border/40': isDivision && !isLastDivision,
                 },
               )}
             >
-              <TableCell className="w-8/12">
-                <div className={cn({ 'pl-4': isDivision })}>
-                  <Link
-                    className="text-base"
-                    to="/event/$eventKey"
-                    params={{ eventKey: event.key }}
-                  >
-                    {event.name}
-                  </Link>
-                  {!isDivision && (
-                    <div className="text-sm text-neutral-600">
-                      {event.city}, {event.state_prov}, {event.country}
-                    </div>
-                  )}
-                </div>
+              <TableCell
+                className={cn('w-8/12', { 'relative pl-[26px]': isDivision })}
+              >
+                {isDivision && districtColor && (
+                  <div
+                    className={cn(
+                      'absolute -inset-y-px left-4 w-0 border-l-4',
+                      districtColor,
+                    )}
+                  />
+                )}
+                <Link
+                  className="text-base"
+                  to="/event/$eventKey"
+                  params={{ eventKey: event.key }}
+                >
+                  {isDivision
+                    ? (() => {
+                        const parentName = divisionParentName.get(event.key);
+                        if (parentName && event.name.startsWith(parentName)) {
+                          return event.name
+                            .slice(parentName.length)
+                            .replace(/^[\s–—-]+/, '');
+                        }
+                        return event.name;
+                      })()
+                    : event.name}
+                </Link>
+                {!isDivision && (
+                  <div className="text-sm text-neutral-600">
+                    {event.city}, {event.state_prov}, {event.country}
+                  </div>
+                )}
               </TableCell>
               <TableCell className="mt-2 flex justify-center md:mt-1">
                 {event.webcasts.length > 0 && (
