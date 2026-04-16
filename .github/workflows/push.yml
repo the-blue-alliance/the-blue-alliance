@@ -655,9 +655,22 @@ jobs:
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Prepare PWA deploy config
+        if: steps.changes.outputs.pwa == 'true'
+        run: |
+          # PWA uses build-time VITE_* vars, but Nexus key is runtime-only server env.
+          # Inject it into a deploy-only app.yaml so it is available as process.env.
+          cp pwa/pwa.yaml pwa/pwa.deploy.yaml
+          cat >> pwa/pwa.deploy.yaml <<EOF
+
+          env_variables:
+            NEXUS_API_KEY: "${NEXUS_API_KEY}"
+          EOF
+        env:
+          NEXUS_API_KEY: ${{ secrets.NEXUS_API_KEY }}
       - name: Deploy
         if: steps.changes.outputs.pwa == 'true'
-        run: ./ops/deploy/deploy_module.sh pwa/pwa.yaml
+        run: ./ops/deploy/deploy_module.sh pwa/pwa.deploy.yaml
   deploy-cron:
     name: Deploy Cron Jobs
     runs-on: ubuntu-24.04
