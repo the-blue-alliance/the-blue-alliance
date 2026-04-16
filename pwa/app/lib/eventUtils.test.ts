@@ -559,6 +559,28 @@ describe('getCurrentWeekEvents 8am-6pm window', () => {
     vi.useRealTimers();
   });
 
+  // Regression: a Pacific event ending Sunday 6pm PDT = Monday 1am UTC only overlaps
+  // the UTC week by 1 hour, which is under the 6-hour minimum. A UTC server must not
+  // include it, or the SSR would flash those events after the week has ended.
+  test('excludes Sunday Pacific event that bleeds only 1 hour into UTC Monday', () => {
+    vi.useFakeTimers();
+    // Wednesday April 17 2026, noon UTC — server timezone is UTC
+    vi.setSystemTime(new Date('2026-04-15T12:00:00Z'));
+    vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue('UTC');
+
+    // CA state champs: ended Sunday April 12 at 6pm PDT = April 13 01:00 UTC.
+    // Week starts Monday April 13 00:00 UTC — only 1 hour of overlap.
+    const caStateChamps = {
+      start_date: '2026-04-09',
+      end_date: '2026-04-12',
+      timezone: 'America/Los_Angeles',
+    } as Event;
+
+    expect(getCurrentWeekEvents([caStateChamps])).not.toContain(caStateChamps);
+    vi.restoreAllMocks();
+    vi.useRealTimers();
+  });
+
   // Events without a timezone should use the Eastern fallback.
   test('uses Eastern fallback timezone when event has no timezone', () => {
     vi.useFakeTimers();

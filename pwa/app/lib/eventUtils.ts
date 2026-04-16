@@ -155,6 +155,13 @@ export function getEventWeekString(event: Event) {
   }
 }
 
+// Minimum overlap (in seconds) between an event's active window and the
+// user's week before the event is considered "this week". 6 hours ensures that
+// an event ending Sunday evening in a western timezone doesn't bleed into the
+// next week on a UTC server, while still catching events that start or end
+// partway through the week.
+const MIN_WEEK_OVERLAP_SECONDS = 6 * 60 * 60;
+
 export function getCurrentWeekEvents(events: Event[]) {
   // Build the user's week window as Instants so we can compare against the
   // event's active window (8am–6pm in the event's timezone) correctly even
@@ -170,11 +177,15 @@ export function getCurrentWeekEvents(events: Event[]) {
   const filteredEvents = [];
   for (const event of events) {
     const { start: eventStart, end: eventEnd } = getEventActiveWindow(event);
-    // Include if the event's active window overlaps with the user's week at all.
-    if (
-      Temporal.Instant.compare(eventStart, weekEnd) < 0 &&
-      Temporal.Instant.compare(eventEnd, weekStart) > 0
-    ) {
+    // Compute how much of the event's active window falls inside this week.
+    const overlapStart =
+      Temporal.Instant.compare(eventStart, weekStart) > 0
+        ? eventStart
+        : weekStart;
+    const overlapEnd =
+      Temporal.Instant.compare(eventEnd, weekEnd) < 0 ? eventEnd : weekEnd;
+    const overlapSeconds = overlapEnd.since(overlapStart).total('seconds');
+    if (overlapSeconds >= MIN_WEEK_OVERLAP_SECONDS) {
       filteredEvents.push(event);
     }
   }
