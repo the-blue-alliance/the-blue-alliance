@@ -281,6 +281,8 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         end_date = datetime.datetime.strptime(request.form.get("end_date"), "%Y-%m-%d")
 
     first_code = request.form.get("first_code", None)
+    if first_code:
+        first_code = first_code.strip()
     district_key = request.form.get("event_district_key", None)
     parent_key = request.form.get("parent_event", None)
 

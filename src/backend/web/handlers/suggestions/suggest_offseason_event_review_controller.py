@@ -69,7 +69,7 @@ class SuggestOffseasonEventReviewController(
 
         first_code = request.form.get("first_code")
         if first_code:
-            first_code = first_code.upper()
+            first_code = first_code.strip().upper()
         event_type_enum = int(request.form.get("event_type_enum", EventType.OFFSEASON))
         event = Event(
             id=event_key,
