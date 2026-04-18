@@ -100,7 +100,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
             )
         ],
         point_total=70,
-        qual_scores=[85, 71, 69],
+        match_scores=[94, 91, 89],
         rookie_bonus=0,
         other_bonus=0,
         single_event_bonus=0,
@@ -131,7 +131,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
             ),
         ],
         point_total=267,
-        qual_scores=[104, 97, 93],
+        match_scores=[127, 121, 113],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -180,7 +180,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             ),
         ],
         point_total=123,
-        qual_scores=[93, 82, 82],
+        match_scores=[93, 82, 82],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=2,
@@ -201,7 +201,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             )
         ],
         point_total=59,
-        qual_scores=[52, 41, 40],
+        match_scores=[73, 59, 57],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -222,7 +222,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             )
         ],
         point_total=41,
-        qual_scores=[67, 56, 45],
+        match_scores=[67, 56, 45],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -280,7 +280,7 @@ def test_hq_adjustments(setup_full_event) -> None:
             )
         ],
         point_total=75,
-        qual_scores=[85, 71, 69],
+        match_scores=[94, 91, 89],
         rookie_bonus=0,
         other_bonus=0,
         single_event_bonus=0,

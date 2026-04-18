@@ -96,7 +96,7 @@ def test_event_detail_regional_champs_points_tab_and_task(
                     "total": 28,
                 }
             },
-            "tiebreakers": {"frc1": {"qual_wins": 0, "highest_qual_scores": []}},
+            "tiebreakers": {"frc1": {"qual_wins": 0, "highest_match_scores": []}},
         },
     ).put()
 

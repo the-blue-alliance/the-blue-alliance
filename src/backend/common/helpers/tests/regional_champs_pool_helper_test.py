@@ -112,7 +112,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
             )
         ],
         point_total=128,
-        qual_scores=[180, 161, 153],
+        match_scores=[185, 180, 175],
         rookie_bonus=0,
         single_event_bonus=57,
         other_bonus=0,
@@ -137,7 +137,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
             )
         ],
         point_total=171,
-        qual_scores=[117, 101, 101],
+        match_scores=[136, 133, 125],
         rookie_bonus=0,
         single_event_bonus=73,
         other_bonus=0,
@@ -179,7 +179,7 @@ def test_hq_adjustments(setup_full_event) -> None:
             )
         ],
         point_total=133,
-        qual_scores=[180, 161, 153],
+        match_scores=[185, 180, 175],
         rookie_bonus=0,
         single_event_bonus=57,
         other_bonus=0,

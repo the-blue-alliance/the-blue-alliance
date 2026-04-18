@@ -234,15 +234,15 @@
   },
   "tiebreakers": {
     "frc1241": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         146,
-        130,
-        121
+        139,
+        130
       ],
       "qual_wins": 0
     },
     "frc1285": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         136,
         132,
         130
@@ -250,15 +250,15 @@
       "qual_wins": 0
     },
     "frc1325": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
+        143,
         136,
-        132,
-        128
+        134
       ],
       "qual_wins": 0
     },
     "frc2013": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         145,
         134,
         134
@@ -266,15 +266,15 @@
       "qual_wins": 0
     },
     "frc216": {
-      "highest_qual_scores": [
-        124,
-        122,
-        114
+      "highest_match_scores": [
+        139,
+        126,
+        124
       ],
       "qual_wins": 0
     },
     "frc244": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         134,
         132,
         128
@@ -282,7 +282,7 @@
       "qual_wins": 0
     },
     "frc2708": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         126,
         120,
         113
@@ -290,23 +290,23 @@
       "qual_wins": 0
     },
     "frc288": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
+        147,
         146,
-        130,
-        107
+        136
       ],
       "qual_wins": 0
     },
     "frc3683": {
-      "highest_qual_scores": [
-        146,
-        145,
-        144
+      "highest_match_scores": [
+        148,
+        147,
+        146
       ],
       "qual_wins": 0
     },
     "frc3739": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         132,
         120,
         119
@@ -314,7 +314,7 @@
       "qual_wins": 0
     },
     "frc3756": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         128,
         124,
         109
@@ -322,15 +322,15 @@
       "qual_wins": 0
     },
     "frc4039": {
-      "highest_qual_scores": [
-        139,
-        134,
-        130
+      "highest_match_scores": [
+        148,
+        147,
+        146
       ],
       "qual_wins": 0
     },
     "frc4617": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         116,
         103,
         99
@@ -338,15 +338,15 @@
       "qual_wins": 0
     },
     "frc4907": {
-      "highest_qual_scores": [
-        132,
-        132,
-        130
+      "highest_match_scores": [
+        143,
+        134,
+        134
       ],
       "qual_wins": 0
     },
     "frc4917": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         125,
         122,
         120
@@ -354,7 +354,7 @@
       "qual_wins": 0
     },
     "frc4992": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         122,
         114,
         99
@@ -362,15 +362,15 @@
       "qual_wins": 0
     },
     "frc5024": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
+        132,
         130,
-        127,
-        125
+        127
       ],
       "qual_wins": 0
     },
     "frc5406": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         144,
         136,
         134
@@ -378,23 +378,23 @@
       "qual_wins": 0
     },
     "frc5460": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
+        139,
         132,
-        127,
-        124
+        127
       ],
       "qual_wins": 0
     },
     "frc5870": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         144,
-        121,
-        97
+        143,
+        134
       ],
       "qual_wins": 0
     },
     "frc6070": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         124,
         124,
         108
@@ -402,7 +402,7 @@
       "qual_wins": 0
     },
     "frc6162": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         128,
         119,
         88
@@ -410,7 +410,7 @@
       "qual_wins": 0
     },
     "frc6725": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         139,
         73,
         71
@@ -418,15 +418,15 @@
       "qual_wins": 0
     },
     "frc6854": {
-      "highest_qual_scores": [
-        145,
-        112,
-        109
+      "highest_match_scores": [
+        148,
+        146,
+        145
       ],
       "qual_wins": 0
     },
     "frc7475": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         122,
         121,
         101
@@ -434,23 +434,23 @@
       "qual_wins": 0
     },
     "frc7480": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         134,
         126,
-        104
+        121
       ],
       "qual_wins": 0
     },
     "frc781": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         127,
-        112,
-        104
+        121,
+        112
       ],
       "qual_wins": 0
     },
     "frc7902": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         130,
         109,
         87
@@ -458,7 +458,7 @@
       "qual_wins": 0
     },
     "frc8089": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         132,
         130,
         112
@@ -466,7 +466,7 @@
       "qual_wins": 0
     },
     "frc8789": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         122,
         104,
         81
@@ -474,7 +474,7 @@
       "qual_wins": 0
     },
     "frc8884": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         109,
         103,
         101
@@ -482,7 +482,7 @@
       "qual_wins": 0
     },
     "frc9113": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         132,
         122,
         109
@@ -490,10 +490,10 @@
       "qual_wins": 0
     },
     "frc9263": {
-      "highest_qual_scores": [
-        100,
-        100,
-        86
+      "highest_match_scores": [
+        132,
+        118,
+        101
       ],
       "qual_wins": 0
     }

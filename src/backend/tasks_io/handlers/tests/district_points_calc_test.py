@@ -236,7 +236,7 @@ def test_calc_regional_pre_2025(
         tiebreakers={
             "frc254": TeamAtEventDistrictPointTiebreakers(
                 qual_wins=0,
-                highest_qual_scores=[],
+                highest_match_scores=[],
             )
         },
     )

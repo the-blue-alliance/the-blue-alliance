@@ -204,7 +204,7 @@ export const zEventDistrictPoints = z.object({
     .record(
       z.string(),
       z.object({
-        highest_qual_scores: z.array(z.int()).optional(),
+        highest_match_scores: z.array(z.int()).optional(),
         qual_wins: z.int().optional(),
       }),
     )

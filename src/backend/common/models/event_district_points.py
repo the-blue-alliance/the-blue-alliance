@@ -23,7 +23,7 @@ class TeamAtEventDistrictPoints(_TeamAtEventDistrictPointsOptional):
 
 class TeamAtEventDistrictPointTiebreakers(TypedDict):
     qual_wins: int
-    highest_qual_scores: List[int]
+    highest_match_scores: List[int]
 
 
 class EventDistrictPoints(TypedDict):

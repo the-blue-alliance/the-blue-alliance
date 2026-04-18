@@ -554,7 +554,7 @@ export type EventDistrictPoints = {
    */
   tiebreakers?: {
     [key: string]: {
-      highest_qual_scores?: Array<number>;
+      highest_match_scores?: Array<number>;
       qual_wins?: number;
     };
   };

@@ -247,7 +247,7 @@ def test_render_regional_cmp_points_advancement_badges(
                     "total": 24,
                 }
             },
-            "tiebreakers": {"frc254": {"qual_wins": 0, "highest_qual_scores": []}},
+            "tiebreakers": {"frc254": {"qual_wins": 0, "highest_match_scores": []}},
         },
     ).put()
 

@@ -52,7 +52,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 lambda: TeamAtEventDistrictPointTiebreakers(
                     # for tiebreaker stats that can't be calculated with 'points'
                     qual_wins=0,
-                    highest_qual_scores=[],
+                    highest_match_scores=[],
                 )
             ),
         }
@@ -139,7 +139,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     best_alliance_points=0,
                     best_qual_points=0,
                 ),
-                qual_scores=[],
+                match_scores=[],
                 other_bonus=0,
                 single_event_bonus=0,
                 adjustments=0,
@@ -190,13 +190,13 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     team_totals[team_key]["tiebreakers"] = tiebreakers
 
                 if team_key in event_regional_points["tiebreakers"]:
-                    team_totals[team_key]["qual_scores"] = heapq.nlargest(
+                    team_totals[team_key]["match_scores"] = heapq.nlargest(
                         3,
                         [
                             *event_regional_points["tiebreakers"][team_key][
-                                "highest_qual_scores"
+                                "highest_match_scores"
                             ],
-                            *team_totals[team_key]["qual_scores"],
+                            *team_totals[team_key]["match_scores"],
                         ],
                     )
 
@@ -245,7 +245,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     -item[1]["point_total"],
                 ]
                 + [-t for t in item[1]["tiebreakers"]]
-                + [-score for score in item[1]["qual_scores"]],
+                + [-score for score in item[1]["match_scores"]],
             )
         )
 

@@ -112,7 +112,7 @@ def test_regional_pool_calc(
         tiebreakers={
             "frc254": TeamAtEventDistrictPointTiebreakers(
                 qual_wins=0,
-                highest_qual_scores=[],
+                highest_match_scores=[],
             )
         },
     )
@@ -163,7 +163,7 @@ def test_regional_pool_calc_no_output_in_taskqueue(
         tiebreakers={
             "frc254": TeamAtEventDistrictPointTiebreakers(
                 qual_wins=0,
-                highest_qual_scores=[],
+                highest_match_scores=[],
             )
         },
     )

@@ -27,6 +27,6 @@ class DistrictPointTiebreakersSortingHelper:
                 -score
                 for score in event_points["tiebreakers"]
                 .get(team_and_points[0], {})
-                .get("highest_qual_scores", [])
+                .get("highest_match_scores", [])
             ],
         )
