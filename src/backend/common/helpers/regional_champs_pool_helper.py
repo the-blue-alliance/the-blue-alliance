@@ -193,9 +193,9 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     team_totals[team_key]["match_scores"] = heapq.nlargest(
                         3,
                         [
-                            *event_regional_points["tiebreakers"][team_key][
-                                "highest_match_scores"
-                            ],
+                            *event_regional_points["tiebreakers"][team_key].get(
+                                "highest_match_scores", []
+                            ),
                             *team_totals[team_key]["match_scores"],
                         ],
                     )

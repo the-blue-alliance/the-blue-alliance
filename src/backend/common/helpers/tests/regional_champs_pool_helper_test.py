@@ -258,6 +258,30 @@ def test_rookie_bonus_per_event(setup_full_event) -> None:
     assert rankings["frc9001"]["point_total"] == 75
 
 
+def test_calc_rankings_tolerates_legacy_tiebreaker_key(setup_full_event) -> None:
+    # Pre-migration EventDetails.regional_champs_pool_points entries store
+    # "highest_qual_scores" instead of the renamed "highest_match_scores".
+    # Rankings calc reads stored JSON directly and must not KeyError on those.
+    setup_full_event("2025mndu")
+
+    event_details = none_throws(EventDetails.get_by_id("2025mndu"))
+    regional_pool_points = none_throws(event_details.regional_champs_pool_points)
+    for team_key, tiebreakers in regional_pool_points["tiebreakers"].items():
+        legacy_scores = tiebreakers.pop("highest_match_scores", [])
+        tiebreakers["highest_qual_scores"] = legacy_scores
+    event_details.regional_champs_pool_points = regional_pool_points
+    event_details.put()
+
+    event = none_throws(Event.get_by_id("2025mndu"))
+    event.prep_details()
+
+    teams = [none_throws(Team.get_by_id("frc2847"))]
+    rankings = RegionalChampsPoolHelper.calculate_rankings([event], teams, 2025, None)
+
+    # Tiebreak scores aren't recovered from the old key, but the calc completes.
+    assert rankings["frc2847"]["match_scores"] == []
+
+
 def test_single_event_bonus_includes_rookie_bonus(setup_full_event) -> None:
     setup_full_event("2025mndu")
 
