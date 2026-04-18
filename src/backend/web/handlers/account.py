@@ -1,4 +1,3 @@
-import datetime
 import logging
 
 from flask import (
@@ -20,6 +19,7 @@ from backend.common.auth import (
     current_user,
     delete_user,
     revoke_session_cookie,
+    SESSION_COOKIE_LIFETIME,
 )
 from backend.common.consts.auth_type import (
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
@@ -152,10 +152,8 @@ def login() -> Response:
         if not id_token:
             abort(400)
 
-        expires_in = datetime.timedelta(days=5)
-
         response = jsonify({"status": "success"})
-        create_session_cookie(id_token, expires_in)
+        create_session_cookie(id_token, SESSION_COOKIE_LIFETIME)
         return response
     else:
         if current_user():

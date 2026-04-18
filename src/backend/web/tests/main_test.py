@@ -1,6 +1,6 @@
 import importlib
 
-from backend.common.auth import _user_context_processor
+from backend.common.auth import _user_context_processor, SESSION_COOKIE_LIFETIME
 from backend.common.environment import Environment
 from backend.web.handlers.account import blueprint as account_blueprint
 
@@ -14,6 +14,12 @@ def test_app_secret_key(ndb_stub) -> None:
 
     # Make sure the secret key is set
     assert main.app.secret_key == Environment.DEFAULT_FLASK_SECRET_KEY
+
+
+def test_app_permanent_session_lifetime() -> None:
+    from backend.web.main import app
+
+    assert app.config["PERMANENT_SESSION_LIFETIME"] == SESSION_COOKIE_LIFETIME
 
 
 def test_app_url_map_strict_slashes() -> None:

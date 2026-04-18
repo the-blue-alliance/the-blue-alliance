@@ -9,6 +9,10 @@ from backend.common.models.user import User
 
 _SESSION_KEY = "session"
 
+# 14 days is Firebase Admin's max (MAX_SESSION_COOKIE_DURATION_SECONDS) and
+# drives both the Firebase session cookie TTL and the Flask cookie's Max-Age.
+SESSION_COOKIE_LIFETIME = datetime.timedelta(days=14)
+
 
 # Code from https://firebase.google.com/docs/auth/admin/manage-cookies
 
@@ -28,6 +32,7 @@ def create_session_cookie(id_token: str, expires_in: datetime.timedelta) -> None
     session_cookie = auth.create_session_cookie(
         id_token, expires_in=expires_in, app=app()
     )
+    session.permanent = True
     session[_SESSION_KEY] = session_cookie
 
 
