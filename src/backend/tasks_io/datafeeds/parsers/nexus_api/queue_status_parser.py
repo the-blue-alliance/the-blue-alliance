@@ -4,8 +4,14 @@ from typing import Dict, Optional
 
 from pyre_extensions import JSON
 
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.nexus_match_status import NexusMatchStatus
-from backend.common.consts.playoff_type import PlayoffType
+from backend.common.consts.playoff_type import (
+    DOUBLE_ELIM_4_MAPPING,
+    DOUBLE_ELIM_MAPPING,
+    LEGACY_DOUBLE_ELIM_MAPPING,
+    PlayoffType,
+)
 from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
@@ -17,6 +23,18 @@ from backend.common.models.event_queue_status import (
 )
 from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
+
+# Nexus labels finals "Final 1/2/3" but TBA continues its match numbering
+# from the semifinal bracket. Offset = (first F key in the mapping) - 1.
+_FINALS_LABEL_OFFSET: dict[PlayoffType, int] = {
+    playoff_type: min(k for k, (level, _, _) in mapping.items() if level == CompLevel.F)
+    - 1
+    for playoff_type, mapping in (
+        (PlayoffType.DOUBLE_ELIM_8_TEAM, DOUBLE_ELIM_MAPPING),
+        (PlayoffType.DOUBLE_ELIM_4_TEAM, DOUBLE_ELIM_4_MAPPING),
+        (PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM, LEGACY_DOUBLE_ELIM_MAPPING),
+    )
+}
 
 
 class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
@@ -31,10 +49,11 @@ class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
         self.matches = event.matches
 
     def parse(self, response: JSON) -> Optional[EventQueueStatus]:
-        if self.event.playoff_type != PlayoffType.DOUBLE_ELIM_8_TEAM:
+        if self.event.playoff_type not in _FINALS_LABEL_OFFSET:
             logging.warning(
-                f"Unable to parse nexus status for {self.event.key_name}, playoff type is {self.event.playoff_type}"
+                f"Unable to parse nexus status for {self.event.key_name}, unsupported playoff type {self.event.playoff_type}"
             )
+            return None
 
         if not isinstance(response, dict):
             return None
@@ -96,18 +115,23 @@ class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
             return None
 
         if level == "Final":
-            # Nexus will report "Final 1, 2, 3"
-            # While FMS match nubmering does not reset for finals
-            # This assumes a double elim format
-            level_number += 13
+            # Nexus reports "Final 1, 2, 3" while TBA's match numbering
+            # continues from the semifinal bracket — the offset depends on
+            # the playoff format.
+            level_number += _FINALS_LABEL_OFFSET[self.event.playoff_type]
 
-        comp_level = PlayoffTypeHelper.get_comp_level(
-            self.event.playoff_type, level, level_number
-        )
-
-        set_number, match_number = PlayoffTypeHelper.get_set_match_number(
-            self.event.playoff_type, comp_level, level_number
-        )
+        try:
+            comp_level = PlayoffTypeHelper.get_comp_level(
+                self.event.playoff_type, level, level_number
+            )
+            set_number, match_number = PlayoffTypeHelper.get_set_match_number(
+                self.event.playoff_type, comp_level, level_number
+            )
+        except KeyError:
+            logging.warning(
+                f"Unable to map nexus match label {description!r} for {self.event.key_name} (playoff_type={self.event.playoff_type})"
+            )
+            return None
         return Match.render_key_name(
             self.event.key_name, comp_level.value, set_number, match_number
         )

@@ -60,7 +60,19 @@ def create_match(played: bool) -> Match:
 
 def test_wrong_playoff_type(ndb_stub) -> None:
     e = create_event(playoff_type=PlayoffType.BRACKET_8_TEAM)
-    data: JSON = []
+    data: JSON = {
+        "dataAsOfTime": 0,
+        "matches": [
+            {
+                "label": "Qualification 1",
+                "status": "Now queuing",
+                "times": {
+                    "estimatedQueueTime": 0,
+                    "estimatedStartTime": 0,
+                },
+            }
+        ],
+    }
     parsed = NexusAPIQueueStatusParser(e).parse(data)
     assert parsed is None
 
@@ -241,6 +253,27 @@ def test_parse_match_label(
     ndb_stub, match_label: str, match_key: Optional[MatchKey]
 ) -> None:
     e = create_event()
+    parsed_key = NexusAPIQueueStatusParser(e)._parse_match_description(match_label)
+    assert parsed_key == match_key
+
+
+@pytest.mark.parametrize(
+    "match_label,match_key",
+    [
+        ("Qualification 1", "2019casj_qm1"),
+        ("Playoff 1", "2019casj_sf1m1"),
+        ("Playoff 5", "2019casj_sf5m1"),
+        ("Final 1", "2019casj_f1m1"),
+        ("Final 2", "2019casj_f1m2"),
+        ("Final 3", "2019casj_f1m3"),
+        # Out-of-range finals (beyond overtime 3) should not crash.
+        ("Final 7", None),
+    ],
+)
+def test_parse_match_label_double_elim_4(
+    ndb_stub, match_label: str, match_key: Optional[MatchKey]
+) -> None:
+    e = create_event(playoff_type=PlayoffType.DOUBLE_ELIM_4_TEAM)
     parsed_key = NexusAPIQueueStatusParser(e)._parse_match_description(match_label)
     assert parsed_key == match_key
 
