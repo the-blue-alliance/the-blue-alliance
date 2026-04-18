@@ -1,5 +1,5 @@
 import json
-from typing import cast
+from typing import cast, Dict
 
 import pytest
 from pyre_extensions import none_throws
@@ -266,9 +266,10 @@ def test_calc_rankings_tolerates_legacy_tiebreaker_key(setup_full_event) -> None
 
     event_details = none_throws(EventDetails.get_by_id("2025mndu"))
     regional_pool_points = none_throws(event_details.regional_champs_pool_points)
-    for team_key, tiebreakers in regional_pool_points["tiebreakers"].items():
-        legacy_scores = tiebreakers.pop("highest_match_scores", [])
-        tiebreakers["highest_qual_scores"] = legacy_scores
+    for tiebreakers in regional_pool_points["tiebreakers"].values():
+        # Cast away the TypedDict to simulate legacy on-disk JSON shape.
+        legacy: Dict[str, object] = cast(Dict[str, object], tiebreakers)
+        legacy["highest_qual_scores"] = legacy.pop("highest_match_scores", [])
     event_details.regional_champs_pool_points = regional_pool_points
     event_details.put()
 
