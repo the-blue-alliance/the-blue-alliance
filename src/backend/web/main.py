@@ -2,7 +2,7 @@ from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from google.appengine.api import wrap_wsgi_app
 
-from backend.common.auth import _user_context_processor
+from backend.common.auth import _user_context_processor, SESSION_COOKIE_LIFETIME
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
@@ -85,6 +85,7 @@ configure_logging()
 app = Flask(__name__)
 app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
 install_middleware(app, configure_secret_key=True, include_appspot_redirect=True)
+app.config["PERMANENT_SESSION_LIFETIME"] = SESSION_COOKIE_LIFETIME
 install_url_converters(app)
 configure_flask_cache(app)
 

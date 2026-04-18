@@ -1,5 +1,5 @@
 from typing import List
-from unittest.mock import ANY, Mock, patch
+from unittest.mock import Mock, patch
 from urllib.parse import parse_qsl, quote, urlparse
 
 import pytest
@@ -8,6 +8,7 @@ from flask.testing import FlaskClient
 
 import backend
 from backend.common import auth
+from backend.common.auth import SESSION_COOKIE_LIFETIME
 from backend.common.consts.client_type import ClientType
 from backend.common.consts.model_type import ModelType
 from backend.common.helpers.account_deletion import AccountDeletionHelper
@@ -424,7 +425,7 @@ def test_login_success(web_client: FlaskClient) -> None:
     ) as mock_create_session_cookie:
         response = web_client.post("/account/login", data={"id_token": "abc"})
 
-    mock_create_session_cookie.assert_called_with("abc", ANY)
+    mock_create_session_cookie.assert_called_with("abc", SESSION_COOKIE_LIFETIME)
 
     assert response.status_code == 200
     assert response.get_json() == {"status": "success"}
