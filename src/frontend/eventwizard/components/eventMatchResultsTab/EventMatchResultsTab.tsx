@@ -8,9 +8,9 @@ export interface EventMatchResultsTabProps {
     path: string,
     body: string | FormData
   ) => Promise<Response>;
-  makeApiV3Request: <T = unknown>(
+  makeApiV3Request: (
     path: string
-  ) => Promise<T>;
+  ) => Promise<Response>;
 }
 
 const EventMatchResultsTab: React.FC<EventMatchResultsTabProps> = ({
