@@ -22,7 +22,7 @@ from backend.common.frc_api.types import (
 from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
-from backend.common.models.event import Event
+from backend.common.models.event import Event, EventSyncOverrides
 from backend.common.models.keys import DistrictKey, Year
 from backend.common.models.webcast import Webcast
 from backend.common.tasklets import typed_tasklet
@@ -102,7 +102,10 @@ class FMSAPIEventListParser(
         sync_overrides = dict(existing_sync_overrides)
 
         if "event_name_override" not in sync_overrides:
-            if event_type == EventType.CMP_FINALS and event_short in self.EINSTEIN_CODES:
+            if (
+                event_type == EventType.CMP_FINALS
+                and event_short in self.EINSTEIN_CODES
+            ):
                 sync_overrides["event_name_override"] = {
                     "short_name": self.EINSTEIN_SHORT_NAME_DEFAULT,
                     "name": self.EINSTEIN_NAME_DEFAULT,
@@ -155,7 +158,9 @@ class FMSAPIEventListParser(
 
         existing_events_by_key = {
             event.key_name: event
-            for event in ndb.get_multi([ndb.Key(Event, key) for key in event_keys_to_fetch])
+            for event in ndb.get_multi(
+                [ndb.Key(Event, key) for key in event_keys_to_fetch]
+            )
             if event is not None
         }
 
@@ -239,11 +244,11 @@ class FMSAPIEventListParser(
 
             event_key = "{}{}".format(self.season, code)
             existing_event = existing_events_by_key.get(event_key)
-            existing_sync_overrides = (
-                existing_event.sync_overrides or {}
-                if existing_event is not None
-                else {}
-            )
+            existing_sync_overrides: Dict[str, Any]
+            if existing_event is not None and existing_event.sync_overrides is not None:
+                existing_sync_overrides = dict(existing_event.sync_overrides)
+            else:
+                existing_sync_overrides = {}
             sync_overrides = self._bootstrap_sync_overrides(
                 none_throws(event_type),
                 code,
@@ -347,13 +352,17 @@ class FMSAPIEventListParser(
 
         for event in events:
             if (
-                event.event_type_enum not in {EventType.DISTRICT_CMP, EventType.CMP_FINALS}
+                event.event_type_enum
+                not in {EventType.DISTRICT_CMP, EventType.CMP_FINALS}
                 or len(event.divisions) == 0
                 or event.end_date.date() >= datetime.datetime.now().date()
             ):
                 continue
 
-            sync_overrides = dict(event.sync_overrides or {})
+            sync_overrides = cast(
+                EventSyncOverrides,
+                dict(cast(Dict[str, Any], event.sync_overrides or {})),
+            )
             if "skip_eventteams" not in sync_overrides:
                 sync_overrides["skip_eventteams"] = True
             if "set_start_day_to_last" not in sync_overrides:

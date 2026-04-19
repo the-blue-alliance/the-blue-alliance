@@ -1,9 +1,11 @@
+from typing import Any, cast, Dict
+
 from flask import abort
 from google.appengine.api import taskqueue
 
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
-from backend.common.models.event import Event
+from backend.common.models.event import Event, EventSyncOverrides
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey
 
@@ -32,7 +34,10 @@ def admin_post_division_tasks(event_key: EventKey) -> str:
     if not event:
         abort(404)
 
-    sync_overrides = dict(event.sync_overrides or {})
+    sync_overrides = cast(
+        EventSyncOverrides,
+        dict(cast(Dict[str, Any], event.sync_overrides or {})),
+    )
     sync_overrides["event_sync_disable"] = True
     sync_overrides["set_start_day_to_last"] = True
     event.sync_overrides = sync_overrides

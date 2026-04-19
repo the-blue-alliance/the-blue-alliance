@@ -382,7 +382,7 @@ class Event(CachedModel):
         return self.withinDays(-1, 1)
 
     def should_skip_eventteams(self) -> bool:
-        config: EventSyncOverrides = self.sync_overrides or {}
+        config = cast(EventSyncOverrides, self.sync_overrides or {})
         if config.get("skip_eventteams", False):
             return True
 

@@ -227,7 +227,9 @@ def test_should_skip_eventteams_automatic_cases(
         year=2023,
         event_short="test",
         event_type_enum=event_type,
-        divisions=[ndb.Key(Event, f"2023test{i}") for i in range(1, division_count + 1)],
+        divisions=[
+            ndb.Key(Event, f"2023test{i}") for i in range(1, division_count + 1)
+        ],
         start_date=datetime(2023, 4, 1),
         end_date=datetime(2023, 4, 4),
     )

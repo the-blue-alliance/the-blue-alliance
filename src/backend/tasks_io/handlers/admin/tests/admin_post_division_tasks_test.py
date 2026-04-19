@@ -1,4 +1,5 @@
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
@@ -62,7 +63,7 @@ def test_post_division_tasks(
 
     # Event cmp hacks should be updated
     updated_event = Event.get_by_id("2020cmptx")
-    sync_overrides = updated_event.sync_overrides or {}
+    sync_overrides = none_throws(updated_event).sync_overrides or {}
     assert sync_overrides["event_sync_disable"] is True
     assert sync_overrides["set_start_day_to_last"] is True
 
@@ -94,7 +95,7 @@ def test_post_division_tasks_idempotent_event_config(
     assert resp.status_code == 200
 
     updated_event = Event.get_by_id("2020cmptx")
-    sync_overrides = updated_event.sync_overrides or {}
+    sync_overrides = none_throws(updated_event).sync_overrides or {}
     assert sync_overrides["event_sync_disable"] is True
     assert sync_overrides["set_start_day_to_last"] is True
 
@@ -127,7 +128,7 @@ def test_post_division_tasks_preserves_other_config(
     assert resp.status_code == 200
 
     updated_event = Event.get_by_id("2020cmptx")
-    sync_overrides = updated_event.sync_overrides or {}
+    sync_overrides = none_throws(updated_event).sync_overrides or {}
     assert sync_overrides["event_sync_disable"] is True
     assert sync_overrides["set_start_day_to_last"] is True
     assert sync_overrides["skip_eventteams"] is True

@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Optional, Set
+from typing import Any, cast, Dict, Optional, Set
 
 from flask import abort, redirect, request, url_for
 from google.appengine.api import taskqueue
@@ -45,7 +45,7 @@ from backend.common.memcache_models.webcast_online_status_memcache import (
 )
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
-from backend.common.models.event import Event
+from backend.common.models.event import Event, EventSyncOverrides
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, Year
@@ -377,7 +377,10 @@ def event_detail_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    sync_overrides = dict(event.sync_overrides or {})
+    sync_overrides = cast(
+        EventSyncOverrides,
+        dict(cast(Dict[str, Any], event.sync_overrides or {})),
+    )
 
     if request.form.get("event_sync_disable"):
         sync_overrides["event_sync_disable"] = True
