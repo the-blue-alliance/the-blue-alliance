@@ -528,9 +528,9 @@
     },
     "frc2513": {
       "highest_match_scores": [
-        101,
         88,
-        72
+        72,
+        66
       ],
       "qual_wins": 0
     },

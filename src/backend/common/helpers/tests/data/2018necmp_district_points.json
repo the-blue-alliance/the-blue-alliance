@@ -708,12 +708,12 @@
     }, 
     "frc3930": {
       "highest_match_scores": [
-        419, 
-        408, 
-        388
-      ], 
+        408,
+        388,
+        365
+      ],
       "qual_wins": 0
-    }, 
+    },
     "frc4041": {
       "highest_match_scores": [
         455, 

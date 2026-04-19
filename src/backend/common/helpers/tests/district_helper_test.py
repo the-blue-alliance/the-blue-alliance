@@ -56,6 +56,18 @@ def test_calc_event_points(
     assert event_points == expected_event_points
 
 
+def test_calc_event_points_excludes_dq_from_match_score_tiebreaker(
+    setup_full_event,
+) -> None:
+    # 2023onlon_qm27 scored 128 with frc6162 on the alliance but frc6162 was
+    # DQ'd in that match; the score must not count toward frc6162's top-3
+    # match score tiebreaker.
+    setup_full_event("2023onlon")
+    event = none_throws(Event.get_by_id("2023onlon"))
+    event_points = DistrictHelper.calculate_event_points(event)
+    assert 128 not in event_points["tiebreakers"]["frc6162"]["highest_match_scores"]
+
+
 def test_calculate_multi_event_rankings_all_teams_filtered(setup_full_event) -> None:
     setup_full_event("2019nyny")
     setup_full_event("2019micmp3")

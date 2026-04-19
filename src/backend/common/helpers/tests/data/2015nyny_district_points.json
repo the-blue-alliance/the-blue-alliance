@@ -922,12 +922,12 @@
     }, 
     "frc5558": {
       "highest_match_scores": [
-        21, 
-        18, 
-        17
-      ], 
+        18,
+        13,
+        10
+      ],
       "qual_wins": 0
-    }, 
+    },
     "frc5599": {
       "highest_match_scores": [
         67, 
