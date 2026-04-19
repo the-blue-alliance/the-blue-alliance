@@ -738,17 +738,24 @@ class DistrictHelper:
                         district_points["tiebreakers"][team]["qual_wins"] += 1
 
                 for color in ALLIANCE_COLORS:
-                    for team in match.alliances[color]["teams"]:
-                        score = match.alliances[color]["score"]
-                        district_points["tiebreakers"][team]["highest_match_scores"] = (
-                            heapq.nlargest(
+                    alliance = match.alliances[color]
+                    score = alliance["score"]
+                    # DQ'd and surrogate teams don't get credit for the match
+                    # score in the tiebreaker (they didn't really "play" it).
+                    excluded = set(alliance.get("dqs", [])) | set(
+                        alliance.get("surrogates", [])
+                    )
+                    for team in alliance["teams"]:
+                        if team not in excluded:
+                            district_points["tiebreakers"][team][
+                                "highest_match_scores"
+                            ] = heapq.nlargest(
                                 3,
                                 district_points["tiebreakers"][team][
                                     "highest_match_scores"
                                 ]
                                 + [score],
                             )
-                        )
                         # Make sure that teams without wins don't get dropped from 'points'
                         district_points["points"][team]["qual_points"] += 0
             else:  # Elim match points
@@ -803,8 +810,16 @@ class DistrictHelper:
         # top individual MATCH scores, qual + playoff
         for match in matches:
             for color in ALLIANCE_COLORS:
-                for team in match.alliances[color]["teams"]:
-                    score = match.alliances[color]["score"]
+                alliance = match.alliances[color]
+                score = alliance["score"]
+                # DQ'd and surrogate teams don't get credit for the match
+                # score in the tiebreaker (they didn't really "play" it).
+                excluded = set(alliance.get("dqs", [])) | set(
+                    alliance.get("surrogates", [])
+                )
+                for team in alliance["teams"]:
+                    if team in excluded:
+                        continue
                     district_points["tiebreakers"][team]["highest_match_scores"] = (
                         heapq.nlargest(
                             3,
