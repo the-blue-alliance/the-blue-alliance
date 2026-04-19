@@ -790,6 +790,40 @@ def event_matches(event_key: EventKey) -> Response:
         MatchManipulator.createOrUpdate(matches, update_manual_attrs=False)
     )
 
+    # Create EventTeams for teams that played a match at this event. The normal
+    # EventTeam sync only runs on the daily event_details fetch, so without this,
+    # teams can appear on matches (e.g. finals-field alliances at a DCMP) without
+    # having an EventTeam binding them to the event.
+    team_ids: Set[TeamKey] = set()
+    for match in new_matches:
+        for team_key_name in match.team_key_names:
+            # strip all suffixes (eg B teams)
+            team_ids.add("frc" + re.sub("[^0-9]", "", team_key_name))
+    team_ids.discard("frc")
+
+    if team_ids:
+        teams = listify(
+            TeamManipulator.createOrUpdate(
+                [
+                    Team(id=team_id, team_number=int(team_id[3:]))
+                    for team_id in team_ids
+                ],
+                update_manual_attrs=False,
+            )
+        )
+        EventTeamManipulator.createOrUpdate(
+            [
+                EventTeam(
+                    id=event_key + "_" + team.key_name,
+                    event=event.key,
+                    team=team.key,
+                    year=event.year,
+                )
+                for team in teams
+            ],
+            update_manual_attrs=False,
+        )
+
     template_values = {"matches": new_matches, "deleted_keys": keys_to_delete}
 
     if (
