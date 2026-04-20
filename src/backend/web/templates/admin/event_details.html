@@ -20,10 +20,10 @@
 
 <div class="row">
   <div class="col-sm-12">
-    <ul class="nav nav-tabs nav-justified">
+    <ul class="nav nav-tabs">
       <li class="active"><a href="#info" data-toggle="tab">Info</a></li>
       <li><a href="#tasks" data-toggle="tab">Tasks</a></li>
-      <li><a href="#api" data-toggle="tab">API</a></li>
+      <li><a href="#api-sync" data-toggle="tab">API & Sync</a></li>
       <li><a href="#webcasts" data-toggle="tab">Webcasts</a></li>
       <li><a href="#teams" data-toggle="tab">Teams</a></li>
       <li><a href="#rankings" data-toggle="tab">Rankings</a></li>
@@ -32,7 +32,6 @@
       <li><a href="#awards" data-toggle="tab">Awards</a></li>
       <li><a href="#matches" data-toggle="tab">Matches</a></li>
       <li><a href="#district-points" data-toggle="tab">{% if is_regional_cmp_pool_eligible %}Regional Champs Points{% else %}District Points{% endif %}</a></li>
-      <li><a href="#sync-status" data-toggle="tab">Sync Status</a></li>
       <li><a href="#media" data-toggle="tab">Media</a></li>
     </ul>
   </div>
@@ -387,7 +386,7 @@
     </div>
   </div>
 
-  <div class="tab-pane" id="api">
+  <div class="tab-pane" id="api-sync">
     <h2>FMS API Settings</h2>
 
     <form action="/admin/event/{{event.key_name}}" method="post">
@@ -432,15 +431,6 @@
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
     </form>
 
-
-    <h2>Write API Keys</h2>
-    <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
-
-    <p>Currently Issued Keys</p>
-    {% include "admin/partials/api_write_table.html" %}
-  </div>
-
-  <div class="tab-pane" id="sync-status">
     <h2>Sync Status</h2>
     {% if sync_status %}
     <table class="table table-striped table-hover">
@@ -470,6 +460,12 @@
     {% else %}
     <p class="text-muted">No sync status available for this event yet.</p>
     {% endif %}
+
+    <h2>Write API Keys</h2>
+    <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
+
+    <p>Currently Issued Keys</p>
+    {% include "admin/partials/api_write_table.html" %}
   </div>
 
   <div class="tab-pane" id="webcasts">

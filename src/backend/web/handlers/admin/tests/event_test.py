@@ -170,10 +170,11 @@ def test_event_detail_sync_status_tab_and_data(
     assert resp.status_code == 200
 
     soup = bs4.BeautifulSoup(resp.data, "html.parser")
-    sync_tab = soup.find("a", href="#sync-status")
+    sync_tab = soup.find("a", href="#api-sync")
     assert sync_tab is not None
+    assert sync_tab.get_text(strip=True) == "API & Sync"
 
-    sync_pane = soup.find("div", id="sync-status")
+    sync_pane = soup.find("div", id="api-sync")
     assert sync_pane is not None
     assert "tasks.get.fmsapi_matches" in sync_pane.get_text()
     assert "2026-03-28T12:34:56+00:00" in sync_pane.get_text()
