@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Optional, Set
+from typing import Any, cast, Dict, Optional, Set
 
 from flask import abort, redirect, request, url_for
 from google.appengine.api import taskqueue
@@ -45,14 +45,13 @@ from backend.common.memcache_models.webcast_online_status_memcache import (
 )
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
-from backend.common.models.event import Event
+from backend.common.models.event import Event, EventSyncOverrides
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.webcast import Webcast
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.web.profiled_render import render_template
 
 
@@ -80,7 +79,7 @@ def event_detail(event_key: EventKey) -> str:
     event.prep_teams()
     event.prep_details()
 
-    reg_sitevar = ChampsRegistrationHacks.get()
+    sync_overrides = event.sync_overrides or {}
     api_keys = ApiAuthAccess.query(
         ApiAuthAccess.event_list == ndb.Key(Event, event_key)
     ).fetch()
@@ -162,18 +161,14 @@ def event_detail(event_key: EventKey) -> str:
         "flushed": request.args.get("flushed"),
         "playoff_types": PLAYOFF_TYPE_NAMES,
         "write_auths": api_keys,
-        "event_sync_disable": event_key in reg_sitevar["divisions_to_skip"],
-        "set_start_day_to_last": event_key in reg_sitevar["set_start_to_last_day"],
-        "skip_eventteams": event_key in reg_sitevar["skip_eventteams"],
-        "event_name_override": next(
-            iter(
-                filter(
-                    lambda e: e.get("event") == event_key,
-                    reg_sitevar["event_name_override"],
-                )
-            ),
-            {},
-        ).get("name", ""),
+        "event_sync_disable": sync_overrides.get("event_sync_disable", False),
+        "set_start_day_to_last": sync_overrides.get("set_start_day_to_last", False),
+        "skip_eventteams": sync_overrides.get("skip_eventteams", False),
+        "event_name_override": (
+            sync_overrides["event_name_override"]["name"]
+            if "event_name_override" in sync_overrides
+            else ""
+        ),
         "elim_bracket_html": elim_bracket_html,
         "advancement_html": advancement_html,
         "match_stats": match_stats,
@@ -382,54 +377,37 @@ def event_detail_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    reg_sitevar = ChampsRegistrationHacks.get()
-    new_divisions_to_skip = reg_sitevar["divisions_to_skip"]
+    sync_overrides = cast(
+        EventSyncOverrides,
+        dict(cast(Dict[str, Any], event.sync_overrides or {})),
+    )
+
     if request.form.get("event_sync_disable"):
-        if event_key not in new_divisions_to_skip:
-            new_divisions_to_skip.append(event_key)
+        sync_overrides["event_sync_disable"] = True
     else:
-        new_divisions_to_skip = list(
-            filter(lambda e: e != event_key, new_divisions_to_skip)
-        )
-    new_start_day_to_last = reg_sitevar["set_start_to_last_day"]
+        sync_overrides.pop("event_sync_disable", None)
+
     if request.form.get("set_start_day_to_last"):
-        if event_key not in new_start_day_to_last:
-            new_start_day_to_last.append(event_key)
+        sync_overrides["set_start_day_to_last"] = True
     else:
-        new_start_day_to_last = list(
-            filter(lambda e: e != event_key, new_start_day_to_last)
-        )
-    new_skip_eventteams = reg_sitevar["skip_eventteams"]
+        sync_overrides.pop("set_start_day_to_last", None)
+
     if request.form.get("skip_eventteams"):
-        if event_key not in new_skip_eventteams:
-            new_skip_eventteams.append(event_key)
+        sync_overrides["skip_eventteams"] = True
     else:
-        new_skip_eventteams = list(
-            filter(lambda e: e != event_key, new_skip_eventteams)
-        )
-    new_name_overrides = reg_sitevar["event_name_override"]
+        sync_overrides.pop("skip_eventteams", None)
+
     form_name_override = request.form.get("event_name_override")
     if form_name_override:
-        if not any(o["event"] == event_key for o in new_name_overrides):
-            new_name_overrides.append(
-                {
-                    "event": event_key,
-                    "name": form_name_override,
-                    "short_name": form_name_override,
-                }
-            )
-    else:
-        new_name_overrides = list(
-            filter(lambda o: o["event"] != event_key, new_name_overrides)
-        )
-    ChampsRegistrationHacks.put(
-        {
-            "divisions_to_skip": new_divisions_to_skip,
-            "set_start_to_last_day": new_start_day_to_last,
-            "skip_eventteams": new_skip_eventteams,
-            "event_name_override": new_name_overrides,
+        sync_overrides["event_name_override"] = {
+            "name": form_name_override,
+            "short_name": form_name_override,
         }
-    )
+    else:
+        sync_overrides.pop("event_name_override", None)
+
+    event.sync_overrides = sync_overrides
+    EventManipulator.createOrUpdate(event)
     return redirect(url_for("admin.event_detail", event_key=event_key))
 
 

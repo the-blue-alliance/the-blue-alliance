@@ -186,6 +186,58 @@ def test_past_future_start_end_today(
         assert e.ends_today == end_today
 
 
+def test_default_sync_overrides() -> None:
+    e = Event()
+    assert e.sync_overrides is None
+
+
+def test_should_skip_eventteams_explicit_config() -> None:
+    e = Event(
+        id="2023test",
+        year=2023,
+        event_short="test",
+        event_type_enum=EventType.OFFSEASON,
+        sync_overrides={"skip_eventteams": True},
+        start_date=datetime(2023, 4, 1),
+        end_date=datetime(2023, 4, 4),
+    )
+
+    assert e.should_skip_eventteams() is True
+
+
+@pytest.mark.parametrize(
+    "event_type,division_count,date_str,should_skip",
+    [
+        (EventType.DISTRICT_CMP, 2, "2023-04-01", True),
+        (EventType.CMP_FINALS, 4, "2023-04-01", True),
+        (EventType.DISTRICT_CMP, 2, "2023-05-01", True),
+        (EventType.CMP_FINALS, 2, "2023-05-01", True),
+        (EventType.DISTRICT_CMP, 2, "2023-03-01", False),
+        (EventType.CMP_FINALS, 2, "2023-03-01", False),
+        (EventType.DISTRICT_CMP, 0, "2023-04-01", False),
+        (EventType.DISTRICT_CMP, 0, "2023-05-01", False),
+        (EventType.OFFSEASON, 2, "2023-04-01", False),
+    ],
+)
+def test_should_skip_eventteams_automatic_cases(
+    event_type: EventType, division_count: int, date_str: str, should_skip: bool
+) -> None:
+    e = Event(
+        id="2023test",
+        year=2023,
+        event_short="test",
+        event_type_enum=event_type,
+        divisions=[
+            ndb.Key(Event, f"2023test{i}") for i in range(1, division_count + 1)
+        ],
+        start_date=datetime(2023, 4, 1),
+        end_date=datetime(2023, 4, 4),
+    )
+
+    with freeze_time(date_str):
+        assert e.should_skip_eventteams() == should_skip
+
+
 @pytest.mark.parametrize(
     "year, event_type, official, week, week_output, week_str",
     [
