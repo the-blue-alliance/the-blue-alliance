@@ -9,6 +9,7 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.frc_api.types import SeasonEventListModelV33
+from backend.common.models.event import Event
 from backend.common.models.webcast import Webcast
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
     FMSAPIEventListParser,
@@ -392,6 +393,49 @@ def test_parse_bootstrap_default_cmp_finals_name_override() -> None:
         "name": "Einstein Field",
         "short_name": "Einstein",
     }
+
+
+def test_parse_bootstrap_past_parent_defaults_when_only_parent_fetched() -> None:
+    existing_event = Event(
+        id="2010testcmp",
+        year=2010,
+        event_short="testcmp",
+        event_type_enum=EventType.DISTRICT_CMP,
+        divisions=[ndb.Key(Event, "2010testcmp1")],
+    )
+    existing_event.put()
+
+    events, _ = FMSAPIEventListParser(2010).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "testcmp",
+                        "type": "districtchampionship",
+                        "name": "Test District Championship",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2010-04-15T00:00:00",
+                        "dateEnd": "2010-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    }
+                ]
+            },
+        )
+    )
+
+    event = events[0]
+    assert none_throws(event.sync_overrides).get("skip_eventteams") is True
+    assert none_throws(event.sync_overrides).get("set_start_day_to_last") is True
+    assert event.start_date == datetime.datetime(2010, 4, 17, 0, 0, 0)
 
 
 def test_parse_2017_official_offseason(test_data_importer):

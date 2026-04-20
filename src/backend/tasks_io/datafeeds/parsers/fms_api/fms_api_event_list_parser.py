@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, cast, Dict, Generator, List, Optional, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -22,7 +22,7 @@ from backend.common.frc_api.types import (
 from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
-from backend.common.models.event import Event, EventSyncOverrides
+from backend.common.models.event import Event
 from backend.common.models.keys import DistrictKey, Year
 from backend.common.models.webcast import Webcast
 from backend.common.tasklets import typed_tasklet
@@ -97,9 +97,21 @@ class FMSAPIEventListParser(
         self,
         event_type: EventType,
         event_short: str,
+        end_date: datetime.datetime,
+        has_divisions: bool,
         existing_sync_overrides: Dict[str, Any],
     ) -> Dict[str, Any]:
         sync_overrides = dict(existing_sync_overrides)
+
+        if (
+            has_divisions
+            and end_date.date() < datetime.datetime.now().date()
+            and event_type in {EventType.DISTRICT_CMP, EventType.CMP_FINALS}
+        ):
+            if "skip_eventteams" not in sync_overrides:
+                sync_overrides["skip_eventteams"] = True
+            if "set_start_day_to_last" not in sync_overrides:
+                sync_overrides["set_start_day_to_last"] = True
 
         if "event_name_override" not in sync_overrides:
             if (
@@ -146,6 +158,27 @@ class FMSAPIEventListParser(
         api_events: list[SeasonEventModelV33] | list[SeasonEventModelV31] = (
             response["Events"] or []
         )
+
+        district_cmp_division_districts: Set[str] = set()
+        cmp_division_end_dates: List[datetime.datetime] = []
+        for api_event in api_events:
+            api_event_type = none_throws(api_event["type"]).lower()
+            if api_event_type == "championshipdivision" and self.season < 2022:
+                continue
+
+            parsed_event_type = self.EVENT_TYPES.get(api_event_type, None)
+            if parsed_event_type == EventType.DISTRICT_CMP_DIVISION and api_event.get(
+                "districtCode"
+            ):
+                district_cmp_division_districts.add(
+                    none_throws(api_event["districtCode"]).lower()
+                )
+            elif parsed_event_type == EventType.CMP_DIVISION:
+                cmp_division_end_dates.append(
+                    datetime.datetime.strptime(
+                        none_throws(api_event["dateEnd"]), self.DATE_FORMAT_STR
+                    )
+                )
 
         event_keys_to_fetch = []
         for api_event in api_events:
@@ -249,9 +282,28 @@ class FMSAPIEventListParser(
                 existing_sync_overrides = dict(existing_event.sync_overrides)
             else:
                 existing_sync_overrides = {}
+
+            has_divisions = False
+            if existing_event is not None and len(existing_event.divisions) > 0:
+                has_divisions = True
+
+            if event_type == EventType.DISTRICT_CMP and (
+                district_code := event.get("districtCode")
+            ):
+                has_divisions = has_divisions or (
+                    district_code.lower() in district_cmp_division_districts
+                )
+            elif event_type == EventType.CMP_FINALS:
+                has_divisions = has_divisions or any(
+                    abs(end - division_end_date) < datetime.timedelta(days=1)
+                    for division_end_date in cmp_division_end_dates
+                )
+
             sync_overrides = self._bootstrap_sync_overrides(
                 none_throws(event_type),
                 code,
+                end,
+                has_divisions,
                 existing_sync_overrides,
             )
 
@@ -349,28 +401,5 @@ class FMSAPIEventListParser(
 
             parent_event.divisions = sorted(parent_event.divisions + [event.key])
             event.parent_event = parent_event.key
-
-        for event in events:
-            if (
-                event.event_type_enum
-                not in {EventType.DISTRICT_CMP, EventType.CMP_FINALS}
-                or len(event.divisions) == 0
-                or event.end_date.date() >= datetime.datetime.now().date()
-            ):
-                continue
-
-            sync_overrides = cast(
-                EventSyncOverrides,
-                dict(cast(Dict[str, Any], event.sync_overrides or {})),
-            )
-            if "skip_eventteams" not in sync_overrides:
-                sync_overrides["skip_eventteams"] = True
-            if "set_start_day_to_last" not in sync_overrides:
-                sync_overrides["set_start_day_to_last"] = True
-                event.start_date = event.end_date.replace(
-                    hour=0, minute=0, second=0, microsecond=0
-                )
-
-            event.sync_overrides = sync_overrides
 
         return events, list(districts.values())
