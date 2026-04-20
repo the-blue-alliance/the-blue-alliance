@@ -88,7 +88,7 @@ class NexusPitLocations(_DatafeedNexus[Any, Dict[TeamKey, EventTeamPitLocation]]
         self.event = event
 
     def endpoint(self) -> str:
-        return f"/event/{self.event.year}{self.event.first_api_code}/pits"
+        return f"/event/{self.event.year}{self.event.nexus_api_code}/pits"
 
     def event_key(self) -> Optional[EventKey]:
         return self.event.key_name
@@ -103,7 +103,7 @@ class NexusEventQueueStatus(_DatafeedNexus[Any, Optional[EventQueueStatus]]):
         self.event = event
 
     def endpoint(self) -> str:
-        return f"/event/{self.event.year}{self.event.first_api_code}"
+        return f"/event/{self.event.year}{self.event.nexus_api_code}"
 
     def event_key(self) -> Optional[EventKey]:
         return self.event.key_name

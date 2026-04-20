@@ -102,6 +102,9 @@ class Event(CachedModel):
     first_code = (
         ndb.StringProperty()
     )  # Event code used in FIRST's API, if different from event_short
+    nexus_code = (
+        ndb.StringProperty()
+    )  # Event code used in Nexus API, if different from first_api_code
     year: Year = ndb.IntegerProperty(required=True)
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
@@ -166,6 +169,7 @@ class Event(CachedModel):
         "enable_predictions",
         "facebook_eid",
         "first_code",
+        "nexus_code",
         "first_eid",
         "city",
         "state_prov",
@@ -190,6 +194,7 @@ class Event(CachedModel):
     _allow_none_attrs: Set[str] = {
         "district_key",
         "first_code",
+        "nexus_code",
     }
 
     _list_attrs: Set[str] = {
@@ -849,6 +854,12 @@ class Event(CachedModel):
         if self.first_code is None:
             return self.compute_first_api_code(self.year, self.event_short)
         return self.first_code
+
+    @property
+    def nexus_api_code(self) -> str:
+        if self.nexus_code is not None:
+            return self.nexus_code
+        return self.first_api_code
 
     @classmethod
     def compute_first_api_code(cls, year: int, event_short: str) -> str:
