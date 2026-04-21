@@ -123,7 +123,7 @@ describe('buildNexusStatusMap', () => {
       buildNexusStatusMap('2024casf', {
         eventKey: '2024casf',
         dataAsOfTime: 0,
-      } as EventStatus),
+      }),
     ).toEqual({});
   });
 

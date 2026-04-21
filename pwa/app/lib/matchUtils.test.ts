@@ -65,7 +65,7 @@ describe.concurrent('getAllianceMatchResult', () => {
       post_result_time: null,
       score_breakdown: null,
       videos: [],
-    } as Match;
+    };
   }
 
   test('returns undefined when match has not been played', () => {

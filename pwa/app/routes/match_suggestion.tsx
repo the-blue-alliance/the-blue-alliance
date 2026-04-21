@@ -482,9 +482,7 @@ function MatchSuggestion(): JSX.Element {
           match,
           event: events[eventIdx],
           eventRankings: eventRankingsQuery.data?.[eventIdx],
-          eventPredictions: eventPredictionsQuery.data?.[
-            eventIdx
-          ] as EventPredictions,
+          eventPredictions: eventPredictionsQuery.data?.[eventIdx],
         });
       }
     });
