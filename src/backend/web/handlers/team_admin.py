@@ -144,8 +144,12 @@ def team_mod():
         "suggestion_names": SUGGESTION_NAMES,
         "suggestion_review_urls": SUGGESTION_REVIEW_URL,
         "show_year_jump": has_global_review_permissions and has_valid_forced_team_year,
-        "year_jump_team_number": int(forced_team) if has_valid_forced_team_year else None,
-        "year_jump_current_year": int(forced_year) if has_valid_forced_team_year else None,
+        "year_jump_team_number": (
+            int(forced_team) if has_valid_forced_team_year else None
+        ),
+        "year_jump_current_year": (
+            int(forced_year) if has_valid_forced_team_year else None
+        ),
     }
 
     return render_template("team_admin_dashboard.html", template_values)
