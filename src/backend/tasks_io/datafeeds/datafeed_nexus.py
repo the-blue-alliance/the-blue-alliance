@@ -77,15 +77,6 @@ class _DatafeedNexus(DatafeedBase[TAPIResponse, TReturn]):
     def event_key(self) -> Optional[EventKey]:
         return None
 
-    @staticmethod
-    def _format_nexus_event_key(event: Event) -> str:
-        code = event.nexus_api_code
-        if len(code) >= 4 and code[:4].isdigit():
-            return code
-        if code.lower().startswith("demo"):
-            return code
-        return f"{event.year}{code}"
-
     @abc.abstractmethod
     def endpoint(self) -> str: ...
 
@@ -97,7 +88,7 @@ class NexusPitLocations(_DatafeedNexus[Any, Dict[TeamKey, EventTeamPitLocation]]
         self.event = event
 
     def endpoint(self) -> str:
-        return f"/event/{self._format_nexus_event_key(self.event)}/pits"
+        return f"/event/{self.event.nexus_code_for_api}/pits"
 
     def event_key(self) -> Optional[EventKey]:
         return self.event.key_name
@@ -112,7 +103,7 @@ class NexusEventQueueStatus(_DatafeedNexus[Any, Optional[EventQueueStatus]]):
         self.event = event
 
     def endpoint(self) -> str:
-        return f"/event/{self._format_nexus_event_key(self.event)}"
+        return f"/event/{self.event.nexus_code_for_api}"
 
     def event_key(self) -> Optional[EventKey]:
         return self.event.key_name

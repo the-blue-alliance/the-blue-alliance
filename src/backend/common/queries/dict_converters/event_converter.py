@@ -71,6 +71,9 @@ class EventConverter(ConverterBase):
             ],  # Datastore stub needs to support repeated properties 2020-06-16 @fangeugene
             "first_event_id": event.first_eid,
             "first_event_code": event.first_api_code if event.official else None,
+            "nexus_code_for_api": (
+                event.nexus_code_for_api if event.nexus_code else None
+            ),
             "year": event.year,
             "timezone": event.timezone_id,
             "week": event.week,

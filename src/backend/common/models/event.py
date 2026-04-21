@@ -861,6 +861,22 @@ class Event(CachedModel):
             return self.nexus_code
         return self.first_api_code
 
+    @property
+    def nexus_code_for_api(self) -> str:
+        """
+        Returns the properly formatted Nexus event key for API/URL construction.
+        Handles demo events and year-prefixed codes to avoid double-prefixing.
+        """
+        code = self.nexus_api_code
+        # Return as-is if already year-prefixed (e.g., "2026demo0755")
+        if len(code) >= 4 and code[:4].isdigit():
+            return code
+        # Return as-is if demo event (e.g., "demo0755")
+        if code.lower().startswith("demo"):
+            return code
+        # Otherwise, prefix with year (e.g., "test" -> "2026test")
+        return f"{self.year}{code}"
+
     @classmethod
     def compute_first_api_code(cls, year: int, event_short: str) -> str:
         if year == 2023:

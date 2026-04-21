@@ -290,7 +290,7 @@
     {% endif %}
 
     <div class="tab-pane {% if match_count == 0 %}active{% endif %}" id="teams">
-      {% set show_pit_locations = event.official and (event.future or event.within_a_day) and nexus_pit_locations %}
+      {% set show_pit_locations = (event.official or event.nexus_code) and (event.future or event.within_a_day) and nexus_pit_locations %}
       <div class="row">
         {% if teams_a %}
           {% with teams_and_medias=teams_a %} 
@@ -538,7 +538,7 @@
 {% endblock %}
 
 {% block footer_content %}
-{% set show_pit_locations = event.official and (event.future or event.within_a_day) and nexus_pit_locations %}
+{% set show_pit_locations = (event.official or event.nexus_code) and (event.future or event.within_a_day) and nexus_pit_locations %}
 {% if event.official and event.year >= 2006 %}
 <div class="text-left col-xs-12" style="margin-bottom: 2rem;">
   <p><span class="glyphicon glyphicon-info-sign"></span> Data provided by the <a href="https://frc-events.firstinspires.org/services/API" target="_blank" rel="noopener noreferrer"><em>FIRST</em><sup>®</sup> Events API</a></p>

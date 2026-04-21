@@ -5959,6 +5959,13 @@
             ],
             "description": "Public facing event code used by FIRST (on frc-events.firstinspires.org, for example)"
           },
+          "nexus_code_for_api": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The properly formatted Nexus event key for API/URL construction. Only present if the event has a nexus_code override set."
+          },
           "webcasts": {
             "type": "array",
             "items": {
