@@ -10,13 +10,16 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
-from backend.common.game_specific.base import SeasonGameConfig, TCriteria
+from backend.common.game_specific.base import (
+    TCriteria,
+    TotalPointsScoreTiebreakGameConfig,
+)
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2022(SeasonGameConfig):
+class GameSpecifics2022(TotalPointsScoreTiebreakGameConfig):
     def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
@@ -318,12 +321,6 @@ class GameSpecifics2022(SeasonGameConfig):
 
     def ranking_bonus_rp_prediction_fields(self) -> List[str]:
         return ["prob_cargo_bonus", "prob_hangar_bonus"]
-
-    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
-        return "totalPoints"
-
-    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
-        return "score"
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

@@ -11,13 +11,13 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
-from backend.common.game_specific.base import SeasonGameConfig
+from backend.common.game_specific.base import TotalPointsScoreTiebreakGameConfig
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2018(SeasonGameConfig):
+class GameSpecifics2018(TotalPointsScoreTiebreakGameConfig):
     def calculate_event_insights(self, matches: List[Match]) -> Optional[EventInsights]:
         qual_matches = []
         playoff_matches = []
@@ -392,12 +392,6 @@ class GameSpecifics2018(SeasonGameConfig):
 
     def ranking_bonus_rp_prediction_fields(self) -> List[str]:
         return ["prob_auto_quest", "prob_face_boss"]
-
-    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
-        return "totalPoints"
-
-    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
-        return "score"
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

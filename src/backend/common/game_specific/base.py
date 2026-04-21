@@ -151,3 +151,23 @@ class SeasonGameConfig:
         corresponding one-to-one with round_robin_tiebreak_keys().
         """
         return []
+
+
+class TotalPointsScoreTiebreakGameConfig(SeasonGameConfig):
+    """
+    Shared base for games whose ranking prediction tiebreaker uses
+    score breakdown `totalPoints` and predicted `score`.
+    """
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return "totalPoints"
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return "score"
+
+
+class TripleWinPointsGameConfig(TotalPointsScoreTiebreakGameConfig):
+    """Shared base for seasons awarding 3 ranking points for a win."""
+
+    def ranking_win_points(self) -> int:
+        return 3

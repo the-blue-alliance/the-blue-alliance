@@ -6,13 +6,17 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
-from backend.common.game_specific.base import SeasonGameConfig, StatAccessor, TCriteria
+from backend.common.game_specific.base import (
+    StatAccessor,
+    TCriteria,
+    TripleWinPointsGameConfig,
+)
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2025(SeasonGameConfig):
+class GameSpecifics2025(TripleWinPointsGameConfig):
     def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
@@ -245,15 +249,6 @@ class GameSpecifics2025(SeasonGameConfig):
 
     def ranking_bonus_rp_prediction_fields(self) -> List[str]:
         return ["prob_auto_coral_bonus", "prob_coral_bonus", "prob_barge_bonus"]
-
-    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
-        return "totalPoints"
-
-    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
-        return "score"
-
-    def ranking_win_points(self) -> int:
-        return 3
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
