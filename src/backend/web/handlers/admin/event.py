@@ -149,6 +149,7 @@ def event_detail(event_key: EventKey) -> str:
     nexus_queue_status = EventNexusQueueStatusMemcache(event.key_name).get()
     sync_status: EventSyncStatus = EventSyncStatusMemcache(event.key_name).get() or {}
 
+    event_name_override = sync_overrides.get("event_name_override", {})
     template_values = {
         "event": event,
         "medias": event_medias.get_result(),
@@ -164,10 +165,9 @@ def event_detail(event_key: EventKey) -> str:
         "event_sync_disable": sync_overrides.get("event_sync_disable", False),
         "set_start_day_to_last": sync_overrides.get("set_start_day_to_last", False),
         "skip_eventteams": sync_overrides.get("skip_eventteams", False),
-        "event_name_override": (
-            sync_overrides["event_name_override"]["name"]
-            if "event_name_override" in sync_overrides
-            else ""
+        "event_name_override": event_name_override.get("name", ""),
+        "event_short_name_override": event_name_override.get(
+            "short_name", event_name_override.get("name", "")
         ),
         "elim_bracket_html": elim_bracket_html,
         "advancement_html": advancement_html,
@@ -405,11 +405,14 @@ def event_detail_post(event_key: EventKey) -> Response:
     else:
         sync_overrides.pop("skip_eventteams", None)
 
-    form_name_override = request.form.get("event_name_override")
-    if form_name_override:
+    form_name_override = (request.form.get("event_name_override") or "").strip()
+    form_short_name_override = (
+        request.form.get("event_short_name_override") or ""
+    ).strip()
+    if form_name_override or form_short_name_override:
         sync_overrides["event_name_override"] = {
-            "name": form_name_override,
-            "short_name": form_name_override,
+            "name": form_name_override or form_short_name_override,
+            "short_name": form_short_name_override or form_name_override,
         }
     else:
         sync_overrides.pop("event_name_override", None)

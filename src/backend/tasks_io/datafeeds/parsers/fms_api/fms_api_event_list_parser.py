@@ -278,8 +278,11 @@ class FMSAPIEventListParser(
                 timezone = iana_tz_name
 
             # Special cases for champs
+            exception_short_name: Optional[str] = None
             if code_in_exceptions:
-                code, short_name = self.get_code_and_short_name(self.season, code)
+                code, exception_short_name = self.get_code_and_short_name(
+                    self.season, code
+                )
 
             elif self.event_short:
                 code = self.event_short
@@ -332,10 +335,12 @@ class FMSAPIEventListParser(
 
                 if code in self.EINSTEIN_CODES:
                     override = sync_overrides.get("event_name_override")
-                    if override:
-                        name = short_name.format(override["name"])
-                        short_name = short_name.format(override["short_name"])
+                    if override and exception_short_name:
+                        name = exception_short_name.format(override["name"])
+                        short_name = exception_short_name.format(override["short_name"])
                 else:  # Divisions
+                    if exception_short_name:
+                        short_name = exception_short_name
                     name = "{} Division".format(short_name)
 
             # Allow an overriding the start date to be the beginning of the last day
