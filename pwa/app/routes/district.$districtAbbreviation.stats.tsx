@@ -11,7 +11,7 @@ import {
   getDistrictInsights,
 } from '~/api/tba/read';
 import { Leaderboard } from '~/components/tba/leaderboard';
-import { EventLink } from '~/components/tba/links';
+import { EventLink, TeamLink } from '~/components/tba/links';
 import {
   Select,
   SelectContent,
@@ -660,6 +660,100 @@ function computePerAwardLeaderboards(
   return leaderboards;
 }
 
+function computeTeamupLeaderboard(
+  yearResults: Array<{
+    year: number;
+    events: Event[];
+    awards: Award[];
+  }>,
+): {
+  rankings: LeaderboardInsight['data']['rankings'];
+  tooltips: Record<string, ReactNode>;
+} {
+  const { nameLookup: eventNameLookup, dateLookup: eventDateLookup } =
+    buildEventLookups(yearResults);
+
+  // Map from event_key -> Set of winning team keys
+  const eventWinners = new Map<string, Set<string>>();
+
+  for (const { events, awards } of yearResults) {
+    const relevantEventKeys = new Set(
+      events
+        .filter(
+          (e) =>
+            e.event_type === EventType.DISTRICT ||
+            e.event_type === EventType.DISTRICT_CMP ||
+            e.event_type === EventType.DISTRICT_CMP_DIVISION,
+        )
+        .map((e) => e.key),
+    );
+
+    for (const award of awards) {
+      if (award.award_type !== AwardType.WINNER) continue;
+      if (!relevantEventKeys.has(award.event_key)) continue;
+
+      const winners = eventWinners.get(award.event_key) ?? new Set<string>();
+      for (const recipient of award.recipient_list) {
+        if (recipient.team_key) {
+          winners.add(recipient.team_key);
+        }
+      }
+      eventWinners.set(award.event_key, winners);
+    }
+  }
+
+  // Count pairs
+  const pairCounts = new Map<string, number>();
+  const pairEvents = new Map<string, string[]>();
+
+  for (const [eventKey, winners] of eventWinners.entries()) {
+    const teamList = Array.from(winners).sort(
+      (a, b) => parseInt(a.substring(3)) - parseInt(b.substring(3)),
+    );
+
+    for (let i = 0; i < teamList.length; i++) {
+      for (let j = i + 1; j < teamList.length; j++) {
+        const pairKey = `${teamList[i]}+${teamList[j]}`;
+        pairCounts.set(pairKey, (pairCounts.get(pairKey) ?? 0) + 1);
+        const evs = pairEvents.get(pairKey) ?? [];
+        evs.push(eventKey);
+        pairEvents.set(pairKey, evs);
+      }
+    }
+  }
+
+  const rankings = mapToRankings(pairCounts);
+
+  // Build tooltips
+  const tooltips: Record<string, ReactNode> = {};
+  for (const [pairKey, eventKeys] of pairEvents.entries()) {
+    const uniqueKeys = Array.from(new Set(eventKeys)).sort((a, b) => {
+      const dateA = eventDateLookup.get(a) ?? '';
+      const dateB = eventDateLookup.get(b) ?? '';
+      return dateA.localeCompare(dateB);
+    });
+    if (uniqueKeys.length === 0) continue;
+    tooltips[pairKey] = (
+      <div className="flex flex-col gap-0.5">
+        {uniqueKeys.map((eventKey) => {
+          const name = eventNameLookup.get(eventKey) ?? eventKey;
+          return (
+            <EventLink
+              key={eventKey}
+              eventOrKey={eventKey}
+              className="underline-offset-2 hover:underline"
+            >
+              {name}
+            </EventLink>
+          );
+        })}
+      </div>
+    );
+  }
+
+  return { rankings, tooltips };
+}
+
 function DistrictStatsPage() {
   const { abbreviation, history, insights, yearResults } =
     Route.useLoaderData();
@@ -674,6 +768,11 @@ function DistrictStatsPage() {
 
   const perAwardLeaderboards = useMemo(
     () => computePerAwardLeaderboards(yearResults),
+    [yearResults],
+  );
+
+  const teamupLeaderboard = useMemo(
+    () => computeTeamupLeaderboard(yearResults),
     [yearResults],
   );
 
@@ -843,6 +942,36 @@ function DistrictStatsPage() {
               }}
               year={0}
             />
+            {teamupLeaderboard.rankings.length > 0 && (
+              <Leaderboard
+                leaderboard={{
+                  data: {
+                    rankings: teamupLeaderboard.rankings,
+                    key_type: 'team',
+                  },
+                  name: 'Most Successful Teamups',
+                  year: 0,
+                }}
+                year={0}
+                contextTooltipMap={teamupLeaderboard.tooltips}
+                renderKey={(key: string) => {
+                  const parts = key.split('+');
+                  const team1 = parts[0] ?? '';
+                  const team2 = parts[1] ?? '';
+                  return (
+                    <>
+                      <TeamLink teamOrKey={team1} year={0}>
+                        {team1.substring(3)}
+                      </TeamLink>
+                      {' / '}
+                      <TeamLink teamOrKey={team2} year={0}>
+                        {team2.substring(3)}
+                      </TeamLink>
+                    </>
+                  );
+                }}
+              />
+            )}
           </div>
         </TabsContent>
 

@@ -40,11 +40,13 @@ export function Leaderboard({
   leaderboard,
   contextTooltipMap,
   year,
+  renderKey,
 }: {
   subtitle?: string;
   leaderboard: LeaderboardInsight;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
+  renderKey?: (key: string) => ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -143,6 +145,7 @@ export function Leaderboard({
                         keyVals={r.keys}
                         contextTooltipMap={contextTooltipMap}
                         year={year}
+                        renderKey={renderKey}
                       />
                     </TableCell>
                   </TableRow>
@@ -161,12 +164,14 @@ function LeaderboardKeyList({
   cutoffSize,
   contextTooltipMap,
   year,
+  renderKey,
 }: {
   keyType: LeaderboardInsight['data']['key_type'];
   keyVals: string[];
   cutoffSize: number;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
+  renderKey?: (key: string) => ReactNode;
 }) {
   return (
     <>
@@ -176,7 +181,12 @@ function LeaderboardKeyList({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <LeaderboardKeyLink keyType={keyType} keyVal={k} year={year} />
+                <LeaderboardKeyLink
+                  keyType={keyType}
+                  keyVal={k}
+                  year={year}
+                  renderKey={renderKey}
+                />
               </TooltipTrigger>
               {contextTooltipMap?.[k] ? (
                 <TooltipContent>
@@ -206,6 +216,7 @@ function LeaderboardKeyList({
                       keyType={keyType}
                       keyVal={k}
                       year={year}
+                      renderKey={renderKey}
                     />
                   </Fragment>
                 ))}
@@ -222,11 +233,16 @@ function LeaderboardKeyLink({
   keyVal,
   keyType,
   year,
+  renderKey,
 }: {
   keyType: LeaderboardInsight['data']['key_type'];
   keyVal: string;
   year: number;
+  renderKey?: (key: string) => ReactNode;
 }) {
+  if (renderKey) {
+    return <>{renderKey(keyVal)}</>;
+  }
   if (keyType === 'team') {
     return (
       <TeamLink teamOrKey={keyVal} year={year}>
