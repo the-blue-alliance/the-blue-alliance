@@ -38,11 +38,11 @@ function Home() {
 
   return (
     <div>
-      {weekEvents.length > 0 && (
-        <div>
-          <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
-          <EventListTable events={weekEvents} enableGrouping />
-        </div>
+      <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
+      {weekEvents.length > 0 ? (
+        <EventListTable events={weekEvents} enableGrouping />
+      ) : (
+        <p className="text-muted-foreground">No events this week.</p>
       )}
     </div>
   );
