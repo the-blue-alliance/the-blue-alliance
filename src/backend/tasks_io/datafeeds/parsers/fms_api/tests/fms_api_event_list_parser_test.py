@@ -360,7 +360,9 @@ def test_parse_bootstrap_past_division_parent_defaults() -> None:
     assert event.start_date == datetime.datetime(2010, 4, 17, 0, 0, 0)
 
 
-def test_parse_bootstrap_future_district_cmp_no_overrides_without_division_teams() -> None:
+def test_parse_bootstrap_future_district_cmp_no_overrides_without_division_teams() -> (
+    None
+):
     Event(
         id="2999netestcmp",
         year=2999,
@@ -519,7 +521,9 @@ def test_parse_bootstrap_default_cmp_finals_name_override() -> None:
     }
 
 
-def test_parse_bootstrap_future_cmp_finals_name_no_override_without_division_teams() -> None:
+def test_parse_bootstrap_future_cmp_finals_name_no_override_without_division_teams() -> (
+    None
+):
     Event(
         id="2999cmptx",
         year=2999,
