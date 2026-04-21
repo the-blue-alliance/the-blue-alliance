@@ -256,6 +256,90 @@ def test_event_detail_post_updates_api_code_overrides(
     assert event.nexus_code is None
 
 
+def test_event_detail_api_sync_has_event_name_override_inputs(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2025cmp",
+        event_short="cmp",
+        year=2025,
+        name="FIRST Championship",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2025, 4, 1),
+        end_date=datetime(2025, 4, 5),
+        sync_overrides={
+            "event_name_override": {
+                "name": "Einstein Field",
+                "short_name": "Einstein",
+            }
+        },
+    ).put()
+
+    resp = web_client.get("/admin/event/2025cmp")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    sync_pane = soup.find("div", id="api-sync")
+    assert sync_pane is not None
+
+    event_name_override_input = sync_pane.find("input", id="event_name_override")
+    assert event_name_override_input is not None
+    assert event_name_override_input.get("value") == "Einstein Field"
+
+    event_short_name_override_input = sync_pane.find(
+        "input", id="event_short_name_override"
+    )
+    assert event_short_name_override_input is not None
+    assert event_short_name_override_input.get("value") == "Einstein"
+
+
+def test_event_detail_post_updates_event_name_overrides(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2025cmp",
+        event_short="cmp",
+        year=2025,
+        name="FIRST Championship",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2025, 4, 1),
+        end_date=datetime(2025, 4, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/2025cmp",
+        data={
+            "event_name_override": "Einstein Field",
+            "event_short_name_override": "Einstein",
+            "csrf_token": "test",
+        },
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2025cmp")
+    assert event is not None
+    assert event.sync_overrides is not None
+    assert event.sync_overrides["event_name_override"] == {
+        "name": "Einstein Field",
+        "short_name": "Einstein",
+    }
+
+    resp = web_client.post(
+        "/admin/event/2025cmp",
+        data={
+            "event_name_override": "",
+            "event_short_name_override": "",
+            "csrf_token": "test",
+        },
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2025cmp")
+    assert event is not None
+    assert event.sync_overrides is not None
+    assert "event_name_override" not in event.sync_overrides
+
+
 def test_invalid_event_delete(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:

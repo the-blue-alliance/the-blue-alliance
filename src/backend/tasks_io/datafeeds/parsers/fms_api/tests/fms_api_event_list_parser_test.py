@@ -561,6 +561,8 @@ def test_parse_bootstrap_future_cmp_finals_name_no_override_without_division_tea
 
     event = events[0]
     assert event.name == "FIRST Championship"
+    assert event.short_name == "FIRST Championship"
+    assert event.short_name != "{}"
     assert not none_throws(event.sync_overrides).get("event_name_override")
 
 
