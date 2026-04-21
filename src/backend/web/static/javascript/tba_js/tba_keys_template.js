@@ -6,3 +6,4 @@ var firebaseProjectId = "demo-test";
 var firebaseStorageBucket = "";
 var firebaseMessagingSenderId = "";
 var firebaseAppId = "";
+var firebaseDatabaseEmulatorHost = ""; // localhost:9000 for local dev
