@@ -240,6 +240,21 @@ class GameSpecifics2025(SeasonGameConfig):
             ("barge_points", 0, 10**2),
         ]
 
+    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+        return ["autoBonusAchieved", "coralBonusAchieved", "bargeBonusAchieved"]
+
+    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+        return ["prob_auto_coral_bonus", "prob_coral_bonus", "prob_barge_bonus"]
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return "totalPoints"
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return "score"
+
+    def ranking_win_points(self) -> int:
+        return 3
+
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
             {"name": "Ranking Score", "precision": 2},

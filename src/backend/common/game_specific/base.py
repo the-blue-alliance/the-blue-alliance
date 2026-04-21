@@ -67,6 +67,48 @@ class SeasonGameConfig:
         """
         return []
 
+    def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:
+        """
+        Returns tuples of
+        (score_breakdown_actual_key, prediction_prob_key, brier_stat_name)
+        used to compute extra Brier components for the game.
+        """
+        return []
+
+    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+        """
+        Returns score-breakdown keys that indicate bonus ranking points
+        earned by an alliance in a played quals match.
+        """
+        return []
+
+    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+        """
+        Returns prediction keys (probabilities) used to sample bonus ranking
+        points for unplayed quals matches.
+        """
+        return []
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        """
+        Returns score-breakdown key used as the ranking tiebreaker contribution
+        for played quals matches, or None when not defined.
+        """
+        return None
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        """
+        Returns prediction key used as the ranking tiebreaker contribution for
+        unplayed quals matches, or None when not defined.
+        """
+        return None
+
+    def ranking_win_points(self) -> int:
+        """
+        Returns ranking points awarded to a winning alliance in quals matches.
+        """
+        return 2
+
     # ── Score Breakdown Keys ───────────────────────────────────────────────────
 
     def valid_score_breakdown_keys(self) -> Set[str]:

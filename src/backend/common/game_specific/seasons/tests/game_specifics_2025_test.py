@@ -73,3 +73,20 @@ def test_get_prediction_relevant_stats() -> None:
     stats = GameSpecifics2025().get_prediction_relevant_stats()
     assert len(stats) > 0
     assert stats[0][0] == "score"
+
+
+def test_prediction_ranking_fields() -> None:
+    game = GameSpecifics2025()
+    assert game.ranking_bonus_rp_breakdown_fields() == [
+        "autoBonusAchieved",
+        "coralBonusAchieved",
+        "bargeBonusAchieved",
+    ]
+    assert game.ranking_bonus_rp_prediction_fields() == [
+        "prob_auto_coral_bonus",
+        "prob_coral_bonus",
+        "prob_barge_bonus",
+    ]
+    assert game.ranking_tiebreaker_breakdown_field() == "totalPoints"
+    assert game.ranking_tiebreaker_prediction_field() == "score"
+    assert game.ranking_win_points() == 3

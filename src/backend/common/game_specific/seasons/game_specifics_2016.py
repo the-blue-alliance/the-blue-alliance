@@ -277,6 +277,24 @@ class GameSpecifics2016(SeasonGameConfig):
             ("boulders", 0, 1**2),
         ]
 
+    def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:
+        return [
+            ("teleopDefensesBreached", "prob_breach", "breach"),
+            ("teleopTowerCaptured", "prob_capture", "capture"),
+        ]
+
+    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+        return ["teleopDefensesBreached", "teleopTowerCaptured"]
+
+    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+        return ["prob_breach", "prob_capture"]
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return "autoPoints"
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return "auto_points"
+
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
             {"name": "Ranking Score", "precision": 0},

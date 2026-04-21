@@ -65,6 +65,25 @@ def test_get_prediction_relevant_stats() -> None:
     assert stats[0][0] == "score"
 
 
+def test_prediction_ranking_fields() -> None:
+    game = GameSpecifics2017()
+    assert game.prediction_brier_fields() == [
+        ("kPaRankingPointAchieved", "prob_pressure", "pressure"),
+        ("rotorRankingPointAchieved", "prob_gears", "gears"),
+    ]
+    assert game.ranking_bonus_rp_breakdown_fields() == [
+        "kPaRankingPointAchieved",
+        "rotorRankingPointAchieved",
+    ]
+    assert game.ranking_bonus_rp_prediction_fields() == [
+        "prob_pressure",
+        "prob_gears",
+    ]
+    assert game.ranking_tiebreaker_breakdown_field() == "totalPoints"
+    assert game.ranking_tiebreaker_prediction_field() == "score"
+    assert game.ranking_win_points() == 2
+
+
 def test_round_robin_tiebreak_keys() -> None:
     assert GameSpecifics2017().round_robin_tiebreak_keys() == ["totalPoints"]
 

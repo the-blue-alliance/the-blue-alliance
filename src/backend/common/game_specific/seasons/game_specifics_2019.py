@@ -415,6 +415,18 @@ class GameSpecifics2019(SeasonGameConfig):
             ("hab_climb_points", 2, 3**2),
         ]
 
+    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+        return ["completeRocketRankingPoint", "habDockingRankingPoint"]
+
+    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+        return ["prob_complete_rocket", "prob_hab_docking"]
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return "totalPoints"
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return "score"
+
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
             {"name": "Ranking Score", "precision": 2},

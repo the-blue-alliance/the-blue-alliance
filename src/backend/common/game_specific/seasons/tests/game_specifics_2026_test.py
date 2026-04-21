@@ -57,3 +57,20 @@ def test_get_prediction_relevant_stats() -> None:
     stats = GameSpecifics2026().get_prediction_relevant_stats()
     assert len(stats) > 0
     assert stats[0][0] == "score"
+
+
+def test_prediction_ranking_fields() -> None:
+    game = GameSpecifics2026()
+    assert game.ranking_bonus_rp_breakdown_fields() == [
+        "energizedAchieved",
+        "superchargedAchieved",
+        "traversalAchieved",
+    ]
+    assert game.ranking_bonus_rp_prediction_fields() == [
+        "prob_energized_bonus",
+        "prob_supercharged_bonus",
+        "prob_traversal_bonus",
+    ]
+    assert game.ranking_tiebreaker_breakdown_field() == "totalPoints"
+    assert game.ranking_tiebreaker_prediction_field() == "score"
+    assert game.ranking_win_points() == 3

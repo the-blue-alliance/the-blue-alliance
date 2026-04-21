@@ -343,6 +343,18 @@ class GameSpecifics2020(SeasonGameConfig):
             ("endgame_points", 0, 20**2),
         ]
 
+    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+        return ["shieldEnergizedRankingPoint", "shieldOperationalRankingPoint"]
+
+    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+        return ["prob_shield_energized", "prob_shield_operational"]
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return "totalPoints"
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return "score"
+
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
             {"name": "Ranking Score", "precision": 2},

@@ -63,3 +63,22 @@ def test_get_prediction_relevant_stats() -> None:
     stats = GameSpecifics2016().get_prediction_relevant_stats()
     assert len(stats) > 0
     assert stats[0][0] == "score"
+
+
+def test_prediction_ranking_fields() -> None:
+    game = GameSpecifics2016()
+    assert game.prediction_brier_fields() == [
+        ("teleopDefensesBreached", "prob_breach", "breach"),
+        ("teleopTowerCaptured", "prob_capture", "capture"),
+    ]
+    assert game.ranking_bonus_rp_breakdown_fields() == [
+        "teleopDefensesBreached",
+        "teleopTowerCaptured",
+    ]
+    assert game.ranking_bonus_rp_prediction_fields() == [
+        "prob_breach",
+        "prob_capture",
+    ]
+    assert game.ranking_tiebreaker_breakdown_field() == "autoPoints"
+    assert game.ranking_tiebreaker_prediction_field() == "auto_points"
+    assert game.ranking_win_points() == 2

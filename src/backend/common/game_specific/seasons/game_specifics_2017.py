@@ -350,6 +350,24 @@ class GameSpecifics2017(SeasonGameConfig):
             ("gears", 0, 1**2),
         ]
 
+    def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:
+        return [
+            ("kPaRankingPointAchieved", "prob_pressure", "pressure"),
+            ("rotorRankingPointAchieved", "prob_gears", "gears"),
+        ]
+
+    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+        return ["kPaRankingPointAchieved", "rotorRankingPointAchieved"]
+
+    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+        return ["prob_pressure", "prob_gears"]
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return "totalPoints"
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return "score"
+
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
             {"name": "Ranking Score", "precision": 2},
