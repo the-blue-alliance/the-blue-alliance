@@ -293,13 +293,10 @@ class FMSAPIEventListParser(
             has_division_teams_assigned = False
             if existing_event is not None and len(existing_event.divisions) > 0:
                 has_divisions = True
-                for division_key in existing_event.divisions:
-                    division_teams = EventTeam.query(
-                        EventTeam.event == division_key
-                    ).fetch(1, keys_only=True)
-                    if division_teams:
-                        has_division_teams_assigned = True
-                        break
+                division_teams = EventTeam.query(
+                    EventTeam.event.IN(existing_event.divisions)
+                ).fetch(1, keys_only=True)
+                has_division_teams_assigned = bool(division_teams)
 
             if event_type == EventType.DISTRICT_CMP and (
                 district_code := event.get("districtCode")
