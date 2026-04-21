@@ -1,0 +1,82 @@
+{% extends "base.html" %}
+
+{% block title %}Nexus Bootstrap{% endblock %}
+
+{% block content %}
+
+<div class="container">
+  <div class="row">
+    <h1>Nexus Bootstrap for {{ event.key_name }}</h1>
+    <p class="text-muted">Nexus code: {{ nexus_code }}</p>
+    <hr>
+
+    <h2>Step 1: Import Teams</h2>
+    <p>
+      Import teams in Nexus at
+      <a href="{{ team_import_url }}" target="_blank" rel="noopener noreferrer">{{ team_import_url }}</a>
+    </p>
+    <p class="text-muted">Be sure to check "Remove teams that are not in this list" on the Nexus import page.</p>
+    <button type="button" class="btn btn-default" data-copy-target="teams_textarea">Copy Teams</button>
+    <textarea id="teams_textarea" class="form-control" rows="12" disabled>{{ teams_text }}</textarea>
+
+    <h2 style="margin-top: 24px;">Step 2: Import Qualification Matches</h2>
+    <p>
+      Import matches in Nexus at
+      <a href="{{ match_import_url }}" target="_blank" rel="noopener noreferrer">{{ match_import_url }}</a>
+    </p>
+    <p class="text-muted">Only qual matches are included.</p>
+    <button type="button" class="btn btn-default" data-copy-target="matches_textarea">Copy Matches</button>
+    <textarea id="matches_textarea" class="form-control" rows="16" disabled>{{ matches_text }}</textarea>
+
+    <h2 style="margin-top: 24px;">Step 3: Interact With Nexus</h2>
+    <p>
+      Nexus event page:
+      <a href="https://frc.nexus/en/event/{{ nexus_code }}" target="_blank" rel="noopener noreferrer">https://frc.nexus/en/event/{{ nexus_code }}</a>
+    </p>
+    <p>
+      Set up pit map:
+      <a href="https://frc.nexus/en/event/{{ nexus_code }}/pits" target="_blank" rel="noopener noreferrer">https://frc.nexus/en/event/{{ nexus_code }}/pits</a>
+    </p>
+    <p>
+      Queue a match:
+      <a href="https://frc.nexus/en/event/{{ nexus_code }}/queue" target="_blank" rel="noopener noreferrer">https://frc.nexus/en/event/{{ nexus_code }}/queue</a>
+    </p>
+    <div class="btn-group" role="group" aria-label="Nexus task actions">
+      <a class="btn btn-warning" href="/tasks/get/nexus_pit_locations/{{ event.key_name }}" target="_blank" rel="noopener noreferrer">
+        Fetch Nexus Pits
+      </a>
+      <a class="btn btn-warning" href="/tasks/get/nexus_queue_status/{{ event.key_name }}" target="_blank" rel="noopener noreferrer">
+        Fetch Nexus Queue Status
+      </a>
+      <a class="btn btn-info" href="/event/{{ event.key_name }}" target="_blank" rel="noopener noreferrer">
+        View on TBA
+      </a>
+    </div>
+  </div>
+</div>
+
+<script>
+  document.querySelectorAll('[data-copy-target]').forEach((button) => {
+    button.addEventListener('click', async () => {
+      const targetId = button.getAttribute('data-copy-target');
+      const textarea = document.getElementById(targetId);
+      if (!textarea) {
+        return;
+      }
+
+      const originalText = button.textContent;
+      try {
+        await navigator.clipboard.writeText(textarea.value);
+        button.textContent = 'Copied!';
+      } catch (error) {
+        button.textContent = 'Copy Failed';
+      }
+
+      setTimeout(() => {
+        button.textContent = originalText;
+      }, 1200);
+    });
+  });
+</script>
+
+{% endblock %}

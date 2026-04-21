@@ -130,6 +130,28 @@ def test_get_pit_locations_nexus_code_override(
 
 @mock.patch.object(NexusAPIPitLocationParser, "parse")
 @mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_locations_demo_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="demo0755")
+
+    endpoint = NexusPitLocations(e).endpoint()
+    assert endpoint == "/event/demo0755/pits"
+
+
+@mock.patch.object(NexusAPIPitLocationParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_locations_year_prefixed_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="2026demo0755")
+
+    endpoint = NexusPitLocations(e).endpoint()
+    assert endpoint == "/event/2026demo0755/pits"
+
+
+@mock.patch.object(NexusAPIPitLocationParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
 def test_get_pit_locations(
     api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
 ) -> None:
@@ -226,6 +248,28 @@ def test_get_event_queue_status_nexus_code_override(
 
     endpoint = NexusEventQueueStatus(e).endpoint()
     assert endpoint == "/event/2019nexus"
+
+
+@mock.patch.object(NexusAPIQueueStatusParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_event_queue_status_demo_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="demo0755")
+
+    endpoint = NexusEventQueueStatus(e).endpoint()
+    assert endpoint == "/event/demo0755"
+
+
+@mock.patch.object(NexusAPIQueueStatusParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_event_queue_status_year_prefixed_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="2026demo0755")
+
+    endpoint = NexusEventQueueStatus(e).endpoint()
+    assert endpoint == "/event/2026demo0755"
 
 
 @mock.patch.object(_DatafeedNexus, "_fetch")

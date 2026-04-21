@@ -74,7 +74,11 @@ def test_wrong_playoff_type(ndb_stub) -> None:
         ],
     }
     parsed = NexusAPIQueueStatusParser(e).parse(data)
-    assert parsed is None
+    assert parsed == EventQueueStatus(
+        data_as_of_ms=0,
+        now_queueing=None,
+        matches={},
+    )
 
 
 def test_bad_format(ndb_stub) -> None:
