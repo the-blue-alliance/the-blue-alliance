@@ -10,6 +10,8 @@ from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.frc_api.types import SeasonEventListModelV33
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
+from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
     FMSAPIEventListParser,
@@ -376,6 +378,99 @@ def test_parse_bootstrap_default_cmp_finals_name_override() -> None:
                         "country": "USA",
                         "dateStart": "2016-04-27T00:00:00",
                         "dateEnd": "2016-04-30T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    }
+                ]
+            },
+        )
+    )
+
+    event = events[0]
+    assert event.name == "Einstein Field"
+    assert event.short_name == "Einstein"
+    assert none_throws(event.sync_overrides).get("event_name_override") == {
+        "name": "Einstein Field",
+        "short_name": "Einstein",
+    }
+
+
+def test_parse_bootstrap_future_cmp_finals_name_no_override_without_division_teams() -> None:
+    Event(
+        id="2999cmptx",
+        year=2999,
+        event_short="cmptx",
+        event_type_enum=EventType.CMP_FINALS,
+        divisions=[ndb.Key(Event, "2999newton")],
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "cmptx",
+                        "type": "championship",
+                        "name": "FIRST Championship",
+                        "districtCode": None,
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Houston",
+                        "stateprov": "TX",
+                        "country": "USA",
+                        "dateStart": "2999-04-20T00:00:00",
+                        "dateEnd": "2999-04-23T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    }
+                ]
+            },
+        )
+    )
+
+    event = events[0]
+    assert event.name == "FIRST Championship"
+    assert not none_throws(event.sync_overrides).get("event_name_override")
+
+
+def test_parse_bootstrap_future_cmp_finals_name_override_with_division_teams() -> None:
+    parent = Event(
+        id="2999cmptx",
+        year=2999,
+        event_short="cmptx",
+        event_type_enum=EventType.CMP_FINALS,
+        divisions=[ndb.Key(Event, "2999newton")],
+    )
+    parent.put()
+    EventTeam(
+        id="2999newton_frc1",
+        event=ndb.Key(Event, "2999newton"),
+        team=ndb.Key(Team, "frc1"),
+        year=2999,
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "cmptx",
+                        "type": "championship",
+                        "name": "FIRST Championship",
+                        "districtCode": None,
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Houston",
+                        "stateprov": "TX",
+                        "country": "USA",
+                        "dateStart": "2999-04-20T00:00:00",
+                        "dateEnd": "2999-04-23T23:59:59",
                         "website": None,
                         "webcasts": [],
                         "timezone": None,

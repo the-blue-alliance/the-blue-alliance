@@ -23,6 +23,7 @@ from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, Year
 from backend.common.models.webcast import Webcast
 from backend.common.tasklets import typed_tasklet
@@ -99,6 +100,7 @@ class FMSAPIEventListParser(
         event_short: str,
         end_date: datetime.datetime,
         has_divisions: bool,
+        has_division_teams_assigned: bool,
         existing_sync_overrides: Dict[str, Any],
     ) -> Dict[str, Any]:
         sync_overrides = dict(existing_sync_overrides)
@@ -117,6 +119,10 @@ class FMSAPIEventListParser(
             if (
                 event_type == EventType.CMP_FINALS
                 and event_short in self.EINSTEIN_CODES
+                and (
+                    end_date.date() < datetime.datetime.now().date()
+                    or has_division_teams_assigned
+                )
             ):
                 sync_overrides["event_name_override"] = {
                     "short_name": self.EINSTEIN_SHORT_NAME_DEFAULT,
@@ -284,8 +290,16 @@ class FMSAPIEventListParser(
                 existing_sync_overrides = {}
 
             has_divisions = False
+            has_division_teams_assigned = False
             if existing_event is not None and len(existing_event.divisions) > 0:
                 has_divisions = True
+                for division_key in existing_event.divisions:
+                    division_teams = EventTeam.query(
+                        EventTeam.event == division_key
+                    ).fetch(1, keys_only=True)
+                    if division_teams:
+                        has_division_teams_assigned = True
+                        break
 
             if event_type == EventType.DISTRICT_CMP and (
                 district_code := event.get("districtCode")
@@ -304,6 +318,7 @@ class FMSAPIEventListParser(
                 code,
                 end,
                 has_divisions,
+                has_division_teams_assigned,
                 existing_sync_overrides,
             )
 
