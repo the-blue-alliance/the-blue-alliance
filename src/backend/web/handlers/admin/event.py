@@ -165,9 +165,7 @@ def event_detail(event_key: EventKey) -> str:
         "event_sync_disable": sync_overrides.get("event_sync_disable", False),
         "set_start_day_to_last": sync_overrides.get("set_start_day_to_last", False),
         "skip_eventteams": sync_overrides.get("skip_eventteams", False),
-        "event_name_override": event_name_override.get(
-            "name", event_name_override.get("short_name", "")
-        ),
+        "event_name_override": event_name_override.get("name", ""),
         "event_short_name_override": event_name_override.get(
             "short_name", event_name_override.get("name", "")
         ),
