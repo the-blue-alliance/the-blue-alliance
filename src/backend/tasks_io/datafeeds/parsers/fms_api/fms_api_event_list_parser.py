@@ -107,7 +107,10 @@ class FMSAPIEventListParser(
 
         if (
             has_divisions
-            and end_date.date() < datetime.datetime.now().date()
+            and (
+                end_date.date() < datetime.datetime.now().date()
+                or has_division_teams_assigned
+            )
             and event_type in {EventType.DISTRICT_CMP, EventType.CMP_FINALS}
         ):
             if "skip_eventteams" not in sync_overrides:

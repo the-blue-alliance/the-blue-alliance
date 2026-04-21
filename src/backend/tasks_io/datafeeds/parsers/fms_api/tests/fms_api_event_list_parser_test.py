@@ -360,6 +360,128 @@ def test_parse_bootstrap_past_division_parent_defaults() -> None:
     assert event.start_date == datetime.datetime(2010, 4, 17, 0, 0, 0)
 
 
+def test_parse_bootstrap_future_district_cmp_no_overrides_without_division_teams() -> None:
+    Event(
+        id="2999netestcmp",
+        year=2999,
+        event_short="netestcmp",
+        event_type_enum=EventType.DISTRICT_CMP,
+        divisions=[ndb.Key(Event, "2999netestcmp1")],
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "netestcmp",
+                        "type": "districtchampionship",
+                        "name": "NE District Championship",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                    {
+                        "code": "netestcmp1",
+                        "type": "districtchampionshipdivision",
+                        "name": "NE District Championship Division 1",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                ]
+            },
+        )
+    )
+
+    event = next(e for e in events if e.key_name == "2999netestcmp")
+    assert not none_throws(event.sync_overrides).get("skip_eventteams")
+    assert not none_throws(event.sync_overrides).get("set_start_day_to_last")
+
+
+def test_parse_bootstrap_future_district_cmp_overrides_with_division_teams() -> None:
+    Event(
+        id="2999netestcmp",
+        year=2999,
+        event_short="netestcmp",
+        event_type_enum=EventType.DISTRICT_CMP,
+        divisions=[ndb.Key(Event, "2999netestcmp1")],
+    ).put()
+    EventTeam(
+        id="2999netestcmp1_frc1",
+        event=ndb.Key(Event, "2999netestcmp1"),
+        team=ndb.Key(Team, "frc1"),
+        year=2999,
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "netestcmp",
+                        "type": "districtchampionship",
+                        "name": "NE District Championship",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                    {
+                        "code": "netestcmp1",
+                        "type": "districtchampionshipdivision",
+                        "name": "NE District Championship Division 1",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                ]
+            },
+        )
+    )
+
+    event = next(e for e in events if e.key_name == "2999netestcmp")
+    assert none_throws(event.sync_overrides).get("skip_eventteams") is True
+    assert none_throws(event.sync_overrides).get("set_start_day_to_last") is True
+
+
 def test_parse_bootstrap_default_cmp_finals_name_override() -> None:
     events, _ = FMSAPIEventListParser(2016).parse(
         cast(
