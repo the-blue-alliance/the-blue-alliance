@@ -44,7 +44,7 @@ def enqueue_nexus_pit_locations_current(
     else:
         events = EventListQuery(year=year or SeasonHelper.get_current_season()).fetch()
 
-    events = list(filter(lambda e: e.official, events))
+    events = list(filter(lambda e: e.official or e.nexus_code is not None, events))
 
     for event in events:
         taskqueue.add(
@@ -95,7 +95,7 @@ def event_pit_locations(event_key: EventKey) -> Response:
 @blueprint.route("/tasks/enqueue/nexus_queue_status/now")
 def current_event_queue_status() -> Response:
     events = EventHelper.events_within_a_day()
-    events = list(filter(lambda e: e.official, events))
+    events = list(filter(lambda e: e.official or e.nexus_code is not None, events))
     for event in events:
         taskqueue.add(
             queue_name="datafeed",

@@ -49,12 +49,6 @@ class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
         self.matches = event.matches
 
     def parse(self, response: JSON) -> Optional[EventQueueStatus]:
-        if self.event.playoff_type not in _FINALS_LABEL_OFFSET:
-            logging.warning(
-                f"Unable to parse nexus status for {self.event.key_name}, unsupported playoff type {self.event.playoff_type}"
-            )
-            return None
-
         if not isinstance(response, dict):
             return None
 
@@ -118,7 +112,7 @@ class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
             # Nexus reports "Final 1, 2, 3" while TBA's match numbering
             # continues from the semifinal bracket — the offset depends on
             # the playoff format.
-            level_number += _FINALS_LABEL_OFFSET[self.event.playoff_type]
+            level_number += _FINALS_LABEL_OFFSET.get(self.event.playoff_type, 0)
 
         try:
             comp_level = PlayoffTypeHelper.get_comp_level(

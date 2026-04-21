@@ -459,6 +459,26 @@ def test_first_api_code() -> None:
     assert event.first_api_code == "hcmp"
 
 
+def test_nexus_api_code() -> None:
+    # Defaults to first_api_code
+    event = Event(id="2023hop", year=2023, event_short="hop")
+    assert event.nexus_api_code == "hcmp"
+
+    # Inherits explicit FIRST override if Nexus override is unset
+    event = Event(id="2019casj", year=2019, event_short="casj", first_code="caovr")
+    assert event.nexus_api_code == "caovr"
+
+    # Explicit Nexus override wins
+    event = Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        first_code="caovr",
+        nexus_code="nexovr",
+    )
+    assert event.nexus_api_code == "nexovr"
+
+
 def test_get_alliances() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
     assert event.alliance_selections is None

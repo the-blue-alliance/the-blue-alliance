@@ -52,12 +52,15 @@ def nexus_api_secrets(ndb_stub) -> None:
     NexusApiSecrets.put(NexusAPISecretsContentType(api_secret="abc123"))
 
 
-def create_event(api_short: Optional[str] = None) -> Event:
+def create_event(
+    first_api_short: Optional[str] = None, nexus_api_short: Optional[str] = None
+) -> Event:
     e = Event(
         id="2019casj",
         year=2019,
         event_short="casj",
-        first_code=api_short,
+        first_code=first_api_short,
+        nexus_code=nexus_api_short,
         start_date=datetime.datetime(2019, 4, 1),
         end_date=datetime.datetime(2019, 4, 3),
         event_type_enum=EventType.REGIONAL,
@@ -108,10 +111,43 @@ def test_request(api_mock: mock.Mock, ndb_stub, nexus_api_secrets) -> None:
 def test_get_pit_locations_different_api_short(
     api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
 ) -> None:
-    e = create_event(api_short="test")
+    e = create_event(first_api_short="test")
 
     endpoint = NexusPitLocations(e).endpoint()
     assert endpoint == "/event/2019test/pits"
+
+
+@mock.patch.object(NexusAPIPitLocationParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_locations_nexus_code_override(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(first_api_short="first", nexus_api_short="nexus")
+
+    endpoint = NexusPitLocations(e).endpoint()
+    assert endpoint == "/event/2019nexus/pits"
+
+
+@mock.patch.object(NexusAPIPitLocationParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_locations_demo_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="demo0755")
+
+    endpoint = NexusPitLocations(e).endpoint()
+    assert endpoint == "/event/demo0755/pits"
+
+
+@mock.patch.object(NexusAPIPitLocationParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_locations_year_prefixed_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="2026demo0755")
+
+    endpoint = NexusPitLocations(e).endpoint()
+    assert endpoint == "/event/2026demo0755/pits"
 
 
 @mock.patch.object(NexusAPIPitLocationParser, "parse")
@@ -197,10 +233,43 @@ def test_get_event_queue_status(
 def test_get_event_queue_status_different_api_short(
     api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
 ) -> None:
-    e = create_event(api_short="test")
+    e = create_event(first_api_short="test")
 
     endpoint = NexusEventQueueStatus(e).endpoint()
     assert endpoint == "/event/2019test"
+
+
+@mock.patch.object(NexusAPIQueueStatusParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_event_queue_status_nexus_code_override(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(first_api_short="first", nexus_api_short="nexus")
+
+    endpoint = NexusEventQueueStatus(e).endpoint()
+    assert endpoint == "/event/2019nexus"
+
+
+@mock.patch.object(NexusAPIQueueStatusParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_event_queue_status_demo_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="demo0755")
+
+    endpoint = NexusEventQueueStatus(e).endpoint()
+    assert endpoint == "/event/demo0755"
+
+
+@mock.patch.object(NexusAPIQueueStatusParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_event_queue_status_year_prefixed_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="2026demo0755")
+
+    endpoint = NexusEventQueueStatus(e).endpoint()
+    assert endpoint == "/event/2026demo0755"
 
 
 @mock.patch.object(_DatafeedNexus, "_fetch")

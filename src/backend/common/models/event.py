@@ -102,6 +102,9 @@ class Event(CachedModel):
     first_code = (
         ndb.StringProperty()
     )  # Event code used in FIRST's API, if different from event_short
+    nexus_code = (
+        ndb.StringProperty()
+    )  # Event code used in Nexus API, if different from first_api_code
     year: Year = ndb.IntegerProperty(required=True)
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
@@ -166,6 +169,7 @@ class Event(CachedModel):
         "enable_predictions",
         "facebook_eid",
         "first_code",
+        "nexus_code",
         "first_eid",
         "city",
         "state_prov",
@@ -190,6 +194,7 @@ class Event(CachedModel):
     _allow_none_attrs: Set[str] = {
         "district_key",
         "first_code",
+        "nexus_code",
     }
 
     _list_attrs: Set[str] = {
@@ -849,6 +854,28 @@ class Event(CachedModel):
         if self.first_code is None:
             return self.compute_first_api_code(self.year, self.event_short)
         return self.first_code
+
+    @property
+    def nexus_api_code(self) -> str:
+        if self.nexus_code is not None:
+            return self.nexus_code
+        return self.first_api_code
+
+    @property
+    def nexus_code_for_api(self) -> str:
+        """
+        Returns the properly formatted Nexus event key for API/URL construction.
+        Handles demo events and year-prefixed codes to avoid double-prefixing.
+        """
+        code = self.nexus_api_code
+        # Return as-is if already year-prefixed (e.g., "2026demo0755")
+        if len(code) >= 4 and code[:4].isdigit():
+            return code
+        # Return as-is if demo event (e.g., "demo0755")
+        if code.lower().startswith("demo"):
+            return code
+        # Otherwise, prefix with year (e.g., "test" -> "2026test")
+        return f"{self.year}{code}"
 
     @classmethod
     def compute_first_api_code(cls, year: int, event_short: str) -> str:

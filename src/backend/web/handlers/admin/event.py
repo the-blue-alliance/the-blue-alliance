@@ -377,6 +377,14 @@ def event_detail_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
+    first_code = request.form.get("first_code")
+    first_code = first_code.strip() if first_code else None
+    event.first_code = first_code or None
+
+    nexus_code = request.form.get("nexus_code")
+    nexus_code = nexus_code.strip() if nexus_code else None
+    event.nexus_code = nexus_code or None
+
     sync_overrides = cast(
         EventSyncOverrides,
         dict(cast(Dict[str, Any], event.sync_overrides or {})),

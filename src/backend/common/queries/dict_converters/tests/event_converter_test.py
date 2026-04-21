@@ -107,3 +107,17 @@ def test_eventConverter_v3_without_event_location(ndb_context) -> None:
     assert converted["gmaps_place_id"] is None
     assert converted["gmaps_url"] is None
     assert converted["district"] == DistrictConverter.districtConverter_v3(district)
+
+
+def test_eventConverter_v3_omits_nexus_code_for_api(ndb_context) -> None:
+    event = Event(
+        id="2026demo",
+        year=2026,
+        event_short="demo",
+        event_type_enum=EventType.REGIONAL,
+        nexus_code="demo0755",
+    )
+
+    converted = EventConverter.eventConverter_v3(event)
+
+    assert "nexus_code_for_api" not in converted

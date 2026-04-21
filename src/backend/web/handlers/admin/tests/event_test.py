@@ -181,6 +181,81 @@ def test_event_detail_sync_status_tab_and_data(
     assert "2" in sync_pane.get_text()
 
 
+def test_event_detail_api_sync_has_code_override_inputs(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        first_code="fmscode",
+        nexus_code="nexuscode",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2025nyny")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    sync_pane = soup.find("div", id="api-sync")
+    assert sync_pane is not None
+
+    first_code_input = sync_pane.find("input", id="first_code")
+    assert first_code_input is not None
+    assert first_code_input.get("value") == "fmscode"
+
+    nexus_code_input = sync_pane.find("input", id="nexus_code")
+    assert nexus_code_input is not None
+    assert nexus_code_input.get("value") == "nexuscode"
+
+
+def test_event_detail_post_updates_api_code_overrides(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/2025nyny",
+        data={
+            "first_code": "  firstovr  ",
+            "nexus_code": "  nexusovr  ",
+            "csrf_token": "test",
+        },
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2025nyny")
+    assert event is not None
+    assert event.first_code == "firstovr"
+    assert event.nexus_code == "nexusovr"
+
+    resp = web_client.post(
+        "/admin/event/2025nyny",
+        data={
+            "first_code": "   ",
+            "nexus_code": "   ",
+            "csrf_token": "test",
+        },
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2025nyny")
+    assert event is not None
+    assert event.first_code is None
+    assert event.nexus_code is None
+
+
 def test_invalid_event_delete(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:
