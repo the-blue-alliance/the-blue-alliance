@@ -174,16 +174,18 @@ MatchLink.displayName = 'MatchLink';
 
 const PitLocationLink = ({
   teamNumber,
-  nexusCodeForApi,
+  year,
+  firstEventCode,
   pitLocation,
 }: {
   teamNumber: number;
-  nexusCodeForApi: string;
+  year: number;
+  firstEventCode: string;
   pitLocation: string;
 }) => {
   return (
     <a
-      href={`https://frc.nexus/en/event/${nexusCodeForApi}/team/${teamNumber}/map`}
+      href={`https://frc.nexus/en/event/${year}${firstEventCode}/team/${teamNumber}/map`}
       target="_blank"
       rel="noopener noreferrer"
       className="text-blue-600 underline dark:text-blue-400"

@@ -986,10 +986,11 @@ function TeamsTab({
                   </TableCell>
                   {showPitLocations && (
                     <TableCell className="text-xs">
-                      {pitLoc && event?.nexus_code_for_api ? (
+                      {pitLoc && firstEventCode ? (
                         <PitLocationLink
                           teamNumber={t.team_number}
-                          nexusCodeForApi={event.nexus_code_for_api}
+                          year={year}
+                          firstEventCode={firstEventCode}
                           pitLocation={pitLoc}
                         />
                       ) : (
