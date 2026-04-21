@@ -5095,8 +5095,7 @@
             "description": "The name of the award as provided by FIRST. May vary for the same award type."
           },
           "award_type": {
-            "type": "integer",
-            "description": "Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py#L8"
+            "$ref": "#/components/schemas/AwardType"
           },
           "event_key": {
             "type": "string",
@@ -5164,6 +5163,244 @@
           "f"
         ],
         "description": "The competition level the match was played at."
+      },
+      "AwardType": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83
+        ],
+        "x-enum-varnames": [
+          "CHAIRMANS",
+          "WINNER",
+          "FINALIST",
+          "WOODIE_FLOWERS",
+          "DEANS_LIST",
+          "VOLUNTEER",
+          "FOUNDERS",
+          "BART_KAMEN_MEMORIAL",
+          "MAKE_IT_LOUD",
+          "ENGINEERING_INSPIRATION",
+          "ROOKIE_ALL_STAR",
+          "GRACIOUS_PROFESSIONALISM",
+          "COOPERTITION",
+          "JUDGES",
+          "HIGHEST_ROOKIE_SEED",
+          "ROOKIE_INSPIRATION",
+          "INDUSTRIAL_DESIGN",
+          "QUALITY",
+          "SAFETY",
+          "SPORTSMANSHIP",
+          "CREATIVITY",
+          "ENGINEERING_EXCELLENCE",
+          "ENTREPRENEURSHIP",
+          "EXCELLENCE_IN_DESIGN",
+          "EXCELLENCE_IN_DESIGN_CAD",
+          "EXCELLENCE_IN_DESIGN_ANIMATION",
+          "DRIVING_TOMORROWS_TECHNOLOGY",
+          "IMAGERY",
+          "MEDIA_AND_TECHNOLOGY",
+          "INNOVATION_IN_CONTROL",
+          "SPIRIT",
+          "WEBSITE",
+          "VISUALIZATION",
+          "AUTODESK_INVENTOR",
+          "FUTURE_INNOVATOR",
+          "RECOGNITION_OF_EXTRAORDINARY_SERVICE",
+          "OUTSTANDING_CART",
+          "WSU_AIM_HIGHER",
+          "LEADERSHIP_IN_CONTROL",
+          "NUM_1_SEED",
+          "INCREDIBLE_PLAY",
+          "PEOPLES_CHOICE_ANIMATION",
+          "VISUALIZATION_RISING_STAR",
+          "BEST_OFFENSIVE_ROUND",
+          "BEST_PLAY_OF_THE_DAY",
+          "FEATHERWEIGHT_IN_THE_FINALS",
+          "MOST_PHOTOGENIC",
+          "OUTSTANDING_DEFENSE",
+          "POWER_TO_SIMPLIFY",
+          "AGAINST_ALL_ODDS",
+          "RISING_STAR",
+          "CHAIRMANS_HONORABLE_MENTION",
+          "CONTENT_COMMUNICATION_HONORABLE_MENTION",
+          "TECHNICAL_EXECUTION_HONORABLE_MENTION",
+          "REALIZATION",
+          "REALIZATION_HONORABLE_MENTION",
+          "DESIGN_YOUR_FUTURE",
+          "DESIGN_YOUR_FUTURE_HONORABLE_MENTION",
+          "SPECIAL_RECOGNITION_CHARACTER_ANIMATION",
+          "HIGH_SCORE",
+          "TEACHER_PIONEER",
+          "BEST_CRAFTSMANSHIP",
+          "BEST_DEFENSIVE_MATCH",
+          "PLAY_OF_THE_DAY",
+          "PROGRAMMING",
+          "PROFESSIONALISM",
+          "GOLDEN_CORNDOG",
+          "MOST_IMPROVED_TEAM",
+          "WILDCARD",
+          "CHAIRMANS_FINALIST",
+          "OTHER",
+          "AUTONOMOUS",
+          "INNOVATION_CHALLENGE_SEMI_FINALIST",
+          "ROOKIE_GAME_CHANGER",
+          "SKILLS_COMPETITION_WINNER",
+          "SKILLS_COMPETITION_FINALIST",
+          "ROOKIE_DESIGN",
+          "ENGINEERING_DESIGN",
+          "DESIGNERS",
+          "CONCEPT",
+          "GAME_DESIGN_CHALLENGE_WINNER",
+          "GAME_DESIGN_CHALLENGE_FINALIST",
+          "SUSTAINABILITY",
+          "RISING_ALL_STAR"
+        ],
+        "description": "Type of award given. The integer values are stable and their symbolic names are in `x-enum-varnames`. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py for full definitions."
+      },
+      "EventType": {
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          99,
+          100,
+          -1
+        ],
+        "x-enum-varnames": [
+          "REGIONAL",
+          "DISTRICT",
+          "DISTRICT_CMP",
+          "CMP_DIVISION",
+          "CMP_FINALS",
+          "DISTRICT_CMP_DIVISION",
+          "FOC",
+          "REMOTE",
+          "OFFSEASON",
+          "PRESEASON",
+          "UNLABLED"
+        ],
+        "description": "Event Type. 0=REGIONAL, 1=DISTRICT, 2=DISTRICT_CMP, 3=CMP_DIVISION, 4=CMP_FINALS, 5=DISTRICT_CMP_DIVISION, 6=FOC, 7=REMOTE, 99=OFFSEASON, 100=PRESEASON, -1=UNLABLED. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py for definitions."
+      },
+      "PlayoffType": {
+        "type": "integer",
+        "enum": [
+          1,
+          0,
+          2,
+          9,
+          3,
+          4,
+          5,
+          10,
+          11,
+          6,
+          7,
+          8
+        ],
+        "x-enum-varnames": [
+          "BRACKET_16_TEAM",
+          "BRACKET_8_TEAM",
+          "BRACKET_4_TEAM",
+          "BRACKET_2_TEAM",
+          "AVG_SCORE_8_TEAM",
+          "ROUND_ROBIN_6_TEAM",
+          "LEGACY_DOUBLE_ELIM_8_TEAM",
+          "DOUBLE_ELIM_8_TEAM",
+          "DOUBLE_ELIM_4_TEAM",
+          "BO5_FINALS",
+          "BO3_FINALS",
+          "CUSTOM"
+        ],
+        "description": "Playoff bracket format. 1=BRACKET_16_TEAM, 0=BRACKET_8_TEAM, 2=BRACKET_4_TEAM, 9=BRACKET_2_TEAM, 3=AVG_SCORE_8_TEAM, 4=ROUND_ROBIN_6_TEAM, 5=LEGACY_DOUBLE_ELIM_8_TEAM, 10=DOUBLE_ELIM_8_TEAM, 11=DOUBLE_ELIM_4_TEAM, 6=BO5_FINALS, 7=BO3_FINALS, 8=CUSTOM. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py for definitions."
       },
       "District": {
         "required": [
@@ -5546,11 +5783,14 @@
                 "description": "Average match score during playoffs. Year specific. May be null."
               },
               "playoff_type": {
-                "type": [
-                  "number",
-                  "null"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayoffType"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
-                "format": "int64",
                 "description": "Playoff type, may be null."
               },
               "level": {
@@ -5813,8 +6053,7 @@
             "description": "Event short code, as provided by FIRST."
           },
           "event_type": {
-            "type": "integer",
-            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8"
+            "$ref": "#/components/schemas/EventType"
           },
           "district": {
             "oneOf": [
@@ -5980,11 +6219,15 @@
             "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
           },
           "playoff_type": {
-            "type": [
-              "integer",
-              "null"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlayoffType"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "description": "Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py#L37, or null."
+            "description": "Playoff Type, or null."
           },
           "playoff_type_string": {
             "type": [
@@ -6969,8 +7212,7 @@
             "description": "Event short code, as provided by FIRST."
           },
           "event_type": {
-            "type": "integer",
-            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8"
+            "$ref": "#/components/schemas/EventType"
           },
           "district": {
             "oneOf": [

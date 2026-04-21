@@ -54,12 +54,14 @@ export const START_OF_ELIMS_BREAKER: ShouldInsertBreakCallback = ({
 }) => {
   return {
     shouldBreak: matchIndex === 0 && match.comp_level !== 'qm',
-    text: {
-      [PlayoffType.DOUBLE_ELIM_8_TEAM]: 'Round 1',
-      [PlayoffType.AVG_SCORE_8_TEAM]: 'Quarterfinals',
-      [PlayoffType.BRACKET_8_TEAM]: 'Quarterfinals',
-      [PlayoffType.CUSTOM]: 'Elims',
-    }[event.playoff_type ?? PlayoffType.CUSTOM],
+    text: (
+      {
+        [PlayoffType.DOUBLE_ELIM_8_TEAM]: 'Round 1',
+        [PlayoffType.AVG_SCORE_8_TEAM]: 'Quarterfinals',
+        [PlayoffType.BRACKET_8_TEAM]: 'Quarterfinals',
+        [PlayoffType.CUSTOM]: 'Elims',
+      } as Partial<Record<PlayoffType, string>>
+    )[event.playoff_type ?? PlayoffType.CUSTOM],
     whereToInsertBreak: 'before',
   };
 };
