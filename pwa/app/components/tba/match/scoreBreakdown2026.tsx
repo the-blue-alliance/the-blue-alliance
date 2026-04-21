@@ -125,6 +125,22 @@ export default function ScoreBreakdown2026({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
+      {/* Transition Fuel */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.hubScore.transitionPoints}
+        redValue={scoreBreakdown.red.hubScore.transitionPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.hubScore.transitionPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Transition Fuel
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.hubScore.transitionPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
       {/* Hub Score: Shift Counts */}
       <ScoreBreakdownRow
         blueValue={scoreBreakdown.blue.hubScore.shift1Count}
@@ -215,6 +231,22 @@ export default function ScoreBreakdown2026({
           {scoreBreakdown.blue.hubScore.shift2Points} /{' '}
           {scoreBreakdown.blue.hubScore.shift3Points} /{' '}
           {scoreBreakdown.blue.hubScore.shift4Points}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Endgame Hub Fuel */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.hubScore.endgamePoints}
+        redValue={scoreBreakdown.red.hubScore.endgamePoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.hubScore.endgamePoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Endgame Hub Fuel
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.hubScore.endgamePoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
