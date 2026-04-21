@@ -48,6 +48,9 @@ def team_mod():
     user = none_throws(current_user())
     account = user.account_key
     now = datetime.now()
+    has_global_review_permissions = user.is_admin or user.has_permission(
+        AccountPermission.REVIEW_MEDIA
+    )
 
     existing_access = TeamAdminAccess.query(
         TeamAdminAccess.account == account, TeamAdminAccess.expiration > now
@@ -57,16 +60,24 @@ def team_mod():
     # team/year combination
     forced_team = request.args.get("team")
     forced_year = request.args.get("year")
+    forced_team_number = (
+        int(forced_team) if forced_team and forced_team.isdigit() else None
+    )
+    forced_year_int = (
+        int(forced_year) if forced_year and forced_year.isdigit() else None
+    )
+    has_valid_forced_team_year = (
+        forced_team_number is not None
+        and forced_team_number > 0
+        and forced_year_int is not None
+        and 1992 <= forced_year_int <= now.year + 1
+    )
 
-    if (
-        (user.is_admin or user.has_permission(AccountPermission.REVIEW_MEDIA))
-        and forced_team
-        and forced_year
-    ):
+    if has_global_review_permissions and has_valid_forced_team_year:
         existing_access.append(
             TeamAdminAccess(
-                team_number=int(forced_team),
-                year=int(forced_year),
+                team_number=forced_team_number,
+                year=forced_year_int,
             )
         )
 
@@ -138,6 +149,13 @@ def team_mod():
         "suggestions_by_team": suggestions_by_team,
         "suggestion_names": SUGGESTION_NAMES,
         "suggestion_review_urls": SUGGESTION_REVIEW_URL,
+        "show_year_jump": has_global_review_permissions and has_valid_forced_team_year,
+        "year_jump_team_number": (
+            forced_team_number if has_valid_forced_team_year else None
+        ),
+        "year_jump_current_year": (
+            forced_year_int if has_valid_forced_team_year else None
+        ),
     }
 
     return render_template("team_admin_dashboard.html", template_values)

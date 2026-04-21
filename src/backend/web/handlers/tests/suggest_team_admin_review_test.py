@@ -54,6 +54,28 @@ def test_mod_review_permission_can_view_with_forced_team_year(login_user, web_cl
     resp = web_client.get(f"/mod?team=1124&year={datetime.datetime.now().year}")
 
     assert resp.status_code == 200
+    assert b"Jump to Year" in resp.data
+    assert b'name="team" value="1124"' in resp.data
+    assert b'name="year"' in resp.data
+
+
+def test_mod_without_review_permission_hides_year_jump(login_user, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    TeamAdminAccess(
+        id=TeamAdminAccess.render_key_name(1124, datetime.datetime.now().year),
+        account=login_user.account_key,
+        team_number=1124,
+        year=datetime.datetime.now().year,
+        expiration=datetime.datetime.now() + datetime.timedelta(days=1),
+    ).put()
+
+    resp = web_client.get("/mod")
+
+    assert resp.status_code == 200
+    assert b"Jump to Year" not in resp.data
 
 
 def test_mod_post_admin_can_set_team_info(login_admin, web_client):
