@@ -37,18 +37,16 @@ def test_spec_integer_enum_matches_python(
     spec_schemas: dict, schema_name: str, enum_class: type[enum.IntEnum]
 ) -> None:
     schema = spec_schemas[schema_name]
-    branches = schema["oneOf"]
-    spec_values = [branch["const"] for branch in branches]
-    spec_names = [branch["title"] for branch in branches]
     expected_values = [member.value for member in enum_class]
     expected_names = [member.name for member in enum_class]
 
-    assert schema["title"] == schema_name
-    assert spec_values == expected_values, (
-        f"{schema_name}.oneOf[*].const in api_v3.json does not match "
+    assert schema["type"] == "integer"
+    assert schema["enum"] == expected_values, (
+        f"{schema_name}.enum in api_v3.json does not match "
         f"{enum_class.__name__} value order from Python"
     )
-    assert spec_names == expected_names, (
-        f"{schema_name}.oneOf[*].title in api_v3.json does not match "
+    assert schema["x-enum-varnames"] == expected_names, (
+        f"{schema_name}.x-enum-varnames in api_v3.json does not match "
         f"{enum_class.__name__} member names from Python"
     )
+    assert len(schema["enum"]) == len(schema["x-enum-varnames"])
