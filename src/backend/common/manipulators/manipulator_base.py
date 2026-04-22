@@ -401,9 +401,12 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         the "old" that are null in the "new".
         """
         updated_attrs: Set[str] = set()
+        manual_attrs = (
+            set(old_model.manual_attrs or []) | old_model._always_manual_attrs
+        )
 
         for attr in old_model._mutable_attrs:
-            if not update_manual_attrs and attr in old_model.manual_attrs:
+            if not update_manual_attrs and attr in manual_attrs:
                 continue
 
             if (
@@ -421,7 +424,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                     old_model._dirty = True
 
         for attr in old_model._json_attrs:
-            if not update_manual_attrs and attr in old_model.manual_attrs:
+            if not update_manual_attrs and attr in manual_attrs:
                 continue
 
             if getattr(new_model, attr) is not None:
@@ -439,7 +442,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
         if not auto_union:
             list_attrs = list_attrs.union(old_model._auto_union_attrs)
         for attr in list_attrs:
-            if not update_manual_attrs and attr in old_model.manual_attrs:
+            if not update_manual_attrs and attr in manual_attrs:
                 continue
 
             if len(getattr(new_model, attr)) > 0 or not auto_union:
@@ -449,7 +452,7 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
                     old_model._dirty = True
 
         for attr in old_model._auto_union_attrs if auto_union else {}:
-            if not update_manual_attrs and attr in old_model.manual_attrs:
+            if not update_manual_attrs and attr in manual_attrs:
                 continue
 
             old_set = set(getattr(old_model, attr))
