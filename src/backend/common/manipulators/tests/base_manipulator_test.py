@@ -621,3 +621,14 @@ def test_no_update_manual_attrs() -> None:
     merged = DummyManipulator.updateMerge(new, old, True, False)
     expected = ManipulatorDummyModel(id="test", int_prop=42, manual_attrs=["int_prop"])
     assert merged == expected
+
+
+def test_no_update_always_manual_attrs(monkeypatch) -> None:
+    monkeypatch.setattr(ManipulatorDummyModel, "_always_manual_attrs", {"int_prop"})
+
+    old = ManipulatorDummyModel(id="test", int_prop=42)
+    new = ManipulatorDummyModel(id="test", int_prop=604)
+
+    merged = DummyManipulator.updateMerge(new, old, True, False)
+    expected = ManipulatorDummyModel(id="test", int_prop=42)
+    assert merged == expected

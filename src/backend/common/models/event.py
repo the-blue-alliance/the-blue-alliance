@@ -201,6 +201,11 @@ class Event(CachedModel):
         "divisions",
     }
 
+    _always_manual_attrs: Set[str] = {
+        "first_code",
+        "nexus_code",
+    }
+
     def __init__(self, *args, **kw):
         # store set of affected references referenced keys for cache clearing
         # keys must be model properties
