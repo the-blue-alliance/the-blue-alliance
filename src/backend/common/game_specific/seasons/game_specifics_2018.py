@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
@@ -27,6 +27,7 @@ class GameSpecifics2018(
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2018
     BONUS_RP_BREAKDOWN_FIELDS = ("autoQuestRankingPoint", "faceTheBossRankingPoint")
     BONUS_RP_PREDICTION_FIELDS = ("prob_auto_quest", "prob_face_boss")
+    EXTRA_SCORE_BREAKDOWN_KEYS = frozenset(["tba_gameData"])
 
     def calculate_event_insights(self, matches: List[Match]) -> Optional[EventInsights]:
         qual_matches = []
@@ -405,50 +406,6 @@ class GameSpecifics2018(
             {"name": "Ownership", "precision": 0},
             {"name": "Vault", "precision": 0},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "autoRobot1",
-                "autoRobot2",
-                "autoRobot3",
-                "autoSwitchOwnershipSec",
-                "autoScaleOwnershipSec",
-                "autoSwitchAtZero",
-                "autoRunPoints",
-                "autoOwnershipPoints",
-                "autoPoints",
-                "teleopSwitchOwnershipSec",
-                "teleopScaleOwnershipSec",
-                "teleopSwitchBoostSec",
-                "teleopScaleBoostSec",
-                "teleopSwitchForceSec",
-                "teleopScaleForceSec",
-                "vaultForceTotal",
-                "vaultForcePlayed",
-                "vaultLevitateTotal",
-                "vaultLevitatePlayed",
-                "vaultBoostTotal",
-                "vaultBoostPlayed",
-                "endgameRobot1",
-                "endgameRobot2",
-                "endgameRobot3",
-                "teleopOwnershipPoints",
-                "vaultPoints",
-                "endgamePoints",
-                "teleopPoints",
-                "autoQuestRankingPoint",
-                "faceTheBossRankingPoint",
-                "foulCount",
-                "techFoulCount",
-                "adjustPoints",
-                "foulPoints",
-                "rp",
-                "totalPoints",
-                # fields added by TBA:
-                "tba_gameData",
-            ]
-        )
 
     def round_robin_tiebreak_keys(self) -> List[str]:
         return ["endgamePoints", "autoPoints"]

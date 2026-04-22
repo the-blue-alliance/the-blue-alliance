@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import Any, Dict, List, Optional, Set, Tuple, TypedDict
+from typing import Any, Dict, List, Optional, Tuple, TypedDict
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -378,45 +378,6 @@ class GameSpecifics2017(
             {"name": "Touchpad", "precision": 0},
             {"name": "Pressure", "precision": 0},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "adjustPoints",
-                "autoFuelHigh",
-                "autoFuelLow",
-                "autoFuelPoints",
-                "autoMobilityPoints",
-                "autoPoints",
-                "autoRotorPoints",
-                "foulCount",
-                "foulPoints",
-                "kPaBonusPoints",
-                "kPaRankingPointAchieved",
-                "robot1Auto",
-                "robot2Auto",
-                "robot3Auto",
-                "rotor1Auto",
-                "rotor1Engaged",
-                "rotor2Auto",
-                "rotor2Engaged",
-                "rotor3Engaged",
-                "rotor4Engaged",
-                "rotorBonusPoints",
-                "rotorRankingPointAchieved",
-                "techFoulCount",
-                "teleopFuelHigh",
-                "teleopFuelLow",
-                "teleopFuelPoints",
-                "teleopPoints",
-                "teleopRotorPoints",
-                "teleopTakeoffPoints",
-                "totalPoints",
-                "touchpadFar",
-                "touchpadMiddle",
-                "touchpadNear",
-            ]
-        )
 
     def round_robin_tiebreak_keys(self) -> List[str]:
         return ["totalPoints"]

@@ -3,7 +3,7 @@ from __future__ import annotations
 import logging
 import traceback
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
@@ -440,63 +440,6 @@ class GameSpecifics2019(
             {"name": "HAB Climb", "precision": 0},
             {"name": "Sandstorm Bonus", "precision": 0},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "adjustPoints",
-                "autoPoints",
-                "bay1",
-                "bay2",
-                "bay3",
-                "bay4",
-                "bay5",
-                "bay6",
-                "bay7",
-                "bay8",
-                "cargoPoints",
-                "completeRocketRankingPoint",
-                "completedRocketFar",
-                "completedRocketNear",
-                "endgameRobot1",
-                "endgameRobot2",
-                "endgameRobot3",
-                "foulCount",
-                "foulPoints",
-                "habClimbPoints",
-                "habDockingRankingPoint",
-                "habLineRobot1",
-                "habLineRobot2",
-                "habLineRobot3",
-                "hatchPanelPoints",
-                "lowLeftRocketFar",
-                "lowLeftRocketNear",
-                "lowRightRocketFar",
-                "lowRightRocketNear",
-                "midLeftRocketFar",
-                "midLeftRocketNear",
-                "midRightRocketFar",
-                "midRightRocketNear",
-                "preMatchBay1",
-                "preMatchBay2",
-                "preMatchBay3",
-                "preMatchBay6",
-                "preMatchBay7",
-                "preMatchBay8",
-                "preMatchLevelRobot1",
-                "preMatchLevelRobot2",
-                "preMatchLevelRobot3",
-                "rp",
-                "sandStormBonusPoints",
-                "techFoulCount",
-                "teleopPoints",
-                "topLeftRocketFar",
-                "topLeftRocketNear",
-                "topRightRocketFar",
-                "topRightRocketNear",
-                "totalPoints",
-            ]
-        )
 
     def round_robin_tiebreak_keys(self) -> List[str]:
         return ["cargoPoints", "hatchPanelPoints"]

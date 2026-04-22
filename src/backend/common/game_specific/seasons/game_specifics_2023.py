@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
@@ -31,6 +31,7 @@ class GameSpecifics2023(
         "sustainabilityBonusAchieved",
         "activationBonusAchieved",
     )
+    EXTRA_SCORE_BREAKDOWN_KEYS = frozenset(["tba_extraRp1", "tba_extraRp2"])
     BONUS_RP_PREDICTION_FIELDS = (
         "prob_sustainability_bonus",
         "prob_activation_bonus",
@@ -371,52 +372,3 @@ class GameSpecifics2023(
             {"name": "Avg Charge Station", "precision": 2},
             {"name": "Avg Auto", "precision": 2},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "activationBonusAchieved",
-                "adjustPoints",
-                "autoBridgeState",
-                "autoChargeStationPoints",
-                "autoChargeStationRobot1",
-                "autoChargeStationRobot2",
-                "autoChargeStationRobot3",
-                "autoCommunity",
-                "autoDocked",
-                "autoGamePieceCount",
-                "autoGamePiecePoints",
-                "autoMobilityPoints",
-                "autoPoints",
-                "coopertitionCriteriaMet",
-                "coopGamePieceCount",
-                "endGameBridgeState",
-                "endGameChargeStationPoints",
-                "endGameChargeStationRobot1",
-                "endGameChargeStationRobot2",
-                "endGameChargeStationRobot3",
-                "endGameParkPoints",
-                "extraGamePieceCount",
-                "foulCount",
-                "foulPoints",
-                "g405Penalty",
-                "h111Penalty",
-                "linkPoints",
-                "links",
-                "mobilityRobot1",
-                "mobilityRobot2",
-                "mobilityRobot3",
-                "rp",
-                "sustainabilityBonusAchieved",
-                "techFoulCount",
-                "teleopCommunity",
-                "teleopGamePieceCount",
-                "teleopGamePiecePoints",
-                "teleopPoints",
-                "totalChargeStationPoints",
-                "totalPoints",
-                # fields added by TBA:
-                "tba_extraRp1",
-                "tba_extraRp2",
-            ]
-        )

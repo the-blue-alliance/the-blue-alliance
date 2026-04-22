@@ -5,7 +5,9 @@ from typing import (
     Callable,
     ClassVar,
     Dict,
+    FrozenSet,
     Generic,
+    get_type_hints,
     List,
     NamedTuple,
     Optional,
@@ -392,6 +394,9 @@ class ModernBreakdownGameConfig(
     """
 
     SCORE_BREAKDOWN_MODEL: ClassVar[type[TScoreBreakdown] | None] = None
+    # Keys injected at parse-time that are not part of the FRC API TypedDict
+    # (e.g. TBA-synthesised fields or match-level values copied per-alliance).
+    EXTRA_SCORE_BREAKDOWN_KEYS: ClassVar[FrozenSet[str]] = frozenset()
 
     def tiebreak_criteria(
         self, red: TScoreBreakdown, blue: TScoreBreakdown
@@ -403,6 +408,20 @@ class ModernBreakdownGameConfig(
 
     def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
         return None
+
+    def valid_score_breakdown_keys(self) -> Set[str]:
+        """Derived automatically from SCORE_BREAKDOWN_MODEL's TypedDict fields.
+
+        The ``alliance`` metadata key is excluded since it is not a scoring
+        field.  Seasons that inject additional keys at parse time (TBA-
+        synthesised or match-level values copied per-alliance) should declare
+        them in EXTRA_SCORE_BREAKDOWN_KEYS.
+        """
+        if self.SCORE_BREAKDOWN_MODEL is None:
+            return set()
+        keys = set(get_type_hints(self.SCORE_BREAKDOWN_MODEL).keys())
+        keys.discard("alliance")
+        return keys | self.EXTRA_SCORE_BREAKDOWN_KEYS
 
 
 class TotalPointsScoreTiebreakGameConfig(

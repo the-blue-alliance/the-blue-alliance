@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 from collections import defaultdict
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -308,47 +308,3 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
             {"name": "Goals", "precision": 0},
             {"name": "Defense", "precision": 0},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "adjustPoints",
-                "autoBoulderPoints",
-                "autoBouldersHigh",
-                "autoBouldersLow",
-                "autoCrossingPoints",
-                "autoPoints",
-                "autoReachPoints",
-                "breachPoints",
-                "capturePoints",
-                "foulCount",
-                "foulPoints",
-                "position1crossings",
-                "position2",
-                "position2crossings",
-                "position3",
-                "position3crossings",
-                "position4",
-                "position4crossings",
-                "position5",
-                "position5crossings",
-                "robot1Auto",
-                "robot2Auto",
-                "robot3Auto",
-                "techFoulCount",
-                "teleopBoulderPoints",
-                "teleopBouldersHigh",
-                "teleopBouldersLow",
-                "teleopChallengePoints",
-                "teleopCrossingPoints",
-                "teleopDefensesBreached",
-                "teleopPoints",
-                "teleopScalePoints",
-                "teleopTowerCaptured",
-                "totalPoints",
-                "towerEndStrength",
-                "towerFaceA",
-                "towerFaceB",
-                "towerFaceC",
-            ]
-        )

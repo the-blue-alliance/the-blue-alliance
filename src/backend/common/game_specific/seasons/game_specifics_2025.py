@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Set, Tuple, TypedDict
+from typing import Any, Dict, List, Optional, Tuple, TypedDict
 
 from pyre_extensions import none_throws
 
@@ -270,46 +270,6 @@ class GameSpecifics2025(
             {"name": "Avg Auto", "precision": 2},
             {"name": "Avg Barge", "precision": 2},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "adjustPoints",
-                "algaePoints",
-                "alliance",
-                "autoBonusAchieved",
-                "autoCoralCount",
-                "autoCoralPoints",
-                "autoLineRobot1",
-                "autoLineRobot2",
-                "autoLineRobot3",
-                "autoMobilityPoints",
-                "autoPoints",
-                "autoReef",
-                "bargeBonusAchieved",
-                "coopertitionCriteriaMet",
-                "coralBonusAchieved",
-                "endGameBargePoints",
-                "endGameRobot1",
-                "endGameRobot2",
-                "endGameRobot3",
-                "foulCount",
-                "foulPoints",
-                "g206Penalty",
-                "g410Penalty",
-                "g418Penalty",
-                "g428Penalty",
-                "netAlgaeCount",
-                "rp",
-                "techFoulCount",
-                "teleopCoralCount",
-                "teleopCoralPoints",
-                "teleopPoints",
-                "teleopReef",
-                "totalPoints",
-                "wallAlgaeCount",
-            ]
-        )
 
 
 class _RankingBreakdown2025(TypedDict):

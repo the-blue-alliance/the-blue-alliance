@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
@@ -366,44 +366,6 @@ class GameSpecifics2020(
             {"name": "End Game", "precision": 0},
             {"name": "Teleop Cell + CPanel", "precision": 0},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "adjustPoints",
-                "autoCellPoints",
-                "autoCellsBottom",
-                "autoCellsInner",
-                "autoCellsOuter",
-                "autoInitLinePoints",
-                "autoPoints",
-                "controlPanelPoints",
-                "endgamePoints",
-                "endgameRobot1",
-                "endgameRobot2",
-                "endgameRobot3",
-                "endgameRungIsLevel",
-                "foulCount",
-                "foulPoints",
-                "initLineRobot1",
-                "initLineRobot2",
-                "initLineRobot3",
-                "rp",
-                "shieldEnergizedRankingPoint",
-                "shieldOperationalRankingPoint",
-                "stage1Activated",
-                "stage2Activated",
-                "stage3Activated",
-                "stage3TargetColor",
-                "techFoulCount",
-                "teleopCellPoints",
-                "teleopCellsBottom",
-                "teleopCellsInner",
-                "teleopCellsOuter",
-                "teleopPoints",
-                "totalPoints",
-            ]
-        )
 
     def round_robin_tiebreak_keys(self) -> List[str]:
         return []

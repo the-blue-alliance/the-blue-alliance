@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
@@ -333,52 +333,6 @@ class GameSpecifics2022(
             {"name": "Avg Hangar", "precision": 2},
             {"name": "Avg Taxi + Auto Cargo", "precision": 2},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "adjustPoints",
-                "autoCargoLowerBlue",
-                "autoCargoLowerFar",
-                "autoCargoLowerNear",
-                "autoCargoLowerRed",
-                "autoCargoPoints",
-                "autoCargoTotal",
-                "autoCargoUpperBlue",
-                "autoCargoUpperFar",
-                "autoCargoUpperNear",
-                "autoCargoUpperRed",
-                "autoPoints",
-                "autoTaxiPoints",
-                "cargoBonusRankingPoint",
-                "endgamePoints",
-                "endgameRobot1",
-                "endgameRobot2",
-                "endgameRobot3",
-                "foulCount",
-                "foulPoints",
-                "hangarBonusRankingPoint",
-                "matchCargoTotal",
-                "quintetAchieved",
-                "rp",
-                "taxiRobot1",
-                "taxiRobot2",
-                "taxiRobot3",
-                "techFoulCount",
-                "teleopCargoLowerBlue",
-                "teleopCargoLowerFar",
-                "teleopCargoLowerNear",
-                "teleopCargoLowerRed",
-                "teleopCargoPoints",
-                "teleopCargoTotal",
-                "teleopCargoUpperBlue",
-                "teleopCargoUpperFar",
-                "teleopCargoUpperNear",
-                "teleopCargoUpperRed",
-                "teleopPoints",
-                "totalPoints",
-            ]
-        )
 
     def round_robin_tiebreak_keys(self) -> List[str]:
         return ["endgamePoints", "autoPoints"]

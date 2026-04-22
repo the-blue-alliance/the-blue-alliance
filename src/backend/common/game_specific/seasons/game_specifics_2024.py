@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Tuple
 
 from pyre_extensions import none_throws
 
@@ -24,6 +24,18 @@ class GameSpecifics2024(
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2024
     BONUS_RP_BREAKDOWN_FIELDS = ("melodyBonusAchieved", "ensembleBonusAchieved")
     BONUS_RP_PREDICTION_FIELDS = ("prob_melody_bonus", "prob_ensemble_bonus")
+    EXTRA_SCORE_BREAKDOWN_KEYS = frozenset(
+        [
+            "tba_extraRp1",
+            "tba_extraRp2",
+            "coopertitionBonusAchieved",
+            "melodyBonusThresholdCoop",
+            "melodyBonusThresholdNonCoop",
+            "melodyBonusThreshold",
+            "ensembleBonusStagePointsThreshold",
+            "ensembleBonusOnStageRobotsThreshold",
+        ]
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2024, blue: ScoreDetailModelAlliance2024
@@ -251,64 +263,3 @@ class GameSpecifics2024(
             {"name": "Avg Auto", "precision": 2},
             {"name": "Avg Stage", "precision": 2},
         ]
-
-    def valid_score_breakdown_keys(self) -> Set[str]:
-        return set(
-            [
-                "adjustPoints",
-                "autoAmpNoteCount",
-                "autoAmpNotePoints",
-                "autoLeavePoints",
-                "autoLineRobot1",
-                "autoLineRobot2",
-                "autoLineRobot3",
-                "autoPoints",
-                "autoSpeakerNoteCount",
-                "autoSpeakerNotePoints",
-                "autoTotalNotePoints",
-                "coopertitionBonusAchieved",
-                "coopertitionCriteriaMet",
-                "coopNotePlayed",
-                "endGameHarmonyPoints",
-                "endGameNoteInTrapPoints",
-                "endGameOnStagePoints",
-                "endGameParkPoints",
-                "endGameRobot1",
-                "endGameRobot2",
-                "endGameRobot3",
-                "endGameSpotLightBonusPoints",
-                "endGameTotalStagePoints",
-                "ensembleBonusAchieved",
-                "ensembleBonusOnStageRobotsThreshold",
-                "ensembleBonusStagePointsThreshold",
-                "foulCount",
-                "foulPoints",
-                "g206Penalty",
-                "g408Penalty",
-                "g424Penalty",
-                "melodyBonusAchieved",
-                "melodyBonusThreshold",
-                "melodyBonusThresholdCoop",
-                "melodyBonusThresholdNonCoop",
-                "micCenterStage",
-                "micStageLeft",
-                "micStageRight",
-                "rp",
-                "techFoulCount",
-                "teleopAmpNoteCount",
-                "teleopAmpNotePoints",
-                "teleopPoints",
-                "teleopSpeakerNoteAmplifiedCount",
-                "teleopSpeakerNoteAmplifiedPoints",
-                "teleopSpeakerNoteCount",
-                "teleopSpeakerNotePoints",
-                "teleopTotalNotePoints",
-                "totalPoints",
-                "trapCenterStage",
-                "trapStageLeft",
-                "trapStageRight",
-                # fields added by TBA:
-                "tba_extraRp1",
-                "tba_extraRp2",
-            ]
-        )
