@@ -14,6 +14,7 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2018
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    TCriteria,
     TotalPointsScoreBonusRpGameConfig,
 )
 from backend.common.models.event_insights import EventInsights
@@ -28,6 +29,13 @@ class GameSpecifics2018(
     BONUS_RP_BREAKDOWN_FIELDS = ("autoQuestRankingPoint", "faceTheBossRankingPoint")
     BONUS_RP_PREDICTION_FIELDS = ("prob_auto_quest", "prob_face_boss")
     EXTRA_SCORE_BREAKDOWN_KEYS = frozenset(["tba_gameData"])
+
+    def tiebreak_criteria(
+        self,
+        red: ScoreDetailModelAlliance2018,
+        blue: ScoreDetailModelAlliance2018,
+    ) -> List[TCriteria]:
+        return []
 
     def calculate_event_insights(self, matches: List[Match]) -> Optional[EventInsights]:
         qual_matches = []

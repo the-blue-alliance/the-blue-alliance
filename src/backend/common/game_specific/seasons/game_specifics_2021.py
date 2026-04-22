@@ -6,6 +6,7 @@ from backend.common.frc_api.types import ScoreDetailModelAlliance2021
 from backend.common.game_specific.base import (
     NoRecordModernBreakdownSeasonGameConfig,
     PredictionStatConfig,
+    TCriteria,
 )
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
@@ -16,6 +17,19 @@ class GameSpecifics2021(
     NoRecordModernBreakdownSeasonGameConfig[ScoreDetailModelAlliance2021]
 ):
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2021
+
+    def tiebreak_criteria(
+        self,
+        red: ScoreDetailModelAlliance2021,
+        blue: ScoreDetailModelAlliance2021,
+    ) -> List[TCriteria]:
+        return []
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return None
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return None
 
     def calculate_event_insights(self, matches: List[Match]) -> Optional[EventInsights]:
         # 2021 was a remote practice-only season; no event insights are computed.

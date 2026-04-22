@@ -344,13 +344,12 @@ class AbstractModernGameConfig(
     Abstract base for modern FMS seasons (2016+).
 
     Provides universal concrete defaults for hooks that are identical across all
-    modern games.  The four year-specific hooks that MUST be overridden per
+    modern games.  The three year-specific hooks that MUST be overridden per
     season are deliberately left abstract so the type checker catches omissions
     when a new year class is created:
 
         * calculate_event_insights
         * get_prediction_relevant_stats
-        * valid_score_breakdown_keys
         * ranking_sort_order_info
 
     All other extension points are either provided here with safe defaults or
@@ -382,32 +381,13 @@ class AbstractModernGameConfig(
     def ranking_win_points(self) -> int:
         return 2
 
+    @property
+    @abstractmethod
+    def SCORE_BREAKDOWN_MODEL(self) -> type[TScoreBreakdown]: ...
 
-class ModernBreakdownGameConfig(
-    AbstractModernGameConfig[TScoreBreakdown], Generic[TScoreBreakdown]
-):
-    """
-    Intermediate base for modern FMS seasons with typed score breakdowns.
-
-    Subclasses must set SCORE_BREAKDOWN_MODEL and may override tiebreak_criteria
-    with the season-specific score breakdown type.
-    """
-
-    SCORE_BREAKDOWN_MODEL: ClassVar[type[TScoreBreakdown] | None] = None
     # Keys injected at parse-time that are not part of the FRC API TypedDict
     # (e.g. TBA-synthesised fields or match-level values copied per-alliance).
     EXTRA_SCORE_BREAKDOWN_KEYS: ClassVar[FrozenSet[str]] = frozenset()
-
-    def tiebreak_criteria(
-        self, red: TScoreBreakdown, blue: TScoreBreakdown
-    ) -> List[TCriteria]:
-        return []
-
-    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
-        return None
-
-    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
-        return None
 
     def valid_score_breakdown_keys(self) -> Set[str]:
         """Derived automatically from SCORE_BREAKDOWN_MODEL's TypedDict fields.
@@ -417,15 +397,13 @@ class ModernBreakdownGameConfig(
         synthesised or match-level values copied per-alliance) should declare
         them in EXTRA_SCORE_BREAKDOWN_KEYS.
         """
-        if self.SCORE_BREAKDOWN_MODEL is None:
-            return set()
         keys = set(get_type_hints(self.SCORE_BREAKDOWN_MODEL).keys())
         keys.discard("alliance")
         return keys | self.EXTRA_SCORE_BREAKDOWN_KEYS
 
 
 class TotalPointsScoreTiebreakGameConfig(
-    ModernBreakdownGameConfig[TScoreBreakdown], Generic[TScoreBreakdown]
+    AbstractModernGameConfig[TScoreBreakdown], Generic[TScoreBreakdown]
 ):
     """
     Shared base for games whose ranking prediction tiebreaker uses
@@ -450,7 +428,7 @@ class TripleWinPointsGameConfig(
 
 class BonusRpBreakdownSeasonGameConfig(
     FixedBonusRankingPointsMixin[str, str],
-    ModernBreakdownGameConfig[TScoreBreakdown],
+    AbstractModernGameConfig[TScoreBreakdown],
     Generic[TScoreBreakdown],
 ):
     """Breakdown game base with configurable bonus RP field mappings."""
@@ -461,7 +439,7 @@ class BonusRpBreakdownSeasonGameConfig(
 class NoRecordModernBreakdownSeasonGameConfig(
     NoBonusRankingPointsMixin,
     NoRecordInRankingsMixin,
-    ModernBreakdownGameConfig[TScoreBreakdown],
+    AbstractModernGameConfig[TScoreBreakdown],
     Generic[TScoreBreakdown],
 ):
     """Typed modern breakdown base for seasons that hide W/L/T record."""
