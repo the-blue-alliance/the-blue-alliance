@@ -23,15 +23,19 @@ def store_team(ndb_stub):
     team.put()
 
 
-def add_team_admin_access(account, team_number=1124, year=None, access_code="abc123"):
+def add_team_admin_access(
+    account, team_number=1124, year=None, access_code="abc123", expiration=None
+):
     if not year:
         year = datetime.datetime.now().year
+    if expiration is None:
+        expiration = datetime.datetime.now() + datetime.timedelta(days=1)
     access = TeamAdminAccess(
         id="test_access_{}".format(year),
         access_code=access_code,
         team_number=team_number,
         year=year,
-        expiration=datetime.datetime.now() + datetime.timedelta(days=1),
+        expiration=expiration,
         account=account,
     )
     return access.put()
@@ -141,6 +145,41 @@ def test_redeem_used_code(login_user: User, web_client: Client, captured_templat
     )
 
     assert_template_status(captured_templates, "code_used")
+
+
+def test_redeem_page_hides_expired_access(
+    login_user: User, web_client: Client, captured_templates
+):
+    add_team_admin_access(
+        account=login_user.account_key,
+        year=datetime.datetime.now().year - 1,
+        access_code="abc123_old",
+        expiration=datetime.datetime.now() - datetime.timedelta(days=1),
+    )
+
+    resp = web_client.get("/mod/redeem")
+    assert resp.status_code == 200
+
+    context = captured_templates[0][1]
+    assert list(context["existing_access"]) == []
+
+
+def test_mod_dashboard_does_not_loop_with_only_expired_access(
+    login_user: User, web_client: Client
+):
+    add_team_admin_access(
+        account=login_user.account_key,
+        year=datetime.datetime.now().year - 1,
+        access_code="abc123_old",
+        expiration=datetime.datetime.now() - datetime.timedelta(days=1),
+    )
+
+    resp = web_client.get("/mod")
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/mod/redeem"
+
+    resp = web_client.get("/mod/redeem")
+    assert resp.status_code == 200
 
 
 def test_redeem_code_after_redeeming_last_year(

@@ -254,7 +254,10 @@ def get_media_and_team_ref(media_key_name, team_number):
 @require_login
 def team_admin_redeem():
     user = none_throws(current_user()).account_key
-    existing_access = TeamAdminAccess.query(TeamAdminAccess.account == user).fetch()
+    now = datetime.now()
+    existing_access = TeamAdminAccess.query(
+        TeamAdminAccess.account == user, TeamAdminAccess.expiration > now
+    ).fetch()
 
     team_keys = [
         ndb.Key(Team, f"frc{access.team_number}") for access in existing_access
