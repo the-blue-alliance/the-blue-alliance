@@ -9,6 +9,10 @@ from backend.common.queries.insight_query import (
     InsightsLeaderboardsYearQuery,
     InsightsNotablesYearQuery,
 )
+from backend.common.queries.insight_v2_query import (
+    InsightV2YearCategoryQuery,
+    InsightV2YearQuery,
+)
 
 
 @api_authenticated
@@ -29,4 +33,24 @@ def insights_notables_year(year: int) -> Response:
     track_call_after_response("insights/notables", str(year))
 
     insights = InsightsNotablesYearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
+    return profiled_jsonify(insights)
+
+
+@api_authenticated
+@cached_public
+def insights_v2_year(year: int) -> Response:
+    track_call_after_response("insights/v2", str(year))
+
+    insights = InsightV2YearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
+    return profiled_jsonify(insights)
+
+
+@api_authenticated
+@cached_public
+def insights_v2_year_category(year: int, category: str) -> Response:
+    track_call_after_response("insights/v2/category", f"{year}/{category}")
+
+    insights = InsightV2YearCategoryQuery(year=year, category=category).fetch_dict(
+        ApiMajorVersion.API_V3
+    )
     return profiled_jsonify(insights)

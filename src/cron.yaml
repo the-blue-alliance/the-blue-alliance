@@ -60,6 +60,12 @@ cron:
     schedule: every day 01:00
     timezone: America/Los_Angeles
 
+  # Insights V2
+  - description: Insights V2 Calculation
+    url: /backend-tasks-b2/enqueue/math/insights_v2
+    schedule: every day 21:00
+    timezone: America/Los_Angeles
+
   # Legacy Insights
   - description: Match Insights Calculation
     url: /backend-tasks-b2/enqueue/math/insights/matches
