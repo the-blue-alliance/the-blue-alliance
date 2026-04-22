@@ -14,14 +14,20 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.game_specific.base import (
     StatAccessor,
     TCriteria,
-    TotalPointsScoreTiebreakGameConfig,
+    TotalPointsScoreBonusRpGameConfig,
 )
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2019(TotalPointsScoreTiebreakGameConfig):
+class GameSpecifics2019(TotalPointsScoreBonusRpGameConfig):
+    BONUS_RP_BREAKDOWN_FIELDS = (
+        "completeRocketRankingPoint",
+        "habDockingRankingPoint",
+    )
+    BONUS_RP_PREDICTION_FIELDS = ("prob_complete_rocket", "prob_hab_docking")
+
     def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
@@ -418,12 +424,6 @@ class GameSpecifics2019(TotalPointsScoreTiebreakGameConfig):
             ("rocket_pieces_scored", 1, 3**2),
             ("hab_climb_points", 2, 3**2),
         ]
-
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
-        return ["completeRocketRankingPoint", "habDockingRankingPoint"]
-
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
-        return ["prob_complete_rocket", "prob_hab_docking"]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

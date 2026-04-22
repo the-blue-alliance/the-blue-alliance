@@ -2,13 +2,11 @@ from __future__ import annotations
 
 from typing import List, Optional, Set
 
-from backend.common.game_specific.base import SeasonGameConfig
+from backend.common.game_specific.base import NoRecordSeasonGameConfig
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2021(SeasonGameConfig):
-    def record_in_rankings(self) -> bool:
-        return False
+class GameSpecifics2021(NoRecordSeasonGameConfig):
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

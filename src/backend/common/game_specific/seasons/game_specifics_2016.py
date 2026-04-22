@@ -7,13 +7,19 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
-from backend.common.game_specific.base import SeasonGameConfig, TCriteria
+from backend.common.game_specific.base import (
+    BonusRpBreakdownSeasonGameConfig,
+    TCriteria,
+)
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2016(SeasonGameConfig):
+class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig):
+    BONUS_RP_BREAKDOWN_FIELDS = ("teleopDefensesBreached", "teleopTowerCaptured")
+    BONUS_RP_PREDICTION_FIELDS = ("prob_breach", "prob_capture")
+
     def finals_can_be_tiebroken(self) -> bool:
         return True
 
@@ -282,12 +288,6 @@ class GameSpecifics2016(SeasonGameConfig):
             ("teleopDefensesBreached", "prob_breach", "breach"),
             ("teleopTowerCaptured", "prob_capture", "capture"),
         ]
-
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
-        return ["teleopDefensesBreached", "teleopTowerCaptured"]
-
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
-        return ["prob_breach", "prob_capture"]
 
     def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
         return "autoPoints"

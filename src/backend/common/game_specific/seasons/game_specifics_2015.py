@@ -1,15 +1,10 @@
 from typing import List, Optional, Set
 
-from backend.common.game_specific.base import SeasonGameConfig
+from backend.common.game_specific.base import QualAverageNoRecordSeasonGameConfig
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2015(SeasonGameConfig):
-    def record_in_rankings(self) -> bool:
-        return False
-
-    def qual_average_in_rankings(self) -> bool:
-        return True
+class GameSpecifics2015(QualAverageNoRecordSeasonGameConfig):
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

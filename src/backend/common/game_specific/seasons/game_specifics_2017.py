@@ -9,14 +9,17 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.game_specific.base import (
     TCriteria,
-    TotalPointsScoreTiebreakGameConfig,
+    TotalPointsScoreBonusRpGameConfig,
 )
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2017(TotalPointsScoreTiebreakGameConfig):
+class GameSpecifics2017(TotalPointsScoreBonusRpGameConfig):
+    BONUS_RP_BREAKDOWN_FIELDS = ("kPaRankingPointAchieved", "rotorRankingPointAchieved")
+    BONUS_RP_PREDICTION_FIELDS = ("prob_pressure", "prob_gears")
+
     def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
@@ -358,12 +361,6 @@ class GameSpecifics2017(TotalPointsScoreTiebreakGameConfig):
             ("kPaRankingPointAchieved", "prob_pressure", "pressure"),
             ("rotorRankingPointAchieved", "prob_gears", "gears"),
         ]
-
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
-        return ["kPaRankingPointAchieved", "rotorRankingPointAchieved"]
-
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
-        return ["prob_pressure", "prob_gears"]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

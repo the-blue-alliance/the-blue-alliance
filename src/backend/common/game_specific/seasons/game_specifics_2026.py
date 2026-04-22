@@ -9,14 +9,25 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.game_specific.base import (
     StatAccessor,
     TCriteria,
-    TripleWinPointsGameConfig,
+    TripleWinTotalPointsScoreBonusRpGameConfig,
 )
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2026(TripleWinPointsGameConfig):
+class GameSpecifics2026(TripleWinTotalPointsScoreBonusRpGameConfig):
+    BONUS_RP_BREAKDOWN_FIELDS = (
+        "energizedAchieved",
+        "superchargedAchieved",
+        "traversalAchieved",
+    )
+    BONUS_RP_PREDICTION_FIELDS = (
+        "prob_energized_bonus",
+        "prob_supercharged_bonus",
+        "prob_traversal_bonus",
+    )
+
     def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
@@ -351,16 +362,6 @@ class GameSpecifics2026(TripleWinPointsGameConfig):
             ("totalAutoPoints", 0, 10**2),
             ("totalTeleopPoints", 0, 10**2),
             ("endGameTowerPoints", 0, 10**2),
-        ]
-
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
-        return ["energizedAchieved", "superchargedAchieved", "traversalAchieved"]
-
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
-        return [
-            "prob_energized_bonus",
-            "prob_supercharged_bonus",
-            "prob_traversal_bonus",
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:

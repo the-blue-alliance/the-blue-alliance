@@ -1,10 +1,10 @@
 from typing import List, Optional, Set
 
-from backend.common.game_specific.base import SeasonGameConfig
+from backend.common.game_specific.base import BreakdownSeasonGameConfig
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2014(SeasonGameConfig):
+class GameSpecifics2014(BreakdownSeasonGameConfig):
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
             {"name": "Qual Score", "precision": 0},

@@ -9,14 +9,17 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.game_specific.base import (
     StatAccessor,
     TCriteria,
-    TotalPointsScoreTiebreakGameConfig,
+    TotalPointsScoreBonusRpGameConfig,
 )
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2024(TotalPointsScoreTiebreakGameConfig):
+class GameSpecifics2024(TotalPointsScoreBonusRpGameConfig):
+    BONUS_RP_BREAKDOWN_FIELDS = ("melodyBonusAchieved", "ensembleBonusAchieved")
+    BONUS_RP_PREDICTION_FIELDS = ("prob_melody_bonus", "prob_ensemble_bonus")
+
     def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
@@ -232,12 +235,6 @@ class GameSpecifics2024(TotalPointsScoreTiebreakGameConfig):
             ("note_scored", 0, 10**2),
             ("stage_points", 0, 10**2),
         ]
-
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
-        return ["melodyBonusAchieved", "ensembleBonusAchieved"]
-
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
-        return ["prob_melody_bonus", "prob_ensemble_bonus"]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [
