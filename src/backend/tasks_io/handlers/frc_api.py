@@ -311,6 +311,13 @@ def event_list(year: Year) -> Response:
     # For all matched offseason events, make sure the FIRST code matches the TBA FIRST code
     for tba_event, first_event in matched_offseason_events:
         tba_event.first_code = first_event.event_short
+
+        # This is the ONE TIME we want to write this field from the datafeed
+        # Normally, we want to skip it, because it's something we intentionally set, so we
+        # want to avoid clobbering it. But here, we are specifically setting it to the known-right value,
+        # so we can allow the write to go throuhg, in this midly hacky way
+        tba_event._always_manual_attrs.discard("first_code")
+
         events_to_put.append(tba_event)  # Update TBA events - discard the FIRST event
 
     # For all new offseason events we can't automatically match, create suggestions
