@@ -40,7 +40,9 @@ export const zBridgeState2023 = z.enum(['Level', 'NotLevel']);
 export const zCompLevel = z.enum(['qm', 'ef', 'qf', 'sf', 'f']);
 
 /**
- * Type of award given. The integer values are stable and their symbolic names are in `x-enum-varnames`. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py for full definitions.
+ * AwardType
+ *
+ * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py for full definitions.
  */
 export const zAwardType = z.union([
   z.literal(0),
@@ -138,7 +140,9 @@ export const zAward = z.object({
 });
 
 /**
- * Event Type. 0=REGIONAL, 1=DISTRICT, 2=DISTRICT_CMP, 3=CMP_DIVISION, 4=CMP_FINALS, 5=DISTRICT_CMP_DIVISION, 6=FOC, 7=REMOTE, 99=OFFSEASON, 100=PRESEASON, -1=UNLABLED. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py for definitions.
+ * EventType
+ *
+ * Event Type. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py for definitions.
  */
 export const zEventType = z.union([
   z.literal(0),
@@ -155,7 +159,9 @@ export const zEventType = z.union([
 ]);
 
 /**
- * Playoff bracket format. 1=BRACKET_16_TEAM, 0=BRACKET_8_TEAM, 2=BRACKET_4_TEAM, 9=BRACKET_2_TEAM, 3=AVG_SCORE_8_TEAM, 4=ROUND_ROBIN_6_TEAM, 5=LEGACY_DOUBLE_ELIM_8_TEAM, 10=DOUBLE_ELIM_8_TEAM, 11=DOUBLE_ELIM_4_TEAM, 6=BO5_FINALS, 7=BO3_FINALS, 8=CUSTOM. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py for definitions.
+ * PlayoffType
+ *
+ * Playoff bracket format. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py for definitions.
  */
 export const zPlayoffType = z.union([
   z.literal(1),
