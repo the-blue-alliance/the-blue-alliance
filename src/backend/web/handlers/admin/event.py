@@ -16,6 +16,7 @@ from backend.common.consts.playoff_type import (
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.game_specific.registry import get_game
 from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
     DistrictPointTiebreakersSortingHelper,
 )
@@ -97,9 +98,9 @@ def event_detail(event_key: EventKey) -> str:
             {
                 "event": event,
                 "playoff_advancement": event.playoff_advancement,
-                "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-                    event.year, []
-                ),
+                "playoff_advancement_tiebreakers": get_game(
+                    event.year
+                ).round_robin_tiebreaker_names(),
                 "bracket_table": event.playoff_bracket,
             },
         )
