@@ -8,7 +8,7 @@ import {
 import { useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
-import { Event } from '~/api/tba/read';
+import { Event, EventType } from '~/api/tba/read';
 import {
   getDistrictsByYearOptions,
   getEventsByYearOptions,
@@ -26,7 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
+import { CMP_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
 import {
   parseParamsForYearElseDefault,

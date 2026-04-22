@@ -1,7 +1,12 @@
 import BiVolumeMute from '~icons/bi/volume-mute';
 import BiVolumeUp from '~icons/bi/volume-up';
 
-import { Match, MatchScoreBreakdown2024 } from '~/api/tba/read';
+import {
+  AutoLineRobot2024,
+  EndGameRobot2024,
+  Match,
+  MatchScoreBreakdown2024,
+} from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   ConditionalCheckmark,
@@ -31,15 +36,21 @@ export default function ScoreBreakdown2024({
             className="bg-alliance-red-dark whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.autoLineRobot1 === 'Yes'}
+              condition={
+                scoreBreakdown.red.autoLineRobot1 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.red.team_keys[0].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.autoLineRobot2 === 'Yes'}
+              condition={
+                scoreBreakdown.red.autoLineRobot2 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.red.team_keys[1].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.autoLineRobot3 === 'Yes'}
+              condition={
+                scoreBreakdown.red.autoLineRobot3 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.red.team_keys[2].substring(3)}
             />
             (+{scoreBreakdown.red.autoLeavePoints})
@@ -51,15 +62,21 @@ export default function ScoreBreakdown2024({
             className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.autoLineRobot1 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.autoLineRobot1 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.blue.team_keys[0].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.autoLineRobot2 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.autoLineRobot2 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.blue.team_keys[1].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.autoLineRobot3 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.autoLineRobot3 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.blue.team_keys[2].substring(3)}
             />
             (+{scoreBreakdown.blue.autoLeavePoints})
@@ -405,9 +422,9 @@ function EndgameRobotCell({
   let points = 0;
 
   if (
-    (endgame === 'CenterStage' && trapCenterStage) ||
-    (endgame === 'StageLeft' && trapStageLeft) ||
-    (endgame === 'StageRight' && trapStageRight)
+    (endgame === EndGameRobot2024.CENTER_STAGE && trapCenterStage) ||
+    (endgame === EndGameRobot2024.STAGE_LEFT && trapStageLeft) ||
+    (endgame === EndGameRobot2024.STAGE_RIGHT && trapStageRight)
   ) {
     display = 'Spotlit';
     points = 4;

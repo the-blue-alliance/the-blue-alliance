@@ -11,7 +11,13 @@ import {
 
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
-import { EliminationAlliance, Event, Match } from '~/api/tba/read';
+import {
+  CompLevel,
+  EliminationAlliance,
+  Event,
+  EventType,
+  Match,
+} from '~/api/tba/read';
 import {
   EliminationBracketPaths,
   PlayoffMatchHandle,
@@ -21,7 +27,6 @@ import {
 } from '~/components/tba/eliminationBracketPaths';
 import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
-import { EventType } from '~/lib/api/EventType';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
@@ -331,7 +336,7 @@ export default function EliminationBracket({
   // Group matches by set_number.
   const matchesBySet = useMemo(() => {
     const grouped = [...matches]
-      .filter((m) => m.comp_level === 'sf') // Non-finals double elim matches are all sf
+      .filter((m) => m.comp_level === CompLevel.SF) // Non-finals double elim matches are all sf
       .reduce<Record<number, Match[]>>((acc, match) => {
         (acc[match.set_number] ??= []).push(match);
         return acc;
@@ -343,7 +348,10 @@ export default function EliminationBracket({
   }, [matches]);
 
   const finalsMatches = useMemo(
-    () => matches.filter((m) => m.comp_level === 'f').sort(sortMatchComparator),
+    () =>
+      matches
+        .filter((m) => m.comp_level === CompLevel.F)
+        .sort(sortMatchComparator),
     [matches],
   );
 

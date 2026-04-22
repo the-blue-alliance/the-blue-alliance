@@ -1,5 +1,5 @@
-import { Event, Match } from '~/api/tba/read';
-import { DOUBLE_ELIM_ROUND_MAPPING, PlayoffType } from '~/lib/api/PlayoffType';
+import { CompLevel, Event, Match, PlayoffType } from '~/api/tba/read';
+import { DOUBLE_ELIM_ROUND_MAPPING } from '~/lib/api/PlayoffType';
 import { COMP_LEVEL_SHORT_STRINGS } from '~/lib/matchUtils';
 import { timestampsAreOnDifferentDays } from '~/lib/utils';
 
@@ -41,7 +41,7 @@ export const START_OF_QUALS_BREAKER: ShouldInsertBreakCallback = ({
   matchIndex,
 }) => {
   return {
-    shouldBreak: matchIndex === 0 && match.comp_level === 'qm',
+    shouldBreak: matchIndex === 0 && match.comp_level === CompLevel.QM,
     text: 'Quals',
     whereToInsertBreak: 'before',
   };
@@ -53,13 +53,15 @@ export const START_OF_ELIMS_BREAKER: ShouldInsertBreakCallback = ({
   event,
 }) => {
   return {
-    shouldBreak: matchIndex === 0 && match.comp_level !== 'qm',
-    text: {
-      [PlayoffType.DOUBLE_ELIM_8_TEAM]: 'Round 1',
-      [PlayoffType.AVG_SCORE_8_TEAM]: 'Quarterfinals',
-      [PlayoffType.BRACKET_8_TEAM]: 'Quarterfinals',
-      [PlayoffType.CUSTOM]: 'Elims',
-    }[event.playoff_type ?? PlayoffType.CUSTOM],
+    shouldBreak: matchIndex === 0 && match.comp_level !== CompLevel.QM,
+    text: (
+      {
+        [PlayoffType.DOUBLE_ELIM_8_TEAM]: 'Round 1',
+        [PlayoffType.AVG_SCORE_8_TEAM]: 'Quarterfinals',
+        [PlayoffType.BRACKET_8_TEAM]: 'Quarterfinals',
+        [PlayoffType.CUSTOM]: 'Elims',
+      } as Partial<Record<PlayoffType, string>>
+    )[event.playoff_type ?? PlayoffType.CUSTOM],
     whereToInsertBreak: 'before',
   };
 };
@@ -69,7 +71,7 @@ export const START_OF_FINALS_BREAKER: ShouldInsertBreakCallback = ({
   matchIndex,
 }) => {
   return {
-    shouldBreak: matchIndex === 0 && match.comp_level === 'f',
+    shouldBreak: matchIndex === 0 && match.comp_level === CompLevel.F,
     text: 'Finals',
     whereToInsertBreak: 'before',
   };
@@ -102,7 +104,7 @@ export const CHANGE_IN_DOUBLE_ELIM_ROUND_BREAKER: ShouldInsertBreakCallback = ({
     shouldBreak:
       DOUBLE_ELIM_ROUND_MAPPING.get(match.set_number) !==
         DOUBLE_ELIM_ROUND_MAPPING.get(nextMatch.set_number) &&
-      nextMatch.comp_level !== 'f',
+      nextMatch.comp_level !== CompLevel.F,
     text: `Round ${DOUBLE_ELIM_ROUND_MAPPING.get(nextMatch.set_number)}`,
     whereToInsertBreak: 'after',
   };

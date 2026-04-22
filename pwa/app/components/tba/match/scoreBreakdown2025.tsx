@@ -1,4 +1,8 @@
-import { Match, MatchScoreBreakdown2025 } from '~/api/tba/read';
+import {
+  AutoLineRobot2024,
+  Match,
+  MatchScoreBreakdown2025,
+} from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
@@ -30,15 +34,21 @@ export default function ScoreBreakdown2025({
             className="bg-alliance-red-dark whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.autoLineRobot1 === 'Yes'}
+              condition={
+                scoreBreakdown.red.autoLineRobot1 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.red.team_keys[0]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.autoLineRobot2 === 'Yes'}
+              condition={
+                scoreBreakdown.red.autoLineRobot2 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.red.team_keys[1]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.autoLineRobot3 === 'Yes'}
+              condition={
+                scoreBreakdown.red.autoLineRobot3 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.red.team_keys[2]}
             />
             (+{scoreBreakdown.red.autoMobilityPoints})
@@ -51,15 +61,21 @@ export default function ScoreBreakdown2025({
             className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.autoLineRobot1 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.autoLineRobot1 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.blue.team_keys[0]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.autoLineRobot2 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.autoLineRobot2 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.blue.team_keys[1]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.autoLineRobot3 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.autoLineRobot3 === AutoLineRobot2024.YES
+              }
               teamKey={match.alliances.blue.team_keys[2]}
             />
             (+{scoreBreakdown.blue.autoMobilityPoints})

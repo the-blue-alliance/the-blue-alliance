@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import type { Match } from '~/api/tba/read';
+import { CompLevel } from '~/api/tba/read';
 import { getAllianceMatchResult, isValidMatchKey } from '~/lib/matchUtils';
 
 describe.concurrent('isValidMatchKey', () => {
@@ -40,7 +41,7 @@ describe.concurrent('getAllianceMatchResult', () => {
   ): Match {
     return {
       key,
-      comp_level: 'qm',
+      comp_level: CompLevel.QM,
       set_number: 1,
       match_number: 1,
       alliances: {
@@ -122,17 +123,17 @@ describe.concurrent('getAllianceMatchResult', () => {
 
   test('handles different comp levels', () => {
     const qualsMatch = createMockMatch('2024test_qm1', 100, 80, 'red');
-    qualsMatch.comp_level = 'qm';
+    qualsMatch.comp_level = CompLevel.QM;
     expect(getAllianceMatchResult(qualsMatch, 'red', 'official')).toBe('win');
 
     const finalsMatch = createMockMatch('2024test_f1m1', 100, 80, 'red');
-    finalsMatch.comp_level = 'f';
+    finalsMatch.comp_level = CompLevel.F;
     expect(getAllianceMatchResult(finalsMatch, 'red', 'official')).toBe('win');
   });
 
   test('handles 2015 playoff matches with score-based strategy', () => {
     const match = createMockMatch('2015test_sf1m1', 100, 80, '');
-    match.comp_level = 'sf';
+    match.comp_level = CompLevel.SF;
     expect(getAllianceMatchResult(match, 'red', 'score-based')).toBe('win');
     expect(getAllianceMatchResult(match, 'blue', 'score-based')).toBe('loss');
   });

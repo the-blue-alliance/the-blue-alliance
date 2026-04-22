@@ -30,14 +30,6 @@ export const zAwardRecipient = z.object({
   awardee: z.string().nullable(),
 });
 
-export const zAward = z.object({
-  name: z.string(),
-  award_type: z.int(),
-  event_key: z.string(),
-  recipient_list: z.array(zAwardRecipient),
-  year: z.int(),
-});
-
 export const zBay2019 = z.enum(['None', 'Panel', 'PanelAndCargo']);
 
 export const zBridgeState2023 = z.enum(['Level', 'NotLevel']);
@@ -46,6 +38,145 @@ export const zBridgeState2023 = z.enum(['Level', 'NotLevel']);
  * The competition level the match was played at.
  */
 export const zCompLevel = z.enum(['qm', 'ef', 'qf', 'sf', 'f']);
+
+/**
+ * AwardType
+ *
+ * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py for full definitions.
+ */
+export const zAwardType = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+  z.literal(6),
+  z.literal(7),
+  z.literal(8),
+  z.literal(9),
+  z.literal(10),
+  z.literal(11),
+  z.literal(12),
+  z.literal(13),
+  z.literal(14),
+  z.literal(15),
+  z.literal(16),
+  z.literal(17),
+  z.literal(18),
+  z.literal(19),
+  z.literal(20),
+  z.literal(21),
+  z.literal(22),
+  z.literal(23),
+  z.literal(24),
+  z.literal(25),
+  z.literal(26),
+  z.literal(27),
+  z.literal(28),
+  z.literal(29),
+  z.literal(30),
+  z.literal(31),
+  z.literal(32),
+  z.literal(33),
+  z.literal(34),
+  z.literal(35),
+  z.literal(36),
+  z.literal(37),
+  z.literal(38),
+  z.literal(39),
+  z.literal(40),
+  z.literal(41),
+  z.literal(42),
+  z.literal(43),
+  z.literal(44),
+  z.literal(45),
+  z.literal(46),
+  z.literal(47),
+  z.literal(48),
+  z.literal(49),
+  z.literal(50),
+  z.literal(51),
+  z.literal(52),
+  z.literal(53),
+  z.literal(54),
+  z.literal(55),
+  z.literal(56),
+  z.literal(57),
+  z.literal(58),
+  z.literal(59),
+  z.literal(60),
+  z.literal(61),
+  z.literal(62),
+  z.literal(63),
+  z.literal(64),
+  z.literal(65),
+  z.literal(66),
+  z.literal(67),
+  z.literal(68),
+  z.literal(69),
+  z.literal(70),
+  z.literal(71),
+  z.literal(72),
+  z.literal(73),
+  z.literal(74),
+  z.literal(75),
+  z.literal(76),
+  z.literal(77),
+  z.literal(78),
+  z.literal(79),
+  z.literal(80),
+  z.literal(81),
+  z.literal(82),
+  z.literal(83),
+]);
+
+export const zAward = z.object({
+  name: z.string(),
+  award_type: zAwardType,
+  event_key: z.string(),
+  recipient_list: z.array(zAwardRecipient),
+  year: z.int(),
+});
+
+/**
+ * EventType
+ *
+ * Event Type. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py for definitions.
+ */
+export const zEventType = z.union([
+  z.literal(0),
+  z.literal(1),
+  z.literal(2),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+  z.literal(6),
+  z.literal(7),
+  z.literal(99),
+  z.literal(100),
+  z.literal(-1),
+]);
+
+/**
+ * PlayoffType
+ *
+ * Playoff bracket format. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py for definitions.
+ */
+export const zPlayoffType = z.union([
+  z.literal(1),
+  z.literal(0),
+  z.literal(2),
+  z.literal(9),
+  z.literal(3),
+  z.literal(4),
+  z.literal(5),
+  z.literal(10),
+  z.literal(11),
+  z.literal(6),
+  z.literal(7),
+  z.literal(8),
+]);
 
 export const zDistrict = z.object({
   abbreviation: z.string(),
@@ -348,7 +479,7 @@ export const zEventSimple = z.object({
   key: z.string(),
   name: z.string(),
   event_code: z.string(),
-  event_type: z.int(),
+  event_type: zEventType,
   district: zDistrict.nullable(),
   city: z.string().nullable(),
   state_prov: z.string().nullable(),
@@ -1407,15 +1538,7 @@ export const zEliminationAlliance = z.object({
   status: z
     .object({
       playoff_average: z.number().nullish(),
-      playoff_type: z.coerce
-        .bigint()
-        .min(BigInt('-9223372036854775808'), {
-          error: 'Invalid value: Expected int64 to be >= -9223372036854775808',
-        })
-        .max(BigInt('9223372036854775807'), {
-          error: 'Invalid value: Expected int64 to be <= 9223372036854775807',
-        })
-        .nullable(),
+      playoff_type: zPlayoffType.nullable(),
       level: zCompLevel,
       record: zWltRecord.nullable(),
       current_level_record: zWltRecord.nullable(),
@@ -1532,7 +1655,7 @@ export const zEvent = z.object({
   key: z.string(),
   name: z.string(),
   event_code: z.string(),
-  event_type: z.int(),
+  event_type: zEventType,
   district: zDistrict.nullable(),
   city: z.string().nullable(),
   state_prov: z.string().nullable(),
@@ -1557,7 +1680,7 @@ export const zEvent = z.object({
   webcasts: z.array(zWebcast),
   division_keys: z.array(z.string()),
   parent_event_key: z.string().nullable(),
-  playoff_type: z.int().nullable(),
+  playoff_type: zPlayoffType.nullable(),
   playoff_type_string: z.string().nullable(),
   remap_teams: z.record(z.string(), z.string()).nullable(),
 });

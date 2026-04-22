@@ -1,4 +1,4 @@
-import { Match, MatchScoreBreakdown2018 } from '~/api/tba/read';
+import { AutoRobot2018, Match, MatchScoreBreakdown2018 } from '~/api/tba/read';
 import { ConditionalBadge, FoulDisplay } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
@@ -31,17 +31,23 @@ export default function ScoreBreakdown2018({
           <div className="flex flex-row items-center gap-1">
             <div className="flex flex-col items-start justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoRobot1 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.red.autoRobot1 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.red.team_keys[0]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoRobot2 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.red.autoRobot2 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.red.team_keys[1]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoRobot3 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.red.autoRobot3 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.red.team_keys[2]}
                 alignIcon="left"
               />
@@ -59,17 +65,23 @@ export default function ScoreBreakdown2018({
             </div>
             <div className="flex flex-col items-end justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoRobot1 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.blue.autoRobot1 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.blue.team_keys[0]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoRobot2 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.blue.autoRobot2 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.blue.team_keys[1]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoRobot3 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.blue.autoRobot3 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.blue.team_keys[2]}
                 alignIcon="right"
               />

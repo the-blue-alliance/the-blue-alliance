@@ -1,5 +1,11 @@
-import { Event, Match, MatchAlliance, WltRecord } from '~/api/tba/read';
-import { PlayoffType } from '~/lib/api/PlayoffType';
+import {
+  CompLevel,
+  Event,
+  Match,
+  MatchAlliance,
+  PlayoffType,
+  WltRecord,
+} from '~/api/tba/read';
 import { median } from '~/lib/utils';
 
 const COMP_LEVEL_SORT_ORDER = {
@@ -50,7 +56,7 @@ export function matchTitleShort(
   match: Match,
   playoffType: PlayoffType,
 ): string {
-  if (match.comp_level === 'qm' || match.comp_level === 'f') {
+  if (match.comp_level === CompLevel.QM || match.comp_level === CompLevel.F) {
     return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.match_number}`;
   }
 
@@ -194,14 +200,14 @@ export function getTeamMatchResults(
         m.alliances.blue.team_keys.includes(teamKey)),
   );
   const quals = {
-    wins: allWins.filter((m) => m.comp_level === 'qm'),
-    losses: allLosses.filter((m) => m.comp_level === 'qm'),
-    ties: allTies.filter((m) => m.comp_level === 'qm'),
+    wins: allWins.filter((m) => m.comp_level === CompLevel.QM),
+    losses: allLosses.filter((m) => m.comp_level === CompLevel.QM),
+    ties: allTies.filter((m) => m.comp_level === CompLevel.QM),
   };
   const playoff = {
-    wins: allWins.filter((m) => m.comp_level !== 'qm'),
-    losses: allLosses.filter((m) => m.comp_level !== 'qm'),
-    ties: allTies.filter((m) => m.comp_level !== 'qm'),
+    wins: allWins.filter((m) => m.comp_level !== CompLevel.QM),
+    losses: allLosses.filter((m) => m.comp_level !== CompLevel.QM),
+    ties: allTies.filter((m) => m.comp_level !== CompLevel.QM),
   };
   return { quals, playoff };
 }

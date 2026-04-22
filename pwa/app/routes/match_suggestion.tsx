@@ -11,9 +11,11 @@ import {
 import { Temporal } from 'temporal-polyfill';
 
 import {
+  CompLevel,
   Event,
   EventRanking,
   Match,
+  PlayoffType,
   getEventMatches,
   getEventPredictions,
   getEventRankings,
@@ -29,7 +31,6 @@ import {
 import { TeamLink } from '~/components/tba/links';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
-import { PlayoffType } from '~/lib/api/PlayoffType';
 import {
   EVENT_FALLBACK_TIMEZONE,
   getCurrentWeekEvents,
@@ -202,7 +203,7 @@ function TeamDetails({
       finish:
         value?.playoff?.status == 'won'
           ? 'Winner'
-          : value?.playoff?.level == 'f'
+          : value?.playoff?.level == CompLevel.F
             ? 'Finalist'
             : '?',
     });

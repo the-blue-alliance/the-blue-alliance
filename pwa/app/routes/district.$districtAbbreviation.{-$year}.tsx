@@ -4,8 +4,10 @@ import { Temporal } from 'temporal-polyfill';
 
 import {
   Award,
+  AwardType,
   DistrictRanking,
   Event,
+  EventType,
   Team,
   getDistrictAwards,
   getDistrictEvents,
@@ -40,8 +42,6 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { AwardType } from '~/lib/api/AwardType';
-import { EventType } from '~/lib/api/EventType';
 import {
   getCurrentWeekEvents,
   getEventDateString,

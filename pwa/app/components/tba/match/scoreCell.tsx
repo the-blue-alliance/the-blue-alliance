@@ -1,6 +1,6 @@
 import { VariantProps, cva } from 'class-variance-authority';
 
-import { Match } from '~/api/tba/read';
+import { CompLevel, Match } from '~/api/tba/read';
 import RpDots from '~/components/tba/rpDot';
 import { cn } from '~/lib/utils';
 
@@ -67,7 +67,7 @@ export default function ScoreCell({
       )}
       {...props}
     >
-      {scoreBreakdown && year && compLevel === 'qm' && (
+      {scoreBreakdown && year && compLevel === CompLevel.QM && (
         <RpDots score_breakdown={scoreBreakdown} year={year} />
       )}
       {score}

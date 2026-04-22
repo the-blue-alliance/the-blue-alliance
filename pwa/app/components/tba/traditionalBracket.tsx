@@ -11,7 +11,14 @@ import {
 
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
-import { EliminationAlliance, Event, Match } from '~/api/tba/read';
+import {
+  CompLevel,
+  EliminationAlliance,
+  Event,
+  EventType,
+  Match,
+  PlayoffType,
+} from '~/api/tba/read';
 import {
   EliminationBracketPaths,
   type PlayoffMatchHandle,
@@ -21,8 +28,6 @@ import {
 } from '~/components/tba/eliminationBracketPaths';
 import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
-import { EventType } from '~/lib/api/EventType';
-import { PlayoffType } from '~/lib/api/PlayoffType';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
@@ -292,7 +297,7 @@ export default function TraditionalBracket({
   const matchGroups = useMemo(() => {
     const groups: Record<string, Match[]> = {};
     for (const match of matches) {
-      if (match.comp_level === 'qm') continue;
+      if (match.comp_level === CompLevel.QM) continue;
       const key = `${match.comp_level}_${match.set_number}`;
       (groups[key] ??= []).push(match);
     }
@@ -302,7 +307,7 @@ export default function TraditionalBracket({
     return groups;
   }, [matches]);
 
-  const hasEighthFinals = matches.some((m) => m.comp_level === 'ef');
+  const hasEighthFinals = matches.some((m) => m.comp_level === CompLevel.EF);
 
   const winnerLinks = useMemo(
     () => buildWinnerLinks(hasEighthFinals, is4Team),

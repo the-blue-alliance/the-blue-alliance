@@ -3,7 +3,9 @@ import { type ReactNode, useMemo } from 'react';
 
 import {
   Award,
+  AwardType,
   Event,
+  EventType,
   type LeaderboardInsight,
   getDistrictAwards,
   getDistrictEvents,
@@ -20,8 +22,7 @@ import {
   SelectValue,
 } from '~/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { AwardType, BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { EventType } from '~/lib/api/EventType';
+import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/district/$districtAbbreviation/stats')({
@@ -528,7 +529,7 @@ function computePerAwardLeaderboards(
     buildEventLookups(yearResults);
 
   // Awards that progress from district events to DCMP — track separately
-  const DCMP_PROGRESSION_AWARDS = new Set([
+  const DCMP_PROGRESSION_AWARDS = new Set<AwardType>([
     AwardType.CHAIRMANS,
     AwardType.DEANS_LIST,
     AwardType.ENGINEERING_INSPIRATION,
