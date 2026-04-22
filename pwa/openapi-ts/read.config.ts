@@ -19,5 +19,9 @@ export default defineConfig({
         offset: true,
       },
     },
+    {
+      name: '@hey-api/sdk',
+      enums: 'typescript',
+    },
   ],
 });
