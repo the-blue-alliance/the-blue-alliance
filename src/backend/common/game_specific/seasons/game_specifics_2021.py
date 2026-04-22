@@ -3,7 +3,12 @@ from __future__ import annotations
 from typing import List, Optional, Set
 
 from backend.common.frc_api.types import ScoreDetailModelAlliance2021
-from backend.common.game_specific.base import NoRecordModernBreakdownSeasonGameConfig
+from backend.common.game_specific.base import (
+    NoRecordModernBreakdownSeasonGameConfig,
+    PredictionStatConfig,
+)
+from backend.common.models.event_insights import EventInsights
+from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
@@ -11,6 +16,14 @@ class GameSpecifics2021(
     NoRecordModernBreakdownSeasonGameConfig[ScoreDetailModelAlliance2021]
 ):
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2021
+
+    def calculate_event_insights(self, matches: List[Match]) -> Optional[EventInsights]:
+        # 2021 was a remote practice-only season; no event insights are computed.
+        return None
+
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
+        # 2021 was a remote practice-only season; no match predictions are run.
+        return []
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

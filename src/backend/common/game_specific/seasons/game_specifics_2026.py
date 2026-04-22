@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple
 
 from pyre_extensions import none_throws
 
@@ -378,3 +378,31 @@ class GameSpecifics2026(
             {"name": "Avg Auto Fuel", "precision": 2},
             {"name": "Avg Tower", "precision": 2},
         ]
+
+    def valid_score_breakdown_keys(self) -> Set[str]:
+        return set(
+            [
+                "adjustPoints",
+                "autoTowerPoints",
+                "autoTowerRobot1",
+                "autoTowerRobot2",
+                "autoTowerRobot3",
+                "endGameTowerPoints",
+                "endGameTowerRobot1",
+                "endGameTowerRobot2",
+                "endGameTowerRobot3",
+                "energizedAchieved",
+                "foulPoints",
+                "g206Penalty",
+                "hubScore",
+                "majorFoulCount",
+                "minorFoulCount",
+                "rp",
+                "superchargedAchieved",
+                "totalAutoPoints",
+                "totalPoints",
+                "totalTeleopPoints",
+                "totalTowerPoints",
+                "traversalAchieved",
+            ]
+        )

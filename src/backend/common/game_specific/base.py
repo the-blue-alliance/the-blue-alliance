@@ -330,12 +330,60 @@ class HistoricalSeasonGameConfig(NoRpSeasonGameConfig):
 
 
 class BreakdownSeasonGameConfig(NoRpSeasonGameConfig):
-    """Intermediate base for games that expose FMS score breakdown data."""
+    """Intermediate base for pre-modern games that expose FMS score breakdown data."""
 
     pass
 
 
-class ModernBreakdownGameConfig(BreakdownSeasonGameConfig, Generic[TScoreBreakdown]):
+class AbstractModernGameConfig(
+    SeasonGameConfig[TScoreBreakdown], Generic[TScoreBreakdown]
+):
+    """
+    Abstract base for modern FMS seasons (2016+).
+
+    Provides universal concrete defaults for hooks that are identical across all
+    modern games.  The four year-specific hooks that MUST be overridden per
+    season are deliberately left abstract so the type checker catches omissions
+    when a new year class is created:
+
+        * calculate_event_insights
+        * get_prediction_relevant_stats
+        * valid_score_breakdown_keys
+        * ranking_sort_order_info
+
+    All other extension points are either provided here with safe defaults or
+    satisfied by the intermediate base class / mixin chosen for the year.
+    DefaultSeasonGameConfig is intentionally NOT in this class's MRO.
+    """
+
+    def finals_can_be_tiebroken(self) -> bool:
+        return False
+
+    def get_manual_coprs(self) -> Dict[str, StatAccessor]:
+        return {}
+
+    def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:
+        return []
+
+    def round_robin_tiebreak_keys(self) -> List[str]:
+        return []
+
+    def round_robin_tiebreaker_names(self) -> List[str]:
+        return []
+
+    def qual_average_in_rankings(self) -> bool:
+        return False
+
+    def record_in_rankings(self) -> bool:
+        return True
+
+    def ranking_win_points(self) -> int:
+        return 2
+
+
+class ModernBreakdownGameConfig(
+    AbstractModernGameConfig[TScoreBreakdown], Generic[TScoreBreakdown]
+):
     """
     Intermediate base for modern FMS seasons with typed score breakdowns.
 
@@ -349,6 +397,12 @@ class ModernBreakdownGameConfig(BreakdownSeasonGameConfig, Generic[TScoreBreakdo
         self, red: TScoreBreakdown, blue: TScoreBreakdown
     ) -> List[TCriteria]:
         return []
+
+    def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
+        return None
+
+    def ranking_tiebreaker_prediction_field(self) -> Optional[str]:
+        return None
 
 
 class TotalPointsScoreTiebreakGameConfig(
@@ -386,6 +440,7 @@ class BonusRpBreakdownSeasonGameConfig(
 
 
 class NoRecordModernBreakdownSeasonGameConfig(
+    NoBonusRankingPointsMixin,
     NoRecordInRankingsMixin,
     ModernBreakdownGameConfig[TScoreBreakdown],
     Generic[TScoreBreakdown],
