@@ -6,13 +6,12 @@ export default defineConfig({
     path: 'app/api/tba/read/',
   },
   plugins: [
+    {
+      name: '@hey-api/typescript',
+      enums: 'typescript',
+    },
     '@hey-api/client-fetch',
     '@tanstack/react-query',
-    'zod',
-    {
-      name: '@hey-api/sdk',
-      validator: true,
-    },
     {
       name: 'zod',
       dates: {
@@ -21,7 +20,7 @@ export default defineConfig({
     },
     {
       name: '@hey-api/sdk',
-      enums: 'typescript',
+      validator: true,
     },
   ],
 });

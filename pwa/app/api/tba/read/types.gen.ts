@@ -40,11 +40,20 @@ export type ApiStatusAppVersion = {
   latest_app_version: number;
 };
 
-export type AutoChargeStationRobot2023 = 'Docked' | 'None';
+export enum AutoChargeStationRobot2023 {
+  DOCKED = 'Docked',
+  NONE = 'None',
+}
 
-export type AutoLineRobot2024 = 'No' | 'Yes';
+export enum AutoLineRobot2024 {
+  NO = 'No',
+  YES = 'Yes',
+}
 
-export type AutoRobot2018 = 'None' | 'AutoRun';
+export enum AutoRobot2018 {
+  NONE = 'None',
+  AUTO_RUN = 'AutoRun',
+}
 
 export type Award = {
   /**
@@ -80,119 +89,479 @@ export type AwardRecipient = {
   awardee: string | null;
 };
 
-export type Bay2019 = 'None' | 'Panel' | 'PanelAndCargo';
+export enum Bay2019 {
+  NONE = 'None',
+  PANEL = 'Panel',
+  PANEL_AND_CARGO = 'PanelAndCargo',
+}
 
-export type BridgeState2023 = 'Level' | 'NotLevel';
+export enum BridgeState2023 {
+  LEVEL = 'Level',
+  NOT_LEVEL = 'NotLevel',
+}
 
 /**
  * The competition level the match was played at.
  */
-export type CompLevel = 'qm' | 'ef' | 'qf' | 'sf' | 'f';
+export enum CompLevel {
+  QM = 'qm',
+  EF = 'ef',
+  QF = 'qf',
+  SF = 'sf',
+  F = 'f',
+}
 
 /**
  * AwardType
  *
  * Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py for full definitions.
  */
-export type AwardType =
-  | 0
-  | 1
-  | 2
-  | 3
-  | 4
-  | 5
-  | 6
-  | 7
-  | 8
-  | 9
-  | 10
-  | 11
-  | 12
-  | 13
-  | 14
-  | 15
-  | 16
-  | 17
-  | 18
-  | 19
-  | 20
-  | 21
-  | 22
-  | 23
-  | 24
-  | 25
-  | 26
-  | 27
-  | 28
-  | 29
-  | 30
-  | 31
-  | 32
-  | 33
-  | 34
-  | 35
-  | 36
-  | 37
-  | 38
-  | 39
-  | 40
-  | 41
-  | 42
-  | 43
-  | 44
-  | 45
-  | 46
-  | 47
-  | 48
-  | 49
-  | 50
-  | 51
-  | 52
-  | 53
-  | 54
-  | 55
-  | 56
-  | 57
-  | 58
-  | 59
-  | 60
-  | 61
-  | 62
-  | 63
-  | 64
-  | 65
-  | 66
-  | 67
-  | 68
-  | 69
-  | 70
-  | 71
-  | 72
-  | 73
-  | 74
-  | 75
-  | 76
-  | 77
-  | 78
-  | 79
-  | 80
-  | 81
-  | 82
-  | 83;
+export enum AwardType {
+  /**
+   * CHAIRMANS
+   */
+  CHAIRMANS = 0,
+  /**
+   * WINNER
+   */
+  WINNER = 1,
+  /**
+   * FINALIST
+   */
+  FINALIST = 2,
+  /**
+   * WOODIE_FLOWERS
+   */
+  WOODIE_FLOWERS = 3,
+  /**
+   * DEANS_LIST
+   */
+  DEANS_LIST = 4,
+  /**
+   * VOLUNTEER
+   */
+  VOLUNTEER = 5,
+  /**
+   * FOUNDERS
+   */
+  FOUNDERS = 6,
+  /**
+   * BART_KAMEN_MEMORIAL
+   */
+  BART_KAMEN_MEMORIAL = 7,
+  /**
+   * MAKE_IT_LOUD
+   */
+  MAKE_IT_LOUD = 8,
+  /**
+   * ENGINEERING_INSPIRATION
+   */
+  ENGINEERING_INSPIRATION = 9,
+  /**
+   * ROOKIE_ALL_STAR
+   */
+  ROOKIE_ALL_STAR = 10,
+  /**
+   * GRACIOUS_PROFESSIONALISM
+   */
+  GRACIOUS_PROFESSIONALISM = 11,
+  /**
+   * COOPERTITION
+   */
+  COOPERTITION = 12,
+  /**
+   * JUDGES
+   */
+  JUDGES = 13,
+  /**
+   * HIGHEST_ROOKIE_SEED
+   */
+  HIGHEST_ROOKIE_SEED = 14,
+  /**
+   * ROOKIE_INSPIRATION
+   */
+  ROOKIE_INSPIRATION = 15,
+  /**
+   * INDUSTRIAL_DESIGN
+   */
+  INDUSTRIAL_DESIGN = 16,
+  /**
+   * QUALITY
+   */
+  QUALITY = 17,
+  /**
+   * SAFETY
+   */
+  SAFETY = 18,
+  /**
+   * SPORTSMANSHIP
+   */
+  SPORTSMANSHIP = 19,
+  /**
+   * CREATIVITY
+   */
+  CREATIVITY = 20,
+  /**
+   * ENGINEERING_EXCELLENCE
+   */
+  ENGINEERING_EXCELLENCE = 21,
+  /**
+   * ENTREPRENEURSHIP
+   */
+  ENTREPRENEURSHIP = 22,
+  /**
+   * EXCELLENCE_IN_DESIGN
+   */
+  EXCELLENCE_IN_DESIGN = 23,
+  /**
+   * EXCELLENCE_IN_DESIGN_CAD
+   */
+  EXCELLENCE_IN_DESIGN_CAD = 24,
+  /**
+   * EXCELLENCE_IN_DESIGN_ANIMATION
+   */
+  EXCELLENCE_IN_DESIGN_ANIMATION = 25,
+  /**
+   * DRIVING_TOMORROWS_TECHNOLOGY
+   */
+  DRIVING_TOMORROWS_TECHNOLOGY = 26,
+  /**
+   * IMAGERY
+   */
+  IMAGERY = 27,
+  /**
+   * MEDIA_AND_TECHNOLOGY
+   */
+  MEDIA_AND_TECHNOLOGY = 28,
+  /**
+   * INNOVATION_IN_CONTROL
+   */
+  INNOVATION_IN_CONTROL = 29,
+  /**
+   * SPIRIT
+   */
+  SPIRIT = 30,
+  /**
+   * WEBSITE
+   */
+  WEBSITE = 31,
+  /**
+   * VISUALIZATION
+   */
+  VISUALIZATION = 32,
+  /**
+   * AUTODESK_INVENTOR
+   */
+  AUTODESK_INVENTOR = 33,
+  /**
+   * FUTURE_INNOVATOR
+   */
+  FUTURE_INNOVATOR = 34,
+  /**
+   * RECOGNITION_OF_EXTRAORDINARY_SERVICE
+   */
+  RECOGNITION_OF_EXTRAORDINARY_SERVICE = 35,
+  /**
+   * OUTSTANDING_CART
+   */
+  OUTSTANDING_CART = 36,
+  /**
+   * WSU_AIM_HIGHER
+   */
+  WSU_AIM_HIGHER = 37,
+  /**
+   * LEADERSHIP_IN_CONTROL
+   */
+  LEADERSHIP_IN_CONTROL = 38,
+  /**
+   * NUM_1_SEED
+   */
+  NUM_1_SEED = 39,
+  /**
+   * INCREDIBLE_PLAY
+   */
+  INCREDIBLE_PLAY = 40,
+  /**
+   * PEOPLES_CHOICE_ANIMATION
+   */
+  PEOPLES_CHOICE_ANIMATION = 41,
+  /**
+   * VISUALIZATION_RISING_STAR
+   */
+  VISUALIZATION_RISING_STAR = 42,
+  /**
+   * BEST_OFFENSIVE_ROUND
+   */
+  BEST_OFFENSIVE_ROUND = 43,
+  /**
+   * BEST_PLAY_OF_THE_DAY
+   */
+  BEST_PLAY_OF_THE_DAY = 44,
+  /**
+   * FEATHERWEIGHT_IN_THE_FINALS
+   */
+  FEATHERWEIGHT_IN_THE_FINALS = 45,
+  /**
+   * MOST_PHOTOGENIC
+   */
+  MOST_PHOTOGENIC = 46,
+  /**
+   * OUTSTANDING_DEFENSE
+   */
+  OUTSTANDING_DEFENSE = 47,
+  /**
+   * POWER_TO_SIMPLIFY
+   */
+  POWER_TO_SIMPLIFY = 48,
+  /**
+   * AGAINST_ALL_ODDS
+   */
+  AGAINST_ALL_ODDS = 49,
+  /**
+   * RISING_STAR
+   */
+  RISING_STAR = 50,
+  /**
+   * CHAIRMANS_HONORABLE_MENTION
+   */
+  CHAIRMANS_HONORABLE_MENTION = 51,
+  /**
+   * CONTENT_COMMUNICATION_HONORABLE_MENTION
+   */
+  CONTENT_COMMUNICATION_HONORABLE_MENTION = 52,
+  /**
+   * TECHNICAL_EXECUTION_HONORABLE_MENTION
+   */
+  TECHNICAL_EXECUTION_HONORABLE_MENTION = 53,
+  /**
+   * REALIZATION
+   */
+  REALIZATION = 54,
+  /**
+   * REALIZATION_HONORABLE_MENTION
+   */
+  REALIZATION_HONORABLE_MENTION = 55,
+  /**
+   * DESIGN_YOUR_FUTURE
+   */
+  DESIGN_YOUR_FUTURE = 56,
+  /**
+   * DESIGN_YOUR_FUTURE_HONORABLE_MENTION
+   */
+  DESIGN_YOUR_FUTURE_HONORABLE_MENTION = 57,
+  /**
+   * SPECIAL_RECOGNITION_CHARACTER_ANIMATION
+   */
+  SPECIAL_RECOGNITION_CHARACTER_ANIMATION = 58,
+  /**
+   * HIGH_SCORE
+   */
+  HIGH_SCORE = 59,
+  /**
+   * TEACHER_PIONEER
+   */
+  TEACHER_PIONEER = 60,
+  /**
+   * BEST_CRAFTSMANSHIP
+   */
+  BEST_CRAFTSMANSHIP = 61,
+  /**
+   * BEST_DEFENSIVE_MATCH
+   */
+  BEST_DEFENSIVE_MATCH = 62,
+  /**
+   * PLAY_OF_THE_DAY
+   */
+  PLAY_OF_THE_DAY = 63,
+  /**
+   * PROGRAMMING
+   */
+  PROGRAMMING = 64,
+  /**
+   * PROFESSIONALISM
+   */
+  PROFESSIONALISM = 65,
+  /**
+   * GOLDEN_CORNDOG
+   */
+  GOLDEN_CORNDOG = 66,
+  /**
+   * MOST_IMPROVED_TEAM
+   */
+  MOST_IMPROVED_TEAM = 67,
+  /**
+   * WILDCARD
+   */
+  WILDCARD = 68,
+  /**
+   * CHAIRMANS_FINALIST
+   */
+  CHAIRMANS_FINALIST = 69,
+  /**
+   * OTHER
+   */
+  OTHER = 70,
+  /**
+   * AUTONOMOUS
+   */
+  AUTONOMOUS = 71,
+  /**
+   * INNOVATION_CHALLENGE_SEMI_FINALIST
+   */
+  INNOVATION_CHALLENGE_SEMI_FINALIST = 72,
+  /**
+   * ROOKIE_GAME_CHANGER
+   */
+  ROOKIE_GAME_CHANGER = 73,
+  /**
+   * SKILLS_COMPETITION_WINNER
+   */
+  SKILLS_COMPETITION_WINNER = 74,
+  /**
+   * SKILLS_COMPETITION_FINALIST
+   */
+  SKILLS_COMPETITION_FINALIST = 75,
+  /**
+   * ROOKIE_DESIGN
+   */
+  ROOKIE_DESIGN = 76,
+  /**
+   * ENGINEERING_DESIGN
+   */
+  ENGINEERING_DESIGN = 77,
+  /**
+   * DESIGNERS
+   */
+  DESIGNERS = 78,
+  /**
+   * CONCEPT
+   */
+  CONCEPT = 79,
+  /**
+   * GAME_DESIGN_CHALLENGE_WINNER
+   */
+  GAME_DESIGN_CHALLENGE_WINNER = 80,
+  /**
+   * GAME_DESIGN_CHALLENGE_FINALIST
+   */
+  GAME_DESIGN_CHALLENGE_FINALIST = 81,
+  /**
+   * SUSTAINABILITY
+   */
+  SUSTAINABILITY = 82,
+  /**
+   * RISING_ALL_STAR
+   */
+  RISING_ALL_STAR = 83,
+}
 
 /**
  * EventType
  *
  * Event Type. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py for definitions.
  */
-export type EventType = 0 | 1 | 2 | 3 | 4 | 5 | 6 | 7 | 99 | 100 | -1;
+export enum EventType {
+  /**
+   * REGIONAL
+   */
+  REGIONAL = 0,
+  /**
+   * DISTRICT
+   */
+  DISTRICT = 1,
+  /**
+   * DISTRICT_CMP
+   */
+  DISTRICT_CMP = 2,
+  /**
+   * CMP_DIVISION
+   */
+  CMP_DIVISION = 3,
+  /**
+   * CMP_FINALS
+   */
+  CMP_FINALS = 4,
+  /**
+   * DISTRICT_CMP_DIVISION
+   */
+  DISTRICT_CMP_DIVISION = 5,
+  /**
+   * FOC
+   */
+  FOC = 6,
+  /**
+   * REMOTE
+   */
+  REMOTE = 7,
+  /**
+   * OFFSEASON
+   */
+  OFFSEASON = 99,
+  /**
+   * PRESEASON
+   */
+  PRESEASON = 100,
+  /**
+   * UNLABLED
+   */
+  UNLABLED = -1,
+}
 
 /**
  * PlayoffType
  *
  * Playoff bracket format. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py for definitions.
  */
-export type PlayoffType = 1 | 0 | 2 | 9 | 3 | 4 | 5 | 10 | 11 | 6 | 7 | 8;
+export enum PlayoffType {
+  /**
+   * BRACKET_16_TEAM
+   */
+  BRACKET_16_TEAM = 1,
+  /**
+   * BRACKET_8_TEAM
+   */
+  BRACKET_8_TEAM = 0,
+  /**
+   * BRACKET_4_TEAM
+   */
+  BRACKET_4_TEAM = 2,
+  /**
+   * BRACKET_2_TEAM
+   */
+  BRACKET_2_TEAM = 9,
+  /**
+   * AVG_SCORE_8_TEAM
+   */
+  AVG_SCORE_8_TEAM = 3,
+  /**
+   * ROUND_ROBIN_6_TEAM
+   */
+  ROUND_ROBIN_6_TEAM = 4,
+  /**
+   * LEGACY_DOUBLE_ELIM_8_TEAM
+   */
+  LEGACY_DOUBLE_ELIM_8_TEAM = 5,
+  /**
+   * DOUBLE_ELIM_8_TEAM
+   */
+  DOUBLE_ELIM_8_TEAM = 10,
+  /**
+   * DOUBLE_ELIM_4_TEAM
+   */
+  DOUBLE_ELIM_4_TEAM = 11,
+  /**
+   * BO5_FINALS
+   */
+  BO5_FINALS = 6,
+  /**
+   * BO3_FINALS
+   */
+  BO3_FINALS = 7,
+  /**
+   * CUSTOM
+   */
+  CUSTOM = 8,
+}
 
 export type District = {
   /**
@@ -359,13 +728,14 @@ export type DistrictRanking = {
 /**
  * Double elimination round, if applicable.
  */
-export type DoubleElimRound =
-  | 'Finals'
-  | 'Round 1'
-  | 'Round 2'
-  | 'Round 3'
-  | 'Round 4'
-  | 'Round 5';
+export enum DoubleElimRound {
+  FINALS = 'Finals',
+  ROUND_1 = 'Round 1',
+  ROUND_2 = 'Round 2',
+  ROUND_3 = 'Round 3',
+  ROUND_4 = 'Round 4',
+  ROUND_5 = 'Round 5',
+}
 
 export type EliminationAlliance = {
   /**
@@ -430,22 +800,34 @@ export type EliminationAlliance = {
   };
 };
 
-export type EndGameChargeStationRobot2023 =
-  | 'Docked'
-  | 'None'
-  | 'Park'
-  | 'Parked';
+export enum EndGameChargeStationRobot2023 {
+  DOCKED = 'Docked',
+  NONE = 'None',
+  PARK = 'Park',
+  PARKED = 'Parked',
+}
 
-export type EndGameRobot2024 =
-  | 'CenterStage'
-  | 'None'
-  | 'Parked'
-  | 'StageLeft'
-  | 'StageRight';
+export enum EndGameRobot2024 {
+  CENTER_STAGE = 'CenterStage',
+  NONE = 'None',
+  PARKED = 'Parked',
+  STAGE_LEFT = 'StageLeft',
+  STAGE_RIGHT = 'StageRight',
+}
 
-export type EndGameRobot2025 = 'DeepCage' | 'None' | 'Parked' | 'ShallowCage';
+export enum EndGameRobot2025 {
+  DEEP_CAGE = 'DeepCage',
+  NONE = 'None',
+  PARKED = 'Parked',
+  SHALLOW_CAGE = 'ShallowCage',
+}
 
-export type TowerRobot2026 = 'Level1' | 'Level2' | 'Level3' | 'None';
+export enum TowerRobot2026 {
+  LEVEL1 = 'Level1',
+  LEVEL2 = 'Level2',
+  LEVEL3 = 'Level3',
+  NONE = 'None',
+}
 
 export type HubScore2026 = {
   autoCount: number;
@@ -468,25 +850,40 @@ export type HubScore2026 = {
   transitionPoints: number;
 };
 
-export type EndgameRobot2018 =
-  | 'Climbing'
-  | 'Levitate'
-  | 'None'
-  | 'Parking'
-  | 'Unknown';
+export enum EndgameRobot2018 {
+  CLIMBING = 'Climbing',
+  LEVITATE = 'Levitate',
+  NONE = 'None',
+  PARKING = 'Parking',
+  UNKNOWN = 'Unknown',
+}
 
-export type EndgameRobot2019 =
-  | 'HabLevel1'
-  | 'HabLevel2'
-  | 'HabLevel3'
-  | 'None'
-  | 'Unknown';
+export enum EndgameRobot2019 {
+  HAB_LEVEL1 = 'HabLevel1',
+  HAB_LEVEL2 = 'HabLevel2',
+  HAB_LEVEL3 = 'HabLevel3',
+  NONE = 'None',
+  UNKNOWN = 'Unknown',
+}
 
-export type EndgameRobot2020 = 'Hang' | 'None' | 'Park';
+export enum EndgameRobot2020 {
+  HANG = 'Hang',
+  NONE = 'None',
+  PARK = 'Park',
+}
 
-export type EndgameRobot2022 = 'High' | 'Low' | 'Mid' | 'None' | 'Traversal';
+export enum EndgameRobot2022 {
+  HIGH = 'High',
+  LOW = 'Low',
+  MID = 'Mid',
+  NONE = 'None',
+  TRAVERSAL = 'Traversal',
+}
 
-export type EndgameRungIsLevel2020 = 'IsLevel' | 'NotLevel';
+export enum EndgameRungIsLevel2020 {
+  IS_LEVEL = 'IsLevel',
+  NOT_LEVEL = 'NotLevel',
+}
 
 export type Event = {
   /**
@@ -1199,18 +1596,22 @@ export type EventSimple = {
   year: number;
 };
 
-export type HabLine2019 =
-  | 'CrossedHabLineInSandstorm'
-  | 'CrossedHabLineInTeleop'
-  | 'None'
-  | 'Unknown';
+export enum HabLine2019 {
+  CROSSED_HAB_LINE_IN_SANDSTORM = 'CrossedHabLineInSandstorm',
+  CROSSED_HAB_LINE_IN_TELEOP = 'CrossedHabLineInTeleop',
+  NONE = 'None',
+  UNKNOWN = 'Unknown',
+}
 
 export type History = {
   events: Array<Event>;
   awards: Array<Award>;
 };
 
-export type InitLineRobot2020 = 'Exited' | 'None';
+export enum InitLineRobot2020 {
+  EXITED = 'Exited',
+  NONE = 'None',
+}
 
 export type LeaderboardInsight = {
   data: {
@@ -2172,7 +2573,10 @@ export type Media = {
   view_url?: string;
 };
 
-export type MobilityRobot2023 = 'No' | 'Yes';
+export enum MobilityRobot2023 {
+  NO = 'No',
+  YES = 'Yes',
+}
 
 export type NotablesInsight = {
   data: {
@@ -2188,19 +2592,24 @@ export type NotablesInsight = {
   year: number;
 };
 
-export type Position2016 =
-  | ''
-  | 'A_ChevalDeFrise'
-  | 'A_Portcullis'
-  | 'B_Moat'
-  | 'B_Ramparts'
-  | 'C_Drawbridge'
-  | 'C_SallyPort'
-  | 'D_RockWall'
-  | 'D_RoughTerrain'
-  | 'NotSpecified';
+export enum Position2016 {
+  '' = '',
+  A_CHEVAL_DE_FRISE = 'A_ChevalDeFrise',
+  A_PORTCULLIS = 'A_Portcullis',
+  B_MOAT = 'B_Moat',
+  B_RAMPARTS = 'B_Ramparts',
+  C_DRAWBRIDGE = 'C_Drawbridge',
+  C_SALLY_PORT = 'C_SallyPort',
+  D_ROCK_WALL = 'D_RockWall',
+  D_ROUGH_TERRAIN = 'D_RoughTerrain',
+  NOT_SPECIFIED = 'NotSpecified',
+}
 
-export type PreMatchBay2019 = 'Cargo' | 'Panel' | 'Unknown';
+export enum PreMatchBay2019 {
+  CARGO = 'Cargo',
+  PANEL = 'Panel',
+  UNKNOWN = 'Unknown',
+}
 
 export type ReefRow2025 = {
   nodeA: boolean;
@@ -2300,15 +2709,24 @@ export type RegionalRanking = {
   }>;
 };
 
-export type RobotAuto2016WithUnknown =
-  | 'Crossed'
-  | 'None'
-  | 'Reached'
-  | 'Unknown';
+export enum RobotAuto2016WithUnknown {
+  CROSSED = 'Crossed',
+  NONE = 'None',
+  REACHED = 'Reached',
+  UNKNOWN = 'Unknown',
+}
 
-export type RobotAuto2016WithoutUnknown = 'Crossed' | 'Reached' | 'None';
+export enum RobotAuto2016WithoutUnknown {
+  CROSSED = 'Crossed',
+  REACHED = 'Reached',
+  NONE = 'None',
+}
 
-export type RobotAuto2017 = 'Mobility' | 'None' | 'Unknown';
+export enum RobotAuto2017 {
+  MOBILITY = 'Mobility',
+  NONE = 'None',
+  UNKNOWN = 'Unknown',
+}
 
 export type SearchIndex = {
   teams: Array<{
@@ -2321,14 +2739,18 @@ export type SearchIndex = {
   }>;
 };
 
-export type Stage3TargetColor2020 =
-  | 'Blue'
-  | 'Green'
-  | 'Red'
-  | 'Unknown'
-  | 'Yellow';
+export enum Stage3TargetColor2020 {
+  BLUE = 'Blue',
+  GREEN = 'Green',
+  RED = 'Red',
+  UNKNOWN = 'Unknown',
+  YELLOW = 'Yellow',
+}
 
-export type TaxiRobot2022 = 'No' | 'Yes';
+export enum TaxiRobot2022 {
+  NO = 'No',
+  YES = 'Yes',
+}
 
 export type Team = {
   /**
@@ -2580,14 +3002,18 @@ export type TeamSimple = {
   country: string | null;
 };
 
-export type Touchpad2017 = 'None' | 'ReadyForTakeoff';
+export enum Touchpad2017 {
+  NONE = 'None',
+  READY_FOR_TAKEOFF = 'ReadyForTakeoff',
+}
 
-export type TowerFace2016 =
-  | 'Both'
-  | 'Challenged'
-  | 'None'
-  | 'Scaled'
-  | 'Unknown';
+export enum TowerFace2016 {
+  BOTH = 'Both',
+  CHALLENGED = 'Challenged',
+  NONE = 'None',
+  SCALED = 'Scaled',
+  UNKNOWN = 'Unknown',
+}
 
 /**
  * A Win-Loss-Tie record for a team, or an alliance.
