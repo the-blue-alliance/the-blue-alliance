@@ -2,12 +2,15 @@ from __future__ import annotations
 
 import json
 
+from typing import cast
+
 import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
+from backend.common.frc_api.types import ScoreDetailModelAlliance2020
 from backend.common.game_specific.seasons.game_specifics_2020 import GameSpecifics2020
 from backend.common.game_specific.seasons.tests.conftest import (
     HELPERS_TESTS,
@@ -40,8 +43,14 @@ def test_finals_can_be_tiebroken() -> None:
 def test_tiebreak_criteria(test_data_importer) -> None:
     test_data_importer.import_match(HELPERS_TESTS, "data/2020mndu2_sf2m2.json")
     match: Match = none_throws(Match.get_by_id("2020mndu2_sf2m2"))
-    red = none_throws(match.score_breakdown)[AllianceColor.RED]
-    blue = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+    red = cast(
+        ScoreDetailModelAlliance2020,
+        none_throws(match.score_breakdown)[AllianceColor.RED],
+    )
+    blue = cast(
+        ScoreDetailModelAlliance2020,
+        none_throws(match.score_breakdown)[AllianceColor.BLUE],
+    )
     assert (
         tiebreak_winner(GameSpecifics2020().tiebreak_criteria(red, blue))
         == AllianceColor.BLUE

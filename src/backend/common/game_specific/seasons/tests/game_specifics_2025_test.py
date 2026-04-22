@@ -1,11 +1,14 @@
 from __future__ import annotations
 
+from typing import cast
+
 import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
+from backend.common.frc_api.types import ScoreDetailModelAlliance2025
 from backend.common.game_specific.seasons.game_specifics_2025 import GameSpecifics2025
 from backend.common.game_specific.seasons.tests.conftest import (
     HELPERS_TESTS,
@@ -38,8 +41,14 @@ def test_finals_can_be_tiebroken() -> None:
 def test_tiebreak_criteria_fouls(test_data_importer) -> None:
     test_data_importer.import_match(HELPERS_TESTS, "data/2025nhsal_sf7m1.json")
     match: Match = none_throws(Match.get_by_id("2025nhsal_sf7m1"))
-    red = none_throws(match.score_breakdown)[AllianceColor.RED]
-    blue = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+    red = cast(
+        ScoreDetailModelAlliance2025,
+        none_throws(match.score_breakdown)[AllianceColor.RED],
+    )
+    blue = cast(
+        ScoreDetailModelAlliance2025,
+        none_throws(match.score_breakdown)[AllianceColor.BLUE],
+    )
     assert (
         tiebreak_winner(GameSpecifics2025().tiebreak_criteria(red, blue))
         == AllianceColor.BLUE
@@ -49,8 +58,14 @@ def test_tiebreak_criteria_fouls(test_data_importer) -> None:
 def test_tiebreak_criteria_auto(test_data_importer) -> None:
     test_data_importer.import_match(HELPERS_TESTS, "data/2025vagle_sf8m1.json")
     match: Match = none_throws(Match.get_by_id("2025vagle_sf8m1"))
-    red = none_throws(match.score_breakdown)[AllianceColor.RED]
-    blue = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+    red = cast(
+        ScoreDetailModelAlliance2025,
+        none_throws(match.score_breakdown)[AllianceColor.RED],
+    )
+    blue = cast(
+        ScoreDetailModelAlliance2025,
+        none_throws(match.score_breakdown)[AllianceColor.BLUE],
+    )
     assert (
         tiebreak_winner(GameSpecifics2025().tiebreak_criteria(red, blue))
         == AllianceColor.BLUE

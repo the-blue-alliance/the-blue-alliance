@@ -1,7 +1,19 @@
 from __future__ import annotations
 
 from abc import ABC, abstractmethod
-from typing import Callable, Dict, List, Optional, Set, Tuple
+from typing import (
+    Callable,
+    ClassVar,
+    Dict,
+    Generic,
+    List,
+    NamedTuple,
+    Optional,
+    Sequence,
+    Set,
+    Tuple,
+    TypeVar,
+)
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.models.event_insights import EventInsights
@@ -14,8 +26,20 @@ TCriteria = Optional[Tuple[int, int]]
 # Computes a numeric value from a match + alliance for use in OPR calculations.
 StatAccessor = Callable[[Match, AllianceColor], float]
 
+TScoreBreakdown = TypeVar("TScoreBreakdown")
+TRpBreakdownField = TypeVar("TRpBreakdownField", bound=str)
+TRpPredictionField = TypeVar("TRpPredictionField", bound=str)
 
-class SeasonGameConfig(ABC):
+
+class PredictionStatConfig(NamedTuple):
+    """A single stat entry driving the Bayesian match prediction model."""
+
+    stat_name: str
+    prior_mean: int
+    prior_variance: int
+
+
+class SeasonGameConfig(ABC, Generic[TScoreBreakdown]):
     """
     Per-season game configuration.
 
@@ -31,7 +55,9 @@ class SeasonGameConfig(ABC):
     # ── Tiebreakers ────────────────────────────────────────────────────────────
 
     @abstractmethod
-    def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
+    def tiebreak_criteria(
+        self, red: TScoreBreakdown, blue: TScoreBreakdown
+    ) -> List[TCriteria]:
         """
         Returns an ordered list of (red_val, blue_val) tiebreaker pairs for
         elimination matches.  None in the list means required data was absent
@@ -68,10 +94,10 @@ class SeasonGameConfig(ABC):
     # ── Match Predictions ──────────────────────────────────────────────────────
 
     @abstractmethod
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         """
-        Returns a list of (stat_name, prior_mean, prior_variance) tuples that
-        drive the Bayesian match prediction model for this game.
+        Returns a list of PredictionStatConfig entries that drive the Bayesian
+        match prediction model for this game.
         """
         raise NotImplementedError()
 
@@ -85,7 +111,7 @@ class SeasonGameConfig(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+    def ranking_bonus_rp_breakdown_fields(self) -> Sequence[str]:
         """
         Returns score-breakdown keys that indicate bonus ranking points
         earned by an alliance in a played quals match.
@@ -93,7 +119,7 @@ class SeasonGameConfig(ABC):
         raise NotImplementedError()
 
     @abstractmethod
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+    def ranking_bonus_rp_prediction_fields(self) -> Sequence[str]:
         """
         Returns prediction keys (probabilities) used to sample bonus ranking
         points for unplayed quals matches.
@@ -173,10 +199,12 @@ class SeasonGameConfig(ABC):
         raise NotImplementedError()
 
 
-class DefaultSeasonGameConfig(SeasonGameConfig):
+class DefaultSeasonGameConfig(SeasonGameConfig[Dict[str, object]]):
     """Concrete baseline with no-op/default behaviors for unimplemented hooks."""
 
-    def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
+    def tiebreak_criteria(
+        self, red: Dict[str, object], blue: Dict[str, object]
+    ) -> List[TCriteria]:
         return []
 
     def finals_can_be_tiebroken(self) -> bool:
@@ -188,16 +216,16 @@ class DefaultSeasonGameConfig(SeasonGameConfig):
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
         return {}
 
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return []
 
     def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:
         return []
 
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+    def ranking_bonus_rp_breakdown_fields(self) -> Sequence[str]:
         return []
 
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+    def ranking_bonus_rp_prediction_fields(self) -> Sequence[str]:
         return []
 
     def ranking_tiebreaker_breakdown_field(self) -> Optional[str]:
@@ -249,21 +277,21 @@ class NoQualAverageInRankingsMixin:
 
 
 class NoBonusRankingPointsMixin:
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+    def ranking_bonus_rp_breakdown_fields(self) -> Sequence[str]:
         return []
 
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+    def ranking_bonus_rp_prediction_fields(self) -> Sequence[str]:
         return []
 
 
-class FixedBonusRankingPointsMixin:
-    BONUS_RP_BREAKDOWN_FIELDS: Tuple[str, ...] = ()
-    BONUS_RP_PREDICTION_FIELDS: Tuple[str, ...] = ()
+class FixedBonusRankingPointsMixin(Generic[TRpBreakdownField, TRpPredictionField]):
+    BONUS_RP_BREAKDOWN_FIELDS: Tuple[TRpBreakdownField, ...] = ()
+    BONUS_RP_PREDICTION_FIELDS: Tuple[TRpPredictionField, ...] = ()
 
-    def ranking_bonus_rp_breakdown_fields(self) -> List[str]:
+    def ranking_bonus_rp_breakdown_fields(self) -> Sequence[str]:
         return list(self.BONUS_RP_BREAKDOWN_FIELDS)
 
-    def ranking_bonus_rp_prediction_fields(self) -> List[str]:
+    def ranking_bonus_rp_prediction_fields(self) -> Sequence[str]:
         return list(self.BONUS_RP_PREDICTION_FIELDS)
 
 
@@ -273,7 +301,9 @@ class NoRpSeasonGameConfig(NoBonusRankingPointsMixin, DefaultSeasonGameConfig):
     pass
 
 
-class BonusRpSeasonGameConfig(FixedBonusRankingPointsMixin, DefaultSeasonGameConfig):
+class BonusRpSeasonGameConfig(
+    FixedBonusRankingPointsMixin[str, str], DefaultSeasonGameConfig
+):
     """Intermediate base for seasons that define bonus ranking points."""
 
     pass
@@ -305,7 +335,25 @@ class BreakdownSeasonGameConfig(NoRpSeasonGameConfig):
     pass
 
 
-class TotalPointsScoreTiebreakGameConfig(BreakdownSeasonGameConfig):
+class ModernBreakdownGameConfig(BreakdownSeasonGameConfig, Generic[TScoreBreakdown]):
+    """
+    Intermediate base for modern FMS seasons with typed score breakdowns.
+
+    Subclasses must set SCORE_BREAKDOWN_MODEL and may override tiebreak_criteria
+    with the season-specific score breakdown type.
+    """
+
+    SCORE_BREAKDOWN_MODEL: ClassVar[type[TScoreBreakdown] | None] = None
+
+    def tiebreak_criteria(
+        self, red: TScoreBreakdown, blue: TScoreBreakdown
+    ) -> List[TCriteria]:
+        return []
+
+
+class TotalPointsScoreTiebreakGameConfig(
+    ModernBreakdownGameConfig[TScoreBreakdown], Generic[TScoreBreakdown]
+):
     """
     Shared base for games whose ranking prediction tiebreaker uses
     score breakdown `totalPoints` and predicted `score`.
@@ -318,7 +366,9 @@ class TotalPointsScoreTiebreakGameConfig(BreakdownSeasonGameConfig):
         return "score"
 
 
-class TripleWinPointsGameConfig(TotalPointsScoreTiebreakGameConfig):
+class TripleWinPointsGameConfig(
+    TotalPointsScoreTiebreakGameConfig[TScoreBreakdown], Generic[TScoreBreakdown]
+):
     """Shared base for seasons awarding 3 ranking points for a win."""
 
     def ranking_win_points(self) -> int:
@@ -326,15 +376,29 @@ class TripleWinPointsGameConfig(TotalPointsScoreTiebreakGameConfig):
 
 
 class BonusRpBreakdownSeasonGameConfig(
-    FixedBonusRankingPointsMixin, BreakdownSeasonGameConfig
+    FixedBonusRankingPointsMixin[str, str],
+    ModernBreakdownGameConfig[TScoreBreakdown],
+    Generic[TScoreBreakdown],
 ):
     """Breakdown game base with configurable bonus RP field mappings."""
 
     pass
 
 
+class NoRecordModernBreakdownSeasonGameConfig(
+    NoRecordInRankingsMixin,
+    ModernBreakdownGameConfig[TScoreBreakdown],
+    Generic[TScoreBreakdown],
+):
+    """Typed modern breakdown base for seasons that hide W/L/T record."""
+
+    pass
+
+
 class TotalPointsScoreBonusRpGameConfig(
-    FixedBonusRankingPointsMixin, TotalPointsScoreTiebreakGameConfig
+    FixedBonusRankingPointsMixin[str, str],
+    TotalPointsScoreTiebreakGameConfig[TScoreBreakdown],
+    Generic[TScoreBreakdown],
 ):
     """TotalPoints/score tiebreaker base with configurable bonus RP mappings."""
 
@@ -342,7 +406,9 @@ class TotalPointsScoreBonusRpGameConfig(
 
 
 class TripleWinTotalPointsScoreBonusRpGameConfig(
-    FixedBonusRankingPointsMixin, TripleWinPointsGameConfig
+    FixedBonusRankingPointsMixin[str, str],
+    TripleWinPointsGameConfig[TScoreBreakdown],
+    Generic[TScoreBreakdown],
 ):
     """3-win-point + totalPoints/score tiebreaker base with bonus RP mappings."""
 

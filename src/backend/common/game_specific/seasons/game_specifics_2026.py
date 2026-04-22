@@ -6,7 +6,9 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.base import (
+    PredictionStatConfig,
     StatAccessor,
     TCriteria,
     TripleWinTotalPointsScoreBonusRpGameConfig,
@@ -16,7 +18,10 @@ from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2026(TripleWinTotalPointsScoreBonusRpGameConfig):
+class GameSpecifics2026(
+    TripleWinTotalPointsScoreBonusRpGameConfig[ScoreDetailModelAlliance2026]
+):
+    SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2026
     BONUS_RP_BREAKDOWN_FIELDS = (
         "energizedAchieved",
         "superchargedAchieved",
@@ -28,7 +33,9 @@ class GameSpecifics2026(TripleWinTotalPointsScoreBonusRpGameConfig):
         "prob_traversal_bonus",
     )
 
-    def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
+    def tiebreak_criteria(
+        self, red: ScoreDetailModelAlliance2026, blue: ScoreDetailModelAlliance2026
+    ) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
         # Cumulative MAJOR FOUL points due to opponent rule violations
@@ -356,12 +363,12 @@ class GameSpecifics2026(TripleWinTotalPointsScoreBonusRpGameConfig):
             ].get("uncounted", 0),
         }
 
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [
-            ("score", 0, 20**2),
-            ("totalAutoPoints", 0, 10**2),
-            ("totalTeleopPoints", 0, 10**2),
-            ("endGameTowerPoints", 0, 10**2),
+            PredictionStatConfig("score", 0, 20**2),
+            PredictionStatConfig("totalAutoPoints", 0, 10**2),
+            PredictionStatConfig("totalTeleopPoints", 0, 10**2),
+            PredictionStatConfig("endGameTowerPoints", 0, 10**2),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:

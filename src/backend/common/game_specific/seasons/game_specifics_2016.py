@@ -7,8 +7,10 @@ from typing import Any, Dict, List, Optional, Set, Tuple
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
+from backend.common.frc_api.types import ScoreDetailModelAlliance2016
 from backend.common.game_specific.base import (
     BonusRpBreakdownSeasonGameConfig,
+    PredictionStatConfig,
     TCriteria,
 )
 from backend.common.models.event_insights import EventInsights
@@ -16,14 +18,17 @@ from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig):
+class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAlliance2016]):
+    SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2016
     BONUS_RP_BREAKDOWN_FIELDS = ("teleopDefensesBreached", "teleopTowerCaptured")
     BONUS_RP_PREDICTION_FIELDS = ("prob_breach", "prob_capture")
 
     def finals_can_be_tiebroken(self) -> bool:
         return True
 
-    def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
+    def tiebreak_criteria(
+        self, red: ScoreDetailModelAlliance2016, blue: ScoreDetailModelAlliance2016
+    ) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
         # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
@@ -275,12 +280,12 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig):
 
         return event_insights
 
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [
-            ("score", 20, 10**2),
-            ("auto_points", 20, 10**2),
-            ("crossings", 0, 1**2),
-            ("boulders", 0, 1**2),
+            PredictionStatConfig("score", 20, 10**2),
+            PredictionStatConfig("auto_points", 20, 10**2),
+            PredictionStatConfig("crossings", 0, 1**2),
+            PredictionStatConfig("boulders", 0, 1**2),
         ]
 
     def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:

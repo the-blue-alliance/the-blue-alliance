@@ -2,11 +2,15 @@ from __future__ import annotations
 
 from typing import List, Optional, Set
 
-from backend.common.game_specific.base import NoRecordSeasonGameConfig
+from backend.common.frc_api.types import ScoreDetailModelAlliance2021
+from backend.common.game_specific.base import NoRecordModernBreakdownSeasonGameConfig
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2021(NoRecordSeasonGameConfig):
+class GameSpecifics2021(
+    NoRecordModernBreakdownSeasonGameConfig[ScoreDetailModelAlliance2021]
+):
+    SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2021
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
         return [

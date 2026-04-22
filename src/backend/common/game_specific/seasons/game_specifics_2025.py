@@ -1,12 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, TypedDict
 
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
+from backend.common.frc_api.types import ScoreDetailModelAlliance2025
 from backend.common.game_specific.base import (
+    PredictionStatConfig,
     StatAccessor,
     TCriteria,
     TripleWinTotalPointsScoreBonusRpGameConfig,
@@ -16,7 +18,10 @@ from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2025(TripleWinTotalPointsScoreBonusRpGameConfig):
+class GameSpecifics2025(
+    TripleWinTotalPointsScoreBonusRpGameConfig[ScoreDetailModelAlliance2025]
+):
+    SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2025
     BONUS_RP_BREAKDOWN_FIELDS = (
         "autoBonusAchieved",
         "coralBonusAchieved",
@@ -28,7 +33,9 @@ class GameSpecifics2025(TripleWinTotalPointsScoreBonusRpGameConfig):
         "prob_barge_bonus",
     )
 
-    def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
+    def tiebreak_criteria(
+        self, red: ScoreDetailModelAlliance2025, blue: ScoreDetailModelAlliance2025
+    ) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
         # TECH FOUL points due to opponent rule violations
@@ -247,12 +254,12 @@ class GameSpecifics2025(TripleWinTotalPointsScoreBonusRpGameConfig):
             ),
         }
 
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [
-            ("score", 0, 20**2),
-            ("auto_coral_scored", 0, 2**2),
-            ("coral_scored", 0, 10**2),
-            ("barge_points", 0, 10**2),
+            PredictionStatConfig("score", 0, 20**2),
+            PredictionStatConfig("auto_coral_scored", 0, 2**2),
+            PredictionStatConfig("coral_scored", 0, 10**2),
+            PredictionStatConfig("barge_points", 0, 10**2),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
@@ -303,3 +310,15 @@ class GameSpecifics2025(TripleWinTotalPointsScoreBonusRpGameConfig):
                 "wallAlgaeCount",
             ]
         )
+
+
+class _RankingBreakdown2025(TypedDict):
+    autoBonusAchieved: bool
+    coralBonusAchieved: bool
+    bargeBonusAchieved: bool
+
+
+class _RankingPrediction2025(TypedDict):
+    prob_auto_coral_bonus: float
+    prob_coral_bonus: float
+    prob_barge_bonus: float

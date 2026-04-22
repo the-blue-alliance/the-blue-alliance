@@ -11,7 +11,9 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
+from backend.common.frc_api.types import ScoreDetailModelAlliance2023
 from backend.common.game_specific.base import (
+    PredictionStatConfig,
     StatAccessor,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -21,7 +23,10 @@ from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2023(TotalPointsScoreBonusRpGameConfig):
+class GameSpecifics2023(
+    TotalPointsScoreBonusRpGameConfig[ScoreDetailModelAlliance2023]
+):
+    SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2023
     BONUS_RP_BREAKDOWN_FIELDS = (
         "sustainabilityBonusAchieved",
         "activationBonusAchieved",
@@ -31,7 +36,9 @@ class GameSpecifics2023(TotalPointsScoreBonusRpGameConfig):
         "prob_activation_bonus",
     )
 
-    def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
+    def tiebreak_criteria(
+        self, red: ScoreDetailModelAlliance2023, blue: ScoreDetailModelAlliance2023
+    ) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
         # TECH FOUL points due to opponent rule violations
@@ -350,11 +357,11 @@ class GameSpecifics2023(TotalPointsScoreBonusRpGameConfig):
             ),
         }
 
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [
-            ("score", 0, 20**2),
-            ("links", 0, 3**2),
-            ("charge_station_points", 0, 10**2),
+            PredictionStatConfig("score", 0, 20**2),
+            PredictionStatConfig("links", 0, 3**2),
+            PredictionStatConfig("charge_station_points", 0, 10**2),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:

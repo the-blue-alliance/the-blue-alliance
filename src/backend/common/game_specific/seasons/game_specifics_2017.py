@@ -2,12 +2,14 @@ from __future__ import annotations
 
 import logging
 import traceback
-from typing import Any, Dict, List, Optional, Set, Tuple
+from typing import Any, Dict, List, Optional, Set, Tuple, TypedDict
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
+from backend.common.frc_api.types import ScoreDetailModelAlliance2017
 from backend.common.game_specific.base import (
+    PredictionStatConfig,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
 )
@@ -16,11 +18,16 @@ from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2017(TotalPointsScoreBonusRpGameConfig):
+class GameSpecifics2017(
+    TotalPointsScoreBonusRpGameConfig[ScoreDetailModelAlliance2017]
+):
+    SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2017
     BONUS_RP_BREAKDOWN_FIELDS = ("kPaRankingPointAchieved", "rotorRankingPointAchieved")
     BONUS_RP_PREDICTION_FIELDS = ("prob_pressure", "prob_gears")
 
-    def tiebreak_criteria(self, red: Dict, blue: Dict) -> List[TCriteria]:
+    def tiebreak_criteria(
+        self, red: ScoreDetailModelAlliance2017, blue: ScoreDetailModelAlliance2017
+    ) -> List[TCriteria]:
         tiebreakers: List[TCriteria] = []
 
         # Greater number of FOUL points awarded (i.e. the ALLIANCE that played the cleaner MATCH)
@@ -349,11 +356,11 @@ class GameSpecifics2017(TotalPointsScoreBonusRpGameConfig):
 
         return event_insights
 
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [
-            ("score", 50, 30**2),
-            ("pressure", 0, 1**2),
-            ("gears", 0, 1**2),
+            PredictionStatConfig("score", 50, 30**2),
+            PredictionStatConfig("pressure", 0, 1**2),
+            PredictionStatConfig("gears", 0, 1**2),
         ]
 
     def prediction_brier_fields(self) -> List[Tuple[str, str, str]]:
@@ -416,3 +423,13 @@ class GameSpecifics2017(TotalPointsScoreBonusRpGameConfig):
 
     def round_robin_tiebreaker_names(self) -> List[str]:
         return ["Match Points"]
+
+
+class _RankingBreakdown2017(TypedDict):
+    kPaRankingPointAchieved: bool
+    rotorRankingPointAchieved: bool
+
+
+class _RankingPrediction2017(TypedDict):
+    prob_pressure: float
+    prob_gears: float

@@ -11,13 +11,20 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
-from backend.common.game_specific.base import TotalPointsScoreBonusRpGameConfig
+from backend.common.frc_api.types import ScoreDetailModelAlliance2018
+from backend.common.game_specific.base import (
+    PredictionStatConfig,
+    TotalPointsScoreBonusRpGameConfig,
+)
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-class GameSpecifics2018(TotalPointsScoreBonusRpGameConfig):
+class GameSpecifics2018(
+    TotalPointsScoreBonusRpGameConfig[ScoreDetailModelAlliance2018]
+):
+    SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2018
     BONUS_RP_BREAKDOWN_FIELDS = ("autoQuestRankingPoint", "faceTheBossRankingPoint")
     BONUS_RP_PREDICTION_FIELDS = ("prob_auto_quest", "prob_face_boss")
 
@@ -383,11 +390,11 @@ class GameSpecifics2018(TotalPointsScoreBonusRpGameConfig):
 
         return event_insights
 
-    def get_prediction_relevant_stats(self) -> List[Tuple[str, int, int]]:
+    def get_prediction_relevant_stats(self) -> List[PredictionStatConfig]:
         return [
-            ("score", 50, 30**2),
-            ("auto_points", 0, 1**2),
-            ("endgame_points", 0, 1**2),
+            PredictionStatConfig("score", 50, 30**2),
+            PredictionStatConfig("auto_points", 0, 1**2),
+            PredictionStatConfig("endgame_points", 0, 1**2),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
