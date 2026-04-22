@@ -1,4 +1,4 @@
-import { Match, MatchScoreBreakdown2022 } from '~/api/tba/read';
+import { Match, MatchScoreBreakdown2022, TaxiRobot2022 } from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
@@ -33,15 +33,15 @@ export default function ScoreBreakdown2022({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.taxiRobot1 === 'Yes'}
+            condition={scoreBreakdown.red.taxiRobot1 === TaxiRobot2022.YES}
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.taxiRobot2 === 'Yes'}
+            condition={scoreBreakdown.red.taxiRobot2 === TaxiRobot2022.YES}
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.taxiRobot3 === 'Yes'}
+            condition={scoreBreakdown.red.taxiRobot3 === TaxiRobot2022.YES}
             teamKey={match.alliances.red.team_keys[2]}
           />
           (+{scoreBreakdown.red.autoTaxiPoints})
@@ -53,15 +53,15 @@ export default function ScoreBreakdown2022({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.taxiRobot1 === 'Yes'}
+            condition={scoreBreakdown.blue.taxiRobot1 === TaxiRobot2022.YES}
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.taxiRobot2 === 'Yes'}
+            condition={scoreBreakdown.blue.taxiRobot2 === TaxiRobot2022.YES}
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.taxiRobot3 === 'Yes'}
+            condition={scoreBreakdown.blue.taxiRobot3 === TaxiRobot2022.YES}
             teamKey={match.alliances.blue.team_keys[2]}
           />
           (+{scoreBreakdown.blue.autoTaxiPoints})

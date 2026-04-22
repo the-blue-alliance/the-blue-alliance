@@ -1,10 +1,9 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { Temporal } from 'temporal-polyfill';
 
-import { getEvent, getMatch } from '~/api/tba/read';
+import { PlayoffType, getEvent, getMatch } from '~/api/tba/read';
 import { EventLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
-import { PlayoffType } from '~/lib/api/PlayoffType';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 import { publicCacheControlHeaders } from '~/lib/utils';
 

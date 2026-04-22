@@ -2,6 +2,7 @@ import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter, useSearch } from '@tanstack/react-router';
 import { Suspense, useRef } from 'react';
 
+import { PlayoffType } from '~/api/tba/read';
 import {
   getEventOptions,
   getMatchOptions,
@@ -15,7 +16,6 @@ import {
   CredenzaHeader,
   CredenzaTitle,
 } from '~/components/ui/credenza';
-import { PlayoffType } from '~/lib/api/PlayoffType';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
 
 export function MatchModal() {

@@ -3,7 +3,7 @@ import { type HTMLAttributes, type JSX } from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
 
-import { EliminationAlliance } from '~/api/tba/read';
+import { CompLevel, EliminationAlliance } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLink } from '~/components/tba/links';
 import {
@@ -86,7 +86,7 @@ export default function AllianceSelectionTable(props: {
             <AllianceTableRow
               key={`alliance-${idx}`}
               variant={
-                a.status?.level === 'f'
+                a.status?.level === CompLevel.F
                   ? a.status.status === 'won'
                     ? 'winner'
                     : 'finalist'

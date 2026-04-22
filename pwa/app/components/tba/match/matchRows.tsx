@@ -8,7 +8,7 @@ import ChevronDownIcon from '~icons/lucide/chevron-down';
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 import YoutubeIcon from '~icons/mdi/youtube';
 
-import { Event, Match } from '~/api/tba/read';
+import { Event, Match, PlayoffType } from '~/api/tba/read';
 import { MatchLink } from '~/components/tba/links';
 import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
@@ -24,7 +24,6 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { PlayoffType } from '~/lib/api/PlayoffType';
 import { matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
 import { cn } from '~/lib/utils';

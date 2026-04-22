@@ -6,6 +6,7 @@ import {
   EliminationAlliance,
   Event,
   EventDistrictPoints,
+  EventType,
   Match,
   RegionalAdvancement,
   Team,
@@ -24,11 +25,7 @@ import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
 import { Separator } from '~/components/ui/separator';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import {
-  DISTRICT_EVENT_TYPES,
-  EventType,
-  SEASON_EVENT_TYPES,
-} from '~/lib/api/EventType';
+import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
 

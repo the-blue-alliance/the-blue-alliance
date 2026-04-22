@@ -25,12 +25,15 @@ import ResultsIcon from '~icons/mdi/tournament';
 import { getEventColors } from '~/api/colors';
 import {
   Award,
+  CompLevel,
   EliminationAlliance,
   Event,
   EventCoprs,
   EventDistrictPoints,
+  EventType,
   Match,
   Media,
+  PlayoffType,
   RegionalAdvancement,
   Team,
   Webcast,
@@ -126,12 +129,8 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import {
-  DISTRICT_EVENT_TYPES,
-  EventType,
-  SEASON_EVENT_TYPES,
-} from '~/lib/api/EventType';
-import { PlayoffType, TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
+import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -761,12 +760,12 @@ function ResultsTab({
   const [inView, setInView] = useState<Set<string>>(new Set());
 
   const quals = useMemo(
-    () => sortedMatches.filter((m) => m.comp_level === 'qm'),
+    () => sortedMatches.filter((m) => m.comp_level === CompLevel.QM),
     [sortedMatches],
   );
 
   const elims = useMemo(
-    () => sortedMatches.filter((m) => m.comp_level !== 'qm'),
+    () => sortedMatches.filter((m) => m.comp_level !== CompLevel.QM),
     [sortedMatches],
   );
 
@@ -1045,11 +1044,13 @@ function MatchStatsTable({
   year: number;
 }) {
   const highScoreQual = useMemo(
-    () => getHighScoreMatch(matches.filter((m) => m.comp_level === 'qm')),
+    () =>
+      getHighScoreMatch(matches.filter((m) => m.comp_level === CompLevel.QM)),
     [matches],
   );
   const highScorePlayoff = useMemo(
-    () => getHighScoreMatch(matches.filter((m) => m.comp_level !== 'qm')),
+    () =>
+      getHighScoreMatch(matches.filter((m) => m.comp_level !== CompLevel.QM)),
     [matches],
   );
   const medianTurnaround = useMemo(

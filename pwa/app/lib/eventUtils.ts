@@ -1,12 +1,8 @@
 import { CalendarEvent } from 'calendar-link';
 import { Temporal } from 'temporal-polyfill';
 
-import { Event } from '~/api/tba/read/types.gen';
-import {
-  CMP_EVENT_TYPES,
-  EventType,
-  SEASON_EVENT_TYPES,
-} from '~/lib/api/EventType';
+import { Event, EventType } from '~/api/tba/read';
+import { CMP_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 
 /** IANA timezone used when an event has no timezone field. */
 export const EVENT_FALLBACK_TIMEZONE = 'America/New_York';

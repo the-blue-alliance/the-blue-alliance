@@ -60,17 +60,23 @@ export default function ScoreBreakdown2026({
           <div className="flex flex-row items-center gap-1">
             <div className="flex flex-col items-start justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoTowerRobot1 !== 'None'}
+                condition={
+                  scoreBreakdown.red.autoTowerRobot1 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.red.team_keys[0]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoTowerRobot2 !== 'None'}
+                condition={
+                  scoreBreakdown.red.autoTowerRobot2 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.red.team_keys[1]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoTowerRobot3 !== 'None'}
+                condition={
+                  scoreBreakdown.red.autoTowerRobot3 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.red.team_keys[2]}
                 alignIcon="left"
               />
@@ -90,17 +96,23 @@ export default function ScoreBreakdown2026({
             </div>
             <div className="flex flex-col items-end justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoTowerRobot1 !== 'None'}
+                condition={
+                  scoreBreakdown.blue.autoTowerRobot1 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.blue.team_keys[0]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoTowerRobot2 !== 'None'}
+                condition={
+                  scoreBreakdown.blue.autoTowerRobot2 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.blue.team_keys[1]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoTowerRobot3 !== 'None'}
+                condition={
+                  scoreBreakdown.blue.autoTowerRobot3 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.blue.team_keys[2]}
                 alignIcon="right"
               />

@@ -1,4 +1,9 @@
-import { Match, MatchScoreBreakdown2020 } from '~/api/tba/read';
+import {
+  EndgameRungIsLevel2020,
+  InitLineRobot2020,
+  Match,
+  MatchScoreBreakdown2020,
+} from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
@@ -39,15 +44,21 @@ export default function ScoreBreakdown2020({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.initLineRobot1 === 'Exited'}
+            condition={
+              scoreBreakdown.red.initLineRobot1 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.initLineRobot2 === 'Exited'}
+            condition={
+              scoreBreakdown.red.initLineRobot2 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.initLineRobot3 === 'Exited'}
+            condition={
+              scoreBreakdown.red.initLineRobot3 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.red.team_keys[2]}
           />
           (+{scoreBreakdown.red.autoInitLinePoints})
@@ -61,15 +72,21 @@ export default function ScoreBreakdown2020({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.initLineRobot1 === 'Exited'}
+            condition={
+              scoreBreakdown.blue.initLineRobot1 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.initLineRobot2 === 'Exited'}
+            condition={
+              scoreBreakdown.blue.initLineRobot2 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.initLineRobot3 === 'Exited'}
+            condition={
+              scoreBreakdown.blue.initLineRobot3 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.blue.team_keys[2]}
           />
           (+{scoreBreakdown.blue.autoInitLinePoints})
@@ -307,7 +324,10 @@ export default function ScoreBreakdown2020({
       <ScoreBreakdownRow>
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <ConditionalRpAchieved
-            condition={scoreBreakdown.red.endgameRungIsLevel === 'IsLevel'}
+            condition={
+              scoreBreakdown.red.endgameRungIsLevel ===
+              EndgameRungIsLevel2020.IS_LEVEL
+            }
           />
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -315,7 +335,10 @@ export default function ScoreBreakdown2020({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <ConditionalRpAchieved
-            condition={scoreBreakdown.blue.endgameRungIsLevel === 'IsLevel'}
+            condition={
+              scoreBreakdown.blue.endgameRungIsLevel ===
+              EndgameRungIsLevel2020.IS_LEVEL
+            }
           />
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>

@@ -1,8 +1,7 @@
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
-import { Event } from '~/api/tba/read';
-import { EventType } from '~/lib/api/EventType';
+import { Event, EventType } from '~/api/tba/read';
 import {
   getCurrentWeekEvents,
   getEventDateString,

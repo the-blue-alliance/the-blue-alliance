@@ -14,6 +14,7 @@ import {
   District,
   DistrictRanking,
   Event,
+  EventType,
   Match,
   RegionalAdvancement,
   RegionalRanking,
@@ -72,11 +73,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import {
-  DISTRICT_EVENT_TYPES,
-  EventType,
-  SEASON_EVENT_TYPES,
-} from '~/lib/api/EventType';
+import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import {

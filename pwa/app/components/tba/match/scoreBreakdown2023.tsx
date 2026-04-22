@@ -1,4 +1,9 @@
-import { Match, MatchScoreBreakdown2023 } from '~/api/tba/read';
+import {
+  AutoChargeStationRobot2023,
+  Match,
+  MatchScoreBreakdown2023,
+  MobilityRobot2023,
+} from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
@@ -27,15 +32,21 @@ export default function ScoreBreakdown2023({
         <TableRow>
           <TableCell className="bg-alliance-red-dark">
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.mobilityRobot1 === 'Yes'}
+              condition={
+                scoreBreakdown.red.mobilityRobot1 === MobilityRobot2023.YES
+              }
               teamKey={match.alliances.red.team_keys[0].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.mobilityRobot2 === 'Yes'}
+              condition={
+                scoreBreakdown.red.mobilityRobot2 === MobilityRobot2023.YES
+              }
               teamKey={match.alliances.red.team_keys[1].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.mobilityRobot3 === 'Yes'}
+              condition={
+                scoreBreakdown.red.mobilityRobot3 === MobilityRobot2023.YES
+              }
               teamKey={match.alliances.red.team_keys[2].substring(3)}
             />
           </TableCell>
@@ -44,15 +55,21 @@ export default function ScoreBreakdown2023({
           </TableCell>
           <TableCell className="bg-alliance-blue-dark">
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.mobilityRobot1 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.mobilityRobot1 === MobilityRobot2023.YES
+              }
               teamKey={match.alliances.blue.team_keys[0].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.mobilityRobot2 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.mobilityRobot2 === MobilityRobot2023.YES
+              }
               teamKey={match.alliances.blue.team_keys[1].substring(3)}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.mobilityRobot3 === 'Yes'}
+              condition={
+                scoreBreakdown.blue.mobilityRobot3 === MobilityRobot2023.YES
+              }
               teamKey={match.alliances.blue.team_keys[2].substring(3)}
             />
           </TableCell>
@@ -87,17 +104,20 @@ export default function ScoreBreakdown2023({
         {/* Charge Station Auto */}
         <TableRow>
           <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.autoChargeStationRobot1 === 'Docked' && (
+            {scoreBreakdown.red.autoChargeStationRobot1 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.red.team_keys[0].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.red.autoChargeStationRobot2 === 'Docked' && (
+            {scoreBreakdown.red.autoChargeStationRobot2 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.red.team_keys[1].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.red.autoChargeStationRobot3 === 'Docked' && (
+            {scoreBreakdown.red.autoChargeStationRobot3 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.red.team_keys[2].substring(3)}
               </Badge>
@@ -107,17 +127,20 @@ export default function ScoreBreakdown2023({
             Charge Station Auto
           </TableCell>
           <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.autoChargeStationRobot1 === 'Docked' && (
+            {scoreBreakdown.blue.autoChargeStationRobot1 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.blue.team_keys[0].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.blue.autoChargeStationRobot2 === 'Docked' && (
+            {scoreBreakdown.blue.autoChargeStationRobot2 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.blue.team_keys[1].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.blue.autoChargeStationRobot3 === 'Docked' && (
+            {scoreBreakdown.blue.autoChargeStationRobot3 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.blue.team_keys[2].substring(3)}
               </Badge>

@@ -9,7 +9,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import { Event, Match, WltRecord } from '~/api/tba/read';
+import { CompLevel, Event, Match, WltRecord } from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { TeamLink } from '~/components/tba/links';
 import {
@@ -527,11 +527,11 @@ export default function TeamMatchStats({
           maxBy(matches, (m) => {
             const originalScore = getMatchScoreWithoutAdjustPoints(m);
             const redScore =
-              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+              useOriginalScoreForPlayoffRedCards && m.comp_level != CompLevel.QM
                 ? originalScore.redScore
                 : m.alliances.red.score;
             const blueScore =
-              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+              useOriginalScoreForPlayoffRedCards && m.comp_level != CompLevel.QM
                 ? originalScore.blueScore
                 : m.alliances.blue.score;
             return m.alliances.red.team_keys.includes(teamKey)
@@ -551,11 +551,11 @@ export default function TeamMatchStats({
           maxBy(matches, (m) => {
             const originalScore = getMatchScoreWithoutAdjustPoints(m);
             const redScore =
-              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+              useOriginalScoreForPlayoffRedCards && m.comp_level != CompLevel.QM
                 ? originalScore.redScore
                 : m.alliances.red.score;
             const blueScore =
-              useOriginalScoreForPlayoffRedCards && m.comp_level != 'qm'
+              useOriginalScoreForPlayoffRedCards && m.comp_level != CompLevel.QM
                 ? originalScore.blueScore
                 : m.alliances.blue.score;
             return m.alliances.blue.team_keys.includes(teamKey)
