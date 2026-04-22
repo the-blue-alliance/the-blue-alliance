@@ -528,7 +528,7 @@ function computePerAwardLeaderboards(
     buildEventLookups(yearResults);
 
   // Awards that progress from district events to DCMP — track separately
-  const DCMP_PROGRESSION_AWARDS = new Set([
+  const DCMP_PROGRESSION_AWARDS = new Set<AwardType>([
     AwardType.CHAIRMANS,
     AwardType.DEANS_LIST,
     AwardType.ENGINEERING_INSPIRATION,
