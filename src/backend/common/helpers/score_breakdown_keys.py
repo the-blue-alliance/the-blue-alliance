@@ -455,6 +455,32 @@ VALID_BREAKDOWNS: Dict[Year, Set[str]] = {
             "wallAlgaeCount",
         ]
     ),
+    2026: set(
+        [
+            "adjustPoints",
+            "autoTowerPoints",
+            "autoTowerRobot1",
+            "autoTowerRobot2",
+            "autoTowerRobot3",
+            "endGameTowerPoints",
+            "endGameTowerRobot1",
+            "endGameTowerRobot2",
+            "endGameTowerRobot3",
+            "energizedAchieved",
+            "foulPoints",
+            "g206Penalty",
+            "hubScore",
+            "majorFoulCount",
+            "minorFoulCount",
+            "rp",
+            "superchargedAchieved",
+            "totalAutoPoints",
+            "totalPoints",
+            "totalTeleopPoints",
+            "totalTowerPoints",
+            "traversalAchieved",
+        ]
+    ),
     # when adding new fields, please keep them sorted alphabetically
 }
 
