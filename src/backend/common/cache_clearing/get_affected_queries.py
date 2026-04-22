@@ -19,6 +19,7 @@ from backend.common.queries import (
     robot_query,
     team_query,
 )
+from backend.common.queries import insight_v2_query
 from backend.common.queries.database_query import CachedDatabaseQuery
 
 TCacheKeyAndQuery = Tuple[str, Type[CachedDatabaseQuery]]
@@ -365,5 +366,18 @@ def insight_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuer
                 district_abbreviation,
             )
         )
+
+    return _queries_to_cache_keys_and_queries(queries)
+
+
+def insight_v2_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+    years = _filter(affected_refs["year"])
+    categories = _filter(affected_refs["category"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for year in years:
+        queries.append(insight_v2_query.InsightV2YearQuery(year))
+        for category in categories:
+            queries.append(insight_v2_query.InsightV2YearCategoryQuery(year, category))
 
     return _queries_to_cache_keys_and_queries(queries)

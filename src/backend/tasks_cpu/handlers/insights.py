@@ -20,8 +20,10 @@ from backend.common.helpers.insights_leaderboard_team_helper import (
     InsightsLeaderboardTeamCalculator,
 )
 from backend.common.helpers.insights_notable_helper import InsightsNotableHelper
+from backend.common.helpers.insights_v2.registry import make_all_insights
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
+from backend.common.manipulators.insight_v2_manipulator import InsightV2Manipulator
 from backend.common.models.insight import Insight, LeaderboardKeyType
 from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.queries.district_query import DistrictsInYearQuery
@@ -399,6 +401,45 @@ def do_district_insights_for_abbreviation(abbrev: str, year: Year) -> Response:
         )
 
     return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights_v2/<int:year>")
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights_v2", defaults={"year": None})
+def enqueue_insights_v2(year: Optional[Year] = None) -> Response:
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    taskqueue.add(
+        url=url_for("insights.do_insights_v2", year=year),
+        method="GET",
+        target="py3-tasks-cpu",
+        queue_name="backend-tasks",
+    )
+
+    return make_response(f"enqueued insights_v2 for year {escape(str(year))}")
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights_v2/all")
+def enqueue_insights_v2_all() -> Response:
+    for year in SeasonHelper.get_valid_years():
+        taskqueue.add(
+            url=url_for("insights.do_insights_v2", year=year),
+            method="GET",
+            target="py3-tasks-cpu",
+            queue_name="backend-tasks",
+        )
+
+    return make_response("enqueued insights_v2 for all years")
+
+
+@blueprint.route("/backend-tasks-b2/do/math/insights_v2/<int:year>")
+def do_insights_v2(year: Year) -> Response:
+    insights = make_all_insights(year)
+
+    if insights:
+        InsightV2Manipulator.createOrUpdate(insights)
+
+    return make_response(repr(insights))
 
 
 @blueprint.route("/backend-tasks-b2/do/math/insights/delete/<name>")
