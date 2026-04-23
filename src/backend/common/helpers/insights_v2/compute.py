@@ -1,13 +1,20 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Dict, List, Optional
+from typing import DefaultDict, Dict, List, Optional
 
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
-from backend.common.models.insight_v2 import InsightV2, LeaderboardRankingV2
+from backend.common.models.insight_v2 import (
+    InsightCategory,
+    InsightV2,
+    InsightV2NameEntry,
+    LeaderboardDataV2,
+    LeaderboardKeyType,
+    LeaderboardRankingV2,
+)
 from backend.common.models.keys import Year
 from backend.common.queries.event_query import EventListQuery
 
@@ -40,7 +47,79 @@ class InsightV2Calculator(ABC):
     def on_event(self, event: Event) -> None: ...
 
     @abstractmethod
-    def make_insight(self, year: Year) -> Optional[InsightV2]: ...
+    def make_insights(self, year: Year) -> List[InsightV2]: ...
+
+
+class LeaderboardV2Calculator(InsightV2Calculator, ABC):
+    def __init__(self) -> None:
+        self.counts: Dict[str, int] = defaultdict(int)
+        self.district_counts: DefaultDict[str, DefaultDict[str, int]] = defaultdict(
+            lambda: defaultdict(int)
+        )
+
+    @property
+    @abstractmethod
+    def insight_name(self) -> InsightV2NameEntry: ...
+
+    @property
+    @abstractmethod
+    def key_type(self) -> LeaderboardKeyType: ...
+
+    def _increment(
+        self, key: str, count: int = 1, district: Optional[str] = None
+    ) -> None:
+        self.counts[key] += count
+        if district:
+            self.district_counts[district][key] += count
+
+    def make_insights(self, year: Year) -> List[InsightV2]:
+        insights = []
+
+        if self.counts:
+            data = LeaderboardDataV2(
+                rankings=build_leaderboard_rankings(self.counts),
+                key_type=self.key_type,
+            )
+            insights.append(
+                InsightV2(
+                    id=InsightV2.render_key_name(
+                        year,
+                        InsightCategory.LEADERBOARD,
+                        self.insight_name.name,
+                    ),
+                    name=self.insight_name.name,
+                    display_name=self.insight_name.display_name,
+                    year=year,
+                    category=InsightCategory.LEADERBOARD,
+                    data_json=data,
+                )
+            )
+
+        for district_abbrev, counts in sorted(self.district_counts.items()):
+            if not counts:
+                continue
+            data = LeaderboardDataV2(
+                rankings=build_leaderboard_rankings(counts),
+                key_type=self.key_type,
+            )
+            insights.append(
+                InsightV2(
+                    id=InsightV2.render_key_name(
+                        year,
+                        InsightCategory.LEADERBOARD,
+                        self.insight_name.name,
+                        district_abbrev,
+                    ),
+                    name=self.insight_name.name,
+                    display_name=self.insight_name.display_name,
+                    year=year,
+                    category=InsightCategory.LEADERBOARD,
+                    district_abbreviation=district_abbrev,
+                    data_json=data,
+                )
+            )
+
+        return insights
 
 
 def compute_insights_for_year(
@@ -65,6 +144,5 @@ def compute_insights_for_year(
 
     insights = []
     for calc in calculators:
-        if insight := calc.make_insight(year):
-            insights.append(insight)
+        insights.extend(calc.make_insights(year))
     return insights

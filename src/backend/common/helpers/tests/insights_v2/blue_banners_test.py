@@ -83,3 +83,55 @@ def test_key_name(ndb_stub, test_data_importer) -> None:
 
     insights = compute_insights_for_year(2024, [BlueBannersV2Calculator()])
     assert insights[0].key_name == "2024_v2_leaderboard_blue_banners"
+
+
+def test_district_insight_created(ndb_stub, test_data_importer) -> None:
+    test_data_importer.import_event(__file__, "../data/2022on305.json")
+    test_data_importer.import_award_list(__file__, "../data/2022on305_awards.json")
+
+    insights = compute_insights_for_year(2022, [BlueBannersV2Calculator()])
+
+    # global insight + one district insight
+    assert len(insights) == 2
+    district_insight = next(i for i in insights if i.district_abbreviation == "ont")
+    assert district_insight.year == 2022
+    assert district_insight.name == "blue_banners"
+    assert district_insight.category == InsightCategory.LEADERBOARD
+    assert district_insight.key_name == "2022_v2_leaderboard_blue_banners_ont"
+    rankings = district_insight.data["rankings"]
+    assert len(rankings) > 0
+    # all winner team keys should appear in the district rankings
+    winner_keys = {"frc2200", "frc610", "frc4015"}
+    ranked_keys = {k for r in rankings for k in r["keys"]}
+    assert winner_keys <= ranked_keys
+
+
+def test_district_insight_excludes_non_district_event_teams(
+    ndb_stub, test_data_importer
+) -> None:
+    # 2024nytr is a regional (no district); 2022on305 is Ontario district
+    test_data_importer.import_event(__file__, "../data/2024nytr.json")
+    test_data_importer.import_award_list(__file__, "../data/2024nytr_awards.json")
+    test_data_importer.import_event(__file__, "../data/2022on305.json")
+    test_data_importer.import_award_list(__file__, "../data/2022on305_awards.json")
+
+    insights_2024 = compute_insights_for_year(2024, [BlueBannersV2Calculator()])
+    # 2024nytr has no district — only the global insight
+    assert all(i.district_abbreviation is None for i in insights_2024)
+
+    insights_2022 = compute_insights_for_year(2022, [BlueBannersV2Calculator()])
+    district_insights = [
+        i for i in insights_2022 if i.district_abbreviation is not None
+    ]
+    assert len(district_insights) == 1
+    assert district_insights[0].district_abbreviation == "ont"
+
+
+def test_district_key_name(ndb_stub, test_data_importer) -> None:
+    test_data_importer.import_event(__file__, "../data/2022on305.json")
+    test_data_importer.import_award_list(__file__, "../data/2022on305_awards.json")
+
+    insights = compute_insights_for_year(2022, [BlueBannersV2Calculator()])
+    key_names = {i.key_name for i in insights}
+    assert "2022_v2_leaderboard_blue_banners" in key_names
+    assert "2022_v2_leaderboard_blue_banners_ont" in key_names
