@@ -5,7 +5,7 @@ from google.appengine.ext import ndb
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import DistrictAbbreviation
 
-LeaderboardKeyType = Literal["team", "event", "match"]
+LeaderboardKeyType = Literal["team", "event", "match", "team_pair"]
 
 
 class InsightCategory:
@@ -20,6 +20,12 @@ class InsightV2NameEntry(NamedTuple):
 
 class InsightV2Names:
     BLUE_BANNERS = InsightV2NameEntry("blue_banners", "Total Blue Banners")
+    MOST_MATCHES_PLAYED = InsightV2NameEntry(
+        "most_matches_played", "Most Matches Played"
+    )
+    MOST_MATCHES_PLAYED_TOGETHER = InsightV2NameEntry(
+        "most_matches_played_together", "Most Matches Played Together"
+    )
 
 
 class InsightV2(CachedModel):
@@ -73,7 +79,7 @@ class InsightV2(CachedModel):
 
 
 class LeaderboardRankingV2(TypedDict):
-    keys: List[str]
+    keys: List[str] | List[List[str]]
     value: int | float
 
 
