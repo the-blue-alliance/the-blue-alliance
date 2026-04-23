@@ -12,18 +12,25 @@ def _put_auth(key: str = "test_auth_key") -> None:
     ).put()
 
 
-def _put_insight(year: int, name: str = "blue_banners") -> InsightV2:
+def _put_insight(
+    year: int,
+    name: str = "blue_banners",
+    district_abbreviation: str | None = None,
+) -> InsightV2:
     data = {
         "key_type": "team",
         "rankings": [{"keys": ["frc1"], "value": 3}],
     }
     insight = InsightV2(
-        id=InsightV2.render_key_name(year, InsightCategory.LEADERBOARD, name),
+        id=InsightV2.render_key_name(
+            year, InsightCategory.LEADERBOARD, name, district_abbreviation
+        ),
         name=name,
         display_name="Total Blue Banners",
         year=year,
         category=InsightCategory.LEADERBOARD,
         data_json=data,
+        district_abbreviation=district_abbreviation,
     )
     insight.put()
     return insight
@@ -96,6 +103,30 @@ def test_insights_v2_year_category_empty(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 200
     assert resp.json == []
+
+
+def test_insights_v2_year_no_district(ndb_stub, api_client: Client) -> None:
+    _put_auth()
+    _put_insight(2024)
+
+    resp = api_client.get(
+        "/api/v3/insights/v2/2024",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json[0]["district_abbreviation"] is None
+
+
+def test_insights_v2_year_with_district(ndb_stub, api_client: Client) -> None:
+    _put_auth()
+    _put_insight(2024, district_abbreviation="ne")
+
+    resp = api_client.get(
+        "/api/v3/insights/v2/2024",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json[0]["district_abbreviation"] == "ne"
 
 
 def test_insights_v2_requires_auth(api_client: Client) -> None:

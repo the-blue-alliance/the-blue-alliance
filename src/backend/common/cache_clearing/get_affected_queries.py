@@ -268,7 +268,7 @@ def districtteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAn
     district_keys = _filter(affected_refs["district_key"])
     team_keys = _filter(affected_refs["team"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: List[CachedDatabaseQuery] = [district_query.AllDistrictTeamsQuery()]
     for district_key in district_keys:
         queries.append(team_query.DistrictTeamsQuery(district_key.id()))
 
