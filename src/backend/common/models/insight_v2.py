@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Set, TypedDict
+from typing import List, Literal, NamedTuple, Optional, Set, TypedDict
 
 from google.appengine.ext import ndb
 
@@ -12,8 +12,14 @@ class InsightCategory:
     LEADERBOARD = "leaderboard"
 
 
-class InsightV2Name:
-    BLUE_BANNERS = "blue_banners"
+# Helper for organizing insight names and display names
+class InsightV2NameEntry(NamedTuple):
+    name: str
+    display_name: str
+
+
+class InsightV2Names:
+    BLUE_BANNERS = InsightV2NameEntry("blue_banners", "Total Blue Banners")
 
 
 class InsightV2(CachedModel):
