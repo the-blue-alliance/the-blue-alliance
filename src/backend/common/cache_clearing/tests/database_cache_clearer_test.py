@@ -395,6 +395,7 @@ class TestDatabaseCacheClearer(unittest.TestCase):
         }
 
         assert cache_keys == {
+            district_query.AllDistrictTeamsQuery().cache_key,
             team_query.DistrictTeamsQuery("2015fim").cache_key,
             team_query.DistrictTeamsQuery("2015mar").cache_key,
             district_query.TeamDistrictsQuery("frc254").cache_key,

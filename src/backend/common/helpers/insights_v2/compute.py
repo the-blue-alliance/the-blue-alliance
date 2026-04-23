@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Optional
+from typing import Any, DefaultDict, Dict, Iterable, List, Set
 
 from google.appengine.ext import ndb
 
@@ -16,6 +16,7 @@ from backend.common.models.insight_v2 import (
     LeaderboardRankingV2,
 )
 from backend.common.models.keys import Year
+from backend.common.queries.district_query import AllDistrictTeamsQuery
 from backend.common.queries.event_query import EventListQuery
 
 LEADERBOARD_TOP_N = 25
@@ -42,20 +43,47 @@ def build_leaderboard_rankings(
     ][:top_n]
 
 
+def _build_team_district_map(team_keys: Iterable[str]) -> Dict[str, str]:
+    """
+    Returns {team_key: district_abbrev} for the given team keys, using each
+    team's most recent district membership. Fetches all DistrictTeam records in
+    one query and filters in memory.
+    """
+    team_keys_set = set(team_keys)
+    all_district_teams = AllDistrictTeamsQuery().fetch()
+
+    team_district_teams: Dict[str, List[Any]] = defaultdict(list)
+    for dt in all_district_teams:
+        if dt.team and str(dt.team.id()) in team_keys_set:
+            team_district_teams[str(dt.team.id())].append(dt)
+
+    return {
+        team_key: str(max(dts, key=lambda dt: dt.year).district_key.id())[4:]
+        for team_key, dts in team_district_teams.items()
+    }
+
+
 class InsightV2Calculator(ABC):
+    @property
+    def team_keys(self) -> Set[str]:
+        return set()
+
     @abstractmethod
     def on_event(self, event: Event) -> None: ...
 
     @abstractmethod
-    def make_insights(self, year: Year) -> List[InsightV2]: ...
+    def make_insights(
+        self, year: Year, team_to_district: Dict[str, str]
+    ) -> List[InsightV2]: ...
 
 
 class LeaderboardV2Calculator(InsightV2Calculator, ABC):
     def __init__(self) -> None:
         self.counts: Dict[str, int] = defaultdict(int)
-        self.district_counts: DefaultDict[str, DefaultDict[str, int]] = defaultdict(
-            lambda: defaultdict(int)
-        )
+
+    @property
+    def team_keys(self) -> Set[str]:
+        return set(self.counts.keys())
 
     @property
     @abstractmethod
@@ -65,14 +93,19 @@ class LeaderboardV2Calculator(InsightV2Calculator, ABC):
     @abstractmethod
     def key_type(self) -> LeaderboardKeyType: ...
 
-    def _increment(
-        self, key: str, count: int = 1, district: Optional[str] = None
-    ) -> None:
+    def _increment(self, key: str, count: int = 1) -> None:
         self.counts[key] += count
-        if district:
-            self.district_counts[district][key] += count
 
-    def make_insights(self, year: Year) -> List[InsightV2]:
+    def make_insights(
+        self, year: Year, team_to_district: Dict[str, str]
+    ) -> List[InsightV2]:
+        district_counts: DefaultDict[str, DefaultDict[str, int]] = defaultdict(
+            lambda: defaultdict(int)
+        )
+        for team_key, count in self.counts.items():
+            if district := team_to_district.get(team_key):
+                district_counts[district][team_key] += count
+
         insights = []
 
         if self.counts:
@@ -95,7 +128,7 @@ class LeaderboardV2Calculator(InsightV2Calculator, ABC):
                 )
             )
 
-        for district_abbrev, counts in sorted(self.district_counts.items()):
+        for district_abbrev, counts in sorted(district_counts.items()):
             if not counts:
                 continue
             data = LeaderboardDataV2(
@@ -142,7 +175,12 @@ def compute_insights_for_year(
             event.clear_awards()
             ndb.get_context().clear_cache()
 
+    all_team_keys: Set[str] = set()
+    for calc in calculators:
+        all_team_keys.update(calc.team_keys)
+    team_to_district = _build_team_district_map(all_team_keys)
+
     insights = []
     for calc in calculators:
-        insights.extend(calc.make_insights(year))
+        insights.extend(calc.make_insights(year, team_to_district))
     return insights

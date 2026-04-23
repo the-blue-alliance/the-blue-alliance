@@ -33,6 +33,7 @@ class InsightV2Converter(ConverterBase):
                 "display_name": insight.display_name,
                 "year": insight.year,
                 "category": insight.category,
+                "district_abbreviation": insight.district_abbreviation,
                 "data": insight.data_json,
             }
         )

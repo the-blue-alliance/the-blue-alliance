@@ -18,8 +18,7 @@ class BlueBannersV2Calculator(LeaderboardV2Calculator):
         return "team"
 
     def on_event(self, event: Event) -> None:
-        district = event.event_district_abbrev
         for award in event.awards:
             if award.award_type_enum in BLUE_BANNER_AWARDS and award.count_banner:
                 for team_key in award.team_list:
-                    self._increment(str(team_key.id()), district=district)
+                    self._increment(str(team_key.id()))
