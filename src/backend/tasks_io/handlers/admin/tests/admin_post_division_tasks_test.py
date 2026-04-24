@@ -64,8 +64,9 @@ def test_post_division_tasks(
     # Event cmp hacks should be updated
     updated_event = Event.get_by_id("2020cmptx")
     sync_overrides = none_throws(updated_event).sync_overrides or {}
-    assert sync_overrides["event_sync_disable"] is True
+    assert "event_sync_disable" not in sync_overrides
     assert sync_overrides["set_start_day_to_last"] is True
+    assert sync_overrides["skip_eventteams"] is True
 
     # event_details task should be enqueued
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
@@ -98,6 +99,7 @@ def test_post_division_tasks_idempotent_event_config(
     sync_overrides = none_throws(updated_event).sync_overrides or {}
     assert sync_overrides["event_sync_disable"] is True
     assert sync_overrides["set_start_day_to_last"] is True
+    assert sync_overrides["skip_eventteams"] is True
 
     # event_details task should be enqueued
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
@@ -129,7 +131,7 @@ def test_post_division_tasks_preserves_other_config(
 
     updated_event = Event.get_by_id("2020cmptx")
     sync_overrides = none_throws(updated_event).sync_overrides or {}
-    assert sync_overrides["event_sync_disable"] is True
+    assert "event_sync_disable" not in sync_overrides
     assert sync_overrides["set_start_day_to_last"] is True
     assert sync_overrides["skip_eventteams"] is True
     assert sync_overrides["event_name_override"] == {
