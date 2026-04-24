@@ -13,7 +13,7 @@ from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.queries.team_query import TeamParticipationQuery
-from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 from backend.web.profiled_render import render_template
 
 
@@ -137,7 +137,7 @@ def team_website_update() -> Response:
     if not website:
         # Clear website
         team.website = ""
-    elif lazy_validate_url(website) and not WebsiteBlacklist.is_blacklisted(website):
+    elif lazy_validate_url(website) and not WebsiteBlocklist.is_blacklisted(website):
         team.website = website
 
     TeamManipulator.createOrUpdate(team)

@@ -7,7 +7,7 @@ class ContentType(TypedDict):
     websites: List[str]
 
 
-class WebsiteBlacklist(Sitevar[ContentType]):
+class WebsiteBlocklist(Sitevar[ContentType]):
     @staticmethod
     def key() -> str:
         return "website_blacklist"

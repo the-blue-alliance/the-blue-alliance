@@ -5,7 +5,7 @@ import pytest
 from google.appengine.ext import ndb
 
 from backend.common.models.district import District
-from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
     FMSAPITeamDetailsParser,
 )
@@ -186,7 +186,7 @@ def test_parse_team_websites(website, expected_website, test_data_importer, ndb_
         return False
 
     with patch.object(
-        WebsiteBlacklist, "is_blacklisted", side_effect=blacklist_side_effect
+        WebsiteBlocklist, "is_blacklisted", side_effect=blacklist_side_effect
     ):
         team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
 

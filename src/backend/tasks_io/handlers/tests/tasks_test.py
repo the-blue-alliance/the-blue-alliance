@@ -11,7 +11,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.team import Team
-from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 
 
 def test_blacklist_website_invalid_key(tasks_client: Client):
@@ -36,7 +36,7 @@ def test_blacklist_website_team(tasks_client: Client):
 
     assert team.website == website
 
-    with patch.object(WebsiteBlacklist, "blacklist") as mock_blacklist:
+    with patch.object(WebsiteBlocklist, "blacklist") as mock_blacklist:
         resp = tasks_client.get("/backend-tasks/do/team_blacklist_website/frc7332")
 
     assert resp.status_code == 302
