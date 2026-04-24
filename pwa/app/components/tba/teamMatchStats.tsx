@@ -9,7 +9,13 @@ import {
   YAxis,
 } from 'recharts';
 
-import { CompLevel, Event, Match, WltRecord } from '~/api/tba/read';
+import {
+  AllianceColor,
+  CompLevel,
+  Event,
+  Match,
+  WltRecord,
+} from '~/api/tba/read';
 import { TitledCard } from '~/components/tba/cards';
 import { TeamLink } from '~/components/tba/links';
 import {
@@ -136,7 +142,7 @@ function calculateStreaks(teamKey: string, matches: Match[]): Streak[] {
 
     const result = getAllianceMatchResult(
       matches[i],
-      isRed ? 'red' : 'blue',
+      isRed ? AllianceColor.RED : AllianceColor.BLUE,
       'score-based',
     );
 
@@ -336,11 +342,17 @@ function MatchWinOverTimeChart({
 
       const isRed = match.alliances.red.team_keys.includes(teamKey);
       const didWin =
-        getAllianceMatchResult(match, isRed ? 'red' : 'blue', 'score-based') ===
-        'win';
+        getAllianceMatchResult(
+          match,
+          isRed ? AllianceColor.RED : AllianceColor.BLUE,
+          'score-based',
+        ) === 'win';
       const didLose =
-        getAllianceMatchResult(match, isRed ? 'red' : 'blue', 'score-based') ===
-        'loss';
+        getAllianceMatchResult(
+          match,
+          isRed ? AllianceColor.RED : AllianceColor.BLUE,
+          'score-based',
+        ) === 'loss';
 
       const newNet =
         data[data.length - 1].netWins + (didWin ? 1 : didLose ? -1 : 0);
@@ -413,7 +425,7 @@ export default function TeamMatchStats({
       const alliance = isRed ? match.alliances.red : match.alliances.blue;
       const result = getAllianceMatchResult(
         match,
-        isRed ? 'red' : 'blue',
+        isRed ? AllianceColor.RED : AllianceColor.BLUE,
         'score-based',
       );
 
@@ -443,7 +455,7 @@ export default function TeamMatchStats({
         : match.alliances.red;
       const result = getAllianceMatchResult(
         match,
-        isRed ? 'red' : 'blue',
+        isRed ? AllianceColor.RED : AllianceColor.BLUE,
         'score-based',
       );
 

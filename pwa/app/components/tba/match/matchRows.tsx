@@ -8,7 +8,7 @@ import ChevronDownIcon from '~icons/lucide/chevron-down';
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 import YoutubeIcon from '~icons/mdi/youtube';
 
-import { Event, Match, PlayoffType } from '~/api/tba/read';
+import { AllianceColor, Event, Match, PlayoffType } from '~/api/tba/read';
 import { MatchLink } from '~/components/tba/links';
 import { ShouldInsertBreakCallback } from '~/components/tba/match/breakers';
 import ScoreCell from '~/components/tba/match/scoreCell';
@@ -185,9 +185,9 @@ export function MatchRow({
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
   const focusedAlliance = focusTeamKey
     ? match.alliances.red.team_keys.includes(focusTeamKey)
-      ? 'red'
+      ? AllianceColor.RED
       : match.alliances.blue.team_keys.includes(focusTeamKey)
-        ? 'blue'
+        ? AllianceColor.BLUE
         : null
     : null;
 
@@ -237,7 +237,7 @@ export function MatchRow({
         allianceColor="red"
         className="col-span-3 pt-0.5 xl:col-span-3 xl:pb-0.5"
         teamCellClassName="max-xl:first:rounded-tl-lg max-xl:last:rounded-tr-lg xl:first:rounded-l-lg"
-        winner={match.winning_alliance === 'red'}
+        winner={match.winning_alliance === AllianceColor.RED}
         dq={match.alliances.red.dq_team_keys}
         surrogate={match.alliances.red.surrogate_team_keys}
         year={year}
@@ -250,7 +250,7 @@ export function MatchRow({
         allianceColor="blue"
         className="col-span-3 pb-0.5 xl:col-span-3 xl:pt-0.5"
         teamCellClassName="max-xl:first:rounded-bl-lg max-xl:last:rounded-br-lg xl:last:rounded-r-lg"
-        winner={match.winning_alliance === 'blue'}
+        winner={match.winning_alliance === AllianceColor.BLUE}
         dq={match.alliances.blue.dq_team_keys}
         surrogate={match.alliances.blue.surrogate_team_keys}
         year={year}
@@ -286,11 +286,11 @@ export function MatchRow({
           className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
             xl:rounded-l-lg"
-          winner={match.winning_alliance === 'red'}
+          winner={match.winning_alliance === AllianceColor.RED}
           scoreBreakdown={match.score_breakdown?.red}
           year={year}
           compLevel={match.comp_level}
-          focused={focusedAlliance === 'red'}
+          focused={focusedAlliance === AllianceColor.RED}
         />
       )}
 
@@ -302,11 +302,11 @@ export function MatchRow({
           className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
             xl:rounded-r-lg"
-          winner={match.winning_alliance === 'blue'}
+          winner={match.winning_alliance === AllianceColor.BLUE}
           scoreBreakdown={match.score_breakdown?.blue}
           year={year}
           compLevel={match.comp_level}
-          focused={focusedAlliance === 'blue'}
+          focused={focusedAlliance === AllianceColor.BLUE}
         />
       )}
     </div>
@@ -353,7 +353,7 @@ export function SimpleMatchRow({
           allianceColor="red"
           className="col-span-3 col-start-1 row-start-2"
           teamCellClassName="first:rounded-tl-lg last:rounded-tr-lg"
-          winner={match.winning_alliance === 'red'}
+          winner={match.winning_alliance === AllianceColor.RED}
           dq={match.alliances.red.dq_team_keys}
           surrogate={match.alliances.red.surrogate_team_keys}
           year={year}
@@ -365,7 +365,7 @@ export function SimpleMatchRow({
           allianceColor="blue"
           className="col-span-3 col-start-1 row-start-3"
           teamCellClassName="first:rounded-bl-lg last:rounded-br-lg"
-          winner={match.winning_alliance === 'blue'}
+          winner={match.winning_alliance === AllianceColor.BLUE}
           dq={match.alliances.blue.dq_team_keys}
           surrogate={match.alliances.blue.surrogate_team_keys}
           year={year}
@@ -397,7 +397,7 @@ export function SimpleMatchRow({
             score={match.alliances.red.score}
             allianceColor="red"
             className="col-start-4 row-start-2 rounded-tl-lg rounded-tr-lg"
-            winner={match.winning_alliance === 'red'}
+            winner={match.winning_alliance === AllianceColor.RED}
             scoreBreakdown={match.score_breakdown?.red}
             year={year}
             compLevel={match.comp_level}
@@ -410,7 +410,7 @@ export function SimpleMatchRow({
             score={match.alliances.blue.score}
             allianceColor="blue"
             className="col-start-4 row-start-3 rounded-br-lg rounded-bl-lg"
-            winner={match.winning_alliance === 'blue'}
+            winner={match.winning_alliance === AllianceColor.BLUE}
             scoreBreakdown={match.score_breakdown?.blue}
             year={year}
             compLevel={match.comp_level}

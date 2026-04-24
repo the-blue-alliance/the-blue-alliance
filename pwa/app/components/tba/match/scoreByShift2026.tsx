@@ -8,7 +8,7 @@ import {
   YAxis,
 } from 'recharts';
 
-import { Match, MatchScoreBreakdown2026 } from '~/api/tba/read';
+import { AllianceColor, Match, MatchScoreBreakdown2026 } from '~/api/tba/read';
 import {
   type ChartConfig,
   ChartContainer,
@@ -43,8 +43,8 @@ function makeChartConfig(match: Match): ChartConfig {
 
 // Red is above when red >= blue; blue is above when blue > red.
 // This guarantees the two labels always end up on opposite sides.
-function makeLabel(alliance: 'red' | 'blue', data: ShiftScore[]) {
-  const fill = alliance === 'red' ? RED_COLOR : BLUE_COLOR;
+function makeLabel(alliance: AllianceColor, data: ShiftScore[]) {
+  const fill = alliance === AllianceColor.RED ? RED_COLOR : BLUE_COLOR;
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   return function ShiftLabel(props: any) {
     const { x, y, value, index } = props as {
@@ -63,7 +63,9 @@ function makeLabel(alliance: 'red' | 'blue', data: ShiftScore[]) {
       return null;
     const point = data[index];
     const isAbove =
-      alliance === 'red' ? point.red >= point.blue : point.blue > point.red;
+      alliance === AllianceColor.RED
+        ? point.red >= point.blue
+        : point.blue > point.red;
     const dy = isAbove ? -10 : 18;
     return (
       <text
@@ -130,8 +132,8 @@ export default function ScoreByShift2026({
   const [activeOnly, setActiveOnly] = useState(false);
   const data = buildShiftData(scoreBreakdown, activeOnly);
   const chartConfig = makeChartConfig(match);
-  const RedLabel = makeLabel('red', data);
-  const BlueLabel = makeLabel('blue', data);
+  const RedLabel = makeLabel(AllianceColor.RED, data);
+  const BlueLabel = makeLabel(AllianceColor.BLUE, data);
 
   return (
     <div className="rounded-lg border bg-card p-3">

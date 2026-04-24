@@ -1,6 +1,7 @@
 import { useCallback, useMemo } from 'react';
 
 import type { Event } from '~/api/tba/read';
+import { WebcastStatus } from '~/api/tba/read';
 import { useFirebaseWebcasts } from '~/lib/gameday/useFirebaseWebcasts';
 
 /**
@@ -14,7 +15,7 @@ export function useOnlineEventWebcasts(): (event: Event) => boolean {
   const onlineEventKeys = useMemo(() => {
     const online = new Set<string>();
     Object.entries(webcasts).forEach(([id, { webcast, isSpecial }]) => {
-      if (!isSpecial && webcast.status === 'online') {
+      if (!isSpecial && webcast.status === WebcastStatus.ONLINE) {
         // id format is `${eventKey}-${index}`
         online.add(id.substring(0, id.lastIndexOf('-')));
       }

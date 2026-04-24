@@ -84,6 +84,7 @@ export {
   type Options,
 } from './sdk.gen';
 export {
+  AllianceColor,
   type ApiStatus,
   type ApiStatusAppVersion,
   AutoChargeStationRobot2023,
@@ -589,6 +590,7 @@ export {
   TowerFace2016,
   TowerRobot2026,
   type Webcast,
+  WebcastStatus,
   type WltRecord,
   type Year,
   type Zebra,
