@@ -99,6 +99,11 @@ cron:
     schedule: every day 01:05
     timezone: America/Los_Angeles
 
+  - description: District Advancement Refresh
+    url: /tasks/enqueue/district_advancement
+    schedule: every day 01:05
+    timezone: America/Los_Angeles
+
   # Leaderboard Insights
   - description: Team Leaderboard Insights Calculation
     url: /backend-tasks-b2/enqueue/math/insights/leaderboards/team
