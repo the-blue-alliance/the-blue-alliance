@@ -5,6 +5,7 @@ from typing import List, Optional
 from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from markupsafe import escape
 from werkzeug.wrappers import Response
 
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
@@ -106,6 +107,40 @@ def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
             )
         )
 
+    return make_response("")
+
+
+@blueprint.route("/tasks/math/enqueue/district_points_calc/district/<district_key>")
+def enqueue_district_points_calc_for_district(district_key: DistrictKey) -> Response:
+    """
+    Enqueues calculation of district points for all events in a single district.
+    Each per-event task auto-enqueues district_rankings_calc on completion.
+    """
+    if not District.validate_key_name(district_key):
+        return make_response(f"{escape(district_key)} is not a valid district key", 400)
+
+    district = District.get_by_id(district_key)
+    if not district:
+        return make_response(f"District {escape(district_key)} not found", 404)
+
+    events = DistrictEventsQuery(district_key).fetch()
+    event_keys = [
+        event.key_name
+        for event in events
+        if event.event_type_enum in SEASON_EVENT_TYPES
+    ]
+    for event_key in event_keys:
+        taskqueue.add(
+            url=url_for("math.event_district_points_calc", event_key=event_key),
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(f"Enqueued for {escape(district_key)}: {event_keys}")
     return make_response("")
 
 

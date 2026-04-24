@@ -145,6 +145,80 @@ def test_enqueue_skips_regionals_2025(
         assert task_resp.status_code == 200
 
 
+def test_enqueue_for_district_invalid_key(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/district/asdf")
+    assert resp.status_code == 400
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+def test_enqueue_for_district_not_found(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/district/2025chs")
+    assert resp.status_code == 404
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+def test_enqueue_for_district(
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    District(
+        id="2025chs",
+        year=2025,
+        abbreviation="chs",
+    ).put()
+    Event(
+        id="2025chsevent",
+        year=2025,
+        event_short="chsevent",
+        event_type_enum=EventType.DISTRICT,
+        district_key=ndb.Key(District, "2025chs"),
+    ).put()
+    Event(
+        id="2025chsoffseason",
+        year=2025,
+        event_short="chsoffseason",
+        event_type_enum=EventType.OFFSEASON,
+        district_key=ndb.Key(District, "2025chs"),
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/district/2025chs")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    task_urls = {t.url for t in tasks}
+    assert task_urls == {
+        "/tasks/math/do/district_points_calc/2025chsevent",
+    }
+
+
+def test_enqueue_for_district_no_output_in_taskqueue(
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    District(
+        id="2025chs",
+        year=2025,
+        abbreviation="chs",
+    ).put()
+    resp = tasks_client.get(
+        "/tasks/math/enqueue/district_points_calc/district/2025chs",
+        headers={
+            "X-Appengine-Taskname": "test",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+
 def test_calc_no_event(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
