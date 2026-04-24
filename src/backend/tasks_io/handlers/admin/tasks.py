@@ -38,7 +38,7 @@ def admin_post_division_tasks(event_key: EventKey) -> str:
         EventSyncOverrides,
         dict(cast(Dict[str, Any], event.sync_overrides or {})),
     )
-    sync_overrides["event_sync_disable"] = True
+    sync_overrides["skip_eventteams"] = True
     sync_overrides["set_start_day_to_last"] = True
     event.sync_overrides = sync_overrides
     EventManipulator.createOrUpdate(event)
