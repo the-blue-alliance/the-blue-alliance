@@ -5,6 +5,7 @@ from typing import List, Optional
 from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from markupsafe import escape
 from werkzeug.wrappers import Response
 
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
@@ -115,9 +116,12 @@ def enqueue_district_points_calc_for_district(district_key: DistrictKey) -> Resp
     Enqueues calculation of district points for all events in a single district.
     Each per-event task auto-enqueues district_rankings_calc on completion.
     """
+    if not District.validate_key_name(district_key):
+        return make_response(f"{escape(district_key)} is not a valid district key", 400)
+
     district = District.get_by_id(district_key)
     if not district:
-        return make_response(f"District {district_key} not found", 404)
+        return make_response(f"District {escape(district_key)} not found", 404)
 
     events = DistrictEventsQuery(district_key).fetch()
     event_keys = [
@@ -136,7 +140,7 @@ def enqueue_district_points_calc_for_district(district_key: DistrictKey) -> Resp
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
-        return make_response(f"Enqueued for {district_key}: {event_keys}")
+        return make_response(f"Enqueued for {escape(district_key)}: {event_keys}")
     return make_response("")
 
 

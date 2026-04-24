@@ -145,6 +145,16 @@ def test_enqueue_skips_regionals_2025(
         assert task_resp.status_code == 200
 
 
+def test_enqueue_for_district_invalid_key(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/district/asdf")
+    assert resp.status_code == 400
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
 def test_enqueue_for_district_not_found(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
