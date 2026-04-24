@@ -125,19 +125,24 @@ def enqueue_rolling_team_details() -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks/get/team_details/<team_key>")
-def team_details(team_key: TeamKey) -> Response:
+@blueprint.route("/backend-tasks/get/team_details/<team_key>", defaults={"year": None})
+@blueprint.route("/backend-tasks/get/team_details/<team_key>/<int:year>")
+def team_details(team_key: TeamKey, year: Year | None) -> Response:
     if not Team.validate_key_name(team_key):
         return make_response(f"Bad team key: {Markup.escape(team_key)}", 400)
 
     fms_df = DatafeedFMSAPI(save_response=True)
-    year = datetime.date.today().year
+    if year is None:
+        year = SeasonHelper.get_max_year()
     fms_details = fms_df.get_team_details(year, team_key).get_result()
 
     team, district_team, robot = fms_details or (None, None, None)
     regional_pool_team: Optional[RegionalPoolTeam] = None
 
-    if team:
+    # Only write the Team row from the latest year's response — historical
+    # calls (e.g. backfilling 2025 DistrictTeams in 2026) should not clobber
+    # current Team metadata (name, city, website, etc.) with a stale snapshot.
+    if team and (year == SeasonHelper.get_max_year()):
         team = TeamManipulator.createOrUpdate(team, update_manual_attrs=False)
 
     if district_team:
@@ -166,34 +171,16 @@ def team_details(team_key: TeamKey) -> Response:
 
     # Clean up junk district teams
     # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
+    # FIRST's response for this year is the authority — delete any other
+    # same-year DistrictTeam for this team. Other years are left alone;
+    # they are the responsibility of their own syncs, not this handler.
     keys_to_delete = set()
-    # Delete all DistrictTeams that are not valid in the current
-    # year, since each team can only be in one district per year
     dt_keys = DistrictTeam.query(
         DistrictTeam.team == ndb.Key(Team, team_key), DistrictTeam.year == year
     ).fetch(keys_only=True)
     for dt_key in dt_keys:
         if not district_team or dt_key.id() != district_team.key.id():
             keys_to_delete.add(dt_key)
-
-    # Delete all DistrictTeam that are for any year that the team
-    # does not have an event
-    dt_keys = DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch()
-    et_keys = EventTeam.query(
-        EventTeam.team == ndb.Key(Team, team_key),
-        projection=[EventTeam.year],
-        group_by=[EventTeam.year],
-    ).fetch()
-    et_years = {et_key.year for et_key in et_keys}
-
-    # The API confirmed this team is in a district for this year, so
-    # treat it as a valid year even if EventTeams don't exist yet
-    if district_team:
-        et_years.add(district_team.year)
-
-    for dt_key in dt_keys:
-        if dt_key.year not in et_years:
-            keys_to_delete.add(dt_key.key)
     DistrictTeamManipulator.delete_keys(keys_to_delete)
 
     if robot:
