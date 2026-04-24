@@ -952,8 +952,33 @@ def district_list(year: Year) -> Response:
     return make_response("")
 
 
+@blueprint.route("/tasks/enqueue/district_advancement/<int:year>")
+@blueprint.route("/tasks/enqueue/district_advancement", defaults={"year": None})
+def enqueue_district_advancement(year: Optional[Year]) -> Response:
+    """Enqueue an advancement refresh for every district in the given season."""
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    districts = District.query(District.year == int(year)).fetch()
+    district_keys = [district.key.id() for district in districts]
+    for district_key in district_keys:
+        taskqueue.add(
+            url=url_for("frc_api.district_rankings", district_key=district_key),
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(f"Enqueued for: {district_keys}")
+    return make_response("")
+
+
 @blueprint.route("/backend-tasks/get/district_rankings/<district_key>")
 def district_rankings(district_key: DistrictKey) -> Response:
+    """Fetch district advancement (DCMP/CMP qualification flags) from FIRST."""
     district = (
         District.get_by_id(district_key)
         if District.validate_key_name(district_key)
@@ -967,18 +992,45 @@ def district_rankings(district_key: DistrictKey) -> Response:
         district_key
     ).get_result()
     district.advancement = data.advancement
-    district.adjustments = data.adjustments
     district = DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
-
-    template_values = {
-        "districts": listify(district),
-    }
 
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(
-            render_template("datafeeds/fms_district_list_get.html", **template_values)
+            render_template(
+                "datafeeds/fms_district_advancement_get.html", district=district
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks/get/district_adjustments/<district_key>")
+def district_adjustments(district_key: DistrictKey) -> Response:
+    """Fetch district point adjustments from FIRST, then recompute rankings."""
+    district = (
+        District.get_by_id(district_key)
+        if District.validate_key_name(district_key)
+        else None
+    )
+    if district is None:
+        return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
+
+    df = DatafeedFMSAPI()
+    data: TParsedDistrictAdvancement = df.get_district_rankings(
+        district_key
+    ).get_result()
+    district.adjustments = data.adjustments
+    district = DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/fms_district_adjustments_get.html", district=district
+            )
         )
 
     taskqueue.add(

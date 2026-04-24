@@ -209,7 +209,7 @@ def enqueue_district_rankings_calc(year: Optional[Year]) -> Response:
         # This will hit the FRC API for adjustment points, and then
         # call back into district_rankings_calc below
         taskqueue.add(
-            url=url_for("frc_api.district_rankings", district_key=district_key),
+            url=url_for("frc_api.district_adjustments", district_key=district_key),
             method="GET",
             target="py3-tasks-io",
             queue_name="default",
