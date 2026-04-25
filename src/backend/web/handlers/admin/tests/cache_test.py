@@ -91,7 +91,7 @@ def test_purge_global_version_redirects(
     web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
     current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
-    old_v = current_v - 1
+    old_v = current_v - 2  # Must be < current_v - 1 to pass validation
 
     CachedQueryResult(
         id=_make_cache_key("test_admin_cache_x", 1, old_v), result=None
@@ -109,7 +109,7 @@ def test_purge_global_version_deletes_old_only(
     web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
     current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
-    old_v = current_v - 1
+    old_v = current_v - 2  # Must be < current_v - 1 to pass validation
 
     old_key1 = _make_cache_key("test_admin_cache_a", 1, old_v)
     old_key2 = _make_cache_key("test_admin_cache_b", 2, old_v)
@@ -180,7 +180,8 @@ def test_cached_query_detail_normalizes_dict_db_version(
 def test_purge_version_deletes_dict_entries_for_version(
     web_client: Client, login_gae_admin, ndb_stub
 ) -> None:
-    old_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION - 1
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    old_v = current_v - 2  # Must be < current_v - 1 to pass validation
 
     plain_key = _make_cache_key("test_admin_cache_alpha", 2, old_v)
     dict_key = _make_dict_cache_key("test_admin_cache_alpha", 2, old_v, 3)
@@ -208,7 +209,8 @@ def test_purge_global_version_not_accessible_without_login(
 def test_purge_class_global_version_redirects(
     web_client: Client, login_gae_admin, ndb_stub
 ) -> None:
-    old_v = max(1, CachedDatabaseQuery.DATABASE_QUERY_VERSION - 1)
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    old_v = max(1, current_v - 2)  # Must be < current_v - 1 to pass validation
 
     CachedQueryResult(
         id=_make_cache_key("test_admin_cache_alpha", 1, old_v), result=None
@@ -223,7 +225,7 @@ def test_purge_class_global_version_deletes_only_matching_class_and_version(
     web_client: Client, login_gae_admin, ndb_stub
 ) -> None:
     current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
-    old_v = current_v - 1
+    old_v = current_v - 2  # Must be < current_v - 1 to pass validation
 
     class_old_qv1 = _make_cache_key("test_admin_cache_alpha", 1, old_v)
     class_old_qv2 = _make_cache_key("test_admin_cache_beta", 2, old_v)
@@ -261,3 +263,56 @@ def test_purge_class_global_version_not_accessible_without_login(
 ) -> None:
     resp = web_client.post("/admin/cache/_TestCachedQuery/purge_global/1")
     assert resp.status_code == 401
+
+
+# ---------------------------------------------------------------------------
+# CachedDatabaseQuery class methods
+# ---------------------------------------------------------------------------
+
+
+def test_get_query_class_by_name_found() -> None:
+    """Test finding a query class by name."""
+    query_class = CachedDatabaseQuery.get_query_class_by_name("_TestCachedQuery")
+    assert query_class is not None
+    assert query_class.__name__ == "_TestCachedQuery"
+    assert query_class is _TestCachedQuery
+
+
+def test_get_query_class_by_name_not_found() -> None:
+    """Test that None is returned for non-existent class."""
+    query_class = CachedDatabaseQuery.get_query_class_by_name("NotARealQueryClass")
+    assert query_class is None
+
+
+def test_validate_db_version_for_deletion_valid() -> None:
+    """Test that old versions are accepted."""
+    current_version = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    # current - 2 should be safe to delete
+    CachedDatabaseQuery.validate_db_version_for_deletion(current_version - 2)
+    # current - 3 should also be safe
+    CachedDatabaseQuery.validate_db_version_for_deletion(current_version - 3)
+
+
+def test_validate_db_version_for_deletion_rejects_positive_rules() -> None:
+    """Test that versions must be positive."""
+    import pytest
+
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        CachedDatabaseQuery.validate_db_version_for_deletion(0)
+
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        CachedDatabaseQuery.validate_db_version_for_deletion(-1)
+
+
+def test_validate_db_version_for_deletion_rejects_recent() -> None:
+    """Test that recent versions (current and current-1) are rejected."""
+    import pytest
+
+    current_version = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    min_safe = current_version - 1
+
+    with pytest.raises(ValueError, match=f"must be less than {min_safe}"):
+        CachedDatabaseQuery.validate_db_version_for_deletion(current_version)
+
+    with pytest.raises(ValueError, match=f"must be less than {min_safe}"):
+        CachedDatabaseQuery.validate_db_version_for_deletion(min_safe)

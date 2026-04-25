@@ -23,17 +23,6 @@ DATASTORE_PAGE_SIZE = 1000
 DATASTORE_DELETE_BATCH_SIZE = 500
 
 
-def _get_cached_query_class(query_class_name: str) -> type[CachedDatabaseQuery] | None:
-    return next(
-        (
-            c
-            for c in CachedDatabaseQuery.__subclasses__()
-            if c.__name__ == query_class_name
-        ),
-        None,
-    )
-
-
 def cached_query_list() -> str:
     cached_queries = {
         c.__name__: {
@@ -55,14 +44,7 @@ def cached_query_key_lookup_post(query_class_name: str) -> Response:
         abort(400)
 
     if ":" not in cache_key:
-        query_class = next(
-            (
-                c
-                for c in CachedDatabaseQuery.__subclasses__()
-                if c.__name__ == query_class_name
-            ),
-            None,
-        )
+        query_class = CachedDatabaseQuery.get_query_class_by_name(query_class_name)
         if query_class is None:
             abort(404)
 
@@ -82,7 +64,7 @@ def cached_query_key_lookup_post(query_class_name: str) -> Response:
 
 
 def cached_query_detail(query_class_name: str) -> str:
-    query_class = _get_cached_query_class(query_class_name)
+    query_class = CachedDatabaseQuery.get_query_class_by_name(query_class_name)
     if query_class is None:
         abort(404)
 
@@ -145,7 +127,7 @@ def cached_query_delete(query_class_name: str, cache_key: str) -> Response:
 def cached_query_purge_version(
     query_class_name: str, db_version: str, query_version: int
 ) -> Response:
-    query_class = _get_cached_query_class(query_class_name)
+    query_class = CachedDatabaseQuery.get_query_class_by_name(query_class_name)
     if query_class is None:
         abort(404)
 
@@ -154,7 +136,11 @@ def cached_query_purge_version(
         target_db_version = int(db_version)
     except ValueError:
         abort(400)
-        raise RuntimeError("unreachable")
+
+    try:
+        CachedDatabaseQuery.validate_db_version_for_deletion(target_db_version)
+    except ValueError:
+        abort(400)
 
     cache_key_prefix = CachedQueryResult.cache_key_prefix_from_format(
         query_class.CACHE_KEY_FORMAT
@@ -190,6 +176,11 @@ def cached_query_purge_global_version(db_version: int) -> Response:
     We enqueue one task per query class on the cache-clearing queue so each task
     only scans/deletes one class slice.
     """
+    try:
+        CachedDatabaseQuery.validate_db_version_for_deletion(db_version)
+    except ValueError:
+        abort(400)
+
     for query_class in CachedDatabaseQuery.__subclasses__():
         defer_safe(
             CachedQueryResult.purge_query_class_global_version,
@@ -207,9 +198,14 @@ def cached_query_purge_global_version(db_version: int) -> Response:
 def cached_query_purge_class_global_version(
     query_class_name: str, db_version: int
 ) -> Response:
-    query_class = _get_cached_query_class(query_class_name)
+    query_class = CachedDatabaseQuery.get_query_class_by_name(query_class_name)
     if query_class is None:
         abort(404)
+
+    try:
+        CachedDatabaseQuery.validate_db_version_for_deletion(db_version)
+    except ValueError:
+        abort(400)
 
     CachedQueryResult.purge_query_class_global_version(
         query_class,

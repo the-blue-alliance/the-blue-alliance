@@ -349,9 +349,12 @@ def test_purge_query_class_global_version_rejects_bad_batch_sizes(ndb_stub) -> N
 def test_purge_query_class_global_version_deletes_only_matching_version(
     ndb_stub,
 ) -> None:
-    old_key = "dummy_purge_query_a:1:4"
-    old_dict_key = "dummy_purge_query_b:1:4~dictv3.0"
-    new_key = "dummy_purge_query_c:1:5"
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    db_version = current_v - 2  # Must be < current_v - 1 to pass validation
+
+    old_key = f"dummy_purge_query_a:1:{db_version}"
+    old_dict_key = f"dummy_purge_query_b:1:{db_version}~dictv3.0"
+    new_key = f"dummy_purge_query_c:1:{current_v}"
     other_prefix_key = "dummy_other_query_z:1:4"
 
     CachedQueryResult(id=old_key, result=None).put()
@@ -361,7 +364,7 @@ def test_purge_query_class_global_version_deletes_only_matching_version(
 
     deleted = CachedQueryResult.purge_query_class_global_version(
         _DummyCachedQueryForPurge,
-        db_version=4,
+        db_version=db_version,
         page_size=10,
         delete_batch_size=2,
     )
@@ -371,3 +374,65 @@ def test_purge_query_class_global_version_deletes_only_matching_version(
     assert CachedQueryResult.get_by_id(old_dict_key) is None
     assert CachedQueryResult.get_by_id(new_key) is not None
     assert CachedQueryResult.get_by_id(other_prefix_key) is not None
+
+
+def test_purge_query_class_global_version_rejects_non_positive_version(
+    ndb_stub,
+) -> None:
+    """Test that version 0 and negative versions are rejected."""
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        CachedQueryResult.purge_query_class_global_version(
+            _DummyCachedQueryForPurge,
+            db_version=0,
+            page_size=100,
+            delete_batch_size=50,
+        )
+
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        CachedQueryResult.purge_query_class_global_version(
+            _DummyCachedQueryForPurge,
+            db_version=-1,
+            page_size=100,
+            delete_batch_size=50,
+        )
+
+
+def test_purge_query_class_global_version_rejects_recent_version(
+    ndb_stub,
+) -> None:
+    """Test that versions >= (CURRENT_VERSION - 1) are rejected."""
+    current_version = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    min_safe_current = current_version - 1
+
+    # Try to delete the current version (should fail)
+    with pytest.raises(
+        ValueError,
+        match=f"must be less than {min_safe_current}",
+    ):
+        CachedQueryResult.purge_query_class_global_version(
+            _DummyCachedQueryForPurge,
+            db_version=current_version,
+            page_size=100,
+            delete_batch_size=50,
+        )
+
+    # Try to delete the prior version (should fail)
+    with pytest.raises(
+        ValueError,
+        match=f"must be less than {min_safe_current}",
+    ):
+        CachedQueryResult.purge_query_class_global_version(
+            _DummyCachedQueryForPurge,
+            db_version=min_safe_current,
+            page_size=100,
+            delete_batch_size=50,
+        )
+
+    # Older version should succeed (db_version = current - 2)
+    deleted = CachedQueryResult.purge_query_class_global_version(
+        _DummyCachedQueryForPurge,
+        db_version=current_version - 2,
+        page_size=100,
+        delete_batch_size=50,
+    )
+    assert deleted == 0  # No entries created, but validation passed

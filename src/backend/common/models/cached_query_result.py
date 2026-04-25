@@ -111,6 +111,21 @@ class CachedQueryResult(ndb.Model):
         if delete_batch_size <= 0:
             raise ValueError("delete_batch_size must be > 0")
 
+        # Validate db_version for safe deletion
+        if db_version <= 0:
+            raise ValueError(
+                f"Cannot delete version {db_version}: must be a positive integer"
+            )
+
+        current_version = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+        min_safe_current = current_version - 1
+        if db_version >= min_safe_current:
+            raise ValueError(
+                f"Cannot delete version {db_version}: must be less than "
+                f"{min_safe_current} (current version {current_version} must "
+                "have at least one prior version as a buffer)"
+            )
+
         cache_key_prefix = cls.cache_key_prefix_from_format(
             query_class.CACHE_KEY_FORMAT
         )
