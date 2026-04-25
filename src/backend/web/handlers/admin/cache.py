@@ -34,7 +34,9 @@ def cached_query_list() -> str:
     }
 
     template_args = {"cached_queries": cached_queries}
-    return render_template("admin/cached_query_list.html", template_args)
+    return render_template(
+        "admin/cached_query_list.html", template_values=template_args
+    )
 
 
 def cached_query_key_lookup_post(query_class_name: str) -> Response:
@@ -97,7 +99,9 @@ def cached_query_detail(query_class_name: str) -> str:
         "cached_items_by_version": cached_items_by_version,
         "total_records": total_records,
     }
-    return render_template("admin/cached_query_detail.html", template_args)
+    return render_template(
+        "admin/cached_query_detail.html", template_values=template_args
+    )
 
 
 def cached_query_info(query_class_name: str, cache_key: str) -> str:
@@ -110,7 +114,9 @@ def cached_query_info(query_class_name: str, cache_key: str) -> str:
         "cache_key": cache_key,
         "cached_query": cached_query,
     }
-    return render_template("admin/cached_query_info.html", template_args)
+    return render_template(
+        "admin/cached_query_info.html", template_values=template_args
+    )
 
 
 def cached_query_delete(query_class_name: str, cache_key: str) -> Response:
