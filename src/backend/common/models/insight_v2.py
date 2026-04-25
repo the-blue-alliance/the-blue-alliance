@@ -10,6 +10,7 @@ LeaderboardKeyType = Literal["team", "event", "match", "team_pair"]
 
 class InsightCategory:
     LEADERBOARD = "leaderboard"
+    STREAK = "streak"
 
 
 # Helper for organizing insight names and display names
@@ -25,6 +26,9 @@ class InsightV2Names:
     )
     MOST_MATCHES_PLAYED_TOGETHER = InsightV2NameEntry(
         "most_matches_played_together", "Most Matches Played Together"
+    )
+    QUALIFYING_EVENT_WIN_STREAK = InsightV2NameEntry(
+        "qualifying_event_win_streak", "Longest Qualifying Event Win Streak"
     )
 
 
@@ -86,3 +90,16 @@ class LeaderboardRankingV2(TypedDict):
 class LeaderboardDataV2(TypedDict):
     rankings: List[LeaderboardRankingV2]
     key_type: LeaderboardKeyType
+
+
+class StreakEntry(TypedDict):
+    key: str
+    key_type: LeaderboardKeyType
+    streak_length: int
+    start: str  # event key or year string
+    end: str  # event key or year string
+    is_active: bool
+
+
+class StreakData(TypedDict):
+    entries: List[StreakEntry]
