@@ -242,6 +242,7 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/cache/<query_class_name>/purge/<db_version>/<int:query_version>",
+    methods=["POST"],
     view_func=cached_query_purge_version,
 )
 admin_routes.add_url_rule(

@@ -230,12 +230,37 @@ def test_purge_version_deletes_dict_entries_for_version(
     CachedQueryResult(id=dict_key, result=None).put()
     CachedQueryResult(id=other_version_key, result=None).put()
 
-    resp = web_client.get(f"/admin/cache/_TestCachedQuery/purge/{old_v}/2")
+    resp = web_client.post(f"/admin/cache/_TestCachedQuery/purge/{old_v}/2")
     assert resp.status_code == 302
 
     assert CachedQueryResult.get_by_id(plain_key) is None
     assert CachedQueryResult.get_by_id(dict_key) is None
     assert CachedQueryResult.get_by_id(other_version_key) is not None
+
+
+def test_purge_version_rejects_protected_versions(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+
+    # current version is protected
+    resp = web_client.post(f"/admin/cache/_TestCachedQuery/purge/{current_v}/1")
+    assert resp.status_code == 400
+
+    # current - 1 (buffer) is also protected
+    resp = web_client.post(f"/admin/cache/_TestCachedQuery/purge/{current_v - 1}/1")
+    assert resp.status_code == 400
+
+    # version 0 is invalid
+    resp = web_client.post("/admin/cache/_TestCachedQuery/purge/0/1")
+    assert resp.status_code == 400
+
+
+def test_purge_version_not_accessible_without_login(
+    web_client: Client, ndb_stub
+) -> None:
+    resp = web_client.post("/admin/cache/_TestCachedQuery/purge/1/1")
+    assert resp.status_code == 401
 
 
 def test_purge_global_version_not_accessible_without_login(
@@ -246,7 +271,7 @@ def test_purge_global_version_not_accessible_without_login(
 
 
 def test_purge_class_global_version_redirects(
-    web_client: Client, login_gae_admin, ndb_stub
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
     current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
     old_v = max(1, current_v - 2)  # Must be < current_v - 1 to pass validation
@@ -261,7 +286,7 @@ def test_purge_class_global_version_redirects(
 
 
 def test_purge_class_global_version_deletes_only_matching_class_and_version(
-    web_client: Client, login_gae_admin, ndb_stub
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
     current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
     old_v = current_v - 2  # Must be < current_v - 1 to pass validation
@@ -282,12 +307,55 @@ def test_purge_class_global_version_deletes_only_matching_class_and_version(
     resp = web_client.post(f"/admin/cache/_TestCachedQuery/purge_global/{old_v}")
     assert resp.status_code == 302
 
+    # Per-class purge is now deferred; nothing deleted until tasks run
+    assert CachedQueryResult.get_by_id(class_old_qv1) is not None
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 1
+    for task in tasks:
+        run_from_task(task)
+
     assert CachedQueryResult.get_by_id(class_old_qv1) is None
     assert CachedQueryResult.get_by_id(class_old_qv2) is None
     assert CachedQueryResult.get_by_id(class_old_dict) is None
 
     assert CachedQueryResult.get_by_id(class_current) is not None
     assert CachedQueryResult.get_by_id(other_class_same_version) is not None
+
+
+def test_purge_class_global_version_defers_task(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    """Per-class global purge should enqueue a task, not delete synchronously."""
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    old_v = current_v - 2
+
+    old_key = _make_cache_key("test_admin_cache_alpha", 1, old_v)
+    CachedQueryResult(id=old_key, result=None).put()
+
+    resp = web_client.post(f"/admin/cache/_TestCachedQuery/purge_global/{old_v}")
+    assert resp.status_code == 302
+
+    # Must not have been deleted immediately — must be deferred
+    assert CachedQueryResult.get_by_id(old_key) is not None
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="cache-clearing")
+    assert len(tasks) == 1
+
+
+def test_purge_class_global_version_rejects_protected_versions(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+
+    # current version is protected
+    resp = web_client.post(f"/admin/cache/_TestCachedQuery/purge_global/{current_v}")
+    assert resp.status_code == 400
+
+    # current - 1 (buffer) is also protected
+    resp = web_client.post(
+        f"/admin/cache/_TestCachedQuery/purge_global/{current_v - 1}"
+    )
+    assert resp.status_code == 400
 
 
 def test_purge_class_global_version_not_found(

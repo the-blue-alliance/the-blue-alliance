@@ -86,7 +86,13 @@
                 <td>{{count}}</td>
                 <td>
                     {% if db_version < current_db_version - 1 %}
-                        <a class="btn btn-danger btn-small" href="/admin/cache/{{query_class_name}}/purge/{{db_version}}/{{query_version}}"><span class="glyphicon glyphicon-trash"></span> Purge</a>
+                        <form method="post" action="/admin/cache/{{query_class_name}}/purge/{{db_version}}/{{query_version}}" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-danger btn-small"
+                                    onclick="return confirm('Delete {{ count }} record(s) for {{query_class_name}} at DB Version {{db_version}}, Query Version {{query_version}}?')">
+                                <span class="glyphicon glyphicon-trash"></span> Purge
+                            </button>
+                        </form>
                     {% else %}
                         <span class="text-muted">protected — cannot purge</span>
                     {% endif %}

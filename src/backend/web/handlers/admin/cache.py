@@ -224,11 +224,14 @@ def cached_query_purge_class_global_version(
     except ValueError:
         abort(400)
 
-    CachedQueryResult.purge_query_class_global_version(
+    defer_safe(
+        CachedQueryResult.purge_query_class_global_version,
         query_class,
         db_version,
         DATASTORE_PAGE_SIZE,
         DATASTORE_DELETE_BATCH_SIZE,
+        _queue="cache-clearing",
+        _target="py3-tasks-io",
     )
 
     return redirect(
