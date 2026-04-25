@@ -788,10 +788,16 @@ export const zMatchSimple = z.object({
     .nullable(),
 });
 
-/**
- * The `Media` object contains a reference for most any media associated with a team or event on TBA.
- */
-export const zMedia = z.object({
+export const zMediaAvatarExtras = z.object({
+  type: z.literal('avatar').optional(),
+  details: z
+    .object({
+      base64Image: z.string(),
+    })
+    .optional(),
+});
+
+export const zMediaBase = z.object({
   type: z.enum([
     'youtube',
     'cdphotothread',
@@ -811,49 +817,133 @@ export const zMedia = z.object({
     'cd-thread',
   ]),
   foreign_key: z.string(),
-  details: z
-    .union([
-      z.record(z.string(), z.never()),
-      z.object({
-        base64Image: z.string(),
-      }),
-      z.object({
-        author_id: z.int(),
-        author_name: z.string(),
-        author_url: z.url(),
-        height: z.int().nullable(),
-        html: z.string(),
-        media_id: z.string(),
-        provider_name: z.string(),
-        provider_url: z.url(),
-        thumbnail_height: z.int(),
-        thumbnail_url: z.url(),
-        thumbnail_width: z.int(),
-        title: z.string(),
-        type: z.string(),
-        version: z.string(),
-        width: z.int(),
-      }),
-      z.object({
-        model_created: z.iso.datetime({ offset: true }),
-        model_description: z.string().nullable(),
-        model_image: z.url(),
-        model_name: z.string(),
-      }),
-      z.object({
-        image_partial: z.string(),
-      }),
-      z.object({
-        thread_title: z.string(),
-        image_url: z.string().nullable(),
-      }),
-    ])
-    .optional(),
   preferred: z.boolean().optional(),
   team_keys: z.array(z.string()),
   direct_url: z.string().optional(),
   view_url: z.string().optional(),
 });
+
+export const zMediaAvatar = zMediaBase.and(zMediaAvatarExtras);
+
+export const zMediaCdPhotoThread = zMediaBase.and(
+  z.object({
+    type: z.literal('cdphotothread').optional(),
+    details: z
+      .object({
+        image_partial: z.string(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaCdThread = zMediaBase.and(
+  z.object({
+    type: z.literal('cd-thread').optional(),
+    details: z
+      .object({
+        thread_title: z.string(),
+        image_url: z.string().nullable(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaGrabCad = zMediaBase.and(
+  z.object({
+    type: z.literal('grabcad').optional(),
+    details: z
+      .object({
+        model_created: z.iso.datetime({ offset: true }),
+        model_description: z.string().nullable(),
+        model_image: z.url(),
+        model_name: z.string(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaNoDetails = zMediaBase.and(
+  z.object({
+    type: z
+      .enum([
+        'youtube',
+        'imgur',
+        'facebook-profile',
+        'youtube-channel',
+        'twitter-profile',
+        'github-profile',
+        'instagram-profile',
+        'periscope-profile',
+        'gitlab-profile',
+        'instagram-image',
+        'external-link',
+      ])
+      .optional(),
+    details: z.object({}).optional(),
+  }),
+);
+
+export const zMediaOnshape = zMediaBase.and(
+  z.object({
+    type: z.literal('onshape').optional(),
+    details: z
+      .object({
+        model_created: z.iso.datetime({ offset: true }),
+        model_description: z.string().nullable(),
+        model_image: z.url(),
+        model_name: z.string(),
+      })
+      .optional(),
+  }),
+);
+
+/**
+ * The `Media` object contains a reference for most any media associated with a team or event on TBA.
+ */
+export const zMedia = z.union([
+  z
+    .object({
+      type: z.literal('avatar'),
+    })
+    .and(zMediaAvatar),
+  z
+    .object({
+      type: z.literal('cdphotothread'),
+    })
+    .and(zMediaCdPhotoThread),
+  z
+    .object({
+      type: z.literal('cd-thread'),
+    })
+    .and(zMediaCdThread),
+  z
+    .object({
+      type: z.literal('grabcad'),
+    })
+    .and(zMediaGrabCad),
+  z
+    .object({
+      type: z.union([
+        z.literal('youtube'),
+        z.literal('imgur'),
+        z.literal('facebook-profile'),
+        z.literal('youtube-channel'),
+        z.literal('twitter-profile'),
+        z.literal('github-profile'),
+        z.literal('instagram-profile'),
+        z.literal('periscope-profile'),
+        z.literal('gitlab-profile'),
+        z.literal('instagram-image'),
+        z.literal('external-link'),
+      ]),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('onshape'),
+    })
+    .and(zMediaOnshape),
+]);
 
 export const zMobilityRobot2023 = z.enum(['No', 'Yes']);
 

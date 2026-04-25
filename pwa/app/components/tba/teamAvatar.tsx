@@ -1,19 +1,19 @@
 import { useState } from 'react';
 
-import { Media } from '~/api/tba/read';
+import { MediaAvatar } from '~/api/tba/read';
 import { cn } from '~/lib/utils';
 
 export default function TeamAvatar({
   media,
   className,
 }: {
-  media: Media;
+  media: MediaAvatar;
   className?: string;
 }) {
   const [colorClass, setColorClass] = useState('bg-first-avatar-blue');
 
   if (!media.details) {
-    return <></>;
+    return null;
   }
 
   const handler = () => {
@@ -24,17 +24,13 @@ export default function TeamAvatar({
     }
   };
 
-  if ('base64Image' in media.details) {
-    return (
-      <button onClick={handler} onKeyDown={handler} className={className}>
-        <img
-          alt="Team Avatar"
-          src={`data:image/png;base64, ${media.details.base64Image}`}
-          className={cn('inline size-12 rounded p-1', colorClass)}
-        />
-      </button>
-    );
-  }
-
-  return null;
+  return (
+    <button onClick={handler} onKeyDown={handler} className={className}>
+      <img
+        alt="Team Avatar"
+        src={`data:image/png;base64, ${media.details.base64Image}`}
+        className={cn('inline size-12 rounded p-1', colorClass)}
+      />
+    </button>
+  );
 }

@@ -9681,12 +9681,63 @@
         }
       },
       "Media": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/Media_Avatar" },
+          { "$ref": "#/components/schemas/Media_CdPhotoThread" },
+          { "$ref": "#/components/schemas/Media_CdThread" },
+          { "$ref": "#/components/schemas/Media_GrabCad" },
+          { "$ref": "#/components/schemas/Media_NoDetails" },
+          { "$ref": "#/components/schemas/Media_Onshape" }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "avatar": "#/components/schemas/Media_Avatar",
+            "cdphotothread": "#/components/schemas/Media_CdPhotoThread",
+            "cd-thread": "#/components/schemas/Media_CdThread",
+            "grabcad": "#/components/schemas/Media_GrabCad",
+            "youtube": "#/components/schemas/Media_NoDetails",
+            "imgur": "#/components/schemas/Media_NoDetails",
+            "facebook-profile": "#/components/schemas/Media_NoDetails",
+            "youtube-channel": "#/components/schemas/Media_NoDetails",
+            "twitter-profile": "#/components/schemas/Media_NoDetails",
+            "github-profile": "#/components/schemas/Media_NoDetails",
+            "instagram-profile": "#/components/schemas/Media_NoDetails",
+            "periscope-profile": "#/components/schemas/Media_NoDetails",
+            "gitlab-profile": "#/components/schemas/Media_NoDetails",
+            "instagram-image": "#/components/schemas/Media_NoDetails",
+            "external-link": "#/components/schemas/Media_NoDetails",
+            "onshape": "#/components/schemas/Media_Onshape"
+          }
+        },
+        "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA."
+      },
+      "Media_Avatar": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Media_Base" },
+          { "$ref": "#/components/schemas/Media_Avatar_Extras" }
+        ]
+      },
+      "Media_Avatar_Extras": {
+        "type": "object",
+        "properties": {
+          "type": { "const": "avatar" },
+          "details": {
+            "type": "object",
+            "required": ["base64Image"],
+            "properties": {
+              "base64Image": { "type": "string" }
+            }
+          }
+        }
+      },
+      "Media_Base": {
+        "type": "object",
         "required": [
           "type",
           "foreign_key",
           "team_keys"
         ],
-        "type": "object",
         "properties": {
           "type": {
             "type": "string",
@@ -9714,158 +9765,6 @@
             "type": "string",
             "description": "The key used to identify this media on the media site."
           },
-          "details": {
-            "type": "object",
-            "description": "If required, a JSON dict of additional media information.",
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
-              },
-              {
-                "properties": {
-                  "base64Image": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "base64Image"
-                ],
-                "type": "object"
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "author_id": {
-                    "type": "integer"
-                  },
-                  "author_name": {
-                    "type": "string"
-                  },
-                  "author_url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "height": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "html": {
-                    "type": "string"
-                  },
-                  "media_id": {
-                    "type": "string"
-                  },
-                  "provider_name": {
-                    "type": "string"
-                  },
-                  "provider_url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "thumbnail_height": {
-                    "type": "integer"
-                  },
-                  "thumbnail_url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "thumbnail_width": {
-                    "type": "integer"
-                  },
-                  "title": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "version": {
-                    "type": "string"
-                  },
-                  "width": {
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "author_id",
-                  "author_name",
-                  "author_url",
-                  "height",
-                  "html",
-                  "media_id",
-                  "provider_name",
-                  "provider_url",
-                  "thumbnail_height",
-                  "thumbnail_url",
-                  "thumbnail_width",
-                  "title",
-                  "type",
-                  "version",
-                  "width"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "model_created": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "model_description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "model_image": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "model_name": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "model_created",
-                  "model_description",
-                  "model_image",
-                  "model_name"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "image_partial": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "image_partial"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "thread_title": {
-                    "type": "string"
-                  },
-                  "image_url": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  }
-                },
-                "required": [
-                  "thread_title",
-                  "image_url"
-                ]
-              }
-            ]
-          },
           "preferred": {
             "type": "boolean",
             "description": "True if the media is of high quality."
@@ -9886,8 +9785,117 @@
             "type": "string",
             "description": "The URL that leads to the full web page for the media, if one exists."
           }
-        },
-        "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA."
+        }
+      },
+      "Media_CdPhotoThread": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "cdphotothread" },
+              "details": {
+                "type": "object",
+                "required": ["image_partial"],
+                "properties": {
+                  "image_partial": { "type": "string" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_CdThread": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "cd-thread" },
+              "details": {
+                "type": "object",
+                "required": ["thread_title", "image_url"],
+                "properties": {
+                  "thread_title": { "type": "string" },
+                  "image_url": { "type": ["string", "null"] }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_GrabCad": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "grabcad" },
+              "details": {
+                "type": "object",
+                "required": ["model_created", "model_description", "model_image", "model_name"],
+                "properties": {
+                  "model_created": { "type": "string", "format": "date-time" },
+                  "model_description": { "type": ["string", "null"] },
+                  "model_image": { "type": "string", "format": "uri" },
+                  "model_name": { "type": "string" }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_NoDetails": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "youtube",
+                  "imgur",
+                  "facebook-profile",
+                  "youtube-channel",
+                  "twitter-profile",
+                  "github-profile",
+                  "instagram-profile",
+                  "periscope-profile",
+                  "gitlab-profile",
+                  "instagram-image",
+                  "external-link"
+                ]
+              },
+              "details": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            }
+          }
+        ]
+      },
+      "Media_Onshape": {
+        "allOf": [
+          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "type": "object",
+            "properties": {
+              "type": { "const": "onshape" },
+              "details": {
+                "type": "object",
+                "required": ["model_created", "model_description", "model_image", "model_name"],
+                "properties": {
+                  "model_created": { "type": "string", "format": "date-time" },
+                  "model_description": { "type": ["string", "null"] },
+                  "model_image": { "type": "string", "format": "uri" },
+                  "model_name": { "type": "string" }
+                }
+              }
+            }
+          }
+        ]
       },
       "MobilityRobot_2023": {
         "type": "string",
