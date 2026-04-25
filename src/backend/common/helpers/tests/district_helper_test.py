@@ -1,5 +1,6 @@
 import json
 from typing import cast
+from unittest import mock
 
 import pytest
 from pyre_extensions import none_throws
@@ -10,6 +11,7 @@ from backend.common.helpers.district_helper import (
     DistrictRankingTiebreakers,
     TeamAtEventDistrictPoints,
 )
+from backend.common.models.district_advancement import ApiDistrictRankingTeamData
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import Year
@@ -326,3 +328,236 @@ def test_hq_adjustments(setup_full_event) -> None:
         adjustments=5,
         tiebreakers=DistrictRankingTiebreakers(*[30, 30, 16, 16, 19]),
     )
+
+
+# --- _break_ties_with_first_rank ---
+
+
+def _mock_event(first_api_code: str) -> Event:
+    event = mock.MagicMock(spec=Event)
+    event.first_api_code = first_api_code
+    return event
+
+
+def _team_total(
+    *,
+    point_total: int,
+    rookie_bonus: int,
+    event_points: list[tuple[Event, TeamAtEventDistrictPoints]],
+    tiebreakers: DistrictRankingTiebreakers = DistrictRankingTiebreakers(0, 0, 0, 0, 0),
+    match_scores: list[int] | None = None,
+) -> DistrictRankingTeamTotal:
+    return DistrictRankingTeamTotal(
+        event_points=event_points,
+        point_total=point_total,
+        tiebreakers=tiebreakers,
+        match_scores=match_scores or [],
+        rookie_bonus=rookie_bonus,
+        single_event_bonus=0,
+        other_bonus=0,
+        adjustments=0,
+    )
+
+
+def _api_data(
+    *,
+    rank: int,
+    total_points: int = 50,
+    team_age_points: int = 0,
+    event1_code: str | None = "ABC",
+    event1_points: int | None = 25,
+    event2_code: str | None = "DEF",
+    event2_points: int | None = 25,
+    district_cmp_code: str | None = None,
+    district_cmp_points: int | None = None,
+) -> ApiDistrictRankingTeamData:
+    return ApiDistrictRankingTeamData(
+        rank=rank,
+        total_points=total_points,
+        team_age_points=team_age_points,
+        event1_code=event1_code,
+        event1_points=event1_points,
+        event2_code=event2_code,
+        event2_points=event2_points,
+        district_cmp_code=district_cmp_code,
+        district_cmp_points=district_cmp_points,
+    )
+
+
+def _tied_team_totals() -> dict[str, DistrictRankingTeamTotal]:
+    # Two teams identical on every TBA tiebreaker but different events.
+    event_a1 = _mock_event("ABC")
+    event_a2 = _mock_event("DEF")
+    event_b1 = _mock_event("ABC")
+    event_b2 = _mock_event("DEF")
+    return {
+        "frcA": _team_total(
+            point_total=50,
+            rookie_bonus=0,
+            event_points=[
+                (
+                    event_a1,
+                    TeamAtEventDistrictPoints(
+                        qual_points=10,
+                        elim_points=5,
+                        alliance_points=5,
+                        award_points=5,
+                        total=25,
+                    ),
+                ),
+                (
+                    event_a2,
+                    TeamAtEventDistrictPoints(
+                        qual_points=10,
+                        elim_points=5,
+                        alliance_points=5,
+                        award_points=5,
+                        total=25,
+                    ),
+                ),
+            ],
+        ),
+        "frcB": _team_total(
+            point_total=50,
+            rookie_bonus=0,
+            event_points=[
+                (
+                    event_b1,
+                    TeamAtEventDistrictPoints(
+                        qual_points=10,
+                        elim_points=5,
+                        alliance_points=5,
+                        award_points=5,
+                        total=25,
+                    ),
+                ),
+                (
+                    event_b2,
+                    TeamAtEventDistrictPoints(
+                        qual_points=10,
+                        elim_points=5,
+                        alliance_points=5,
+                        award_points=5,
+                        total=25,
+                    ),
+                ),
+            ],
+        ),
+    }
+
+
+def test_break_ties_full_agreement_uses_first_rank() -> None:
+    team_totals = _tied_team_totals()
+    api_team_data = {
+        "frcA": _api_data(rank=2),
+        "frcB": _api_data(rank=1),
+    }
+    result = DistrictHelper._break_ties_with_first_rank(team_totals, api_team_data)
+    assert list(result.keys()) == ["frcB", "frcA"]
+
+
+def test_break_ties_total_points_disagree_leaves_order() -> None:
+    team_totals = _tied_team_totals()
+    api_team_data = {
+        "frcA": _api_data(rank=2),
+        "frcB": _api_data(rank=1, total_points=51),  # mismatch
+    }
+    result = DistrictHelper._break_ties_with_first_rank(team_totals, api_team_data)
+    assert list(result.keys()) == ["frcA", "frcB"]
+
+
+def test_break_ties_per_event_points_disagree_leaves_order() -> None:
+    team_totals = _tied_team_totals()
+    api_team_data = {
+        "frcA": _api_data(rank=2),
+        "frcB": _api_data(rank=1, event1_points=24),  # 24 != TBA's 25
+    }
+    result = DistrictHelper._break_ties_with_first_rank(team_totals, api_team_data)
+    assert list(result.keys()) == ["frcA", "frcB"]
+
+
+def test_break_ties_event_code_mismatch_leaves_order() -> None:
+    team_totals = _tied_team_totals()
+    api_team_data = {
+        "frcA": _api_data(rank=2),
+        # frcB's TBA event "DEF" isn't in FIRST's reported events for this team
+        "frcB": _api_data(rank=1, event2_code="ZZZ"),
+    }
+    result = DistrictHelper._break_ties_with_first_rank(team_totals, api_team_data)
+    assert list(result.keys()) == ["frcA", "frcB"]
+
+
+def test_break_ties_team_age_points_disagree_leaves_order() -> None:
+    team_totals = _tied_team_totals()
+    api_team_data = {
+        "frcA": _api_data(rank=2),
+        "frcB": _api_data(rank=1, team_age_points=5),  # TBA rookie_bonus is 0
+    }
+    result = DistrictHelper._break_ties_with_first_rank(team_totals, api_team_data)
+    assert list(result.keys()) == ["frcA", "frcB"]
+
+
+def test_break_ties_missing_api_data_leaves_order() -> None:
+    team_totals = _tied_team_totals()
+    api_team_data = {"frcA": _api_data(rank=2)}  # frcB missing
+    result = DistrictHelper._break_ties_with_first_rank(team_totals, api_team_data)
+    assert list(result.keys()) == ["frcA", "frcB"]
+
+
+def test_break_ties_untied_teams_unaffected() -> None:
+    # frcA and frcB are NOT tied (different point_totals); FIRST's ranks
+    # disagree with TBA's order, but we shouldn't touch them.
+    event_a = _mock_event("ABC")
+    event_b = _mock_event("ABC")
+    team_totals = {
+        "frcA": _team_total(
+            point_total=60,
+            rookie_bonus=0,
+            event_points=[
+                (
+                    event_a,
+                    TeamAtEventDistrictPoints(
+                        qual_points=10,
+                        elim_points=10,
+                        alliance_points=10,
+                        award_points=30,
+                        total=60,
+                    ),
+                )
+            ],
+        ),
+        "frcB": _team_total(
+            point_total=50,
+            rookie_bonus=0,
+            event_points=[
+                (
+                    event_b,
+                    TeamAtEventDistrictPoints(
+                        qual_points=10,
+                        elim_points=10,
+                        alliance_points=5,
+                        award_points=25,
+                        total=50,
+                    ),
+                )
+            ],
+        ),
+    }
+    api_team_data = {
+        "frcA": _api_data(
+            rank=2,
+            total_points=60,
+            event1_points=60,
+            event2_code=None,
+            event2_points=None,
+        ),
+        "frcB": _api_data(
+            rank=1,
+            total_points=50,
+            event1_points=50,
+            event2_code=None,
+            event2_points=None,
+        ),
+    }
+    result = DistrictHelper._break_ties_with_first_rank(team_totals, api_team_data)
+    assert list(result.keys()) == ["frcA", "frcB"]
