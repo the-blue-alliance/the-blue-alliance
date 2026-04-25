@@ -41,6 +41,36 @@
 </div>
 
 <div class="row">
+    <h2>Breakdown By DB Version</h2>
+    <table class="table table-striped">
+        <tr>
+            <th>DB Version</th>
+            <th>Number of Records</th>
+            <th></th>
+        </tr>
+        {% for db_version, count in db_version_counts.items() %}
+            <tr>
+                <td>{{db_version}}{% if db_version == current_db_version %} <span class="label label-success">current</span>{% endif %}</td>
+                <td>{{count}}</td>
+                <td>
+                    {% if db_version != current_db_version %}
+                        <form method="post" action="/admin/cache/{{query_class_name}}/purge_global/{{db_version}}" style="display:inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-danger btn-small"
+                                    onclick="return confirm('Delete all {{ count }} record(s) for {{query_class_name}} at DB Version {{db_version}}?')">
+                                <span class="glyphicon glyphicon-trash"></span> Purge DB Version
+                            </button>
+                        </form>
+                    {% else %}
+                        <span class="text-muted">active — cannot purge</span>
+                    {% endif %}
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
+<div class="row">
     <h2>Breakdown By Version</h2>
     <table class="table table-striped">
         <tr>

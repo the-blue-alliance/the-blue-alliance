@@ -6,13 +6,15 @@
 
 <h1>Cached Database Queries</h1>
 
-<table class="table table-striped">
-    <tr>
-        <th>Query Name</th>
-        <th>Cache Key Format</th>
-        <th>Version</th>
-        <th></th>
-    </tr>
+<div class="row">
+    <h2>Query Classes</h2>
+    <table class="table table-striped">
+        <tr>
+            <th>Query Name</th>
+            <th>Cache Key Format</th>
+            <th>Version</th>
+            <th></th>
+        </tr>
     {% for cached_query in cached_queries.values() %}
         <tr>
             <td><a href="/admin/cache/{{cached_query['class_name']}}">{{cached_query['class_name']}}</a></td>
@@ -30,6 +32,7 @@
             </td>
         </tr>
     {% endfor %}
-</table>
+    </table>
+</div>
 
 {% endblock %}

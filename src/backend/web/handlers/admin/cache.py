@@ -4,6 +4,7 @@ from flask import abort, redirect, request, url_for
 from google.appengine.ext import ndb
 from werkzeug import Response
 
+from backend.common.helpers.deferred import defer_safe
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -18,6 +19,20 @@ from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.web.profiled_render import render_template
 
+DATASTORE_PAGE_SIZE = 1000
+DATASTORE_DELETE_BATCH_SIZE = 500
+
+
+def _get_cached_query_class(query_class_name: str) -> type[CachedDatabaseQuery] | None:
+    return next(
+        (
+            c
+            for c in CachedDatabaseQuery.__subclasses__()
+            if c.__name__ == query_class_name
+        ),
+        None,
+    )
+
 
 def cached_query_list() -> str:
     cached_queries = {
@@ -28,6 +43,7 @@ def cached_query_list() -> str:
         }
         for c in CachedDatabaseQuery.__subclasses__()
     }
+
     template_args = {"cached_queries": cached_queries}
     return render_template("admin/cached_query_list.html", template_args)
 
@@ -66,48 +82,38 @@ def cached_query_key_lookup_post(query_class_name: str) -> Response:
 
 
 def cached_query_detail(query_class_name: str) -> str:
-    query_class = next(
-        (
-            c
-            for c in CachedDatabaseQuery.__subclasses__()
-            if c.__name__ == query_class_name
-        ),
-        None,
-    )
+    query_class = _get_cached_query_class(query_class_name)
     if query_class is None:
         abort(404)
 
-    cache_key_splits = query_class.CACHE_KEY_FORMAT.split("_")
-    cache_key_prefix_parts = []
-    for part in cache_key_splits:
-        if "{" not in part and "}" not in part:
-            cache_key_prefix_parts.append(part)
-    cache_key_prefix = "_".join(cache_key_prefix_parts)
-    cached_item_keys = (
-        CachedQueryResult.query()
-        .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
-            > ndb.Key(CachedQueryResult, cache_key_prefix)
-        )
-        .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
-            < ndb.Key(CachedQueryResult, cache_key_prefix + "_:")
-        )
-        .fetch(keys_only=True)
+    cache_key_prefix = CachedQueryResult.cache_key_prefix_from_format(
+        query_class.CACHE_KEY_FORMAT
     )
 
     cached_items_by_version = defaultdict(lambda: 0)
-    for item in cached_item_keys:
-        key_split = item.string_id().split(":")
-        query_version = int(key_split[1])
-        global_version = key_split[2]
-        cached_items_by_version[(global_version, query_version)] += 1
+    db_version_counts = defaultdict(lambda: 0)
+    total_records = 0
+    for item in CachedQueryResult.iter_keys_by_cache_key_prefix(
+        cache_key_prefix, DATASTORE_PAGE_SIZE
+    ):
+        total_records += 1
+        key_string = item.string_id()
+        if key_string is None:
+            continue
+        query_version = CachedQueryResult.query_version_from_key_string(key_string)
+        db_version = CachedQueryResult.db_version_from_key_string(key_string)
+        if query_version is None or db_version is None:
+            continue
+        cached_items_by_version[(db_version, query_version)] += 1
+        db_version_counts[db_version] += 1
 
     template_args = {
         "query_class_name": query_class_name,
         "query_class": query_class,
+        "current_db_version": CachedDatabaseQuery.DATABASE_QUERY_VERSION,
+        "db_version_counts": db_version_counts,
         "cached_items_by_version": cached_items_by_version,
-        "total_records": len(cached_item_keys),
+        "total_records": total_records,
     }
     return render_template("admin/cached_query_detail.html", template_args)
 
@@ -139,47 +145,78 @@ def cached_query_delete(query_class_name: str, cache_key: str) -> Response:
 def cached_query_purge_version(
     query_class_name: str, db_version: str, query_version: int
 ) -> Response:
-    query_class = next(
-        (
-            c
-            for c in CachedDatabaseQuery.__subclasses__()
-            if c.__name__ == query_class_name
-        ),
-        None,
-    )
+    query_class = _get_cached_query_class(query_class_name)
     if query_class is None:
         abort(404)
 
-    cache_key_splits = query_class.CACHE_KEY_FORMAT.split("_")
-    cache_key_prefix_parts = []
-    for part in cache_key_splits:
-        if "{" not in part and "}" not in part:
-            cache_key_prefix_parts.append(part)
-    cache_key_prefix = "_".join(cache_key_prefix_parts)
+    target_db_version: int
+    try:
+        target_db_version = int(db_version)
+    except ValueError:
+        abort(400)
+        raise RuntimeError("unreachable")
 
-    cache_key_prefix = "_".join(cache_key_prefix_parts)
-    cached_item_keys = (
-        CachedQueryResult.query()
-        .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
-            > ndb.Key(CachedQueryResult, cache_key_prefix)
-        )
-        .filter(
-            CachedQueryResult.key  # pyre-ignore[58]
-            < ndb.Key(CachedQueryResult, cache_key_prefix + "_:")
-        )
-        .fetch(keys_only=True)
+    cache_key_prefix = CachedQueryResult.cache_key_prefix_from_format(
+        query_class.CACHE_KEY_FORMAT
     )
 
     keys_to_delete = set()
-    for key in cached_item_keys:
-        key_split = key.string_id().split(":")
-        item_query_version = int(key_split[1])
-        item_db_version = key_split[2]
-        if query_version == item_query_version and item_db_version == db_version:
+    for key in CachedQueryResult.iter_keys_by_cache_key_prefix(
+        cache_key_prefix, DATASTORE_PAGE_SIZE
+    ):
+        key_string = key.string_id()
+        if key_string is None:
+            continue
+        item_query_version = CachedQueryResult.query_version_from_key_string(key_string)
+        item_db_version = CachedQueryResult.db_version_from_key_string(key_string)
+        if (
+            item_query_version is not None
+            and item_db_version is not None
+            and query_version == item_query_version
+            and item_db_version == target_db_version
+        ):
             keys_to_delete.add(key)
 
     ndb.delete_multi(keys_to_delete)
+
+    return redirect(
+        url_for("admin.cached_query_detail", query_class_name=query_class_name)
+    )
+
+
+def cached_query_purge_global_version(db_version: int) -> Response:
+    """Enqueue per-class purge tasks for the given DATABASE_QUERY_VERSION.
+
+    We enqueue one task per query class on the cache-clearing queue so each task
+    only scans/deletes one class slice.
+    """
+    for query_class in CachedDatabaseQuery.__subclasses__():
+        defer_safe(
+            CachedQueryResult.purge_query_class_global_version,
+            query_class,
+            db_version,
+            DATASTORE_PAGE_SIZE,
+            DATASTORE_DELETE_BATCH_SIZE,
+            _queue="cache-clearing",
+            _target="py3-tasks-io",
+        )
+
+    return redirect(url_for("admin.cached_query_list"))
+
+
+def cached_query_purge_class_global_version(
+    query_class_name: str, db_version: int
+) -> Response:
+    query_class = _get_cached_query_class(query_class_name)
+    if query_class is None:
+        abort(404)
+
+    CachedQueryResult.purge_query_class_global_version(
+        query_class,
+        db_version,
+        DATASTORE_PAGE_SIZE,
+        DATASTORE_DELETE_BATCH_SIZE,
+    )
 
     return redirect(
         url_for("admin.cached_query_detail", query_class_name=query_class_name)
