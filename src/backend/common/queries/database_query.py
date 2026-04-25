@@ -120,6 +120,52 @@ class CachedDatabaseQuery(
             [ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys]
         )
 
+    @classmethod
+    def get_query_class_by_name(
+        cls, query_class_name: str
+    ) -> Optional[Type[CachedDatabaseQuery]]:
+        """Find a CachedDatabaseQuery subclass by name.
+
+        Args:
+            query_class_name: The name of the query class to find
+
+        Returns:
+            The query class if found, None otherwise
+        """
+        return next(
+            (c for c in cls.__subclasses__() if c.__name__ == query_class_name),
+            None,
+        )
+
+    @classmethod
+    def validate_db_version_for_deletion(cls, db_version: int) -> None:
+        """Validate that db_version is safe to delete.
+
+        Rules:
+        - Must be a positive integer
+        - Must be less than (CURRENT_VERSION - 1), ensuring the prior version
+          is kept as a buffer.
+
+        Args:
+            db_version: The database version to validate
+
+        Raises:
+            ValueError: If db_version is invalid or too recent
+        """
+        if db_version <= 0:
+            raise ValueError(
+                f"Cannot delete version {db_version}: must be a positive integer"
+            )
+
+        current_version = cls.DATABASE_QUERY_VERSION
+        min_safe_current = current_version - 1
+        if db_version >= min_safe_current:
+            raise ValueError(
+                f"Cannot delete version {db_version}: must be less than "
+                f"{min_safe_current} (current version {current_version} must "
+                "have at least one prior version as a buffer)"
+            )
+
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
         if not self.MODEL_CACHING_ENABLED:
