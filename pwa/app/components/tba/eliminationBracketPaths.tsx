@@ -8,6 +8,9 @@ import {
 
 import { AllianceColor, Match } from '~/api/tba/read';
 
+/** Alliance color when a bracket series has a winner (never NO_ALLIANCE). */
+type BracketWinningAlliance = Exclude<AllianceColor, AllianceColor.NO_ALLIANCE>;
+
 type MatchResult = {
   score: number;
   won: boolean;
@@ -38,7 +41,7 @@ export type PlayoffMatchHandle = {
 
 export type AdvancementPath = {
   d: string;
-  winner: AllianceColor;
+  winner: BracketWinningAlliance;
   allianceNumber: number | null;
   key: string;
 };
@@ -84,7 +87,7 @@ export function useAdvancementPaths({
 
         const seriesResult = getSeriesResult(matchLookup[link.from]);
         if (!seriesResult) return;
-        let winner: AllianceColor | null = null;
+        let winner: BracketWinningAlliance | null = null;
         let allianceNumber: number | null = null;
         if (seriesResult.redWon && seriesResult.redAllianceNumber) {
           winner = AllianceColor.RED;

@@ -19,9 +19,9 @@ export const zApiStatus = z.object({
 /**
  * AllianceColor
  *
- * The color of an alliance. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/alliance_color.py for full definitions.
+ * The color of an alliance, or an empty string when there is no winning alliance (e.g. tie or no result). See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/alliance_color.py for red/blue definitions.
  */
-export const zAllianceColor = z.enum(['red', 'blue']);
+export const zAllianceColor = z.enum(['red', 'blue', '']);
 
 export const zAutoChargeStationRobot2023 = z.enum(['Docked', 'None']);
 
@@ -757,7 +757,7 @@ export const zMatchSimple = z.object({
     red: zMatchAlliance,
     blue: zMatchAlliance,
   }),
-  winning_alliance: z.union([zAllianceColor, z.literal('')]),
+  winning_alliance: zAllianceColor,
   event_key: z.string(),
   time: z.coerce
     .bigint()
@@ -1435,7 +1435,7 @@ export const zMatch = z.object({
     red: zMatchAlliance,
     blue: zMatchAlliance,
   }),
-  winning_alliance: z.union([zAllianceColor, z.literal('')]),
+  winning_alliance: zAllianceColor,
   event_key: z.string(),
   time: z.coerce
     .bigint()
