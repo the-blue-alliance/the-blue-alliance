@@ -12,7 +12,8 @@ def test_blue_banners_year(ndb_stub, test_data_importer) -> None:
     insight = insights[0]
     assert insight.name == "blue_banners"
     assert insight.display_name == "Total Blue Banners"
-    assert len(insight.data["rankings"]) > 0
+    # A single event yields value=1 per team, which is filtered out by design
+    assert insight.data["rankings"] == []
 
 
 def test_blue_banners_overall(ndb_stub, test_data_importer) -> None:
