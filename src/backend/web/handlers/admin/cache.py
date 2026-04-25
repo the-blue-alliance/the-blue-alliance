@@ -33,7 +33,18 @@ def cached_query_list() -> str:
         for c in CachedDatabaseQuery.__subclasses__()
     }
 
-    template_args = {"cached_queries": cached_queries}
+    current_db_version = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    # Generate list of versions that can be deleted (< current - 1)
+    # and versions that are protected (current and current - 1)
+    protected_versions = [current_db_version, current_db_version - 1]
+    clearable_versions = list(range(1, current_db_version - 1))
+
+    template_args = {
+        "cached_queries": cached_queries,
+        "current_db_version": current_db_version,
+        "protected_versions": protected_versions,
+        "clearable_versions": clearable_versions,
+    }
     return render_template(
         "admin/cached_query_list.html", template_values=template_args
     )

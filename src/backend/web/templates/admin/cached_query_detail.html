@@ -53,7 +53,7 @@
                 <td>{{db_version}}{% if db_version == current_db_version %} <span class="label label-success">current</span>{% endif %}</td>
                 <td>{{count}}</td>
                 <td>
-                    {% if db_version != current_db_version %}
+                    {% if db_version < current_db_version - 1 %}
                         <form method="post" action="/admin/cache/{{query_class_name}}/purge_global/{{db_version}}" style="display:inline">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
                             <button type="submit" class="btn btn-danger btn-small"
@@ -62,7 +62,7 @@
                             </button>
                         </form>
                     {% else %}
-                        <span class="text-muted">active — cannot purge</span>
+                        <span class="text-muted">protected — cannot purge</span>
                     {% endif %}
                 </td>
             </tr>
@@ -84,7 +84,13 @@
                 <td>{{db_version}}</td>
                 <td>{{query_version}}</td>
                 <td>{{count}}</td>
-                <td><a class="btn btn-danger btn-small" href="/admin/cache/{{query_class_name}}/purge/{{db_version}}/{{query_version}}"><span class="glyphicon glyphicon-trash"></span> Purge</a></td>
+                <td>
+                    {% if db_version < current_db_version - 1 %}
+                        <a class="btn btn-danger btn-small" href="/admin/cache/{{query_class_name}}/purge/{{db_version}}/{{query_version}}"><span class="glyphicon glyphicon-trash"></span> Purge</a>
+                    {% else %}
+                        <span class="text-muted">protected — cannot purge</span>
+                    {% endif %}
+                </td>
             </tr>
         {% endfor %}
     </table>

@@ -35,4 +35,48 @@
     </table>
 </div>
 
+<div class="row">
+    <h2>Global Version Management</h2>
+    <p>Manage database query cache versions globally across all query classes.</p>
+    
+    <table class="table table-striped">
+        <tr>
+            <th>DB Version</th>
+            <th>Status</th>
+            <th>Action</th>
+        </tr>
+        <!-- Protected versions -->
+        {% for version in protected_versions | sort(reverse=True) %}
+            <tr>
+                <td>{{version}}</td>
+                <td>
+                    {% if version == current_db_version %}
+                        <span class="label label-success">Current</span>
+                    {% else %}
+                        <span class="label label-warning">Prior (Buffer)</span>
+                    {% endif %}
+                </td>
+                <td><span class="text-muted">Protected &mdash; cannot delete</span></td>
+            </tr>
+        {% endfor %}
+        <!-- Clearable versions -->
+        {% for version in clearable_versions | sort(reverse=True) %}
+            <tr>
+                <td>{{version}}</td>
+                <td><span class="label label-default">Clearable</span></td>
+                <td>
+                    <form method="post" action="/admin/cache/purge_global/{{version}}" style="display:inline">
+                        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                        <button type="submit" class="btn btn-danger btn-sm"
+                                onclick="return confirm('Clear all cache entries for DB Version {{version}} across all query classes?')">
+                            <span class="glyphicon glyphicon-trash"></span> Clear Version
+                        </button>
+                    </form>
+                </td>
+            </tr>
+        {% endfor %}
+    </table>
+</div>
+
 {% endblock %}
+

@@ -65,8 +65,27 @@ def test_cache_list_does_not_render_global_version_stats(
     assert resp.status_code == 200
 
     body = resp.data.decode()
+    # Should not show expensive global stats
     assert "Global DATABASE_QUERY_VERSION Stats" not in body
-    assert "/admin/cache/purge_global/" not in body
+    # Should show version management section
+    assert "Global Version Management" in body
+    # Should have purge buttons for clearable versions
+    assert "/admin/cache/purge_global/" in body
+
+
+def test_cache_list_version_management_shows_correct_labels(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    resp = web_client.get("/admin/cache")
+    assert resp.status_code == 200
+
+    body = resp.data.decode()
+    # Should show current version as "Current"
+    assert "Current" in body
+    # Should show prior version as "Prior (Buffer)"
+    assert "Prior (Buffer)" in body
+    # Should show clearable versions as "Clearable"
+    assert "Clearable" in body
 
 
 def test_cache_list_renders_with_cached_entries(
@@ -175,6 +194,26 @@ def test_cached_query_detail_normalizes_dict_db_version(
 
     body = resp.data.decode()
     assert f"{old_v}~dictv" not in body
+
+
+def test_cached_query_detail_breakdown_by_version_hides_protected_purge_links(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    clearable_v = current_v - 2
+
+    clearable_key = _make_cache_key("test_admin_cache_clearable", 1, clearable_v)
+    protected_key = _make_cache_key("test_admin_cache_protected", 1, current_v)
+
+    CachedQueryResult(id=clearable_key, result=None).put()
+    CachedQueryResult(id=protected_key, result=None).put()
+
+    resp = web_client.get("/admin/cache/_TestCachedQuery")
+    assert resp.status_code == 200
+
+    body = resp.data.decode()
+    assert f"/admin/cache/_TestCachedQuery/purge/{clearable_v}/1" in body
+    assert f"/admin/cache/_TestCachedQuery/purge/{current_v}/1" not in body
 
 
 def test_purge_version_deletes_dict_entries_for_version(
