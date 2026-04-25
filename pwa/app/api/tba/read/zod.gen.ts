@@ -16,6 +16,13 @@ export const zApiStatus = z.object({
   max_team_page: z.int(),
 });
 
+/**
+ * AllianceColor
+ *
+ * The color of an alliance. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/alliance_color.py for full definitions.
+ */
+export const zAllianceColor = z.enum(['red', 'blue']);
+
 export const zAutoChargeStationRobot2023 = z.enum(['Docked', 'None']);
 
 export const zAutoLineRobot2024 = z.enum(['No', 'Yes']);
@@ -750,7 +757,7 @@ export const zMatchSimple = z.object({
     red: zMatchAlliance,
     blue: zMatchAlliance,
   }),
-  winning_alliance: z.enum(['red', 'blue', '']),
+  winning_alliance: z.union([zAllianceColor, z.literal('')]),
   event_key: z.string(),
   time: z.coerce
     .bigint()
@@ -1428,7 +1435,7 @@ export const zMatch = z.object({
     red: zMatchAlliance,
     blue: zMatchAlliance,
   }),
-  winning_alliance: z.enum(['red', 'blue', '']),
+  winning_alliance: z.union([zAllianceColor, z.literal('')]),
   event_key: z.string(),
   time: z.coerce
     .bigint()
@@ -1628,6 +1635,13 @@ export const zTeamEventStatus = z.object({
   pit_location: z.string().nullish(),
 });
 
+/**
+ * WebcastStatus
+ *
+ * Online status of a webcast. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/webcast_status.py for full definitions.
+ */
+export const zWebcastStatus = z.enum(['unknown', 'online', 'offline']);
+
 export const zWebcast = z.object({
   type: z.enum([
     'youtube',
@@ -1646,7 +1660,7 @@ export const zWebcast = z.object({
   channel: z.string(),
   date: z.string().nullish(),
   file: z.string().nullish(),
-  status: z.enum(['unknown', 'online', 'offline']).optional(),
+  status: zWebcastStatus.nullish(),
   stream_title: z.string().nullish(),
   viewer_count: z.int().nullish(),
 });

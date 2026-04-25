@@ -12,6 +12,7 @@ import {
 import PlayCircleIcon from '~icons/mdi/play-circle-outline';
 
 import {
+  AllianceColor,
   CompLevel,
   EliminationAlliance,
   Event,
@@ -397,17 +398,17 @@ export default function EliminationBracket({
 
     const redResults = setMatches.map((match) => ({
       score: match.alliances.red.score,
-      won: match.winning_alliance === 'red',
+      won: match.winning_alliance === AllianceColor.RED,
     }));
     const blueResults = setMatches.map((match) => ({
       score: match.alliances.blue.score,
-      won: match.winning_alliance === 'blue',
+      won: match.winning_alliance === AllianceColor.BLUE,
     }));
 
     // Determine overall winner from the series
     const lastMatch = setMatches[setMatches.length - 1];
-    const redWon = lastMatch.winning_alliance === 'red';
-    const blueWon = lastMatch.winning_alliance === 'blue';
+    const redWon = lastMatch.winning_alliance === AllianceColor.RED;
+    const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
 
     return {
       redTeams,

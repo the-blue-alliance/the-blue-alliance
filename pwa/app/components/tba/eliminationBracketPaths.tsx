@@ -6,7 +6,7 @@ import {
   useState,
 } from 'react';
 
-import { Match } from '~/api/tba/read';
+import { AllianceColor, Match } from '~/api/tba/read';
 
 type MatchResult = {
   score: number;
@@ -38,7 +38,7 @@ export type PlayoffMatchHandle = {
 
 export type AdvancementPath = {
   d: string;
-  winner: 'red' | 'blue';
+  winner: AllianceColor;
   allianceNumber: number | null;
   key: string;
 };
@@ -84,18 +84,19 @@ export function useAdvancementPaths({
 
         const seriesResult = getSeriesResult(matchLookup[link.from]);
         if (!seriesResult) return;
-        let winner: 'red' | 'blue' | null = null;
+        let winner: AllianceColor | null = null;
         let allianceNumber: number | null = null;
         if (seriesResult.redWon && seriesResult.redAllianceNumber) {
-          winner = 'red';
+          winner = AllianceColor.RED;
           allianceNumber = seriesResult.redAllianceNumber;
         } else if (seriesResult.blueWon && seriesResult.blueAllianceNumber) {
-          winner = 'blue';
+          winner = AllianceColor.BLUE;
           allianceNumber = seriesResult.blueAllianceNumber;
         }
         if (!winner) return;
 
-        const fromRow = winner === 'red' ? fromNode.redRow : fromNode.blueRow;
+        const fromRow =
+          winner === AllianceColor.RED ? fromNode.redRow : fromNode.blueRow;
         const fromRect = (fromRow ?? fromNode.card)?.getBoundingClientRect();
         if (!fromRect) return;
 

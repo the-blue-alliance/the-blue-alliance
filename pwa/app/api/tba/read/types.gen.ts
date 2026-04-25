@@ -40,6 +40,22 @@ export type ApiStatusAppVersion = {
   latest_app_version: number;
 };
 
+/**
+ * AllianceColor
+ *
+ * The color of an alliance. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/alliance_color.py for full definitions.
+ */
+export enum AllianceColor {
+  /**
+   * RED
+   */
+  RED = 'red',
+  /**
+   * BLUE
+   */
+  BLUE = 'blue',
+}
+
 export enum AutoChargeStationRobot2023 {
   DOCKED = 'Docked',
   NONE = 'None',
@@ -1664,7 +1680,7 @@ export type Match = {
   /**
    * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
    */
-  winning_alliance: 'red' | 'blue' | '';
+  winning_alliance: AllianceColor | '';
   /**
    * Event key of the event the match was played at.
    */
@@ -2323,7 +2339,7 @@ export type MatchSimple = {
   /**
    * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
    */
-  winning_alliance: 'red' | 'blue' | '';
+  winning_alliance: AllianceColor | '';
   /**
    * Event key of the event the match was played at.
    */
@@ -3033,6 +3049,26 @@ export type WltRecord = {
   ties: number;
 };
 
+/**
+ * WebcastStatus
+ *
+ * Online status of a webcast. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/webcast_status.py for full definitions.
+ */
+export enum WebcastStatus {
+  /**
+   * UNKNOWN
+   */
+  UNKNOWN = 'unknown',
+  /**
+   * ONLINE
+   */
+  ONLINE = 'online',
+  /**
+   * OFFLINE
+   */
+  OFFLINE = 'offline',
+}
+
 export type Webcast = {
   /**
    * Type of webcast, typically descriptive of the streaming provider.
@@ -3065,7 +3101,7 @@ export type Webcast = {
   /**
    * The online status of the webcast, fetched from the streaming provider's API. May be null if not available.
    */
-  status?: 'unknown' | 'online' | 'offline';
+  status?: WebcastStatus | null;
   /**
    * The title of the stream from the streaming provider. May be null.
    */
