@@ -486,7 +486,7 @@
     {% endif %}
 
     <h2>Write API Keys</h2>
-    <p>Issue a key <a href="/admin/api_auth/add">here</a></p>
+    <p>Issue a key <a href="/admin/api_auth/add?event_key={{event.key_name}}">here</a></p>
 
     <p>Currently Issued Keys</p>
     {% include "admin/partials/api_write_table.html" %}
