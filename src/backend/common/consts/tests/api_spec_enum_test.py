@@ -54,10 +54,22 @@ def test_spec_integer_enum_matches_python(
     assert len(schema["enum"]) == len(schema["x-enum-varnames"])
 
 
+def test_spec_alliance_color_matches_python_plus_empty_winner(
+    spec_schemas: dict,
+) -> None:
+    """API wire type includes '' for no winner / tie; see TMatchWinner in alliance_color.py."""
+    schema = spec_schemas["AllianceColor"]
+    py_values = [member.value for member in AllianceColor]
+    py_names = [member.name for member in AllianceColor]
+    assert schema["type"] == "string"
+    assert schema["enum"] == py_values + [""]
+    assert schema["x-enum-varnames"] == py_names + ["NO_ALLIANCE"]
+    assert len(schema["enum"]) == len(schema["x-enum-varnames"])
+
+
 @pytest.mark.parametrize(
     "schema_name,enum_class",
     [
-        ("AllianceColor", AllianceColor),
         ("WebcastStatus", WebcastStatus),
     ],
 )

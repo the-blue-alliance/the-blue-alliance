@@ -43,7 +43,7 @@ export type ApiStatusAppVersion = {
 /**
  * AllianceColor
  *
- * The color of an alliance. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/alliance_color.py for full definitions.
+ * The color of an alliance, or an empty string when there is no winning alliance (e.g. tie or no result). See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/alliance_color.py for red/blue definitions.
  */
 export enum AllianceColor {
   /**
@@ -54,6 +54,10 @@ export enum AllianceColor {
    * BLUE
    */
   BLUE = 'blue',
+  /**
+   * NO_ALLIANCE
+   */
+  NO_ALLIANCE = '',
 }
 
 export enum AutoChargeStationRobot2023 {
@@ -1680,7 +1684,7 @@ export type Match = {
   /**
    * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
    */
-  winning_alliance: AllianceColor | '';
+  winning_alliance: AllianceColor;
   /**
    * Event key of the event the match was played at.
    */
@@ -2339,7 +2343,7 @@ export type MatchSimple = {
   /**
    * The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.
    */
-  winning_alliance: AllianceColor | '';
+  winning_alliance: AllianceColor;
   /**
    * Event key of the event the match was played at.
    */

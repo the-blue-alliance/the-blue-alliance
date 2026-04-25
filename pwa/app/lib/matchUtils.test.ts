@@ -37,7 +37,7 @@ describe.concurrent('getAllianceMatchResult', () => {
     key: string,
     redScore: number,
     blueScore: number,
-    winningAlliance: '' | AllianceColor,
+    winningAlliance: AllianceColor,
   ): Match {
     return {
       key,
@@ -70,7 +70,12 @@ describe.concurrent('getAllianceMatchResult', () => {
   }
 
   test('returns undefined when match has not been played', () => {
-    const match = createMockMatch('2024test_qm1', -1, -1, '');
+    const match = createMockMatch(
+      '2024test_qm1',
+      -1,
+      -1,
+      AllianceColor.NO_ALLIANCE,
+    );
     expect(
       getAllianceMatchResult(match, AllianceColor.RED, 'official'),
     ).toBeUndefined();
@@ -94,7 +99,12 @@ describe.concurrent('getAllianceMatchResult', () => {
   });
 
   test('returns tie when match is tied (non-2015)', () => {
-    const match = createMockMatch('2024test_qm1', 100, 100, '');
+    const match = createMockMatch(
+      '2024test_qm1',
+      100,
+      100,
+      AllianceColor.NO_ALLIANCE,
+    );
     expect(getAllianceMatchResult(match, AllianceColor.RED, 'official')).toBe(
       'tie',
     );
@@ -104,7 +114,12 @@ describe.concurrent('getAllianceMatchResult', () => {
   });
 
   test('returns tie for 2015 match with official strategy', () => {
-    const match = createMockMatch('2015test_qm1', 100, 80, '');
+    const match = createMockMatch(
+      '2015test_qm1',
+      100,
+      80,
+      AllianceColor.NO_ALLIANCE,
+    );
     expect(getAllianceMatchResult(match, AllianceColor.RED, 'official')).toBe(
       'tie',
     );
@@ -114,7 +129,12 @@ describe.concurrent('getAllianceMatchResult', () => {
   });
 
   test('returns win/loss for 2015 match with score-based strategy when red scores higher', () => {
-    const match = createMockMatch('2015test_qm1', 100, 80, '');
+    const match = createMockMatch(
+      '2015test_qm1',
+      100,
+      80,
+      AllianceColor.NO_ALLIANCE,
+    );
     expect(
       getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),
     ).toBe('win');
@@ -124,7 +144,12 @@ describe.concurrent('getAllianceMatchResult', () => {
   });
 
   test('returns win/loss for 2015 match with score-based strategy when blue scores higher', () => {
-    const match = createMockMatch('2015test_qm1', 80, 100, '');
+    const match = createMockMatch(
+      '2015test_qm1',
+      80,
+      100,
+      AllianceColor.NO_ALLIANCE,
+    );
     expect(
       getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),
     ).toBe('loss');
@@ -134,7 +159,12 @@ describe.concurrent('getAllianceMatchResult', () => {
   });
 
   test('returns tie for 2015 match with score-based strategy when scores are equal', () => {
-    const match = createMockMatch('2015test_qm1', 100, 100, '');
+    const match = createMockMatch(
+      '2015test_qm1',
+      100,
+      100,
+      AllianceColor.NO_ALLIANCE,
+    );
     expect(
       getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),
     ).toBe('tie');
@@ -178,7 +208,12 @@ describe.concurrent('getAllianceMatchResult', () => {
   });
 
   test('handles 2015 playoff matches with score-based strategy', () => {
-    const match = createMockMatch('2015test_sf1m1', 100, 80, '');
+    const match = createMockMatch(
+      '2015test_sf1m1',
+      100,
+      80,
+      AllianceColor.NO_ALLIANCE,
+    );
     match.comp_level = CompLevel.SF;
     expect(
       getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),

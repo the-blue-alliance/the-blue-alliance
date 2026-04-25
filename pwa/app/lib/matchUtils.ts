@@ -133,7 +133,7 @@ export function getAllianceMatchResult(
   }
 
   // no winner listed
-  if (match.winning_alliance === '') {
+  if (match.winning_alliance === AllianceColor.NO_ALLIANCE) {
     // if it's been played, there's no winner, and it's not 2015, it's a tie
     if (!match.key.startsWith('2015')) {
       return 'tie';
