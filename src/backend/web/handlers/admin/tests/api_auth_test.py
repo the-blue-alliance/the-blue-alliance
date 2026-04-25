@@ -6,7 +6,7 @@ def test_api_auth_add(login_gae_admin, web_client: Client) -> None:
     assert resp.status_code == 200
     content = resp.data.decode("utf-8")
     assert 'name="event_list_str"' in content
-    assert 'value=""' in content
+    assert 'name="event_list_str" placeholder="2014cc,2014mttd" value=""' in content
 
 
 def test_api_auth_add_with_event_key(login_gae_admin, web_client: Client) -> None:
