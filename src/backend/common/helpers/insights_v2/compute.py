@@ -20,6 +20,7 @@ from backend.common.queries.district_query import AllDistrictTeamsQuery
 from backend.common.queries.event_query import EventListQuery
 
 LEADERBOARD_TOP_N = 25
+LEADERBOARD_MAX_KEYS_PER_RANKING = 10
 
 
 def build_leaderboard_rankings(
@@ -40,6 +41,7 @@ def build_leaderboard_rankings(
             value=value,
         )
         for value, keys in sorted(value_to_keys.items(), reverse=True)
+        if value > 1 and len(keys) <= LEADERBOARD_MAX_KEYS_PER_RANKING
     ][:top_n]
 
 
@@ -64,6 +66,7 @@ def build_leaderboard_pair_rankings(
             value=value,
         )
         for value, pairs in sorted(value_to_pairs.items(), reverse=True)
+        if value > 1 and len(pairs) <= LEADERBOARD_MAX_KEYS_PER_RANKING
     ][:top_n]
 
 

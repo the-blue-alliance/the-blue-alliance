@@ -4,7 +4,9 @@ from google.appengine.ext import ndb
 
 from backend.common.helpers.insights_v2.compute import (
     _build_team_district_map,
+    build_leaderboard_pair_rankings,
     build_leaderboard_rankings,
+    LEADERBOARD_MAX_KEYS_PER_RANKING,
     LeaderboardV2Calculator,
 )
 from backend.common.models.district import District
@@ -105,6 +107,44 @@ def test_district_key_name(ndb_stub) -> None:
         "2024_v2_leaderboard_most_matches_played",
         "2024_v2_leaderboard_most_matches_played_ne",
     }
+
+
+def test_rankings_excludes_value_of_one() -> None:
+    assert build_leaderboard_rankings({"frc1": 1, "frc2": 2}) == [
+        LeaderboardRankingV2(keys=["frc2"], value=2),
+    ]
+
+
+def test_rankings_excludes_groups_exceeding_max_keys() -> None:
+    counts = {f"frc{i}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING + 1)}
+    assert build_leaderboard_rankings(counts) == []
+
+
+def test_rankings_includes_group_at_max_keys() -> None:
+    counts = {f"frc{i}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING)}
+    result = build_leaderboard_rankings(counts)
+    assert len(result) == 1
+    assert len(result[0]["keys"]) == LEADERBOARD_MAX_KEYS_PER_RANKING
+
+
+def test_pair_rankings_excludes_value_of_one() -> None:
+    assert build_leaderboard_pair_rankings({"frc1|frc2": 1, "frc3|frc4": 2}) == [
+        LeaderboardRankingV2(keys=[["frc3", "frc4"]], value=2),
+    ]
+
+
+def test_pair_rankings_excludes_groups_exceeding_max_keys() -> None:
+    counts = {
+        f"frc{i}|frc{i + 1}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING + 1)
+    }
+    assert build_leaderboard_pair_rankings(counts) == []
+
+
+def test_pair_rankings_includes_group_at_max_keys() -> None:
+    counts = {f"frc{i}|frc{i + 1}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING)}
+    result = build_leaderboard_pair_rankings(counts)
+    assert len(result) == 1
+    assert len(result[0]["keys"]) == LEADERBOARD_MAX_KEYS_PER_RANKING
 
 
 def test_district_uses_most_recent_district_team(ndb_stub) -> None:
