@@ -1,18 +1,15 @@
 from google.appengine.ext import ndb
 
-from backend.common.helpers.insights_v2.compute import _build_team_district_map
-from backend.common.helpers.insights_v2.streak_calculator import (
+from backend.common.helpers.insights_v2.names import InsightV2NameEntry, InsightV2Names
+from backend.common.helpers.insights_v2.registry import _build_team_district_map
+from backend.common.helpers.insights_v2.streaks.calculator import (
     STREAK_TOP_N,
     StreakV2Calculator,
 )
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
-from backend.common.models.insight_v2 import (
-    InsightCategory,
-    InsightV2NameEntry,
-    InsightV2Names,
-)
+from backend.common.models.insight_v2 import InsightCategory
 from backend.common.models.team import Team
 
 

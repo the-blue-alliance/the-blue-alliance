@@ -3,8 +3,8 @@ from google.appengine.ext import ndb
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.helpers.insights_v2.compute import compute_insights_for_year
-from backend.common.helpers.insights_v2.qualifying_event_streak import (
+from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.insights_v2.streaks.qualifying_event_streak import (
     LongestQualifyingEventStreakV2Calculator,
 )
 from backend.common.models.award import Award
@@ -207,12 +207,12 @@ def test_district_events_count_toward_streak(ndb_stub) -> None:
 def test_real_data_frc1796_streak(ndb_stub, test_data_importer) -> None:
     # frc1796 wins both 2019nyny (REGIONAL) and 2024nytr (REGIONAL);
     # with only these two events loaded, their streak should be 2
-    test_data_importer.import_event(__file__, "../data/2019nyny.json")
-    test_data_importer.import_award_list(__file__, "../data/2019nyny_awards.json")
-    test_data_importer.import_match_list(__file__, "../data/2019nyny_matches.json")
-    test_data_importer.import_event(__file__, "../data/2024nytr.json")
-    test_data_importer.import_award_list(__file__, "../data/2024nytr_awards.json")
-    test_data_importer.import_match_list(__file__, "../data/2024nytr_matches.json")
+    test_data_importer.import_event(__file__, "../../data/2019nyny.json")
+    test_data_importer.import_award_list(__file__, "../../data/2019nyny_awards.json")
+    test_data_importer.import_match_list(__file__, "../../data/2019nyny_matches.json")
+    test_data_importer.import_event(__file__, "../../data/2024nytr.json")
+    test_data_importer.import_award_list(__file__, "../../data/2024nytr_awards.json")
+    test_data_importer.import_match_list(__file__, "../../data/2024nytr_matches.json")
 
     insights = compute_insights_for_year(
         0, [LongestQualifyingEventStreakV2Calculator()]

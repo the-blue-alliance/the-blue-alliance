@@ -1,17 +1,13 @@
 import itertools
 from typing import Dict, List, Optional, Set
 
-from backend.common.helpers.insights_v2.compute import (
+from backend.common.helpers.insights_v2.leaderboards.calculator import (
     build_leaderboard_pair_rankings,
     LeaderboardV2Calculator,
 )
+from backend.common.helpers.insights_v2.names import InsightV2NameEntry, InsightV2Names
 from backend.common.models.event import Event
-from backend.common.models.insight_v2 import (
-    InsightV2NameEntry,
-    InsightV2Names,
-    LeaderboardKeyType,
-    LeaderboardRankingV2,
-)
+from backend.common.models.insight_v2 import LeaderboardKeyType, LeaderboardRankingV2
 
 
 class MostMatchesPlayedTogetherV2Calculator(LeaderboardV2Calculator):
