@@ -16,7 +16,6 @@ from backend.web.handlers.ajax import (
     account_favorites_delete_handler,
     account_favorites_handler,
     account_info_handler,
-    account_register_fcm_token,
     event_remap_teams_handler,
     playoff_types_handler,
     typeahead_handler,
@@ -204,11 +203,6 @@ app.add_url_rule(
 app.add_url_rule(
     "/_/account/info",
     view_func=account_info_handler,
-)
-app.add_url_rule(
-    "/_/account/register_fcm_token",
-    view_func=account_register_fcm_token,
-    methods=["POST"],
 )
 app.add_url_rule("/_/remap_teams/<event_key>", view_func=event_remap_teams_handler)
 app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)

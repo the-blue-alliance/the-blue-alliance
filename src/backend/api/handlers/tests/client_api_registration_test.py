@@ -198,3 +198,34 @@ def test_unregister_no_client(api_client: Client, mock_clientapi_auth: User) -> 
         MobileClient.user_id == str(none_throws(mock_clientapi_auth.account_key).id())
     ).fetch()
     assert len(user_clients) == 0
+
+
+def test_register_collapses_duplicate_token(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    """A re-registration with the same token but a new device_uuid should
+    collapse the existing token row instead of creating a duplicate."""
+    user_id = str(none_throws(mock_clientapi_auth.account_key).id())
+    MobileClient(
+        parent=mock_clientapi_auth.account_key,
+        user_id=user_id,
+        messaging_id="abc123",
+        client_type=ClientType.WEB,
+        device_uuid="old-uuid",
+        display_name="Old Device",
+    ).put()
+
+    req = RegistrationRequest(
+        operating_system="web",
+        mobile_id="abc123",
+        device_uuid="new-uuid",
+        name="New Device",
+    )
+    resp = make_clientapi_request(api_client, "/register", req)
+    assert resp["code"] == 304
+
+    user_clients = MobileClient.query(MobileClient.user_id == user_id).fetch()
+    assert len(user_clients) == 1
+    assert user_clients[0].messaging_id == "abc123"
+    assert user_clients[0].device_uuid == "new-uuid"
+    assert user_clients[0].display_name == "New Device"

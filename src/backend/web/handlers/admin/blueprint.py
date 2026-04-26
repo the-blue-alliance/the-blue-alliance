@@ -91,6 +91,10 @@ from backend.web.handlers.admin.media import (
     media_make_preferred,
     media_remove_preferred,
 )
+from backend.web.handlers.admin.mobile_clients import (
+    mobile_clients_dashboard,
+    mobile_clients_dedupe_post,
+)
 from backend.web.handlers.admin.regional_champs_pool import regional_champs_pool_list
 from backend.web.handlers.admin.sitevars import (
     sitevar_create,
@@ -472,6 +476,14 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/team/set_robot_name", view_func=team_robot_name_update, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/mobile_clients", view_func=mobile_clients_dashboard, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/mobile_clients/dedupe",
+    view_func=mobile_clients_dedupe_post,
+    methods=["POST"],
 )
 admin_routes.add_url_rule("/user/<user_id>", view_func=user_detail)
 admin_routes.add_url_rule("/user/edit/<user_id>", methods=["GET"], view_func=user_edit)
