@@ -9,6 +9,18 @@ from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.leaderboards.blue_banners import (
     BlueBannersV2Calculator,
 )
+from backend.common.helpers.insights_v2.leaderboards.most_cmp_finals_appearances import (
+    MostCmpFinalsAppearancesV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_cmp_wins import (
+    MostCmpWinsV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_division_finals_appearances import (
+    MostDivisionFinalsAppearancesV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_division_wins import (
+    MostDivisionWinsV2Calculator,
+)
 from backend.common.helpers.insights_v2.leaderboards.most_matches_played import (
     MostMatchesPlayedV2Calculator,
 )
@@ -83,6 +95,10 @@ def make_all_insights(year: Year) -> List[InsightV2]:
         BlueBannersV2Calculator(),
         MostMatchesPlayedV2Calculator(),
         MostMatchesPlayedTogetherV2Calculator(),
+        MostDivisionFinalsAppearancesV2Calculator(),
+        MostDivisionWinsV2Calculator(),
+        MostCmpFinalsAppearancesV2Calculator(),
+        MostCmpWinsV2Calculator(),
     ]
     if year == 0:
         calculators += [

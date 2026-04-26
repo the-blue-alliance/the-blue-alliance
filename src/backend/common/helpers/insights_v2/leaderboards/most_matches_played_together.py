@@ -7,7 +7,7 @@ from backend.common.helpers.insights_v2.leaderboards.calculator import (
 )
 from backend.common.helpers.insights_v2.names import InsightV2NameEntry, InsightV2Names
 from backend.common.models.event import Event
-from backend.common.models.insight_v2 import LeaderboardKeyType, LeaderboardRankingV2
+from backend.common.models.insight_v2 import LeaderboardKeyType, LeaderboardRanking
 
 
 class MostMatchesPlayedTogetherV2Calculator(LeaderboardV2Calculator):
@@ -28,7 +28,7 @@ class MostMatchesPlayedTogetherV2Calculator(LeaderboardV2Calculator):
             keys.add(team_b)
         return keys
 
-    def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRankingV2]:
+    def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
         return build_leaderboard_pair_rankings(counts)
 
     def _get_district(
