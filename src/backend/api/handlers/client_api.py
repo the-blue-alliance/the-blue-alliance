@@ -55,32 +55,31 @@ def register_mobile_client(req: RegistrationRequest) -> BaseResponse:
     name = req.get("name", "Unnamed Device")
     uuid = req["device_uuid"]
 
-    query = MobileClient.query(
-        MobileClient.user_id == user_id,
-        MobileClient.device_uuid == uuid,
-        MobileClient.client_type == os,
+    # Dedup on the FCM token (`messaging_id`): FCM guarantees it is unique per
+    # (app install, device), so the same token re-registering is the same client.
+    # `device_uuid` is unreliable as a dedup key on iOS (regenerated from
+    # UIDevice.identifierForVendor on each launch / reinstall).
+    existing = MobileClient.query(
+        MobileClient.messaging_id == gcm_id,
         ancestor=account_key,
-    )
-
-    # trying to figure out an elusive dupe bug
-    if query.count() == 0:
-        # Record doesn't exist yet, so add it
-        MobileClient(
-            parent=account_key,
-            user_id=user_id,
-            messaging_id=gcm_id,
-            client_type=os,
-            device_uuid=uuid,
-            display_name=name,
-        ).put()
-        return BaseResponse(code=200, message="Registration successful")
-    else:
-        # Record already exists, update it
-        client = query.fetch(1)[0]
-        client.messaging_id = gcm_id
-        client.display_name = name
-        client.put()
+    ).get()
+    if existing:
+        existing.user_id = user_id
+        existing.client_type = os
+        existing.device_uuid = uuid
+        existing.display_name = name
+        existing.put()
         return BaseResponse(code=304, message="Client already exists")
+
+    MobileClient(
+        parent=account_key,
+        user_id=user_id,
+        messaging_id=gcm_id,
+        client_type=os,
+        device_uuid=uuid,
+        display_name=name,
+    ).put()
+    return BaseResponse(code=200, message="Registration successful")
 
 
 @client_api_method(VoidRequest, ListDevicesResponse)

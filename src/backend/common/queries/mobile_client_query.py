@@ -1,4 +1,5 @@
-from typing import Any, Generator, List
+from collections.abc import Generator
+from typing import Any
 
 from google.appengine.ext import ndb
 
@@ -8,13 +9,13 @@ from backend.common.queries.database_query import DatabaseQuery
 from backend.common.tasklets import typed_tasklet
 
 
-class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
+class MobileClientQuery(DatabaseQuery[list[MobileClient], None]):
     DICT_CONVERTER = None
 
     def __init__(
         self,
-        user_ids: List[str],
-        client_types: List[ClientType] = list(ClientType),
+        user_ids: list[str],
+        client_types: list[ClientType] = list(ClientType),
         only_verified: bool = True,
     ) -> None:
         super().__init__(
@@ -24,10 +25,10 @@ class MobileClientQuery(DatabaseQuery[List[MobileClient], None]):
     @typed_tasklet
     def _query_async(
         self,
-        user_ids: List[str],
-        client_types: List[ClientType] = list(ClientType),
+        user_ids: list[str],
+        client_types: list[ClientType] = list(ClientType),
         only_verified: bool = True,
-    ) -> Generator[Any, Any, List[MobileClient]]:
+    ) -> Generator[Any, Any, list[MobileClient]]:
         if not user_ids or not client_types:
             return []
 
