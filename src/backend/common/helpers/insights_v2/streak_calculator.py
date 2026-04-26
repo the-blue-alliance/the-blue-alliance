@@ -3,7 +3,13 @@ from collections import defaultdict
 from typing import Dict, List, NamedTuple, Set
 
 from backend.common.helpers.insights_v2.compute import InsightV2Calculator
-from backend.common.models.insight_v2 import InsightV2, StreakEntry
+from backend.common.models.insight_v2 import (
+    InsightCategory,
+    InsightV2,
+    InsightV2NameEntry,
+    StreakData,
+    StreakEntry,
+)
 from backend.common.models.keys import Year
 
 STREAK_TOP_N = 25
@@ -27,6 +33,10 @@ class StreakV2Calculator(InsightV2Calculator):
         self._best: Dict[str, _StreakRecord] = {}
 
     @property
+    @abstractmethod
+    def insight_name(self) -> InsightV2NameEntry: ...
+
+    @property
     def team_keys(self) -> Set[str]:
         return set(self._best.keys())
 
@@ -46,10 +56,11 @@ class StreakV2Calculator(InsightV2Calculator):
         """Break key's active streak."""
         self._active.pop(key, None)
 
-    def _build_streak_entries(self, top_n: int = STREAK_TOP_N) -> List[StreakEntry]:
+    def _build_streak_entries(self) -> List[StreakEntry]:
         """
-        Returns up to top_n StreakEntry items, sorted by streak_length descending
-        then by team number ascending. Flushes still-active streaks first.
+        Returns all StreakEntry items sorted by streak_length descending then by
+        team number ascending. Callers are responsible for slicing to their desired
+        top-N. Flushes still-active streaks first.
         """
         for key, active in self._active.items():
             if key not in self._best or active.length > self._best[key].length:
@@ -75,7 +86,7 @@ class StreakV2Calculator(InsightV2Calculator):
             )
 
         entries.sort(key=lambda e: (-e["streak_length"], int(e["key"][3:])))
-        return entries[:top_n]
+        return entries
 
     def _build_district_entries(
         self,
@@ -95,7 +106,42 @@ class StreakV2Calculator(InsightV2Calculator):
                     bucket.append(entry)
         return dict(district_entries)
 
-    @abstractmethod
     def make_insights(
         self, year: Year, team_to_district: Dict[str, str]
-    ) -> List[InsightV2]: ...
+    ) -> List[InsightV2]:
+        # Build all entries sorted; slice to top-N for global, but pass the full
+        # list to district grouping so each district gets its own independent top-N.
+        all_entries = self._build_streak_entries()
+        if not all_entries:
+            return []
+
+        name = self.insight_name
+        insights: List[InsightV2] = [
+            InsightV2(
+                id=InsightV2.render_key_name(year, InsightCategory.STREAK, name.name),
+                name=name.name,
+                display_name=name.display_name,
+                year=year,
+                category=InsightCategory.STREAK,
+                data_json=StreakData(entries=all_entries[:STREAK_TOP_N]),
+            )
+        ]
+
+        for district_abbrev, d_entries in sorted(
+            self._build_district_entries(all_entries, team_to_district).items()
+        ):
+            insights.append(
+                InsightV2(
+                    id=InsightV2.render_key_name(
+                        year, InsightCategory.STREAK, name.name, district_abbrev
+                    ),
+                    name=name.name,
+                    display_name=name.display_name,
+                    year=year,
+                    category=InsightCategory.STREAK,
+                    district_abbreviation=district_abbrev,
+                    data_json=StreakData(entries=d_entries),
+                )
+            )
+
+        return insights
