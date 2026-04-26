@@ -155,7 +155,7 @@ def test_renamed_district_normalized_to_latest_code(ndb_stub) -> None:
     calc._advance_streak("frc1", "e2")
     calc._advance_streak("frc2", "e1")
 
-    team_to_district = _build_team_district_map(calc.team_keys)
+    team_to_district = _build_team_district_map()
     insights = calc.make_insights(2024, team_to_district)
 
     district_insights = [i for i in insights if i.district_abbreviation is not None]

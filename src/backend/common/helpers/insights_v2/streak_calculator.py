@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from collections import defaultdict
-from typing import Dict, List, NamedTuple, Set
+from typing import Dict, List, NamedTuple
 
 from backend.common.helpers.insights_v2.compute import InsightV2Calculator
 from backend.common.models.insight_v2 import (
@@ -35,10 +35,6 @@ class StreakV2Calculator(InsightV2Calculator):
     @property
     @abstractmethod
     def insight_name(self) -> InsightV2NameEntry: ...
-
-    @property
-    def team_keys(self) -> Set[str]:
-        return set(self._best.keys())
 
     def _advance_streak(self, key: str, label: str) -> None:
         """Extend key's active streak. label identifies the current unit (event key, year, etc.)."""

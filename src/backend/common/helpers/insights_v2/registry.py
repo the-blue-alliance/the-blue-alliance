@@ -5,6 +5,9 @@ from backend.common.helpers.insights_v2.compute import (
     compute_insights_for_year,
     InsightV2Calculator,
 )
+from backend.common.helpers.insights_v2.einstein_streak import (
+    LongestEinsteinStreakV2Calculator,
+)
 from backend.common.helpers.insights_v2.most_matches_played import (
     MostMatchesPlayedV2Calculator,
 )
@@ -25,5 +28,8 @@ def make_all_insights(year: Year) -> List[InsightV2]:
         MostMatchesPlayedTogetherV2Calculator(),
     ]
     if year == 0:
-        calculators += [LongestQualifyingEventStreakV2Calculator()]
+        calculators += [
+            LongestQualifyingEventStreakV2Calculator(),
+            LongestEinsteinStreakV2Calculator(),
+        ]
     return compute_insights_for_year(year, calculators)

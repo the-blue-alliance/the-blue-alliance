@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from collections import defaultdict
-from typing import Any, DefaultDict, Dict, Iterable, List, Optional, Set, Tuple
+from typing import Any, DefaultDict, Dict, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
@@ -71,18 +71,16 @@ def build_leaderboard_pair_rankings(
     ][:top_n]
 
 
-def _build_team_district_map(team_keys: Iterable[str]) -> Dict[str, str]:
+def _build_team_district_map() -> Dict[str, str]:
     """
-    Returns {team_key: district_abbrev} for the given team keys, using each
-    team's most recent district membership. Fetches all DistrictTeam records in
-    one query and filters in memory.
+    Returns {team_key: district_abbrev} for all teams, using each team's most
+    recent district membership.
     """
-    team_keys_set = set(team_keys)
     all_district_teams = AllDistrictTeamsQuery().fetch()
 
     team_district_teams: Dict[str, List[Any]] = defaultdict(list)
     for dt in all_district_teams:
-        if dt.team and str(dt.team.id()) in team_keys_set:
+        if dt.team:
             team_district_teams[str(dt.team.id())].append(dt)
 
     return {
@@ -94,10 +92,6 @@ def _build_team_district_map(team_keys: Iterable[str]) -> Dict[str, str]:
 
 
 class InsightV2Calculator(ABC):
-    @property
-    def team_keys(self) -> Set[str]:
-        return set()
-
     @abstractmethod
     def on_event(self, event: Event) -> None: ...
 
@@ -110,10 +104,6 @@ class InsightV2Calculator(ABC):
 class LeaderboardV2Calculator(InsightV2Calculator, ABC):
     def __init__(self) -> None:
         self.counts: Dict[str, int] = defaultdict(int)
-
-    @property
-    def team_keys(self) -> Set[str]:
-        return set(self.counts.keys())
 
     @property
     @abstractmethod
@@ -222,10 +212,7 @@ def compute_insights_for_year(
             event.clear_matches()
             ndb.get_context().clear_cache()
 
-    all_team_keys: Set[str] = set()
-    for calc in calculators:
-        all_team_keys.update(calc.team_keys)
-    team_to_district = _build_team_district_map(all_team_keys)
+    team_to_district = _build_team_district_map()
 
     insights = []
     for calc in calculators:
