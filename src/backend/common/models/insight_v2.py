@@ -30,6 +30,9 @@ class InsightV2Names:
     QUALIFYING_EVENT_WIN_STREAK = InsightV2NameEntry(
         "qualifying_event_win_streak", "Longest Qualifying Event Win Streak"
     )
+    EINSTEIN_WIN_STREAK = InsightV2NameEntry(
+        "einstein_streak", "Longest Einstein Streak"
+    )
 
 
 class InsightV2(CachedModel):

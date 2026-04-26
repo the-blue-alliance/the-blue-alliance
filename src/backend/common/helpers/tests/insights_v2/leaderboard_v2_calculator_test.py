@@ -172,7 +172,7 @@ def test_renamed_district_normalized_to_latest_code(ndb_stub) -> None:
         district_key=ndb.Key(District, district_key_new),
     ).put()
 
-    result = _build_team_district_map(["frc1", "frc2"])
+    result = _build_team_district_map()
     # Both teams must map to the canonical "fch" abbreviation, not split across "chs"/"fch"
     assert result == {"frc1": "fch", "frc2": "fch"}
 
@@ -195,4 +195,4 @@ def test_district_uses_most_recent_district_team(ndb_stub) -> None:
         district_key=ndb.Key(District, district_key_ne),
     ).put()
 
-    assert _build_team_district_map(["frc1"]) == {"frc1": "ne"}
+    assert _build_team_district_map() == {"frc1": "ne"}
