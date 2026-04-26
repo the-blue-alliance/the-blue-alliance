@@ -6,6 +6,7 @@ from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import DistrictAbbreviation
 
 LeaderboardKeyType = Literal["team", "event", "match", "team_pair"]
+LeaderboardContextType = Literal["event_list", "none"]
 
 
 class InsightCategory:
@@ -68,9 +69,25 @@ class LeaderboardRankingV2(TypedDict):
     value: int | float
 
 
+class EventListContext(TypedDict):
+    event_keys: List[str]
+
+
+class LeaderboardRankingWithEventList(TypedDict):
+    keys: List[str]
+    value: int | float
+    contexts: List[
+        EventListContext
+    ]  # parallel to keys; zip(keys, contexts) gives per-team events
+
+
+LeaderboardRanking = LeaderboardRankingV2 | LeaderboardRankingWithEventList
+
+
 class LeaderboardDataV2(TypedDict):
-    rankings: List[LeaderboardRankingV2]
+    rankings: List[LeaderboardRanking]
     key_type: LeaderboardKeyType
+    context_type: LeaderboardContextType
 
 
 class StreakEntry(TypedDict):

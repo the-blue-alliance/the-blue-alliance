@@ -16,6 +16,7 @@ from backend.common.models.event import Event
 from backend.common.models.insight_v2 import (
     InsightCategory,
     LeaderboardKeyType,
+    LeaderboardRanking,
     LeaderboardRankingV2,
 )
 from backend.common.models.team import Team
@@ -32,7 +33,7 @@ class _StubLeaderboard(LeaderboardV2Calculator):
     def key_type(self) -> LeaderboardKeyType:
         return "team"
 
-    def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRankingV2]:
+    def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
         return build_leaderboard_rankings(counts)
 
     def on_event(self, event: Event) -> None:
