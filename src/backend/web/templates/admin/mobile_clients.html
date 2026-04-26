@@ -42,6 +42,7 @@
       watch logs for per-page deletion counts.
     </p>
     <form action="{{ url_for('admin.mobile_clients_dedupe_post') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
       <button type="submit" class="btn btn-danger">Dedupe MobileClients</button>
     </form>
   </div>
