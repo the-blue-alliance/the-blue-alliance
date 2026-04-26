@@ -2,13 +2,10 @@ from typing import Dict, List, Optional, Set
 
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
-from backend.common.helpers.insights_v2.streak_calculator import StreakV2Calculator
+from backend.common.helpers.insights_v2.names import InsightV2NameEntry, InsightV2Names
+from backend.common.helpers.insights_v2.streaks.calculator import StreakV2Calculator
 from backend.common.models.event import Event
-from backend.common.models.insight_v2 import (
-    InsightV2,
-    InsightV2NameEntry,
-    InsightV2Names,
-)
+from backend.common.models.insight_v2 import InsightV2
 from backend.common.models.keys import Year
 
 

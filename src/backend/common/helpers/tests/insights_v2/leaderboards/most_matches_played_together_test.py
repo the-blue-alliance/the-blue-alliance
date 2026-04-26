@@ -1,12 +1,12 @@
-from backend.common.helpers.insights_v2.compute import compute_insights_for_year
-from backend.common.helpers.insights_v2.most_matches_played_together import (
+from backend.common.helpers.insights_v2.leaderboards.most_matches_played_together import (
     MostMatchesPlayedTogetherV2Calculator,
 )
+from backend.common.helpers.insights_v2.registry import compute_insights_for_year
 
 
 def test_most_matches_played_together_year(ndb_stub, test_data_importer) -> None:
-    test_data_importer.import_event(__file__, "../data/2024nytr.json")
-    test_data_importer.import_match_list(__file__, "../data/2024nytr_matches.json")
+    test_data_importer.import_event(__file__, "../../data/2024nytr.json")
+    test_data_importer.import_match_list(__file__, "../../data/2024nytr_matches.json")
 
     insights = compute_insights_for_year(
         2024, [MostMatchesPlayedTogetherV2Calculator()]
@@ -21,8 +21,8 @@ def test_most_matches_played_together_year(ndb_stub, test_data_importer) -> None
 
 
 def test_most_matches_played_together_top_pair(ndb_stub, test_data_importer) -> None:
-    test_data_importer.import_event(__file__, "../data/2024nytr.json")
-    test_data_importer.import_match_list(__file__, "../data/2024nytr_matches.json")
+    test_data_importer.import_event(__file__, "../../data/2024nytr.json")
+    test_data_importer.import_match_list(__file__, "../../data/2024nytr_matches.json")
 
     insights = compute_insights_for_year(
         2024, [MostMatchesPlayedTogetherV2Calculator()]
@@ -34,8 +34,8 @@ def test_most_matches_played_together_top_pair(ndb_stub, test_data_importer) -> 
 
 
 def test_key_format(ndb_stub, test_data_importer) -> None:
-    test_data_importer.import_event(__file__, "../data/2024nytr.json")
-    test_data_importer.import_match_list(__file__, "../data/2024nytr_matches.json")
+    test_data_importer.import_event(__file__, "../../data/2024nytr.json")
+    test_data_importer.import_match_list(__file__, "../../data/2024nytr_matches.json")
 
     insights = compute_insights_for_year(
         2024, [MostMatchesPlayedTogetherV2Calculator()]
@@ -51,8 +51,8 @@ def test_key_format(ndb_stub, test_data_importer) -> None:
 
 
 def test_key_name(ndb_stub, test_data_importer) -> None:
-    test_data_importer.import_event(__file__, "../data/2024nytr.json")
-    test_data_importer.import_match_list(__file__, "../data/2024nytr_matches.json")
+    test_data_importer.import_event(__file__, "../../data/2024nytr.json")
+    test_data_importer.import_match_list(__file__, "../../data/2024nytr_matches.json")
 
     insights = compute_insights_for_year(
         2024, [MostMatchesPlayedTogetherV2Calculator()]
@@ -61,7 +61,7 @@ def test_key_name(ndb_stub, test_data_importer) -> None:
 
 
 def test_no_unplayed_matches_counted(ndb_stub, test_data_importer) -> None:
-    test_data_importer.import_event(__file__, "../data/2024nytr.json")
+    test_data_importer.import_event(__file__, "../../data/2024nytr.json")
 
     insights = compute_insights_for_year(
         2024, [MostMatchesPlayedTogetherV2Calculator()]

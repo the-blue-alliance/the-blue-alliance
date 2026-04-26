@@ -1,17 +1,13 @@
 from typing import Dict, List
 
 from backend.common.consts.award_type import BLUE_BANNER_AWARDS
-from backend.common.helpers.insights_v2.compute import (
+from backend.common.helpers.insights_v2.leaderboards.calculator import (
     build_leaderboard_rankings,
     LeaderboardV2Calculator,
 )
+from backend.common.helpers.insights_v2.names import InsightV2NameEntry, InsightV2Names
 from backend.common.models.event import Event
-from backend.common.models.insight_v2 import (
-    InsightV2NameEntry,
-    InsightV2Names,
-    LeaderboardKeyType,
-    LeaderboardRankingV2,
-)
+from backend.common.models.insight_v2 import LeaderboardKeyType, LeaderboardRankingV2
 
 
 class BlueBannersV2Calculator(LeaderboardV2Calculator):

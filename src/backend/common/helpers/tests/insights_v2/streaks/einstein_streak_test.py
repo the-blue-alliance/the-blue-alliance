@@ -3,8 +3,8 @@ from google.appengine.ext import ndb
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.helpers.insights_v2.compute import compute_insights_for_year
-from backend.common.helpers.insights_v2.einstein_streak import (
+from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.insights_v2.streaks.einstein_streak import (
     LongestEinsteinStreakV2Calculator,
 )
 from backend.common.models.award import Award

@@ -2,20 +2,19 @@ from typing import Dict, List
 
 from google.appengine.ext import ndb
 
-from backend.common.helpers.insights_v2.compute import (
-    _build_team_district_map,
+from backend.common.helpers.insights_v2.leaderboards.calculator import (
     build_leaderboard_pair_rankings,
     build_leaderboard_rankings,
     LEADERBOARD_MAX_KEYS_PER_RANKING,
     LeaderboardV2Calculator,
 )
+from backend.common.helpers.insights_v2.names import InsightV2NameEntry, InsightV2Names
+from backend.common.helpers.insights_v2.registry import _build_team_district_map
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.insight_v2 import (
     InsightCategory,
-    InsightV2NameEntry,
-    InsightV2Names,
     LeaderboardKeyType,
     LeaderboardRankingV2,
 )

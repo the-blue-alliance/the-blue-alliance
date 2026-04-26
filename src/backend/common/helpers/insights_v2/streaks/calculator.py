@@ -2,11 +2,11 @@ from abc import abstractmethod
 from collections import defaultdict
 from typing import Dict, List, NamedTuple
 
-from backend.common.helpers.insights_v2.compute import InsightV2Calculator
+from backend.common.helpers.insights_v2.base import InsightV2Calculator
+from backend.common.helpers.insights_v2.names import InsightV2NameEntry
 from backend.common.models.insight_v2 import (
     InsightCategory,
     InsightV2,
-    InsightV2NameEntry,
     StreakData,
     StreakEntry,
 )
