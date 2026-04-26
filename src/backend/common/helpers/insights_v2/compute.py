@@ -5,6 +5,7 @@ from typing import Any, DefaultDict, Dict, Iterable, List, Optional, Set, Tuple
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
 from backend.common.models.insight_v2 import (
@@ -85,7 +86,9 @@ def _build_team_district_map(team_keys: Iterable[str]) -> Dict[str, str]:
             team_district_teams[str(dt.team.id())].append(dt)
 
     return {
-        team_key: str(max(dts, key=lambda dt: dt.year).district_key.id())[4:]
+        team_key: RenamedDistricts.get_latest_code(
+            str(max(dts, key=lambda dt: dt.year).district_key.id())[4:]
+        )
         for team_key, dts in team_district_teams.items()
     }
 

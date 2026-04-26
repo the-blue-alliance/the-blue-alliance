@@ -147,6 +147,36 @@ def test_pair_rankings_includes_group_at_max_keys() -> None:
     assert len(result[0]["keys"]) == LEADERBOARD_MAX_KEYS_PER_RANKING
 
 
+def test_renamed_district_normalized_to_latest_code(ndb_stub) -> None:
+    # Teams whose most recent DistrictTeam record uses the old abbreviation (e.g. "chs")
+    # should be normalized to the current abbreviation ("fch") so they are bucketed
+    # together with teams whose records already use the new code.
+    district_key_old = "2022chs"
+    district_key_new = "2024fch"
+    District(id=district_key_old, year=2022, abbreviation="chs").put()
+    District(id=district_key_new, year=2024, abbreviation="fch").put()
+
+    # frc1 last seen under the old "chs" code
+    DistrictTeam(
+        id=f"{district_key_old}_frc1",
+        team=ndb.Key(Team, "frc1"),
+        year=2022,
+        district_key=ndb.Key(District, district_key_old),
+    ).put()
+
+    # frc2 already on the new "fch" code
+    DistrictTeam(
+        id=f"{district_key_new}_frc2",
+        team=ndb.Key(Team, "frc2"),
+        year=2024,
+        district_key=ndb.Key(District, district_key_new),
+    ).put()
+
+    result = _build_team_district_map(["frc1", "frc2"])
+    # Both teams must map to the canonical "fch" abbreviation, not split across "chs"/"fch"
+    assert result == {"frc1": "fch", "frc2": "fch"}
+
+
 def test_district_uses_most_recent_district_team(ndb_stub) -> None:
     district_key_ont = "2018ont"
     district_key_ne = "2024ne"

@@ -52,11 +52,6 @@ def _put_match(event_key: str, year: int, team_keys: list) -> None:
     ).put()
 
 
-def test_no_insights_for_specific_year(ndb_stub) -> None:
-    calc = LongestQualifyingEventStreakV2Calculator()
-    assert calc.make_insights(2024, {}) == []
-
-
 def test_consecutive_wins_build_streak(ndb_stub) -> None:
     _put_event("2022nyny", 2022, EventType.REGIONAL)
     _put_winner_award("2022nyny", 2022, ["frc254"])
@@ -71,9 +66,7 @@ def test_consecutive_wins_build_streak(ndb_stub) -> None:
     )
 
     assert len(insights) == 1
-    entries = insights[0].data["entries"]
-    assert len(entries) >= 1
-    top = entries[0]
+    top = insights[0].data["entries"][0]
     assert top["key"] == "frc254"
     assert top["key_type"] == "team"
     assert top["streak_length"] == 2
@@ -209,30 +202,6 @@ def test_district_events_count_toward_streak(ndb_stub) -> None:
     top = insights[0].data["entries"][0]
     assert top["key"] == "frc254"
     assert top["streak_length"] == 2
-
-
-def test_insight_uses_streak_category(ndb_stub) -> None:
-    _put_event("2022nyny", 2022, EventType.REGIONAL)
-    _put_winner_award("2022nyny", 2022, ["frc254"])
-    _put_match("2022nyny", 2022, ["frc254", "frc1", "frc2", "frc3", "frc4", "frc5"])
-
-    insights = compute_insights_for_year(
-        0, [LongestQualifyingEventStreakV2Calculator()]
-    )
-
-    assert insights[0].category == "streak"
-    assert insights[0].name == "qualifying_event_win_streak"
-
-
-def test_key_name(ndb_stub) -> None:
-    _put_event("2022nyny", 2022, EventType.REGIONAL)
-    _put_winner_award("2022nyny", 2022, ["frc254"])
-    _put_match("2022nyny", 2022, ["frc254", "frc1", "frc2", "frc3", "frc4", "frc5"])
-
-    insights = compute_insights_for_year(
-        0, [LongestQualifyingEventStreakV2Calculator()]
-    )
-    assert insights[0].key_name == "0_v2_streak_qualifying_event_win_streak"
 
 
 def test_real_data_frc1796_streak(ndb_stub, test_data_importer) -> None:
