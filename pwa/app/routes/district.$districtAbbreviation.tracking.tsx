@@ -189,23 +189,28 @@ function TeamCell({
         : undefined;
     cellColors = { background: bg, text: textColor, outline: secondary };
   } else {
-    cellColors = {
-      background: alliance === 'red' ? '#ffdddd' : '#ddddff',
-      text: 'black',
-    };
+    cellColors = { background: '', text: '' };
   }
 
-  const style: React.CSSProperties = {
-    backgroundColor: cellColors.background,
-    color: cellColors.text,
-    ...(cellColors.outline
-      ? { outline: `2px solid ${cellColors.outline}`, outlineOffset: '-2px' }
-      : {}),
-  };
+  const allianceClass =
+    alliance === 'red' ? 'bg-alliance-red-cell' : 'bg-alliance-blue-cell';
+
+  const style: React.CSSProperties =
+    cellColors.background
+      ? {
+          backgroundColor: cellColors.background,
+          color: cellColors.text,
+          ...(cellColors.outline
+            ? { outline: `2px solid ${cellColors.outline}`, outlineOffset: '-2px' }
+            : {}),
+        }
+      : {};
 
   return (
     <TableCell
-      className="px-2 py-1 text-center text-xs font-medium"
+      className={`px-2 py-1 text-center text-xs font-medium ${
+        cellColors.background ? '' : allianceClass
+      }`}
       style={style}
     >
       <div className={isDistrictTeam ? 'font-bold' : 'opacity-70'}>
@@ -309,14 +314,20 @@ function MatchesTable({
                 ),
               )}
               <TableCell
-                className={`text-center font-bold
-                ${winner === AllianceColor.RED ? 'bg-red-100' : ''}`}
+                className={`text-center font-bold ${
+                  winner === AllianceColor.RED
+                    ? 'bg-alliance-red-cell-winner'
+                    : 'bg-alliance-red-cell'
+                }`}
               >
                 {played ? redScore : '—'}
               </TableCell>
               <TableCell
-                className={`text-center font-bold
-                ${winner === AllianceColor.BLUE ? 'bg-blue-100' : ''}`}
+                className={`text-center font-bold ${
+                  winner === AllianceColor.BLUE
+                    ? 'bg-alliance-blue-cell-winner'
+                    : 'bg-alliance-blue-cell'
+                }`}
               >
                 {played ? blueScore : '—'}
               </TableCell>
