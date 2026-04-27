@@ -40,6 +40,7 @@ import { Route as EventsDistrictAbbreviationYearRouteImport } from './routes/eve
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
 import { Route as DistrictDistrictAbbreviationStatsRouteImport } from './routes/district.$districtAbbreviation.stats'
 import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './routes/district.$districtAbbreviation.insights'
+import { Route as DistrictDistrictAbbreviationChampsYearRouteImport } from './routes/district.$districtAbbreviation.champs.$year'
 
 const WebcastsRoute = WebcastsRouteImport.update({
   id: '/webcasts',
@@ -205,6 +206,12 @@ const DistrictDistrictAbbreviationInsightsRoute =
     path: '/district/$districtAbbreviation/insights',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DistrictDistrictAbbreviationChampsYearRoute =
+  DistrictDistrictAbbreviationChampsYearRouteImport.update({
+    id: '/district/$districtAbbreviation/champs/$year',
+    path: '/district/$districtAbbreviation/champs/$year',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -238,6 +245,7 @@ export interface FileRoutesByFullPath {
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -271,6 +279,7 @@ export interface FileRoutesByTo {
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -305,6 +314,7 @@ export interface FileRoutesById {
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -340,6 +350,7 @@ export interface FileRouteTypes {
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/district/$districtAbbreviation/champs/$year'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -373,6 +384,7 @@ export interface FileRouteTypes {
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/district/$districtAbbreviation/champs/$year'
   id:
     | '__root__'
     | '/'
@@ -406,6 +418,7 @@ export interface FileRouteTypes {
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/district/$districtAbbreviation/champs/$year'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -439,6 +452,7 @@ export interface RootRouteChildren {
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
   TeamTeamNumberStatsRoute: typeof TeamTeamNumberStatsRoute
   TeamTeamNumberChar123YearChar125Route: typeof TeamTeamNumberChar123YearChar125Route
+  DistrictDistrictAbbreviationChampsYearRoute: typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -660,6 +674,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DistrictDistrictAbbreviationInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/district/$districtAbbreviation/champs/$year': {
+      id: '/district/$districtAbbreviation/champs/$year'
+      path: '/district/$districtAbbreviation/champs/$year'
+      fullPath: '/district/$districtAbbreviation/champs/$year'
+      preLoaderRoute: typeof DistrictDistrictAbbreviationChampsYearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -708,6 +729,8 @@ const rootRouteChildren: RootRouteChildren = {
   TeamTeamNumberHistoryRoute: TeamTeamNumberHistoryRoute,
   TeamTeamNumberStatsRoute: TeamTeamNumberStatsRoute,
   TeamTeamNumberChar123YearChar125Route: TeamTeamNumberChar123YearChar125Route,
+  DistrictDistrictAbbreviationChampsYearRoute:
+    DistrictDistrictAbbreviationChampsYearRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
