@@ -1,4 +1,4 @@
-from unittest.mock import Mock, patch
+from unittest.mock import ANY, Mock, patch
 
 import pytest
 from firebase_admin import messaging
@@ -48,7 +48,10 @@ def test_init_delivery_too_many_tokens(fcm_app):
 
 def test_str(fcm_app):
     request = FCMRequest(fcm_app, notification=MockNotification(), tokens=["abc"])
-    assert "FCMRequest(tokens=['abc'], notification=MockNotification())" == str(request)
+    assert (
+        "FCMRequest(tokens=['abc'], notification=MockNotification(), dry_run=False)"
+        == str(request)
+    )
 
 
 def test_send(fcm_app):
@@ -104,6 +107,28 @@ def test_send_failed_partial(fcm_app):
         response = request.send()
     mock_send.assert_called_once()
     mock_track.assert_called_once_with(1)
+    assert response == batch_response
+
+
+def test_send_dry_run_passes_kwarg_and_skips_tracking(fcm_app):
+    """A dry-run send goes through the same FCM path but must (a) pass
+    `dry_run=True` so FCM validates without delivering, and (b) skip the
+    notification-tracking deferred so probe runs don't pollute metrics."""
+    batch_response = messaging.BatchResponse(
+        [messaging.SendResponse({"name": "abc"}, None)]
+    )
+    request = FCMRequest(
+        fcm_app, notification=MockNotification(), tokens=["abc"], dry_run=True
+    )
+    with (
+        patch.object(
+            messaging, "send_each_for_multicast", return_value=batch_response
+        ) as mock_send,
+        patch.object(request, "defer_track_notification") as mock_track,
+    ):
+        response = request.send()
+    mock_send.assert_called_once_with(ANY, app=fcm_app, dry_run=True)
+    mock_track.assert_not_called()
     assert response == batch_response
 
 
