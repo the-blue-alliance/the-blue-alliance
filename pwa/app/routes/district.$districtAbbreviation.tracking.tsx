@@ -20,6 +20,13 @@ import {
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from '~/components/ui/select';
+import {
   Table,
   TableBody,
   TableCell,
@@ -416,9 +423,16 @@ function RankingsTable({
 
 // --- Main page component ---
 
+const FIRST_TRACKING_YEAR = 2017;
+const TRACKING_YEARS = Array.from(
+  { length: CURRENT_YEAR - FIRST_TRACKING_YEAR + 1 },
+  (_, i) => CURRENT_YEAR - i,
+);
+
 function TrackingPage() {
   const { abbreviation, displayName } = Route.useLoaderData();
-  const districtKey = `${CURRENT_YEAR}${abbreviation}`;
+  const [year, setYear] = useState(CURRENT_YEAR);
+  const districtKey = `${year}${abbreviation}`;
 
   // Auto-refresh countdown
   const [countdown, setCountdown] = useState(REFETCH_INTERVAL / 1000);
@@ -452,7 +466,7 @@ function TrackingPage() {
 
   // Fetch all events for the year and filter to CMP divisions
   const allEventsQuery = useQuery({
-    ...getEventsByYearOptions({ path: { year: CURRENT_YEAR } }),
+    ...getEventsByYearOptions({ path: { year } }),
     refetchInterval: REFETCH_INTERVAL,
   });
 
@@ -533,11 +547,30 @@ function TrackingPage() {
     <div className="space-y-4">
       <div className="mt-4 flex items-center justify-between gap-4">
         <h1 className="text-3xl font-medium">
-          {displayName} at FIRST Championship {CURRENT_YEAR}
+          {displayName} at FIRST Championship {year}
         </h1>
-        <span className="rounded border px-2 py-1 text-xs text-muted-foreground">
-          {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
-        </span>
+        <div className="flex items-center gap-2">
+          <Select
+            value={String(year)}
+            onValueChange={(v) => setYear(Number(v))}
+          >
+            <SelectTrigger className="w-24">
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent>
+              {TRACKING_YEARS.map((y) => (
+                <SelectItem key={y} value={String(y)}>
+                  {y}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+          <span
+            className="rounded border px-2 py-1 text-xs text-muted-foreground"
+          >
+            {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
+          </span>
+        </div>
       </div>
 
       {isLoading && (
