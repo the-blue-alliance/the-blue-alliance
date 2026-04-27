@@ -325,6 +325,19 @@ def update_event_matches(event_key: EventKey) -> Response:
 
     if event.remap_teams:
         EventRemapTeamsHelper.remapteams_matches(matches, event.remap_teams)
+
+    # Merge with existing matches so delete_invalid_matches can see the full
+    # set and identify unplayed elim matches whose set has already been
+    # decided (e.g. an f1m3 placeholder when finals ended 2-0).
+    new_match_keys = {m.key.id() for m in matches}
+    existing_matches = Match.query(Match.event == event.key).fetch()
+    for existing_match in existing_matches:
+        if existing_match.key.id() not in new_match_keys:
+            matches.append(existing_match)
+
+    matches, keys_to_delete = MatchHelper.delete_invalid_matches(matches, event)
+
+    MatchManipulator.delete_keys(keys_to_delete)
     MatchManipulator.createOrUpdate(matches)
 
     return profiled_jsonify({"Success": "Matches successfully updated"})
