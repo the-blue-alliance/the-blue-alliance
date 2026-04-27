@@ -149,9 +149,13 @@ def ping_mobile_client(req: PingRequest) -> BaseResponse:
         )
     else:
         client: MobileClient = clients[0]
-        success, valid_client = TBANSHelper.ping(client)
-        if success:
+        result = TBANSHelper.ping(client)
+        if result == "sent":
             return BaseResponse(code=200, message="Ping sent")
+        elif result == "deleted":
+            return BaseResponse(
+                code=410, message="Token was unregistered; client removed"
+            )
         else:
             return BaseResponse(code=500, message="Failed to ping client")
 

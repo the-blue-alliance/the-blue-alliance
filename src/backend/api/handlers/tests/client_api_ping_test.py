@@ -39,7 +39,7 @@ def test_ping_client(api_client: Client, mock_clientapi_auth: User, ndb_stub) ->
     ).put()
 
     with patch.object(TBANSHelper, "ping") as mock_ping:
-        mock_ping.return_value = (True, True)
+        mock_ping.return_value = "sent"
         req = PingRequest(
             mobile_id="abc123",
         )
@@ -61,10 +61,34 @@ def test_ping_client_fails(
     ).put()
 
     with patch.object(TBANSHelper, "ping") as mock_ping:
-        mock_ping.return_value = (False, False)
+        mock_ping.return_value = "failed"
         req = PingRequest(
             mobile_id="abc123",
         )
         resp = make_clientapi_request(api_client, "/ping", req)
 
     assert resp["code"] == 500
+
+
+def test_ping_client_deleted(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    """When TBANSHelper.ping cleans up a dead token, the API returns 410 Gone
+    so the calling client can react (e.g. drop its cached token)."""
+    MobileClient(
+        parent=mock_clientapi_auth.account_key,
+        user_id=str(mock_clientapi_auth.uid),
+        messaging_id="abc123",
+        client_type=ClientType.TEST,
+        device_uuid="asdf",
+        display_name="Test Device",
+    ).put()
+
+    with patch.object(TBANSHelper, "ping") as mock_ping:
+        mock_ping.return_value = "deleted"
+        req = PingRequest(
+            mobile_id="abc123",
+        )
+        resp = make_clientapi_request(api_client, "/ping", req)
+
+    assert resp["code"] == 410

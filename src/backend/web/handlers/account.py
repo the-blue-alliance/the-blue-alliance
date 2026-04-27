@@ -57,7 +57,7 @@ def overview() -> str:
         "webhook_verification_success": request.args.get(
             "webhook_verification_success"
         ),
-        "ping_sent": session.pop("ping_sent", None),
+        "ping_result": session.pop("ping_result", None),
         "ping_enabled": NotificationsEnable.notifications_enabled(),
         "auth_write_type_names": AUTH_TYPE_WRITE_TYPE_NAMES,
     }
@@ -550,17 +550,12 @@ def ping():
         int(mobile_client_id), parent=none_throws(user.account_key)
     )
     if client is None:
-        session["ping_sent"] = "0"
+        session["ping_result"] = "failed"
         return response
 
     from backend.common.helpers.tbans_helper import TBANSHelper
 
-    success, valid_url = TBANSHelper.ping(client)
-    if success:
-        session["ping_sent"] = "1"
-    else:
-        session["ping_sent"] = "0"
-
+    session["ping_result"] = TBANSHelper.ping(client)
     return response
 
 
