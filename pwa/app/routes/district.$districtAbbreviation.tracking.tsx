@@ -147,13 +147,36 @@ type ColorsQueryResult =
   | { status: 500 }
   | undefined;
 
-// --- Team cell component ---
+// --- Team color helper ---
 
 interface TeamCellColors {
   background: string;
   text: string;
   outline?: string;
 }
+
+function resolveTeamColors(
+  teamKey: string,
+  colors: ColorsQueryResult,
+): TeamCellColors | null {
+  if (colors === undefined || colors.status === 500 || !('data' in colors))
+    return null;
+  const tc = colors.data.teams[teamKey.substring(3)]?.colors;
+  if (!tc) return null;
+  const bg = tc.primaryHex.startsWith('#')
+    ? tc.primaryHex
+    : `#${tc.primaryHex}`;
+  const textColor = getTextColor(bg);
+  const secondary =
+    tc.verified && tc.secondaryHex
+      ? tc.secondaryHex.startsWith('#')
+        ? tc.secondaryHex
+        : `#${tc.secondaryHex}`
+      : undefined;
+  return { background: bg, text: textColor, outline: secondary };
+}
+
+// --- Team cell component ---
 
 function TeamCell({
   teamKey,
@@ -169,25 +192,12 @@ function TeamCell({
   const number = teamNumberFromKey(teamKey);
   const isDistrictTeam = districtTeamSet.has(teamKey);
 
-  const teamColors =
-    colors !== undefined && colors.status !== 500 && 'data' in colors
-      ? (colors.data.teams[teamKey]?.colors ?? null)
-      : null;
+  const teamColors = isDistrictTeam ? resolveTeamColors(teamKey, colors) : null;
 
   let cellColors: TeamCellColors;
 
   if (teamColors !== null) {
-    const bg = teamColors.primaryHex.startsWith('#')
-      ? teamColors.primaryHex
-      : `#${teamColors.primaryHex}`;
-    const textColor = getTextColor(bg);
-    const secondary =
-      teamColors.verified && teamColors.secondaryHex
-        ? teamColors.secondaryHex.startsWith('#')
-          ? teamColors.secondaryHex
-          : `#${teamColors.secondaryHex}`
-        : undefined;
-    cellColors = { background: bg, text: textColor, outline: secondary };
+    cellColors = teamColors;
   } else {
     cellColors = { background: '', text: '' };
   }
@@ -195,16 +205,18 @@ function TeamCell({
   const allianceClass =
     alliance === 'red' ? 'bg-alliance-red-cell' : 'bg-alliance-blue-cell';
 
-  const style: React.CSSProperties =
-    cellColors.background
-      ? {
-          backgroundColor: cellColors.background,
-          color: cellColors.text,
-          ...(cellColors.outline
-            ? { outline: `2px solid ${cellColors.outline}`, outlineOffset: '-2px' }
-            : {}),
-        }
-      : {};
+  const style: React.CSSProperties = cellColors.background
+    ? {
+        backgroundColor: cellColors.background,
+        color: cellColors.text,
+        ...(cellColors.outline
+          ? {
+              outline: `2px solid ${cellColors.outline}`,
+              outlineOffset: '-2px',
+            }
+          : {}),
+      }
+    : {};
 
   return (
     <TableCell
@@ -429,20 +441,25 @@ function AllRankingsTable({
   divisions,
   districtTeamSet,
 }: {
-  divisions: Array<{ name: string; rankings: EventRanking | null | undefined }>;
+  divisions: Array<{
+    name: string;
+    rankings: EventRanking | null | undefined;
+    eventKey: string;
+  }>;
   districtTeamSet: Set<string>;
 }) {
   type Row = {
     rank: number;
     teamKey: string;
     division: string;
+    eventKey: string;
     wins: number;
     losses: number;
     ties: number;
     matchesPlayed: number;
   };
 
-  const rows: Row[] = divisions.flatMap(({ name, rankings }) => {
+  const rows: Row[] = divisions.flatMap(({ name, rankings, eventKey }) => {
     if (!rankings?.rankings) return [];
     return rankings.rankings
       .filter((r) => districtTeamSet.has(r.team_key))
@@ -450,6 +467,7 @@ function AllRankingsTable({
         rank: r.rank,
         teamKey: r.team_key,
         division: name,
+        eventKey,
         wins: r.record?.wins ?? 0,
         losses: r.record?.losses ?? 0,
         ties: r.record?.ties ?? 0,
@@ -697,6 +715,7 @@ function TrackingPage() {
                 divisions={cmpDivisions.map((div, idx) => ({
                   name: div.short_name ?? div.name,
                   rankings: rankingsQueries[idx]?.data ?? null,
+                  eventKey: div.key,
                 }))}
                 districtTeamSet={districtTeamSet}
               />
