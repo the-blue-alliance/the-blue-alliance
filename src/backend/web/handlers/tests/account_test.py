@@ -636,9 +636,12 @@ def test_mytba(
     assert context["year"] == mock_year
 
 
-@pytest.mark.parametrize("ping_result", ["sent", "deleted", "failed"])
+@pytest.mark.parametrize(
+    "ping_sent, expected", [((True, True), "1"), ((False, True), "0")]
+)
 def test_ping_client(
-    ping_result,
+    ping_sent,
+    expected,
     login_user,
     captured_templates: List[CapturedTemplate],
     web_client: FlaskClient,
@@ -653,7 +656,7 @@ def test_ping_client(
 
     with (
         web_client,
-        patch.object(TBANSHelper, "ping", return_value=ping_result) as mock_ping,
+        patch.object(TBANSHelper, "ping", return_value=ping_sent) as mock_ping,
     ):
         response = web_client.post(
             "/account/ping", data={"mobile_client_id": c1.key.id()}
@@ -662,7 +665,7 @@ def test_ping_client(
     mock_ping.assert_called_with(c1)
 
     with web_client.session_transaction() as session:
-        assert session.get("ping_result") == ping_result
+        assert session.get("ping_sent") == expected
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
@@ -690,7 +693,7 @@ def test_ping_not_our_client(
 
     with (
         web_client,
-        patch.object(TBANSHelper, "ping", return_value="sent") as mock_ping,
+        patch.object(TBANSHelper, "ping", return_value=(True, True)) as mock_ping,
     ):
         response = web_client.post(
             "/account/ping", data={"mobile_client_id": c1.key.id()}
@@ -699,7 +702,7 @@ def test_ping_not_our_client(
     mock_ping.assert_not_called()
 
     with web_client.session_transaction() as session:
-        assert session.get("ping_result") == "failed"
+        assert session.get("ping_sent") == "0"
 
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])

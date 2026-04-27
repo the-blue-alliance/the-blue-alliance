@@ -14,7 +14,7 @@ class FCMRequest(Request):
         tokens (list, string): The FCM registration tokens (up to 500) to send a message to.
     """
 
-    def __init__(self, app, notification, tokens=None, dry_run: bool = False):
+    def __init__(self, app, notification, tokens=None):
         """
         Note:
             Should only supply one delivery method - either token, topic, or connection.
@@ -22,9 +22,6 @@ class FCMRequest(Request):
             app (firebase_admin.App): The Firebase app to send to.
             notification (Notification): The Notification to send.
             tokens (list, string): The FCM registration tokens (up to 100) to send a message to.
-            dry_run (bool): If True, validate tokens with FCM without delivering. Used by
-                cleanup probes to check token validity silently; success/error responses
-                mirror a real send (UnregisteredError still surfaces).
         """
         super(FCMRequest, self).__init__(notification=notification)
 
@@ -38,11 +35,10 @@ class FCMRequest(Request):
             )
 
         self.tokens = tokens
-        self.dry_run = dry_run
 
     def __str__(self):
-        return "FCMRequest(tokens={}, notification={}, dry_run={})".format(
-            self.tokens, str(self.notification), self.dry_run
+        return "FCMRequest(tokens={}, notification={})".format(
+            self.tokens, str(self.notification)
         )
 
     def send(self):
@@ -50,10 +46,8 @@ class FCMRequest(Request):
         Returns:
             messaging.BatchResponse - Batch response object for the messages sent.
         """
-        response = messaging.send_each_for_multicast(
-            self._fcm_message(), app=self._app, dry_run=self.dry_run
-        )
-        if response.success_count > 0 and not self.dry_run:
+        response = messaging.send_each_for_multicast(self._fcm_message(), app=self._app)
+        if response.success_count > 0:
             try:
                 self.defer_track_notification(response.success_count)
             except Exception:

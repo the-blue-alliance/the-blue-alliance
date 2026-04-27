@@ -61,22 +61,16 @@
     </div>
   </div>
   {% endif %}
-  {% if ping_result %}
+  {% if ping_sent %}
   <div id="ping-row" class="row">
     <div class="col-md-10 col-md-offset-1">
-      {% if ping_result == 'sent' %}
+      {% if ping_sent == '1' %}
       <div class="alert alert-success">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Success!</h4>
         <p>Ping was sent.</p>
       </div>
-      {% elif ping_result == 'deleted' %}
-      <div class="alert alert-warning">
-        <button type="button" class="close" data-dismiss="alert">&times;</button>
-        <h4>Device unreachable</h4>
-        <p>We removed it from your Connected Devices.</p>
-      </div>
-      {% elif ping_result == 'failed' %}
+      {% elif ping_sent == '0' %}
       <div class="alert alert-danger">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4>Failure</h4>
@@ -295,7 +289,6 @@
       <p class="notifications-enabled-visible">Push notifications (beta) for this device are <strong>enabled</strong>! <a class="btn btn-danger" role="button" onclick="disableMessaging()">Disable</a></p> -->
       {% if user.mobile_clients %}
       <p>All devices will appear below, whether or not push notifications are enabled or disabled for a specific device.</p>
-      <p class="text-muted"><small>Use <strong>Test connection</strong> to send a ping. If a device can't be reached, we'll remove it from your list automatically.</small></p>
       <table class="table table-striped">
         <tr>
           <th>Type</th>
@@ -321,7 +314,7 @@
               <td><form action="{{ url_for('account.ping') }}" method="post">
                 <input name="mobile_client_id" type="hidden" value="{{ client.key.id() }}" />
                 <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-                <button type="submit" class="ping btn btn-default" {{ '' if ping_enabled else 'disabled' }}><span class="glyphicon glyphicon-cloud"></span> Test connection</button>
+                <button type="submit" class="ping btn btn-default" {{ '' if ping_enabled else 'disabled' }}><span class="glyphicon glyphicon-cloud"></span> Ping</button>
               </form></td>
               <td>
                 {% if client.is_webhook %}

@@ -48,23 +48,4 @@
   </div>
 </div>
 
-<div class="panel panel-warning">
-  <div class="panel-heading">
-    <h3 class="panel-title">Probe &amp; remove unregistered clients</h3>
-  </div>
-  <div class="panel-body">
-    <p>
-      Sends a <code>dry_run</code> FCM multicast to every <code>MobileClient</code>
-      and deletes the ones whose tokens come back as <code>UnregisteredError</code>
-      or <code>SenderIdMismatchError</code>. Webhooks are skipped. The task
-      self-defers across pages of 500 entities; watch logs for per-page deletion
-      counts.
-    </p>
-    <form action="{{ url_for('admin.mobile_clients_probe_cleanup_post') }}" method="POST">
-      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
-      <button type="submit" class="btn btn-danger">Probe &amp; remove unregistered clients</button>
-    </form>
-  </div>
-</div>
-
 {% endblock %}

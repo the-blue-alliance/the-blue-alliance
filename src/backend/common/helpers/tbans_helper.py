@@ -2,7 +2,6 @@ import datetime
 import enum
 import logging
 import time
-from typing import Literal
 
 import firebase_admin
 from firebase_admin.exceptions import FirebaseError
@@ -49,10 +48,6 @@ from backend.common.queries.mobile_client_query import MobileClientQuery
 
 MAXIMUM_BACKOFF = 32
 MATCH_UPCOMING_MINUTES = datetime.timedelta(minutes=-7)
-
-# `"deleted"` means the ping surfaced a token-dead FCM error (UnregisteredError /
-# SenderIdMismatchError) and the MobileClient was removed as a side effect.
-PingResult = Literal["sent", "deleted", "failed"]
 
 
 class _NotificationMode(enum.Flag):
@@ -516,97 +511,42 @@ class TBANSHelper:
         )
 
     @staticmethod
-    def ping(client: MobileClient) -> PingResult:
-        """Immediately dispatch a Ping to either FCM or a webhook.
-
-        Returns `"deleted"` when an FCM ping surfaces a token-dead error and
-        the MobileClient row was removed as a result. Webhooks never return
-        `"deleted"` — webhook failure semantics aren't FCM-shaped.
-        """
+    def ping(client: MobileClient) -> tuple[bool, bool]:
+        """Immediately dispatch a Ping to either FCM or a webhook"""
         if client.client_type == ClientType.WEBHOOK:
             return TBANSHelper._ping_webhook(client)
         else:
             return TBANSHelper._ping_client(client)
 
     @staticmethod
-    def _ping_client(client: MobileClient) -> PingResult:
+    def _ping_client(client: MobileClient) -> tuple[bool, bool]:
         client_type = client.client_type
-        if client_type not in FCM_CLIENTS:
+        if client_type in FCM_CLIENTS:
+            notification = PingNotification()
+
+            fcm_request = FCMRequest(
+                firebase_app,
+                notification,
+                tokens=[client.messaging_id],
+            )
+
+            batch_response = fcm_request.send()
+            if batch_response.failure_count > 0:
+                return (False, False)
+        else:
             raise Exception("Unsupported FCM client type: {}".format(client_type))
 
-        fcm_request = FCMRequest(
-            firebase_app,
-            PingNotification(),
-            tokens=[client.messaging_id],
-        )
-
-        batch_response = fcm_request.send()
-        if batch_response.failure_count == 0:
-            return "sent"
-
-        # Mirror the cleanup behavior in `_send_fcm`: a ping that surfaces a
-        # token-dead error means the device is no longer reachable, so prune it
-        # from the user's Connected Devices list.
-        from firebase_admin.messaging import (
-            SenderIdMismatchError,
-            UnregisteredError,
-        )
-
-        exception = batch_response.responses[0].exception
-        if isinstance(exception, (UnregisteredError, SenderIdMismatchError)):
-            logging.info(f"Ping deleting mobile client with ID: {client.messaging_id}")
-            MobileClientQuery.delete_for_messaging_id(client.messaging_id)
-            return "deleted"
-
-        return "failed"
+        return (True, True)
 
     @staticmethod
-    def _ping_webhook(client: MobileClient) -> PingResult:
+    def _ping_webhook(client: MobileClient) -> tuple[bool, bool]:
+        notification = PingNotification()
+
         webhook_request = WebhookRequest(
-            PingNotification(), client.messaging_id, client.secret
-        )
-        success, _valid_url = webhook_request.send()
-        return "sent" if success else "failed"
-
-    @classmethod
-    def probe_and_cleanup_fcm_clients(cls, clients: list[MobileClient]) -> int:
-        """Send a dry-run FCM probe to each FCM client and delete the ones
-        whose tokens come back as `UnregisteredError` or
-        `SenderIdMismatchError`.
-
-        Returns the count of deleted clients.
-        """
-        fcm_clients = [c for c in clients if c.client_type in FCM_CLIENTS]
-        if not fcm_clients:
-            return 0
-
-        fcm_request = FCMRequest(
-            firebase_app,
-            PingNotification(),
-            tokens=[c.messaging_id for c in fcm_clients],
-            dry_run=True,
-        )
-        batch_response = fcm_request.send()
-
-        from firebase_admin.messaging import (
-            SenderIdMismatchError,
-            UnregisteredError,
+            notification, client.messaging_id, client.secret
         )
 
-        deleted = 0
-        for index, response in enumerate(batch_response.responses):
-            if response.success:
-                continue
-            client = fcm_clients[index]
-            if isinstance(
-                response.exception, (UnregisteredError, SenderIdMismatchError)
-            ):
-                logging.info(
-                    f"Probe deleting mobile client with ID: {client.messaging_id}"
-                )
-                MobileClientQuery.delete_for_messaging_id(client.messaging_id)
-                deleted += 1
-        return deleted
+        return webhook_request.send()
 
     @classmethod
     def schedule_upcoming_match(cls, match_key: str) -> None:

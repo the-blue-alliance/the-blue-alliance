@@ -94,7 +94,6 @@ from backend.web.handlers.admin.media import (
 from backend.web.handlers.admin.mobile_clients import (
     mobile_clients_dashboard,
     mobile_clients_dedupe_post,
-    mobile_clients_probe_cleanup_post,
 )
 from backend.web.handlers.admin.regional_champs_pool import regional_champs_pool_list
 from backend.web.handlers.admin.sitevars import (
@@ -484,11 +483,6 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/mobile_clients/dedupe",
     view_func=mobile_clients_dedupe_post,
-    methods=["POST"],
-)
-admin_routes.add_url_rule(
-    "/mobile_clients/probe_cleanup",
-    view_func=mobile_clients_probe_cleanup_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule("/user/<user_id>", view_func=user_detail)
