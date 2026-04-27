@@ -2,8 +2,6 @@ import logging
 import re
 from typing import Dict, Optional
 
-from pyre_extensions import JSON
-
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.nexus_match_status import NexusMatchStatus
 from backend.common.consts.playoff_type import (
@@ -23,6 +21,7 @@ from backend.common.models.event_queue_status import (
 )
 from backend.common.models.keys import MatchKey
 from backend.common.models.match import Match
+from backend.common.nexus_api.types import EventStatus
 
 # Nexus labels finals "Final 1/2/3" but TBA continues its match numbering
 # from the semifinal bracket. Offset = (first F key in the mapping) - 1.
@@ -37,7 +36,7 @@ _FINALS_LABEL_OFFSET: dict[PlayoffType, int] = {
 }
 
 
-class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
+class NexusAPIQueueStatusParser(ParserBase[EventStatus, Optional[EventQueueStatus]]):
 
     MATCH_LABEL_PATTERN: re.Pattern = re.compile(
         r"(Practice|Qualification|Playoff|Final) (\d+)( Replay)?"
@@ -48,7 +47,7 @@ class NexusAPIQueueStatusParser(ParserBase[JSON, Optional[EventQueueStatus]]):
         self.event = event
         self.matches = event.matches
 
-    def parse(self, response: JSON) -> Optional[EventQueueStatus]:
+    def parse(self, response: EventStatus) -> Optional[EventQueueStatus]:
         if not isinstance(response, dict):
             return None
 
