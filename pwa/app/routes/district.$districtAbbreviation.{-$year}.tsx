@@ -238,8 +238,8 @@ function DistrictPage() {
           {districtHistory[districtHistory.length - 1].display_name} {year}
         </h1>
         <Link
-          to="/district/$districtAbbreviation/tracking"
-          params={{ districtAbbreviation: abbreviation }}
+          to="/district/$districtAbbreviation/champs/$year"
+          params={{ districtAbbreviation: abbreviation, year: String(year) }}
           className="text-sm text-muted-foreground hover:text-foreground"
         >
           Follow teams at FIRST Championship

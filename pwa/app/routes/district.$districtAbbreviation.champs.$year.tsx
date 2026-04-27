@@ -1,6 +1,13 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
-import { useEffect, useRef, useState } from 'react';
+import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import {
+  type CSSProperties,
+  Fragment,
+  useEffect,
+  useRef,
+  useState,
+} from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { type EventColors, getEventColors } from '~/api/colors';
 import {
@@ -10,7 +17,6 @@ import {
   EventRanking,
   EventType,
   type Match,
-  getDistrictHistory,
 } from '~/api/tba/read';
 import {
   getDistrictHistoryOptions,
@@ -18,7 +24,9 @@ import {
   getEventMatchesOptions,
   getEventRankingsOptions,
   getEventsByYearOptions,
+  getStatusOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
+import { EventLink, MatchLink, TeamLink } from '~/components/tba/links';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import {
   Select,
@@ -36,29 +44,39 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { cn, publicCacheControlHeaders } from '~/lib/utils';
 
-const CURRENT_YEAR = 2026;
 const REFETCH_INTERVAL = 60_000;
 
 export const Route = createFileRoute(
-  '/district/$districtAbbreviation/tracking',
+  '/district/$districtAbbreviation/champs/$year',
 )({
-  loader: async ({ params }) => {
-    const historyResult = await getDistrictHistory({
-      path: { district_abbreviation: params.districtAbbreviation },
-    });
+  loader: async ({ params, context: { queryClient } }) => {
+    const history = await queryClient.ensureQueryData(
+      getDistrictHistoryOptions({
+        path: { district_abbreviation: params.districtAbbreviation },
+      }),
+    );
 
-    if (historyResult.data === undefined || historyResult.data.length === 0) {
+    if (!history || history.length === 0) {
       throw notFound();
     }
 
-    const history = historyResult.data;
+    const year = Number(params.year);
+    if (!Number.isInteger(year) || year < 1992) {
+      throw notFound();
+    }
+
     const displayName = history[history.length - 1].display_name;
+    const status = await queryClient.ensureQueryData(getStatusOptions({}));
+    const currentSeason =
+      status?.current_season ?? Temporal.Now.plainDateISO().year;
 
     return {
       abbreviation: params.districtAbbreviation,
       displayName,
+      currentSeason,
+      year,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -78,16 +96,16 @@ export const Route = createFileRoute(
     return {
       meta: [
         {
-          title: `${loaderData.displayName} at FIRST Championship ${CURRENT_YEAR} - The Blue Alliance`,
+          title: `${loaderData.displayName} at FIRST Championship - The Blue Alliance`,
         },
         {
           name: 'description',
-          content: `Track ${loaderData.displayName} teams competing at the ${CURRENT_YEAR} FIRST Championship.`,
+          content: `Track ${loaderData.displayName} teams competing at the FIRST Championship.`,
         },
       ],
     };
   },
-  component: TrackingPage,
+  component: ChampsPage,
 });
 
 // --- Color helpers ---
@@ -206,7 +224,7 @@ function TeamCell({
   const allianceClass =
     alliance === 'red' ? 'bg-alliance-red-cell' : 'bg-alliance-blue-cell';
 
-  const style: React.CSSProperties = cellColors.background
+  const style: CSSProperties = cellColors.background
     ? {
         backgroundColor: cellColors.background,
         color: cellColors.text,
@@ -227,15 +245,13 @@ function TeamCell({
       style={style}
     >
       <div className={isDistrictTeam ? 'font-bold' : 'opacity-70'}>
-        <a
-          href={`https://www.thebluealliance.com/team/${number}`}
-          target="_blank"
-          rel="noopener noreferrer"
+        <TeamLink
+          teamOrKey={teamKey}
           style={{ color: cellColors.text }}
           className="hover:underline"
         >
           {number}
-        </a>
+        </TeamLink>
       </div>
     </TableCell>
   );
@@ -264,105 +280,240 @@ function MatchesTable({
     );
   }
 
-  return (
-    <Table className="text-xs">
-      <TableHeader>
-        <TableRow>
-          <TableHead className="text-center">Match</TableHead>
-          {divisionNames && (
-            <TableHead className="text-center">Division</TableHead>
-          )}
-          <TableHead className="text-center" colSpan={3}>
-            Red Alliance
-          </TableHead>
-          <TableHead className="text-center">Red</TableHead>
-          <TableHead className="text-center">Blue</TableHead>
-          <TableHead className="text-center" colSpan={3}>
-            Blue Alliance
-          </TableHead>
-        </TableRow>
-      </TableHeader>
-      <TableBody>
-        {sorted.map((match) => {
-          const colors = eventColors.get(match.event_key);
-          const redTeams = match.alliances.red.team_keys;
-          const blueTeams = match.alliances.blue.team_keys;
-          const redScore = match.alliances.red.score;
-          const blueScore = match.alliances.blue.score;
-          const played = redScore >= 0;
-          const winner = match.winning_alliance;
+  const matchRows = sorted.map((match) => {
+    const colors = eventColors.get(match.event_key);
+    const redTeams = match.alliances.red.team_keys;
+    const blueTeams = match.alliances.blue.team_keys;
+    const redScore = match.alliances.red.score;
+    const blueScore = match.alliances.blue.score;
+    const played = redScore >= 0;
+    const winner = match.winning_alliance;
+    return {
+      match,
+      colors,
+      redTeams,
+      blueTeams,
+      redScore,
+      blueScore,
+      played,
+      winner,
+    };
+  });
 
-          return (
-            <TableRow key={match.key}>
-              <TableCell
-                className="text-center font-mono text-xs text-muted-foreground"
-              >
-                <a
-                  href={`https://www.thebluealliance.com/match/${match.key}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  {matchLabel(match)}
-                </a>
-              </TableCell>
+  return (
+    <>
+      {/* Mobile: 2 rows per match, red on top */}
+      <div className="md:hidden">
+        <Table className="text-xs">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center">Match</TableHead>
               {divisionNames && (
-                <TableCell className="text-center text-muted-foreground">
-                  {divisionNames.get(match.event_key) ?? ''}
-                </TableCell>
+                <TableHead className="text-center">Division</TableHead>
               )}
-              {redTeams.slice(0, 3).map((tk) => (
-                <TeamCell
-                  key={tk}
-                  teamKey={tk}
-                  alliance="red"
-                  colors={colors}
-                  districtTeamSet={districtTeamSet}
-                />
-              ))}
-              {/* Pad if fewer than 3 */}
-              {Array.from({ length: Math.max(0, 3 - redTeams.length) }).map(
-                (_, i) => (
-                  <TableCell key={`red-pad-${i}`} />
-                ),
-              )}
-              <TableCell
-                className={`text-center font-bold ${
-                  winner === AllianceColor.RED
-                    ? 'bg-alliance-red-cell-winner'
-                    : 'bg-alliance-red-cell'
-                }`}
-              >
-                {played ? redScore : '—'}
-              </TableCell>
-              <TableCell
-                className={`text-center font-bold ${
-                  winner === AllianceColor.BLUE
-                    ? 'bg-alliance-blue-cell-winner'
-                    : 'bg-alliance-blue-cell'
-                }`}
-              >
-                {played ? blueScore : '—'}
-              </TableCell>
-              {blueTeams.slice(0, 3).map((tk) => (
-                <TeamCell
-                  key={tk}
-                  teamKey={tk}
-                  alliance="blue"
-                  colors={colors}
-                  districtTeamSet={districtTeamSet}
-                />
-              ))}
-              {Array.from({ length: Math.max(0, 3 - blueTeams.length) }).map(
-                (_, i) => (
-                  <TableCell key={`blue-pad-${i}`} />
-                ),
-              )}
+              <TableHead className="text-center" colSpan={3}>
+                Teams
+              </TableHead>
+              <TableHead className="text-center">Score</TableHead>
             </TableRow>
-          );
-        })}
-      </TableBody>
-    </Table>
+          </TableHeader>
+          <TableBody>
+            {matchRows.map(
+              ({
+                match,
+                colors,
+                redTeams,
+                blueTeams,
+                redScore,
+                blueScore,
+                played,
+                winner,
+              }) => (
+                <Fragment key={match.key}>
+                  <TableRow className="border-b-0">
+                    <TableCell
+                      className="text-center font-mono text-xs
+                        text-muted-foreground"
+                      rowSpan={2}
+                    >
+                      <MatchLink
+                        matchOrKey={match}
+                        noModal
+                        className="hover:underline"
+                      >
+                        {matchLabel(match)}
+                      </MatchLink>
+                    </TableCell>
+                    {divisionNames && (
+                      <TableCell
+                        className="text-center text-muted-foreground"
+                        rowSpan={2}
+                      >
+                        {divisionNames.get(match.event_key) ?? ''}
+                      </TableCell>
+                    )}
+                    {redTeams.slice(0, 3).map((tk) => (
+                      <TeamCell
+                        key={tk}
+                        teamKey={tk}
+                        alliance="red"
+                        colors={colors}
+                        districtTeamSet={districtTeamSet}
+                      />
+                    ))}
+                    {Array.from({
+                      length: Math.max(0, 3 - redTeams.length),
+                    }).map((_, i) => (
+                      <TableCell key={`red-pad-${i}`} />
+                    ))}
+                    <TableCell
+                      className={cn(
+                        'text-center font-bold',
+                        winner === AllianceColor.RED
+                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-red)_30%,transparent)]'
+                          : 'bg-alliance-red-cell',
+                      )}
+                    >
+                      {played ? redScore : '—'}
+                    </TableCell>
+                  </TableRow>
+                  <TableRow>
+                    {blueTeams.slice(0, 3).map((tk) => (
+                      <TeamCell
+                        key={tk}
+                        teamKey={tk}
+                        alliance="blue"
+                        colors={colors}
+                        districtTeamSet={districtTeamSet}
+                      />
+                    ))}
+                    {Array.from({
+                      length: Math.max(0, 3 - blueTeams.length),
+                    }).map((_, i) => (
+                      <TableCell key={`blue-pad-${i}`} />
+                    ))}
+                    <TableCell
+                      className={cn(
+                        'text-center font-bold',
+                        winner === AllianceColor.BLUE
+                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue)_30%,transparent)]'
+                          : 'bg-alliance-blue-cell',
+                      )}
+                    >
+                      {played ? blueScore : '—'}
+                    </TableCell>
+                  </TableRow>
+                </Fragment>
+              ),
+            )}
+          </TableBody>
+        </Table>
+      </div>
+
+      {/* Desktop: 1 row per match */}
+      <div className="hidden md:block">
+        <Table className="text-xs">
+          <TableHeader>
+            <TableRow>
+              <TableHead className="text-center">Match</TableHead>
+              {divisionNames && (
+                <TableHead className="text-center">Division</TableHead>
+              )}
+              <TableHead className="text-center" colSpan={3}>
+                Red Alliance
+              </TableHead>
+              <TableHead className="text-center">Red</TableHead>
+              <TableHead className="text-center">Blue</TableHead>
+              <TableHead className="text-center" colSpan={3}>
+                Blue Alliance
+              </TableHead>
+            </TableRow>
+          </TableHeader>
+          <TableBody>
+            {matchRows.map(
+              ({
+                match,
+                colors,
+                redTeams,
+                blueTeams,
+                redScore,
+                blueScore,
+                played,
+                winner,
+              }) => (
+                <TableRow key={match.key}>
+                  <TableCell
+                    className="text-center font-mono text-xs
+                      text-muted-foreground"
+                  >
+                    <MatchLink
+                      matchOrKey={match}
+                      noModal
+                      className="hover:underline"
+                    >
+                      {matchLabel(match)}
+                    </MatchLink>
+                  </TableCell>
+                  {divisionNames && (
+                    <TableCell className="text-center text-muted-foreground">
+                      {divisionNames.get(match.event_key) ?? ''}
+                    </TableCell>
+                  )}
+                  {redTeams.slice(0, 3).map((tk) => (
+                    <TeamCell
+                      key={tk}
+                      teamKey={tk}
+                      alliance="red"
+                      colors={colors}
+                      districtTeamSet={districtTeamSet}
+                    />
+                  ))}
+                  {Array.from({ length: Math.max(0, 3 - redTeams.length) }).map(
+                    (_, i) => (
+                      <TableCell key={`red-pad-${i}`} />
+                    ),
+                  )}
+                  <TableCell
+                    className={cn(
+                      'text-center font-bold',
+                      winner === AllianceColor.RED
+                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-red)_30%,transparent)]'
+                        : 'bg-alliance-red-cell',
+                    )}
+                  >
+                    {played ? redScore : '—'}
+                  </TableCell>
+                  <TableCell
+                    className={cn(
+                      'text-center font-bold',
+                      winner === AllianceColor.BLUE
+                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue)_30%,transparent)]'
+                        : 'bg-alliance-blue-cell',
+                    )}
+                  >
+                    {played ? blueScore : '—'}
+                  </TableCell>
+                  {blueTeams.slice(0, 3).map((tk) => (
+                    <TeamCell
+                      key={tk}
+                      teamKey={tk}
+                      alliance="blue"
+                      colors={colors}
+                      districtTeamSet={districtTeamSet}
+                    />
+                  ))}
+                  {Array.from({
+                    length: Math.max(0, 3 - blueTeams.length),
+                  }).map((_, i) => (
+                    <TableCell key={`blue-pad-${i}`} />
+                  ))}
+                </TableRow>
+              ),
+            )}
+          </TableBody>
+        </Table>
+      </div>
+    </>
   );
 }
 
@@ -413,14 +564,7 @@ function RankingsTable({
             <TableRow key={r.team_key}>
               <TableCell className="text-center font-bold">{r.rank}</TableCell>
               <TableCell className="text-center">
-                <a
-                  href={`https://www.thebluealliance.com/team/${number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  {number}
-                </a>
+                <TeamLink teamOrKey={r.team_key}>{number}</TeamLink>
               </TableCell>
               <TableCell className="text-center">
                 {record
@@ -507,16 +651,11 @@ function AllRankingsTable({
             <TableRow key={r.teamKey}>
               <TableCell className="text-center font-bold">{r.rank}</TableCell>
               <TableCell className="text-center">
-                <a
-                  href={`https://www.thebluealliance.com/team/${number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="hover:underline"
-                >
-                  {number}
-                </a>
+                <TeamLink teamOrKey={r.teamKey}>{number}</TeamLink>
               </TableCell>
-              <TableCell className="text-center">{r.division}</TableCell>
+              <TableCell className="text-center">
+                <EventLink eventOrKey={r.eventKey}>{r.division}</EventLink>
+              </TableCell>
               <TableCell className="text-center">
                 {`${r.wins}-${r.losses}-${r.ties}`}
               </TableCell>
@@ -531,9 +670,10 @@ function AllRankingsTable({
 
 // --- Main page component ---
 
-function TrackingPage() {
-  const { abbreviation, displayName } = Route.useLoaderData();
-  const [year, setYear] = useState(CURRENT_YEAR);
+function ChampsPage() {
+  const { abbreviation, displayName, currentSeason, year } =
+    Route.useLoaderData();
+  const navigate = useNavigate();
   const districtKey = `${year}${abbreviation}`;
 
   // Fetch district history to know which years this district existed
@@ -546,17 +686,9 @@ function TrackingPage() {
   const validYears: number[] = districtHistoryQuery.data
     ? districtHistoryQuery.data
         .map((d) => d.year)
-        .filter((y) => y <= CURRENT_YEAR)
+        .filter((y) => y <= currentSeason)
         .sort((a, b) => b - a)
-    : [CURRENT_YEAR];
-
-  // Snap year to most recent valid year once history loads
-  useEffect(() => {
-    if (districtHistoryQuery.data && !validYears.includes(year)) {
-      setYear(validYears[0] ?? CURRENT_YEAR);
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [districtHistoryQuery.data]);
+    : [currentSeason];
 
   // Auto-refresh countdown
   const [countdown, setCountdown] = useState(REFETCH_INTERVAL / 1000);
@@ -680,7 +812,12 @@ function TrackingPage() {
           </span>
           <Select
             value={String(year)}
-            onValueChange={(v) => setYear(Number(v))}
+            onValueChange={(v) => {
+              void navigate({
+                to: '/district/$districtAbbreviation/champs/$year',
+                params: { districtAbbreviation: abbreviation, year: v },
+              });
+            }}
           >
             <SelectTrigger className="w-24">
               <SelectValue />

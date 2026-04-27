@@ -48,7 +48,7 @@
   --color-alliance-red-light: --alpha(var(--color-alliance-red) / 10%);
   --color-alliance-red-dark: --alpha(var(--color-alliance-red) / 20%);
   --color-alliance-red-cell: --alpha(var(--color-alliance-red) / 15%);
-  --color-alliance-red-cell-winner: --alpha(var(--color-alliance-red) / 30%);
+  --color-alliance-red-cell-winner: --alpha(var(--color-alliance-red) / 15%);
 
   /* Blue Alliance */
   --color-first-avatar-blue: #0066b3;
@@ -56,7 +56,7 @@
   --color-alliance-blue-light: --alpha(var(--color-alliance-blue) / 10%);
   --color-alliance-blue-dark: --alpha(var(--color-alliance-blue) / 20%);
   --color-alliance-blue-cell: --alpha(var(--color-alliance-blue) / 15%);
-  --color-alliance-blue-cell-winner: --alpha(var(--color-alliance-blue) / 30%);
+  --color-alliance-blue-cell-winner: --alpha(var(--color-alliance-blue) / 15%);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
