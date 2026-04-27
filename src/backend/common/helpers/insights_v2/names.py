@@ -23,6 +23,18 @@ class InsightV2Names:
         "most_cmp_finals_appearances", "Most World Championship Finals Appearances"
     )
     MOST_CMP_WINS = InsightV2NameEntry("most_cmp_wins", "Most World Championship Wins")
+    MOST_EVENTS_WON = InsightV2NameEntry("most_events_won", "Most Events Won")
+    MOST_EVENTS_WON_TOGETHER = InsightV2NameEntry(
+        "most_events_won_together", "Most Events Won Together"
+    )
+    MOST_IMPACT_AWARD_WINS = InsightV2NameEntry(
+        "most_impact_award_wins", "Most Impact Award Wins"
+    )
+    MOST_AWARDS_WON = InsightV2NameEntry("most_awards_won", "Most Awards Won")
+    MOST_DISTRICT_CMP_WINS = InsightV2NameEntry(
+        "most_district_cmp_wins", "Most District Championship Wins"
+    )
+    MOST_WFFA_WINS = InsightV2NameEntry("most_wffa_wins", "Most WFFAs")
 
     # Streaks
     QUALIFYING_EVENT_WIN_STREAK = InsightV2NameEntry(
