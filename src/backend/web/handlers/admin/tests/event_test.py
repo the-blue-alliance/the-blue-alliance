@@ -13,6 +13,7 @@ from backend.common.memcache_models.event_sync_status_memcache import (
 )
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.nexus_pit_map import NexusPitMap
 from backend.web.handlers.tests import helpers
 
 
@@ -69,6 +70,42 @@ def test_event_detail(web_client: Client, login_gae_admin, setup_full_event) -> 
     soup = bs4.BeautifulSoup(resp.data, "html.parser")
     audit_logs_link = soup.find("a", href="/admin/audit_logs?key=Event:2019nyny")
     assert audit_logs_link is not None
+
+
+def test_event_detail_teams_subtabs_show_nexus_pit_map(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2026casj",
+        event_short="casj",
+        year=2026,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2026, 3, 1),
+        end_date=datetime(2026, 3, 5),
+    ).put()
+    NexusPitMap(
+        id="2026casj",
+        data_json={"size": {"x": 100, "y": 50}, "pits": {}},
+    ).put()
+
+    resp = web_client.get("/admin/event/2026casj")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    team_list_subtab = soup.find("a", href="#teams-list")
+    pit_map_subtab = soup.find("a", href="#teams-pit-map")
+
+    assert team_list_subtab is not None
+    assert team_list_subtab.get_text(strip=True) == "Team List"
+    assert pit_map_subtab is not None
+    assert pit_map_subtab.get_text(strip=True) == "Nexus Pit Map"
+
+    pit_map_pane = soup.find("div", id="teams-pit-map")
+    assert pit_map_pane is not None
+    pane_text = pit_map_pane.get_text()
+    assert "size" in pane_text
+    assert "100" in pane_text
 
 
 def test_event_detail_regional_champs_points_tab_and_task(

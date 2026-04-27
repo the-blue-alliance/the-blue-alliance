@@ -579,24 +579,41 @@
 
   <div class="tab-pane" id="teams">
     <h2>Teams</h2>
-    <table class="table table-striped table-condensed table-center">
-      <tr>
-        <td>Team</td>
-        <td>Event Status</td>
-        <td>Nexus Pit Location</td>
-      </tr>
-      {% for et in eventteams %}
-      <tr>
-        <td><a href="/admin/team/{{et.team.string_id()|strip_frc}}">{{et.team.string_id()|strip_frc}}</a></td>
-        <td>
-          <pre class="text-left">{{et.status|pprint_json}}</pre>
-        </td>
-        <td>
-          <pre class="text-left">{% if et.pit_location %}{{et.pit_location|pprint_json}}{%endif%}</pre>
-        </td>
-      </tr>
-      {% endfor %}
-    </table>
+    <ul class="nav nav-tabs">
+      <li class="active"><a href="#teams-list" data-toggle="tab">Team List</a></li>
+      <li><a href="#teams-pit-map" data-toggle="tab">Nexus Pit Map</a></li>
+    </ul>
+
+    <div class="tab-content" style="margin-top: 16px;">
+      <div class="tab-pane active" id="teams-list">
+        <table class="table table-striped table-condensed table-center">
+          <tr>
+            <td>Team</td>
+            <td>Event Status</td>
+            <td>Nexus Pit Location</td>
+          </tr>
+          {% for et in eventteams %}
+          <tr>
+            <td><a href="/admin/team/{{et.team.string_id()|strip_frc}}">{{et.team.string_id()|strip_frc}}</a></td>
+            <td>
+              <pre class="text-left">{{et.status|pprint_json}}</pre>
+            </td>
+            <td>
+              <pre class="text-left">{% if et.pit_location %}{{et.pit_location|pprint_json}}{%endif%}</pre>
+            </td>
+          </tr>
+          {% endfor %}
+        </table>
+      </div>
+
+      <div class="tab-pane" id="teams-pit-map">
+        {% if nexus_pit_map %}
+          <pre class="text-left">{{ nexus_pit_map|pprint_json }}</pre>
+        {% else %}
+          <p>No Nexus pit map data found.</p>
+        {% endif %}
+      </div>
+    </div>
   </div>
 
   <div class="tab-pane" id="rankings">

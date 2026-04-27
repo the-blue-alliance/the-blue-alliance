@@ -13,7 +13,7 @@ from backend.common.memcache_models.event_sync_status_memcache import (
     EventSyncStatusMemcache,
 )
 from backend.common.models.event import Event
-from backend.common.nexus_api.types import PitAddresses
+from backend.common.nexus_api.types import PitAddresses, PitMap
 from backend.common.sitevars.nexus_api_secret import (
     ContentType as NexusAPISecretsContentType,
 )
@@ -23,9 +23,13 @@ from backend.tasks_io.datafeeds.datafeed_nexus import (
     _DatafeedNexus,
     NexusEventQueueStatus,
     NexusPitLocations,
+    NexusPitMapDatafeed,
 )
 from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
     NexusAPIPitLocationParser,
+)
+from backend.tasks_io.datafeeds.parsers.nexus_api.pit_map_parser import (
+    NexusAPIPitMapParser,
 )
 from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
     NexusAPIQueueStatusParser,
@@ -208,6 +212,61 @@ def test_get_pit_locations_error(
     response = NexusPitLocations(e).fetch_async()
     assert response.get_result() is None
     parser_mock.assert_not_called()
+
+
+@mock.patch.object(NexusAPIPitMapParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_map(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event()
+    api_content: PitMap = {
+        "size": {"x": 1000, "y": 500},
+        "pits": {},
+    }
+    api_response = URLFetchResult.mock_for_content(
+        "https://frc.nexus/api/v3/event/2019casj/map",
+        200,
+        json.dumps(api_content),
+    )
+    api_mock.return_value = InstantFuture(api_response)
+    parser_mock.return_value = api_content
+
+    response = NexusPitMapDatafeed(e).fetch_async()
+    assert response.get_result() == api_content
+
+
+@mock.patch.object(NexusAPIPitMapParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_map_different_api_short(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(first_api_short="test")
+
+    endpoint = NexusPitMapDatafeed(e).endpoint()
+    assert endpoint == "/event/2019test/map"
+
+
+@mock.patch.object(NexusAPIPitMapParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_map_nexus_code_override(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(first_api_short="first", nexus_api_short="nexus")
+
+    endpoint = NexusPitMapDatafeed(e).endpoint()
+    assert endpoint == "/event/2019nexus/map"
+
+
+@mock.patch.object(NexusAPIPitMapParser, "parse")
+@mock.patch.object(_DatafeedNexus, "_urlfetch")
+def test_get_pit_map_demo_event_code(
+    api_mock: mock.Mock, parser_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    e = create_event(nexus_api_short="demo0755")
+
+    endpoint = NexusPitMapDatafeed(e).endpoint()
+    assert endpoint == "/event/demo0755/map"
 
 
 @mock.patch.object(NexusAPIQueueStatusParser, "parse")

@@ -15,10 +15,13 @@ from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import EventKey, TeamKey
-from backend.common.nexus_api.types import EventStatus, PitAddresses
+from backend.common.nexus_api.types import EventStatus, PitAddresses, PitMap
 from backend.common.sitevars.nexus_api_secret import NexusApiSecrets
 from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
     NexusAPIPitLocationParser,
+)
+from backend.tasks_io.datafeeds.parsers.nexus_api.pit_map_parser import (
+    NexusAPIPitMapParser,
 )
 from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
     NexusAPIQueueStatusParser,
@@ -113,3 +116,18 @@ class NexusEventQueueStatus(_DatafeedNexus[EventStatus, Optional[EventQueueStatu
 
     def parser(self) -> NexusAPIQueueStatusParser:
         return NexusAPIQueueStatusParser(self.event)
+
+
+class NexusPitMapDatafeed(_DatafeedNexus[PitMap, PitMap]):
+    def __init__(self, event: Event) -> None:
+        super().__init__()
+        self.event = event
+
+    def endpoint(self) -> str:
+        return f"/event/{self.event.nexus_code_for_api}/map"
+
+    def event_key(self) -> Optional[EventKey]:
+        return self.event.key_name
+
+    def parser(self) -> NexusAPIPitMapParser:
+        return NexusAPIPitMapParser()

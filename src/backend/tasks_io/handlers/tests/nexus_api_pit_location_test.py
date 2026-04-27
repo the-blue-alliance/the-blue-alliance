@@ -12,8 +12,13 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.nexus_pit_map import NexusPitMap
 from backend.common.models.team import Team
-from backend.tasks_io.datafeeds.datafeed_nexus import NexusPitLocations
+from backend.common.nexus_api.types import PitMap
+from backend.tasks_io.datafeeds.datafeed_nexus import (
+    NexusPitLocations,
+    NexusPitMapDatafeed,
+)
 
 
 def create_event(official: bool, nexus_code: str | None = None) -> Event:
@@ -182,9 +187,11 @@ def test_fetch_missing_event(
     assert resp.status_code == 404
 
 
+@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
 @mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam(
     nexus_api_mock,
+    pit_map_mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
@@ -193,6 +200,7 @@ def test_fetch_updates_eventteam(
 
     pit_location = EventTeamPitLocation(location="A1")
     nexus_api_mock.return_value = InstantFuture({"frc254": pit_location})
+    pit_map_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/tasks/get/nexus_pit_locations/2019casj")
     assert resp.status_code == 200
@@ -203,9 +211,11 @@ def test_fetch_updates_eventteam(
     assert et.pit_location == pit_location
 
 
+@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
 @mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam_skip_missing(
     nexus_api_mock,
+    pit_map_mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
@@ -213,6 +223,7 @@ def test_fetch_updates_eventteam_skip_missing(
     create_eventteam("2019casj", "frc254")
 
     nexus_api_mock.return_value = InstantFuture({})
+    pit_map_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get("/tasks/get/nexus_pit_locations/2019casj")
     assert resp.status_code == 200
@@ -223,9 +234,11 @@ def test_fetch_updates_eventteam_skip_missing(
     assert et.pit_location is None
 
 
+@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
 @mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam_no_write_in_taskqueue(
     nexus_api_mock,
+    pit_map_mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
@@ -234,6 +247,7 @@ def test_fetch_updates_eventteam_no_write_in_taskqueue(
 
     pit_location = EventTeamPitLocation(location="A1")
     nexus_api_mock.return_value = InstantFuture({"frc254": pit_location})
+    pit_map_mock.return_value = InstantFuture(None)
 
     resp = tasks_client.get(
         "/tasks/get/nexus_pit_locations/2019casj",
@@ -245,3 +259,30 @@ def test_fetch_updates_eventteam_no_write_in_taskqueue(
     et = EventTeam.get_by_id("2019casj_frc254")
     assert et is not None
     assert et.pit_location == pit_location
+
+
+@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
+@mock.patch.object(NexusPitLocations, "fetch_async")
+def test_fetch_writes_nexus_pit_map(
+    nexus_api_mock,
+    pit_map_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    create_event(official=True)
+    create_eventteam("2019casj", "frc254")
+
+    pit_location = EventTeamPitLocation(location="A1")
+    pit_map: PitMap = {
+        "size": {"x": 1, "y": 2},
+        "pits": {"1": {"team": "254"}},
+    }
+    nexus_api_mock.return_value = InstantFuture({"frc254": pit_location})
+    pit_map_mock.return_value = InstantFuture(pit_map)
+
+    resp = tasks_client.get("/tasks/get/nexus_pit_locations/2019casj")
+    assert resp.status_code == 200
+
+    stored_map = NexusPitMap.get_by_id("2019casj")
+    assert stored_map is not None
+    assert stored_map.data_json == pit_map
