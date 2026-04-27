@@ -17,6 +17,10 @@ class MostDivisionWinsV2Calculator(EventListLeaderboardV2Calculator):
     def key_type(self) -> LeaderboardKeyType:
         return "team"
 
+    @property
+    def min_count(self) -> int:
+        return 1
+
     def on_event(self, event: Event) -> None:
         if event.event_type_enum != EventType.CMP_DIVISION:
             return
