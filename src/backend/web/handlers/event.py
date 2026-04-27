@@ -5,7 +5,7 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import Any, cast, Dict, List, Optional, Tuple
 
 import pytz
 from flask import abort, redirect, request
@@ -30,6 +30,7 @@ from backend.common.helpers.match_time_prediction_helper import (
     MatchTimePredictionHelper,
 )
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.nexus_pit_map_svg_helper import NexusPitMapSVGHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -38,6 +39,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_matchstats import Component, TeamStatMap
 from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
+from backend.common.models.nexus_pit_map import NexusPitMap
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
@@ -488,6 +490,37 @@ def event_detail(event_key: EventKey) -> Response:
             else timedelta(hours=6)
         ),
     )
+
+
+@cached_public
+def event_pitmap(event_key: EventKey) -> Response:
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    if not event:
+        abort(404)
+
+    nexus_pit_map = NexusPitMap.get_by_id(event_key)
+    if not nexus_pit_map:
+        abort(404)
+
+    try:
+        template_values = NexusPitMapSVGHelper.template_values(
+            cast(dict[str, Any], nexus_pit_map.data_json),
+            event_key,
+        )
+    except ValueError:
+        abort(404)
+        raise RuntimeError("unreachable")
+
+    response = make_cached_response(
+        render_template("event_pitmap.svg", template_values),
+        ttl=(
+            timedelta(seconds=61)
+            if event.should_use_short_cache
+            else timedelta(hours=6)
+        ),
+    )
+    response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
+    return response
 
 
 @cached_public
