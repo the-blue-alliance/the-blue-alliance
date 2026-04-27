@@ -318,46 +318,6 @@ def create_test_event(event_key: str) -> Response:
     )
 
 
-@local_routes.route(
-    "/seed_debug_mobile_clients/<string:account_id>", methods=["GET", "POST"]
-)
-def seed_debug_mobile_clients(account_id: str) -> Response:
-    """Insert MobileClient rows whose `messaging_id` triggers each PingResult
-    branch in `_ping_client` / `probe_and_cleanup_fcm_clients`. Hit this once
-    in dev, then exercise the Connected Devices UI / admin probe button."""
-    from google.appengine.ext import ndb
-
-    from backend.common.consts.client_type import ClientType
-    from backend.common.models.account import Account
-    from backend.common.models.mobile_client import MobileClient
-
-    parent_key = ndb.Key(Account, account_id)
-    rows = [
-        ("DEBUG_SENT_zach1", "Debug iPhone (sent)", ClientType.OS_IOS),
-        ("DEBUG_FAILED_zach1", "Debug iPhone (failed)", ClientType.OS_IOS),
-        ("DEBUG_DELETED_zach1", "Debug iPhone (deleted)", ClientType.OS_IOS),
-        (
-            "DEBUG_DELETED_zach2",
-            "Debug Android (deleted)",
-            ClientType.OS_ANDROID_FCM,
-        ),
-    ]
-    created = []
-    for messaging_id, name, ctype in rows:
-        mc = MobileClient(
-            parent=parent_key,
-            user_id=account_id,
-            messaging_id=messaging_id,
-            client_type=ctype,
-            device_uuid=f"uuid-{messaging_id}",
-            display_name=name,
-            verified=True,
-        )
-        mc.put()
-        created.append({"messaging_id": messaging_id, "key_id": mc.key.id()})
-    return jsonify({"account_id": account_id, "created": created})
-
-
 local_routes.add_url_rule(
     "/seed_test_event",
     view_func=seed_test_event,

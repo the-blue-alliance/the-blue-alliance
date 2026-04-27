@@ -89,7 +89,7 @@ def test_overview(
     context_keys = {
         "status",
         "webhook_verification_success",
-        "ping_result",
+        "ping_sent",
         "ping_enabled",
         "auth_write_type_names",
         "user",
@@ -222,31 +222,17 @@ def test_overview_no_webhook_verification_success(
     assert webhook_row is None
 
 
-@pytest.mark.parametrize(
-    "ping_result, alert_class, title, message",
-    [
-        ("sent", "alert-success", "Success!", "Ping was sent."),
-        (
-            "deleted",
-            "alert-warning",
-            "Device unreachable",
-            "We removed it from your Connected Devices.",
-        ),
-        ("failed", "alert-danger", "Failure", "Failed to send ping."),
-    ],
-)
-def test_overview_ping_result(
+@pytest.mark.parametrize("ping_sent, success", [("1", True), ("0", False)])
+def test_overview_ping_sent(
     login_user,
-    ping_result: str,
-    alert_class: str,
-    title: str,
-    message: str,
+    ping_sent: str,
+    success: bool,
     captured_templates: List[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
     with web_client:
         with web_client.session_transaction() as session:
-            session["ping_result"] = ping_result
+            session["ping_sent"] = ping_sent
         response = web_client.get("/account")
 
     assert response.status_code == 200
@@ -255,17 +241,20 @@ def test_overview_ping_result(
     template = captured_templates[0][0]
     context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["ping_result"] == ping_result
+    assert context["ping_sent"] == ping_sent
 
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     ping_row = soup.find(id="ping-row", attrs={"class": "row"})
     ping_alert = ping_row.find("div", attrs={"class": "alert"})
-    assert alert_class in ping_alert.attrs["class"]
-    assert ping_alert.find("h4").text == title
-    assert ping_alert.find("p").text == message
+    assert_alert(
+        ping_alert,
+        ("Success!" if success else "Failure"),
+        ("Ping was sent." if success else "Failed to send ping."),
+        success,
+    )
 
 
-def test_overview_no_ping_result(
+def test_overview_no_ping_sent(
     login_user,
     captured_templates: List[CapturedTemplate],
     web_client: FlaskClient,
@@ -278,7 +267,7 @@ def test_overview_no_ping_result(
     template = captured_templates[0][0]
     context = captured_templates[0][1]
     assert template.name == "account_overview.html"
-    assert context["ping_result"] is None
+    assert context["ping_sent"] is None
 
     soup = bs4.BeautifulSoup(response.data, "html.parser")
     ping_row = soup.find(id="ping-row", attrs={"class": "row"})

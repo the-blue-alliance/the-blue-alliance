@@ -881,11 +881,11 @@ class TestTBANSHelper(unittest.TestCase):
         )
 
         with patch.object(
-            TBANSHelper, "_ping_client", return_value="sent"
+            TBANSHelper, "_ping_client", return_value=True
         ) as mock_ping_client:
-            result = TBANSHelper.ping(client)
+            success = TBANSHelper.ping(client)
             mock_ping_client.assert_called_once_with(client)
-            assert result == "sent"
+            assert success
 
     def test_ping_webhook(self):
         client = MobileClient(
@@ -898,11 +898,11 @@ class TestTBANSHelper(unittest.TestCase):
         )
 
         with patch.object(
-            TBANSHelper, "_ping_webhook", return_value="sent"
+            TBANSHelper, "_ping_webhook", return_value=True
         ) as mock_ping_webhook:
-            result = TBANSHelper.ping(client)
+            success = TBANSHelper.ping(client)
             mock_ping_webhook.assert_called_once_with(client)
-            assert result == "sent"
+            assert success
 
     def test_ping_fcm(self):
         client = MobileClient(
@@ -925,11 +925,11 @@ class TestTBANSHelper(unittest.TestCase):
             ) as mock_fcm_request_constructor,
             patch.object(FCMRequest, "send", return_value=batch_response) as mock_send,
         ):
-            result = TBANSHelper._ping_client(client)
+            success = TBANSHelper._ping_client(client)
 
             mock_fcm_request_constructor.assert_called_once()
             mock_send.assert_called_once()
-            assert result == "sent"
+            assert success
 
     def test_ping_fcm_fail(self):
         client = MobileClient(
@@ -945,76 +945,10 @@ class TestTBANSHelper(unittest.TestCase):
             [messaging.SendResponse(None, FirebaseError(500, "testing"))]
         )
         with patch.object(FCMRequest, "send", return_value=batch_response) as mock_send:
-            result = TBANSHelper._ping_client(client)
+            success, is_valid = TBANSHelper._ping_client(client)
             mock_send.assert_called_once()
-            assert result == "failed"
-
-    def test_ping_fcm_unregistered_deletes(self):
-        """A ping that comes back UnregisteredError prunes the MobileClient row
-        and returns "deleted", so the user-facing UI can surface the cleanup."""
-        account_key = ndb.Key(Account, "user_id")
-        client = MobileClient(
-            parent=account_key,
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.OS_IOS,
-            device_uuid="uuid",
-            display_name="Phone",
-        )
-        client.put()
-
-        batch_response = messaging.BatchResponse(
-            [messaging.SendResponse(None, UnregisteredError("code", "message"))]
-        )
-        with patch.object(FCMRequest, "send", return_value=batch_response):
-            result = TBANSHelper._ping_client(client)
-
-        assert result == "deleted"
-        assert MobileClient.query(ancestor=account_key).count() == 0
-
-    def test_ping_fcm_sender_mismatch_deletes(self):
-        account_key = ndb.Key(Account, "user_id")
-        client = MobileClient(
-            parent=account_key,
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.OS_IOS,
-            device_uuid="uuid",
-            display_name="Phone",
-        )
-        client.put()
-
-        batch_response = messaging.BatchResponse(
-            [messaging.SendResponse(None, SenderIdMismatchError("code", "message"))]
-        )
-        with patch.object(FCMRequest, "send", return_value=batch_response):
-            result = TBANSHelper._ping_client(client)
-
-        assert result == "deleted"
-        assert MobileClient.query(ancestor=account_key).count() == 0
-
-    def test_ping_fcm_transient_error_does_not_delete(self):
-        """Transient FCM errors (InternalError, UnavailableError) should NOT
-        prune the row — the device may still be reachable on retry."""
-        account_key = ndb.Key(Account, "user_id")
-        client = MobileClient(
-            parent=account_key,
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.OS_IOS,
-            device_uuid="uuid",
-            display_name="Phone",
-        )
-        client.put()
-
-        batch_response = messaging.BatchResponse(
-            [messaging.SendResponse(None, InternalError("internal-fcm-error"))]
-        )
-        with patch.object(FCMRequest, "send", return_value=batch_response):
-            result = TBANSHelper._ping_client(client)
-
-        assert result == "failed"
-        assert MobileClient.query(ancestor=account_key).count() == 1
+            assert not success
+            assert not is_valid
 
     def test_ping_webhook_success(self):
         client = MobileClient(
@@ -1033,9 +967,10 @@ class TestTBANSHelper(unittest.TestCase):
         with patch.object(
             WebhookRequest, "send", return_value=(True, True)
         ) as mock_send:
-            result = TBANSHelper._ping_webhook(client)
+            success, is_valid = TBANSHelper._ping_webhook(client)
             mock_send.assert_called_once()
-            assert result == "sent"
+            assert success
+            assert is_valid
 
     def test_ping_webhook_failure(self):
         client = MobileClient(
@@ -1051,119 +986,10 @@ class TestTBANSHelper(unittest.TestCase):
             WebhookRequest,
         )
 
-        with patch.object(
-            WebhookRequest, "send", return_value=(False, False)
-        ) as mock_send:
-            result = TBANSHelper._ping_webhook(client)
+        with patch.object(WebhookRequest, "send", return_value=False) as mock_send:
+            success = TBANSHelper._ping_webhook(client)
             mock_send.assert_called_once()
-            assert result == "failed"
-
-    def test_probe_and_cleanup_no_clients(self):
-        with patch.object(FCMRequest, "send") as mock_send:
-            deleted = TBANSHelper.probe_and_cleanup_fcm_clients([])
-        assert deleted == 0
-        mock_send.assert_not_called()
-
-    def test_probe_and_cleanup_skips_webhooks(self):
-        """Webhook clients are filtered out before the FCM call — webhook failure
-        semantics aren't FCM-shaped and a homelab outage shouldn't drop a hook."""
-        webhook = MobileClient(
-            parent=ndb.Key(Account, "user_id"),
-            user_id="user_id",
-            messaging_id="https://example.com/webhook",
-            client_type=ClientType.WEBHOOK,
-            display_name="Webhook",
-        )
-        with patch.object(FCMRequest, "send") as mock_send:
-            deleted = TBANSHelper.probe_and_cleanup_fcm_clients([webhook])
-        assert deleted == 0
-        mock_send.assert_not_called()
-
-    def test_probe_and_cleanup_deletes_unregistered(self):
-        account_key = ndb.Key(Account, "user_id")
-        valid = MobileClient(
-            parent=account_key,
-            user_id="user_id",
-            messaging_id="valid-token",
-            client_type=ClientType.OS_IOS,
-            device_uuid="uuid-a",
-            display_name="iPhone",
-        )
-        unregistered = MobileClient(
-            parent=account_key,
-            user_id="user_id",
-            messaging_id="dead-token",
-            client_type=ClientType.OS_IOS,
-            device_uuid="uuid-b",
-            display_name="iPhone",
-        )
-        sender_mismatch = MobileClient(
-            parent=account_key,
-            user_id="user_id",
-            messaging_id="mismatch-token",
-            client_type=ClientType.OS_ANDROID_FCM,
-            device_uuid="uuid-c",
-            display_name="Pixel",
-        )
-        valid.put()
-        unregistered.put()
-        sender_mismatch.put()
-
-        batch_response = messaging.BatchResponse(
-            [
-                messaging.SendResponse({"name": "msg-1"}, None),
-                messaging.SendResponse(None, UnregisteredError("code", "message")),
-                messaging.SendResponse(None, SenderIdMismatchError("code", "message")),
-            ]
-        )
-
-        captured_kwargs = {}
-
-        def capture_init(self, app, notification, tokens=None, dry_run=False):
-            captured_kwargs["tokens"] = tokens
-            captured_kwargs["dry_run"] = dry_run
-
-        with (
-            patch.object(FCMRequest, "__init__", capture_init),
-            patch.object(FCMRequest, "send", return_value=batch_response),
-        ):
-            deleted = TBANSHelper.probe_and_cleanup_fcm_clients(
-                [valid, unregistered, sender_mismatch]
-            )
-
-        assert deleted == 2
-        assert captured_kwargs["dry_run"] is True
-        assert captured_kwargs["tokens"] == [
-            "valid-token",
-            "dead-token",
-            "mismatch-token",
-        ]
-        remaining = MobileClient.query(ancestor=account_key).fetch()
-        assert len(remaining) == 1
-        assert remaining[0].messaging_id == "valid-token"
-
-    def test_probe_and_cleanup_keeps_clients_on_transient_error(self):
-        """InternalError / UnavailableError mean FCM had a hiccup, not that the
-        token is dead. Don't delete on those."""
-        account_key = ndb.Key(Account, "user_id")
-        client = MobileClient(
-            parent=account_key,
-            user_id="user_id",
-            messaging_id="token",
-            client_type=ClientType.OS_IOS,
-            device_uuid="uuid",
-            display_name="iPhone",
-        )
-        client.put()
-
-        batch_response = messaging.BatchResponse(
-            [messaging.SendResponse(None, InternalError("internal-fcm-error"))]
-        )
-        with patch.object(FCMRequest, "send", return_value=batch_response):
-            deleted = TBANSHelper.probe_and_cleanup_fcm_clients([client])
-
-        assert deleted == 0
-        assert MobileClient.query(ancestor=account_key).count() == 1
+            assert not success
 
     def test_send_webhook_test_not_webhook_client(self):
         client = MobileClient(
