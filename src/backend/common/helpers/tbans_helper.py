@@ -14,6 +14,7 @@ from backend.common.consts.notification_type import (
     ENABLED_TEAM_NOTIFICATIONS,
     NotificationType,
 )
+from backend.common.environment import Environment
 from backend.common.helpers.deferred import defer_safe
 from backend.common.models.district import District
 from backend.common.models.event import Event
@@ -534,6 +535,31 @@ class TBANSHelper:
         if client_type not in FCM_CLIENTS:
             raise Exception("Unsupported FCM client type: {}".format(client_type))
 
+        # Local-dev shortcut: prefix a MobileClient's messaging_id with one of
+        # these tokens in the dev datastore to exercise each PingResult path
+        # without needing FCM behavior. No-op outside `GAE_ENV=localdev`.
+        #
+        #   DEBUG_SENT_*    -> "sent"     (success banner)
+        #   DEBUG_FAILED_*  -> "failed"   (red banner)
+        #   DEBUG_DELETED_* -> "deleted"  (yellow banner; row removed)
+        if Environment.is_dev() and client.messaging_id.startswith("DEBUG_"):
+            if client.messaging_id.startswith("DEBUG_DELETED"):
+                logging.warning(
+                    f"[DEV PING SHORTCUT] simulating 'deleted' for {client.messaging_id}"
+                )
+                MobileClientQuery.delete_for_messaging_id(client.messaging_id)
+                return "deleted"
+            if client.messaging_id.startswith("DEBUG_FAILED"):
+                logging.warning(
+                    f"[DEV PING SHORTCUT] simulating 'failed' for {client.messaging_id}"
+                )
+                return "failed"
+            if client.messaging_id.startswith("DEBUG_SENT"):
+                logging.warning(
+                    f"[DEV PING SHORTCUT] simulating 'sent' for {client.messaging_id}"
+                )
+                return "sent"
+
         fcm_request = FCMRequest(
             firebase_app,
             PingNotification(),
@@ -579,6 +605,20 @@ class TBANSHelper:
         fcm_clients = [c for c in clients if c.client_type in FCM_CLIENTS]
         if not fcm_clients:
             return 0
+
+        # Local-dev shortcut: skip the real FCM probe and treat anything with
+        # `DEBUG_DELETED` in its messaging_id as a dead token. Lets the admin
+        # button be exercised end-to-end without working FCM credentials.
+        if Environment.is_dev():
+            deleted = 0
+            for client in fcm_clients:
+                if client.messaging_id.startswith("DEBUG_DELETED"):
+                    logging.warning(
+                        f"[DEV PROBE SHORTCUT] deleting {client.messaging_id}"
+                    )
+                    MobileClientQuery.delete_for_messaging_id(client.messaging_id)
+                    deleted += 1
+            return deleted
 
         fcm_request = FCMRequest(
             firebase_app,
