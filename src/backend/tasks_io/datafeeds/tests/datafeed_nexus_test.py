@@ -13,6 +13,7 @@ from backend.common.memcache_models.event_sync_status_memcache import (
     EventSyncStatusMemcache,
 )
 from backend.common.models.event import Event
+from backend.common.nexus_api.types import PitAddresses
 from backend.common.sitevars.nexus_api_secret import (
     ContentType as NexusAPISecretsContentType,
 )
@@ -31,14 +32,14 @@ from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
 )
 
 
-class DummyDatafeedNexus(_DatafeedNexus[Any, Any]):
+class DummyDatafeedNexus(_DatafeedNexus[PitAddresses, Any]):
 
     def endpoint(self) -> str:
         return "/"
 
-    def parser(self):
-        class DummyParser(ParserBase[Any, Any]):
-            def parse(self, response):
+    def parser(self) -> ParserBase[PitAddresses, Any]:
+        class DummyParser(ParserBase[PitAddresses, Any]):
+            def parse(self, response: PitAddresses) -> Any:
                 return response
 
         return DummyParser()
