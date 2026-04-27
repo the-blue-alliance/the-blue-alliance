@@ -888,7 +888,16 @@ function ChampsPage() {
               <div className="space-y-4">
                 <Card>
                   <CardHeader>
-                    <CardTitle>Rankings</CardTitle>
+                    <CardTitle className="flex items-center gap-2">
+                      Rankings
+                      <EventLink
+                        eventOrKey={div.key}
+                        className="text-sm font-normal text-muted-foreground
+                          hover:text-foreground"
+                      >
+                        {div.short_name ?? div.name}
+                      </EventLink>
+                    </CardTitle>
                   </CardHeader>
                   <CardContent className="p-0">
                     <RankingsTable
