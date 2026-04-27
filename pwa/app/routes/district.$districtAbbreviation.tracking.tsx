@@ -421,6 +421,100 @@ function RankingsTable({
   );
 }
 
+// --- All Rankings table (across all divisions) ---
+
+function AllRankingsTable({
+  divisions,
+  districtTeamSet,
+}: {
+  divisions: Array<{ name: string; rankings: EventRanking | null | undefined }>;
+  districtTeamSet: Set<string>;
+}) {
+  type Row = {
+    rank: number;
+    teamKey: string;
+    division: string;
+    wins: number;
+    losses: number;
+    ties: number;
+    matchesPlayed: number;
+  };
+
+  const rows: Row[] = divisions.flatMap(({ name, rankings }) => {
+    if (!rankings?.rankings) return [];
+    return rankings.rankings
+      .filter((r) => districtTeamSet.has(r.team_key))
+      .map((r) => ({
+        rank: r.rank,
+        teamKey: r.team_key,
+        division: name,
+        wins: r.record?.wins ?? 0,
+        losses: r.record?.losses ?? 0,
+        ties: r.record?.ties ?? 0,
+        matchesPlayed: r.matches_played,
+      }));
+  });
+
+  if (rows.length === 0) {
+    return (
+      <p className="py-4 text-center text-sm text-muted-foreground">
+        No rankings available yet.
+      </p>
+    );
+  }
+
+  // Sort by rank, then by division name as a tiebreaker
+  rows.sort((a, b) => a.rank !== b.rank ? a.rank - b.rank : a.division.localeCompare(b.division));
+
+  return (
+    <Table className="text-xs">
+      <TableHeader>
+        <TableRow>
+          <TableHead>Rank</TableHead>
+          <TableHead>Team</TableHead>
+          <TableHead>Division</TableHead>
+          <TableHead className="text-center">W-L-T</TableHead>
+          <TableHead className="text-center">Matches</TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {rows.map((r) => {
+          const number = teamNumberFromKey(r.teamKey);
+          return (
+            <TableRow key={r.teamKey}>
+              <TableCell className="font-bold">{r.rank}</TableCell>
+              <TableCell>
+                <a
+                  href={`https://www.thebluealliance.com/team/${number}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="hover:underline"
+                >
+                  {number}
+                </a>{' '}
+                <a
+                  href={`https://www.statbotics.io/team/${number}`}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:underline"
+                  title="Statbotics"
+                >
+                  ↗
+                </a>
+              </TableCell>
+              <TableCell>{r.division}</TableCell>
+              <TableCell className="text-center">
+                {`${r.wins}-${r.losses}-${r.ties}`}
+              </TableCell>
+              <TableCell className="text-center">{r.matchesPlayed}</TableCell>
+            </TableRow>
+          );
+        })}
+      </TableBody>
+    </Table>
+  );
+}
+
 // --- Main page component ---
 
 const FIRST_TRACKING_YEAR = 2017;
@@ -540,8 +634,7 @@ function TrackingPage() {
   const isLoading = allEventsQuery.isPending || districtTeamsQuery.isPending;
 
   const divisionTabIds = cmpDivisions.map((div) => div.short_name ?? div.name);
-  const defaultTab =
-    cmpDivisions.length > 0 ? divisionTabIds[0] : 'all-matches';
+  const defaultTab = 'all-rankings';
 
   return (
     <div className="space-y-4">
@@ -586,6 +679,7 @@ function TrackingPage() {
       {cmpDivisions.length > 0 && (
         <Tabs defaultValue={defaultTab}>
           <TabsList>
+            <TabsTrigger value="all-rankings">Rankings</TabsTrigger>
             {cmpDivisions.map((div, idx) => (
               <TabsTrigger key={div.key} value={divisionTabIds[idx]}>
                 {div.short_name ?? div.name}
@@ -593,6 +687,23 @@ function TrackingPage() {
             ))}
             <TabsTrigger value="all-matches">All Matches</TabsTrigger>
           </TabsList>
+
+          <TabsContent value="all-rankings">
+            <Card>
+              <CardHeader>
+                <CardTitle>All Rankings</CardTitle>
+              </CardHeader>
+              <CardContent className="p-0">
+                <AllRankingsTable
+                  divisions={cmpDivisions.map((div, idx) => ({
+                    name: div.short_name ?? div.name,
+                    rankings: rankingsQueries[idx]?.data ?? null,
+                  }))}
+                  districtTeamSet={districtTeamSet}
+                />
+              </CardContent>
+            </Card>
+          </TabsContent>
 
           {cmpDivisions.map((div, idx) => {
             const divMatches = matchesQueries[idx]?.data
@@ -605,23 +716,23 @@ function TrackingPage() {
                 <div className="space-y-4">
                   <Card>
                     <CardHeader>
-                      <CardTitle>Matches</CardTitle>
+                      <CardTitle>Rankings</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <MatchesTable
-                        matches={divMatches}
-                        eventColors={eventColorsMap}
+                      <RankingsTable
+                        rankings={divRankings}
                         districtTeamSet={districtTeamSet}
                       />
                     </CardContent>
                   </Card>
                   <Card>
                     <CardHeader>
-                      <CardTitle>Rankings</CardTitle>
+                      <CardTitle>Matches</CardTitle>
                     </CardHeader>
                     <CardContent className="p-0">
-                      <RankingsTable
-                        rankings={divRankings}
+                      <MatchesTable
+                        matches={divMatches}
+                        eventColors={eventColorsMap}
                         districtTeamSet={districtTeamSet}
                       />
                     </CardContent>
