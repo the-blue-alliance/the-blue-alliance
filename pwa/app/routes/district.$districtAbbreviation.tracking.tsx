@@ -538,7 +538,9 @@ function TrackingPage() {
 
   // Fetch district history to know which years this district existed
   const districtHistoryQuery = useQuery({
-    ...getDistrictHistoryOptions({ path: { district_abbreviation: abbreviation } }),
+    ...getDistrictHistoryOptions({
+      path: { district_abbreviation: abbreviation },
+    }),
   });
 
   const validYears: number[] = districtHistoryQuery.data
@@ -553,7 +555,7 @@ function TrackingPage() {
     if (districtHistoryQuery.data && !validYears.includes(year)) {
       setYear(validYears[0] ?? CURRENT_YEAR);
     }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [districtHistoryQuery.data]);
 
   // Auto-refresh countdown
