@@ -375,8 +375,8 @@ function RankingsTable({
     <Table className="text-xs">
       <TableHeader>
         <TableRow>
-          <TableHead>Rank</TableHead>
-          <TableHead>Team</TableHead>
+          <TableHead className="text-center">Rank</TableHead>
+          <TableHead className="text-center">Team</TableHead>
           <TableHead className="text-center">W-L-T</TableHead>
           <TableHead className="text-center">Matches</TableHead>
         </TableRow>
@@ -387,8 +387,8 @@ function RankingsTable({
           const record = r.record;
           return (
             <TableRow key={r.team_key}>
-              <TableCell className="font-bold">{r.rank}</TableCell>
-              <TableCell>
+              <TableCell className="text-center font-bold">{r.rank}</TableCell>
+              <TableCell className="text-center">
                 <a
                   href={`https://www.thebluealliance.com/team/${number}`}
                   target="_blank"
@@ -464,17 +464,19 @@ function AllRankingsTable({
   }
 
   // Sort by rank, then by division name as a tiebreaker
-  rows.sort((a, b) => a.rank !== b.rank ? a.rank - b.rank : a.division.localeCompare(b.division));
+  rows.sort((a, b) =>
+    a.rank !== b.rank ? a.rank - b.rank : a.division.localeCompare(b.division),
+  );
 
   return (
     <Table className="text-xs">
       <TableHeader>
         <TableRow>
-          <TableHead>Rank</TableHead>
-          <TableHead>Team</TableHead>
-          <TableHead>Division</TableHead>
-          <TableHead className="text-center">W-L-T</TableHead>
-          <TableHead className="text-center">Matches</TableHead>
+          <TableHead className="w-1/5 text-center">Rank</TableHead>
+          <TableHead className="w-1/5 text-center">Team</TableHead>
+          <TableHead className="w-1/5 text-center">Division</TableHead>
+          <TableHead className="w-1/5 text-center">W-L-T</TableHead>
+          <TableHead className="w-1/5 text-center">Matches</TableHead>
         </TableRow>
       </TableHeader>
       <TableBody>
@@ -482,8 +484,8 @@ function AllRankingsTable({
           const number = teamNumberFromKey(r.teamKey);
           return (
             <TableRow key={r.teamKey}>
-              <TableCell className="font-bold">{r.rank}</TableCell>
-              <TableCell>
+              <TableCell className="text-center font-bold">{r.rank}</TableCell>
+              <TableCell className="text-center">
                 <a
                   href={`https://www.thebluealliance.com/team/${number}`}
                   target="_blank"
@@ -502,7 +504,7 @@ function AllRankingsTable({
                   ↗
                 </a>
               </TableCell>
-              <TableCell>{r.division}</TableCell>
+              <TableCell className="text-center">{r.division}</TableCell>
               <TableCell className="text-center">
                 {`${r.wins}-${r.losses}-${r.ties}`}
               </TableCell>
@@ -637,12 +639,17 @@ function TrackingPage() {
   const defaultTab = 'all-rankings';
 
   return (
-    <div className="space-y-4">
+    <div>
       <div className="mt-4 flex items-center justify-between gap-4">
-        <h1 className="text-3xl font-medium">
+        <h1 className="text-4xl font-medium">
           {displayName} at FIRST Championship {year}
         </h1>
         <div className="flex items-center gap-2">
+          <span
+            className="rounded border px-2 py-1 text-xs text-muted-foreground"
+          >
+            {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
+          </span>
           <Select
             value={String(year)}
             onValueChange={(v) => setYear(Number(v))}
@@ -658,106 +665,104 @@ function TrackingPage() {
               ))}
             </SelectContent>
           </Select>
-          <span
-            className="rounded border px-2 py-1 text-xs text-muted-foreground"
-          >
-            {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
-          </span>
         </div>
       </div>
 
-      {isLoading && (
-        <p className="text-sm text-muted-foreground">Loading divisions…</p>
-      )}
+      <Tabs defaultValue={defaultTab} className="mt-4">
+        <TabsList
+          className="flex h-auto flex-wrap items-center justify-evenly
+            *:basis-1/2 lg:*:basis-1"
+        >
+          <TabsTrigger value="all-rankings">Rankings</TabsTrigger>
+          {cmpDivisions.map((div, idx) => (
+            <TabsTrigger key={div.key} value={divisionTabIds[idx]}>
+              {div.short_name ?? div.name}
+            </TabsTrigger>
+          ))}
+          <TabsTrigger value="all-matches">All Matches</TabsTrigger>
+        </TabsList>
 
-      {!isLoading && cmpDivisions.length === 0 && (
-        <p className="text-sm text-muted-foreground">
-          No FIRST Championship divisions found for {CURRENT_YEAR}.
-        </p>
-      )}
+        {isLoading && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            Loading divisions…
+          </p>
+        )}
 
-      {cmpDivisions.length > 0 && (
-        <Tabs defaultValue={defaultTab}>
-          <TabsList>
-            <TabsTrigger value="all-rankings">Rankings</TabsTrigger>
-            {cmpDivisions.map((div, idx) => (
-              <TabsTrigger key={div.key} value={divisionTabIds[idx]}>
-                {div.short_name ?? div.name}
-              </TabsTrigger>
-            ))}
-            <TabsTrigger value="all-matches">All Matches</TabsTrigger>
-          </TabsList>
+        {!isLoading && cmpDivisions.length === 0 && (
+          <p className="mt-4 text-sm text-muted-foreground">
+            No FIRST Championship divisions found for {year}.
+          </p>
+        )}
 
-          <TabsContent value="all-rankings">
-            <Card>
-              <CardHeader>
-                <CardTitle>All Rankings</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <AllRankingsTable
-                  divisions={cmpDivisions.map((div, idx) => ({
-                    name: div.short_name ?? div.name,
-                    rankings: rankingsQueries[idx]?.data ?? null,
-                  }))}
-                  districtTeamSet={districtTeamSet}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
+        <TabsContent value="all-rankings">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Rankings</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <AllRankingsTable
+                divisions={cmpDivisions.map((div, idx) => ({
+                  name: div.short_name ?? div.name,
+                  rankings: rankingsQueries[idx]?.data ?? null,
+                }))}
+                districtTeamSet={districtTeamSet}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
 
-          {cmpDivisions.map((div, idx) => {
-            const divMatches = matchesQueries[idx]?.data
-              ? filterMatchesToDistrictTeams(matchesQueries[idx].data ?? [])
-              : [];
-            const divRankings = rankingsQueries[idx]?.data ?? null;
+        {cmpDivisions.map((div, idx) => {
+          const divMatches = matchesQueries[idx]?.data
+            ? filterMatchesToDistrictTeams(matchesQueries[idx].data ?? [])
+            : [];
+          const divRankings = rankingsQueries[idx]?.data ?? null;
 
-            return (
-              <TabsContent key={div.key} value={divisionTabIds[idx]}>
-                <div className="space-y-4">
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Rankings</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <RankingsTable
-                        rankings={divRankings}
-                        districtTeamSet={districtTeamSet}
-                      />
-                    </CardContent>
-                  </Card>
-                  <Card>
-                    <CardHeader>
-                      <CardTitle>Matches</CardTitle>
-                    </CardHeader>
-                    <CardContent className="p-0">
-                      <MatchesTable
-                        matches={divMatches}
-                        eventColors={eventColorsMap}
-                        districtTeamSet={districtTeamSet}
-                      />
-                    </CardContent>
-                  </Card>
-                </div>
-              </TabsContent>
-            );
-          })}
+          return (
+            <TabsContent key={div.key} value={divisionTabIds[idx]}>
+              <div className="space-y-4">
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Rankings</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <RankingsTable
+                      rankings={divRankings}
+                      districtTeamSet={districtTeamSet}
+                    />
+                  </CardContent>
+                </Card>
+                <Card>
+                  <CardHeader>
+                    <CardTitle>Matches</CardTitle>
+                  </CardHeader>
+                  <CardContent className="p-0">
+                    <MatchesTable
+                      matches={divMatches}
+                      eventColors={eventColorsMap}
+                      districtTeamSet={districtTeamSet}
+                    />
+                  </CardContent>
+                </Card>
+              </div>
+            </TabsContent>
+          );
+        })}
 
-          <TabsContent value="all-matches">
-            <Card>
-              <CardHeader>
-                <CardTitle>All Matches</CardTitle>
-              </CardHeader>
-              <CardContent className="p-0">
-                <MatchesTable
-                  matches={allMatches}
-                  eventColors={eventColorsMap}
-                  districtTeamSet={districtTeamSet}
-                />
-              </CardContent>
-            </Card>
-          </TabsContent>
-        </Tabs>
-      )}
+        <TabsContent value="all-matches">
+          <Card>
+            <CardHeader>
+              <CardTitle>All Matches</CardTitle>
+            </CardHeader>
+            <CardContent className="p-0">
+              <MatchesTable
+                matches={allMatches}
+                eventColors={eventColorsMap}
+                districtTeamSet={districtTeamSet}
+              />
+            </CardContent>
+          </Card>
+        </TabsContent>
+      </Tabs>
     </div>
   );
 }
