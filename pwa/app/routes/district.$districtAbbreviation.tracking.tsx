@@ -217,16 +217,6 @@ function TeamCell({
           className="hover:underline"
         >
           {number}
-        </a>{' '}
-        <a
-          href={`https://www.statbotics.io/team/${number}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ color: cellColors.text, opacity: 0.75 }}
-          className="hover:underline"
-          title="Statbotics"
-        >
-          ↗
         </a>
       </div>
     </TableCell>
@@ -396,15 +386,6 @@ function RankingsTable({
                   className="hover:underline"
                 >
                   {number}
-                </a>{' '}
-                <a
-                  href={`https://www.statbotics.io/team/${number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:underline"
-                  title="Statbotics"
-                >
-                  ↗
                 </a>
               </TableCell>
               <TableCell className="text-center">
@@ -493,15 +474,6 @@ function AllRankingsTable({
                   className="hover:underline"
                 >
                   {number}
-                </a>{' '}
-                <a
-                  href={`https://www.statbotics.io/team/${number}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-muted-foreground hover:underline"
-                  title="Statbotics"
-                >
-                  ↗
                 </a>
               </TableCell>
               <TableCell className="text-center">{r.division}</TableCell>
