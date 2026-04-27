@@ -229,10 +229,12 @@ function MatchesTable({
   matches,
   eventColors,
   districtTeamSet,
+  divisionNames,
 }: {
   matches: Match[];
   eventColors: Map<string, ColorsQueryResult>;
   districtTeamSet: Set<string>;
+  divisionNames?: Map<string, string>;
 }) {
   const sorted = sortMatches(matches);
 
@@ -249,6 +251,9 @@ function MatchesTable({
       <TableHeader>
         <TableRow>
           <TableHead className="text-center">Match</TableHead>
+          {divisionNames && (
+            <TableHead className="text-center">Division</TableHead>
+          )}
           <TableHead className="text-center" colSpan={3}>
             Red Alliance
           </TableHead>
@@ -283,6 +288,11 @@ function MatchesTable({
                   {matchLabel(match)}
                 </a>
               </TableCell>
+              {divisionNames && (
+                <TableCell className="text-center text-muted-foreground">
+                  {divisionNames.get(match.event_key) ?? ''}
+                </TableCell>
+              )}
               {redTeams.slice(0, 3).map((tk) => (
                 <TeamCell
                   key={tk}
@@ -730,6 +740,14 @@ function TrackingPage() {
                 matches={allMatches}
                 eventColors={eventColorsMap}
                 districtTeamSet={districtTeamSet}
+                divisionNames={
+                  new Map(
+                    cmpDivisions.map((div) => [
+                      div.key,
+                      div.short_name ?? div.name,
+                    ]),
+                  )
+                }
               />
             </CardContent>
           </Card>
