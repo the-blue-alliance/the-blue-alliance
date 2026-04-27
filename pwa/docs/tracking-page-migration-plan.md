@@ -10,7 +10,7 @@ Port the district championship live-tracking feature from [frc.jmiller.dev](http
 
 ## Route
 
-`/district/$districtAbbreviation/tracking`  
+`/district/$districtAbbreviation/tracking`
 New file: `pwa/app/routes/district.$districtAbbreviation.tracking.tsx`
 
 Sibling routes for reference: `stats`, `insights`, `{-$year}`
@@ -31,49 +31,56 @@ A live-tracking page that shows district teams' performance at the FIRST Champio
 ## Decisions (Resolved)
 
 ### 1. Division Discovery
+
 **Decision:** Dynamically query TBA via `getEventsByYearOptions({ path: { year: 2026 } })` and filter by `event_type === EventType.CMP_DIVISION` (= `3`). The current year is always assumed to be `2026`.
 
 ### 2. All-Matches Tab
+
 **Decision:** Include as a **third tab** alongside per-division tabs. Tab order: Division tabs first, then "All Matches".
 
 ### 3. Statbotics Links
-**Decision:** **Include** Statbotics links alongside TBA links for each team. Format:  
-- TBA: `https://www.thebluealliance.com/team/{number}`  
+
+**Decision:** **Include** Statbotics links alongside TBA links for each team. Format:
+
+- TBA: `https://www.thebluealliance.com/team/{number}`
 - Statbotics: `https://www.statbotics.io/team/{number}`
 
 ### 4. Auto-Refresh Countdown Display
+
 **Decision:** Show a **subtle** "auto-refresh in Xs" countdown badge. No flashy animations. A small muted badge that counts down from 60 to 0.
 
 ### 5. Color Fallback When frc-colors Unavailable
+
 **Decision:** Fall back to **red/blue alliance cell backgrounds** (i.e., standard red/blue coloring) when frc-colors data is unavailable for a team.
 
 ### 6. Navigation / Discovery
-**Decision:** Add a `"Follow teams at FIRST Championship"` text/link in the **district page header**, between the `<h1>{name} {year}</h1>` heading and the year `<Select>` dropdown.  
+
+**Decision:** Add a `"Follow teams at FIRST Championship"` text/link in the **district page header**, between the `<h1>{name} {year}</h1>` heading and the year `<Select>` dropdown.
 File to edit: `pwa/app/routes/district.$districtAbbreviation.{-$year}.tsx`
 
 ---
 
 ## Files to Create / Edit
 
-| File | Action | Notes |
-|------|--------|-------|
-| `pwa/app/routes/district.$districtAbbreviation.tracking.tsx` | **Create** | New route — primary deliverable |
-| `pwa/app/routes/district.$districtAbbreviation.{-$year}.tsx` | **Edit** | Add "Follow teams at FIRST Championship" link in header |
-| `pwa/app/routeTree.gen.ts` | **Edit** | Register new tracking route (follows `stats`/`insights` pattern) |
+| File                                                         | Action     | Notes                                                            |
+| ------------------------------------------------------------ | ---------- | ---------------------------------------------------------------- |
+| `pwa/app/routes/district.$districtAbbreviation.tracking.tsx` | **Create** | New route — primary deliverable                                  |
+| `pwa/app/routes/district.$districtAbbreviation.{-$year}.tsx` | **Edit**   | Add "Follow teams at FIRST Championship" link in header          |
+| `pwa/app/routeTree.gen.ts`                                   | **Edit**   | Register new tracking route (follows `stats`/`insights` pattern) |
 
 ---
 
 ## Technical Stack
 
-| Concern | Solution |
-|---------|----------|
-| Routing | TanStack Router (file-based) |
-| Data fetching | TanStack React Query (`useQuery`, `useQueries`) |
-| Auto-refresh | `refetchInterval: 60_000` on all queries |
+| Concern             | Solution                                                                                     |
+| ------------------- | -------------------------------------------------------------------------------------------- |
+| Routing             | TanStack Router (file-based)                                                                 |
+| Data fetching       | TanStack React Query (`useQuery`, `useQueries`)                                              |
+| Auto-refresh        | `refetchInterval: 60_000` on all queries                                                     |
 | Live data in loader | None — live data is client-side only; loader only fetches static metadata for `<head>` title |
-| Team colors | frc-colors API via `getEventColors` from `~/api/colors` |
-| Color fallback | Red/blue alliance background per team |
-| Countdown badge | `useEffect` + `setInterval` (60→0 countdown, resets on `isFetching`) |
+| Team colors         | frc-colors API via `getEventColors` from `~/api/colors`                                      |
+| Color fallback      | Red/blue alliance background per team                                                        |
+| Countdown badge     | `useEffect` + `setInterval` (60→0 countdown, resets on `isFetching`)                         |
 
 ---
 
@@ -125,6 +132,7 @@ All Matches tab:
 ## Key Types / APIs
 
 ### TBA Types (from `types.gen.ts`)
+
 - `EventType.CMP_DIVISION = 3`
 - `AllianceColor.RED = 'red'`, `.BLUE = 'blue'`, `.NO_ALLIANCE = ''`
 - `CompLevel`: `QM = 'qm'`, `EF = 'ef'`, `QF = 'qf'`, `SF = 'sf'`, `F = 'f'`
@@ -134,6 +142,7 @@ All Matches tab:
 - `MatchScoreBreakdown2026Alliance`: `totalPoints`, `rp` (plus all 2026-specific fields)
 
 ### React Query Option Functions (from `react-query.gen.ts`)
+
 - `getDistrictHistoryOptions({ path: { districtAbbreviation } })` — loader only
 - `getDistrictTeamsKeysOptions({ path: { districtKey } })` — district team set
 - `getEventsByYearOptions({ path: { year } })` — find CMP divisions
@@ -141,6 +150,7 @@ All Matches tab:
 - `getEventRankingsOptions({ path: { eventKey } })` — per-division rankings
 
 ### frc-colors API (from `~/api/colors`)
+
 - `getEventColors({ eventKey })` → `Promise<{status:200, data: EventColors} | {status:500}>`
 - `EventColors.teams: Record<string, TeamWithColor>`
 - `TeamWithColor.colors: TeamColors | null`
@@ -169,17 +179,18 @@ function getTextColor(hex: string): 'black' | 'white' {
 
 ## Match Label Format
 
-| `comp_level` | `set_number` | `match_number` | Label |
-|---|---|---|---|
-| `qm` | — | 5 | `qm5` |
-| `sf` | 1 | 2 | `sf1-2` |
-| `f` | 1 | 1 | `f1-1` |
+| `comp_level` | `set_number` | `match_number` | Label   |
+| ------------ | ------------ | -------------- | ------- |
+| `qm`         | —            | 5              | `qm5`   |
+| `sf`         | 1            | 2              | `sf1-2` |
+| `f`          | 1            | 1              | `f1-1`  |
 
 ---
 
 ## Header Edit (district `{-$year}` page)
 
 In `district.$districtAbbreviation.{-$year}.tsx`, inside:
+
 ```tsx
 <div className="mt-4 flex items-center justify-between gap-4">
   <h1>...</h1>
@@ -189,6 +200,7 @@ In `district.$districtAbbreviation.{-$year}.tsx`, inside:
 ```
 
 Add:
+
 ```tsx
 <Link
   to="/district/$districtAbbreviation/tracking"
@@ -207,7 +219,7 @@ Follow the exact pattern of `DistrictDistrictAbbreviationStatsRoute` and `Distri
 
 1. Add import:
    ```ts
-   import { Route as DistrictDistrictAbbreviationTrackingRouteImport } from './routes/district.$districtAbbreviation.tracking'
+   import { Route as DistrictDistrictAbbreviationTrackingRouteImport } from './routes/district.$districtAbbreviation.tracking';
    ```
 2. Add to all `FileRoutesByPath` interface maps:
    ```ts
