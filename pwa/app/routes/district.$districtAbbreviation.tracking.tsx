@@ -13,6 +13,7 @@ import {
   getDistrictHistory,
 } from '~/api/tba/read';
 import {
+  getDistrictHistoryOptions,
   getDistrictTeamsKeysOptions,
   getEventMatchesOptions,
   getEventRankingsOptions,
@@ -530,16 +531,30 @@ function AllRankingsTable({
 
 // --- Main page component ---
 
-const FIRST_TRACKING_YEAR = 2017;
-const TRACKING_YEARS = Array.from(
-  { length: CURRENT_YEAR - FIRST_TRACKING_YEAR + 1 },
-  (_, i) => CURRENT_YEAR - i,
-);
-
 function TrackingPage() {
   const { abbreviation, displayName } = Route.useLoaderData();
   const [year, setYear] = useState(CURRENT_YEAR);
   const districtKey = `${year}${abbreviation}`;
+
+  // Fetch district history to know which years this district existed
+  const districtHistoryQuery = useQuery({
+    ...getDistrictHistoryOptions({ path: { district_abbreviation: abbreviation } }),
+  });
+
+  const validYears: number[] = districtHistoryQuery.data
+    ? districtHistoryQuery.data
+        .map((d) => d.year)
+        .filter((y) => y <= CURRENT_YEAR)
+        .sort((a, b) => b - a)
+    : [CURRENT_YEAR];
+
+  // Snap year to most recent valid year once history loads
+  useEffect(() => {
+    if (districtHistoryQuery.data && !validYears.includes(year)) {
+      setYear(validYears[0] ?? CURRENT_YEAR);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [districtHistoryQuery.data]);
 
   // Auto-refresh countdown
   const [countdown, setCountdown] = useState(REFETCH_INTERVAL / 1000);
@@ -669,7 +684,7 @@ function TrackingPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {TRACKING_YEARS.map((y) => (
+              {validYears.map((y) => (
                 <SelectItem key={y} value={String(y)}>
                   {y}
                 </SelectItem>
