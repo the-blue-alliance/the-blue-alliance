@@ -44,6 +44,7 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { sortMatchComparator } from '~/lib/matchUtils';
 import { cn, publicCacheControlHeaders } from '~/lib/utils';
 
 const REFETCH_INTERVAL = 60_000;
@@ -138,25 +139,6 @@ function matchLabel(match: Match): string {
     return `qm${match.match_number}`;
   }
   return `${match.comp_level}${match.set_number}-${match.match_number}`;
-}
-
-// Sort order for comp levels
-const COMP_LEVEL_ORDER: Record<CompLevel, number> = {
-  [CompLevel.QM]: 0,
-  [CompLevel.EF]: 1,
-  [CompLevel.QF]: 2,
-  [CompLevel.SF]: 3,
-  [CompLevel.F]: 4,
-};
-
-function sortMatches(matches: Match[]): Match[] {
-  return [...matches].sort((a, b) => {
-    const levelDiff =
-      COMP_LEVEL_ORDER[a.comp_level] - COMP_LEVEL_ORDER[b.comp_level];
-    if (levelDiff !== 0) return levelDiff;
-    if (a.set_number !== b.set_number) return a.set_number - b.set_number;
-    return a.match_number - b.match_number;
-  });
 }
 
 // --- Types ---
@@ -270,7 +252,7 @@ function MatchesTable({
   districtTeamSet: Set<string>;
   divisionNames?: Map<string, string>;
 }) {
-  const sorted = sortMatches(matches);
+  const sorted = matches.toSorted(sortMatchComparator);
 
   if (sorted.length === 0) {
     return (
