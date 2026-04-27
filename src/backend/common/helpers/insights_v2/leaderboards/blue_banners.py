@@ -20,7 +20,7 @@ class BlueBannersV2Calculator(LeaderboardV2Calculator):
         return "team"
 
     def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
-        return build_leaderboard_rankings(counts)
+        return build_leaderboard_rankings(counts, min_count=self.min_count)
 
     def on_event(self, event: Event) -> None:
         for award in event.awards:

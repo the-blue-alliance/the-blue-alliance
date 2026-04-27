@@ -29,7 +29,7 @@ class MostMatchesPlayedTogetherV2Calculator(LeaderboardV2Calculator):
         return keys
 
     def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
-        return build_leaderboard_pair_rankings(counts)
+        return build_leaderboard_pair_rankings(counts, min_count=self.min_count)
 
     def _get_district(
         self, key: str, team_to_district: Dict[str, str]

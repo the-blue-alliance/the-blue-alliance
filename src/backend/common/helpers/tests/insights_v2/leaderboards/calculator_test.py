@@ -34,7 +34,7 @@ class _StubLeaderboard(LeaderboardV2Calculator):
         return "team"
 
     def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
-        return build_leaderboard_rankings(counts)
+        return build_leaderboard_rankings(counts, min_count=self.min_count)
 
     def on_event(self, event: Event) -> None:
         pass
@@ -110,25 +110,27 @@ def test_district_key_name(ndb_stub) -> None:
 
 
 def test_rankings_excludes_value_of_one() -> None:
-    assert build_leaderboard_rankings({"frc1": 1, "frc2": 2}) == [
+    assert build_leaderboard_rankings({"frc1": 1, "frc2": 2}, min_count=2) == [
         LeaderboardRankingV2(keys=["frc2"], value=2),
     ]
 
 
 def test_rankings_excludes_groups_exceeding_max_keys() -> None:
     counts = {f"frc{i}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING + 1)}
-    assert build_leaderboard_rankings(counts) == []
+    assert build_leaderboard_rankings(counts, min_count=2) == []
 
 
 def test_rankings_includes_group_at_max_keys() -> None:
     counts = {f"frc{i}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING)}
-    result = build_leaderboard_rankings(counts)
+    result = build_leaderboard_rankings(counts, min_count=2)
     assert len(result) == 1
     assert len(result[0]["keys"]) == LEADERBOARD_MAX_KEYS_PER_RANKING
 
 
 def test_pair_rankings_excludes_value_of_one() -> None:
-    assert build_leaderboard_pair_rankings({"frc1|frc2": 1, "frc3|frc4": 2}) == [
+    assert build_leaderboard_pair_rankings(
+        {"frc1|frc2": 1, "frc3|frc4": 2}, min_count=2
+    ) == [
         LeaderboardRankingV2(keys=[["frc3", "frc4"]], value=2),
     ]
 
@@ -137,12 +139,12 @@ def test_pair_rankings_excludes_groups_exceeding_max_keys() -> None:
     counts = {
         f"frc{i}|frc{i + 1}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING + 1)
     }
-    assert build_leaderboard_pair_rankings(counts) == []
+    assert build_leaderboard_pair_rankings(counts, min_count=2) == []
 
 
 def test_pair_rankings_includes_group_at_max_keys() -> None:
     counts = {f"frc{i}|frc{i + 1}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING)}
-    result = build_leaderboard_pair_rankings(counts)
+    result = build_leaderboard_pair_rankings(counts, min_count=2)
     assert len(result) == 1
     assert len(result[0]["keys"]) == LEADERBOARD_MAX_KEYS_PER_RANKING
 

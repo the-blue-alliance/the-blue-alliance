@@ -40,14 +40,15 @@ def _put_award(
     ).put()
 
 
-def test_single_win_excluded(ndb_stub) -> None:
+def test_single_win_included(ndb_stub) -> None:
     _put_event("2022cmptx", 2022, EventType.CMP_FINALS)
     _put_award("2022cmptx", 2022, ["frc254"], AwardType.WINNER, EventType.CMP_FINALS)
 
     insights = compute_insights_for_year(2022, [MostCmpWinsV2Calculator()])
 
     assert len(insights) == 1
-    assert insights[0].data["rankings"] == []
+    assert insights[0].data["rankings"][0]["keys"] == ["frc254"]
+    assert insights[0].data["rankings"][0]["value"] == 1
 
 
 def test_two_wins_shown_in_rankings(ndb_stub) -> None:

@@ -22,7 +22,10 @@ LEADERBOARD_MAX_KEYS_PER_RANKING = 10
 
 
 def build_leaderboard_rankings(
-    counts: Dict[str, int], top_n: int = LEADERBOARD_TOP_N
+    counts: Dict[str, int],
+    top_n: int = LEADERBOARD_TOP_N,
+    *,
+    min_count: int,
 ) -> List[LeaderboardRanking]:
     """
     Converts a {team_key: count} dict into a sorted list of LeaderboardRankingV2,
@@ -39,13 +42,16 @@ def build_leaderboard_rankings(
             value=value,
         )
         for value, keys in sorted(value_to_keys.items(), reverse=True)
-        if value > 1 and len(keys) <= LEADERBOARD_MAX_KEYS_PER_RANKING
+        if value >= min_count and len(keys) <= LEADERBOARD_MAX_KEYS_PER_RANKING
     ]
     return result[:top_n]
 
 
 def build_leaderboard_event_list_rankings(
-    team_events: Dict[str, List[str]], top_n: int = LEADERBOARD_TOP_N
+    team_events: Dict[str, List[str]],
+    top_n: int = LEADERBOARD_TOP_N,
+    *,
+    min_count: int,
 ) -> List[LeaderboardRanking]:
     """
     Converts a {team_key: [event_key, ...]} dict into a sorted list of
@@ -59,7 +65,7 @@ def build_leaderboard_event_list_rankings(
 
     result: List[LeaderboardRanking] = []
     for count, team_keys in sorted(counts_to_teams.items(), reverse=True):
-        if count <= 1:
+        if count < min_count:
             continue
         if len(team_keys) > LEADERBOARD_MAX_KEYS_PER_RANKING:
             continue
@@ -78,7 +84,10 @@ def build_leaderboard_event_list_rankings(
 
 
 def build_leaderboard_pair_rankings(
-    counts: Dict[str, int], top_n: int = LEADERBOARD_TOP_N
+    counts: Dict[str, int],
+    top_n: int = LEADERBOARD_TOP_N,
+    *,
+    min_count: int,
 ) -> List[LeaderboardRanking]:
     """
     Converts a {"frcA|frcB": count} dict into a sorted list of LeaderboardRankingV2.
@@ -98,7 +107,7 @@ def build_leaderboard_pair_rankings(
             value=value,
         )
         for value, pairs in sorted(value_to_pairs.items(), reverse=True)
-        if value > 1 and len(pairs) <= LEADERBOARD_MAX_KEYS_PER_RANKING
+        if value >= min_count and len(pairs) <= LEADERBOARD_MAX_KEYS_PER_RANKING
     ]
     return result[:top_n]
 
@@ -118,6 +127,10 @@ class LeaderboardV2Calculator(InsightV2Calculator):
     @property
     def context_type(self) -> LeaderboardContextType:
         return "none"
+
+    @property
+    def min_count(self) -> int:
+        return 2
 
     @abstractmethod
     def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
@@ -220,4 +233,4 @@ class EventListLeaderboardV2Calculator(LeaderboardV2Calculator):
 
     def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
         filtered = {k: self._team_events[k] for k in counts}
-        return build_leaderboard_event_list_rankings(filtered)
+        return build_leaderboard_event_list_rankings(filtered, min_count=self.min_count)
