@@ -38,6 +38,7 @@ import { Route as TeamTeamNumberStatsRouteImport } from './routes/team.$teamNumb
 import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNumber.history'
 import { Route as EventsDistrictAbbreviationYearRouteImport } from './routes/events.$districtAbbreviation.$year'
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
+import { Route as DistrictDistrictAbbreviationTrackingRouteImport } from './routes/district.$districtAbbreviation.tracking'
 import { Route as DistrictDistrictAbbreviationStatsRouteImport } from './routes/district.$districtAbbreviation.stats'
 import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './routes/district.$districtAbbreviation.insights'
 
@@ -193,6 +194,12 @@ const DistrictDistrictAbbreviationChar123YearChar125Route =
     path: '/district/$districtAbbreviation/{-$year}',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DistrictDistrictAbbreviationTrackingRoute =
+  DistrictDistrictAbbreviationTrackingRouteImport.update({
+    id: '/district/$districtAbbreviation/tracking',
+    path: '/district/$districtAbbreviation/tracking',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DistrictDistrictAbbreviationStatsRoute =
   DistrictDistrictAbbreviationStatsRouteImport.update({
     id: '/district/$districtAbbreviation/stats',
@@ -233,6 +240,7 @@ export interface FileRoutesByFullPath {
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
+  '/district/$districtAbbreviation/tracking': typeof DistrictDistrictAbbreviationTrackingRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -266,6 +274,7 @@ export interface FileRoutesByTo {
   '/account': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
+  '/district/$districtAbbreviation/tracking': typeof DistrictDistrictAbbreviationTrackingRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -300,6 +309,7 @@ export interface FileRoutesById {
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
   '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
+  '/district/$districtAbbreviation/tracking': typeof DistrictDistrictAbbreviationTrackingRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/stats'
+    | '/district/$districtAbbreviation/tracking'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
     | '/team/$teamNumber/history'
@@ -368,6 +379,7 @@ export interface FileRouteTypes {
     | '/account'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/stats'
+    | '/district/$districtAbbreviation/tracking'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
     | '/team/$teamNumber/history'
@@ -401,6 +413,7 @@ export interface FileRouteTypes {
     | '/account/'
     | '/district/$districtAbbreviation/insights'
     | '/district/$districtAbbreviation/stats'
+    | '/district/$districtAbbreviation/tracking'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
     | '/team/$teamNumber/history'
@@ -434,6 +447,7 @@ export interface RootRouteChildren {
   AccountIndexRoute: typeof AccountIndexRoute
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
   DistrictDistrictAbbreviationStatsRoute: typeof DistrictDistrictAbbreviationStatsRoute
+  DistrictDistrictAbbreviationTrackingRoute: typeof DistrictDistrictAbbreviationTrackingRoute
   DistrictDistrictAbbreviationChar123YearChar125Route: typeof DistrictDistrictAbbreviationChar123YearChar125Route
   EventsDistrictAbbreviationYearRoute: typeof EventsDistrictAbbreviationYearRoute
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
@@ -646,6 +660,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DistrictDistrictAbbreviationChar123YearChar125RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/district/$districtAbbreviation/tracking': {
+      id: '/district/$districtAbbreviation/tracking'
+      path: '/district/$districtAbbreviation/tracking'
+      fullPath: '/district/$districtAbbreviation/tracking'
+      preLoaderRoute: typeof DistrictDistrictAbbreviationTrackingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/district/$districtAbbreviation/stats': {
       id: '/district/$districtAbbreviation/stats'
       path: '/district/$districtAbbreviation/stats'
@@ -702,6 +723,8 @@ const rootRouteChildren: RootRouteChildren = {
     DistrictDistrictAbbreviationInsightsRoute,
   DistrictDistrictAbbreviationStatsRoute:
     DistrictDistrictAbbreviationStatsRoute,
+  DistrictDistrictAbbreviationTrackingRoute:
+    DistrictDistrictAbbreviationTrackingRoute,
   DistrictDistrictAbbreviationChar123YearChar125Route:
     DistrictDistrictAbbreviationChar123YearChar125Route,
   EventsDistrictAbbreviationYearRoute: EventsDistrictAbbreviationYearRoute,

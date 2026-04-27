@@ -1,4 +1,9 @@
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import {
+  Link,
+  createFileRoute,
+  notFound,
+  useNavigate,
+} from '@tanstack/react-router';
 import { groupBy, sumBy } from 'lodash-es';
 import { Temporal } from 'temporal-polyfill';
 
@@ -232,6 +237,13 @@ function DistrictPage() {
         <h1 className="text-4xl font-medium">
           {districtHistory[districtHistory.length - 1].display_name} {year}
         </h1>
+        <Link
+          to="/district/$districtAbbreviation/tracking"
+          params={{ districtAbbreviation: abbreviation }}
+          className="text-sm text-muted-foreground hover:text-foreground"
+        >
+          Follow teams at FIRST Championship
+        </Link>
         <Select
           value={String(year)}
           onValueChange={(value) => {
