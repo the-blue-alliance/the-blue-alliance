@@ -52,7 +52,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
-from backend.common.models.nexus_pit_map import NexusPitMap
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.webcast import Webcast
 from backend.web.profiled_render import render_template
 
@@ -149,7 +149,7 @@ def event_detail(event_key: EventKey) -> str:
     webcast_online_status = [w for w in webcast_online_status if w is not None]
 
     nexus_queue_status = EventNexusQueueStatusMemcache(event.key_name).get()
-    nexus_pit_map = NexusPitMap.get_by_id(event.key_name)
+    nexus_event_details = NexusEventDetails.get_by_id(event.key_name)
     sync_status: EventSyncStatus = EventSyncStatusMemcache(event.key_name).get() or {}
 
     event_name_override = sync_overrides.get("event_name_override", {})
@@ -181,7 +181,9 @@ def event_detail(event_key: EventKey) -> str:
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "webcast_online_status": webcast_online_status,
         "nexus_queue_status": nexus_queue_status,
-        "nexus_pit_map": nexus_pit_map.data_json if nexus_pit_map else None,
+        "nexus_event_details": (
+            nexus_event_details.data_json if nexus_event_details else None
+        ),
         "sync_status": sorted(sync_status.items()),
         "event_sync_types": dict(EventSyncType.__members__.items()),
     }

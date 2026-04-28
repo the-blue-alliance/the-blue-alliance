@@ -1,6 +1,6 @@
 import pytest
 
-from backend.common.helpers.nexus_pit_map_svg_helper import NexusPitMapSVGHelper
+from backend.common.helpers.nexus_pit_map_svg_helper import NexusEventDetailsSVGHelper
 from backend.common.nexus_api.types import PitMap
 
 
@@ -38,7 +38,7 @@ def test_template_values_renders_expected_sections() -> None:
         "walls": None,
     }
 
-    values = NexusPitMapSVGHelper.template_values(map_data, "2026nyny")
+    values = NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")
 
     assert values["event_url"] == "https://frc.nexus/2026nyny/pits"
     assert "A1" in values["pit_elements"]
@@ -65,7 +65,7 @@ def test_template_values_applies_pit_rotation_angle() -> None:
         "walls": None,
     }
 
-    values = NexusPitMapSVGHelper.template_values(map_data, "2026nyny")
+    values = NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")
 
     assert 'transform="rotate(90 50 50)"' in values["pit_elements"]
 
@@ -86,7 +86,7 @@ def test_template_values_highlights_frc_team_keys() -> None:
         "walls": None,
     }
 
-    values = NexusPitMapSVGHelper.template_values(
+    values = NexusEventDetailsSVGHelper.template_values(
         map_data,
         "2026nyny",
         highlight_team_keys={"frc1678"},
@@ -100,7 +100,7 @@ def test_template_values_highlights_frc_team_keys() -> None:
 def test_template_values_requires_size() -> None:
     map_data: PitMap = {"pits": {}}
     with pytest.raises(ValueError):
-        NexusPitMapSVGHelper.template_values(map_data, "2026nyny")
+        NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")
 
 
 def test_template_values_handles_missing_sections() -> None:
@@ -108,7 +108,7 @@ def test_template_values_handles_missing_sections() -> None:
         "size": {"x": 100, "y": 100},
     }
 
-    values = NexusPitMapSVGHelper.template_values(map_data, "2026nyny")
+    values = NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")
 
     assert values["pit_elements"] == ""
     assert values["area_elements"] == ""

@@ -1,8 +1,8 @@
-from backend.common.models.nexus_pit_map import NexusPitMap
+from backend.common.models.nexus_event_details import NexusEventDetails
 
 
 def test_key_name() -> None:
-    model = NexusPitMap(id="2026casj", data_json={"size": {"x": 10, "y": 20}})
+    model = NexusEventDetails(id="2026casj", data_json={"size": {"x": 10, "y": 20}})
     assert model.key_name == "2026casj"
 
 
@@ -11,8 +11,8 @@ def test_data_json_persisted(ndb_stub) -> None:
         "size": {"x": 10, "y": 20},
         "pits": {"A": {"team": "254"}},
     }
-    NexusPitMap(id="2026casj", data_json=data).put()
+    NexusEventDetails(id="2026casj", data_json=data).put()
 
-    stored = NexusPitMap.get_by_id("2026casj")
+    stored = NexusEventDetails.get_by_id("2026casj")
     assert stored is not None
     assert stored.data_json == data

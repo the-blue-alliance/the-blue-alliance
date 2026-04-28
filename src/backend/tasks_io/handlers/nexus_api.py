@@ -8,8 +8,8 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
-from backend.common.manipulators.nexus_pit_map_manipulator import (
-    NexusPitMapManipulator,
+from backend.common.manipulators.nexus_event_details_manipulator import (
+    NexusEventDetailsManipulator,
 )
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
@@ -17,14 +17,14 @@ from backend.common.memcache_models.event_nexus_queue_status_memcache import (
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey, Year
-from backend.common.models.nexus_pit_map import NexusPitMap
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.nexus_api.types import PitMap
 from backend.common.queries.event_query import EventListQuery
 from backend.common.queries.team_query import EventEventTeamsQuery
 from backend.tasks_io.datafeeds.datafeed_nexus import (
+    NexusEventDetailsDatafeed,
     NexusEventQueueStatus,
     NexusPitLocations,
-    NexusPitMapDatafeed,
 )
 
 blueprint = Blueprint("nexus_api", __name__)
@@ -78,17 +78,17 @@ def event_pit_locations(event_key: EventKey) -> Response:
 
     eventteams_future = EventEventTeamsQuery(event_key).fetch_async()
     nexus_pit_locations_future = NexusPitLocations(event).fetch_async()
-    nexus_pit_map_future = NexusPitMapDatafeed(event).fetch_async()
+    nexus_event_details_future = NexusEventDetailsDatafeed(event).fetch_async()
 
     eventteams = eventteams_future.get_result()
     nexus_pit_locations = nexus_pit_locations_future.get_result()
-    nexus_pit_map: Optional[PitMap] = nexus_pit_map_future.get_result()
+    nexus_event_details: Optional[PitMap] = nexus_event_details_future.get_result()
 
-    if nexus_pit_map is not None:
-        NexusPitMapManipulator.createOrUpdate(
-            NexusPitMap(
+    if nexus_event_details is not None:
+        NexusEventDetailsManipulator.createOrUpdate(
+            NexusEventDetails(
                 id=event.key_name,
-                data_json=nexus_pit_map,
+                data_json=nexus_event_details,
             )
         )
 
@@ -104,7 +104,7 @@ def event_pit_locations(event_key: EventKey) -> Response:
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(
-            f"Fetched pit locations: <pre>{json.dumps([{"team_key": e.team.string_id(), "pit_location": e.pit_location} for e in eventteams], indent=2)}</pre><br/>Fetched pit map: <pre>{json.dumps(nexus_pit_map, indent=2)}</pre>"
+            f"Fetched pit locations: <pre>{json.dumps([{"team_key": e.team.string_id(), "pit_location": e.pit_location} for e in eventteams], indent=2)}</pre><br/>Fetched nexus event details: <pre>{json.dumps(nexus_event_details, indent=2)}</pre>"
         )
 
     return make_response("")

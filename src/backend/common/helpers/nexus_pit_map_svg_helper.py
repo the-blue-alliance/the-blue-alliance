@@ -14,7 +14,7 @@ from backend.common.nexus_api.types import (
 T = TypeVar("T")
 
 
-class PitMapTemplateValues(TypedDict):
+class NexusEventDetailsTemplateValues(TypedDict):
     svg_namespace: str
     outer_width: str
     outer_height: str
@@ -41,7 +41,7 @@ class PitMapTemplateValues(TypedDict):
     logo_element: str
 
 
-class NexusPitMapSVGHelper:
+class NexusEventDetailsSVGHelper:
     SVG_NAMESPACE = "http://www.w3.org/2000/svg"
     PADDING = 24
     FOOTER_HEIGHT = 96
@@ -82,7 +82,7 @@ class NexusPitMapSVGHelper:
         map_data: PitMap,
         nexus_event_code: str,
         highlight_team_keys: set[str] | None = None,
-    ) -> PitMapTemplateValues:
+    ) -> NexusEventDetailsTemplateValues:
         size = map_data.get("size")
         if not isinstance(size, dict):
             raise ValueError("Map response is missing size metadata")

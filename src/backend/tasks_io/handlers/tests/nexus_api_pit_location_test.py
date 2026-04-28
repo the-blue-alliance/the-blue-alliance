@@ -12,12 +12,12 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import EventKey, TeamKey
-from backend.common.models.nexus_pit_map import NexusPitMap
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.team import Team
 from backend.common.nexus_api.types import PitMap
 from backend.tasks_io.datafeeds.datafeed_nexus import (
+    NexusEventDetailsDatafeed,
     NexusPitLocations,
-    NexusPitMapDatafeed,
 )
 
 
@@ -187,7 +187,7 @@ def test_fetch_missing_event(
     assert resp.status_code == 404
 
 
-@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
+@mock.patch.object(NexusEventDetailsDatafeed, "fetch_async")
 @mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam(
     nexus_api_mock,
@@ -211,7 +211,7 @@ def test_fetch_updates_eventteam(
     assert et.pit_location == pit_location
 
 
-@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
+@mock.patch.object(NexusEventDetailsDatafeed, "fetch_async")
 @mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam_skip_missing(
     nexus_api_mock,
@@ -234,7 +234,7 @@ def test_fetch_updates_eventteam_skip_missing(
     assert et.pit_location is None
 
 
-@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
+@mock.patch.object(NexusEventDetailsDatafeed, "fetch_async")
 @mock.patch.object(NexusPitLocations, "fetch_async")
 def test_fetch_updates_eventteam_no_write_in_taskqueue(
     nexus_api_mock,
@@ -261,9 +261,9 @@ def test_fetch_updates_eventteam_no_write_in_taskqueue(
     assert et.pit_location == pit_location
 
 
-@mock.patch.object(NexusPitMapDatafeed, "fetch_async")
+@mock.patch.object(NexusEventDetailsDatafeed, "fetch_async")
 @mock.patch.object(NexusPitLocations, "fetch_async")
-def test_fetch_writes_nexus_pit_map(
+def test_fetch_writes_nexus_event_details(
     nexus_api_mock,
     pit_map_mock,
     tasks_client: Client,
@@ -283,6 +283,6 @@ def test_fetch_writes_nexus_pit_map(
     resp = tasks_client.get("/tasks/get/nexus_pit_locations/2019casj")
     assert resp.status_code == 200
 
-    stored_map = NexusPitMap.get_by_id("2019casj")
+    stored_map = NexusEventDetails.get_by_id("2019casj")
     assert stored_map is not None
     assert stored_map.data_json == pit_map

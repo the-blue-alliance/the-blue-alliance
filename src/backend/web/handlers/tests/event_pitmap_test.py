@@ -8,7 +8,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
 from backend.common.models.event import Event
-from backend.common.models.nexus_pit_map import NexusPitMap
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.web.handlers.tests import helpers
 
 
@@ -46,7 +46,7 @@ def test_event_pitmap_renders_svg_with_long_cache(ndb_stub, web_client: Client) 
         end_date=datetime(2019, 3, 5),
     ).put()
 
-    NexusPitMap(
+    NexusEventDetails(
         id="2019nyny",
         data_json={
             "size": {"x": 100, "y": 100},
@@ -82,7 +82,7 @@ def test_event_pitmap_uses_short_cache_for_active_event(
     ndb_stub, web_client: Client
 ) -> None:
     helpers.preseed_event("2020nyny")
-    NexusPitMap(
+    NexusEventDetails(
         id="2020nyny",
         data_json={
             "size": {"x": 100, "y": 100},
@@ -116,7 +116,7 @@ def test_event_pitmap_matches_nysu_golden_svg(ndb_stub, web_client: Client) -> N
         end_date=datetime(2026, 3, 5),
     ).put()
 
-    NexusPitMap(
+    NexusEventDetails(
         id="2026nysu",
         data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
     ).put()
@@ -140,7 +140,7 @@ def test_event_pitmap_matches_nyny_golden_svg(ndb_stub, web_client: Client) -> N
         end_date=datetime(2026, 3, 5),
     ).put()
 
-    NexusPitMap(
+    NexusEventDetails(
         id="2026nyny",
         data_json=json.loads(_load_fixture("2026nyny_pitmap.json")),
     ).put()
@@ -166,7 +166,7 @@ def test_event_pitmap_matches_nyny_highlight_golden_svg(
         end_date=datetime(2026, 3, 5),
     ).put()
 
-    NexusPitMap(
+    NexusEventDetails(
         id="2026nyny",
         data_json=json.loads(_load_fixture("2026nyny_pitmap.json")),
     ).put()
@@ -192,7 +192,7 @@ def test_event_pitmap_matches_nysu_highlight_golden_svg(
         end_date=datetime(2026, 3, 5),
     ).put()
 
-    NexusPitMap(
+    NexusEventDetails(
         id="2026nysu",
         data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
     ).put()
@@ -218,7 +218,7 @@ def test_event_pitmap_highlight_supports_list_of_team_keys(
         end_date=datetime(2026, 3, 5),
     ).put()
 
-    NexusPitMap(
+    NexusEventDetails(
         id="2026nysu",
         data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
     ).put()

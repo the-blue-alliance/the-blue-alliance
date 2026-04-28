@@ -30,7 +30,7 @@ from backend.common.helpers.match_time_prediction_helper import (
     MatchTimePredictionHelper,
 )
 from backend.common.helpers.media_helper import MediaHelper
-from backend.common.helpers.nexus_pit_map_svg_helper import NexusPitMapSVGHelper
+from backend.common.helpers.nexus_pit_map_svg_helper import NexusEventDetailsSVGHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -39,7 +39,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_matchstats import Component, TeamStatMap
 from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
-from backend.common.models.nexus_pit_map import NexusPitMap
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.nexus_api.types import PitMap
 from backend.common.queries import district_query, event_query, media_query, team_query
@@ -499,8 +499,8 @@ def event_pitmap(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    nexus_pit_map = NexusPitMap.get_by_id(event_key)
-    if not nexus_pit_map:
+    nexus_event_details = NexusEventDetails.get_by_id(event_key)
+    if not nexus_event_details:
         abort(404)
 
     highlight_team_keys = set()
@@ -511,8 +511,8 @@ def event_pitmap(event_key: EventKey) -> Response:
                 highlight_team_keys.add(team_key)
 
     try:
-        template_values = NexusPitMapSVGHelper.template_values(
-            cast(PitMap, nexus_pit_map.data_json),
+        template_values = NexusEventDetailsSVGHelper.template_values(
+            cast(PitMap, nexus_event_details.data_json),
             event.nexus_code_for_api,
             highlight_team_keys=highlight_team_keys,
         )

@@ -13,7 +13,7 @@ from backend.common.memcache_models.event_sync_status_memcache import (
 )
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
-from backend.common.models.nexus_pit_map import NexusPitMap
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.web.handlers.tests import helpers
 
 
@@ -72,7 +72,7 @@ def test_event_detail(web_client: Client, login_gae_admin, setup_full_event) -> 
     assert audit_logs_link is not None
 
 
-def test_event_detail_teams_subtabs_show_nexus_pit_map(
+def test_event_detail_teams_subtabs_show_nexus_event_details(
     web_client: Client, login_gae_admin
 ) -> None:
     Event(
@@ -84,7 +84,7 @@ def test_event_detail_teams_subtabs_show_nexus_pit_map(
         start_date=datetime(2026, 3, 1),
         end_date=datetime(2026, 3, 5),
     ).put()
-    NexusPitMap(
+    NexusEventDetails(
         id="2026casj",
         data_json={"size": {"x": 100, "y": 50}, "pits": {}},
     ).put()
@@ -99,7 +99,7 @@ def test_event_detail_teams_subtabs_show_nexus_pit_map(
     assert team_list_subtab is not None
     assert team_list_subtab.get_text(strip=True) == "Team List"
     assert pit_map_subtab is not None
-    assert pit_map_subtab.get_text(strip=True) == "Nexus Pit Map"
+    assert pit_map_subtab.get_text(strip=True) == "Nexus Event Details"
 
     pit_map_pane = soup.find("div", id="teams-pit-map")
     assert pit_map_pane is not None

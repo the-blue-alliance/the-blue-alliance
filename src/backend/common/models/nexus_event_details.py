@@ -7,7 +7,7 @@ from backend.common.models.keys import EventKey
 from backend.common.nexus_api.types import PitMap
 
 
-class NexusPitMap(CachedModel):
+class NexusEventDetails(CachedModel):
     data_json: dict[str, PitMap] = cast(
         dict[str, PitMap],
         ndb.JsonProperty(required=True, indexed=False, compressed=True),
@@ -23,7 +23,7 @@ class NexusPitMap(CachedModel):
         self._affected_references = {
             "key": set(),
         }
-        super(NexusPitMap, self).__init__(*args, **kw)
+        super(NexusEventDetails, self).__init__(*args, **kw)
 
     @property
     def key_name(self) -> EventKey:
