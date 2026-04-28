@@ -232,8 +232,7 @@ def test_event_pitmap_teams_supports_list_of_team_keys(
     assert resp.status_code == 200
 
     body = resp.get_data(as_text=True)
-    assert body.count('fill="#fff8e6"') == 2
-    assert body.count('stroke="#ff9800"') == 2
+    assert body.count('class="pit pit-highlighted"') == 2
 
 
 def test_event_pitmap_teams_supports_comma_separated_team_keys(
@@ -258,7 +257,7 @@ def test_event_pitmap_teams_supports_comma_separated_team_keys(
     assert resp.status_code == 200
 
     body = resp.get_data(as_text=True)
-    assert body.count('fill="#fff8e6"') == 2
+    assert body.count('class="pit pit-highlighted"') == 2
 
 
 def test_event_pitmap_400_when_teams_param_contains_invalid_team_key(

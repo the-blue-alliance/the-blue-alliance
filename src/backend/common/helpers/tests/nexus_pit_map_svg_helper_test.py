@@ -159,9 +159,7 @@ def test_template_values_highlights_frc_team_keys() -> None:
         highlight_team_keys={"frc1678"},
     )
 
-    assert 'fill="#fff8e6"' in values["pit_elements"]
-    assert 'stroke="#ff9800"' in values["pit_elements"]
-    assert 'stroke-width="4"' in values["pit_elements"]
+    assert 'class="pit pit-highlighted"' in values["pit_elements"]
 
 
 def test_template_values_requires_size() -> None:
