@@ -13,20 +13,20 @@ class TestNexusEventDetailsManipulator(unittest.TestCase):
     def setUp(self):
         self.old_model = NexusEventDetails(
             id="2026casj",
-            data_json={"size": {"x": 10, "y": 20}},
+            pitmap_json={"size": {"x": 10, "y": 20}},
         )
         self.new_model = NexusEventDetails(
             id="2026casj",
-            data_json={"size": {"x": 20, "y": 40}, "pits": {}},
+            pitmap_json={"size": {"x": 20, "y": 40}, "pits": {}},
         )
 
     def test_create_or_update(self):
         NexusEventDetailsManipulator.createOrUpdate(self.old_model)
         created = NexusEventDetails.get_by_id("2026casj")
         assert created is not None
-        assert created.data_json == {"size": {"x": 10, "y": 20}}
+        assert created.pitmap_json == {"size": {"x": 10, "y": 20}}
 
         NexusEventDetailsManipulator.createOrUpdate(self.new_model)
         updated = NexusEventDetails.get_by_id("2026casj")
         assert updated is not None
-        assert updated.data_json == {"size": {"x": 20, "y": 40}, "pits": {}}
+        assert updated.pitmap_json == {"size": {"x": 20, "y": 40}, "pits": {}}

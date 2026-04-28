@@ -285,4 +285,4 @@ def test_fetch_writes_nexus_event_details(
 
     stored_map = NexusEventDetails.get_by_id("2019casj")
     assert stored_map is not None
-    assert stored_map.data_json == pit_map
+    assert stored_map.pitmap_json == pit_map

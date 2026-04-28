@@ -23,6 +23,11 @@ def _normalize_svg(svg: str) -> str:
     return re.sub(r"\s+", " ", normalized).strip()
 
 
+def test_event_pitmap_400_when_event_key_invalid(web_client: Client) -> None:
+    resp = web_client.get("/event/not-a-real-key/pitmap")
+    assert resp.status_code == 400
+
+
 def test_event_pitmap_404_when_event_missing(web_client: Client) -> None:
     resp = web_client.get("/event/2026nyny/pitmap")
     assert resp.status_code == 404
@@ -48,7 +53,7 @@ def test_event_pitmap_renders_svg_with_long_cache(ndb_stub, web_client: Client) 
 
     NexusEventDetails(
         id="2019nyny",
-        data_json={
+        pitmap_json={
             "size": {"x": 100, "y": 100},
             "pits": {
                 "A1": {
@@ -84,7 +89,7 @@ def test_event_pitmap_uses_short_cache_for_active_event(
     helpers.preseed_event("2020nyny")
     NexusEventDetails(
         id="2020nyny",
-        data_json={
+        pitmap_json={
             "size": {"x": 100, "y": 100},
             "pits": {
                 "A1": {
@@ -118,7 +123,7 @@ def test_event_pitmap_matches_nysu_golden_svg(ndb_stub, web_client: Client) -> N
 
     NexusEventDetails(
         id="2026nysu",
-        data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
+        pitmap_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
     ).put()
 
     resp = web_client.get("/event/2026nysu/pitmap")
@@ -142,7 +147,7 @@ def test_event_pitmap_matches_nyny_golden_svg(ndb_stub, web_client: Client) -> N
 
     NexusEventDetails(
         id="2026nyny",
-        data_json=json.loads(_load_fixture("2026nyny_pitmap.json")),
+        pitmap_json=json.loads(_load_fixture("2026nyny_pitmap.json")),
     ).put()
 
     resp = web_client.get("/event/2026nyny/pitmap")
@@ -168,10 +173,10 @@ def test_event_pitmap_matches_nyny_highlight_golden_svg(
 
     NexusEventDetails(
         id="2026nyny",
-        data_json=json.loads(_load_fixture("2026nyny_pitmap.json")),
+        pitmap_json=json.loads(_load_fixture("2026nyny_pitmap.json")),
     ).put()
 
-    resp = web_client.get("/event/2026nyny/pitmap?highlight=frc3015")
+    resp = web_client.get("/event/2026nyny/pitmap?teams=frc3015")
     assert resp.status_code == 200
 
     expected_svg = _load_fixture("2026nyny_pitmap_team3015_expected.svg")
@@ -194,10 +199,10 @@ def test_event_pitmap_matches_nysu_highlight_golden_svg(
 
     NexusEventDetails(
         id="2026nysu",
-        data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
+        pitmap_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
     ).put()
 
-    resp = web_client.get("/event/2026nysu/pitmap?highlight=frc1796")
+    resp = web_client.get("/event/2026nysu/pitmap?teams=frc1796")
     assert resp.status_code == 200
 
     expected_svg = _load_fixture("2026nysu_pitmap_team1796_expected.svg")
@@ -205,7 +210,7 @@ def test_event_pitmap_matches_nysu_highlight_golden_svg(
     assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
 
 
-def test_event_pitmap_highlight_supports_list_of_team_keys(
+def test_event_pitmap_teams_supports_list_of_team_keys(
     ndb_stub, web_client: Client
 ) -> None:
     Event(
@@ -220,12 +225,50 @@ def test_event_pitmap_highlight_supports_list_of_team_keys(
 
     NexusEventDetails(
         id="2026nysu",
-        data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
+        pitmap_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
     ).put()
 
-    resp = web_client.get("/event/2026nysu/pitmap?highlight=frc10922&highlight=frc1796")
+    resp = web_client.get("/event/2026nysu/pitmap?teams=frc10922&teams=frc1796")
     assert resp.status_code == 200
 
     body = resp.get_data(as_text=True)
     assert body.count('fill="#fff8e6"') == 2
     assert body.count('stroke="#ff9800"') == 2
+
+
+def test_event_pitmap_teams_supports_comma_separated_team_keys(
+    ndb_stub, web_client: Client
+) -> None:
+    Event(
+        id="2026nysu",
+        event_short="nysu",
+        year=2026,
+        name="NYSU Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2026, 3, 1),
+        end_date=datetime(2026, 3, 5),
+    ).put()
+
+    NexusEventDetails(
+        id="2026nysu",
+        pitmap_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
+    ).put()
+
+    resp = web_client.get("/event/2026nysu/pitmap?teams=frc10922,frc1796")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert body.count('fill="#fff8e6"') == 2
+
+
+def test_event_pitmap_400_when_teams_param_contains_invalid_team_key(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2026nyny")
+    NexusEventDetails(
+        id="2026nyny",
+        pitmap_json={"size": {"x": 100, "y": 100}, "pits": {}},
+    ).put()
+
+    resp = web_client.get("/event/2026nyny/pitmap?teams=3015")
+    assert resp.status_code == 400

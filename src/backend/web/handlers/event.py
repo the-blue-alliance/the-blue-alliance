@@ -41,6 +41,7 @@ from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.team import Team
 from backend.common.nexus_api.types import PitMap
 from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
@@ -495,6 +496,9 @@ def event_detail(event_key: EventKey) -> Response:
 
 @cached_public
 def event_pitmap(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(400)
+
     event: Optional[Event] = event_query.EventQuery(event_key).fetch()
     if not event:
         abort(404)
@@ -504,15 +508,16 @@ def event_pitmap(event_key: EventKey) -> Response:
         abort(404)
 
     highlight_team_keys = set()
-    for highlight_value in request.args.getlist("highlight"):
-        for maybe_team_key in highlight_value.split(","):
+    for teams_value in request.args.getlist("teams"):
+        for maybe_team_key in teams_value.split(","):
             team_key = maybe_team_key.strip().lower()
-            if re.fullmatch(r"frc\d+", team_key):
-                highlight_team_keys.add(team_key)
+            if not Team.validate_key_name(team_key):
+                abort(400)
+            highlight_team_keys.add(team_key)
 
     try:
         template_values = NexusEventDetailsSVGHelper.template_values(
-            cast(PitMap, nexus_event_details.data_json),
+            cast(PitMap, nexus_event_details.pitmap_json),
             event.nexus_code_for_api,
             highlight_team_keys=highlight_team_keys,
         )

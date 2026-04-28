@@ -88,7 +88,7 @@ def event_pit_locations(event_key: EventKey) -> Response:
         NexusEventDetailsManipulator.createOrUpdate(
             NexusEventDetails(
                 id=event.key_name,
-                data_json=nexus_event_details,
+                pitmap_json=nexus_event_details,
             )
         )
 

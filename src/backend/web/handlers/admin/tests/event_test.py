@@ -86,7 +86,7 @@ def test_event_detail_teams_subtabs_show_nexus_event_details(
     ).put()
     NexusEventDetails(
         id="2026casj",
-        data_json={"size": {"x": 100, "y": 50}, "pits": {}},
+        pitmap_json={"size": {"x": 100, "y": 50}, "pits": {}},
     ).put()
 
     resp = web_client.get("/admin/event/2026casj")

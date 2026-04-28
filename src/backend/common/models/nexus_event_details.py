@@ -8,7 +8,7 @@ from backend.common.nexus_api.types import PitMap
 
 
 class NexusEventDetails(CachedModel):
-    data_json: dict[str, PitMap] = cast(
+    pitmap_json: dict[str, PitMap] = cast(
         dict[str, PitMap],
         ndb.JsonProperty(required=True, indexed=False, compressed=True),
     )
@@ -16,7 +16,7 @@ class NexusEventDetails(CachedModel):
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     _mutable_attrs: Set[str] = {
-        "data_json",
+        "pitmap_json",
     }
 
     def __init__(self, *args, **kw):

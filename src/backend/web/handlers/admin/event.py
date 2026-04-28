@@ -182,7 +182,7 @@ def event_detail(event_key: EventKey) -> str:
         "webcast_online_status": webcast_online_status,
         "nexus_queue_status": nexus_queue_status,
         "nexus_event_details": (
-            nexus_event_details.data_json if nexus_event_details else None
+            nexus_event_details.pitmap_json if nexus_event_details else None
         ),
         "sync_status": sorted(sync_status.items()),
         "event_sync_types": dict(EventSyncType.__members__.items()),
