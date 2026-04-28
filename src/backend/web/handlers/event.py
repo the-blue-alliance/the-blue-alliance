@@ -494,6 +494,25 @@ def event_detail(event_key: EventKey) -> Response:
     )
 
 
+def _label_event_keys_for(event: Event) -> dict[str, str]:
+    """Map Nexus label text → TBA event key for the current event. Used to
+    attach `data-label-key` to the event's own field label in the rendered SVG
+    so clients can scroll to it by event key (e.g. `2026hop`).
+    """
+    event_id = none_throws(event.key.string_id())
+    candidates: list[str] = []
+    short = (event.short_name or "").strip()
+    if short:
+        candidates.append(short.lower())
+        without_division = short.lower().replace(" division", "").strip()
+        if without_division and without_division != short.lower():
+            candidates.append(without_division)
+        first_word = short.split()[0].lower() if short.split() else ""
+        if first_word and first_word not in candidates:
+            candidates.append(first_word)
+    return {candidate: event_id for candidate in candidates}
+
+
 @cached_public
 def event_pitmap(event_key: EventKey) -> Response:
     if not Event.validate_key_name(event_key):
@@ -520,6 +539,7 @@ def event_pitmap(event_key: EventKey) -> Response:
             cast(PitMap, nexus_event_details.pitmap_json),
             event.nexus_code_for_api,
             highlight_team_keys=highlight_team_keys,
+            label_event_keys=_label_event_keys_for(event),
         )
     except ValueError:
         abort(404)

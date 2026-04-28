@@ -70,6 +70,40 @@ def test_template_values_applies_pit_rotation_angle() -> None:
     assert 'transform="rotate(90 50 50)"' in values["pit_elements"]
 
 
+def test_template_values_labels_carry_label_key_attribute() -> None:
+    map_data: PitMap = {
+        "size": {"x": 200, "y": 200},
+        "labels": {
+            "l0": {
+                "position": {"x": 50, "y": 50},
+                "size": {"x": 60, "y": 30},
+                "label": "Hopper",
+            },
+            "l1": {
+                "position": {"x": 150, "y": 150},
+                "size": {"x": 60, "y": 30},
+                "label": "JOHNSON",
+            },
+            "l2": {
+                "position": {"x": 100, "y": 100},
+                "size": {"x": 60, "y": 30},
+                "label": "Inspection",
+            },
+        },
+    }
+
+    values = NexusEventDetailsSVGHelper.template_values(
+        map_data,
+        "2026joh",
+        label_event_keys={"hopper": "2026hop", "johnson": "2026joh"},
+    )
+
+    assert 'data-label-key="2026hop"' in values["label_elements"]
+    assert 'data-label-key="2026joh"' in values["label_elements"]
+    assert "Inspection" in values["label_elements"]
+    assert values["label_elements"].count("data-label-key=") == 2
+
+
 def test_template_values_pits_carry_team_key_attribute() -> None:
     map_data: PitMap = {
         "size": {"x": 100, "y": 100},

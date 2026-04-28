@@ -82,6 +82,7 @@ class NexusEventDetailsSVGHelper:
         map_data: PitMap,
         nexus_event_code: str,
         highlight_team_keys: set[str] | None = None,
+        label_event_keys: dict[str, str] | None = None,
     ) -> NexusEventDetailsTemplateValues:
         size = map_data.get("size")
         if not isinstance(size, dict):
@@ -97,6 +98,10 @@ class NexusEventDetailsSVGHelper:
         arrows = cls._dict_or_empty(map_data.get("arrows"))
         normalized_highlight_team_keys = {
             team_key.lower() for team_key in (highlight_team_keys or set())
+        }
+        normalized_label_event_keys = {
+            label.lower(): event_key
+            for label, event_key in (label_event_keys or {}).items()
         }
 
         wall_rects = [cls._get_wall_rect(walls[wall_key]) for wall_key in sorted(walls)]
@@ -151,6 +156,7 @@ class NexusEventDetailsSVGHelper:
                     thin_wall_rects,
                     canvas_width,
                     canvas_height,
+                    normalized_label_event_keys,
                 )
                 for label_key in sorted(labels)
             ),
@@ -565,6 +571,7 @@ class NexusEventDetailsSVGHelper:
         thin_walls: list[tuple[float, float, float, float]],
         canvas_width: float,
         canvas_height: float,
+        label_event_keys: dict[str, str],
     ) -> str:
         x, y, width, height = cls._choose_label_rect(
             label,
@@ -584,7 +591,7 @@ class NexusEventDetailsSVGHelper:
 
         text = str(label.get("label", "")).strip()
         font_size = max(12, min(width, height) * 0.38)
-        return cls._svg_wrapped_text(
+        rendered = cls._svg_wrapped_text(
             x + width / 2,
             y,
             width,
@@ -596,6 +603,10 @@ class NexusEventDetailsSVGHelper:
             max_lines=3,
             width_tolerance=0.98,
         )
+        event_key = label_event_keys.get(text.lower()) if text else None
+        if not event_key:
+            return rendered
+        return f'<g data-label-key="{escape(event_key)}">{rendered}</g>'
 
     @classmethod
     def _render_arrow(cls, arrow: Arrows) -> str:
