@@ -51,6 +51,9 @@ from backend.common.helpers.insights_v2.streaks.einstein_streak import (
 from backend.common.helpers.insights_v2.streaks.qualifying_event_streak import (
     LongestQualifyingEventStreakV2Calculator,
 )
+from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
+    HighScoreOverTimeV2Calculator,
+)
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.insight_v2 import InsightV2
 from backend.common.models.keys import Year
@@ -129,4 +132,6 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             LongestQualifyingEventStreakV2Calculator(),
             LongestEinsteinStreakV2Calculator(),
         ]
+    else:
+        calculators.append(HighScoreOverTimeV2Calculator())
     return compute_insights_for_year(year, calculators)

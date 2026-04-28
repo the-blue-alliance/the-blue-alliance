@@ -1,0 +1,224 @@
+import datetime
+import json
+
+from google.appengine.ext import ndb
+
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
+    HighScoreOverTimeV2Calculator,
+)
+from backend.common.models.event import Event
+from backend.common.models.match import Match
+
+
+def _alliances_json(red_score: int, blue_score: int) -> str:
+    return json.dumps(
+        {
+            "red": {
+                "score": red_score,
+                "teams": ["frc1", "frc2", "frc3"],
+                "surrogates": [],
+                "dqs": [],
+            },
+            "blue": {
+                "score": blue_score,
+                "teams": ["frc4", "frc5", "frc6"],
+                "surrogates": [],
+                "dqs": [],
+            },
+        }
+    )
+
+
+def _put_event(event_key: str, year: int) -> None:
+    Event(
+        id=event_key,
+        year=year,
+        event_short=event_key[4:],
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+
+def _put_match(
+    event_key: str,
+    year: int,
+    match_number: int,
+    red_score: int,
+    blue_score: int,
+    post_result_time: datetime.datetime,
+) -> None:
+    Match(
+        id=f"{event_key}_qm{match_number}",
+        comp_level=CompLevel.QM,
+        event=ndb.Key(Event, event_key),
+        year=year,
+        match_number=match_number,
+        set_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=_alliances_json(red_score, blue_score),
+        post_result_time=post_result_time,
+    ).put()
+
+
+def test_single_match_sets_initial_record(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    data = insights[0].data
+    assert data["point_context_type"] == "match_record"
+    assert data["x_type"] == "year"
+    assert len(data["series"]) == 1
+    series = data["series"][0]
+    assert series["label"] == "World Record"
+    assert len(series["points"]) == 1
+
+    pt = series["points"][0]
+    assert pt["x"] == 2022
+    assert pt["y"] == 100.0
+    assert pt["context"]["match_key"] == "2022casj_qm1"
+    assert pt["context"]["alliance"] == ["frc1", "frc2", "frc3"]
+    assert pt["context"]["is_current"] is True
+
+
+def test_higher_score_breaks_record(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+    _put_match("2022casj", 2022, 2, 120, 90, datetime.datetime(2022, 3, 6))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 2
+    assert points[0]["y"] == 100.0
+    assert points[0]["context"]["is_current"] is False
+    assert points[1]["y"] == 120.0
+    assert points[1]["context"]["is_current"] is True
+
+
+def test_lower_score_does_not_break_record(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+    _put_match("2022casj", 2022, 2, 90, 70, datetime.datetime(2022, 3, 6))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 1
+    assert points[0]["y"] == 100.0
+
+
+def test_equal_score_does_not_break_record(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+    _put_match("2022casj", 2022, 2, 100, 95, datetime.datetime(2022, 3, 6))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 1
+    assert points[0]["y"] == 100.0
+
+
+def test_blue_alliance_wins_when_higher(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 80, 100, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    pt = insights[0].data["series"][0]["points"][0]
+    assert pt["y"] == 100.0
+    assert pt["context"]["alliance"] == ["frc4", "frc5", "frc6"]
+
+
+def test_matches_ordered_by_post_result_time_within_event(ndb_stub) -> None:
+    # Match 2 was posted earlier than match 1 within the same event
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 120, 90, datetime.datetime(2022, 3, 10))
+    _put_match("2022casj", 2022, 2, 100, 80, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    # match 2 posted first (record=100), then match 1 breaks it (record=120)
+    assert len(points) == 2
+    assert points[0]["context"]["match_key"] == "2022casj_qm2"
+    assert points[0]["y"] == 100.0
+    assert points[1]["context"]["match_key"] == "2022casj_qm1"
+    assert points[1]["y"] == 120.0
+
+
+def test_held_duration_seconds_for_intermediate_record(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5, 12, 0, 0))
+    _put_match("2022casj", 2022, 2, 120, 90, datetime.datetime(2022, 3, 5, 14, 30, 0))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 2
+    # First record held for exactly 2.5 hours (9000 seconds) before being broken
+    assert points[0]["context"]["held_duration_seconds"] == 9000
+    assert points[0]["context"]["is_current"] is False
+
+
+def test_unplayed_matches_skipped(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, -1, -1, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert insights == []
+
+
+def test_no_matches_produces_no_insight(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert insights == []
+
+
+def test_records_across_multiple_events_same_year(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 80, 60, datetime.datetime(2022, 3, 5))
+
+    _put_event("2022mnmi", 2022)
+    _put_match("2022mnmi", 2022, 1, 100, 80, datetime.datetime(2022, 3, 12))
+
+    _put_event("2022new", 2022)
+    _put_match("2022new", 2022, 1, 95, 70, datetime.datetime(2022, 3, 19))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    # Only casj and mnmi set records; new is lower than mnmi
+    assert len(points) == 2
+    assert points[0]["y"] == 80.0
+    assert points[1]["y"] == 100.0
+    assert points[1]["context"]["is_current"] is True
+
+
+def test_insight_stored_with_timeseries_category(ndb_stub) -> None:
+    from backend.common.models.insight_v2 import InsightCategory
+
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    assert insights[0].category == InsightCategory.TIMESERIES
+    assert insights[0].name == "high_score_over_time"
+    assert insights[0].year == 2022
