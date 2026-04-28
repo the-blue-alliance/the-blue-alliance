@@ -6,11 +6,15 @@ import { cn } from '~/lib/utils';
 export default function TeamAvatar({
   media,
   className,
+  defaultRed = false,
 }: {
   media: MediaAvatar;
   className?: string;
+  defaultRed?: boolean;
 }) {
-  const [colorClass, setColorClass] = useState('bg-first-avatar-blue');
+  const [colorClass, setColorClass] = useState(
+    defaultRed ? 'bg-first-avatar-red' : 'bg-first-avatar-blue',
+  );
 
   if (!media.details) {
     return null;
