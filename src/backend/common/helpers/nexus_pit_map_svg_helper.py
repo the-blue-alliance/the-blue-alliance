@@ -19,11 +19,6 @@ class NexusEventDetailsTemplateValues(TypedDict):
     outer_width: str
     outer_height: str
     view_box: str
-    page_background: str
-    map_background: str
-    map_border: str
-    footer_link: str
-    footer_text: str
     padding: str
     canvas_width: str
     canvas_height: str
@@ -46,35 +41,6 @@ class NexusEventDetailsSVGHelper:
     PADDING = 24
     FOOTER_HEIGHT = 96
     LOGO_SIZE = 54
-
-    PAGE_BACKGROUND = "#eef2f7"
-    MAP_BACKGROUND = "#ffffff"
-    MAP_BORDER = "#c8d2e3"
-
-    FOOTER_LINK = "#0f172a"
-    FOOTER_TEXT = "#64748b"
-
-    WALL_FILL = "#546e7a"
-    WALL_STROKE = "#455a64"
-
-    PIT_FILL = "#f8faff"
-    PIT_STROKE = "#3f51b5"
-    PIT_TITLE = "#2f3d8f"
-    PIT_TEAM = "#1f2937"
-
-    HIGHLIGHT_FILL = "#fff8e6"
-    HIGHLIGHT_STROKE = "#ff9800"
-    HIGHLIGHT_TITLE = "#bf6d00"
-    HIGHLIGHT_TEAM = "#7c4a03"
-
-    AREA_FILL = "#f2f5fb"
-    AREA_STROKE = "#90a4ae"
-    AREA_TEXT = "#37474f"
-
-    LABEL_TEXT = "#263238"
-
-    ARROW_FILL = "#5c6bc0"
-    ARROW_STROKE = "#3949ab"
 
     @classmethod
     def template_values(
@@ -122,11 +88,6 @@ class NexusEventDetailsSVGHelper:
             "outer_width": cls._fmt_number(outer_width),
             "outer_height": cls._fmt_number(outer_height),
             "view_box": f"0 0 {cls._fmt_number(outer_width)} {cls._fmt_number(outer_height)}",
-            "page_background": cls.PAGE_BACKGROUND,
-            "map_background": cls.MAP_BACKGROUND,
-            "map_border": cls.MAP_BORDER,
-            "footer_link": cls.FOOTER_LINK,
-            "footer_text": cls.FOOTER_TEXT,
             "padding": cls._fmt_number(cls.PADDING),
             "canvas_width": cls._fmt_number(canvas_width),
             "canvas_height": cls._fmt_number(canvas_height),
@@ -148,7 +109,9 @@ class NexusEventDetailsSVGHelper:
                     pits[pit_key],
                     normalized_highlight_team_keys,
                 )
-                for pit_key in sorted(pits)
+                for pit_key in cls._sorted_pit_keys_highlighted_last(
+                    pits, normalized_highlight_team_keys
+                )
             ),
             "label_elements": "".join(
                 cls._render_label(
@@ -169,6 +132,21 @@ class NexusEventDetailsSVGHelper:
     @staticmethod
     def _dict_or_empty(value: dict[str, T] | None) -> dict[str, T]:
         return value or {}
+
+    @staticmethod
+    def _sorted_pit_keys_highlighted_last(
+        pits: dict[str, Pits],
+        highlight_team_keys: set[str],
+    ) -> list[str]:
+        normal: list[str] = []
+        highlighted: list[str] = []
+        for pit_key in sorted(pits):
+            team = str(pits[pit_key].get("team", "")).strip().lower()
+            if team and f"frc{team}" in highlight_team_keys:
+                highlighted.append(pit_key)
+            else:
+                normal.append(pit_key)
+        return normal + highlighted
 
     @staticmethod
     def _as_number(value: object, *, name: str) -> float:
@@ -335,22 +313,21 @@ class NexusEventDetailsSVGHelper:
         width: float,
         height: float,
         *,
-        fill: str,
-        stroke: str,
-        stroke_width: float = 2,
+        class_name: str | None = None,
         rx: float = 0,
         opacity: float | None = None,
         transform: str | None = None,
     ) -> str:
+        class_attr = f' class="{class_name}"' if class_name else ""
         rx_attr = f' rx="{cls._fmt_number(rx)}"' if rx else ""
         opacity_attr = (
             f' opacity="{cls._fmt_number(opacity)}"' if opacity is not None else ""
         )
         transform_attr = f' transform="{transform}"' if transform else ""
         return (
-            f'<rect x="{cls._fmt_number(x)}" y="{cls._fmt_number(y)}" '
-            f'width="{cls._fmt_number(width)}" height="{cls._fmt_number(height)}"{rx_attr} '
-            f'fill="{fill}" stroke="{stroke}" stroke-width="{cls._fmt_number(stroke_width)}"'
+            f"<rect{class_attr} "
+            f'x="{cls._fmt_number(x)}" y="{cls._fmt_number(y)}" '
+            f'width="{cls._fmt_number(width)}" height="{cls._fmt_number(height)}"{rx_attr}'
             f"{opacity_attr}{transform_attr} />"
         )
 
@@ -362,15 +339,17 @@ class NexusEventDetailsSVGHelper:
         text: str,
         *,
         font_size: float,
-        fill: str,
+        class_name: str | None = None,
         weight: str | None = None,
         anchor: str = "middle",
         dominant_baseline: str = "middle",
     ) -> str:
+        class_attr = f' class="{class_name}"' if class_name else ""
         weight_attr = f' font-weight="{weight}"' if weight else ""
         return (
-            f'<text x="{cls._fmt_number(x)}" y="{cls._fmt_number(y)}" '
-            f'font-size="{cls._fmt_number(font_size)}" fill="{fill}" text-anchor="{anchor}" '
+            f"<text{class_attr} "
+            f'x="{cls._fmt_number(x)}" y="{cls._fmt_number(y)}" '
+            f'font-size="{cls._fmt_number(font_size)}" text-anchor="{anchor}" '
             f'dominant-baseline="{dominant_baseline}"{weight_attr}>{escape(text)}</text>'
         )
 
@@ -384,7 +363,7 @@ class NexusEventDetailsSVGHelper:
         text: str,
         *,
         font_size: float,
-        fill: str,
+        class_name: str | None = None,
         weight: str | None = None,
         max_lines: int = 3,
         min_font_size: float = 10,
@@ -441,10 +420,12 @@ class NexusEventDetailsSVGHelper:
                 f'<tspan x="{cls._fmt_number(x)}" dy="{dy}">{escape(line)}</tspan>'
             )
 
+        class_attr = f' class="{class_name}"' if class_name else ""
         weight_attr = f' font-weight="{weight}"' if weight else ""
         return (
-            f'<text x="{cls._fmt_number(x)}" y="{cls._fmt_number(start_y)}" '
-            f'font-size="{cls._fmt_number(current_font_size)}" fill="{fill}" '
+            f"<text{class_attr} "
+            f'x="{cls._fmt_number(x)}" y="{cls._fmt_number(start_y)}" '
+            f'font-size="{cls._fmt_number(current_font_size)}" '
             f'text-anchor="middle" dominant-baseline="middle"{weight_attr}>'
             f'{"".join(spans)}</text>'
         )
@@ -461,29 +442,16 @@ class NexusEventDetailsSVGHelper:
         team = str(pit.get("team", "")).strip()
         team_key = f"frc{team}" if team else ""
         is_highlighted = bool(team_key and team_key.lower() in highlight_team_keys)
-        fill = cls.HIGHLIGHT_FILL if is_highlighted else cls.PIT_FILL
-        stroke = cls.HIGHLIGHT_STROKE if is_highlighted else cls.PIT_STROKE
-        title_fill = cls.HIGHLIGHT_TITLE if is_highlighted else cls.PIT_TITLE
-        team_fill = cls.HIGHLIGHT_TEAM if is_highlighted else cls.PIT_TEAM
-        stroke_width = 4 if is_highlighted else 2
         center_x = x + width / 2
         center_y = y + height / 2
         elements = [
-            cls._svg_rect(
-                x,
-                y,
-                width,
-                height,
-                fill=fill,
-                stroke=stroke,
-                stroke_width=stroke_width,
-            ),
+            cls._svg_rect(x, y, width, height, class_name="pit-rect"),
             cls._svg_text(
                 center_x,
                 y + height * 0.26,
                 pit_key,
                 font_size=min(width, height) * 0.3,
-                fill=title_fill,
+                class_name="pit-title",
                 weight="700",
             ),
         ]
@@ -494,12 +462,13 @@ class NexusEventDetailsSVGHelper:
                     y + height * 0.62,
                     team,
                     font_size=min(width, height) * 0.28,
-                    fill=team_fill,
+                    class_name="pit-team",
                     weight="700",
                 )
             )
 
         content = "".join(elements)
+        group_class = "pit pit-highlighted" if is_highlighted else "pit"
         team_attr = f' data-team-key="frc{escape(team)}"' if team else ""
         transform_attr = ""
         if not math.isclose(angle, 0):
@@ -508,9 +477,7 @@ class NexusEventDetailsSVGHelper:
                 f'{cls._fmt_number(center_x)} {cls._fmt_number(center_y)})"'
             )
 
-        if not team_attr and not transform_attr:
-            return content
-        return f"<g{team_attr}{transform_attr}>{content}</g>"
+        return f'<g class="{group_class}"{team_attr}{transform_attr}>{content}</g>'
 
     @classmethod
     def _render_area(cls, area: Areas) -> str:
@@ -523,8 +490,7 @@ class NexusEventDetailsSVGHelper:
                     y,
                     width,
                     height,
-                    fill=cls.AREA_FILL,
-                    stroke=cls.AREA_STROKE,
+                    class_name="area-rect",
                     rx=8,
                     opacity=0.98,
                 ),
@@ -535,7 +501,7 @@ class NexusEventDetailsSVGHelper:
                     height,
                     label,
                     font_size=max(12, min(width, height) * 0.18),
-                    fill=cls.AREA_TEXT,
+                    class_name="area-text",
                     weight="700",
                 ),
             ]
@@ -558,9 +524,7 @@ class NexusEventDetailsSVGHelper:
             y,
             width,
             height,
-            fill=cls.WALL_FILL,
-            stroke=cls.WALL_STROKE,
-            stroke_width=1,
+            class_name="wall",
             transform=transform,
         )
 
@@ -598,7 +562,7 @@ class NexusEventDetailsSVGHelper:
             height,
             text,
             font_size=font_size,
-            fill=cls.LABEL_TEXT,
+            class_name="label-text",
             weight="700",
             max_lines=3,
             width_tolerance=0.98,
@@ -653,11 +617,43 @@ class NexusEventDetailsSVGHelper:
             f"{cls._fmt_number(px)},{cls._fmt_number(py)}" for px, py in points
         )
         return (
-            f'<polygon points="{point_string}" fill="{cls.ARROW_FILL}" '
-            f'stroke="{cls.ARROW_STROKE}" stroke-width="2" '
+            f'<polygon class="arrow" points="{point_string}" '
             f'transform="rotate({cls._fmt_number(angle)} {cls._fmt_number(center_x)} '
             f'{cls._fmt_number(center_y)})" />'
         )
+
+    _DARK_MEDIA_QUERY = "@media (prefers-color-scheme: dark)"
+
+    @classmethod
+    def force_light_color_scheme(cls, svg: str) -> str:
+        """Strip the dark-mode @media block so the SVG always renders light colors.
+
+        Used when checking in golden fixtures so PR review renders consistently.
+        """
+        start = svg.find(cls._DARK_MEDIA_QUERY)
+        if start == -1:
+            return svg
+        brace_start = svg.find("{", start)
+        if brace_start == -1:
+            return svg
+        depth = 1
+        i = brace_start + 1
+        while i < len(svg) and depth > 0:
+            if svg[i] == "{":
+                depth += 1
+            elif svg[i] == "}":
+                depth -= 1
+            i += 1
+        line_start = svg.rfind("\n", 0, start) + 1
+        end = i
+        if end < len(svg) and svg[end] == "\n":
+            end += 1
+        return svg[:line_start] + svg[end:]
+
+    @classmethod
+    def force_dark_color_scheme(cls, svg: str) -> str:
+        """Make the dark-mode @media block always apply, forcing dark colors."""
+        return svg.replace(cls._DARK_MEDIA_QUERY, "@media all")
 
     @classmethod
     def _svg_icon(cls, x: float, y: float, size: float, opacity: float) -> str:
