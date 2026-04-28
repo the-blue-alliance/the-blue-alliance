@@ -168,6 +168,45 @@ def test_template_values_requires_size() -> None:
         NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")
 
 
+def test_highlighted_pits_render_last_so_neighbors_dont_cover_stroke() -> None:
+    map_data: PitMap = {
+        "size": {"x": 200, "y": 100},
+        "pits": {
+            "A1": {
+                "position": {"x": 30, "y": 50},
+                "size": {"x": 40, "y": 40},
+                "team": "10922",
+            },
+            "B1": {
+                "position": {"x": 80, "y": 50},
+                "size": {"x": 40, "y": 40},
+                "team": "1678",
+            },
+            "C1": {
+                "position": {"x": 130, "y": 50},
+                "size": {"x": 40, "y": 40},
+                "team": "254",
+            },
+        },
+        "areas": None,
+        "labels": None,
+        "arrows": None,
+        "walls": None,
+    }
+
+    values = NexusEventDetailsSVGHelper.template_values(
+        map_data,
+        "2026nysu",
+        highlight_team_keys={"frc10922"},
+    )
+
+    elements = values["pit_elements"]
+    a1_index = elements.find('data-team-key="frc10922"')
+    b1_index = elements.find('data-team-key="frc1678"')
+    c1_index = elements.find('data-team-key="frc254"')
+    assert 0 <= b1_index < c1_index < a1_index
+
+
 def test_force_light_color_scheme_strips_dark_media_block() -> None:
     svg = (
         "<svg><style>\n"

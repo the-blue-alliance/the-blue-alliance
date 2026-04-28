@@ -109,7 +109,9 @@ class NexusEventDetailsSVGHelper:
                     pits[pit_key],
                     normalized_highlight_team_keys,
                 )
-                for pit_key in sorted(pits)
+                for pit_key in cls._sorted_pit_keys_highlighted_last(
+                    pits, normalized_highlight_team_keys
+                )
             ),
             "label_elements": "".join(
                 cls._render_label(
@@ -130,6 +132,21 @@ class NexusEventDetailsSVGHelper:
     @staticmethod
     def _dict_or_empty(value: dict[str, T] | None) -> dict[str, T]:
         return value or {}
+
+    @staticmethod
+    def _sorted_pit_keys_highlighted_last(
+        pits: dict[str, Pits],
+        highlight_team_keys: set[str],
+    ) -> list[str]:
+        normal: list[str] = []
+        highlighted: list[str] = []
+        for pit_key in sorted(pits):
+            team = str(pits[pit_key].get("team", "")).strip().lower()
+            if team and f"frc{team}" in highlight_team_keys:
+                highlighted.append(pit_key)
+            else:
+                normal.append(pit_key)
+        return normal + highlighted
 
     @staticmethod
     def _as_number(value: object, *, name: str) -> float:
