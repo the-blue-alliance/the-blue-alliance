@@ -71,21 +71,19 @@ interface EventPredictions {
       {
         red: {
           score: number;
-          coral_scored: number;
-          barge_points: number;
+          endGameTowerPoints: number;
         };
         blue: {
           score: number;
-          coral_scored: number;
-          barge_points: number;
+          endGameTowerPoints: number;
         };
       }
     >;
     playoff: Record<
       string,
       {
-        red: { score: number; coral_scored: number; barge_points: number };
-        blue: { score: number; coral_scored: number; barge_points: number };
+        red: { score: number; endGameTowerPoints: number };
+        blue: { score: number; endGameTowerPoints: number };
       }
     >;
   };
@@ -137,11 +135,11 @@ function TeamDetails({
 }) {
   const teamQuery = useQuery(getTeamOptions({ path: { team_key: teamKey } }));
   const eventStatusesQuery = useQuery({
-    queryKey: ['teamEventStatusByYear', teamKey, 2025],
+    queryKey: ['teamEventStatusByYear', teamKey, 2026],
     queryFn: () =>
       queryFromAPI(
         getTeamEventsStatusesByYear({
-          path: { team_key: teamKey, year: 2025 },
+          path: { team_key: teamKey, year: 2026 },
         }),
       ),
   });
@@ -158,7 +156,7 @@ function TeamDetails({
     queryKey: ['epaQuery', teamKey],
     queryFn: async () => {
       const response = await fetch(
-        `https://api.statbotics.io/v3/team_year/${teamKey.substring(3)}/2025`,
+        `https://api.statbotics.io/v3/team_year/${teamKey.substring(3)}/2026`,
       );
       // eslint-disable-next-line
       return response.json();
@@ -168,11 +166,9 @@ function TeamDetails({
   // eslint-disable-next-line
   const epaBreakdown: {
     total_points: number;
-    auto_coral: number;
-    teleop_coral: number;
-    processor_algae: number;
-    net_algae: number;
-    barge_points: number;
+    auto_fuel: number;
+    teleop_fuel: number;
+    total_tower: number;
   } | null = // eslint-disable-next-line
     epaQuery.data ? epaQuery.data.epa.breakdown : null;
 
@@ -198,7 +194,7 @@ function TeamDetails({
       event: key,
       rank: value?.qual?.ranking?.rank,
       alliance: value?.alliance
-        ? `A${value.alliance.number}P${value.alliance.pick ?? 'C'}`
+        ? `A${value.alliance.number}${value.alliance.pick == 0 ? 'C' : `P${value.alliance.pick}`}`
         : 'DNP',
       finish:
         value?.playoff?.status == 'won'
@@ -225,20 +221,13 @@ function TeamDetails({
           <b>EPA:</b> {epaBreakdown ? epaBreakdown.total_points : '?'}
         </div>
         <div>
-          <b>Auto Coral:</b> {epaBreakdown ? epaBreakdown.auto_coral : '?'}
+          <b>Auto Fuel:</b> {epaBreakdown ? epaBreakdown.auto_fuel : '?'}
         </div>
         <div>
-          <b>Teleop Coral:</b> {epaBreakdown ? epaBreakdown.teleop_coral : '?'}
+          <b>Teleop Fuel:</b> {epaBreakdown ? epaBreakdown.teleop_fuel : '?'}
         </div>
         <div>
-          <b>Processor Algae:</b>{' '}
-          {epaBreakdown ? epaBreakdown.processor_algae : '?'}
-        </div>
-        <div>
-          <b>Net Algae:</b> {epaBreakdown ? epaBreakdown.net_algae : '?'}
-        </div>
-        <div>
-          <b>Barge Points:</b> {epaBreakdown ? epaBreakdown.barge_points : '?'}
+          <b>Tower Points:</b> {epaBreakdown ? epaBreakdown.total_tower : '?'}
         </div>
       </div>
       <hr />
@@ -282,11 +271,10 @@ function MatchSuggestionRow({
   const predictedRedScore = prediction ? prediction.red.score : 0.0;
   const predictedBlueScore = prediction ? prediction.blue.score : 0.0;
 
-  const redGamePieceCount = prediction ? prediction.red.coral_scored : 0.0;
-  const blueGamePieceCount = prediction ? prediction.blue.coral_scored : 0.0;
-
-  const redEndGamePoints = prediction ? prediction.red.barge_points : 0.0;
-  const blueEndGamePoints = prediction ? prediction.blue.barge_points : 0.0;
+  const redEndGamePoints = prediction ? prediction.red.endGameTowerPoints : 0.0;
+  const blueEndGamePoints = prediction
+    ? prediction.blue.endGameTowerPoints
+    : 0.0;
 
   const blueZoneScore =
     100 *
@@ -294,7 +282,7 @@ function MatchSuggestionRow({
       1.0,
       (Math.max(predictedRedScore, predictedBlueScore) +
         2.0 * Math.min(predictedRedScore, predictedBlueScore)) /
-        750.0,
+        3000.0,
     );
 
   return (
@@ -343,14 +331,6 @@ function MatchSuggestionRow({
         </td>
         <td className="border bg-alliance-blue-dark">
           {predictedBlueScore.toFixed(0)}
-        </td>
-        <td className="border bg-alliance-red-light">
-          {redGamePieceCount.toFixed(0)}
-          <Progress value={(redGamePieceCount / 69.0) * 100.0} />
-        </td>
-        <td className="border bg-alliance-blue-light">
-          {blueGamePieceCount.toFixed(0)}
-          <Progress value={(blueGamePieceCount / 69.0) * 100.0} />
         </td>
         <td className="border bg-alliance-red-light">
           {redEndGamePoints.toFixed(0)}
@@ -504,7 +484,7 @@ function MatchSuggestion(): JSX.Element {
   );
 
   return (
-    <div className="absolute right-0 left-0 px-4 py-8">
+    <div className="w-full px-4 py-8">
       <h1 className="text-3xl font-medium">Match Suggestions</h1>
       <Badge
         className="ml-2 cursor-pointer"
@@ -542,10 +522,8 @@ function MatchSuggestion(): JSX.Element {
             <th className="border">B3 (Rank)</th>
             <th className="border">Red Predicted Score</th>
             <th className="border">Blue Predicted Score</th>
-            <th className="border">Red Game Piece Count</th>
-            <th className="border">Blue Game Piece Count</th>
-            <th className="border">Red Endgame Points</th>
-            <th className="border">Blue Endgame Points</th>
+            <th className="border">Red Tower Points</th>
+            <th className="border">Blue Tower Points</th>
             <th className="border">BlueZone Score</th>
             <th className="border">Details</th>
           </tr>
@@ -571,10 +549,8 @@ function MatchSuggestion(): JSX.Element {
             <th className="border">B3 (Rank)</th>
             <th className="border">Red Predicted Score</th>
             <th className="border">Blue Predicted Score</th>
-            <th className="border">Red Game Piece Count</th>
-            <th className="border">Blue Game Piece Count</th>
-            <th className="border">Red Endgame Points</th>
-            <th className="border">Blue Endgame Points</th>
+            <th className="border">Red Tower Points</th>
+            <th className="border">Blue Tower Points</th>
             <th className="border">BlueZone Score</th>
             <th className="border">Details</th>
           </tr>
