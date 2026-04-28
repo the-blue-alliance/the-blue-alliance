@@ -99,7 +99,7 @@ def test_event_detail_teams_subtabs_show_nexus_event_details(
     assert team_list_subtab is not None
     assert team_list_subtab.get_text(strip=True) == "Team List"
     assert pit_map_subtab is not None
-    assert pit_map_subtab.get_text(strip=True) == "Nexus Event Details"
+    assert pit_map_subtab.get_text(strip=True) == "Nexus Pit Map"
 
     pit_map_pane = soup.find("div", id="teams-pit-map")
     assert pit_map_pane is not None

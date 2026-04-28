@@ -581,7 +581,7 @@
     <h2>Teams</h2>
     <ul class="nav nav-tabs">
       <li class="active"><a href="#teams-list" data-toggle="tab">Team List</a></li>
-      <li><a href="#teams-pit-map" data-toggle="tab">Nexus Event Details</a></li>
+      <li><a href="#teams-pit-map" data-toggle="tab">Nexus Pit Map</a></li>
     </ul>
 
     <div class="tab-content" style="margin-top: 16px;">
@@ -607,10 +607,10 @@
       </div>
 
       <div class="tab-pane" id="teams-pit-map">
-        {% if nexus_event_details %}
-          <pre class="text-left">{{ nexus_event_details|pprint_json }}</pre>
+        {% if nexus_pit_map %}
+          <pre class="text-left">{{ nexus_pit_map|pprint_json }}</pre>
         {% else %}
-          <p>No Nexus event details found.</p>
+          <p>No Nexus pit map found.</p>
         {% endif %}
       </div>
     </div>

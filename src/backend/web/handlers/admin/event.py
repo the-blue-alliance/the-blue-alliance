@@ -181,7 +181,7 @@ def event_detail(event_key: EventKey) -> str:
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "webcast_online_status": webcast_online_status,
         "nexus_queue_status": nexus_queue_status,
-        "nexus_event_details": (
+        "nexus_pit_map": (
             nexus_event_details.pitmap_json if nexus_event_details else None
         ),
         "sync_status": sorted(sync_status.items()),
