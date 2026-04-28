@@ -10,13 +10,19 @@ import {
 } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
+import MedalIcon from '~icons/lucide/medal';
+import TrophyIcon from '~icons/lucide/trophy';
+
 import {
+  AwardType,
   CompLevel,
   Event,
   EventRanking,
   Match,
+  MediaAvatar,
   PlayoffType,
   getEventMatches,
+  getEventOprs,
   getEventPredictions,
   getEventRankings,
   getEventsByYear,
@@ -25,11 +31,17 @@ import {
   getTeamEventsStatusesByYear,
 } from '~/api/tba/read';
 import {
+  getDistrictRankingsOptions,
   getEventOptions,
+  getTeamAwardsByYearOptions,
+  getTeamDistrictsOptions,
+  getTeamEventsByYearOptions,
+  getTeamMediaByYearOptions,
   getTeamOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
-import { TeamLink } from '~/components/tba/links';
+import { EventLink, TeamLink } from '~/components/tba/links';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
+import TeamAvatar from '~/components/tba/teamAvatar';
 import { Badge } from '~/components/ui/badge';
 import {
   EVENT_FALLBACK_TIMEZONE,
@@ -129,11 +141,17 @@ function EventName({ eventKey }: { eventKey: string }) {
 function TeamDetails({
   teamKey,
   className,
+  defaultRed = false,
 }: {
   teamKey: string;
   className: string;
+  defaultRed?: boolean;
 }) {
   const teamQuery = useQuery(getTeamOptions({ path: { team_key: teamKey } }));
+  const teamMediaQuery = useQuery({
+    ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year: 2026 } }),
+    select: (media) => media.find((m): m is MediaAvatar => m.type === 'avatar'),
+  });
   const eventStatusesQuery = useQuery({
     queryKey: ['teamEventStatusByYear', teamKey, 2026],
     queryFn: () =>
@@ -142,6 +160,45 @@ function TeamDetails({
           path: { team_key: teamKey, year: 2026 },
         }),
       ),
+  });
+  const teamEventsByYearQuery = useQuery(
+    getTeamEventsByYearOptions({ path: { team_key: teamKey, year: 2026 } }),
+  );
+  const eventOprsQuery = useQuery({
+    queryKey: ['eventOprs', teamKey, 2026],
+    enabled: !!teamEventsByYearQuery.data,
+    queryFn: async () => {
+      const results = await Promise.all(
+        (teamEventsByYearQuery.data ?? []).map((e) =>
+          getEventOprs({ path: { event_key: e.key } }),
+        ),
+      );
+      const map = new Map<string, number>();
+      (teamEventsByYearQuery.data ?? []).forEach((e, i) => {
+        const opr = results[i].data?.oprs?.[teamKey];
+        if (opr != null) map.set(e.key, opr);
+      });
+      return map;
+    },
+  });
+  const teamAwardsByYearQuery = useQuery(
+    getTeamAwardsByYearOptions({ path: { team_key: teamKey, year: 2026 } }),
+  );
+  const teamDistrictsQuery = useQuery(
+    getTeamDistrictsOptions({ path: { team_key: teamKey } }),
+  );
+  const district2026 = teamDistrictsQuery.data?.find((d) => d.year === 2026);
+  const district2026Key = district2026?.key;
+  const district2026Abbrev = district2026?.abbreviation.toUpperCase();
+  const districtRankingsQuery = useQuery({
+    ...getDistrictRankingsOptions({
+      path: { district_key: district2026Key ?? '' },
+    }),
+    enabled: !!district2026Key,
+    select: (rankings) => ({
+      entry: (rankings ?? []).find((r) => r.team_key === teamKey),
+      total: (rankings ?? []).length,
+    }),
   });
 
   const insightNotablesYearQuery = useQuery({
@@ -188,8 +245,16 @@ function TeamDetails({
     ? divisionWinnersNotable.context.map((eventKey) => eventKey.substring(0, 4))
     : [];
 
+  const eventInfoMap = new Map(
+    (teamEventsByYearQuery.data ?? []).map((e) => [
+      e.key,
+      { startDate: e.start_date, week: e.week },
+    ]),
+  );
+
   const statuses = [];
   for (const [key, value] of Object.entries(eventStatusesQuery.data)) {
+    const info = eventInfoMap.get(key);
     statuses.push({
       event: key,
       rank: value?.qual?.ranking?.rank,
@@ -202,56 +267,232 @@ function TeamDetails({
           : value?.playoff?.level == CompLevel.F
             ? 'Finalist'
             : '?',
+      week: info?.week ?? null,
+      startDate: info?.startDate ?? key,
     });
+  }
+  statuses.sort((a, b) =>
+    a.startDate < b.startDate ? 1 : a.startDate > b.startDate ? -1 : 0,
+  );
+
+  const awardsByEvent = new Map<string, { name: string; type: AwardType }[]>();
+  for (const award of teamAwardsByYearQuery.data ?? []) {
+    // Skip Winner/Finalist — already shown via the finish field
+    if (
+      award.award_type === AwardType.WINNER ||
+      award.award_type === AwardType.FINALIST
+    ) {
+      continue;
+    }
+    const list = awardsByEvent.get(award.event_key) ?? [];
+    list.push({ name: award.name, type: award.award_type });
+    awardsByEvent.set(award.event_key, list);
   }
 
   return (
-    <div className={cn('text-left', className)}>
-      <div className="text-lg">
-        Team {teamQuery.data.team_number} - {teamQuery.data.nickname}
-      </div>
-      <hr />
-      <div>
-        {teamQuery.data.city}, {teamQuery.data.state_prov},{' '}
-        {teamQuery.data.country}
-      </div>
-      <hr />
-      <div>
-        <div>
-          <b>EPA:</b> {epaBreakdown ? epaBreakdown.total_points : '?'}
-        </div>
-        <div>
-          <b>Auto Fuel:</b> {epaBreakdown ? epaBreakdown.auto_fuel : '?'}
-        </div>
-        <div>
-          <b>Teleop Fuel:</b> {epaBreakdown ? epaBreakdown.teleop_fuel : '?'}
-        </div>
-        <div>
-          <b>Tower Points:</b> {epaBreakdown ? epaBreakdown.total_tower : '?'}
-        </div>
-      </div>
-      <hr />
-      <div>
-        <b>Past Einstein:</b>{' '}
-        {divisionWins.length > 0 ? divisionWins.join(', ') : 'N/A'}
-      </div>
-      <hr />
-      {statuses.map((status) => (
-        <div key={status.event} className="py-2">
+    <div className={cn('rounded-lg p-3 text-left', className)}>
+      {/* Header */}
+      <div className="mb-2">
+        <div className="flex items-center gap-2">
+          {teamMediaQuery.data && (
+            <TeamAvatar
+              media={teamMediaQuery.data}
+              className="shrink-0"
+              defaultRed={defaultRed}
+            />
+          )}
           <div>
-            <b>Event:</b> <EventName eventKey={status.event} />
-          </div>
-          <div>
-            <b>Rank:</b> {status.rank}
-          </div>
-          <div>
-            <b>Alliance:</b> {status.alliance}
-          </div>
-          <div>
-            <b>Finish:</b> {status.finish}
+            <div className="text-base leading-tight font-bold">
+              <TeamLink teamOrKey={teamQuery.data} year={2026} target="_blank">
+                #{teamQuery.data.team_number}
+              </TeamLink>{' '}
+              &mdash; {teamQuery.data.nickname}
+            </div>
+            <div className="mt-0.5 text-xs text-muted-foreground">
+              {teamQuery.data.city}, {teamQuery.data.state_prov},{' '}
+              {teamQuery.data.country}
+            </div>
+            {districtRankingsQuery.data?.entry && (
+              <div className="mt-0.5 text-xs text-muted-foreground">
+                {district2026Abbrev} Rank:{' '}
+                <span className="font-semibold text-foreground">
+                  #{districtRankingsQuery.data.entry.rank}
+                </span>
+                {' / '}
+                {districtRankingsQuery.data.total}
+                {' · '}
+                <span className="font-semibold text-foreground">
+                  {districtRankingsQuery.data.entry.point_total}
+                </span>{' '}
+                pts
+              </div>
+            )}
           </div>
         </div>
-      ))}
+      </div>
+
+      <hr className="mb-2" />
+
+      {/* EPA Stats */}
+      <div className="mb-2">
+        <div
+          className="mb-1 text-xs font-semibold tracking-wide
+            text-muted-foreground uppercase"
+        >
+          EPA (Statbotics)
+        </div>
+        <div className="grid grid-cols-2 gap-x-2 gap-y-1 text-sm">
+          <div>
+            <span className="font-medium">Total</span>{' '}
+            <span className="float-right font-mono">
+              {epaBreakdown ? epaBreakdown.total_points.toFixed(1) : '—'}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium">Tower</span>{' '}
+            <span className="float-right font-mono">
+              {epaBreakdown ? epaBreakdown.total_tower.toFixed(1) : '—'}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium">Auto Fuel</span>{' '}
+            <span className="float-right font-mono">
+              {epaBreakdown ? epaBreakdown.auto_fuel.toFixed(1) : '—'}
+            </span>
+          </div>
+          <div>
+            <span className="font-medium">Tele Fuel</span>{' '}
+            <span className="float-right font-mono">
+              {epaBreakdown ? epaBreakdown.teleop_fuel.toFixed(1) : '—'}
+            </span>
+          </div>
+        </div>
+      </div>
+
+      {/* Past Einstein */}
+      {divisionWins.length > 0 && (
+        <>
+          <hr className="mb-2" />
+          <div className="mb-2 flex flex-wrap gap-1">
+            <span
+              className="text-xs font-semibold tracking-wide
+                text-muted-foreground uppercase"
+            >
+              Einstein:
+            </span>
+            {divisionWins.map((year) => (
+              <Badge key={year} className="text-xs">
+                {year}
+              </Badge>
+            ))}
+          </div>
+        </>
+      )}
+
+      {/* Per-event statuses */}
+      {statuses.length > 0 && (
+        <>
+          <hr className="mb-2" />
+          <div className="space-y-1.5">
+            {statuses.map((status) => (
+              <div
+                key={status.event}
+                className="rounded border border-border bg-background/50 px-2
+                  py-1.5 text-sm"
+              >
+                <div
+                  className="flex items-baseline gap-1.5 truncate font-medium"
+                >
+                  {status.week != null && (
+                    <span
+                      className="shrink-0 rounded bg-muted px-1 py-0.5
+                        text-[10px] font-semibold text-muted-foreground"
+                    >
+                      {status.week === 0 ? 'Pre' : `Wk ${status.week}`}
+                    </span>
+                  )}
+                  <span className="truncate">
+                    <EventLink eventOrKey={status.event} target="_blank">
+                      <EventName eventKey={status.event} />
+                    </EventLink>
+                  </span>
+                </div>
+                <div className="space-y-0.5 text-xs text-muted-foreground">
+                  <div className="grid grid-cols-2 gap-x-2">
+                    <span>
+                      Rank:{' '}
+                      <span className="font-semibold text-foreground">
+                        {status.rank ?? '—'}
+                      </span>
+                    </span>
+                    <span>
+                      Alliance:{' '}
+                      <span className="font-semibold text-foreground">
+                        {status.alliance}
+                      </span>
+                    </span>
+                  </div>
+                  <div className="grid grid-cols-2 gap-x-2">
+                    <span>
+                      Finish:{' '}
+                      <span
+                        className="inline-flex items-center gap-0.5
+                          font-semibold text-foreground"
+                      >
+                        {status.finish === 'Winner' && (
+                          <TrophyIcon className="size-3 text-yellow-500" />
+                        )}
+                        {status.finish === 'Finalist' && (
+                          <MedalIcon className="size-3 text-slate-400" />
+                        )}
+                        {status.finish}
+                      </span>
+                    </span>
+                    <span>
+                      OPR:{' '}
+                      <span className="font-semibold text-foreground">
+                        {eventOprsQuery.data?.has(status.event)
+                          ? (
+                              eventOprsQuery.data.get(status.event) ?? 0
+                            ).toFixed(1)
+                          : '—'}
+                      </span>
+                    </span>
+                  </div>
+                </div>
+                {(awardsByEvent.get(status.event) ?? []).length > 0 && (
+                  <div className="mt-1 flex flex-wrap gap-1">
+                    {(awardsByEvent.get(status.event) ?? []).map((award, i) => {
+                      const isImpact = award.type === AwardType.CHAIRMANS;
+                      const isEI =
+                        award.type === AwardType.ENGINEERING_INSPIRATION;
+                      return (
+                        <span
+                          key={i}
+                          className={cn(
+                            'rounded px-1 py-0.5 text-[10px] font-semibold',
+                            isImpact &&
+                              `bg-yellow-100 text-yellow-800 dark:bg-yellow-900
+                              dark:text-yellow-200`,
+                            isEI &&
+                              `bg-blue-100 text-blue-800 dark:bg-blue-900
+                              dark:text-blue-200`,
+                            !isImpact &&
+                              !isEI &&
+                              'bg-muted text-muted-foreground',
+                          )}
+                        >
+                          {award.name}
+                        </span>
+                      );
+                    })}
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        </>
+      )}
     </div>
   );
 }
@@ -358,12 +599,13 @@ function MatchSuggestionRow({
       {showDetails && (
         <tr>
           <td colSpan={17}>
-            <div className="grid grid-cols-6 gap-4">
+            <div className="grid grid-cols-6 gap-4 py-4">
               {match.alliances.red.team_keys.map((k) => (
                 <TeamDetails
                   key={k}
                   teamKey={k}
                   className="bg-alliance-red-light"
+                  defaultRed
                 />
               ))}
               {match.alliances.blue.team_keys.map((k) => (
