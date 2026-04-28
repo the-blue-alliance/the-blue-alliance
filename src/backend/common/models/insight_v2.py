@@ -1,4 +1,4 @@
-from typing import List, Literal, Optional, Set, TypedDict
+from typing import List, Literal, Optional, Set, TypedDict, Union
 
 from google.appengine.ext import ndb
 
@@ -8,10 +8,14 @@ from backend.common.models.keys import DistrictAbbreviation
 LeaderboardKeyType = Literal["team", "event", "match", "team_pair"]
 LeaderboardContextType = Literal["event_list", "none"]
 
+TimeseriesXType = Literal["week", "year", "event"]
+TimeseriesPointContextType = Literal["none", "match_record"]
+
 
 class InsightCategory:
     LEADERBOARD = "leaderboard"
     STREAK = "streak"
+    TIMESERIES = "timeseries"
 
 
 class InsightV2(CachedModel):
@@ -101,3 +105,37 @@ class StreakEntry(TypedDict):
 
 class StreakData(TypedDict):
     entries: List[StreakEntry]
+
+
+class MatchRecordPointContext(TypedDict):
+    match_key: str
+    alliance: List[str]  # team keys on the record-setting alliance
+    held_duration_seconds: int  # seconds this score was the world record
+    is_current: bool  # True if this is still the current world record
+
+
+class TimeseriesPointNoContext(TypedDict):
+    x: Union[str, int, float]
+    y: float
+
+
+class TimeseriesPointWithMatchRecord(TypedDict):
+    x: Union[str, int, float]
+    y: float
+    context: MatchRecordPointContext
+
+
+TimeseriesPoint = Union[TimeseriesPointNoContext, TimeseriesPointWithMatchRecord]
+
+
+class TimeseriesSeries(TypedDict):
+    label: str
+    points: List[TimeseriesPoint]
+
+
+class TimeseriesData(TypedDict):
+    series: List[TimeseriesSeries]
+    x_type: TimeseriesXType
+    x_label: str
+    y_label: str
+    point_context_type: TimeseriesPointContextType
