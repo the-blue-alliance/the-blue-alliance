@@ -605,6 +605,39 @@ class NexusEventDetailsSVGHelper:
             f'{cls._fmt_number(center_y)})" />'
         )
 
+    _DARK_MEDIA_QUERY = "@media (prefers-color-scheme: dark)"
+
+    @classmethod
+    def force_light_color_scheme(cls, svg: str) -> str:
+        """Strip the dark-mode @media block so the SVG always renders light colors.
+
+        Used when checking in golden fixtures so PR review renders consistently.
+        """
+        start = svg.find(cls._DARK_MEDIA_QUERY)
+        if start == -1:
+            return svg
+        brace_start = svg.find("{", start)
+        if brace_start == -1:
+            return svg
+        depth = 1
+        i = brace_start + 1
+        while i < len(svg) and depth > 0:
+            if svg[i] == "{":
+                depth += 1
+            elif svg[i] == "}":
+                depth -= 1
+            i += 1
+        line_start = svg.rfind("\n", 0, start) + 1
+        end = i
+        if end < len(svg) and svg[end] == "\n":
+            end += 1
+        return svg[:line_start] + svg[end:]
+
+    @classmethod
+    def force_dark_color_scheme(cls, svg: str) -> str:
+        """Make the dark-mode @media block always apply, forcing dark colors."""
+        return svg.replace(cls._DARK_MEDIA_QUERY, "@media all")
+
     @classmethod
     def _svg_icon(cls, x: float, y: float, size: float, opacity: float) -> str:
         return (

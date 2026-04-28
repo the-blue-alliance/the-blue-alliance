@@ -25,31 +25,6 @@
       --arrow-fill: #5c6bc0;
       --arrow-stroke: #3949ab;
     }
-    @media (prefers-color-scheme: dark) {
-      svg {
-        --page-bg: #0f172a;
-        --map-bg: #1e293b;
-        --map-border: #334155;
-        --footer-link: #e2e8f0;
-        --footer-text: #94a3b8;
-        --wall-fill: #cbd5e1;
-        --wall-stroke: #f1f5f9;
-        --pit-fill: #0f172a;
-        --pit-stroke: #818cf8;
-        --pit-title: #c7d2fe;
-        --pit-team: #f1f5f9;
-        --highlight-fill: #422006;
-        --highlight-stroke: #fbbf24;
-        --highlight-title: #fcd34d;
-        --highlight-team: #fef3c7;
-        --area-fill: #1e293b;
-        --area-stroke: #64748b;
-        --area-text: #cbd5e1;
-        --label-text: #e2e8f0;
-        --arrow-fill: #818cf8;
-        --arrow-stroke: #a5b4fc;
-      }
-    }
     text { font-family: Roboto, Arial, Helvetica, sans-serif; letter-spacing: 0.1px; }
     a { text-decoration: none; }
     .page-bg { fill: var(--page-bg); }

@@ -168,6 +168,43 @@ def test_template_values_requires_size() -> None:
         NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")
 
 
+def test_force_light_color_scheme_strips_dark_media_block() -> None:
+    svg = (
+        "<svg><style>\n"
+        "    svg { --x: #fff; }\n"
+        "    @media (prefers-color-scheme: dark) {\n"
+        "      svg { --x: #000; }\n"
+        "    }\n"
+        "    .foo { fill: var(--x); }\n"
+        "</style></svg>"
+    )
+    forced = NexusEventDetailsSVGHelper.force_light_color_scheme(svg)
+    assert "@media" not in forced
+    assert "--x: #fff" in forced
+    assert "--x: #000" not in forced
+    assert ".foo { fill: var(--x); }" in forced
+
+
+def test_force_dark_color_scheme_makes_dark_block_unconditional() -> None:
+    svg = (
+        "<svg><style>\n"
+        "    svg { --x: #fff; }\n"
+        "    @media (prefers-color-scheme: dark) {\n"
+        "      svg { --x: #000; }\n"
+        "    }\n"
+        "</style></svg>"
+    )
+    forced = NexusEventDetailsSVGHelper.force_dark_color_scheme(svg)
+    assert "(prefers-color-scheme: dark)" not in forced
+    assert "@media all" in forced
+    assert "--x: #000" in forced
+
+
+def test_force_light_color_scheme_is_a_noop_when_no_dark_block() -> None:
+    svg = "<svg><style>svg { --x: #fff; }</style></svg>"
+    assert NexusEventDetailsSVGHelper.force_light_color_scheme(svg) == svg
+
+
 def test_template_values_handles_missing_sections() -> None:
     map_data: PitMap = {
         "size": {"x": 100, "y": 100},

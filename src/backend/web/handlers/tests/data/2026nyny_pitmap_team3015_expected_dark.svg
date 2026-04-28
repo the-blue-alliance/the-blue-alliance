@@ -25,7 +25,7 @@
       --arrow-fill: #5c6bc0;
       --arrow-stroke: #3949ab;
     }
-    @media (prefers-color-scheme: dark) {
+    @media all {
       svg {
         --page-bg: #0f172a;
         --map-bg: #1e293b;

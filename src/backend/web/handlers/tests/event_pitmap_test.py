@@ -7,6 +7,7 @@ from freezegun import freeze_time
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.nexus_pit_map_svg_helper import NexusEventDetailsSVGHelper
 from backend.common.models.event import Event
 from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.web.handlers.tests import helpers
@@ -21,6 +22,17 @@ def _load_fixture(filename: str) -> str:
 def _normalize_svg(svg: str) -> str:
     normalized = re.sub(r">\s+<", "><", svg)
     return re.sub(r"\s+", " ", normalized).strip()
+
+
+def _assert_matches_light_and_dark(actual_svg: str, base_name: str) -> None:
+    light_expected = _load_fixture(f"{base_name}_light.svg")
+    dark_expected = _load_fixture(f"{base_name}_dark.svg")
+    assert _normalize_svg(
+        NexusEventDetailsSVGHelper.force_light_color_scheme(actual_svg)
+    ) == _normalize_svg(light_expected)
+    assert _normalize_svg(
+        NexusEventDetailsSVGHelper.force_dark_color_scheme(actual_svg)
+    ) == _normalize_svg(dark_expected)
 
 
 def test_event_pitmap_400_when_event_key_invalid(web_client: Client) -> None:
@@ -129,9 +141,9 @@ def test_event_pitmap_matches_nysu_golden_svg(ndb_stub, web_client: Client) -> N
     resp = web_client.get("/event/2026nysu/pitmap")
     assert resp.status_code == 200
 
-    expected_svg = _load_fixture("2026nysu_pitmap_expected.svg")
-    actual_svg = resp.get_data(as_text=True)
-    assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
+    _assert_matches_light_and_dark(
+        resp.get_data(as_text=True), "2026nysu_pitmap_expected"
+    )
 
 
 def test_event_pitmap_matches_nyny_golden_svg(ndb_stub, web_client: Client) -> None:
@@ -153,9 +165,9 @@ def test_event_pitmap_matches_nyny_golden_svg(ndb_stub, web_client: Client) -> N
     resp = web_client.get("/event/2026nyny/pitmap")
     assert resp.status_code == 200
 
-    expected_svg = _load_fixture("2026nyny_pitmap_expected.svg")
-    actual_svg = resp.get_data(as_text=True)
-    assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
+    _assert_matches_light_and_dark(
+        resp.get_data(as_text=True), "2026nyny_pitmap_expected"
+    )
 
 
 def test_event_pitmap_matches_nyny_highlight_golden_svg(
@@ -179,9 +191,9 @@ def test_event_pitmap_matches_nyny_highlight_golden_svg(
     resp = web_client.get("/event/2026nyny/pitmap?teams=frc3015")
     assert resp.status_code == 200
 
-    expected_svg = _load_fixture("2026nyny_pitmap_team3015_expected.svg")
-    actual_svg = resp.get_data(as_text=True)
-    assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
+    _assert_matches_light_and_dark(
+        resp.get_data(as_text=True), "2026nyny_pitmap_team3015_expected"
+    )
 
 
 def test_event_pitmap_matches_nysu_highlight_golden_svg(
@@ -205,9 +217,9 @@ def test_event_pitmap_matches_nysu_highlight_golden_svg(
     resp = web_client.get("/event/2026nysu/pitmap?teams=frc1796")
     assert resp.status_code == 200
 
-    expected_svg = _load_fixture("2026nysu_pitmap_team1796_expected.svg")
-    actual_svg = resp.get_data(as_text=True)
-    assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
+    _assert_matches_light_and_dark(
+        resp.get_data(as_text=True), "2026nysu_pitmap_team1796_expected"
+    )
 
 
 def test_event_pitmap_teams_supports_list_of_team_keys(
