@@ -1,10 +1,11 @@
 import pytest
 
 from backend.common.helpers.nexus_pit_map_svg_helper import NexusPitMapSVGHelper
+from backend.common.nexus_api.types import PitMap
 
 
 def test_template_values_renders_expected_sections() -> None:
-    map_data = {
+    map_data: PitMap = {
         "size": {"x": 100, "y": 200},
         "pits": {
             "A1": {
@@ -39,7 +40,7 @@ def test_template_values_renders_expected_sections() -> None:
 
     values = NexusPitMapSVGHelper.template_values(map_data, "2026nyny")
 
-    assert values["event_url"] == "https://frc.nexus/en/event/2026nyny/pits"
+    assert values["event_url"] == "https://frc.nexus/2026nyny/pits"
     assert "A1" in values["pit_elements"]
     assert "1678" in values["pit_elements"]
     assert "Inspection" in values["area_elements"]
@@ -48,7 +49,7 @@ def test_template_values_renders_expected_sections() -> None:
 
 
 def test_template_values_applies_pit_rotation_angle() -> None:
-    map_data = {
+    map_data: PitMap = {
         "size": {"x": 100, "y": 100},
         "pits": {
             "A1": {
@@ -70,7 +71,7 @@ def test_template_values_applies_pit_rotation_angle() -> None:
 
 
 def test_template_values_highlights_frc_team_keys() -> None:
-    map_data = {
+    map_data: PitMap = {
         "size": {"x": 100, "y": 100},
         "pits": {
             "A1": {
@@ -97,16 +98,19 @@ def test_template_values_highlights_frc_team_keys() -> None:
 
 
 def test_template_values_requires_size() -> None:
+    map_data: PitMap = {"pits": {}}
     with pytest.raises(ValueError):
-        NexusPitMapSVGHelper.template_values({"pits": {}}, "2026nyny")
+        NexusPitMapSVGHelper.template_values(map_data, "2026nyny")
 
 
-def test_template_values_rejects_bad_section_type() -> None:
-    with pytest.raises(ValueError):
-        NexusPitMapSVGHelper.template_values(
-            {
-                "size": {"x": 100, "y": 100},
-                "pits": [],
-            },
-            "2026nyny",
-        )
+def test_template_values_handles_missing_sections() -> None:
+    map_data: PitMap = {
+        "size": {"x": 100, "y": 100},
+    }
+
+    values = NexusPitMapSVGHelper.template_values(map_data, "2026nyny")
+
+    assert values["pit_elements"] == ""
+    assert values["area_elements"] == ""
+    assert values["label_elements"] == ""
+    assert values["arrow_elements"] == ""

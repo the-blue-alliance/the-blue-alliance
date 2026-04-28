@@ -1,6 +1,44 @@
 import math
-from typing import Any, Mapping
+from typing import Mapping, TypedDict, TypeVar
 from xml.sax.saxutils import escape
+
+from backend.common.nexus_api.types import (
+    Areas,
+    Arrows,
+    Labels,
+    MapElement,
+    PitMap,
+    Pits,
+)
+
+T = TypeVar("T")
+
+
+class PitMapTemplateValues(TypedDict):
+    svg_namespace: str
+    outer_width: str
+    outer_height: str
+    view_box: str
+    page_background: str
+    map_background: str
+    map_border: str
+    footer_link: str
+    footer_text: str
+    padding: str
+    canvas_width: str
+    canvas_height: str
+    map_translate: str
+    footer_top: str
+    footer_line_x2: str
+    footer_link_y: str
+    footer_text_y: str
+    event_url: str
+    wall_elements: str
+    area_elements: str
+    pit_elements: str
+    label_elements: str
+    arrow_elements: str
+    logo_element: str
 
 
 class NexusPitMapSVGHelper:
@@ -41,10 +79,10 @@ class NexusPitMapSVGHelper:
     @classmethod
     def template_values(
         cls,
-        map_data: Mapping[str, Any],
-        event_key: str,
+        map_data: PitMap,
+        nexus_event_code: str,
         highlight_team_keys: set[str] | None = None,
-    ) -> dict[str, Any]:
+    ) -> PitMapTemplateValues:
         size = map_data.get("size")
         if not isinstance(size, dict):
             raise ValueError("Map response is missing size metadata")
@@ -52,11 +90,11 @@ class NexusPitMapSVGHelper:
         canvas_width = cls._as_number(size.get("x"), name="size.x")
         canvas_height = cls._as_number(size.get("y"), name="size.y")
 
-        walls = cls._get_section(map_data, "walls")
-        areas = cls._get_section(map_data, "areas")
-        pits = cls._get_section(map_data, "pits")
-        labels = cls._get_section(map_data, "labels")
-        arrows = cls._get_section(map_data, "arrows")
+        walls = cls._dict_or_empty(map_data.get("walls"))
+        areas = cls._dict_or_empty(map_data.get("areas"))
+        pits = cls._dict_or_empty(map_data.get("pits"))
+        labels = cls._dict_or_empty(map_data.get("labels"))
+        arrows = cls._dict_or_empty(map_data.get("arrows"))
         normalized_highlight_team_keys = {
             team_key.lower() for team_key in (highlight_team_keys or set())
         }
@@ -92,7 +130,7 @@ class NexusPitMapSVGHelper:
             "footer_line_x2": cls._fmt_number(outer_width - cls.PADDING),
             "footer_link_y": cls._fmt_number(footer_top + 30),
             "footer_text_y": cls._fmt_number(footer_top + 58),
-            "event_url": f"https://frc.nexus/en/event/{event_key}/pits",
+            "event_url": f"https://frc.nexus/{nexus_event_code}/pits",
             "wall_elements": "".join(
                 cls._render_wall(walls[wall_key]) for wall_key in sorted(walls)
             ),
@@ -122,28 +160,12 @@ class NexusPitMapSVGHelper:
             "logo_element": cls._svg_icon(logo_x, logo_y, cls.LOGO_SIZE, 0.22),
         }
 
-    @classmethod
-    def _get_section(
-        cls, map_data: Mapping[str, Any], section_name: str
-    ) -> dict[str, dict[str, Any]]:
-        section = map_data.get(section_name)
-        if section is None:
-            return {}
-        if not isinstance(section, dict):
-            raise ValueError(f"Map response field {section_name!r} must be an object")
-
-        parsed_section: dict[str, dict[str, Any]] = {}
-        for key, value in section.items():
-            if not isinstance(value, dict):
-                raise ValueError(
-                    f"Map response field {section_name!r}[{key!r}] must be an object"
-                )
-            parsed_section[str(key)] = value
-
-        return parsed_section
+    @staticmethod
+    def _dict_or_empty(value: dict[str, T] | None) -> dict[str, T]:
+        return value or {}
 
     @staticmethod
-    def _as_number(value: Any, *, name: str) -> float:
+    def _as_number(value: object, *, name: str) -> float:
         if isinstance(value, (int, float)):
             return float(value)
         raise ValueError(f"Expected numeric {name}, got {value!r}")
@@ -157,7 +179,7 @@ class NexusPitMapSVGHelper:
 
     @classmethod
     def _get_position_size(
-        cls, item: dict[str, Any]
+        cls, item: Mapping[str, object]
     ) -> tuple[float, float, float, float]:
         position = item.get("position")
         size = item.get("size")
@@ -172,13 +194,13 @@ class NexusPitMapSVGHelper:
 
     @classmethod
     def _get_centered_position_size(
-        cls, item: dict[str, Any]
+        cls, item: Mapping[str, object]
     ) -> tuple[float, float, float, float]:
         x, y, width, height = cls._get_position_size(item)
         return x - width / 2, y - height / 2, width, height
 
     @classmethod
-    def _get_wall_rect(cls, wall: dict[str, Any]) -> tuple[float, float, float, float]:
+    def _get_wall_rect(cls, wall: MapElement) -> tuple[float, float, float, float]:
         x, y, width, height = cls._get_centered_position_size(wall)
         angle = cls._as_number(wall.get("angle", 0), name="angle")
         if math.isclose(abs(angle) % 180, 90):
@@ -227,7 +249,7 @@ class NexusPitMapSVGHelper:
     @classmethod
     def _choose_label_rect(
         cls,
-        label: dict[str, Any],
+        label: Labels,
         thin_walls: list[tuple[float, float, float, float]],
         canvas_width: float,
         canvas_height: float,
@@ -248,7 +270,7 @@ class NexusPitMapSVGHelper:
     @classmethod
     def _find_label_enclosure(
         cls,
-        label: dict[str, Any],
+        label: Labels,
         thin_walls: list[tuple[float, float, float, float]],
     ) -> tuple[float, float, float, float] | None:
         position = label.get("position")
@@ -425,7 +447,7 @@ class NexusPitMapSVGHelper:
     def _render_pit(
         cls,
         pit_key: str,
-        pit: dict[str, Any],
+        pit: Pits,
         highlight_team_keys: set[str],
     ) -> str:
         x, y, width, height = cls._get_centered_position_size(pit)
@@ -481,7 +503,7 @@ class NexusPitMapSVGHelper:
         )
 
     @classmethod
-    def _render_area(cls, area: dict[str, Any]) -> str:
+    def _render_area(cls, area: Areas) -> str:
         x, y, width, height = cls._get_centered_position_size(area)
         label = str(area.get("label", "")).strip()
         return "".join(
@@ -510,7 +532,7 @@ class NexusPitMapSVGHelper:
         )
 
     @classmethod
-    def _render_wall(cls, wall: dict[str, Any]) -> str:
+    def _render_wall(cls, wall: MapElement) -> str:
         angle = cls._as_number(wall.get("angle", 0), name="angle")
         x, y, width, height = cls._get_centered_position_size(wall)
         center_x = x + width / 2
@@ -535,7 +557,7 @@ class NexusPitMapSVGHelper:
     @classmethod
     def _render_label(
         cls,
-        label: dict[str, Any],
+        label: Labels,
         thin_walls: list[tuple[float, float, float, float]],
         canvas_width: float,
         canvas_height: float,
@@ -572,7 +594,7 @@ class NexusPitMapSVGHelper:
         )
 
     @classmethod
-    def _render_arrow(cls, arrow: dict[str, Any]) -> str:
+    def _render_arrow(cls, arrow: Arrows) -> str:
         x, y, width, height = cls._get_centered_position_size(arrow)
         angle = cls._as_number(arrow.get("angle", 0), name="angle")
         arrow_type = str(arrow.get("type", "single")).strip().lower()

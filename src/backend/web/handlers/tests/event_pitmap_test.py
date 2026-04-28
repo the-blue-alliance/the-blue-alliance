@@ -74,7 +74,7 @@ def test_event_pitmap_renders_svg_with_long_cache(ndb_stub, web_client: Client) 
     assert "<svg" in body
     assert "A1" in body
     assert "1678" in body
-    assert "https://frc.nexus/en/event/2019nyny/pits" in body
+    assert "https://frc.nexus/2019nyny/pits" in body
 
 
 @freeze_time("2020-03-02")

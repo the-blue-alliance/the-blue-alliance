@@ -5,7 +5,7 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import Any, cast, Dict, List, Optional, Tuple
+from typing import cast, Dict, List, Optional, Tuple
 
 import pytz
 from flask import abort, redirect, request
@@ -41,6 +41,7 @@ from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.nexus_pit_map import NexusPitMap
 from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.nexus_api.types import PitMap
 from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
 
@@ -511,8 +512,8 @@ def event_pitmap(event_key: EventKey) -> Response:
 
     try:
         template_values = NexusPitMapSVGHelper.template_values(
-            cast(dict[str, Any], nexus_pit_map.data_json),
-            event_key,
+            cast(PitMap, nexus_pit_map.data_json),
+            event.nexus_code_for_api,
             highlight_team_keys=highlight_team_keys,
         )
     except ValueError:
