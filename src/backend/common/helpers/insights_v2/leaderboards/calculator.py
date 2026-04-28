@@ -163,31 +163,36 @@ class LeaderboardV2Calculator(InsightV2Calculator):
         insights = []
 
         if self.counts:
-            data = LeaderboardDataV2(
-                rankings=self._build_rankings(self.counts),
-                key_type=self.key_type,
-                context_type=self.context_type,
-            )
-            insights.append(
-                InsightV2(
-                    id=InsightV2.render_key_name(
-                        year,
-                        InsightCategory.LEADERBOARD,
-                        self.insight_name.name,
-                    ),
-                    name=self.insight_name.name,
-                    display_name=self.insight_name.display_name,
-                    year=year,
-                    category=InsightCategory.LEADERBOARD,
-                    data_json=data,
+            rankings = self._build_rankings(self.counts)
+            if rankings:
+                data = LeaderboardDataV2(
+                    rankings=rankings,
+                    key_type=self.key_type,
+                    context_type=self.context_type,
                 )
-            )
+                insights.append(
+                    InsightV2(
+                        id=InsightV2.render_key_name(
+                            year,
+                            InsightCategory.LEADERBOARD,
+                            self.insight_name.name,
+                        ),
+                        name=self.insight_name.name,
+                        display_name=self.insight_name.display_name,
+                        year=year,
+                        category=InsightCategory.LEADERBOARD,
+                        data_json=data,
+                    )
+                )
 
         for district_abbrev, counts in sorted(district_counts.items()):
             if not counts:
                 continue
+            rankings = self._build_rankings(counts)
+            if not rankings:
+                continue
             data = LeaderboardDataV2(
-                rankings=self._build_rankings(counts),
+                rankings=rankings,
                 key_type=self.key_type,
                 context_type=self.context_type,
             )

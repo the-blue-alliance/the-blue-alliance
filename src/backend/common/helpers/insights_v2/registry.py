@@ -9,11 +9,17 @@ from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.leaderboards.blue_banners import (
     BlueBannersV2Calculator,
 )
+from backend.common.helpers.insights_v2.leaderboards.most_awards_won import (
+    MostAwardsWonV2Calculator,
+)
 from backend.common.helpers.insights_v2.leaderboards.most_cmp_finals_appearances import (
     MostCmpFinalsAppearancesV2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_cmp_wins import (
     MostCmpWinsV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_district_cmp_wins import (
+    MostDistrictCmpWinsV2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_division_finals_appearances import (
     MostDivisionFinalsAppearancesV2Calculator,
@@ -21,11 +27,23 @@ from backend.common.helpers.insights_v2.leaderboards.most_division_finals_appear
 from backend.common.helpers.insights_v2.leaderboards.most_division_wins import (
     MostDivisionWinsV2Calculator,
 )
+from backend.common.helpers.insights_v2.leaderboards.most_events_won import (
+    MostEventsWonV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_events_won_together import (
+    MostEventsWonTogetherV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_impact_award_wins import (
+    MostImpactAwardWinsV2Calculator,
+)
 from backend.common.helpers.insights_v2.leaderboards.most_matches_played import (
     MostMatchesPlayedV2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_matches_played_together import (
     MostMatchesPlayedTogetherV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_wffa_wins import (
+    MostWffaWinsV2Calculator,
 )
 from backend.common.helpers.insights_v2.streaks.einstein_streak import (
     LongestEinsteinStreakV2Calculator,
@@ -99,6 +117,12 @@ def make_all_insights(year: Year) -> List[InsightV2]:
         MostDivisionWinsV2Calculator(),
         MostCmpFinalsAppearancesV2Calculator(),
         MostCmpWinsV2Calculator(),
+        MostEventsWonV2Calculator(),
+        MostEventsWonTogetherV2Calculator(),
+        MostImpactAwardWinsV2Calculator(),
+        MostAwardsWonV2Calculator(),
+        MostDistrictCmpWinsV2Calculator(),
+        MostWffaWinsV2Calculator(),
     ]
     if year == 0:
         calculators += [
