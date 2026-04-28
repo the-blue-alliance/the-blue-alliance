@@ -494,13 +494,17 @@ class NexusEventDetailsSVGHelper:
             )
 
         content = "".join(elements)
-        if math.isclose(angle, 0):
-            return content
+        team_attr = f' data-team-key="frc{escape(team)}"' if team else ""
+        transform_attr = ""
+        if not math.isclose(angle, 0):
+            transform_attr = (
+                f' transform="rotate({cls._fmt_number(angle)} '
+                f'{cls._fmt_number(center_x)} {cls._fmt_number(center_y)})"'
+            )
 
-        return (
-            f'<g transform="rotate({cls._fmt_number(angle)} {cls._fmt_number(center_x)} '
-            f'{cls._fmt_number(center_y)})">{content}</g>'
-        )
+        if not team_attr and not transform_attr:
+            return content
+        return f"<g{team_attr}{transform_attr}>{content}</g>"
 
     @classmethod
     def _render_area(cls, area: Areas) -> str:

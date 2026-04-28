@@ -70,6 +70,39 @@ def test_template_values_applies_pit_rotation_angle() -> None:
     assert 'transform="rotate(90 50 50)"' in values["pit_elements"]
 
 
+def test_template_values_pits_carry_team_key_attribute() -> None:
+    map_data: PitMap = {
+        "size": {"x": 100, "y": 100},
+        "pits": {
+            "A1": {
+                "position": {"x": 50, "y": 50},
+                "size": {"x": 40, "y": 40},
+                "team": "1678",
+            },
+            "A2": {
+                "position": {"x": 50, "y": 50},
+                "size": {"x": 40, "y": 40},
+                "angle": 90,
+                "team": "254",
+            },
+            "A3": {
+                "position": {"x": 50, "y": 50},
+                "size": {"x": 40, "y": 40},
+            },
+        },
+        "areas": None,
+        "labels": None,
+        "arrows": None,
+        "walls": None,
+    }
+
+    values = NexusEventDetailsSVGHelper.template_values(map_data, "2026nyny")
+
+    assert 'data-team-key="frc1678"' in values["pit_elements"]
+    assert 'data-team-key="frc254"' in values["pit_elements"]
+    assert values["pit_elements"].count("data-team-key=") == 2
+
+
 def test_template_values_highlights_frc_team_keys() -> None:
     map_data: PitMap = {
         "size": {"x": 100, "y": 100},
