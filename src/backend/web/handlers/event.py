@@ -5,7 +5,7 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import cast, Dict, List, Optional, Tuple
 
 import pytz
 from flask import abort, redirect, request
@@ -30,6 +30,7 @@ from backend.common.helpers.match_time_prediction_helper import (
     MatchTimePredictionHelper,
 )
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.nexus_pit_map_svg_helper import NexusEventDetailsSVGHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -38,7 +39,10 @@ from backend.common.models.event import Event
 from backend.common.models.event_matchstats import Component, TeamStatMap
 from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.team import Team
+from backend.common.nexus_api.types import PitMap
 from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
 
@@ -488,6 +492,49 @@ def event_detail(event_key: EventKey) -> Response:
             else timedelta(hours=6)
         ),
     )
+
+
+@cached_public
+def event_pitmap(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(400)
+
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    if not event:
+        abort(404)
+
+    nexus_event_details = NexusEventDetails.get_by_id(event_key)
+    if not nexus_event_details:
+        abort(404)
+
+    highlight_team_keys = set()
+    for teams_value in request.args.getlist("teams"):
+        for maybe_team_key in teams_value.split(","):
+            team_key = maybe_team_key.strip().lower()
+            if not Team.validate_key_name(team_key):
+                abort(400)
+            highlight_team_keys.add(team_key)
+
+    try:
+        template_values = NexusEventDetailsSVGHelper.template_values(
+            cast(PitMap, nexus_event_details.pitmap_json),
+            event.nexus_code_for_api,
+            highlight_team_keys=highlight_team_keys,
+        )
+    except ValueError:
+        abort(404)
+        raise RuntimeError("unreachable")
+
+    response = make_cached_response(
+        render_template("event_pitmap.svg", template_values),
+        ttl=(
+            timedelta(seconds=61)
+            if event.should_use_short_cache
+            else timedelta(hours=6)
+        ),
+    )
+    response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
+    return response
 
 
 @cached_public

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="{{ svg_namespace }}" width="{{ outer_width }}" height="{{ outer_height }}" viewBox="{{ view_box }}">
+  <style>
+    text { font-family: Roboto, Arial, Helvetica, sans-serif; letter-spacing: 0.1px; }
+    a { text-decoration: none; }
+  </style>
+
+  <rect x="0" y="0" width="{{ outer_width }}" height="{{ outer_height }}" fill="{{ page_background }}" />
+
+  <g transform="{{ map_translate }}">
+    <rect x="0" y="0" width="{{ canvas_width }}" height="{{ canvas_height }}" rx="10" fill="{{ map_background }}" stroke="{{ map_border }}" stroke-width="2" />
+    {{ wall_elements | safe }}
+    {{ area_elements | safe }}
+    {{ pit_elements | safe }}
+    {{ label_elements | safe }}
+    {{ arrow_elements | safe }}
+  </g>
+
+  <line x1="{{ padding }}" y1="{{ footer_top }}" x2="{{ footer_line_x2 }}" y2="{{ footer_top }}" stroke="{{ map_border }}" stroke-width="1" />
+
+  <a href="{{ event_url }}">
+    <text x="{{ padding }}" y="{{ footer_link_y }}" font-size="18" fill="{{ footer_link }}" text-anchor="start" dominant-baseline="middle" font-weight="700">{{ event_url }}</text>
+  </a>
+  <text x="{{ padding }}" y="{{ footer_text_y }}" font-size="13" fill="{{ footer_text }}" text-anchor="start" dominant-baseline="middle">Rendered from frc.nexus pit map data</text>
+
+  {{ logo_element | safe }}
+</svg>

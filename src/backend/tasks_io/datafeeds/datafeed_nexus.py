@@ -21,7 +21,7 @@ from backend.tasks_io.datafeeds.parsers.nexus_api.pit_location_parser import (
     NexusAPIPitLocationParser,
 )
 from backend.tasks_io.datafeeds.parsers.nexus_api.pit_map_parser import (
-    NexusAPIPitMapParser,
+    NexusAPIEventDetailsParser,
 )
 from backend.tasks_io.datafeeds.parsers.nexus_api.queue_status_parser import (
     NexusAPIQueueStatusParser,
@@ -118,7 +118,7 @@ class NexusEventQueueStatus(_DatafeedNexus[EventStatus, Optional[EventQueueStatu
         return NexusAPIQueueStatusParser(self.event)
 
 
-class NexusPitMapDatafeed(_DatafeedNexus[PitMap, PitMap]):
+class NexusEventDetailsDatafeed(_DatafeedNexus[PitMap, PitMap]):
     def __init__(self, event: Event) -> None:
         super().__init__()
         self.event = event
@@ -129,5 +129,5 @@ class NexusPitMapDatafeed(_DatafeedNexus[PitMap, PitMap]):
     def event_key(self) -> Optional[EventKey]:
         return self.event.key_name
 
-    def parser(self) -> NexusAPIPitMapParser:
-        return NexusAPIPitMapParser()
+    def parser(self) -> NexusAPIEventDetailsParser:
+        return NexusAPIEventDetailsParser()
