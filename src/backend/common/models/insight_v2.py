@@ -110,7 +110,7 @@ class StreakData(TypedDict):
 class MatchRecordPointContext(TypedDict):
     match_key: str
     alliance: List[str]  # team keys on the record-setting alliance
-    held_duration_seconds: int  # seconds this score was the world record
+    post_result_time: int  # Unix timestamp when the record was set
     is_current: bool  # True if this is still the current world record
 
 
