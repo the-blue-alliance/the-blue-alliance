@@ -157,19 +157,21 @@ def test_matches_ordered_by_post_result_time_within_event(ndb_stub) -> None:
     assert points[1]["y"] == 120.0
 
 
-def test_held_duration_seconds_for_intermediate_record(ndb_stub) -> None:
+def test_post_result_time_stored_as_unix_timestamp(ndb_stub) -> None:
+    t1 = datetime.datetime(2022, 3, 5, 12, 0, 0)
+    t2 = datetime.datetime(2022, 3, 5, 14, 30, 0)
     _put_event("2022casj", 2022)
-    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5, 12, 0, 0))
-    _put_match("2022casj", 2022, 2, 120, 90, datetime.datetime(2022, 3, 5, 14, 30, 0))
+    _put_match("2022casj", 2022, 1, 100, 80, t1)
+    _put_match("2022casj", 2022, 2, 120, 90, t2)
 
     insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
 
     assert len(insights) == 1
     points = insights[0].data["series"][0]["points"]
     assert len(points) == 2
-    # First record held for exactly 2.5 hours (9000 seconds) before being broken
-    assert points[0]["context"]["held_duration_seconds"] == 9000
+    assert points[0]["context"]["post_result_time"] == int(t1.timestamp())
     assert points[0]["context"]["is_current"] is False
+    assert points[1]["context"]["post_result_time"] == int(t2.timestamp())
 
 
 def test_unplayed_matches_skipped(ndb_stub) -> None:
@@ -208,6 +210,37 @@ def test_records_across_multiple_events_same_year(ndb_stub) -> None:
     assert points[0]["y"] == 80.0
     assert points[1]["y"] == 100.0
     assert points[1]["context"]["is_current"] is True
+
+
+def test_concurrent_events_sorted_globally_by_time(ndb_stub) -> None:
+    # Two events running the same week (alphabetically alhu < caclv).
+    # caclv_qm2 was played BEFORE alhu_qm62, so alhu_qm62 (630) should not
+    # appear in the record list because caclv_qm2 (748) already beat it.
+    _put_event("2022alhu", 2022)
+    _put_match("2022alhu", 2022, 1, 349, 200, datetime.datetime(2022, 3, 5, 10, 0, 0))
+    _put_match("2022alhu", 2022, 62, 630, 400, datetime.datetime(2022, 3, 6, 16, 0, 0))
+
+    _put_event("2022caclv", 2022)
+    # caclv_qm2 played before alhu_qm62 but after alhu_qm1
+    _put_match("2022caclv", 2022, 2, 748, 500, datetime.datetime(2022, 3, 6, 10, 0, 0))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    # alhu_qm1 sets 349, caclv_qm2 sets 748 (before alhu_qm62), alhu_qm62 does not set a record
+    assert len(points) == 2
+    assert points[0]["context"]["match_key"] == "2022alhu_qm1"
+    assert points[0]["y"] == 349.0
+    assert points[1]["context"]["match_key"] == "2022caclv_qm2"
+    assert points[1]["y"] == 748.0
+    assert points[1]["context"]["is_current"] is True
+    assert points[0]["context"]["post_result_time"] == int(
+        datetime.datetime(2022, 3, 5, 10, 0, 0).timestamp()
+    )
+    assert points[1]["context"]["post_result_time"] == int(
+        datetime.datetime(2022, 3, 6, 10, 0, 0).timestamp()
+    )
 
 
 def test_insight_stored_with_timeseries_category(ndb_stub) -> None:
