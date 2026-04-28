@@ -54,6 +54,7 @@ from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.models.zebra_motionworks import ZebraMotionWorks
+from backend.common.queries.match_query import EventMatchesQuery
 
 
 @require_write_auth({AuthType.EVENT_TEAMS})
@@ -330,7 +331,7 @@ def update_event_matches(event_key: EventKey) -> Response:
     # set and identify unplayed elim matches whose set has already been
     # decided (e.g. an f1m3 placeholder when finals ended 2-0).
     new_match_keys = {m.key.id() for m in matches}
-    existing_matches = Match.query(Match.event == event.key).fetch()
+    existing_matches = EventMatchesQuery(event_key=event_key).fetch()
     for existing_match in existing_matches:
         if existing_match.key.id() not in new_match_keys:
             matches.append(existing_match)

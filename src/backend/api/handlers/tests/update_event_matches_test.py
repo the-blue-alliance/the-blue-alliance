@@ -12,6 +12,7 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 
@@ -443,6 +444,11 @@ def test_unplayed_finals_match_cleaned_up_on_followup_upload(
         data=request_body,
     )
     assert response.status_code == 200
+
+    # Cache invalidation runs on a deferred queue that doesn't fire in tests,
+    # so manually clear cached query results to simulate the production state
+    # where the followup upload sees fresh matches via EventMatchesQuery.
+    ndb.delete_multi(CachedQueryResult.query().fetch(keys_only=True))
 
     # Follow-up upload: only f1m2 is sent (now played, red wins again).
     # f1m3 should be cleaned up by merging with existing matches.
