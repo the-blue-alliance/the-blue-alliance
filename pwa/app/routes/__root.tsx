@@ -26,7 +26,7 @@ import { ApiError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { ThemeProvider } from '~/lib/theme';
-import { createLogger } from '~/lib/utils';
+import { cn, createLogger } from '~/lib/utils';
 import appCss from '~/tailwind.css?url';
 
 const logger = createLogger('root');
@@ -145,6 +145,7 @@ export const Route = createRootRouteWithContext<{
 });
 
 const FULLSCREEN_ROUTES = ['/gameday'];
+const FULLWIDTH_ROUTES = ['/match_suggestion'];
 
 function RootComponent() {
   const { renderTime } = Route.useLoaderData();
@@ -156,6 +157,9 @@ function RootComponent() {
     document.body.setAttribute('data-hydrated', 'true');
   }, []);
   const isFullscreen = FULLSCREEN_ROUTES.some((route) =>
+    pathname.startsWith(route),
+  );
+  const isFullwidth = FULLWIDTH_ROUTES.some((route) =>
     pathname.startsWith(route),
   );
 
@@ -191,9 +195,11 @@ function RootComponent() {
                 <Navbar />
                 <TOCRendererProvider>
                   <div
-                    className="container mx-auto
-                      min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
-                      px-4 text-sm"
+                    className={cn(
+                      !isFullwidth && 'container mx-auto',
+                      `min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
+                        px-4 text-sm`,
+                    )}
                   >
                     <div vaul-drawer-wrapper="" className="bg-background">
                       <Outlet />
