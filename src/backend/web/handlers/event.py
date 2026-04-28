@@ -502,10 +502,18 @@ def event_pitmap(event_key: EventKey) -> Response:
     if not nexus_pit_map:
         abort(404)
 
+    highlight_team_keys = set()
+    for highlight_value in request.args.getlist("highlight"):
+        for maybe_team_key in highlight_value.split(","):
+            team_key = maybe_team_key.strip().lower()
+            if re.fullmatch(r"frc\d+", team_key):
+                highlight_team_keys.add(team_key)
+
     try:
         template_values = NexusPitMapSVGHelper.template_values(
             cast(dict[str, Any], nexus_pit_map.data_json),
             event_key,
+            highlight_team_keys=highlight_team_keys,
         )
     except ValueError:
         abort(404)

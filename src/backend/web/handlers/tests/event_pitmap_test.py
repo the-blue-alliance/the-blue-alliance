@@ -151,3 +151,81 @@ def test_event_pitmap_matches_nyny_golden_svg(ndb_stub, web_client: Client) -> N
     expected_svg = _load_fixture("2026nyny_pitmap_expected.svg")
     actual_svg = resp.get_data(as_text=True)
     assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
+
+
+def test_event_pitmap_matches_nyny_highlight_golden_svg(
+    ndb_stub, web_client: Client
+) -> None:
+    Event(
+        id="2026nyny",
+        event_short="nyny",
+        year=2026,
+        name="NYNY Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2026, 3, 1),
+        end_date=datetime(2026, 3, 5),
+    ).put()
+
+    NexusPitMap(
+        id="2026nyny",
+        data_json=json.loads(_load_fixture("2026nyny_pitmap.json")),
+    ).put()
+
+    resp = web_client.get("/event/2026nyny/pitmap?highlight=frc3015")
+    assert resp.status_code == 200
+
+    expected_svg = _load_fixture("2026nyny_pitmap_team3015_expected.svg")
+    actual_svg = resp.get_data(as_text=True)
+    assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
+
+
+def test_event_pitmap_matches_nysu_highlight_golden_svg(
+    ndb_stub, web_client: Client
+) -> None:
+    Event(
+        id="2026nysu",
+        event_short="nysu",
+        year=2026,
+        name="NYSU Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2026, 3, 1),
+        end_date=datetime(2026, 3, 5),
+    ).put()
+
+    NexusPitMap(
+        id="2026nysu",
+        data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
+    ).put()
+
+    resp = web_client.get("/event/2026nysu/pitmap?highlight=frc1796")
+    assert resp.status_code == 200
+
+    expected_svg = _load_fixture("2026nysu_pitmap_team1796_expected.svg")
+    actual_svg = resp.get_data(as_text=True)
+    assert _normalize_svg(actual_svg) == _normalize_svg(expected_svg)
+
+
+def test_event_pitmap_highlight_supports_list_of_team_keys(
+    ndb_stub, web_client: Client
+) -> None:
+    Event(
+        id="2026nysu",
+        event_short="nysu",
+        year=2026,
+        name="NYSU Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2026, 3, 1),
+        end_date=datetime(2026, 3, 5),
+    ).put()
+
+    NexusPitMap(
+        id="2026nysu",
+        data_json=json.loads(_load_fixture("2026nysu_pitmap.json")),
+    ).put()
+
+    resp = web_client.get("/event/2026nysu/pitmap?highlight=frc10922&highlight=frc1796")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert body.count('fill="#fff8e6"') == 2
+    assert body.count('stroke="#ff9800"') == 2

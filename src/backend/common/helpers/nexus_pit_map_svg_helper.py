@@ -24,6 +24,11 @@ class NexusPitMapSVGHelper:
     PIT_TITLE = "#2f3d8f"
     PIT_TEAM = "#1f2937"
 
+    HIGHLIGHT_FILL = "#fff8e6"
+    HIGHLIGHT_STROKE = "#ff9800"
+    HIGHLIGHT_TITLE = "#bf6d00"
+    HIGHLIGHT_TEAM = "#7c4a03"
+
     AREA_FILL = "#f2f5fb"
     AREA_STROKE = "#90a4ae"
     AREA_TEXT = "#37474f"
@@ -35,7 +40,10 @@ class NexusPitMapSVGHelper:
 
     @classmethod
     def template_values(
-        cls, map_data: Mapping[str, Any], event_key: str
+        cls,
+        map_data: Mapping[str, Any],
+        event_key: str,
+        highlight_team_keys: set[str] | None = None,
     ) -> dict[str, Any]:
         size = map_data.get("size")
         if not isinstance(size, dict):
@@ -49,6 +57,9 @@ class NexusPitMapSVGHelper:
         pits = cls._get_section(map_data, "pits")
         labels = cls._get_section(map_data, "labels")
         arrows = cls._get_section(map_data, "arrows")
+        normalized_highlight_team_keys = {
+            team_key.lower() for team_key in (highlight_team_keys or set())
+        }
 
         wall_rects = [cls._get_wall_rect(walls[wall_key]) for wall_key in sorted(walls)]
         thin_wall_rects = [
@@ -89,7 +100,12 @@ class NexusPitMapSVGHelper:
                 cls._render_area(areas[area_key]) for area_key in sorted(areas)
             ),
             "pit_elements": "".join(
-                cls._render_pit(pit_key, pits[pit_key]) for pit_key in sorted(pits)
+                cls._render_pit(
+                    pit_key,
+                    pits[pit_key],
+                    normalized_highlight_team_keys,
+                )
+                for pit_key in sorted(pits)
             ),
             "label_elements": "".join(
                 cls._render_label(
@@ -406,22 +422,40 @@ class NexusPitMapSVGHelper:
         )
 
     @classmethod
-    def _render_pit(cls, pit_key: str, pit: dict[str, Any]) -> str:
+    def _render_pit(
+        cls,
+        pit_key: str,
+        pit: dict[str, Any],
+        highlight_team_keys: set[str],
+    ) -> str:
         x, y, width, height = cls._get_centered_position_size(pit)
         angle = cls._as_number(pit.get("angle", 0), name="angle")
         team = str(pit.get("team", "")).strip()
+        team_key = f"frc{team}" if team else ""
+        is_highlighted = bool(team_key and team_key.lower() in highlight_team_keys)
+        fill = cls.HIGHLIGHT_FILL if is_highlighted else cls.PIT_FILL
+        stroke = cls.HIGHLIGHT_STROKE if is_highlighted else cls.PIT_STROKE
+        title_fill = cls.HIGHLIGHT_TITLE if is_highlighted else cls.PIT_TITLE
+        team_fill = cls.HIGHLIGHT_TEAM if is_highlighted else cls.PIT_TEAM
+        stroke_width = 4 if is_highlighted else 2
         center_x = x + width / 2
         center_y = y + height / 2
         elements = [
             cls._svg_rect(
-                x, y, width, height, fill=cls.PIT_FILL, stroke=cls.PIT_STROKE
+                x,
+                y,
+                width,
+                height,
+                fill=fill,
+                stroke=stroke,
+                stroke_width=stroke_width,
             ),
             cls._svg_text(
                 center_x,
                 y + height * 0.26,
                 pit_key,
                 font_size=min(width, height) * 0.3,
-                fill=cls.PIT_TITLE,
+                fill=title_fill,
                 weight="700",
             ),
         ]
@@ -432,7 +466,7 @@ class NexusPitMapSVGHelper:
                     y + height * 0.62,
                     team,
                     font_size=min(width, height) * 0.28,
-                    fill=cls.PIT_TEAM,
+                    fill=team_fill,
                     weight="700",
                 )
             )

@@ -69,6 +69,33 @@ def test_template_values_applies_pit_rotation_angle() -> None:
     assert 'transform="rotate(90 50 50)"' in values["pit_elements"]
 
 
+def test_template_values_highlights_frc_team_keys() -> None:
+    map_data = {
+        "size": {"x": 100, "y": 100},
+        "pits": {
+            "A1": {
+                "position": {"x": 50, "y": 50},
+                "size": {"x": 40, "y": 40},
+                "team": "1678",
+            }
+        },
+        "areas": None,
+        "labels": None,
+        "arrows": None,
+        "walls": None,
+    }
+
+    values = NexusPitMapSVGHelper.template_values(
+        map_data,
+        "2026nyny",
+        highlight_team_keys={"frc1678"},
+    )
+
+    assert 'fill="#fff8e6"' in values["pit_elements"]
+    assert 'stroke="#ff9800"' in values["pit_elements"]
+    assert 'stroke-width="4"' in values["pit_elements"]
+
+
 def test_template_values_requires_size() -> None:
     with pytest.raises(ValueError):
         NexusPitMapSVGHelper.template_values({"pits": {}}, "2026nyny")
