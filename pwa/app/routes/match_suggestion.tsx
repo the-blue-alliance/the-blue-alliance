@@ -106,6 +106,17 @@ interface MatchInfo {
   event: Event;
   eventRankings?: EventRanking | null;
   eventPredictions?: EventPredictions | null;
+  epaPercentileMap?: Map<string, number> | null;
+}
+
+function epaStars(percentile: number | undefined): string {
+  if (percentile == null) return '';
+  if (percentile >= 0.9975) return '⭐⭐⭐⭐⭐';
+  if (percentile >= 0.995) return '⭐⭐⭐⭐';
+  if (percentile >= 0.99) return '⭐⭐⭐';
+  if (percentile >= 0.98) return '⭐⭐';
+  if (percentile >= 0.975) return '⭐';
+  return '';
 }
 
 const Progress = forwardRef<
@@ -502,6 +513,7 @@ function MatchSuggestionRow({
   event,
   eventRankings,
   eventPredictions,
+  epaPercentileMap,
 }: MatchInfo) {
   const [showDetails, setShowDetails] = useState(false);
 
@@ -556,6 +568,14 @@ function MatchSuggestionRow({
             </TeamLink>
             <br />(
             {eventRankings?.rankings.find((r) => r.team_key == k)?.rank ?? '?'})
+            {epaStars(epaPercentileMap?.get(k)) && (
+              <>
+                <br />
+                <span className="text-xs">
+                  {epaStars(epaPercentileMap?.get(k))}
+                </span>
+              </>
+            )}
           </td>
         ))}
         {match.alliances.blue.team_keys.map((k) => (
@@ -565,6 +585,14 @@ function MatchSuggestionRow({
             </TeamLink>
             <br />(
             {eventRankings?.rankings.find((r) => r.team_key == k)?.rank ?? '?'})
+            {epaStars(epaPercentileMap?.get(k)) && (
+              <>
+                <br />
+                <span className="text-xs">
+                  {epaStars(epaPercentileMap?.get(k))}
+                </span>
+              </>
+            )}
           </td>
         ))}
         <td className="border bg-alliance-red-dark">
@@ -667,6 +695,25 @@ function MatchSuggestion(): JSX.Element {
         ),
       ),
   });
+  const epaPercentilesQuery = useQuery({
+    queryKey: ['epaPercentiles', 2026],
+    queryFn: async () => {
+      const response = await fetch(
+        'https://api.statbotics.io/v3/team_years?year=2026',
+      );
+      // eslint-disable-next-line
+      const allTeams: {
+        team: number;
+        epa: { ranks: { total: { percentile: number } } };
+      }[] = await response.json();
+      const map = new Map<string, number>();
+      for (const entry of allTeams) {
+        map.set(`frc${entry.team}`, entry.epa.ranks.total.percentile);
+      }
+      return map;
+    },
+    staleTime: 10 * 60 * 1000,
+  });
 
   if (!eventMatchesQuery.data) {
     return <div>No matches!</div>;
@@ -679,7 +726,7 @@ function MatchSuggestion(): JSX.Element {
   eventMatchesQuery.data.forEach((eventMatches, eventIdx) => {
     const lastMatch = eventMatches.findLast(
       (match) =>
-        match.alliances.red.score != -1 && match.alliances.blue.score != -1,
+        match.alliances.red.score !== -1 && match.alliances.blue.score !== -1,
     );
     if (lastMatch) {
       finishedMatches.push(lastMatch);
@@ -687,7 +734,7 @@ function MatchSuggestion(): JSX.Element {
 
     const unplayedMatches = eventMatches.filter(
       (match) =>
-        match.alliances.red.score == -1 || match.alliances.blue.score == -1,
+        match.alliances.red.score === -1 || match.alliances.blue.score === -1,
     );
     unplayedMatches.forEach((match, i) => {
       if (i > 2) {
@@ -699,6 +746,7 @@ function MatchSuggestion(): JSX.Element {
           event: events[eventIdx],
           eventRankings: eventRankingsQuery.data?.[eventIdx],
           eventPredictions: eventPredictionsQuery.data?.[eventIdx] ?? null,
+          epaPercentileMap: epaPercentilesQuery.data ?? null,
         });
       } else {
         upcomingMatches.push({
@@ -706,6 +754,7 @@ function MatchSuggestion(): JSX.Element {
           event: events[eventIdx],
           eventRankings: eventRankingsQuery.data?.[eventIdx],
           eventPredictions: eventPredictionsQuery.data?.[eventIdx],
+          epaPercentileMap: epaPercentilesQuery.data ?? null,
         });
       }
     });
@@ -736,6 +785,7 @@ function MatchSuggestion(): JSX.Element {
               eventMatchesQuery.refetch(),
               eventRankingsQuery.refetch(),
               eventPredictionsQuery.refetch(),
+              epaPercentilesQuery.refetch(),
             ]);
           })();
         }}
@@ -749,6 +799,11 @@ function MatchSuggestion(): JSX.Element {
         event={events[0]}
         breakers={[]}
       />
+      <div className="my-4 text-sm text-muted-foreground">
+        <span className="font-semibold text-foreground">Key:</span> ⭐⭐⭐⭐⭐
+        Top 0.25% · ⭐⭐⭐⭐ Top 0.5% · ⭐⭐⭐ Top 1% · ⭐⭐ Top 2% · ⭐ Top
+        2.5%
+      </div>
       <h2 className="text-2xl font-medium">Current Matches</h2>
       <table className="w-[100%]">
         <thead>
