@@ -279,7 +279,7 @@ export async function queryFromAPI<T>(
     return Promise.resolve(resp.data as T);
   }
 
-  return Promise.reject(new Error(resp.response.status.toString()));
+  return Promise.reject(new Error((resp.response?.status ?? 0).toString()));
 }
 
 // https://web.archive.org/web/20250409124545/https://www.evanmiller.org/how-not-to-sort-by-average-rating.html

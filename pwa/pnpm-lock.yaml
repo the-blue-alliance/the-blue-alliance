@@ -187,8 +187,8 @@ importers:
         specifier: 10.0.1
         version: 10.0.1(eslint@10.2.1(jiti@2.6.1))
       '@hey-api/openapi-ts':
-        specifier: 0.96.1
-        version: 0.96.1(magicast@0.5.2)(typescript@6.0.3)
+        specifier: 0.97.0
+        version: 0.97.0(magicast@0.5.2)(typescript@6.0.3)
       '@iconify/json':
         specifier: 2.2.467
         version: 2.2.467
@@ -1418,23 +1418,23 @@ packages:
     peerDependencies:
       vue: ^3.2.0
 
-  '@hey-api/codegen-core@0.8.0':
-    resolution: {integrity: sha512-OuF/jenX9wz7AWHRBfb37v+jLkrfCt0FJXQuALNH2UsW6+bdZBmoibHl0K778SiHwneotJbAaEvX2S05wEqUQw==}
+  '@hey-api/codegen-core@0.8.1':
+    resolution: {integrity: sha512-Iciv2vUCJTW9lWM/ROvyZLblmcbYJHPuXfzb1SzeDVVn4xEXu2ilLU1pq3fn+09FZ/Y0P7VyvRE47UDU6om8xA==}
     engines: {node: '>=22.13.0'}
 
   '@hey-api/json-schema-ref-parser@1.4.1':
     resolution: {integrity: sha512-DoPJGxVApDlktP1yYLjmOrF0YBEqb32ieCbx1S1i09n8TyCgdoh4yQaQ3kp0sMTauH+bwNKPsFh7S8qiWCoKZA==}
     engines: {node: '>=22.13.0'}
 
-  '@hey-api/openapi-ts@0.96.1':
-    resolution: {integrity: sha512-EnH+6ncaVC1yNvYWcsO7MoeBSqCvYZaKvRDRqh+S7dsfb9lhe2mKUR2+7sDacGUBm7VDZZ7hg4q4egxlpZaf0g==}
+  '@hey-api/openapi-ts@0.97.0':
+    resolution: {integrity: sha512-WZkKgrDlZpxKlDv2HkBCzaAYeuM+EtZKFmKGBv9/JblAKpX3JQTROi7PzlCZE3eisetRPSakbcRgn+LGyB7EiQ==}
     engines: {node: '>=22.13.0'}
     hasBin: true
     peerDependencies:
       typescript: '>=5.5.3 || >=6.0.0 || 6.0.1-rc'
 
-  '@hey-api/shared@0.4.1':
-    resolution: {integrity: sha512-EDAjvGpEamn2fOB7W87ZStyDSv5mEpnQCciVbiZ+Ll4EfawwIjHMMtDtRQOYol0YjTkAeEm274GFPAtg3xfPGA==}
+  '@hey-api/shared@0.4.2':
+    resolution: {integrity: sha512-4fconS10E0Xr4/acV8G+BkApxaIStxrT0GhB9BDTQWvrFTy5/nV933SyFk8qImcbpKvgv9hpn3N+7bV8oFrbjA==}
     engines: {node: '>=22.13.0'}
 
   '@hey-api/spec-types@0.2.0':
@@ -1539,6 +1539,10 @@ packages:
 
   '@lezer/yaml@1.0.4':
     resolution: {integrity: sha512-2lrrHqxalACEbxIbsjhqGpSW8kWpUKuY6RHgnSAFZa6qK62wvnPxA8hGOwOoDbwHcOFs5M4o27mjGu+P7TvBmw==}
+
+  '@lukeed/ms@2.0.2':
+    resolution: {integrity: sha512-9I2Zn6+NJLfaGoz9jN3lpwDgAYvfGeNYdbAIjJOqzs4Tpc+VU3Jqq4IofSUBKajiDS8k9fZIg18/z13mpk1bsA==}
+    engines: {node: '>=8'}
 
   '@marijn/find-cluster-break@1.0.2':
     resolution: {integrity: sha512-l0h88YhZFyKdXIFNfSWpyjStDjGHwZ/U7iobcK1cQQD8sejsONdQtTVU+1wVN1PBw40PiiHB1vA5S7VTfQiP9g==}
@@ -9033,7 +9037,7 @@ snapshots:
       '@tanstack/vue-virtual': 3.13.24(vue@3.5.33(typescript@6.0.3))
       vue: 3.5.33(typescript@6.0.3)
 
-  '@hey-api/codegen-core@0.8.0(magicast@0.5.2)':
+  '@hey-api/codegen-core@0.8.1(magicast@0.5.2)':
     dependencies:
       '@hey-api/types': 0.1.4
       ansi-colors: 4.1.3
@@ -9048,13 +9052,14 @@ snapshots:
       '@types/json-schema': 7.0.15
       yaml: 2.8.3
 
-  '@hey-api/openapi-ts@0.96.1(magicast@0.5.2)(typescript@6.0.3)':
+  '@hey-api/openapi-ts@0.97.0(magicast@0.5.2)(typescript@6.0.3)':
     dependencies:
-      '@hey-api/codegen-core': 0.8.0(magicast@0.5.2)
+      '@hey-api/codegen-core': 0.8.1(magicast@0.5.2)
       '@hey-api/json-schema-ref-parser': 1.4.1
-      '@hey-api/shared': 0.4.1(magicast@0.5.2)
+      '@hey-api/shared': 0.4.2(magicast@0.5.2)
       '@hey-api/spec-types': 0.2.0
       '@hey-api/types': 0.1.4
+      '@lukeed/ms': 2.0.2
       ansi-colors: 4.1.3
       color-support: 1.1.3
       commander: 14.0.3
@@ -9063,9 +9068,9 @@ snapshots:
     transitivePeerDependencies:
       - magicast
 
-  '@hey-api/shared@0.4.1(magicast@0.5.2)':
+  '@hey-api/shared@0.4.2(magicast@0.5.2)':
     dependencies:
-      '@hey-api/codegen-core': 0.8.0(magicast@0.5.2)
+      '@hey-api/codegen-core': 0.8.1(magicast@0.5.2)
       '@hey-api/json-schema-ref-parser': 1.4.1
       '@hey-api/spec-types': 0.2.0
       '@hey-api/types': 0.1.4
@@ -9203,6 +9208,8 @@ snapshots:
       '@lezer/common': 1.5.2
       '@lezer/highlight': 1.2.3
       '@lezer/lr': 1.4.10
+
+  '@lukeed/ms@2.0.2': {}
 
   '@marijn/find-cluster-break@1.0.2': {}
 
