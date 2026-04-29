@@ -50,8 +50,8 @@ client.interceptors.request.use((request) => {
 // function can distinguish 4xx "client error" failures from transient ones.
 client.interceptors.error.use((_error, response) => {
   return new ApiError(
-    response.statusText || String(response.status),
-    response.status,
+    response?.statusText || String(response?.status ?? 0),
+    response?.status ?? 0,
   );
 });
 
