@@ -7,6 +7,31 @@ import { createLogger } from '~/lib/utils';
 
 export type NexusMatchStatus = 'Now queuing' | 'On deck' | 'On field';
 
+// Nexus uses full division names while TBA uses short codes for champs divisions.
+const TBA_TO_NEXUS_DIVISION: Record<string, string> = {
+  arc: 'archimedes',
+  cars: 'carson',
+  carv: 'carver',
+  cur: 'curie',
+  dal: 'daly',
+  dar: 'darwin',
+  gal: 'galileo',
+  hop: 'hopper',
+  joh: 'johnson',
+  mil: 'milstein',
+  new: 'newton',
+  roe: 'roebling',
+  tes: 'tesla',
+  tur: 'turing',
+};
+
+export function tbaEventKeyToNexusKey(eventKey: string): string {
+  const year = eventKey.slice(0, 4);
+  const code = eventKey.slice(4);
+  const nexusCode = TBA_TO_NEXUS_DIVISION[code];
+  return nexusCode ? `${year}${nexusCode}` : eventKey;
+}
+
 function nexusLabelToTbaKey(eventKey: string, label: string): string | null {
   const qualMatch = label.match(/^Qualification (\d+)(?:\s+Replay)?$/);
   const finalMatch = label.match(/^Final (\d+)$/);
@@ -95,7 +120,8 @@ export async function fetchNexusEventStatusHandler(
   // Allow a demo event key override for local development/testing.
   // Set NEXUS_DEMO_EVENT_KEY to a Nexus demo key (e.g. demo2750) to test
   // the integration without a live event.
-  const effectiveKey = process.env.NEXUS_DEMO_EVENT_KEY || eventKey;
+  const effectiveKey =
+    process.env.NEXUS_DEMO_EVENT_KEY || tbaEventKeyToNexusKey(eventKey);
 
   const response = await pullLiveEventStatus({
     path: { eventKey: effectiveKey },
