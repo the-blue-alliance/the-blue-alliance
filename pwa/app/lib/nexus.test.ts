@@ -2,7 +2,11 @@ import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import { pullLiveEventStatus } from '~/api/nexus/sdk.gen';
 import type { EventStatus } from '~/api/nexus/types.gen';
-import { buildNexusStatusMap, fetchNexusEventStatusHandler } from '~/lib/nexus';
+import {
+  buildNexusStatusMap,
+  fetchNexusEventStatusHandler,
+  tbaEventKeyToNexusKey,
+} from '~/lib/nexus';
 
 // Mock the Nexus SDK before importing the handler
 vi.mock('~/api/nexus/sdk.gen', () => ({
@@ -41,6 +45,30 @@ const sampleStatus: EventStatus = {
   partsRequests: [],
 };
 
+describe('tbaEventKeyToNexusKey', () => {
+  it('expands known champs division codes to full names', () => {
+    expect(tbaEventKeyToNexusKey('2026arc')).toBe('2026archimedes');
+    expect(tbaEventKeyToNexusKey('2026new')).toBe('2026newton');
+    expect(tbaEventKeyToNexusKey('2026cur')).toBe('2026curie');
+    expect(tbaEventKeyToNexusKey('2026gal')).toBe('2026galileo');
+    expect(tbaEventKeyToNexusKey('2026hop')).toBe('2026hopper');
+    expect(tbaEventKeyToNexusKey('2026dal')).toBe('2026daly');
+    expect(tbaEventKeyToNexusKey('2026dar')).toBe('2026darwin');
+    expect(tbaEventKeyToNexusKey('2026joh')).toBe('2026johnson');
+    expect(tbaEventKeyToNexusKey('2026mil')).toBe('2026milstein');
+    expect(tbaEventKeyToNexusKey('2026roe')).toBe('2026roebling');
+    expect(tbaEventKeyToNexusKey('2026tes')).toBe('2026tesla');
+    expect(tbaEventKeyToNexusKey('2026tur')).toBe('2026turing');
+    expect(tbaEventKeyToNexusKey('2026cars')).toBe('2026carson');
+    expect(tbaEventKeyToNexusKey('2026carv')).toBe('2026carver');
+  });
+
+  it('returns non-division event keys unchanged', () => {
+    expect(tbaEventKeyToNexusKey('2024casf')).toBe('2024casf');
+    expect(tbaEventKeyToNexusKey('2026cmptx')).toBe('2026cmptx');
+  });
+});
+
 describe('fetchNexusEventStatusHandler', () => {
   beforeEach(() => {
     vi.clearAllMocks();
@@ -76,6 +104,19 @@ describe('fetchNexusEventStatusHandler', () => {
       headers: { 'Nexus-Api-Key': 'test-api-key' },
       throwOnError: true,
     });
+  });
+
+  it('expands champs division key to full Nexus name', async () => {
+    vi.stubEnv('NEXUS_API_KEY', 'test-api-key');
+    mockPullLiveEventStatus.mockResolvedValueOnce({
+      data: sampleStatus,
+    } as Awaited<ReturnType<typeof pullLiveEventStatus>>);
+
+    await fetchNexusEventStatusHandler('2026arc');
+
+    expect(mockPullLiveEventStatus).toHaveBeenCalledWith(
+      expect.objectContaining({ path: { eventKey: '2026archimedes' } }),
+    );
   });
 
   it('uses NEXUS_DEMO_EVENT_KEY override when set', async () => {
