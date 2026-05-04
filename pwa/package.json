@@ -127,7 +127,7 @@
     "unplugin-icons": "23.0.1",
     "vite": "8.0.10",
     "vitest": "4.1.5",
-    "workbox-build": "7.4.0"
+    "workbox-build": "7.4.1"
   },
   "engines": {
     "node": ">=22"
