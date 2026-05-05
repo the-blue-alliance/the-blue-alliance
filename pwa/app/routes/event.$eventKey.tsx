@@ -769,9 +769,11 @@ function ResultsTab({
     [sortedMatches],
   );
 
-  const leftSideMatches = (
+  const hasQuals = quals.length > 0;
+
+  const leftSideMatches = hasQuals ? (
     <SimpleMatchRowsWithBreaks
-      matches={quals.length > 0 ? quals : elims}
+      matches={quals}
       event={event}
       breakers={[
         END_OF_DAY_BREAKER,
@@ -780,7 +782,7 @@ function ResultsTab({
       ]}
       nexusStatusByKey={nexusStatusByKey}
     />
-  );
+  ) : null;
 
   const rightSideElims =
     elims.length > 0 ? (
@@ -809,7 +811,9 @@ function ResultsTab({
     alliances.length > 0 && TRADITIONAL_BRACKET_TYPES.has(event.playoff_type);
 
   const tocItems = [
-    { slug: 'qual-matches', label: 'Qualification Matches' },
+    ...(hasQuals
+      ? [{ slug: 'qual-matches', label: 'Qualification Matches' }]
+      : []),
     { slug: 'alliances', label: 'Alliances' },
     { slug: 'playoff-matches', label: 'Playoff Matches' },
     { slug: 'playoff-bracket', label: 'Playoff Bracket' },
@@ -820,16 +824,18 @@ function ResultsTab({
       <TableOfContents tocItems={tocItems} inView={inView} mobileOnly />
 
       <div className="flex flex-wrap gap-4 lg:flex-nowrap">
-        <TableOfContentsSection
-          id="qual-matches"
-          setInView={setInView}
-          className="basis-full lg:basis-1/2"
-        >
-          <h2 className="mb-2 text-xl font-medium">Qualification Matches</h2>
-          {leftSideMatches}
-        </TableOfContentsSection>
+        {hasQuals && (
+          <TableOfContentsSection
+            id="qual-matches"
+            setInView={setInView}
+            className="basis-full lg:basis-1/2"
+          >
+            <h2 className="mb-2 text-xl font-medium">Qualification Matches</h2>
+            {leftSideMatches}
+          </TableOfContentsSection>
+        )}
 
-        <div className="basis-full lg:basis-1/2">
+        <div className={`basis-full ${hasQuals ? 'lg:basis-1/2' : ''}`}>
           {alliances.length > 0 && (
             <TableOfContentsSection id="alliances" setInView={setInView}>
               <AllianceSelectionTable alliances={alliances} year={event.year} />
