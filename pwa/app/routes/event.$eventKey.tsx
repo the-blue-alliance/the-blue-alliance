@@ -1284,9 +1284,7 @@ function ChampsQualPointsTab({
       header: 'Team',
       accessorFn: (row) => row.teamKey,
       cell: (cell) => (
-        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
-          {cell.getValue<string>().substring(3)}
-        </TeamLink>
+        <TeamLinkWithTooltip teamKey={cell.getValue<string>()} year={year} />
       ),
     },
     ...(hasPoints
