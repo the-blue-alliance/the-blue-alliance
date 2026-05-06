@@ -1,4 +1,5 @@
 import { VariantProps, cva } from 'class-variance-authority';
+import { Suspense } from 'react';
 
 import { TeamLink } from '~/components/tba/links';
 import {
@@ -7,6 +8,8 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { cn } from '~/lib/utils';
+
+import TeamTooltip from '~/components/tba/teamTooltip';
 
 const teamListSubgridVariants = cva('flex items-center justify-center', {
   variants: {
@@ -39,8 +42,8 @@ const teamListSubgridVariants = cva('flex items-center justify-center', {
 
 interface TeamListSubgridProps
   extends
-    React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof teamListSubgridVariants> {
+  React.HTMLAttributes<HTMLDivElement>,
+  VariantProps<typeof teamListSubgridVariants> {
   allianceColor: 'red' | 'blue';
   teamKeys: string[];
   dq: string[];
@@ -112,8 +115,8 @@ const teamCellVariants = cva(
 
 interface TeamCellProps
   extends
-    React.HTMLAttributes<HTMLDivElement>,
-    VariantProps<typeof teamCellVariants> {
+  React.HTMLAttributes<HTMLDivElement>,
+  VariantProps<typeof teamCellVariants> {
   teamKey: string;
   year: number;
 }
@@ -126,26 +129,29 @@ function TeamCell({
   focus,
   ...props
 }: TeamCellProps) {
-  const content = (
-    <TeamLink
-      teamOrKey={teamKey}
-      year={year}
-      className={cn(teamCellVariants({ dq, surrogate, focus }))}
-    >
-      {teamKey.substring(3)}
-    </TeamLink>
+  return (
+    <div {...props}>
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <TeamLink
+            teamOrKey={teamKey}
+            year={year}
+            className={cn(teamCellVariants({ dq, surrogate, focus }))}
+          >
+            {teamKey.substring(3)}
+          </TeamLink>
+        </TooltipTrigger>
+        <Suspense>
+          <TooltipContent>
+            <TeamTooltip
+              teamKey={teamKey}
+              year={year}
+              disqualified={dq ?? false}
+              surrogate={surrogate ?? false}
+            />
+          </TooltipContent>
+        </Suspense>
+      </Tooltip>
+    </div>
   );
-
-  if (dq || surrogate) {
-    return (
-      <div {...props}>
-        <Tooltip>
-          <TooltipTrigger asChild>{content}</TooltipTrigger>
-          <TooltipContent>{dq ? 'DQ' : 'Surrogate'}</TooltipContent>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return <div {...props}>{content}</div>;
 }
