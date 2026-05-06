@@ -1,13 +1,18 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { useMemo } from 'react';
+import { ComponentProps, Suspense, useMemo } from 'react';
 
 import { MediaAvatar } from '~/api/tba/read';
 import {
   getTeamMediaByYearOptions,
   getTeamOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
-
+import { TeamLink } from '~/components/tba/links';
 import TeamAvatar from '~/components/tba/teamAvatar';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 
 export interface TeamTooltipProps {
   teamKey: string;
@@ -16,7 +21,35 @@ export interface TeamTooltipProps {
   surrogate?: boolean;
 }
 
-export default function TeamTooltip({
+export function TeamLinkWithTooltip({
+  teamKey,
+  year,
+  disqualified,
+  surrogate,
+  ...props
+}: TeamTooltipProps & Omit<ComponentProps<typeof TeamLink>, 'teamOrKey'>) {
+  return (
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <TeamLink teamOrKey={teamKey} year={year} {...props}>
+          {teamKey.substring(3)}
+        </TeamLink>
+      </TooltipTrigger>
+      <Suspense>
+        <TooltipContent>
+          <TeamTooltip
+            teamKey={teamKey}
+            year={year}
+            disqualified={disqualified ?? false}
+            surrogate={surrogate ?? false}
+          />
+        </TooltipContent>
+      </Suspense>
+    </Tooltip>
+  );
+}
+
+export function TeamTooltip({
   teamKey,
   year,
   disqualified,

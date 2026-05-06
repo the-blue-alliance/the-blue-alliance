@@ -5,7 +5,7 @@ import BiTrophy from '~icons/bi/trophy';
 
 import { CompLevel, EliminationAlliance } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
-import { TeamLink } from '~/components/tba/links';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import {
   Table,
   TableBody,
@@ -61,7 +61,7 @@ function extractAllianceNumber(input: string): string {
 
 export default function AllianceSelectionTable(props: {
   alliances: EliminationAlliance[];
-  year?: number;
+  year: number;
 }) {
   const allianceSize =
     Math.max(...props.alliances.map((a) => a.picks.length)) || 3;
@@ -107,9 +107,10 @@ export default function AllianceSelectionTable(props: {
               {[...Array(allianceSize).keys()].map((i) =>
                 a.picks.length > i ? (
                   <TableCell key={a.picks[i]}>
-                    <TeamLink teamOrKey={a.picks[i]} year={props.year}>
-                      {a.picks[i].substring(3)}
-                    </TeamLink>
+                    <TeamLinkWithTooltip
+                      teamKey={a.picks[i]}
+                      year={props.year}
+                    />
                   </TableCell>
                 ) : (
                   <TableCell key={`${a.name ?? 'Alliance'}-${i}`}>-</TableCell>
