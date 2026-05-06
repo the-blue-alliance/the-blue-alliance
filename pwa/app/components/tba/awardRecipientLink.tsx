@@ -1,17 +1,15 @@
 import { AwardRecipient } from '~/api/tba/read';
-import { TeamLink } from '~/components/tba/links';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 
 export default function AwardRecipientLink({
   recipient,
   year,
 }: {
   recipient: AwardRecipient;
-  year?: number;
+  year: number;
 }) {
   const teamLink = recipient.team_key ? (
-    <TeamLink teamOrKey={recipient.team_key} year={year}>
-      {recipient.team_key.substring(3)}
-    </TeamLink>
+    <TeamLinkWithTooltip teamKey={recipient.team_key} year={year} />
   ) : (
     <></>
   );
