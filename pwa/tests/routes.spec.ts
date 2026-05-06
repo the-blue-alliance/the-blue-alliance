@@ -44,6 +44,7 @@ const allRoutes = defineAllRoutes([
   '/match/$matchKey',
   '/privacy',
   '/search',
+  '/suggest/team/media',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
   '/team/$teamNumber/stats',
