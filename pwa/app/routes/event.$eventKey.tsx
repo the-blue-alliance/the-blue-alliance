@@ -87,6 +87,7 @@ import {
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
 import TeamAvatar from '~/components/tba/teamAvatar';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
@@ -169,7 +170,6 @@ import {
   publicCacheControlHeaders,
   splitIntoNChunks,
 } from '~/lib/utils';
-import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 
 export const Route = createFileRoute('/event/$eventKey')({
   loader: async ({ params, context: { queryClient } }) => {
@@ -256,22 +256,22 @@ export const Route = createFileRoute('/event/$eventKey')({
       url: `https://www.thebluealliance.com/event/${event.key}`,
       ...(event.lat &&
         event.lng && {
-        location: {
-          '@type': 'Place',
-          name: event.location_name ?? event.name,
-          address: {
-            '@type': 'PostalAddress',
-            addressLocality: event.city,
-            addressRegion: event.state_prov,
-            addressCountry: event.country,
+          location: {
+            '@type': 'Place',
+            name: event.location_name ?? event.name,
+            address: {
+              '@type': 'PostalAddress',
+              addressLocality: event.city,
+              addressRegion: event.state_prov,
+              addressCountry: event.country,
+            },
+            geo: {
+              '@type': 'GeoCoordinates',
+              latitude: event.lat,
+              longitude: event.lng,
+            },
           },
-          geo: {
-            '@type': 'GeoCoordinates',
-            latitude: event.lat,
-            longitude: event.lng,
-          },
-        },
-      }),
+        }),
       organizer: {
         '@type': 'Organization',
         name: 'FIRST',
@@ -574,23 +574,23 @@ function EventPage() {
           )}
           {(shouldPreviewRankingsTab ||
             (rankingsQuery.data && rankingsQuery.data.rankings.length > 0)) && (
-              <TabsTrigger value="rankings">
-                <InlineIcon>
-                  <RankingsIcon />
-                  Rankings
-                </InlineIcon>
-              </TabsTrigger>
-            )}
+            <TabsTrigger value="rankings">
+              <InlineIcon>
+                <RankingsIcon />
+                Rankings
+              </InlineIcon>
+            </TabsTrigger>
+          )}
           {((shouldPreviewAwardsTab && awardsQuery.isPending) ||
             (awardsQuery.data !== undefined &&
               awardsQuery.data.length > 0)) && (
-              <TabsTrigger value="awards">
-                <InlineIcon>
-                  <AwardsIcon />
-                  Awards
-                </InlineIcon>
-              </TabsTrigger>
-            )}
+            <TabsTrigger value="awards">
+              <InlineIcon>
+                <AwardsIcon />
+                Awards
+              </InlineIcon>
+            </TabsTrigger>
+          )}
           <TabsTrigger value="teams">
             <InlineIcon>
               <TeamsIcon />
@@ -654,6 +654,7 @@ function EventPage() {
         {rankingsQuery.data && (
           <TabsContent value="rankings">
             <RankingsTable
+              year={event.year}
               rankings={rankingsQuery.data}
               winners={
                 alliances.find((a) => a.status?.status === 'won')?.picks ?? []
@@ -1207,36 +1208,36 @@ function DistrictPointsTab({
     awardPoints: number;
     total: number;
   }>[] = [
-      {
-        header: 'Team',
-        accessorFn: (row) => row.teamKey,
-        cell: (cell) => (
-          <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
-            {cell.getValue<string>().substring(3)}
-          </TeamLink>
-        ),
-      },
-      {
-        header: 'Qual',
-        accessorFn: (row) => row.qualPoints,
-      },
-      {
-        header: 'Elim',
-        accessorFn: (row) => row.elimPoints,
-      },
-      {
-        header: 'Alliance',
-        accessorFn: (row) => row.alliancePoints,
-      },
-      {
-        header: 'Award',
-        accessorFn: (row) => row.awardPoints,
-      },
-      {
-        header: 'Total',
-        accessorFn: (row) => row.total,
-      },
-    ];
+    {
+      header: 'Team',
+      accessorFn: (row) => row.teamKey,
+      cell: (cell) => (
+        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
+          {cell.getValue<string>().substring(3)}
+        </TeamLink>
+      ),
+    },
+    {
+      header: 'Qual',
+      accessorFn: (row) => row.qualPoints,
+    },
+    {
+      header: 'Elim',
+      accessorFn: (row) => row.elimPoints,
+    },
+    {
+      header: 'Alliance',
+      accessorFn: (row) => row.alliancePoints,
+    },
+    {
+      header: 'Award',
+      accessorFn: (row) => row.awardPoints,
+    },
+    {
+      header: 'Total',
+      accessorFn: (row) => row.total,
+    },
+  ];
 
   const data = Object.entries(districtPoints.points)
     .map(([teamKey, points]) => ({
@@ -1289,12 +1290,12 @@ function ChampsQualPointsTab({
     },
     ...(hasPoints
       ? ([
-        { header: 'Qual', accessorFn: (row) => row.qualPoints },
-        { header: 'Playoff', accessorFn: (row) => row.elimPoints },
-        { header: 'Alliance', accessorFn: (row) => row.alliancePoints },
-        { header: 'Award', accessorFn: (row) => row.awardPoints },
-        { header: 'Total', accessorFn: (row) => row.total },
-      ] satisfies ColumnDef<RowData>[])
+          { header: 'Qual', accessorFn: (row) => row.qualPoints },
+          { header: 'Playoff', accessorFn: (row) => row.elimPoints },
+          { header: 'Alliance', accessorFn: (row) => row.alliancePoints },
+          { header: 'Award', accessorFn: (row) => row.awardPoints },
+          { header: 'Total', accessorFn: (row) => row.total },
+        ] satisfies ColumnDef<RowData>[])
       : []),
     {
       header: 'CMP Advancement',

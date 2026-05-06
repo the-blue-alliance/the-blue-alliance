@@ -1,11 +1,14 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { ComponentProps, Suspense, useMemo } from 'react';
 
+import BiTrophy from '~icons/bi/trophy';
+
 import { MediaAvatar } from '~/api/tba/read';
 import {
   getTeamMediaByYearOptions,
   getTeamOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
+import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLink } from '~/components/tba/links';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import {
@@ -19,6 +22,8 @@ export interface TeamTooltipProps {
   year: number;
   disqualified?: boolean;
   surrogate?: boolean;
+  isWinner?: boolean;
+  isCaptain?: boolean;
 }
 
 export function TeamLinkWithTooltip({
@@ -26,13 +31,36 @@ export function TeamLinkWithTooltip({
   year,
   disqualified,
   surrogate,
+  isWinner,
+  isCaptain,
   ...props
 }: TeamTooltipProps & Omit<ComponentProps<typeof TeamLink>, 'teamOrKey'>) {
+  const teamNumber = teamKey.substring(3);
+
   return (
     <Tooltip>
       <TooltipTrigger asChild>
         <TeamLink teamOrKey={teamKey} year={year} {...props}>
-          {teamKey.substring(3)}
+          {isWinner ? (
+            <InlineIcon className="relative right-[1ch] justify-center">
+              <BiTrophy />
+              {teamNumber}
+              {isCaptain && (
+                <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
+                  C
+                </sup>
+              )}
+            </InlineIcon>
+          ) : isCaptain ? (
+            <>
+              {teamNumber}
+              <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
+                C
+              </sup>
+            </>
+          ) : (
+            <>{teamNumber}</>
+          )}
         </TeamLink>
       </TooltipTrigger>
       <Suspense>
