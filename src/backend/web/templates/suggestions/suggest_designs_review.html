@@ -11,6 +11,46 @@
   </ol>
   <h1>{{ suggestions_and_references|length }} Pending CAD Models & Discussion Thread Suggestions</h1>
 
+  <div class="row">
+    <div class="col-sm-6">
+      <h2>CAD Model / Discussion Thread Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li>CAD Models of Robots (or Discussions thereof)</li>
+          <li>Open Alliance Discussion Threads</li>
+          <li>"Technical Binder" Documents or Discussions</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>Images or Videos of Robots</li>
+          <li>Reveal Videos or Discussions</li>
+          <li>Match, Event, or Season Review/Overview Videos</li>
+          <li>Content that is not generated, released, or initiated by the team</li>
+        </ul>
+      </div>
+    </div>
+    <div class="col-sm-6">
+      <h2>Image Approval Guidelines</h2>
+      <div class="alert alert-success">
+        <strong>Do approve:</strong>
+        <ul>
+          <li>Robot photos</li>
+          <li>Team photos with robot</li>
+        </ul>
+      </div>
+      <div class="alert alert-danger">
+        <strong>Do NOT approve:</strong>
+        <ul>
+          <li>GIFs</li>
+          <li>Images without robot</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
   <form action="/suggest/cad/review" method="post" id='review_designs'>
       <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
 
