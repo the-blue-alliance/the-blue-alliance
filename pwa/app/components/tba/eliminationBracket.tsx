@@ -26,7 +26,8 @@ import {
   type WinnerLink,
   useAdvancementPaths,
 } from '~/components/tba/eliminationBracketPaths';
-import { MatchLink, TeamLink } from '~/components/tba/links';
+import { MatchLink } from '~/components/tba/links';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
@@ -202,13 +203,11 @@ const PlayoffMatch = forwardRef<
                       'underline decoration-current decoration-dotted',
                   )}
                 >
-                  <TeamLink
+                  <TeamLinkWithTooltip
                     className="text-inherit"
-                    teamOrKey={`frc${team}`}
+                    teamKey={`frc${team}`}
                     year={event.year}
-                  >
-                    {team}
-                  </TeamLink>
+                  />
                 </span>
               );
             })}
@@ -261,13 +260,11 @@ const PlayoffMatch = forwardRef<
                       'underline decoration-current decoration-dotted',
                   )}
                 >
-                  <TeamLink
+                  <TeamLinkWithTooltip
                     className="text-inherit"
-                    teamOrKey={`frc${team}`}
+                    teamKey={`frc${team}`}
                     year={event.year}
-                  >
-                    {team}
-                  </TeamLink>
+                  />
                 </span>
               );
             })}
