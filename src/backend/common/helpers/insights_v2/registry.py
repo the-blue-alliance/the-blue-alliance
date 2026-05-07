@@ -51,6 +51,12 @@ from backend.common.helpers.insights_v2.streaks.einstein_streak import (
 from backend.common.helpers.insights_v2.streaks.qualifying_event_streak import (
     LongestQualifyingEventStreakV2Calculator,
 )
+from backend.common.helpers.insights_v2.streaks.undefeated_streak import (
+    LongestUndefeatedStreakV2Calculator,
+)
+from backend.common.helpers.insights_v2.streaks.win_streak import (
+    LongestWinStreakV2Calculator,
+)
 from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
     HighScoreOverTimeV2Calculator,
 )
@@ -131,6 +137,8 @@ def make_all_insights(year: Year) -> List[InsightV2]:
         calculators += [
             LongestQualifyingEventStreakV2Calculator(),
             LongestEinsteinStreakV2Calculator(),
+            LongestUndefeatedStreakV2Calculator(),
+            LongestWinStreakV2Calculator(),
         ]
     else:
         calculators.append(HighScoreOverTimeV2Calculator())

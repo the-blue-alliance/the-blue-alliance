@@ -43,6 +43,10 @@ class InsightV2Names:
     EINSTEIN_WIN_STREAK = InsightV2NameEntry(
         "einstein_streak", "Longest Einstein Streak"
     )
+    UNDEFEATED_STREAK = InsightV2NameEntry(
+        "undefeated_streak", "Longest Undefeated Season Start"
+    )
+    WIN_STREAK = InsightV2NameEntry("win_streak", "Longest Win Streak")
 
     # Timeseries
     HIGH_SCORE_OVER_TIME = InsightV2NameEntry(
