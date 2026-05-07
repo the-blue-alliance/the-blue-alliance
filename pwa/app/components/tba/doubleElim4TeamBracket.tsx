@@ -41,10 +41,10 @@ type MatchLabel4 =
   | 'Finals';
 
 const WINNER_LINKS: WinnerLink[] = [
-  { from: 'Match 1', to: 'Match 4' },
-  { from: 'Match 2', to: 'Match 4' },
-  { from: 'Match 3', to: 'Match 5' },
-  { from: 'Match 4', to: 'Finals' },
+  { from: 'Match 1', to: 'Match 3' },
+  { from: 'Match 2', to: 'Match 3' },
+  { from: 'Match 3', to: 'Finals' },
+  { from: 'Match 4', to: 'Match 5' },
   { from: 'Match 5', to: 'Finals' },
 ];
 
@@ -460,10 +460,10 @@ export default function DoubleElim4TeamBracket({
                     <div className="h-8"></div>
                     <BracketMatch
                       ref={(node) => {
-                        matchRefs.current['Match 4'] = node;
+                        matchRefs.current['Match 3'] = node;
                       }}
-                      matchLabel="Match 4"
-                      matches={matchesBySet[4]}
+                      matchLabel="Match 3"
+                      matches={matchesBySet[3]}
                       event={event}
                       hoveredAlliance={hoveredAlliance}
                       setHoveredAlliance={setHoveredAlliance}
@@ -507,10 +507,10 @@ export default function DoubleElim4TeamBracket({
                   <div className="space-y-4">
                     <BracketMatch
                       ref={(node) => {
-                        matchRefs.current['Match 3'] = node;
+                        matchRefs.current['Match 4'] = node;
                       }}
-                      matchLabel="Match 3"
-                      matches={matchesBySet[3]}
+                      matchLabel="Match 4"
+                      matches={matchesBySet[4]}
                       event={event}
                       hoveredAlliance={hoveredAlliance}
                       setHoveredAlliance={setHoveredAlliance}
