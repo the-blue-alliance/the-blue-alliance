@@ -9934,12 +9934,24 @@
       },
       "Media": {
         "oneOf": [
-          { "$ref": "#/components/schemas/Media_Avatar" },
-          { "$ref": "#/components/schemas/Media_CdPhotoThread" },
-          { "$ref": "#/components/schemas/Media_CdThread" },
-          { "$ref": "#/components/schemas/Media_GrabCad" },
-          { "$ref": "#/components/schemas/Media_NoDetails" },
-          { "$ref": "#/components/schemas/Media_Onshape" }
+          {
+            "$ref": "#/components/schemas/Media_Avatar"
+          },
+          {
+            "$ref": "#/components/schemas/Media_CdPhotoThread"
+          },
+          {
+            "$ref": "#/components/schemas/Media_CdThread"
+          },
+          {
+            "$ref": "#/components/schemas/Media_GrabCad"
+          },
+          {
+            "$ref": "#/components/schemas/Media_NoDetails"
+          },
+          {
+            "$ref": "#/components/schemas/Media_Onshape"
+          }
         ],
         "discriminator": {
           "propertyName": "type",
@@ -9966,19 +9978,29 @@
       },
       "Media_Avatar": {
         "allOf": [
-          { "$ref": "#/components/schemas/Media_Base" },
-          { "$ref": "#/components/schemas/Media_Avatar_Extras" }
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "$ref": "#/components/schemas/Media_Avatar_Extras"
+          }
         ]
       },
       "Media_Avatar_Extras": {
         "type": "object",
         "properties": {
-          "type": { "const": "avatar" },
+          "type": {
+            "const": "avatar"
+          },
           "details": {
             "type": "object",
-            "required": ["base64Image"],
+            "required": [
+              "base64Image"
+            ],
             "properties": {
-              "base64Image": { "type": "string" }
+              "base64Image": {
+                "type": "string"
+              }
             }
           }
         }
@@ -10041,16 +10063,24 @@
       },
       "Media_CdPhotoThread": {
         "allOf": [
-          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
           {
             "type": "object",
             "properties": {
-              "type": { "const": "cdphotothread" },
+              "type": {
+                "const": "cdphotothread"
+              },
               "details": {
                 "type": "object",
-                "required": ["image_partial"],
+                "required": [
+                  "image_partial"
+                ],
                 "properties": {
-                  "image_partial": { "type": "string" }
+                  "image_partial": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -10059,17 +10089,31 @@
       },
       "Media_CdThread": {
         "allOf": [
-          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
           {
             "type": "object",
             "properties": {
-              "type": { "const": "cd-thread" },
+              "type": {
+                "const": "cd-thread"
+              },
               "details": {
                 "type": "object",
-                "required": ["thread_title", "image_url"],
+                "required": [
+                  "thread_title",
+                  "image_url"
+                ],
                 "properties": {
-                  "thread_title": { "type": "string" },
-                  "image_url": { "type": ["string", "null"] }
+                  "thread_title": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
                 }
               }
             }
@@ -10078,19 +10122,41 @@
       },
       "Media_GrabCad": {
         "allOf": [
-          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
           {
             "type": "object",
             "properties": {
-              "type": { "const": "grabcad" },
+              "type": {
+                "const": "grabcad"
+              },
               "details": {
                 "type": "object",
-                "required": ["model_created", "model_description", "model_image", "model_name"],
+                "required": [
+                  "model_created",
+                  "model_description",
+                  "model_image",
+                  "model_name"
+                ],
                 "properties": {
-                  "model_created": { "type": "string", "format": "date-time" },
-                  "model_description": { "type": ["string", "null"] },
-                  "model_image": { "type": "string", "format": "uri" },
-                  "model_name": { "type": "string" }
+                  "model_created": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "model_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "model_image": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "model_name": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -10099,7 +10165,9 @@
       },
       "Media_NoDetails": {
         "allOf": [
-          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
           {
             "type": "object",
             "properties": {
@@ -10130,19 +10198,41 @@
       },
       "Media_Onshape": {
         "allOf": [
-          { "$ref": "#/components/schemas/Media_Base" },
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
           {
             "type": "object",
             "properties": {
-              "type": { "const": "onshape" },
+              "type": {
+                "const": "onshape"
+              },
               "details": {
                 "type": "object",
-                "required": ["model_created", "model_description", "model_image", "model_name"],
+                "required": [
+                  "model_created",
+                  "model_description",
+                  "model_image",
+                  "model_name"
+                ],
                 "properties": {
-                  "model_created": { "type": "string", "format": "date-time" },
-                  "model_description": { "type": ["string", "null"] },
-                  "model_image": { "type": "string", "format": "uri" },
-                  "model_name": { "type": "string" }
+                  "model_created": {
+                    "type": "string",
+                    "format": "date-time"
+                  },
+                  "model_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "model_image": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "model_name": {
+                    "type": "string"
+                  }
                 }
               }
             }
@@ -10204,9 +10294,15 @@
       },
       "InsightV2": {
         "oneOf": [
-          { "$ref": "#/components/schemas/InsightV2_Leaderboard" },
-          { "$ref": "#/components/schemas/InsightV2_Streak" },
-          { "$ref": "#/components/schemas/InsightV2_Timeseries" }
+          {
+            "$ref": "#/components/schemas/InsightV2_Leaderboard"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Streak"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Timeseries"
+          }
         ],
         "discriminator": {
           "propertyName": "category",
@@ -10258,44 +10354,74 @@
       },
       "InsightV2_Leaderboard": {
         "allOf": [
-          { "$ref": "#/components/schemas/InsightV2_Base" },
-          { "$ref": "#/components/schemas/InsightV2_Leaderboard_Extras" }
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Leaderboard_Extras"
+          }
         ]
       },
       "InsightV2_Leaderboard_Extras": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "category": { "const": "leaderboard" },
-          "data": { "$ref": "#/components/schemas/InsightV2LeaderboardData" }
+          "category": {
+            "const": "leaderboard"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2LeaderboardData"
+          }
         }
       },
       "InsightV2_Streak": {
         "allOf": [
-          { "$ref": "#/components/schemas/InsightV2_Base" },
-          { "$ref": "#/components/schemas/InsightV2_Streak_Extras" }
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Streak_Extras"
+          }
         ]
       },
       "InsightV2_Streak_Extras": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "category": { "const": "streak" },
-          "data": { "$ref": "#/components/schemas/InsightV2StreakData" }
+          "category": {
+            "const": "streak"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2StreakData"
+          }
         }
       },
       "InsightV2_Timeseries": {
         "allOf": [
-          { "$ref": "#/components/schemas/InsightV2_Base" },
-          { "$ref": "#/components/schemas/InsightV2_Timeseries_Extras" }
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Timeseries_Extras"
+          }
         ]
       },
       "InsightV2_Timeseries_Extras": {
         "type": "object",
-        "required": ["data"],
+        "required": [
+          "data"
+        ],
         "properties": {
-          "category": { "const": "timeseries" },
-          "data": { "$ref": "#/components/schemas/InsightV2TimeseriesData" }
+          "category": {
+            "const": "timeseries"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2TimeseriesData"
+          }
         }
       },
       "InsightV2LeaderboardData": {
@@ -10313,7 +10439,8 @@
               "team",
               "event",
               "match",
-              "team_pair"
+              "team_pair",
+              "alliance"
             ],
             "description": "What kind of keys appear in the rankings."
           },
@@ -10321,9 +10448,10 @@
             "type": "string",
             "enum": [
               "event_list",
-              "none"
+              "none",
+              "match_alliance"
             ],
-            "description": "Whether rankings include per-entry event context."
+            "description": "Whether rankings include per-entry context."
           },
           "rankings": {
             "type": "array",
@@ -10361,17 +10489,41 @@
                 },
                 "contexts": {
                   "type": "array",
-                  "description": "Present when context_type is event_list. Parallel to keys; each entry lists the events where the corresponding key achieved this value.",
+                  "description": "Present when context_type is event_list or match_alliance. Parallel to keys. For event_list, each entry lists event_keys. For match_alliance, each entry has match_key and alliance (team keys).",
                   "items": {
-                    "type": "object",
-                    "properties": {
-                      "event_keys": {
-                        "type": "array",
-                        "items": {
-                          "type": "string"
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "description": "event_list context",
+                        "properties": {
+                          "event_keys": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "description": "match_alliance context",
+                        "required": [
+                          "match_key",
+                          "alliance"
+                        ],
+                        "properties": {
+                          "match_key": {
+                            "type": "string"
+                          },
+                          "alliance": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
                         }
                       }
-                    }
+                    ]
                   }
                 }
               }
