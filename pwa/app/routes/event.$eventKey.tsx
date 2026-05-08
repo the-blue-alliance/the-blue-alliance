@@ -87,6 +87,7 @@ import {
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
 import TeamAvatar from '~/components/tba/teamAvatar';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
@@ -653,6 +654,7 @@ function EventPage() {
         {rankingsQuery.data && (
           <TabsContent value="rankings">
             <RankingsTable
+              year={event.year}
               rankings={rankingsQuery.data}
               winners={
                 alliances.find((a) => a.status?.status === 'won')?.picks ?? []
@@ -1145,9 +1147,7 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
       header: 'Team',
       accessorFn: (row) => row.teamKey,
       cell: (cell) => (
-        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
-          {cell.getValue<string>().substring(3)}
-        </TeamLink>
+        <TeamLinkWithTooltip teamKey={cell.getValue<string>()} year={year} />
       ),
     },
     {
@@ -1291,9 +1291,7 @@ function ChampsQualPointsTab({
       header: 'Team',
       accessorFn: (row) => row.teamKey,
       cell: (cell) => (
-        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
-          {cell.getValue<string>().substring(3)}
-        </TeamLink>
+        <TeamLinkWithTooltip teamKey={cell.getValue<string>()} year={year} />
       ),
     },
     ...(hasPoints

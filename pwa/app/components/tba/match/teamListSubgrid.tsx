@@ -1,11 +1,6 @@
 import { VariantProps, cva } from 'class-variance-authority';
 
-import { TeamLink } from '~/components/tba/links';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '~/components/ui/tooltip';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { cn } from '~/lib/utils';
 
 const teamListSubgridVariants = cva('flex items-center justify-center', {
@@ -126,26 +121,15 @@ function TeamCell({
   focus,
   ...props
 }: TeamCellProps) {
-  const content = (
-    <TeamLink
-      teamOrKey={teamKey}
-      year={year}
-      className={cn(teamCellVariants({ dq, surrogate, focus }))}
-    >
-      {teamKey.substring(3)}
-    </TeamLink>
+  return (
+    <div {...props}>
+      <TeamLinkWithTooltip
+        teamKey={teamKey}
+        year={year}
+        disqualified={dq ?? false}
+        surrogate={surrogate ?? false}
+        className={cn(teamCellVariants({ dq, surrogate, focus }))}
+      />
+    </div>
   );
-
-  if (dq || surrogate) {
-    return (
-      <div {...props}>
-        <Tooltip>
-          <TooltipTrigger asChild>{content}</TooltipTrigger>
-          <TooltipContent>{dq ? 'DQ' : 'Surrogate'}</TooltipContent>
-        </Tooltip>
-      </div>
-    );
-  }
-
-  return <div {...props}>{content}</div>;
 }

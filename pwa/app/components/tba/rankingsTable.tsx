@@ -1,11 +1,8 @@
-import { Link } from '@tanstack/react-router';
 import type { ColumnDef } from '@tanstack/react-table';
-
-import BiTrophy from '~icons/bi/trophy';
 
 import { EventRanking } from '~/api/tba/read';
 import { DataTable } from '~/components/tba/dataTable';
-import InlineIcon from '~/components/tba/inlineIcon';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { cn } from '~/lib/utils';
 
 type RankingColumnType = ColumnDef<EventRanking['rankings'][number]>[];
@@ -14,10 +11,12 @@ export default function RankingsTable({
   rankings,
   winners,
   captains,
+  year,
 }: {
   rankings: EventRanking;
   winners: string[];
   captains: string[];
+  year: number;
 }) {
   const standardCols: RankingColumnType = [
     { header: 'Rank', accessorKey: 'rank', sortDescFirst: false },
@@ -25,36 +24,15 @@ export default function RankingsTable({
       header: 'Team',
       cell: ({ row }) => {
         const teamKey = row.original.team_key;
-        const teamNumber = teamKey.substring(3);
         const isWinner = winners.includes(teamKey);
         const isCaptain = captains.includes(teamKey);
         return (
-          <Link
-            to="/team/$teamNumber/{-$year}"
-            params={{ teamNumber }}
-            className="whitespace-nowrap"
-          >
-            {isWinner ? (
-              <InlineIcon className="relative right-[1ch] justify-center">
-                <BiTrophy />
-                {teamNumber}
-                {isCaptain && (
-                  <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
-                    C
-                  </sup>
-                )}
-              </InlineIcon>
-            ) : isCaptain ? (
-              <>
-                {teamNumber}
-                <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
-                  C
-                </sup>
-              </>
-            ) : (
-              <>{teamNumber}</>
-            )}
-          </Link>
+          <TeamLinkWithTooltip
+            teamKey={row.original.team_key}
+            year={year}
+            isWinner={isWinner}
+            isCaptain={isCaptain}
+          />
         );
       },
       accessorFn: (row) => Number(row.team_key.substring(3)),
