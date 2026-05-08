@@ -35,6 +35,12 @@ class InsightV2Names:
         "most_district_cmp_wins", "Most District Championship Wins"
     )
     MOST_WFFA_WINS = InsightV2NameEntry("most_wffa_wins", "Most WFFAs")
+    HIGHEST_MATCH_CLEAN_SCORE = InsightV2NameEntry(
+        "highest_match_clean_score", "Highest Clean Score"
+    )
+    HIGHEST_MATCH_CLEAN_COMBINED_SCORE = InsightV2NameEntry(
+        "highest_match_clean_combined_score", "Highest Combined Clean Score"
+    )
 
     # Streaks
     QUALIFYING_EVENT_WIN_STREAK = InsightV2NameEntry(

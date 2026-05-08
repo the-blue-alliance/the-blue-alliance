@@ -1040,17 +1040,23 @@ export const zInsightV2Base = z.object({
  * Data for a leaderboard-category InsightV2. Rankings of teams, events, or matches by a numeric value.
  */
 export const zInsightV2LeaderboardData = z.object({
-  key_type: z.enum(['team', 'event', 'match', 'team_pair']),
-  context_type: z.enum(['event_list', 'none']),
+  key_type: z.enum(['team', 'event', 'match', 'team_pair', 'alliance']),
+  context_type: z.enum(['event_list', 'none', 'match_alliance']),
   rankings: z.array(
     z.object({
       keys: z.union([z.array(z.string()), z.array(z.array(z.string()))]),
       value: z.number(),
       contexts: z
         .array(
-          z.object({
-            event_keys: z.array(z.string()).optional(),
-          }),
+          z.union([
+            z.object({
+              event_keys: z.array(z.string()).optional(),
+            }),
+            z.object({
+              match_key: z.string(),
+              alliance: z.array(z.string()),
+            }),
+          ]),
         )
         .optional(),
     }),

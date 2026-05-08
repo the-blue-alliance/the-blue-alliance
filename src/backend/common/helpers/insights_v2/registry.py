@@ -9,6 +9,12 @@ from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.leaderboards.blue_banners import (
     BlueBannersV2Calculator,
 )
+from backend.common.helpers.insights_v2.leaderboards.highest_match_clean_combined_score import (
+    HighestMatchCleanCombinedScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_match_clean_score import (
+    HighestMatchCleanScoreV2Calculator,
+)
 from backend.common.helpers.insights_v2.leaderboards.most_awards_won import (
     MostAwardsWonV2Calculator,
 )
@@ -141,5 +147,9 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             LongestWinStreakV2Calculator(),
         ]
     else:
-        calculators.append(HighScoreOverTimeV2Calculator())
+        calculators += [
+            HighScoreOverTimeV2Calculator(),
+            HighestMatchCleanScoreV2Calculator(),
+            HighestMatchCleanCombinedScoreV2Calculator(),
+        ]
     return compute_insights_for_year(year, calculators)

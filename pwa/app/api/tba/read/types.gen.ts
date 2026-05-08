@@ -2728,11 +2728,11 @@ export type InsightV2LeaderboardData = {
   /**
    * What kind of keys appear in the rankings.
    */
-  key_type: 'team' | 'event' | 'match' | 'team_pair';
+  key_type: 'team' | 'event' | 'match' | 'team_pair' | 'alliance';
   /**
-   * Whether rankings include per-entry event context.
+   * Whether rankings include per-entry context.
    */
-  context_type: 'event_list' | 'none';
+  context_type: 'event_list' | 'none' | 'match_alliance';
   /**
    * Ranked entries, ordered from highest to lowest value.
    */
@@ -2746,11 +2746,17 @@ export type InsightV2LeaderboardData = {
      */
     value: number;
     /**
-     * Present when context_type is event_list. Parallel to keys; each entry lists the events where the corresponding key achieved this value.
+     * Present when context_type is event_list or match_alliance. Parallel to keys. For event_list, each entry lists event_keys. For match_alliance, each entry has match_key and alliance (team keys).
      */
-    contexts?: Array<{
-      event_keys?: Array<string>;
-    }>;
+    contexts?: Array<
+      | {
+          event_keys?: Array<string>;
+        }
+      | {
+          match_key: string;
+          alliance: Array<string>;
+        }
+    >;
   }>;
 };
 
