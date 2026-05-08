@@ -85,7 +85,17 @@ class LeaderboardRankingWithEventList(TypedDict):
     ]  # parallel to keys; zip(keys, contexts) gives per-team events
 
 
-LeaderboardRanking = LeaderboardRankingV2 | LeaderboardRankingWithEventList
+class LeaderboardRankingPairWithEventList(TypedDict):
+    keys: List[List[str]]
+    value: int | float
+    contexts: List[EventListContext]  # parallel to keys; one context per pair
+
+
+LeaderboardRanking = (
+    LeaderboardRankingV2
+    | LeaderboardRankingWithEventList
+    | LeaderboardRankingPairWithEventList
+)
 
 
 class LeaderboardDataV2(TypedDict):

@@ -12,13 +12,14 @@ from backend.common.models.insight_v2 import (
     LeaderboardDataV2,
     LeaderboardKeyType,
     LeaderboardRanking,
+    LeaderboardRankingPairWithEventList,
     LeaderboardRankingV2,
     LeaderboardRankingWithEventList,
 )
 from backend.common.models.keys import Year
 
 LEADERBOARD_TOP_N = 25
-LEADERBOARD_MAX_KEYS_PER_RANKING = 10
+LEADERBOARD_MAX_KEYS_PER_RANKING = 25
 
 
 def build_leaderboard_rankings(
@@ -109,6 +110,46 @@ def build_leaderboard_pair_rankings(
         for value, pairs in sorted(value_to_pairs.items(), reverse=True)
         if value >= min_count and len(pairs) <= LEADERBOARD_MAX_KEYS_PER_RANKING
     ]
+    return result[:top_n]
+
+
+def build_leaderboard_pair_event_list_rankings(
+    pair_events: Dict[str, List[str]],
+    top_n: int = LEADERBOARD_TOP_N,
+    *,
+    min_count: int,
+) -> List[LeaderboardRanking]:
+    """
+    Converts a {"frcA|frcB": [event_key, ...]} dict into a sorted list of
+    LeaderboardRankingPairWithEventList. Pairs with equal counts are grouped;
+    contexts is a per-pair event list parallel to keys.
+    """
+    counts_to_pairs: DefaultDict[int, List[str]] = defaultdict(list)
+    for pair_key, events in pair_events.items():
+        if events:
+            counts_to_pairs[len(events)].append(pair_key)
+
+    def _pair_sort_key(pair: List[str]) -> Tuple[int, int]:
+        return (int(pair[0][3:]), int(pair[1][3:]))
+
+    result: List[LeaderboardRanking] = []
+    for count, pair_keys in sorted(counts_to_pairs.items(), reverse=True):
+        if count < min_count:
+            continue
+        if len(pair_keys) > LEADERBOARD_MAX_KEYS_PER_RANKING:
+            continue
+        pairs = [k.split("|") for k in pair_keys]
+        sorted_pairs = sorted(pairs, key=_pair_sort_key)
+        result.append(
+            LeaderboardRankingPairWithEventList(
+                keys=sorted_pairs,
+                value=count,
+                contexts=[
+                    EventListContext(event_keys=sorted(pair_events[f"{p[0]}|{p[1]}"]))
+                    for p in sorted_pairs
+                ],
+            )
+        )
     return result[:top_n]
 
 

@@ -145,3 +145,30 @@ def test_insight_name_and_display_name(ndb_stub) -> None:
 
     assert insights[0].name == "most_events_won_together"
     assert insights[0].display_name == "Most Events Won Together"
+
+
+def test_context_type_is_event_list(ndb_stub) -> None:
+    _put_event("2022nytr", 2022, EventType.REGIONAL)
+    _put_award("2022nytr", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.REGIONAL)
+    _put_event("2022txcmp", 2022, EventType.DISTRICT_CMP)
+    _put_award(
+        "2022txcmp", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.DISTRICT_CMP
+    )
+
+    insights = compute_insights_for_year(2022, [MostEventsWonTogetherV2Calculator()])
+
+    assert insights[0].data["context_type"] == "event_list"
+
+
+def test_event_list_context_contains_event_keys(ndb_stub) -> None:
+    _put_event("2022nytr", 2022, EventType.REGIONAL)
+    _put_award("2022nytr", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.REGIONAL)
+    _put_event("2022txcmp", 2022, EventType.DISTRICT_CMP)
+    _put_award(
+        "2022txcmp", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.DISTRICT_CMP
+    )
+
+    insights = compute_insights_for_year(2022, [MostEventsWonTogetherV2Calculator()])
+
+    ranking = insights[0].data["rankings"][0]
+    assert ranking["contexts"][0]["event_keys"] == ["2022nytr", "2022txcmp"]
