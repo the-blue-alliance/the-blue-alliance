@@ -87,13 +87,11 @@ export function TeamTooltip({
     getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
   );
 
-  const { data: searchIndex } = useSuspenseQuery(
-    getSearchIndexOptions({}),
-  );
+  const { data: searchIndex } = useSuspenseQuery(getSearchIndexOptions({}));
 
   const team = useMemo(
     () => searchIndex && searchIndex.teams.find((t) => t.key === teamKey),
-    [searchIndex],
+    [searchIndex, teamKey],
   );
 
   const maybeAvatar = useMemo(
