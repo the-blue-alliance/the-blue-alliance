@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 from typing import Any, Dict, List
 
 from google.appengine.ext import ndb
@@ -103,7 +104,11 @@ def compute_insights_for_year(
     """
     event_years = [year] if year != 0 else SeasonHelper.get_valid_years()
     for event_year in event_years:
-        for event in EventListQuery(year=event_year).fetch():
+        events = sorted(
+            EventListQuery(year=event_year).fetch(),
+            key=lambda e: (e.start_date or datetime(1, 1, 1), e.key_name),
+        )
+        for event in events:
             if event.event_type_enum not in SEASON_EVENT_TYPES:
                 continue
 

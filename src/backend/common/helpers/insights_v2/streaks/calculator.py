@@ -2,6 +2,7 @@ from abc import abstractmethod
 from collections import defaultdict
 from typing import Dict, List, NamedTuple
 
+from backend.common.consts.alliance_color import AllianceColor
 from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.names import InsightV2NameEntry
 from backend.common.models.insight_v2 import (
@@ -11,6 +12,7 @@ from backend.common.models.insight_v2 import (
     StreakEntry,
 )
 from backend.common.models.keys import Year
+from backend.common.models.match import Match
 
 STREAK_TOP_N = 25
 
@@ -35,6 +37,23 @@ class StreakV2Calculator(InsightV2Calculator):
     @property
     @abstractmethod
     def insight_name(self) -> InsightV2NameEntry: ...
+
+    @staticmethod
+    def _effective_winning_alliance(match: Match) -> str:
+        """
+        Returns the winning alliance for a match. For 2015, scores are used
+        directly because winning_alliance returns "" for all non-finals playoff
+        matches in that year regardless of the actual score.
+        """
+        if match.year == 2015:
+            red_score = int(match.alliances[AllianceColor.RED]["score"])
+            blue_score = int(match.alliances[AllianceColor.BLUE]["score"])
+            if red_score > blue_score:
+                return AllianceColor.RED
+            elif blue_score > red_score:
+                return AllianceColor.BLUE
+            return ""
+        return match.winning_alliance
 
     def _advance_streak(self, key: str, label: str) -> None:
         """Extend key's active streak. label identifies the current unit (event key, year, etc.)."""

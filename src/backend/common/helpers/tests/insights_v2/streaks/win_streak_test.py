@@ -1,4 +1,6 @@
 import json
+from datetime import datetime
+from typing import Optional
 
 from google.appengine.ext import ndb
 
@@ -25,13 +27,17 @@ def _alliances_json(red_score: int, blue_score: int) -> str:
 
 
 def _put_event(
-    event_key: str, year: int, event_type: EventType = EventType.REGIONAL
+    event_key: str,
+    year: int,
+    event_type: EventType = EventType.REGIONAL,
+    start_date: Optional[datetime] = None,
 ) -> None:
     Event(
         id=event_key,
         year=year,
         event_short=event_key[4:],
         event_type_enum=event_type,
+        start_date=start_date,
     ).put()
 
 
@@ -245,3 +251,82 @@ def test_is_active_false_when_current_run_is_not_best(ndb_stub) -> None:
 
     assert entries["frc1"]["streak_length"] == 5
     assert entries["frc1"]["is_active"] is False
+
+
+def test_2015_playoff_match_winner_determined_by_score(ndb_stub) -> None:
+    # 2015 non-finals playoff matches have winning_alliance="" in the model;
+    # the calculator must use scores directly so the real winner is identified.
+    _put_event("2015nyny", 2015)
+    # frc1 (red) wins a 2015 playoff match by score
+    Match(
+        id="2015nyny_sf1m1",
+        comp_level=CompLevel.SF,
+        event=ndb.Key(Event, "2015nyny"),
+        year=2015,
+        match_number=1,
+        set_number=1,
+        team_key_names=_ALL_TEAMS,
+        alliances_json=_alliances_json(red_score=200, blue_score=100),
+    ).put()
+
+    insights = compute_insights_for_year(0, [_calc()])
+    assert len(insights) == 1
+    entries = {e["key"]: e for e in insights[0].data["entries"]}
+
+    assert entries["frc1"]["streak_length"] == 1
+    assert "frc4" not in entries
+
+
+def test_2015_playoff_loss_breaks_streak(ndb_stub) -> None:
+    _put_event("2015nyny", 2015)
+    # frc1 wins first match, then loses the second
+    Match(
+        id="2015nyny_sf1m1",
+        comp_level=CompLevel.SF,
+        event=ndb.Key(Event, "2015nyny"),
+        year=2015,
+        match_number=1,
+        set_number=1,
+        team_key_names=_ALL_TEAMS,
+        alliances_json=_alliances_json(red_score=200, blue_score=100),
+    ).put()
+    Match(
+        id="2015nyny_sf1m2",
+        comp_level=CompLevel.SF,
+        event=ndb.Key(Event, "2015nyny"),
+        year=2015,
+        match_number=2,
+        set_number=1,
+        team_key_names=_ALL_TEAMS,
+        alliances_json=_alliances_json(red_score=50, blue_score=150),
+    ).put()
+
+    insights = compute_insights_for_year(0, [_calc()])
+    entries = {e["key"]: e for e in insights[0].data["entries"]}
+
+    assert entries["frc1"]["streak_length"] == 1
+    assert entries["frc1"]["is_active"] is False
+
+
+def test_events_processed_in_start_date_order(ndb_stub) -> None:
+    # 2024zzzy is alphabetically later but starts earlier (week 1).
+    # A loss there should break the streak even though 2024aaax is processed
+    # first alphabetically. With start_date sorting, zzzy is processed first.
+    week1 = datetime(2024, 3, 1)
+    week2 = datetime(2024, 3, 8)
+
+    _put_event("2024zzzy", 2024, start_date=week1)
+    _put_match("2024zzzy", 2024, red_score=5, blue_score=10, match_number=1)  # loss
+
+    _put_event("2024aaax", 2024, start_date=week2)
+    for i in range(1, 4):
+        _put_match("2024aaax", 2024, red_score=10, blue_score=5, match_number=i)
+
+    insights = compute_insights_for_year(0, [_calc()])
+    entries = {e["key"]: e for e in insights[0].data["entries"]}
+
+    # Loss at week1 (zzzy) breaks any prior streak; the 3-win run at aaax is
+    # the best. is_active should be True since there's no subsequent loss.
+    assert entries["frc1"]["streak_length"] == 3
+    assert entries["frc1"]["start"] == "2024aaax"
+    assert entries["frc1"]["is_active"] is True
