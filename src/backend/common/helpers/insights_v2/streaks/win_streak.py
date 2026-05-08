@@ -34,7 +34,7 @@ class LongestWinStreakV2Calculator(StreakV2Calculator):
             if not match.has_been_played:
                 continue
 
-            winning_alliance = match.winning_alliance
+            winning_alliance = self._effective_winning_alliance(match)
             for color in ALLIANCE_COLORS:
                 for team_key in match.alliances[color]["teams"]:
                     if winning_alliance == color:
