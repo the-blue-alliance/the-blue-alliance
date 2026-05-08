@@ -5,8 +5,8 @@ import BiTrophy from '~icons/bi/trophy';
 
 import { MediaAvatar } from '~/api/tba/read';
 import {
+  getSearchIndexOptions,
   getTeamMediaByYearOptions,
-  getTeamOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLink } from '~/components/tba/links';
@@ -87,14 +87,21 @@ export function TeamTooltip({
     getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
   );
 
-  const { data: team } = useSuspenseQuery(
-    getTeamOptions({ path: { team_key: teamKey } }),
+  const { data: searchIndex } = useSuspenseQuery(
+    getSearchIndexOptions({}),
+  );
+
+  const team = useMemo(
+    () => searchIndex && searchIndex.teams.find((t) => t.key === teamKey),
+    [searchIndex],
   );
 
   const maybeAvatar = useMemo(
     () => media && media.find((m): m is MediaAvatar => m.type === 'avatar'),
     [media],
   );
+
+  if (!team) return null;
 
   return (
     <div>
