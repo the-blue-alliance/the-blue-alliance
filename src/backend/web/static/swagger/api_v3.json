@@ -3,9 +3,9 @@
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.14.0",
+    "version": "3.15.0",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.14.0: Introduce named string enum schemas (AllianceColor, WebcastStatus). Webcast.status now references the WebcastStatus schema. AllianceColor includes red, blue, and empty string for no winner or tie; Match.winning_alliance references AllianceColor. Wire values are unchanged; clients regenerated against the spec get correctly-named enum members. 3.13.0: Introduce named integer enum schemas (AwardType, EventType, PlayoffType) using OpenAPI 3.1.1's annotated-enumeration pattern (`oneOf` of `const` branches with per-branch titles). The `award_type`, `event_type`, and `playoff_type` fields now reference these schemas. Integer values on the wire are unchanged; clients regenerated against the spec get value constraints, and Swagger UI renders the value->name mapping inline. 3.12.2: Renames District `highest_qual_scores` tiebreaker to `highest_match_scores` to more accurately reflect district rankings. 3.12.1: Add pit_location to Team_Event_Status. 3.12.0: Add 2026 score breakdowns. 3.11.0: Deprecate Event.lat, Event.lng, Event.gmaps_place_id, Event.gmaps_url. Event models will no longer be geocoded. Moving forward, these fields will return null. Eventually these fields will be removed. Event.address will now return FRC-API address, and Event.location_name will return FRC-API venue. 3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.15.0: Add InsightV2 endpoints and schemas. Introduces /insights/{year}, /insights/{year}/{category}, /insights/{year}/district/{district_abbreviation}, and /insights/{year}/{category}/district/{district_abbreviation} routes returning typed InsightV2 objects with leaderboard, streak, and timeseries categories. Use year=0 for all-time insights. 3.14.0: Introduce named string enum schemas (AllianceColor, WebcastStatus). Webcast.status now references the WebcastStatus schema. AllianceColor includes red, blue, and empty string for no winner or tie; Match.winning_alliance references AllianceColor. Wire values are unchanged; clients regenerated against the spec get correctly-named enum members. 3.13.0: Introduce named integer enum schemas (AwardType, EventType, PlayoffType) using OpenAPI 3.1.1's annotated-enumeration pattern (`oneOf` of `const` branches with per-branch titles). The `award_type`, `event_type`, and `playoff_type` fields now reference these schemas. Integer values on the wire are unchanged; clients regenerated against the spec get value constraints, and Swagger UI renders the value->name mapping inline. 3.12.2: Renames District `highest_qual_scores` tiebreaker to `highest_match_scores` to more accurately reflect district rankings. 3.12.1: Add pit_location to Team_Event_Status. 3.12.0: Add 2026 score breakdowns. 3.11.0: Deprecate Event.lat, Event.lng, Event.gmaps_place_id, Event.gmaps_url. Event models will no longer be geocoded. Moving forward, these fields will return null. Eventually these fields will be removed. Event.address will now return FRC-API address, and Event.location_name will return FRC-API venue. 3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -2443,6 +2443,258 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/NotablesInsight"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year across all categories. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights.",
+        "operationId": "getInsightsV2Year",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}/{category}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.",
+        "operationId": "getInsightsV2YearCategory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          },
+          {
+            "$ref": "#/components/parameters/insight_v2_category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}/district/{district_abbreviation}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year scoped to a specific district, across all categories. Use year=0 for all-time insights.",
+        "operationId": "getInsightsV2YearDistrict",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          },
+          {
+            "$ref": "#/components/parameters/district_abbreviation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}/{category}/district/{district_abbreviation}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.",
+        "operationId": "getInsightsV2YearCategoryDistrict",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          },
+          {
+            "$ref": "#/components/parameters/insight_v2_category"
+          },
+          {
+            "$ref": "#/components/parameters/district_abbreviation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
                   }
                 }
               }
@@ -9950,6 +10202,345 @@
           "year"
         ]
       },
+      "InsightV2": {
+        "oneOf": [
+          { "$ref": "#/components/schemas/InsightV2_Leaderboard" },
+          { "$ref": "#/components/schemas/InsightV2_Streak" },
+          { "$ref": "#/components/schemas/InsightV2_Timeseries" }
+        ],
+        "discriminator": {
+          "propertyName": "category",
+          "mapping": {
+            "leaderboard": "#/components/schemas/InsightV2_Leaderboard",
+            "streak": "#/components/schemas/InsightV2_Streak",
+            "timeseries": "#/components/schemas/InsightV2_Timeseries"
+          }
+        },
+        "description": "A typed insight object. Use `category` to discriminate between leaderboard, streak, and timeseries shapes."
+      },
+      "InsightV2_Base": {
+        "type": "object",
+        "required": [
+          "name",
+          "display_name",
+          "year",
+          "category",
+          "district_abbreviation"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Programmatic name of the insight, e.g. `blue_banners`."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Human-readable name of the insight, e.g. `Total Blue Banners`."
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year the insight was measured in. Use 0 for all-time insights."
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "leaderboard",
+              "streak",
+              "timeseries"
+            ],
+            "description": "Insight category. Discriminates the shape of `data`."
+          },
+          "district_abbreviation": {
+            "type": "string",
+            "nullable": true,
+            "description": "District abbreviation if the insight is district-scoped, otherwise null."
+          }
+        }
+      },
+      "InsightV2_Leaderboard": {
+        "allOf": [
+          { "$ref": "#/components/schemas/InsightV2_Base" },
+          { "$ref": "#/components/schemas/InsightV2_Leaderboard_Extras" }
+        ]
+      },
+      "InsightV2_Leaderboard_Extras": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "category": { "const": "leaderboard" },
+          "data": { "$ref": "#/components/schemas/InsightV2LeaderboardData" }
+        }
+      },
+      "InsightV2_Streak": {
+        "allOf": [
+          { "$ref": "#/components/schemas/InsightV2_Base" },
+          { "$ref": "#/components/schemas/InsightV2_Streak_Extras" }
+        ]
+      },
+      "InsightV2_Streak_Extras": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "category": { "const": "streak" },
+          "data": { "$ref": "#/components/schemas/InsightV2StreakData" }
+        }
+      },
+      "InsightV2_Timeseries": {
+        "allOf": [
+          { "$ref": "#/components/schemas/InsightV2_Base" },
+          { "$ref": "#/components/schemas/InsightV2_Timeseries_Extras" }
+        ]
+      },
+      "InsightV2_Timeseries_Extras": {
+        "type": "object",
+        "required": ["data"],
+        "properties": {
+          "category": { "const": "timeseries" },
+          "data": { "$ref": "#/components/schemas/InsightV2TimeseriesData" }
+        }
+      },
+      "InsightV2LeaderboardData": {
+        "type": "object",
+        "description": "Data for a leaderboard-category InsightV2. Rankings of teams, events, or matches by a numeric value.",
+        "required": [
+          "rankings",
+          "key_type",
+          "context_type"
+        ],
+        "properties": {
+          "key_type": {
+            "type": "string",
+            "enum": [
+              "team",
+              "event",
+              "match",
+              "team_pair"
+            ],
+            "description": "What kind of keys appear in the rankings."
+          },
+          "context_type": {
+            "type": "string",
+            "enum": [
+              "event_list",
+              "none"
+            ],
+            "description": "Whether rankings include per-entry event context."
+          },
+          "rankings": {
+            "type": "array",
+            "description": "Ranked entries, ordered from highest to lowest value.",
+            "items": {
+              "type": "object",
+              "required": [
+                "keys",
+                "value"
+              ],
+              "properties": {
+                "keys": {
+                  "description": "Team/event/match keys sharing this rank. For team_pair, a list of two-element lists.",
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "value": {
+                  "type": "number",
+                  "description": "The numeric value for this rank."
+                },
+                "contexts": {
+                  "type": "array",
+                  "description": "Present when context_type is event_list. Parallel to keys; each entry lists the events where the corresponding key achieved this value.",
+                  "items": {
+                    "type": "object",
+                    "properties": {
+                      "event_keys": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "InsightV2StreakData": {
+        "type": "object",
+        "description": "Data for a streak-category InsightV2. Records of consecutive achievement by teams.",
+        "required": [
+          "entries"
+        ],
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "key",
+                "key_type",
+                "streak_length",
+                "start",
+                "end",
+                "is_active"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "Team or entity key."
+                },
+                "key_type": {
+                  "type": "string",
+                  "enum": [
+                    "team",
+                    "event",
+                    "match",
+                    "team_pair"
+                  ]
+                },
+                "streak_length": {
+                  "type": "integer",
+                  "description": "Length of the streak."
+                },
+                "start": {
+                  "type": "string",
+                  "description": "Event key or year string where the streak began."
+                },
+                "end": {
+                  "type": "string",
+                  "description": "Event key or year string where the streak ended (or is ongoing)."
+                },
+                "is_active": {
+                  "type": "boolean",
+                  "description": "Whether this streak is still ongoing."
+                }
+              }
+            }
+          }
+        }
+      },
+      "InsightV2TimeseriesData": {
+        "type": "object",
+        "description": "Data for a timeseries-category InsightV2. One or more named series of (x, y) data points over time.",
+        "required": [
+          "series",
+          "x_type",
+          "x_label",
+          "y_label",
+          "point_context_type"
+        ],
+        "properties": {
+          "x_type": {
+            "type": "string",
+            "enum": [
+              "week",
+              "year",
+              "event"
+            ],
+            "description": "What the x-axis represents."
+          },
+          "x_label": {
+            "type": "string",
+            "description": "Human-readable label for the x-axis."
+          },
+          "y_label": {
+            "type": "string",
+            "description": "Human-readable label for the y-axis."
+          },
+          "point_context_type": {
+            "type": "string",
+            "enum": [
+              "none",
+              "match_record"
+            ],
+            "description": "Whether data points include additional context."
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "label",
+                "points"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable series name."
+                },
+                "points": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "properties": {
+                      "x": {
+                        "description": "X-axis value (week string, year integer, or event key).",
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      },
+                      "y": {
+                        "type": "number",
+                        "description": "Y-axis value."
+                      },
+                      "context": {
+                        "type": "object",
+                        "description": "Present when point_context_type is match_record.",
+                        "properties": {
+                          "match_key": {
+                            "type": "string"
+                          },
+                          "alliance": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Team keys on the record-setting alliance."
+                          },
+                          "post_result_time": {
+                            "type": "integer",
+                            "description": "Unix timestamp when the record was set."
+                          },
+                          "is_current": {
+                            "type": "boolean",
+                            "description": "Whether this is still the current world record."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
       "Position_2016": {
         "type": "string",
         "enum": [
@@ -11008,6 +11599,20 @@
         "required": true,
         "schema": {
           "type": "string"
+        }
+      },
+      "insight_v2_category": {
+        "name": "category",
+        "in": "path",
+        "description": "InsightV2 category. One of: leaderboard, streak, timeseries.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "leaderboard",
+            "streak",
+            "timeseries"
+          ]
         }
       },
       "year": {

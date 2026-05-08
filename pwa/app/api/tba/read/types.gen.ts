@@ -2663,6 +2663,182 @@ export type NotablesInsight = {
   year: number;
 };
 
+/**
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, and timeseries shapes.
+ */
+export type InsightV2 =
+  | ({
+      category: 'leaderboard';
+    } & InsightV2Leaderboard)
+  | ({
+      category: 'streak';
+    } & InsightV2Streak)
+  | ({
+      category: 'timeseries';
+    } & InsightV2Timeseries);
+
+export type InsightV2Base = {
+  /**
+   * Programmatic name of the insight, e.g. `blue_banners`.
+   */
+  name: string;
+  /**
+   * Human-readable name of the insight, e.g. `Total Blue Banners`.
+   */
+  display_name: string;
+  /**
+   * Year the insight was measured in. Use 0 for all-time insights.
+   */
+  year: number;
+  /**
+   * Insight category. Discriminates the shape of `data`.
+   */
+  category: 'leaderboard' | 'streak' | 'timeseries';
+  /**
+   * District abbreviation if the insight is district-scoped, otherwise null.
+   */
+  district_abbreviation: string;
+};
+
+export type InsightV2Leaderboard = InsightV2Base & InsightV2LeaderboardExtras;
+
+export type InsightV2LeaderboardExtras = {
+  category?: 'leaderboard';
+  data: InsightV2LeaderboardData;
+};
+
+export type InsightV2Streak = InsightV2Base & InsightV2StreakExtras;
+
+export type InsightV2StreakExtras = {
+  category?: 'streak';
+  data: InsightV2StreakData;
+};
+
+export type InsightV2Timeseries = InsightV2Base & InsightV2TimeseriesExtras;
+
+export type InsightV2TimeseriesExtras = {
+  category?: 'timeseries';
+  data: InsightV2TimeseriesData;
+};
+
+/**
+ * Data for a leaderboard-category InsightV2. Rankings of teams, events, or matches by a numeric value.
+ */
+export type InsightV2LeaderboardData = {
+  /**
+   * What kind of keys appear in the rankings.
+   */
+  key_type: 'team' | 'event' | 'match' | 'team_pair';
+  /**
+   * Whether rankings include per-entry event context.
+   */
+  context_type: 'event_list' | 'none';
+  /**
+   * Ranked entries, ordered from highest to lowest value.
+   */
+  rankings: Array<{
+    /**
+     * Team/event/match keys sharing this rank. For team_pair, a list of two-element lists.
+     */
+    keys: Array<string> | Array<Array<string>>;
+    /**
+     * The numeric value for this rank.
+     */
+    value: number;
+    /**
+     * Present when context_type is event_list. Parallel to keys; each entry lists the events where the corresponding key achieved this value.
+     */
+    contexts?: Array<{
+      event_keys?: Array<string>;
+    }>;
+  }>;
+};
+
+/**
+ * Data for a streak-category InsightV2. Records of consecutive achievement by teams.
+ */
+export type InsightV2StreakData = {
+  entries: Array<{
+    /**
+     * Team or entity key.
+     */
+    key: string;
+    key_type: 'team' | 'event' | 'match' | 'team_pair';
+    /**
+     * Length of the streak.
+     */
+    streak_length: number;
+    /**
+     * Event key or year string where the streak began.
+     */
+    start: string;
+    /**
+     * Event key or year string where the streak ended (or is ongoing).
+     */
+    end: string;
+    /**
+     * Whether this streak is still ongoing.
+     */
+    is_active: boolean;
+  }>;
+};
+
+/**
+ * Data for a timeseries-category InsightV2. One or more named series of (x, y) data points over time.
+ */
+export type InsightV2TimeseriesData = {
+  /**
+   * What the x-axis represents.
+   */
+  x_type: 'week' | 'year' | 'event';
+  /**
+   * Human-readable label for the x-axis.
+   */
+  x_label: string;
+  /**
+   * Human-readable label for the y-axis.
+   */
+  y_label: string;
+  /**
+   * Whether data points include additional context.
+   */
+  point_context_type: 'none' | 'match_record';
+  series: Array<{
+    /**
+     * Human-readable series name.
+     */
+    label: string;
+    points: Array<{
+      /**
+       * X-axis value (week string, year integer, or event key).
+       */
+      x: string | number | number;
+      /**
+       * Y-axis value.
+       */
+      y: number;
+      /**
+       * Present when point_context_type is match_record.
+       */
+      context?: {
+        match_key?: string;
+        /**
+         * Team keys on the record-setting alliance.
+         */
+        alliance?: Array<string>;
+        /**
+         * Unix timestamp when the record was set.
+         */
+        post_result_time?: number;
+        /**
+         * Whether this is still the current world record.
+         */
+        is_current?: boolean;
+      };
+    }>;
+  }>;
+};
+
 export enum Position2016 {
   '' = '',
   A_CHEVAL_DE_FRISE = 'A_ChevalDeFrise',
@@ -3242,6 +3418,15 @@ export type PageNum = number;
  * TBA Team Key, eg `frc254`
  */
 export type TeamKey = string;
+
+/**
+ * InsightV2 category. One of: leaderboard, streak, timeseries.
+ */
+export enum InsightV2Category {
+  LEADERBOARD = 'leaderboard',
+  STREAK = 'streak',
+  TIMESERIES = 'timeseries',
+}
 
 /**
  * Competition Year (or Season). Must be 4 digits.
@@ -5082,6 +5267,210 @@ export type GetInsightsNotablesYearResponses = {
 
 export type GetInsightsNotablesYearResponse =
   GetInsightsNotablesYearResponses[keyof GetInsightsNotablesYearResponses];
+
+export type GetInsightsV2YearData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+  };
+  query?: never;
+  url: '/insights/{year}';
+};
+
+export type GetInsightsV2YearErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetInsightsV2YearError =
+  GetInsightsV2YearErrors[keyof GetInsightsV2YearErrors];
+
+export type GetInsightsV2YearResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<InsightV2>;
+};
+
+export type GetInsightsV2YearResponse =
+  GetInsightsV2YearResponses[keyof GetInsightsV2YearResponses];
+
+export type GetInsightsV2YearCategoryData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+    /**
+     * InsightV2 category. One of: leaderboard, streak, timeseries.
+     */
+    category: 'leaderboard' | 'streak' | 'timeseries';
+  };
+  query?: never;
+  url: '/insights/{year}/{category}';
+};
+
+export type GetInsightsV2YearCategoryErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetInsightsV2YearCategoryError =
+  GetInsightsV2YearCategoryErrors[keyof GetInsightsV2YearCategoryErrors];
+
+export type GetInsightsV2YearCategoryResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<InsightV2>;
+};
+
+export type GetInsightsV2YearCategoryResponse =
+  GetInsightsV2YearCategoryResponses[keyof GetInsightsV2YearCategoryResponses];
+
+export type GetInsightsV2YearDistrictData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+    /**
+     * District abbreviation, eg `ne` or `fim`
+     */
+    district_abbreviation: string;
+  };
+  query?: never;
+  url: '/insights/{year}/district/{district_abbreviation}';
+};
+
+export type GetInsightsV2YearDistrictErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetInsightsV2YearDistrictError =
+  GetInsightsV2YearDistrictErrors[keyof GetInsightsV2YearDistrictErrors];
+
+export type GetInsightsV2YearDistrictResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<InsightV2>;
+};
+
+export type GetInsightsV2YearDistrictResponse =
+  GetInsightsV2YearDistrictResponses[keyof GetInsightsV2YearDistrictResponses];
+
+export type GetInsightsV2YearCategoryDistrictData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * Competition Year (or Season). Must be 4 digits.
+     */
+    year: number;
+    /**
+     * InsightV2 category. One of: leaderboard, streak, timeseries.
+     */
+    category: 'leaderboard' | 'streak' | 'timeseries';
+    /**
+     * District abbreviation, eg `ne` or `fim`
+     */
+    district_abbreviation: string;
+  };
+  query?: never;
+  url: '/insights/{year}/{category}/district/{district_abbreviation}';
+};
+
+export type GetInsightsV2YearCategoryDistrictErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetInsightsV2YearCategoryDistrictError =
+  GetInsightsV2YearCategoryDistrictErrors[keyof GetInsightsV2YearCategoryDistrictErrors];
+
+export type GetInsightsV2YearCategoryDistrictResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<InsightV2>;
+};
+
+export type GetInsightsV2YearCategoryDistrictResponse =
+  GetInsightsV2YearCategoryDistrictResponses[keyof GetInsightsV2YearCategoryDistrictResponses];
 
 export type GetMatchData = {
   body?: never;

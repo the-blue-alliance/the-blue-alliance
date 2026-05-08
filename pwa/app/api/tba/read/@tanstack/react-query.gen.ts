@@ -42,6 +42,10 @@ import {
   getEventsByYearSimple,
   getInsightsLeaderboardsYear,
   getInsightsNotablesYear,
+  getInsightsV2Year,
+  getInsightsV2YearCategory,
+  getInsightsV2YearCategoryDistrict,
+  getInsightsV2YearDistrict,
   getMatch,
   getMatchSimple,
   getMatchTimeseries,
@@ -200,6 +204,18 @@ import type {
   GetInsightsNotablesYearData,
   GetInsightsNotablesYearError,
   GetInsightsNotablesYearResponse,
+  GetInsightsV2YearCategoryData,
+  GetInsightsV2YearCategoryDistrictData,
+  GetInsightsV2YearCategoryDistrictError,
+  GetInsightsV2YearCategoryDistrictResponse,
+  GetInsightsV2YearCategoryError,
+  GetInsightsV2YearCategoryResponse,
+  GetInsightsV2YearData,
+  GetInsightsV2YearDistrictData,
+  GetInsightsV2YearDistrictError,
+  GetInsightsV2YearDistrictResponse,
+  GetInsightsV2YearError,
+  GetInsightsV2YearResponse,
   GetMatchData,
   GetMatchError,
   GetMatchResponse,
@@ -1438,6 +1454,118 @@ export const getInsightsNotablesYearOptions = (
       return data;
     },
     queryKey: getInsightsNotablesYearQueryKey(options),
+  });
+
+export const getInsightsV2YearQueryKey = (
+  options: Options<GetInsightsV2YearData>,
+) => createQueryKey('getInsightsV2Year', options);
+
+/**
+ * Gets a list of `InsightV2` objects for the given year across all categories. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights.
+ */
+export const getInsightsV2YearOptions = (
+  options: Options<GetInsightsV2YearData>,
+) =>
+  queryOptions<
+    GetInsightsV2YearResponse,
+    GetInsightsV2YearError,
+    GetInsightsV2YearResponse,
+    ReturnType<typeof getInsightsV2YearQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInsightsV2Year({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInsightsV2YearQueryKey(options),
+  });
+
+export const getInsightsV2YearCategoryQueryKey = (
+  options: Options<GetInsightsV2YearCategoryData>,
+) => createQueryKey('getInsightsV2YearCategory', options);
+
+/**
+ * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.
+ */
+export const getInsightsV2YearCategoryOptions = (
+  options: Options<GetInsightsV2YearCategoryData>,
+) =>
+  queryOptions<
+    GetInsightsV2YearCategoryResponse,
+    GetInsightsV2YearCategoryError,
+    GetInsightsV2YearCategoryResponse,
+    ReturnType<typeof getInsightsV2YearCategoryQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInsightsV2YearCategory({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInsightsV2YearCategoryQueryKey(options),
+  });
+
+export const getInsightsV2YearDistrictQueryKey = (
+  options: Options<GetInsightsV2YearDistrictData>,
+) => createQueryKey('getInsightsV2YearDistrict', options);
+
+/**
+ * Gets a list of `InsightV2` objects for the given year scoped to a specific district, across all categories. Use year=0 for all-time insights.
+ */
+export const getInsightsV2YearDistrictOptions = (
+  options: Options<GetInsightsV2YearDistrictData>,
+) =>
+  queryOptions<
+    GetInsightsV2YearDistrictResponse,
+    GetInsightsV2YearDistrictError,
+    GetInsightsV2YearDistrictResponse,
+    ReturnType<typeof getInsightsV2YearDistrictQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInsightsV2YearDistrict({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInsightsV2YearDistrictQueryKey(options),
+  });
+
+export const getInsightsV2YearCategoryDistrictQueryKey = (
+  options: Options<GetInsightsV2YearCategoryDistrictData>,
+) => createQueryKey('getInsightsV2YearCategoryDistrict', options);
+
+/**
+ * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.
+ */
+export const getInsightsV2YearCategoryDistrictOptions = (
+  options: Options<GetInsightsV2YearCategoryDistrictData>,
+) =>
+  queryOptions<
+    GetInsightsV2YearCategoryDistrictResponse,
+    GetInsightsV2YearCategoryDistrictError,
+    GetInsightsV2YearCategoryDistrictResponse,
+    ReturnType<typeof getInsightsV2YearCategoryDistrictQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getInsightsV2YearCategoryDistrict({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getInsightsV2YearCategoryDistrictQueryKey(options),
   });
 
 export const getMatchQueryKey = (options: Options<GetMatchData>) =>
