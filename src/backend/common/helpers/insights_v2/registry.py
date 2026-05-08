@@ -124,8 +124,6 @@ def make_all_insights(year: Year) -> List[InsightV2]:
         MostMatchesPlayedTogetherV2Calculator(),
         MostDivisionFinalsAppearancesV2Calculator(),
         MostDivisionWinsV2Calculator(),
-        MostCmpFinalsAppearancesV2Calculator(),
-        MostCmpWinsV2Calculator(),
         MostEventsWonV2Calculator(),
         MostEventsWonTogetherV2Calculator(),
         MostImpactAwardWinsV2Calculator(),
@@ -135,6 +133,8 @@ def make_all_insights(year: Year) -> List[InsightV2]:
     ]
     if year == 0:
         calculators += [
+            MostCmpFinalsAppearancesV2Calculator(),
+            MostCmpWinsV2Calculator(),
             LongestQualifyingEventStreakV2Calculator(),
             LongestEinsteinStreakV2Calculator(),
             LongestUndefeatedStreakV2Calculator(),
