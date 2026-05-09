@@ -38,7 +38,7 @@ export function TeamLinkWithTooltip({
   const teamNumber = teamKey.substring(3);
 
   return (
-    <Tooltip>
+    <Tooltip delayDuration={1000}>
       <TooltipTrigger asChild>
         <TeamLink teamOrKey={teamKey} year={year} {...props}>
           {isWinner ? (
