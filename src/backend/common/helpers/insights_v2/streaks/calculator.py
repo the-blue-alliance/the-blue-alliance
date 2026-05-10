@@ -25,14 +25,14 @@ class _StreakRecord(NamedTuple):
 
 class StreakV2Calculator(InsightV2Calculator):
     """
-    Base class for streak insights. Tracks active and all-time-best streaks per key.
+    Base class for streak insights. Tracks active and all completed streaks per key.
     Subclasses call _advance_streak / _reset_streak from their own on_event, which
     may iterate at event granularity, match granularity, or any other unit.
     """
 
     def __init__(self) -> None:
         self._active: Dict[str, _StreakRecord] = {}
-        self._best: Dict[str, _StreakRecord] = {}
+        self._completed: Dict[str, List[_StreakRecord]] = defaultdict(list)
 
     @property
     @abstractmethod
@@ -63,44 +63,46 @@ class StreakV2Calculator(InsightV2Calculator):
         else:
             self._active[key] = _StreakRecord(1, label, label)
 
-        active = self._active[key]
-        if key not in self._best or active.length > self._best[key].length:
-            self._best[key] = active
-
     def _reset_streak(self, key: str) -> None:
-        """Break key's active streak."""
-        self._active.pop(key, None)
+        """Break key's active streak, saving it to completed history."""
+        if key in self._active:
+            self._completed[key].append(self._active.pop(key))
 
     def _build_streak_entries(self) -> List[StreakEntry]:
         """
         Returns all StreakEntry items sorted by streak_length descending then by
-        team number ascending. Callers are responsible for slicing to their desired
-        top-N. Flushes still-active streaks first.
+        team number ascending then by start ascending. A single team may appear
+        multiple times if they have multiple distinct streaks (completed or active).
+        Callers are responsible for slicing to their desired top-N.
         """
-        for key, active in self._active.items():
-            if key not in self._best or active.length > self._best[key].length:
-                self._best[key] = active
-
         entries: List[StreakEntry] = []
-        for key, best in self._best.items():
-            active = self._active.get(key)
-            is_active = (
-                active is not None
-                and active.length == best.length
-                and active.start == best.start
-            )
+
+        for key, completed_list in self._completed.items():
+            for rec in completed_list:
+                entries.append(
+                    StreakEntry(
+                        key=key,
+                        key_type="team",
+                        streak_length=rec.length,
+                        start=rec.start,
+                        end=rec.end,
+                        is_active=False,
+                    )
+                )
+
+        for key, active in self._active.items():
             entries.append(
                 StreakEntry(
                     key=key,
                     key_type="team",
-                    streak_length=best.length,
-                    start=best.start,
-                    end=best.end,
-                    is_active=is_active,
+                    streak_length=active.length,
+                    start=active.start,
+                    end=active.end,
+                    is_active=True,
                 )
             )
 
-        entries.sort(key=lambda e: (-e["streak_length"], int(e["key"][3:])))
+        entries.sort(key=lambda e: (-e["streak_length"], int(e["key"][3:]), e["start"]))
         return entries
 
     def _build_district_entries(

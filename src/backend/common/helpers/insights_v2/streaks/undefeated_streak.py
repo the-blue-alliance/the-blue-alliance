@@ -32,7 +32,6 @@ class LongestUndefeatedStreakV2Calculator(StreakV2Calculator):
         if not event.matches:
             return
 
-        label = event.key_name
         sorted_matches = sorted(
             event.matches,
             key=lambda m: (
@@ -52,7 +51,7 @@ class LongestUndefeatedStreakV2Calculator(StreakV2Calculator):
                     if team_key in self._year_lost:
                         continue
                     if winning_alliance == color or winning_alliance == "":
-                        self._advance_streak(team_key, label)
+                        self._advance_streak(team_key, match.key_name)
                     else:
                         self._reset_streak(team_key)
                         self._year_lost.add(team_key)
