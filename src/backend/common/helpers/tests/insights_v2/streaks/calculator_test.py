@@ -55,6 +55,52 @@ def test_reset_streak_marks_inactive_and_preserves_best(ndb_stub) -> None:
     assert entries[0]["is_active"] is False
 
 
+def test_team_appears_multiple_times_with_multiple_distinct_streaks(ndb_stub) -> None:
+    calc = _StubStreak()
+    # frc1 has two separate streaks of length 2
+    calc._advance_streak("frc1", "e1")
+    calc._advance_streak("frc1", "e2")
+    calc._reset_streak("frc1")
+    calc._advance_streak("frc1", "e3")
+    calc._advance_streak("frc1", "e4")
+
+    entries = calc.make_insights(2024, {})[0].data["entries"]
+    assert len(entries) == 2
+    assert all(e["key"] == "frc1" for e in entries)
+    assert entries[0]["streak_length"] == 2
+    assert entries[0]["start"] == "e1"
+    assert entries[0]["end"] == "e2"
+    assert entries[0]["is_active"] is False
+    assert entries[1]["streak_length"] == 2
+    assert entries[1]["start"] == "e3"
+    assert entries[1]["end"] == "e4"
+    assert entries[1]["is_active"] is True
+
+
+def test_team_completed_and_active_streaks_both_appear(ndb_stub) -> None:
+    calc = _StubStreak()
+    # frc1 completes a streak of 3, then starts a new streak of 2
+    calc._advance_streak("frc1", "e1")
+    calc._advance_streak("frc1", "e2")
+    calc._advance_streak("frc1", "e3")
+    calc._reset_streak("frc1")
+    calc._advance_streak("frc1", "e4")
+    calc._advance_streak("frc1", "e5")
+    # frc2 has a single active streak of 2
+    calc._advance_streak("frc2", "e1")
+    calc._advance_streak("frc2", "e2")
+
+    entries = calc.make_insights(2024, {})[0].data["entries"]
+    # frc1's length-3 streak comes first, then frc2 and frc1 at length 2
+    assert entries[0]["key"] == "frc1"
+    assert entries[0]["streak_length"] == 3
+    assert entries[0]["is_active"] is False
+    # The two length-2 entries sorted by team number (frc1 < frc2), then start
+    length_2 = [e for e in entries if e["streak_length"] == 2]
+    assert length_2[0]["key"] == "frc1"
+    assert length_2[1]["key"] == "frc2"
+
+
 def test_entries_sorted_by_length_then_team_number(ndb_stub) -> None:
     calc = _StubStreak()
     calc._advance_streak("frc100", "e1")

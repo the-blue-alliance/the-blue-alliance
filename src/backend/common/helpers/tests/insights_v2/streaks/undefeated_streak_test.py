@@ -75,8 +75,8 @@ def test_consecutive_wins_build_streak(ndb_stub) -> None:
     entries = {e["key"]: e for e in insights[0].data["entries"]}
 
     assert entries["frc1"]["streak_length"] == 3
-    assert entries["frc1"]["start"] == "2024nyny"
-    assert entries["frc1"]["end"] == "2024nyny"
+    assert entries["frc1"]["start"] == "2024nyny_qm1"
+    assert entries["frc1"]["end"] == "2024nyny_qm3"
     assert entries["frc1"]["is_active"] is True
 
     # Blue lost all 3 — no entry for blue teams
@@ -150,13 +150,18 @@ def test_streak_resets_each_year(ndb_stub) -> None:
         _put_match("2024nyny", 2024, red_score=10, blue_score=5, match_number=i)
 
     insights = compute_insights_for_year(0, [_calc()])
-    entries = {e["key"]: e for e in insights[0].data["entries"]}
+    frc1_entries = [e for e in insights[0].data["entries"] if e["key"] == "frc1"]
 
-    assert entries["frc1"]["streak_length"] == 5
-    assert entries["frc1"]["start"] == "2023nyny"
-    assert entries["frc1"]["end"] == "2023nyny"
-    # Current active run (3) is less than best (5)
-    assert entries["frc1"]["is_active"] is False
+    # The completed 5-win streak from 2023 is preserved and not active.
+    assert any(
+        e["streak_length"] == 5
+        and e["start"] == "2023nyny_qm1"
+        and e["end"] == "2023nyny_qm5"
+        and e["is_active"] is False
+        for e in frc1_entries
+    )
+    # No streak of 8 — the reset between years prevents merging.
+    assert not any(e["streak_length"] == 8 for e in frc1_entries)
 
 
 def test_best_streak_preserved_after_later_loss(ndb_stub) -> None:
@@ -172,7 +177,7 @@ def test_best_streak_preserved_after_later_loss(ndb_stub) -> None:
     entries = {e["key"]: e for e in insights[0].data["entries"]}
 
     assert entries["frc1"]["streak_length"] == 5
-    assert entries["frc1"]["start"] == "2018nyny"
+    assert entries["frc1"]["start"] == "2018nyny_qm1"
     assert entries["frc1"]["is_active"] is False
 
 
@@ -231,8 +236,8 @@ def test_streak_spans_multiple_events_in_same_year(ndb_stub) -> None:
 
     assert entries["frc1"]["streak_length"] == 6
     # mabos < nyny alphabetically, so mabos is fetched first in test stub
-    assert entries["frc1"]["start"] == "2024mabos"
-    assert entries["frc1"]["end"] == "2024nyny"
+    assert entries["frc1"]["start"] == "2024mabos_qm1"
+    assert entries["frc1"]["end"] == "2024nyny_qm3"
     assert entries["frc1"]["is_active"] is True
 
 
@@ -261,11 +266,15 @@ def test_is_active_true_when_current_run_equals_best(ndb_stub) -> None:
         _put_match("2024nyny", 2024, red_score=10, blue_score=5, match_number=i)
 
     insights = compute_insights_for_year(0, [_calc()])
-    entries = {e["key"]: e for e in insights[0].data["entries"]}
+    frc1_entries = [e for e in insights[0].data["entries"] if e["key"] == "frc1"]
 
-    assert entries["frc1"]["streak_length"] == 3
-    assert entries["frc1"]["start"] == "2024nyny"
-    assert entries["frc1"]["is_active"] is True
+    # The active 3-win streak from 2024 is the longest and is active.
+    assert any(
+        e["streak_length"] == 3
+        and e["start"] == "2024nyny_qm1"
+        and e["is_active"] is True
+        for e in frc1_entries
+    )
 
 
 def test_2015_playoff_match_winner_determined_by_score(ndb_stub) -> None:

@@ -74,8 +74,8 @@ def test_consecutive_wins_build_streak(ndb_stub) -> None:
     entries = {e["key"]: e for e in insights[0].data["entries"]}
 
     assert entries["frc1"]["streak_length"] == 3
-    assert entries["frc1"]["start"] == "2024nyny"
-    assert entries["frc1"]["end"] == "2024nyny"
+    assert entries["frc1"]["start"] == "2024nyny_qm1"
+    assert entries["frc1"]["end"] == "2024nyny_qm3"
     assert entries["frc1"]["is_active"] is True
 
     # Blue lost all 3 — no entry
@@ -90,11 +90,12 @@ def test_loss_resets_streak(ndb_stub) -> None:
     _put_match("2024nyny", 2024, red_score=10, blue_score=5, match_number=4)
 
     insights = compute_insights_for_year(0, [_calc()])
-    entries = {e["key"]: e for e in insights[0].data["entries"]}
+    frc1_entries = [e for e in insights[0].data["entries"] if e["key"] == "frc1"]
 
-    # Best streak was 2 before the loss; the 1-win streak after does not exceed it
-    assert entries["frc1"]["streak_length"] == 2
-    assert entries["frc1"]["is_active"] is False
+    # Both the completed 2-win streak and the new 1-win streak appear
+    assert any(
+        e["streak_length"] == 2 and e["is_active"] is False for e in frc1_entries
+    )
 
 
 def test_streak_after_loss_becomes_best(ndb_stub) -> None:
@@ -105,11 +106,10 @@ def test_streak_after_loss_becomes_best(ndb_stub) -> None:
         _put_match("2024nyny", 2024, red_score=10, blue_score=5, match_number=i)
 
     insights = compute_insights_for_year(0, [_calc()])
-    entries = {e["key"]: e for e in insights[0].data["entries"]}
+    frc1_entries = [e for e in insights[0].data["entries"] if e["key"] == "frc1"]
 
-    # Post-loss streak of 5 is the best
-    assert entries["frc1"]["streak_length"] == 5
-    assert entries["frc1"]["is_active"] is True
+    # Post-loss streak of 5 is present and active; the 1-win streak also appears
+    assert any(e["streak_length"] == 5 and e["is_active"] is True for e in frc1_entries)
 
 
 def test_tie_does_not_break_streak(ndb_stub) -> None:
@@ -151,8 +151,8 @@ def test_streak_crosses_years(ndb_stub) -> None:
 
     # 3 wins in 2023 + 3 wins in 2024 = 6 consecutive wins
     assert entries["frc1"]["streak_length"] == 6
-    assert entries["frc1"]["start"] == "2023nyny"
-    assert entries["frc1"]["end"] == "2024nyny"
+    assert entries["frc1"]["start"] == "2023nyny_qm1"
+    assert entries["frc1"]["end"] == "2024nyny_qm3"
     assert entries["frc1"]["is_active"] is True
 
 
@@ -168,12 +168,24 @@ def test_loss_between_years_resets_cross_year_streak(ndb_stub) -> None:
         _put_match("2024nyny", 2024, red_score=10, blue_score=5, match_number=i)
 
     insights = compute_insights_for_year(0, [_calc()])
-    entries = {e["key"]: e for e in insights[0].data["entries"]}
+    frc1_entries = [e for e in insights[0].data["entries"] if e["key"] == "frc1"]
 
-    # Best is 3 (from 2023 before the loss), not 6
-    assert entries["frc1"]["streak_length"] == 3
-    assert entries["frc1"]["start"] == "2023nyny"
-    assert entries["frc1"]["is_active"] is False
+    # No streak of 6 — the loss in 2023 breaks the cross-year run.
+    assert not any(e["streak_length"] == 6 for e in frc1_entries)
+    # The 2023 completed streak (3 wins before the loss) is preserved.
+    assert any(
+        e["streak_length"] == 3
+        and e["start"] == "2023nyny_qm1"
+        and e["is_active"] is False
+        for e in frc1_entries
+    )
+    # The 2024 active streak (3 wins after) also appears.
+    assert any(
+        e["streak_length"] == 3
+        and e["start"] == "2024nyny_qm1"
+        and e["is_active"] is True
+        for e in frc1_entries
+    )
 
 
 def test_tie_bridges_wins_across_years(ndb_stub) -> None:
@@ -210,8 +222,8 @@ def test_cancelled_event_does_not_break_streak(ndb_stub) -> None:
     entries = {e["key"]: e for e in insights[0].data["entries"]}
 
     assert entries["frc1"]["streak_length"] == 5
-    assert entries["frc1"]["start"] == "2019nyny"
-    assert entries["frc1"]["end"] == "2022nyny"
+    assert entries["frc1"]["start"] == "2019nyny_qm1"
+    assert entries["frc1"]["end"] == "2022nyny_qm2"
     assert entries["frc1"]["is_active"] is True
 
 
@@ -247,10 +259,14 @@ def test_is_active_false_when_current_run_is_not_best(ndb_stub) -> None:
         _put_match("2024nyny", 2024, red_score=10, blue_score=5, match_number=i)
 
     insights = compute_insights_for_year(0, [_calc()])
-    entries = {e["key"]: e for e in insights[0].data["entries"]}
+    frc1_entries = [e for e in insights[0].data["entries"] if e["key"] == "frc1"]
 
-    assert entries["frc1"]["streak_length"] == 5
-    assert entries["frc1"]["is_active"] is False
+    # The 5-win completed streak from 2023 appears and is not active.
+    assert any(
+        e["streak_length"] == 5 and e["is_active"] is False for e in frc1_entries
+    )
+    # The active 3-win streak from 2024 also appears.
+    assert any(e["streak_length"] == 3 and e["is_active"] is True for e in frc1_entries)
 
 
 def test_2015_playoff_match_winner_determined_by_score(ndb_stub) -> None:
@@ -328,5 +344,5 @@ def test_events_processed_in_start_date_order(ndb_stub) -> None:
     # Loss at week1 (zzzy) breaks any prior streak; the 3-win run at aaax is
     # the best. is_active should be True since there's no subsequent loss.
     assert entries["frc1"]["streak_length"] == 3
-    assert entries["frc1"]["start"] == "2024aaax"
+    assert entries["frc1"]["start"] == "2024aaax_qm1"
     assert entries["frc1"]["is_active"] is True

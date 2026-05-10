@@ -1,6 +1,6 @@
 from abc import abstractmethod
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, Optional, Tuple
+from typing import Any, Callable, DefaultDict, Dict, List, Optional, Tuple
 
 from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.names import InsightV2NameEntry
@@ -21,7 +21,7 @@ from backend.common.models.insight_v2 import (
 from backend.common.models.keys import Year
 
 LEADERBOARD_TOP_N = 25
-LEADERBOARD_MAX_KEYS_PER_RANKING = 25
+LEADERBOARD_MAX_KEYS_PER_RANKING = 50
 
 
 def build_leaderboard_rankings(
@@ -115,16 +115,24 @@ def build_leaderboard_pair_rankings(
     return result[:top_n]
 
 
+def _default_event_sort_key(event_key: str) -> str:
+    return event_key
+
+
 def build_leaderboard_pair_event_list_rankings(
     pair_events: Dict[str, List[str]],
     top_n: int = LEADERBOARD_TOP_N,
     *,
     min_count: int,
+    event_sort_key: Callable[[str], Any] = _default_event_sort_key,
 ) -> List[LeaderboardRanking]:
     """
     Converts a {"frcA|frcB": [event_key, ...]} dict into a sorted list of
     LeaderboardRankingPairWithEventList. Pairs with equal counts are grouped;
     contexts is a per-pair event list parallel to keys.
+
+    event_sort_key: key function for sorting each pair's event list.
+    Defaults to alphabetical order.
     """
     counts_to_pairs: DefaultDict[int, List[str]] = defaultdict(list)
     for pair_key, events in pair_events.items():
@@ -147,7 +155,11 @@ def build_leaderboard_pair_event_list_rankings(
                 keys=sorted_pairs,
                 value=count,
                 contexts=[
-                    EventListContext(event_keys=sorted(pair_events[f"{p[0]}|{p[1]}"]))
+                    EventListContext(
+                        event_keys=sorted(
+                            pair_events[f"{p[0]}|{p[1]}"], key=event_sort_key
+                        )
+                    )
                     for p in sorted_pairs
                 ],
             )

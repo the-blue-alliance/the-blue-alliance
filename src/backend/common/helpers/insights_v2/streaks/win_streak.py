@@ -20,7 +20,6 @@ class LongestWinStreakV2Calculator(StreakV2Calculator):
         if not event.matches:
             return
 
-        label = event.key_name
         sorted_matches = sorted(
             event.matches,
             key=lambda m: (
@@ -38,7 +37,7 @@ class LongestWinStreakV2Calculator(StreakV2Calculator):
             for color in ALLIANCE_COLORS:
                 for team_key in match.alliances[color]["teams"]:
                     if winning_alliance == color:
-                        self._advance_streak(team_key, label)
+                        self._advance_streak(team_key, match.key_name)
                     elif winning_alliance != "":
                         self._reset_streak(team_key)
                     # Tie: no-op
