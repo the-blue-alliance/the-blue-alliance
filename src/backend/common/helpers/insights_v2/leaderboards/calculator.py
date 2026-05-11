@@ -316,6 +316,8 @@ def build_leaderboard_match_alliance_rankings(
     for value, keys in sorted(value_to_keys.items(), reverse=True):
         if value < min_count:
             continue
+        if len(keys) > LEADERBOARD_MAX_KEYS_PER_RANKING:
+            continue
         sorted_keys = sorted(keys)
         result.append(
             LeaderboardRankingWithMatchAlliance(
