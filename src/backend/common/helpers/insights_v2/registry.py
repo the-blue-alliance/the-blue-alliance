@@ -10,11 +10,23 @@ from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.leaderboards.blue_banners import (
     BlueBannersV2Calculator,
 )
+from backend.common.helpers.insights_v2.leaderboards.highest_auto_score import (
+    HighestAutoScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_endgame_score import (
+    HighestEndgameScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_losing_score import (
+    HighestLosingScoreV2Calculator,
+)
 from backend.common.helpers.insights_v2.leaderboards.highest_match_clean_combined_score import (
     HighestMatchCleanCombinedScoreV2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.highest_match_clean_score import (
     HighestMatchCleanScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_teleop_score import (
+    HighestTeleopScoreV2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_awards_won import (
     MostAwardsWonV2Calculator,
@@ -24,6 +36,9 @@ from backend.common.helpers.insights_v2.leaderboards.most_cmp_finals_appearances
 )
 from backend.common.helpers.insights_v2.leaderboards.most_cmp_wins import (
     MostCmpWinsV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_coral_scored import (
+    MostCoralScored2025V2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_district_cmp_wins import (
     MostDistrictCmpWinsV2Calculator,
@@ -39,6 +54,9 @@ from backend.common.helpers.insights_v2.leaderboards.most_events_won import (
 )
 from backend.common.helpers.insights_v2.leaderboards.most_events_won_together import (
     MostEventsWonTogetherV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_fuel_scored import (
+    MostFuelScored2026V2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_impact_award_wins import (
     MostImpactAwardWinsV2Calculator,
@@ -156,5 +174,13 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             HighScoreOverTimeV2Calculator(),
             HighestMatchCleanScoreV2Calculator(),
             HighestMatchCleanCombinedScoreV2Calculator(),
+            HighestLosingScoreV2Calculator(),
+            HighestAutoScoreV2Calculator(),
+            HighestTeleopScoreV2Calculator(),
+            HighestEndgameScoreV2Calculator(),
         ]
+        if year == 2025:
+            calculators.append(MostCoralScored2025V2Calculator())
+        if year == 2026:
+            calculators.append(MostFuelScored2026V2Calculator())
     return compute_insights_for_year(year, calculators)
