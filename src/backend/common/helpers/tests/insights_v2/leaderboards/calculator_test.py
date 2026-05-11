@@ -3,6 +3,7 @@ from typing import Dict, List
 from google.appengine.ext import ndb
 
 from backend.common.helpers.insights_v2.leaderboards.calculator import (
+    build_leaderboard_match_alliance_rankings,
     build_leaderboard_pair_rankings,
     build_leaderboard_rankings,
     LEADERBOARD_MAX_KEYS_PER_RANKING,
@@ -18,6 +19,7 @@ from backend.common.models.insight_v2 import (
     LeaderboardKeyType,
     LeaderboardRanking,
     LeaderboardRankingV2,
+    MatchAllianceContext,
 )
 from backend.common.models.team import Team
 
@@ -145,6 +147,29 @@ def test_pair_rankings_excludes_groups_exceeding_max_keys() -> None:
 def test_pair_rankings_includes_group_at_max_keys() -> None:
     counts = {f"frc{i}|frc{i + 1}": 5 for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING)}
     result = build_leaderboard_pair_rankings(counts, min_count=2)
+    assert len(result) == 1
+    assert len(result[0]["keys"]) == LEADERBOARD_MAX_KEYS_PER_RANKING
+
+
+def _make_match_contexts(keys: List[str]) -> Dict[str, MatchAllianceContext]:
+    return {k: MatchAllianceContext(match_key=k, alliance=[]) for k in keys}
+
+
+def test_match_alliance_rankings_excludes_groups_exceeding_max_keys() -> None:
+    keys = [f"2024miket_qm{i}" for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING + 1)]
+    counts = {k: 100 for k in keys}
+    result = build_leaderboard_match_alliance_rankings(
+        counts, _make_match_contexts(keys), min_count=1
+    )
+    assert result == []
+
+
+def test_match_alliance_rankings_includes_group_at_max_keys() -> None:
+    keys = [f"2024miket_qm{i}" for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING)]
+    counts = {k: 100 for k in keys}
+    result = build_leaderboard_match_alliance_rankings(
+        counts, _make_match_contexts(keys), min_count=1
+    )
     assert len(result) == 1
     assert len(result[0]["keys"]) == LEADERBOARD_MAX_KEYS_PER_RANKING
 
