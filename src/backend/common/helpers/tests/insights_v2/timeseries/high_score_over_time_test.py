@@ -48,7 +48,17 @@ def _put_match(
     red_score: int,
     blue_score: int,
     post_result_time: datetime.datetime,
+    red_foul_points: int = 0,
+    blue_foul_points: int = 0,
 ) -> None:
+    score_breakdown_json = None
+    if red_foul_points or blue_foul_points:
+        score_breakdown_json = json.dumps(
+            {
+                "red": {"foulPoints": red_foul_points},
+                "blue": {"foulPoints": blue_foul_points},
+            }
+        )
     Match(
         id=f"{event_key}_qm{match_number}",
         comp_level=CompLevel.QM,
@@ -58,6 +68,7 @@ def _put_match(
         set_number=1,
         team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
         alliances_json=_alliances_json(red_score, blue_score),
+        score_breakdown_json=score_breakdown_json,
         post_result_time=post_result_time,
     ).put()
 
@@ -255,3 +266,74 @@ def test_insight_stored_with_timeseries_category(ndb_stub) -> None:
     assert insights[0].category == InsightCategory.TIMESERIES
     assert insights[0].name == "high_score_over_time"
     assert insights[0].year == 2022
+
+
+def test_foul_dominated_match_does_not_set_record(ndb_stub) -> None:
+    # Match 1: 100 clean. Match 2: 374 total but 278 fouls -> 96 clean, not a record.
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+    _put_match(
+        "2022casj",
+        2022,
+        2,
+        374,
+        4,
+        datetime.datetime(2022, 3, 6),
+        red_foul_points=278,
+    )
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 1
+    assert points[0]["y"] == 100.0
+    assert points[0]["context"]["match_key"] == "2022casj_qm1"
+
+
+def test_clean_score_is_used_for_record(ndb_stub) -> None:
+    # Match 1: 100 clean. Match 2: 150 total but 60 fouls -> 90 clean, not a record.
+    # Match 3: 110 total, 0 fouls -> 110 clean, breaks the record.
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+    _put_match(
+        "2022casj",
+        2022,
+        2,
+        150,
+        20,
+        datetime.datetime(2022, 3, 6),
+        red_foul_points=60,
+    )
+    _put_match("2022casj", 2022, 3, 110, 90, datetime.datetime(2022, 3, 7))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 2
+    assert points[0]["y"] == 100.0
+    assert points[1]["y"] == 110.0
+    assert points[1]["context"]["match_key"] == "2022casj_qm3"
+    assert points[1]["context"]["is_current"] is True
+
+
+def test_foul_points_on_losing_alliance_ignored(ndb_stub) -> None:
+    # Fouls on the losing (blue) alliance don't affect red's clean score.
+    _put_event("2022casj", 2022)
+    _put_match(
+        "2022casj",
+        2022,
+        1,
+        120,
+        80,
+        datetime.datetime(2022, 3, 5),
+        blue_foul_points=10,
+    )
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 1
+    assert points[0]["y"] == 120.0
