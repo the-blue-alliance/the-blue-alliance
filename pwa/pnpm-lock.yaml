@@ -93,8 +93,8 @@ importers:
         specifier: 2.2.0
         version: 2.2.0
       calendar-link:
-        specifier: 2.11.1
-        version: 2.11.1
+        specifier: 2.11.2
+        version: 2.11.2
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -4098,8 +4098,8 @@ packages:
   cache-control-parser@2.2.0:
     resolution: {integrity: sha512-Me01OJfiZiyGT42qApiunD9fKiE8WMk9w+zhu1LZlRHuDGW1gvy/IA+GcdJbWXVhZbQkn6NmZKomVaO7BFdl1g==}
 
-  calendar-link@2.11.1:
-    resolution: {integrity: sha512-LDWCr0DM/b/7ezdzrEWxk3nuueeH+XzOAG/BS2BRs39YQ0BDKJfeoaw1unIr6WdB3uEOIjVsorxqr+jcF8hvNw==}
+  calendar-link@2.11.2:
+    resolution: {integrity: sha512-HluMKPnrFiKosAy1MsfEVG625bl/nwIY1Jsn1IrlHR9MX92+XjdzKeyAmOY0Pw13Md0Fu4DAmzXdNN2KdH+BVg==}
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -12263,7 +12263,7 @@ snapshots:
 
   cache-control-parser@2.2.0: {}
 
-  calendar-link@2.11.1:
+  calendar-link@2.11.2:
     dependencies:
       dayjs: 1.11.20
 
