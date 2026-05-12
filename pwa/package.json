@@ -103,7 +103,7 @@
     "@typescript-eslint/eslint-plugin": "8.59.2",
     "@typescript-eslint/parser": "8.59.2",
     "@vitejs/plugin-react": "6.0.1",
-    "@vitest/coverage-v8": "4.1.5",
+    "@vitest/coverage-v8": "4.1.6",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "10.3.0",
     "eslint-config-prettier": "10.1.8",
@@ -125,8 +125,8 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.59.2",
     "unplugin-icons": "23.0.1",
-    "vite": "8.0.11",
-    "vitest": "4.1.5",
+    "vite": "8.0.12",
+    "vitest": "4.1.6",
     "workbox-build": "7.4.1"
   },
   "engines": {
