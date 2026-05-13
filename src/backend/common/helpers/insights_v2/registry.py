@@ -152,7 +152,6 @@ def make_all_insights(year: Year) -> List[InsightV2]:
         MostMatchesPlayedV2Calculator(),
         MostMatchesPlayedTogetherV2Calculator(),
         MostDivisionFinalsAppearancesV2Calculator(),
-        MostDivisionWinsV2Calculator(),
         MostEventsWonV2Calculator(),
         MostEventsWonTogetherV2Calculator(),
         MostImpactAwardWinsV2Calculator(),
@@ -162,6 +161,7 @@ def make_all_insights(year: Year) -> List[InsightV2]:
     ]
     if year == 0:
         calculators += [
+            MostDivisionWinsV2Calculator(),
             MostCmpFinalsAppearancesV2Calculator(),
             MostCmpWinsV2Calculator(),
             LongestQualifyingEventStreakV2Calculator(),
@@ -177,8 +177,9 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             HighestLosingScoreV2Calculator(),
             HighestAutoScoreV2Calculator(),
             HighestTeleopScoreV2Calculator(),
-            HighestEndgameScoreV2Calculator(),
         ]
+        if year not in {2017, 2018, 2023, 2025}:
+            calculators.append(HighestEndgameScoreV2Calculator())
         if year == 2025:
             calculators.append(MostCoralScored2025V2Calculator())
         if year == 2026:
