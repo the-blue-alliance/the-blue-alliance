@@ -67,14 +67,15 @@ def test_team_appears_multiple_times_with_multiple_distinct_streaks(ndb_stub) ->
     entries = calc.make_insights(2024, {})[0].data["entries"]
     assert len(entries) == 2
     assert all(e["key"] == "frc1" for e in entries)
+    # Active streak sorts first when lengths are tied
     assert entries[0]["streak_length"] == 2
-    assert entries[0]["start"] == "e1"
-    assert entries[0]["end"] == "e2"
-    assert entries[0]["is_active"] is False
+    assert entries[0]["start"] == "e3"
+    assert entries[0]["end"] == "e4"
+    assert entries[0]["is_active"] is True
     assert entries[1]["streak_length"] == 2
-    assert entries[1]["start"] == "e3"
-    assert entries[1]["end"] == "e4"
-    assert entries[1]["is_active"] is True
+    assert entries[1]["start"] == "e1"
+    assert entries[1]["end"] == "e2"
+    assert entries[1]["is_active"] is False
 
 
 def test_team_completed_and_active_streaks_both_appear(ndb_stub) -> None:
@@ -109,6 +110,22 @@ def test_entries_sorted_by_length_then_team_number(ndb_stub) -> None:
 
     entries = calc.make_insights(2024, {})[0].data["entries"]
     assert [e["key"] for e in entries] == ["frc5", "frc100"]
+
+
+def test_active_streak_sorted_before_inactive_of_equal_length(ndb_stub) -> None:
+    calc = _StubStreak()
+    # frc1 has a completed streak of length 2; frc2 has an active streak of length 2
+    calc._advance_streak("frc1", "e1")
+    calc._advance_streak("frc1", "e2")
+    calc._reset_streak("frc1")
+    calc._advance_streak("frc2", "e1")
+    calc._advance_streak("frc2", "e2")
+
+    entries = calc.make_insights(2024, {})[0].data["entries"]
+    assert entries[0]["key"] == "frc2"
+    assert entries[0]["is_active"] is True
+    assert entries[1]["key"] == "frc1"
+    assert entries[1]["is_active"] is False
 
 
 def test_entries_with_equal_length_sorted_by_team_number(ndb_stub) -> None:

@@ -111,6 +111,16 @@ make freeze             # Generate src/requirements.txt for GAE deploy
 ## Testing & Linting
 Tests and linting use `uv` for dependency management. Dependencies are synced automatically on first `make` invocation.
 
+**Run commands inside Docker when the container is running, otherwise run locally.** Check with `docker compose ps tba` — if the `tba` service is up, prefix commands with `docker compose exec tba`. Example:
+
+```bash
+# Container running
+docker compose exec tba make test ARGS='src/backend/...'
+
+# Container not running
+make test ARGS='src/backend/...'
+```
+
 ```bash
 # Sync all dev dependencies explicitly
 make sync
