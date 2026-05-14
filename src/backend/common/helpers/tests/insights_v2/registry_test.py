@@ -81,3 +81,51 @@ def test_highest_endgame_score_excluded_for_unsupported_years(
 ) -> None:
     make_all_insights(year)
     mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.MostDivisionFinalsAppearancesV2Calculator"
+)
+def test_most_division_finals_appearances_only_for_all_time(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(0)
+    mock_calc.assert_called_once_with()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.MostDivisionFinalsAppearancesV2Calculator"
+)
+def test_most_division_finals_appearances_not_for_specific_year(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(2024)
+    mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.MostDistrictCmpWinsV2Calculator")
+def test_most_district_cmp_wins_only_for_all_time(mock_calc, mock_compute) -> None:
+    make_all_insights(0)
+    mock_calc.assert_called_once_with()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.MostDistrictCmpWinsV2Calculator")
+def test_most_district_cmp_wins_not_for_specific_year(mock_calc, mock_compute) -> None:
+    make_all_insights(2024)
+    mock_calc.assert_not_called()
