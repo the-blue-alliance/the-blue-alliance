@@ -1,5 +1,6 @@
 import datetime
 import json
+from typing import Optional
 
 from google.appengine.ext import ndb
 
@@ -9,6 +10,7 @@ from backend.common.helpers.insights_v2.registry import compute_insights_for_yea
 from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
     HighScoreOverTimeV2Calculator,
 )
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 
@@ -32,12 +34,17 @@ def _alliances_json(red_score: int, blue_score: int) -> str:
     )
 
 
-def _put_event(event_key: str, year: int) -> None:
+def _put_event(
+    event_key: str,
+    year: int,
+    district_key: Optional[str] = None,
+) -> None:
     Event(
         id=event_key,
         year=year,
         event_short=event_key[4:],
-        event_type_enum=EventType.REGIONAL,
+        event_type_enum=EventType.DISTRICT if district_key else EventType.REGIONAL,
+        district_key=ndb.Key(District, district_key) if district_key else None,
     ).put()
 
 
@@ -337,3 +344,85 @@ def test_foul_points_on_losing_alliance_ignored(ndb_stub) -> None:
     points = insights[0].data["series"][0]["points"]
     assert len(points) == 1
     assert points[0]["y"] == 120.0
+
+
+def test_district_event_produces_district_insight(ndb_stub) -> None:
+    _put_event("2022mabos", 2022, district_key="2022ne")
+    _put_match("2022mabos", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 2
+    global_insight = next(i for i in insights if i.district_abbreviation is None)
+    district_insight = next(i for i in insights if i.district_abbreviation == "ne")
+
+    assert global_insight.data["series"][0]["label"] == "World Record"
+    assert district_insight.data["series"][0]["label"] == "District Record"
+    assert district_insight.data["series"][0]["points"][0]["y"] == 100.0
+
+
+def test_district_insight_key_name_includes_district(ndb_stub) -> None:
+    _put_event("2022mabos", 2022, district_key="2022ne")
+    _put_match("2022mabos", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    district_insight = next(i for i in insights if i.district_abbreviation == "ne")
+    assert district_insight.key_name == "2022_v2_timeseries_high_score_over_time_ne"
+
+
+def test_non_district_event_produces_no_district_insight(ndb_stub) -> None:
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    assert insights[0].district_abbreviation is None
+
+
+def test_district_record_independent_from_world_record(ndb_stub) -> None:
+    # Regional has the world high score; district tracks only its own matches.
+    _put_event("2022casj", 2022)
+    _put_match("2022casj", 2022, 1, 200, 180, datetime.datetime(2022, 3, 5))
+
+    _put_event("2022mabos", 2022, district_key="2022ne")
+    _put_match("2022mabos", 2022, 1, 100, 80, datetime.datetime(2022, 3, 12))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    global_insight = next(i for i in insights if i.district_abbreviation is None)
+    district_insight = next(i for i in insights if i.district_abbreviation == "ne")
+
+    assert global_insight.data["series"][0]["points"][-1]["y"] == 200.0
+    assert district_insight.data["series"][0]["points"][-1]["y"] == 100.0
+
+
+def test_multiple_districts_produce_separate_insights(ndb_stub) -> None:
+    _put_event("2022mabos", 2022, district_key="2022ne")
+    _put_match("2022mabos", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+
+    _put_event("2022mimid", 2022, district_key="2022fim")
+    _put_match("2022mimid", 2022, 1, 120, 90, datetime.datetime(2022, 3, 12))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    district_abbrevs = {i.district_abbreviation for i in insights}
+    assert district_abbrevs == {None, "ne", "fim"}
+
+    ne_insight = next(i for i in insights if i.district_abbreviation == "ne")
+    fim_insight = next(i for i in insights if i.district_abbreviation == "fim")
+
+    assert ne_insight.data["series"][0]["points"][-1]["y"] == 100.0
+    assert fim_insight.data["series"][0]["points"][-1]["y"] == 120.0
+
+
+def test_renamed_district_uses_latest_code(ndb_stub) -> None:
+    # "mar" is an old code that maps to "fma" via RenamedDistricts
+    _put_event("2022njbri", 2022, district_key="2022mar")
+    _put_match("2022njbri", 2022, 1, 100, 80, datetime.datetime(2022, 3, 5))
+
+    insights = compute_insights_for_year(2022, [HighScoreOverTimeV2Calculator()])
+
+    district_insight = next(i for i in insights if i.district_abbreviation is not None)
+    assert district_insight.district_abbreviation == "fma"
