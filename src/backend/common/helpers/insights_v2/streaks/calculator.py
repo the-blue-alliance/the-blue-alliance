@@ -102,7 +102,14 @@ class StreakV2Calculator(InsightV2Calculator):
                 )
             )
 
-        entries.sort(key=lambda e: (-e["streak_length"], int(e["key"][3:]), e["start"]))
+        entries.sort(
+            key=lambda e: (
+                -e["streak_length"],
+                not e["is_active"],
+                int(e["key"][3:]),
+                e["start"],
+            )
+        )
         return entries
 
     def _build_district_entries(
