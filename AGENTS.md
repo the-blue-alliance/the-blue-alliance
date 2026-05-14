@@ -172,6 +172,33 @@ make typecheck
 - **Add configuration**: Use Sitevar (see docs/common/Sitevars.md)
 - **Update API/models**: Reflect changes in `src/backend/web/static/swagger/*.json` OpenAPI specs (api_v3.json, api_trusted_v1.json, client_v9.json), then regenerate PWA client by running `cd pwa && ./generate-api.sh`
 
+## Tournament Structures
+
+### FIRST Championship
+At the FIRST Championship, teams are split into 8 divisions. Each division runs a full tournament to crown division Champions. Those 8 division Champions then compete in the **Championship Playoffs** on the **Einstein fields** (event type `CMP_FINALS`) to determine the overall Championship Winners.
+
+### District Championships
+Some district championships have grown large enough to split into multiple divisions (either 2 or 4, depending on the district). These divisions feed into a finals field that mirrors the Einstein structure, though it is not officially called Einstein. Not all district championships use this format — smaller ones run as a single standard tournament.
+
+### Standard Tournament Format (pre-2023 vs. 2023+)
+See [Data Idiosyncrasies](#data-idiosyncrasies) for notes on the elimination bracket format change (single-elimination BO3 before 2023, Double Elimination from 2023 onward).
+
+### Game Manual
+The 2026 FIRST Game Manual (authoritative source for tournament rules and structure) is available at:
+https://firstfrc.blob.core.windows.net/frc2026/Manual/2026GameManual.pdf
+
+If unsure about tournament structure details, consult this manual.
+
+## Data Idiosyncrasies
+FRC data has several quirks that are important to understand when working with historical records:
+
+- **Award renames**: The Chairman's Award was renamed to the Impact Award in fall of 2022 — they are the same award. The Dean's List Award was renamed to the FIRST Leadership Award in fall of 2025 — they are the same award.
+- **Award types**: FIRST has added and removed many award types over the years. Most `AwardType` values are not in active use today, but they still appear in historical records.
+- **Score breakdowns**: Match score breakdowns only became available in 2015. Finer details such as foul points are unavailable for prior years.
+- **Data completeness varies by era**: Event data may be fully populated, partially populated, or entirely missing. The further back in history, the less reliable the data. Rankings, alliances, match results, award data, and team lists may be partially or entirely absent on older events.
+- **Reliability by year**: Data becomes more reliable around 2010. Prior to 2006, data is uncommon.
+- **Elimination format**: FIRST implemented Double Elimination brackets starting in the 2023 season. Prior seasons used a single-elimination best-of-three bracket.
+
 ## Notes
 - The PWA (Progressive Web App) is a separate project in `pwa/` with its own AGENTS.md
 - GAE deployment via `ops/deploy/` scripts (maintainers only)
