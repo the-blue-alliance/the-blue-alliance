@@ -30,7 +30,7 @@ function RpDot({
             cy={2.5}
             r={achieved ? 2.5 : 2}
             fill={achieved ? 'currentColor' : 'none'}
-            stroke={achieved ? 'none' : '#9ca3af'}
+            stroke={achieved ? 'none' : 'var(--color-muted-foreground)'}
             strokeWidth={achieved ? 0 : 1}
           />
         </svg>

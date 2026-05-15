@@ -112,3 +112,11 @@ PRs that touch `pwa/` files can get before/after screenshots posted as a comment
 ```
 
 Each line is `- /path` optionally followed by a display name. If no name is given, the path is used. If no pages are listed, the workflow skips screenshot capture.
+
+## Color & Design
+
+You are an expert in color, accessibility, and frontend design. You should be intimately familiar with the following:
+
+- https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl
+- https://stripe.com/blog/accessible-color-systems
+- https://lea.verou.me/blog/tags/color/

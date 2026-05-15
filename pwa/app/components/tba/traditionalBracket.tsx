@@ -101,10 +101,9 @@ const BracketMatchCard = forwardRef<
               (
               <span
                 className={cn(
-                  'text-alliance-red transition-all duration-200',
+                  'text-foreground transition-all duration-200',
                   isRedHighlighted &&
-                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900
-                    dark:text-white`,
+                    'rounded bg-alliance-red-winner px-1 text-sm',
                 )}
               >
                 {getAllianceDisplayName(result.redAllianceNumber)}
@@ -112,10 +111,9 @@ const BracketMatchCard = forwardRef<
               vs{' '}
               <span
                 className={cn(
-                  'text-alliance-blue transition-all duration-200',
+                  'text-foreground transition-all duration-200',
                   isBlueHighlighted &&
-                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
-                    dark:text-white`,
+                    'rounded bg-alliance-blue-winner px-1 text-sm',
                 )}
               >
                 {getAllianceDisplayName(result.blueAllianceNumber)}
@@ -138,10 +136,9 @@ const BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-red/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-red
-          data-[highlight=true]:text-white`}
+        className="group flex cursor-pointer items-center justify-between
+          bg-alliance-red-loser px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-red-winner"
         data-highlight={isRedHighlighted}
         ref={redRowRef}
         onMouseEnter={() =>
@@ -159,8 +156,7 @@ const BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-red
-                    group-data-[highlight=true]:text-white`,
+                    'w-12 text-center text-sm text-foreground',
                     result.redWon && 'font-bold',
                   )}
                 >
@@ -191,10 +187,9 @@ const BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-blue/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-blue
-          data-[highlight=true]:text-white`}
+        className="group flex cursor-pointer items-center justify-between
+          bg-alliance-blue-loser px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-blue-winner"
         data-highlight={isBlueHighlighted}
         ref={blueRowRef}
         onMouseEnter={() =>
@@ -212,8 +207,7 @@ const BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-blue
-                    group-data-[highlight=true]:text-white`,
+                    'w-12 text-center text-sm text-foreground',
                     result.blueWon && 'font-bold',
                   )}
                 >

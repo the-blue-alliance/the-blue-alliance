@@ -24,37 +24,37 @@ import { cn } from '~/lib/utils';
 
 const DISTRICT_COLORS: Record<string, string> = {
   // California
-  ca: 'border-l-[#FAB604]',
+  ca: 'border-l-(--color-district-cal)',
   // Chesapeake
-  chs: 'border-l-[#2FA4A9]',
-  fch: 'border-l-[#2FA4A9]',
+  chs: 'border-l-(--color-district-fch)',
+  fch: 'border-l-(--color-district-fch)',
   // Indiana
-  fin: 'border-l-[#E04B4B]',
-  in: 'border-l-[#E04B4B]',
+  fin: 'border-l-(--color-district-fin)',
+  in: 'border-l-(--color-district-fin)',
   // Israel
-  isr: 'border-l-[#7DD3FC]',
+  isr: 'border-l-(--color-district-isr)',
   // Michigan
-  fim: 'border-l-[#94A3B8]',
+  fim: 'border-l-(--color-district-fim)',
   // Mid-Atlantic
-  fma: 'border-l-[#9A8FD1]',
-  mar: 'border-l-[#9A8FD1]',
+  fma: 'border-l-(--color-district-mar)',
+  mar: 'border-l-(--color-district-mar)',
   // New England
-  ne: 'border-l-[#271380]',
+  ne: 'border-l-(--color-district-ne)',
   // North Carolina
-  fnc: 'border-l-[#7BA7D9]',
+  fnc: 'border-l-(--color-district-fnc)',
   // Ontario
-  ont: 'border-l-[#4F6EF7]',
+  ont: 'border-l-(--color-district-ont)',
   // Pacific Northwest
-  pnw: 'border-l-[#3A9D7A]',
+  pnw: 'border-l-(--color-district-pnw)',
   // Peachtree
-  pch: 'border-l-[#FDB4A0]',
+  pch: 'border-l-(--color-district-pch)',
   // South Carolina
-  fsc: 'border-l-[#4FA37A]',
+  fsc: 'border-l-(--color-district-fsc)',
   // Texas
-  fit: 'border-l-[#E36A2E]',
-  tx: 'border-l-[#E36A2E]',
+  fit: 'border-l-(--color-district-tx)',
+  tx: 'border-l-(--color-district-tx)',
   // Wisconsin
-  win: 'border-l-[#E84393]',
+  win: 'border-l-(--color-district-fw)',
 };
 
 function getDistrictColorClass(

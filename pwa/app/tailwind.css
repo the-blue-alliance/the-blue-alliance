@@ -15,48 +15,91 @@
     ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Monaco, Consolas,
     'Liberation Mono', 'Courier New', monospace;
 
-  --color-border: hsl(var(--border));
-  --color-input: hsl(var(--input));
-  --color-ring: hsl(var(--ring));
-  --color-background: hsl(var(--background));
-  --color-foreground: hsl(var(--foreground));
+  --color-border: oklch(var(--border));
+  --color-input: oklch(var(--input));
+  --color-ring: oklch(var(--ring));
+  --color-background: oklch(var(--background));
+  --color-foreground: oklch(var(--foreground));
 
-  --color-primary: hsl(var(--primary));
-  --color-primary-foreground: hsl(var(--primary-foreground));
+  --color-primary: oklch(var(--primary));
+  --color-primary-foreground: oklch(var(--primary-foreground));
 
-  --color-secondary: hsl(var(--secondary));
-  --color-secondary-foreground: hsl(var(--secondary-foreground));
+  --color-secondary: oklch(var(--secondary));
+  --color-secondary-foreground: oklch(var(--secondary-foreground));
 
-  --color-destructive: hsl(var(--destructive));
-  --color-destructive-foreground: hsl(var(--destructive-foreground));
+  --color-destructive: oklch(var(--destructive));
+  --color-destructive-foreground: oklch(var(--destructive-foreground));
 
-  --color-muted: hsl(var(--muted));
-  --color-muted-foreground: hsl(var(--muted-foreground));
+  --color-muted: oklch(var(--muted));
+  --color-muted-foreground: oklch(var(--muted-foreground));
 
-  --color-accent: hsl(var(--accent));
-  --color-accent-foreground: hsl(var(--accent-foreground));
+  --color-accent: oklch(var(--accent));
+  --color-accent-foreground: oklch(var(--accent-foreground));
 
-  --color-popover: hsl(var(--popover));
-  --color-popover-foreground: hsl(var(--popover-foreground));
+  --color-popover: oklch(var(--popover));
+  --color-popover-foreground: oklch(var(--popover-foreground));
 
-  --color-card: hsl(var(--card));
-  --color-card-foreground: hsl(var(--card-foreground));
+  --color-card: oklch(var(--card));
+  --color-card-foreground: oklch(var(--card-foreground));
 
-  /* Red Alliance */
-  --color-first-avatar-red: #ed1c24;
-  --color-alliance-red: #f44336;
-  --color-alliance-red-light: --alpha(var(--color-alliance-red) / 10%);
-  --color-alliance-red-dark: --alpha(var(--color-alliance-red) / 20%);
-  --color-alliance-red-cell: --alpha(var(--color-alliance-red) / 15%);
-  --color-alliance-red-cell-winner: --alpha(var(--color-alliance-red) / 15%);
+  /* Fixed navbar color — never changes between modes */
+  --color-navbar: oklch(0.4782 0.1589 271.4);
 
-  /* Blue Alliance */
-  --color-first-avatar-blue: #0066b3;
-  --color-alliance-blue: #007cff;
-  --color-alliance-blue-light: --alpha(var(--color-alliance-blue) / 10%);
-  --color-alliance-blue-dark: --alpha(var(--color-alliance-blue) / 20%);
-  --color-alliance-blue-cell: --alpha(var(--color-alliance-blue) / 15%);
-  --color-alliance-blue-cell-winner: --alpha(var(--color-alliance-blue) / 15%);
+  /*
+    Alliance colors. Three tokens per alliance: the brand, plus two surface
+    variants (winner / loser). All six are explicit oklch literals — no
+    derived values — designed so black text passes WCAG 4.5:1 on every token.
+
+    Convention:
+      - hue (H) is the alliance identity — stays constant: ~18 red, ~255 blue
+      - same L per tier across red and blue (perceptual uniformity)
+      - same C% of each hue's max chroma per tier (equal vividness)
+      - L increases toward white as emphasis decreases: brand → winner → loser
+
+    Reading guide for -winner / -loser across contexts:
+      - match row:       literal (won / lost)
+      - score breakdown: figurative (emphasized totals / regular data cells)
+      - bracket row:     loser = default subdued tint; no winner tint in brackets
+                         (active hover highlight uses the brand bg-alliance-red)
+
+    Tuning:
+      - Shift a whole alliance hue: edit H in all three tokens for that alliance
+      - Make winner pop more: bump C on --color-alliance-{red,blue}-winner
+      - Dial loser fade: lower C or raise L on --color-alliance-{red,blue}-loser
+      - Brand vibrancy: edit --color-alliance-{red,blue} directly
+  */
+
+  /* brand (L=0.77): text, rings, charts, full fills — vivid, black text OK */
+  --color-alliance-red:  oklch(0.77 0.16  18);
+  --color-alliance-blue: oklch(0.77 0.13 255);
+
+  /* winner (L=0.88): clearly tinted surface — 80% of max C per hue */
+  --color-alliance-red-winner:  oklch(0.88 0.07  18);
+  --color-alliance-blue-winner: oklch(0.88 0.06 255);
+
+  /* loser (L=0.93): lightly tinted surface — 80% of max C per hue */
+  --color-alliance-red-loser:  oklch(0.93 0.040  18);
+  --color-alliance-blue-loser: oklch(0.93 0.035 255);
+
+  /* FIRST avatar fallback backgrounds — not part of the alliance theme */
+  --color-first-avatar-red:  oklch(0.54 0.25  27);
+  --color-first-avatar-blue: oklch(0.47 0.17 254);
+
+  /* District accent colors (border-l accents on event list rows) */
+  --color-district-cal: oklch(0.80 0.17 83);
+  --color-district-fch: oklch(0.65 0.09 192);
+  --color-district-fin: oklch(0.59 0.16 27);
+  --color-district-isr: oklch(0.82 0.10 214);
+  --color-district-fim: oklch(0.67 0.04 243);
+  --color-district-mar: oklch(0.65 0.10 293);
+  --color-district-ne:  oklch(0.27 0.16 271);
+  --color-district-fnc: oklch(0.69 0.09 238);
+  --color-district-ont: oklch(0.56 0.19 264);
+  --color-district-pnw: oklch(0.60 0.11 165);
+  --color-district-pch: oklch(0.82 0.09 44);
+  --color-district-fsc: oklch(0.62 0.10 155);
+  --color-district-tx:  oklch(0.65 0.16 44);
+  --color-district-fw:  oklch(0.62 0.22 350);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -149,79 +192,68 @@
 @layer base {
   :root {
     --scalar-custom-header-height: var(--header-height);
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 231 48.4% 47.8%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 220 14.3% 95.9%;
-    --secondary-foreground: 220.9 39.3% 11%;
-    --muted: 220 14.3% 95.9%;
-    --muted-foreground: 220 8.9% 46.1%;
-    --accent: 220 14.3% 95.9%;
-    --accent-foreground: 220.9 39.3% 11%;
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 20% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 224 71.4% 4.1%;
+
+    /* All values are OKLCH: L C H (perceptually uniform) */
+    --background: 1 0 0;
+    --foreground: 0.20 0.02 255;
+    --card: 0.975 0.007 240;
+    --card-foreground: 0.20 0.02 255;
+    --popover: 0.975 0.007 240;
+    --popover-foreground: 0.20 0.02 255;
+    --primary: 0.452 0.191 264;
+    --primary-foreground: 1 0 0;
+    --secondary: 0.965 0.009 240;
+    --secondary-foreground: 0.22 0.02 255;
+    --muted: 0.965 0.009 240;
+    --muted-foreground: 0.52 0.015 255;
+    --accent: 0.965 0.009 240;
+    --accent-foreground: 0.22 0.02 255;
+    --destructive: 0.52 0.22 25;
+    --destructive-foreground: 1 0 0;
+    --border: 0.88 0.015 240;
+    --input: 0.88 0.015 240;
+    --ring: 0.57 0.20 264;
     --radius: 0.5rem;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --chart-1: 0.52 0.16 245;
+    --chart-2: 0.52 0.16 145;
+    --chart-3: 0.52 0.16 315;
+    --chart-4: 0.52 0.16 55;
+    --chart-5: 0.52 0.16 195;
   }
 
   .dark {
-    --background: 0 0% 5%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 5%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 5%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 231 48.4% 47.8%;
-    --primary-foreground: 0 0% 100%;
-    --secondary: 0 0% 14.9%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
-    --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
+    --background: 0.14 0.02 255;
+    --foreground: 0.94 0.01 240;
+    --card: 0.19 0.02 255;
+    --card-foreground: 0.94 0.01 240;
+    --popover: 0.19 0.02 255;
+    --popover-foreground: 0.94 0.01 240;
+    --primary: 0.60 0.18 264;
+    --primary-foreground: 1 0 0;
+    --secondary: 0.19 0.02 255;
+    --secondary-foreground: 0.94 0.01 240;
+    --muted: 0.19 0.02 255;
+    --muted-foreground: 0.65 0.015 240;
+    --accent: 0.19 0.02 255;
+    --accent-foreground: 0.94 0.01 240;
+    --destructive: 0.67 0.22 25;
+    --destructive-foreground: 1 0 0;
+    --border: 0.28 0.02 255;
+    --input: 0.28 0.02 255;
+    --ring: 0.72 0.17 264;
+    --chart-1: 0.72 0.16 245;
+    --chart-2: 0.72 0.16 145;
+    --chart-3: 0.72 0.16 315;
+    --chart-4: 0.72 0.16 55;
+    --chart-5: 0.72 0.16 195;
+    /* Dark mode: brand unchanged — vivid on dark surfaces, good as text.
+       winner/loser are dark tinted surfaces; text-foreground (L≈0.94)
+       provides contrast. Same L per tier, same C% of max chroma per tier. */
+    --color-alliance-red-winner:  oklch(0.30 0.10  18);
+    --color-alliance-blue-winner: oklch(0.30 0.09 255);
 
-    --color-alliance-red-cell: color-mix(
-      in srgb,
-      var(--color-alliance-red) 15%,
-      hsl(var(--background))
-    );
-    --color-alliance-red-cell-winner: color-mix(
-      in srgb,
-      var(--color-alliance-red) 25%,
-      hsl(var(--background))
-    );
-    --color-alliance-blue-cell: color-mix(
-      in srgb,
-      var(--color-alliance-blue) 15%,
-      hsl(var(--background))
-    );
-    --color-alliance-blue-cell-winner: color-mix(
-      in srgb,
-      var(--color-alliance-blue) 25%,
-      hsl(var(--background))
-    );
+    --color-alliance-red-loser:  oklch(0.22 0.04  18);
+    --color-alliance-blue-loser: oklch(0.22 0.04 255);
   }
 }
 
@@ -239,16 +271,21 @@
 
   /* Apply blue text and a hover underline to every link */
   a {
-    @apply text-blue-800 hover:underline dark:text-blue-400;
+    @apply text-blue-600 hover:underline dark:text-blue-400;
   }
 
   /* Bootstrap-style code styling */
   code {
-    background-color: #f9f2f4;
+    background-color: oklch(0.96 0.01 355);
     border-radius: 4px;
-    color: #c7254e;
+    color: oklch(0.50 0.22 355);
     padding: 2px 4px;
     font-size: 90%;
     font-family: var(--font-mono);
+  }
+
+  .dark code {
+    background-color: oklch(0.23 0.03 355);
+    color: oklch(0.72 0.20 355);
   }
 }

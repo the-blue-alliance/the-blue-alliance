@@ -136,8 +136,7 @@ export default function SimpleMatchRowsWithBreaks({
 
   return (
     <div
-      className="flex flex-col divide-y *:odd:bg-neutral-50
-        dark:*:odd:bg-neutral-900"
+      className="flex flex-col divide-y *:odd:bg-black/5 dark:*:odd:bg-white/5"
     >
       {divs}
     </div>
