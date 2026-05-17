@@ -516,7 +516,7 @@ def test_offseason_link_with_code(
 
 
 def test_offseason_link_with_frc_events_url(
-    login_user_with_offseason_permission, web_client: Client
+    login_user_with_offseason_permission, web_client: Client, taskqueue_stub
 ) -> None:
     event_key = f"{datetime.now().year}ohnew"
     response = web_client.post(

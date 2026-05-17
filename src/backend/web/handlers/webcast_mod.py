@@ -199,9 +199,11 @@ def webcast_detail(event_key: EventKey) -> str:
 @require_permission(AccountPermission.REVIEW_OFFSEASON_EVENTS)
 def offseason_list() -> str:
     year = datetime.now().year
-    events = Event.query(
-        Event.year == year, Event.event_type_enum == EventType.OFFSEASON
-    ).order(Event.start_date, Event.key).fetch()
+    events = (
+        Event.query(Event.year == year, Event.event_type_enum == EventType.OFFSEASON)
+        .order(Event.start_date, Event.key)
+        .fetch()
+    )
     return render_template("mod/offseason_list.html", {"events": events, "year": year})
 
 
@@ -211,14 +213,20 @@ def offseason_list() -> str:
 def offseason_link(event_key: EventKey) -> Response:
     event = _get_event_or_404(event_key)
     if not Event.validate_key_name(event.key_name):
-        return redirect(url_for("webcast_mod.offseason_list", status="invalid_event_key"))
+        return redirect(
+            url_for("webcast_mod.offseason_list", status="invalid_event_key")
+        )
 
     if event.event_type_enum != EventType.OFFSEASON:
-        return redirect(url_for("webcast_mod.offseason_list", status="invalid_event_type"))
+        return redirect(
+            url_for("webcast_mod.offseason_list", status="invalid_event_type")
+        )
 
     first_code = _parse_first_code(request.form.get("first_code", ""), event.year)
     if first_code is None:
-        return redirect(url_for("webcast_mod.offseason_list", status="invalid_first_code"))
+        return redirect(
+            url_for("webcast_mod.offseason_list", status="invalid_first_code")
+        )
 
     if event.first_code:
         return redirect(url_for("webcast_mod.offseason_list", status="already_linked"))
