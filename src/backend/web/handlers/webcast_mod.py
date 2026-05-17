@@ -1,12 +1,15 @@
 import json
 from datetime import datetime
 from typing import List, Optional
+from urllib.parse import urlparse
 
 from flask import abort, Blueprint, redirect, request, url_for
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.consts.account_permission import AccountPermission
+from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.event_helper import EventHelper
@@ -139,6 +142,37 @@ def _parse_new_webcast() -> Optional[Webcast]:
     return webcast
 
 
+def _parse_first_code(raw: str, year: int) -> Optional[str]:
+    input_str = raw.strip()
+    if not input_str:
+        return None
+
+    if input_str.startswith("http://") or input_str.startswith("https://"):
+        parsed = urlparse(input_str)
+        if parsed.netloc not in {
+            "frc-events.firstinspires.org",
+            "www.frc-events.firstinspires.org",
+        }:
+            return None
+
+        path_parts = [part for part in parsed.path.split("/") if part]
+        if len(path_parts) < 2:
+            return None
+        if path_parts[0] != str(year):
+            return None
+        input_str = path_parts[1]
+
+    first_code = input_str.upper()
+    if not first_code:
+        return None
+
+    candidate_event_key = f"{year}{first_code.lower()}"
+    if not Event.validate_key_name(candidate_event_key):
+        return None
+
+    return first_code
+
+
 @blueprint.route("/webcasts", methods=["GET"])
 @require_permission(AccountPermission.REVIEW_MEDIA)
 def webcast_list() -> str:
@@ -159,6 +193,48 @@ def webcast_detail(event_key: EventKey) -> str:
         "webcasts": _get_webcasts_with_status(event.webcast or []),
     }
     return render_template("mod/webcast_detail.html", template_values)
+
+
+@blueprint.route("/offseasons", methods=["GET"])
+@require_permission(AccountPermission.REVIEW_OFFSEASON_EVENTS)
+def offseason_list() -> str:
+    year = datetime.now().year
+    events = Event.query(
+        Event.year == year, Event.event_type_enum == EventType.OFFSEASON
+    ).order(Event.start_date, Event.key).fetch()
+    return render_template("mod/offseason_list.html", {"events": events, "year": year})
+
+
+@blueprint.route("/offseason/<event_key>/link", methods=["POST"])
+@require_permission(AccountPermission.REVIEW_OFFSEASON_EVENTS)
+@audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
+def offseason_link(event_key: EventKey) -> Response:
+    event = _get_event_or_404(event_key)
+    if not Event.validate_key_name(event.key_name):
+        return redirect(url_for("webcast_mod.offseason_list", status="invalid_event_key"))
+
+    if event.event_type_enum != EventType.OFFSEASON:
+        return redirect(url_for("webcast_mod.offseason_list", status="invalid_event_type"))
+
+    first_code = _parse_first_code(request.form.get("first_code", ""), event.year)
+    if first_code is None:
+        return redirect(url_for("webcast_mod.offseason_list", status="invalid_first_code"))
+
+    if event.first_code:
+        return redirect(url_for("webcast_mod.offseason_list", status="already_linked"))
+
+    event.first_code = first_code
+    event.official = True
+    EventManipulator.createOrUpdate(event)
+
+    taskqueue.add(
+        queue_name="datafeed",
+        target="py3-tasks-io",
+        url=f"/backend-tasks/enqueue/event_details/{event.key_name}",
+        method="GET",
+    )
+
+    return redirect(url_for("webcast_mod.offseason_list", status="linked"))
 
 
 @blueprint.route("/webcast/<event_key>/add", methods=["POST"])
