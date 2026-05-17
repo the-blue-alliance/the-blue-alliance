@@ -199,6 +199,8 @@
       <div class="alert alert-danger">Event code cannot be empty.</div>
       {% elif request.args.get('link_frc_api_error') == 'invalid_url' %}
       <div class="alert alert-danger">Could not extract an event code from the provided URL. Please check the URL and try again.</div>
+      {% elif request.args.get('link_frc_api_error') == 'invalid_code' %}
+      <div class="alert alert-danger">The provided event code is not valid.</div>
       {% endif %}
       <form action="/admin/event/link_frc_api/{{event.key_name}}" method="post">
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

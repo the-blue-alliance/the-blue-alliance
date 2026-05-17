@@ -694,6 +694,16 @@ def event_link_frc_api_post(event_key: EventKey) -> Response:
         # Treat the whole input as an event code
         first_code = frc_event_input.upper()
 
+    candidate_event_key = Event.render_key_name(event.year, first_code)
+    if not Event.validate_key_name(candidate_event_key):
+        return redirect(
+            url_for(
+                "admin.event_detail",
+                event_key=event_key,
+                link_frc_api_error="invalid_code",
+            )
+        )
+
     event.official = True
     event.first_code = first_code
     EventManipulator.createOrUpdate(event)

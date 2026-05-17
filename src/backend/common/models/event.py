@@ -803,6 +803,10 @@ class Event(CachedModel):
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
+    @classmethod
+    def render_key_name(cls, year: Year, event_short: str) -> EventKey:
+        return f"{year}{event_short.lower()}"
+
     @property
     def event_district_str(self) -> Optional[str]:
         from backend.common.queries.district_query import DistrictQuery
