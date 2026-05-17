@@ -163,8 +163,6 @@ def _parse_first_code(raw: str, year: int) -> Optional[str]:
         input_str = path_parts[1]
 
     first_code = input_str.upper()
-    if not first_code:
-        return None
 
     candidate_event_key = f"{year}{first_code.lower()}"
     if not Event.validate_key_name(candidate_event_key):
