@@ -1,6 +1,7 @@
 import datetime
 import json
 from typing import Any, cast, Dict, Optional, Set
+from urllib.parse import urlparse
 
 from flask import abort, redirect, request, url_for
 from google.appengine.api import taskqueue
@@ -666,17 +667,41 @@ def event_link_frc_api_post(event_key: EventKey) -> Response:
 
     frc_event_input = (request.form.get("frc_event_input") or "").strip()
     if not frc_event_input:
-        abort(400)
+        return redirect(
+            url_for(
+                "admin.event_detail",
+                event_key=event_key,
+                link_frc_api_error="empty",
+            )
+        )
 
     # Support full FRC events URLs like https://frc-events.firstinspires.org/2026/OHNEW
     # as well as bare event codes like OHNEW
-    if "/" in frc_event_input:
-        first_code = frc_event_input.rstrip("/").split("/")[-1].upper()
+    parsed = urlparse(frc_event_input)
+    if parsed.scheme in ("http", "https"):
+        # Extract the last non-empty path segment from the URL
+        path_parts = [p for p in parsed.path.split("/") if p]
+        if not path_parts:
+            return redirect(
+                url_for(
+                    "admin.event_detail",
+                    event_key=event_key,
+                    link_frc_api_error="invalid_url",
+                )
+            )
+        first_code = path_parts[-1].upper()
     else:
+        # Treat the whole input as an event code
         first_code = frc_event_input.upper()
 
     if not first_code:
-        abort(400)
+        return redirect(
+            url_for(
+                "admin.event_detail",
+                event_key=event_key,
+                link_frc_api_error="empty",
+            )
+        )
 
     event.official = True
     event.first_code = first_code

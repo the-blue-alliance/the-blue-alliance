@@ -1270,4 +1270,38 @@ def test_link_frc_api_post_rejects_empty_input(
         "/admin/event/link_frc_api/2026ohnew",
         data={"frc_event_input": "   ", "csrf_token": "test"},
     )
-    assert resp.status_code == 400
+    assert resp.status_code == 302
+    assert "link_frc_api_error=empty" in resp.headers.get("Location", "")
+
+    # Event should not have been modified
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.official is False
+    assert event.first_code is None
+
+
+def test_link_frc_api_post_invalid_url_redirects_with_error(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    # A URL with no path segments after the scheme/host
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={"frc_event_input": "https://frc-events.firstinspires.org/", "csrf_token": "test"},
+    )
+    assert resp.status_code == 302
+    assert "link_frc_api_error=invalid_url" in resp.headers.get("Location", "")
+
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.official is False
