@@ -74,6 +74,15 @@
       </div>
     </div>
     {% endif %}
+
+    {% if user.is_admin or offseason_permission in user.permissions %}
+    <div class="row" id="review-offseason-tools">
+      <div class="col-xs-12 col-sm-6">
+        <h3>Review Offseason Tools</h3>
+        <p><a class="btn btn-default" id="offseason-dashboard-link" href="/mod/offseasons">Offseason Dashboard</a></p>
+      </div>
+    </div>
+    {% endif %}
   </div>
 
 </div>
