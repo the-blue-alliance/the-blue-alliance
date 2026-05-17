@@ -689,12 +689,12 @@ def event_link_frc_api_post(event_key: EventKey) -> Response:
                     link_frc_api_error="invalid_url",
                 )
             )
-        first_code = path_parts[-1].upper()
+        extracted_event_short = path_parts[-1].upper()
     else:
         # Treat the whole input as an event code
-        first_code = frc_event_input.upper()
+        extracted_event_short = frc_event_input.upper()
 
-    candidate_event_key = Event.render_key_name(event.year, first_code)
+    candidate_event_key = Event.render_key_name(event.year, extracted_event_short)
     if not Event.validate_key_name(candidate_event_key):
         return redirect(
             url_for(
@@ -705,7 +705,7 @@ def event_link_frc_api_post(event_key: EventKey) -> Response:
         )
 
     event.official = True
-    event.first_code = first_code
+    event.first_code = extracted_event_short
     EventManipulator.createOrUpdate(event)
 
     taskqueue.add(

@@ -805,6 +805,12 @@ class Event(CachedModel):
 
     @classmethod
     def render_key_name(cls, year: Year, event_short: str) -> EventKey:
+        """
+        Renders an event key from a year and event short code.
+
+        Note this does not validate `event_short`; callers should validate the
+        resulting key with `validate_key_name` when handling untrusted input.
+        """
         return f"{year}{event_short.lower()}"
 
     @property
