@@ -59,6 +59,7 @@ from backend.web.handlers.admin.event import (
     event_divisions_released_post,
     event_edit,
     event_edit_post,
+    event_link_frc_api_post,
     event_list,
     event_remap_teams_post,
     event_remove_webcast_post,
@@ -367,6 +368,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/update_location/<event_key>",
     view_func=event_update_location_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/link_frc_api/<event_key>",
+    view_func=event_link_frc_api_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})

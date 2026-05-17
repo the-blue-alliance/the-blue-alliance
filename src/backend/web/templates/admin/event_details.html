@@ -189,6 +189,30 @@
         </td>
       </tr>
     </table>
+
+    {% if event.is_offseason and not event.official %}
+    <h2>Link FRC API Event</h2>
+    <div>
+      <p>Set this event as official and link it to the FRC Events API to fetch team list and event details.</p>
+      <p>Enter an FRC Events event code (e.g. <code>OHNEW</code>) or a full FRC Events page link (e.g. <code>https://frc-events.firstinspires.org/2026/OHNEW</code>).</p>
+      {% if request.args.get('link_frc_api_error') == 'empty' %}
+      <div class="alert alert-danger">Event code cannot be empty.</div>
+      {% elif request.args.get('link_frc_api_error') == 'invalid_url' %}
+      <div class="alert alert-danger">Could not extract an event code from the provided URL. Please check the URL and try again.</div>
+      {% elif request.args.get('link_frc_api_error') == 'invalid_code' %}
+      <div class="alert alert-danger">The provided event code is not valid.</div>
+      {% endif %}
+      <form action="/admin/event/link_frc_api/{{event.key_name}}" method="post">
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+        <div class="input-group" style="max-width: 600px;">
+          <input type="text" class="form-control" name="frc_event_input" placeholder="OHNEW or https://frc-events.firstinspires.org/2026/OHNEW" />
+          <span class="input-group-btn">
+            <button type="submit" class="btn btn-success"><span class="glyphicon glyphicon-link"></span> Link FRC API Event</button>
+          </span>
+        </div>
+      </form>
+    </div>
+    {% endif %}
   </div>
 
   <div class="tab-pane" id="tasks">
