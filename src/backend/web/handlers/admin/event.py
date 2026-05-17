@@ -653,6 +653,45 @@ def event_divisions_released_post(event_key: EventKey) -> Response:
     return redirect(url_for("admin.event_detail", event_key=event_key))
 
 
+def event_link_frc_api_post(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    if not event.is_offseason or event.official:
+        abort(400)
+
+    frc_event_input = (request.form.get("frc_event_input") or "").strip()
+    if not frc_event_input:
+        abort(400)
+
+    # Support full FRC events URLs like https://frc-events.firstinspires.org/2026/OHNEW
+    # as well as bare event codes like OHNEW
+    if "/" in frc_event_input:
+        first_code = frc_event_input.rstrip("/").split("/")[-1].upper()
+    else:
+        first_code = frc_event_input.upper()
+
+    if not first_code:
+        abort(400)
+
+    event.official = True
+    event.first_code = first_code
+    EventManipulator.createOrUpdate(event)
+
+    taskqueue.add(
+        queue_name="datafeed",
+        target="py3-tasks-io",
+        url=f"/backend-tasks/get/event_details/{event_key}",
+        method="GET",
+    )
+
+    return redirect(url_for("admin.event_detail", event_key=event_key))
+
+
 def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
     event = Event.get_by_id(event_key)
     if not event:
