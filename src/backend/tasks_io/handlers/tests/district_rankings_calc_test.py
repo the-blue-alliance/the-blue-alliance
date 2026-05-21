@@ -13,10 +13,20 @@ from backend.common.helpers.district_helper import (
 )
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.district import District
+from backend.common.models.district_advancement import ApiDistrictRankingTeamData
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
+    TParsedDistrictRankings,
+)
+
+
+def _empty_rankings_future() -> InstantFuture:
+    return InstantFuture(
+        TParsedDistrictRankings(advancement={}, adjustments={}, api_team_data={})
+    )
 
 
 def test_enqueue_bad_year(tasks_client: Client) -> None:
@@ -111,10 +121,16 @@ def test_calc_no_district(tasks_client: Client) -> None:
         (EventType.DISTRICT_CMP_DIVISION, True),
     ],
 )
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
 @mock.patch.object(DistrictHelper, "calculate_rankings")
 def test_calc(
-    calc_mock: mock.Mock, event_type: EventType, is_dcmp: bool, tasks_client: Client
+    calc_mock: mock.Mock,
+    district_rankings_mock: mock.Mock,
+    event_type: EventType,
+    is_dcmp: bool,
+    tasks_client: Client,
 ) -> None:
+    district_rankings_mock.return_value = _empty_rankings_future()
     District(
         id="2020ne",
         year=2020,
@@ -177,10 +193,14 @@ def test_calc(
     ]
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
 @mock.patch.object(DistrictHelper, "calculate_rankings")
 def test_calc_no_output_in_taskqueue(
-    calc_mock: mock.Mock, tasks_client: Client
+    calc_mock: mock.Mock,
+    district_rankings_mock: mock.Mock,
+    tasks_client: Client,
 ) -> None:
+    district_rankings_mock.return_value = _empty_rankings_future()
     District(
         id="2020ne",
         year=2020,
@@ -209,8 +229,33 @@ def test_calc_no_output_in_taskqueue(
     assert resp.data == b""
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
 @mock.patch.object(DistrictHelper, "calculate_rankings")
-def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> None:
+def test_calc_with_adjustments(
+    calc_mock: mock.Mock,
+    district_rankings_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    api_team_data = {
+        "frc254": ApiDistrictRankingTeamData(
+            rank=1,
+            total_points=5,
+            team_age_points=0,
+            event1_code=None,
+            event1_points=None,
+            event2_code=None,
+            event2_points=None,
+            district_cmp_code=None,
+            district_cmp_points=None,
+        )
+    }
+    district_rankings_mock.return_value = InstantFuture(
+        TParsedDistrictRankings(
+            advancement={},
+            adjustments={"frc254": 5},
+            api_team_data=api_team_data,
+        )
+    )
     District(
         id="2020ne",
         year=2020,
@@ -240,7 +285,11 @@ def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> No
     assert resp.data == b""
 
     calc_mock.assert_called_once_with(
-        mock.ANY, mock.ANY, mock.ANY, adjustments={"frc254": 5}
+        mock.ANY,
+        mock.ANY,
+        mock.ANY,
+        adjustments={"frc254": 5},
+        api_team_data=api_team_data,
     )
 
     district = District.get_by_id("2020ne")

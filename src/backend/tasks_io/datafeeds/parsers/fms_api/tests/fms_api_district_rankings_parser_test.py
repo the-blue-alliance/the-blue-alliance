@@ -74,3 +74,35 @@ def test_parse_district_rankings_adjustments(test_data_importer):
         "frc7691": 3,
         "frc9658": 1,
     }
+
+
+def test_parse_district_rankings_api_team_data(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2025fit_rankings.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    data, _ = FMSAPIDistrictRankingsParser().parse(data)
+
+    assert data.api_team_data["frc118"] == {
+        "rank": 1,
+        "total_points": 149,
+        "team_age_points": 0,
+        "event1_code": "TXTOM",
+        "event1_points": 73,
+        "event2_code": "TXMAN",
+        "event2_points": 76,
+        "district_cmp_code": None,
+        "district_cmp_points": 0,
+    }
+    assert data.api_team_data["frc3005"]["rank"] == 2
+    assert data.api_team_data["frc6672"] == {
+        "rank": 17,
+        "total_points": 95,
+        "team_age_points": 0,
+        "event1_code": "TXWAC",
+        "event1_points": 44,
+        "event2_code": "TXFOR",
+        "event2_points": 44,
+        "district_cmp_code": None,
+        "district_cmp_points": 0,
+    }
