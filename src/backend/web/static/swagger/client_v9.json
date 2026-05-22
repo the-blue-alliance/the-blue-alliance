@@ -89,6 +89,38 @@
           }
         }
       },
+      "MediaSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "reference_key",
+          "reference_type",
+          "year",
+          "media_url",
+          "details_json"
+        ],
+        "properties": {
+          "reference_key": {
+            "type": "string",
+            "description": "The key of the model the suggestion is for (e.g. team key)"
+          },
+          "reference_type": {
+            "type": "string",
+            "description": "The type of model the suggestion is for (currently only 'team' is supported)"
+          },
+          "year": {
+            "type": "integer",
+            "description": "The year the media is from"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "The URL of the media being suggested"
+          },
+          "details_json": {
+            "type": "string",
+            "description": "Optional JSON-encoded details about the media"
+          }
+        }
+      },
       "SubscriptionMessage": {
         "type": "object",
         "required": [
@@ -208,6 +240,39 @@
                     "description": "Whether to favorite the model"
                   }
                 }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/media/suggest": {
+      "post": {
+        "summary": "Suggest team media",
+        "operationId": "suggestTeamMedia",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MediaSuggestionMessage"
               }
             }
           }

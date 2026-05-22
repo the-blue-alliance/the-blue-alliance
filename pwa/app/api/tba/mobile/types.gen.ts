@@ -40,6 +40,29 @@ export type SubscriptionCollection = {
   subscriptions?: Array<SubscriptionMessage>;
 };
 
+export type MediaSuggestionMessage = {
+  /**
+   * The key of the model the suggestion is for (e.g. team key)
+   */
+  reference_key: string;
+  /**
+   * The type of model the suggestion is for (currently only 'team' is supported)
+   */
+  reference_type: string;
+  /**
+   * The year the media is from
+   */
+  year: number;
+  /**
+   * The URL of the media being suggested
+   */
+  media_url: string;
+  /**
+   * Optional JSON-encoded details about the media
+   */
+  details_json: string;
+};
+
 export type SubscriptionMessage = {
   device_key?: string;
   model_key: string;
@@ -98,6 +121,23 @@ export type SetModelPreferencesResponses = {
 
 export type SetModelPreferencesResponse =
   SetModelPreferencesResponses[keyof SetModelPreferencesResponses];
+
+export type SuggestTeamMediaData = {
+  body: MediaSuggestionMessage;
+  path?: never;
+  query?: never;
+  url: '/team/media/suggest';
+};
+
+export type SuggestTeamMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type SuggestTeamMediaResponse =
+  SuggestTeamMediaResponses[keyof SuggestTeamMediaResponses];
 
 export type ListSubscriptionsData = {
   body?: never;

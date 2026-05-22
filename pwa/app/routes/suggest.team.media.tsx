@@ -3,6 +3,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 import { type JSX, useState } from 'react';
 import { z } from 'zod';
 
+import { suggestTeamMedia } from '~/api/tba/mobile/sdk.gen';
 import {
   getTeamMediaByYearOptions,
   getTeamOptions,
@@ -76,30 +77,23 @@ function SuggestTeamMedia(): JSX.Element {
     setStatus('loading');
     try {
       const token = await user.getIdToken();
-      const mobileApiBaseUrl =
-        import.meta.env.VITE_TBA_MOBILE_API_BASE_URL ??
-        'https://www.thebluealliance.com/clientapi/tbaClient/v9';
-      const response = await fetch(`${mobileApiBaseUrl}/team/media/suggest`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
+      const { data } = await suggestTeamMedia({
+        auth: token,
+        body: {
           reference_type: 'team',
           reference_key: team_key,
           year,
           media_url: mediaUrl,
           details_json: '',
-        }),
+        },
       });
-      const data = (await response.json()) as { code: number };
-      if (data.code === 200) {
+      const code = Number(data?.code);
+      if (code === 200) {
         setStatus('success');
         setMediaUrl('');
-      } else if (data.code === 304) {
+      } else if (code === 304) {
         setStatus('exists');
-      } else if (data.code === 400) {
+      } else if (code === 400) {
         setStatus('bad_url');
       } else {
         setStatus('error');

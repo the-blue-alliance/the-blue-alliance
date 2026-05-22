@@ -8,6 +8,8 @@ import type {
   ListSubscriptionsResponses,
   SetModelPreferencesData,
   SetModelPreferencesResponses,
+  SuggestTeamMediaData,
+  SuggestTeamMediaResponses,
 } from './types.gen';
 
 export type Options<
@@ -57,6 +59,26 @@ export const setModelPreferences = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/model/setPreferences',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Suggest team media
+ */
+export const suggestTeamMedia = <ThrowOnError extends boolean = false>(
+  options: Options<SuggestTeamMediaData, ThrowOnError>,
+) =>
+  (options.client ?? client).post<
+    SuggestTeamMediaResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/team/media/suggest',
     ...options,
     headers: {
       'Content-Type': 'application/json',
