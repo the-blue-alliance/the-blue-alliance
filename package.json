@@ -23,7 +23,7 @@
     "react-countup": "^6.5.3",
     "react-dom": "^19.2.6",
     "react-ga4": "^2.1.0",
-    "react-redux": "^9.2.0",
+    "react-redux": "^9.3.0",
     "react-select": "^5.10.2",
     "react-transition-group": "^4.4.5",
     "redux": "^5.0.1",
