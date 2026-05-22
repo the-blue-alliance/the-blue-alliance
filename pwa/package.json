@@ -102,7 +102,7 @@
     "@types/react-dom": "19.2.3",
     "@typescript-eslint/eslint-plugin": "8.59.3",
     "@typescript-eslint/parser": "8.59.3",
-    "@vitejs/plugin-react": "6.0.1",
+    "@vitejs/plugin-react": "6.0.2",
     "@vitest/coverage-v8": "4.1.6",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "10.3.0",
@@ -125,7 +125,7 @@
     "typescript": "6.0.3",
     "typescript-eslint": "8.59.3",
     "unplugin-icons": "23.0.1",
-    "vite": "8.0.12",
+    "vite": "8.0.13",
     "vitest": "4.1.6",
     "workbox-build": "7.4.1"
   },
