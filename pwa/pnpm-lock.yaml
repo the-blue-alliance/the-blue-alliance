@@ -57,8 +57,8 @@ importers:
         specifier: 1.2.8
         version: 1.2.8(@types/react-dom@19.2.3(@types/react@19.2.14))(@types/react@19.2.14)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
       '@scalar/api-reference-react':
-        specifier: 0.9.36
-        version: 0.9.36(react@19.2.6)(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)
+        specifier: 0.9.37
+        version: 0.9.37(react@19.2.6)(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)
       '@scalar/react-renderer':
         specifier: 0.4.1
         version: 0.4.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(vue@3.5.34(typescript@6.0.3))
@@ -2660,22 +2660,22 @@ packages:
   '@rtsao/scc@1.1.0':
     resolution: {integrity: sha512-zt6OdqaDoOnJ1ZYsCYGt9YmWzDXl4vQdKTyJev62gFhRGKdx7mcT54V9KIjg+d2wi9EXsPvAPKe7i7WjfVWB8g==}
 
-  '@scalar/agent-chat@0.12.0':
-    resolution: {integrity: sha512-EwSO7uXCFmyVezfCSJFBuvjnSCb7sxTHawFWjkDmLkIUnJjCc4DaWSP9+UdvK4rvh44v+oLLPXVKMSW6/Tj0Jw==}
+  '@scalar/agent-chat@0.12.1':
+    resolution: {integrity: sha512-rQ7q/dPPRv7uf9OSJc1PFitC/RLdyTSkt5oxzPFgXIzeYMHpYDJER9xb0ExXTZUIk77gFEEbLlvqIbVQTWacdg==}
     engines: {node: '>=22'}
 
-  '@scalar/api-client@3.8.0':
-    resolution: {integrity: sha512-1SwesVjEe7BrIQgQQlHN1K4tBnP3GoJTfnCEUmPh3QSQCWTeT2X4ZMm4FpwmZGurbXWjc8u4AJwmLRNdWsFrbQ==}
+  '@scalar/api-client@3.8.1':
+    resolution: {integrity: sha512-aPx6xLNuc2qw2ZNAVIXbNWWxIQ07jbsRVEa/qPAzJiLaq4LOuaIifgYWwB4R0KfzGM8WaNjdaziOxYXCHKfa4g==}
     engines: {node: '>=22'}
 
-  '@scalar/api-reference-react@0.9.36':
-    resolution: {integrity: sha512-oHfVIGtOOngi3YTt0kLkVFeuVsTQ52AtY5ty6QdGSiH5nsxwfFTDA84hKyk3vGbhvQcyGyOt98AidVA91CBdFw==}
+  '@scalar/api-reference-react@0.9.37':
+    resolution: {integrity: sha512-omjYZNjbgAhnIZm0SvjjC6/PG1d8hc4Phwi/tnYc1V9It4DErKpTZ4bRcQ8Jc9gJiaf0CILj5+IgXTVpEToKhQ==}
     engines: {node: '>=22'}
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
-  '@scalar/api-reference@1.57.0':
-    resolution: {integrity: sha512-y/nBlBgUDDI+hW8lKFjG5xIynwRAxvk0GCgpO4HMJybEPCPV6u4WiYwJmX4zQtuKW4XvhVxX179wQJmhB1xWiQ==}
+  '@scalar/api-reference@1.57.1':
+    resolution: {integrity: sha512-jo8uzMBobd1iyNDZSLEvQyK0CdYMUwb4j9zTyie6E8BKuInt5wFSQBlroH4409qlpvIrZAxcawvbLaxkksrWXQ==}
     engines: {node: '>=22'}
 
   '@scalar/code-highlight@0.3.4':
@@ -10297,10 +10297,10 @@ snapshots:
 
   '@rtsao/scc@1.1.0': {}
 
-  '@scalar/agent-chat@0.12.0(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)':
+  '@scalar/agent-chat@0.12.1(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
       '@ai-sdk/vue': 3.0.33(vue@3.5.34(typescript@6.0.3))(zod@4.4.3)
-      '@scalar/api-client': 3.8.0(tailwindcss@4.3.0)(typescript@6.0.3)
+      '@scalar/api-client': 3.8.1(tailwindcss@4.3.0)(typescript@6.0.3)
       '@scalar/components': 0.24.4(tailwindcss@4.3.0)(typescript@6.0.3)
       '@scalar/helpers': 0.8.0
       '@scalar/icons': 0.7.2(typescript@6.0.3)
@@ -10335,7 +10335,7 @@ snapshots:
       - universal-cookie
       - zod
 
-  '@scalar/api-client@3.8.0(tailwindcss@4.3.0)(typescript@6.0.3)':
+  '@scalar/api-client@3.8.1(tailwindcss@4.3.0)(typescript@6.0.3)':
     dependencies:
       '@headlessui/tailwindcss': 0.2.2(tailwindcss@4.3.0)
       '@headlessui/vue': 1.7.23(vue@3.5.34(typescript@6.0.3))
@@ -10385,9 +10385,9 @@ snapshots:
       - typescript
       - universal-cookie
 
-  '@scalar/api-reference-react@0.9.36(react@19.2.6)(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)':
+  '@scalar/api-reference-react@0.9.37(react@19.2.6)(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
-      '@scalar/api-reference': 1.57.0(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)
+      '@scalar/api-reference': 1.57.1(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)
       '@scalar/types': 0.11.0
       react: 19.2.6
     transitivePeerDependencies:
@@ -10407,11 +10407,11 @@ snapshots:
       - universal-cookie
       - zod
 
-  '@scalar/api-reference@1.57.0(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)':
+  '@scalar/api-reference@1.57.1(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)':
     dependencies:
       '@headlessui/vue': 1.7.23(vue@3.5.34(typescript@6.0.3))
-      '@scalar/agent-chat': 0.12.0(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)
-      '@scalar/api-client': 3.8.0(tailwindcss@4.3.0)(typescript@6.0.3)
+      '@scalar/agent-chat': 0.12.1(tailwindcss@4.3.0)(typescript@6.0.3)(zod@4.4.3)
+      '@scalar/api-client': 3.8.1(tailwindcss@4.3.0)(typescript@6.0.3)
       '@scalar/code-highlight': 0.3.4
       '@scalar/components': 0.24.4(tailwindcss@4.3.0)(typescript@6.0.3)
       '@scalar/helpers': 0.8.0
