@@ -3,6 +3,8 @@ import {
   type JSX,
   type SetStateAction,
   forwardRef,
+  memo,
+  useCallback,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -65,7 +67,7 @@ const WINNER_LINKS: WinnerLink[] = [
   { from: 'Match 11', to: 'Finals' },
 ];
 
-const PlayoffMatch = forwardRef<
+const _PlayoffMatch = forwardRef<
   PlayoffMatchHandle,
   {
     matchLabel: MatchLabel;
@@ -290,6 +292,28 @@ const PlayoffMatch = forwardRef<
   );
 });
 
+const PlayoffMatch = memo(_PlayoffMatch, (prev, next) => {
+  if (
+    prev.matches !== next.matches ||
+    prev.event !== next.event ||
+    prev.matchLabel !== next.matchLabel ||
+    prev.showFullAllliance !== next.showFullAllliance ||
+    prev.getSeriesResult !== next.getSeriesResult ||
+    prev.getAllianceDisplayName !== next.getAllianceDisplayName ||
+    prev.setHoveredAlliance !== next.setHoveredAlliance
+  ) {
+    return false;
+  }
+  // Only re-render if this match's own highlight status changed
+  const result = next.getSeriesResult(next.matches);
+  return (
+    (prev.hoveredAlliance === result?.redAllianceNumber) ===
+      (next.hoveredAlliance === result?.redAllianceNumber) &&
+    (prev.hoveredAlliance === result?.blueAllianceNumber) ===
+      (next.hoveredAlliance === result?.blueAllianceNumber)
+  );
+});
+
 export default function EliminationBracket({
   alliances,
   matches,
@@ -318,18 +342,17 @@ export default function EliminationBracket({
   });
   const containerRef = useRef<HTMLDivElement>(null);
 
-  // Helper to get alliance display name
-  const getAllianceDisplayName = (allianceNumber: number): string => {
-    if (!allianceNumber || allianceNumber > alliances.length) return '';
-
-    const alliance = alliances[allianceNumber - 1];
-    if (event.event_type === EventType.CMP_FINALS && alliance.name) {
-      // For Einstein events, use division shortform if available
-      return getDivisionShortform(alliance.name);
-    }
-    // Default to alliance number
-    return `#${allianceNumber}`;
-  };
+  const getAllianceDisplayName = useCallback(
+    (allianceNumber: number): string => {
+      if (!allianceNumber || allianceNumber > alliances.length) return '';
+      const alliance = alliances[allianceNumber - 1];
+      if (event.event_type === EventType.CMP_FINALS && alliance.name) {
+        return getDivisionShortform(alliance.name);
+      }
+      return `#${allianceNumber}`;
+    },
+    [alliances, event.event_type],
+  );
 
   // Group matches by set_number.
   const matchesBySet = useMemo(() => {
@@ -353,73 +376,78 @@ export default function EliminationBracket({
     [matches],
   );
 
-  // Helper to get alliance numbers for teams
-  const getAllianceNumber = (teamKeys: string[]): number | null => {
-    for (let i = 0; i < alliances.length; i++) {
-      // Check if all team keys match this alliance
-      const allianceTeamKeys = alliances[i].picks.map((pick) =>
-        pick.substring(3),
-      );
-      if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
-        return i + 1; // Alliance numbers are 1-based
+  const getAllianceNumber = useCallback(
+    (teamKeys: string[]): number | null => {
+      for (let i = 0; i < alliances.length; i++) {
+        const allianceTeamKeys = alliances[i].picks.map((pick) =>
+          pick.substring(3),
+        );
+        if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
+          return i + 1;
+        }
       }
-    }
-    return null;
-  };
+      return null;
+    },
+    [alliances],
+  );
 
-  // Helper to get match result
-  const getSeriesResult = (
-    setMatches: Match[] | undefined,
-  ): SeriesResult | null => {
-    if (!setMatches || setMatches.length === 0) return null;
+  const getSeriesResult = useCallback(
+    (setMatches: Match[] | undefined): SeriesResult | null => {
+      if (!setMatches || setMatches.length === 0) return null;
 
-    // Use the first match to get team information (they should be the same across the series)
-    const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
-      t.substring(3),
-    );
-    const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
-      t.substring(3),
-    );
+      // Use the first match to get team information (they should be the same across the series)
+      const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
+        t.substring(3),
+      );
+      const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
+        t.substring(3),
+      );
 
-    // Get alliance numbers and full alliance rosters
-    const redAllianceNumber = getAllianceNumber(matchRedTeams);
-    const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
+      // Get alliance numbers and full alliance rosters
+      const redAllianceNumber = getAllianceNumber(matchRedTeams);
+      const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
 
-    // Get full alliance rosters (all teams, not just the 3 that played)
-    const redTeams = redAllianceNumber
-      ? alliances[redAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchRedTeams;
-    const blueTeams = blueAllianceNumber
-      ? alliances[blueAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchBlueTeams;
+      // Get full alliance rosters (all teams, not just the 3 that played)
+      const redTeams = redAllianceNumber
+        ? alliances[redAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchRedTeams;
+      const blueTeams = blueAllianceNumber
+        ? alliances[blueAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchBlueTeams;
 
-    const redResults = setMatches.map((match) => ({
-      score: match.alliances.red.score,
-      won: match.winning_alliance === AllianceColor.RED,
-    }));
-    const blueResults = setMatches.map((match) => ({
-      score: match.alliances.blue.score,
-      won: match.winning_alliance === AllianceColor.BLUE,
-    }));
+      const redResults = setMatches.map((match) => ({
+        score: match.alliances.red.score,
+        won: match.winning_alliance === AllianceColor.RED,
+      }));
+      const blueResults = setMatches.map((match) => ({
+        score: match.alliances.blue.score,
+        won: match.winning_alliance === AllianceColor.BLUE,
+      }));
 
-    // Determine overall winner from the series
-    const lastMatch = setMatches[setMatches.length - 1];
-    const redWon = lastMatch.winning_alliance === AllianceColor.RED;
-    const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
+      // Determine overall winner from the series
+      const lastMatch = setMatches[setMatches.length - 1];
+      const redWon = lastMatch.winning_alliance === AllianceColor.RED;
+      const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
 
-    return {
-      redTeams,
-      blueTeams,
-      redAllianceNumber,
-      blueAllianceNumber,
-      redResults,
-      blueResults,
-      redWon,
-      blueWon,
-      matchRedTeams, // Teams that actually played
-      matchBlueTeams, // Teams that actually played
-    };
-  };
+      return {
+        redTeams,
+        blueTeams,
+        redAllianceNumber,
+        blueAllianceNumber,
+        redResults,
+        blueResults,
+        redWon,
+        blueWon,
+        matchRedTeams,
+        matchBlueTeams,
+      };
+    },
+    [alliances, getAllianceNumber],
+  );
 
   const matchLookup: Record<string, Match[] | undefined> = useMemo(
     () => ({
