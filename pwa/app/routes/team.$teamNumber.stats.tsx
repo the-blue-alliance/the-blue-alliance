@@ -1,5 +1,5 @@
 import { useQueries } from '@tanstack/react-query';
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
@@ -20,15 +20,9 @@ import { DoubleSlider } from '~/components/tba/doubleSlider';
 import TeamAwardsSummary from '~/components/tba/teamAwardsSummary';
 import TeamMatchStats from '~/components/tba/teamMatchStats';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Divider } from '~/components/ui/divider';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
@@ -124,7 +118,6 @@ function MatchStatsLoadingState({
 }
 
 function TeamStatsPage() {
-  const navigate = useNavigate();
   const { team, allEvents, allAwards, socials, media } = Route.useLoaderData();
 
   const [includeOffseasons, setIncludeOffseasons] = useState(false);
@@ -199,27 +192,25 @@ function TeamStatsPage() {
   return (
     <div className="flex flex-wrap sm:flex-nowrap">
       <div className="top-0 mr-4 pt-5 sm:sticky">
-        <Select
-          onValueChange={(value) => {
-            void navigate({
-              to: '/team/$teamNumber/{-$year}',
-              params: { teamNumber: String(team.team_number), year: value },
-            });
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder="Stats" />
-          </SelectTrigger>
-          <SelectContent className="max-h-[30vh] overflow-y-auto">
-            <SelectItem value="history">History</SelectItem>
-            <SelectItem value="stats">Stats</SelectItem>
-            {yearsParticipated.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel="Stats"
+          triggerClassName="w-[180px]"
+          options={[
+            {
+              label: 'History',
+              to: `/team/${team.team_number}/history`,
+            },
+            {
+              label: 'Stats',
+              to: `/team/${team.team_number}/stats`,
+              isCurrent: true,
+            },
+            ...yearsParticipated.map((y) => ({
+              label: String(y),
+              to: `/team/${team.team_number}/${y}`,
+            })),
+          ]}
+        />
       </div>
       <div className="w-full">
         <div className="mt-8 flex w-full flex-row justify-between">

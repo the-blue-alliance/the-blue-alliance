@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { ReactNode } from 'react';
 
 import {
@@ -10,13 +10,7 @@ import {
 import { TitledCard } from '~/components/tba/cards';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
+import { YearSelector } from '~/components/tba/yearSelector';
 import {
   NOTABLE_NAME_TO_DISPLAY_NAME,
   leaderboardFromNotable,
@@ -115,7 +109,6 @@ function SingleYearInsights({
   notables: NotablesInsight[];
 }) {
   const validYears = useValidYears();
-  const navigate = useNavigate();
 
   const notableDiv =
     year !== 0 ? (
@@ -142,31 +135,22 @@ function SingleYearInsights({
           </p>
         </div>
 
-        <Select
-          value={year > 0 ? `${year}` : 'Overall'}
-          onValueChange={(value) => {
-            void navigate({
-              to: '/insights/{-$year}',
-              params: { year: value === 'Overall' ? '' : value },
-            });
-          }}
-        >
-          <SelectTrigger
-            className="w-[180px] cursor-pointer border-border/50 shadow-sm"
-          >
-            <SelectValue placeholder="Overall" />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="Overall" className="cursor-pointer">
-              Overall
-            </SelectItem>
-            {validYears.map((y) => (
-              <SelectItem key={y} value={`${y}`} className="cursor-pointer">
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel={year > 0 ? String(year) : 'Overall'}
+          triggerClassName="w-[180px] border-border/50 shadow-sm"
+          options={[
+            {
+              label: 'Overall',
+              to: '/insights',
+              isCurrent: year === 0,
+            },
+            ...validYears.map((y) => ({
+              label: String(y),
+              to: `/insights/${y}`,
+              isCurrent: y === year,
+            })),
+          ]}
+        />
       </div>
 
       <div className="mb-8">

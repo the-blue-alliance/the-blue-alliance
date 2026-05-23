@@ -19,6 +19,7 @@ import {
   TableOfContentsSection,
   type TocNode,
 } from '~/components/tba/tableOfContents';
+import { YearSelector } from '~/components/tba/yearSelector';
 import {
   Select,
   SelectContent,
@@ -229,25 +230,15 @@ function YearEventsPage() {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView}>
-        <Select
-          value={String(year)}
-          onValueChange={(value) => {
-            void navigate({ to: `/events/${value}` });
-          }}
-        >
-          <SelectTrigger
-            className="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
-          >
-            <SelectValue placeholder={year} />
-          </SelectTrigger>
-          <SelectContent className="max-h-[30vh] overflow-y-auto">
-            {validYears.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          options={validYears.map((y) => ({
+            label: String(y),
+            to: `/events/${y}`,
+            isCurrent: y === year,
+          }))}
+        />
         <Select
           defaultValue="all"
           onValueChange={(value) => {
