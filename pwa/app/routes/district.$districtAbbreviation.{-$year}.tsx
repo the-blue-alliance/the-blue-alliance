@@ -1,9 +1,4 @@
-import {
-  Link,
-  createFileRoute,
-  notFound,
-  useNavigate,
-} from '@tanstack/react-router';
+import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 import { groupBy, sumBy } from 'lodash-es';
 import { Temporal } from 'temporal-polyfill';
 
@@ -28,15 +23,9 @@ import {
   TeamLink,
   TeamLocationLink,
 } from '~/components/tba/links';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Badge } from '~/components/ui/badge';
 import { Divider } from '~/components/ui/divider';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import {
   Table,
   TableBody,
@@ -181,7 +170,6 @@ function DistrictPage() {
     teams,
     year,
   } = Route.useLoaderData();
-  const navigate = useNavigate();
 
   const hasRankings = rankings !== null;
 
@@ -244,30 +232,21 @@ function DistrictPage() {
         >
           Follow teams at FIRST Championship
         </Link>
-        <Select
-          value={String(year)}
-          onValueChange={(value) => {
-            void navigate({
-              to: '/district/$districtAbbreviation/{-$year}',
-              params: {
-                districtAbbreviation: abbreviation,
-                year: value,
-              },
-            });
-          }}
-        >
-          <SelectTrigger className="w-30">
-            <SelectValue placeholder={year} />
-          </SelectTrigger>
-          <SelectContent className="max-h-[30vh] overflow-y-auto">
-            <SelectItem value="stats">Stats</SelectItem>
-            {validYears.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-30"
+          options={[
+            {
+              label: 'Stats',
+              to: `/district/${abbreviation}/stats`,
+            },
+            ...validYears.map((y) => ({
+              label: String(y),
+              to: `/district/${abbreviation}/${y}`,
+              isCurrent: y === year,
+            })),
+          ]}
+        />
       </div>
 
       <Tabs defaultValue={'overview'} className="mt-4">

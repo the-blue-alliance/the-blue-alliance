@@ -1,5 +1,5 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import {
   type CSSProperties,
   Fragment,
@@ -27,14 +27,8 @@ import {
   getStatusOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, MatchLink, TeamLink } from '~/components/tba/links';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import {
   Table,
   TableBody,
@@ -655,7 +649,6 @@ function AllRankingsTable({
 function ChampsPage() {
   const { abbreviation, displayName, currentSeason, year } =
     Route.useLoaderData();
-  const navigate = useNavigate();
   const districtKey = `${year}${abbreviation}`;
 
   // Fetch district history to know which years this district existed
@@ -792,26 +785,15 @@ function ChampsPage() {
           >
             {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
           </span>
-          <Select
-            value={String(year)}
-            onValueChange={(v) => {
-              void navigate({
-                to: '/district/$districtAbbreviation/champs/$year',
-                params: { districtAbbreviation: abbreviation, year: v },
-              });
-            }}
-          >
-            <SelectTrigger className="w-24">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {validYears.map((y) => (
-                <SelectItem key={y} value={String(y)}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <YearSelector
+            currentLabel={String(year)}
+            triggerClassName="w-24"
+            options={validYears.map((y) => ({
+              label: String(y),
+              to: `/district/${abbreviation}/champs/${y}`,
+              isCurrent: y === year,
+            }))}
+          />
         </div>
       </div>
 

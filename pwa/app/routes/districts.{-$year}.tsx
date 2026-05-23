@@ -1,5 +1,5 @@
 import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
 import {
@@ -7,13 +7,7 @@ import {
   getDistrictsByYearOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { DistrictLink } from '~/components/tba/links';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
+import { YearSelector } from '~/components/tba/yearSelector';
 import {
   Table,
   TableBody,
@@ -86,8 +80,6 @@ function DistrictsPage() {
     ...getDistrictsByYearOptions({ path: { year } }),
   });
   const validYears = useValidYears();
-  const navigate = useNavigate();
-
   const sortedDistricts = useMemo(
     () =>
       [...districts].sort((a, b) =>
@@ -119,23 +111,15 @@ function DistrictsPage() {
             {districts.length} Districts
           </small>
         </h1>
-        <Select
-          value={String(year)}
-          onValueChange={(value) => {
-            void navigate({ to: `/districts/${value}` });
-          }}
-        >
-          <SelectTrigger className="w-[120px]">
-            <SelectValue placeholder={year} />
-          </SelectTrigger>
-          <SelectContent className="max-h-[30vh] overflow-y-auto">
-            {validYears.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-[120px]"
+          options={validYears.map((y) => ({
+            label: String(y),
+            to: `/districts/${y}`,
+            isCurrent: y === year,
+          }))}
+        />
       </div>
 
       <Table>
