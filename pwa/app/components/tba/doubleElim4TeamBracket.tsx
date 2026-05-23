@@ -3,6 +3,8 @@ import {
   type JSX,
   type SetStateAction,
   forwardRef,
+  memo,
+  useCallback,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -49,7 +51,7 @@ const WINNER_LINKS: WinnerLink[] = [
   { from: 'Match 5', to: 'Finals' },
 ];
 
-const BracketMatch = forwardRef<
+const _BracketMatch = forwardRef<
   PlayoffMatchHandle,
   {
     matchLabel: MatchLabel4;
@@ -268,6 +270,26 @@ const BracketMatch = forwardRef<
   );
 });
 
+const BracketMatch = memo(_BracketMatch, (prev, next) => {
+  if (
+    prev.matches !== next.matches ||
+    prev.event !== next.event ||
+    prev.matchLabel !== next.matchLabel ||
+    prev.getSeriesResult !== next.getSeriesResult ||
+    prev.getAllianceDisplayName !== next.getAllianceDisplayName ||
+    prev.setHoveredAlliance !== next.setHoveredAlliance
+  ) {
+    return false;
+  }
+  const result = next.getSeriesResult(next.matches);
+  return (
+    (prev.hoveredAlliance === result?.redAllianceNumber) ===
+      (next.hoveredAlliance === result?.redAllianceNumber) &&
+    (prev.hoveredAlliance === result?.blueAllianceNumber) ===
+      (next.hoveredAlliance === result?.blueAllianceNumber)
+  );
+});
+
 export default function DoubleElim4TeamBracket({
   alliances,
   matches,
@@ -310,75 +332,86 @@ export default function DoubleElim4TeamBracket({
     [matches],
   );
 
-  const getAllianceNumber = (teamKeys: string[]): number | null => {
-    for (let i = 0; i < alliances.length; i++) {
-      const allianceTeamKeys = alliances[i].picks.map((pick) =>
-        pick.substring(3),
-      );
-      if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
-        return i + 1;
+  const getAllianceNumber = useCallback(
+    (teamKeys: string[]): number | null => {
+      for (let i = 0; i < alliances.length; i++) {
+        const allianceTeamKeys = alliances[i].picks.map((pick) =>
+          pick.substring(3),
+        );
+        if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
+          return i + 1;
+        }
       }
-    }
-    return null;
-  };
+      return null;
+    },
+    [alliances],
+  );
 
-  const getAllianceDisplayName = (allianceNumber: number): string => {
-    if (!allianceNumber || allianceNumber > alliances.length) return '';
-    const alliance = alliances[allianceNumber - 1];
-    if (event.event_type === EventType.CMP_FINALS && alliance.name) {
-      return getDivisionShortform(alliance.name);
-    }
-    return `#${allianceNumber}`;
-  };
+  const getAllianceDisplayName = useCallback(
+    (allianceNumber: number): string => {
+      if (!allianceNumber || allianceNumber > alliances.length) return '';
+      const alliance = alliances[allianceNumber - 1];
+      if (event.event_type === EventType.CMP_FINALS && alliance.name) {
+        return getDivisionShortform(alliance.name);
+      }
+      return `#${allianceNumber}`;
+    },
+    [alliances, event.event_type],
+  );
 
-  const getSeriesResult = (
-    setMatches: Match[] | undefined,
-  ): SeriesResult | null => {
-    if (!setMatches || setMatches.length === 0) return null;
+  const getSeriesResult = useCallback(
+    (setMatches: Match[] | undefined): SeriesResult | null => {
+      if (!setMatches || setMatches.length === 0) return null;
 
-    const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
-      t.substring(3),
-    );
-    const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
-      t.substring(3),
-    );
+      const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
+        t.substring(3),
+      );
+      const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
+        t.substring(3),
+      );
 
-    const redAllianceNumber = getAllianceNumber(matchRedTeams);
-    const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
+      const redAllianceNumber = getAllianceNumber(matchRedTeams);
+      const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
 
-    const redTeams = redAllianceNumber
-      ? alliances[redAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchRedTeams;
-    const blueTeams = blueAllianceNumber
-      ? alliances[blueAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchBlueTeams;
+      const redTeams = redAllianceNumber
+        ? alliances[redAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchRedTeams;
+      const blueTeams = blueAllianceNumber
+        ? alliances[blueAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchBlueTeams;
 
-    const redResults = setMatches.map((match) => ({
-      score: match.alliances.red.score,
-      won: match.winning_alliance === AllianceColor.RED,
-    }));
-    const blueResults = setMatches.map((match) => ({
-      score: match.alliances.blue.score,
-      won: match.winning_alliance === AllianceColor.BLUE,
-    }));
+      const redResults = setMatches.map((match) => ({
+        score: match.alliances.red.score,
+        won: match.winning_alliance === AllianceColor.RED,
+      }));
+      const blueResults = setMatches.map((match) => ({
+        score: match.alliances.blue.score,
+        won: match.winning_alliance === AllianceColor.BLUE,
+      }));
 
-    const lastMatch = setMatches[setMatches.length - 1];
-    const redWon = lastMatch.winning_alliance === AllianceColor.RED;
-    const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
+      const lastMatch = setMatches[setMatches.length - 1];
+      const redWon = lastMatch.winning_alliance === AllianceColor.RED;
+      const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
 
-    return {
-      redTeams,
-      blueTeams,
-      redAllianceNumber,
-      blueAllianceNumber,
-      redResults,
-      blueResults,
-      redWon,
-      blueWon,
-      matchRedTeams,
-      matchBlueTeams,
-    };
-  };
+      return {
+        redTeams,
+        blueTeams,
+        redAllianceNumber,
+        blueAllianceNumber,
+        redResults,
+        blueResults,
+        redWon,
+        blueWon,
+        matchRedTeams,
+        matchBlueTeams,
+      };
+    },
+    [alliances, getAllianceNumber],
+  );
 
   const matchLookup: Record<string, Match[] | undefined> = useMemo(
     () => ({
