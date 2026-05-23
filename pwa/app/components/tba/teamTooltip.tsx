@@ -1,4 +1,4 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { ComponentProps, Suspense, useMemo } from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
@@ -27,6 +27,113 @@ export interface TeamTooltipProps {
 }
 
 export function TeamLinkWithTooltip({
+  teamKey,
+  year,
+  disqualified,
+  surrogate,
+  isWinner,
+  isCaptain,
+  ...props
+}: TeamTooltipProps & Omit<ComponentProps<typeof TeamLink>, 'teamOrKey'>) {
+  const teamNumber = teamKey.substring(3);
+  const { data: searchIndex } = useQuery(getSearchIndexOptions({}));
+  const teamName = useMemo(
+    () => searchIndex?.teams.find((t) => t.key === teamKey)?.nickname,
+    [searchIndex, teamKey],
+  );
+
+  const label = (
+    <>
+      {isWinner ? (
+        <InlineIcon className="relative right-[1ch] justify-center">
+          <BiTrophy />
+          {teamNumber}
+          {isCaptain && (
+            <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
+              C
+            </sup>
+          )}
+        </InlineIcon>
+      ) : isCaptain ? (
+        <>
+          {teamNumber}
+          <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">C</sup>
+        </>
+      ) : (
+        <>{teamNumber}</>
+      )}
+    </>
+  );
+
+  if (!teamName) {
+    return (
+      <TeamLink teamOrKey={teamKey} year={year} {...props}>
+        {label}
+      </TeamLink>
+    );
+  }
+
+  return (
+    <Tooltip delayDuration={1500}>
+      <TooltipTrigger asChild>
+        <TeamLink teamOrKey={teamKey} year={year} {...props}>
+          {label}
+        </TeamLink>
+      </TooltipTrigger>
+      <TooltipContent>
+        {disqualified
+          ? `${teamName} (DQ)`
+          : surrogate
+            ? `${teamName} (surrogate)`
+            : teamName}
+      </TooltipContent>
+    </Tooltip>
+  );
+}
+
+export function TeamTooltip({
+  teamKey,
+  year,
+  disqualified,
+  surrogate,
+}: TeamTooltipProps) {
+  const { data: media } = useSuspenseQuery(
+    getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+  );
+
+  const { data: searchIndex } = useSuspenseQuery(getSearchIndexOptions({}));
+
+  const team = useMemo(
+    () => searchIndex && searchIndex.teams.find((t) => t.key === teamKey),
+    [searchIndex, teamKey],
+  );
+
+  const maybeAvatar = useMemo(
+    () => media && media.find((m): m is MediaAvatar => m.type === 'avatar'),
+    [media],
+  );
+
+  if (!team) return null;
+
+  return (
+    <div>
+      {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
+      <h1>{team.nickname}</h1>
+      {disqualified && (
+        <i>
+          <h1>Disqualified</h1>
+        </i>
+      )}
+      {surrogate && (
+        <i>
+          <h1>Surrogate</h1>
+        </i>
+      )}
+    </div>
+  );
+}
+
+export function TeamLinkWithAvatarTooltip({
   teamKey,
   year,
   disqualified,
@@ -74,47 +181,5 @@ export function TeamLinkWithTooltip({
         </TooltipContent>
       </Suspense>
     </Tooltip>
-  );
-}
-
-export function TeamTooltip({
-  teamKey,
-  year,
-  disqualified,
-  surrogate,
-}: TeamTooltipProps) {
-  const { data: media } = useSuspenseQuery(
-    getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-
-  const { data: searchIndex } = useSuspenseQuery(getSearchIndexOptions({}));
-
-  const team = useMemo(
-    () => searchIndex && searchIndex.teams.find((t) => t.key === teamKey),
-    [searchIndex, teamKey],
-  );
-
-  const maybeAvatar = useMemo(
-    () => media && media.find((m): m is MediaAvatar => m.type === 'avatar'),
-    [media],
-  );
-
-  if (!team) return null;
-
-  return (
-    <div>
-      {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
-      <h1>{team.nickname}</h1>
-      {disqualified && (
-        <i>
-          <h1>Disqualified</h1>
-        </i>
-      )}
-      {surrogate && (
-        <i>
-          <h1>Surrogate</h1>
-        </i>
-      )}
-    </div>
   );
 }

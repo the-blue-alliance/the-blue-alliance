@@ -21,6 +21,7 @@ import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { Toaster } from '~/components/ui/sonner';
+import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
 import { ApiError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
@@ -187,30 +188,32 @@ function RootComponent() {
       </head>
       <body>
         <ThemeProvider>
-          <AuthContextProvider>
-            {isFullscreen ? (
-              <Outlet />
-            ) : (
-              <>
-                <Navbar />
-                <TOCRendererProvider>
-                  <div
-                    className={cn(
-                      !isFullwidth && 'container mx-auto',
-                      `min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
-                        px-4 text-sm`,
-                    )}
-                  >
-                    <div vaul-drawer-wrapper="" className="bg-background">
-                      <Outlet />
-                      <MatchModal />
+          <TooltipProvider delayDuration={300} skipDelayDuration={0}>
+            <AuthContextProvider>
+              {isFullscreen ? (
+                <Outlet />
+              ) : (
+                <>
+                  <Navbar />
+                  <TOCRendererProvider>
+                    <div
+                      className={cn(
+                        !isFullwidth && 'container mx-auto',
+                        `min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
+                          px-4 text-sm`,
+                      )}
+                    >
+                      <div vaul-drawer-wrapper="" className="bg-background">
+                        <Outlet />
+                        <MatchModal />
+                      </div>
                     </div>
-                  </div>
-                </TOCRendererProvider>
-                <Footer renderTime={renderTime} />
-              </>
-            )}
-          </AuthContextProvider>
+                  </TOCRendererProvider>
+                  <Footer renderTime={renderTime} />
+                </>
+              )}
+            </AuthContextProvider>
+          </TooltipProvider>
           <Toaster />
         </ThemeProvider>
         <TanStackRouterDevtools position="bottom-right" />
