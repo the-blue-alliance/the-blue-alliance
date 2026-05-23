@@ -2,7 +2,6 @@ import { Match } from '~/api/tba/read';
 import {
   Tooltip,
   TooltipContent,
-  TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import {
@@ -18,30 +17,28 @@ function RpDot({
   achieved: boolean;
 }) {
   return (
-    <TooltipProvider delayDuration={100}>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <svg
-            className="size-1"
-            viewBox="0 0 5 5"
-            fill="none"
-            xmlns="http://www.w3.org/2000/svg"
-          >
-            <circle
-              cx={2.5}
-              cy={2.5}
-              r={achieved ? 2.5 : 2}
-              fill={achieved ? 'currentColor' : 'none'}
-              stroke={achieved ? 'none' : '#9ca3af'}
-              strokeWidth={achieved ? 0 : 1}
-            />
-          </svg>
-        </TooltipTrigger>
-        <TooltipContent>
-          <span className="font-normal">{tooltipText}</span>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+    <Tooltip>
+      <TooltipTrigger asChild>
+        <svg
+          className="size-1"
+          viewBox="0 0 5 5"
+          fill="none"
+          xmlns="http://www.w3.org/2000/svg"
+        >
+          <circle
+            cx={2.5}
+            cy={2.5}
+            r={achieved ? 2.5 : 2}
+            fill={achieved ? 'currentColor' : 'none'}
+            stroke={achieved ? 'none' : '#9ca3af'}
+            strokeWidth={achieved ? 0 : 1}
+          />
+        </svg>
+      </TooltipTrigger>
+      <TooltipContent>
+        <span className="font-normal">{tooltipText}</span>
+      </TooltipContent>
+    </Tooltip>
   );
 }
 
