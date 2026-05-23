@@ -198,7 +198,9 @@ function TeamCell({
   }
 
   const allianceClass =
-    alliance === 'red' ? 'bg-alliance-red-loser' : 'bg-alliance-blue-loser';
+    alliance === 'red'
+      ? 'bg-alliance-red-bg-faded'
+      : 'bg-alliance-blue-bg-faded';
 
   const style: CSSProperties = cellColors.background
     ? {
@@ -346,8 +348,8 @@ function MatchesTable({
                       className={cn(
                         'text-center font-bold',
                         winner === AllianceColor.RED
-                          ? 'bg-alliance-red-winner'
-                          : 'bg-alliance-red-loser',
+                          ? 'bg-alliance-red-bg'
+                          : 'bg-alliance-red-bg-faded',
                       )}
                     >
                       {played ? redScore : '—'}
@@ -372,8 +374,8 @@ function MatchesTable({
                       className={cn(
                         'text-center font-bold',
                         winner === AllianceColor.BLUE
-                          ? 'bg-alliance-blue-winner'
-                          : 'bg-alliance-blue-loser',
+                          ? 'bg-alliance-blue-bg'
+                          : 'bg-alliance-blue-bg-faded',
                       )}
                     >
                       {played ? blueScore : '—'}
@@ -453,8 +455,8 @@ function MatchesTable({
                     className={cn(
                       'text-center font-bold',
                       winner === AllianceColor.RED
-                        ? 'bg-alliance-red-winner'
-                        : 'bg-alliance-red-loser',
+                        ? 'bg-alliance-red-bg'
+                        : 'bg-alliance-red-bg-faded',
                     )}
                   >
                     {played ? redScore : '—'}
@@ -463,8 +465,8 @@ function MatchesTable({
                     className={cn(
                       'text-center font-bold',
                       winner === AllianceColor.BLUE
-                        ? 'bg-alliance-blue-winner'
-                        : 'bg-alliance-blue-loser',
+                        ? 'bg-alliance-blue-bg'
+                        : 'bg-alliance-blue-bg-faded',
                     )}
                   >
                     {played ? blueScore : '—'}

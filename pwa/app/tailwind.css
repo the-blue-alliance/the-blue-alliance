@@ -46,60 +46,48 @@
   --color-navbar: oklch(0.4782 0.1589 271.4);
 
   /*
-    Alliance colors. Three tokens per alliance: the brand, plus two surface
-    variants (winner / loser). All six are explicit oklch literals — no
-    derived values — designed so black text passes WCAG 4.5:1 on every token.
+    Alliance color palette — three semantic tokens per alliance.
+    Fixed (same in light and dark). All surfaces require white text (see @layer base).
 
-    Convention:
-      - hue (H) is the alliance identity — stays constant: ~18 red, ~255 blue
-      - same L per tier across red and blue (perceptual uniformity)
-      - same C% of each hue's max chroma per tier (equal vividness)
-      - L increases toward white as emphasis decreases: brand → winner → loser
+    Tokens:
+      bg         — winner / emphasized surface (match rows, score cells)
+      bg-faded   — loser / subdued surface (brackets, data cells at rest)
+      accent     — ring, badge border, chart fill (exact brand hex)
 
-    Reading guide for -winner / -loser across contexts:
-      - match row:       literal (won / lost)
-      - score breakdown: figurative (emphasized totals / regular data cells)
-      - bracket row:     loser = default subdued tint; no winner tint in brackets
-                         (active hover highlight uses the brand bg-alliance-red)
+    bg and bg-faded are perceptually symmetric: identical L and C across both
+    alliances, differing only in hue (H=27 red, H=250 blue). This ensures
+    equal visual weight regardless of alliance color.
 
-    Tuning:
-      - Shift a whole alliance hue: edit H in all three tokens for that alliance
-      - Make winner pop more: bump C on --color-alliance-{red,blue}-winner
-      - Dial loser fade: lower C or raise L on --color-alliance-{red,blue}-loser
-      - Brand vibrancy: edit --color-alliance-{red,blue} directly
+    accent uses colors from the 2026 audience display: red #eb1b22, blue #0165b0.
+
+    APCA (white text): bg Lc ≥ 75, bg-faded Lc ≥ 95.
   */
 
-  /* brand (L=0.77): text, rings, charts, full fills — vivid, black text OK */
-  --color-alliance-red:  oklch(0.77 0.16  18);
-  --color-alliance-blue: oklch(0.77 0.13 255);
+  /* ─── Red alliance (H=27) ─── */
+  --color-alliance-red-bg: oklch(0.55 0.1875 27);
+  --color-alliance-red-bg-faded: oklch(0.35 0.15 27);
+  --color-alliance-red-accent: oklch(0.5988 0.2336 27.2);
 
-  /* winner (L=0.88): clearly tinted surface — 80% of max C per hue */
-  --color-alliance-red-winner:  oklch(0.88 0.07  18);
-  --color-alliance-blue-winner: oklch(0.88 0.06 255);
-
-  /* loser (L=0.93): lightly tinted surface — 80% of max C per hue */
-  --color-alliance-red-loser:  oklch(0.93 0.040  18);
-  --color-alliance-blue-loser: oklch(0.93 0.035 255);
-
-  /* FIRST avatar fallback backgrounds — not part of the alliance theme */
-  --color-first-avatar-red:  oklch(0.54 0.25  27);
-  --color-first-avatar-blue: oklch(0.47 0.17 254);
+  /* ─── Blue alliance (H=250) ─── */
+  --color-alliance-blue-bg: oklch(0.55 0.1875 250);
+  --color-alliance-blue-bg-faded: oklch(0.35 0.15 250);
+  --color-alliance-blue-accent: oklch(0.4997 0.1422 250.31);
 
   /* District accent colors (border-l accents on event list rows) */
-  --color-district-cal: oklch(0.80 0.17 83);
+  --color-district-cal: oklch(0.8 0.17 83);
   --color-district-fch: oklch(0.65 0.09 192);
   --color-district-fin: oklch(0.59 0.16 27);
-  --color-district-isr: oklch(0.82 0.10 214);
+  --color-district-isr: oklch(0.82 0.1 214);
   --color-district-fim: oklch(0.67 0.04 243);
-  --color-district-mar: oklch(0.65 0.10 293);
-  --color-district-ne:  oklch(0.27 0.16 271);
+  --color-district-mar: oklch(0.65 0.1 293);
+  --color-district-ne: oklch(0.27 0.16 271);
   --color-district-fnc: oklch(0.69 0.09 238);
   --color-district-ont: oklch(0.56 0.19 264);
-  --color-district-pnw: oklch(0.60 0.11 165);
+  --color-district-pnw: oklch(0.6 0.11 165);
   --color-district-pch: oklch(0.82 0.09 44);
-  --color-district-fsc: oklch(0.62 0.10 155);
-  --color-district-tx:  oklch(0.65 0.16 44);
-  --color-district-fw:  oklch(0.62 0.22 350);
+  --color-district-fsc: oklch(0.62 0.1 155);
+  --color-district-tx: oklch(0.65 0.16 44);
+  --color-district-fw: oklch(0.62 0.22 350);
 
   --radius-lg: var(--radius);
   --radius-md: calc(var(--radius) - 2px);
@@ -195,11 +183,11 @@
 
     /* All values are OKLCH: L C H (perceptually uniform) */
     --background: 1 0 0;
-    --foreground: 0.20 0.02 255;
+    --foreground: 0.2 0.02 255;
     --card: 0.975 0.007 240;
-    --card-foreground: 0.20 0.02 255;
+    --card-foreground: 0.2 0.02 255;
     --popover: 0.975 0.007 240;
-    --popover-foreground: 0.20 0.02 255;
+    --popover-foreground: 0.2 0.02 255;
     --primary: 0.452 0.191 264;
     --primary-foreground: 1 0 0;
     --secondary: 0.965 0.009 240;
@@ -212,7 +200,7 @@
     --destructive-foreground: 1 0 0;
     --border: 0.88 0.015 240;
     --input: 0.88 0.015 240;
-    --ring: 0.57 0.20 264;
+    --ring: 0.57 0.2 264;
     --radius: 0.5rem;
     --chart-1: 0.52 0.16 245;
     --chart-2: 0.52 0.16 145;
@@ -228,7 +216,7 @@
     --card-foreground: 0.94 0.01 240;
     --popover: 0.19 0.02 255;
     --popover-foreground: 0.94 0.01 240;
-    --primary: 0.60 0.18 264;
+    --primary: 0.6 0.18 264;
     --primary-foreground: 1 0 0;
     --secondary: 0.19 0.02 255;
     --secondary-foreground: 0.94 0.01 240;
@@ -246,14 +234,6 @@
     --chart-3: 0.72 0.16 315;
     --chart-4: 0.72 0.16 55;
     --chart-5: 0.72 0.16 195;
-    /* Dark mode: brand unchanged — vivid on dark surfaces, good as text.
-       winner/loser are dark tinted surfaces; text-foreground (L≈0.94)
-       provides contrast. Same L per tier, same C% of max chroma per tier. */
-    --color-alliance-red-winner:  oklch(0.30 0.10  18);
-    --color-alliance-blue-winner: oklch(0.30 0.09 255);
-
-    --color-alliance-red-loser:  oklch(0.22 0.04  18);
-    --color-alliance-blue-loser: oklch(0.22 0.04 255);
   }
 }
 
@@ -269,16 +249,34 @@
     @apply bg-background text-foreground;
   }
 
+  /* Alliance bg surfaces use white text. Sets color directly so plain text
+     nodes (score numbers, results) inherit white without needing explicit classes.
+     Elements with text-* utility classes must use text-white explicitly. */
+  .bg-alliance-red-bg,
+  .bg-alliance-red-bg-faded,
+  .bg-alliance-blue-bg,
+  .bg-alliance-blue-bg-faded {
+    color: oklch(1 0 0);
+  }
+
   /* Apply blue text and a hover underline to every link */
   a {
     @apply text-blue-600 hover:underline dark:text-blue-400;
+  }
+
+  /* Override link color inside alliance bg surfaces — higher specificity than `a` in same layer */
+  .bg-alliance-red-bg a,
+  .bg-alliance-red-bg-faded a,
+  .bg-alliance-blue-bg a,
+  .bg-alliance-blue-bg-faded a {
+    color: oklch(1 0 0);
   }
 
   /* Bootstrap-style code styling */
   code {
     background-color: oklch(0.96 0.01 355);
     border-radius: 4px;
-    color: oklch(0.50 0.22 355);
+    color: oklch(0.5 0.22 355);
     padding: 2px 4px;
     font-size: 90%;
     font-family: var(--font-mono);
@@ -286,6 +284,6 @@
 
   .dark code {
     background-color: oklch(0.23 0.03 355);
-    color: oklch(0.72 0.20 355);
+    color: oklch(0.72 0.2 355);
   }
 }

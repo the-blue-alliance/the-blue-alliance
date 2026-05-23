@@ -562,7 +562,7 @@ function MatchSuggestionRow({
           )}
         </td>
         {match.alliances.red.team_keys.map((k) => (
-          <td className="border bg-alliance-red-loser" key={k}>
+          <td className="border bg-alliance-red-bg-faded" key={k}>
             <TeamLink teamOrKey={k} year={event.year}>
               {k.substring(3)}
             </TeamLink>
@@ -579,7 +579,7 @@ function MatchSuggestionRow({
           </td>
         ))}
         {match.alliances.blue.team_keys.map((k) => (
-          <td className="border bg-alliance-blue-loser" key={k}>
+          <td className="border bg-alliance-blue-bg-faded" key={k}>
             <TeamLink teamOrKey={k} year={event.year}>
               {k.substring(3)}
             </TeamLink>
@@ -595,17 +595,17 @@ function MatchSuggestionRow({
             )}
           </td>
         ))}
-        <td className="border bg-alliance-red-winner">
+        <td className="border bg-alliance-red-bg">
           {predictedRedScore.toFixed(0)}
         </td>
-        <td className="border bg-alliance-blue-winner">
+        <td className="border bg-alliance-blue-bg">
           {predictedBlueScore.toFixed(0)}
         </td>
-        <td className="border bg-alliance-red-loser">
+        <td className="border bg-alliance-red-bg-faded">
           {redEndGamePoints.toFixed(0)}
           <Progress value={(redEndGamePoints / 36.0) * 100.0} />
         </td>
-        <td className="border bg-alliance-blue-loser">
+        <td className="border bg-alliance-blue-bg-faded">
           {blueEndGamePoints.toFixed(0)}
           <Progress value={(blueEndGamePoints / 36.0) * 100.0} />
         </td>
@@ -632,7 +632,7 @@ function MatchSuggestionRow({
                 <TeamDetails
                   key={k}
                   teamKey={k}
-                  className="bg-alliance-red-loser"
+                  className="bg-alliance-red-bg-faded"
                   defaultRed
                 />
               ))}
@@ -640,7 +640,7 @@ function MatchSuggestionRow({
                 <TeamDetails
                   key={k}
                   teamKey={k}
-                  className="bg-alliance-blue-loser"
+                  className="bg-alliance-blue-bg-faded"
                 />
               ))}
             </div>

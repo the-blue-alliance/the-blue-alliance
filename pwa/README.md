@@ -130,6 +130,50 @@ With all that said... There are various levels of caching available when making 
 
 TBA Beta uses [TailwindCSS](https://tailwindcss.com/) and [ShadCN](https://ui.shadcn.com/) components.
 
+## Colors
+
+All colors use the [OKLCH color space](https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl) (`oklch(L C H)`), which is perceptually uniform: equal steps in L produce equal perceived brightness changes, and hue stays visually stable across the lightness range. This makes it far more predictable than HSL for building consistent palettes. All values are verified to be within the sRGB gamut (no P3 or REC2020 required) so they render faithfully on any display.
+
+Contrast is evaluated using [APCA](https://www.myndex.com/APCA/) (Advanced Perceptual Contrast Algorithm), which supersedes WCAG 2 contrast ratios. The minimum threshold used here is **Lc 70** for UI labels and data cells.
+
+### Alliance Colors
+
+FRC matches have two alliances — red and blue. Three semantic tokens are defined per alliance:
+
+| Token                       | Purpose                                                                                    |
+| --------------------------- | ------------------------------------------------------------------------------------------ |
+| `alliance-{color}-bg`       | Winner row / emphasized surface (match result tables, score cells, team avatar background) |
+| `alliance-{color}-bg-faded` | Loser row / subdued tint (bracket rows, data cells at rest)                                |
+| `alliance-{color}-accent`   | Vivid ring, badge border, chart fill                                                       |
+
+All tokens are **fixed** — identical in light and dark mode. A `@layer base` rule enforces white text on all alliance bg surfaces so components need no `text-white` class.
+
+#### Color values
+
+| Token           | OKLCH                         | Notes                         | White text Lc |
+| --------------- | ----------------------------- | ----------------------------- | ------------- |
+| `red-bg`        | `oklch(0.50 0.1875 27)`       | winner surface                | Lc ≥ 75 ✓     |
+| `red-bg-faded`  | `oklch(0.375 0.15 27)`        | loser surface                 | Lc ≥ 95 ✓     |
+| `red-accent`    | `oklch(0.5988 0.2336 27.2)`   | 2026 audience display #eb1b22 | —             |
+| `blue-bg`       | `oklch(0.50 0.1875 250)`      | winner surface                | Lc ≥ 75 ✓     |
+| `blue-bg-faded` | `oklch(0.375 0.15 250)`       | loser surface                 | Lc ≥ 95 ✓     |
+| `blue-accent`   | `oklch(0.4997 0.1422 250.31)` | 2026 audience display #0165b0 | —             |
+
+#### Rationale
+
+`bg` and `bg-faded` are perceptually symmetric: both alliances share identical L and C values, differing only in hue (H=27 for red, H=250 for blue). This ensures equal visual weight regardless of alliance color — the red row and blue row carry identical perceived brightness and saturation.
+
+`accent` uses precise OKLCH conversions of the colors from the 2026 FRC audience display: **#eb1b22** (red) and **#0165b0** (blue). Accents appear as rings, badge borders, and chart fills.
+
+All bg and bg-faded values are mid-to-dark lightness (L=0.375–0.50), so white is the only viable text color. Components that use these backgrounds apply `text-white` explicitly; a `@layer base` rule also sets `color: white` on these elements for plain text node inheritance.
+
+#### Reference
+
+- [OKLCH in CSS: why quit RGB and HSL](https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl) — why OKLCH over HSL/RGB
+- [APCA contrast calculator](https://www.myndex.com/APCA/) — contrast tool used to verify all Lc values
+- [OKLCH color picker / gamut explorer](https://oklch.fyi) — interactive tool for exploring sRGB limits by L and H
+- [Stripe: accessible color systems](https://stripe.com/blog/accessible-color-systems) — practical guide to building adaptive palettes
+
 ## Icons
 
 Icons are complicated and opinionated. TBA uses `@unplugin/unplugin-icons`, which combines two nice tools:

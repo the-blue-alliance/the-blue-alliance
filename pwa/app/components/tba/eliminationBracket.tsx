@@ -118,9 +118,9 @@ const _PlayoffMatch = forwardRef<
         `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200
         bg-background transition-all duration-200 dark:border-neutral-700`,
         {
-          [`border-transparent shadow-lg ring-2 ring-alliance-red/75
+          [`border-transparent shadow-lg ring-2 ring-alliance-red-accent
           dark:border-transparent`]: isHighlighted && result.redWon,
-          [`border-transparent shadow-lg ring-2 ring-alliance-blue/75
+          [`border-transparent shadow-lg ring-2 ring-alliance-blue-accent
           dark:border-transparent`]: isHighlighted && result.blueWon,
         },
       )}
@@ -136,9 +136,10 @@ const _PlayoffMatch = forwardRef<
               (
               <span
                 className={cn(
-                  'text-foreground transition-all duration-200',
-                  isRedHighlighted &&
-                    'rounded bg-alliance-red-winner px-1 text-sm',
+                  'transition-all duration-200',
+                  isRedHighlighted
+                    ? 'rounded bg-alliance-red-bg px-1 text-sm text-white'
+                    : 'text-foreground',
                 )}
               >
                 {getAllianceDisplayName(result.redAllianceNumber)}
@@ -146,9 +147,10 @@ const _PlayoffMatch = forwardRef<
               vs{' '}
               <span
                 className={cn(
-                  'text-foreground transition-all duration-200',
-                  isBlueHighlighted &&
-                    'rounded bg-alliance-blue-winner px-1 text-sm',
+                  'transition-all duration-200',
+                  isBlueHighlighted
+                    ? 'rounded bg-alliance-blue-bg px-1 text-sm text-white'
+                    : 'text-foreground',
                 )}
               >
                 {getAllianceDisplayName(result.blueAllianceNumber)}
@@ -173,10 +175,17 @@ const _PlayoffMatch = forwardRef<
         </div>
       </div>
       <div
-        className="group flex cursor-pointer items-center justify-between
-          bg-alliance-red-loser px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-red-winner"
-        data-highlight={isRedHighlighted}
+        className={cn(
+          `group flex cursor-pointer items-center justify-between px-1 py-1
+          transition-colors duration-200`,
+          hoveredAlliance !== null
+            ? isRedHighlighted
+              ? 'bg-alliance-red-bg'
+              : 'bg-alliance-red-bg-faded'
+            : result.redWon
+              ? 'bg-alliance-red-bg'
+              : 'bg-alliance-red-bg-faded',
+        )}
         ref={redRowRef}
         onMouseEnter={() =>
           result.redAllianceNumber &&
@@ -195,8 +204,10 @@ const _PlayoffMatch = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    'w-12 text-center text-sm text-foreground',
-                    result.redWon && 'font-bold',
+                    'w-12 text-center text-sm text-white',
+                    (hoveredAlliance !== null
+                      ? isRedHighlighted
+                      : result.redWon) && 'font-bold',
                     !teamPlayed &&
                       'underline decoration-current decoration-dotted',
                   )}
@@ -218,7 +229,8 @@ const _PlayoffMatch = forwardRef<
                 key={i}
                 className={cn(
                   'w-8 shrink-0 text-center text-sm',
-                  r.won && 'font-bold',
+                  (hoveredAlliance !== null ? isRedHighlighted : r.won) &&
+                    'font-bold',
                 )}
               >
                 {r.score !== -1 ? r.score : '-'}
@@ -228,10 +240,17 @@ const _PlayoffMatch = forwardRef<
         </div>
       </div>
       <div
-        className="group flex cursor-pointer items-center justify-between
-          bg-alliance-blue-loser px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-blue-winner"
-        data-highlight={isBlueHighlighted}
+        className={cn(
+          `group flex cursor-pointer items-center justify-between px-1 py-1
+          transition-colors duration-200`,
+          hoveredAlliance !== null
+            ? isBlueHighlighted
+              ? 'bg-alliance-blue-bg'
+              : 'bg-alliance-blue-bg-faded'
+            : result.blueWon
+              ? 'bg-alliance-blue-bg'
+              : 'bg-alliance-blue-bg-faded',
+        )}
         ref={blueRowRef}
         onMouseEnter={() =>
           result.blueAllianceNumber &&
@@ -250,8 +269,10 @@ const _PlayoffMatch = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    'w-12 text-center text-sm text-foreground',
-                    result.blueWon && 'font-bold',
+                    'w-12 text-center text-sm text-white',
+                    (hoveredAlliance !== null
+                      ? isBlueHighlighted
+                      : result.blueWon) && 'font-bold',
                     !teamPlayed &&
                       'underline decoration-current decoration-dotted',
                   )}
@@ -273,7 +294,8 @@ const _PlayoffMatch = forwardRef<
                 key={i}
                 className={cn(
                   'w-8 flex-shrink-0 text-center text-sm',
-                  r.won && 'font-bold',
+                  (hoveredAlliance !== null ? isBlueHighlighted : r.won) &&
+                    'font-bold',
                 )}
               >
                 {r.score !== -1 ? r.score : '-'}
@@ -298,13 +320,15 @@ const PlayoffMatch = memo(_PlayoffMatch, (prev, next) => {
   ) {
     return false;
   }
-  // Only re-render if this match's own highlight status changed
+  // Re-render if this match's highlight status changed, or if hover
+  // started/stopped (winner rows need to dim/undim across all matches)
   const result = next.getSeriesResult(next.matches);
   return (
     (prev.hoveredAlliance === result?.redAllianceNumber) ===
       (next.hoveredAlliance === result?.redAllianceNumber) &&
     (prev.hoveredAlliance === result?.blueAllianceNumber) ===
-      (next.hoveredAlliance === result?.blueAllianceNumber)
+      (next.hoveredAlliance === result?.blueAllianceNumber) &&
+    (prev.hoveredAlliance === null) === (next.hoveredAlliance === null)
   );
 });
 

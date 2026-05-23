@@ -13,20 +13,20 @@ const scoreCellVariants = cva(
         false: '',
       },
       allianceColor: {
-        red: 'bg-alliance-red-loser',
-        blue: 'bg-alliance-blue-loser',
+        red: 'bg-alliance-red-bg-faded',
+        blue: 'bg-alliance-blue-bg-faded',
       },
     },
     compoundVariants: [
       {
         winner: true,
         allianceColor: 'red',
-        className: 'bg-alliance-red-winner',
+        className: 'bg-alliance-red-bg',
       },
       {
         winner: true,
         allianceColor: 'blue',
-        className: 'bg-alliance-blue-winner',
+        className: 'bg-alliance-blue-bg',
       },
     ],
     defaultVariants: {

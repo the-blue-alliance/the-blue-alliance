@@ -6,8 +6,8 @@ import { cn } from '~/lib/utils';
 const teamListSubgridVariants = cva('flex items-center justify-center', {
   variants: {
     allianceColor: {
-      red: 'bg-alliance-red-loser',
-      blue: 'bg-alliance-blue-loser',
+      red: 'bg-alliance-red-bg-faded',
+      blue: 'bg-alliance-blue-bg-faded',
     },
     winner: {
       true: 'font-semibold',
@@ -18,12 +18,12 @@ const teamListSubgridVariants = cva('flex items-center justify-center', {
     {
       winner: true,
       allianceColor: 'red',
-      className: 'bg-alliance-red-winner',
+      className: 'bg-alliance-red-bg',
     },
     {
       winner: true,
       allianceColor: 'blue',
-      className: 'bg-alliance-blue-winner',
+      className: 'bg-alliance-blue-bg',
     },
   ],
   defaultVariants: {
@@ -80,30 +80,27 @@ export default function TeamListSubgrid({
   );
 }
 
-const teamCellVariants = cva(
-  'flex items-center justify-center text-foreground',
-  {
-    variants: {
-      dq: {
-        true: 'line-through',
-        false: '',
-      },
-      surrogate: {
-        true: 'underline decoration-dashed',
-        false: '',
-      },
-      focus: {
-        true: 'underline',
-        false: '',
-      },
+const teamCellVariants = cva('flex items-center justify-center text-white', {
+  variants: {
+    dq: {
+      true: 'line-through',
+      false: '',
     },
-    defaultVariants: {
-      dq: false,
-      surrogate: false,
-      focus: false,
+    surrogate: {
+      true: 'underline decoration-dashed',
+      false: '',
+    },
+    focus: {
+      true: 'underline',
+      false: '',
     },
   },
-);
+  defaultVariants: {
+    dq: false,
+    surrogate: false,
+    focus: false,
+  },
+});
 
 interface TeamCellProps
   extends

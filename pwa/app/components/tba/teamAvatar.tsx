@@ -13,7 +13,7 @@ export default function TeamAvatar({
   defaultRed?: boolean;
 }) {
   const [colorClass, setColorClass] = useState(
-    defaultRed ? 'bg-first-avatar-red' : 'bg-first-avatar-blue',
+    defaultRed ? 'bg-alliance-red-bg' : 'bg-alliance-blue-bg',
   );
 
   if (!media.details) {
@@ -21,10 +21,10 @@ export default function TeamAvatar({
   }
 
   const handler = () => {
-    if (colorClass === 'bg-first-avatar-blue') {
-      setColorClass('bg-first-avatar-red');
+    if (colorClass === 'bg-alliance-blue-bg') {
+      setColorClass('bg-alliance-red-bg');
     } else {
-      setColorClass('bg-first-avatar-blue');
+      setColorClass('bg-alliance-blue-bg');
     }
   };
 

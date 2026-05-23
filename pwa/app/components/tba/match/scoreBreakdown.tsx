@@ -98,22 +98,22 @@ const cellVariants = cva('', {
     {
       color: 'red',
       shade: 'light',
-      class: 'bg-alliance-red-loser',
+      class: 'bg-alliance-red-bg-faded',
     },
     {
       color: 'red',
       shade: 'dark',
-      class: 'bg-alliance-red-winner',
+      class: 'bg-alliance-red-bg',
     },
     {
       color: 'blue',
       shade: 'light',
-      class: 'bg-alliance-blue-loser',
+      class: 'bg-alliance-blue-bg-faded',
     },
     {
       color: 'blue',
       shade: 'dark',
-      class: 'bg-alliance-blue-winner',
+      class: 'bg-alliance-blue-bg',
     },
     {
       color: 'neutral',
