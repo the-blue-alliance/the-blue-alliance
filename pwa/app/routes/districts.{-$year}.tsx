@@ -144,7 +144,7 @@ function DistrictsPage() {
               <TableCell className="font-mono text-muted-foreground">
                 {district.abbreviation}
               </TableCell>
-              <TableCell className="text-right tabular-nums">
+              <TableCell className="text-right numeric-data">
                 {teamCountByDistrict.get(district.key)}
               </TableCell>
             </TableRow>

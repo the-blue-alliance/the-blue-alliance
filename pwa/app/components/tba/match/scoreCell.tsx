@@ -5,7 +5,7 @@ import RpDots from '~/components/tba/rpDot';
 import { cn } from '~/lib/utils';
 
 const scoreCellVariants = cva(
-  'relative flex items-center justify-center tabular-nums',
+  'relative flex items-center justify-center numeric-data',
   {
     variants: {
       winner: {
@@ -13,20 +13,20 @@ const scoreCellVariants = cva(
         false: '',
       },
       allianceColor: {
-        red: 'bg-alliance-red-cell',
-        blue: 'bg-alliance-blue-cell',
+        red: 'bg-alliance-red-loser',
+        blue: 'bg-alliance-blue-loser',
       },
     },
     compoundVariants: [
       {
         winner: true,
         allianceColor: 'red',
-        className: 'bg-alliance-red-cell-winner',
+        className: 'bg-alliance-red-winner',
       },
       {
         winner: true,
         allianceColor: 'blue',
-        className: 'bg-alliance-blue-cell-winner',
+        className: 'bg-alliance-blue-winner',
       },
     ],
     defaultVariants: {

@@ -25,8 +25,8 @@ interface ShiftScore {
   blue: number;
 }
 
-const RED_COLOR = '#ef4444';
-const BLUE_COLOR = '#3b82f6';
+const RED_COLOR = 'var(--color-alliance-red-accent)';
+const BLUE_COLOR = 'var(--color-alliance-blue-accent)';
 
 function makeChartConfig(match: Match): ChartConfig {
   const redLabel = match.alliances.red.team_keys

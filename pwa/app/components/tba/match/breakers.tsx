@@ -1,6 +1,6 @@
 import { CompLevel, Event, Match, PlayoffType } from '~/api/tba/read';
 import { DOUBLE_ELIM_ROUND_MAPPING } from '~/lib/api/PlayoffType';
-import { COMP_LEVEL_SHORT_STRINGS } from '~/lib/matchUtils';
+import { COMP_LEVEL_LONG_STRINGS } from '~/lib/matchUtils';
 import { timestampsAreOnDifferentDays } from '~/lib/utils';
 
 export interface BreakerResult {
@@ -42,7 +42,7 @@ export const START_OF_QUALS_BREAKER: ShouldInsertBreakCallback = ({
 }) => {
   return {
     shouldBreak: matchIndex === 0 && match.comp_level === CompLevel.QM,
-    text: 'Quals',
+    text: COMP_LEVEL_LONG_STRINGS[CompLevel.QM],
     whereToInsertBreak: 'before',
   };
 };
@@ -57,11 +57,11 @@ export const START_OF_ELIMS_BREAKER: ShouldInsertBreakCallback = ({
     text: (
       {
         [PlayoffType.DOUBLE_ELIM_8_TEAM]: 'Round 1',
-        [PlayoffType.AVG_SCORE_8_TEAM]: 'Quarterfinals',
-        [PlayoffType.BRACKET_8_TEAM]: 'Quarterfinals',
-        [PlayoffType.CUSTOM]: 'Elims',
+        [PlayoffType.AVG_SCORE_8_TEAM]: COMP_LEVEL_LONG_STRINGS[CompLevel.QF],
+        [PlayoffType.BRACKET_8_TEAM]: COMP_LEVEL_LONG_STRINGS[CompLevel.QF],
+        [PlayoffType.CUSTOM]: 'Playoffs',
       } as Partial<Record<PlayoffType, string>>
-    )[event.playoff_type ?? PlayoffType.CUSTOM],
+    )[event.playoff_type ?? PlayoffType.BRACKET_8_TEAM],
     whereToInsertBreak: 'before',
   };
 };
@@ -72,7 +72,7 @@ export const START_OF_FINALS_BREAKER: ShouldInsertBreakCallback = ({
 }) => {
   return {
     shouldBreak: matchIndex === 0 && match.comp_level === CompLevel.F,
-    text: 'Finals',
+    text: COMP_LEVEL_LONG_STRINGS[CompLevel.F],
     whereToInsertBreak: 'before',
   };
 };
@@ -87,7 +87,7 @@ export const CHANGE_IN_COMP_LEVEL_BREAKER: ShouldInsertBreakCallback = ({
 
   return {
     shouldBreak: match.comp_level !== nextMatch.comp_level,
-    text: COMP_LEVEL_SHORT_STRINGS[nextMatch.comp_level],
+    text: COMP_LEVEL_LONG_STRINGS[nextMatch.comp_level],
     whereToInsertBreak: 'after',
   };
 };

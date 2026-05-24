@@ -198,7 +198,7 @@ function TeamCell({
   }
 
   const allianceClass =
-    alliance === 'red' ? 'bg-alliance-red-cell' : 'bg-alliance-blue-cell';
+    alliance === 'red' ? 'bg-alliance-red-loser' : 'bg-alliance-blue-loser';
 
   const style: CSSProperties = cellColors.background
     ? {
@@ -346,8 +346,8 @@ function MatchesTable({
                       className={cn(
                         'text-center font-bold',
                         winner === AllianceColor.RED
-                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-red)_30%,transparent)]'
-                          : 'bg-alliance-red-cell',
+                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-red-accent)_30%,transparent)]'
+                          : 'bg-alliance-red-loser',
                       )}
                     >
                       {played ? redScore : '—'}
@@ -372,8 +372,8 @@ function MatchesTable({
                       className={cn(
                         'text-center font-bold',
                         winner === AllianceColor.BLUE
-                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue)_30%,transparent)]'
-                          : 'bg-alliance-blue-cell',
+                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue-accent)_30%,transparent)]'
+                          : 'bg-alliance-blue-loser',
                       )}
                     >
                       {played ? blueScore : '—'}
@@ -453,8 +453,8 @@ function MatchesTable({
                     className={cn(
                       'text-center font-bold',
                       winner === AllianceColor.RED
-                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-red)_30%,transparent)]'
-                        : 'bg-alliance-red-cell',
+                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-red-accent)_30%,transparent)]'
+                        : 'bg-alliance-red-loser',
                     )}
                   >
                     {played ? redScore : '—'}
@@ -463,8 +463,8 @@ function MatchesTable({
                     className={cn(
                       'text-center font-bold',
                       winner === AllianceColor.BLUE
-                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue)_30%,transparent)]'
-                        : 'bg-alliance-blue-cell',
+                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue-accent)_30%,transparent)]'
+                        : 'bg-alliance-blue-loser',
                     )}
                   >
                     {played ? blueScore : '—'}
