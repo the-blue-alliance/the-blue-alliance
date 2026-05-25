@@ -7,13 +7,17 @@
   {% set status = request.args.get('status') %}
   {% set status_messages = {
     'linked': 'Offseason linked successfully. Event details fetch has been queued.',
+    'unlinked': 'Offseason unlinked successfully.',
+    'deleted': 'Offseason event deleted successfully.',
     'invalid_event_key': 'Event key is invalid.',
     'invalid_event_type': 'Only offseason events can be linked here.',
     'invalid_first_code': 'Please enter a valid FIRST event code or frc-events URL for this season.',
-    'already_linked': 'This event is already linked to a FIRST event code.'
+    'already_linked': 'This event is already linked to a FIRST event code.',
+    'not_linked': 'This event is not currently linked to a FIRST event code.',
+    'delete_not_allowed': 'Only offseason events that have not started yet can be deleted.'
   } %}
   {% if status and status_messages.get(status) %}
-  <div class="alert alert-{% if status == 'linked' %}success{% else %}danger{% endif %}" id="offseason-status-message">
+  <div class="alert alert-{% if status in ['linked', 'unlinked', 'deleted'] %}success{% else %}danger{% endif %}" id="offseason-status-message">
     {{ status_messages.get(status) }}
   </div>
   {% endif %}
@@ -30,10 +34,12 @@
         <th>Event</th>
         <th>Dates</th>
         <th>FIRST API Code</th>
+        <th>Actions</th>
       </tr>
     </thead>
     <tbody>
       {% for event in events %}
+      {% set can_delete = event.start_date and event.start_date > now %}
       <tr id="event-{{ event.key_name }}">
         <td>
           <strong>{{ event.name }}</strong><br>
@@ -64,6 +70,18 @@
             {% else %}
             <button class="btn btn-primary btn-sm" type="submit">Link</button>
             {% endif %}
+          </form>
+        </td>
+        <td>
+          {% if event.first_code %}
+          <form action="/mod/offseason/{{ event.key_name }}/unlink" method="post" style="display:inline-block; margin-right: 8px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="btn btn-warning btn-sm" id="unlink-{{ event.key_name }}" type="submit">Unlink</button>
+          </form>
+          {% endif %}
+          <form action="/mod/offseason/{{ event.key_name }}/delete" method="post" style="display:inline-block;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="btn btn-sm {% if can_delete %}btn-danger{% else %}btn-default{% endif %}" id="delete-{{ event.key_name }}" type="submit" {% if can_delete %}onclick="return confirm('Delete {{ event.name|e }}?');"{% else %}disabled title="This event has already started or is missing a start date."{% endif %}>Delete</button>
           </form>
         </td>
       </tr>
