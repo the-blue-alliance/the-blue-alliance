@@ -3,6 +3,8 @@ import {
   type JSX,
   type SetStateAction,
   forwardRef,
+  memo,
+  useCallback,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -34,7 +36,7 @@ import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
 
-const BracketMatchCard = forwardRef<
+const _BracketMatchCard = forwardRef<
   PlayoffMatchHandle,
   {
     label: string;
@@ -247,6 +249,27 @@ const BracketMatchCard = forwardRef<
   );
 });
 
+const BracketMatchCard = memo(_BracketMatchCard, (prev, next) => {
+  if (
+    prev.matches !== next.matches ||
+    prev.event !== next.event ||
+    prev.label !== next.label ||
+    prev.getSeriesResult !== next.getSeriesResult ||
+    prev.getAllianceDisplayName !== next.getAllianceDisplayName ||
+    prev.setHoveredAlliance !== next.setHoveredAlliance
+  ) {
+    return false;
+  }
+  // Only re-render if this match's own highlight status changed
+  const result = next.getSeriesResult(next.matches);
+  return (
+    (prev.hoveredAlliance === result?.redAllianceNumber) ===
+      (next.hoveredAlliance === result?.redAllianceNumber) &&
+    (prev.hoveredAlliance === result?.blueAllianceNumber) ===
+      (next.hoveredAlliance === result?.blueAllianceNumber)
+  );
+});
+
 function buildWinnerLinks(
   hasEighthFinals: boolean,
   is4Team: boolean,
@@ -334,75 +357,86 @@ export default function TraditionalBracket({
     return lookup;
   }, [matchGroups, is4Team, hasEighthFinals]);
 
-  const getAllianceNumber = (teamKeys: string[]): number | null => {
-    for (let i = 0; i < alliances.length; i++) {
-      const allianceTeamKeys = alliances[i].picks.map((pick) =>
-        pick.substring(3),
-      );
-      if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
-        return i + 1;
+  const getAllianceNumber = useCallback(
+    (teamKeys: string[]): number | null => {
+      for (let i = 0; i < alliances.length; i++) {
+        const allianceTeamKeys = alliances[i].picks.map((pick) =>
+          pick.substring(3),
+        );
+        if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
+          return i + 1;
+        }
       }
-    }
-    return null;
-  };
+      return null;
+    },
+    [alliances],
+  );
 
-  const getAllianceDisplayName = (allianceNumber: number): string => {
-    if (!allianceNumber || allianceNumber > alliances.length) return '';
-    const alliance = alliances[allianceNumber - 1];
-    if (event.event_type === EventType.CMP_FINALS && alliance.name) {
-      return getDivisionShortform(alliance.name);
-    }
-    return `#${allianceNumber}`;
-  };
+  const getAllianceDisplayName = useCallback(
+    (allianceNumber: number): string => {
+      if (!allianceNumber || allianceNumber > alliances.length) return '';
+      const alliance = alliances[allianceNumber - 1];
+      if (event.event_type === EventType.CMP_FINALS && alliance.name) {
+        return getDivisionShortform(alliance.name);
+      }
+      return `#${allianceNumber}`;
+    },
+    [alliances, event.event_type],
+  );
 
-  const getSeriesResult = (
-    setMatches: Match[] | undefined,
-  ): SeriesResult | null => {
-    if (!setMatches || setMatches.length === 0) return null;
+  const getSeriesResult = useCallback(
+    (setMatches: Match[] | undefined): SeriesResult | null => {
+      if (!setMatches || setMatches.length === 0) return null;
 
-    const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
-      t.substring(3),
-    );
-    const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
-      t.substring(3),
-    );
+      const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
+        t.substring(3),
+      );
+      const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
+        t.substring(3),
+      );
 
-    const redAllianceNumber = getAllianceNumber(matchRedTeams);
-    const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
+      const redAllianceNumber = getAllianceNumber(matchRedTeams);
+      const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
 
-    const redTeams = redAllianceNumber
-      ? alliances[redAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchRedTeams;
-    const blueTeams = blueAllianceNumber
-      ? alliances[blueAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchBlueTeams;
+      const redTeams = redAllianceNumber
+        ? alliances[redAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchRedTeams;
+      const blueTeams = blueAllianceNumber
+        ? alliances[blueAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchBlueTeams;
 
-    const redResults = setMatches.map((match) => ({
-      score: match.alliances.red.score,
-      won: match.winning_alliance === AllianceColor.RED,
-    }));
-    const blueResults = setMatches.map((match) => ({
-      score: match.alliances.blue.score,
-      won: match.winning_alliance === AllianceColor.BLUE,
-    }));
+      const redResults = setMatches.map((match) => ({
+        score: match.alliances.red.score,
+        won: match.winning_alliance === AllianceColor.RED,
+      }));
+      const blueResults = setMatches.map((match) => ({
+        score: match.alliances.blue.score,
+        won: match.winning_alliance === AllianceColor.BLUE,
+      }));
 
-    const lastMatch = setMatches[setMatches.length - 1];
-    const redWon = lastMatch.winning_alliance === AllianceColor.RED;
-    const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
+      const lastMatch = setMatches[setMatches.length - 1];
+      const redWon = lastMatch.winning_alliance === AllianceColor.RED;
+      const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
 
-    return {
-      redTeams,
-      blueTeams,
-      redAllianceNumber,
-      blueAllianceNumber,
-      redResults,
-      blueResults,
-      redWon,
-      blueWon,
-      matchRedTeams,
-      matchBlueTeams,
-    };
-  };
+      return {
+        redTeams,
+        blueTeams,
+        redAllianceNumber,
+        blueAllianceNumber,
+        redResults,
+        blueResults,
+        redWon,
+        blueWon,
+        matchRedTeams,
+        matchBlueTeams,
+      };
+    },
+    [alliances, getAllianceNumber],
+  );
 
   const { paths, svgSize } = useAdvancementPaths({
     containerRef,
@@ -428,26 +462,30 @@ export default function TraditionalBracket({
           className="relative isolate flex min-w-max items-start gap-8 px-4
             pb-4"
         >
-          <div className="relative z-1 flex items-start gap-8">
+          <div className="relative z-1 flex gap-8">
             {/* Eighth-Finals (16-team only) */}
             {hasEighthFinals && (
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col">
                 <h3 className="mb-4 text-center">Eighths</h3>
-                <div className="space-y-3">
+                <div className="flex flex-1 flex-col">
                   {[1, 2, 3, 4, 5, 6, 7, 8].map((setNum) => (
-                    <BracketMatchCard
+                    <div
                       key={`ef_${setNum}`}
-                      ref={(node) => {
-                        matchRefs.current[`EF ${setNum}`] = node;
-                      }}
-                      label={`EF ${setNum}`}
-                      matches={matchGroups[`ef_${setNum}`]}
-                      event={event}
-                      hoveredAlliance={hoveredAlliance}
-                      setHoveredAlliance={setHoveredAlliance}
-                      getSeriesResult={getSeriesResult}
-                      getAllianceDisplayName={getAllianceDisplayName}
-                    />
+                      className="flex flex-1 items-center py-1.5"
+                    >
+                      <BracketMatchCard
+                        ref={(node) => {
+                          matchRefs.current[`EF ${setNum}`] = node;
+                        }}
+                        label={`EF ${setNum}`}
+                        matches={matchGroups[`ef_${setNum}`]}
+                        event={event}
+                        hoveredAlliance={hoveredAlliance}
+                        setHoveredAlliance={setHoveredAlliance}
+                        getSeriesResult={getSeriesResult}
+                        getAllianceDisplayName={getAllianceDisplayName}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
@@ -455,63 +493,62 @@ export default function TraditionalBracket({
 
             {/* Quarterfinals (8-team and 16-team) */}
             {!is4Team && (
-              <div className="flex flex-col items-center">
+              <div className="flex flex-col">
                 <h3 className="mb-4 text-center">Quarters</h3>
-                <div
-                  className="flex flex-col justify-around gap-3"
-                  style={hasEighthFinals ? { minHeight: '100%' } : {}}
-                >
+                <div className="flex flex-1 flex-col">
                   {[1, 2, 3, 4].map((setNum) => (
-                    <BracketMatchCard
+                    <div
                       key={`qf_${setNum}`}
-                      ref={(node) => {
-                        matchRefs.current[`QF ${setNum}`] = node;
-                      }}
-                      label={`QF ${setNum}`}
-                      matches={matchGroups[`qf_${setNum}`]}
-                      event={event}
-                      hoveredAlliance={hoveredAlliance}
-                      setHoveredAlliance={setHoveredAlliance}
-                      getSeriesResult={getSeriesResult}
-                      getAllianceDisplayName={getAllianceDisplayName}
-                    />
+                      className="flex flex-1 items-center py-1.5"
+                    >
+                      <BracketMatchCard
+                        ref={(node) => {
+                          matchRefs.current[`QF ${setNum}`] = node;
+                        }}
+                        label={`QF ${setNum}`}
+                        matches={matchGroups[`qf_${setNum}`]}
+                        event={event}
+                        hoveredAlliance={hoveredAlliance}
+                        setHoveredAlliance={setHoveredAlliance}
+                        getSeriesResult={getSeriesResult}
+                        getAllianceDisplayName={getAllianceDisplayName}
+                      />
+                    </div>
                   ))}
                 </div>
               </div>
             )}
 
             {/* Semifinals */}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col">
               <h3 className="mb-4 text-center">Semis</h3>
-              <div
-                className="flex flex-col justify-around gap-3"
-                style={{ minHeight: is4Team ? undefined : '100%' }}
-              >
+              <div className="flex flex-1 flex-col">
                 {[1, 2].map((setNum) => (
-                  <BracketMatchCard
+                  <div
                     key={`sf_${setNum}`}
-                    ref={(node) => {
-                      matchRefs.current[`SF ${setNum}`] = node;
-                    }}
-                    label={`SF ${setNum}`}
-                    matches={matchGroups[`sf_${setNum}`]}
-                    event={event}
-                    hoveredAlliance={hoveredAlliance}
-                    setHoveredAlliance={setHoveredAlliance}
-                    getSeriesResult={getSeriesResult}
-                    getAllianceDisplayName={getAllianceDisplayName}
-                  />
+                    className="flex flex-1 items-center py-1.5"
+                  >
+                    <BracketMatchCard
+                      ref={(node) => {
+                        matchRefs.current[`SF ${setNum}`] = node;
+                      }}
+                      label={`SF ${setNum}`}
+                      matches={matchGroups[`sf_${setNum}`]}
+                      event={event}
+                      hoveredAlliance={hoveredAlliance}
+                      setHoveredAlliance={setHoveredAlliance}
+                      getSeriesResult={getSeriesResult}
+                      getAllianceDisplayName={getAllianceDisplayName}
+                    />
+                  </div>
                 ))}
               </div>
             </div>
 
             {/* Finals */}
-            <div className="flex flex-col items-center">
+            <div className="flex flex-col">
               <h3 className="mb-4 text-center font-bold">Finals</h3>
-              <div
-                className="flex flex-col justify-center"
-                style={{ minHeight: '100%' }}
-              >
+              <div className="flex flex-1 items-center py-1.5">
                 <BracketMatchCard
                   ref={(node) => {
                     matchRefs.current.Finals = node;
