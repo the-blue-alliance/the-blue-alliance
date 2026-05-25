@@ -90,6 +90,10 @@ import TeamAvatar from '~/components/tba/teamAvatar';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import {
+  AnimatedTabs,
+  AnimatedTabsTrigger,
+} from '~/components/ui/animated-tabs';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -129,7 +133,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { TabsContent, TabsList } from '~/components/ui/tabs';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
@@ -556,7 +560,7 @@ function EventPage() {
           )}
       </div>
 
-      <Tabs
+      <AnimatedTabs
         defaultValue={matches.length > 0 ? 'results' : 'teams'}
         className="mt-4"
       >
@@ -565,33 +569,33 @@ function EventPage() {
             *:basis-1/2 lg:*:basis-1"
         >
           {(matches.length > 0 || alliances.length > 0) && (
-            <TabsTrigger value="results">
+            <AnimatedTabsTrigger value="results">
               <InlineIcon>
                 <ResultsIcon />
                 Results
               </InlineIcon>
-            </TabsTrigger>
+            </AnimatedTabsTrigger>
           )}
           {(shouldPreviewRankingsTab ||
             (rankingsQuery.data && rankingsQuery.data.rankings.length > 0)) && (
-            <TabsTrigger value="rankings">
+            <AnimatedTabsTrigger value="rankings">
               <InlineIcon>
                 <RankingsIcon />
                 Rankings
               </InlineIcon>
-            </TabsTrigger>
+            </AnimatedTabsTrigger>
           )}
           {((shouldPreviewAwardsTab && awardsQuery.isPending) ||
             (awardsQuery.data !== undefined &&
               awardsQuery.data.length > 0)) && (
-            <TabsTrigger value="awards">
+            <AnimatedTabsTrigger value="awards">
               <InlineIcon>
                 <AwardsIcon />
                 Awards
               </InlineIcon>
-            </TabsTrigger>
+            </AnimatedTabsTrigger>
           )}
-          <TabsTrigger value="teams">
+          <AnimatedTabsTrigger value="teams">
             <InlineIcon>
               <TeamsIcon />
               Teams
@@ -599,48 +603,48 @@ function EventPage() {
                 {teamsQuery.data?.length ?? '-'}
               </Badge>
             </InlineIcon>
-          </TabsTrigger>
+          </AnimatedTabsTrigger>
           {((shouldPreviewInsightsTab &&
             (coprsQuery.isPending || colorsQuery.isPending)) ||
             (coprsQuery.data && colorsQuery.data)) &&
             matches.length > 0 && (
-              <TabsTrigger value="insights">
+              <AnimatedTabsTrigger value="insights">
                 <InlineIcon>
                   <InsightsIcon />
                   Insights
                 </InlineIcon>
-              </TabsTrigger>
+              </AnimatedTabsTrigger>
             )}
           {districtPointsQuery.data &&
             DISTRICT_EVENT_TYPES.has(event.event_type) && (
-              <TabsTrigger value="district-points">
+              <AnimatedTabsTrigger value="district-points">
                 <InlineIcon>
                   <DistrictPointsIcon />
                   District Points
                 </InlineIcon>
-              </TabsTrigger>
+              </AnimatedTabsTrigger>
             )}
           {event.event_type === EventType.REGIONAL &&
             (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
-              <TabsTrigger value="champs-qual-points">
+              <AnimatedTabsTrigger value="champs-qual-points">
                 <InlineIcon>
                   <ChampsQualPointsIcon />
                   Champs Qual Points
                 </InlineIcon>
-              </TabsTrigger>
+              </AnimatedTabsTrigger>
             )}
-          <TabsTrigger value="media">
+          <AnimatedTabsTrigger value="media">
             <InlineIcon>
               <MediaIcon />
               Media
             </InlineIcon>
-          </TabsTrigger>
-          <TabsTrigger value="scouting">
+          </AnimatedTabsTrigger>
+          <AnimatedTabsTrigger value="scouting">
             <InlineIcon>
               <ScoutingIcon />
               Scouting
             </InlineIcon>
-          </TabsTrigger>
+          </AnimatedTabsTrigger>
         </TabsList>
 
         <TabsContent
@@ -685,7 +689,11 @@ function EventPage() {
           )}
         </TabsContent>
 
-        <TabsContent value="insights">
+        <TabsContent
+          value="insights"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
           <MatchStatsTable
             matches={sortedMatches.filter(
               (m) =>
@@ -749,7 +757,7 @@ function EventPage() {
             />
           )}
         </TabsContent>
-      </Tabs>
+      </AnimatedTabs>
     </div>
   );
 }
