@@ -1,0 +1,95 @@
+{% extends "base.html" %}
+
+{% block title %}Offseason Moderator - The Blue Alliance{% endblock %}
+
+{% block content %}
+<div class="container">
+  {% set status = request.args.get('status') %}
+  {% set status_messages = {
+    'linked': 'Offseason linked successfully. Event details fetch has been queued.',
+    'unlinked': 'Offseason unlinked successfully.',
+    'deleted': 'Offseason event deleted successfully.',
+    'invalid_event_key': 'Event key is invalid.',
+    'invalid_event_type': 'Only offseason events can be linked here.',
+    'invalid_first_code': 'Please enter a valid FIRST event code or frc-events URL for this season.',
+    'already_linked': 'This event is already linked to a FIRST event code.',
+    'not_linked': 'This event is not currently linked to a FIRST event code.',
+    'delete_not_allowed': 'Only offseason events that have not started yet can be deleted.'
+  } %}
+  {% if status and status_messages.get(status) %}
+  <div class="alert alert-{% if status in ['linked', 'unlinked', 'deleted'] %}success{% else %}danger{% endif %}" id="offseason-status-message">
+    {{ status_messages.get(status) }}
+  </div>
+  {% endif %}
+
+  <div class="page-header">
+    <h1>Offseason Moderator</h1>
+    <p class="text-muted">Link {{ year }} offseason events to FIRST API event codes.</p>
+  </div>
+
+  {% if events %}
+  <table class="table table-striped table-hover" id="offseason-events">
+    <thead>
+      <tr>
+        <th>Event</th>
+        <th>Dates</th>
+        <th>FIRST API Code</th>
+        <th>Actions</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for event in events %}
+      {% set can_delete = event.start_date and event.start_date > now %}
+      <tr id="event-{{ event.key_name }}">
+        <td>
+          <strong>{{ event.name }}</strong><br>
+          <small>{{ event.key_name }}</small><br>
+          <small>{{ event.city }}, {{ event.state_prov or event.country }}</small>
+        </td>
+        <td>
+          {% if event.start_date and event.end_date %}
+          {{ event.start_date|strftime("%b %d") }} - {{ event.end_date|strftime("%b %d, %Y") }}
+          {% else %}
+          <span class="text-muted">Unknown</span>
+          {% endif %}
+        </td>
+        <td>
+          <form action="/mod/offseason/{{ event.key_name }}/link" method="post" class="form-inline">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <input
+              class="form-control input-sm"
+              type="text"
+              name="first_code"
+              id="first-code-{{ event.key_name }}"
+              placeholder="OHNEW or frc-events URL"
+              value="{{ event.first_code or '' }}"
+              {% if event.first_code %}disabled{% endif %}
+            />
+            {% if event.first_code %}
+            <span class="label label-success">Linked</span>
+            {% else %}
+            <button class="btn btn-primary btn-sm" type="submit">Link</button>
+            {% endif %}
+          </form>
+        </td>
+        <td>
+          {% if event.first_code %}
+          <form action="/mod/offseason/{{ event.key_name }}/unlink" method="post" style="display:inline-block; margin-right: 8px;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="btn btn-warning btn-sm" id="unlink-{{ event.key_name }}" type="submit">Unlink</button>
+          </form>
+          {% endif %}
+          <form action="/mod/offseason/{{ event.key_name }}/delete" method="post" style="display:inline-block;">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+            <button class="btn btn-sm {% if can_delete %}btn-danger{% else %}btn-default{% endif %}" id="delete-{{ event.key_name }}" type="submit" {% if can_delete %}onclick="return confirm('Delete {{ event.name|e }}?');"{% else %}disabled title="This event has already started or is missing a start date."{% endif %}>Delete</button>
+          </form>
+        </td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% else %}
+  <div class="alert alert-info">No offseason events found for {{ year }}.</div>
+  {% endif %}
+</div>
+{% endblock %}

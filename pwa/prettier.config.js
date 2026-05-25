@@ -14,5 +14,5 @@ export default {
   importOrder: ['^@/(.*)$', '^~icons/(.*)$', '^~/(.*)$', '^[./]'],
   importOrderSeparation: true,
   importOrderSortSpecifiers: true,
-  tailwindStylesheet: './app/tailwind.css',
+  tailwindStylesheet: './app/style/tailwind.css',
 };

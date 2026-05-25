@@ -42,18 +42,28 @@
       <h2 id="results">Adding Offseason Event Results</h2>
       <div class="row">
         <div class="col-xs-6 col-sm-5 col-lg-6">
-          <h3>FMS Sync</h3> Offseason events have the ability to have their match results, team list, and other data synchronized <i>to FIRST</i> Headquarters infrastructure using the same mechanisms that are used in-season. If your offseason-event is using FMS Sync, it is <i>automatically</i> added to TBA.
+          <h3>FMS Sync</h3> Offseason events have the ability to have their match results, team list, and other data synchronized <i>to FIRST</i> Headquarters infrastructure using the same mechanisms that are used in-season. If your offseason-event is using FMS Sync, it is <i>automatically</i> added to TBA. To register your offseason with FIRST, refer to <a href="https://frc-events.firstinspires.org/OffSeasonEvent" target="_blank" rel="noopener noreferrer">the instructions on frc-events</a>.
           <br><br>
           Match videos, livestreams, and awards would still need to be added using the mechanisms listed above though.
+          <br><br>
+          Offseason FMS sync only supports standard playoff formats, so if your event does something unique, you can still sync Qual results, but you will need to use the "Offline" methods to import playoffs.
         </div>
         <div class="col-xs-6 col-sm-4 col-lg-6">
-          <h3>Offline FMS</h3> If your offseason event does <i>not</i> have FMS Sync back to Headquarters, that's not an issue either. You can <a href="/request/apiwrite">request write keys</a> and post individual data points during an event using the <a href="https://www.thebluealliance.com/eventwizard2">Event Wizard</a> to get results in a timely manner.
+          <h3>Offline FMS</h3> If your offseason event does <i>not</i> have FMS Sync back to Headquarters, or uses a special playoff format, that's not an issue either.
           <br><br>
-          Alternately, get the FMS Reports exported before you tear down your field. TBA can take the Excel files and import them to get match data after the fact, to get as much historical data as possible.
+          The recommended strategy is to use the "FMS Companion" app running on the FTA Toughbook. See the <a href="https://github.com/the-blue-alliance/fms-companion-dist" target="_blank" rel="noopener noreferrer">details here </a>. This app can sync data, including full score breakdowns and unique playoff formats, to TBA if internet is available, or collect a full archive that you can later import via <a href="/eventwizard">Event Wizard</a> after the fact. You will need to <a href="/request/apiwrite">obtain write keys</a> before the event.
+          <br><br>
+          Alternately, export FMS Reports (in excel format) before you tear down your field. You can manually import them on the <a href="/eventwizard">Event Wizard</a> after the event. This method will not include rich score breakdowns of match results, however.
+        </div>
+        <div class="col-xs-6 col-sm-4 col-lg-6">
+          <h3>Cheesy Areana</h3>
+          <a href="https://github.com/Team254/cheesy-arena" target="_blank" rel="noopener noreferrer">Cheesy Arena</a> is an alternative field management system. It supports direct sync to TBA if you <a href="/request/apiwrite">obtain write keys</a> before the event.
+        </div>
+        <div class="col-xs-6 col-sm-4 col-lg-6">
+          <h3>FMS Reports</h3>
+          <p>We can also import FMS Report exports into The Blue Alliance. You can either <a href="/request/apiwrite">obtain write keys</a> and use the <a href="/eventwizard">Event Wizard</a> to input the reports, or post them in our <a href="http://facebook.com/groups/moardata">Facebook Group</a>.</p>
         </div>
       </div>
-    <h3>FMS Reports</h3>
-    <p>We can also import FMS Report exports into The Blue Alliance. You can either <a href="/request/apiwrite">obtain write keys</a> and use the <a href="/eventwizard">Event Wizard</a> to input the reports, or post them in our <a href="http://facebook.com/groups/moardata">Facebook Group</a>.</p>
 
     <h2 id="other">Other</h2>
     <p>For other data you'd like to add, reach out on our <a href="http://facebook.com/groups/moardata">Facebook Group</a> or <a href="/contact">drop us a line</a>, we'll be happy to help!</p>

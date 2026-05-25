@@ -118,6 +118,18 @@ import type {
   GetInsightsNotablesYearData,
   GetInsightsNotablesYearErrors,
   GetInsightsNotablesYearResponses,
+  GetInsightsV2YearCategoryData,
+  GetInsightsV2YearCategoryDistrictData,
+  GetInsightsV2YearCategoryDistrictErrors,
+  GetInsightsV2YearCategoryDistrictResponses,
+  GetInsightsV2YearCategoryErrors,
+  GetInsightsV2YearCategoryResponses,
+  GetInsightsV2YearData,
+  GetInsightsV2YearDistrictData,
+  GetInsightsV2YearDistrictErrors,
+  GetInsightsV2YearDistrictResponses,
+  GetInsightsV2YearErrors,
+  GetInsightsV2YearResponses,
   GetMatchData,
   GetMatchErrors,
   GetMatchResponses,
@@ -360,6 +372,18 @@ import {
   zGetInsightsNotablesYearHeaders,
   zGetInsightsNotablesYearPath,
   zGetInsightsNotablesYearResponse,
+  zGetInsightsV2YearCategoryDistrictHeaders,
+  zGetInsightsV2YearCategoryDistrictPath,
+  zGetInsightsV2YearCategoryDistrictResponse,
+  zGetInsightsV2YearCategoryHeaders,
+  zGetInsightsV2YearCategoryPath,
+  zGetInsightsV2YearCategoryResponse,
+  zGetInsightsV2YearDistrictHeaders,
+  zGetInsightsV2YearDistrictPath,
+  zGetInsightsV2YearDistrictResponse,
+  zGetInsightsV2YearHeaders,
+  zGetInsightsV2YearPath,
+  zGetInsightsV2YearResponse,
   zGetMatchHeaders,
   zGetMatchPath,
   zGetMatchResponse,
@@ -1559,6 +1583,116 @@ export const getInsightsNotablesYear = <ThrowOnError extends boolean = false>(
       await zGetInsightsNotablesYearResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/insights/notables/{year}',
+    ...options,
+  });
+
+/**
+ * Gets a list of `InsightV2` objects for the given year across all categories. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights.
+ */
+export const getInsightsV2Year = <ThrowOnError extends boolean = false>(
+  options: Options<GetInsightsV2YearData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetInsightsV2YearResponses,
+    GetInsightsV2YearErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetInsightsV2YearHeaders.optional(),
+          path: zGetInsightsV2YearPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInsightsV2YearResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/insights/{year}',
+    ...options,
+  });
+
+/**
+ * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.
+ */
+export const getInsightsV2YearCategory = <ThrowOnError extends boolean = false>(
+  options: Options<GetInsightsV2YearCategoryData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetInsightsV2YearCategoryResponses,
+    GetInsightsV2YearCategoryErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetInsightsV2YearCategoryHeaders.optional(),
+          path: zGetInsightsV2YearCategoryPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInsightsV2YearCategoryResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/insights/{year}/{category}',
+    ...options,
+  });
+
+/**
+ * Gets a list of `InsightV2` objects for the given year scoped to a specific district, across all categories. Use year=0 for all-time insights.
+ */
+export const getInsightsV2YearDistrict = <ThrowOnError extends boolean = false>(
+  options: Options<GetInsightsV2YearDistrictData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetInsightsV2YearDistrictResponses,
+    GetInsightsV2YearDistrictErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetInsightsV2YearDistrictHeaders.optional(),
+          path: zGetInsightsV2YearDistrictPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInsightsV2YearDistrictResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/insights/{year}/district/{district_abbreviation}',
+    ...options,
+  });
+
+/**
+ * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.
+ */
+export const getInsightsV2YearCategoryDistrict = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetInsightsV2YearCategoryDistrictData, ThrowOnError>,
+) =>
+  (options.client ?? client).get<
+    GetInsightsV2YearCategoryDistrictResponses,
+    GetInsightsV2YearCategoryDistrictErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetInsightsV2YearCategoryDistrictHeaders.optional(),
+          path: zGetInsightsV2YearCategoryDistrictPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetInsightsV2YearCategoryDistrictResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/insights/{year}/{category}/district/{district_abbreviation}',
     ...options,
   });
 

@@ -21,13 +21,14 @@ import { Footer } from '~/components/tba/navigation/footer';
 import { Navbar } from '~/components/tba/navigation/navbar';
 import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { Toaster } from '~/components/ui/sonner';
+import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
 import { ApiError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { ThemeProvider } from '~/lib/theme';
 import { cn, createLogger } from '~/lib/utils';
-import appCss from '~/tailwind.css?url';
+import appCss from '~/style/tailwind.css?url';
 
 const logger = createLogger('root');
 
@@ -132,10 +133,6 @@ export const Route = createRootRouteWithContext<{
         href: 'https://fonts.gstatic.com',
         crossOrigin: 'anonymous',
       },
-      {
-        rel: 'stylesheet',
-        href: 'https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&display=swap',
-      },
       { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'apple-touch-icon', href: appleTouchIcon180 },
       ...APPLE_SPLASH_STARTUP_LINKS,
@@ -187,30 +184,31 @@ function RootComponent() {
       </head>
       <body>
         <ThemeProvider>
-          <AuthContextProvider>
-            {isFullscreen ? (
-              <Outlet />
-            ) : (
-              <>
-                <Navbar />
-                <TOCRendererProvider>
-                  <div
-                    className={cn(
-                      !isFullwidth && 'container mx-auto',
-                      `min-h-[calc(100vh-var(--header-height)-var(--footer-min-height)-var(--footer-inset-top))]
-                        px-4 text-sm`,
-                    )}
-                  >
-                    <div vaul-drawer-wrapper="" className="bg-background">
-                      <Outlet />
-                      <MatchModal />
+          <TooltipProvider delayDuration={300} skipDelayDuration={0}>
+            <AuthContextProvider>
+              {isFullscreen ? (
+                <Outlet />
+              ) : (
+                <div className="flex min-h-screen flex-col">
+                  <Navbar />
+                  <TOCRendererProvider>
+                    <div
+                      className={cn(
+                        !isFullwidth && 'container mx-auto',
+                        'flex-1 px-4 text-sm',
+                      )}
+                    >
+                      <div vaul-drawer-wrapper="" className="bg-background">
+                        <Outlet />
+                        <MatchModal />
+                      </div>
                     </div>
-                  </div>
-                </TOCRendererProvider>
-                <Footer renderTime={renderTime} />
-              </>
-            )}
-          </AuthContextProvider>
+                  </TOCRendererProvider>
+                  <Footer renderTime={renderTime} />
+                </div>
+              )}
+            </AuthContextProvider>
+          </TooltipProvider>
           <Toaster />
         </ThemeProvider>
         <TanStackRouterDevtools position="bottom-right" />

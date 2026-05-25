@@ -23,38 +23,24 @@ import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
 import { cn } from '~/lib/utils';
 
 const DISTRICT_COLORS: Record<string, string> = {
-  // California
-  ca: 'border-l-[#FAB604]',
-  // Chesapeake
-  chs: 'border-l-[#2FA4A9]',
-  fch: 'border-l-[#2FA4A9]',
-  // Indiana
-  fin: 'border-l-[#E04B4B]',
-  in: 'border-l-[#E04B4B]',
-  // Israel
-  isr: 'border-l-[#7DD3FC]',
-  // Michigan
-  fim: 'border-l-[#94A3B8]',
-  // Mid-Atlantic
-  fma: 'border-l-[#9A8FD1]',
-  mar: 'border-l-[#9A8FD1]',
-  // New England
-  ne: 'border-l-[#271380]',
-  // North Carolina
-  fnc: 'border-l-[#7BA7D9]',
-  // Ontario
-  ont: 'border-l-[#4F6EF7]',
-  // Pacific Northwest
-  pnw: 'border-l-[#3A9D7A]',
-  // Peachtree
-  pch: 'border-l-[#FDB4A0]',
-  // South Carolina
-  fsc: 'border-l-[#4FA37A]',
-  // Texas
-  fit: 'border-l-[#E36A2E]',
-  tx: 'border-l-[#E36A2E]',
-  // Wisconsin
-  win: 'border-l-[#E84393]',
+  ca: 'border-l-district-ca',
+  chs: 'border-l-district-chs',
+  fch: 'border-l-district-chs',
+  fin: 'border-l-district-fin',
+  in: 'border-l-district-fin',
+  isr: 'border-l-district-isr',
+  fim: 'border-l-district-fim',
+  fma: 'border-l-district-fma',
+  mar: 'border-l-district-fma',
+  ne: 'border-l-district-ne',
+  fnc: 'border-l-district-fnc',
+  ont: 'border-l-district-ont',
+  pnw: 'border-l-district-pnw',
+  pch: 'border-l-district-pch',
+  fsc: 'border-l-district-fsc',
+  fit: 'border-l-district-fit',
+  tx: 'border-l-district-fit',
+  win: 'border-l-district-win',
 };
 
 function getDistrictColorClass(

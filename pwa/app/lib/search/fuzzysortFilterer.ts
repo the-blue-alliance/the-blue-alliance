@@ -6,11 +6,17 @@ import { SearchIndex } from '~/api/tba/read';
 type SearchableTeam = SearchIndex['teams'][number];
 type SearchableEvent = SearchIndex['events'][number];
 
+export interface FilteredSearchIndex {
+  teams: SearchableTeam[];
+  events: SearchableEvent[];
+  teamsFirst: boolean;
+}
+
 function searchTeams(
   teams: SearchableTeam[],
   query: string,
   limit: number,
-): SearchableTeam[] {
+): { results: SearchableTeam[]; topScore: number } {
   const results = fuzzysort.go(
     query,
     teams.map((t) => ({ ...t, team_number: Number(t.key.substring(3)) })),
@@ -21,14 +27,17 @@ function searchTeams(
     },
   );
 
-  return results.map((result) => result.obj);
+  return {
+    results: results.map((result) => result.obj),
+    topScore: results[0]?.score ?? -Infinity,
+  };
 }
 
 function searchEvents(
   events: SearchableEvent[],
   query: string,
   limit: number,
-): SearchableEvent[] {
+): { results: SearchableEvent[]; topScore: number } {
   const results = fuzzysort.go(query, events, {
     limit,
     keys: ['key', 'name'],
@@ -47,18 +56,25 @@ function searchEvents(
     },
   });
 
-  return results.map((result) => result.obj);
+  return {
+    results: results.map((result) => result.obj),
+    topScore: results[0]?.score ?? -Infinity,
+  };
 }
 
 interface SearchDataFilterer {
-  filter(data: SearchIndex, query: string): SearchIndex;
+  filter(data: SearchIndex, query: string): FilteredSearchIndex;
 }
 
 export default class FuzzysortFilterer implements SearchDataFilterer {
-  filter(data: SearchIndex, query: string): SearchIndex {
+  filter(data: SearchIndex, query: string): FilteredSearchIndex {
+    const teams = searchTeams(data.teams, query, 5);
+    const events = searchEvents(data.events, query, 5);
+
     return {
-      teams: searchTeams(data.teams, query, 5),
-      events: searchEvents(data.events, query, 10),
+      teams: teams.results,
+      events: events.results,
+      teamsFirst: teams.topScore >= events.topScore,
     };
   }
 }

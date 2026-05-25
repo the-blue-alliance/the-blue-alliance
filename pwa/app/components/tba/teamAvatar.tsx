@@ -3,6 +3,9 @@ import { useState } from 'react';
 import { MediaAvatar } from '~/api/tba/read';
 import { cn } from '~/lib/utils';
 
+const RED_ACCENT = 'bg-alliance-red-accent';
+const BLUE_ACCENT = 'bg-alliance-blue-accent';
+
 export default function TeamAvatar({
   media,
   className,
@@ -13,7 +16,7 @@ export default function TeamAvatar({
   defaultRed?: boolean;
 }) {
   const [colorClass, setColorClass] = useState(
-    defaultRed ? 'bg-first-avatar-red' : 'bg-first-avatar-blue',
+    defaultRed ? RED_ACCENT : BLUE_ACCENT,
   );
 
   if (!media.details) {
@@ -21,10 +24,10 @@ export default function TeamAvatar({
   }
 
   const handler = () => {
-    if (colorClass === 'bg-first-avatar-blue') {
-      setColorClass('bg-first-avatar-red');
+    if (colorClass === BLUE_ACCENT) {
+      setColorClass(RED_ACCENT);
     } else {
-      setColorClass('bg-first-avatar-blue');
+      setColorClass(BLUE_ACCENT);
     }
   };
 

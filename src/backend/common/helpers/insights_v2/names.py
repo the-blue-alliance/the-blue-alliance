@@ -35,6 +35,22 @@ class InsightV2Names:
         "most_district_cmp_wins", "Most District Championship Wins"
     )
     MOST_WFFA_WINS = InsightV2NameEntry("most_wffa_wins", "Most WFFAs")
+    HIGHEST_MATCH_CLEAN_SCORE = InsightV2NameEntry(
+        "highest_match_clean_score", "Highest Clean Score"
+    )
+    HIGHEST_MATCH_CLEAN_COMBINED_SCORE = InsightV2NameEntry(
+        "highest_match_clean_combined_score", "Highest Combined Clean Score"
+    )
+    HIGHEST_LOSING_SCORE = InsightV2NameEntry(
+        "highest_losing_score", "Highest Losing Score"
+    )
+    HIGHEST_AUTO_SCORE = InsightV2NameEntry("highest_auto_score", "Highest Auto Score")
+    HIGHEST_TELEOP_SCORE = InsightV2NameEntry(
+        "highest_teleop_score", "Highest Teleop Score"
+    )
+    HIGHEST_ENDGAME_SCORE = InsightV2NameEntry(
+        "highest_endgame_score", "Highest Endgame Score"
+    )
 
     # Streaks
     QUALIFYING_EVENT_WIN_STREAK = InsightV2NameEntry(
@@ -43,6 +59,13 @@ class InsightV2Names:
     EINSTEIN_WIN_STREAK = InsightV2NameEntry(
         "einstein_streak", "Longest Einstein Streak"
     )
+    UNDEFEATED_STREAK = InsightV2NameEntry(
+        "undefeated_streak", "Longest Undefeated Season Start"
+    )
+    WIN_STREAK = InsightV2NameEntry("win_streak", "Longest Win Streak")
+
+    MOST_CORAL_SCORED = InsightV2NameEntry("most_coral_scored", "Most Coral Scored")
+    MOST_FUEL_SCORED = InsightV2NameEntry("most_fuel_scored", "Most Fuel Scored")
 
     # Timeseries
     HIGH_SCORE_OVER_TIME = InsightV2NameEntry(

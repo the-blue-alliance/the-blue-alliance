@@ -1028,6 +1028,132 @@ export const zNotablesInsight = z.object({
   year: z.int(),
 });
 
+export const zInsightV2Base = z.object({
+  name: z.string(),
+  display_name: z.string(),
+  year: z.int(),
+  category: z.enum(['leaderboard', 'streak', 'timeseries']),
+  district_abbreviation: z.string(),
+});
+
+/**
+ * Data for a leaderboard-category InsightV2. Rankings of teams, events, or matches by a numeric value.
+ */
+export const zInsightV2LeaderboardData = z.object({
+  key_type: z.enum(['team', 'event', 'match', 'team_pair', 'alliance']),
+  context_type: z.enum(['event_list', 'none', 'match_alliance']),
+  rankings: z.array(
+    z.object({
+      keys: z.union([z.array(z.string()), z.array(z.array(z.string()))]),
+      value: z.number(),
+      contexts: z
+        .array(
+          z.union([
+            z.object({
+              event_keys: z.array(z.string()).optional(),
+            }),
+            z.object({
+              match_key: z.string(),
+              alliance: z.array(z.string()),
+            }),
+          ]),
+        )
+        .optional(),
+    }),
+  ),
+});
+
+export const zInsightV2LeaderboardExtras = z.object({
+  category: z.literal('leaderboard').optional(),
+  data: zInsightV2LeaderboardData,
+});
+
+export const zInsightV2Leaderboard = zInsightV2Base.and(
+  zInsightV2LeaderboardExtras,
+);
+
+/**
+ * Data for a streak-category InsightV2. Records of consecutive achievement by teams.
+ */
+export const zInsightV2StreakData = z.object({
+  entries: z.array(
+    z.object({
+      key: z.string(),
+      key_type: z.enum(['team', 'event', 'match', 'team_pair']),
+      streak_length: z.int(),
+      start: z.string(),
+      end: z.string(),
+      is_active: z.boolean(),
+    }),
+  ),
+});
+
+export const zInsightV2StreakExtras = z.object({
+  category: z.literal('streak').optional(),
+  data: zInsightV2StreakData,
+});
+
+export const zInsightV2Streak = zInsightV2Base.and(zInsightV2StreakExtras);
+
+/**
+ * Data for a timeseries-category InsightV2. One or more named series of (x, y) data points over time.
+ */
+export const zInsightV2TimeseriesData = z.object({
+  x_type: z.enum(['week', 'year', 'event']),
+  x_label: z.string(),
+  y_label: z.string(),
+  point_context_type: z.enum(['none', 'match_record']),
+  series: z.array(
+    z.object({
+      label: z.string(),
+      points: z.array(
+        z.object({
+          x: z.union([z.string(), z.int(), z.number()]),
+          y: z.number(),
+          context: z
+            .object({
+              match_key: z.string().optional(),
+              alliance: z.array(z.string()).optional(),
+              post_result_time: z.int().optional(),
+              is_current: z.boolean().optional(),
+            })
+            .optional(),
+        }),
+      ),
+    }),
+  ),
+});
+
+export const zInsightV2TimeseriesExtras = z.object({
+  category: z.literal('timeseries').optional(),
+  data: zInsightV2TimeseriesData,
+});
+
+export const zInsightV2Timeseries = zInsightV2Base.and(
+  zInsightV2TimeseriesExtras,
+);
+
+/**
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, and timeseries shapes.
+ */
+export const zInsightV2 = z.union([
+  z
+    .object({
+      category: z.literal('leaderboard'),
+    })
+    .and(zInsightV2Leaderboard),
+  z
+    .object({
+      category: z.literal('streak'),
+    })
+    .and(zInsightV2Streak),
+  z
+    .object({
+      category: z.literal('timeseries'),
+    })
+    .and(zInsightV2Timeseries),
+]);
+
 export const zPosition2016 = z.enum([
   '',
   'A_ChevalDeFrise',
@@ -1850,6 +1976,15 @@ export const zPageNum = z.int();
 export const zTeamKey = z.string();
 
 /**
+ * InsightV2 category. One of: leaderboard, streak, timeseries.
+ */
+export const zInsightV2Category = z.enum([
+  'leaderboard',
+  'streak',
+  'timeseries',
+]);
+
+/**
  * Competition Year (or Season). Must be 4 digits.
  */
 export const zYear = z.int();
@@ -2377,6 +2512,62 @@ export const zGetInsightsNotablesYearPath = z.object({
  * Successful response
  */
 export const zGetInsightsNotablesYearResponse = z.array(zNotablesInsight);
+
+export const zGetInsightsV2YearHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetInsightsV2YearPath = z.object({
+  year: z.int(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetInsightsV2YearResponse = z.array(zInsightV2);
+
+export const zGetInsightsV2YearCategoryHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetInsightsV2YearCategoryPath = z.object({
+  year: z.int(),
+  category: z.enum(['leaderboard', 'streak', 'timeseries']),
+});
+
+/**
+ * Successful response
+ */
+export const zGetInsightsV2YearCategoryResponse = z.array(zInsightV2);
+
+export const zGetInsightsV2YearDistrictHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetInsightsV2YearDistrictPath = z.object({
+  year: z.int(),
+  district_abbreviation: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetInsightsV2YearDistrictResponse = z.array(zInsightV2);
+
+export const zGetInsightsV2YearCategoryDistrictHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetInsightsV2YearCategoryDistrictPath = z.object({
+  year: z.int(),
+  category: z.enum(['leaderboard', 'streak', 'timeseries']),
+  district_abbreviation: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetInsightsV2YearCategoryDistrictResponse = z.array(zInsightV2);
 
 export const zGetMatchHeaders = z.object({
   'If-None-Match': z.string().optional(),

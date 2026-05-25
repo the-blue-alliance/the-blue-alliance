@@ -28,12 +28,22 @@ const TeamLink = forwardRef<
       ? removeNonNumeric(teamOrKey)
       : teamOrKey.team_number.toString();
 
-  const yearSuffix = year === 0 ? 'history' : year?.toString();
+  if (year === 0) {
+    return (
+      <Link
+        to="/team/$teamNumber/history"
+        params={{ teamNumber }}
+        className={className ?? 'text-foreground hover:underline'}
+        {...props}
+        ref={ref}
+      />
+    );
+  }
 
   return (
     <Link
       to="/team/$teamNumber/{-$year}"
-      params={{ teamNumber, year: yearSuffix }}
+      params={{ teamNumber, year: year?.toString() }}
       className={className ?? 'text-foreground hover:underline'}
       {...props}
       ref={ref}

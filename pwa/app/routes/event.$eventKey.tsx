@@ -87,6 +87,7 @@ import {
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
 import TeamAvatar from '~/components/tba/teamAvatar';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
@@ -619,14 +620,15 @@ function EventPage() {
                 </InlineIcon>
               </TabsTrigger>
             )}
-          {event.event_type === EventType.REGIONAL && (
-            <TabsTrigger value="champs-qual-points">
-              <InlineIcon>
-                <ChampsQualPointsIcon />
-                Champs Qual Points
-              </InlineIcon>
-            </TabsTrigger>
-          )}
+          {event.event_type === EventType.REGIONAL &&
+            (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
+              <TabsTrigger value="champs-qual-points">
+                <InlineIcon>
+                  <ChampsQualPointsIcon />
+                  Champs Qual Points
+                </InlineIcon>
+              </TabsTrigger>
+            )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MediaIcon />
@@ -641,7 +643,11 @@ function EventPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="results">
+        <TabsContent
+          value="results"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
           <ResultsTab
             event={event}
             sortedMatches={sortedMatches}
@@ -653,6 +659,7 @@ function EventPage() {
         {rankingsQuery.data && (
           <TabsContent value="rankings">
             <RankingsTable
+              year={event.year}
               rankings={rankingsQuery.data}
               winners={
                 alliances.find((a) => a.status?.status === 'won')?.picks ?? []
@@ -713,18 +720,19 @@ function EventPage() {
             </TabsContent>
           )}
 
-        {event.event_type === EventType.REGIONAL && (
-          <TabsContent value="champs-qual-points">
-            <ChampsQualPointsTab
-              teams={teamsQuery.data ?? []}
-              champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
-              advancement={regionalAdvancementQuery.data ?? null}
-              eventKey={eventKey}
-              eventWeek={event.week}
-              year={event.year}
-            />
-          </TabsContent>
-        )}
+        {event.event_type === EventType.REGIONAL &&
+          (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
+            <TabsContent value="champs-qual-points">
+              <ChampsQualPointsTab
+                teams={teamsQuery.data ?? []}
+                champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
+                advancement={regionalAdvancementQuery.data ?? null}
+                eventKey={eventKey}
+                eventWeek={event.week}
+                year={event.year}
+              />
+            </TabsContent>
+          )}
 
         <TabsContent value="media">
           <MediaTab webcasts={event.webcasts} eventKey={event.key} />
@@ -1145,9 +1153,7 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
       header: 'Team',
       accessorFn: (row) => row.teamKey,
       cell: (cell) => (
-        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
-          {cell.getValue<string>().substring(3)}
-        </TeamLink>
+        <TeamLinkWithTooltip teamKey={cell.getValue<string>()} year={year} />
       ),
     },
     {
@@ -1291,9 +1297,7 @@ function ChampsQualPointsTab({
       header: 'Team',
       accessorFn: (row) => row.teamKey,
       cell: (cell) => (
-        <TeamLink teamOrKey={cell.getValue<string>()} year={year}>
-          {cell.getValue<string>().substring(3)}
-        </TeamLink>
+        <TeamLinkWithTooltip teamKey={cell.getValue<string>()} year={year} />
       ),
     },
     ...(hasPoints

@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { type ReactNode, useMemo } from 'react';
 
 import {
@@ -14,13 +14,7 @@ import {
 } from '~/api/tba/read';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { publicCacheControlHeaders } from '~/lib/utils';
@@ -758,7 +752,6 @@ function computeTeamupLeaderboard(
 function DistrictStatsPage() {
   const { abbreviation, history, insights, yearResults } =
     Route.useLoaderData();
-  const navigate = useNavigate();
 
   const validYears = history.map((d) => d.year).sort((a, b) => b - a);
 
@@ -783,30 +776,21 @@ function DistrictStatsPage() {
     <div>
       <div className="mt-4 flex items-center justify-between gap-4">
         <h1 className="text-4xl font-medium">{displayName} Stats</h1>
-        <Select
-          onValueChange={(value) => {
-            if (value === 'stats') return;
-            void navigate({
-              to: '/district/$districtAbbreviation/{-$year}',
-              params: {
-                districtAbbreviation: abbreviation,
-                year: value,
-              },
-            });
-          }}
-        >
-          <SelectTrigger className="w-30">
-            <SelectValue placeholder="Stats" />
-          </SelectTrigger>
-          <SelectContent className="max-h-[30vh] overflow-y-auto">
-            <SelectItem value="stats">Stats</SelectItem>
-            {validYears.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel="Stats"
+          triggerClassName="w-30"
+          options={[
+            {
+              label: 'Stats',
+              to: `/district/${abbreviation}/stats`,
+              isCurrent: true,
+            },
+            ...validYears.map((y) => ({
+              label: String(y),
+              to: `/district/${abbreviation}/${y}`,
+            })),
+          ]}
+        />
       </div>
 
       <Tabs defaultValue="championships" className="mt-4">

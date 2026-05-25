@@ -562,7 +562,7 @@ function MatchSuggestionRow({
           )}
         </td>
         {match.alliances.red.team_keys.map((k) => (
-          <td className="border bg-alliance-red-light" key={k}>
+          <td className="border bg-alliance-red-loser" key={k}>
             <TeamLink teamOrKey={k} year={event.year}>
               {k.substring(3)}
             </TeamLink>
@@ -579,7 +579,7 @@ function MatchSuggestionRow({
           </td>
         ))}
         {match.alliances.blue.team_keys.map((k) => (
-          <td className="border bg-alliance-blue-light" key={k}>
+          <td className="border bg-alliance-blue-loser" key={k}>
             <TeamLink teamOrKey={k} year={event.year}>
               {k.substring(3)}
             </TeamLink>
@@ -595,17 +595,17 @@ function MatchSuggestionRow({
             )}
           </td>
         ))}
-        <td className="border bg-alliance-red-dark">
+        <td className="border bg-alliance-red-winner">
           {predictedRedScore.toFixed(0)}
         </td>
-        <td className="border bg-alliance-blue-dark">
+        <td className="border bg-alliance-blue-winner">
           {predictedBlueScore.toFixed(0)}
         </td>
-        <td className="border bg-alliance-red-light">
+        <td className="border bg-alliance-red-loser">
           {redEndGamePoints.toFixed(0)}
           <Progress value={(redEndGamePoints / 36.0) * 100.0} />
         </td>
-        <td className="border bg-alliance-blue-light">
+        <td className="border bg-alliance-blue-loser">
           {blueEndGamePoints.toFixed(0)}
           <Progress value={(blueEndGamePoints / 36.0) * 100.0} />
         </td>
@@ -632,7 +632,7 @@ function MatchSuggestionRow({
                 <TeamDetails
                   key={k}
                   teamKey={k}
-                  className="bg-alliance-red-light"
+                  className="bg-alliance-red-loser"
                   defaultRed
                 />
               ))}
@@ -640,7 +640,7 @@ function MatchSuggestionRow({
                 <TeamDetails
                   key={k}
                   teamKey={k}
-                  className="bg-alliance-blue-light"
+                  className="bg-alliance-blue-loser"
                 />
               ))}
             </div>

@@ -3,6 +3,8 @@ import {
   type JSX,
   type SetStateAction,
   forwardRef,
+  memo,
+  useCallback,
   useImperativeHandle,
   useMemo,
   useRef,
@@ -26,7 +28,8 @@ import {
   type WinnerLink,
   useAdvancementPaths,
 } from '~/components/tba/eliminationBracketPaths';
-import { MatchLink, TeamLink } from '~/components/tba/links';
+import { MatchLink } from '~/components/tba/links';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
@@ -41,14 +44,14 @@ type MatchLabel4 =
   | 'Finals';
 
 const WINNER_LINKS: WinnerLink[] = [
-  { from: 'Match 1', to: 'Match 4' },
-  { from: 'Match 2', to: 'Match 4' },
-  { from: 'Match 3', to: 'Match 5' },
-  { from: 'Match 4', to: 'Finals' },
+  { from: 'Match 1', to: 'Match 3' },
+  { from: 'Match 2', to: 'Match 3' },
+  { from: 'Match 3', to: 'Finals' },
+  { from: 'Match 4', to: 'Match 5' },
   { from: 'Match 5', to: 'Finals' },
 ];
 
-const BracketMatch = forwardRef<
+const _BracketMatch = forwardRef<
   PlayoffMatchHandle,
   {
     matchLabel: MatchLabel4;
@@ -99,9 +102,9 @@ const BracketMatch = forwardRef<
         `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200
         bg-background transition-all duration-200 dark:border-neutral-700`,
         {
-          [`border-transparent shadow-lg ring-2 ring-alliance-red/75
+          [`border-transparent shadow-lg ring-2 ring-alliance-red-accent/75
           dark:border-transparent`]: isHighlighted && result.redWon,
-          [`border-transparent shadow-lg ring-2 ring-alliance-blue/75
+          [`border-transparent shadow-lg ring-2 ring-alliance-blue-accent/75
           dark:border-transparent`]: isHighlighted && result.blueWon,
         },
       )}
@@ -117,7 +120,7 @@ const BracketMatch = forwardRef<
               (
               <span
                 className={cn(
-                  'text-alliance-red transition-all duration-200',
+                  'transition-all duration-200',
                   isRedHighlighted &&
                     `rounded bg-red-100 px-1 text-sm dark:bg-red-900
                     dark:text-white`,
@@ -128,7 +131,7 @@ const BracketMatch = forwardRef<
               vs{' '}
               <span
                 className={cn(
-                  'text-alliance-blue transition-all duration-200',
+                  'transition-all duration-200',
                   isBlueHighlighted &&
                     `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
                     dark:text-white`,
@@ -155,8 +158,8 @@ const BracketMatch = forwardRef<
       </div>
       <div
         className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-red/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-red
+          bg-alliance-red-loser px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-red-accent
           data-[highlight=true]:text-white`}
         data-highlight={isRedHighlighted}
         ref={redRowRef}
@@ -175,20 +178,18 @@ const BracketMatch = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-red
+                    `w-12 text-center text-sm
                     group-data-[highlight=true]:text-white`,
                     result.redWon && 'font-bold',
                     !teamPlayed &&
                       'underline decoration-current decoration-dotted',
                   )}
                 >
-                  <TeamLink
+                  <TeamLinkWithTooltip
                     className="text-inherit"
-                    teamOrKey={`frc${team}`}
+                    teamKey={`frc${team}`}
                     year={event.year}
-                  >
-                    {team}
-                  </TeamLink>
+                  />
                 </span>
               );
             })}
@@ -212,8 +213,8 @@ const BracketMatch = forwardRef<
       </div>
       <div
         className={`group flex cursor-pointer items-center justify-between
-          bg-alliance-blue/15 px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-blue
+          bg-alliance-blue-loser px-1 py-1 transition-colors duration-200
+          data-[highlight=true]:bg-alliance-blue-accent
           data-[highlight=true]:text-white`}
         data-highlight={isBlueHighlighted}
         ref={blueRowRef}
@@ -232,20 +233,18 @@ const BracketMatch = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm text-alliance-blue
+                    `w-12 text-center text-sm
                     group-data-[highlight=true]:text-white`,
                     result.blueWon && 'font-bold',
                     !teamPlayed &&
                       'underline decoration-current decoration-dotted',
                   )}
                 >
-                  <TeamLink
+                  <TeamLinkWithTooltip
                     className="text-inherit"
-                    teamOrKey={`frc${team}`}
+                    teamKey={`frc${team}`}
                     year={event.year}
-                  >
-                    {team}
-                  </TeamLink>
+                  />
                 </span>
               );
             })}
@@ -268,6 +267,26 @@ const BracketMatch = forwardRef<
         </div>
       </div>
     </div>
+  );
+});
+
+const BracketMatch = memo(_BracketMatch, (prev, next) => {
+  if (
+    prev.matches !== next.matches ||
+    prev.event !== next.event ||
+    prev.matchLabel !== next.matchLabel ||
+    prev.getSeriesResult !== next.getSeriesResult ||
+    prev.getAllianceDisplayName !== next.getAllianceDisplayName ||
+    prev.setHoveredAlliance !== next.setHoveredAlliance
+  ) {
+    return false;
+  }
+  const result = next.getSeriesResult(next.matches);
+  return (
+    (prev.hoveredAlliance === result?.redAllianceNumber) ===
+      (next.hoveredAlliance === result?.redAllianceNumber) &&
+    (prev.hoveredAlliance === result?.blueAllianceNumber) ===
+      (next.hoveredAlliance === result?.blueAllianceNumber)
   );
 });
 
@@ -313,75 +332,86 @@ export default function DoubleElim4TeamBracket({
     [matches],
   );
 
-  const getAllianceNumber = (teamKeys: string[]): number | null => {
-    for (let i = 0; i < alliances.length; i++) {
-      const allianceTeamKeys = alliances[i].picks.map((pick) =>
-        pick.substring(3),
-      );
-      if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
-        return i + 1;
+  const getAllianceNumber = useCallback(
+    (teamKeys: string[]): number | null => {
+      for (let i = 0; i < alliances.length; i++) {
+        const allianceTeamKeys = alliances[i].picks.map((pick) =>
+          pick.substring(3),
+        );
+        if (teamKeys.every((team) => allianceTeamKeys.includes(team))) {
+          return i + 1;
+        }
       }
-    }
-    return null;
-  };
+      return null;
+    },
+    [alliances],
+  );
 
-  const getAllianceDisplayName = (allianceNumber: number): string => {
-    if (!allianceNumber || allianceNumber > alliances.length) return '';
-    const alliance = alliances[allianceNumber - 1];
-    if (event.event_type === EventType.CMP_FINALS && alliance.name) {
-      return getDivisionShortform(alliance.name);
-    }
-    return `#${allianceNumber}`;
-  };
+  const getAllianceDisplayName = useCallback(
+    (allianceNumber: number): string => {
+      if (!allianceNumber || allianceNumber > alliances.length) return '';
+      const alliance = alliances[allianceNumber - 1];
+      if (event.event_type === EventType.CMP_FINALS && alliance.name) {
+        return getDivisionShortform(alliance.name);
+      }
+      return `#${allianceNumber}`;
+    },
+    [alliances, event.event_type],
+  );
 
-  const getSeriesResult = (
-    setMatches: Match[] | undefined,
-  ): SeriesResult | null => {
-    if (!setMatches || setMatches.length === 0) return null;
+  const getSeriesResult = useCallback(
+    (setMatches: Match[] | undefined): SeriesResult | null => {
+      if (!setMatches || setMatches.length === 0) return null;
 
-    const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
-      t.substring(3),
-    );
-    const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
-      t.substring(3),
-    );
+      const matchRedTeams = setMatches[0].alliances.red.team_keys.map((t) =>
+        t.substring(3),
+      );
+      const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
+        t.substring(3),
+      );
 
-    const redAllianceNumber = getAllianceNumber(matchRedTeams);
-    const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
+      const redAllianceNumber = getAllianceNumber(matchRedTeams);
+      const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
 
-    const redTeams = redAllianceNumber
-      ? alliances[redAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchRedTeams;
-    const blueTeams = blueAllianceNumber
-      ? alliances[blueAllianceNumber - 1].picks.map((pick) => pick.substring(3))
-      : matchBlueTeams;
+      const redTeams = redAllianceNumber
+        ? alliances[redAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchRedTeams;
+      const blueTeams = blueAllianceNumber
+        ? alliances[blueAllianceNumber - 1].picks.map((pick) =>
+            pick.substring(3),
+          )
+        : matchBlueTeams;
 
-    const redResults = setMatches.map((match) => ({
-      score: match.alliances.red.score,
-      won: match.winning_alliance === AllianceColor.RED,
-    }));
-    const blueResults = setMatches.map((match) => ({
-      score: match.alliances.blue.score,
-      won: match.winning_alliance === AllianceColor.BLUE,
-    }));
+      const redResults = setMatches.map((match) => ({
+        score: match.alliances.red.score,
+        won: match.winning_alliance === AllianceColor.RED,
+      }));
+      const blueResults = setMatches.map((match) => ({
+        score: match.alliances.blue.score,
+        won: match.winning_alliance === AllianceColor.BLUE,
+      }));
 
-    const lastMatch = setMatches[setMatches.length - 1];
-    const redWon = lastMatch.winning_alliance === AllianceColor.RED;
-    const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
+      const lastMatch = setMatches[setMatches.length - 1];
+      const redWon = lastMatch.winning_alliance === AllianceColor.RED;
+      const blueWon = lastMatch.winning_alliance === AllianceColor.BLUE;
 
-    return {
-      redTeams,
-      blueTeams,
-      redAllianceNumber,
-      blueAllianceNumber,
-      redResults,
-      blueResults,
-      redWon,
-      blueWon,
-      matchRedTeams,
-      matchBlueTeams,
-    };
-  };
+      return {
+        redTeams,
+        blueTeams,
+        redAllianceNumber,
+        blueAllianceNumber,
+        redResults,
+        blueResults,
+        redWon,
+        blueWon,
+        matchRedTeams,
+        matchBlueTeams,
+      };
+    },
+    [alliances, getAllianceNumber],
+  );
 
   const matchLookup: Record<string, Match[] | undefined> = useMemo(
     () => ({
@@ -460,10 +490,10 @@ export default function DoubleElim4TeamBracket({
                     <div className="h-8"></div>
                     <BracketMatch
                       ref={(node) => {
-                        matchRefs.current['Match 4'] = node;
+                        matchRefs.current['Match 3'] = node;
                       }}
-                      matchLabel="Match 4"
-                      matches={matchesBySet[4]}
+                      matchLabel="Match 3"
+                      matches={matchesBySet[3]}
                       event={event}
                       hoveredAlliance={hoveredAlliance}
                       setHoveredAlliance={setHoveredAlliance}
@@ -507,10 +537,10 @@ export default function DoubleElim4TeamBracket({
                   <div className="space-y-4">
                     <BracketMatch
                       ref={(node) => {
-                        matchRefs.current['Match 3'] = node;
+                        matchRefs.current['Match 4'] = node;
                       }}
-                      matchLabel="Match 3"
-                      matches={matchesBySet[3]}
+                      matchLabel="Match 4"
+                      matches={matchesBySet[4]}
                       event={event}
                       hoveredAlliance={hoveredAlliance}
                       setHoveredAlliance={setHoveredAlliance}

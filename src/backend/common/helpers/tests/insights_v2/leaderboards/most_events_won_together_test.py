@@ -1,4 +1,5 @@
-from typing import List
+from datetime import datetime
+from typing import List, Optional
 
 from google.appengine.ext import ndb
 
@@ -13,12 +14,18 @@ from backend.common.models.event import Event
 from backend.common.models.team import Team
 
 
-def _put_event(event_key: str, year: int, event_type: EventType) -> None:
+def _put_event(
+    event_key: str,
+    year: int,
+    event_type: EventType,
+    start_date: Optional[datetime] = None,
+) -> None:
     Event(
         id=event_key,
         year=year,
         event_short=event_key[4:],
         event_type_enum=event_type,
+        start_date=start_date,
     ).put()
 
 
@@ -145,3 +152,49 @@ def test_insight_name_and_display_name(ndb_stub) -> None:
 
     assert insights[0].name == "most_events_won_together"
     assert insights[0].display_name == "Most Events Won Together"
+
+
+def test_context_type_is_event_list(ndb_stub) -> None:
+    _put_event("2022nytr", 2022, EventType.REGIONAL)
+    _put_award("2022nytr", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.REGIONAL)
+    _put_event("2022txcmp", 2022, EventType.DISTRICT_CMP)
+    _put_award(
+        "2022txcmp", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.DISTRICT_CMP
+    )
+
+    insights = compute_insights_for_year(2022, [MostEventsWonTogetherV2Calculator()])
+
+    assert insights[0].data["context_type"] == "event_list"
+
+
+def test_event_list_context_contains_event_keys(ndb_stub) -> None:
+    _put_event("2022nytr", 2022, EventType.REGIONAL)
+    _put_award("2022nytr", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.REGIONAL)
+    _put_event("2022txcmp", 2022, EventType.DISTRICT_CMP)
+    _put_award(
+        "2022txcmp", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.DISTRICT_CMP
+    )
+
+    insights = compute_insights_for_year(2022, [MostEventsWonTogetherV2Calculator()])
+
+    ranking = insights[0].data["rankings"][0]
+    assert ranking["contexts"][0]["event_keys"] == ["2022nytr", "2022txcmp"]
+
+
+def test_event_list_context_sorted_by_start_date(ndb_stub) -> None:
+    # 2022txcmp starts later alphabetically but comes first chronologically.
+    # The context event list should follow date order, not alphabetical order.
+    _put_event(
+        "2022txcmp", 2022, EventType.DISTRICT_CMP, start_date=datetime(2022, 3, 1)
+    )
+    _put_award(
+        "2022txcmp", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.DISTRICT_CMP
+    )
+    _put_event("2022nytr", 2022, EventType.REGIONAL, start_date=datetime(2022, 4, 1))
+    _put_award("2022nytr", 2022, ["frc1", "frc2"], AwardType.WINNER, EventType.REGIONAL)
+
+    insights = compute_insights_for_year(2022, [MostEventsWonTogetherV2Calculator()])
+
+    ranking = insights[0].data["rankings"][0]
+    # txcmp (March) should precede nytr (April) despite being later alphabetically
+    assert ranking["contexts"][0]["event_keys"] == ["2022txcmp", "2022nytr"]

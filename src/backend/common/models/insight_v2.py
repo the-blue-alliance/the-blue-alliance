@@ -5,8 +5,8 @@ from google.appengine.ext import ndb
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.keys import DistrictAbbreviation
 
-LeaderboardKeyType = Literal["team", "event", "match", "team_pair"]
-LeaderboardContextType = Literal["event_list", "none"]
+LeaderboardKeyType = Literal["team", "event", "match", "team_pair", "alliance"]
+LeaderboardContextType = Literal["event_list", "match_alliance", "none"]
 
 TimeseriesXType = Literal["week", "year", "event"]
 TimeseriesPointContextType = Literal["none", "match_record"]
@@ -77,6 +77,11 @@ class EventListContext(TypedDict):
     event_keys: List[str]
 
 
+class MatchAllianceContext(TypedDict):
+    match_key: str
+    alliance: List[str]  # team keys
+
+
 class LeaderboardRankingWithEventList(TypedDict):
     keys: List[str]
     value: int | float
@@ -85,7 +90,24 @@ class LeaderboardRankingWithEventList(TypedDict):
     ]  # parallel to keys; zip(keys, contexts) gives per-team events
 
 
-LeaderboardRanking = LeaderboardRankingV2 | LeaderboardRankingWithEventList
+class LeaderboardRankingPairWithEventList(TypedDict):
+    keys: List[List[str]]
+    value: int | float
+    contexts: List[EventListContext]  # parallel to keys; one context per pair
+
+
+class LeaderboardRankingWithMatchAlliance(TypedDict):
+    keys: List[str]  # match keys
+    value: int | float
+    contexts: List[MatchAllianceContext]  # parallel to keys
+
+
+LeaderboardRanking = (
+    LeaderboardRankingV2
+    | LeaderboardRankingWithEventList
+    | LeaderboardRankingPairWithEventList
+    | LeaderboardRankingWithMatchAlliance
+)
 
 
 class LeaderboardDataV2(TypedDict):

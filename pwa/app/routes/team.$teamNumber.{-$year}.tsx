@@ -51,14 +51,8 @@ import TeamEventAppearance from '~/components/tba/teamEventAppearance';
 import TeamMediaGallery from '~/components/tba/teamMediaGallery';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Badge } from '~/components/ui/badge';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import { Separator } from '~/components/ui/separator';
 import {
   Table,
@@ -253,7 +247,6 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 });
 
 function TeamPage(): React.JSX.Element {
-  const navigate = useNavigate();
   const { teamKey, year } = Route.useLoaderData();
 
   const { data: team } = useSuspenseQuery(
@@ -388,30 +381,25 @@ function TeamPage(): React.JSX.Element {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView}>
-        <Select
-          value={String(year)}
-          onValueChange={(value) => {
-            void navigate({
-              to: '/team/$teamNumber/{-$year}',
-              params: { teamNumber: String(team.team_number), year: value },
-            });
-          }}
-        >
-          <SelectTrigger
-            className="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
-          >
-            <SelectValue placeholder={year} />
-          </SelectTrigger>
-          <SelectContent className="max-h-[30vh] overflow-y-auto">
-            <SelectItem value="history">History</SelectItem>
-            <SelectItem value="stats">Stats</SelectItem>
-            {yearsParticipated.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          options={[
+            {
+              label: 'History',
+              to: `/team/${team.team_number}/history`,
+            },
+            {
+              label: 'Stats',
+              to: `/team/${team.team_number}/stats`,
+            },
+            ...yearsParticipated.map((y) => ({
+              label: String(y),
+              to: `/team/${team.team_number}/${y}`,
+              isCurrent: y === year,
+            })),
+          ]}
+        />
       </TableOfContents>
 
       <div className="mt-8 w-full">

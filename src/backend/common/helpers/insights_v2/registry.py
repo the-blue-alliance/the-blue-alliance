@@ -1,4 +1,5 @@
 from collections import defaultdict
+from datetime import datetime
 from typing import Any, Dict, List
 
 from google.appengine.ext import ndb
@@ -9,6 +10,24 @@ from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.leaderboards.blue_banners import (
     BlueBannersV2Calculator,
 )
+from backend.common.helpers.insights_v2.leaderboards.highest_auto_score import (
+    HighestAutoScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_endgame_score import (
+    HighestEndgameScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_losing_score import (
+    HighestLosingScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_match_clean_combined_score import (
+    HighestMatchCleanCombinedScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_match_clean_score import (
+    HighestMatchCleanScoreV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_teleop_score import (
+    HighestTeleopScoreV2Calculator,
+)
 from backend.common.helpers.insights_v2.leaderboards.most_awards_won import (
     MostAwardsWonV2Calculator,
 )
@@ -17,6 +36,9 @@ from backend.common.helpers.insights_v2.leaderboards.most_cmp_finals_appearances
 )
 from backend.common.helpers.insights_v2.leaderboards.most_cmp_wins import (
     MostCmpWinsV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_coral_scored import (
+    MostCoralScored2025V2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_district_cmp_wins import (
     MostDistrictCmpWinsV2Calculator,
@@ -32,6 +54,9 @@ from backend.common.helpers.insights_v2.leaderboards.most_events_won import (
 )
 from backend.common.helpers.insights_v2.leaderboards.most_events_won_together import (
     MostEventsWonTogetherV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.most_fuel_scored import (
+    MostFuelScored2026V2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_impact_award_wins import (
     MostImpactAwardWinsV2Calculator,
@@ -50,6 +75,12 @@ from backend.common.helpers.insights_v2.streaks.einstein_streak import (
 )
 from backend.common.helpers.insights_v2.streaks.qualifying_event_streak import (
     LongestQualifyingEventStreakV2Calculator,
+)
+from backend.common.helpers.insights_v2.streaks.undefeated_streak import (
+    LongestUndefeatedStreakV2Calculator,
+)
+from backend.common.helpers.insights_v2.streaks.win_streak import (
+    LongestWinStreakV2Calculator,
 )
 from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
     HighScoreOverTimeV2Calculator,
@@ -91,7 +122,11 @@ def compute_insights_for_year(
     """
     event_years = [year] if year != 0 else SeasonHelper.get_valid_years()
     for event_year in event_years:
-        for event in EventListQuery(year=event_year).fetch():
+        events = sorted(
+            EventListQuery(year=event_year).fetch(),
+            key=lambda e: (e.start_date or datetime(1, 1, 1), e.key_name),
+        )
+        for event in events:
             if event.event_type_enum not in SEASON_EVENT_TYPES:
                 continue
 
@@ -116,22 +151,37 @@ def make_all_insights(year: Year) -> List[InsightV2]:
         BlueBannersV2Calculator(),
         MostMatchesPlayedV2Calculator(),
         MostMatchesPlayedTogetherV2Calculator(),
-        MostDivisionFinalsAppearancesV2Calculator(),
-        MostDivisionWinsV2Calculator(),
-        MostCmpFinalsAppearancesV2Calculator(),
-        MostCmpWinsV2Calculator(),
         MostEventsWonV2Calculator(),
         MostEventsWonTogetherV2Calculator(),
         MostImpactAwardWinsV2Calculator(),
         MostAwardsWonV2Calculator(),
-        MostDistrictCmpWinsV2Calculator(),
         MostWffaWinsV2Calculator(),
     ]
     if year == 0:
         calculators += [
+            MostDistrictCmpWinsV2Calculator(),
+            MostDivisionFinalsAppearancesV2Calculator(),
+            MostDivisionWinsV2Calculator(),
+            MostCmpFinalsAppearancesV2Calculator(),
+            MostCmpWinsV2Calculator(),
             LongestQualifyingEventStreakV2Calculator(),
             LongestEinsteinStreakV2Calculator(),
+            LongestUndefeatedStreakV2Calculator(),
+            LongestWinStreakV2Calculator(),
         ]
     else:
-        calculators.append(HighScoreOverTimeV2Calculator())
+        calculators += [
+            HighScoreOverTimeV2Calculator(),
+            HighestMatchCleanScoreV2Calculator(),
+            HighestMatchCleanCombinedScoreV2Calculator(),
+            HighestLosingScoreV2Calculator(),
+            HighestAutoScoreV2Calculator(),
+            HighestTeleopScoreV2Calculator(),
+        ]
+        if year not in {2017, 2018, 2023, 2025}:
+            calculators.append(HighestEndgameScoreV2Calculator())
+        if year == 2025:
+            calculators.append(MostCoralScored2025V2Calculator())
+        if year == 2026:
+            calculators.append(MostFuelScored2026V2Calculator())
     return compute_insights_for_year(year, calculators)

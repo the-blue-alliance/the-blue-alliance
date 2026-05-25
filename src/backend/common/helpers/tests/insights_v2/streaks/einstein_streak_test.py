@@ -200,3 +200,32 @@ def test_winning_multiple_divisions_same_year_counts_once(ndb_stub) -> None:
     top = insights[0].data["entries"][0]
     assert top["key"] == "frc254"
     assert top["streak_length"] == 1
+
+
+def test_team_with_two_equal_streaks_appears_twice(ndb_stub) -> None:
+    # frc254 wins 2018 and 2019 (streak of 2), loses in 2020,
+    # then wins 2022 and 2023 (another streak of 2).
+    # Both streaks should appear in the output.
+    for year, event_key in [(2018, "2018micmp1"), (2019, "2019micmp1")]:
+        _put_event(event_key, year, EventType.CMP_DIVISION)
+        _put_winner_award(event_key, year, ["frc254"], EventType.CMP_DIVISION)
+        _put_match(event_key, year, ["frc254", "frc1", "frc2", "frc3", "frc4", "frc5"])
+
+    # 2020: CMP_DIVISION exists but frc1 wins, not frc254 — breaks frc254's streak
+    _put_event("2020micmp1", 2020, EventType.CMP_DIVISION)
+    _put_winner_award("2020micmp1", 2020, ["frc1"], EventType.CMP_DIVISION)
+    _put_match("2020micmp1", 2020, ["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"])
+
+    for year, event_key in [(2022, "2022micmp1"), (2023, "2023micmp1")]:
+        _put_event(event_key, year, EventType.CMP_DIVISION)
+        _put_winner_award(event_key, year, ["frc254"], EventType.CMP_DIVISION)
+        _put_match(event_key, year, ["frc254", "frc1", "frc2", "frc3", "frc4", "frc5"])
+
+    insights = compute_insights_for_year(0, [LongestEinsteinStreakV2Calculator()])
+
+    assert len(insights) == 1
+    frc254_entries = [e for e in insights[0].data["entries"] if e["key"] == "frc254"]
+    assert len(frc254_entries) == 2
+    assert all(e["streak_length"] == 2 for e in frc254_entries)
+    starts = {e["start"] for e in frc254_entries}
+    assert starts == {"2018", "2022"}

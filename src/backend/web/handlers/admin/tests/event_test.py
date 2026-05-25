@@ -1057,3 +1057,281 @@ def test_divisions_released_button_not_shown_without_divisions(
         btn for btn in soup.find_all("button") if "Divisions Released" in btn.get_text()
     ]
     assert len(buttons) == 0
+
+
+def test_link_frc_api_button_shown_for_offseason_unofficial_event(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2026ohnew")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    link_form = soup.find("form", action="/admin/event/link_frc_api/2026ohnew")
+    assert link_form is not None
+    frc_event_input = link_form.find("input", {"name": "frc_event_input"})
+    assert frc_event_input is not None
+
+
+def test_link_frc_api_button_not_shown_for_official_event(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=True,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2026ohnew")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    link_form = soup.find("form", action="/admin/event/link_frc_api/2026ohnew")
+    assert link_form is None
+
+
+def test_link_frc_api_button_not_shown_for_non_offseason_event(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2026nyny",
+        event_short="nyny",
+        year=2026,
+        name="New York Regional",
+        event_type_enum=EventType.REGIONAL,
+        official=False,
+        start_date=datetime(2026, 3, 1),
+        end_date=datetime(2026, 3, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2026nyny")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    link_form = soup.find("form", action="/admin/event/link_frc_api/2026nyny")
+    assert link_form is None
+
+
+def test_link_frc_api_post_with_event_code(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={"frc_event_input": "OHNEW", "csrf_token": "test"},
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.official is True
+    assert event.first_code == "OHNEW"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert any("/backend-tasks/get/event_details/2026ohnew" in t.url for t in tasks)
+
+
+def test_link_frc_api_post_with_frc_events_url(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={
+            "frc_event_input": "https://frc-events.firstinspires.org/2026/OHNEW",
+            "csrf_token": "test",
+        },
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.official is True
+    assert event.first_code == "OHNEW"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert any("/backend-tasks/get/event_details/2026ohnew" in t.url for t in tasks)
+
+
+def test_link_frc_api_post_lowercase_code_uppercased(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={"frc_event_input": "ohnew", "csrf_token": "test"},
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.first_code == "OHNEW"
+
+
+def test_link_frc_api_post_rejects_official_event(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=True,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={"frc_event_input": "OHNEW", "csrf_token": "test"},
+    )
+    assert resp.status_code == 400
+
+
+def test_link_frc_api_post_rejects_non_offseason_event(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026nyny",
+        event_short="nyny",
+        year=2026,
+        name="New York Regional",
+        event_type_enum=EventType.REGIONAL,
+        official=False,
+        start_date=datetime(2026, 3, 1),
+        end_date=datetime(2026, 3, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026nyny",
+        data={"frc_event_input": "NYNY", "csrf_token": "test"},
+    )
+    assert resp.status_code == 400
+
+
+def test_link_frc_api_post_rejects_empty_input(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={"frc_event_input": "   ", "csrf_token": "test"},
+    )
+    assert resp.status_code == 302
+    assert "link_frc_api_error=empty" in resp.headers.get("Location", "")
+
+    # Event should not have been modified
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.official is False
+    assert event.first_code is None
+
+
+def test_link_frc_api_post_invalid_url_redirects_with_error(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    # A URL with no path segments after the scheme/host
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={
+            "frc_event_input": "https://frc-events.firstinspires.org/",
+            "csrf_token": "test",
+        },
+    )
+    assert resp.status_code == 302
+    assert "link_frc_api_error=invalid_url" in resp.headers.get("Location", "")
+
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.official is False
+
+
+def test_link_frc_api_post_invalid_code_redirects_with_error(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2026ohnew",
+        event_short="ohnew",
+        year=2026,
+        name="Ohio New Event",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+        start_date=datetime(2026, 9, 1),
+        end_date=datetime(2026, 9, 5),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2026ohnew",
+        data={"frc_event_input": "OH NEW", "csrf_token": "test"},
+    )
+    assert resp.status_code == 302
+    assert "link_frc_api_error=invalid_code" in resp.headers.get("Location", "")
+
+    event = Event.get_by_id("2026ohnew")
+    assert event is not None
+    assert event.official is False
+    assert event.first_code is None

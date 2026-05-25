@@ -33,7 +33,7 @@ export default function ScoreBreakdown2024({
         {/* Auto Leave */}
         <TableRow>
           <TableCell
-            className="bg-alliance-red-dark whitespace-nowrap *:align-middle"
+            className="bg-alliance-red-winner whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
               condition={
@@ -59,7 +59,7 @@ export default function ScoreBreakdown2024({
             Auto Leave
           </TableCell>
           <TableCell
-            className="bg-alliance-blue-dark whitespace-nowrap *:align-middle"
+            className="bg-alliance-blue-winner whitespace-nowrap *:align-middle"
           >
             <ConditionalCheckmark
               condition={
@@ -85,65 +85,65 @@ export default function ScoreBreakdown2024({
 
         {/* Auto Amp Note Count */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.autoAmpNoteCount}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Auto Amp Note Count
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.autoAmpNoteCount}
           </TableCell>
         </TableRow>
 
         {/* Auto Speaker Note Count */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.autoSpeakerNoteCount}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Auto Speaker Note Count
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.autoSpeakerNoteCount}
           </TableCell>
         </TableRow>
 
         {/* Auto Note Points */}
         <TableRow>
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.autoTotalNotePoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Auto Note Points
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.autoTotalNotePoints}
           </TableCell>
         </TableRow>
 
         {/* Total Auto */}
         <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.autoPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Total Auto
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.autoPoints}
           </TableCell>
         </TableRow>
 
         {/* Teleop Amp Note Count */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.teleopAmpNoteCount}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Teleop Amp Note Count
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.teleopAmpNoteCount}
           </TableCell>
         </TableRow>
@@ -152,7 +152,7 @@ export default function ScoreBreakdown2024({
         <TableRow>
           <TableCell
             className="flex flex-row items-center justify-center gap-4
-              bg-alliance-red-light"
+              bg-alliance-red-loser"
           >
             <InlineIcon>
               <BiVolumeUp className="size-4" />
@@ -169,7 +169,7 @@ export default function ScoreBreakdown2024({
 
           <TableCell
             className="flex flex-row items-center justify-center gap-4
-              bg-alliance-blue-light"
+              bg-alliance-blue-loser"
           >
             <InlineIcon>
               <BiVolumeUp className="size-4" />
@@ -184,20 +184,20 @@ export default function ScoreBreakdown2024({
 
         {/* Teleop Note Points */}
         <TableRow>
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.teleopTotalNotePoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Teleop Note Points
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.teleopTotalNotePoints}
           </TableCell>
         </TableRow>
 
         {/* Robot 1 Endgame */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot1}
               teamKey={match.alliances.red.team_keys[0]}
@@ -209,7 +209,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Robot 1 Endgame
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot1}
               teamKey={match.alliances.blue.team_keys[0]}
@@ -222,7 +222,7 @@ export default function ScoreBreakdown2024({
 
         {/* Robot 2 Endgame */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot2}
               teamKey={match.alliances.red.team_keys[1]}
@@ -234,7 +234,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Robot 2 Endgame
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
               teamKey={match.alliances.blue.team_keys[1]}
@@ -247,7 +247,7 @@ export default function ScoreBreakdown2024({
 
         {/* Robot 3 Endgame */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot3}
               teamKey={match.alliances.red.team_keys[2]}
@@ -259,7 +259,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Robot 3 Endgame
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
               teamKey={match.alliances.blue.team_keys[2]}
@@ -272,46 +272,46 @@ export default function ScoreBreakdown2024({
 
         {/* Harmony Points */}
         <TableRow>
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.endGameHarmonyPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Harmony Points
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.endGameHarmonyPoints}
           </TableCell>
         </TableRow>
 
         {/* Trap Points */}
         <TableRow>
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.endGameNoteInTrapPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Trap Points
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.endGameNoteInTrapPoints}
           </TableCell>
         </TableRow>
 
         {/* Total Teleop */}
         <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.teleopPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Total Teleop
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.teleopPoints}
           </TableCell>
         </TableRow>
 
         {/* Coopertition Criteria Met */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.red.coopertitionCriteriaMet ?? false}
             />
@@ -319,7 +319,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Coopertition Criteria Met
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.coopertitionCriteriaMet ?? false}
             />
@@ -328,7 +328,7 @@ export default function ScoreBreakdown2024({
 
         {/* Melody Bonus */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.red.melodyBonusAchieved ?? false}
             />
@@ -336,7 +336,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Melody Bonus
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.melodyBonusAchieved ?? false}
             />
@@ -345,7 +345,7 @@ export default function ScoreBreakdown2024({
 
         {/* Fouls / Tech Fouls */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.foulCount} (+
             {(scoreBreakdown.red.foulCount ?? 0) * 2}) /{' '}
             {scoreBreakdown.red.techFoulCount} (+
@@ -354,7 +354,7 @@ export default function ScoreBreakdown2024({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Fouls / Tech Fouls
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.foulCount} (+
             {(scoreBreakdown.blue.foulCount ?? 0) * 2}) /{' '}
             {scoreBreakdown.blue.techFoulCount} (+
@@ -364,39 +364,39 @@ export default function ScoreBreakdown2024({
 
         {/* Adjustments */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.adjustPoints}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Adjustments
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.adjustPoints}
           </TableCell>
         </TableRow>
 
         {/* Total Score */}
         <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.totalPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Total Score
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.totalPoints}
           </TableCell>
         </TableRow>
 
         {/* RP */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             +{scoreBreakdown.red.rp} RP
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             RP
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             +{scoreBreakdown.blue.rp} RP
           </TableCell>
         </TableRow>

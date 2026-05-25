@@ -5,6 +5,7 @@ from urllib.parse import parse_qs, urlparse
 
 import pytest
 from bs4 import BeautifulSoup
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
@@ -16,6 +17,9 @@ from backend.common.memcache_models.webcast_online_status_memcache import (
 )
 from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
+from backend.common.models.match import Match
+from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast
 
 
@@ -94,6 +98,83 @@ def create_events(ndb_stub) -> None:
     )
     inactive_event.put()
 
+    offseason_unlinked = Event(
+        id=f"{now.year}ohnew",
+        name="Ohio Offseason",
+        event_short="ohnew",
+        short_name="OHNEW",
+        year=now.year,
+        start_date=now + timedelta(days=20),
+        end_date=now + timedelta(days=22),
+        timezone_id="America/New_York",
+        city="Columbus",
+        state_prov="OH",
+        country="USA",
+        venue="Venue",
+        venue_address="101 Main St",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+    )
+    offseason_unlinked.put()
+
+    offseason_linked = Event(
+        id=f"{now.year}caoff",
+        name="California Offseason",
+        event_short="caoff",
+        short_name="CAOFF",
+        year=now.year,
+        start_date=now + timedelta(days=10),
+        end_date=now + timedelta(days=11),
+        timezone_id="America/Los_Angeles",
+        city="San Jose",
+        state_prov="CA",
+        country="USA",
+        venue="Venue",
+        venue_address="202 Main St",
+        event_type_enum=EventType.OFFSEASON,
+        official=True,
+        first_code="CAOFF",
+    )
+    offseason_linked.put()
+
+    offseason_started = Event(
+        id=f"{now.year}pastoff",
+        name="Past Offseason",
+        event_short="pastoff",
+        short_name="PASTOFF",
+        year=now.year,
+        start_date=now - timedelta(days=2),
+        end_date=now + timedelta(days=1),
+        timezone_id="America/Los_Angeles",
+        city="Oakland",
+        state_prov="CA",
+        country="USA",
+        venue="Venue",
+        venue_address="404 Main St",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+    )
+    offseason_started.put()
+
+    offseason_old_year = Event(
+        id=f"{now.year - 1}oldoff",
+        name="Old Year Offseason",
+        event_short="oldoff",
+        short_name="OLDOFF",
+        year=now.year - 1,
+        start_date=now + timedelta(days=10),
+        end_date=now + timedelta(days=11),
+        timezone_id="America/Los_Angeles",
+        city="Los Angeles",
+        state_prov="CA",
+        country="USA",
+        venue="Venue",
+        venue_address="303 Main St",
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+    )
+    offseason_old_year.put()
+
     webcast_status = Webcast(
         type=WebcastType.TWITCH,
         channel="frc0",
@@ -106,6 +187,12 @@ def create_events(ndb_stub) -> None:
 @pytest.fixture
 def login_user_with_permission(login_user):
     login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+    return login_user
+
+
+@pytest.fixture
+def login_user_with_offseason_permission(login_user):
+    login_user.permissions = [AccountPermission.REVIEW_OFFSEASON_EVENTS]
     return login_user
 
 
@@ -393,3 +480,215 @@ def test_post_requires_permission(login_user, web_client: Client) -> None:
     )
 
     assert response.status_code == 401
+
+
+def test_offseason_list_login_redirect(web_client: Client) -> None:
+    response = web_client.get("/mod/offseasons")
+
+    assert response.status_code == 302
+    assert urlparse(response.headers["Location"]).path == "/account/login"
+
+
+def test_offseason_list_requires_permission(login_user, web_client: Client) -> None:
+    response = web_client.get("/mod/offseasons")
+
+    assert response.status_code == 401
+
+
+def test_offseason_list_shows_current_year_events(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    response = web_client.get("/mod/offseasons")
+
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, "html.parser")
+    events_table = soup.find(id="offseason-events")
+    assert events_table is not None
+    assert "Ohio Offseason" in events_table.get_text()
+    assert "California Offseason" in events_table.get_text()
+    assert "Old Year Offseason" not in events_table.get_text()
+
+    linked_input = soup.find("input", id=f"first-code-{datetime.now().year}caoff")
+    assert linked_input is not None
+    assert linked_input.get("disabled") is not None
+    assert soup.find("button", id=f"unlink-{datetime.now().year}caoff") is not None
+
+    unlinked_input = soup.find("input", id=f"first-code-{datetime.now().year}ohnew")
+    assert unlinked_input is not None
+    assert unlinked_input.get("disabled") is None
+    assert soup.find("button", id=f"unlink-{datetime.now().year}ohnew") is None
+    future_delete = soup.find("button", id=f"delete-{datetime.now().year}ohnew")
+    assert future_delete is not None
+    assert future_delete.get("disabled") is None
+
+    started_delete = soup.find("button", id=f"delete-{datetime.now().year}pastoff")
+    assert started_delete is not None
+    assert started_delete.get("disabled") is not None
+
+
+def test_offseason_link_with_code(
+    login_user_with_offseason_permission, web_client: Client, taskqueue_stub
+) -> None:
+    event_key = f"{datetime.now().year}ohnew"
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/link",
+        data={"first_code": "ohnew", "csrf_token": "ignore-me"},
+    )
+
+    assert response.status_code == 302
+    event = Event.get_by_id(event_key)
+    assert event is not None
+    assert event.official is True
+    assert event.first_code == "OHNEW"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert any(
+        t.url == f"/backend-tasks/enqueue/event_details/{event_key}" for t in tasks
+    )
+
+
+def test_offseason_link_with_frc_events_url(
+    login_user_with_offseason_permission, web_client: Client, taskqueue_stub
+) -> None:
+    event_key = f"{datetime.now().year}ohnew"
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/link",
+        data={
+            "first_code": f"https://frc-events.firstinspires.org/{datetime.now().year}/OHNEW",
+            "csrf_token": "ignore-me",
+        },
+    )
+
+    assert response.status_code == 302
+    event = Event.get_by_id(event_key)
+    assert event is not None
+    assert event.first_code == "OHNEW"
+
+
+def test_offseason_link_invalid_code_redirects_error(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}ohnew"
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/link",
+        data={"first_code": "bad code", "csrf_token": "ignore-me"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parse_qs(parsed.query)["status"] == ["invalid_first_code"]
+
+
+def test_offseason_link_when_already_linked(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}caoff"
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/link",
+        data={"first_code": "CAOFF", "csrf_token": "ignore-me"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parse_qs(parsed.query)["status"] == ["already_linked"]
+
+
+def test_offseason_unlink(
+    login_user_with_offseason_permission, web_client: Client, taskqueue_stub
+) -> None:
+    event_key = f"{datetime.now().year}caoff"
+
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/unlink",
+        data={"csrf_token": "ignore-me"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parse_qs(parsed.query)["status"] == ["unlinked"]
+
+    event = Event.get_by_id(event_key)
+    assert event is not None
+    assert event.first_code is None
+    assert event.official is False
+
+
+def test_offseason_unlink_when_not_linked(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}ohnew"
+
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/unlink",
+        data={"csrf_token": "ignore-me"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parse_qs(parsed.query)["status"] == ["not_linked"]
+
+
+def test_offseason_delete(
+    login_user_with_offseason_permission, web_client: Client, taskqueue_stub
+) -> None:
+    event_key = f"{datetime.now().year}ohnew"
+    event = Event.get_by_id(event_key)
+    assert event is not None
+
+    Team(id="frc1", team_number=1, nickname="Team 1").put()
+    Match(
+        id=f"{event_key}_qm1",
+        event=event.key,
+        year=event.year,
+        comp_level="qm",
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc1"],
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": ["frc1"], "surrogates": [], "dqs": [], "score": -1},
+                "blue": {"teams": [], "surrogates": [], "dqs": [], "score": -1},
+            }
+        ),
+    ).put()
+    EventTeam(
+        id=f"{event_key}_frc1",
+        event=event.key,
+        team=none_throws(Team.get_by_id("frc1")).key,
+        year=event.year,
+    ).put()
+
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/delete",
+        data={"csrf_token": "ignore-me"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parse_qs(parsed.query)["status"] == ["deleted"]
+
+    assert Event.get_by_id(event_key) is None
+    assert Match.get_by_id(f"{event_key}_qm1") is None
+    assert EventTeam.get_by_id(f"{event_key}_frc1") is None
+
+
+def test_offseason_delete_not_allowed_after_start(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}pastoff"
+
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/delete",
+        data={"csrf_token": "ignore-me"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parse_qs(parsed.query)["status"] == ["delete_not_allowed"]
+    assert Event.get_by_id(event_key) is not None

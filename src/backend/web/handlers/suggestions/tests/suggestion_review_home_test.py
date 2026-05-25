@@ -120,3 +120,31 @@ def test_hides_review_media_tools_without_review_media_permission(
 
     assert soup.find("a", id="webcast-dashboard-link") is None
     assert soup.find(id="manage-team-media-form") is None
+
+
+def test_shows_offseason_dashboard_for_offseason_permission(
+    login_user, web_client: Client
+) -> None:
+    login_user.permissions = [AccountPermission.REVIEW_OFFSEASON_EVENTS]
+
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    offseason_link = soup.find("a", id="offseason-dashboard-link")
+    assert offseason_link is not None
+    assert offseason_link["href"] == "/mod/offseasons"
+
+
+def test_hides_offseason_dashboard_without_offseason_permission(
+    login_user, web_client: Client
+) -> None:
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    assert soup.find("a", id="offseason-dashboard-link") is None

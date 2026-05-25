@@ -1,5 +1,5 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import {
   type CSSProperties,
   Fragment,
@@ -27,14 +27,8 @@ import {
   getStatusOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, MatchLink, TeamLink } from '~/components/tba/links';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import {
   Table,
   TableBody,
@@ -204,7 +198,7 @@ function TeamCell({
   }
 
   const allianceClass =
-    alliance === 'red' ? 'bg-alliance-red-cell' : 'bg-alliance-blue-cell';
+    alliance === 'red' ? 'bg-alliance-red-loser' : 'bg-alliance-blue-loser';
 
   const style: CSSProperties = cellColors.background
     ? {
@@ -352,8 +346,8 @@ function MatchesTable({
                       className={cn(
                         'text-center font-bold',
                         winner === AllianceColor.RED
-                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-red)_30%,transparent)]'
-                          : 'bg-alliance-red-cell',
+                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-red-accent)_30%,transparent)]'
+                          : 'bg-alliance-red-loser',
                       )}
                     >
                       {played ? redScore : '—'}
@@ -378,8 +372,8 @@ function MatchesTable({
                       className={cn(
                         'text-center font-bold',
                         winner === AllianceColor.BLUE
-                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue)_30%,transparent)]'
-                          : 'bg-alliance-blue-cell',
+                          ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue-accent)_30%,transparent)]'
+                          : 'bg-alliance-blue-loser',
                       )}
                     >
                       {played ? blueScore : '—'}
@@ -459,8 +453,8 @@ function MatchesTable({
                     className={cn(
                       'text-center font-bold',
                       winner === AllianceColor.RED
-                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-red)_30%,transparent)]'
-                        : 'bg-alliance-red-cell',
+                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-red-accent)_30%,transparent)]'
+                        : 'bg-alliance-red-loser',
                     )}
                   >
                     {played ? redScore : '—'}
@@ -469,8 +463,8 @@ function MatchesTable({
                     className={cn(
                       'text-center font-bold',
                       winner === AllianceColor.BLUE
-                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue)_30%,transparent)]'
-                        : 'bg-alliance-blue-cell',
+                        ? 'bg-[color-mix(in_srgb,var(--color-alliance-blue-accent)_30%,transparent)]'
+                        : 'bg-alliance-blue-loser',
                     )}
                   >
                     {played ? blueScore : '—'}
@@ -655,7 +649,6 @@ function AllRankingsTable({
 function ChampsPage() {
   const { abbreviation, displayName, currentSeason, year } =
     Route.useLoaderData();
-  const navigate = useNavigate();
   const districtKey = `${year}${abbreviation}`;
 
   // Fetch district history to know which years this district existed
@@ -792,26 +785,15 @@ function ChampsPage() {
           >
             {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
           </span>
-          <Select
-            value={String(year)}
-            onValueChange={(v) => {
-              void navigate({
-                to: '/district/$districtAbbreviation/champs/$year',
-                params: { districtAbbreviation: abbreviation, year: v },
-              });
-            }}
-          >
-            <SelectTrigger className="w-24">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              {validYears.map((y) => (
-                <SelectItem key={y} value={String(y)}>
-                  {y}
-                </SelectItem>
-              ))}
-            </SelectContent>
-          </Select>
+          <YearSelector
+            currentLabel={String(year)}
+            triggerClassName="w-24"
+            options={validYears.map((y) => ({
+              label: String(y),
+              to: `/district/${abbreviation}/champs/${y}`,
+              isCurrent: y === year,
+            }))}
+          />
         </div>
       </div>
 

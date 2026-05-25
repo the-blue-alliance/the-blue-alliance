@@ -5,7 +5,6 @@ import { useEffect, useMemo, useRef, useState } from 'react';
 
 import SearchIcon from '~icons/lucide/search';
 
-import { SearchIndex } from '~/api/tba/read';
 import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { Button } from '~/components/ui/button';
 import {
@@ -24,7 +23,9 @@ import {
 } from '~/components/ui/dialog';
 import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
-import FuzzysortFilterer from '~/lib/search/fuzzysortFilterer';
+import FuzzysortFilterer, {
+  FilteredSearchIndex,
+} from '~/lib/search/fuzzysortFilterer';
 import { cn } from '~/lib/utils';
 
 export function SearchModal({ ...props }: DialogProps) {
@@ -38,7 +39,7 @@ export function SearchModal({ ...props }: DialogProps) {
       ? navigator.userAgent.includes('Macintosh')
       : false;
 
-  const searchResults: SearchIndex | null = useMemo(() => {
+  const searchResults: FilteredSearchIndex | null = useMemo(() => {
     if (!searchIndexQuery.data) {
       return null;
     }
@@ -138,48 +139,62 @@ export function SearchModal({ ...props }: DialogProps) {
             )}
           </div>
           <CommandList className="no-scrollbar scroll-pt-2 scroll-pb-1.5">
-            {searchResults?.teams && searchResults.teams.length > 0 && (
-              <CommandGroup
-                heading="Teams"
-                className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                  **:[[cmdk-group-heading]]:p-3!
-                  **:[[cmdk-group-heading]]:pb-1!"
-              >
-                {searchResults.teams.map((team) => (
-                  <SearchItem
-                    key={team.key}
-                    value={team.key}
-                    onSelect={() => {
-                      void navigate({ to: `/team/${team.key.substring(3)}` });
-                      setOpen(false);
-                    }}
-                  >
-                    {team.key.substring(3)} - {team.nickname}
-                  </SearchItem>
-                ))}
-              </CommandGroup>
-            )}
-            {searchResults?.events && searchResults.events.length > 0 && (
-              <CommandGroup
-                heading="Events"
-                className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                  **:[[cmdk-group-heading]]:p-3!
-                  **:[[cmdk-group-heading]]:pb-1!"
-              >
-                {searchResults.events.map((event) => (
-                  <SearchItem
-                    key={event.key}
-                    value={event.key}
-                    onSelect={() => {
-                      void navigate({ to: `/event/${event.key}` });
-                      setOpen(false);
-                    }}
-                  >
-                    {event.key.substring(0, 4)} {event.name} [
-                    {event.key.substring(4)}]
-                  </SearchItem>
-                ))}
-              </CommandGroup>
+            {searchResults && (
+              <>
+                {[
+                  searchResults.teamsFirst ? 'teams' : 'events',
+                  searchResults.teamsFirst ? 'events' : 'teams',
+                ].map((group) =>
+                  group === 'teams'
+                    ? searchResults.teams.length > 0 && (
+                        <CommandGroup
+                          key="teams"
+                          heading="Teams"
+                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
+                            **:[[cmdk-group-heading]]:p-3!
+                            **:[[cmdk-group-heading]]:pb-1!"
+                        >
+                          {searchResults.teams.map((team) => (
+                            <SearchItem
+                              key={team.key}
+                              value={team.key}
+                              onSelect={() => {
+                                void navigate({
+                                  to: `/team/${team.key.substring(3)}`,
+                                });
+                                setOpen(false);
+                              }}
+                            >
+                              {team.key.substring(3)} - {team.nickname}
+                            </SearchItem>
+                          ))}
+                        </CommandGroup>
+                      )
+                    : searchResults.events.length > 0 && (
+                        <CommandGroup
+                          key="events"
+                          heading="Events"
+                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
+                            **:[[cmdk-group-heading]]:p-3!
+                            **:[[cmdk-group-heading]]:pb-1!"
+                        >
+                          {searchResults.events.map((event) => (
+                            <SearchItem
+                              key={event.key}
+                              value={event.key}
+                              onSelect={() => {
+                                void navigate({ to: `/event/${event.key}` });
+                                setOpen(false);
+                              }}
+                            >
+                              {event.key.substring(0, 4)} {event.name} [
+                              {event.key.substring(4)}]
+                            </SearchItem>
+                          ))}
+                        </CommandGroup>
+                      ),
+                )}
+              </>
             )}
           </CommandList>
         </Command>

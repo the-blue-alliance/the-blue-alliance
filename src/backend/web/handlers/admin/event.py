@@ -1,6 +1,7 @@
 import datetime
 import json
 from typing import Any, cast, Dict, Optional, Set
+from urllib.parse import urlparse
 
 from flask import abort, redirect, request, url_for
 from google.appengine.api import taskqueue
@@ -647,6 +648,70 @@ def event_divisions_released_post(event_key: EventKey) -> Response:
         queue_name="admin",
         target="py3-tasks-io",
         url=f"/tasks/admin/do/post_division_tasks/{event_key}",
+        method="GET",
+    )
+
+    return redirect(url_for("admin.event_detail", event_key=event_key))
+
+
+def event_link_frc_api_post(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    if not event.is_offseason or event.official:
+        abort(400)
+
+    frc_event_input = (request.form.get("frc_event_input") or "").strip()
+    if not frc_event_input:
+        return redirect(
+            url_for(
+                "admin.event_detail",
+                event_key=event_key,
+                link_frc_api_error="empty",
+            )
+        )
+
+    # Support full FRC events URLs like https://frc-events.firstinspires.org/2026/OHNEW
+    # as well as bare event codes like OHNEW
+    parsed = urlparse(frc_event_input)
+    if parsed.scheme in ("http", "https"):
+        # Extract the last non-empty path segment from the URL
+        path_parts = [p for p in parsed.path.split("/") if p]
+        if not path_parts:
+            return redirect(
+                url_for(
+                    "admin.event_detail",
+                    event_key=event_key,
+                    link_frc_api_error="invalid_url",
+                )
+            )
+        extracted_event_short = path_parts[-1].upper()
+    else:
+        # Treat the whole input as an event code
+        extracted_event_short = frc_event_input.upper()
+
+    candidate_event_key = Event.render_key_name(event.year, extracted_event_short)
+    if not Event.validate_key_name(candidate_event_key):
+        return redirect(
+            url_for(
+                "admin.event_detail",
+                event_key=event_key,
+                link_frc_api_error="invalid_code",
+            )
+        )
+
+    event.official = True
+    event.first_code = extracted_event_short
+    EventManipulator.createOrUpdate(event)
+
+    taskqueue.add(
+        queue_name="datafeed",
+        target="py3-tasks-io",
+        url=f"/backend-tasks/get/event_details/{event_key}",
         method="GET",
     )
 
