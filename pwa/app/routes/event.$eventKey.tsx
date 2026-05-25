@@ -620,14 +620,15 @@ function EventPage() {
                 </InlineIcon>
               </TabsTrigger>
             )}
-          {event.event_type === EventType.REGIONAL && (
-            <TabsTrigger value="champs-qual-points">
-              <InlineIcon>
-                <ChampsQualPointsIcon />
-                Champs Qual Points
-              </InlineIcon>
-            </TabsTrigger>
-          )}
+          {event.event_type === EventType.REGIONAL &&
+            (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
+              <TabsTrigger value="champs-qual-points">
+                <InlineIcon>
+                  <ChampsQualPointsIcon />
+                  Champs Qual Points
+                </InlineIcon>
+              </TabsTrigger>
+            )}
           <TabsTrigger value="media">
             <InlineIcon>
               <MediaIcon />
@@ -642,7 +643,11 @@ function EventPage() {
           </TabsTrigger>
         </TabsList>
 
-        <TabsContent value="results">
+        <TabsContent
+          value="results"
+          forceMount
+          className="data-[state=inactive]:hidden"
+        >
           <ResultsTab
             event={event}
             sortedMatches={sortedMatches}
@@ -715,18 +720,19 @@ function EventPage() {
             </TabsContent>
           )}
 
-        {event.event_type === EventType.REGIONAL && (
-          <TabsContent value="champs-qual-points">
-            <ChampsQualPointsTab
-              teams={teamsQuery.data ?? []}
-              champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
-              advancement={regionalAdvancementQuery.data ?? null}
-              eventKey={eventKey}
-              eventWeek={event.week}
-              year={event.year}
-            />
-          </TabsContent>
-        )}
+        {event.event_type === EventType.REGIONAL &&
+          (event.year >= 2025 || regionalAdvancementQuery.data != null) && (
+            <TabsContent value="champs-qual-points">
+              <ChampsQualPointsTab
+                teams={teamsQuery.data ?? []}
+                champsPoolPoints={regionalChampsPoolPointsQuery.data ?? null}
+                advancement={regionalAdvancementQuery.data ?? null}
+                eventKey={eventKey}
+                eventWeek={event.week}
+                year={event.year}
+              />
+            </TabsContent>
+          )}
 
         <TabsContent value="media">
           <MediaTab webcasts={event.webcasts} eventKey={event.key} />
