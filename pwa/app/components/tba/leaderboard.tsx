@@ -132,7 +132,7 @@ export function Leaderboard({
                   >
                     <TableCell
                       className={cn(
-                        'text-center font-semibold tabular-nums',
+                        'text-center font-semibold numeric-data',
                         isTopThree && 'text-base',
                       )}
                     >

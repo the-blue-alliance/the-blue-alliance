@@ -25,6 +25,14 @@ export const COMP_LEVEL_SHORT_STRINGS: Record<CompLevel, string> = {
   [CompLevel.QM]: 'Quals',
 };
 
+export const COMP_LEVEL_LONG_STRINGS: Record<CompLevel, string> = {
+  [CompLevel.F]: 'Finals',
+  [CompLevel.SF]: 'Semifinals',
+  [CompLevel.QF]: 'Quarterfinals',
+  [CompLevel.EF]: 'Eighthfinals',
+  [CompLevel.QM]: 'Qualifications',
+};
+
 type RecycleRushWLTStrategy = 'official' | 'score-based';
 
 export function isValidMatchKey(key: string) {

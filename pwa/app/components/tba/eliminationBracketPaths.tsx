@@ -47,12 +47,12 @@ export type AdvancementPath = {
 };
 
 const saturatedColors = {
-  red: 'var(--color-red-500)',
-  blue: 'var(--color-blue-500)',
+  red: 'var(--alliance-red-accent)',
+  blue: 'var(--alliance-blue-accent)',
 };
 const desaturatedColors = {
-  red: 'var(--color-red-300)',
-  blue: 'var(--color-blue-300)',
+  red: 'var(--alliance-red-accent)',
+  blue: 'var(--alliance-blue-accent)',
 };
 
 export function useAdvancementPaths({

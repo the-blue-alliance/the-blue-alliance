@@ -130,6 +130,85 @@ With all that said... There are various levels of caching available when making 
 
 TBA Beta uses [TailwindCSS](https://tailwindcss.com/) and [ShadCN](https://ui.shadcn.com/) components.
 
+## Color
+
+It's important to be familiar with some color resources before adding or modifying colors:
+
+- https://stripe.com/blog/accessible-color-systems
+- https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl
+- https://oklch.fyi/
+- https://lea.verou.me/blog/tags/color/
+- https://git.apcacontrast.com/documentation/WhyAPCA.html
+
+The following colors (defined in `app/style/colors/`) were rigorously analyzed and chosen deliberately:
+
+|                                                   | Name    | OKLCH                        | Hex       |
+| ------------------------------------------------- | ------- | ---------------------------- | --------- |
+| ![](https://placehold.co/16x16/3f51b5/3f51b5.png) | Primary | `oklch(0.4782 0.1589 271.4)` | `#3f51b5` |
+
+**Alliance — light mode**
+
+|                                                   | Name        | OKLCH                          | Hex       |
+| ------------------------------------------------- | ----------- | ------------------------------ | --------- |
+| ![](https://placehold.co/16x16/fbb4a8/fbb4a8.png) | Red winner  | `oklch(0.832852 0.085938 29)`  | `#fbb4a8` |
+| ![](https://placehold.co/16x16/fed7d1/fed7d1.png) | Red loser   | `oklch(0.910855 0.04375 29)`   | `#fed7d1` |
+| ![](https://placehold.co/16x16/a9c6fe/a9c6fe.png) | Blue winner | `oklch(0.824681 0.085938 264)` | `#a9c6fe` |
+| ![](https://placehold.co/16x16/d2e1fe/d2e1fe.png) | Blue loser  | `oklch(0.906397 0.04375 264)`  | `#d2e1fe` |
+
+**Alliance — dark mode**
+
+|                                                   | Name        | OKLCH                       | Hex       |
+| ------------------------------------------------- | ----------- | --------------------------- | --------- |
+| ![](https://placehold.co/16x16/a23127/a23127.png) | Red winner  | `oklch(0.482064 0.15 29)`   | `#a23127` |
+| ![](https://placehold.co/16x16/4e1c17/4e1c17.png) | Red loser   | `oklch(0.30319 0.077 29)`   | `#4e1c17` |
+| ![](https://placehold.co/16x16/3056b0/3056b0.png) | Blue winner | `oklch(0.477592 0.15 264)`  | `#3056b0` |
+| ![](https://placehold.co/16x16/1a2c55/1a2c55.png) | Blue loser  | `oklch(0.302296 0.077 264)` | `#1a2c55` |
+
+**Alliance accents — light mode** (used as a background; no text is placed on top)
+
+|                                                   | Name | OKLCH                          | Hex       |
+| ------------------------------------------------- | ---- | ------------------------------ | --------- |
+| ![](https://placehold.co/16x16/ff9789/ff9789.png) | Red  | `oklch(0.781918 0.126563 29)`  | `#ff9789` |
+| ![](https://placehold.co/16x16/8fb4fe/8fb4fe.png) | Blue | `oklch(0.770976 0.114063 264)` | `#8fb4fe` |
+
+**Alliance accents — dark mode** (used as a background; no text is placed on top)
+
+|                                                   | Name | OKLCH                          | Hex       |
+| ------------------------------------------------- | ---- | ------------------------------ | --------- |
+| ![](https://placehold.co/16x16/ff4537/ff4537.png) | Red  | `oklch(0.663086 0.223438 29)`  | `#ff4537` |
+| ![](https://placehold.co/16x16/5488fe/5488fe.png) | Blue | `oklch(0.650391 0.184375 264)` | `#5488fe` |
+
+The other colors used across the site are just Tailwind or ShadCN colors that seemed to look good — they weren't rigorously analyzed like the above.
+
+These colors were generated from [here](https://harmonizer.evilmartians.com/), with APCA contrasts of 70 and 85 on text colors `#1f1f1f` (for light mode) and `#e3e3e3` (for dark mode). These are all sRGB colors so they should be mostly consistent across device screens (OKLCH can attempt to display P3 colors which are not supported on every display). All reds have hue of 29 and all blues have a hue of 264 (except the primary brand color, which is separate).
+
+The accent colors generally should not have text overtop of them. They can be used for borders, etc. They are rated to be used as text elements on both light and dark backgrounds as well.
+
+The other colors that are being used across the site (that are not listed above) are just Tailwind or Shadcn colors that seemed to look good -- they weren't rigorously analyzed like the above.
+
+**Districts**
+
+These are mostly arbitrary values for each district. If your district has branding guidelines, please let us know.
+
+|                                                   | Name              | Districts    | OKLCH                      | Hex       |
+| ------------------------------------------------- | ----------------- | ------------ | -------------------------- | --------- |
+| ![](https://placehold.co/16x16/FAB604/FAB604.png) | California        | `ca`         | `oklch(0.818 0.168 81.3)`  | `#FAB604` |
+| ![](https://placehold.co/16x16/2FA4A9/2FA4A9.png) | Chesapeake        | `chs`, `fch` | `oklch(0.658 0.100 199.3)` | `#2FA4A9` |
+| ![](https://placehold.co/16x16/E04B4B/E04B4B.png) | Indiana           | `fin`, `in`  | `oklch(0.620 0.186 24.3)`  | `#E04B4B` |
+| ![](https://placehold.co/16x16/7DD3FC/7DD3FC.png) | Israel            | `isr`        | `oklch(0.828 0.101 230.3)` | `#7DD3FC` |
+| ![](https://placehold.co/16x16/94A3B8/94A3B8.png) | Michigan          | `fim`        | `oklch(0.711 0.035 256.8)` | `#94A3B8` |
+| ![](https://placehold.co/16x16/9A8FD1/9A8FD1.png) | Mid-Atlantic      | `fma`, `mar` | `oklch(0.685 0.096 291.3)` | `#9A8FD1` |
+| ![](https://placehold.co/16x16/271380/271380.png) | New England       | `ne`         | `oklch(0.309 0.166 278.9)` | `#271380` |
+| ![](https://placehold.co/16x16/7BA7D9/7BA7D9.png) | North Carolina    | `fnc`        | `oklch(0.716 0.088 252.2)` | `#7BA7D9` |
+| ![](https://placehold.co/16x16/4F6EF7/4F6EF7.png) | Ontario           | `ont`        | `oklch(0.593 0.207 269.4)` | `#4F6EF7` |
+| ![](https://placehold.co/16x16/3A9D7A/3A9D7A.png) | Pacific Northwest | `pnw`        | `oklch(0.628 0.107 166.2)` | `#3A9D7A` |
+| ![](https://placehold.co/16x16/FDB4A0/FDB4A0.png) | Peachtree         | `pch`        | `oklch(0.834 0.090 35.9)`  | `#FDB4A0` |
+| ![](https://placehold.co/16x16/4FA37A/4FA37A.png) | South Carolina    | `fsc`        | `oklch(0.651 0.103 160.3)` | `#4FA37A` |
+| ![](https://placehold.co/16x16/E36A2E/E36A2E.png) | Texas             | `fit`, `tx`  | `oklch(0.661 0.167 44.1)`  | `#E36A2E` |
+| ![](https://placehold.co/16x16/E84393/E84393.png) | Wisconsin         | `win`        | `oklch(0.643 0.212 355.2)` | `#E84393` |
+
+(All this said, colors are never "final", so be sure to double-check the code to verify this readme is up to date.)
+
 ## Icons
 
 Icons are complicated and opinionated. TBA uses `@unplugin/unplugin-icons`, which combines two nice tools:

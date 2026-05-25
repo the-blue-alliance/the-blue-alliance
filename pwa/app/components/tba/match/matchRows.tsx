@@ -74,6 +74,7 @@ export default function SimpleMatchRowsWithBreaks({
 }) {
   const playlistUrls = buildYoutubePlaylistUrls(matches, event.name);
   let firstBreakRowSeen = false;
+  let zebraIdx = 0;
   const divs = [];
 
   for (let i = 0; i < matches.length; i++) {
@@ -109,8 +110,12 @@ export default function SimpleMatchRowsWithBreaks({
         key={match.key}
         focusTeamKey={focusTeamKey}
         nexusStatus={nexusStatusByKey?.[match.key]}
+        className={cn(
+          zebraIdx % 2 === 0 && 'bg-neutral-50 dark:bg-neutral-900',
+        )}
       />,
     );
+    zebraIdx++;
 
     for (let bi = 0; bi < breakers.length; bi++) {
       const result = breakers[bi]({
@@ -134,14 +139,7 @@ export default function SimpleMatchRowsWithBreaks({
     }
   }
 
-  return (
-    <div
-      className="flex flex-col divide-y *:odd:bg-neutral-50
-        dark:*:odd:bg-neutral-900"
-    >
-      {divs}
-    </div>
-  );
+  return <div className="flex flex-col divide-y">{divs}</div>;
 }
 
 const NEXUS_STATUS_ICONS: Record<NexusMatchStatus, React.ReactNode> = {
@@ -172,12 +170,14 @@ export function MatchRow({
   year,
   focusTeamKey,
   nexusStatus,
+  className,
 }: {
   match: Match;
   event: Event;
   year: number;
   focusTeamKey?: string;
   nexusStatus?: NexusMatchStatus;
+  className?: string;
 }) {
   const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
@@ -194,9 +194,12 @@ export function MatchRow({
   /* Desktop: 1x11 grid, Mobile: 2x6 grid */
   return (
     <div
-      className="mx-auto grid w-full max-w-6xl
-        grid-cols-[2.5em_7em_repeat(4,1fr)] grid-rows-[2em_2em] gap-0.5 text-sm
-        tabular-nums xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1"
+      className={cn(
+        `mx-auto grid w-full max-w-6xl grid-cols-[2.5em_7em_repeat(4,1fr)]
+        grid-rows-[2em_2em] gap-0.5 text-sm numeric-data
+        xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1`,
+        className,
+      )}
     >
       {/* Play Button */}
       <div
@@ -329,7 +332,7 @@ export function SimpleMatchRow({
       {/* 3x4 grid with header row */}
       <div
         className="mx-auto grid w-full max-w-6xl grid-cols-[repeat(4,1fr)]
-          grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm tabular-nums"
+          grid-rows-[auto_repeat(2,2em)] gap-x-1 text-sm numeric-data"
       >
         {/* Header: Teams */}
         <div
@@ -445,7 +448,7 @@ export function BreakRow({
       {...props}
     >
       <div
-        className="relative flex h-8 w-full items-center justify-center text-xs
+        className="relative flex h-8 w-full items-center justify-center text-sm
           font-medium"
       >
         <span>{text}</span>

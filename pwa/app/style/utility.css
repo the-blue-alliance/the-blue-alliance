@@ -1,0 +1,33 @@
+@utility container {
+  margin-inline: auto;
+  padding-inline: 15px;
+
+  @media (width >= --theme(--breakpoint-sm)) {
+    max-width: none;
+  }
+  @media (width >= 768px) {
+    max-width: 768px;
+  }
+  @media (width >= 992px) {
+    max-width: 992px;
+  }
+  @media (width >= 1200px) {
+    max-width: 1200px;
+  }
+}
+
+/*
+ * This is intended to fix a very peculiar bug that is specific
+ * to rendering Roboto on Linux. I'm not really sure why this
+ * happens, and I can't find anything on Github about other
+ * people having this issue:
+ *
+ * https://github.com/the-blue-alliance/the-blue-alliance/issues/9939
+ *
+ * I think this is a bug inside Roboto font files where specific
+ * glyphs are not being rendered as expected when using the
+ * `tabular-nums` font variant.
+ */
+@utility numeric-data {
+  font-variant-numeric: lining-nums tabular-nums;
+}

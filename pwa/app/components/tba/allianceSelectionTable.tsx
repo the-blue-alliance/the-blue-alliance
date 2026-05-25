@@ -72,7 +72,7 @@ export default function AllianceSelectionTable(props: {
 
       <Table className="table-fixed">
         <TableHeader>
-          <TableRow className="*:h-8 *:text-center *:font-bold">
+          <TableRow className="*:h-8 *:text-center *:text-foreground">
             <TableHead>Alliance</TableHead>
             <TableHead>Captain</TableHead>
             {allianceSize > 1 &&
@@ -85,6 +85,7 @@ export default function AllianceSelectionTable(props: {
           {props.alliances.map((a, idx) => (
             <AllianceTableRow
               key={`alliance-${idx}`}
+              className="odd:bg-transparent"
               variant={
                 a.status?.level === CompLevel.F
                   ? a.status.status === 'won'
