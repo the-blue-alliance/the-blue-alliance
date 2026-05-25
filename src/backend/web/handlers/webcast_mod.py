@@ -17,11 +17,15 @@ from backend.common.helpers.event_webcast_adder import EventWebcastAdder
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
+from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey
+from backend.common.models.match import Match
 from backend.common.models.webcast import Webcast
 from backend.web.decorators import audit_post_mutation, require_permission
 from backend.web.profiled_render import render_template
@@ -170,6 +174,17 @@ def _parse_first_code(raw: str, year: int) -> Optional[str]:
     return first_code
 
 
+def _redirect_offseason_list(*, status: Optional[str] = None) -> Response:
+    if status is not None:
+        return redirect(url_for("webcast_mod.offseason_list", status=status))
+
+    return redirect(url_for("webcast_mod.offseason_list"))
+
+
+def _can_delete_offseason_event(event: Event, now: datetime) -> bool:
+    return event.start_date is not None and event.start_date > now
+
+
 @blueprint.route("/webcasts", methods=["GET"])
 @require_permission(AccountPermission.REVIEW_MEDIA)
 def webcast_list() -> str:
@@ -195,13 +210,17 @@ def webcast_detail(event_key: EventKey) -> str:
 @blueprint.route("/offseasons", methods=["GET"])
 @require_permission(AccountPermission.REVIEW_OFFSEASON_EVENTS)
 def offseason_list() -> str:
-    year = datetime.now().year
+    now = datetime.now()
+    year = now.year
     events = (
         Event.query(Event.year == year, Event.event_type_enum == EventType.OFFSEASON)
         .order(Event.start_date, Event.key)
         .fetch()
     )
-    return render_template("mod/offseason_list.html", {"events": events, "year": year})
+    return render_template(
+        "mod/offseason_list.html",
+        {"events": events, "year": year, "now": now},
+    )
 
 
 @blueprint.route("/offseason/<event_key>/link", methods=["POST"])
@@ -210,23 +229,17 @@ def offseason_list() -> str:
 def offseason_link(event_key: EventKey) -> Response:
     event = _get_event_or_404(event_key)
     if not Event.validate_key_name(event.key_name):
-        return redirect(
-            url_for("webcast_mod.offseason_list", status="invalid_event_key")
-        )
+        return _redirect_offseason_list(status="invalid_event_key")
 
     if event.event_type_enum != EventType.OFFSEASON:
-        return redirect(
-            url_for("webcast_mod.offseason_list", status="invalid_event_type")
-        )
+        return _redirect_offseason_list(status="invalid_event_type")
 
     first_code = _parse_first_code(request.form.get("first_code", ""), event.year)
     if first_code is None:
-        return redirect(
-            url_for("webcast_mod.offseason_list", status="invalid_first_code")
-        )
+        return _redirect_offseason_list(status="invalid_first_code")
 
     if event.first_code:
-        return redirect(url_for("webcast_mod.offseason_list", status="already_linked"))
+        return _redirect_offseason_list(status="already_linked")
 
     event.first_code = first_code
     event.official = True
@@ -239,7 +252,50 @@ def offseason_link(event_key: EventKey) -> Response:
         method="GET",
     )
 
-    return redirect(url_for("webcast_mod.offseason_list", status="linked"))
+    return _redirect_offseason_list(status="linked")
+
+
+@blueprint.route("/offseason/<event_key>/unlink", methods=["POST"])
+@require_permission(AccountPermission.REVIEW_OFFSEASON_EVENTS)
+@audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
+def offseason_unlink(event_key: EventKey) -> Response:
+    event = _get_event_or_404(event_key)
+    if not Event.validate_key_name(event.key_name):
+        return _redirect_offseason_list(status="invalid_event_key")
+
+    if event.event_type_enum != EventType.OFFSEASON:
+        return _redirect_offseason_list(status="invalid_event_type")
+
+    if not event.first_code:
+        return _redirect_offseason_list(status="not_linked")
+
+    event.first_code = None
+    event.official = False
+    EventManipulator.createOrUpdate(event)
+
+    return _redirect_offseason_list(status="unlinked")
+
+
+@blueprint.route("/offseason/<event_key>/delete", methods=["POST"])
+@require_permission(AccountPermission.REVIEW_OFFSEASON_EVENTS)
+@audit_post_mutation(target_key_getter=lambda event_key: ndb.Key(Event, event_key))
+def offseason_delete(event_key: EventKey) -> Response:
+    event = _get_event_or_404(event_key)
+    if event.event_type_enum != EventType.OFFSEASON:
+        return _redirect_offseason_list(status="invalid_event_type")
+
+    if not _can_delete_offseason_event(event, datetime.now()):
+        return _redirect_offseason_list(status="delete_not_allowed")
+
+    matches = Match.query(Match.event == event.key).fetch(5000)
+    MatchManipulator.delete(matches)
+
+    event_teams = EventTeam.query(EventTeam.event == event.key).fetch(5000)
+    EventTeamManipulator.delete(event_teams)
+
+    EventManipulator.delete(event)
+
+    return _redirect_offseason_list(status="deleted")
 
 
 @blueprint.route("/webcast/<event_key>/add", methods=["POST"])
