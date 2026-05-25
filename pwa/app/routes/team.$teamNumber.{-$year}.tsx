@@ -5,7 +5,6 @@ import {
   createFileRoute,
   notFound,
   redirect,
-  useNavigate,
 } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
