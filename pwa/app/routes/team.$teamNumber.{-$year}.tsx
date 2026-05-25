@@ -1,6 +1,11 @@
 import * as Sentry from '@sentry/tanstackstart-react';
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound, redirect } from '@tanstack/react-router';
+import {
+  Link,
+  createFileRoute,
+  notFound,
+  redirect,
+} from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
@@ -479,12 +484,20 @@ function TeamPage(): React.JSX.Element {
             </TableOfContentsSection>
           ))}
 
-          {embedMedia.length > 0 && (
-            <div>
-              <h2 className="mb-4 text-xl font-semibold">Media</h2>
-              <TeamMediaGallery media={media} />
+          <div>
+            <div className="mb-4 flex items-center justify-between">
+              <h2 className="text-xl font-semibold">Media</h2>
+              <Link
+                to="/suggest/team/media"
+                search={{ team_key: teamKey, year }}
+                className="text-sm text-muted-foreground underline-offset-4
+                  hover:underline"
+              >
+                Add Media
+              </Link>
             </div>
-          )}
+            {embedMedia.length > 0 && <TeamMediaGallery media={media} />}
+          </div>
         </div>
       </div>
     </div>

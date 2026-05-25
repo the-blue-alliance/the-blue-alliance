@@ -5,6 +5,7 @@ export {
   listSubscriptions,
   type Options,
   setModelPreferences,
+  suggestTeamMedia,
 } from './sdk.gen';
 export type {
   BaseResponse,
@@ -17,6 +18,7 @@ export type {
   ListSubscriptionsData,
   ListSubscriptionsResponse,
   ListSubscriptionsResponses,
+  MediaSuggestionMessage,
   ModelType,
   NotificationType,
   SetModelPreferencesData,
@@ -24,4 +26,7 @@ export type {
   SetModelPreferencesResponses,
   SubscriptionCollection,
   SubscriptionMessage,
+  SuggestTeamMediaData,
+  SuggestTeamMediaResponse,
+  SuggestTeamMediaResponses,
 } from './types.gen';
