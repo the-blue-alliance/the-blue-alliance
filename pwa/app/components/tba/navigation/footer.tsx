@@ -151,7 +151,16 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
           </span>
 
           <p className="text-xs text-neutral-600 dark:text-neutral-400">
-            Generated on {renderTime}. Commit:{' '}
+            Data provided by the{' '}
+            <a
+              href="https://frc-events.firstinspires.org/services/API"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="hover:underline"
+            >
+              <i>FIRST</i>® Events API
+            </a>
+            . Generated on {renderTime}. Commit:{' '}
             <a
               href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
               target="_blank"
