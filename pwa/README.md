@@ -190,22 +190,22 @@ The other colors that are being used across the site (that are not listed above)
 
 These are mostly arbitrary values for each district. If your district has branding guidelines, please let us know.
 
-|                                                   | Name              | Districts    | OKLCH                      | Hex       |
-| ------------------------------------------------- | ----------------- | ------------ | -------------------------- | --------- |
-| ![](https://placehold.co/16x16/FAB604/FAB604.png) | California        | `ca`         | `oklch(0.818 0.168 81.3)`  | `#FAB604` |
-| ![](https://placehold.co/16x16/2FA4A9/2FA4A9.png) | Chesapeake        | `chs`, `fch` | `oklch(0.658 0.100 199.3)` | `#2FA4A9` |
-| ![](https://placehold.co/16x16/E04B4B/E04B4B.png) | Indiana           | `fin`, `in`  | `oklch(0.620 0.186 24.3)`  | `#E04B4B` |
-| ![](https://placehold.co/16x16/7DD3FC/7DD3FC.png) | Israel            | `isr`        | `oklch(0.828 0.101 230.3)` | `#7DD3FC` |
-| ![](https://placehold.co/16x16/94A3B8/94A3B8.png) | Michigan          | `fim`        | `oklch(0.711 0.035 256.8)` | `#94A3B8` |
-| ![](https://placehold.co/16x16/9A8FD1/9A8FD1.png) | Mid-Atlantic      | `fma`, `mar` | `oklch(0.685 0.096 291.3)` | `#9A8FD1` |
-| ![](https://placehold.co/16x16/271380/271380.png) | New England       | `ne`         | `oklch(0.309 0.166 278.9)` | `#271380` |
-| ![](https://placehold.co/16x16/7BA7D9/7BA7D9.png) | North Carolina    | `fnc`        | `oklch(0.716 0.088 252.2)` | `#7BA7D9` |
-| ![](https://placehold.co/16x16/4F6EF7/4F6EF7.png) | Ontario           | `ont`        | `oklch(0.593 0.207 269.4)` | `#4F6EF7` |
-| ![](https://placehold.co/16x16/3A9D7A/3A9D7A.png) | Pacific Northwest | `pnw`        | `oklch(0.628 0.107 166.2)` | `#3A9D7A` |
-| ![](https://placehold.co/16x16/FDB4A0/FDB4A0.png) | Peachtree         | `pch`        | `oklch(0.834 0.090 35.9)`  | `#FDB4A0` |
-| ![](https://placehold.co/16x16/4FA37A/4FA37A.png) | South Carolina    | `fsc`        | `oklch(0.651 0.103 160.3)` | `#4FA37A` |
-| ![](https://placehold.co/16x16/E36A2E/E36A2E.png) | Texas             | `fit`, `tx`  | `oklch(0.661 0.167 44.1)`  | `#E36A2E` |
-| ![](https://placehold.co/16x16/E84393/E84393.png) | Wisconsin         | `win`        | `oklch(0.643 0.212 355.2)` | `#E84393` |
+|                                                   | Name              | Districts    | OKLCH                               | Hex       | Reason                                        |
+| ------------------------------------------------- | ----------------- | ------------ | ----------------------------------- | --------- | --------------------------------------------- |
+| ![](https://placehold.co/16x16/B78727/B78727.png) | California        | `ca`         | `oklch(0.6542 0.122 80.14)`         | `#B78727` | University of California gold (Pantone 116 U) |
+| ![](https://placehold.co/16x16/2FA4A9/2FA4A9.png) | Chesapeake        | `chs`, `fch` | `oklch(0.658 0.1 199.3)`            | `#2FA4A9` | Arbitrary                                     |
+| ![](https://placehold.co/16x16/FAD040/FAD040.png) | Indiana           | `fin`, `in`  | `oklch(0.8702 0.1592 91.9)`         | `#FAD040` | Corn                                          |
+| ![](https://placehold.co/16x16/005EB8/005EB8.png) | Israel            | `isr`        | `oklch(0.489212 0.160786 254.9444)` | `#005EB8` | Flag of Israel blue                           |
+| ![](https://placehold.co/16x16/94A3B8/94A3B8.png) | Michigan          | `fim`        | `oklch(0.711 0.035 256.8)`          | `#94A3B8` | Arbitrary                                     |
+| ![](https://placehold.co/16x16/9A8FD1/9A8FD1.png) | Mid-Atlantic      | `fma`, `mar` | `oklch(0.685 0.096 291.3)`          | `#9A8FD1` | Arbitrary                                     |
+| ![](https://placehold.co/16x16/A51C30/A51C30.png) | New England       | `ne`         | `oklch(0.4701 0.1703 20)`           | `#A51C30` | Harvard crimson red (Pantone 187 U)           |
+| ![](https://placehold.co/16x16/4B9CD3/4B9CD3.png) | North Carolina    | `fnc`        | `oklch(0.6655 0.1138 241.09)`       | `#4B9CD3` | UNC blue (Pantone 542 C)                      |
+| ![](https://placehold.co/16x16/D80621/D80621.png) | Ontario           | `ont`        | `oklch(0.5569 0.2241 25.65)`        | `#D80621` | Flag of Canada red                            |
+| ![](https://placehold.co/16x16/05472A/05472A.png) | Pacific Northwest | `pnw`        | `oklch(0.3517 0.0798 157.61)`       | `#05472A` | Nature evergreen                              |
+| ![](https://placehold.co/16x16/E9A99A/E9A99A.png) | Peachtree         | `pch`        | `oklch(0.7913 0.079 33.61)`         | `#E9A99A` | Peach                                         |
+| ![](https://placehold.co/16x16/9BB35B/9BB35B.png) | South Carolina    | `fsc`        | `oklch(0.7289 0.1178 121.94)`       | `#9BB35B` | Arbitrary shade of Palmetto Green             |
+| ![](https://placehold.co/16x16/BF5700/BF5700.png) | Texas             | `fit`, `tx`  | `oklch(0.5778 0.1545 49.2)`         | `#BF5700` | UT Austin burnt orange (Pantone 159 C)        |
+| ![](https://placehold.co/16x16/E84393/E84393.png) | Wisconsin         | `win`        | `oklch(0.643 0.212 355.2)`          | `#E84393` | Arbitrary                                     |
 
 (All this said, colors are never "final", so be sure to double-check the code to verify this readme is up to date.)
 
