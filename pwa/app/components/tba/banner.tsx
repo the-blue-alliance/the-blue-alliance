@@ -1,3 +1,5 @@
+import { Fragment } from 'react';
+
 import { Award, Event } from '~/api/tba/read';
 import { getNormalizedName } from '~/lib/api/AwardType';
 import { cn } from '~/lib/utils';
@@ -34,20 +36,31 @@ export function Banner({
 }) {
   const formattedTitle = (title ?? '')
     .toUpperCase()
-    .split(/(FIRST)/) // Split the string to isolate "FIRST"
+    .split(/(FIRST)/)
     .map((part, index) =>
-      part === 'FIRST' ? <em key={index}>{part}</em> : part,
+      part === 'FIRST' ? (
+        <Fragment key={index}>
+          <em>{part}</em>
+          <br />
+        </Fragment>
+      ) : (
+        part.trim()
+      ),
     );
 
   return (
     <div
       className={cn(
-        `flex h-64 w-40 flex-col items-center justify-between bg-blue-banner
-        px-4 py-6 text-center tracking-tight text-white`,
+        `relative h-60 w-36 bg-blue-banner text-center tracking-tight
+        text-white`,
         className,
       )}
     >
-      <svg width="100" viewBox="0 0 223 153">
+      <svg
+        width="100"
+        viewBox="0 0 223 153"
+        className="absolute top-6 left-1/2 -translate-x-1/2"
+      >
         <path
           d="M106.324 32.8997V28.3371L98.8387 21.2428L95.4483 18.0294L91.0092 13.8244L76.4254 0.00488139L66.2168 57.2534L87.8161 47.7603C85.6659 45.8597 84.1417 43.8343 83.0094 41.4476L75.9783 44.4653L76.6836 40.7741L81.2399 17.031L81.6202 15.0368L85.3819 18.8257L90.2224 23.6991L92.2998 25.794L100.843 33.1527L92.5502 36.9525C94.7045 39.1045 97.2556 40.9984 100.695 42.0698L111.042 37.4239L106.324 32.8997Z"
           fill="#ED1C24"
@@ -205,19 +218,24 @@ export function Banner({
           fill="white"
         />
       </svg>
-      <span
-        className={cn('text-lg/5 font-bold text-balance', {
-          'text-sm/4': title && title.length > 25,
-          'text-base/4': title && 20 <= title.length && title.length <= 25,
-          'text-lg/5': title && title.length < 20,
-        })}
+      <div
+        className="absolute inset-x-2 top-24 flex h-16 items-center
+          justify-center"
       >
-        {formattedTitle}
-      </span>
-      <span className="text-xs/4 font-bold text-balance">
-        <span className="mb-1 block text-xs">{year}</span>
+        <span
+          className={cn('font-bold', {
+            'text-sm/4': title && title.length > 17,
+            'text-base/4': title && 9 <= title.length && title.length <= 17,
+            'text-lg/5': title && title.length < 9,
+          })}
+        >
+          {formattedTitle}
+        </span>
+      </div>
+      <div className="absolute inset-x-4 bottom-6 text-xs/3 font-bold">
+        <div className="mb-0.5 text-xs">{year}</div>
         {description?.toUpperCase()}
-      </span>
+      </div>
     </div>
   );
 }
