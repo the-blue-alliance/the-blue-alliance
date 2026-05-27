@@ -17,7 +17,9 @@ test('navbar logo link is visible', async ({ page }) => {
 
 test('navbar nav links are visible', async ({ page }) => {
   await expect(page.getByRole('link', { name: 'myTBA' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Events' })).toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Events', exact: true }),
+  ).toBeVisible();
   await expect(page.getByRole('link', { name: 'Teams' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'GameDay' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Insights' })).toBeVisible();
@@ -44,7 +46,9 @@ test('(mobile) navbar shows a toggle menu button instead of nav links', async ({
   page,
 }) => {
   await expect(page.getByRole('button', { name: 'Toggle Menu' })).toBeVisible();
-  await expect(page.getByRole('link', { name: 'Events' })).not.toBeVisible();
+  await expect(
+    page.getByRole('link', { name: 'Events', exact: true }),
+  ).not.toBeVisible();
 });
 
 // This Week's Events
