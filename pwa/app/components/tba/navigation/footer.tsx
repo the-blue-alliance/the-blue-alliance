@@ -62,6 +62,7 @@ function ThemeToggle() {
       className="group inline-flex cursor-pointer items-center rounded-full
         border p-1"
       aria-label="Toggle Theme"
+      data-mounted={mounted}
       onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
     >
       {themes.map(([key, Icon]) => {

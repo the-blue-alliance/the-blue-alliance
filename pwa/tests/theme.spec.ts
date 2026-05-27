@@ -8,6 +8,10 @@ test.describe('Dark mode toggle', () => {
     await page.reload();
     // Scroll to footer to make the toggle visible
     await page.locator('footer').scrollIntoViewIfNeeded();
+    // Wait for React to finish hydrating the toggle button
+    await page.waitForSelector(
+      '[aria-label="Toggle Theme"][data-mounted="true"]',
+    );
   });
 
   test('toggle changes theme to dark mode', async ({ page }) => {
