@@ -75,6 +75,12 @@ export default defineConfig({
       VITE_FIREBASE_DATABASE_URL: Schema.string({
         message: 'Copy your Firebase config from .env.example',
       }),
+      VITE_FIREBASE_APP_ID: Schema.string({
+        message: 'Copy your Firebase config from .env.example',
+      }),
+      VITE_FIREBASE_MEASUREMENT_ID: Schema.string({
+        message: 'Copy your Firebase config from .env.example',
+      }),
     }),
   ],
   build: {
