@@ -1,9 +1,11 @@
 import * as Sentry from '@sentry/tanstackstart-react';
 import { QueryClient } from '@tanstack/react-query';
-import { createRouter } from '@tanstack/react-router';
+import { ParsedLocation, createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
+import { logEvent } from 'firebase/analytics';
 import { useEffect } from 'react';
 
+import { analytics } from '~/firebase/firebaseConfig';
 import { ApiError } from '~/lib/apiError';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
@@ -101,6 +103,29 @@ export function getRouter() {
       enabled: process.env.NODE_ENV === 'production',
     });
     void registerServiceWorker();
+
+    router.subscribe(
+      'onResolved',
+      ({ toLocation }: { toLocation: ParsedLocation }) => {
+        if (analytics === null) {
+          return;
+        }
+        logEvent(analytics, 'page_view', {
+          page_path: toLocation.pathname,
+          page_location: toLocation.href,
+          client_platform: 'pwa', // GA4 custom dimension
+        });
+      },
+    );
+
+    // onResolved doesn't fire for the initial hydration, so log it manually.
+    if (analytics !== null) {
+      logEvent(analytics, 'page_view', {
+        page_path: window.location.pathname,
+        page_location: window.location.href,
+        client_platform: 'pwa', // GA4 custom dimension
+      });
+    }
   }
 
   return router;
