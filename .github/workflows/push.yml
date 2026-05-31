@@ -100,14 +100,13 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
-      - name: Install Puppeteer Chrome
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npx puppeteer browsers install chrome
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_node.sh
@@ -336,14 +335,13 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Node Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
-      - name: Install Puppeteer Chrome
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: npx puppeteer browsers install chrome
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
