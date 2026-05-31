@@ -1,0 +1,8 @@
+allowBuilds:
+  '@firebase/util': true
+  '@sentry/cli': true
+  esbuild: true
+  msw: true
+  protobufjs: true
+  unrs-resolver: true
+  vue-demi: true
