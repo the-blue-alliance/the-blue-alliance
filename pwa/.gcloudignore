@@ -4,5 +4,6 @@
 # Explicitly include:
 !package.json
 !pnpm-lock.yaml
+!pnpm-workspace.yaml
 !build/
 !server.js
