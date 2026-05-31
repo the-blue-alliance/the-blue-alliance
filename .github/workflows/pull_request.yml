@@ -152,14 +152,13 @@ jobs:
         if: steps.changes.outputs.node == 'true'
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Dependencies
         if: steps.changes.outputs.node == 'true'
         run: npm ci
-      - name: Install Puppeteer Chrome
-        if: steps.changes.outputs.node == 'true'
-        run: npx @puppeteer/browsers@2 install chrome
       - name: Run Tests
         if: steps.changes.outputs.node == 'true'
         run: ./ops/test_node.sh
@@ -254,16 +253,15 @@ jobs:
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Node Dependencies
         if: steps.changes.outputs.web == 'true'
         run: |
           npm ci
           npm install -g capture-website-cli
-      - name: Install Puppeteer Chrome
-        if: steps.changes.outputs.web == 'true'
-        run: npx @puppeteer/browsers@2 install chrome
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
