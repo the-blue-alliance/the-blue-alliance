@@ -105,6 +105,9 @@ jobs:
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
+      - name: Install Puppeteer Chrome
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npx puppeteer browsers install chrome
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_node.sh
@@ -338,6 +341,9 @@ jobs:
       - name: Install Node Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
+      - name: Install Puppeteer Chrome
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        run: npx puppeteer browsers install chrome
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
