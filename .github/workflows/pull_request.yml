@@ -159,7 +159,7 @@ jobs:
         run: npm ci
       - name: Install Puppeteer Chrome
         if: steps.changes.outputs.node == 'true'
-        run: npx puppeteer browsers install chrome
+        run: npx @puppeteer/browsers@2 install chrome
       - name: Run Tests
         if: steps.changes.outputs.node == 'true'
         run: ./ops/test_node.sh
@@ -263,7 +263,7 @@ jobs:
           npm install -g capture-website-cli
       - name: Install Puppeteer Chrome
         if: steps.changes.outputs.web == 'true'
-        run: npx puppeteer browsers install chrome
+        run: npx @puppeteer/browsers@2 install chrome
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
