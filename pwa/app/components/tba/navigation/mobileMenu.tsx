@@ -30,7 +30,7 @@ export function MobileMenu() {
             <Link
               key={title}
               to={to}
-              className="animate-navigation-item-fade-in flex w-full
+              className="flex w-full animate-navigation-item-fade-in
                 items-center gap-3 py-4 opacity-0 hover:no-underline"
               activeProps={{ className: 'bg-white/15 rounded-md' }}
               style={{ animationDelay: `${index * 50}ms` }}
