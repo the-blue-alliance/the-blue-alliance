@@ -165,8 +165,8 @@ importers:
         specifier: 3.8.1
         version: 3.8.1(@types/react@19.2.15)(react-dom@19.2.6(react@19.2.6))(react-is@16.13.1)(react@19.2.6)(redux@5.0.1)
       shadcn:
-        specifier: 4.8.1
-        version: 4.8.1(@types/node@24.12.4)(typescript@6.0.3)
+        specifier: 4.8.2
+        version: 4.8.2(@types/node@24.12.4)(typescript@6.0.3)
       sonner:
         specifier: 2.0.7
         version: 2.0.7(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
@@ -4568,8 +4568,8 @@ packages:
     engines: {node: '>=0.10.0'}
     hasBin: true
 
-  electron-to-chromium@1.5.366:
-    resolution: {integrity: sha512-OlRuhb688YTCzzU3gXPLn6nGyd+F+53INE1qaKKlu6kETErE8FYsyDh0XqXEU+uBRn0MpCzz2vfNwORhkap8qg==}
+  electron-to-chromium@1.5.367:
+    resolution: {integrity: sha512-4Mk/mrynCNQ+atY40D3UpmhLWB6AHMbYMlIrPhHcMF6x0L7O0b052FCAsxw1LlaR++UFuNg3D/A6XCuGDa0guQ==}
 
   embla-carousel-autoplay@8.6.0:
     resolution: {integrity: sha512-OBu5G3nwaSXkZCo1A6LTaFMZ8EpkYbwIaH+bPqdBnDGQ2fh4+NbzjXjs2SktoPNKCtflfVMc75njaDHOYXcrsA==}
@@ -7037,8 +7037,8 @@ packages:
   setprototypeof@1.2.0:
     resolution: {integrity: sha512-E5LDX7Wrp85Kil5bhZv46j8jOeboKq5JMmYM3gVGdGH8xFpPWXUMsNrlODCrkoxMEeNi/XZIwuRvY4XNwYMJpw==}
 
-  shadcn@4.8.1:
-    resolution: {integrity: sha512-B2J63uYwqfLJPNzZk2AAlonXG1aJhwv8xmXlUag8OZdV61CQB6570nkXLjU1u9XN1qXm0LpJhSFQ0ZhlOruA4Q==}
+  shadcn@4.8.2:
+    resolution: {integrity: sha512-pt3KneOg6LGYKNAdoTVf/lpVcf7t2MlV+Ll2Xc3lIIYN3ph4ajrjU+CcG6OVSgO5ubbLZj+9j5oMA9Lqg7o8KA==}
     hasBin: true
 
   shebang-command@2.0.0:
@@ -12432,7 +12432,7 @@ snapshots:
     dependencies:
       baseline-browser-mapping: 2.10.33
       caniuse-lite: 1.0.30001793
-      electron-to-chromium: 1.5.366
+      electron-to-chromium: 1.5.367
       node-releases: 2.0.47
       update-browserslist-db: 1.2.3(browserslist@4.28.2)
 
@@ -12850,7 +12850,7 @@ snapshots:
     dependencies:
       jake: 10.9.4
 
-  electron-to-chromium@1.5.366: {}
+  electron-to-chromium@1.5.367: {}
 
   embla-carousel-autoplay@8.6.0(embla-carousel@8.6.0):
     dependencies:
@@ -15865,7 +15865,7 @@ snapshots:
 
   setprototypeof@1.2.0: {}
 
-  shadcn@4.8.1(@types/node@24.12.4)(typescript@6.0.3):
+  shadcn@4.8.2(@types/node@24.12.4)(typescript@6.0.3):
     dependencies:
       '@babel/core': 7.29.7
       '@babel/parser': 7.29.7
