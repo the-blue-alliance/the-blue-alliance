@@ -20,7 +20,7 @@ wheels = [
 
 [[package]]
 name = "appengine-python-standard"
-version = "2.0.0"
+version = "2.0.1"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "attrs" },
@@ -32,13 +32,14 @@ dependencies = [
     { name = "protobuf" },
     { name = "pytz" },
     { name = "requests" },
+    { name = "rsa" },
     { name = "ruamel-yaml" },
     { name = "six" },
     { name = "urllib3" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/cf/dc/61df8d214f8b8066f2de0d75d6c8f79da319ac1814b321a9d0e4d0952f9b/appengine_python_standard-2.0.0.tar.gz", hash = "sha256:bad2ba237504a5be6cea0c40a4a8de31a7591692e1b2ec3616b0bec581d896d5", size = 837406, upload-time = "2026-03-02T10:44:13.568Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/af/2a/39f41ab85996e42c3b488e2875cebe62391187265b97a343a84ca80385a1/appengine_python_standard-2.0.1.tar.gz", hash = "sha256:2b5bb63a53e4057d0e610ee8b2e3b25e696740cc004fe520982c374bfc59f023", size = 837434, upload-time = "2026-05-29T13:10:53.04Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1f/4e/4f940f556fe0824d53434df0a72e5c1b3ea5579cc541490600d63907e37d/appengine_python_standard-2.0.0-py3-none-any.whl", hash = "sha256:b8ef65875d6c8ed828f5241674e18136aea4282aa7b339878f0507ea504feb1b", size = 994360, upload-time = "2026-03-02T10:44:11.774Z" },
+    { url = "https://files.pythonhosted.org/packages/73/fd/3dc90cd71868595abc37b33bdf650edcd3be356ea340962e13d588be47a7/appengine_python_standard-2.0.1-py3-none-any.whl", hash = "sha256:6b92b6dd8416bcb324b296f8e13d2f4531eb08495f0386113ec8356cea96b8f9", size = 994416, upload-time = "2026-05-29T13:10:51.458Z" },
 ]
 
 [[package]]
@@ -1904,7 +1905,7 @@ webpack = [
 
 [package.metadata]
 requires-dist = [
-    { name = "appengine-python-standard", specifier = "==2.0.0" },
+    { name = "appengine-python-standard", specifier = "==2.0.1" },
     { name = "beautifulsoup4", specifier = "==4.14.3" },
     { name = "firebase-admin", specifier = "==7.4.0" },
     { name = "flask", specifier = "==3.1.3" },
