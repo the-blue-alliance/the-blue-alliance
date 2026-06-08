@@ -96,8 +96,8 @@ importers:
         specifier: 2.2.0
         version: 2.2.0
       calendar-link:
-        specifier: 2.11.2
-        version: 2.11.2
+        specifier: 2.11.3
+        version: 2.11.3
       class-variance-authority:
         specifier: 0.7.1
         version: 0.7.1
@@ -4132,8 +4132,8 @@ packages:
   cache-control-parser@2.2.0:
     resolution: {integrity: sha512-Me01OJfiZiyGT42qApiunD9fKiE8WMk9w+zhu1LZlRHuDGW1gvy/IA+GcdJbWXVhZbQkn6NmZKomVaO7BFdl1g==}
 
-  calendar-link@2.11.2:
-    resolution: {integrity: sha512-HluMKPnrFiKosAy1MsfEVG625bl/nwIY1Jsn1IrlHR9MX92+XjdzKeyAmOY0Pw13Md0Fu4DAmzXdNN2KdH+BVg==}
+  calendar-link@2.11.3:
+    resolution: {integrity: sha512-UOx+lqJudLhyz3/UdyApNV8+YfNRR/cerysiqFINseG7cy8oJ238Wy8WB565VuQGlvM6U8R1Zx78Ckx6J6lVKQ==}
 
   call-bind-apply-helpers@1.0.2:
     resolution: {integrity: sha512-Sp1ablJ0ivDkSzjcaJdxEunN5/XvksFJ2sMBFfq6x0ryhQV/2b/KwFe21cMpmHtPOSij8K99/wSfoEuTObmuMQ==}
@@ -4438,8 +4438,8 @@ packages:
   dateformat@4.6.3:
     resolution: {integrity: sha512-2P0p0pFGzHS5EMnhdxQi7aJN+iMheud0UhG4dlE1DLAlvL8JHjJJTX/CSm4JXwV0Ka5nGk3zC5mcb5bUQUxxMA==}
 
-  dayjs@1.11.20:
-    resolution: {integrity: sha512-YbwwqR/uYpeoP4pu043q+LTDLFBLApUP6VxRihdfNTqu4ubqMlGDLd6ErXhEgsyvY0K6nCs7nggYumAN+9uEuQ==}
+  dayjs@1.11.21:
+    resolution: {integrity: sha512-98IT+HOahAisibz/yjKbzuOBwYcjJ7BCLPzARyHiyEBmRz4fatF+KPJszEHXsGYjUG234aH/cOjW1wwTbKUZlA==}
 
   debug@2.6.9:
     resolution: {integrity: sha512-bC7ElrdJaJnPbAP+1EotYvqZsb3ecl5wi6Bfi6BJTUcNowp6cvspg0jXznRTKDjm/E7AdgFBVeAPVMNcKGsHMA==}
@@ -12486,9 +12486,9 @@ snapshots:
 
   cache-control-parser@2.2.0: {}
 
-  calendar-link@2.11.2:
+  calendar-link@2.11.3:
     dependencies:
-      dayjs: 1.11.20
+      dayjs: 1.11.21
 
   call-bind-apply-helpers@1.0.2:
     dependencies:
@@ -12757,7 +12757,7 @@ snapshots:
 
   dateformat@4.6.3: {}
 
-  dayjs@1.11.20: {}
+  dayjs@1.11.21: {}
 
   debug@2.6.9:
     dependencies:
