@@ -181,32 +181,11 @@ function DistrictPage() {
       event.event_type === EventType.DISTRICT_CMP_DIVISION,
   );
 
-  const parentDCMPEvent = dcmpEvents.find(
-    (event) => event.event_type === EventType.DISTRICT_CMP,
-  );
-
-  const dcmpAwards = awards.filter(
-    (award) =>
-      dcmpEvents.find((event) => event.key === award.event_key) !== undefined,
-  );
-
-  const parentDCMPAwards = dcmpAwards.filter(
-    (award) => award.event_key === parentDCMPEvent?.key,
+  const parentDCMPEvents = sortEvents(
+    dcmpEvents.filter((event) => event.event_type === EventType.DISTRICT_CMP),
   );
 
   const thisWeekEvents = getCurrentWeekEvents(events);
-
-  const dcmpChairmanRecipients = dcmpAwards
-    .filter((award) => award.award_type === AwardType.CHAIRMANS)
-    .flatMap((award) => award.recipient_list)
-    .map((recipient) => recipient.team_key)
-    .filter((k): k is string => k !== null && k !== undefined);
-
-  const dcmpWinnerRecipients = parentDCMPAwards
-    .filter((award) => award.award_type === AwardType.WINNER)
-    .flatMap((award) => award.recipient_list)
-    .map((recipient) => recipient.team_key)
-    .filter((k): k is string => k !== null && k !== undefined);
 
   const teamsByLocation = groupBy(teams, (team) =>
     team.country === 'USA' ? team.state_prov : team.country,
@@ -345,77 +324,15 @@ function DistrictPage() {
             </>
           )}
 
-          {parentDCMPEvent &&
-            (dcmpChairmanRecipients.length > 0 ||
-              dcmpWinnerRecipients.length > 0) && (
-              <>
-                <Divider className="py-4">
-                  <div className="text-xl">
-                    <EventLink eventOrKey={parentDCMPEvent.key}>DCMP</EventLink>
-                  </div>
-                </Divider>
-
-                <div className="gap-3 lg:grid lg:grid-cols-2">
-                  {dcmpChairmanRecipients.length > 0 && (
-                    <TitledCard
-                      cardTitle={joinComponents(
-                        dcmpChairmanRecipients
-                          .map((k) => k.substring(3))
-                          .sort((a, b) => Number(a) - Number(b))
-                          .map((teamNumber) => (
-                            <TeamLink
-                              teamOrKey={`frc${teamNumber}`}
-                              year={year}
-                              key={teamNumber}
-                            >
-                              {teamNumber}
-                            </TeamLink>
-                          )),
-                        <span className="font-medium">, </span>,
-                      )}
-                      cardSubtitle={
-                        <>
-                          {dcmpAwards
-                            .find(
-                              (award) =>
-                                award.award_type === AwardType.CHAIRMANS,
-                            )
-                            ?.name.replace('Regional', 'District Championship')}
-                        </>
-                      }
-                    />
-                  )}
-                  {dcmpWinnerRecipients.length > 0 && (
-                    <TitledCard
-                      cardTitle={joinComponents(
-                        dcmpWinnerRecipients
-                          .map((k) => k.substring(3))
-                          .sort((a, b) => Number(a) - Number(b))
-                          .map((teamNumber) => (
-                            <TeamLink
-                              teamOrKey={`frc${teamNumber}`}
-                              year={year}
-                              key={teamNumber}
-                            >
-                              {teamNumber}
-                            </TeamLink>
-                          )),
-                        <span className="font-medium">, </span>,
-                      )}
-                      cardSubtitle={
-                        <>
-                          {dcmpAwards
-                            .find(
-                              (award) => award.award_type === AwardType.WINNER,
-                            )
-                            ?.name.replace('Regional', 'District Championship')}
-                        </>
-                      }
-                    />
-                  )}
-                </div>
-              </>
-            )}
+          {parentDCMPEvents.map((parentDCMPEvent) => (
+            <DistrictDCMPOverviewSection
+              key={parentDCMPEvent.key}
+              parentDCMPEvent={parentDCMPEvent}
+              showDetailedName={parentDCMPEvents.length > 1}
+              awards={awards}
+              year={year}
+            />
+          ))}
 
           {hasRankings && rankings !== null && rankings.length > 0 && (
             <>
@@ -513,6 +430,123 @@ function DistrictPage() {
           <DistrictTeamsTable teams={teams} year={year} />
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function DistrictDCMPOverviewSection({
+  parentDCMPEvent,
+  showDetailedName,
+  awards,
+  year,
+}: {
+  parentDCMPEvent: Event;
+  showDetailedName: boolean;
+  awards: Award[];
+  year: number;
+}) {
+  const associatedEventKeys = [
+    parentDCMPEvent.key,
+    ...(parentDCMPEvent.division_keys || []),
+  ];
+
+  const parentDCMPAwards = awards.filter((award) =>
+    associatedEventKeys.includes(award.event_key),
+  );
+
+  const dcmpChairmanRecipients = parentDCMPAwards
+    .filter((award) => award.award_type === AwardType.CHAIRMANS)
+    .flatMap((award) => award.recipient_list)
+    .map((recipient) => recipient.team_key)
+    .filter((k): k is string => k !== null && k !== undefined);
+
+  const dcmpWinnerRecipients = parentDCMPAwards
+    .filter(
+      (award) =>
+        award.award_type === AwardType.WINNER &&
+        award.event_key === parentDCMPEvent.key,
+    )
+    .flatMap((award) => award.recipient_list)
+    .map((recipient) => recipient.team_key)
+    .filter((k): k is string => k !== null && k !== undefined);
+
+  if (
+    dcmpChairmanRecipients.length === 0 &&
+    dcmpWinnerRecipients.length === 0
+  ) {
+    return null;
+  }
+
+  const chairmanAwardName =
+    parentDCMPAwards
+      .find((award) => award.award_type === AwardType.CHAIRMANS)
+      ?.name.replace('Regional', 'District Championship') ??
+    'District Championship FIRST Impact Award';
+
+  const winnerAwardName =
+    parentDCMPAwards
+      .find(
+        (award) =>
+          award.award_type === AwardType.WINNER &&
+          award.event_key === parentDCMPEvent.key,
+      )
+      ?.name.replace('Regional', 'District Championship') ??
+    'District Championship Winner';
+
+  return (
+    <div>
+      <Divider className="py-4">
+        <div className="text-xl">
+          <EventLink eventOrKey={parentDCMPEvent.key}>
+            {showDetailedName
+              ? parentDCMPEvent.short_name || parentDCMPEvent.name
+              : 'DCMP'}
+          </EventLink>
+        </div>
+      </Divider>
+
+      <div className="gap-3 lg:grid lg:grid-cols-2">
+        {dcmpChairmanRecipients.length > 0 && (
+          <TitledCard
+            cardTitle={joinComponents(
+              dcmpChairmanRecipients
+                .map((k) => k.substring(3))
+                .sort((a, b) => Number(a) - Number(b))
+                .map((teamNumber) => (
+                  <TeamLink
+                    teamOrKey={`frc${teamNumber}`}
+                    year={year}
+                    key={teamNumber}
+                  >
+                    {teamNumber}
+                  </TeamLink>
+                )),
+              <span className="font-medium">, </span>,
+            )}
+            cardSubtitle={<>{chairmanAwardName}</>}
+          />
+        )}
+        {dcmpWinnerRecipients.length > 0 && (
+          <TitledCard
+            cardTitle={joinComponents(
+              dcmpWinnerRecipients
+                .map((k) => k.substring(3))
+                .sort((a, b) => Number(a) - Number(b))
+                .map((teamNumber) => (
+                  <TeamLink
+                    teamOrKey={`frc${teamNumber}`}
+                    year={year}
+                    key={teamNumber}
+                  >
+                    {teamNumber}
+                  </TeamLink>
+                )),
+              <span className="font-medium">, </span>,
+            )}
+            cardSubtitle={<>{winnerAwardName}</>}
+          />
+        )}
+      </div>
     </div>
   );
 }
