@@ -62,7 +62,7 @@ type KeyMap = Map<
     }
 >;
 
-const buildKeyMap = (fields: FieldsConfig, map?: KeyMap): KeyMap => {
+function buildKeyMap(fields: FieldsConfig, map?: KeyMap): KeyMap {
   if (!map) {
     map = new Map();
   }
@@ -85,7 +85,7 @@ const buildKeyMap = (fields: FieldsConfig, map?: KeyMap): KeyMap => {
   }
 
   return map;
-};
+}
 
 interface Params {
   body: unknown;
@@ -94,7 +94,9 @@ interface Params {
   query: Record<string, unknown>;
 }
 
-const stripEmptySlots = (params: Params) => {
+type ParamsSlotMap = Record<Slot, unknown>;
+
+function stripEmptySlots(params: ParamsSlotMap): void {
   for (const [slot, value] of Object.entries(params)) {
     if (
       value &&
@@ -105,13 +107,13 @@ const stripEmptySlots = (params: Params) => {
       delete params[slot as Slot];
     }
   }
-};
+}
 
-export const buildClientParams = (
+export function buildClientParams(
   args: ReadonlyArray<unknown>,
   fields: FieldsConfig,
-) => {
-  const params: Params = {
+): Params {
+  const params: ParamsSlotMap = {
     body: Object.create(null),
     headers: Object.create(null),
     path: Object.create(null),
@@ -177,5 +179,5 @@ export const buildClientParams = (
 
   stripEmptySlots(params);
 
-  return params;
-};
+  return params as Params;
+}
