@@ -119,7 +119,7 @@
     "globals": "17.6.0",
     "pino-pretty": "13.1.3",
     "prettier": "3.8.3",
-    "prettier-plugin-classnames": "0.10.1",
+    "prettier-plugin-classnames": "0.10.2",
     "prettier-plugin-merge": "0.10.1",
     "prettier-plugin-tailwindcss": "0.8.0",
     "tailwindcss": "4.3.0",
