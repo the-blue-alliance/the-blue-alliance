@@ -9,7 +9,7 @@ from backend.common.models.district import District
 from backend.common.models.district_advancement import TeamDistrictAdvancement
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
-    TParsedDistrictAdvancement,
+    TParsedDistrictRankings,
 )
 
 
@@ -67,7 +67,9 @@ def test_district_rankings(api_mock, tasks_client: Client) -> None:
     advancement = {"frc254": TeamDistrictAdvancement(dcmp=True, cmp=True)}
     adjustments = {"frc254": 5}
     api_mock.return_value = InstantFuture(
-        TParsedDistrictAdvancement(advancement=advancement, adjustments=adjustments)
+        TParsedDistrictRankings(
+            advancement=advancement, adjustments=adjustments, api_team_data={}
+        )
     )
 
     resp = tasks_client.get(
@@ -91,7 +93,9 @@ def test_district_rankings_no_output_in_taskqueue(
     advancement = {"frc254": TeamDistrictAdvancement(dcmp=True, cmp=True)}
     adjustments = {"frc254": 5}
     api_mock.return_value = InstantFuture(
-        TParsedDistrictAdvancement(advancement=advancement, adjustments=adjustments)
+        TParsedDistrictRankings(
+            advancement=advancement, adjustments=adjustments, api_team_data={}
+        )
     )
 
     resp = tasks_client.get(
@@ -123,7 +127,9 @@ def test_district_adjustments(api_mock, tasks_client: Client) -> None:
     advancement = {"frc254": TeamDistrictAdvancement(dcmp=True, cmp=True)}
     adjustments = {"frc254": 5}
     api_mock.return_value = InstantFuture(
-        TParsedDistrictAdvancement(advancement=advancement, adjustments=adjustments)
+        TParsedDistrictRankings(
+            advancement=advancement, adjustments=adjustments, api_team_data={}
+        )
     )
 
     resp = tasks_client.get(
@@ -147,7 +153,9 @@ def test_district_adjustments_no_output_in_taskqueue(
     advancement = {"frc254": TeamDistrictAdvancement(dcmp=True, cmp=True)}
     adjustments = {"frc254": 5}
     api_mock.return_value = InstantFuture(
-        TParsedDistrictAdvancement(advancement=advancement, adjustments=adjustments)
+        TParsedDistrictRankings(
+            advancement=advancement, adjustments=adjustments, api_team_data={}
+        )
     )
 
     resp = tasks_client.get(

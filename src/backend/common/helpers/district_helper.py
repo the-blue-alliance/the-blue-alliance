@@ -34,6 +34,9 @@ from backend.common.helpers.playoff_advancement_helper import (
     PlayoffAdvancementHelper,
 )
 from backend.common.models.alliance import EventAlliance
+from backend.common.models.district_advancement import (
+    ApiDistrictRankingTeamData,
+)
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
@@ -217,6 +220,7 @@ class DistrictHelper:
         teams: Union[List[Team], TypedFuture[List[Team]]],
         year: Year,
         adjustments: Optional[Dict[TeamKey, int]],
+        api_team_data: Optional[Dict[TeamKey, ApiDistrictRankingTeamData]] = None,
     ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two events and district championship
         events_by_key: Dict[EventKey, Event] = {}
@@ -360,9 +364,80 @@ class DistrictHelper:
             )
         )
 
+        if api_team_data:
+            team_totals = cls._break_ties_with_first_rank(team_totals, api_team_data)
+
         return dict(
             filter(lambda item: item[0] in valid_team_keys, team_totals.items())
         )
+
+    @classmethod
+    def _break_ties_with_first_rank(
+        cls,
+        team_totals: Dict[TeamKey, DistrictRankingTeamTotal],
+        api_team_data: Dict[TeamKey, ApiDistrictRankingTeamData],
+    ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
+        """
+        Re-orders runs of teams that are tied across all TBA tiebreakers
+        (point_total, DistrictRankingTiebreakers, top-3 match_scores) using
+        FIRST's published rank, but only when every team in the tie group
+        agrees with FIRST's per-event point math. If even one team in the
+        group disagrees, the group is left in its original order so the
+        underlying calculation drift remains visible.
+        """
+        sorted_items = list(team_totals.items())
+        i = 0
+        while i < len(sorted_items):
+            j = i + 1
+            while j < len(sorted_items) and cls._tie_key(
+                sorted_items[j][1]
+            ) == cls._tie_key(sorted_items[i][1]):
+                j += 1
+            if j - i > 1 and all(
+                cls._team_agrees_with_first(totals, api_team_data.get(team_key))
+                for team_key, totals in sorted_items[i:j]
+            ):
+                sorted_items[i:j] = sorted(
+                    sorted_items[i:j],
+                    key=lambda kv: api_team_data[kv[0]]["rank"],
+                )
+            i = j
+        return dict(sorted_items)
+
+    @staticmethod
+    def _tie_key(
+        totals: DistrictRankingTeamTotal,
+    ) -> Tuple[int, Tuple[int, ...], Tuple[int, ...]]:
+        return (
+            totals["point_total"],
+            tuple(totals["tiebreakers"]),
+            tuple(totals["match_scores"]),
+        )
+
+    @staticmethod
+    def _team_agrees_with_first(
+        totals: DistrictRankingTeamTotal,
+        api: Optional[ApiDistrictRankingTeamData],
+    ) -> bool:
+        if api is None:
+            return False
+        if totals["point_total"] != api["total_points"]:
+            return False
+        if totals["rookie_bonus"] != api["team_age_points"]:
+            return False
+        first_event_points: Dict[str, Optional[int]] = {
+            (api["event1_code"] or "").upper(): api["event1_points"],
+            (api["event2_code"] or "").upper(): api["event2_points"],
+            (api["district_cmp_code"] or "").upper(): api["district_cmp_points"],
+        }
+        first_event_points.pop("", None)
+        for event, team_event_points in totals["event_points"]:
+            code = event.first_api_code.upper()
+            if code not in first_event_points:
+                return False
+            if first_event_points[code] != team_event_points["total"]:
+                return False
+        return True
 
     @classmethod
     def _get_rookie_bonus(cls, year: Year, team_rookie_year: Year) -> int:

@@ -13,6 +13,9 @@ from backend.common.helpers.district_helper import (
     DistrictHelper,
     DistrictRankingTeamTotal,
 )
+from backend.common.models.district_advancement import (
+    ApiDistrictRankingTeamData,
+)
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
@@ -126,6 +129,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
         teams: Union[List[Team], TypedFuture[List[Team]]],
         year: Year,
         adjustments: Optional[Dict[TeamKey, int]],
+        api_team_data: Optional[Dict[TeamKey, ApiDistrictRankingTeamData]] = None,
     ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two regional events
         team_attendance: DefaultDict[TeamKey, List[str]] = defaultdict(list)
