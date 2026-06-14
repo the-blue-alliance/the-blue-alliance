@@ -1012,3 +1012,25 @@ def test_parse_2026_event_rich_webcasts(test_data_importer):
             date="2026-02-21",
         )
     ]
+
+
+def test_parse_offseason_preserves_first_api_code(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2015_event_list.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, _ = FMSAPIEventListParser(2015).parse(data)
+    event = events[4]
+
+    assert event.key_name == "2015iri"
+    assert event.first_code is None
+
+    event.first_code = "synccode"
+    event.put()
+
+    # Re-parse and ensure first_code is preserved
+    events, _ = FMSAPIEventListParser(2015).parse(data)
+    event = events[4]
+
+    assert event.key_name == "2015iri"
+    assert event.first_code == "synccode"
