@@ -72,7 +72,7 @@ class FMSAPIEventListParser(
     EINSTEIN_NAME_DEFAULT = "Einstein Field"
     EINSTEIN_CODES = {"cmp", "cmpmi", "cmpmo", "cmptx"}
 
-    def __init__(self, season: Year, short: Optional[str] = None) -> None:
+    def __init__(self, season: Year, short: str | None = None) -> None:
         self.season = season
         self.event_short = short
 
@@ -297,6 +297,8 @@ class FMSAPIEventListParser(
 
             has_divisions = False
             has_division_teams_assigned = False
+            first_api_code = None
+            nexus_api_code = None
             if existing_event is not None and len(existing_event.divisions) > 0:
                 has_divisions = True
                 division_teams = EventTeam.query(
@@ -315,6 +317,9 @@ class FMSAPIEventListParser(
                     abs(end - division_end_date) < datetime.timedelta(days=1)
                     for division_end_date in cmp_division_end_dates
                 )
+            elif event_type == EventType.OFFSEASON and existing_event:
+                first_api_code = existing_event.first_code
+                nexus_api_code = existing_event.nexus_code
 
             sync_overrides = self._bootstrap_sync_overrides(
                 none_throws(event_type),
@@ -360,6 +365,8 @@ class FMSAPIEventListParser(
                     event_type_enum=event_type,
                     timezone_id=timezone,
                     official=official,
+                    first_code=first_api_code,
+                    nexus_code=nexus_api_code,
                     playoff_type=playoff_type,
                     start_date=start,
                     end_date=end,
