@@ -24,7 +24,7 @@ jobs:
     if: "(github.event.action == 'labeled' && github.event.label.name == 'preview-pwa') || (github.event.action == 'synchronize' && contains(github.event.pull_request.labels.*.name, 'preview-pwa'))"
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v5

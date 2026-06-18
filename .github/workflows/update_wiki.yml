@@ -15,7 +15,7 @@ jobs:
       wiki-dir: docs
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Update wiki repo
         run: |
           git config --global user.email "action@github.com"

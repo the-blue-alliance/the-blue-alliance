@@ -20,7 +20,7 @@ jobs:
     name: "[py3] Type Check"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Run Type Check
@@ -30,7 +30,7 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Run Format & Lint
@@ -43,7 +43,7 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Run Tests
@@ -60,7 +60,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [py3-test]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Download all artifacts
@@ -80,7 +80,7 @@ jobs:
     name: "[node] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -96,7 +96,7 @@ jobs:
     name: "[node] Test"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -120,7 +120,7 @@ jobs:
     name: "[pwa] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -146,7 +146,7 @@ jobs:
     name: "[pwa] Type Check"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -169,7 +169,7 @@ jobs:
     name: "[pwa] Test"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -199,7 +199,7 @@ jobs:
     name: "[pwa] Build"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
         uses: pnpm/action-setup@v5
         with:
@@ -234,7 +234,7 @@ jobs:
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up pnpm
         uses: pnpm/action-setup@v5
@@ -274,7 +274,7 @@ jobs:
     name: "[bash] Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Run Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make lint-bash
@@ -282,7 +282,7 @@ jobs:
     name: "[py3] Check Python Version Consistency"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check Python Version
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/check_python_version.sh
@@ -291,7 +291,7 @@ jobs:
     name: Build Web
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Set up Node
@@ -318,7 +318,7 @@ jobs:
     name: Ops Fullstack Test
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # See https://github.com/puppeteer/puppeteer/issues/12818
       # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
       - name: Disable AppArmor
@@ -365,7 +365,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-queues-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -393,7 +393,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-index-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -421,7 +421,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-default-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -466,7 +466,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-web-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -511,7 +511,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-api-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -550,7 +550,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-tasks-io-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -584,7 +584,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-tasks-cpu-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -621,7 +621,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-pwa-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 10 # Needed for Sentry release
       - uses: dorny/paths-filter@v4
@@ -684,7 +684,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-cron-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
@@ -721,7 +721,7 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-dispatch-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - uses: dorny/paths-filter@v4
         id: changes
         with:
