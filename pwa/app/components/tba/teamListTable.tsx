@@ -34,7 +34,7 @@ export default function TeamListTable({ teams }: { teams: TeamSimple[] }) {
                 {team.team_number}
               </Link>
             </TableCell>
-            <TableCell className="w-6/12 truncate max-w-px">
+            <TableCell className="w-6/12 max-w-px truncate">
               {team.nickname}
             </TableCell>
             <TableCell className="w-4/12">
