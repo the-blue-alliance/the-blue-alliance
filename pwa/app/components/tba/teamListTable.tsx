@@ -34,8 +34,8 @@ export default function TeamListTable({ teams }: { teams: TeamSimple[] }) {
                 {team.team_number}
               </Link>
             </TableCell>
-            <TableCell className="w-6/12">
-              <div className="truncate">{team.nickname}</div>
+            <TableCell className="w-6/12 truncate max-w-px">
+              {team.nickname}
             </TableCell>
             <TableCell className="w-4/12">
               {team.city != null && (
