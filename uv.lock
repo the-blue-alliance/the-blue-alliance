@@ -1934,7 +1934,7 @@ requires-dist = [
     { name = "requests", specifier = "==2.34.2" },
     { name = "six", specifier = "==1.17.0" },
     { name = "typing-extensions", specifier = "==4.15.0" },
-    { name = "tzlocal", specifier = "==5.4" },
+    { name = "tzlocal", specifier = "==5.4.3" },
     { name = "werkzeug", specifier = "==3.1.6" },
 ]
 
@@ -2070,14 +2070,14 @@ wheels = [
 
 [[package]]
 name = "tzlocal"
-version = "5.4"
+version = "5.4.3"
 source = { registry = "https://pypi.org/simple" }
 dependencies = [
     { name = "tzdata", marker = "sys_platform == 'win32'" },
 ]
-sdist = { url = "https://files.pythonhosted.org/packages/d8/52/ee2e6d7031687c5bad28363148cb72f2bbf38201d2e220671bd9fb830bc2/tzlocal-5.4.tar.gz", hash = "sha256:41e1293f80d4b5ff38dff222601a8fbd06b4fdcaf25e224704047ad26a39af54", size = 30922, upload-time = "2026-06-15T12:06:56.594Z" }
+sdist = { url = "https://files.pythonhosted.org/packages/48/55/15e2340963d2bfedcc6042da3911438fd336f8ae96b65bdbe3a29766da0c/tzlocal-5.4.3.tar.gz", hash = "sha256:3a8c9bc18cf47e1dcde252ea0e6a72a6cde320a400b6ac6db1f1f8cccd553c00", size = 30873, upload-time = "2026-06-17T04:17:41.764Z" }
 wheels = [
-    { url = "https://files.pythonhosted.org/packages/1d/70/5771c9ecbdb7cc0c3f3bbded7e0fa7911ee8e872ce5b5dc48ce7dce21a11/tzlocal-5.4-py3-none-any.whl", hash = "sha256:024d11221ff83453eae1f608f09b145b9779e1345d08c15404ce8ff7917cf629", size = 28261, upload-time = "2026-06-15T12:06:54.914Z" },
+    { url = "https://files.pythonhosted.org/packages/42/28/fc144409c71569e928585f8f3c629d80d1ca3ef40175e9222f01588f98c9/tzlocal-5.4.3-py3-none-any.whl", hash = "sha256:24ce97bb58e2a973f7640ec2553ab4e6f6d5a0d0d1aa9dc43bca21d89e1feb82", size = 18039, upload-time = "2026-06-17T04:17:40.027Z" },
 ]
 
 [[package]]
