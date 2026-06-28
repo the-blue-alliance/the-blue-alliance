@@ -105,6 +105,34 @@ describe('getSearchRedirect', () => {
     });
   });
 
+  describe('numeric prefix collisions (#10104)', () => {
+    // When a team number is a prefix of a longer one, fuzzysort must rank the
+    // shorter exact match first. Both getSearchRedirect (the /search route) and
+    // the search modal rely on this ranking via FuzzysortFilterer, so these
+    // cases lock it in: "1022" resolves to team 1022, never 10221.
+    const collisionIndex: SearchIndex = {
+      teams: [
+        { key: 'frc1022', nickname: 'Titan Robotics' },
+        { key: 'frc10221', nickname: 'RoboLords' },
+        { key: 'frc254', nickname: 'The Cheesy Poofs' },
+        { key: 'frc2543', nickname: 'PETRONAS Mustangs' },
+      ],
+      events: [],
+    };
+
+    it('should redirect "1022" to team 1022, not 10221', () => {
+      const result = getSearchRedirect(collisionIndex, '1022');
+      expect(result.type).toBe('team');
+      expect(result.path).toBe('/team/1022');
+    });
+
+    it('should redirect "254" to team 254, not 2543', () => {
+      const result = getSearchRedirect(collisionIndex, '254');
+      expect(result.type).toBe('team');
+      expect(result.path).toBe('/team/254');
+    });
+  });
+
   describe('priority logic', () => {
     it('should prefer team when both team and event match', () => {
       // When searching for something that could match both, teams should win
