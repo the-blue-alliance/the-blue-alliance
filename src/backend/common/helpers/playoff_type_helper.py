@@ -1,6 +1,7 @@
-from typing import Tuple
+from typing import Optional, Tuple
 
 from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import (
     BRACKET_ELIM_MAPPING,
     BRACKET_OCTO_ELIM_MAPPING,
@@ -16,9 +17,20 @@ from backend.common.consts.playoff_type import (
 class PlayoffTypeHelper:
     @classmethod
     def get_comp_level(
-        cls, playoff_type: PlayoffType, match_level: str, match_number: int
+        cls,
+        playoff_type: PlayoffType,
+        match_level: str,
+        match_number: int,
+        event_type: Optional[EventType] = None,
     ) -> CompLevel:
-        if match_level == "Qualification":
+        # Championship (Einstein) events have no qualification phase, but the
+        # FMS feed sometimes tags their playoff matches as "Qualification".
+        # Those must be routed through the playoff logic below rather than
+        # mislabeled as qualification matches (#10102). Only CMP_FINALS is
+        # special-cased: a non-split DISTRICT_CMP runs real qualification
+        # matches, so it can't be blanket-skipped. (Split district-champ finals
+        # fields share this FMS mistag but are not handled here.)
+        if match_level == "Qualification" and event_type != EventType.CMP_FINALS:
             return CompLevel.QM
         else:
             if playoff_type == PlayoffType.AVG_SCORE_8_TEAM:

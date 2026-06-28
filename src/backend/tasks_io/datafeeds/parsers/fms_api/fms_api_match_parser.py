@@ -95,7 +95,7 @@ class FMSAPIHybridScheduleParser(
             else:  # 2015
                 level = match["level"]
             comp_level = PlayoffTypeHelper.get_comp_level(
-                event.playoff_type, level, match["matchNumber"]
+                event.playoff_type, level, match["matchNumber"], event.event_type_enum
             )
             set_number, match_number = PlayoffTypeHelper.get_set_match_number(
                 event.playoff_type, comp_level, match["matchNumber"]
@@ -388,6 +388,7 @@ class FMSAPIMatchDetailsParser(
                 event.playoff_type,
                 none_throws(match["matchLevel"]),
                 none_throws(match["matchNumber"]),
+                event.event_type_enum,
             )
             set_number, match_number = PlayoffTypeHelper.get_set_match_number(
                 event.playoff_type, comp_level, match["matchNumber"]

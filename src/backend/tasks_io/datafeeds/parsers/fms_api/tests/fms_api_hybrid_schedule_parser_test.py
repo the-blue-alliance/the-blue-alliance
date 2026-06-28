@@ -263,6 +263,47 @@ def test_parse_2champs_einstein(ndb_stub, test_data_importer) -> None:
         assert len(clean_matches[CompLevel.F]) == 3
 
 
+def test_parse_modern_einstein_qualification_tagged(
+    ndb_stub, test_data_importer
+) -> None:
+    # Regression for #10102: modern Championship (Einstein) is an 8-alliance
+    # double-elimination event, and the FMS feed can tag its matches with
+    # tournamentLevel "Qualification" even though Einstein has no quals. Those
+    # must parse as playoff matches (sf/f), not qualification (qm).
+    event = Event(
+        id="2026cmptx",
+        name="Einstein Field",
+        event_type_enum=EventType.CMP_FINALS,
+        short_name="Einstein",
+        event_short="cmptx",
+        year=2026,
+        end_date=datetime(2026, 4, 18),
+        official=True,
+        start_date=datetime(2026, 4, 15),
+        timezone_id="America/New_York",
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+    )
+    event.put()
+
+    # Reuse real match structures, re-tagged "Qualification" with modern
+    # double-elim numbering (1-13 -> sf, 14-16 -> f).
+    path = test_data_importer._get_path(
+        __file__, "data/2017cmptx_staging_playoff_schedule.json"
+    )
+    with open(path, "r") as f:
+        schedule = json.loads(f.read())["Schedule"][:16]
+    for i, match in enumerate(schedule):
+        match["tournamentLevel"] = "Qualification"
+        match["matchNumber"] = i + 1
+
+    matches, _ = FMSAPIHybridScheduleParser(2026, "cmptx").parse({"Schedule": schedule})
+
+    _, clean_matches = MatchHelper.organized_matches(matches)
+    assert len(clean_matches[CompLevel.QM]) == 0
+    assert len(clean_matches[CompLevel.SF]) == 13
+    assert len(clean_matches[CompLevel.F]) == 3
+
+
 def test_parse_foc_b05(ndb_stub, test_data_importer) -> None:
     event = Event(
         id="2017nhfoc",

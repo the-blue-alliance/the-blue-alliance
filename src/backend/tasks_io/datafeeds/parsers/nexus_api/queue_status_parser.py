@@ -115,7 +115,7 @@ class NexusAPIQueueStatusParser(ParserBase[EventStatus, Optional[EventQueueStatu
 
         try:
             comp_level = PlayoffTypeHelper.get_comp_level(
-                self.event.playoff_type, level, level_number
+                self.event.playoff_type, level, level_number, self.event.event_type_enum
             )
             set_number, match_number = PlayoffTypeHelper.get_set_match_number(
                 self.event.playoff_type, comp_level, level_number
