@@ -128,7 +128,7 @@ export default function EventListTable({
                   </div>
                 )}
               </TableCell>
-              <TableCell className="mt-2 flex justify-center md:mt-1">
+              <TableCell>
                 {event.webcasts.length > 0 && (
                   <Button
                     asChild={isOnline || withinADay}
