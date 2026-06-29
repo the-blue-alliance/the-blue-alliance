@@ -132,8 +132,8 @@ importers:
         specifier: 3.1.0
         version: 3.1.0
       isbot:
-        specifier: 5.1.43
-        version: 5.1.43
+        specifier: 5.1.44
+        version: 5.1.44
       lodash-es:
         specifier: 4.18.1
         version: 4.18.1
@@ -5691,8 +5691,8 @@ packages:
   isarray@2.0.5:
     resolution: {integrity: sha512-xHjhDr3cNBK0BzdUJSPXZntQUx/mwMS5Rw4A7lPJ90XGAO6ISP/ePDNuo0vhqOZU+UD5JoodwCAAoZQd3FeAKw==}
 
-  isbot@5.1.43:
-    resolution: {integrity: sha512-drJhFmibra4LO6Wd7D3Oi6UICRK9244vSZkmxzhlZP0TTdwCA2ueK4PEkUkzPYeuqug9+cqqdWPgihjk5+83Cg==}
+  isbot@5.1.44:
+    resolution: {integrity: sha512-PGEHtwMnKbZpeSEXW2Utx+/JWed7dp6DiH0WWg33vGSDA7RUvpUeJSVlLrVkQ1RCpvDOUc/eH9ql7VsdbBZ8pA==}
     engines: {node: '>=18'}
 
   isexe@2.0.0:
@@ -7117,6 +7117,9 @@ packages:
   set-cookie-parser@3.1.0:
     resolution: {integrity: sha512-kjnC1DXBHcxaOaOXBHBeRtltsDG2nUiUni+jP92M9gYdW12rsmx92UsfpH7o5tDRs7I1ZZPSQJQGv3UaRfCiuw==}
 
+  set-cookie-parser@3.1.1:
+    resolution: {integrity: sha512-vM9SUhjsUYs6UeJUmygc5Ofm5eQGe85riob5ju6XCgFGJI5PLV4nrDAQpQjd+LkFBpAkADn5BQQpZ9EUNkyLuA==}
+
   set-function-length@1.2.2:
     resolution: {integrity: sha512-pgRc4hJ4/sNjWCSS9AmnS40x3bNMDTknHgL5UaMBTMyJnU90EgWh1Rz+MC9eFu4BuN/UwZjKQuY/1v3rM7HMfg==}
     engines: {node: '>= 0.4'}
@@ -7462,11 +7465,11 @@ packages:
     resolution: {integrity: sha512-Bf+ILmBgretUrdJxzXM0SgXLZ3XfiaUuOj/IKQHuTXip+05Xn+uyEYdVg0kYDipTBcLrCVyUzAPz7QmArb0mmw==}
     engines: {node: '>=14.0.0'}
 
-  tldts-core@7.4.3:
-    resolution: {integrity: sha512-27ep5H9PzdBrNd5OFM/j3WCU8F3kPwM9D0BOaOf7uYfxMJfyr0K5Tjj69Gri+sZlh2WXd5buIm47NuPF29CDiw==}
+  tldts-core@7.4.5:
+    resolution: {integrity: sha512-pGrwzZDvPwKe+7NNUqAunb6rqTfynr0VOUhCMdqbu5xlvNiszsAJygRzwvpVycdzejlbpY+SWJOn+s75Og7FEA==}
 
-  tldts@7.4.3:
-    resolution: {integrity: sha512-A3BDQBeeukYPzB4QdQ1DtdlUmp4x2OCH8n5UVhEWbyANxNep8GavottKzd1xYKFJKjUgMyPT7EzOfnBO55s8Sg==}
+  tldts@7.4.5:
+    resolution: {integrity: sha512-RfEzKWcq5fHUOFq7J3rl3Oz6ylKGtcHqUznzj4EcXsxLSIjJcvpbXAQtWGeJQ0xKnimR5e0Cn+cn9TssfMzm+g==}
     hasBin: true
 
   to-regex-range@5.0.1:
@@ -11514,7 +11517,7 @@ snapshots:
       '@tanstack/history': 1.162.0
       '@tanstack/react-store': 0.9.3(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@tanstack/router-core': 1.171.13
-      isbot: 5.1.43
+      isbot: 5.1.44
       react: 19.2.7
       react-dom: 19.2.7(react@19.2.7)
 
@@ -14117,7 +14120,7 @@ snapshots:
   headers-polyfill@5.0.1:
     dependencies:
       '@types/set-cookie-parser': 2.4.10
-      set-cookie-parser: 3.1.0
+      set-cookie-parser: 3.1.1
     optional: true
 
   help-me@5.0.0: {}
@@ -14405,7 +14408,7 @@ snapshots:
 
   isarray@2.0.5: {}
 
-  isbot@5.1.43: {}
+  isbot@5.1.44: {}
 
   isexe@2.0.0: {}
 
@@ -16067,6 +16070,9 @@ snapshots:
 
   set-cookie-parser@3.1.0: {}
 
+  set-cookie-parser@3.1.1:
+    optional: true
+
   set-function-length@1.2.2:
     dependencies:
       define-data-property: 1.1.4
@@ -16478,12 +16484,12 @@ snapshots:
 
   tinyrainbow@3.1.0: {}
 
-  tldts-core@7.4.3:
+  tldts-core@7.4.5:
     optional: true
 
-  tldts@7.4.3:
+  tldts@7.4.5:
     dependencies:
-      tldts-core: 7.4.3
+      tldts-core: 7.4.5
     optional: true
 
   to-regex-range@5.0.1:
@@ -16494,7 +16500,7 @@ snapshots:
 
   tough-cookie@6.0.1:
     dependencies:
-      tldts: 7.4.3
+      tldts: 7.4.5
     optional: true
 
   tr46@0.0.3: {}
