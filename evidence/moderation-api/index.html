@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Moderation API — Phase 1 E2E Evidence</title>
+<style>
+  :root { color-scheme: light; }
+  body { font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif; margin: 0; background: #f6f7fb; color: #1a1d29; }
+  header { background: #3f51b5; color: #fff; padding: 32px 40px; }
+  header h1 { margin: 0 0 6px; font-size: 26px; }
+  header p { margin: 0; opacity: 0.85; }
+  main { max-width: 1100px; margin: 0 auto; padding: 32px 24px 64px; }
+  section { margin-bottom: 44px; }
+  h2 { font-size: 20px; border-bottom: 2px solid #d9ddec; padding-bottom: 8px; }
+  p.caption { color: #4a4f63; max-width: 75ch; }
+  figure { margin: 18px 0; background: #fff; border: 1px solid #d9ddec; border-radius: 10px; padding: 14px; }
+  figure img { width: 100%; border-radius: 6px; display: block; }
+  figcaption { font-size: 13px; color: #4a4f63; padding-top: 10px; }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  code { background: #e8eaf4; border-radius: 4px; padding: 1px 5px; font-size: 0.92em; }
+  table { border-collapse: collapse; background: #fff; width: 100%; }
+  th, td { border: 1px solid #d9ddec; padding: 8px 12px; text-align: left; font-size: 14px; }
+  th { background: #eceef7; }
+  .ok { color: #1b7f3b; font-weight: 600; }
+</style>
+</head>
+<body>
+<header>
+  <h1>Moderation API — Phase 1 end-to-end evidence</h1>
+  <p>Branch <code>moderation-api</code> · Firebase Bearer auth · PWA suggestion review for all 8 types · captured against the local dev stack with headless Chrome</p>
+</header>
+<main>
+
+<section>
+  <h2>What this shows</h2>
+  <p class="caption">
+    A moderator signs into the PWA via Firebase, the new <code>/api/moderation/v1</code>
+    API authenticates the Bearer ID token and authorizes against live
+    <code>Account.permissions</code>, and every suggestion type can be reviewed and
+    accepted from the PWA — match videos, team media, social media, robot/CAD designs,
+    event media, webcasts, offseason events, and API write keys. Accepting creates the
+    real domain entities through the shared <code>SuggestionReviewer</code> service
+    (the same transactional accept logic the web review controllers use).
+  </p>
+  <table>
+    <tr><th>Suggestion type</th><th>API slug</th><th>Bulk accept</th><th>Result</th></tr>
+    <tr><td>Match Videos</td><td><code>match</code></td><td>Select All Accepts → submit</td><td class="ok">accepted, queue emptied</td></tr>
+    <tr><td>Team Media</td><td><code>media</code></td><td>Select All Accepts → submit</td><td class="ok">accepted, queue emptied</td></tr>
+    <tr><td>Social Media</td><td><code>social-media</code></td><td>Select All Accepts → submit</td><td class="ok">accepted, queue emptied</td></tr>
+    <tr><td>Robot / CAD</td><td><code>robot</code></td><td>Select All Accepts → submit</td><td class="ok">accepted, queue emptied</td></tr>
+    <tr><td>Event Media</td><td><code>event_media</code></td><td>Select All Accepts → submit</td><td class="ok">accepted, queue emptied</td></tr>
+    <tr><td>Webcasts</td><td><code>event</code></td><td>Select All Accepts → submit</td><td class="ok">accepted, queue emptied</td></tr>
+    <tr><td>Offseason Events</td><td><code>offseason-event</code></td><td>individual (unique short code)</td><td class="ok">accepted</td></tr>
+    <tr><td>API Key Requests</td><td><code>api_auth_access</code></td><td>Select All Accepts → submit</td><td class="ok">accepted, queue emptied</td></tr>
+  </table>
+</section>
+
+<section>
+  <h2>1 · Seed test data (admin)</h2>
+  <p class="caption">The new <code>/admin/suggestions/seed</code> page creates a pending
+  suggestion of every type (plus minimal target entities on an empty datastore) and can
+  grant review permissions to a moderator by email.</p>
+  <div class="grid2">
+    <figure><img src="01-admin-seed-page.png" alt="Admin seed page"><figcaption>Admin seed page — one button per suggestion type, seed-all, and permission grant by email.</figcaption></figure>
+    <figure><img src="02-admin-seed-results.png" alt="Seed results"><figcaption>Seed results — one pending suggestion of each type created.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>2 · Moderator sign-in (Firebase)</h2>
+  <p class="caption">The PWA review routes are login-gated. The moderator signs in through
+  the Firebase auth emulator; the PWA then calls the moderation API with
+  <code>Authorization: Bearer &lt;firebase_id_token&gt;</code>.</p>
+  <div class="grid2">
+    <figure><img src="03-pwa-login-page.png" alt="Login gate"><figcaption>/suggest/review before sign-in.</figcaption></figure>
+    <figure><img src="04-pwa-after-signin.png" alt="After sign-in"><figcaption>Signed in, before permissions are granted — no queues visible.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>3 · Review dashboard</h2>
+  <p class="caption">With <code>REVIEW_*</code> permissions granted, <code>GET /queue</code>
+  returns pending counts per type, filtered to the caller's permissions.</p>
+  <figure><img src="07-pwa-review-dashboard.png" alt="Review dashboard"><figcaption>/suggest/review — all 8 queue types with live pending counts.</figcaption></figure>
+</section>
+
+<section>
+  <h2>4 · Reviewing each type</h2>
+  <p class="caption">Each queue page mirrors the web review pattern: rich per-suggestion
+  metadata (embeds/previews, target links, suggester identity, type-specific override
+  inputs), individual Accept/Reject, and bulk select-then-submit.</p>
+  <figure><img src="08-review-match-queue.png" alt="Match video queue"><figcaption>Match Videos — YouTube embed, match/event links, target-match-key override, bulk controls.</figcaption></figure>
+  <div class="grid2">
+    <figure><img src="09-review-match-selected.png" alt="Match videos selected"><figcaption>Select All Accepts.</figcaption></figure>
+    <figure><img src="10-review-match-after-accept.png" alt="Match videos accepted"><figcaption>After submit — queue empty.</figcaption></figure>
+    <figure><img src="11-review-media-queue.png" alt="Team media queue"><figcaption>Team Media — image previews, year + preferred controls.</figcaption></figure>
+    <figure><img src="13-review-media-after-accept.png" alt="Team media accepted"><figcaption>Team Media accepted.</figcaption></figure>
+    <figure><img src="14-review-social-media-queue.png" alt="Social media queue"><figcaption>Social Media queue.</figcaption></figure>
+    <figure><img src="16-review-social-media-after-accept.png" alt="Social media accepted"><figcaption>Social Media accepted.</figcaption></figure>
+    <figure><img src="17-review-robot-queue.png" alt="CAD queue"><figcaption>Robot / CAD designs queue.</figcaption></figure>
+    <figure><img src="19-review-robot-after-accept.png" alt="CAD accepted"><figcaption>CAD accepted.</figcaption></figure>
+    <figure><img src="20-review-event_media-queue.png" alt="Event media queue"><figcaption>Event Videos queue.</figcaption></figure>
+    <figure><img src="22-review-event_media-after-accept.png" alt="Event media accepted"><figcaption>Event Videos accepted.</figcaption></figure>
+    <figure><img src="23-review-event-queue.png" alt="Webcast queue"><figcaption>Webcasts — parsed webcast fields with type/channel/file/date overrides.</figcaption></figure>
+    <figure><img src="25-review-event-after-accept.png" alt="Webcasts accepted"><figcaption>Webcasts accepted.</figcaption></figure>
+    <figure><img src="26-review-offseason-event-queue.png" alt="Offseason queue"><figcaption>Offseason Events — full event payload + short-code input.</figcaption></figure>
+    <figure><img src="28-review-offseason-event-after-accept.png" alt="Offseason accepted"><figcaption>Offseason event accepted individually.</figcaption></figure>
+    <figure><img src="29-review-api_auth_access-queue.png" alt="API keys queue"><figcaption>API Key Requests — auth types + expiration.</figcaption></figure>
+    <figure><img src="31-review-api_auth_access-after-accept.png" alt="API keys accepted"><figcaption>API Key Requests accepted.</figcaption></figure>
+  </div>
+</section>
+
+<section>
+  <h2>5 · Final state</h2>
+  <figure><img src="32-pwa-review-dashboard-final.png" alt="Final dashboard"><figcaption>All queues drained (Offseason Events retains the remaining seeds — the driver accepts one, as each accept needs a unique event short code).</figcaption></figure>
+</section>
+
+<section>
+  <h2>Backend verification</h2>
+  <p class="caption">
+    Independent of the UI: 36 handler tests in
+    <code>src/backend/api/handlers/tests/moderation_test.py</code> cover auth (401/403),
+    queue counts, listings, accept side-effects (entity creation, state flip, audit log),
+    reject, and double-review no-ops. Datastore inspection after this run confirms
+    accepted suggestions flipped to <code>REVIEW_ACCEPTED</code>, created their target
+    entities (e.g. the match gained its YouTube video), and wrote
+    <code>AuditLogEntry</code> rows. Full backend suite: 3819 passed ·
+    <code>make lint</code> / <code>make typecheck</code> clean · PWA typecheck/eslint
+    clean, 266 unit tests passing.
+  </p>
+</section>
+
+</main>
+</body>
+</html>
