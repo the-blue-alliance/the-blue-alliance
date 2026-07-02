@@ -21,6 +21,9 @@ updates:
   ignore:
   - dependency-name: swagger-ui
   groups:
+    babel:
+      patterns:
+        - "@babel/*"
     react:
       patterns:
         - "react"
