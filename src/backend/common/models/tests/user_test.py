@@ -394,7 +394,7 @@ def test_submissions_method_count_none(method) -> None:
     assert method.__get__(user) == 0
 
 
-@pytest.mark.parametrize("method, count", zip(submission_methods, [1, 1]))
+@pytest.mark.parametrize("method, count", list(zip(submission_methods, [1, 1])))
 def test_submissions_method_count(method, count) -> None:
     email = "zach@thebluealliance.com"
     account = Account(id="account", email=email)
@@ -485,13 +485,15 @@ def _api_key(auth_type: AuthType) -> Callable[[], ApiAuthAccess]:
 
 @pytest.mark.parametrize(
     "method, keys",
-    zip(
-        api_keys_method,
-        [
-            [_api_key(AuthType.ZEBRA_MOTIONWORKS), _api_key(AuthType.READ_API)],
-            [_api_key(AuthType.READ_API)],
-            [_api_key(AuthType.ZEBRA_MOTIONWORKS)],
-        ],
+    list(
+        zip(
+            api_keys_method,
+            [
+                [_api_key(AuthType.ZEBRA_MOTIONWORKS), _api_key(AuthType.READ_API)],
+                [_api_key(AuthType.READ_API)],
+                [_api_key(AuthType.ZEBRA_MOTIONWORKS)],
+            ],
+        )
     ),
 )
 def test_api_keys_method(method, keys) -> None:
