@@ -78,3 +78,45 @@ export default class FuzzysortFilterer implements SearchDataFilterer {
     };
   }
 }
+
+/**
+ * Maps a search-index key to its route path. Team keys look like "frc254"
+ * (-> /team/254); event keys look like "2024casj" (-> /event/2024casj). Single
+ * source of truth for both the rendered result links and Enter navigation.
+ */
+export function keyToPath(key: string): string {
+  return key.startsWith('frc') ? `/team/${key.substring(3)}` : `/event/${key}`;
+}
+
+export interface TopSearchResult {
+  type: 'team' | 'event';
+  /** The result's search-index key (matches the cmdk item value). */
+  value: string;
+  path: string;
+}
+
+/**
+ * Returns the first result in display order — i.e. the item shown highlighted
+ * at the top of the list, honoring `teamsFirst` — or null if there are no
+ * results. Used to seed the controlled cmdk selection so a freshly-typed
+ * query's default highlight (and therefore Enter) always matches what the user
+ * sees, rather than trusting cmdk's asynchronously-committed selection (#10104).
+ */
+export function firstSearchResult(
+  results: FilteredSearchIndex,
+): TopSearchResult | null {
+  const order: ('teams' | 'events')[] = results.teamsFirst
+    ? ['teams', 'events']
+    : ['events', 'teams'];
+  for (const group of order) {
+    const item = group === 'teams' ? results.teams[0] : results.events[0];
+    if (item) {
+      return {
+        type: group === 'teams' ? 'team' : 'event',
+        value: item.key,
+        path: keyToPath(item.key),
+      };
+    }
+  }
+  return null;
+}
