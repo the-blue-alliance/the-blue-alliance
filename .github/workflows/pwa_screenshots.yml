@@ -83,7 +83,7 @@ jobs:
       # --- Setup toolchain ---
       - name: Checkout PR branch
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up pnpm
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
@@ -154,7 +154,7 @@ jobs:
 
       - name: Checkout base branch
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           clean: false
