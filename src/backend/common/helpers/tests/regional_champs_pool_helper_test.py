@@ -1,4 +1,5 @@
 import json
+from typing import cast
 
 import pytest
 from pyre_extensions import none_throws
@@ -9,7 +10,10 @@ from backend.common.helpers.regional_champs_pool_helper import (
     RegionalChampsPoolTiebreakers,
 )
 from backend.common.models.event import Event
-from backend.common.models.event_district_points import TeamAtEventDistrictPoints
+from backend.common.models.event_details import EventDetails
+from backend.common.models.event_district_points import (
+    TeamAtEventRegionalChampsPoolPoints,
+)
 from backend.common.models.team import Team
 
 
@@ -38,6 +42,31 @@ def test_calc_event_points(
         expected_event_points = json.load(f)
 
     assert event_points == expected_event_points
+
+
+def test_calc_event_points_includes_event_level_rookie_bonus(setup_full_event) -> None:
+    setup_full_event("2025mndu")
+
+    # Use an attending team and make it a rookie for this season
+    rookie_team = none_throws(Team.get_by_id("frc2847"))
+    rookie_team.rookie_year = 2025
+    rookie_team.put()
+
+    event = none_throws(Event.get_by_id("2025mndu"))
+    event_points = RegionalChampsPoolHelper.calculate_event_points(event)
+    breakdown = cast(
+        TeamAtEventRegionalChampsPoolPoints,
+        event_points["points"]["frc2847"],
+    )
+
+    assert breakdown["rookie_bonus"] == 10
+    assert breakdown["total"] == (
+        breakdown["qual_points"]
+        + breakdown["elim_points"]
+        + breakdown["alliance_points"]
+        + breakdown["award_points"]
+        + breakdown["rookie_bonus"]
+    )
 
 
 def test_calc_multi_event_rankings_all_teams_filtered(setup_full_event) -> None:
@@ -73,7 +102,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
         event_points=[
             (
                 events[0],
-                TeamAtEventDistrictPoints(
+                TeamAtEventRegionalChampsPoolPoints(
                     alliance_points=15,
                     award_points=5,
                     elim_points=30,
@@ -83,7 +112,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
             )
         ],
         point_total=128,
-        qual_scores=[180, 161, 153],
+        match_scores=[185, 180, 175],
         rookie_bonus=0,
         single_event_bonus=57,
         other_bonus=0,
@@ -98,7 +127,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
         event_points=[
             (
                 events[1],
-                TeamAtEventDistrictPoints(
+                TeamAtEventRegionalChampsPoolPoints(
                     alliance_points=14,
                     award_points=45,
                     elim_points=20,
@@ -108,7 +137,7 @@ def test_calc_multi_event_rankings(setup_full_event) -> None:
             )
         ],
         point_total=171,
-        qual_scores=[117, 101, 101],
+        match_scores=[136, 133, 125],
         rookie_bonus=0,
         single_event_bonus=73,
         other_bonus=0,
@@ -140,7 +169,7 @@ def test_hq_adjustments(setup_full_event) -> None:
         event_points=[
             (
                 events[0],
-                TeamAtEventDistrictPoints(
+                TeamAtEventRegionalChampsPoolPoints(
                     alliance_points=15,
                     award_points=5,
                     elim_points=30,
@@ -150,7 +179,7 @@ def test_hq_adjustments(setup_full_event) -> None:
             )
         ],
         point_total=133,
-        qual_scores=[180, 161, 153],
+        match_scores=[185, 180, 175],
         rookie_bonus=0,
         single_event_bonus=57,
         other_bonus=0,
@@ -161,3 +190,131 @@ def test_hq_adjustments(setup_full_event) -> None:
             best_qual_points=21,
         ),
     )
+
+
+def test_rookie_bonus_per_event(setup_full_event) -> None:
+    """Test that rookie bonus is applied per event attended, not just once."""
+    setup_full_event("2025mndu")
+    setup_full_event("2025mndu2")
+
+    events = [
+        none_throws(Event.get_by_id("2025mndu")),
+        none_throws(Event.get_by_id("2025mndu2")),
+    ]
+
+    # Set up event points for rookie teams that attend events
+    # Rookie team attending both events
+    event1_details = EventDetails.get_by_id("2025mndu")
+    if event1_details and event1_details.regional_champs_pool_points:
+        event1_details.regional_champs_pool_points["points"]["frc9001"] = (
+            TeamAtEventRegionalChampsPoolPoints(
+                rookie_bonus=10,
+                alliance_points=10,
+                award_points=0,
+                elim_points=0,
+                qual_points=15,
+                total=35,
+            )
+        )
+        event1_details.put()
+
+    event2_details = EventDetails.get_by_id("2025mndu2")
+    if event2_details and event2_details.regional_champs_pool_points:
+        event2_details.regional_champs_pool_points["points"]["frc9001"] = (
+            TeamAtEventRegionalChampsPoolPoints(
+                rookie_bonus=10,
+                alliance_points=12,
+                award_points=0,
+                elim_points=0,
+                qual_points=18,
+                total=40,
+            )
+        )
+        event2_details.put()
+
+    # Reload events to get updated points
+    events = [
+        none_throws(Event.get_by_id("2025mndu")),
+        none_throws(Event.get_by_id("2025mndu2")),
+    ]
+    for event in events:
+        event.prep_details()
+
+    # Create rookie team
+    rookie_two_events = Team(
+        id="frc9001",
+        team_number=9001,
+        rookie_year=2025,  # Current year rookie gets 10 points per event
+    )
+    rookie_two_events.put()
+
+    teams = [rookie_two_events]
+
+    rankings = RegionalChampsPoolHelper.calculate_rankings(events, teams, 2025, None)
+
+    # Rookie team attending 2 events should get 10 points per event = 20
+    assert rankings["frc9001"]["rookie_bonus"] == 20
+    # Total: 35 (event1 incl team age) + 40 (event2 incl team age) = 75
+    assert rankings["frc9001"]["point_total"] == 75
+
+
+def test_calc_rankings_tolerates_legacy_tiebreaker_key(setup_full_event) -> None:
+    # Pre-migration EventDetails.regional_champs_pool_points entries store
+    # "highest_qual_scores" instead of the renamed "highest_match_scores".
+    # Rankings calc reads stored JSON directly and must not KeyError on those.
+    setup_full_event("2025mndu")
+
+    event_details = none_throws(EventDetails.get_by_id("2025mndu"))
+    regional_pool_points = none_throws(event_details.regional_champs_pool_points)
+    for tiebreakers in regional_pool_points["tiebreakers"].values():
+        # Cast away the TypedDict to simulate legacy on-disk JSON shape.
+        legacy: dict[str, object] = cast(dict[str, object], tiebreakers)
+        legacy["highest_qual_scores"] = legacy.pop("highest_match_scores", [])
+    event_details.regional_champs_pool_points = regional_pool_points
+    event_details.put()
+
+    event = none_throws(Event.get_by_id("2025mndu"))
+    event.prep_details()
+
+    teams = [none_throws(Team.get_by_id("frc2847"))]
+    rankings = RegionalChampsPoolHelper.calculate_rankings([event], teams, 2025, None)
+
+    # Tiebreak scores aren't recovered from the old key, but the calc completes.
+    assert rankings["frc2847"]["match_scores"] == []
+
+
+def test_single_event_bonus_includes_rookie_bonus(setup_full_event) -> None:
+    setup_full_event("2025mndu")
+
+    event_details = none_throws(EventDetails.get_by_id("2025mndu"))
+    regional_pool_points = none_throws(event_details.regional_champs_pool_points)
+    regional_pool_points["points"]["frc9002"] = TeamAtEventRegionalChampsPoolPoints(
+        rookie_bonus=10,
+        alliance_points=10,
+        award_points=0,
+        elim_points=0,
+        qual_points=15,
+        total=35,
+    )
+    event_details.regional_champs_pool_points = regional_pool_points
+    event_details.put()
+
+    event = none_throws(Event.get_by_id("2025mndu"))
+    event.prep_details()
+
+    rookie_single_event = Team(
+        id="frc9002",
+        team_number=9002,
+        rookie_year=2025,
+    )
+    rookie_single_event.put()
+
+    rankings = RegionalChampsPoolHelper.calculate_rankings(
+        [event], [rookie_single_event], 2025, None
+    )
+
+    # E1 already includes team age points for regional events: 35
+    # E2 = round(0.6 * E1) + 14 = round(0.6 * 35) + 14 = 35
+    assert rankings["frc9002"]["rookie_bonus"] == 10
+    assert rankings["frc9002"]["single_event_bonus"] == 35
+    assert rankings["frc9002"]["point_total"] == 70

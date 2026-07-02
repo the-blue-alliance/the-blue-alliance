@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, cast, Dict, Generator, List, Optional, Tuple
+from typing import Any, cast, Dict, Generator, List, Optional, Set, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -11,6 +11,7 @@ from tzlocal.windows_tz import win_tz as WINDOWS_TO_IANA
 from backend.common.consts.event_code_exceptions import EVENT_CODE_EXCEPTIONS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import (
     SeasonEventListModelV31,
     SeasonEventListModelV33,
@@ -22,11 +23,10 @@ from backend.common.helpers.event_short_name_helper import EventShortNameHelper
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, Year
 from backend.common.models.webcast import Webcast
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.tasklets import typed_tasklet
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class FMSAPIEventListParser(
@@ -72,7 +72,7 @@ class FMSAPIEventListParser(
     EINSTEIN_NAME_DEFAULT = "Einstein Field"
     EINSTEIN_CODES = {"cmp", "cmpmi", "cmpmo", "cmptx"}
 
-    def __init__(self, season: Year, short: Optional[str] = None) -> None:
+    def __init__(self, season: Year, short: str | None = None) -> None:
         self.season = season
         self.event_short = short
 
@@ -93,6 +93,46 @@ class FMSAPIEventListParser(
             playoff_type = self.PLAYOFF_TYPES.get(alliance_count)
 
         return playoff_type
+
+    def _bootstrap_sync_overrides(
+        self,
+        event_type: EventType,
+        event_short: str,
+        end_date: datetime.datetime,
+        has_divisions: bool,
+        has_division_teams_assigned: bool,
+        existing_sync_overrides: Dict[str, Any],
+    ) -> Dict[str, Any]:
+        sync_overrides = dict(existing_sync_overrides)
+
+        if (
+            has_divisions
+            and (
+                end_date.date() < datetime.datetime.now().date()
+                or has_division_teams_assigned
+            )
+            and event_type in {EventType.DISTRICT_CMP, EventType.CMP_FINALS}
+        ):
+            if "skip_eventteams" not in sync_overrides:
+                sync_overrides["skip_eventteams"] = True
+            if "set_start_day_to_last" not in sync_overrides:
+                sync_overrides["set_start_day_to_last"] = True
+
+        if "event_name_override" not in sync_overrides:
+            if (
+                event_type == EventType.CMP_FINALS
+                and event_short in self.EINSTEIN_CODES
+                and (
+                    end_date.date() < datetime.datetime.now().date()
+                    or has_division_teams_assigned
+                )
+            ):
+                sync_overrides["event_name_override"] = {
+                    "short_name": self.EINSTEIN_SHORT_NAME_DEFAULT,
+                    "name": self.EINSTEIN_NAME_DEFAULT,
+                }
+
+        return sync_overrides
 
     @staticmethod
     @typed_tasklet
@@ -124,16 +164,51 @@ class FMSAPIEventListParser(
         events: List[Event] = []
         districts: Dict[DistrictKey, District] = {}
 
-        cmp_hack_sitevar = ChampsRegistrationHacks.get()
-        divisions_to_skip = cmp_hack_sitevar["divisions_to_skip"]
-        event_name_override = cmp_hack_sitevar["event_name_override"]
-        events_to_change_dates = cmp_hack_sitevar["set_start_to_last_day"]
-
         api_events: list[SeasonEventModelV33] | list[SeasonEventModelV31] = (
             response["Events"] or []
         )
+
+        district_cmp_division_districts: Set[str] = set()
+        cmp_division_end_dates: List[datetime.datetime] = []
+        for api_event in api_events:
+            api_event_type = none_throws(api_event["type"]).lower()
+            if api_event_type == "championshipdivision" and self.season < 2022:
+                continue
+
+            parsed_event_type = self.EVENT_TYPES.get(api_event_type, None)
+            if parsed_event_type == EventType.DISTRICT_CMP_DIVISION and api_event.get(
+                "districtCode"
+            ):
+                district_cmp_division_districts.add(
+                    none_throws(api_event["districtCode"]).lower()
+                )
+            elif parsed_event_type == EventType.CMP_DIVISION:
+                cmp_division_end_dates.append(
+                    datetime.datetime.strptime(
+                        none_throws(api_event["dateEnd"]), self.DATE_FORMAT_STR
+                    )
+                )
+
+        event_keys_to_fetch = []
+        for api_event in api_events:
+            key_code = none_throws(api_event["code"]).lower()
+            if key_code in EVENT_CODE_EXCEPTIONS:
+                key_code, _ = self.get_code_and_short_name(self.season, key_code)
+            elif self.event_short:
+                key_code = self.event_short
+            event_keys_to_fetch.append(f"{self.season}{key_code}")
+
+        existing_events_by_key = {
+            event.key_name: event
+            for event in ndb.get_multi(
+                [ndb.Key(Event, key) for key in event_keys_to_fetch]
+            )
+            if event is not None
+        }
+
         for event in api_events:
             code = none_throws(event["code"]).lower()
+            code_in_exceptions = code in EVENT_CODE_EXCEPTIONS
 
             api_event_type = none_throws(event["type"]).lower()
             event_type = (
@@ -203,33 +278,78 @@ class FMSAPIEventListParser(
                 timezone = iana_tz_name
 
             # Special cases for champs
-            if code in EVENT_CODE_EXCEPTIONS:
-                code, short_name = self.get_code_and_short_name(self.season, code)
+            exception_short_name: Optional[str] = None
+            if code_in_exceptions:
+                code, exception_short_name = self.get_code_and_short_name(
+                    self.season, code
+                )
 
-                # FIRST indicates CMP registration before divisions are assigned by adding all teams
-                # to Einstein. We will hack around that by not storing divisions and renaming
-                # Einstein to simply "Championship" when certain sitevar flags are set
-
-                if code in self.EINSTEIN_CODES:
-                    override = [
-                        item
-                        for item in event_name_override
-                        if item["event"] == "{}{}".format(self.season, code)
-                    ]
-                    if override:
-                        name = short_name.format(override[0]["name"])
-                        short_name = short_name.format(override[0]["short_name"])
-                else:  # Divisions
-                    name = "{} Division".format(short_name)
             elif self.event_short:
                 code = self.event_short
 
             event_key = "{}{}".format(self.season, code)
-            if event_key in divisions_to_skip:
+            existing_event = existing_events_by_key.get(event_key)
+            existing_sync_overrides: Dict[str, Any]
+            if existing_event is not None and existing_event.sync_overrides is not None:
+                existing_sync_overrides = dict(existing_event.sync_overrides)
+            else:
+                existing_sync_overrides = {}
+
+            has_divisions = False
+            has_division_teams_assigned = False
+            first_api_code = None
+            nexus_api_code = None
+            if existing_event is not None and len(existing_event.divisions) > 0:
+                has_divisions = True
+                division_teams = EventTeam.query(
+                    EventTeam.event.IN(existing_event.divisions)
+                ).fetch(1, keys_only=True)
+                has_division_teams_assigned = bool(division_teams)
+
+            if event_type == EventType.DISTRICT_CMP and (
+                district_code := event.get("districtCode")
+            ):
+                has_divisions = has_divisions or (
+                    district_code.lower() in district_cmp_division_districts
+                )
+            elif event_type == EventType.CMP_FINALS:
+                has_divisions = has_divisions or any(
+                    abs(end - division_end_date) < datetime.timedelta(days=1)
+                    for division_end_date in cmp_division_end_dates
+                )
+            elif event_type == EventType.OFFSEASON and existing_event:
+                first_api_code = existing_event.first_code
+                nexus_api_code = existing_event.nexus_code
+
+            sync_overrides = self._bootstrap_sync_overrides(
+                none_throws(event_type),
+                code,
+                end,
+                has_divisions,
+                has_division_teams_assigned,
+                existing_sync_overrides,
+            )
+
+            if sync_overrides.get("event_sync_disable", False):
                 continue
 
+            if code_in_exceptions:
+                # FIRST indicates CMP registration before divisions are assigned by adding all teams
+                # to Einstein. We will hack around that by not storing divisions and renaming
+                # Einstein to simply "Championship" when certain hack flags are set
+
+                if code in self.EINSTEIN_CODES:
+                    override = sync_overrides.get("event_name_override")
+                    if override and exception_short_name:
+                        name = exception_short_name.format(override["name"])
+                        short_name = exception_short_name.format(override["short_name"])
+                else:  # Divisions
+                    if exception_short_name:
+                        short_name = exception_short_name
+                    name = "{} Division".format(short_name)
+
             # Allow an overriding the start date to be the beginning of the last day
-            if event_key in events_to_change_dates:
+            if sync_overrides.get("set_start_day_to_last", False):
                 start = end.replace(hour=0, minute=0, second=0, microsecond=0)
 
             playoff_type = self.get_playoff_type(
@@ -245,6 +365,8 @@ class FMSAPIEventListParser(
                     event_type_enum=event_type,
                     timezone_id=timezone,
                     official=official,
+                    first_code=first_api_code,
+                    nexus_code=nexus_api_code,
                     playoff_type=playoff_type,
                     start_date=start,
                     end_date=end,
@@ -258,6 +380,7 @@ class FMSAPIEventListParser(
                         ndb.Key(District, district_key) if district_key else None
                     ),
                     website=website,
+                    sync_overrides=sync_overrides,
                     webcast_json=json.dumps(webcasts) if webcasts else None,
                 )
             )

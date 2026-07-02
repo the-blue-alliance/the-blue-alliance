@@ -48,7 +48,10 @@ class FCMRequest(Request):
         """
         response = messaging.send_each_for_multicast(self._fcm_message(), app=self._app)
         if response.success_count > 0:
-            self.defer_track_notification(response.success_count)
+            try:
+                self.defer_track_notification(response.success_count)
+            except Exception:
+                pass
         return response
 
     def _fcm_message(self):

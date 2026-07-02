@@ -9,6 +9,7 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import COMP_LEVELS
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_tag import MediaTag
+from backend.common.consts.media_type import MediaType
 from backend.common.helpers.alliance_helper import AllianceHelper
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.event_helper import EventHelper
@@ -282,6 +283,13 @@ class TeamRenderer:
         preferred_image_medias = list(
             filter(lambda x: team.key in x.preferred_references, image_medias)
         )
+        # Filter to images with direct URLs for use in og:image meta tags.
+        # Instagram images are excluded since they no longer have direct URLs.
+        og_image_medias = [
+            m
+            for m in preferred_image_medias
+            if m.media_type_enum != MediaType.INSTAGRAM_IMAGE
+        ]
 
         participation_years, last_competed, current_year = (
             participation_future.get_result()
@@ -312,6 +320,7 @@ class TeamRenderer:
             "social_medias": social_media_future.get_result(),
             "image_medias": image_medias,
             "preferred_image_medias": preferred_image_medias,
+            "og_image_medias": og_image_medias,
             "robot": robot_future.get_result(),
             "district_name": district_name,
             "district_abbrev": district_abbrev,

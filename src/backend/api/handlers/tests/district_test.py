@@ -1,3 +1,5 @@
+import json
+
 import pytest
 
 from google.appengine.ext import ndb
@@ -18,6 +20,7 @@ from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.common.models.insight import Insight
 from backend.common.models.team import Team
 
 
@@ -145,12 +148,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "fim",
             "display_name": "Michigan",
             "key": "2019fim",
+            "official_advancement_counts": {"dcmp": 160, "cmp": 87},
             "year": 2019,
         },
         {
             "abbreviation": "fim",
             "display_name": "Michigan",
             "key": "2020fim",
+            "official_advancement_counts": {"dcmp": 200, "cmp": 90},
             "year": 2020,
         },
     ]
@@ -173,12 +178,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "mar",
             "display_name": "Mid-Atlantic",
             "key": "2014mar",
+            "official_advancement_counts": {"dcmp": 55, "cmp": 18},
             "year": 2014,
         },
         {
             "abbreviation": "fma",
             "display_name": "Mid-Atlantic",
             "key": "2024fma",
+            "official_advancement_counts": {"dcmp": 60, "cmp": 22},
             "year": 2024,
         },
     ]
@@ -194,12 +201,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "mar",
             "display_name": "Mid-Atlantic",
             "key": "2014mar",
+            "official_advancement_counts": {"dcmp": 55, "cmp": 18},
             "year": 2014,
         },
         {
             "abbreviation": "fma",
             "display_name": "Mid-Atlantic",
             "key": "2024fma",
+            "official_advancement_counts": {"dcmp": 60, "cmp": 22},
             "year": 2024,
         },
     ]
@@ -338,6 +347,8 @@ def test_district_list_year(ndb_stub, api_client: Client) -> None:
     district_keys = set([d["key"] for d in resp.json])
     assert "2020ne" in district_keys
     assert "2020fim" in district_keys
+    for d in resp.json:
+        assert "official_advancement_counts" in d
 
 
 def test_district_awards(ndb_stub, api_client: Client) -> None:
@@ -391,6 +402,82 @@ def test_district_awards(ndb_stub, api_client: Client) -> None:
             "year": 2024,
         }
     ]
+
+
+def test_district_insights(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2024fim",
+        year=2024,
+        abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+
+    Insight(
+        id=Insight.render_key_name(
+            0,
+            Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+        year=0,
+        district_abbreviation="fim",
+        data_json=json.dumps({"frc1": {"district_seasons": 1}}),
+    ).put()
+    Insight(
+        id=Insight.render_key_name(
+            0,
+            Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+        year=0,
+        district_abbreviation="fim",
+        data_json=json.dumps({"district_wide_data": {}, "region_data": {}}),
+    ).put()
+    Insight(
+        id=Insight.render_key_name(
+            2024,
+            Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+        year=2024,
+        district_abbreviation="fim",
+        data_json=json.dumps(42),
+    ).put()
+    Insight(
+        id=Insight.render_key_name(
+            2024,
+            Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS],
+        year=2024,
+        district_abbreviation="fim",
+        data_json=json.dumps({"qual": {"total_matches_count": 42}}),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/fim/insights",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+
+    assert resp.status_code == 200
+    assert resp.json == {
+        "team_data": {"frc1": {"district_seasons": 1}},
+        "district_data": {"district_wide_data": {}, "region_data": {}},
+        "seasonal_insights": {
+            "2024": {
+                "num_matches": 42,
+                "match_predictions": {"qual": {"total_matches_count": 42}},
+            }
+        },
+    }
 
 
 @pytest.mark.parametrize(

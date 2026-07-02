@@ -54,6 +54,7 @@ from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
 from backend.common.models.zebra_motionworks import ZebraMotionWorks
+from backend.common.queries.match_query import EventMatchesQuery
 
 
 @require_write_auth({AuthType.EVENT_TEAMS})
@@ -128,12 +129,46 @@ def add_match_video(event_key: EventKey) -> Response:
     return profiled_jsonify({"Success": "Match videos successfully updated"})
 
 
+@require_write_auth({AuthType.MATCH_VIDEO})
+@validate_keys
+def delete_match_video(event_key: EventKey) -> Response:
+    event_key = EventCodeExceptions.resolve(event_key)
+    match_key_to_video = JSONMatchVideoParser.parse(event_key, request.data)
+    match_keys = [ndb.Key(Match, k) for k in match_key_to_video.keys()]
+    match_futures: List[TypedFuture[Match]] = ndb.get_multi_async(match_keys)
+
+    nonexistent_matches = []
+    matches_to_put = []
+    for (match_key, youtube_id), match_future in zip(
+        match_key_to_video.items(), match_futures
+    ):
+        match = match_future.get_result()
+        if match is None:
+            nonexistent_matches.append(match_key)
+            continue
+
+        if youtube_id in match.youtube_videos:
+            match.youtube_videos.remove(youtube_id)
+            matches_to_put.append(match)
+
+    if nonexistent_matches:
+        return make_response(
+            profiled_jsonify({"Error": f"Matches {nonexistent_matches} do not exist!"}),
+            404,
+        )
+
+    if matches_to_put:
+        MatchManipulator.createOrUpdate(matches_to_put, auto_union=False)
+
+    return profiled_jsonify({"Success": "Match videos successfully deleted"})
+
+
 @require_write_auth({AuthType.EVENT_INFO})
 @validate_keys
 def update_event_info(event_key: EventKey) -> Response:
     event_key = EventCodeExceptions.resolve(event_key)
-    parsed_info = JSONEventInfoParser.parse(request.data)
     event: Event = none_throws(Event.get_by_id(event_key))
+    parsed_info = JSONEventInfoParser(event).parse(request.data)
 
     if "webcasts" in parsed_info:
         EventWebcastAdder.add_webcast(
@@ -147,8 +182,11 @@ def update_event_info(event_key: EventKey) -> Response:
         defer_safe(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
 
     if "first_event_code" in parsed_info:
-        event.official = parsed_info["first_event_code"] is not None
-        event.first_code = parsed_info["first_event_code"]
+        first_code = parsed_info["first_event_code"]
+        if isinstance(first_code, str):
+            first_code = first_code.strip() or None
+        event.official = first_code is not None
+        event.first_code = first_code
 
     if "playoff_type" in parsed_info:
         playoff_type = parsed_info["playoff_type"]
@@ -288,6 +326,19 @@ def update_event_matches(event_key: EventKey) -> Response:
 
     if event.remap_teams:
         EventRemapTeamsHelper.remapteams_matches(matches, event.remap_teams)
+
+    # Merge with existing matches so delete_invalid_matches can see the full
+    # set and identify unplayed elim matches whose set has already been
+    # decided (e.g. an f1m3 placeholder when finals ended 2-0).
+    new_match_keys = {m.key.id() for m in matches}
+    existing_matches = EventMatchesQuery(event_key=event_key).fetch()
+    for existing_match in existing_matches:
+        if existing_match.key.id() not in new_match_keys:
+            matches.append(existing_match)
+
+    matches, keys_to_delete = MatchHelper.delete_invalid_matches(matches, event)
+
+    MatchManipulator.delete_keys(keys_to_delete)
     MatchManipulator.createOrUpdate(matches)
 
     return profiled_jsonify({"Success": "Matches successfully updated"})

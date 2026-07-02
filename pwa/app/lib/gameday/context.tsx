@@ -8,6 +8,7 @@ import {
   useRef,
 } from 'react';
 
+import { getBestLayoutForCount } from '~/lib/gameday/layouts';
 import {
   type GamedayState,
   gamedayReducer,
@@ -37,11 +38,19 @@ const GamedayContext = createContext<{
 } | null>(null);
 
 // Provider
-export function GamedayProvider({ children }: { children: React.ReactNode }) {
+export function GamedayProvider({
+  children,
+  initialEventCode,
+}: {
+  children: React.ReactNode;
+  initialEventCode?: string;
+}) {
   const [state, dispatch] = useReducer(gamedayReducer, initialState);
 
   // Track if we've restored URL state
   const hasRestoredUrlState = useRef(false);
+  // Track if we've loaded webcasts for the initial event code
+  const hasLoadedEventWebcasts = useRef(false);
 
   // Subscribe to Firebase and sync webcasts into state
   const { webcasts: firebaseWebcasts, isLoading } = useFirebaseWebcasts();
@@ -57,8 +66,11 @@ export function GamedayProvider({ children }: { children: React.ReactNode }) {
   // Check if we have URL state to restore (computed synchronously)
   const hasUrlState = hasUrlStateToRestore(initialUrlState);
 
-  // We're initializing if we have URL state to restore but haven't done so yet
-  const isInitializing = hasUrlState && !hasRestoredUrlState.current;
+  // We're initializing if restoring URL state, or if waiting for Firebase to
+  // load webcasts for an event code (prevents flash of the layout selector)
+  const isInitializing =
+    (hasUrlState && !hasRestoredUrlState.current) ||
+    (!!initialEventCode && isLoading && !hasUrlState);
 
   // Restore state from URL after webcasts are loaded (so webcast IDs are valid)
   useEffect(() => {
@@ -80,6 +92,31 @@ export function GamedayProvider({ children }: { children: React.ReactNode }) {
       });
     }
   }, [firebaseWebcasts, isLoading]);
+
+  // Auto-load all webcasts for the initial event code once Firebase is ready
+  useEffect(() => {
+    if (
+      isLoading ||
+      !initialEventCode ||
+      hasLoadedEventWebcasts.current ||
+      hasUrlStateToRestore(initialUrlState)
+    )
+      return;
+
+    const eventWebcasts = Object.values(state.webcastsById)
+      .filter((w) => !w.isSpecial && w.id.startsWith(`${initialEventCode}-`))
+      .sort((a, b) => a.id.localeCompare(b.id));
+
+    if (eventWebcasts.length === 0) return;
+
+    hasLoadedEventWebcasts.current = true;
+    const layoutId = getBestLayoutForCount(eventWebcasts.length);
+    dispatch({
+      type: 'LOAD_EVENT_WEBCASTS',
+      webcasts: eventWebcasts,
+      layoutId,
+    });
+  }, [isLoading, initialEventCode, state.webcastsById, initialUrlState]);
 
   // Selectors
   const displayedWebcasts = useMemo(

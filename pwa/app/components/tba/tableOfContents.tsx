@@ -1,10 +1,10 @@
 import { useRouter } from '@tanstack/react-router';
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
@@ -52,7 +52,7 @@ export function TOCRendererProvider({
 function TOCRenderPortal({ children }: { children: React.ReactNode }) {
   const { setContent } = useContext(TOCRendererContext);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setContent(children);
   }, [children, setContent]);
 
@@ -190,13 +190,17 @@ export function TableOfContentsSection({
       className={cn('scroll-mt-12 lg:scroll-mt-4', className)}
       rootMargin="-15% 0px 0px 0px"
       onChange={(inView) => {
-        setInView((prev) => {
-          if (inView) {
-            prev.add(id);
-          } else {
-            prev.delete(id);
-          }
-          return new Set(prev);
+        // Low-priority update so pointer events/hover aren't blocked by the re-render
+        startTransition(() => {
+          setInView((prev) => {
+            const next = new Set(prev);
+            if (inView) {
+              next.add(id);
+            } else {
+              next.delete(id);
+            }
+            return next;
+          });
         });
       }}
       {...props}

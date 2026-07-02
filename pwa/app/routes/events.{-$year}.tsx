@@ -1,8 +1,14 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import {
+  createFileRoute,
+  notFound,
+  redirect,
+  useNavigate,
+} from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
-import { Event } from '~/api/tba/read';
+import { Event, EventType } from '~/api/tba/read';
 import {
   getDistrictsByYearOptions,
   getEventsByYearOptions,
@@ -13,6 +19,7 @@ import {
   TableOfContentsSection,
   type TocNode,
 } from '~/components/tba/tableOfContents';
+import { YearSelector } from '~/components/tba/yearSelector';
 import {
   Select,
   SelectContent,
@@ -20,7 +27,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { CMP_EVENT_TYPES, EventType } from '~/lib/api/EventType';
+import { CMP_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
 import {
   parseParamsForYearElseDefault,
@@ -31,6 +38,14 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/events/{-$year}')({
+  beforeLoad: ({ params }) => {
+    if (params.year !== undefined && Number.isNaN(Number(params.year))) {
+      throw redirect({
+        to: '/district/$districtAbbreviation/{-$year}',
+        params: { districtAbbreviation: params.year },
+      });
+    }
+  },
   loader: async ({ params, context: { queryClient } }) => {
     const year = await parseParamsForYearElseDefault(queryClient, params);
     if (year === undefined) {
@@ -138,10 +153,9 @@ function groupBySections(events: Event[]): EventGroup[] {
       event.event_type == EventType.PRESEASON ||
       event.event_type == EventType.OFFSEASON
     ) {
-      const eventDate = new Date(event.start_date);
-      const monthName = eventDate.toLocaleDateString('default', {
-        month: 'long',
-      });
+      const monthName = Temporal.PlainDate.from(
+        event.start_date,
+      ).toLocaleString('default', { month: 'long' });
       const offseasonGroup = unofficialEventsByMonth.get(monthName);
       if (offseasonGroup) {
         offseasonGroup.events.push(event);
@@ -216,25 +230,15 @@ function YearEventsPage() {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView}>
-        <Select
-          value={String(year)}
-          onValueChange={(value) => {
-            void navigate({ to: `/events/${value}` });
-          }}
-        >
-          <SelectTrigger
-            className="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
-          >
-            <SelectValue placeholder={year} />
-          </SelectTrigger>
-          <SelectContent className="max-h-[30vh] overflow-y-auto">
-            {validYears.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel={String(year)}
+          triggerClassName="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          options={validYears.map((y) => ({
+            label: String(y),
+            to: `/events/${y}`,
+            isCurrent: y === year,
+          }))}
+        />
         <Select
           defaultValue="all"
           onValueChange={(value) => {

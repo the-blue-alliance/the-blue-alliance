@@ -288,7 +288,7 @@ function ChartTooltipContent({
                     {item.value != null && (
                       <span
                         className="font-mono font-medium text-foreground
-                          tabular-nums"
+                          numeric-data"
                       >
                         {typeof item.value === 'number'
                           ? item.value.toLocaleString()
@@ -385,15 +385,13 @@ function getPayloadConfigFromPayload(
     key in payload &&
     typeof payload[key as keyof typeof payload] === 'string'
   ) {
-    configLabelKey = payload[key as keyof typeof payload] as string;
+    configLabelKey = payload[key as keyof typeof payload];
   } else if (
     payloadPayload &&
     key in payloadPayload &&
     typeof payloadPayload[key as keyof typeof payloadPayload] === 'string'
   ) {
-    configLabelKey = payloadPayload[
-      key as keyof typeof payloadPayload
-    ] as string;
+    configLabelKey = payloadPayload[key as keyof typeof payloadPayload];
   }
 
   return configLabelKey in config ? config[configLabelKey] : config[key];

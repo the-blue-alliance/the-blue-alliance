@@ -1,5 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { Temporal } from 'temporal-polyfill';
 
 import {
   getEventsByYearOptions,
@@ -14,7 +15,9 @@ export const Route = createFileRoute('/')({
     const status = await queryClient.ensureQueryData(getStatusOptions({}));
     await queryClient.ensureQueryData(
       getEventsByYearOptions({
-        path: { year: status?.current_season ?? new Date().getFullYear() },
+        path: {
+          year: status?.current_season ?? Temporal.Now.plainDateISO().year,
+        },
       }),
     );
   },
@@ -26,18 +29,20 @@ function Home() {
   const { data: status } = useSuspenseQuery(getStatusOptions({}));
   const { data: events } = useSuspenseQuery(
     getEventsByYearOptions({
-      path: { year: status?.current_season ?? new Date().getFullYear() },
+      path: {
+        year: status?.current_season ?? Temporal.Now.plainDateISO().year,
+      },
     }),
   );
   const weekEvents = getCurrentWeekEvents(events);
 
   return (
     <div>
-      {weekEvents.length > 0 && (
-        <div>
-          <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
-          <EventListTable events={weekEvents} />
-        </div>
+      <h1 className="mt-5 mb-2.5 text-4xl">This Week&apos;s Events</h1>
+      {weekEvents.length > 0 ? (
+        <EventListTable events={weekEvents} enableGrouping />
+      ) : (
+        <p className="text-muted-foreground">No events this week.</p>
       )}
     </div>
   );

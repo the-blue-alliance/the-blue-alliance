@@ -418,6 +418,42 @@ def test_event_teams_statuses(ndb_stub, api_client: Client) -> None:
     )
 
 
+def test_event_teams_statuses_pit_location(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+        pit_location={"location": "A1"},
+    ).put()
+    EventTeam(
+        id="2020casj_frc604",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc604"),
+        year=2020,
+        status={},
+        pit_location={"location": "B3"},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2020casj/teams/statuses",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json.get("frc254") == {"pit_location": "A1"}
+    assert resp.json.get("frc604")["pit_location"] == "B3"
+
+
 def test_event_matches(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",

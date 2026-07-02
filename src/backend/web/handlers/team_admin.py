@@ -1,11 +1,13 @@
 from collections import defaultdict
 from datetime import datetime
+from typing import Optional
 
 from flask import abort, Blueprint, redirect, request, url_for
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.auth import current_user
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.robot_manipulator import RobotManipulator
@@ -15,7 +17,7 @@ from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.queries.media_query import TeamSocialMediaQuery
-from backend.web.decorators import require_login
+from backend.web.decorators import audit_post_mutation, require_login
 from backend.web.profiled_render import render_template
 
 blueprint = Blueprint("team_admin", __name__, url_prefix="/")
@@ -33,12 +35,22 @@ SUGGESTION_REVIEW_URL = {
 }
 
 
+def _get_team_key_from_form() -> Optional[ndb.Key]:
+    team_number = request.form.get("team_number", "").strip()
+    if not team_number.isdigit():
+        return None
+    return ndb.Key(Team, f"frc{team_number}")
+
+
 @blueprint.route("/mod", methods=["GET"])
 @require_login
 def team_mod():
     user = none_throws(current_user())
     account = user.account_key
     now = datetime.now()
+    has_global_review_permissions = user.is_admin or user.has_permission(
+        AccountPermission.REVIEW_MEDIA
+    )
 
     existing_access = TeamAdminAccess.query(
         TeamAdminAccess.account == account, TeamAdminAccess.expiration > now
@@ -48,11 +60,24 @@ def team_mod():
     # team/year combination
     forced_team = request.args.get("team")
     forced_year = request.args.get("year")
-    if user.is_admin and forced_team and forced_year:
+    forced_team_number = (
+        int(forced_team) if forced_team and forced_team.isdigit() else None
+    )
+    forced_year_int = (
+        int(forced_year) if forced_year and forced_year.isdigit() else None
+    )
+    has_valid_forced_team_year = (
+        forced_team_number is not None
+        and forced_team_number > 0
+        and forced_year_int is not None
+        and 1992 <= forced_year_int <= now.year + 1
+    )
+
+    if has_global_review_permissions and has_valid_forced_team_year:
         existing_access.append(
             TeamAdminAccess(
-                team_number=int(forced_team),
-                year=int(forced_year),
+                team_number=forced_team_number,
+                year=forced_year_int,
             )
         )
 
@@ -124,6 +149,13 @@ def team_mod():
         "suggestions_by_team": suggestions_by_team,
         "suggestion_names": SUGGESTION_NAMES,
         "suggestion_review_urls": SUGGESTION_REVIEW_URL,
+        "show_year_jump": has_global_review_permissions and has_valid_forced_team_year,
+        "year_jump_team_number": (
+            forced_team_number if has_valid_forced_team_year else None
+        ),
+        "year_jump_current_year": (
+            forced_year_int if has_valid_forced_team_year else None
+        ),
     }
 
     return render_template("team_admin_dashboard.html", template_values)
@@ -131,6 +163,7 @@ def team_mod():
 
 @blueprint.route("/mod", methods=["POST"])
 @require_login
+@audit_post_mutation(target_key_getter=lambda: _get_team_key_from_form())
 def team_mod_post():
     team_number = request.form.get("team_number")
     if not team_number:
@@ -140,13 +173,22 @@ def team_mod_post():
     if not team:
         return abort(400)
 
-    user = none_throws(current_user()).account_key
+    user = none_throws(current_user())
     now = datetime.now()
-    existing_access = TeamAdminAccess.query(
-        TeamAdminAccess.account == user,
-        TeamAdminAccess.team_number == team_number,
-        TeamAdminAccess.expiration > now,
-    ).fetch()
+    if user.is_admin or user.has_permission(AccountPermission.REVIEW_MEDIA):
+        has_permissions = True
+        existing_access = TeamAdminAccess(
+            account=user.account_key,
+            team_number=team_number,
+            year=now.year,
+        )
+    else:
+        has_permissions = False
+        existing_access = TeamAdminAccess.query(
+            TeamAdminAccess.account == user.account_key,
+            TeamAdminAccess.team_number == team_number,
+            TeamAdminAccess.expiration > now,
+        ).fetch()
     if not existing_access:
         return abort(403)
 
@@ -192,7 +234,12 @@ def team_mod_post():
     else:
         return abort(400)
 
-    return redirect(url_for(".team_mod"))
+    if has_permissions:
+        return redirect(
+            url_for(".team_mod", team=team_number, year=existing_access.year)
+        )
+    else:
+        return redirect(url_for(".team_mod"))
 
 
 def get_media_and_team_ref(media_key_name, team_number):
@@ -207,7 +254,10 @@ def get_media_and_team_ref(media_key_name, team_number):
 @require_login
 def team_admin_redeem():
     user = none_throws(current_user()).account_key
-    existing_access = TeamAdminAccess.query(TeamAdminAccess.account == user).fetch()
+    now = datetime.now()
+    existing_access = TeamAdminAccess.query(
+        TeamAdminAccess.account == user, TeamAdminAccess.expiration > now
+    ).fetch()
 
     team_keys = [
         ndb.Key(Team, f"frc{access.team_number}") for access in existing_access
@@ -228,6 +278,7 @@ def team_admin_redeem():
 
 @require_login
 @blueprint.route("/mod/redeem", methods=["POST"])
+@audit_post_mutation(target_key_getter=lambda: _get_team_key_from_form())
 def team_admin_redeem_post():
     user = none_throws(current_user()).account_key
 

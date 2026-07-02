@@ -28,12 +28,22 @@ const TeamLink = forwardRef<
       ? removeNonNumeric(teamOrKey)
       : teamOrKey.team_number.toString();
 
-  const yearSuffix = year === 0 ? 'history' : year?.toString();
+  if (year === 0) {
+    return (
+      <Link
+        to="/team/$teamNumber/history"
+        params={{ teamNumber }}
+        className={className ?? 'text-foreground hover:underline'}
+        {...props}
+        ref={ref}
+      />
+    );
+  }
 
   return (
     <Link
       to="/team/$teamNumber/{-$year}"
-      params={{ teamNumber, year: yearSuffix }}
+      params={{ teamNumber, year: year?.toString() }}
       className={className ?? 'text-foreground hover:underline'}
       {...props}
       ref={ref}
@@ -172,6 +182,30 @@ const MatchLink = forwardRef<
 });
 MatchLink.displayName = 'MatchLink';
 
+const PitLocationLink = ({
+  teamNumber,
+  year,
+  firstEventCode,
+  pitLocation,
+}: {
+  teamNumber: number;
+  year: number;
+  firstEventCode: string;
+  pitLocation: string;
+}) => {
+  return (
+    <a
+      href={`https://frc.nexus/en/event/${year}${firstEventCode}/team/${teamNumber}/map`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-600 underline dark:text-blue-400"
+    >
+      {pitLocation}
+    </a>
+  );
+};
+PitLocationLink.displayName = 'PitLocationLink';
+
 const DistrictLink = forwardRef<
   HTMLAnchorElement,
   PropsWithChildren<
@@ -200,6 +234,7 @@ export {
   EventLink,
   EventLocationLink,
   MatchLink,
+  PitLocationLink,
   TeamLink,
   TeamLocationLink,
 };

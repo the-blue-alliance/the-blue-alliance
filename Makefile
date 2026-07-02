@@ -1,12 +1,13 @@
-.PHONY: test lint lint-bash typecheck sync freeze help
+.PHONY: test test-inline lint lint-bash typecheck sync freeze help
 
 # Default target
 help:
 	@echo "Available targets:"
 	@echo "  make test                       - Run all tests"
 	@echo "  make test ARGS='...'            - Run tests with custom arguments"
+	@echo "  make test-inline                - Run staged/related tests only (pre-commit)"
 	@echo "  make lint                       - Check code formatting (black + flake8)"
-	@echo "  make lint ARGS='--fix'          - Auto-fix formatting with black, then run flake8"
+	@echo "  make lint-fix                   - Auto-fix formatting with black, then run flake8"
 	@echo "  make typecheck                  - Run pyre type checker"
 	@echo "  make lint-bash                  - Check bash script formatting (shellcheck + shfmt)"
 	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
@@ -37,6 +38,14 @@ else
 	uv run --group test ./ops/test_py3.sh
 endif
 
+# Run staged/related tests for fast pre-commit feedback
+test-inline:
+ifdef ARGS
+	uv run --group test ./ops/test_py3.sh --inline $(ARGS)
+else
+	uv run --group test ./ops/test_py3.sh --inline
+endif
+
 # Run tests with coverage (CI only)
 test-ci:
 ifdef ARGS
@@ -50,10 +59,13 @@ endif
 lint:
 	uv run --group lint ./ops/lint_py3.sh $(ARGS)
 
+lint-fix:
+	uv run --group lint ./ops/lint_py3.sh --fix
+
 # Run bash linter (shellcheck + shfmt)
 # Use ARGS='--fix' to auto-fix formatting issues
 lint-bash:
-	docker compose run --rm lint-bash $(ARGS)
+	docker compose --profile tools run --rm lint-bash $(ARGS)
 
 # Run pyre type checker
 typecheck:

@@ -1,14 +1,18 @@
 import datetime
 import json
-
+from typing import cast
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
-from backend.common.consts.event_type import CMP_EVENT_TYPES, EventType
+from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.frc_api.types import SeasonEventListModelV33
+from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
+from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_list_parser import (
     FMSAPIEventListParser,
 )
@@ -268,42 +272,19 @@ def test_parse_2017_event(test_data_importer):
     assert event.website == "http://www.firstsv.org"
 
 
-def test_parse_2017_events_with_cmp_hacks(test_data_importer):
-    hack_sitevar = {
-        "event_name_override": [
-            {
-                "event": "2017cmpmo",
-                "name": "FIRST Championship Event",
-                "short_name": "Championship",
-            },
-            {
-                "event": "2017cmptx",
-                "name": "FIRST Championship Event",
-                "short_name": "Championship",
-            },
-        ],
-        "set_start_to_last_day": ["2017cmptx", "2017cmpmo"],
-        "divisions_to_skip": ["2017arc", "2017cars", "2017cur", "2017dal", "2017dar"],
-    }
-    ChampsRegistrationHacks.put(hack_sitevar)
-
+def test_parse_2017_events_bootstrap_default_sync_overrides(test_data_importer):
     path = test_data_importer._get_path(__file__, "data/2017_event_list.json")
     with open(path, "r") as f:
         data = json.load(f)
 
     events, districts = FMSAPIEventListParser(2017).parse(data)
-    assert len(events) == 160
+    assert len(events) == 165
     assert len(districts) == 10
-
-    non_einstein_types = CMP_EVENT_TYPES
-    non_einstein_types.remove(EventType.CMP_FINALS)
-    for key in hack_sitevar["divisions_to_skip"]:
-        assert not list(filter(lambda e: e.key_name == key, events))
 
     einstein_stl = next(e for e in events if e.key_name == "2017cmpmo")
     assert einstein_stl is not None
-    assert einstein_stl.name == "FIRST Championship Event (St. Louis)"
-    assert einstein_stl.short_name == "Championship (St. Louis)"
+    assert einstein_stl.name == "Einstein Field (St. Louis)"
+    assert einstein_stl.short_name == "Einstein (St. Louis)"
     assert einstein_stl.start_date == datetime.datetime(
         year=2017, month=4, day=29, hour=0, minute=0, second=0
     )
@@ -313,14 +294,370 @@ def test_parse_2017_events_with_cmp_hacks(test_data_importer):
 
     einstein_hou = next(e for e in events if e.key_name == "2017cmptx")
     assert einstein_hou is not None
-    assert einstein_hou.name == "FIRST Championship Event (Houston)"
-    assert einstein_hou.short_name == "Championship (Houston)"
+    assert einstein_hou.name == "Einstein Field (Houston)"
+    assert einstein_hou.short_name == "Einstein (Houston)"
     assert einstein_hou.start_date == datetime.datetime(
         year=2017, month=4, day=22, hour=0, minute=0, second=0
     )
     assert einstein_hou.end_date == datetime.datetime(
         year=2017, month=4, day=22, hour=23, minute=59, second=59
     )
+
+    assert einstein_stl.sync_overrides.get("skip_eventteams") is True
+    assert einstein_stl.sync_overrides.get("set_start_day_to_last") is True
+    assert einstein_hou.sync_overrides.get("skip_eventteams") is True
+    assert einstein_hou.sync_overrides.get("set_start_day_to_last") is True
+
+
+def test_parse_bootstrap_past_division_parent_defaults() -> None:
+    events, _ = FMSAPIEventListParser(2010).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "testcmp",
+                        "type": "districtchampionship",
+                        "name": "Test District Championship",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2010-04-15T00:00:00",
+                        "dateEnd": "2010-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                    {
+                        "code": "testcmp1",
+                        "type": "districtchampionshipdivision",
+                        "name": "Test District Championship Division 1",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2010-04-15T00:00:00",
+                        "dateEnd": "2010-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                ]
+            },
+        )
+    )
+
+    event = next(e for e in events if e.key_name == "2010testcmp")
+    assert none_throws(event.sync_overrides).get("skip_eventteams") is True
+    assert none_throws(event.sync_overrides).get("set_start_day_to_last") is True
+    assert event.start_date == datetime.datetime(2010, 4, 17, 0, 0, 0)
+
+
+def test_parse_bootstrap_future_district_cmp_no_overrides_without_division_teams() -> (
+    None
+):
+    Event(
+        id="2999netestcmp",
+        year=2999,
+        event_short="netestcmp",
+        event_type_enum=EventType.DISTRICT_CMP,
+        divisions=[ndb.Key(Event, "2999netestcmp1")],
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "netestcmp",
+                        "type": "districtchampionship",
+                        "name": "NE District Championship",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                    {
+                        "code": "netestcmp1",
+                        "type": "districtchampionshipdivision",
+                        "name": "NE District Championship Division 1",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                ]
+            },
+        )
+    )
+
+    event = next(e for e in events if e.key_name == "2999netestcmp")
+    assert not none_throws(event.sync_overrides).get("skip_eventteams")
+    assert not none_throws(event.sync_overrides).get("set_start_day_to_last")
+
+
+def test_parse_bootstrap_future_district_cmp_overrides_with_division_teams() -> None:
+    Event(
+        id="2999netestcmp",
+        year=2999,
+        event_short="netestcmp",
+        event_type_enum=EventType.DISTRICT_CMP,
+        divisions=[ndb.Key(Event, "2999netestcmp1")],
+    ).put()
+    EventTeam(
+        id="2999netestcmp1_frc1",
+        event=ndb.Key(Event, "2999netestcmp1"),
+        team=ndb.Key(Team, "frc1"),
+        year=2999,
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "netestcmp",
+                        "type": "districtchampionship",
+                        "name": "NE District Championship",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                    {
+                        "code": "netestcmp1",
+                        "type": "districtchampionshipdivision",
+                        "name": "NE District Championship Division 1",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2999-04-15T00:00:00",
+                        "dateEnd": "2999-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    },
+                ]
+            },
+        )
+    )
+
+    event = next(e for e in events if e.key_name == "2999netestcmp")
+    assert none_throws(event.sync_overrides).get("skip_eventteams") is True
+    assert none_throws(event.sync_overrides).get("set_start_day_to_last") is True
+
+
+def test_parse_bootstrap_default_cmp_finals_name_override() -> None:
+    events, _ = FMSAPIEventListParser(2016).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "cmp",
+                        "type": "championship",
+                        "name": "FIRST Championship",
+                        "districtCode": None,
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "St. Louis",
+                        "stateprov": "MO",
+                        "country": "USA",
+                        "dateStart": "2016-04-27T00:00:00",
+                        "dateEnd": "2016-04-30T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    }
+                ]
+            },
+        )
+    )
+
+    event = events[0]
+    assert event.name == "Einstein Field"
+    assert event.short_name == "Einstein"
+    assert none_throws(event.sync_overrides).get("event_name_override") == {
+        "name": "Einstein Field",
+        "short_name": "Einstein",
+    }
+
+
+def test_parse_bootstrap_future_cmp_finals_name_no_override_without_division_teams() -> (
+    None
+):
+    Event(
+        id="2999cmptx",
+        year=2999,
+        event_short="cmptx",
+        event_type_enum=EventType.CMP_FINALS,
+        divisions=[ndb.Key(Event, "2999newton")],
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "cmptx",
+                        "type": "championship",
+                        "name": "FIRST Championship",
+                        "districtCode": None,
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Houston",
+                        "stateprov": "TX",
+                        "country": "USA",
+                        "dateStart": "2999-04-20T00:00:00",
+                        "dateEnd": "2999-04-23T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    }
+                ]
+            },
+        )
+    )
+
+    event = events[0]
+    assert event.name == "FIRST Championship"
+    assert event.short_name == "FIRST Championship"
+    assert not none_throws(event.sync_overrides).get("event_name_override")
+
+
+def test_parse_bootstrap_future_cmp_finals_name_override_with_division_teams() -> None:
+    parent = Event(
+        id="2999cmptx",
+        year=2999,
+        event_short="cmptx",
+        event_type_enum=EventType.CMP_FINALS,
+        divisions=[ndb.Key(Event, "2999newton")],
+    )
+    parent.put()
+    EventTeam(
+        id="2999newton_frc1",
+        event=ndb.Key(Event, "2999newton"),
+        team=ndb.Key(Team, "frc1"),
+        year=2999,
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2999).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "cmptx",
+                        "type": "championship",
+                        "name": "FIRST Championship",
+                        "districtCode": None,
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Houston",
+                        "stateprov": "TX",
+                        "country": "USA",
+                        "dateStart": "2999-04-20T00:00:00",
+                        "dateEnd": "2999-04-23T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    }
+                ]
+            },
+        )
+    )
+
+    event = events[0]
+    assert event.name == "Einstein Field"
+    assert event.short_name == "Einstein"
+    assert none_throws(event.sync_overrides).get("event_name_override") == {
+        "name": "Einstein Field",
+        "short_name": "Einstein",
+    }
+
+
+def test_parse_bootstrap_past_parent_defaults_when_only_parent_fetched() -> None:
+    existing_event = Event(
+        id="2010testcmp",
+        year=2010,
+        event_short="testcmp",
+        event_type_enum=EventType.DISTRICT_CMP,
+        divisions=[ndb.Key(Event, "2010testcmp1")],
+    )
+    existing_event.put()
+
+    events, _ = FMSAPIEventListParser(2010).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    {
+                        "code": "testcmp",
+                        "type": "districtchampionship",
+                        "name": "Test District Championship",
+                        "districtCode": "ne",
+                        "address": "123 Main St",
+                        "venue": "Test Venue",
+                        "city": "Test City",
+                        "stateprov": "MA",
+                        "country": "USA",
+                        "dateStart": "2010-04-15T00:00:00",
+                        "dateEnd": "2010-04-17T23:59:59",
+                        "website": None,
+                        "webcasts": [],
+                        "timezone": None,
+                        "allianceCount": "EightAlliance",
+                    }
+                ]
+            },
+        )
+    )
+
+    event = events[0]
+    assert none_throws(event.sync_overrides).get("skip_eventteams") is True
+    assert none_throws(event.sync_overrides).get("set_start_day_to_last") is True
+    assert event.start_date == datetime.datetime(2010, 4, 17, 0, 0, 0)
 
 
 def test_parse_2017_official_offseason(test_data_importer):
@@ -675,3 +1012,25 @@ def test_parse_2026_event_rich_webcasts(test_data_importer):
             date="2026-02-21",
         )
     ]
+
+
+def test_parse_offseason_preserves_first_api_code(test_data_importer):
+    path = test_data_importer._get_path(__file__, "data/2015_event_list.json")
+    with open(path, "r") as f:
+        data = json.load(f)
+
+    events, _ = FMSAPIEventListParser(2015).parse(data)
+    event = events[4]
+
+    assert event.key_name == "2015iri"
+    assert event.first_code is None
+
+    event.first_code = "synccode"
+    event.put()
+
+    # Re-parse and ensure first_code is preserved
+    events, _ = FMSAPIEventListParser(2015).parse(data)
+    event = events[4]
+
+    assert event.key_name == "2015iri"
+    assert event.first_code == "synccode"

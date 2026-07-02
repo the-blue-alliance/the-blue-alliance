@@ -34,7 +34,6 @@
           <img class="team-avatar single blue" src='{{avatar.avatar_image_url}}'/>
         {% endif %}
         Team {{team.team_number}}{% if team.nickname %} - {{team.nickname}}{% endif %}</h2>
-        {% if district_name %}<blockquote class="visible-xs"><em>Part of the <a href="/events/{{district_abbrev}}/{{year}}">{{district_name}} District</a></em></blockquote>{% endif %}
 
         <div class="tba-sidebar">
           <ul class="nav tba-sidenav">
@@ -109,12 +108,12 @@
           {% for comp in participation %}
             <div class="row" id="{{ comp.event.key_name }}">
               <div class="col-sm-4">
-                {% set show_pit_locations = comp.event.official and (comp.event.future or comp.event.within_a_day) and comp.nexus_pit_location %}
+                {% set show_pit_locations = (comp.event.official or comp.event.nexus_code) and (comp.event.future or comp.event.within_a_day) and comp.nexus_pit_location %}
                 <h3><a href="/event/{{ comp.event.key_name }}">{{ comp.event.name }}</a></h3>
                 <p>
                   {% if comp.event.location %}<span class="glyphicon glyphicon-map-marker"></span> in <a href="http://maps.google.com/maps?q={{ comp.event.location }}" target="_blank" rel="noopener noreferrer">{{ comp.event.location }}</a><br />{% endif %}
                   {{ em.showEventDates(comp.event) }}
-                  {% if show_pit_locations %}<br/><img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Location: <a href="https://frc.nexus/en/event/{{comp.event.year}}{{comp.event.first_api_code}}/team/{{team.team_number}}/map" target="_blank" rel="noopener noreferrer">{{comp.nexus_pit_location}}</a>{% endif %}
+                  {% if show_pit_locations %}<br/><img style="width:12px; height:12px; vertical-align: baseline;" src="/images/nexus_logo.png" alt="nexus logo"> Pit Location: <a href="https://frc.nexus/en/event/{{comp.event.nexus_code_for_api}}/team/{{team.team_number}}/map" target="_blank" rel="noopener noreferrer">{{comp.nexus_pit_location}}</a>{% endif %}
                 </p>
 
                 {% if comp.wlt or comp.rank or comp.awards or comp.qual_avg or comp.elim_avg %}

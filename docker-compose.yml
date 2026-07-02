@@ -18,8 +18,8 @@ services:
 
   datastore:
     build:
-      context: ./
-      dockerfile: ./ops/dev/datastore/Dockerfile.datastore
+      context: ./ops/dev/datastore/
+      dockerfile: Dockerfile.datastore
     environment:
       <<: *env-vars
     ports:
@@ -34,12 +34,9 @@ services:
       start_period: 5s
 
   tba:
-    # image: ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-    image: tba
     build:
-      context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile
-
+      context: ./ops/dev/docker/
+      dockerfile: Dockerfile
     depends_on:
       firebase:
         condition: service_started
@@ -47,8 +44,6 @@ services:
         condition: service_healthy
     volumes:
       - ./:/tba:delegated
-    tty: true
-    stdin_open: true
     ports:
       # GAE
       - "8080:8080"
@@ -62,22 +57,30 @@ services:
       - "8088:8088"
       # GAE Admin
       - "8000:8000"
-    entrypoint: [ "sh", "/tba/ops/dev/docker/docker-entry.sh" ]
-    command: [ "/usr/sbin/sshd", "-D" ]
     working_dir: /tba
     hostname: tba
     environment:
-      - PUPPETEER_SKIP_DOWNLOAD=true
-      - TBA_DOCKER_COMPOSE=true
+      - DATASTORE_EMULATOR_HOST=datastore:8089
       - FIREBASE_AUTH_EMULATOR_HOST=firebase:9099
       - FIREBASE_DATABASE_EMULATOR_HOST=firebase:9000
+
+  webpack:
+    build:
+      context: ./ops/dev/webpack/
+      dockerfile: Dockerfile.webpack
+    volumes:
+      - ./:/tba:delegated
+    working_dir: /tba
+    environment:
+      - WATCH=true
+      - PUPPETEER_SKIP_DOWNLOAD=true
 
   ### Tools
 
   lint-bash:
     build:
-      context: ./
-      dockerfile: ./ops/dev/docker/Dockerfile.lint_bash
+      context: ./ops/dev/docker/
+      dockerfile: Dockerfile.lint_bash
     profiles: ["tools"]
     volumes:
       - ./:/tba:delegated

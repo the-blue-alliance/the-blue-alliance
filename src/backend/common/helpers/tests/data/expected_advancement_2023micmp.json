@@ -249,7 +249,14 @@
           "ties": 0
         },
         "red_name": "DTE Energy",
-        "blue_name": "Aptiv"
+        "blue_name": "Aptiv",
+        "results": [
+          {
+            "blue_score": 156,
+            "red_score": 129,
+            "winner": "blue"
+          }
+        ]
       },
       "sf2": {
         "red_alliance": [
@@ -276,7 +283,14 @@
           "ties": 0
         },
         "red_name": "Consumers",
-        "blue_name": "Ford"
+        "blue_name": "Ford",
+        "results": [
+          {
+            "blue_score": 181,
+            "red_score": 191,
+            "winner": "red"
+          }
+        ]
       },
       "sf3": {
         "red_alliance": [
@@ -303,7 +317,14 @@
           "ties": 0
         },
         "red_name": "Aptiv",
-        "blue_name": "Consumers"
+        "blue_name": "Consumers",
+        "results": [
+          {
+            "blue_score": 172,
+            "red_score": 155,
+            "winner": "blue"
+          }
+        ]
       },
       "sf4": {
         "red_alliance": [
@@ -331,7 +352,14 @@
           "ties": 0
         },
         "red_name": "DTE Energy",
-        "blue_name": "Ford"
+        "blue_name": "Ford",
+        "results": [
+          {
+            "blue_score": 170,
+            "red_score": 134,
+            "winner": "blue"
+          }
+        ]
       },
       "sf5": {
         "red_alliance": [
@@ -358,7 +386,14 @@
           "ties": 0
         },
         "red_name": "Aptiv",
-        "blue_name": "Ford"
+        "blue_name": "Ford",
+        "results": [
+          {
+            "blue_score": 172,
+            "red_score": 163,
+            "winner": "blue"
+          }
+        ]
       }
     },
     "f": {
@@ -387,7 +422,19 @@
           "ties": 0
         },
         "red_name": "Consumers",
-        "blue_name": "Ford"
+        "blue_name": "Ford",
+        "results": [
+          {
+            "blue_score": 183,
+            "red_score": 168,
+            "winner": "blue"
+          },
+          {
+            "blue_score": 153,
+            "red_score": 130,
+            "winner": "blue"
+          }
+        ]
       }
     }
   }

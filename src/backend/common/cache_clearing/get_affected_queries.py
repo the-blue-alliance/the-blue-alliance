@@ -19,6 +19,7 @@ from backend.common.queries import (
     robot_query,
     team_query,
 )
+from backend.common.queries import insight_v2_query
 from backend.common.queries.database_query import CachedDatabaseQuery
 
 TCacheKeyAndQuery = Tuple[str, Type[CachedDatabaseQuery]]
@@ -267,7 +268,7 @@ def districtteam_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAn
     district_keys = _filter(affected_refs["district_key"])
     team_keys = _filter(affected_refs["team"])
 
-    queries: List[CachedDatabaseQuery] = []
+    queries: List[CachedDatabaseQuery] = [district_query.AllDistrictTeamsQuery()]
     for district_key in district_keys:
         queries.append(team_query.DistrictTeamsQuery(district_key.id()))
 
@@ -365,5 +366,29 @@ def insight_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuer
                 district_abbreviation,
             )
         )
+
+    return _queries_to_cache_keys_and_queries(queries)
+
+
+def insight_v2_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]:
+    years = _filter(affected_refs["year"])
+    categories = _filter(affected_refs["category"])
+    district_abbreviations = _filter(affected_refs["district_abbreviation"])
+
+    queries: List[CachedDatabaseQuery] = []
+    for year in years:
+        queries.append(insight_v2_query.InsightV2YearQuery(year))
+        for category in categories:
+            queries.append(insight_v2_query.InsightV2YearCategoryQuery(year, category))
+        for district_abbreviation in district_abbreviations:
+            queries.append(
+                insight_v2_query.InsightV2YearDistrictQuery(year, district_abbreviation)
+            )
+            for category in categories:
+                queries.append(
+                    insight_v2_query.InsightV2YearCategoryDistrictQuery(
+                        year, category, district_abbreviation
+                    )
+                )
 
     return _queries_to_cache_keys_and_queries(queries)

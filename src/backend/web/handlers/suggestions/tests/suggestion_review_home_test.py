@@ -79,3 +79,72 @@ def test_shows_all_reviews_for_admin(
         set(expected_review_items).issubset(set([i["id"] for i in review_items]))
         is True
     )
+
+
+def test_shows_review_media_tools_for_review_media_permission(
+    login_user, web_client: Client
+) -> None:
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    webcast_link = soup.find("a", id="webcast-dashboard-link")
+    assert webcast_link is not None
+    assert webcast_link["href"] == "/mod/webcasts"
+
+    manage_form = soup.find(id="manage-team-media-form")
+    assert manage_form is not None
+
+    team_input = manage_form.find("input", id="manage-team-media-team-number")
+    assert team_input is not None
+
+    manage_button = manage_form.find("button", id="manage-team-media-button")
+    assert manage_button is not None
+    assert manage_button["type"] == "button"
+    assert "/mod?team=" in manage_button["onclick"]
+    assert "&year=" in manage_button["onclick"]
+
+
+def test_hides_review_media_tools_without_review_media_permission(
+    login_user, web_client: Client
+) -> None:
+    login_user.permissions = [AccountPermission.REVIEW_DESIGNS]
+
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    assert soup.find("a", id="webcast-dashboard-link") is None
+    assert soup.find(id="manage-team-media-form") is None
+
+
+def test_shows_offseason_dashboard_for_offseason_permission(
+    login_user, web_client: Client
+) -> None:
+    login_user.permissions = [AccountPermission.REVIEW_OFFSEASON_EVENTS]
+
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    offseason_link = soup.find("a", id="offseason-dashboard-link")
+    assert offseason_link is not None
+    assert offseason_link["href"] == "/mod/offseasons"
+
+
+def test_hides_offseason_dashboard_without_offseason_permission(
+    login_user, web_client: Client
+) -> None:
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    assert soup.find("a", id="offseason-dashboard-link") is None

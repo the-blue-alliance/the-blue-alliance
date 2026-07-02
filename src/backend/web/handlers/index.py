@@ -86,9 +86,39 @@ def index_buildseason(template_values: Dict[str, Any]) -> str:
     return render_template("index/index_buildseason.html", template_values)
 
 
+def _get_top_online_events_by_viewers(
+    events: list[Event], limit: int = 10
+) -> list[Event]:
+    events_with_viewer_count: list[tuple[Event, int]] = []
+
+    for event in events:
+        max_viewer_count = 0
+        has_online_webcast = False
+
+        for webcast in event.online_webcasts:
+            if webcast.get("status") != "online":
+                continue
+
+            has_online_webcast = True
+
+            viewer_count = webcast.get("viewer_count")
+            if isinstance(viewer_count, int):
+                max_viewer_count = max(max_viewer_count, viewer_count)
+
+        if has_online_webcast:
+            events_with_viewer_count.append((event, max_viewer_count))
+
+    events_with_viewer_count.sort(
+        key=lambda event_with_viewer_count: event_with_viewer_count[1],
+        reverse=True,
+    )
+    return [event for event, _ in events_with_viewer_count[:limit]]
+
+
 def index_competitionseason(template_values: Dict[str, Any]) -> str:
     week_events = EventHelper.week_events()
     popular_teams_events = TeamHelper.getPopularTeamsEvents(week_events)
+    popular_online_events = _get_top_online_events_by_viewers(week_events, limit=10)
 
     # Only show special webcasts that aren't also hosting an event
     special_webcasts = []
@@ -121,6 +151,7 @@ def index_competitionseason(template_values: Dict[str, Any]) -> str:
             ),
             "special_webcasts": special_webcasts,
             "popular_teams_events": popular_teams_events,
+            "popular_online_events": popular_online_events,
         }
     )
     return render_template("index/index_competitionseason.html", template_values)

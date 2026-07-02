@@ -60,6 +60,17 @@ cron:
     schedule: every day 01:00
     timezone: America/Los_Angeles
 
+  # Insights V2
+  - description: Insights V2 Calculation
+    url: /backend-tasks-b2/enqueue/math/insights_v2
+    schedule: every day 21:00
+    timezone: America/Los_Angeles
+
+  - description: Insights V2 Calculation (All Years)
+    url: /backend-tasks-b2/enqueue/math/insights_v2/0
+    schedule: every day 21:30
+    timezone: America/Los_Angeles
+
   # Legacy Insights
   - description: Match Insights Calculation
     url: /backend-tasks-b2/enqueue/math/insights/matches
@@ -90,6 +101,11 @@ cron:
 
   - description: District Rankings Calculation
     url: /tasks/math/enqueue/district_rankings_calc
+    schedule: every day 01:05
+    timezone: America/Los_Angeles
+
+  - description: District Advancement Refresh
+    url: /tasks/enqueue/district_advancement
     schedule: every day 01:05
     timezone: America/Los_Angeles
 

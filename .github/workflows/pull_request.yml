@@ -14,8 +14,8 @@ jobs:
     name: "[py3] Type Check"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -33,8 +33,8 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -55,8 +55,8 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5]
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -73,7 +73,7 @@ jobs:
         run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -83,8 +83,8 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [py3-test]
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -106,7 +106,7 @@ jobs:
           uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.python == 'true'
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
@@ -114,8 +114,8 @@ jobs:
     name: "[node] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -139,8 +139,8 @@ jobs:
     name: "[node] Test"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -152,7 +152,9 @@ jobs:
         if: steps.changes.outputs.node == 'true'
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Dependencies
         if: steps.changes.outputs.node == 'true'
@@ -162,161 +164,16 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.node == 'true'
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
-  pwa-lint:
-    name: "[pwa] Format & Lint"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "10.24.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
-      - name: Install Dependencies
-        run: pnpm --dir pwa install --frozen-lockfile
-      - name: Run Format
-        run: pnpm --dir pwa run format
-      - name: Run Lint
-        run: pnpm --dir pwa run lint
-  pwa-type:
-    name: "[pwa] Type Check"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "10.24.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
-      - name: Install Dependencies
-        run: pnpm --dir pwa install --frozen-lockfile
-      - name: Run Type Check
-        run: pnpm --dir pwa run typecheck
-  pwa-test:
-    name: "[pwa] Test"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "10.24.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
-      - name: Install Dependencies
-        run: pnpm --dir pwa install --frozen-lockfile
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
-      - name: Run Test
-        run: pnpm --dir pwa test
-      - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v5.5.2
-        with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: ./pwa/coverage/
-  pwa-build:
-    name: "[pwa] Build"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "10.24.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
-      - name: Install Dependencies
-        run: pnpm --dir pwa install --frozen-lockfile
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
-          FIREBASE_API_KEY: fake-api-key"
-          GCLOUD_PROJECT_ID: demo-test"
-      - name: Run Build
-        run: pnpm --dir pwa run build
-
-  check-pwa-api:
-    name: "[pwa] Check API regeneration"
-    runs-on: ubuntu-24.04
-
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "10.24.0"
-
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
-
-      - name: Create dotenv
-        run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
-
-      - name: Install Dependencies
-        working-directory: pwa
-        run: pnpm install --frozen-lockfile
-
-      - name: Run generate-api.sh
-        working-directory: ./pwa
-        run: ./generate-api.sh
-
-      - name: Detect changes in pwa/app/api
-        run: |
-          CHANGED_FILES=$(git diff --name-only pwa/app/api)
-          if [[ -n "$CHANGED_FILES" ]]; then
-            echo "::error title=API Mismatch::Files changed in pwa/app/api:"
-            echo "$CHANGED_FILES"
-            exit 1
-          else
-            echo "No changes detected in pwa/app/api."
-          fi
-
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -329,7 +186,7 @@ jobs:
     name: "[py3] Check Python Version Consistency"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check Python Version
         run: ./ops/check_python_version.sh
 
@@ -337,8 +194,8 @@ jobs:
     name: Build Web
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -347,11 +204,9 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
+      - name: Set up uv
         if: steps.changes.outputs.buildweb == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
+        uses: astral-sh/setup-uv@v7
       - name: Set up Node
         if: steps.changes.outputs.buildweb == 'true'
         uses: actions/setup-node@v6
@@ -368,14 +223,9 @@ jobs:
   ops-test:
     name: Ops Fullstack Test
     runs-on: ubuntu-24.04
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -403,56 +253,36 @@ jobs:
         if: steps.changes.outputs.web == 'true'
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Node Dependencies
         if: steps.changes.outputs.web == 'true'
         run: |
           npm ci
           npm install -g capture-website-cli
-      - name: Install Vagrant
-        if: steps.changes.outputs.web == 'true'
-        run: |
-          wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-          sudo apt update
-          sudo apt install vagrant
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-      - name: Set up Docker Buildx
+      - name: Start Containers
         if: steps.changes.outputs.web == 'true'
-        id: buildx
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: network=host
-      - name: Build Docker Image
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+      - name: Test Docker Startup
         if: steps.changes.outputs.web == 'true'
-        uses: docker/build-push-action@v6.19.2
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: ./ops/dev/docker
-          push: true
-          tags: localhost:5000/tba-py3-dev:latest
-          cache-from: |
-            type=gha
-            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-          cache-to: type=gha,mode=max
-      - name: Start Container
+        run: python ./ops/test_docker_startup.py
+      - name: Pre-pull companion import image
         if: steps.changes.outputs.web == 'true'
-        run: vagrant up
-      - name: Test Vagrant Startup
-        if: steps.changes.outputs.web == 'true'
-        run: ./ops/test_vagrant_startup.py
+        run: docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest
       - name: Test Ops Fullstack
         if: steps.changes.outputs.web == 'true'
         run: ./ops/test_ops.sh
       - name: Capture screenshots
         if: steps.changes.outputs.web == 'true'
-        run: ./ops/pr_screenshots/capture_screenshots.py
+        run: python ./ops/pr_screenshots/capture_screenshots.py
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: ci_screenshots
           path: ci_screenshots.pickle

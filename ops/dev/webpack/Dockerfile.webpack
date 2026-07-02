@@ -1,0 +1,8 @@
+FROM node:24-bookworm-slim
+
+# Install uv for Python dependency management (uv manages its own Python)
+COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
+
+WORKDIR /tba
+
+ENTRYPOINT ["./ops/dev/webpack/entrypoint.sh"]

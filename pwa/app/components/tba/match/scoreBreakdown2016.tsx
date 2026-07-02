@@ -2,6 +2,8 @@ import {
   Match,
   MatchScoreBreakdown2016,
   MatchScoreBreakdown2016Alliance,
+  RobotAuto2016WithUnknown,
+  RobotAuto2016WithoutUnknown,
 } from '~/api/tba/read';
 import {
   ConditionalCheckmark,
@@ -63,22 +65,26 @@ export default function ScoreBreakdown2016({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.robot1Auto === 'Crossed' ||
-              scoreBreakdown.red.robot1Auto === 'Reached'
+              scoreBreakdown.red.robot1Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.red.robot1Auto === RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.robot2Auto === 'Crossed' ||
-              scoreBreakdown.red.robot2Auto === 'Reached'
+              scoreBreakdown.red.robot2Auto ===
+                RobotAuto2016WithoutUnknown.CROSSED ||
+              scoreBreakdown.red.robot2Auto ===
+                RobotAuto2016WithoutUnknown.REACHED
             }
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.robot3Auto === 'Crossed' ||
-              scoreBreakdown.red.robot3Auto === 'Reached'
+              scoreBreakdown.red.robot3Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.red.robot3Auto === RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.red.team_keys[2]}
           />
@@ -93,22 +99,28 @@ export default function ScoreBreakdown2016({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.robot1Auto === 'Crossed' ||
-              scoreBreakdown.blue.robot1Auto === 'Reached'
+              scoreBreakdown.blue.robot1Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.blue.robot1Auto ===
+                RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.robot2Auto === 'Crossed' ||
-              scoreBreakdown.blue.robot2Auto === 'Reached'
+              scoreBreakdown.blue.robot2Auto ===
+                RobotAuto2016WithoutUnknown.CROSSED ||
+              scoreBreakdown.blue.robot2Auto ===
+                RobotAuto2016WithoutUnknown.REACHED
             }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.robot3Auto === 'Crossed' ||
-              scoreBreakdown.blue.robot3Auto === 'Reached'
+              scoreBreakdown.blue.robot3Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.blue.robot3Auto ===
+                RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.blue.team_keys[2]}
           />

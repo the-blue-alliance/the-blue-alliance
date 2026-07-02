@@ -135,6 +135,29 @@ def test_clear_first_code() -> None:
 
 
 @pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
+@pytest.mark.parametrize(
+    ("attr", "manual_value", "datafeed_value"),
+    [("first_code", "manual-first", None), ("nexus_code", "manual-nexus", "api-nexus")],
+)
+def test_datafeed_does_not_overwrite_always_manual_attrs(
+    attr: str,
+    manual_value: str,
+    datafeed_value: str | None,
+    old_event: Event,
+    new_event: Event,
+) -> None:
+    setattr(old_event, attr, manual_value)
+    EventManipulator.createOrUpdate(old_event)
+
+    setattr(new_event, attr, datafeed_value)
+    EventManipulator.createOrUpdate(new_event, update_manual_attrs=False)
+
+    updated_event = none_throws(Event.get_by_id("2011ct"))
+    assert getattr(updated_event, attr) == manual_value
+    assert updated_event.facebook_eid == "7"
+
+
+@pytest.mark.usefixtures("ndb_context", "taskqueue_stub")
 @pytest.mark.parametrize("official", [True, False])
 @patch.object(LocationHelper, "get_timezone_id")
 @patch.object(LocationHelper, "get_event_location")

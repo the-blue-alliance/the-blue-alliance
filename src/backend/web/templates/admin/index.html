@@ -59,19 +59,19 @@ $(function () {
 {% block content %}
 
 <div class="row">
-    <div class="col-xs-12">
+    <div class="col-xs-6">
         <div class="panel panel-default">
             <div class="panel-heading">
-                <h3 class="panel-title">Setup</h3>
+                <h3 class="panel-title">Status</h3>
             </div>
             <div class="panel-body">
-                <p>See the <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/docs/Setup/Setup-Guide-Beta.md">Setup Guide</a> to set up a dev instance.</p>
+                {% if commit_sha %}
+                <p>Running commit: <a href="https://github.com/the-blue-alliance/the-blue-alliance/commit/{{commit_sha}}"><code>{{commit_sha[:12]}}</code></a>{% if commit_shortlog %} {{commit_shortlog}}{% endif %}</p>
+                {% else %}
+                <p>Running commit: <em>unknown</em></p>
+                {% endif %}
             </div>
         </div>
-    </div>
-</div>
-<div class="row">
-    <div class="col-xs-6">
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Stats</h3>
@@ -93,6 +93,14 @@ $(function () {
         </div>
     </div>
     <div class="col-xs-6">
+        <div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">Setup</h3>
+            </div>
+            <div class="panel-body">
+                <p>See the <a href="https://github.com/the-blue-alliance/the-blue-alliance/blob/master/docs/Setup/Setup-Guide.md">Setup Guide</a> to set up a dev instance.</p>
+            </div>
+        </div>
         <div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">New Users</h3>

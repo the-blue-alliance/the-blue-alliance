@@ -4,7 +4,7 @@ import datetime
 import json
 import re
 import typing
-from typing import Any, cast, Dict, Generator, List, Optional, Set
+from typing import Any, cast, Dict, Generator, List, Optional, Set, TypedDict
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -25,7 +25,10 @@ from backend.common.models.alliance import EventAlliance
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
 from backend.common.models.event_details import EventDetails
-from backend.common.models.event_district_points import EventDistrictPoints
+from backend.common.models.event_district_points import (
+    EventDistrictPoints,
+    EventRegionalChampsPoolPoints,
+)
 from backend.common.models.event_playoff_advancement import (
     TBracketTable,
     TPlayoffAdvancement,
@@ -40,6 +43,18 @@ if typing.TYPE_CHECKING:
     from backend.common.models.award import Award
     from backend.common.models.match import Match
     from backend.common.models.team import Team
+
+
+class EventNameOverride(TypedDict):
+    name: str
+    short_name: str
+
+
+class EventSyncOverrides(TypedDict, total=False):
+    event_sync_disable: bool
+    set_start_day_to_last: bool
+    skip_eventteams: bool
+    event_name_override: EventNameOverride
 
 
 class Event(CachedModel):
@@ -87,6 +102,9 @@ class Event(CachedModel):
     first_code = (
         ndb.StringProperty()
     )  # Event code used in FIRST's API, if different from event_short
+    nexus_code = (
+        ndb.StringProperty()
+    )  # Event code used in Nexus API, if different from first_api_code
     year: Year = ndb.IntegerProperty(required=True)
     district_key: Optional[ndb.Key] = ndb.KeyProperty(kind=District)
     start_date = ndb.DateTimeProperty()
@@ -134,6 +152,9 @@ class Event(CachedModel):
     remap_teams: Dict[TeamKey, TeamKey] = (
         ndb.JsonProperty()
     )  # Map of temporary "off-season demo" team numbers to pre-rookie and B teams. key is the old team key, value is the new team key
+    sync_overrides: Optional[EventSyncOverrides] = cast(
+        Optional[EventSyncOverrides], ndb.JsonProperty(indexed=False)
+    )
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -148,6 +169,7 @@ class Event(CachedModel):
         "enable_predictions",
         "facebook_eid",
         "first_code",
+        "nexus_code",
         "first_eid",
         "city",
         "state_prov",
@@ -166,15 +188,22 @@ class Event(CachedModel):
         "website",
         "year",
         "remap_teams",
+        "sync_overrides",
     }
 
     _allow_none_attrs: Set[str] = {
         "district_key",
         "first_code",
+        "nexus_code",
     }
 
     _list_attrs: Set[str] = {
         "divisions",
+    }
+
+    _always_manual_attrs: Set[str] = {
+        "first_code",
+        "nexus_code",
     }
 
     def __init__(self, *args, **kw):
@@ -252,7 +281,7 @@ class Event(CachedModel):
             return self.details.district_points
 
     @property
-    def regional_champs_pool_points(self) -> Optional[EventDistrictPoints]:
+    def regional_champs_pool_points(self) -> Optional[EventRegionalChampsPoolPoints]:
         if self.event_type_enum != EventType.REGIONAL or self.details is None:
             return None
 
@@ -361,6 +390,38 @@ class Event(CachedModel):
     @property
     def within_a_day(self) -> bool:
         return self.withinDays(-1, 1)
+
+    def should_skip_eventteams(self) -> bool:
+        config = cast(EventSyncOverrides, self.sync_overrides or {})
+        if config.get("skip_eventteams", False):
+            return True
+
+        # For events that have divisions (like DCMP or Einstein), the FRC API returns
+        # team registrations. Once the event starts though, we want the registrations
+        # to only be for the division, and let the "finals" event only include teams
+        # who play a match or win an award
+        if (
+            self.event_type_enum in [EventType.DISTRICT_CMP, EventType.CMP_FINALS]
+            and len(self.divisions) > 0
+            and (self.now or self.past)
+        ):
+            return True
+
+        return False
+
+    @property
+    def should_use_short_cache(self) -> bool:
+        """Returns True if the event page should use the short cache timer (61s).
+
+        Events with divisions or a parent event use the short cache timer for
+        7 days before the event starts through 1 day after. All other events
+        use the short cache timer only when within_a_day.
+        """
+        if self.within_a_day:
+            return True
+        if bool(self.divisions or self.parent_event):
+            return self.withinDays(-7, 1)
+        return False
 
     @property
     def past(self) -> bool:
@@ -580,16 +641,20 @@ class Event(CachedModel):
             try:
                 self._webcast: List[Webcast] = json.loads(self.webcast_json)
 
-                # Sort firstinspires channels to the front, keep the order of the rest
+                # Sort firstinspires channels to the front, then by date ascending
+                # Webcasts without a date sort last (they apply to all days)
                 self._webcast = sorted(
                     self._webcast or [],
                     key=lambda w: (
-                        0
-                        if (
-                            w["type"] == "twitch"
-                            and w["channel"].startswith("firstinspires")
-                        )
-                        else 1
+                        (
+                            0
+                            if (
+                                w["type"] == "twitch"
+                                and w["channel"].startswith("firstinspires")
+                            )
+                            else 1
+                        ),
+                        w.get("date") or "9999-99-99",
                     ),
                 )
             except Exception:
@@ -606,13 +671,19 @@ class Event(CachedModel):
 
         for webcast, with_status in zip(self.current_webcasts, statuses):
             if with_status is not None:
-                webcast.update(
-                    WebcastOnlineStatus(
-                        status=with_status["status"],
-                        stream_title=with_status["stream_title"],
-                        viewer_count=with_status["viewer_count"],
-                    )
-                )
+                patched_status: WebcastOnlineStatus = {}
+                if "status" in with_status:
+                    patched_status["status"] = with_status["status"]
+                if "stream_title" in with_status:
+                    patched_status["stream_title"] = with_status["stream_title"]
+                if "viewer_count" in with_status:
+                    patched_status["viewer_count"] = with_status["viewer_count"]
+                if "scheduled_start_time_utc" in with_status:
+                    patched_status["scheduled_start_time_utc"] = with_status[
+                        "scheduled_start_time_utc"
+                    ]
+
+                webcast.update(patched_status)
 
     @property
     def webcast_status(self) -> str:
@@ -732,6 +803,16 @@ class Event(CachedModel):
         match = re.match(key_name_regex, event_key)
         return True if match else False
 
+    @classmethod
+    def render_key_name(cls, year: Year, event_short: str) -> EventKey:
+        """
+        Renders an event key from a year and event short code.
+
+        Note this does not validate `event_short`; callers should validate the
+        resulting key with `validate_key_name` when handling untrusted input.
+        """
+        return f"{year}{event_short.lower()}"
+
     @property
     def event_district_str(self) -> Optional[str]:
         from backend.common.queries.district_query import DistrictQuery
@@ -788,6 +869,28 @@ class Event(CachedModel):
         if self.first_code is None:
             return self.compute_first_api_code(self.year, self.event_short)
         return self.first_code
+
+    @property
+    def nexus_api_code(self) -> str:
+        if self.nexus_code is not None:
+            return self.nexus_code
+        return self.first_api_code
+
+    @property
+    def nexus_code_for_api(self) -> str:
+        """
+        Returns the properly formatted Nexus event key for API/URL construction.
+        Handles demo events and year-prefixed codes to avoid double-prefixing.
+        """
+        code = self.nexus_api_code
+        # Return as-is if already year-prefixed (e.g., "2026demo0755")
+        if len(code) >= 4 and code[:4].isdigit():
+            return code
+        # Return as-is if demo event (e.g., "demo0755")
+        if code.lower().startswith("demo"):
+            return code
+        # Otherwise, prefix with year (e.g., "test" -> "2026test")
+        return f"{self.year}{code}"
 
     @classmethod
     def compute_first_api_code(cls, year: int, event_short: str) -> str:

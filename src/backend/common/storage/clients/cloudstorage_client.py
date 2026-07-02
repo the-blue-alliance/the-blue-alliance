@@ -41,17 +41,18 @@ class CloudStorageClient(StorageClient):
         except NotFoundError:
             return None
 
-    def get_files(self, path: str | None = None) -> list[str]:
+    def get_files(self, path: str | None = None, recursive: bool = False) -> list[str]:
         list_path = Path(self.bucket)
         if path:
             list_path /= Path(path)
 
         bucket_prefix = f"/{self.bucket}/"
+        delimiter = None if (path is None or recursive) else "/"
         return [
             obj.filename[len(bucket_prefix) :]
             for obj in listbucket(
                 f"/{str(list_path)}/",
-                delimiter="/" if path else None,
+                delimiter=delimiter,
             )
             if not obj.is_dir
         ]

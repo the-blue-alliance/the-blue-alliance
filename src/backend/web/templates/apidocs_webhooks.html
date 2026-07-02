@@ -489,7 +489,7 @@
             <pre class="example-json">
             {"message_data": {"event_key": "2014necmp", "event_name": "New England FRC Region Championship", "first_match_time": 1397330280}, "message_type": "schedule_updated"}
             </pre>
-            {% with type=types.starting_comp_level, event_key='2014necmp', match_key='2014necmp_f1m1' %}
+            {% with type=types.schedule_updated, event_key='2014necmp', match_key='2014necmp_f1m1' %}
               {% include "apidocs_partials/apidocs_webhooks_test.html" %}
             {% endwith %}
 

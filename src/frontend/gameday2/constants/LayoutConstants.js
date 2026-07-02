@@ -8,11 +8,11 @@ export const MAX_SUPPORTED_VIEWS = 9;
 
 // Maps a layout ID to the number of views that layout supports
 // The layout ID is the index into this array
-export const NUM_VIEWS_FOR_LAYOUT = [1, 2, 3, 4, 4, 5, 6, 8, 9, 2, 7, 8];
+export const NUM_VIEWS_FOR_LAYOUT = [1, 2, 3, 4, 4, 5, 6, 8, 9, 2, 7, 8, 3];
 
 // Defines the order layouts are shown in the layout selection list
 // Each element is the number of the layout that should be shown at that index
-export const LAYOUT_DISPLAY_ORDER = [0, 1, 9, 2, 3, 4, 5, 6, 10, 7, 11, 8];
+export const LAYOUT_DISPLAY_ORDER = [0, 1, 9, 2, 12, 3, 4, 5, 6, 10, 7, 11, 8];
 
 // Maps a layout ID for the appropriate name for that layout
 export const NAME_FOR_LAYOUT = [
@@ -28,6 +28,7 @@ export const NAME_FOR_LAYOUT = [
   "Horizontal Split View",
   '"1+6" View',
   "Octo-View (Vertical)",
+  "Triple View",
 ];
 
 // Holds SVG path data that can be used to render icons for each layout
@@ -45,6 +46,7 @@ export const LAYOUT_SVG_PATHS = [
   "M0 0h23v7h-23v-7z M0 8h23v7h-23v-7z",
   "M0,0h17v9.8H0V0z M17.7,0H23v4.6h-5.3v4.6V0z M17.7,5.2H23v4.6h-5.3v4.6V5.2z M5.9,10.3h5.3V15H5.9v4.7V10.3z M0,10.3h5.3V15H0v4.7V10.3z M11.8,10.4H17V15h-5.3v4.6C11.8,19.7,11.8,10.4,11.8,10.4z M17.7,10.4H23V15h-5.3v4.6V10.4z",
   "M0 0h11v3h-11v-3z M0 4h11v3h-11v-3z M0 8h11v3h-11v-3z M0 12h11v3h-11v-3z M12 0h11v3h-11v-3z M12 4h11v3h-11v-3z M12 8h11v3h-11v-3z M12 12h11v3h-11v-3z",
+  "M0 0h23v4h-23v-4z M0 5.5h23v4h-23v-4z M0 11h23v4h-23v-4z",
 ];
 
 // Holds styling information about the various layouts
@@ -620,6 +622,42 @@ const LAYOUT_11 = [
   },
 ];
 
+/* Layout 12
+
+ +-------------+
+ |      0      |
+ |-------------|
+ |      1      |
+ |-------------|
+ |      2      |
+ +-------------+
+
+ */
+
+const LAYOUT_12 = [
+  {
+    width: "100%",
+    height: "33.33%",
+    top: 0,
+    left: 0,
+    position: "absolute",
+  },
+  {
+    width: "100%",
+    height: "33.33%",
+    top: "33.33%",
+    left: 0,
+    position: "absolute",
+  },
+  {
+    width: "100%",
+    height: "33.33%",
+    top: "66.66%",
+    left: 0,
+    position: "absolute",
+  },
+];
+
 export const LAYOUT_STYLES = [
   LAYOUT_0,
   LAYOUT_1,
@@ -633,4 +671,5 @@ export const LAYOUT_STYLES = [
   LAYOUT_9,
   LAYOUT_10,
   LAYOUT_11,
+  LAYOUT_12,
 ];

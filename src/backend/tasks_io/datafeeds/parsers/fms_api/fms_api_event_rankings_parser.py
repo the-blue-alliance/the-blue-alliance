@@ -1,10 +1,10 @@
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import (
     EventRankingListModelV2,
     EventRankingTeamModelV2,
 )
 from backend.common.helpers.rankings_helper import RankingsHelper
 from backend.common.models.event_ranking import EventRanking
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class FMSAPIEventRankingsParser(

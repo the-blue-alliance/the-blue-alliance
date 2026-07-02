@@ -64,4 +64,14 @@
     </tr>
 </table>
 
+<h3>Recent Audit Logs</h3>
+{% if audit_logs %}
+    {% set logs = audit_logs %}
+    {% set accounts_by_key = audit_log_accounts_by_key %}
+    {% set show_account_column = False %}
+    {% include "admin/audit_log_table.html" %}
+{% else %}
+    <p>No audit log entries for this user.</p>
+{% endif %}
+
 {% endblock %}

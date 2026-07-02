@@ -24,7 +24,7 @@ from backend.common.models.match import Match
 from backend.tasks_io.datafeeds.datafeed_nexus import NexusEventQueueStatus
 
 
-def create_event(official: bool) -> Event:
+def create_event(official: bool, nexus_code: str | None = None) -> Event:
     e = Event(
         id="2019casj",
         year=2019,
@@ -33,6 +33,7 @@ def create_event(official: bool) -> Event:
         end_date=datetime.datetime(2019, 4, 3),
         event_type_enum=EventType.REGIONAL,
         official=official,
+        nexus_code=nexus_code,
     )
     e.put()
     return e
@@ -97,6 +98,21 @@ def test_enqueue_current_skips_unofficial(
 
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
     assert len(tasks) == 0
+
+
+@freeze_time("2019-04-01")
+def test_enqueue_current_includes_unofficial_with_nexus_code(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    create_event(official=False, nexus_code="demoevent")
+
+    resp = tasks_client.get("/tasks/enqueue/nexus_queue_status/now")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="datafeed")
+    assert len(tasks) == 1
+    assert tasks[0].url == "/tasks/get/nexus_queue_status/2019casj"
 
 
 def test_fetch_bad_key(

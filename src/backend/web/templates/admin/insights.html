@@ -1,0 +1,120 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Insights ({{year}}){% endblock %}
+
+{% block content %}
+
+<h1>Insights ({{year}})</h1>
+
+<div class="btn-group" style="margin-bottom: 16px;">
+  <a class="btn btn-default btn-lg dropdown-toggle" data-toggle="dropdown" href="#">
+    {{year}}
+    <span class="caret"></span>
+  </a>
+  <ul class="dropdown-menu tba-dropdown-menu-limited">
+    {% for y in valid_years %}
+      <li><a href="/admin/insights/{{y}}">{{y}}</a></li>
+    {% endfor %}
+  </ul>
+</div>
+
+<hr>
+
+<h2>Enqueue Computations for {{year}}</h2>
+<div class="row" style="margin-bottom: 8px;">
+  <div class="col-sm-12">
+    <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/insights/matches/{{year}}"><span class="glyphicon glyphicon-fast-forward"></span> Enqueue Match Insights ({{year}})</a>
+    <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/insights/awards/{{year}}"><span class="glyphicon glyphicon-fast-forward"></span> Enqueue Award Insights ({{year}})</a>
+    <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/insights/predictions/{{year}}"><span class="glyphicon glyphicon-fast-forward"></span> Enqueue Prediction Insights ({{year}})</a>
+  </div>
+</div>
+<div class="row" style="margin-bottom: 8px;">
+  <div class="col-sm-12">
+    <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/overallinsights/matches"><span class="glyphicon glyphicon-fast-forward"></span> Enqueue Overall Match Insights</a>
+    <a class="btn btn-warning" href="/backend-tasks-b2/enqueue/math/overallinsights/awards"><span class="glyphicon glyphicon-fast-forward"></span> Enqueue Overall Award Insights</a>
+  </div>
+</div>
+<div class="row" style="margin-bottom: 16px;">
+  <div class="col-sm-12">
+    <a class="btn btn-info" href="/backend-tasks-b2/enqueue/math/insights/districts/{{year}}"><span class="glyphicon glyphicon-fast-forward"></span> Enqueue All District Insights (fan-out per district)</a>
+    {% if district_insights %}
+    <div class="btn-group" style="margin-left: 8px;">
+      <button class="btn btn-info dropdown-toggle" data-toggle="dropdown">
+        Enqueue Single District <span class="caret"></span>
+      </button>
+      <ul class="dropdown-menu">
+        {% for abbrev in district_insights.keys() %}
+        <li><a href="/backend-tasks-b2/do/math/insights/districts/{{year}}/{{abbrev}}">{{abbrev}}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </div>
+</div>
+
+<hr>
+
+<h2>Global Insights for {{year}}</h2>
+{% if global_insights %}
+<table class="table table-striped table-condensed">
+  <thead>
+    <tr>
+      <th>Key</th>
+      <th>Name</th>
+      <th>Updated</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for insight in global_insights %}
+    <tr>
+      <td><code>{{insight.key.id()}}</code></td>
+      <td>{{insight.name}}</td>
+      <td>{{insight.updated.strftime('%Y-%m-%d %H:%M') if insight.updated else '—'}}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p class="text-muted">No global insights stored for {{year}}.</p>
+{% endif %}
+
+<hr>
+
+<h2>District Insights for {{year}}</h2>
+{% if district_insights %}
+  {% for abbrev, insights in district_insights.items() %}
+  <h3>
+    {{abbrev}}
+    <small>
+      <a class="btn btn-xs btn-info" href="/backend-tasks-b2/do/math/insights/districts/{{year}}/{{abbrev}}">
+        <span class="glyphicon glyphicon-fast-forward"></span> Recompute
+      </a>
+      <a class="btn btn-xs btn-default" href="/district/{{abbrev}}/insights">View on site</a>
+    </small>
+  </h3>
+  <table class="table table-striped table-condensed">
+    <thead>
+      <tr>
+        <th>Key</th>
+        <th>Name</th>
+        <th>Year</th>
+        <th>Updated</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for insight in insights %}
+      <tr>
+        <td><code>{{insight.key.id()}}</code></td>
+        <td>{{insight.name}}</td>
+        <td>{{insight.year if insight.year != 0 else 'overall'}}</td>
+        <td>{{insight.updated.strftime('%Y-%m-%d %H:%M') if insight.updated else '—'}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  {% endfor %}
+{% else %}
+<p class="text-muted">No district insights stored for {{year}}.</p>
+{% endif %}
+
+{% endblock %}

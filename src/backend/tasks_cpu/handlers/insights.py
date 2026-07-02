@@ -1,4 +1,5 @@
 import logging
+import time
 from html import escape
 from typing import Optional
 
@@ -7,6 +8,7 @@ from google.appengine.api import taskqueue
 from werkzeug.wrappers import Response
 
 from backend.common.consts.insight_type import InsightType
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.insights_helper import InsightsHelper
 from backend.common.helpers.insights_leaderboard_event_helper import (
     InsightsLeaderboardEventHelper,
@@ -18,10 +20,13 @@ from backend.common.helpers.insights_leaderboard_team_helper import (
     InsightsLeaderboardTeamCalculator,
 )
 from backend.common.helpers.insights_notable_helper import InsightsNotableHelper
+from backend.common.helpers.insights_v2.registry import make_all_insights
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
+from backend.common.manipulators.insight_v2_manipulator import InsightV2Manipulator
 from backend.common.models.insight import Insight, LeaderboardKeyType
-from backend.common.models.keys import Year
+from backend.common.models.keys import DistrictAbbreviation, Year
+from backend.common.queries.district_query import DistrictsInYearQuery
 
 blueprint = Blueprint("insights", __name__)
 
@@ -283,6 +288,158 @@ def enqueue_all_insights_of_kind(kind: str) -> Response:
         )
 
     return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights/districts/<int:year>")
+@blueprint.route(
+    "/backend-tasks-b2/enqueue/math/insights/districts",
+    defaults={"year": None},
+)
+def enqueue_district_insights(year: Optional[Year] = None) -> Response:
+    """
+    Enqueues one district-insights task per district abbreviation, so each
+    task is small enough to complete within the request deadline.
+    """
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    if year == 0:
+        # year=0 means compute overall/all-time aggregate insights for every
+        # known district abbreviation.
+        abbreviations = RenamedDistricts.get_latest_codes()
+        for abbrev in abbreviations:
+            taskqueue.add(
+                url=url_for(
+                    "insights.do_district_insights_for_abbreviation",
+                    year=0,
+                    abbrev=abbrev,
+                ),
+                method="GET",
+                target="py3-tasks-cpu",
+                queue_name="backend-tasks",
+            )
+
+        if "X-Appengine-Taskname" not in request.headers:
+            return make_response(
+                f"enqueued overall district insights for {len(abbreviations)} district abbreviations"
+            )
+
+        return make_response("")
+
+    districts = DistrictsInYearQuery(year).fetch()
+    for district in districts:
+        taskqueue.add(
+            url=url_for(
+                "insights.do_district_insights_for_abbreviation",
+                year=year,
+                abbrev=district.abbreviation,
+            ),
+            method="GET",
+            target="py3-tasks-cpu",
+            queue_name="backend-tasks",
+        )
+
+    if "X-Appengine-Taskname" not in request.headers:
+        return make_response(
+            f"enqueued district insights for {len(districts)} districts in year {year}"
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/do/math/insights/districts/<int:year>/<abbrev>")
+def do_district_insights_for_abbreviation(abbrev: str, year: Year) -> Response:
+    """
+    Calculates district insights for a single district abbreviation.
+    """
+    start = time.perf_counter()
+    logging.info(
+        "District insights task start district=%s year=%s task=%s",
+        abbrev,
+        year,
+        request.headers.get("X-Appengine-Taskname", "manual"),
+    )
+
+    insights = InsightsHelper.doDistrictInsightsForAbbreviation(
+        DistrictAbbreviation(abbrev), year=year if year != 0 else None
+    )
+
+    logging.info(
+        "District insights task computed district=%s year=%s insights=%s elapsed=%.3fs",
+        abbrev,
+        year,
+        len(insights),
+        time.perf_counter() - start,
+    )
+
+    if insights:
+        write_start = time.perf_counter()
+        InsightManipulator.createOrUpdate(insights)
+        logging.info(
+            "District insights task wrote district=%s year=%s insights=%s elapsed=%.3fs total=%.3fs",
+            abbrev,
+            year,
+            len(insights),
+            time.perf_counter() - write_start,
+            time.perf_counter() - start,
+        )
+    else:
+        logging.info(
+            "District insights task empty district=%s year=%s total=%.3fs",
+            abbrev,
+            year,
+            time.perf_counter() - start,
+        )
+
+    if "X-Appengine-Taskname" not in request.headers:
+        return make_response(
+            render_template(
+                "math/year_insights_do.html",
+                kind=f"districts/{year}/{abbrev}",
+                insights=insights,
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights_v2/<int:year>")
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights_v2", defaults={"year": None})
+def enqueue_insights_v2(year: Optional[Year] = None) -> Response:
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    taskqueue.add(
+        url=url_for("insights.do_insights_v2", year=year),
+        method="GET",
+        target="py3-tasks-cpu",
+        queue_name="backend-tasks",
+    )
+
+    return make_response(f"enqueued insights_v2 for year {escape(str(year))}")
+
+
+@blueprint.route("/backend-tasks-b2/enqueue/math/insights_v2/all")
+def enqueue_insights_v2_all() -> Response:
+    for year in SeasonHelper.get_valid_years():
+        taskqueue.add(
+            url=url_for("insights.do_insights_v2", year=year),
+            method="GET",
+            target="py3-tasks-cpu",
+            queue_name="backend-tasks",
+        )
+
+    return make_response("enqueued insights_v2 for all years")
+
+
+@blueprint.route("/backend-tasks-b2/do/math/insights_v2/<int:year>")
+def do_insights_v2(year: Year) -> Response:
+    insights = make_all_insights(year)
+
+    if insights:
+        InsightV2Manipulator.createOrUpdate(insights)
+
+    return make_response(repr(insights))
 
 
 @blueprint.route("/backend-tasks-b2/do/math/insights/delete/<name>")

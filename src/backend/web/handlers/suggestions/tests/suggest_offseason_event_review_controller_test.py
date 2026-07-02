@@ -4,12 +4,14 @@ from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.suggestions.suggestion_creator import (
@@ -142,6 +144,35 @@ def test_accept_suggestion_normalize_event_short_and_first_code(
     assert event.event_short == "test"
     assert event.official is True
     assert event.first_code == "FRCTEST"
+
+
+def test_accept_suggestion_strips_first_code_whitespace(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+    assert form_fields != {}
+
+    form_fields["event_short"] = "test"
+    form_fields["first_code"] = " frctest "
+    form_fields["verdict"] = "accept"
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+        follow_redirects=True,
+    )
+    assert response.status_code == 200
+
+    event = Event.get_by_id("2016test")
+    assert event is not None
+    assert event.first_code == "FRCTEST"
+    assert event.official is True
 
 
 def test_reject_suggestion(
@@ -287,3 +318,53 @@ def test_accept_suggestion_override_to_offseason(
     event = Event.get_by_id("2016overtest")
     assert event is not None
     assert event.event_type_enum == EventType.OFFSEASON
+
+
+def test_accept_creates_audit_log_with_new_event_key(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+    taskqueue_stub,
+) -> None:
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+
+    form_fields["event_short"] = "test"
+    form_fields["verdict"] = "accept"
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+    )
+    assert response.status_code == 302
+
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.account == login_user_with_permission.account_key
+    assert entry.endpoint == "suggestion_review.suggest_offseason_review"
+    assert entry.target_key == ndb.Key("Event", "2016test")
+
+
+def test_reject_does_not_create_audit_log(
+    login_user_with_permission,
+    web_client: Client,
+    ndb_stub,
+) -> None:
+    """Rejected offseason suggestions have no event key, so no audit log is written."""
+    suggestion_id = createSuggestion(login_user_with_permission)
+    queue, form_fields = get_suggestion_queue_and_fields(
+        web_client, f"review_{suggestion_id}"
+    )
+    assert queue == [suggestion_id]
+
+    form_fields["verdict"] = "reject"
+    response = web_client.post(
+        "/suggest/offseason/review",
+        data=form_fields,
+    )
+    assert response.status_code == 302
+
+    assert AuditLogEntry.query().count() == 0

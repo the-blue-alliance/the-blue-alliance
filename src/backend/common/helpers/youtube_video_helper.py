@@ -1,14 +1,22 @@
 import logging
 import re
+from datetime import datetime
 from typing import Any, cast, Dict, Generator, List, Optional, TypedDict
 from urllib import parse as urlparse
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
-from backend.common.sitevars.google_api_secret import GoogleApiSecret
+from backend.common.datafeeds.datafeed_youtube import (
+    YoutubeChannelListForHandleDatafeed,
+    YoutubePlaylistItemsDatafeed,
+    YoutubeUpcomingStreamsDatafeed,
+    YoutubeVideoDetailsDatafeed,
+)
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    ParsedVideoDetails,
+)
 from backend.common.tasklets import typed_tasklet
-from backend.common.urlfetch import URLFetchResult
 
 
 class YouTubePlaylistItem(TypedDict):
@@ -17,7 +25,24 @@ class YouTubePlaylistItem(TypedDict):
     guessed_match_partial: str
 
 
+class YouTubeUpcomingStream(TypedDict):
+    stream_id: str
+    title: str
+    description: str
+    scheduled_start_time: str
+    live_broadcast_content: str
+
+
+class YouTubeChannel(TypedDict):
+    channel_id: str
+    channel_name: str
+
+
 class YouTubeVideoHelper(object):
+    """
+    Helper class for YouTube URL parsing and YouTube API access.
+    """
+
     # Patterns to extract YouTube video ID from various URL formats
     VIDEO_ID_PATTERNS = [
         r".*youtu\.be\/([a-zA-Z0-9_-]*)",  # Short links: youtu.be/ID
@@ -87,120 +112,277 @@ class YouTubeVideoHelper(object):
 
     @classmethod
     @typed_tasklet
-    def get_scheduled_start_time(
-        cls, video_id: str
-    ) -> Generator[Any, Any, Optional[str]]:
+    def get_scheduled_start_times(
+        cls, video_ids: List[str]
+    ) -> Generator[Any, Any, Dict[str, str]]:
         """
-        Fetches the scheduledStartTime for a YouTube video from the YouTube API.
-        Returns the date in YYYY-MM-DD format, or None if not available.
+        Fetches scheduled start times for multiple YouTube videos.
+        Returns a dict of video_id -> start_date (YYYY-MM-DD) for videos with a
+        usable start date.
         """
-        yt_secret = GoogleApiSecret.secret_key()
-        if not yt_secret:
+        if not video_ids:
+            raise ndb.Return({})
+
+        try:
+            video_details = yield cls.get_video_details_batch(video_ids)
+        except ValueError:
             logging.warning(
                 "No Google API secret, unable to fetch YouTube video details"
             )
+            raise ndb.Return({})
+        except Exception:
+            logging.exception("Failed to fetch YouTube video scheduled start times")
+            raise ndb.Return({})
+
+        scheduled_start_times: Dict[str, str] = {}
+        for video_id in video_ids:
+            details = video_details.get(video_id)
+            if details is None:
+                continue
+
+            scheduled_start_time = details.get("scheduled_start_time")
+            actual_start_time = details.get("actual_start_time")
+
+            if scheduled_start_time is not None and actual_start_time is not None:
+                try:
+                    scheduled_start_datetime = datetime.fromisoformat(
+                        scheduled_start_time
+                    )
+                    actual_start_datetime = datetime.fromisoformat(actual_start_time)
+                    if actual_start_datetime.date() > scheduled_start_datetime.date():
+                        scheduled_start_times[video_id] = actual_start_time
+                        continue
+                except ValueError:
+                    logging.warning(
+                        "Unable to parse YouTube start times for %s (scheduled=%s, actual=%s)",
+                        video_id,
+                        scheduled_start_time,
+                        actual_start_time,
+                    )
+
+            if scheduled_start_time is not None:
+                scheduled_start_times[video_id] = scheduled_start_time
+
+        raise ndb.Return(scheduled_start_times)
+
+    @classmethod
+    @typed_tasklet
+    def get_video_details_batch(
+        cls, video_ids: List[str]
+    ) -> Generator[Any, Any, Dict[str, ParsedVideoDetails]]:
+        """
+        Fetches details for multiple YouTube video IDs in a single request.
+        Returns a dict mapping video_id to ParsedVideoDetails for every video
+        present in the YouTube API response. Video IDs absent from the result
+        were not found (deleted/invalid).
+        """
+        if not video_ids:
+            raise ndb.Return({})
+        datafeed = YoutubeVideoDetailsDatafeed(video_ids)
+        result = yield datafeed.fetch_async()
+        raise ndb.Return(result if result is not None else {})
+
+    @classmethod
+    @typed_tasklet
+    def resolve_channel_id(
+        cls, channel_username: str
+    ) -> Generator[Any, Any, Optional[YouTubeChannel]]:
+        """
+        Resolves a YouTube channel username/handle to a channel ID.
+        Returns channel metadata if found, else None.
+        """
+        normalized_handle = channel_username.strip().lstrip("@")
+        if not normalized_handle:
             raise ndb.Return(None)
 
-        url = f"https://www.googleapis.com/youtube/v3/videos?part=liveStreamingDetails&id={video_id}&key={yt_secret}"
         try:
-            ndb_context = ndb.get_context()
-            urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
-            urlfetch_result = URLFetchResult(url, urlfetch_response)
+            datafeed = YoutubeChannelListForHandleDatafeed(normalized_handle)
+            response = yield datafeed._fetch()
 
-            if urlfetch_result.status_code != 200:
-                logging.warning(
-                    f"YouTube API returned status {urlfetch_result.status_code}"
+            if response.status_code != 200:
+                raise ndb.Return(None)
+
+            raw_data = cast(Optional[dict], response.json())
+            if not raw_data or not raw_data.get("items"):
+                raise ndb.Return(None)
+
+            parsed_data = datafeed.parser().parse(raw_data)
+            if not parsed_data:
+                raise ndb.Return(None)
+
+            first_item = parsed_data[0]
+            resolved_channel_id = first_item.get("channel_id")
+            resolved_channel_name = first_item.get("channel_name")
+            if not resolved_channel_id:
+                raise ndb.Return(None)
+
+            raise ndb.Return(
+                YouTubeChannel(
+                    channel_id=resolved_channel_id,
+                    channel_name=resolved_channel_name or channel_username,
                 )
-                raise ndb.Return(None)
-
-            data = cast(Optional[dict], urlfetch_result.json())
-            if not data or not data.get("items"):
-                raise ndb.Return(None)
-
-            live_details = data["items"][0].get("liveStreamingDetails", {})
-            scheduled_start_time = live_details.get("scheduledStartTime")
-            if not scheduled_start_time:
-                raise ndb.Return(None)
-
-            # Parse ISO 8601 datetime and return as YYYY-MM-DD
-            raise ndb.Return(scheduled_start_time[:10])
+            )
+        except ValueError:
+            logging.warning("No Google API secret, unable to resolve YouTube channel")
+            raise ndb.Return(None)
         except ndb.Return:
             raise
         except Exception:
             logging.exception(
-                "Failed to fetch YouTube video scheduled start time for %s", video_id
+                "Failed to resolve YouTube channel handle '%s'",
+                channel_username,
             )
             raise ndb.Return(None)
+
+    @classmethod
+    @typed_tasklet
+    def resolve_channel_name(
+        cls, channel_name: str
+    ) -> Generator[Any, Any, Optional[YouTubeChannel]]:
+        """Backward-compatible wrapper around handle-based channel resolution."""
+        resolved_channel = yield cls.resolve_channel_id(channel_name)
+        raise ndb.Return(resolved_channel)
 
     @classmethod
     @typed_tasklet
     def videos_in_playlist(
         cls, playlist_id: str
     ) -> Generator[Any, Any, List[YouTubePlaylistItem]]:
-        videos: List[Dict] = []
-        yt_secret = GoogleApiSecret.secret_key()
-        if not yt_secret:
-            msg = "No Google API secret, unable to resolve playlist"
-            logging.warning(msg)
-            raise Exception(msg)
+        videos: List[YouTubePlaylistItem] = []
 
         next_page_token = ""
-        base_url = "https://www.googleapis.com/youtube/v3/playlistItems"
         i = 0
 
-        while i < 10:  # Precent runaway looping
+        while i < 10:  # Prevent runaway looping
             try:
-                # Build URL with query parameters
-                params = {
-                    "playlistId": playlist_id,
-                    "part": "id,snippet",
-                    "maxResults": "50",
-                    "pageToken": next_page_token,
-                    "key": yt_secret,
-                }
-                query_string = "&".join(f"{k}={v}" for k, v in params.items() if v)
-                url = f"{base_url}?{query_string}"
+                datafeed = YoutubePlaylistItemsDatafeed(
+                    playlist_id,
+                    max_results=50,
+                    page_token=next_page_token,
+                )
+            except ValueError:
+                msg = "No Google API secret, unable to resolve playlist"
+                logging.warning(msg)
+                raise Exception(msg)
 
-                ndb_context = ndb.get_context()
-                urlfetch_response = yield ndb_context.urlfetch(url, deadline=10)
-                urlfetch_result = URLFetchResult(url, urlfetch_response)
+            try:
+                response = yield datafeed._fetch()
 
-                if urlfetch_result.status_code != 200:
-                    logging.error(
-                        f"YouTube API returned status {urlfetch_result.status_code}"
-                    )
+                if response.status_code != 200:
+                    error_msg = f"YouTube API returned status {response.status_code} for {response.url}. Response: {response.content[:500] if response.content else 'No content'}"
+                    logging.error(error_msg)
                     raise Exception(
-                        f"Unable to call Youtube API for videos in playlist: status {urlfetch_result.status_code}"
+                        f"Unable to call YouTube API for videos in playlist '{playlist_id}': status {response.status_code}"
                     )
-            except Exception:
-                logging.exception("Unable to call Youtube API for videos in playlist")
+            except Exception as e:
+                logging.exception(
+                    "Unable to call YouTube API for videos in playlist '%s': %s",
+                    playlist_id,
+                    str(e),
+                )
                 raise
 
-            video_result = cast(Optional[dict], urlfetch_result.json())
+            video_result = cast(Optional[dict], response.json())
             if video_result is None:
                 logging.error("YouTube API returned no data")
                 break
 
-            videos += [
-                video
-                for video in video_result["items"]
-                if video["snippet"]["resourceId"]["kind"] == "youtube#video"
-            ]
+            for video in datafeed.parser().parse(video_result):
+                video_id = video.get("video_id")
+                if not video_id:
+                    continue
+                video_title = video.get("title", "")
+                videos.append(
+                    YouTubePlaylistItem(
+                        video_id=video_id,
+                        video_title=video_title,
+                        guessed_match_partial=cls.guessMatchPartial(video_title),
+                    )
+                )
 
             if "nextPageToken" not in video_result:
                 break
             next_page_token = video_result["nextPageToken"]
             i += 1
 
-        raise ndb.Return(
-            [
-                YouTubePlaylistItem(
-                    video_id=video["snippet"]["resourceId"]["videoId"],
-                    video_title=video["snippet"]["title"],
-                    guessed_match_partial=cls.guessMatchPartial(
-                        video["snippet"]["title"]
-                    ),
+        raise ndb.Return(videos)
+
+    @classmethod
+    @typed_tasklet
+    def get_upcoming_streams(
+        cls, channel_id: str
+    ) -> Generator[Any, Any, List[YouTubeUpcomingStream]]:
+        """
+        Fetches all upcoming live streams for a given YouTube channel.
+        Returns a list of streams with stream_id, title, and scheduled_start_time.
+        """
+        stream_basics: List[Dict[str, str]] = []
+        try:
+            search_datafeed = YoutubeUpcomingStreamsDatafeed(
+                channel_id=channel_id,
+                max_results=50,
+                order="date",
+            )
+            parsed_search_results = yield search_datafeed.fetch_all_pages_async()
+        except ValueError:
+            msg = "No Google API secret, unable to fetch upcoming streams"
+            logging.warning(msg)
+            raise Exception(msg)
+        except Exception as e:
+            logging.exception(
+                "Unable to call YouTube API for upcoming streams in channel '%s': %s",
+                channel_id,
+                str(e),
+            )
+            raise Exception(
+                f"Unable to call YouTube API for upcoming streams in channel '{channel_id}': {str(e)}"
+            ) from e
+
+        for item in parsed_search_results:
+            video_id = item.get("video_id")
+            if video_id:
+                stream_basics.append(
+                    {
+                        "stream_id": video_id,
+                        "title": item.get("title", ""),
+                        "live_broadcast_content": item.get(
+                            "live_broadcast_content", ""
+                        ),
+                        "description": item.get("description", ""),
+                    }
                 )
-                for video in videos
-            ]
-        )
+
+        streams: List[YouTubeUpcomingStream] = []
+        for batch_start in range(0, len(stream_basics), 50):
+            batch = stream_basics[batch_start : batch_start + 50]
+            batch_datafeed = YoutubeVideoDetailsDatafeed(
+                [stream["stream_id"] for stream in batch]
+            )
+
+            try:
+                video_details = yield batch_datafeed.fetch_async()
+
+                if video_details is None:
+                    continue
+
+                for stream in batch:
+                    stream_id = stream["stream_id"]
+                    details = video_details.get(stream_id)
+                    streams.append(
+                        YouTubeUpcomingStream(
+                            stream_id=stream_id,
+                            title=stream["title"],
+                            description=stream["description"],
+                            scheduled_start_time=(
+                                details.get("scheduled_start_time") if details else None
+                            )
+                            or "",
+                            live_broadcast_content=stream.get(
+                                "live_broadcast_content", ""
+                            ),
+                        )
+                    )
+            except Exception:
+                logging.exception("Unable to fetch video details from YouTube API")
+
+        raise ndb.Return(streams)

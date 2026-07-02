@@ -1,6 +1,7 @@
 import datetime
 import json
-from typing import Optional
+from typing import Any, cast, Dict, Optional, Set
+from urllib.parse import urlparse
 
 from flask import abort, redirect, request, url_for
 from google.appengine.api import taskqueue
@@ -16,6 +17,7 @@ from backend.common.consts.playoff_type import (
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
 )
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.game_specific.registry import get_game
 from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
     DistrictPointTiebreakersSortingHelper,
 )
@@ -24,7 +26,9 @@ from backend.common.helpers.location_helper import LocationHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
@@ -34,19 +38,23 @@ from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
+from backend.common.memcache_models.event_sync_status_memcache import (
+    EventSyncStatus,
+    EventSyncStatusMemcache,
+)
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
-from backend.common.models.event import Event
+from backend.common.models.event import Event, EventSyncOverrides
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
+from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.webcast import Webcast
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.web.profiled_render import render_template
 
 
@@ -74,7 +82,7 @@ def event_detail(event_key: EventKey) -> str:
     event.prep_teams()
     event.prep_details()
 
-    reg_sitevar = ChampsRegistrationHacks.get()
+    sync_overrides = event.sync_overrides or {}
     api_keys = ApiAuthAccess.query(
         ApiAuthAccess.event_list == ndb.Key(Event, event_key)
     ).fetch()
@@ -92,9 +100,9 @@ def event_detail(event_key: EventKey) -> str:
             {
                 "event": event,
                 "playoff_advancement": event.playoff_advancement,
-                "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-                    event.year, []
-                ),
+                "playoff_advancement_tiebreakers": get_game(
+                    event.year
+                ).round_robin_tiebreaker_names(),
                 "bracket_table": event.playoff_bracket,
             },
         )
@@ -142,7 +150,10 @@ def event_detail(event_key: EventKey) -> str:
     webcast_online_status = [w for w in webcast_online_status if w is not None]
 
     nexus_queue_status = EventNexusQueueStatusMemcache(event.key_name).get()
+    nexus_event_details = NexusEventDetails.get_by_id(event.key_name)
+    sync_status: EventSyncStatus = EventSyncStatusMemcache(event.key_name).get() or {}
 
+    event_name_override = sync_overrides.get("event_name_override", {})
     template_values = {
         "event": event,
         "medias": event_medias.get_result(),
@@ -155,26 +166,26 @@ def event_detail(event_key: EventKey) -> str:
         "flushed": request.args.get("flushed"),
         "playoff_types": PLAYOFF_TYPE_NAMES,
         "write_auths": api_keys,
-        "event_sync_disable": event_key in reg_sitevar["divisions_to_skip"],
-        "set_start_day_to_last": event_key in reg_sitevar["set_start_to_last_day"],
-        "skip_eventteams": event_key in reg_sitevar["skip_eventteams"],
-        "event_name_override": next(
-            iter(
-                filter(
-                    lambda e: e.get("event") == event_key,
-                    reg_sitevar["event_name_override"],
-                )
-            ),
-            {},
-        ).get("name", ""),
+        "event_sync_disable": sync_overrides.get("event_sync_disable", False),
+        "set_start_day_to_last": sync_overrides.get("set_start_day_to_last", False),
+        "skip_eventteams": sync_overrides.get("skip_eventteams", False),
+        "event_name_override": event_name_override.get("name", ""),
+        "event_short_name_override": event_name_override.get(
+            "short_name", event_name_override.get("name", "")
+        ),
         "elim_bracket_html": elim_bracket_html,
         "advancement_html": advancement_html,
         "match_stats": match_stats,
         "deleted_count": request.args.get("deleted"),
         "district_points_sorted": district_points_sorted,
+        "is_regional_cmp_pool_eligible": is_regional_cmp_pool_eligible,
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
         "webcast_online_status": webcast_online_status,
         "nexus_queue_status": nexus_queue_status,
+        "nexus_pit_map": (
+            nexus_event_details.pitmap_json if nexus_event_details else None
+        ),
+        "sync_status": sorted(sync_status.items()),
         "event_sync_types": dict(EventSyncType.__members__.items()),
     }
 
@@ -272,6 +283,8 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         end_date = datetime.datetime.strptime(request.form.get("end_date"), "%Y-%m-%d")
 
     first_code = request.form.get("first_code", None)
+    if first_code:
+        first_code = first_code.strip()
     district_key = request.form.get("event_district_key", None)
     parent_key = request.form.get("parent_event", None)
 
@@ -371,54 +384,48 @@ def event_detail_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    reg_sitevar = ChampsRegistrationHacks.get()
-    new_divisions_to_skip = reg_sitevar["divisions_to_skip"]
-    if request.form.get("event_sync_disable"):
-        if event_key not in new_divisions_to_skip:
-            new_divisions_to_skip.append(event_key)
-    else:
-        new_divisions_to_skip = list(
-            filter(lambda e: e != event_key, new_divisions_to_skip)
-        )
-    new_start_day_to_last = reg_sitevar["set_start_to_last_day"]
-    if request.form.get("set_start_day_to_last"):
-        if event_key not in new_start_day_to_last:
-            new_start_day_to_last.append(event_key)
-    else:
-        new_start_day_to_last = list(
-            filter(lambda e: e != event_key, new_start_day_to_last)
-        )
-    new_skip_eventteams = reg_sitevar["skip_eventteams"]
-    if request.form.get("skip_eventteams"):
-        if event_key not in new_skip_eventteams:
-            new_skip_eventteams.append(event_key)
-    else:
-        new_skip_eventteams = list(
-            filter(lambda e: e != event_key, new_skip_eventteams)
-        )
-    new_name_overrides = reg_sitevar["event_name_override"]
-    form_name_override = request.form.get("event_name_override")
-    if form_name_override:
-        if not any(o["event"] == event_key for o in new_name_overrides):
-            new_name_overrides.append(
-                {
-                    "event": event_key,
-                    "name": form_name_override,
-                    "short_name": form_name_override,
-                }
-            )
-    else:
-        new_name_overrides = list(
-            filter(lambda o: o["event"] != event_key, new_name_overrides)
-        )
-    ChampsRegistrationHacks.put(
-        {
-            "divisions_to_skip": new_divisions_to_skip,
-            "set_start_to_last_day": new_start_day_to_last,
-            "skip_eventteams": new_skip_eventteams,
-            "event_name_override": new_name_overrides,
-        }
+    first_code = request.form.get("first_code")
+    first_code = first_code.strip() if first_code else None
+    event.first_code = first_code or None
+
+    nexus_code = request.form.get("nexus_code")
+    nexus_code = nexus_code.strip() if nexus_code else None
+    event.nexus_code = nexus_code or None
+
+    sync_overrides = cast(
+        EventSyncOverrides,
+        dict(cast(Dict[str, Any], event.sync_overrides or {})),
     )
+
+    if request.form.get("event_sync_disable"):
+        sync_overrides["event_sync_disable"] = True
+    else:
+        sync_overrides.pop("event_sync_disable", None)
+
+    if request.form.get("set_start_day_to_last"):
+        sync_overrides["set_start_day_to_last"] = True
+    else:
+        sync_overrides.pop("set_start_day_to_last", None)
+
+    if request.form.get("skip_eventteams"):
+        sync_overrides["skip_eventteams"] = True
+    else:
+        sync_overrides.pop("skip_eventteams", None)
+
+    form_name_override = (request.form.get("event_name_override") or "").strip()
+    form_short_name_override = (
+        request.form.get("event_short_name_override") or ""
+    ).strip()
+    if form_name_override or form_short_name_override:
+        sync_overrides["event_name_override"] = {
+            "name": form_name_override or form_short_name_override,
+            "short_name": form_short_name_override or form_name_override,
+        }
+    else:
+        sync_overrides.pop("event_name_override", None)
+
+    event.sync_overrides = sync_overrides
+    EventManipulator.createOrUpdate(event)
     return redirect(url_for("admin.event_detail", event_key=event_key))
 
 
@@ -488,12 +495,26 @@ def event_add_webcast_post(event_key: EventKey) -> Response:
     if not event:
         abort(404)
 
-    webcast = Webcast(
-        type=WebcastType(request.form.get("webcast_type")),
-        channel=none_throws(request.form.get("webcast_channel")),
-    )
-    if request.form.get("webcast_file"):
-        webcast["file"] = none_throws(request.form.get("webcast_file"))
+    webcast_url = request.form.get("webcast_url", "").strip()
+    if webcast_url:
+        webcast = WebcastParser.webcast_dict_from_url(webcast_url).get_result()
+        if webcast is None:
+            return redirect(
+                url_for(
+                    "admin.event_detail",
+                    event_key=event.key_name,
+                    _anchor="webcasts",
+                    webcast_url_error=1,
+                )
+            )
+    else:
+        webcast = Webcast(
+            type=WebcastType(request.form.get("webcast_type")),
+            channel=none_throws(request.form.get("webcast_channel")),
+        )
+        if request.form.get("webcast_file"):
+            webcast["file"] = none_throws(request.form.get("webcast_file"))
+
     if request.form.get("webcast_date"):
         webcast["date"] = none_throws(request.form.get("webcast_date"))
 
@@ -520,6 +541,228 @@ def event_remove_webcast_post(event_key: EventKey) -> Response:
     EventWebcastAdder.remove_webcast(
         event, webcast_index, webcast_type, webcast_channel, webcast_file
     )
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
+
+
+def event_update_webcast_date_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcast_type = WebcastType(request.form.get("type"))
+    webcast_channel = none_throws(request.form.get("channel"))
+    webcast_index = int(request.form.get("index")) - 1
+
+    if webcast_type != WebcastType.YOUTUBE:
+        abort(400)
+
+    webcasts = event.webcast
+    if not webcasts or webcast_index >= len(webcasts):
+        abort(400)
+
+    webcast = webcasts[webcast_index]
+    if webcast.get("channel") != webcast_channel:
+        abort(400)
+
+    scheduled_dates = YouTubeVideoHelper.get_scheduled_start_times(
+        [webcast_channel]
+    ).get_result()
+    scheduled_date = scheduled_dates.get(webcast_channel)
+
+    if scheduled_date:
+        webcast["date"] = scheduled_date
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
+
+
+def event_update_all_webcast_dates_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcasts = event.webcast
+    youtube_webcasts = [w for w in webcasts if w.get("type") == WebcastType.YOUTUBE]
+    if not youtube_webcasts:
+        return redirect(
+            url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+        )
+
+    video_ids = [w["channel"] for w in youtube_webcasts]
+    scheduled_dates = YouTubeVideoHelper.get_scheduled_start_times(
+        video_ids
+    ).get_result()
+
+    changed = False
+    for webcast in webcasts:
+        if webcast.get("type") != WebcastType.YOUTUBE:
+            continue
+
+        video_id = webcast.get("channel")
+        if not video_id:
+            continue
+
+        scheduled_date = scheduled_dates.get(video_id)
+        if scheduled_date and webcast.get("date") != scheduled_date:
+            webcast["date"] = scheduled_date
+            changed = True
+
+    if changed:
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
+
+    return redirect(
+        url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+    )
+
+
+def event_divisions_released_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    if not event.divisions:
+        abort(400)
+
+    # Enqueue team fetches for all divisions
+    for division_key in event.divisions:
+        taskqueue.add(
+            queue_name="datafeed",
+            target="py3-tasks-io",
+            url=f"/backend-tasks/get/event_details/{division_key.string_id()}",
+            method="GET",
+        )
+
+    # Enqueue post_division_tasks for the parent event
+    taskqueue.add(
+        queue_name="admin",
+        target="py3-tasks-io",
+        url=f"/tasks/admin/do/post_division_tasks/{event_key}",
+        method="GET",
+    )
+
+    return redirect(url_for("admin.event_detail", event_key=event_key))
+
+
+def event_link_frc_api_post(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(404)
+
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    if not event.is_offseason or event.official:
+        abort(400)
+
+    frc_event_input = (request.form.get("frc_event_input") or "").strip()
+    if not frc_event_input:
+        return redirect(
+            url_for(
+                "admin.event_detail",
+                event_key=event_key,
+                link_frc_api_error="empty",
+            )
+        )
+
+    # Support full FRC events URLs like https://frc-events.firstinspires.org/2026/OHNEW
+    # as well as bare event codes like OHNEW
+    parsed = urlparse(frc_event_input)
+    if parsed.scheme in ("http", "https"):
+        # Extract the last non-empty path segment from the URL
+        path_parts = [p for p in parsed.path.split("/") if p]
+        if not path_parts:
+            return redirect(
+                url_for(
+                    "admin.event_detail",
+                    event_key=event_key,
+                    link_frc_api_error="invalid_url",
+                )
+            )
+        extracted_event_short = path_parts[-1].upper()
+    else:
+        # Treat the whole input as an event code
+        extracted_event_short = frc_event_input.upper()
+
+    candidate_event_key = Event.render_key_name(event.year, extracted_event_short)
+    if not Event.validate_key_name(candidate_event_key):
+        return redirect(
+            url_for(
+                "admin.event_detail",
+                event_key=event_key,
+                link_frc_api_error="invalid_code",
+            )
+        )
+
+    event.official = True
+    event.first_code = extracted_event_short
+    EventManipulator.createOrUpdate(event)
+
+    taskqueue.add(
+        queue_name="datafeed",
+        target="py3-tasks-io",
+        url=f"/backend-tasks/get/event_details/{event_key}",
+        method="GET",
+    )
+
+    return redirect(url_for("admin.event_detail", event_key=event_key))
+
+
+def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
+    event = Event.get_by_id(event_key)
+    if not event:
+        abort(404)
+
+    webcasts = event.webcast
+    youtube_webcasts = [w for w in webcasts if w.get("type") == WebcastType.YOUTUBE]
+    if not youtube_webcasts:
+        return redirect(
+            url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
+        )
+
+    video_ids = [w["channel"] for w in youtube_webcasts]
+    video_details = YouTubeVideoHelper.get_video_details_batch(video_ids).get_result()
+
+    changed = False
+    seen_video_ids: Set[str] = set()
+    # Iterate in reverse so that removals by index don't shift later indices
+    for i in range(len(webcasts) - 1, -1, -1):
+        webcast = webcasts[i]
+        if webcast.get("type") != WebcastType.YOUTUBE:
+            continue
+        video_id = webcast["channel"]
+        if video_id not in video_details:
+            # Video doesn't exist in YouTube - remove the webcast
+            webcasts.pop(i)
+            changed = True
+        elif video_id in seen_video_ids:
+            # Duplicate stream ID - remove the webcast
+            webcasts.pop(i)
+            changed = True
+        else:
+            seen_video_ids.add(video_id)
+            details = video_details[video_id]
+            date = details.get("scheduled_start_time")
+            if date and webcast.get("date") != date:
+                # Video exists and has a scheduled start time - update the date
+                webcast["date"] = date
+                changed = True
+
+    if changed:
+        event.webcast_json = json.dumps(webcasts)
+        event._webcast = None
+        event._dirty = True
+        EventManipulator.createOrUpdate(event, auto_union=False)
 
     return redirect(
         url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")

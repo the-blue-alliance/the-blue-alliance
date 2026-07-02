@@ -11,3 +11,4 @@ node_modules
 .react-router/
 .tanstack/
 /server.js
+.playwright-mcp/

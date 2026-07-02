@@ -764,10 +764,10 @@ def test_2023ncash_double_elim(ndb_stub, taskqueue_stub) -> None:
     match = Match.get_by_id("2023ncash_sf12m1")
     assert match is not None
     assert match.winning_alliance == ""
-    assert match.verbose_name == "Match 12"
+    assert match.verbose_name == "Playoff Match 12"
 
     # The second play gets added afterwards
     match = Match.get_by_id("2023ncash_sf12m2")
     assert match is not None
     assert match.winning_alliance == AllianceColor.RED
-    assert match.verbose_name == "Match 12 (Play 2)"
+    assert match.verbose_name == "Playoff Match 12 (Play 2)"

@@ -13,7 +13,9 @@ from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
 from backend.common.futures import InstantFuture
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
+from backend.common.models.team import Team
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
@@ -227,6 +229,106 @@ def test_get_remap_teams(
     m = Match.get_by_id("2020nyny_qm1")
     assert m is not None
     assert m.team_key_names == ["frc9000"]
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_matches")
+def test_get_creates_event_teams(
+    fmsapi_matches_mock,
+    tasks_client: Client,
+) -> None:
+    create_event(official=True)
+    matches = [
+        Match(
+            id="2020nyny_sf1m1",
+            event=ndb.Key(Event, "2020nyny"),
+            comp_level=CompLevel.SF,
+            set_number=1,
+            match_number=1,
+            year=2020,
+            alliances_json=json.dumps(
+                {
+                    "red": {
+                        "score": 100,
+                        "teams": ["frc2337", "frc7166", "frc8280"],
+                    },
+                    "blue": {
+                        "score": 90,
+                        "teams": ["frc27", "frc3668", "frc7769"],
+                    },
+                }
+            ),
+            team_key_names=[
+                "frc2337",
+                "frc7166",
+                "frc8280",
+                "frc27",
+                "frc3668",
+                "frc7769",
+            ],
+        )
+    ]
+
+    fmsapi_matches_mock.return_value = InstantFuture(matches)
+
+    resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
+    assert resp.status_code == 200
+
+    # Every team that played a match gets bound to the event, even without
+    # an award or pre-registered roster.
+    et_team_ids = {
+        et.team.id()
+        for et in EventTeam.query(EventTeam.event == ndb.Key(Event, "2020nyny")).fetch()
+    }
+    assert et_team_ids == {
+        "frc2337",
+        "frc7166",
+        "frc8280",
+        "frc27",
+        "frc3668",
+        "frc7769",
+    }
+
+    # Stub Teams are created for any we haven't seen before.
+    team = Team.get_by_id("frc2337")
+    assert team is not None
+    assert team.team_number == 2337
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_matches")
+def test_get_strips_b_team_suffix_when_creating_event_teams(
+    fmsapi_matches_mock,
+    tasks_client: Client,
+) -> None:
+    create_event(official=True)
+    matches = [
+        Match(
+            id="2020nyny_qm1",
+            event=ndb.Key(Event, "2020nyny"),
+            comp_level=CompLevel.QM,
+            set_number=1,
+            match_number=1,
+            year=2020,
+            alliances_json=json.dumps(
+                {
+                    "red": {"score": 10, "teams": ["frc254B"]},
+                    "blue": {"score": 20, "teams": []},
+                }
+            ),
+            team_key_names=["frc254B"],
+        )
+    ]
+
+    fmsapi_matches_mock.return_value = InstantFuture(matches)
+
+    resp = tasks_client.get("/tasks/get/fmsapi_matches/2020nyny")
+    assert resp.status_code == 200
+
+    # B-team suffixes are collapsed to the parent team number.
+    et_team_ids = {
+        et.team.id()
+        for et in EventTeam.query(EventTeam.event == ndb.Key(Event, "2020nyny")).fetch()
+    }
+    assert et_team_ids == {"frc254"}
 
 
 @mock.patch.object(DatafeedFMSAPI, "get_event_matches")

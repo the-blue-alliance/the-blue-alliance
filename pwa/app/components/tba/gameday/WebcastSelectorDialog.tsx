@@ -2,6 +2,7 @@ import HelpCircleIcon from '~icons/lucide/help-circle';
 import VideoIcon from '~icons/lucide/video';
 import VideoOffIcon from '~icons/lucide/video-off';
 
+import { WebcastStatus } from '~/api/tba/read';
 import { WebcastTypeIcon } from '~/components/tba/gameday/WebcastTypeIcon';
 import {
   Dialog,
@@ -27,16 +28,16 @@ export function WebcastSelectorDialog({
 
   // Group webcasts by special vs regular, then by online/offline status
   const specialWebcasts = availableWebcasts.filter(
-    (w) => w.isSpecial && w.webcast.status !== 'offline',
+    (w) => w.isSpecial && w.webcast.status !== WebcastStatus.OFFLINE,
   );
   const offlineSpecialWebcasts = availableWebcasts.filter(
-    (w) => w.isSpecial && w.webcast.status === 'offline',
+    (w) => w.isSpecial && w.webcast.status === WebcastStatus.OFFLINE,
   );
   const regularWebcasts = availableWebcasts.filter(
-    (w) => !w.isSpecial && w.webcast.status !== 'offline',
+    (w) => !w.isSpecial && w.webcast.status !== WebcastStatus.OFFLINE,
   );
   const offlineRegularWebcasts = availableWebcasts.filter(
-    (w) => !w.isSpecial && w.webcast.status === 'offline',
+    (w) => !w.isSpecial && w.webcast.status === WebcastStatus.OFFLINE,
   );
 
   return (
@@ -164,10 +165,10 @@ function WebcastItem({
 
   // Determine the status icon
   const StatusIcon = () => {
-    if (status === 'online') {
+    if (status === WebcastStatus.ONLINE) {
       return <VideoIcon className="h-4 w-4 shrink-0 text-green-500" />;
     }
-    if (status === 'offline') {
+    if (status === WebcastStatus.OFFLINE) {
       return (
         <VideoOffIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
       );
@@ -180,7 +181,7 @@ function WebcastItem({
 
   // Secondary text: stream title for online streams
   const secondaryText =
-    status === 'online' && webcast.webcast.stream_title
+    status === WebcastStatus.ONLINE && webcast.webcast.stream_title
       ? webcast.webcast.stream_title
       : null;
 
@@ -204,12 +205,13 @@ function WebcastItem({
       </div>
       <div className="flex shrink-0 items-center gap-2">
         {/* Viewer count for online streams */}
-        {status === 'online' && webcast.webcast.viewer_count != null && (
-          <div className="text-right text-xs text-muted-foreground">
-            <div>{webcast.webcast.viewer_count.toLocaleString()}</div>
-            <div>Viewers</div>
-          </div>
-        )}
+        {status === WebcastStatus.ONLINE &&
+          webcast.webcast.viewer_count != null && (
+            <div className="text-right text-xs text-muted-foreground">
+              <div>{webcast.webcast.viewer_count.toLocaleString()}</div>
+              <div>Viewers</div>
+            </div>
+          )}
         <StatusIcon />
       </div>
     </button>

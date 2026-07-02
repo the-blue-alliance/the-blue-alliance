@@ -34,7 +34,12 @@ export type GamedayAction =
   | { type: 'RESET_WEBCASTS' }
   | { type: 'TOGGLE_CHAT_SIDEBAR' }
   | { type: 'SET_CURRENT_CHAT'; channel: string }
-  | { type: 'RESTORE_URL_STATE'; urlState: GamedayUrlState };
+  | { type: 'RESTORE_URL_STATE'; urlState: GamedayUrlState }
+  | {
+      type: 'LOAD_EVENT_WEBCASTS';
+      webcasts: WebcastWithMeta[];
+      layoutId: number;
+    };
 
 // Reducer
 export function gamedayReducer(
@@ -154,6 +159,20 @@ export function gamedayReducer(
       }
 
       return newState;
+    }
+
+    case 'LOAD_EVENT_WEBCASTS': {
+      const { webcasts, layoutId } = action;
+      const numViews = getNumViewsForLayout(layoutId);
+      const positionToWebcast = createEmptyPositionArray();
+      webcasts.slice(0, numViews).forEach((w, i) => {
+        positionToWebcast[i] = w.id;
+      });
+      return {
+        ...state,
+        layoutId,
+        positionToWebcast,
+      };
     }
 
     default:

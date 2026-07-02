@@ -1,0 +1,30 @@
+@theme inline {
+  /* California */
+  --color-district-ca: oklch(0.6542 0.122 80.14);
+  /* Chesapeake */
+  --color-district-chs: oklch(0.658 0.1 199.3);
+  /* Indiana */
+  --color-district-fin: oklch(0.8702 0.1592 91.9);
+  /* Israel */
+  --color-district-isr: oklch(0.489212 0.160786 254.9444);
+  /* Michigan */
+  --color-district-fim: oklch(0.711 0.035 256.8);
+  /* Mid-Atlantic */
+  --color-district-fma: oklch(0.685 0.096 291.3);
+  /* New England */
+  --color-district-ne: oklch(0.4701 0.1703 20);
+  /* North Carolina */
+  --color-district-fnc: oklch(0.6655 0.1138 241.09);
+  /* Ontario */
+  --color-district-ont: oklch(0.5569 0.2241 25.65);
+  /* Pacific Northwest */
+  --color-district-pnw: oklch(0.3517 0.0798 157.61);
+  /* Peachtree */
+  --color-district-pch: oklch(0.7913 0.079 33.61);
+  /* South Carolina */
+  --color-district-fsc: oklch(0.7289 0.1178 121.94);
+  /* Texas */
+  --color-district-fit: oklch(0.5778 0.1545 49.2);
+  /* Wisconsin */
+  --color-district-win: oklch(0.643 0.212 355.2);
+}

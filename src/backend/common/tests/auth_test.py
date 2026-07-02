@@ -39,6 +39,7 @@ def test_create_session_cookie(secret_app: Flask) -> None:
 
     with secret_app.test_request_context("/"):
         assert session.get("session") is None
+        assert session.permanent is False
 
         with patch.object(auth, "create_session_cookie") as mock_create_session_cookie:
             create_session_cookie(id_token, expires_in)
@@ -47,6 +48,7 @@ def test_create_session_cookie(secret_app: Flask) -> None:
         )
 
         assert session["session"] is not None
+        assert session.permanent is True
 
 
 def test_revoke_session_cookie_no_claims(secret_app: Flask) -> None:

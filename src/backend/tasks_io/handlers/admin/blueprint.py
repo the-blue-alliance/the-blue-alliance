@@ -1,7 +1,10 @@
-from flask import abort, Blueprint
+from flask import abort, Blueprint, request
 from google.appengine.api import users as gae_login
 
-from backend.tasks_io.handlers.admin.tasks import admin_clear_eventteams
+from backend.tasks_io.handlers.admin.tasks import (
+    admin_clear_eventteams,
+    admin_post_division_tasks,
+)
 
 """
 This is a special interface available to TBA admins to manage data
@@ -13,8 +16,13 @@ admin_routes = Blueprint("admin", __name__, url_prefix="/tasks/admin")
 @admin_routes.before_request
 def require_gae_admin() -> None:
     """
-    Ensure that only admins can access this blueprint
+    Ensure that only admins can access this blueprint.
+    Requests originating from the task queue are identified by the
+    X-AppEngine-QueueName header (set by GAE, stripped from external requests)
+    and are allowed through without a user admin check.
     """
+    if request.headers.get("X-AppEngine-QueueName"):
+        return
     if not gae_login.is_current_user_admin():
         abort(401)
 
@@ -26,4 +34,7 @@ def test_admin_task_view() -> str:
 
 admin_routes.add_url_rule(
     "/do/clear_eventteams/<event_key>", view_func=admin_clear_eventteams
+)
+admin_routes.add_url_rule(
+    "/do/post_division_tasks/<event_key>", view_func=admin_post_division_tasks
 )

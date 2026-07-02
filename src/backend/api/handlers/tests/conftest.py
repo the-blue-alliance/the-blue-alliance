@@ -38,3 +38,14 @@ def mock_clientapi_auth(ndb_stub, monkeypatch: pytest.MonkeyPatch) -> User:
 
     monkeypatch.setattr(ClientApiAuthHelper, "get_current_user", mock_current_user)
     return mock_user
+
+
+@pytest.fixture
+def mock_clientapi_auth_no_account(ndb_stub, monkeypatch: pytest.MonkeyPatch) -> None:
+    """Simulates a valid Firebase token but no email claim.
+    get_current_user returns None (rejected at auth helper)."""
+
+    def mock_current_user():
+        return None
+
+    monkeypatch.setattr(ClientApiAuthHelper, "get_current_user", mock_current_user)

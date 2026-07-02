@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest';
 
 import type { Match } from '~/api/tba/read';
+import { AllianceColor, CompLevel } from '~/api/tba/read';
 import { getAllianceMatchResult, isValidMatchKey } from '~/lib/matchUtils';
 
 describe.concurrent('isValidMatchKey', () => {
@@ -36,11 +37,11 @@ describe.concurrent('getAllianceMatchResult', () => {
     key: string,
     redScore: number,
     blueScore: number,
-    winningAlliance: '' | 'red' | 'blue',
+    winningAlliance: AllianceColor,
   ): Match {
     return {
       key,
-      comp_level: 'qm',
+      comp_level: CompLevel.QM,
       set_number: 1,
       match_number: 1,
       alliances: {
@@ -65,75 +66,160 @@ describe.concurrent('getAllianceMatchResult', () => {
       post_result_time: null,
       score_breakdown: null,
       videos: [],
-    } as Match;
+    };
   }
 
   test('returns undefined when match has not been played', () => {
-    const match = createMockMatch('2024test_qm1', -1, -1, '');
-    expect(getAllianceMatchResult(match, 'red', 'official')).toBeUndefined();
-    expect(getAllianceMatchResult(match, 'blue', 'official')).toBeUndefined();
+    const match = createMockMatch(
+      '2024test_qm1',
+      -1,
+      -1,
+      AllianceColor.NO_ALLIANCE,
+    );
+    expect(
+      getAllianceMatchResult(match, AllianceColor.RED, 'official'),
+    ).toBeUndefined();
+    expect(
+      getAllianceMatchResult(match, AllianceColor.BLUE, 'official'),
+    ).toBeUndefined();
   });
 
   test('returns win when alliance won', () => {
-    const match = createMockMatch('2024test_qm1', 100, 80, 'red');
-    expect(getAllianceMatchResult(match, 'red', 'official')).toBe('win');
+    const match = createMockMatch('2024test_qm1', 100, 80, AllianceColor.RED);
+    expect(getAllianceMatchResult(match, AllianceColor.RED, 'official')).toBe(
+      'win',
+    );
   });
 
   test('returns loss when alliance lost', () => {
-    const match = createMockMatch('2024test_qm1', 100, 80, 'red');
-    expect(getAllianceMatchResult(match, 'blue', 'official')).toBe('loss');
+    const match = createMockMatch('2024test_qm1', 100, 80, AllianceColor.RED);
+    expect(getAllianceMatchResult(match, AllianceColor.BLUE, 'official')).toBe(
+      'loss',
+    );
   });
 
   test('returns tie when match is tied (non-2015)', () => {
-    const match = createMockMatch('2024test_qm1', 100, 100, '');
-    expect(getAllianceMatchResult(match, 'red', 'official')).toBe('tie');
-    expect(getAllianceMatchResult(match, 'blue', 'official')).toBe('tie');
+    const match = createMockMatch(
+      '2024test_qm1',
+      100,
+      100,
+      AllianceColor.NO_ALLIANCE,
+    );
+    expect(getAllianceMatchResult(match, AllianceColor.RED, 'official')).toBe(
+      'tie',
+    );
+    expect(getAllianceMatchResult(match, AllianceColor.BLUE, 'official')).toBe(
+      'tie',
+    );
   });
 
   test('returns tie for 2015 match with official strategy', () => {
-    const match = createMockMatch('2015test_qm1', 100, 80, '');
-    expect(getAllianceMatchResult(match, 'red', 'official')).toBe('tie');
-    expect(getAllianceMatchResult(match, 'blue', 'official')).toBe('tie');
+    const match = createMockMatch(
+      '2015test_qm1',
+      100,
+      80,
+      AllianceColor.NO_ALLIANCE,
+    );
+    expect(getAllianceMatchResult(match, AllianceColor.RED, 'official')).toBe(
+      'tie',
+    );
+    expect(getAllianceMatchResult(match, AllianceColor.BLUE, 'official')).toBe(
+      'tie',
+    );
   });
 
   test('returns win/loss for 2015 match with score-based strategy when red scores higher', () => {
-    const match = createMockMatch('2015test_qm1', 100, 80, '');
-    expect(getAllianceMatchResult(match, 'red', 'score-based')).toBe('win');
-    expect(getAllianceMatchResult(match, 'blue', 'score-based')).toBe('loss');
+    const match = createMockMatch(
+      '2015test_qm1',
+      100,
+      80,
+      AllianceColor.NO_ALLIANCE,
+    );
+    expect(
+      getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),
+    ).toBe('win');
+    expect(
+      getAllianceMatchResult(match, AllianceColor.BLUE, 'score-based'),
+    ).toBe('loss');
   });
 
   test('returns win/loss for 2015 match with score-based strategy when blue scores higher', () => {
-    const match = createMockMatch('2015test_qm1', 80, 100, '');
-    expect(getAllianceMatchResult(match, 'red', 'score-based')).toBe('loss');
-    expect(getAllianceMatchResult(match, 'blue', 'score-based')).toBe('win');
+    const match = createMockMatch(
+      '2015test_qm1',
+      80,
+      100,
+      AllianceColor.NO_ALLIANCE,
+    );
+    expect(
+      getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),
+    ).toBe('loss');
+    expect(
+      getAllianceMatchResult(match, AllianceColor.BLUE, 'score-based'),
+    ).toBe('win');
   });
 
   test('returns tie for 2015 match with score-based strategy when scores are equal', () => {
-    const match = createMockMatch('2015test_qm1', 100, 100, '');
-    expect(getAllianceMatchResult(match, 'red', 'score-based')).toBe('tie');
-    expect(getAllianceMatchResult(match, 'blue', 'score-based')).toBe('tie');
+    const match = createMockMatch(
+      '2015test_qm1',
+      100,
+      100,
+      AllianceColor.NO_ALLIANCE,
+    );
+    expect(
+      getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),
+    ).toBe('tie');
+    expect(
+      getAllianceMatchResult(match, AllianceColor.BLUE, 'score-based'),
+    ).toBe('tie');
   });
 
   test('handles blue alliance winning', () => {
-    const match = createMockMatch('2024test_qm1', 80, 100, 'blue');
-    expect(getAllianceMatchResult(match, 'blue', 'official')).toBe('win');
-    expect(getAllianceMatchResult(match, 'red', 'official')).toBe('loss');
+    const match = createMockMatch('2024test_qm1', 80, 100, AllianceColor.BLUE);
+    expect(getAllianceMatchResult(match, AllianceColor.BLUE, 'official')).toBe(
+      'win',
+    );
+    expect(getAllianceMatchResult(match, AllianceColor.RED, 'official')).toBe(
+      'loss',
+    );
   });
 
   test('handles different comp levels', () => {
-    const qualsMatch = createMockMatch('2024test_qm1', 100, 80, 'red');
-    qualsMatch.comp_level = 'qm';
-    expect(getAllianceMatchResult(qualsMatch, 'red', 'official')).toBe('win');
+    const qualsMatch = createMockMatch(
+      '2024test_qm1',
+      100,
+      80,
+      AllianceColor.RED,
+    );
+    qualsMatch.comp_level = CompLevel.QM;
+    expect(
+      getAllianceMatchResult(qualsMatch, AllianceColor.RED, 'official'),
+    ).toBe('win');
 
-    const finalsMatch = createMockMatch('2024test_f1m1', 100, 80, 'red');
-    finalsMatch.comp_level = 'f';
-    expect(getAllianceMatchResult(finalsMatch, 'red', 'official')).toBe('win');
+    const finalsMatch = createMockMatch(
+      '2024test_f1m1',
+      100,
+      80,
+      AllianceColor.RED,
+    );
+    finalsMatch.comp_level = CompLevel.F;
+    expect(
+      getAllianceMatchResult(finalsMatch, AllianceColor.RED, 'official'),
+    ).toBe('win');
   });
 
   test('handles 2015 playoff matches with score-based strategy', () => {
-    const match = createMockMatch('2015test_sf1m1', 100, 80, '');
-    match.comp_level = 'sf';
-    expect(getAllianceMatchResult(match, 'red', 'score-based')).toBe('win');
-    expect(getAllianceMatchResult(match, 'blue', 'score-based')).toBe('loss');
+    const match = createMockMatch(
+      '2015test_sf1m1',
+      100,
+      80,
+      AllianceColor.NO_ALLIANCE,
+    );
+    match.comp_level = CompLevel.SF;
+    expect(
+      getAllianceMatchResult(match, AllianceColor.RED, 'score-based'),
+    ).toBe('win');
+    expect(
+      getAllianceMatchResult(match, AllianceColor.BLUE, 'score-based'),
+    ).toBe('loss');
   });
 });

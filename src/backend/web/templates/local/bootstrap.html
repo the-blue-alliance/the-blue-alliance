@@ -27,6 +27,12 @@
     {% endif %}
 
     <h1>Fetch Some Data!</h1>
+    {% if apiv3_key %}
+    <form method="post" style="margin-bottom: 15px;">
+        <input type="hidden" name="bootstrap_key" value="{{ current_year }}" />
+        <button type="submit" class="btn btn-success btn-lg"><span class="glyphicon glyphicon-refresh"></span> Sync {{ current_year }}</button>
+    </form>
+    {% endif %}
     <div class="alert alert-info alert-dismissible">
         <button type="button" class="close" data-dismiss="alert">&times;</button>
         <h4 class="alert-heading">Getting Started</h4>
@@ -39,7 +45,7 @@
             <ul>
                 <li>Team keys, in the format <pre>frc1234</pre></li>
                 <li>Event keys, in the format <pre>2019nyny</pre></li>
-                <li>A year (to load all events/teams from that year)</li>
+                <li>A year (to load all events, teams, and districts from that year)</li>
             </ul>
         </p>
     </div>
@@ -57,9 +63,24 @@
         <button type="submit" class="btn btn-success">Seed Test Event</button>
         <p class="help-block">Creates "North Pole Showdown" with completed, upcoming, and unscheduled matches.</p>
     </form>
-    <form method="POST" action="/local/seed_test_team" style="display: inline-block;">
+    <form method="POST" action="/local/seed_test_team" style="display: inline-block; margin-right: 10px;">
         <button type="submit" class="btn btn-success">Seed Test Team</button>
         <p class="help-block">Creates Team 2 "The Reindeer" with YouTube, Imgur, and Instagram media.</p>
+    </form>
+    <form method="POST" action="/local/seed_media_suggestions" style="display: inline-block; margin-right: 10px;">
+        <button type="submit" class="btn btn-success">Seed Media Suggestions</button>
+        <p class="help-block">Creates pending media suggestions (YouTube, Imgur, Instagram) for review.</p>
+    </form>
+    <form style="display: inline-block;">
+        <button
+            type="button"
+            class="btn btn-success"
+            data-toggle="modal"
+            data-target="#linkNexusDemoModal"
+        >
+            Link Nexus Demo Event
+        </button>
+        <p class="help-block">Links a local test event to a Nexus demo event and generates import steps.</p>
     </form>
   </div>
 
@@ -80,5 +101,68 @@
     </form>
   </div>
 </div>
+
+<div class="modal fade" id="linkNexusDemoModal" tabindex="-1" role="dialog" aria-labelledby="linkNexusDemoModalLabel">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            <form method="post" action="/local/bootstrap/link_nexus_demo">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="linkNexusDemoModalLabel">Link Nexus Demo Event</h4>
+                </div>
+                <div class="modal-body">
+                    <input type="hidden" name="test_event_key" id="test_event_key" value="{{ current_year }}test" />
+
+                    <div class="form-group">
+                        <label for="nexus_demo_event_id">Demo Event ID</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nexus_demo_event_id"
+                            name="nexus_demo_event_id"
+                            placeholder="2026demo"
+                            required
+                        />
+                    </div>
+
+                    <div class="form-group">
+                        <label for="nexus_api_key">Nexus API Key</label>
+                        <input
+                            type="text"
+                            class="form-control"
+                            id="nexus_api_key"
+                            name="nexus_api_key"
+                            value="{{ nexus_api_key }}"
+                            placeholder="Nexus API key"
+                        />
+                        <small class="form-text text-muted">
+                            Get a Nexus API key from <a href="https://frc.nexus/en/api" target="_blank" rel="noopener noreferrer">frc.nexus/en/api</a>.
+                        </small>
+                    </div>
+
+                    <div class="checkbox">
+                        <label>
+                            <input type="checkbox" name="save_api_key" /> Save API key
+                        </label>
+                    </div>
+                    <p class="text-muted">Uses the current Data Key value as the local test event key.</p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                    <button type="submit" class="btn btn-primary">Continue</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<script>
+    $('#linkNexusDemoModal').on('show.bs.modal', function () {
+        const bootstrapKey = ($('#bootstrap_key').val() || '').trim().toLowerCase();
+        if (bootstrapKey) {
+            $('#test_event_key').val(bootstrapKey);
+        }
+    });
+</script>
 
 {% endblock %}

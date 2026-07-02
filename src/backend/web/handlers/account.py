@@ -1,4 +1,4 @@
-import datetime
+import logging
 
 from flask import (
     abort,
@@ -19,6 +19,7 @@ from backend.common.auth import (
     current_user,
     delete_user,
     revoke_session_cookie,
+    SESSION_COOKIE_LIFETIME,
 )
 from backend.common.consts.auth_type import (
     WRITE_TYPE_NAMES as AUTH_TYPE_WRITE_TYPE_NAMES,
@@ -135,7 +136,10 @@ def delete() -> Response:
         revoke_session_cookie()
 
         # delete the user in firebase
-        delete_user(str(user.uid))
+        try:
+            delete_user(str(user.uid))
+        except Exception:
+            logging.warning(f"Firebase delete_user failed for uid {user.uid}")
         return redirect(url_for("index"))
     else:
         return make_response(render_template("account_delete.html"))
@@ -148,10 +152,8 @@ def login() -> Response:
         if not id_token:
             abort(400)
 
-        expires_in = datetime.timedelta(days=5)
-
         response = jsonify({"status": "success"})
-        create_session_cookie(id_token, expires_in)
+        create_session_cookie(id_token, SESSION_COOKIE_LIFETIME)
         return response
     else:
         if current_user():

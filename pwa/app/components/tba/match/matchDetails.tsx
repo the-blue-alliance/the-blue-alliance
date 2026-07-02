@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Event, Match } from '~/api/tba/read';
 import { getMatchZebraOptions } from '~/api/tba/read/@tanstack/react-query.gen';
@@ -15,6 +16,7 @@ import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
 import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
 import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
 import ScoreBreakdown2026 from '~/components/tba/match/scoreBreakdown2026';
+import ScoreByShift2026 from '~/components/tba/match/scoreByShift2026';
 import ZebraMotionWorks from '~/components/tba/match/zebraMotionWorks';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
@@ -33,28 +35,26 @@ import {
 } from '~/lib/rankingPoints';
 
 function formatMatchDate(timestamp: number, timezone: string): string {
-  const date = new Date(timestamp * 1000);
-
-  return date.toLocaleString('en-US', {
-    timeZone: timezone,
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
+  return Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
+    .toZonedDateTimeISO(timezone)
+    .toLocaleString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
 }
 
 function formatMatchTime(
   timestamp: number,
   timezone: string,
 ): React.JSX.Element {
-  const date = new Date(timestamp * 1000);
-
-  const time = date.toLocaleString('en-US', {
-    timeZone: timezone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
+  const time = Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
+    .toZonedDateTimeISO(timezone)
+    .toLocaleString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
 
   return <span className="font-bold">{time}</span>;
 }
@@ -115,10 +115,16 @@ export default function MatchDetails({
 
   if (isScoreBreakdown2026(match.score_breakdown)) {
     sbDiv = (
-      <ScoreBreakdown2026
-        scoreBreakdown={match.score_breakdown}
-        match={match}
-      />
+      <>
+        <ScoreBreakdown2026
+          scoreBreakdown={match.score_breakdown}
+          match={match}
+        />
+        <ScoreByShift2026
+          scoreBreakdown={match.score_breakdown}
+          match={match}
+        />
+      </>
     );
   }
 

@@ -108,7 +108,7 @@
   },
   "tiebreakers": {
     "frc1334": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         54,
         34,
         28
@@ -116,7 +116,7 @@
       "qual_wins": 0
     },
     "frc1360": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         49,
         46,
         36
@@ -124,7 +124,7 @@
       "qual_wins": 0
     },
     "frc2198": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         69,
         38,
         29
@@ -132,23 +132,23 @@
       "qual_wins": 0
     },
     "frc2200": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         82,
         75,
-        69
+        73
       ],
       "qual_wins": 0
     },
     "frc2386": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         75,
         60,
-        42
+        49
       ],
       "qual_wins": 0
     },
     "frc3161": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         69,
         52,
         42
@@ -156,15 +156,15 @@
       "qual_wins": 0
     },
     "frc4015": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         82,
-        39,
-        38
+        73,
+        59
       ],
       "qual_wins": 0
     },
     "frc5032": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         75,
         52,
         49
@@ -172,23 +172,23 @@
       "qual_wins": 0
     },
     "frc610": {
-      "highest_qual_scores": [
-        52,
-        41,
-        40
+      "highest_match_scores": [
+        73,
+        59,
+        57
       ],
       "qual_wins": 0
     },
     "frc6397": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         54,
         40,
-        36
+        38
       ],
       "qual_wins": 0
     },
     "frc7520": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         42,
         39,
         31
@@ -196,7 +196,7 @@
       "qual_wins": 0
     },
     "frc771": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         52,
         52,
         25
@@ -204,15 +204,15 @@
       "qual_wins": 0
     },
     "frc865": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         60,
         41,
-        34
+        38
       ],
       "qual_wins": 0
     },
     "frc8764": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         46,
         32,
         29
@@ -220,10 +220,10 @@
       "qual_wins": 0
     },
     "frc914": {
-      "highest_qual_scores": [
+      "highest_match_scores": [
         82,
         49,
-        39
+        49
       ],
       "qual_wins": 0
     }

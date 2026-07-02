@@ -6,7 +6,10 @@ import {
   useState,
 } from 'react';
 
-import { Match } from '~/api/tba/read';
+import { AllianceColor, Match } from '~/api/tba/read';
+
+/** Alliance color when a bracket series has a winner (never NO_ALLIANCE). */
+type BracketWinningAlliance = Exclude<AllianceColor, AllianceColor.NO_ALLIANCE>;
 
 type MatchResult = {
   score: number;
@@ -38,18 +41,18 @@ export type PlayoffMatchHandle = {
 
 export type AdvancementPath = {
   d: string;
-  winner: 'red' | 'blue';
+  winner: BracketWinningAlliance;
   allianceNumber: number | null;
   key: string;
 };
 
 const saturatedColors = {
-  red: 'var(--color-red-500)',
-  blue: 'var(--color-blue-500)',
+  red: 'var(--alliance-red-accent)',
+  blue: 'var(--alliance-blue-accent)',
 };
 const desaturatedColors = {
-  red: 'var(--color-red-300)',
-  blue: 'var(--color-blue-300)',
+  red: 'var(--alliance-red-accent)',
+  blue: 'var(--alliance-blue-accent)',
 };
 
 export function useAdvancementPaths({
@@ -84,18 +87,19 @@ export function useAdvancementPaths({
 
         const seriesResult = getSeriesResult(matchLookup[link.from]);
         if (!seriesResult) return;
-        let winner: 'red' | 'blue' | null = null;
+        let winner: BracketWinningAlliance | null = null;
         let allianceNumber: number | null = null;
         if (seriesResult.redWon && seriesResult.redAllianceNumber) {
-          winner = 'red';
+          winner = AllianceColor.RED;
           allianceNumber = seriesResult.redAllianceNumber;
         } else if (seriesResult.blueWon && seriesResult.blueAllianceNumber) {
-          winner = 'blue';
+          winner = AllianceColor.BLUE;
           allianceNumber = seriesResult.blueAllianceNumber;
         }
         if (!winner) return;
 
-        const fromRow = winner === 'red' ? fromNode.redRow : fromNode.blueRow;
+        const fromRow =
+          winner === AllianceColor.RED ? fromNode.redRow : fromNode.blueRow;
         const fromRect = (fromRow ?? fromNode.card)?.getBoundingClientRect();
         if (!fromRect) return;
 

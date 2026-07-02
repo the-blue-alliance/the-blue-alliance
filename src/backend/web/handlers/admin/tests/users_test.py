@@ -6,6 +6,7 @@ from werkzeug.test import Client
 
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.models.account import Account
+from backend.common.models.audit_log_entry import AuditLogEntry
 
 
 def create_accounts(n: int, permissions: List[AccountPermission] = []) -> List[ndb.Key]:
@@ -76,6 +77,27 @@ def test_user_detail(web_client: Client, login_gae_admin) -> None:
     account_key = create_accounts(n=1)[0]
     resp = web_client.get(f"/admin/user/{account_key.id()}")
     assert resp.status_code == 200
+
+
+def test_user_detail_shows_recent_audit_logs(
+    web_client: Client, login_gae_admin
+) -> None:
+    account_key = create_accounts(n=1)[0]
+    for index in range(30):
+        AuditLogEntry(
+            account=account_key,
+            endpoint=f"endpoint_{index}",
+            url_args={},
+            form_params={},
+        ).put()
+
+    resp = web_client.get(f"/admin/user/{account_key.id()}")
+    assert resp.status_code == 200
+
+    assert b"Recent Audit Logs" in resp.data
+    assert b"endpoint_29" in resp.data
+    assert b"endpoint_5" in resp.data
+    assert b"endpoint_4" not in resp.data
 
 
 def test_user_detail_doesnt_exist(web_client: Client, login_gae_admin) -> None:

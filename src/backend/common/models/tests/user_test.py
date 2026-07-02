@@ -20,8 +20,13 @@ from backend.common.models.user import User
 from backend.common.queries.account_query import AccountQuery
 
 
-def test_init_no_email() -> None:
+def test_init_no_email_no_uid() -> None:
     user = User(session_claims={"email": ""})
+    assert user._account is None
+
+
+def test_init_no_email() -> None:
+    user = User(session_claims={})
     assert user._account is None
 
 

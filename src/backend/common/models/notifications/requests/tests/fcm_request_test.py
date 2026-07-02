@@ -107,6 +107,33 @@ def test_send_failed_partial(fcm_app):
     assert response == batch_response
 
 
+def test_send_track_notification_failure(fcm_app):
+    """Analytics tracking failure must not prevent the batch response from being returned.
+
+    The caller (_send_fcm) inspects the batch response to clean up stale
+    mobile clients.  If defer_track_notification raises, the response must
+    still be returned so that error-handling logic can execute.
+    """
+    batch_response = messaging.BatchResponse(
+        [messaging.SendResponse({"name": "abc"}, None)]
+    )
+    request = FCMRequest(fcm_app, notification=MockNotification(), tokens=["abc"])
+    with (
+        patch.object(
+            messaging, "send_each_for_multicast", return_value=batch_response
+        ) as mock_send,
+        patch.object(
+            request,
+            "defer_track_notification",
+            side_effect=Exception("task queue error"),
+        ) as mock_track,
+    ):
+        response = request.send()
+    mock_send.assert_called_once()
+    mock_track.assert_called_once_with(1)
+    assert response == batch_response
+
+
 def test_fcm_message_empty(fcm_app):
     request = FCMRequest(fcm_app, notification=MockNotification(), tokens=["abc"])
     message = request._fcm_message()

@@ -33,7 +33,9 @@ class LocalStorageClient(StorageClient):
 
         return None
 
-    def get_files(self, path: Optional[str] = None) -> List[str]:
+    def get_files(
+        self, path: Optional[str] = None, recursive: bool = False
+    ) -> List[str]:
         logging.info(f"Getting files from local storage with prefix: {path}")
         if not self.base_path.exists():
             logging.info(f"Base path {self.base_path} does not exist.")

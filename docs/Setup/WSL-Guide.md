@@ -5,29 +5,26 @@
 3. Open Docker Desktop -> Settings -> General -> Enable `Use the WSL 2 based engine`
 4. Open Docker Desktop -> Settings -> Resources -> WSL integration -> enable integration with all repos (if this doesn't show up, install the Docker CLI on your ubuntu distro and restart Docker Desktop)
 5. Make sure to hit `Apply & Restart` on Docker Desktop
-6. Fork and clone TBA's source on the `py3` branch
-7. Run `docker compose up -d`. This will begin to bring up the TBA stack in the background. After a few minutes, you'll be able to reach `localhost:8000` and various other ports.
+6. Fork and clone TBA's source
+7. Run `docker compose up --build -d`. This will begin to bring up the TBA stack in the background. After a few minutes, you'll be able to reach `localhost:8080` and various other ports.
 
 ### Console logs
 
-In order to view console logs, you need to SSH into the container.
+View logs directly via `docker compose`:
 
 ```bash
-# First, check that the docker bringup has concluded
-wsl:$ docker compose logs
-# ... snipped for brevity ...
-tba-1  | 2: datastore (1 panes) [80x24] [layout b25f,80x24,0,0,2] @2
-tba-1  | 3: webpack (1 panes) [80x24] [layout b260,80x24,0,0,3] @3
-tba-1  | 5: firebase- (1 panes) [80x24] [layout b261,80x24,0,0,4] @4
-tba-1  | To view logs and auto-update files, run `./ops/dev/host.sh`
+# Follow all service logs
+wsl:$ docker compose logs -f
 
-# This assumes that TBA is the most recent thing you've brought up
-# Next, run bash in an interactive terminal on the container
-wsl:$ docker exec -it $(docker container ls --latest --quiet) /bin/bash
-root@tba:/tba$
+# Follow logs for a specific service
+wsl:$ docker compose logs -f tba
+wsl:$ docker compose logs -f webpack
+```
 
-# Now that you are in, you can attach to the existing tmux session
-root@tba:/tba$ tmux attach
+To get a shell inside the container:
+
+```bash
+wsl:$ docker compose exec tba bash
 ```
 
 ### App Engine Admin Console

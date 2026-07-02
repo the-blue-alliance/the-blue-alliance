@@ -27,6 +27,7 @@ from backend.common.consts.event_type import (
     EventType,
     SEASON_EVENT_TYPES,
 )
+from backend.common.game_specific.registry import get_game
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.event import Event
@@ -413,6 +414,12 @@ class ContributionCalculator:
                     means[color] = score_breakdown[color]["teleopCoralCount"]
                 elif self._stat == "barge_points":
                     means[color] = score_breakdown[color]["endGameBargePoints"]
+                elif self._stat == "totalAutoPoints":
+                    means[color] = score_breakdown[color]["totalAutoPoints"]
+                elif self._stat == "totalTeleopPoints":
+                    means[color] = score_breakdown[color]["totalTeleopPoints"]
+                elif self._stat == "endGameTowerPoints":
+                    means[color] = score_breakdown[color]["endGameTowerPoints"]
                 else:
                     raise Exception("Unknown stat: {}".format(self._stat))
 
@@ -766,6 +773,31 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
                     prediction[color]["prob_barge_bonus"] = prob
+                # 2026
+                if stat == "totalAutoPoints":
+                    required_points = 15
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_energized_bonus"] = prob
+                if stat == "totalTeleopPoints":
+                    required_points = 30
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_supercharged_bonus"] = prob
+                if stat == "endGameTowerPoints":
+                    required_points = 15
+
+                    mu = mean_vars[color][stat]["mean"] - required_points
+                    prob = 1 - cls._normcdf(
+                        -mu / np.sqrt(mean_vars[color][stat]["var"])
+                    )
+                    prediction[color]["prob_traversal_bonus"] = prob
 
         # Prob win
         red_score = prediction["red"]["score"]
@@ -811,65 +843,7 @@ class PredictionHelper:
         }
         event_key = matches[0].event
         event = event_key.get()
-        relevant_stats: List[Tuple[str, int, int]]
-        if event.year == 2016:
-            relevant_stats = [
-                ("score", 20, 10**2),
-                ("auto_points", 20, 10**2),
-                ("crossings", 0, 1**2),
-                ("boulders", 0, 1**2),
-            ]
-        elif event.year == 2017:
-            relevant_stats = [
-                ("score", 50, 30**2),
-                ("pressure", 0, 1**2),
-                ("gears", 0, 1**2),
-            ]
-        elif event.year == 2018:
-            relevant_stats = [
-                ("score", 50, 30**2),
-                ("auto_points", 0, 1**2),
-                ("endgame_points", 0, 1**2),
-            ]
-        elif event.year == 2019:
-            relevant_stats = [
-                ("score", 10, 20**2),
-                ("rocket_pieces_scored", 1, 3**2),
-                ("hab_climb_points", 2, 3**2),
-            ]
-        elif event.year == 2020:
-            relevant_stats = [
-                ("score", 0, 50**2),
-                ("power_cells_scored", 0, 20**2),
-                ("endgame_points", 0, 20**2),
-            ]
-        elif event.year == 2022:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("cargo_scored", 0, 10**2),
-                ("endgame_points", 0, 10**2),
-            ]
-        elif event.year == 2023:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("links", 0, 3**2),
-                ("charge_station_points", 0, 10**2),
-            ]
-        elif event.year == 2024:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("note_scored", 0, 10**2),
-                ("stage_points", 0, 10**2),
-            ]
-        elif event.year == 2025:
-            relevant_stats = [
-                ("score", 0, 20**2),
-                ("auto_coral_scored", 0, 2**2),
-                ("coral_scored", 0, 10**2),
-                ("barge_points", 0, 10**2),
-            ]
-        else:
-            relevant_stats = []
+        relevant_stats = get_game(event.year).get_prediction_relevant_stats()
 
         contribution_calculators = [
             ContributionCalculator(event, matches, s, m, v)
@@ -929,42 +903,17 @@ class PredictionHelper:
                         brier_sums["score"] += pow(prediction["prob"] - 0, 2)
 
                     for color in ALLIANCE_COLORS:
-                        score_breakdown = none_throws(match.score_breakdown)
+                        if match.score_breakdown is None:
+                            continue
+                        score_breakdown = match.score_breakdown
                         color_prediction = prediction[str(color)]  # pyre-ignore[26]
-                        if event.year == 2016:
-                            if score_breakdown[color]["teleopDefensesBreached"]:
-                                brier_sums["breach"] += pow(
-                                    color_prediction["prob_breach"] - 1, 2
-                                )
-                            else:
-                                brier_sums["breach"] += pow(
-                                    color_prediction["prob_breach"] - 0, 2
-                                )
-                            if score_breakdown[color]["teleopTowerCaptured"]:
-                                brier_sums["capture"] += pow(
-                                    color_prediction["prob_capture"] - 1, 2
-                                )
-                            else:
-                                brier_sums["capture"] += pow(
-                                    color_prediction["prob_capture"] - 0, 2
-                                )
-                        elif event.year == 2017:
-                            if score_breakdown[color]["kPaRankingPointAchieved"]:
-                                brier_sums["pressure"] += pow(
-                                    color_prediction["prob_pressure"] - 1, 2
-                                )
-                            else:
-                                brier_sums["pressure"] += pow(
-                                    color_prediction["prob_pressure"] - 0, 2
-                                )
-                            if score_breakdown[color]["rotorRankingPointAchieved"]:
-                                brier_sums["gears"] += pow(
-                                    color_prediction["prob_gears"] - 1, 2
-                                )
-                            else:
-                                brier_sums["gears"] += pow(
-                                    color_prediction["prob_gears"] - 0, 2
-                                )
+                        for actual_key, prob_key, brier_name in get_game(
+                            event.year
+                        ).prediction_brier_fields():
+                            actual = score_breakdown[color].get(actual_key, False)
+                            brier_sums[brier_name] += pow(
+                                color_prediction[prob_key] - (1 if actual else 0), 2
+                            )
 
             brier_scores = {}
             for stat, brier_sum in brier_sums.items():
@@ -1036,6 +985,11 @@ class PredictionHelper:
             team_ranking_points = defaultdict(int)
             team_rank_tiebreaker = defaultdict(int)
             num_played = defaultdict(int)
+            game = get_game(matches[0].year)
+            rp_breakdown_fields = game.ranking_bonus_rp_breakdown_fields()
+            rp_prediction_fields = game.ranking_bonus_rp_prediction_fields()
+            tiebreaker_breakdown_field = game.ranking_tiebreaker_breakdown_field()
+            tiebreaker_prediction_field = game.ranking_tiebreaker_prediction_field()
             for match in matches:
                 for alliance_color in ALLIANCE_COLORS:
                     for team in match.alliances[alliance_color]["teams"]:
@@ -1066,99 +1020,21 @@ class PredictionHelper:
                     last_played_match = none_throws(match.key.string_id())
                     sampled_winner = match.winning_alliance
                     for alliance_color in ALLIANCE_COLORS:
-                        if match.year == 2016:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["teleopDefensesBreached"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["teleopTowerCaptured"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["autoPoints"]
-                        elif match.year == 2017:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["kPaRankingPointAchieved"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["rotorRankingPointAchieved"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
-                        elif match.year == 2018:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["autoQuestRankingPoint"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["faceTheBossRankingPoint"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
-                        elif match.year == 2019:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["completeRocketRankingPoint"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["habDockingRankingPoint"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
-                        elif match.year == 2020:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["shieldEnergizedRankingPoint"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["shieldOperationalRankingPoint"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
-                        elif match.year == 2022:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["cargoBonusRankingPoint"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["hangarBonusRankingPoint"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
-                        elif match.year == 2023:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["sustainabilityBonusAchieved"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["activationBonusAchieved"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
-                        elif match.year == 2024:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["melodyBonusAchieved"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["ensembleBonusAchieved"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
-                        elif match.year == 2025:
-                            sampled_rp1[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["autoBonusAchieved"]
-                            sampled_rp2[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["coralBonusAchieved"]
-                            sampled_rp3[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["bargeBonusAchieved"]
-                            sampled_tiebreaker[alliance_color] = score_breakdown[
-                                alliance_color
-                            ]["totalPoints"]
+                        alliance_breakdown = score_breakdown[alliance_color]
+                        sampled_rp_values = [
+                            bool(alliance_breakdown.get(field, False))
+                            for field in rp_breakdown_fields
+                        ]
+                        if len(sampled_rp_values) > 0:
+                            sampled_rp1[alliance_color] = sampled_rp_values[0]
+                        if len(sampled_rp_values) > 1:
+                            sampled_rp2[alliance_color] = sampled_rp_values[1]
+                        if len(sampled_rp_values) > 2:
+                            sampled_rp3[alliance_color] = sampled_rp_values[2]
+                        if tiebreaker_breakdown_field is not None:
+                            sampled_tiebreaker[alliance_color] = alliance_breakdown.get(
+                                tiebreaker_breakdown_field, 0
+                            )
                 else:
                     prediction = qual_predictions[none_throws(match.key.string_id())]
                     if np.random.uniform(high=1) < prediction["prob"]:
@@ -1168,117 +1044,19 @@ class PredictionHelper:
 
                     for alliance_color in ALLIANCE_COLORS:
                         color_prediction = prediction[alliance_color]  # pyre-ignore[6]
-                        if match.year == 2016:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_breach"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_capture"]
-                            )
+                        sampled_rp_values = [
+                            np.random.uniform(high=1) < color_prediction[prob_key]
+                            for prob_key in rp_prediction_fields
+                        ]
+                        if len(sampled_rp_values) > 0:
+                            sampled_rp1[alliance_color] = sampled_rp_values[0]
+                        if len(sampled_rp_values) > 1:
+                            sampled_rp2[alliance_color] = sampled_rp_values[1]
+                        if len(sampled_rp_values) > 2:
+                            sampled_rp3[alliance_color] = sampled_rp_values[2]
+                        if tiebreaker_prediction_field is not None:
                             sampled_tiebreaker[alliance_color] = color_prediction[
-                                "auto_points"
-                            ]
-                        elif match.year == 2017:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_pressure"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_gears"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
-                            ]
-                        elif match.year == 2018:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_auto_quest"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_face_boss"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
-                            ]
-                        elif match.year == 2019:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_complete_rocket"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_hab_docking"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
-                            ]
-                        elif match.year == 2020:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_shield_energized"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_shield_operational"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
-                            ]
-                        elif match.year == 2022:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_cargo_bonus"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_hangar_bonus"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
-                            ]
-                        elif match.year == 2023:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_sustainability_bonus"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_activation_bonus"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
-                            ]
-                        elif match.year == 2024:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_melody_bonus"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_ensemble_bonus"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
-                            ]
-                        elif match.year == 2025:
-                            sampled_rp1[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_auto_coral_bonus"]
-                            )
-                            sampled_rp2[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_coral_bonus"]
-                            )
-                            sampled_rp3[alliance_color] = (
-                                np.random.uniform(high=1)
-                                < color_prediction["prob_barge_bonus"]
-                            )
-                            sampled_tiebreaker[alliance_color] = color_prediction[
-                                "score"
+                                tiebreaker_prediction_field
                             ]
 
                 # Using match results, update RP and tiebreaker
@@ -1305,7 +1083,7 @@ class PredictionHelper:
                     for team in match.alliances[sampled_winner]["teams"]:
                         if team in surrogate_teams and num_played[team] == 3:
                             continue
-                        team_ranking_points[team] += 2 if match.year < 2025 else 3
+                        team_ranking_points[team] += game.ranking_win_points()
 
                     sampled_loser = OPPONENT[sampled_winner]
                     for team in match.alliances[sampled_loser]["teams"]:

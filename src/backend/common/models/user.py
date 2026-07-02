@@ -206,6 +206,11 @@ class User:
             return False
         return True if none_throws(self._account).permissions else False
 
+    def has_permission(self, permission: AccountPermission) -> bool:
+        if self._account is None:
+            return False
+        return permission in none_throws(self._account).permissions
+
     @property
     def api_keys(self) -> List[ApiAuthAccess]:
         if self._account is None:

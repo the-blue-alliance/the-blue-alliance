@@ -1,3 +1,7 @@
+import re
+from datetime import datetime
+from urllib.parse import urlparse
+
 from flask import abort, Blueprint, jsonify, redirect, request, url_for
 from pyre_extensions import none_throws
 from werkzeug.wrappers import Response
@@ -5,9 +9,11 @@ from werkzeug.wrappers import Response
 from backend.common.auth import current_user
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.media_type import MediaType
+from backend.common.frc_api.frc_api import FRCAPI
 from backend.common.helpers.media_helper import MediaHelper
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.team import Team
@@ -25,6 +31,84 @@ from backend.web.profiled_render import render_template
 
 blueprint = Blueprint("suggestions", __name__)
 
+_FRC_EVENTS_URL_RE = re.compile(r"^/(\d{4})/([A-Za-z0-9]+)$")
+
+
+def _parse_frc_events_link(frc_events_link: str) -> tuple[int, str] | None:
+    parsed = urlparse(frc_events_link)
+    if parsed.scheme != "https" or parsed.netloc != "frc-events.firstinspires.org":
+        return None
+
+    match = _FRC_EVENTS_URL_RE.match(parsed.path.rstrip("/"))
+    if not match:
+        return None
+
+    year = int(match.group(1))
+    event_code = match.group(2).upper()
+    return year, event_code
+
+
+def _normalized_event_name(event_name: str) -> str:
+    return re.sub(r"[^a-z0-9]", "", event_name.lower())
+
+
+def _get_frc_event_code(
+    frc_events_link: str,
+    event_name: str,
+    start_date: str,
+    end_date: str,
+) -> tuple[str | None, str | None]:
+    link_parts = _parse_frc_events_link(frc_events_link)
+    if link_parts is None:
+        return (
+            None,
+            "Invalid frc-events link. Use a URL like https://frc-events.firstinspires.org/2026/INLAF",
+        )
+
+    year, event_code = link_parts
+
+    try:
+        response = FRCAPI().event_info(year, event_code).get_result()
+    except Exception:
+        return None, "Unable to validate frc-events link right now"
+
+    if response.status_code != 200:
+        return None, "Could not find this event on the FRC API"
+
+    event_data = response.json() or {}
+    events = event_data.get("Events") or []
+    matched_event = next(
+        (event for event in events if (event.get("code") or "").upper() == event_code),
+        None,
+    )
+    if not matched_event:
+        return None, "Could not find this event on the FRC API"
+
+    frc_event_name = matched_event.get("name") or ""
+    normalized_submitted_name = _normalized_event_name(event_name)
+    normalized_frc_name = _normalized_event_name(frc_event_name)
+    if (
+        normalized_submitted_name
+        and normalized_frc_name
+        and normalized_submitted_name != normalized_frc_name
+    ):
+        return None, "frc-events link must point to the same event name"
+
+    frc_start_date = (matched_event.get("dateStart") or "").split("T")[0]
+    frc_end_date = (matched_event.get("dateEnd") or "").split("T")[0]
+    if start_date and frc_start_date and start_date != frc_start_date:
+        return None, "frc-events link must point to the same start date"
+    if end_date and frc_end_date and end_date != frc_end_date:
+        return None, "frc-events link must point to the same end date"
+
+    try:
+        if datetime.strptime(start_date, "%Y-%m-%d").year != year:
+            return None, "frc-events link year must match the event year"
+    except ValueError:
+        pass
+
+    return event_code, None
+
 
 @blueprint.route("/suggest/event/webcast")
 @require_login
@@ -37,9 +121,16 @@ def suggest_webcast() -> str:
     if not event:
         abort(404)
 
+    uses_official_webcast_unit = False
+    if event.event_district_key:
+        district = District.get_by_id(event.event_district_key)
+        if district:
+            uses_official_webcast_unit = bool(district.uses_official_webcast_unit)
+
     template_values = {
         "status": request.args.get("status"),
         "event": event,
+        "uses_official_webcast_unit": uses_official_webcast_unit,
     }
     return render_template("suggestions/suggest_event_webcast.html", template_values)
 
@@ -421,20 +512,45 @@ def suggest_offseason() -> Response:
 def submit_offseason() -> Response:
     user = none_throws(current_user())
     event_name = request.form.get("name", "")
+    start_date = request.form.get("start_date", "")
+    end_date = request.form.get("end_date", "")
+    venue_name = (request.form.get("venue_name") or "").strip()
+    venue_address = (request.form.get("venue_address") or "").strip()
+    venue_city = (request.form.get("venue_city") or "").strip()
+    venue_state = (request.form.get("venue_state") or "").strip()
+    venue_country = (request.form.get("venue_country") or "").strip()
+    frc_events_link = (request.form.get("frc_events_link") or "").strip() or None
     website = WebsiteHelper.format_url(request.form.get("website", None))
-    status, failures = SuggestionCreator.createOffseasonEventSuggestion(
-        author_account_key=none_throws(user.account_key),
-        name=event_name,
-        start_date=request.form.get("start_date", ""),
-        end_date=request.form.get("end_date", ""),
-        website=website,
-        venue_name=request.form.get("venue_name", ""),
-        address=request.form.get("venue_address", ""),
-        city=request.form.get("venue_city", ""),
-        state=request.form.get("venue_state", ""),
-        country=request.form.get("venue_country", ""),
-        first_code=request.form.get("first_code"),
-    )
+
+    first_code = None
+    frc_events_link_error = None
+    if frc_events_link:
+        first_code, frc_events_link_error = _get_frc_event_code(
+            frc_events_link,
+            event_name,
+            start_date,
+            end_date,
+        )
+
+    failures = None
+    if frc_events_link_error:
+        status = SuggestionCreationStatus.VALIDATION_FAILURE
+        failures = {"frc_events_link": frc_events_link_error}
+    else:
+        status, failures = SuggestionCreator.createOffseasonEventSuggestion(
+            author_account_key=none_throws(user.account_key),
+            name=event_name,
+            start_date=start_date,
+            end_date=end_date,
+            website=website,
+            venue_name=venue_name,
+            address=venue_address,
+            city=venue_city,
+            state=venue_state,
+            country=venue_country,
+            first_code=first_code,
+        )
+
     if status != "success":
         # Don't completely wipe form data if validation fails
         template_values = {
@@ -444,8 +560,12 @@ def submit_offseason() -> Response:
             "start_date": request.form.get("start_date", None),
             "end_date": request.form.get("end_date", None),
             "website": request.form.get("website", None),
+            "venue_name": request.form.get("venue_name", None),
             "venue_address": request.form.get("venue_address", None),
-            "first_code": request.form.get("first_code", None),
+            "venue_city": request.form.get("venue_city", None),
+            "venue_state": request.form.get("venue_state", None),
+            "venue_country": request.form.get("venue_country", None),
+            "frc_events_link": request.form.get("frc_events_link", None),
         }
         return render_template(
             "suggestions/suggest_offseason_event.html", template_values

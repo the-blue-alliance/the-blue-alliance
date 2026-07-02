@@ -282,3 +282,17 @@ DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
 DOUBLE_ELIM_4_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
     v: k for k, v in DOUBLE_ELIM_4_MAPPING.items()
 }
+
+
+LEGACY_DOUBLE_ELIM_MAPPING_INVERSE: Dict[Tuple[CompLevel, int, int], int] = {
+    v: k for k, v in LEGACY_DOUBLE_ELIM_MAPPING.items()
+}
+
+
+DOUBLE_ELIM_INVERSE_MAPPINGS: Dict[
+    PlayoffType, Dict[Tuple[CompLevel, int, int], int]
+] = {
+    PlayoffType.DOUBLE_ELIM_8_TEAM: DOUBLE_ELIM_MAPPING_INVERSE,
+    PlayoffType.DOUBLE_ELIM_4_TEAM: DOUBLE_ELIM_4_MAPPING_INVERSE,
+    PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM: LEGACY_DOUBLE_ELIM_MAPPING_INVERSE,
+}

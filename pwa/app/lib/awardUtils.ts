@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 import { Award, Event } from '~/api/tba/read';
 import { SORT_ORDER } from '~/lib/api/AwardType';
 
@@ -16,10 +18,10 @@ export function sortAwardsByEventDate(
     const eventB = events.find((event) => event.key === b.event_key);
 
     if (eventA && eventB) {
-      const dateA = new Date(eventA.start_date);
-      const dateB = new Date(eventB.start_date);
-
-      return dateA.getTime() - dateB.getTime();
+      return Temporal.PlainDate.compare(
+        Temporal.PlainDate.from(eventA.start_date),
+        Temporal.PlainDate.from(eventB.start_date),
+      );
     }
 
     return sortAwardsComparator(a, b);

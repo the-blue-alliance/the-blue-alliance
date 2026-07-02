@@ -1,4 +1,10 @@
 <div class="row">
+    {% if rankings is none %}
+    <div class="alert alert-block alert-danger">
+        <h4>Failed to fetch rankings for {{event_name}}</h4>
+        <p>The FRC API returned an error.</p>
+    </div>
+    {% else %}
     <div class="alert alert-block alert-success">
         <h4>Got Rankings for {{event_name}}</h4>
     </div>
@@ -18,4 +24,5 @@
         </tr>
     {% endfor %}
     </table>
+    {% endif %}
 </div>

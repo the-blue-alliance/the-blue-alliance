@@ -4,6 +4,7 @@ from typing import Any, cast, Dict, List, Optional, Union
 import requests
 from google.appengine.ext import ndb
 
+from backend.common.consts.renamed_districts import ALL_KNOWN_DISTRICT_ABBREVIATIONS
 from backend.common.helpers.deferred import defer_safe
 from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.district_manipulator import DistrictManipulator
@@ -19,12 +20,13 @@ from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.award import Award
-from backend.common.models.district import ALL_KNOWN_DISTRICT_ABBREVIATIONS, District
+from backend.common.models.district import District
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
+from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import (
     DistrictAbbreviation,
     DistrictKey,
@@ -205,6 +207,18 @@ class LocalDataBootstrap:
         teams = list(map(cls.store_team, event_teams))
         list(map(lambda t: cls.store_eventteam(t, event), teams))
 
+        # Fetch pit locations from teams/statuses endpoint
+        event_statuses = cls.fetch_event_detail(key, "teams/statuses", auth_token)
+        if event_statuses:
+            for team_key_str, status in event_statuses.items():
+                if status and "pit_location" in status:
+                    et = EventTeam.get_by_id(f"{key}_{team_key_str}")
+                    if et:
+                        et.pit_location = EventTeamPitLocation(
+                            location=status["pit_location"]
+                        )
+                        EventTeamManipulator.createOrUpdate(et)
+
         event_matches = cls.fetch_event_detail(key, "matches", auth_token)
         list(map(cls.store_match, event_matches))
 
@@ -221,6 +235,12 @@ class LocalDataBootstrap:
 
         event_predictions = cls.fetch_event_detail(key, "predictions", auth_token)
         cls.store_eventdetail(event, "predictions", event_predictions)
+
+        event_district_points = cls.fetch_event_detail(
+            key, "district_points", auth_token
+        )
+        if event_district_points:
+            cls.store_eventdetail(event, "district_points", event_district_points)
 
     @classmethod
     def update_team(cls, key: TeamKey, auth_token: str) -> None:
@@ -276,6 +296,11 @@ class LocalDataBootstrap:
             ]
             for event_key in event_keys:
                 defer_safe(cls.update_event, event_key, apiv3_key)
+
+            districts = cls.fetch_endpoint(f"districts/{key}", apiv3_key)
+            for district_data in districts:
+                defer_safe(cls.update_district, district_data, apiv3_key)
+
             return f"/events/{key}"
         elif key in ALL_KNOWN_DISTRICT_ABBREVIATIONS:
             # bootstrap all years for the given district abbr

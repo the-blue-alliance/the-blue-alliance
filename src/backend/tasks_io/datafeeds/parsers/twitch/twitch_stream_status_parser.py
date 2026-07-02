@@ -1,8 +1,8 @@
 from typing import Any, cast, List, TypedDict
 
 from backend.common.consts.webcast_status import WebcastStatus
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.models.webcast import Webcast
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class _StreamDataResponse(TypedDict):

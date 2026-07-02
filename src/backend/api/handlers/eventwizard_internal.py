@@ -13,6 +13,7 @@ from backend.common.cloudrun import get_job_status, start_job
 from backend.common.consts.auth_type import AuthType
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
 from backend.common.helpers.fms_report_helper import FMSReportHelper
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.keys import EventKey
 
@@ -130,6 +131,22 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
             **job_params,
         }
     )
+
+
+@require_write_auth({AuthType.MATCH_VIDEO})
+@validate_keys
+def get_playlist_videos(event_key: EventKey, playlist_id: str) -> Response:
+    try:
+        playlist_videos = YouTubeVideoHelper.videos_in_playlist(
+            playlist_id
+        ).get_result()
+        return profiled_jsonify(playlist_videos)
+    except Exception as e:
+        logging.exception("Failed to fetch YouTube playlist videos")
+        return make_response(
+            profiled_jsonify({"Error": f"Failed to fetch playlist videos: {str(e)}"}),
+            500,
+        )
 
 
 @require_write_auth({AuthType.EVENT_TEAMS})

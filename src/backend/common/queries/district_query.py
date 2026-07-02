@@ -16,7 +16,7 @@ from backend.common.tasklets import typed_tasklet
 
 
 class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDict]]):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_{district_key}"
     DICT_CONVERTER = DistrictConverter
 
@@ -55,7 +55,7 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict
 
 
 class DistrictHistoryQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_history_{abbreviation}"
     DICT_CONVERTER = DistrictConverter
 
@@ -94,10 +94,25 @@ class TeamDistrictsQuery(CachedDatabaseQuery[List[District], List[DistrictDict]]
         return list(filter(lambda x: x is not None, districts))
 
 
+class AllDistrictTeamsQuery(CachedDatabaseQuery[List[DistrictTeam], None]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "all_district_teams"
+    DICT_CONVERTER = None
+
+    def __init__(self) -> None:
+        super().__init__()
+
+    @typed_tasklet
+    def _query_async(self) -> Generator[Any, Any, List[DistrictTeam]]:
+        keys = yield DistrictTeam.query().fetch_async(keys_only=True)
+        district_teams = yield ndb.get_multi_async(keys)
+        return list(filter(lambda x: x is not None, district_teams))
+
+
 class DistrictAbbreviationQuery(
     CachedDatabaseQuery[List[District], List[DistrictDict]]
 ):
-    CACHE_VERSION = 2
+    CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_abbreviation_{abbreviation}"
     DICT_CONVERTER = DistrictConverter
 

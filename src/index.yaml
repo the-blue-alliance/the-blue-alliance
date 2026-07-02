@@ -118,6 +118,12 @@ indexes:
       - name: name
       - name: year
 
+  - kind: Insight
+    properties:
+      - name: name
+      - name: district_abbreviation
+      - name: year
+
   - kind: Match
     properties:
       - name: event
@@ -180,3 +186,15 @@ indexes:
     properties:
       - name: year
       - name: team_number
+
+  - kind: AuditLogEntry
+    properties:
+      - name: target_key
+      - name: time
+        direction: desc
+
+  - kind: AuditLogEntry
+    properties:
+      - name: account
+      - name: time
+        direction: desc

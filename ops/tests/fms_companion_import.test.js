@@ -132,7 +132,7 @@ describe("FMS Companion Import", () => {
       if (error.stderr) console.error("stderr:", error.stderr);
       throw error;
     }
-  });
+  }, 180000); // 3 min — container execution + data processing
 
   it("should have matches written", async () => {
     expect(eventKey).not.toBeNull();

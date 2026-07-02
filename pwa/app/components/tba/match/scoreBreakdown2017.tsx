@@ -1,4 +1,4 @@
-import { Match, MatchScoreBreakdown2017 } from '~/api/tba/read';
+import { Match, MatchScoreBreakdown2017, RobotAuto2017 } from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
@@ -33,15 +33,15 @@ export default function ScoreBreakdown2017({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.robot1Auto === 'Mobility'}
+            condition={scoreBreakdown.red.robot1Auto === RobotAuto2017.MOBILITY}
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.robot2Auto === 'Mobility'}
+            condition={scoreBreakdown.red.robot2Auto === RobotAuto2017.MOBILITY}
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.robot3Auto === 'Mobility'}
+            condition={scoreBreakdown.red.robot3Auto === RobotAuto2017.MOBILITY}
             teamKey={match.alliances.red.team_keys[2]}
           />
           (+{scoreBreakdown.red.autoMobilityPoints})
@@ -55,15 +55,21 @@ export default function ScoreBreakdown2017({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.robot1Auto === 'Mobility'}
+            condition={
+              scoreBreakdown.blue.robot1Auto === RobotAuto2017.MOBILITY
+            }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.robot2Auto === 'Mobility'}
+            condition={
+              scoreBreakdown.blue.robot2Auto === RobotAuto2017.MOBILITY
+            }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.robot3Auto === 'Mobility'}
+            condition={
+              scoreBreakdown.blue.robot3Auto === RobotAuto2017.MOBILITY
+            }
             teamKey={match.alliances.blue.team_keys[2]}
           />
           (+{scoreBreakdown.blue.autoMobilityPoints})

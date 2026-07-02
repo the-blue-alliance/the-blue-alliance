@@ -4,6 +4,7 @@ from typing import List, Optional, Set
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import (
     AwardAssignmentListModelV2,
     AwardAssignmentModelV2,
@@ -12,7 +13,6 @@ from backend.common.helpers.award_helper import AwardHelper
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.team import Team
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class FMSAPIAwardsParser(ParserBase[AwardAssignmentListModelV2, List[Award]]):

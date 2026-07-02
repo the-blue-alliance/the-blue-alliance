@@ -1,3 +1,5 @@
+from typing import Optional
+
 from flask import redirect, request
 from pyre_extensions.refinement import none_throws
 from werkzeug.wrappers import Response
@@ -6,6 +8,7 @@ from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.webcast import Webcast
@@ -20,6 +23,10 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
 
     def __init__(self, *args, **kw):
         super(SuggestEventWebcastReviewController, self).__init__(*args, **kw)
+
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        return "Event"
 
     def create_target_model(self, suggestion: Suggestion) -> Event:
         webcast = Webcast(
@@ -65,8 +72,20 @@ class SuggestEventWebcastReviewController(SuggestionsReviewBase[Event]):
 
         suggestion_sets = []
         for event_key, suggestions in suggestions_by_event_key.items():
+            event = Event.get_by_id(event_key)
+            uses_official_webcast_unit = False
+            if event and event.event_district_key:
+                district = District.get_by_id(event.event_district_key)
+                if district:
+                    uses_official_webcast_unit = bool(
+                        district.uses_official_webcast_unit
+                    )
             suggestion_sets.append(
-                {"event": Event.get_by_id(event_key), "suggestions": suggestions}
+                {
+                    "event": event,
+                    "suggestions": suggestions,
+                    "uses_official_webcast_unit": uses_official_webcast_unit,
+                }
             )
 
         template_values = {

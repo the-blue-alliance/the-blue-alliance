@@ -7,9 +7,10 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
-from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.comp_level import CompLevel, ELIM_LEVELS
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import DOUBLE_ELIM_TYPES
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.frc_api import TScoreDetailReturn, TScoreDetailUnion
 from backend.common.frc_api.types import (
     EventScheduleHybridModelV2,
@@ -24,7 +25,6 @@ from backend.common.models.keys import MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.suggestions.media_parser import MediaParser
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 QF_SF_MAP = {
     1: (1, 3),  # in sf1, qf seeds 2 and 4 play. 0-indexed becomes 1, 3
@@ -48,6 +48,15 @@ class FMSAPIHybridScheduleParser(
         self.event_short = event_short
 
     @classmethod
+    def _is_blank_breakdown_value(cls, value: Any) -> bool:
+        """Recursively check if a score breakdown value is blank (zero, falsy, or sentinel string)."""
+        if isinstance(value, dict):
+            return all(cls._is_blank_breakdown_value(v) for v in value.values())
+        if isinstance(value, list):
+            return all(cls._is_blank_breakdown_value(v) for v in value)
+        return not value or value in {"Unknown", "None"}
+
+    @classmethod
     def is_blank_match(cls, match: Match) -> bool:
         """
         Detect junk playoff matches like in 2017scmb
@@ -58,10 +67,7 @@ class FMSAPIHybridScheduleParser(
             if match.alliances[color]["score"] != 0:
                 return False
             for value in none_throws(match.score_breakdown)[color].values():
-                if value and value not in {
-                    "Unknown",
-                    "None",
-                }:  # Nonzero, False, blank, None, etc.
+                if not cls._is_blank_breakdown_value(value):
                     return False
         return True
 
@@ -235,10 +241,17 @@ class FMSAPIHybridScheduleParser(
                     )
                 )
                 existing_match = existing_match.tiebreak_match_key.get()
+
+            if existing_match and existing_match.alliances_json is None:
+                logging.error(
+                    f"Corrupt match! {existing_match.key.id()} has no alliances_json! Skipping tiebreak logic"
+                )
+                existing_match = None
+
             # Check if last existing match needs to be tiebroken
             if (
                 existing_match
-                and existing_match.comp_level != "qm"
+                and existing_match.comp_level in ELIM_LEVELS
                 and existing_match.has_been_played
                 and existing_match.winning_alliance == ""
                 and existing_match.actual_time != actual_time

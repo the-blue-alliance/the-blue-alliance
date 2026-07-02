@@ -140,10 +140,10 @@ export default function CoprScatterChart({
           <ScatterChart
             data={data}
             margin={{
-              left: 0,
-              right: 0,
-              bottom: 10,
-              top: 10,
+              left: 20,
+              right: 20,
+              bottom: 20,
+              top: 20,
             }}
           >
             {generateGridPoints(
@@ -282,7 +282,10 @@ const CustomTooltip = ({
     ).teamKey.substring(3);
 
     return (
-      <div className="flex flex-col rounded-md bg-white shadow-xl">
+      <div
+        className="flex flex-col rounded-md bg-background text-foreground
+          shadow-xl"
+      >
         <div className="flex flex-col p-4">
           <div className="pb-2 text-xl">{teamKey}</div>
           <div className="">

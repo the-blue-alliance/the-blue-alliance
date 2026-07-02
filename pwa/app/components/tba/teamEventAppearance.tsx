@@ -6,10 +6,13 @@ import {
   EliminationAlliance,
   Event,
   EventDistrictPoints,
+  EventType,
   Match,
+  RegionalAdvancement,
   Team,
   TeamEventStatus,
 } from '~/api/tba/read';
+import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import { AwardBanner } from '~/components/tba/banner';
 import DetailEntity from '~/components/tba/detailEntity';
 import { EventLink, EventLocationLink, TeamLink } from '~/components/tba/links';
@@ -20,11 +23,51 @@ import {
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
+import { Separator } from '~/components/ui/separator';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-import { cn, pluralize } from '~/lib/utils';
+
+function StatChip({
+  label,
+  value,
+  sub,
+}: {
+  label: string;
+  value: string;
+  sub?: string;
+}) {
+  return (
+    <div className="rounded-lg bg-muted p-3 text-center">
+      <div className="text-xs tracking-wide text-muted-foreground uppercase">
+        {label}
+      </div>
+      <div className="mt-1 text-2xl leading-none font-bold">{value}</div>
+      {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
+    </div>
+  );
+}
+
+function Section({
+  title,
+  children,
+}: {
+  title: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <div className="space-y-2">
+      <h3
+        className="flex items-center gap-2 text-sm font-medium tracking-wide
+          text-muted-foreground uppercase"
+      >
+        {title}
+      </h3>
+      {children}
+    </div>
+  );
+}
 
 export default function TeamEventAppearance({
   event,
@@ -33,7 +76,9 @@ export default function TeamEventAppearance({
   team,
   awards,
   maybeDistrictPoints,
+  maybeRegionalPoolPoints,
   maybeAlliances,
+  teamRegionalAdvancement,
 }: {
   event: Event;
   matches: Match[];
@@ -41,7 +86,9 @@ export default function TeamEventAppearance({
   team: Team;
   awards: Award[];
   maybeDistrictPoints: EventDistrictPoints | null;
+  maybeRegionalPoolPoints: EventDistrictPoints | null;
   maybeAlliances: EliminationAlliance[] | null;
+  teamRegionalAdvancement?: RegionalAdvancement;
 }): React.JSX.Element {
   const bannerAwards = awards.filter((a) =>
     BLUE_BANNER_AWARDS.has(a.award_type),
@@ -50,54 +97,65 @@ export default function TeamEventAppearance({
   matches.sort(sortMatchComparator);
 
   return (
-    <div className="flex flex-wrap gap-x-8" id={event.key}>
-      <div className="w-full md:w-[32%]">
-        <h2 className="text-2xl font-medium">
-          <EventLink eventOrKey={event.key}>{event.name}</EventLink>
-        </h2>
+    <div className="relative" id={event.key}>
+      <div className="flex flex-wrap gap-x-8">
+        <div className="w-full md:w-[32%]">
+          <h2 className="mb-1 text-2xl font-medium">
+            <EventLink eventOrKey={event.key}>{event.name}</EventLink>
+          </h2>
 
-        <div className="mb-3 space-y-1">
-          <DetailEntity icon={<DateIcon />}>
-            {getEventDateString(event, 'long')}{' '}
-            {event.week !== null && (
-              <Badge variant={'secondary'}>Week {event.week + 1}</Badge>
-            )}
-          </DetailEntity>
-          <DetailEntity icon={<LocationIcon />}>
-            <EventLocationLink event={event} />
-          </DetailEntity>
+          <div className="mb-3 space-y-1">
+            <DetailEntity icon={<DateIcon />}>
+              {getEventDateString(event, 'long')}
+              <AddToCalendarLinks event={event} />{' '}
+              {event.week !== null && (
+                <Badge variant={'secondary'}>Week {event.week + 1}</Badge>
+              )}
+            </DetailEntity>
+            <DetailEntity icon={<LocationIcon />}>
+              <EventLocationLink
+                event={event}
+                hideVenue={true}
+                hideUSA={true}
+              />
+            </DetailEntity>
+          </div>
+          <TeamStatus
+            event={event}
+            status={status}
+            team={team}
+            awards={awards}
+            maybeDistrictPoints={maybeDistrictPoints}
+            maybeRegionalPoolPoints={maybeRegionalPoolPoints}
+            maybeAlliances={maybeAlliances}
+            teamRegionalAdvancement={teamRegionalAdvancement}
+          />
         </div>
 
-        <TeamStatus
-          event={event}
-          status={status}
-          team={team}
-          awards={awards}
-          maybeDistrictPoints={maybeDistrictPoints}
-          maybeAlliances={maybeAlliances}
-        />
+        <div className="grow">
+          <SimpleMatchRowsWithBreaks
+            matches={matches}
+            event={event}
+            breakers={[
+              START_OF_QUALS_BREAKER,
+              END_OF_DAY_BREAKER,
+              CHANGE_IN_COMP_LEVEL_BREAKER,
+            ]}
+            focusTeamKey={team.key}
+          />
+        </div>
+      </div>
 
-        {SEASON_EVENT_TYPES.has(event.event_type) &&
-          bannerAwards.length > 0 && (
-            <div className="mt-6 flex flex-row flex-wrap justify-center gap-2">
-              {bannerAwards.map((a) => (
-                <AwardBanner key={a.award_type} award={a} event={event} />
-              ))}
-            </div>
-          )}
-      </div>
-      <div className="grow">
-        <SimpleMatchRowsWithBreaks
-          matches={matches}
-          event={event}
-          breakers={[
-            START_OF_QUALS_BREAKER,
-            END_OF_DAY_BREAKER,
-            CHANGE_IN_COMP_LEVEL_BREAKER,
-          ]}
-          focusTeamKey={team.key}
-        />
-      </div>
+      {SEASON_EVENT_TYPES.has(event.event_type) && bannerAwards.length > 0 && (
+        <div
+          className="absolute top-0 right-0 -mr-46 hidden min-[1550px]:flex
+            min-[1550px]:flex-col min-[1550px]:gap-2"
+        >
+          {bannerAwards.map((a) => (
+            <AwardBanner key={a.award_type} award={a} event={event} />
+          ))}
+        </div>
+      )}
     </div>
   );
 }
@@ -108,116 +166,173 @@ function TeamStatus({
   team,
   awards,
   maybeDistrictPoints,
+  maybeRegionalPoolPoints,
   maybeAlliances,
+  teamRegionalAdvancement,
 }: {
   event: Event;
   status: TeamEventStatus | null;
   team: Team;
   awards: Award[];
   maybeDistrictPoints: EventDistrictPoints | null;
+  maybeRegionalPoolPoints: EventDistrictPoints | null;
   maybeAlliances: EliminationAlliance[] | null;
+  teamRegionalAdvancement?: RegionalAdvancement;
 }) {
-  return (
-    <div className="flow-root">
-      <dl className="-my-3 divide-y text-sm">
-        {status?.qual?.ranking?.rank && (
-          <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium">Rank</dt>
-            <dd className="sm:col-span-2">
-              <span className="font-bold">{status.qual.ranking.rank}</span>
-              <span className="text-muted-foreground">
-                {' '}
-                of {status.qual.num_teams}
-              </span>
-            </dd>
-          </div>
-        )}
+  const hasRank = status?.qual?.ranking?.rank;
+  const hasRecord = status?.qual?.ranking?.record;
+  const hasAlliance =
+    status?.alliance && maybeAlliances && maybeAlliances.length > 0;
+  const hasAwards = awards.length > 0;
+  const hasDistrictPoints =
+    DISTRICT_EVENT_TYPES.has(event.event_type) &&
+    maybeDistrictPoints?.points[team.key];
+  const hasRegionalPoolPoints =
+    event.event_type === EventType.REGIONAL &&
+    maybeRegionalPoolPoints?.points[team.key];
 
-        {status?.qual?.ranking?.record && (
-          <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium">Record</dt>
-            <dd className="sm:col-span-2">
-              {status.qual.ranking.record.wins +
-                (status.playoff?.record?.wins ?? 0)}
-              -
-              {status.qual.ranking.record.losses +
-                (status.playoff?.record?.losses ?? 0)}
-              -
-              {status.qual.ranking.record.ties +
-                (status.playoff?.record?.ties ?? 0)}
-            </dd>
-          </div>
-        )}
+  const sections = [];
 
-        {awards.length > 0 && (
-          <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium">
-              {pluralize(awards.length, 'Award', 'Awards', false)}
-            </dt>
-            <dd className="sm:col-span-2">
-              <ul
-                className={cn({
-                  'list-none': awards.length == 1,
-                  'list-inside list-disc': awards.length > 1,
-                })}
+  // Stats row (rank + record)
+  if (hasRank || hasRecord) {
+    sections.push(
+      <div key="stats" className="grid grid-cols-2 gap-2">
+        {hasRank && status?.qual?.ranking?.rank && (
+          <StatChip
+            label="Rank"
+            value={status.qual.ranking.rank.toString()}
+            sub={`of ${status.qual.num_teams}`}
+          />
+        )}
+        {hasRecord && status?.qual?.ranking?.record && (
+          <StatChip
+            label="Record"
+            value={`${
+              status.qual.ranking.record.wins +
+              (status.playoff?.record?.wins ?? 0)
+            }-${
+              status.qual.ranking.record.losses +
+              (status.playoff?.record?.losses ?? 0)
+            }-${
+              status.qual.ranking.record.ties +
+              (status.playoff?.record?.ties ?? 0)
+            }`}
+          />
+        )}
+      </div>,
+    );
+  }
+
+  // Alliance section
+  if (hasAlliance) {
+    sections.push(
+      <Section key="alliance" title={status.alliance?.name ?? 'Alliance'}>
+        <div className="flex flex-wrap gap-1">
+          {maybeAlliances
+            .find((a) => a.picks.includes(team.key))
+            ?.picks.map((k) => (
+              <TeamLink key={k} teamOrKey={k} year={event.year}>
+                <Badge variant={'outline'}>{k.substring(3)}</Badge>
+              </TeamLink>
+            ))}
+        </div>
+      </Section>,
+    );
+  }
+
+  // Awards section
+  if (hasAwards) {
+    sections.push(
+      <Section key="awards" title="Awards">
+        <div className="space-y-3">
+          <ul className="list-none space-y-1">
+            {awards.map((award) => {
+              const namedRecipients = award.recipient_list.filter(
+                (r) =>
+                  r.awardee !== null &&
+                  r.awardee !== '' &&
+                  r.team_key === team.key,
+              );
+
+              return (
+                <li key={`${award.award_type}-${award.event_key}`}>
+                  {award.name}
+                  {namedRecipients.length > 0 && (
+                    <span className="text-muted-foreground">
+                      {' '}
+                      ({namedRecipients.map((r) => r.awardee).join(', ')})
+                    </span>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        </div>
+      </Section>,
+    );
+  }
+
+  // District Points section
+  if (hasDistrictPoints) {
+    sections.push(
+      <Section key="district" title="District Points">
+        <DistrictPointsTable
+          districtPoints={maybeDistrictPoints.points[team.key]}
+        />
+      </Section>,
+    );
+  }
+
+  // Regional Pool Points section
+  if (hasRegionalPoolPoints) {
+    // If qualifying_event is set, the team got their pool invite at a specific event.
+    // Otherwise (PoolQualified), match by week number instead.
+    const poolWeek = teamRegionalAdvancement?.qualifying_pool_week;
+    const qualifiedAtEvent =
+      teamRegionalAdvancement?.qualifying_event === event.key;
+    const qualifiedAtWeek =
+      teamRegionalAdvancement?.qualifying_event === undefined &&
+      event.week !== null &&
+      event.week + 1 === poolWeek;
+    const qualifiedViaPoolHere =
+      poolWeek !== undefined && (qualifiedAtEvent || qualifiedAtWeek);
+
+    sections.push(
+      <Section
+        key="regional-pool"
+        title={
+          <>
+            Regional Pool Points
+            {qualifiedViaPoolHere && (
+              <Badge
+                variant="success"
+                className="ml-auto tracking-normal normal-case"
               >
-                {awards.map((award) => {
-                  const namedRecipients = award.recipient_list.filter(
-                    (r) =>
-                      r.awardee !== null &&
-                      r.awardee !== '' &&
-                      r.team_key === team.key,
-                  );
+                Qualified
+              </Badge>
+            )}
+          </>
+        }
+      >
+        <DistrictPointsTable
+          districtPoints={maybeRegionalPoolPoints.points[team.key]}
+        />
+      </Section>,
+    );
+  }
 
-                  return (
-                    <li key={`${award.award_type}-${award.event_key}`}>
-                      {award.name}
-                      {namedRecipients.length > 0 ? (
-                        <>
-                          {' '}
-                          ({namedRecipients.map((r) => r.awardee).join(', ')})
-                        </>
-                      ) : (
-                        <></>
-                      )}
-                    </li>
-                  );
-                })}
-              </ul>
-            </dd>
-          </div>
-        )}
+  if (sections.length === 0) {
+    return null;
+  }
 
-        {status?.alliance && maybeAlliances && maybeAlliances.length > 0 && (
-          <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium">{status.alliance.name}</dt>
-            <dd className="sm:col-span-2">
-              <div className="flex flex-wrap gap-1">
-                {maybeAlliances
-                  .find((a) => a.picks.includes(team.key))
-                  ?.picks.map((k) => (
-                    <TeamLink key={k} teamOrKey={k} year={event.year}>
-                      <Badge key={k} variant={'outline'}>
-                        {k.substring(3)}
-                      </Badge>
-                    </TeamLink>
-                  ))}
-              </div>
-            </dd>
-          </div>
-        )}
-
-        {maybeDistrictPoints?.points[team.key] && (
-          <div className="grid grid-cols-1 gap-1 py-3 sm:grid-cols-3 sm:gap-4">
-            <dt className="font-medium">District Points</dt>
-            <dd className="sm:col-span-2">
-              <DistrictPointsTable
-                districtPoints={maybeDistrictPoints.points[team.key]}
-              />
-            </dd>
-          </div>
-        )}
-      </dl>
+  return (
+    <div className="space-y-4">
+      {sections.map((section, index) => (
+        <div key={section.key}>
+          {index > 0 && <Separator className="mb-4" />}
+          {section}
+        </div>
+      ))}
     </div>
   );
 }
@@ -228,43 +343,28 @@ function DistrictPointsTable({
   districtPoints: EventDistrictPoints['points'][string];
 }) {
   return (
-    <div className="flow-root">
-      <dl className="my-0 text-sm">
-        <div className="grid grid-cols-3 gap-2 py-0.5">
-          <dt className="col-span-1 font-medium">Quals</dt>
-          <dd className="col-span-2 text-right">
-            {districtPoints.qual_points}
-          </dd>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 py-0.5">
-          <dt className="col-span-1 font-medium">Alliance</dt>
-          <dd className="col-span-2 text-right">
-            {districtPoints.alliance_points}
-          </dd>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 py-0.5">
-          <dt className="col-span-1 font-medium">Playoff</dt>
-          <dd className="col-span-2 text-right">
-            {districtPoints.elim_points}
-          </dd>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 py-0.5">
-          <dt className="col-span-1 font-medium">Award</dt>
-          <dd className="col-span-2 text-right">
-            {districtPoints.award_points}
-          </dd>
-        </div>
-
-        <div className="grid grid-cols-3 gap-2 border-t-2 py-0.5 pt-1">
-          <dt className="col-span-1 font-semibold">Total</dt>
-          <dd className="col-span-2 text-right font-bold">
-            {districtPoints.total}
-          </dd>
-        </div>
-      </dl>
+    <div className="space-y-1 text-sm">
+      <div className="flex justify-between">
+        <span>Quals</span>
+        <span className="font-medium">{districtPoints.qual_points}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Alliance</span>
+        <span className="font-medium">{districtPoints.alliance_points}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Playoff</span>
+        <span className="font-medium">{districtPoints.elim_points}</span>
+      </div>
+      <div className="flex justify-between">
+        <span>Award</span>
+        <span className="font-medium">{districtPoints.award_points}</span>
+      </div>
+      <Separator className="my-2" />
+      <div className="flex justify-between font-semibold">
+        <span>Total</span>
+        <span>{districtPoints.total}</span>
+      </div>
     </div>
   );
 }

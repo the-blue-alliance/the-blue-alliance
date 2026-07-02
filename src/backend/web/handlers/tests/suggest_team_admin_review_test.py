@@ -8,8 +8,10 @@ import pytest
 from flask.testing import FlaskClient
 from google.appengine.ext import ndb
 
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.media import Media
 from backend.common.models.robot import Robot
 from backend.common.models.suggestion import Suggestion
@@ -27,6 +29,109 @@ def test_login_redirect(web_client):
 
     assert resp.status_code == 302
     assert urlparse(resp.headers["Location"]).path == "/account/login"
+
+
+def test_mod_admin_can_view_with_forced_team_year(login_admin, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_admin.has_permission.return_value = False
+
+    resp = web_client.get(f"/mod?team=1124&year={datetime.datetime.now().year}")
+
+    assert resp.status_code == 200
+
+
+def test_mod_review_permission_can_view_with_forced_team_year(login_user, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_user.has_permission.return_value = True
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    resp = web_client.get(f"/mod?team=1124&year={datetime.datetime.now().year}")
+
+    assert resp.status_code == 200
+    assert b"Jump to Year" in resp.data
+    assert b'name="team" value="1124"' in resp.data
+    assert b'name="year"' in resp.data
+
+
+def test_mod_without_review_permission_hides_year_jump(login_user, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    TeamAdminAccess(
+        id=TeamAdminAccess.render_key_name(1124, datetime.datetime.now().year),
+        account=login_user.account_key,
+        team_number=1124,
+        year=datetime.datetime.now().year,
+        expiration=datetime.datetime.now() + datetime.timedelta(days=1),
+    ).put()
+
+    resp = web_client.get("/mod")
+
+    assert resp.status_code == 200
+    assert b"Jump to Year" not in resp.data
+
+
+def test_mod_post_admin_can_set_team_info(login_admin, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_admin.has_permission.return_value = False
+
+    resp = web_client.post(
+        "/mod",
+        data={
+            "team_number": 1124,
+            "action": "set_team_info",
+            "robot_name": "",
+        },
+    )
+
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/mod"
+
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.account == login_admin.account_key
+    assert entry.endpoint == "team_admin.team_mod_post"
+    assert entry.target_key is not None
+    assert entry.target_key.kind() == "Team"
+    assert entry.target_key.id() == "frc1124"
+    assert entry.url_args == {}
+    assert entry.form_params == {
+        "team_number": ["1124"],
+        "action": ["set_team_info"],
+        "robot_name": [""],
+    }
+
+
+def test_mod_post_review_permission_can_set_team_info(login_user, web_client):
+    Team(
+        id="frc1124",
+        team_number=1124,
+    ).put()
+    login_user.has_permission.return_value = True
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    resp = web_client.post(
+        "/mod",
+        data={
+            "team_number": 1124,
+            "action": "set_team_info",
+            "robot_name": "",
+        },
+    )
+
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/mod"
 
 
 @pytest.fixture(autouse=True)
@@ -69,6 +174,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         self.account = login_user
         self.web_client = web_client
         self.now = datetime.datetime.now()
+        self.account.has_permission.return_value = False
 
         self.team = Team(
             id="frc1124",

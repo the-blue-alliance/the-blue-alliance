@@ -2,6 +2,8 @@ from flask import abort, Blueprint
 from google.appengine.api import users as gae_login
 
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.environment.environment import Environment
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account
 from backend.common.models.suggestion import Suggestion
@@ -15,6 +17,7 @@ from backend.web.handlers.admin.api_auth import (
 )
 from backend.web.handlers.admin.api_history import api_history
 from backend.web.handlers.admin.apistatus import apistatus_get, apistatus_post
+from backend.web.handlers.admin.audit_logs import audit_logs
 from backend.web.handlers.admin.authkeys import authkeys_get, authkeys_post
 from backend.web.handlers.admin.awards import (
     award_dashboard,
@@ -28,10 +31,13 @@ from backend.web.handlers.admin.cache import (
     cached_query_info,
     cached_query_key_lookup_post,
     cached_query_list,
+    cached_query_purge_class_global_version,
+    cached_query_purge_global_version,
     cached_query_purge_version,
     clear_model_cache,
 )
 from backend.web.handlers.admin.districts import (
+    district_add_webcast_channel_post,
     district_create,
     district_delete,
     district_delete_post,
@@ -39,23 +45,31 @@ from backend.web.handlers.admin.districts import (
     district_edit,
     district_edit_post,
     district_list,
+    district_remove_webcast_channel_post,
+    district_set_home_dcmp_post,
 )
 from backend.web.handlers.admin.event import (
     event_add_webcast_post,
+    event_cleanup_youtube_webcasts_post,
     event_create,
     event_delete,
     event_delete_matches,
     event_detail,
     event_detail_post,
+    event_divisions_released_post,
     event_edit,
     event_edit_post,
+    event_link_frc_api_post,
     event_list,
     event_remap_teams_post,
     event_remove_webcast_post,
+    event_update_all_webcast_dates_post,
     event_update_location_get,
     event_update_location_post,
+    event_update_webcast_date_post,
 )
 from backend.web.handlers.admin.gameday import gameday_dashboard, gameday_dashboard_post
+from backend.web.handlers.admin.insights import insights_list
 from backend.web.handlers.admin.landing import (
     landing_edit,
 )
@@ -68,6 +82,8 @@ from backend.web.handlers.admin.match import (
     match_edit,
     match_edit_post,
     match_override_score_breakdown,
+    match_youtube_video_add_post,
+    match_youtube_video_delete_post,
 )
 from backend.web.handlers.admin.media import (
     media_add,
@@ -75,6 +91,10 @@ from backend.web.handlers.admin.media import (
     media_delete_reference,
     media_make_preferred,
     media_remove_preferred,
+)
+from backend.web.handlers.admin.mobile_clients import (
+    mobile_clients_dashboard,
+    mobile_clients_dedupe_post,
 )
 from backend.web.handlers.admin.regional_champs_pool import regional_champs_pool_list
 from backend.web.handlers.admin.sitevars import (
@@ -137,17 +157,33 @@ def admin_home() -> str:
     # https://docs.cloud.google.com/appengine/docs/standard/services/ndb/queries?tab=python#order
     users = Account.query().order(-Account.created).fetch(5)  # pyre-ignore[16]
 
+    commit_sha, commit_shortlog = Environment.commit_info()
+
     template_values = {
         "memcache_stats": memcache_stats,
         "users": users,
         "suggestions_count": suggestions_count,
+        "commit_sha": commit_sha,
+        "commit_shortlog": commit_shortlog,
     }
     return render_template("admin/index.html", template_values)
 
 
 @admin_routes.route("/tasks")
 def task_launcher() -> str:
-    return render_template("admin/tasks.html")
+    from backend.common.queries.district_query import DistrictsInYearQuery
+
+    current_year = SeasonHelper.get_current_season()
+    districts = sorted(
+        DistrictsInYearQuery(current_year).fetch(), key=lambda d: d.abbreviation
+    )
+    return render_template(
+        "admin/tasks.html",
+        {
+            "current_year": current_year,
+            "districts": districts,
+        },
+    )
 
 
 # More complex endpoints should be split out into their own files
@@ -178,6 +214,7 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/api_history/<event_key>", view_func=api_history, methods=["GET"]
 )
+admin_routes.add_url_rule("/audit_logs", view_func=audit_logs, methods=["GET"])
 admin_routes.add_url_rule("/apistatus", view_func=apistatus_get, methods=["GET"])
 admin_routes.add_url_rule("/apistatus", view_func=apistatus_post, methods=["POST"])
 admin_routes.add_url_rule("/authkeys", view_func=authkeys_get, methods=["GET"])
@@ -210,7 +247,18 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/cache/<query_class_name>/purge/<db_version>/<int:query_version>",
+    methods=["POST"],
     view_func=cached_query_purge_version,
+)
+admin_routes.add_url_rule(
+    "/cache/<query_class_name>/purge_global/<int:db_version>",
+    methods=["POST"],
+    view_func=cached_query_purge_class_global_version,
+)
+admin_routes.add_url_rule(
+    "/cache/purge_global/<int:db_version>",
+    methods=["POST"],
+    view_func=cached_query_purge_global_version,
 )
 admin_routes.add_url_rule(
     "/cache/clear/<model_type>/<model_key>",
@@ -239,6 +287,21 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/district/edit/<district_key>", methods=["GET"], view_func=district_edit
+)
+admin_routes.add_url_rule(
+    "/district/<district_key>/webcasts/add",
+    methods=["POST"],
+    view_func=district_add_webcast_channel_post,
+)
+admin_routes.add_url_rule(
+    "/district/<district_key>/webcasts/remove",
+    methods=["POST"],
+    view_func=district_remove_webcast_channel_post,
+)
+admin_routes.add_url_rule(
+    "/district/<district_key>/home_dcmp",
+    methods=["POST"],
+    view_func=district_set_home_dcmp_post,
 )
 
 admin_routes.add_url_rule("/event/create", view_func=event_create, methods=["GET"])
@@ -273,6 +336,26 @@ admin_routes.add_url_rule(
     methods=["POST"],
 )
 admin_routes.add_url_rule(
+    "/event/update_webcast_date/<event_key>",
+    view_func=event_update_webcast_date_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/update_all_webcast_dates/<event_key>",
+    view_func=event_update_all_webcast_dates_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/cleanup_youtube_webcasts/<event_key>",
+    view_func=event_cleanup_youtube_webcasts_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/divisions_released/<event_key>",
+    view_func=event_divisions_released_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
     "/event/delete_matches/<event_key>/<comp_level>/<to_delete>",
     view_func=event_delete_matches,
     methods=["GET"],
@@ -285,6 +368,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/update_location/<event_key>",
     view_func=event_update_location_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/link_frc_api/<event_key>",
+    view_func=event_link_frc_api_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule("/events", view_func=event_list, defaults={"year": None})
@@ -310,6 +398,16 @@ admin_routes.add_url_rule(
     "/match/delete/<match_key>", view_func=match_delete_post, methods=["POST"]
 )
 admin_routes.add_url_rule(
+    "/match/youtube/add/<match_key>",
+    view_func=match_youtube_video_add_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/match/youtube/delete/<match_key>",
+    view_func=match_youtube_video_delete_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
     "/regional_champs_pool",
     view_func=regional_champs_pool_list,
     defaults={"year": None},
@@ -328,6 +426,9 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/sitevar/edit/<sitevar_key>", view_func=sitevar_edit_post, methods=["POST"]
 )
+admin_routes.add_url_rule("/insights", view_func=insights_list, defaults={"year": None})
+admin_routes.add_url_rule("/insights/<int:year>", view_func=insights_list)
+
 admin_routes.add_url_rule("/gameday", methods=["GET"], view_func=gameday_dashboard)
 admin_routes.add_url_rule(
     "/gameday", methods=["POST"], view_func=gameday_dashboard_post
@@ -345,17 +446,17 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule("/media", view_func=media_dashboard)
 admin_routes.add_url_rule("/media/add_media", methods=["POST"], view_func=media_add)
 admin_routes.add_url_rule(
-    "/media/delete_reference/<media_key_name>",
+    "/media/delete_reference/<path:media_key_name>",
     methods=["POST"],
     view_func=media_delete_reference,
 )
 admin_routes.add_url_rule(
-    "/media/make_preferred/<media_key_name>",
+    "/media/make_preferred/<path:media_key_name>",
     methods=["POST"],
     view_func=media_make_preferred,
 )
 admin_routes.add_url_rule(
-    "/media/remove_preferred/<media_key_name>",
+    "/media/remove_preferred/<path:media_key_name>",
     methods=["POST"],
     view_func=media_remove_preferred,
 )
@@ -381,6 +482,14 @@ admin_routes.add_url_rule(
 )
 admin_routes.add_url_rule(
     "/team/set_robot_name", view_func=team_robot_name_update, methods=["POST"]
+)
+admin_routes.add_url_rule(
+    "/mobile_clients", view_func=mobile_clients_dashboard, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/mobile_clients/dedupe",
+    view_func=mobile_clients_dedupe_post,
+    methods=["POST"],
 )
 admin_routes.add_url_rule("/user/<user_id>", view_func=user_detail)
 admin_routes.add_url_rule("/user/edit/<user_id>", methods=["GET"], view_func=user_edit)

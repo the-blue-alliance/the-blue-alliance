@@ -1,4 +1,4 @@
-import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, notFound } from '@tanstack/react-router';
 import { Fragment } from 'react/jsx-runtime';
 
 import {
@@ -10,13 +10,7 @@ import {
 import { AwardBanner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Separator } from '~/components/ui/separator';
 import {
   Table,
@@ -103,7 +97,6 @@ export const Route = createFileRoute('/team/$teamNumber/history')({
 });
 
 function TeamHistoryPage(): React.JSX.Element {
-  const navigate = useNavigate();
   const { team, history, yearsParticipated, socials } = Route.useLoaderData();
 
   yearsParticipated.sort((a, b) => b - a);
@@ -124,27 +117,25 @@ function TeamHistoryPage(): React.JSX.Element {
   return (
     <div className="flex flex-wrap sm:flex-nowrap">
       <div className="top-0 mr-4 pt-5 sm:sticky">
-        <Select
-          onValueChange={(value) => {
-            void navigate({
-              to: '/team/$teamNumber/{-$year}',
-              params: { teamNumber: String(team.team_number), year: value },
-            });
-          }}
-        >
-          <SelectTrigger className="w-[180px]">
-            <SelectValue placeholder={'History'} />
-          </SelectTrigger>
-          <SelectContent>
-            <SelectItem value="history">History</SelectItem>
-            <SelectItem value="stats">Stats</SelectItem>
-            {yearsParticipated.map((y) => (
-              <SelectItem key={y} value={`${y}`}>
-                {y}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+        <YearSelector
+          currentLabel="History"
+          triggerClassName="w-[180px]"
+          options={[
+            {
+              label: 'History',
+              to: `/team/${team.team_number}/history`,
+              isCurrent: true,
+            },
+            {
+              label: 'Stats',
+              to: `/team/${team.team_number}/stats`,
+            },
+            ...yearsParticipated.map((y) => ({
+              label: String(y),
+              to: `/team/${team.team_number}/${y}`,
+            })),
+          ]}
+        />
       </div>
 
       <div className="mt-5 w-full">
@@ -163,7 +154,7 @@ function TeamHistoryPage(): React.JSX.Element {
 
         <Separator className="my-4" />
 
-        <div className="flex flex-row gap-4">
+        <div className="flex flex-col gap-4 sm:flex-row">
           <Table className="w-auto">
             <TableHeader>
               <TableRow>
@@ -220,7 +211,7 @@ function TeamHistoryPage(): React.JSX.Element {
               ))}
             </TableBody>
           </Table>
-          <div>
+          <div className="flex justify-center sm:block">
             {bannerAwards.length > 0 && (
               <div className="flex w-96 flex-row flex-wrap justify-center gap-2">
                 {bannerAwards.map((a) => {

@@ -461,6 +461,66 @@ def test_score_breakdown_2025_keys() -> None:
     assert parsed[0]["score_breakdown_json"] is not None
 
 
+def test_score_breakdown_2026_keys() -> None:
+    # Test with 2026-specific keys, including the nested hubScore object
+    data = [
+        make_match(
+            {
+                "score_breakdown": {
+                    "red": {
+                        "totalAutoPoints": 26,
+                        "totalTeleopPoints": 223,
+                        "totalTowerPoints": 0,
+                        "energizedAchieved": True,
+                        "superchargedAchieved": False,
+                        "traversalAchieved": False,
+                        "hubScore": {
+                            "autoCount": 26,
+                            "teleopCount": 223,
+                            "totalPoints": 249,
+                        },
+                        "rp": 4,
+                        "totalPoints": 249,
+                    },
+                    "blue": {
+                        "totalAutoPoints": 56,
+                        "totalTeleopPoints": 179,
+                        "totalTowerPoints": 15,
+                        "energizedAchieved": False,
+                        "superchargedAchieved": False,
+                        "traversalAchieved": False,
+                        "hubScore": {
+                            "autoCount": 41,
+                            "teleopCount": 179,
+                            "totalPoints": 220,
+                        },
+                        "rp": 0,
+                        "totalPoints": 235,
+                    },
+                }
+            }
+        )
+    ]
+    parsed = JSONMatchesParser.parse(json.dumps(data), 2026)
+    assert parsed[0]["score_breakdown_json"] is not None
+
+
+def test_score_breakdown_2025_key_rejected_in_2026() -> None:
+    # algaePoints is a 2025 key, not valid for 2026
+    data = [
+        make_match(
+            {
+                "score_breakdown": {
+                    "red": {"algaePoints": 10},
+                    "blue": {"algaePoints": 5},
+                }
+            }
+        )
+    ]
+    with pytest.raises(ParserInputException, match="Invalid score breakdown fields"):
+        JSONMatchesParser.parse(json.dumps(data), 2026)
+
+
 def test_score_breakdown_wrong_year_key_raises_exception() -> None:
     # algaePoints is a 2025 key, not valid for 2024
     data = [

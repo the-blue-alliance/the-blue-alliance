@@ -49,7 +49,6 @@ from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
@@ -126,19 +125,24 @@ def enqueue_rolling_team_details() -> Response:
     return make_response("")
 
 
-@blueprint.route("/backend-tasks/get/team_details/<team_key>")
-def team_details(team_key: TeamKey) -> Response:
+@blueprint.route("/backend-tasks/get/team_details/<team_key>", defaults={"year": None})
+@blueprint.route("/backend-tasks/get/team_details/<team_key>/<int:year>")
+def team_details(team_key: TeamKey, year: Year | None) -> Response:
     if not Team.validate_key_name(team_key):
         return make_response(f"Bad team key: {Markup.escape(team_key)}", 400)
 
     fms_df = DatafeedFMSAPI(save_response=True)
-    year = datetime.date.today().year
+    if year is None:
+        year = SeasonHelper.get_max_year()
     fms_details = fms_df.get_team_details(year, team_key).get_result()
 
     team, district_team, robot = fms_details or (None, None, None)
     regional_pool_team: Optional[RegionalPoolTeam] = None
 
-    if team:
+    # Only write the Team row from the latest year's response — historical
+    # calls (e.g. backfilling 2025 DistrictTeams in 2026) should not clobber
+    # current Team metadata (name, city, website, etc.) with a stale snapshot.
+    if team and (year == SeasonHelper.get_max_year()):
         team = TeamManipulator.createOrUpdate(team, update_manual_attrs=False)
 
     if district_team:
@@ -167,29 +171,16 @@ def team_details(team_key: TeamKey) -> Response:
 
     # Clean up junk district teams
     # https://www.facebook.com/groups/moardata/permalink/1310068625680096/
+    # FIRST's response for this year is the authority — delete any other
+    # same-year DistrictTeam for this team. Other years are left alone;
+    # they are the responsibility of their own syncs, not this handler.
     keys_to_delete = set()
-    # Delete all DistrictTeams that are not valid in the current
-    # year, since each team can only be in one district per year
     dt_keys = DistrictTeam.query(
         DistrictTeam.team == ndb.Key(Team, team_key), DistrictTeam.year == year
     ).fetch(keys_only=True)
     for dt_key in dt_keys:
         if not district_team or dt_key.id() != district_team.key.id():
             keys_to_delete.add(dt_key)
-
-    # Delete all DistrictTeam that are for any year that the team
-    # does not have an event
-    dt_keys = DistrictTeam.query(DistrictTeam.team == ndb.Key(Team, team_key)).fetch()
-    et_keys = EventTeam.query(
-        EventTeam.team == ndb.Key(Team, team_key),
-        projection=[EventTeam.year],
-        group_by=[EventTeam.year],
-    ).fetch()
-    et_years = {et_key.year for et_key in et_keys}
-
-    for dt_key in dt_keys:
-        if dt_key.year not in et_years:
-            keys_to_delete.add(dt_key.key)
     DistrictTeamManipulator.delete_keys(keys_to_delete)
 
     if robot:
@@ -307,6 +298,13 @@ def event_list(year: Year) -> Response:
     # For all matched offseason events, make sure the FIRST code matches the TBA FIRST code
     for tba_event, first_event in matched_offseason_events:
         tba_event.first_code = first_event.event_short
+
+        # This is the ONE TIME we want to write this field from the datafeed
+        # Normally, we want to skip it, because it's something we intentionally set, so we
+        # want to avoid clobbering it. But here, we are specifically setting it to the known-right value,
+        # so we can allow the write to go throuhg, in this midly hacky way
+        tba_event._always_manual_attrs.discard("first_code")
+
         events_to_put.append(tba_event)  # Update TBA events - discard the FIRST event
 
     # For all new offseason events we can't automatically match, create suggestions
@@ -457,7 +455,7 @@ def event_details(event_key: EventKey) -> Response:
         teams = [teams]
 
     # Build EventTeams
-    skip_eventteams = ChampsRegistrationHacks.should_skip_eventteams(event)
+    skip_eventteams = event.should_skip_eventteams()
     event_teams = (
         [
             EventTeam(
@@ -511,6 +509,22 @@ def event_details(event_key: EventKey) -> Response:
     )
     if not isinstance(event_teams, list):
         event_teams = [event_teams]
+
+    # If this is a division event with newly registered teams, enqueue
+    # post_division_tasks for the parent event so it can update accordingly.
+    if event.parent_event is not None and any(
+        et._is_new for et in event_teams if et is not None
+    ):
+        parent_key = event.parent_event.string_id()
+        logging.info(
+            f"New teams found for division {event_key}, enqueueing post_division_tasks for {parent_key}"
+        )
+        taskqueue.add(
+            queue_name="admin",
+            target="py3-tasks-io",
+            url=f"/tasks/admin/do/post_division_tasks/{parent_key}",
+            method="GET",
+        )
 
     if event.year >= 2018:
         avatars, keys_to_delete = event_team_avatars_future.get_result()
@@ -596,17 +610,20 @@ def event_alliances(event_key: EventKey) -> Response:
 
     alliance_selections = df.get_event_alliances(event_key).get_result()
 
-    if event and event.remap_teams:
-        EventRemapTeamsHelper.remapteams_alliances(
-            alliance_selections, event.remap_teams
-        )
+    if alliance_selections is not None:
+        if event and event.remap_teams:
+            EventRemapTeamsHelper.remapteams_alliances(
+                alliance_selections, event.remap_teams
+            )
 
-    event_details = EventDetails(id=event_key, alliance_selections=alliance_selections)
-    EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
+        event_details = EventDetails(
+            id=event_key, alliance_selections=alliance_selections
+        )
+        EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
 
     template_values = {
         "alliance_selections": alliance_selections,
-        "event_name": event_details.key.id(),
+        "event_name": event_key,
     }
 
     if (
@@ -670,13 +687,14 @@ def event_rankings(event_key: EventKey) -> Response:
 
     rankings2 = df.get_event_rankings(event_key).get_result()
 
-    if event and event.remap_teams:
-        EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
+    if rankings2 is not None:
+        if event and event.remap_teams:
+            EventRemapTeamsHelper.remapteams_rankings2(rankings2, event.remap_teams)
 
-    event_details = EventDetails(id=event_key, rankings2=rankings2)
-    EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
+        event_details = EventDetails(id=event_key, rankings2=rankings2)
+        EventDetailsManipulator.createOrUpdate(event_details, update_manual_attrs=False)
 
-    template_values = {"rankings": rankings2, "event_name": event_details.key.id()}
+    template_values = {"rankings": rankings2, "event_name": event_key}
 
     if (
         "X-Appengine-Taskname" not in request.headers
@@ -764,6 +782,40 @@ def event_matches(event_key: EventKey) -> Response:
     new_matches = listify(
         MatchManipulator.createOrUpdate(matches, update_manual_attrs=False)
     )
+
+    # Create EventTeams for teams that played a match at this event. The normal
+    # EventTeam sync only runs on the daily event_details fetch, so without this,
+    # teams can appear on matches (e.g. finals-field alliances at a DCMP) without
+    # having an EventTeam binding them to the event.
+    team_ids: Set[TeamKey] = set()
+    for match in new_matches:
+        for team_key_name in match.team_key_names:
+            # strip all suffixes (eg B teams)
+            team_ids.add("frc" + re.sub("[^0-9]", "", team_key_name))
+    team_ids.discard("frc")
+
+    if team_ids:
+        teams = listify(
+            TeamManipulator.createOrUpdate(
+                [
+                    Team(id=team_id, team_number=int(team_id[3:]))
+                    for team_id in team_ids
+                ],
+                update_manual_attrs=False,
+            )
+        )
+        EventTeamManipulator.createOrUpdate(
+            [
+                EventTeam(
+                    id=event_key + "_" + team.key_name,
+                    event=event.key,
+                    team=team.key,
+                    year=event.year,
+                )
+                for team in teams
+            ],
+            update_manual_attrs=False,
+        )
 
     template_values = {"matches": new_matches, "deleted_keys": keys_to_delete}
 
@@ -900,8 +952,33 @@ def district_list(year: Year) -> Response:
     return make_response("")
 
 
+@blueprint.route("/tasks/enqueue/district_advancement/<int:year>")
+@blueprint.route("/tasks/enqueue/district_advancement", defaults={"year": None})
+def enqueue_district_advancement(year: Optional[Year]) -> Response:
+    """Enqueue an advancement refresh for every district in the given season."""
+    if year is None:
+        year = SeasonHelper.get_current_season()
+
+    districts = District.query(District.year == int(year)).fetch()
+    district_keys = [district.key.id() for district in districts]
+    for district_key in district_keys:
+        taskqueue.add(
+            url=url_for("frc_api.district_rankings", district_key=district_key),
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(f"Enqueued for: {district_keys}")
+    return make_response("")
+
+
 @blueprint.route("/backend-tasks/get/district_rankings/<district_key>")
 def district_rankings(district_key: DistrictKey) -> Response:
+    """Fetch district advancement (DCMP/CMP qualification flags) from FIRST."""
     district = (
         District.get_by_id(district_key)
         if District.validate_key_name(district_key)
@@ -915,18 +992,45 @@ def district_rankings(district_key: DistrictKey) -> Response:
         district_key
     ).get_result()
     district.advancement = data.advancement
-    district.adjustments = data.adjustments
     district = DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
-
-    template_values = {
-        "districts": listify(district),
-    }
 
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
         return make_response(
-            render_template("datafeeds/fms_district_list_get.html", **template_values)
+            render_template(
+                "datafeeds/fms_district_advancement_get.html", district=district
+            )
+        )
+
+    return make_response("")
+
+
+@blueprint.route("/backend-tasks/get/district_adjustments/<district_key>")
+def district_adjustments(district_key: DistrictKey) -> Response:
+    """Fetch district point adjustments from FIRST, then recompute rankings."""
+    district = (
+        District.get_by_id(district_key)
+        if District.validate_key_name(district_key)
+        else None
+    )
+    if district is None:
+        return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
+
+    df = DatafeedFMSAPI()
+    data: TParsedDistrictAdvancement = df.get_district_rankings(
+        district_key
+    ).get_result()
+    district.adjustments = data.adjustments
+    district = DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(
+            render_template(
+                "datafeeds/fms_district_adjustments_get.html", district=district
+            )
         )
 
     taskqueue.add(

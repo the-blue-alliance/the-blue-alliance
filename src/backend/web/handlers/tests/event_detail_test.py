@@ -1,9 +1,25 @@
 import json
+from datetime import datetime
 
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.consts.webcast_status import WebcastStatus
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.memcache_models.webcast_online_status_memcache import (
+    WebcastOnlineStatusMemcache,
+)
+from backend.common.models.alliance import MatchAlliance
+from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
+from backend.common.models.match import Match
+from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
 
 
@@ -21,6 +37,27 @@ def test_render_event(ndb_stub, web_client: Client) -> None:
 
     soup = BeautifulSoup(resp.data, "html.parser")
     assert soup.find(id="event-name").string == "Test Event 2020"
+
+
+def test_render_2026_event_with_legacy_insight_data(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2026test")
+
+    legacy_2026_insights = {"backfill_pending": True}
+
+    EventDetails(
+        id="2026test",
+        insights={"qual": legacy_2026_insights, "playoff": {}},
+    ).put()
+
+    resp = web_client.get("/event/2026test")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert "Auto Win Conversion" in body
+    assert "Fuel Statistics" in body
+    assert "Tower Statistics" in body
 
 
 @freeze_time("2020-03-02")
@@ -51,6 +88,52 @@ def test_render_full_regional(web_client: Client, setup_full_event) -> None:
 
     alliances_table = soup.find(id="event-alliances")
     assert len(alliances_table.find_all("tr")) > 1
+
+
+@freeze_time("2020-03-02")
+def test_render_event_offline_webcast_has_scheduled_start_tooltip(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+
+    Match(
+        id="2020nyny_qm1",
+        year=2020,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2020nyny"),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(
+                    teams=["frc1", "frc2", "frc3"], score=-1
+                ),
+                AllianceColor.BLUE: MatchAlliance(
+                    teams=["frc4", "frc5", "frc6"], score=-1
+                ),
+            }
+        ),
+    ).put()
+
+    webcast_status = Webcast(
+        type=WebcastType.TWITCH,
+        channel="firstinspires",
+        status=WebcastStatus.OFFLINE,
+        stream_title="Upcoming Stream",
+        viewer_count=None,
+        scheduled_start_time_utc="2020-03-02T18:00:00Z",
+    )
+    WebcastOnlineStatusMemcache(webcast_status).put(webcast_status)
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    offline_button = soup.select_one(".panel-heading a.tba-webcast-offline-tooltip")
+    assert offline_button is not None
+    assert offline_button.get("data-scheduled-start-utc") == "2020-03-02T18:00:00Z"
+    assert offline_button.get("title") == "scheduled to start at"
+    assert "tooltip" in offline_button.get("rel", [])
 
 
 def test_render_full_regional_round_robin(web_client: Client, setup_full_event) -> None:
@@ -130,6 +213,72 @@ def test_render_regional_cmp_points(web_client: Client, test_data_importer) -> N
     assert regional_point_tab is not None
 
 
+def test_render_regional_cmp_points_advancement_badges(
+    ndb_stub, web_client: Client
+) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 3),
+    ).put()
+    Event(
+        id="2025casj",
+        event_short="casj",
+        year=2025,
+        name="Silicon Valley Regional",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 8),
+        end_date=datetime(2025, 3, 10),
+    ).put()
+
+    EventDetails(
+        id="2025nyny",
+        regional_champs_pool_points={
+            "points": {
+                "frc254": {
+                    "qual_points": 10,
+                    "elim_points": 8,
+                    "alliance_points": 4,
+                    "award_points": 2,
+                    "total": 24,
+                }
+            },
+            "tiebreakers": {"frc254": {"qual_wins": 0, "highest_match_scores": []}},
+        },
+    ).put()
+
+    RegionalChampsPool(
+        id=RegionalChampsPool.render_key_name(2025),
+        year=2025,
+        rankings=[],
+        adjustments={},
+        advancement={
+            "frc254": {
+                "cmp": True,
+                "cmp_status": "EventQualified",
+                "qualifying_event": "2025casj",
+                "qualifying_award_name": "Winner",
+            }
+        },
+    ).put()
+
+    resp = web_client.get("/event/2025nyny")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    cmp_points_tab = soup.find(id="cmp-points")
+    assert cmp_points_tab is not None
+    assert cmp_points_tab.find("th", string="CMP Advancement") is not None
+
+    advancement_badge = cmp_points_tab.find("span", {"class": "label label-warning"})
+    assert advancement_badge is not None
+    assert advancement_badge.get_text(strip=True) == "Winner at Silicon Valley Regional"
+
+
 def test_schema_org_sports_event(ndb_stub, web_client: Client) -> None:
     """Test that event pages include schema.org SportsEvent JSON-LD markup."""
     helpers.preseed_event("2020nyny")
@@ -198,3 +347,120 @@ def test_schema_org_sports_event_with_location(
     assert sports_event_schema["location"]["@type"] == "Place"
     assert "address" in sports_event_schema["location"]
     assert sports_event_schema["location"]["address"]["@type"] == "PostalAddress"
+
+
+def test_render_event_with_b_team_coprs(ndb_stub, web_client: Client) -> None:
+    """Test that event detail page handles B teams in COPR data without crashing."""
+    helpers.preseed_event("2020nyny")
+    EventDetails(
+        id="2020nyny",
+        coprs={"Cargo": {"frc6884B": 10.5, "frc254": 20.0}},
+    ).put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+
+
+@freeze_time("2020-02-23")
+def test_render_short_cache_event_with_divisions_within_7_days(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events with divisions should use short cache within 7 days before start."""
+    division_key = ndb.Key(Event, "2020nynyd1")
+    Event(
+        id="2020nynyd1",
+        event_short="nynyd1",
+        year=2020,
+        name="Test Division 1",
+        event_type_enum=EventType.CMP_DIVISION,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event 2020",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        divisions=[division_key],
+    ).put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert "max-age=61" in resp.headers["Cache-Control"]
+
+
+@freeze_time("2020-02-23")
+def test_render_short_cache_event_with_parent_within_7_days(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events with a parent should use short cache within 7 days before start."""
+    parent_key = ndb.Key(Event, "2020nyny")
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event 2020",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    Event(
+        id="2020nynyd1",
+        event_short="nynyd1",
+        year=2020,
+        name="Test Division 1",
+        event_type_enum=EventType.CMP_DIVISION,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        parent_event=parent_key,
+    ).put()
+
+    resp = web_client.get("/event/2020nynyd1")
+    assert resp.status_code == 200
+    assert "max-age=61" in resp.headers["Cache-Control"]
+
+
+@freeze_time("2020-02-10")
+def test_render_long_cache_event_with_divisions_beyond_7_days(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events with divisions should NOT use short cache more than 7 days before start."""
+    division_key = ndb.Key(Event, "2020nynyd1")
+    Event(
+        id="2020nynyd1",
+        event_short="nynyd1",
+        year=2020,
+        name="Test Division 1",
+        event_type_enum=EventType.CMP_DIVISION,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event 2020",
+        event_type_enum=EventType.CMP_FINALS,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+        divisions=[division_key],
+    ).put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert "max-age=21600" in resp.headers["Cache-Control"]
+
+
+@freeze_time("2020-02-10")
+def test_render_long_cache_event_without_divisions_beyond_a_day(
+    ndb_stub, web_client: Client
+) -> None:
+    """Events without divisions/parent should use long cache when not within_a_day."""
+    helpers.preseed_event("2020nyny")
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert "max-age=21600" in resp.headers["Cache-Control"]

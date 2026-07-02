@@ -23,9 +23,17 @@ class TeamAtEventDistrictPoints(_TeamAtEventDistrictPointsOptional):
 
 class TeamAtEventDistrictPointTiebreakers(TypedDict):
     qual_wins: int
-    highest_qual_scores: List[int]
+    highest_match_scores: List[int]
 
 
 class EventDistrictPoints(TypedDict):
     points: Dict[TeamKey, TeamAtEventDistrictPoints]
     tiebreakers: Dict[TeamKey, TeamAtEventDistrictPointTiebreakers]
+
+
+class TeamAtEventRegionalChampsPoolPoints(TeamAtEventDistrictPoints, total=False):
+    rookie_bonus: int
+
+
+class EventRegionalChampsPoolPoints(EventDistrictPoints):
+    pass

@@ -1,18 +1,26 @@
 import json
+from typing import cast
 from unittest.mock import patch
 
 import pytest
 
 from backend.common.frc_api import FRCAPI
+from backend.common.frc_api.types import ApiIndexModelV2
 from backend.common.futures import InstantFuture
+from backend.common.memcache_models.event_sync_status_memcache import (
+    EventSyncStatusMemcache,
+)
 from backend.common.models.event import Event
 from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 from backend.common.sitevars.fms_api_secrets import (
     ContentType as FMSApiSecretsContentType,
 )
 from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
-from backend.common.urlfetch import URLFetchResult
+from backend.common.urlfetch import TypedURLFetchResult, URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_root_parser import (
+    FMSAPIRootParser,
+)
 
 
 @pytest.fixture()
@@ -133,3 +141,56 @@ def test_mark_api_down(fms_api_secrets):
     with patch.object(FRCAPI, "root", return_value=InstantFuture(response2)):
         assert df.get_root_info().get_result() == {}
         assert ApiStatusFMSApiDown.get() is False
+
+
+def test_parse_records_event_sync_success(fms_api_secrets, ndb_stub) -> None:
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/",
+        200,
+        json.dumps({"apiVersion": "3.0"}),
+    )
+
+    df = DatafeedFMSAPI()
+    with patch.object(
+        DatafeedFMSAPI,
+        "_request_endpoint",
+        return_value="tasks.get.fmsapi_matches",
+    ):
+        df._parse(
+            cast(TypedURLFetchResult[ApiIndexModelV2], response),
+            FMSAPIRootParser(),
+            event_key="2025casj",
+        )
+
+    status = EventSyncStatusMemcache("2025casj").get()
+    assert status is not None
+    assert "tasks.get.fmsapi_matches" in status
+    assert status["tasks.get.fmsapi_matches"]["num_consecutive_failures"] == 0
+    assert status["tasks.get.fmsapi_matches"]["last_success_time"] is not None
+
+
+def test_parse_records_event_sync_failure(fms_api_secrets, ndb_stub) -> None:
+    cache = EventSyncStatusMemcache("2025casj")
+    with patch.object(
+        DatafeedFMSAPI,
+        "_request_endpoint",
+        return_value="tasks.get.fmsapi_matches",
+    ):
+        cache.record_success("tasks.get.fmsapi_matches")
+
+        response = URLFetchResult.mock_for_content(
+            "https://frc-api.firstinspires.org/v3.0/",
+            500,
+            json.dumps({}),
+        )
+
+        df = DatafeedFMSAPI()
+        df._parse(
+            cast(TypedURLFetchResult[ApiIndexModelV2], response),
+            FMSAPIRootParser(),
+            event_key="2025casj",
+        )
+
+    status = cache.get()
+    assert status is not None
+    assert status["tasks.get.fmsapi_matches"]["num_consecutive_failures"] == 1

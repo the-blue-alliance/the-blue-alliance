@@ -280,6 +280,38 @@ def test_team_events_statuses_year(ndb_stub, api_client: Client) -> None:
     )
 
 
+def test_team_events_statuses_year_pit_location(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+        pit_location={"location": "A1"},
+    ).put()
+    EventTeam(
+        id="2020casf_frc254",
+        event=ndb.Key("Event", "2020casf"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+        status={},
+        pit_location={"location": "B3"},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/events/2020/statuses",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json.get("2020casj") == {"pit_location": "A1"}
+    casf_status = resp.json.get("2020casf")
+    assert casf_status["pit_location"] == "B3"
+
+
 def test_team_events_year(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
@@ -522,6 +554,34 @@ def test_team_event_status(ndb_stub, api_client: Client) -> None:
     assert (
         resp.json["overall_status_str"] == "Team 254 is waiting for the event to begin."
     )
+
+
+def test_team_event_status_pit_location(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    EventTeam(
+        id="2020casj_frc254",
+        event=ndb.Key("Event", "2020casj"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+        pit_location={"location": "A1"},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254/event/2020casj/status",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {"pit_location": "A1"}
 
 
 def test_team_awards(ndb_stub, api_client: Client) -> None:

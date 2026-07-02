@@ -64,4 +64,4 @@ def test_get_files():
     with patch.object(storage, "_client_for_env", return_value=client):
         storage.get_files(path)
 
-    client.get_files.assert_called_with(path)
+    client.get_files.assert_called_with(path, recursive=False)

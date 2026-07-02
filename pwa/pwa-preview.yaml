@@ -1,0 +1,9 @@
+service: pwa
+runtime: nodejs24
+
+instance_class: F1
+automatic_scaling:
+  max_idle_instances: 0
+  target_cpu_utilization: 0.9
+  target_throughput_utilization: 0.9
+  max_concurrent_requests: 80

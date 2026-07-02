@@ -89,42 +89,6 @@ for yaml in "$REPO_ROOT"/src/*.yaml; do
     fi
 done
 
-# Check/update Dockerfile defaults
-for dockerfile in "$REPO_ROOT"/ops/dev/docker/Dockerfile*; do
-    # Handle ARG-based Python version defaults
-    if grep -q "ARG PYTHON_VERSION=" "$dockerfile"; then
-        local_default=$(grep "ARG PYTHON_VERSION=" "$dockerfile" | sed 's/ARG PYTHON_VERSION=//')
-        if [[ "$local_default" != "$PYTHON_VERSION" ]]; then
-            if [[ "$UPDATE_MODE" == true ]]; then
-                update_file "$dockerfile" "s/ARG PYTHON_VERSION=[0-9.]*/ARG PYTHON_VERSION=$PYTHON_VERSION/"
-            else
-                echo "ERROR: $dockerfile has default ARG PYTHON_VERSION=$local_default (expected $PYTHON_VERSION)"
-                ERRORS=$((ERRORS + 1))
-            fi
-        else
-            echo "OK: $dockerfile (ARG PYTHON_VERSION)"
-        fi
-    fi
-
-    # Handle ENV-based Python version defaults (e.g., ENV PYTHON_VERSION=python3.13)
-    if grep -q "ENV PYTHON_VERSION=" "$dockerfile"; then
-        local_env_default=$(grep "ENV PYTHON_VERSION=" "$dockerfile" | sed 's/ENV PYTHON_VERSION=//')
-        local_expected_env_value="python$PYTHON_VERSION"
-        if [[ "$local_env_default" != "$local_expected_env_value" ]]; then
-            if [[ "$UPDATE_MODE" == true ]]; then
-                sed -i.bak "s|ENV PYTHON_VERSION=.*|ENV PYTHON_VERSION=$local_expected_env_value|" "$dockerfile" && rm -f "$dockerfile.bak"
-                echo "UPDATED: $dockerfile (ENV PYTHON_VERSION)"
-                UPDATED=$((UPDATED + 1))
-            else
-                echo "ERROR: $dockerfile has ENV PYTHON_VERSION=$local_env_default (expected $local_expected_env_value)"
-                ERRORS=$((ERRORS + 1))
-            fi
-        else
-            echo "OK: $dockerfile (ENV PYTHON_VERSION)"
-        fi
-    fi
-done
-
 # Check/update GitHub Actions workflow files
 for workflow in "$REPO_ROOT"/.github/workflows/*.yml; do
     if [[ -f "$workflow" ]]; then

@@ -1,4 +1,5 @@
 import json
+from typing import cast
 
 import pytest
 from pyre_extensions import none_throws
@@ -10,6 +11,7 @@ from backend.common.helpers.district_helper import (
     TeamAtEventDistrictPoints,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import Year
 from backend.common.models.team import Team
 
@@ -52,6 +54,18 @@ def test_calc_event_points(
         expected_event_points = json.load(f)
 
     assert event_points == expected_event_points
+
+
+def test_calc_event_points_excludes_dq_from_match_score_tiebreaker(
+    setup_full_event,
+) -> None:
+    # 2023onlon_qm27 scored 128 with frc6162 on the alliance but frc6162 was
+    # DQ'd in that match; the score must not count toward frc6162's top-3
+    # match score tiebreaker.
+    setup_full_event("2023onlon")
+    event = none_throws(Event.get_by_id("2023onlon"))
+    event_points = DistrictHelper.calculate_event_points(event)
+    assert 128 not in event_points["tiebreakers"]["frc6162"]["highest_match_scores"]
 
 
 def test_calculate_multi_event_rankings_all_teams_filtered(setup_full_event) -> None:
@@ -100,7 +114,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
             )
         ],
         point_total=70,
-        qual_scores=[85, 71, 69],
+        match_scores=[94, 91, 89],
         rookie_bonus=0,
         other_bonus=0,
         single_event_bonus=0,
@@ -131,7 +145,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
             ),
         ],
         point_total=267,
-        qual_scores=[104, 97, 93],
+        match_scores=[127, 121, 113],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -180,7 +194,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             ),
         ],
         point_total=123,
-        qual_scores=[93, 82, 82],
+        match_scores=[93, 82, 82],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=2,
@@ -201,7 +215,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             )
         ],
         point_total=59,
-        qual_scores=[52, 41, 40],
+        match_scores=[73, 59, 57],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -222,7 +236,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             )
         ],
         point_total=41,
-        qual_scores=[67, 56, 45],
+        match_scores=[67, 56, 45],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -249,6 +263,31 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
 )
 def test_pandemic_rookie_edge_cases(year: Year, rookie_year: Year, bonus: int) -> None:
     assert DistrictHelper._get_rookie_bonus(year, rookie_year) == bonus
+
+
+def test_calc_rankings_tolerates_legacy_tiebreaker_key(setup_full_event) -> None:
+    # Pre-migration EventDetails.district_points entries store
+    # "highest_qual_scores" instead of the renamed "highest_match_scores".
+    # Rankings calc reads stored JSON directly and must not KeyError on those.
+    setup_full_event("2019nyny")
+
+    event_details = none_throws(EventDetails.get_by_id("2019nyny"))
+    district_points = none_throws(event_details.district_points)
+    for tiebreakers in district_points["tiebreakers"].values():
+        # Cast away the TypedDict to simulate legacy on-disk JSON shape.
+        legacy: dict[str, object] = cast(dict[str, object], tiebreakers)
+        legacy["highest_qual_scores"] = legacy.pop("highest_match_scores", [])
+    event_details.district_points = district_points
+    event_details.put()
+
+    event = none_throws(Event.get_by_id("2019nyny"))
+    event.prep_details()
+
+    teams = [none_throws(Team.get_by_id("frc694"))]
+    rankings = DistrictHelper.calculate_rankings([event], teams, 2019, None)
+
+    # Tiebreak scores aren't recovered from the old key, but the calc completes.
+    assert rankings["frc694"]["match_scores"] == []
 
 
 def test_hq_adjustments(setup_full_event) -> None:
@@ -280,7 +319,7 @@ def test_hq_adjustments(setup_full_event) -> None:
             )
         ],
         point_total=75,
-        qual_scores=[85, 71, 69],
+        match_scores=[94, 91, 89],
         rookie_bonus=0,
         other_bonus=0,
         single_event_bonus=0,

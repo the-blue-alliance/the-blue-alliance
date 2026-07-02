@@ -1,8 +1,9 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
-import { MoonIcon, SunIcon } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 
+import MoonIcon from '~icons/lucide/moon';
+import SunIcon from '~icons/lucide/sun';
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
@@ -40,7 +41,7 @@ const links: NavigationLink[] = [
   { label: 'Privacy Policy', to: '/privacy' },
 ];
 
-// Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
+// Commit hash is string-replaced at build time, so we need to ignore eslint and typescript errors.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const commitHash = __COMMIT_HASH__ as string;
@@ -61,6 +62,7 @@ function ThemeToggle() {
       className="group inline-flex cursor-pointer items-center rounded-full
         border p-1"
       aria-label="Toggle Theme"
+      data-mounted={mounted}
       onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
     >
       {themes.map(([key, Icon]) => {
@@ -81,16 +83,7 @@ function ThemeToggle() {
   );
 }
 
-export const Footer = () => {
-  const renderTime = new Date().toLocaleString('en-US', {
-    month: 'short',
-    day: 'numeric',
-    year: 'numeric',
-    hour: 'numeric',
-    minute: 'numeric',
-    hour12: true,
-  });
-
+export const Footer = ({ renderTime }: { renderTime: string }) => {
   return (
     <footer
       className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
@@ -159,7 +152,16 @@ export const Footer = () => {
           </span>
 
           <p className="text-xs text-neutral-600 dark:text-neutral-400">
-            Generated on {renderTime}. Commit:{' '}
+            Data provided by the{' '}
+            <a
+              href="https://frc-events.firstinspires.org/services/API"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="hover:underline"
+            >
+              <i>FIRST</i>® Events API
+            </a>
+            . Generated on {renderTime}. Commit:{' '}
             <a
               href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
               target="_blank"

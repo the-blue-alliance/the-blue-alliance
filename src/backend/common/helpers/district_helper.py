@@ -53,7 +53,7 @@ class DistrictRankingTeamTotal(TypedDict):
     event_points: List[Tuple[Event, TeamAtEventDistrictPoints]]
     point_total: int
     tiebreakers: Sequence[int]
-    qual_scores: List[int]
+    match_scores: List[int]
     rookie_bonus: int
     single_event_bonus: int
     other_bonus: int
@@ -128,7 +128,7 @@ class DistrictHelper:
                 lambda: TeamAtEventDistrictPointTiebreakers(
                     # for tiebreaker stats that can't be calculated with 'points'
                     qual_wins=0,
-                    highest_qual_scores=[],
+                    highest_match_scores=[],
                 )
             ),
         }
@@ -233,7 +233,7 @@ class DistrictHelper:
                     best_alliance_points=0,
                     total_qual_points=0,
                 ),
-                qual_scores=[],
+                match_scores=[],
                 other_bonus=0,
                 adjustments=0,
                 single_event_bonus=0,
@@ -295,13 +295,13 @@ class DistrictHelper:
                         if (
                             team_key in event_district_points["tiebreakers"]
                         ):  # add more tiebreakers
-                            team_totals[team_key]["qual_scores"] = heapq.nlargest(
+                            team_totals[team_key]["match_scores"] = heapq.nlargest(
                                 3,
                                 [
-                                    *event_district_points["tiebreakers"][team_key][
-                                        "highest_qual_scores"
-                                    ],
-                                    *team_totals[team_key]["qual_scores"],
+                                    *event_district_points["tiebreakers"][team_key].get(
+                                        "highest_match_scores", []
+                                    ),
+                                    *team_totals[team_key]["match_scores"],
                                 ],
                             )
 
@@ -356,7 +356,7 @@ class DistrictHelper:
                     -item[1]["point_total"],
                 ]
                 + [-t for t in item[1]["tiebreakers"]]
-                + [-score for score in item[1]["qual_scores"]],
+                + [-score for score in item[1]["match_scores"]],
             )
         )
 
@@ -385,6 +385,30 @@ class DistrictHelper:
                 bonus = 5
 
         return bonus
+
+    @classmethod
+    def _get_event_level_rookie_bonus_points(
+        cls,
+        event: Event,
+        team_keys: Set[TeamKey],
+        multiplier: int = 1,
+    ) -> Dict[TeamKey, int]:
+        rookie_points: Dict[TeamKey, int] = {}
+
+        for team_key in team_keys:
+            team = Team.get_by_id(team_key)
+            if team is None:
+                continue
+
+            rookie_bonus = (
+                cls._get_rookie_bonus(event.year, team.rookie_year) * multiplier
+            )
+            if rookie_bonus <= 0:
+                continue
+
+            rookie_points[team_key] = rookie_bonus
+
+        return rookie_points
 
     @classmethod
     def _get_alliance_number_from_teams(
@@ -714,17 +738,24 @@ class DistrictHelper:
                         district_points["tiebreakers"][team]["qual_wins"] += 1
 
                 for color in ALLIANCE_COLORS:
-                    for team in match.alliances[color]["teams"]:
-                        score = match.alliances[color]["score"]
-                        district_points["tiebreakers"][team]["highest_qual_scores"] = (
-                            heapq.nlargest(
+                    alliance = match.alliances[color]
+                    score = alliance["score"]
+                    # DQ'd and surrogate teams don't get credit for the match
+                    # score in the tiebreaker (they didn't really "play" it).
+                    excluded = set(alliance.get("dqs", [])) | set(
+                        alliance.get("surrogates", [])
+                    )
+                    for team in alliance["teams"]:
+                        if team not in excluded:
+                            district_points["tiebreakers"][team][
+                                "highest_match_scores"
+                            ] = heapq.nlargest(
                                 3,
                                 district_points["tiebreakers"][team][
-                                    "highest_qual_scores"
+                                    "highest_match_scores"
                                 ]
                                 + [score],
                             )
-                        )
                         # Make sure that teams without wins don't get dropped from 'points'
                         district_points["points"][team]["qual_points"] += 0
             else:  # Elim match points
@@ -776,15 +807,23 @@ class DistrictHelper:
 
         _count, organized_matches = MatchHelper.organized_matches(matches)
 
-        # qual match calculations. only used for tiebreaking
-        for match in organized_matches[CompLevel.QM]:
+        # top individual MATCH scores, qual + playoff
+        for match in matches:
             for color in ALLIANCE_COLORS:
-                for team in match.alliances[color]["teams"]:
-                    score = match.alliances[color]["score"]
-                    district_points["tiebreakers"][team]["highest_qual_scores"] = (
+                alliance = match.alliances[color]
+                score = alliance["score"]
+                # DQ'd and surrogate teams don't get credit for the match
+                # score in the tiebreaker (they didn't really "play" it).
+                excluded = set(alliance.get("dqs", [])) | set(
+                    alliance.get("surrogates", [])
+                )
+                for team in alliance["teams"]:
+                    if team in excluded:
+                        continue
+                    district_points["tiebreakers"][team]["highest_match_scores"] = (
                         heapq.nlargest(
                             3,
-                            district_points["tiebreakers"][team]["highest_qual_scores"]
+                            district_points["tiebreakers"][team]["highest_match_scores"]
                             + [score],
                         )
                     )

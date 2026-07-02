@@ -5,7 +5,7 @@ import json
 import re
 from collections import OrderedDict
 from datetime import datetime, timedelta
-from typing import Dict, List, Optional, Tuple
+from typing import cast, Dict, List, Optional, Tuple
 
 import pytz
 from flask import abort, redirect, request
@@ -19,6 +19,7 @@ from backend.common.consts.comp_level import COMP_LEVELS, CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
+from backend.common.game_specific.registry import get_game
 from backend.common.helpers.award_helper import AwardHelper
 from backend.common.helpers.district_point_tiebreakers_sorting_helper import (
     DistrictPointTiebreakersSortingHelper,
@@ -29,6 +30,7 @@ from backend.common.helpers.match_time_prediction_helper import (
     MatchTimePredictionHelper,
 )
 from backend.common.helpers.media_helper import MediaHelper
+from backend.common.helpers.nexus_pit_map_svg_helper import NexusEventDetailsSVGHelper
 from backend.common.helpers.playlist_helper import PlaylistHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
@@ -37,6 +39,10 @@ from backend.common.models.event import Event
 from backend.common.models.event_matchstats import Component, TeamStatMap
 from backend.common.models.keys import EventKey, TeamId, TeamKey, Year
 from backend.common.models.match import Match
+from backend.common.models.nexus_event_details import NexusEventDetails
+from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.team import Team
+from backend.common.nexus_api.types import PitMap
 from backend.common.queries import district_query, event_query, media_query, team_query
 from backend.web.profiled_render import render_template
 
@@ -311,6 +317,35 @@ def event_detail(event_key: EventKey) -> Response:
         for component, tsm in event.coprs.items():
             copr_leaders[component] = sort_and_limit_stats(tsm)
 
+    # Build Component OPR CSV
+    # Format: team_number, component1, component2, ...
+    # Filter out all-zero components
+    copr_csv = ""
+    if event.coprs is not None:
+        all_coprs = dict(event.coprs)
+        if event.matchstats is not None:
+            oprs_dict = event.matchstats.get("oprs") or {}
+            if oprs_dict:
+                all_coprs = {"OPR": oprs_dict, **all_coprs}
+        component_names = [
+            k for k, tsm in all_coprs.items() if any(v != 0 for v in tsm.values())
+        ]
+        if component_names:
+            # Gather all team keys across all components, sorted by team number
+            all_team_keys = sorted(
+                {tk for tsm in all_coprs.values() for tk in tsm},
+                key=lambda tk: (int(re.sub(r"[^0-9]", "", tk)), tk),
+            )
+            copr_rows = []
+            for team_key in all_team_keys:
+                row: OrderedDict = OrderedDict()
+                row["team_number"] = team_key.replace("frc", "")
+                for component in component_names:
+                    value = all_coprs[component].get(team_key, 0.0)
+                    row[component] = round(value * 100) / 100
+                copr_rows.append(row)
+            copr_csv = dicts_to_csv(copr_rows)
+
     # Container for (component, componentValidHtmlId, and componentHumanReadableName) elements
     copr_items: List[Tuple[Component, str, str]] = [
         (k, re.sub("[^0-9a-zA-Z]+", "_", k), convert_component_name(k))
@@ -344,6 +379,20 @@ def event_detail(event_key: EventKey) -> Response:
         regional_champs_pool_points_sorted = (
             DistrictPointTiebreakersSortingHelper.sorted_points(points)
         )
+
+    regional_champs_pool_advancement = None
+    if is_regional_cmp_pool_eligible:
+        regional_champs_pool = RegionalChampsPool.get_by_id(
+            RegionalChampsPool.render_key_name(event.year)
+        )
+        regional_champs_pool_advancement = (
+            regional_champs_pool.advancement if regional_champs_pool else None
+        )
+
+    events_by_key = {
+        event.key_name: event
+        for event in event_query.EventListQuery(event.year).fetch()
+    }
 
     event_insights = event.details.insights if event.details else None
     event_insights_template = None
@@ -405,11 +454,13 @@ def event_detail(event_key: EventKey) -> Response:
         "bracket_table": bracket_table or {},
         "playoff_advancement": playoff_advancement,
         "playoff_template": playoff_template,
-        "playoff_advancement_tiebreakers": PlayoffAdvancementHelper.ROUND_ROBIN_TIEBREAKERS.get(
-            event.year, []
-        ),
+        "playoff_advancement_tiebreakers": get_game(
+            event.year
+        ).round_robin_tiebreaker_names(),
         "district_points_sorted": district_points_sorted,
         "regional_champs_pool_points_sorted": regional_champs_pool_points_sorted,
+        "regional_champs_pool_advancement": regional_champs_pool_advancement,
+        "events_by_key": events_by_key,
         "event_insights_qual": event_insights["qual"] if event_insights else None,
         "event_insights_playoff": event_insights["playoff"] if event_insights else None,
         "event_insights_template": event_insights_template,
@@ -430,12 +481,80 @@ def event_detail(event_key: EventKey) -> Response:
         "team_list_csv": team_list_csv,
         "schedule_csv": schedule_csv,
         "flat_schedule_csv": flat_schedule_csv,
+        "copr_csv": copr_csv,
     }
 
     return make_cached_response(
         render_template("event_details.html", template_values),
-        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
+        ttl=(
+            timedelta(seconds=61)
+            if event.should_use_short_cache
+            else timedelta(hours=6)
+        ),
     )
+
+
+def _label_event_keys_for(event: Event) -> dict[str, str]:
+    """Map Nexus label text → TBA event key for the current event. Used to
+    attach `data-label-key` to the event's own field label in the rendered SVG
+    so clients can scroll to it by event key (e.g. `2026hop`).
+    """
+    event_id = none_throws(event.key.string_id())
+    candidates: list[str] = []
+    short = (event.short_name or "").strip()
+    if short:
+        candidates.append(short.lower())
+        without_division = short.lower().replace(" division", "").strip()
+        if without_division and without_division != short.lower():
+            candidates.append(without_division)
+        first_word = short.split()[0].lower() if short.split() else ""
+        if first_word and first_word not in candidates:
+            candidates.append(first_word)
+    return {candidate: event_id for candidate in candidates}
+
+
+@cached_public
+def event_pitmap(event_key: EventKey) -> Response:
+    if not Event.validate_key_name(event_key):
+        abort(400)
+
+    event: Optional[Event] = event_query.EventQuery(event_key).fetch()
+    if not event:
+        abort(404)
+
+    nexus_event_details = NexusEventDetails.get_by_id(event_key)
+    if not nexus_event_details:
+        abort(404)
+
+    highlight_team_keys = set()
+    for teams_value in request.args.getlist("teams"):
+        for maybe_team_key in teams_value.split(","):
+            team_key = maybe_team_key.strip().lower()
+            if not Team.validate_key_name(team_key):
+                abort(400)
+            highlight_team_keys.add(team_key)
+
+    try:
+        template_values = NexusEventDetailsSVGHelper.template_values(
+            cast(PitMap, nexus_event_details.pitmap_json),
+            event.nexus_code_for_api,
+            highlight_team_keys=highlight_team_keys,
+            label_event_keys=_label_event_keys_for(event),
+        )
+    except ValueError:
+        abort(404)
+        raise RuntimeError("unreachable")
+
+    response = make_cached_response(
+        render_template("event_pitmap.svg", template_values),
+        ttl=(
+            timedelta(seconds=61)
+            if event.should_use_short_cache
+            else timedelta(hours=6)
+        ),
+    )
+    response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
+    return response
 
 
 @cached_public
@@ -536,9 +655,10 @@ def event_insights(event_key: EventKey) -> Response:
         "last_played_match_num": last_played_match_num,
     }
 
+    use_short_cache = event.should_use_short_cache
     return make_cached_response(
         render_template("event_insights.html", template_values),
-        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
+        ttl=(timedelta(seconds=61) if use_short_cache else timedelta(hours=6)),
     )
 
 
@@ -558,9 +678,10 @@ def event_rss(event_key: EventKey) -> Response:
         "datetime": datetime.now(),
     }
 
+    use_short_cache = event.should_use_short_cache
     response = make_cached_response(
         render_template("event_rss.xml", template_values),
-        ttl=timedelta(seconds=61) if event.within_a_day else timedelta(hours=6),
+        ttl=(timedelta(seconds=61) if use_short_cache else timedelta(hours=6)),
     )
     response.headers["content-type"] = "application/xml; charset=UTF-8"
 

@@ -3,30 +3,30 @@ name = "the-blue-alliance"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
-    "appengine-python-standard==1.1.10",
-    "beautifulsoup4==4.14.3",
-    "firebase-admin==7.2.0",
+    "appengine-python-standard==2.0.1",
+    "beautifulsoup4==4.15.0",
+    "firebase-admin==7.4.0",
     "Flask==3.1.3",
     "Flask-Caching==2.3.1",
     "Flask-Cors==6.0.2",
     "Flask-WTF==1.2.2",
-    "google-api-core==2.30.0",
-    "google-api-python-client==2.190.0",
-    "google-cloud-logging==3.13.0",
-    "google-cloud-run==0.15.0",
-    "grpcio==1.78.1",
-    "gunicorn==25.1.0",
+    "google-api-core==2.31.0",
+    "google-api-python-client==2.197.0",
+    "google-cloud-logging==3.16.0",
+    "google-cloud-run==0.16.0",
+    "grpcio==1.81.1",
+    "gunicorn==26.0.0",
     "Jinja2==3.1.6",
     "MarkupSafe==3.0.3",
-    "numpy==2.4.2",
+    "numpy==2.5.0",
     "oauth2client==4.1.3",
     "openpyxl==3.1.5",
     "pyre-extensions==0.0.32",
-    "pytz==2025.2",
-    "requests==2.32.5",
+    "pytz==2026.2",
+    "requests==2.34.2",
     "six==1.17.0",
     "typing-extensions==4.15.0",
-    "tzlocal==5.3.1",
+    "tzlocal==5.4.3",
     "Werkzeug==3.1.6",
 ]
 
@@ -44,13 +44,17 @@ ci = [
     "pytest-cov",
 ]
 lint = [
-    "black==26.1.0",
+    "black==26.5.1",
     "flake8==7.3.0",
     "flake8-import-order",
     "flake8-tidy-imports",
 ]
 typecheck = [
+    { include-group = "webpack" },
     "pyre-check==0.9.25",
+]
+webpack = [
+    "watchdog==6.0.0",
 ]
 dev = [
     { include-group = "test" },

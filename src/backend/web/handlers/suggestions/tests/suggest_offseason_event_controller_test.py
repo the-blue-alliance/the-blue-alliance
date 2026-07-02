@@ -9,6 +9,7 @@ from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
 from backend.web.handlers.conftest import CapturedTemplate
+from backend.web.handlers.suggestions import suggestion_submission
 
 
 def assert_template_status(
@@ -51,7 +52,7 @@ def test_get_form(login_user, web_client: Client) -> None:
     assert form.find(attrs={"name": "venue_address"}) is not None
     assert form.find(attrs={"name": "venue_city"}) is not None
     assert form.find(attrs={"name": "venue_country"}) is not None
-    assert form.find(attrs={"name": "first_code"}) is not None
+    assert form.find(attrs={"name": "frc_events_link"}) is not None
 
 
 def test_submit_empty_form(
@@ -128,3 +129,142 @@ def test_suggest_event(
         first_code=None,
         event_type=EventType.OFFSEASON,
     )
+
+
+def test_suggest_event_with_valid_frc_events_link(
+    login_user,
+    ndb_stub,
+    web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    monkeypatch,
+) -> None:
+    class MockFRCResponse:
+        status_code = 200
+
+        def json(self):
+            return {
+                "Events": [
+                    {
+                        "code": "INLAF",
+                        "name": "Test Event",
+                        "dateStart": "2012-04-04T00:00:00",
+                        "dateEnd": "2012-04-06T00:00:00",
+                    }
+                ]
+            }
+
+    class MockFuture:
+        def get_result(self):
+            return MockFRCResponse()
+
+    class MockFRCAPI:
+        def event_info(self, year: int, event_short: str):
+            assert year == 2012
+            assert event_short == "INLAF"
+            return MockFuture()
+
+    monkeypatch.setattr(suggestion_submission, "FRCAPI", MockFRCAPI)
+
+    form = {
+        "name": "Test Event",
+        "start_date": "2012-04-04",
+        "end_date": "2012-04-06",
+        "website": "http://foo.com/bar",
+        "venue_name": "This is a Venue",
+        "venue_address": "123 Fake St",
+        "venue_city": "New York",
+        "venue_state": "NY",
+        "venue_country": "USA",
+        "frc_events_link": "https://frc-events.firstinspires.org/2012/INLAF",
+    }
+
+    resp = web_client.post("/suggest/offseason", data=form, follow_redirects=True)
+    assert resp.status_code == 200
+    assert_template_status(captured_templates, "success")
+
+    suggestion = cast(Suggestion, Suggestion.query().fetch()[0])
+    assert suggestion.contents["first_code"] == "INLAF"
+
+
+def test_suggest_event_with_invalid_frc_events_link_format(
+    login_user,
+    ndb_stub,
+    web_client: Client,
+    captured_templates: List[CapturedTemplate],
+) -> None:
+    form = {
+        "name": "Test Event",
+        "start_date": "2012-04-04",
+        "end_date": "2012-04-06",
+        "website": "http://foo.com/bar",
+        "venue_name": "This is a Venue",
+        "venue_address": "123 Fake St",
+        "venue_city": "New York",
+        "venue_state": "NY",
+        "venue_country": "USA",
+        "frc_events_link": "https://example.com/2012/INLAF",
+    }
+
+    resp = web_client.post("/suggest/offseason", data=form, follow_redirects=True)
+    assert resp.status_code == 200
+    failures = assert_template_status(captured_templates, "validation_failure")
+    assert failures is not None
+    assert "frc_events_link" in failures
+
+    assert Suggestion.query().fetch() == []
+
+
+def test_suggest_event_with_mismatched_frc_events_link(
+    login_user,
+    ndb_stub,
+    web_client: Client,
+    captured_templates: List[CapturedTemplate],
+    monkeypatch,
+) -> None:
+    class MockFRCResponse:
+        status_code = 200
+
+        def json(self):
+            return {
+                "Events": [
+                    {
+                        "code": "INLAF",
+                        "name": "Different Event",
+                        "dateStart": "2012-04-04T00:00:00",
+                        "dateEnd": "2012-04-06T00:00:00",
+                    }
+                ]
+            }
+
+    class MockFuture:
+        def get_result(self):
+            return MockFRCResponse()
+
+    class MockFRCAPI:
+        def event_info(self, year: int, event_short: str):
+            assert year == 2012
+            assert event_short == "INLAF"
+            return MockFuture()
+
+    monkeypatch.setattr(suggestion_submission, "FRCAPI", MockFRCAPI)
+
+    form = {
+        "name": "Test Event",
+        "start_date": "2012-04-04",
+        "end_date": "2012-04-06",
+        "website": "http://foo.com/bar",
+        "venue_name": "This is a Venue",
+        "venue_address": "123 Fake St",
+        "venue_city": "New York",
+        "venue_state": "NY",
+        "venue_country": "USA",
+        "frc_events_link": "https://frc-events.firstinspires.org/2012/INLAF",
+    }
+
+    resp = web_client.post("/suggest/offseason", data=form, follow_redirects=True)
+    assert resp.status_code == 200
+    failures = assert_template_status(captured_templates, "validation_failure")
+    assert failures is not None
+    assert "frc_events_link" in failures
+
+    assert Suggestion.query().fetch() == []

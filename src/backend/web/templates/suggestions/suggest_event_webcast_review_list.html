@@ -103,6 +103,11 @@
                                             {% endif %}
                                             <input type="hidden" name="suggestion_key" value="{{suggestion.key.id()}}" />
                                             <input type="hidden" name="event_key" value="{{suggestion.target_key}}" />
+                                            {% if suggestion_set.uses_official_webcast_unit %}
+                                            <div class="alert alert-warning" style="margin-top: 10px;">
+                                                <strong><span class="glyphicon glyphicon-warning-sign"></span> Official Webcast Unit:</strong> This event is part of a district that uses FIRST's official webcast unit. Webcasts are typically published automatically and should not need to be added manually.
+                                            </div>
+                                            {% endif %}
                                             <button type="submit" class="btn btn-primary" name="verdict" value="accept"><span class="glyphicon glyphicon-thumbs-up"></span> Add Webcast</button> <button type="submit" class="btn btn-danger" name="verdict" value="reject"><span class="glyphicon glyphicon-thumbs-down"></span> Reject</button>
                                         </form>
                                     </div>

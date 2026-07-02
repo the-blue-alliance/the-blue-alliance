@@ -1,5 +1,14 @@
+{% if media.media_type_enum == 10 %}
+<div class="thumbnail" style="text-align: center; padding: 10px;">
+  <a href="https://www.instagram.com/p/{{media.foreign_key}}/" target="_blank" rel="noopener noreferrer" style="color: #c13584; text-decoration: none;">
+    <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="2" y="2" width="20" height="20" rx="5" ry="5"/><circle cx="12" cy="12" r="5"/><circle cx="17.5" cy="6.5" r="1.5"/></svg>
+    <div style="font-size: 11px; margin-top: 4px;">Instagram</div>
+  </a>
+</div>
+{% else %}
 <div class="thumbnail cdphotothread-thumbnail">
   <a href="{{media.image_direct_url}}" class="gallery">
     <span style="background-image:url('{{media.image_direct_url_med}}')"></span>
   </a>
 </div>
+{% endif %}

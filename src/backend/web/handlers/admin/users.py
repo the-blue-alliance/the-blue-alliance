@@ -8,6 +8,7 @@ from backend.common.consts.account_permission import AccountPermission, PERMISSI
 from backend.common.firebase import app
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.web.profiled_render import render_template
 
 USER_PAGE_SIZE = 1000
@@ -45,11 +46,20 @@ def user_detail(user_id: str) -> str:
         logging.error(f"Failed to fetch Firebase user: {e}")
 
     api_keys = ApiAuthAccess.query(ApiAuthAccess.owner == user.key).fetch()
+    # Negation for descending order is valid NDB syntax, but Pyre doesn't understand it
+    audit_logs = (
+        AuditLogEntry.query(AuditLogEntry.account == user.key)
+        .order(-AuditLogEntry.time)  # pyre-ignore[16]
+        .fetch(25)
+    )
+    audit_log_accounts_by_key = {user.key: user}
 
     template_values = {
         "user": user,
         "firebase_user": firebase_user,
         "api_keys": api_keys,
+        "audit_logs": audit_logs,
+        "audit_log_accounts_by_key": audit_log_accounts_by_key,
         "permissions": PERMISSIONS,
     }
     return render_template("admin/user_details.html", template_values)

@@ -19,7 +19,7 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.team import Team
-from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 
 blueprint = Blueprint("tasks", __name__)
 
@@ -33,7 +33,7 @@ def blacklist_website(team_key: TeamKey) -> Response:
 
     if team and team.website:
         # Blacklist website
-        WebsiteBlacklist.blacklist(team.website)
+        WebsiteBlocklist.blacklist(team.website)
         # Clear existing website
         team.website = ""
         TeamManipulator.createOrUpdate(team)

@@ -277,6 +277,42 @@ def mock_event_predictions_url(
     )
 
 
+def mock_event_teams_statuses_url(
+    m: RequestsMocker,
+    event_key: EventKey,
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams/statuses",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json={},
+    )
+
+
+def mock_event_district_points_url(
+    m: RequestsMocker,
+    event_key: EventKey,
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/district_points",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json={},
+    )
+
+
+def mock_districts_url(m: RequestsMocker, year: Year, districts: List[Dict]) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/districts/{year}",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=districts,
+    )
+
+
 def test_bootstrap_unknown_key() -> None:
     resp = LocalDataBootstrap.bootstrap_key("asdf", "asdf")
     assert resp is None
@@ -348,6 +384,7 @@ def test_bootstrap_event(
     )
     mock_event_detail_url(requests_mock, event)
     mock_event_teams_url(requests_mock, event.key_name, [team1, team2])
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
     mock_event_matches_url(requests_mock, event.key_name, [match])
     mock_event_rankings_url(requests_mock, event.key_name, rankings)
     mock_event_alliances_url(requests_mock, event.key_name, alliances)
@@ -363,6 +400,7 @@ def test_bootstrap_event(
             "ranking_prediction_stats": None,
         },
     )
+    mock_event_district_points_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -421,6 +459,7 @@ def test_bootstrap_year(
     for event in [e1, e2]:
         mock_event_detail_url(requests_mock, event)
         mock_event_teams_url(requests_mock, event.key_name, [])
+        mock_event_teams_statuses_url(requests_mock, event.key_name)
         mock_event_matches_url(requests_mock, event.key_name, [])
         mock_event_rankings_url(requests_mock, event.key_name, [])
         mock_event_alliances_url(requests_mock, event.key_name, [])
@@ -436,6 +475,9 @@ def test_bootstrap_year(
                 "ranking_prediction_stats": None,
             },
         )
+        mock_event_district_points_url(requests_mock, event.key_name)
+
+    mock_districts_url(requests_mock, 2020, [])
 
     resp = LocalDataBootstrap.bootstrap_key("2020", "test_apiv3")
     assert resp == "/events/2020"
@@ -467,6 +509,7 @@ def test_bootstrap_event_with_district(
 
     mock_event_detail_url(requests_mock, event)
     mock_event_teams_url(requests_mock, event.key_name, [])
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
     mock_event_matches_url(requests_mock, event.key_name, [])
     mock_event_rankings_url(requests_mock, event.key_name, [])
     mock_event_alliances_url(requests_mock, event.key_name, [])
@@ -482,6 +525,7 @@ def test_bootstrap_event_with_district(
             "ranking_prediction_stats": None,
         },
     )
+    mock_event_district_points_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"

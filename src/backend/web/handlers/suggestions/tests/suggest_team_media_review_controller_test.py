@@ -249,3 +249,32 @@ def test_reject_suggestion(
     # Verify no medias are created
     medias = Media.query().fetch()
     assert medias == []
+
+
+def test_instagram_suggestion_renders_embed(
+    login_user_with_permission,
+    web_client: Client,
+) -> None:
+    status = SuggestionCreator.createTeamMediaSuggestion(
+        login_user_with_permission.account_key,
+        "https://www.instagram.com/p/abc123/",
+        "frc1124",
+        "2024",
+    ).get_result()
+    assert status[0] == SuggestionCreationStatus.SUCCESS
+
+    response = web_client.get("/suggest/team/media/review")
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, "html.parser")
+
+    # Verify Instagram embed blockquote is rendered
+    blockquote = soup.find("blockquote", class_="instagram-media")
+    assert blockquote is not None
+    assert (
+        blockquote.get("data-instgrm-permalink")
+        == "https://www.instagram.com/p/abc123/"
+    )
+
+    # Verify embed.js script is included
+    embed_script = soup.find("script", attrs={"src": re.compile("instagram.com/embed")})
+    assert embed_script is not None

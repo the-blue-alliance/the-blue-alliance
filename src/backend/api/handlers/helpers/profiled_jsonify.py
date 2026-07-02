@@ -1,10 +1,16 @@
-from typing import Any
+from typing import Generic, TypeVar
 
 from flask import jsonify, Response
 
 from backend.common.profiler import Span
 
+T = TypeVar("T")
 
-def profiled_jsonify(obj: Any) -> Response:
+
+class TypedFlaskResponse(Response, Generic[T]):
+    pass
+
+
+def profiled_jsonify(obj: T) -> TypedFlaskResponse[T]:
     with Span("profiled_jsonify"):
-        return jsonify(obj)
+        return jsonify(obj)  # type: ignore[return-value]

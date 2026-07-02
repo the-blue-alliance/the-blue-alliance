@@ -5,7 +5,7 @@ import BiChevronBarDown from '~icons/bi/chevron-bar-down';
 import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 import MaterialSymbolsTrophy from '~icons/material-symbols/trophy';
 
-import { LeaderboardInsight } from '~/api/tba/read';
+import { type LeaderboardInsight } from '~/api/tba/read';
 import { MatchLink, TeamLink } from '~/components/tba/links';
 import { Button } from '~/components/ui/button';
 import {
@@ -36,13 +36,17 @@ const MAX_KEYS_PER_ROW = 20;
 const PRE_EXPANDED_ROWS = 10;
 
 export function Leaderboard({
+  subtitle,
   leaderboard,
   contextTooltipMap,
   year,
+  renderKey,
 }: {
+  subtitle?: string;
   leaderboard: LeaderboardInsight;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
+  renderKey?: (key: string) => ReactNode;
 }) {
   const [expanded, setExpanded] = useState(false);
 
@@ -70,9 +74,11 @@ export function Leaderboard({
               <CardTitle className="text-lg leading-tight font-semibold">
                 {displayName}
               </CardTitle>
-              <CardDescription className="mt-0.5 text-sm">
-                {leaderboard.year > 0 ? leaderboard.year : 'Overall'}
-              </CardDescription>
+              {subtitle && (
+                <CardDescription className="mt-0.5 text-sm">
+                  {subtitle}
+                </CardDescription>
+              )}
             </div>
           </div>
           <Button
@@ -126,7 +132,7 @@ export function Leaderboard({
                   >
                     <TableCell
                       className={cn(
-                        'text-center font-semibold tabular-nums',
+                        'text-center font-semibold numeric-data',
                         isTopThree && 'text-base',
                       )}
                     >
@@ -139,6 +145,7 @@ export function Leaderboard({
                         keyVals={r.keys}
                         contextTooltipMap={contextTooltipMap}
                         year={year}
+                        renderKey={renderKey}
                       />
                     </TableCell>
                   </TableRow>
@@ -157,12 +164,14 @@ function LeaderboardKeyList({
   cutoffSize,
   contextTooltipMap,
   year,
+  renderKey,
 }: {
   keyType: LeaderboardInsight['data']['key_type'];
   keyVals: string[];
   cutoffSize: number;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
+  renderKey?: (key: string) => ReactNode;
 }) {
   return (
     <>
@@ -172,7 +181,12 @@ function LeaderboardKeyList({
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
-                <LeaderboardKeyLink keyType={keyType} keyVal={k} year={year} />
+                <LeaderboardKeyLink
+                  keyType={keyType}
+                  keyVal={k}
+                  year={year}
+                  renderKey={renderKey}
+                />
               </TooltipTrigger>
               {contextTooltipMap?.[k] ? (
                 <TooltipContent>
@@ -202,6 +216,7 @@ function LeaderboardKeyList({
                       keyType={keyType}
                       keyVal={k}
                       year={year}
+                      renderKey={renderKey}
                     />
                   </Fragment>
                 ))}
@@ -218,11 +233,16 @@ function LeaderboardKeyLink({
   keyVal,
   keyType,
   year,
+  renderKey,
 }: {
   keyType: LeaderboardInsight['data']['key_type'];
   keyVal: string;
   year: number;
+  renderKey?: (key: string) => ReactNode;
 }) {
+  if (renderKey) {
+    return <>{renderKey(keyVal)}</>;
+  }
   if (keyType === 'team') {
     return (
       <TeamLink teamOrKey={keyVal} year={year}>

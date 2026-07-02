@@ -1,4 +1,5 @@
 import React, { ChangeEvent, useState } from "react";
+import ensureRequestSuccess from "../../net/EnsureRequestSuccess";
 
 const COMP_LEVELS_PLAY_ORDER: Record<string, number> = {
   qm: 1,
@@ -41,13 +42,11 @@ interface MatchResultsFromMatchPlayProps {
   selectedEvent: string;
   makeTrustedRequest: (
     path: string,
-    body: string,
-    successCallback: (response: any) => void,
-    errorCallback: (error: any) => void
-  ) => void;
-  makeApiV3Request: <T = unknown>(
+    body: string | FormData
+  ) => Promise<Response>;
+  makeApiV3Request: (
     path: string
-  ) => Promise<T>;
+  ) => Promise<Response>;
 }
 
 const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
@@ -71,12 +70,19 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
     setStatusMessage("Loading matches...");
 
     try {
-      const data = await makeApiV3Request<SimpleMatch[]>(
+      const response = await makeApiV3Request(
         `/api/v3/event/${selectedEvent}/matches/simple`
       );
+      ensureRequestSuccess(response);
+      const data = await response.json();
 
-      // Sort matches by comp_level and match_number
-      const sortedMatches = data.sort((a, b) => {
+      if (!Array.isArray(data)) {
+        throw new Error("Unexpected matches response format");
+      }
+
+      const matchesFromApi = data as SimpleMatch[];
+
+      const sortedMatches = [...matchesFromApi].sort((a, b) => {
         const compLevelDiff =
           COMP_LEVELS_PLAY_ORDER[a.comp_level] -
           COMP_LEVELS_PLAY_ORDER[b.comp_level];
@@ -127,7 +133,7 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
     }));
   };
 
-  const updateMatch = (match: SimpleMatch): void => {
+  const updateMatch = async (match: SimpleMatch): Promise<void> => {
     const matchKey = match.key;
     const redScore = parseInt(scores[matchKey]?.red);
     const blueScore = parseInt(scores[matchKey]?.blue);
@@ -156,18 +162,17 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
       },
     };
 
-    makeTrustedRequest(
-      `/api/trusted/v1/event/${selectedEvent}/matches/update`,
-      JSON.stringify([matchUpdate]),
-      () => {
-        setUpdatingMatches((prev) => ({ ...prev, [matchKey]: false }));
-        setStatusMessage(`Successfully updated ${formatMatchName(match)}!`);
-      },
-      (error) => {
-        setUpdatingMatches((prev) => ({ ...prev, [matchKey]: false }));
-        setStatusMessage(`Error updating match: ${error}`);
-      }
-    );
+    try {
+      await makeTrustedRequest(
+        `/api/trusted/v1/event/${selectedEvent}/matches/update`,
+        JSON.stringify([matchUpdate])
+      );
+      setStatusMessage(`Successfully updated ${formatMatchName(match)}!`);
+    } catch (error) {
+      setStatusMessage(`Error updating match: ${error}`);
+    } finally {
+      setUpdatingMatches((prev) => ({ ...prev, [matchKey]: false }));
+    }
   };
 
   const formatMatchName = (match: SimpleMatch): string => {

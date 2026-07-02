@@ -1,7 +1,7 @@
 import time
 
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.models.twitch_access_token import TwitchAccessToken
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class TwitchAccessTokenParser(ParserBase[dict, TwitchAccessToken]):

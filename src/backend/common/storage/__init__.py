@@ -29,6 +29,8 @@ def read(file_name: str, bucket: str | None = None) -> Optional[str | bytes]:
     return client.read(file_name)
 
 
-def get_files(path: Optional[str] = None, bucket: str | None = None) -> List[str]:
+def get_files(
+    path: Optional[str] = None, bucket: str | None = None, recursive: bool = False
+) -> List[str]:
     client = _client_for_env(bucket)
-    return client.get_files(path)
+    return client.get_files(path, recursive=recursive)

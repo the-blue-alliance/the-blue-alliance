@@ -1,4 +1,6 @@
 import {
+  Bay2019,
+  HabLine2019,
   Match,
   MatchScoreBreakdown2019,
   MatchScoreBreakdown2019Alliance,
@@ -25,14 +27,14 @@ const ENDGAME_2019_POINTS: Record<string, number> = {
   Unknown: 0,
 };
 
-type Bay2019 = MatchScoreBreakdown2019Alliance['bay1'];
-
 function countPanels(...bays: Bay2019[]): number {
-  return bays.filter((b) => b === 'Panel' || b === 'PanelAndCargo').length;
+  return bays.filter(
+    (b) => b === Bay2019.PANEL || b === Bay2019.PANEL_AND_CARGO,
+  ).length;
 }
 
 function countCargo(...bays: Bay2019[]): number {
-  return bays.filter((b) => b === 'PanelAndCargo').length;
+  return bays.filter((b) => b === Bay2019.PANEL_AND_CARGO).length;
 }
 
 function cargoShipPanels(a: MatchScoreBreakdown2019Alliance): number {
@@ -110,19 +112,22 @@ export default function ScoreBreakdown2019({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.habLineRobot1 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.red.habLineRobot1 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.habLineRobot2 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.red.habLineRobot2 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.habLineRobot3 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.red.habLineRobot3 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.red.team_keys[2]}
           />
@@ -138,19 +143,22 @@ export default function ScoreBreakdown2019({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot1 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot1 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot2 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot2 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot3 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot3 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.blue.team_keys[2]}
           />

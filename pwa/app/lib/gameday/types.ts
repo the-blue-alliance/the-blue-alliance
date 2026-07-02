@@ -1,4 +1,4 @@
-import type { Webcast } from '~/api/tba/read';
+import type { Webcast, WebcastStatus } from '~/api/tba/read';
 
 /**
  * Supported webcast types
@@ -15,7 +15,7 @@ export interface FirebaseWebcast {
   file?: string;
   date?: string;
   // Live status fields populated by WebcastOnlineHelper
-  status?: 'unknown' | 'online' | 'offline';
+  status?: WebcastStatus;
   stream_title?: string | null;
   viewer_count?: number | null;
 }

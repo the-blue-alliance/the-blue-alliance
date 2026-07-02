@@ -2,8 +2,8 @@ from typing import cast
 
 from typing_extensions import TypedDict
 
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import ApiIndexModelV2
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class RootInfo(TypedDict):

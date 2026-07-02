@@ -85,5 +85,54 @@
         "total": 24
     }
 },
-  "tiebreakers": {}
+  "tiebreakers": {
+    "frc131": {
+      "highest_match_scores": [
+        109,
+        98,
+        98
+      ],
+      "qual_wins": 0
+    },
+    "frc1729": {
+      "highest_match_scores": [
+        109,
+        98,
+        98
+      ],
+      "qual_wins": 0
+    },
+    "frc195": {
+      "highest_match_scores": [
+        114,
+        98,
+        98
+      ],
+      "qual_wins": 0
+    },
+    "frc5112": {
+      "highest_match_scores": [
+        114,
+        98,
+        98
+      ],
+      "qual_wins": 0
+    },
+    "frc6329": {
+      "highest_match_scores": [
+        109,
+        98,
+        98
+      ],
+      "qual_wins": 0
+    },
+    "frc8013": {
+      "highest_match_scores": [
+        114,
+        98,
+        98
+      ],
+      "qual_wins": 0
+    }
+  }
 }

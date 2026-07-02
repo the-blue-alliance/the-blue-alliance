@@ -192,9 +192,6 @@ def test_schema_org_sports_team(web_client: Client, ndb_stub) -> None:
         "https://frc-events.firstinspires.org/team/254" in sports_team_schema["sameAs"]
     )
 
-    # Check website
-    assert sports_team_schema["url"] == "https://www.thebluealliance.com"
-
 
 def test_schema_org_sports_team_full_data(web_client: Client, setup_full_team) -> None:
     """Test schema.org markup with full team data."""

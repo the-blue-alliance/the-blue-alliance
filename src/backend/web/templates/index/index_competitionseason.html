@@ -28,6 +28,9 @@
             <ul class="nav nav-tabs nav-justified">
               <li class="active"><a href="#events" data-toggle="tab">Events This Week</a></li>
               <li><a href="#popular-teams" data-toggle="tab">Popular Teams Competing</a></li>
+              {% if popular_online_events %}
+                <li><a href="#popular-events" data-toggle="tab">Popular Events</a></li>
+              {% endif %}
             </ul>
           </div>
         </div>
@@ -95,6 +98,18 @@
               </div>
             </div>
           </div>
+          {% if popular_online_events %}
+            <div class="tab-pane" id="popular-events">
+              <p>* This list of teams is automatically generated based on how many people are watching an event's webcast</p>
+              <div class="row">
+                <div class="col-sm-12">
+                  {% with events = popular_online_events %}
+                    {% include "event_partials/event_table.html" %}
+                  {% endwith %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
         </div>
       {% else %}
         <h2>Build season has ended. Competitions start soon!</h2>

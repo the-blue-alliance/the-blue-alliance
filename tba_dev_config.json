@@ -8,7 +8,5 @@
     "storage_mode": "local",
     "storage_path": "ops/dev/storage",
     "save_frc_api_response": "false",
-    "min_gcloud_sdk_version": "380.0.0",
-    "firebase_auth_emulator_host": "localhost:9099",
-    "firebase_database_emulator_host": "localhost:9000"
+    "min_gcloud_sdk_version": "380.0.0"
 }

@@ -11,6 +11,7 @@ from werkzeug.wrappers import Response
 from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.team_admin_access import TeamAdminAccess
 
@@ -107,6 +108,33 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
     def was_create_success(self, ret: Optional[TTargetModel]) -> bool:
         return ret is not None
 
+    @property
+    def _audit_target_kind(self) -> Optional[str]:
+        """
+        The NDB model kind name for the entity targeted by suggestions reviewed
+        by this controller, used when writing AuditLogEntry records.
+        Return None to skip audit logging (e.g. when no entity key is available
+        on the suggestion itself, as with offseason events).
+        """
+        raise NotImplementedError
+
+    def _get_audit_target_key(self, suggestion: Suggestion) -> Optional[ndb.Key]:
+        """Returns the ndb.Key of the entity this suggestion targets, for audit logging."""
+        kind = self._audit_target_kind
+        if kind is None or not suggestion.target_key:
+            return None
+        return ndb.Key(kind, suggestion.target_key)
+
+    def _get_accepted_audit_target_key(
+        self, suggestion: Suggestion, ret: Optional[TTargetModel]
+    ) -> Optional[ndb.Key]:
+        """
+        Returns the ndb.Key to use when logging an accepted suggestion.
+        Subclasses may override this when the target key is only known after
+        the model is created (e.g. offseason events).
+        """
+        return self._get_audit_target_key(suggestion)
+
     @ndb.transactional(xg=True)
     def _process_accepted(self, accept_key: str) -> Optional[TTargetModel]:
         """
@@ -133,6 +161,17 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             suggestion.reviewer = self.user.account_key
             suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()
+            AuditLogEntry(
+                account=self.user.account_key,
+                endpoint=request.endpoint or "",
+                target_key=self._get_accepted_audit_target_key(suggestion, ret),
+                url_args={str(k): str(v) for k, v in (request.view_args or {}).items()},
+                form_params={
+                    k: v
+                    for k, v in request.form.to_dict(flat=False).items()
+                    if k != "csrf_token"
+                },
+            ).put()
         return ret
 
     def _process_rejected(self, reject_keys: List[Union[int, str]]) -> None:
@@ -158,3 +197,18 @@ class SuggestionsReviewBase(Generic[TTargetModel], MethodView):
             suggestion.reviewer = self.user.account_key
             suggestion.reviewed_at = datetime.datetime.now()
             suggestion.put()
+            target_key = self._get_audit_target_key(suggestion)
+            if target_key is not None:
+                AuditLogEntry(
+                    account=self.user.account_key,
+                    endpoint=request.endpoint or "",
+                    target_key=target_key,
+                    url_args={
+                        str(k): str(v) for k, v in (request.view_args or {}).items()
+                    },
+                    form_params={
+                        k: v
+                        for k, v in request.form.to_dict(flat=False).items()
+                        if k != "csrf_token"
+                    },
+                ).put()

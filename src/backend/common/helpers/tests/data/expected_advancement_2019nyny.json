@@ -1,1 +1,245 @@
-[{"f": {"f1": {"winning_alliance": "red", "blue_alliance": ["4122", "1155", "2869"], "blue_record": {"wins": 0, "losses": 2, "ties": 0}, "blue_name": "Alliance 2", "red_record": {"wins": 2, "losses": 0, "ties": 0}, "red_name": "Alliance 1", "blue_wins": 0, "red_wins": 2, "red_alliance": ["1796", "694", "2265"]}}, "sf": {"sf2": {"winning_alliance": "red", "blue_alliance": ["2579", "333", "334"], "blue_record": {"wins": 0, "losses": 2, "ties": 0}, "blue_name": "Alliance 6", "red_record": {"wins": 2, "losses": 0, "ties": 0}, "red_name": "Alliance 2", "blue_wins": 0, "red_wins": 2, "red_alliance": ["4122", "1155", "2869"]}, "sf1": {"winning_alliance": "red", "blue_alliance": ["1880", "354", "3419"], "blue_record": {"wins": 0, "losses": 2, "ties": 0}, "blue_name": "Alliance 4", "red_record": {"wins": 2, "losses": 0, "ties": 0}, "red_name": "Alliance 1", "blue_wins": 0, "red_wins": 2, "red_alliance": ["1796", "694", "2265"]}}, "qf": {"qf4": {"winning_alliance": "blue", "blue_alliance": ["2579", "333", "334"], "blue_record": {"wins": 2, "losses": 1, "ties": 0}, "blue_name": "Alliance 6", "red_record": {"wins": 1, "losses": 2, "ties": 0}, "red_name": "Alliance 3", "blue_wins": 2, "red_wins": 1, "red_alliance": ["7522", "4571", "5806"]}, "qf1": {"winning_alliance": "red", "blue_alliance": ["5781", "1635", "7458"], "blue_record": {"wins": 0, "losses": 2, "ties": 0}, "blue_name": "Alliance 8", "red_record": {"wins": 2, "losses": 0, "ties": 0}, "red_name": "Alliance 1", "blue_wins": 0, "red_wins": 2, "red_alliance": ["1796", "694", "2265"]}, "qf2": {"winning_alliance": "red", "blue_alliance": ["6401", "7004", "4383"], "blue_record": {"wins": 1, "losses": 2, "ties": 0}, "blue_name": "Alliance 5", "red_record": {"wins": 2, "losses": 1, "ties": 0}, "red_name": "Alliance 4", "blue_wins": 1, "red_wins": 2, "red_alliance": ["1880", "354", "3419"]}, "qf3": {"winning_alliance": "red", "blue_alliance": ["1660", "2344", "395"], "blue_record": {"wins": 1, "losses": 2, "ties": 0}, "blue_name": "Alliance 7", "red_record": {"wins": 2, "losses": 1, "ties": 0}, "red_name": "Alliance 2", "blue_wins": 1, "red_wins": 2, "red_alliance": ["4122", "1155", "2869"]}}}, null, null, null]
+[
+  {
+    "f": {
+      "f1": {
+        "blue_alliance": ["4122", "1155", "2869"],
+        "blue_name": "Alliance 2",
+        "blue_record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "blue_wins": 0,
+        "red_alliance": ["1796", "694", "2265"],
+        "red_name": "Alliance 1",
+        "red_record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "red_wins": 2,
+        "results": [
+          {
+            "blue_score": 58,
+            "red_score": 91,
+            "winner": "red"
+          },
+          {
+            "blue_score": 53,
+            "red_score": 77,
+            "winner": "red"
+          }
+        ],
+        "winning_alliance": "red"
+      }
+    },
+    "qf": {
+      "qf1": {
+        "blue_alliance": ["5781", "1635", "7458"],
+        "blue_name": "Alliance 8",
+        "blue_record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "blue_wins": 0,
+        "red_alliance": ["1796", "694", "2265"],
+        "red_name": "Alliance 1",
+        "red_record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "red_wins": 2,
+        "results": [
+          {
+            "blue_score": 46,
+            "red_score": 94,
+            "winner": "red"
+          },
+          {
+            "blue_score": 50,
+            "red_score": 89,
+            "winner": "red"
+          }
+        ],
+        "winning_alliance": "red"
+      },
+      "qf2": {
+        "blue_alliance": ["6401", "7004", "4383"],
+        "blue_name": "Alliance 5",
+        "blue_record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 1
+        },
+        "blue_wins": 1,
+        "red_alliance": ["1880", "354", "3419"],
+        "red_name": "Alliance 4",
+        "red_record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 2
+        },
+        "red_wins": 2,
+        "results": [
+          {
+            "blue_score": 45,
+            "red_score": 57,
+            "winner": "red"
+          },
+          {
+            "blue_score": 60,
+            "red_score": 58,
+            "winner": "blue"
+          },
+          {
+            "blue_score": 47,
+            "red_score": 59,
+            "winner": "red"
+          }
+        ],
+        "winning_alliance": "red"
+      },
+      "qf3": {
+        "blue_alliance": ["1660", "2344", "395"],
+        "blue_name": "Alliance 7",
+        "blue_record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 1
+        },
+        "blue_wins": 1,
+        "red_alliance": ["4122", "1155", "2869"],
+        "red_name": "Alliance 2",
+        "red_record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 2
+        },
+        "red_wins": 2,
+        "results": [
+          {
+            "blue_score": 40,
+            "red_score": 56,
+            "winner": "red"
+          },
+          {
+            "blue_score": 61,
+            "red_score": 54,
+            "winner": "blue"
+          },
+          {
+            "blue_score": 0,
+            "red_score": 45,
+            "winner": "red"
+          }
+        ],
+        "winning_alliance": "red"
+      },
+      "qf4": {
+        "blue_alliance": ["2579", "333", "334"],
+        "blue_name": "Alliance 6",
+        "blue_record": {
+          "losses": 1,
+          "ties": 0,
+          "wins": 2
+        },
+        "blue_wins": 2,
+        "red_alliance": ["7522", "4571", "5806"],
+        "red_name": "Alliance 3",
+        "red_record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 1
+        },
+        "red_wins": 1,
+        "results": [
+          {
+            "blue_score": 55,
+            "red_score": 61,
+            "winner": "red"
+          },
+          {
+            "blue_score": 51,
+            "red_score": 43,
+            "winner": "blue"
+          },
+          {
+            "blue_score": 60,
+            "red_score": 48,
+            "winner": "blue"
+          }
+        ],
+        "winning_alliance": "blue"
+      }
+    },
+    "sf": {
+      "sf1": {
+        "blue_alliance": ["1880", "354", "3419"],
+        "blue_name": "Alliance 4",
+        "blue_record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "blue_wins": 0,
+        "red_alliance": ["1796", "694", "2265"],
+        "red_name": "Alliance 1",
+        "red_record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "red_wins": 2,
+        "results": [
+          {
+            "blue_score": 71,
+            "red_score": 86,
+            "winner": "red"
+          },
+          {
+            "blue_score": 57,
+            "red_score": 69,
+            "winner": "red"
+          }
+        ],
+        "winning_alliance": "red"
+      },
+      "sf2": {
+        "blue_alliance": ["2579", "333", "334"],
+        "blue_name": "Alliance 6",
+        "blue_record": {
+          "losses": 2,
+          "ties": 0,
+          "wins": 0
+        },
+        "blue_wins": 0,
+        "red_alliance": ["4122", "1155", "2869"],
+        "red_name": "Alliance 2",
+        "red_record": {
+          "losses": 0,
+          "ties": 0,
+          "wins": 2
+        },
+        "red_wins": 2,
+        "results": [
+          {
+            "blue_score": 46,
+            "red_score": 55,
+            "winner": "red"
+          },
+          {
+            "blue_score": 39,
+            "red_score": 48,
+            "winner": "red"
+          }
+        ],
+        "winning_alliance": "red"
+      }
+    }
+  },
+  null,
+  null,
+  null
+]

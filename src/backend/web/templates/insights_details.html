@@ -1,12 +1,12 @@
 {% extends "insights_base.html" %}
 {% import "match_partials/match_table_macros.html" as mtm %}
 
-{% block title %}{{selected_year}} Insights - The Blue Alliance{% endblock %}
+{% block title %}{{page_title|default(selected_year ~ " Insights - The Blue Alliance")}}{% endblock %}
 
-{% block meta_description %}FIRST Robotics Competition (FRC) insights from {{selected_year}}.{% endblock %}
+{% block meta_description %}{{meta_description|default("FIRST Robotics Competition (FRC) insights from " ~ selected_year ~ ".")}}{% endblock %}
 
 {% block detailed_content %}
-  <h1 class="end_header">{{selected_year}} Insights</h1>
+  <h1 class="end_header">{{heading|default(selected_year ~ " Insights")}}</h1>
   {% if last_updated %}<p>Last updated on <time datetime="{{last_updated|rfc2822}}+00:00" class="tba-verbose-datetime-utc">{{last_updated|strftime("%b. %d, %Y at %I:%M%p")}} UTC</time></p>{% endif %}
 
   {% if match_highscore or match_averages_by_week or score_distribution %}

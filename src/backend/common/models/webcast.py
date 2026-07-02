@@ -9,6 +9,7 @@ class WebcastOnlineStatus(TypedDict):
     status: NotRequired[WebcastStatus]
     stream_title: NotRequired[Optional[str]]
     viewer_count: NotRequired[Optional[int]]
+    scheduled_start_time_utc: NotRequired[Optional[str]]
 
 
 class Webcast(WebcastOnlineStatus):
@@ -16,3 +17,9 @@ class Webcast(WebcastOnlineStatus):
     channel: str
     file: NotRequired[str]
     date: NotRequired[str]
+
+
+class WebcastChannel(TypedDict):
+    type: WebcastType
+    channel: str
+    channel_id: str

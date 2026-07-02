@@ -28,6 +28,7 @@ from backend.common.consts.playoff_type import (
     ORDERED_DOUBLE_ELIM_ROUNDS,
     PlayoffType,
 )
+from backend.common.game_specific.registry import get_game
 from backend.common.helpers.match_helper import (
     MatchHelper,
     TOrganizedDoubleElimMatches,
@@ -69,24 +70,6 @@ class PlayoffAdvancement(NamedTuple):
 
 
 class PlayoffAdvancementHelper:
-    ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS: Dict[Year, List[str]] = {
-        2017: ["totalPoints"],
-        2018: ["endgamePoints", "autoPoints"],
-        2019: ["cargoPoints", "hatchPanelPoints"],
-        2020: [],
-        2021: [],
-        2022: ["endgamePoints", "autoPoints"],
-    }
-
-    ROUND_ROBIN_TIEBREAKERS: Dict[Year, List[str]] = {
-        2017: ["Match Points"],
-        2018: ["Park/Climb Points", "Auto Points"],
-        2019: ["Cargo Points", "Hatch Panel Points"],
-        2020: [],
-        2021: [],
-        2022: ["Hangar Points", "Auto Taxi/Cargo Points"],
-    }
-
     ADVANCEMENT_COUNT_2015: Dict[CompLevel, int] = {
         CompLevel.EF: 8,
         CompLevel.QF: 4,
@@ -243,6 +226,7 @@ class PlayoffAdvancementHelper:
                         "blue_record": {"wins": 0, "losses": 0, "ties": 0},
                         "red_name": None,
                         "blue_name": None,
+                        "results": [],
                     }
                 for color in [AllianceColor.RED, AllianceColor.BLUE]:
                     alliance = copy.copy(match.alliances[color]["teams"])
@@ -288,6 +272,21 @@ class PlayoffAdvancementHelper:
                     continue
 
                 winner = match.winning_alliance
+
+                bracket_table[comp_level][set_key]["results"] = bracket_table[
+                    comp_level
+                ][set_key]["results"] + [
+                    {
+                        "red_score": match.alliances.get(AllianceColor.RED, {}).get(
+                            "score", -1
+                        ),
+                        "blue_score": match.alliances.get(AllianceColor.BLUE, {}).get(
+                            "score", -1
+                        ),
+                        "winner": match.winning_alliance,
+                    }
+                ]
+
                 if not winner or winner == "":
                     # if the match is a tie
                     bracket_table[comp_level][set_key]["red_record"]["ties"] = (
@@ -465,12 +464,9 @@ class PlayoffAdvancementHelper:
                 if match.has_been_played:
                     champ_points.append(cp)
 
-                    if (
-                        year in cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS
-                        and match.score_breakdown is not None
-                    ):
+                    tiebreak_keys = get_game(year).round_robin_tiebreak_keys()
+                    if tiebreak_keys and match.score_breakdown is not None:
                         breakdown = none_throws(match.score_breakdown)
-                        tiebreak_keys = cls.ROUND_ROBIN_TIEBREAK_BEAKDOWN_KEYS[year]
 
                         key1 = tiebreak_keys[0] if len(tiebreak_keys) > 0 else None
                         tiebreaker1.append(breakdown[color][key1] if key1 else 0)
@@ -849,7 +845,7 @@ class PlayoffAdvancementHelper:
             ],
         )
 
-        for tiebreaker in cls.ROUND_ROBIN_TIEBREAKERS[event.year]:
+        for tiebreaker in get_game(event.year).round_robin_tiebreaker_names():
             data["sort_order_info"].append(
                 {"name": tiebreaker, "type": "int", "precision": 0}
             )

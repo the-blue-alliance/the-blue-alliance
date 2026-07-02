@@ -17,10 +17,10 @@ const mapStateToProps = (state: RootState) => ({
       requestBody
     );
   },
-  makeApiV3Request: <T = unknown>(
+  makeApiV3Request: (
     requestPath: string
   ) => {
-    return makeApiV3Request<T>(state.auth.authId || "", requestPath);
+    return makeApiV3Request(state.auth.authId || "", requestPath);
   },
 });
 

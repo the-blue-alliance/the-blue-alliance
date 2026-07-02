@@ -1,7 +1,7 @@
 import heapq
 import logging
 from collections import defaultdict
-from typing import DefaultDict, Dict, List, NamedTuple, Optional, Set, Union
+from typing import cast, DefaultDict, Dict, List, NamedTuple, Optional, Set, Union
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -16,10 +16,12 @@ from backend.common.helpers.district_helper import (
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
+    EventRegionalChampsPoolPoints,
     TeamAtEventDistrictPoints,
     TeamAtEventDistrictPointTiebreakers,
+    TeamAtEventRegionalChampsPoolPoints,
 )
-from backend.common.models.keys import EventKey, TeamKey, Year
+from backend.common.models.keys import TeamKey, Year
 from backend.common.models.team import Team
 
 
@@ -32,7 +34,7 @@ class RegionalChampsPoolTiebreakers(NamedTuple):
 class RegionalChampsPoolHelper(DistrictHelper):
 
     @classmethod
-    def calculate_event_points(cls, event: Event) -> EventDistrictPoints:
+    def calculate_event_points(cls, event: Event) -> EventRegionalChampsPoolPoints:
         event.prep_awards()
         event.prep_matches()
 
@@ -50,7 +52,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 lambda: TeamAtEventDistrictPointTiebreakers(
                     # for tiebreaker stats that can't be calculated with 'points'
                     qual_wins=0,
-                    highest_qual_scores=[],
+                    highest_match_scores=[],
                 )
             ),
         }
@@ -102,7 +104,20 @@ class RegionalChampsPoolHelper(DistrictHelper):
             )
             district_points["points"][team]["total"] += total_points
 
-        return district_points
+        # Team age points are awarded at each regional event attended.
+        rookie_points = cls._get_event_level_rookie_bonus_points(
+            event, set(district_points["points"].keys()), multiplier=1
+        )
+        regional_points = cast(EventRegionalChampsPoolPoints, district_points)
+        for team_key, rookie_bonus in rookie_points.items():
+            team_points = cast(
+                TeamAtEventRegionalChampsPoolPoints,
+                regional_points["points"][team_key],
+            )
+            team_points["rookie_bonus"] = rookie_bonus
+            team_points["total"] += rookie_bonus
+
+        return regional_points
 
     @classmethod
     def calculate_rankings(
@@ -113,9 +128,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
         adjustments: Optional[Dict[TeamKey, int]],
     ) -> Dict[TeamKey, DistrictRankingTeamTotal]:
         # aggregate points from first two regional events
-        events_by_key: Dict[EventKey, Event] = {}
-        team_attendance: DefaultDict[TeamKey, List[EventKey]] = defaultdict(list)
-        single_event_teams: Set[TeamKey] = set()
+        team_attendance: DefaultDict[TeamKey, List[str]] = defaultdict(list)
         team_totals: Dict[TeamKey, DistrictRankingTeamTotal] = defaultdict(
             lambda: DistrictRankingTeamTotal(
                 event_points=[],
@@ -126,7 +139,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     best_alliance_points=0,
                     best_qual_points=0,
                 ),
-                qual_scores=[],
+                match_scores=[],
                 other_bonus=0,
                 single_event_bonus=0,
                 adjustments=0,
@@ -134,7 +147,6 @@ class RegionalChampsPoolHelper(DistrictHelper):
         )
 
         for event in events:
-            events_by_key[event.key_name] = event
             event_regional_points = event.regional_champs_pool_points
             if event_regional_points is None:
                 continue
@@ -145,11 +157,6 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 team_attendance[team_key].append(event.key_name)
 
                 num_events = len(team_attendance[team_key])
-                if num_events == 1:
-                    single_event_teams.add(team_key)
-                else:
-                    single_event_teams.discard(team_key)
-
                 if num_events > 2:
                     continue
 
@@ -183,32 +190,15 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     team_totals[team_key]["tiebreakers"] = tiebreakers
 
                 if team_key in event_regional_points["tiebreakers"]:
-                    team_totals[team_key]["qual_scores"] = heapq.nlargest(
+                    team_totals[team_key]["match_scores"] = heapq.nlargest(
                         3,
                         [
-                            *event_regional_points["tiebreakers"][team_key][
-                                "highest_qual_scores"
-                            ],
-                            *team_totals[team_key]["qual_scores"],
+                            *event_regional_points["tiebreakers"][team_key].get(
+                                "highest_match_scores", []
+                            ),
+                            *team_totals[team_key]["match_scores"],
                         ],
                     )
-
-        # Single-Event regional teams are award additional points
-        # based on event 1 performance
-        # E2 points = 0.6 * (E1 points) + 14
-        # See section 12.3.1 of the 2025 game manual
-        for team_key in single_event_teams:
-            team_total = team_totals[team_key]
-            if len(team_total["event_points"]) != 1:
-                logging.warning(
-                    f"Team {team_key} has regional cmp point event count mismatch"
-                )
-                continue
-
-            first_event_points = team_total["event_points"][0][1]
-            bonus = round(0.6 * first_event_points["total"]) + 14
-            team_totals[team_key]["single_event_bonus"] = bonus
-            team_totals[team_key]["point_total"] += bonus
 
         if isinstance(teams, ndb.tasklets.Future):
             teams = teams.get_result()
@@ -219,15 +209,32 @@ class RegionalChampsPoolHelper(DistrictHelper):
                 team = team_f.get_result()
             else:
                 team = team_f
-            bonus = cls._get_rookie_bonus(year, team.rookie_year)
+            team_total = team_totals[team.key_name]
+            num_events_attended = len(team_total["event_points"])
+            total_rookie_bonus = sum(
+                cast(TeamAtEventRegionalChampsPoolPoints, event_points).get(
+                    "rookie_bonus", 0
+                )
+                for _, event_points in team_total["event_points"]
+            )
 
-            team_totals[team.key_name]["rookie_bonus"] = bonus
-            team_totals[team.key_name]["point_total"] += bonus
+            # Single-Event regional teams are award additional points
+            # based on event 1 performance.
+            # E2 points = 0.6 * (E1 points) + 14
+            # Team age points are included in event-level totals.
+            # See section 12.3.1 of the 2025 game manual.
+            if num_events_attended == 1:
+                first_event_points = team_total["event_points"][0][1]
+                single_event_bonus = round(0.6 * first_event_points["total"]) + 14
+                team_total["single_event_bonus"] = single_event_bonus
+                team_total["point_total"] += single_event_bonus
+
+            team_total["rookie_bonus"] = total_rookie_bonus
 
             # For other adjustments made by HQ
             if adjustments and (team_adjustment := adjustments.get(team.key_name)):
-                team_totals[team.key_name]["adjustments"] = team_adjustment
-                team_totals[team.key_name]["point_total"] += team_adjustment
+                team_total["adjustments"] = team_adjustment
+                team_total["point_total"] += team_adjustment
 
             valid_team_keys.add(team.key_name)
 
@@ -238,7 +245,7 @@ class RegionalChampsPoolHelper(DistrictHelper):
                     -item[1]["point_total"],
                 ]
                 + [-t for t in item[1]["tiebreakers"]]
-                + [-score for score in item[1]["qual_scores"]],
+                + [-score for score in item[1]["match_scores"]],
             )
         )
 

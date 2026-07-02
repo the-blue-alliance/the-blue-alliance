@@ -186,6 +186,58 @@ def test_past_future_start_end_today(
         assert e.ends_today == end_today
 
 
+def test_default_sync_overrides() -> None:
+    e = Event()
+    assert e.sync_overrides is None
+
+
+def test_should_skip_eventteams_explicit_config() -> None:
+    e = Event(
+        id="2023test",
+        year=2023,
+        event_short="test",
+        event_type_enum=EventType.OFFSEASON,
+        sync_overrides={"skip_eventteams": True},
+        start_date=datetime(2023, 4, 1),
+        end_date=datetime(2023, 4, 4),
+    )
+
+    assert e.should_skip_eventteams() is True
+
+
+@pytest.mark.parametrize(
+    "event_type,division_count,date_str,should_skip",
+    [
+        (EventType.DISTRICT_CMP, 2, "2023-04-01", True),
+        (EventType.CMP_FINALS, 4, "2023-04-01", True),
+        (EventType.DISTRICT_CMP, 2, "2023-05-01", True),
+        (EventType.CMP_FINALS, 2, "2023-05-01", True),
+        (EventType.DISTRICT_CMP, 2, "2023-03-01", False),
+        (EventType.CMP_FINALS, 2, "2023-03-01", False),
+        (EventType.DISTRICT_CMP, 0, "2023-04-01", False),
+        (EventType.DISTRICT_CMP, 0, "2023-05-01", False),
+        (EventType.OFFSEASON, 2, "2023-04-01", False),
+    ],
+)
+def test_should_skip_eventteams_automatic_cases(
+    event_type: EventType, division_count: int, date_str: str, should_skip: bool
+) -> None:
+    e = Event(
+        id="2023test",
+        year=2023,
+        event_short="test",
+        event_type_enum=event_type,
+        divisions=[
+            ndb.Key(Event, f"2023test{i}") for i in range(1, division_count + 1)
+        ],
+        start_date=datetime(2023, 4, 1),
+        end_date=datetime(2023, 4, 4),
+    )
+
+    with freeze_time(date_str):
+        assert e.should_skip_eventteams() == should_skip
+
+
 @pytest.mark.parametrize(
     "year, event_type, official, week, week_output, week_str",
     [
@@ -298,6 +350,32 @@ def test_webcasts() -> None:
     assert event.has_first_official_webcast is True
 
 
+def test_webcasts_sorted_chronologically() -> None:
+    event = Event(
+        start_date=datetime(2026, 3, 3),
+        end_date=datetime(2026, 3, 5),
+        webcast_json=json.dumps(
+            [
+                {"type": "twitch", "channel": "day2_stream", "date": "2026-03-04"},
+                {"type": "twitch", "channel": "day3_stream", "date": "2026-03-05"},
+                {"type": "twitch", "channel": "day1_stream", "date": "2026-03-03"},
+                {"type": "twitch", "channel": "firstinspires", "date": "2026-03-05"},
+                {"type": "youtube", "channel": "all_days"},
+            ]
+        ),
+    )
+    webcasts = event.webcast
+    assert len(webcasts) == 5
+    # firstinspires sorts first regardless of date
+    assert webcasts[0]["channel"] == "firstinspires"
+    # Then by date ascending
+    assert webcasts[1]["channel"] == "day1_stream"
+    assert webcasts[2]["channel"] == "day2_stream"
+    assert webcasts[3]["channel"] == "day3_stream"
+    # No-date webcasts sort last
+    assert webcasts[4]["channel"] == "all_days"
+
+
 def test_linked_district() -> None:
     District(
         id="2019ne",
@@ -379,6 +457,26 @@ def test_first_api_code() -> None:
     # 2023 championship div
     event = Event(id="2023hop", year=2023, event_short="hop")
     assert event.first_api_code == "hcmp"
+
+
+def test_nexus_api_code() -> None:
+    # Defaults to first_api_code
+    event = Event(id="2023hop", year=2023, event_short="hop")
+    assert event.nexus_api_code == "hcmp"
+
+    # Inherits explicit FIRST override if Nexus override is unset
+    event = Event(id="2019casj", year=2019, event_short="casj", first_code="caovr")
+    assert event.nexus_api_code == "caovr"
+
+    # Explicit Nexus override wins
+    event = Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        first_code="caovr",
+        nexus_code="nexovr",
+    )
+    assert event.nexus_api_code == "nexovr"
 
 
 def test_get_alliances() -> None:

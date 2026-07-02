@@ -141,6 +141,36 @@ def test_get_no_rankings(fmsapi_event_rankings_mock, tasks_client: Client) -> No
 
 
 @mock.patch.object(DatafeedFMSAPI, "get_event_rankings")
+def test_get_none_rankings_does_not_overwrite_existing(
+    fmsapi_event_rankings_mock, tasks_client: Client
+) -> None:
+    create_event(official=True)
+    existing_rankings = [
+        EventRanking(
+            rank=1,
+            team_key="frc254",
+            record=None,
+            qual_average=None,
+            matches_played=1,
+            dq=0,
+            sort_orders=[],
+        )
+    ]
+    EventDetails(id="2020nyny", rankings2=existing_rankings).put()
+
+    fmsapi_event_rankings_mock.return_value = InstantFuture(None)
+
+    resp = tasks_client.get("/tasks/get/fmsapi_event_rankings/2020nyny")
+    assert resp.status_code == 200
+    assert b"Failed to fetch rankings" in resp.data
+
+    # Existing rankings should be preserved when API returns None (failure)
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.rankings2 == existing_rankings
+
+
+@mock.patch.object(DatafeedFMSAPI, "get_event_rankings")
 def test_get_no_events_no_output_in_taskqueue(
     fmsapi_event_rankings_mock, tasks_client: Client
 ) -> None:

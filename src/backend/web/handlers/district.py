@@ -2,19 +2,23 @@ import datetime
 import logging
 from datetime import timedelta
 from operator import itemgetter
-from typing import List, Optional, Tuple
+from typing import Dict, List, Optional, Tuple
 
-from flask import abort
+from flask import abort, redirect
 from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
+from backend.common.consts.event_type import EventType
 from backend.common.decorators import cached_public
 from backend.common.flask_cache import make_cached_response
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.team_helper import TeamHelper
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event_team import EventTeam
-from backend.common.models.keys import DistrictAbbreviation, Year
+from backend.common.models.insight import Insight
+from backend.common.models.keys import DistrictAbbreviation, EventKey, TeamKey, Year
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.queries.district_query import (
     DistrictHistoryQuery,
@@ -24,6 +28,18 @@ from backend.common.queries.district_query import (
 from backend.common.queries.event_query import DistrictEventsQuery, RegionalEventsQuery
 from backend.common.queries.team_query import DistrictTeamsQuery, EventTeamsQuery
 from backend.web.profiled_render import render_template
+
+
+def district_redirect(
+    district_abbrev: DistrictAbbreviation, year: Optional[Year]
+) -> Response:
+    if year is not None:
+        return redirect(f"/events/{district_abbrev}/{year}", code=301)
+    return redirect(f"/events/{district_abbrev}", code=301)
+
+
+def districts_redirect() -> Response:
+    return redirect("/events", code=301)
 
 
 @cached_public
@@ -52,6 +68,14 @@ def district_detail(
 
     # needed for valid_districts
     districts_in_year_future = DistrictsInYearQuery(district.year).fetch_async()
+
+    # needed for insights tab
+    year_specific_insight_future = ndb.Key(
+        Insight,
+        Insight.render_key_name(
+            year, Insight.INSIGHT_NAMES[Insight.YEAR_SPECIFIC], district_abbrev
+        ),
+    ).get_async()
 
     # needed for active team statuses
     live_events = []
@@ -142,6 +166,23 @@ def district_detail(
     else:
         has_adjustments = False
 
+    # Identify DCMP events; if there are multiple, build per-team home DCMP mapping
+    _dcmp_types = {EventType.DISTRICT_CMP}
+    dcmp_events = sorted(
+        [e for e in events if e.event_type_enum in _dcmp_types],
+        key=EventHelper.start_date_or_distant_future,
+    )
+    home_dcmp_per_team: Dict[TeamKey, EventKey] = {}
+    if len(dcmp_events) > 1:
+        district_team_objs = DistrictTeam.query(
+            DistrictTeam.district_key == ndb.Key(District, district.key_name)
+        ).fetch()
+        home_dcmp_per_team = {
+            dt.team.id(): dt.home_dcmp_event_key
+            for dt in district_team_objs
+            if dt.home_dcmp_event_key
+        }
+
     template_values = {
         "explicit_year": explicit_year,
         "year": year,
@@ -158,11 +199,73 @@ def district_detail(
         "teams_a": teams_a,
         "teams_b": teams_b,
         "live_events_with_teams": live_events_with_teams,
+        "dcmp_events": dcmp_events,
+        "home_dcmp_per_team": home_dcmp_per_team,
+        "year_specific": year_specific_insight_future.get_result(),
+        "year_specific_insights_template": "event_partials/event_insights_{}.html".format(
+            year
+        ),
     }
 
     return make_cached_response(
         render_template("district_details.html", template_values),
         ttl=timedelta(minutes=15) if current_year else timedelta(days=1),
+    )
+
+
+@cached_public
+def district_insights(
+    district_abbrev: DistrictAbbreviation, year: Optional[Year]
+) -> Response:
+    history = DistrictHistoryQuery(district_abbrev).fetch()
+    if len(history) == 0:
+        abort(404)
+
+    valid_years = sorted([district.year for district in history], reverse=True)
+
+    if year is None:
+        year = valid_years[0]
+
+    if year not in valid_years:
+        abort(404)
+
+    latest_district = sorted(history, key=lambda district: district.year)[-1]
+
+    template_values = {
+        "selected_year": year,
+        "valid_years": valid_years,
+        "year_specific_insights_template": "event_partials/event_insights_{}.html".format(
+            year
+        ),
+        "insights_overview_url": f"/district/{district_abbrev}/insights",
+        "insights_base_path": f"/district/{district_abbrev}/insights",
+        "page_title": f"{year} {latest_district.display_name} District Insights - The Blue Alliance",
+        "meta_description": f"FIRST Robotics Competition (FRC) insights from {year} for the {latest_district.display_name} District.",
+        "heading": f"{year} {latest_district.display_name} District Insights",
+    }
+
+    insights = ndb.get_multi(
+        [
+            ndb.Key(
+                Insight,
+                Insight.render_key_name(year, insight_name, district_abbrev),
+            )
+            for insight_name in Insight.INSIGHT_NAMES.values()
+        ]
+    )
+    last_updated = None
+    for insight in insights:
+        if insight:
+            template_values[insight.name] = insight
+            if last_updated is None:
+                last_updated = insight.updated
+            else:
+                last_updated = max(last_updated, insight.updated)
+    template_values["last_updated"] = last_updated
+
+    return make_cached_response(
+        render_template("insights_details.html", template_values),
+        ttl=timedelta(days=1),
     )
 
 

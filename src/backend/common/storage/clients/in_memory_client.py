@@ -31,5 +31,7 @@ class InMemoryClient(StorageClient):
     def read(self, file_name: str) -> Optional[str | bytes]:
         return self.data.get(file_name)
 
-    def get_files(self, path: Optional[str] = None) -> List[str]:
+    def get_files(
+        self, path: Optional[str] = None, recursive: bool = False
+    ) -> List[str]:
         return [p for p in self.data.keys() if path is None or p.startswith(path)]

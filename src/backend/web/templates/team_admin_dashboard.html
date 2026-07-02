@@ -15,6 +15,15 @@
     {%endfor%}
   </ul>
 
+  {% if show_year_jump %}
+  <form class="form-inline" action="/mod" method="get">
+    <legend>Jump to Year</legend>
+    <input type="hidden" name="team" value="{{year_jump_team_number}}">
+    <input class="form-control" name="year" type="text" placeholder="year" value="{{year_jump_current_year}}">
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-fast-forward"></span> Go</button>
+  </form>
+  {% endif %}
+
   <div class="row">
     <div class="col-sm-12">
       <ul class="nav nav-tabs">

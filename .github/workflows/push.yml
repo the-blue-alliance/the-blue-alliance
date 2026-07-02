@@ -5,12 +5,22 @@ on:
     branches:
       - main
 
+env:
+  VITE_TBA_API_READ_KEY: ${{ vars.VITE_TBA_API_READ_KEY }}
+  VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+  VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+  VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+  VITE_FIREBASE_DATABASE_URL: ${{ vars.VITE_FIREBASE_DATABASE_URL }}
+  VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+  VITE_FIREBASE_MEASUREMENT_ID: ${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}
+
+
 jobs:
   py3-type:
     name: "[py3] Type Check"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Run Type Check
@@ -20,7 +30,7 @@ jobs:
     name: "[py3] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Run Format & Lint
@@ -33,14 +43,14 @@ jobs:
       matrix:
         group: [1, 2, 3, 4, 5]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Run Tests
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: coverage${{ matrix.group }}
           path: .coverage
@@ -50,7 +60,7 @@ jobs:
     runs-on: ubuntu-24.04
     needs: [py3-test]
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up uv
         uses: astral-sh/setup-uv@v7
       - name: Download all artifacts
@@ -62,7 +72,7 @@ jobs:
           uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
@@ -70,7 +80,7 @@ jobs:
     name: "[node] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -86,11 +96,13 @@ jobs:
     name: "[node] Test"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
@@ -100,7 +112,7 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
@@ -108,9 +120,9 @@ jobs:
     name: "[pwa] Format & Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
       - name: Set up Node
@@ -121,8 +133,6 @@ jobs:
           cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa install --frozen-lockfile
@@ -136,9 +146,9 @@ jobs:
     name: "[pwa] Type Check"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
       - name: Set up Node
@@ -149,8 +159,6 @@ jobs:
           cache-dependency-path: "pwa/pnpm-lock.yaml"
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa install --frozen-lockfile
@@ -161,9 +169,9 @@ jobs:
     name: "[pwa] Test"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
       - name: Set up Node
@@ -178,14 +186,12 @@ jobs:
       - name: Create dotenv
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
       - name: Run Test
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa test
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v5.5.2
+        uses: codecov/codecov-action@v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
@@ -193,9 +199,9 @@ jobs:
     name: "[pwa] Build"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
       - name: Set up Node
@@ -208,77 +214,30 @@ jobs:
         run: pnpm --dir pwa install --frozen-lockfile
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
-          FIREBASE_API_KEY: ${{ secrets.FIREBASE_API_KEY }}
-          GCLOUD_PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
       - name: Run Build
         run: pnpm --dir pwa run build
         env:
           SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
       - name: Archive production artifacts (build)
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: pwa-build
           path: pwa/build
       - name: Archive production artifacts (server.js)
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: pwa-server
           path: pwa/server.js
-
-  pwa-e2e:
-    name: "[pwa] E2E Tests"
-    runs-on: ubuntu-24.04
-    steps:
-      - uses: actions/checkout@v6
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v4
-        with:
-          version: "10.24.0"
-
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
-
-      - name: Install Dependencies
-        working-directory: pwa
-        run: pnpm install --frozen-lockfile
-
-      - name: Cache Playwright browsers
-        uses: actions/cache@v5
-        with:
-          path: ~/.cache/ms-playwright
-          key: ${{ runner.os }}-playwright-${{ hashFiles('pwa/pnpm-lock.yaml') }}
-          restore-keys: |
-            ${{ runner.os }}-playwright-
-
-      - name: Install Playwright Browsers
-        working-directory: pwa
-        run: pnpm exec playwright install --with-deps chromium webkit
-
-      - name: Run Playwright tests
-        working-directory: pwa
-        run: pnpm exec playwright test
-        env:
-          VITE_TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
-          VITE_FIREBASE_API_KEY: "fake-api-key"
-          VITE_FIREBASE_AUTH_DOMAIN: "demo-test"
-          VITE_FIREBASE_PROJECT_ID: "demo-test"
 
   check-pwa-api:
     name: "[pwa] Check API regeneration"
     runs-on: ubuntu-24.04
 
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
@@ -291,8 +250,6 @@ jobs:
 
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: TEST_KEY
 
       - name: Install Dependencies
         working-directory: pwa
@@ -317,7 +274,7 @@ jobs:
     name: "[bash] Lint"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Run Lint
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: make lint-bash
@@ -325,7 +282,7 @@ jobs:
     name: "[py3] Check Python Version Consistency"
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       - name: Check Python Version
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/check_python_version.sh
@@ -334,11 +291,9 @@ jobs:
     name: Build Web
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@v6
-      - name: Set up Python 3.13
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
+      - uses: actions/checkout@v7
+      - name: Set up uv
+        uses: astral-sh/setup-uv@v7
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
@@ -354,7 +309,7 @@ jobs:
           FIREBASE_APP_ID: ${{ secrets.FIREBASE_APP_ID }}
           FIREBASE_MESSAGING_SENDER_ID: ${{ secrets.FIREBASE_MESSAGING_SENDER_ID }}
       - name: Archive production artifacts
-        uses: actions/upload-artifact@v7.0.0
+        uses: actions/upload-artifact@v7
         with:
           name: web-build
           path: src/build
@@ -362,13 +317,8 @@ jobs:
   ops-test:
     name: Ops Fullstack Test
     runs-on: ubuntu-24.04
-    services:
-      registry:
-        image: registry:2
-        ports:
-          - 5000:5000
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
       # See https://github.com/puppeteer/puppeteer/issues/12818
       # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
       - name: Disable AppArmor
@@ -385,45 +335,25 @@ jobs:
       - name: Set up Node
         uses: actions/setup-node@v6
         with:
-          node-version: "24"
+          # Transitive dependency of puppeteer (extract-zip) broken on 24.16
+          # https://github.com/puppeteer/puppeteer/issues/15071
+          node-version: "24.15.0"
           cache: "npm"
       - name: Install Node Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: npm ci
-      - name: Install Vagrant
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: |
-          wget -O - https://apt.releases.hashicorp.com/gpg | sudo gpg --dearmor -o /usr/share/keyrings/hashicorp-archive-keyring.gpg
-          echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/hashicorp-archive-keyring.gpg] https://apt.releases.hashicorp.com $(grep -oP '(?<=UBUNTU_CODENAME=).*' /etc/os-release || lsb_release -cs) main" | sudo tee /etc/apt/sources.list.d/hashicorp.list
-          sudo apt update
-          sudo apt install vagrant
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
-      - name: Set up Docker Buildx
-        id: buildx
+      - name: Start Containers
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/setup-buildx-action@v3
-        with:
-          driver-opts: network=host
-      - name: Build Docker Image
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+      - name: Test Docker Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: docker/build-push-action@v6.19.2
-        with:
-          builder: ${{ steps.buildx.outputs.name }}
-          context: ./ops/dev/docker
-          push: true
-          tags: localhost:5000/tba-py3-dev:latest
-          cache-from: |
-            type=gha
-            ghcr.io/the-blue-alliance/the-blue-alliance/tba-py3-dev:latest
-          cache-to: type=gha,mode=max
-      - name: Start Container
+        run: python ./ops/test_docker_startup.py
+      - name: Pre-pull companion import image
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: vagrant up
-      - name: Test Vagrant Startup
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: ./ops/test_vagrant_startup.py
+        run: docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest
       - name: Test Ops Fullstack
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_ops.sh
@@ -435,18 +365,13 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-queues-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
             queue:
               - 'src/queue.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.queue == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.queue == 'true'
         uses: google-github-actions/auth@v3
@@ -468,18 +393,13 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-index-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
             index:
               - 'src/index.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.index == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.index == 'true'
         uses: google-github-actions/auth@v3
@@ -501,8 +421,8 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-default-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -511,11 +431,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.default == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.default == 'true'
         uses: astral-sh/setup-uv@v7
@@ -551,8 +466,8 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-web-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -561,11 +476,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.web == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.web == 'true'
         uses: astral-sh/setup-uv@v7
@@ -601,8 +511,8 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-api-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -611,11 +521,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.api == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.api == 'true'
         uses: astral-sh/setup-uv@v7
@@ -645,8 +550,8 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-tasks-io-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -655,11 +560,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.tasks-io == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.tasks-io == 'true'
         uses: astral-sh/setup-uv@v7
@@ -684,8 +584,8 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-tasks-cpu-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -694,11 +594,6 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.tasks-cpu == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Set up uv
         if: steps.changes.outputs.tasks-cpu == 'true'
         uses: astral-sh/setup-uv@v7
@@ -726,10 +621,10 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-pwa-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 10 # Needed for Sentry release
-      - uses: dorny/paths-filter@v3
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
@@ -766,9 +661,22 @@ jobs:
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
+      - name: Prepare PWA deploy config
+        if: steps.changes.outputs.pwa == 'true'
+        run: |
+          # PWA uses build-time VITE_* vars, but Nexus key is runtime-only server env.
+          # Inject it into a deploy-only app.yaml so it is available as process.env.
+          cp pwa/pwa.yaml pwa/pwa.deploy.yaml
+          cat >> pwa/pwa.deploy.yaml <<EOF
+
+          env_variables:
+            NEXUS_API_KEY: "${NEXUS_API_KEY}"
+          EOF
+        env:
+          NEXUS_API_KEY: ${{ secrets.NEXUS_API_KEY }}
       - name: Deploy
         if: steps.changes.outputs.pwa == 'true'
-        run: ./ops/deploy/deploy_module.sh pwa/pwa.yaml
+        run: ./ops/deploy/deploy_module.sh pwa/pwa.deploy.yaml
   deploy-cron:
     name: Deploy Cron Jobs
     runs-on: ubuntu-24.04
@@ -776,18 +684,13 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-cron-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
             cron:
               - 'src/cron.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.cron == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.cron == 'true'
         uses: google-github-actions/auth@v3
@@ -818,18 +721,13 @@ jobs:
     if: contains(github.event.commits[0].message, '[nodeploy]') == false
     concurrency: deploy-dispatch-${{ github.ref }}
     steps:
-      - uses: actions/checkout@v6
-      - uses: dorny/paths-filter@v3
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
         id: changes
         with:
           filters: |
             dispatch:
               - 'src/dispatch.yaml'
-      - name: Set up Python 3.13
-        if: steps.changes.outputs.dispatch == 'true'
-        uses: actions/setup-python@v6
-        with:
-          python-version: "3.13"
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.dispatch == 'true'
         uses: google-github-actions/auth@v3

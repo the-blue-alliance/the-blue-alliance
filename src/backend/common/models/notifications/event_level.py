@@ -21,18 +21,21 @@ class EventLevelNotification(Notification):
     @property
     def fcm_notification(self) -> Optional[Any]:
         if self.match.time:
-            time = self.match.time.strftime("%H:%M")
-            # Add timezone, if possible
+            # Convert UTC time to event local time, if possible
             if self.event.timezone_id:
                 try:
                     import pytz
 
                     timezone = pytz.timezone(self.event.timezone_id)
-                    time += timezone.localize(self.match.time).strftime(" %Z")
+                    local_time = pytz.utc.localize(self.match.time).astimezone(timezone)
+                    time = local_time.strftime("%-H:%M %Z")
                 except Exception as e:
                     logging.warning(
-                        f"Unable to add timezone to event level notification: {e}"
+                        f"Unable to convert timezone for event level notification: {e}"
                     )
+                    time = self.match.time.strftime("%-H:%M")
+            else:
+                time = self.match.time.strftime("%-H:%M")
             ending = f"scheduled for {time}."
         else:
             ending = "starting."

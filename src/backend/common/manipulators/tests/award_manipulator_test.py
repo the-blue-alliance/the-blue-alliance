@@ -227,8 +227,133 @@ class TestAwardManipulator(unittest.TestCase):
             queue_names="push-notifications"
         )
         assert len(tasks) == 1
-        task = tasks[0]
-        assert task.name == "2013casj_awards"
+
+    def test_postUpdateHook_notifications_second_update(self):
+        """A second award update should still enqueue a notification task."""
+        import datetime
+
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        # First award creation
+        AwardManipulator.createOrUpdate(self.new_award)
+        hook_tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(hook_tasks) == 1
+        run_from_task(hook_tasks[0])
+
+        first_push_count = len(
+            none_throws(self.taskqueue_stub).get_filtered_tasks(
+                queue_names="push-notifications"
+            )
+        )
+        assert first_push_count == 1
+
+        # Second award creation for the same event
+        second_award = Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.FINALIST),
+            name_str="Regional Finalist",
+            award_type_enum=AwardType.FINALIST,
+            year=2013,
+            event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, "frc111")],
+            recipient_json_list=[json.dumps({"team_number": 111, "awardee": None})],
+        )
+        AwardManipulator.createOrUpdate(second_award)
+        hook_tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        # Run only the second hook task
+        run_from_task(hook_tasks[-1])
+
+        # Should now have TWO push-notification tasks (not blocked by tombstone)
+        push_tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(push_tasks) == 2
+
+    def test_postUpdateHook_notifications_passes_new_team_keys(self):
+        """New award team keys are passed through to TBANSHelper.awards()."""
+        import datetime
+
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        AwardManipulator.createOrUpdate(self.new_award)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        for task in tasks:
+            run_from_task(task)
+
+        # Run the push-notification task and verify args
+        push_tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        assert len(push_tasks) == 1
+
+        with patch.object(TBANSHelper, "awards") as mock_awards:
+            for task in push_tasks:
+                run_from_task(task)
+
+            mock_awards.assert_called_once()
+            call_kwargs = mock_awards.call_args
+            # event_key is the first positional arg
+            assert call_kwargs[0][0] == "2013casj"
+            # new_award_team_keys should contain the team from the new award
+            assert call_kwargs[1]["new_award_team_keys"] == {"frc359"}
+
+    def test_postUpdateHook_notifications_updated_award_empty_new_team_keys(self):
+        """Updated (not new) awards pass empty new_award_team_keys."""
+        import datetime
+
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        # First, create the award
+        AwardManipulator.createOrUpdate(self.new_award)
+        # Drain post-update-hooks and push-notifications
+        for task in none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        ):
+            run_from_task(task)
+
+        # Now update the same award (change name)
+        updated_award = Award(
+            id="2013casj_1",
+            name_str="Regional Winner",
+            award_type_enum=AwardType.WINNER,
+            year=2013,
+            event=self.event.key,
+            event_type_enum=EventType.REGIONAL,
+            team_list=[ndb.Key(Team, "frc359")],
+            recipient_json_list=[json.dumps({"team_number": 359, "awardee": None})],
+        )
+        AwardManipulator.createOrUpdate(updated_award)
+
+        # Run the second post-update-hook
+        all_tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        # Run only the latest hook (second one)
+        run_from_task(all_tasks[-1])
+
+        # Get push-notification tasks (there should be 2 now)
+        push_tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="push-notifications"
+        )
+        # Run the latest push task and verify args
+        with patch.object(TBANSHelper, "awards") as mock_awards:
+            run_from_task(push_tasks[-1])
+
+            mock_awards.assert_called_once()
+            call_kwargs = mock_awards.call_args
+            assert call_kwargs[0][0] == "2013casj"
+            # Not a new award, so new_award_team_keys should be empty
+            assert call_kwargs[1]["new_award_team_keys"] == set()
 
     def test_postUpdateHook_notifications_notWithinADay(self):
         AwardManipulator.createOrUpdate(self.new_award)

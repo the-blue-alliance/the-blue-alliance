@@ -9,20 +9,27 @@ on:
       - ".github/workflows/pwa_screenshots.yml"
   workflow_dispatch:
 
+env:
+  VITE_TBA_API_READ_KEY: ${{ vars.VITE_TBA_API_READ_KEY }}
+  VITE_FIREBASE_API_KEY: ${{ vars.VITE_FIREBASE_API_KEY }}
+  VITE_FIREBASE_AUTH_DOMAIN: ${{ vars.VITE_FIREBASE_AUTH_DOMAIN }}
+  VITE_FIREBASE_PROJECT_ID: ${{ vars.VITE_FIREBASE_PROJECT_ID }}
+  VITE_FIREBASE_DATABASE_URL: ${{ vars.VITE_FIREBASE_DATABASE_URL }}
+  VITE_FIREBASE_APP_ID: ${{ vars.VITE_FIREBASE_APP_ID }}
+  VITE_FIREBASE_MEASUREMENT_ID: ${{ vars.VITE_FIREBASE_MEASUREMENT_ID }}
+
+
 jobs:
   pwa-screenshots:
     name: "PWA Screenshots"
     runs-on: ubuntu-24.04
-    # Skip if TBA API key is not available (e.g. fork PRs without secrets)
-    env:
-      TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
     steps:
       - name: Check for API key
         id: check-key
         run: |
-          if [ -z "$TBA_API_READ_KEY" ]; then
+          if [ -z "$VITE_TBA_API_READ_KEY" ]; then
             echo "skip=true" >> "$GITHUB_OUTPUT"
-            echo "TBA_API_READ_KEY not available (expected for fork PRs). Skipping screenshots."
+            echo "VITE_TBA_API_READ_KEY not available. Skipping screenshots."
           else
             echo "skip=false" >> "$GITHUB_OUTPUT"
           fi
@@ -31,7 +38,7 @@ jobs:
       - name: Parse screenshot pages from PR body
         if: steps.check-key.outputs.skip != 'true'
         id: pages
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const pr = await github.rest.pulls.get({
@@ -76,11 +83,11 @@ jobs:
       # --- Setup toolchain ---
       - name: Checkout PR branch
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
 
       - name: Set up pnpm
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: pnpm/action-setup@v4
+        uses: pnpm/action-setup@v5
         with:
           version: "10.24.0"
 
@@ -94,7 +101,7 @@ jobs:
 
       - name: Cache Playwright browsers
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: actions/cache@v5
+        uses: actions/cache@v6
         with:
           path: ~/.cache/ms-playwright
           key: ${{ runner.os }}-playwright-${{ hashFiles('pwa/pnpm-lock.yaml') }}
@@ -113,10 +120,6 @@ jobs:
       - name: Create dotenv (PR)
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
-          FIREBASE_API_KEY: fake-api-key
-          GCLOUD_PROJECT_ID: demo-test
 
       - name: Build PWA (PR branch)
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
@@ -151,7 +154,7 @@ jobs:
 
       - name: Checkout base branch
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: actions/checkout@v6
+        uses: actions/checkout@v7
         with:
           ref: ${{ github.event.pull_request.base.sha }}
           clean: false
@@ -166,10 +169,6 @@ jobs:
       - name: Create dotenv (base)
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]' && steps.base-deps.outcome == 'success'
         run: ./ops/pwa/create_dotenv.sh --env
-        env:
-          TBA_API_READ_KEY: ${{ secrets.TBA_API_READ_KEY }}
-          FIREBASE_API_KEY: fake-api-key
-          GCLOUD_PROJECT_ID: demo-test
 
       - name: Build PWA (base branch)
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]' && steps.base-deps.outcome == 'success'
@@ -211,7 +210,7 @@ jobs:
 
       - name: Post comment on PR
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
-        uses: actions/github-script@v8
+        uses: actions/github-script@v9
         with:
           script: |
             const fs = require('fs');

@@ -27,6 +27,7 @@ import { Route as TeamsChar123PgNumChar125RouteImport } from './routes/teams.{-$
 import { Route as MatchMatchKeyRouteImport } from './routes/match.$matchKey'
 import { Route as LocalDebugRouteImport } from './routes/local.debug'
 import { Route as InsightsChar123YearChar125RouteImport } from './routes/insights.{-$year}'
+import { Route as GamedayEventCodeRouteImport } from './routes/gameday.$eventCode'
 import { Route as EventsChar123YearChar125RouteImport } from './routes/events.{-$year}'
 import { Route as EventEventKeyRouteImport } from './routes/event.$eventKey'
 import { Route as DistrictsChar123YearChar125RouteImport } from './routes/districts.{-$year}'
@@ -35,8 +36,12 @@ import { Route as AccountMytbaRouteImport } from './routes/account.mytba'
 import { Route as TeamTeamNumberChar123YearChar125RouteImport } from './routes/team.$teamNumber.{-$year}'
 import { Route as TeamTeamNumberStatsRouteImport } from './routes/team.$teamNumber.stats'
 import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNumber.history'
+import { Route as SuggestTeamMediaRouteImport } from './routes/suggest.team.media'
+import { Route as EventsDistrictAbbreviationYearRouteImport } from './routes/events.$districtAbbreviation.$year'
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
+import { Route as DistrictDistrictAbbreviationStatsRouteImport } from './routes/district.$districtAbbreviation.stats'
 import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './routes/district.$districtAbbreviation.insights'
+import { Route as DistrictDistrictAbbreviationChampsYearRouteImport } from './routes/district.$districtAbbreviation.champs.$year'
 
 const WebcastsRoute = WebcastsRouteImport.update({
   id: '/webcasts',
@@ -130,6 +135,11 @@ const InsightsChar123YearChar125Route =
     path: '/insights/{-$year}',
     getParentRoute: () => rootRouteImport,
   } as any)
+const GamedayEventCodeRoute = GamedayEventCodeRouteImport.update({
+  id: '/$eventCode',
+  path: '/$eventCode',
+  getParentRoute: () => GamedayRoute,
+} as any)
 const EventsChar123YearChar125Route =
   EventsChar123YearChar125RouteImport.update({
     id: '/events/{-$year}',
@@ -173,16 +183,39 @@ const TeamTeamNumberHistoryRoute = TeamTeamNumberHistoryRouteImport.update({
   path: '/team/$teamNumber/history',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuggestTeamMediaRoute = SuggestTeamMediaRouteImport.update({
+  id: '/suggest/team/media',
+  path: '/suggest/team/media',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventsDistrictAbbreviationYearRoute =
+  EventsDistrictAbbreviationYearRouteImport.update({
+    id: '/events/$districtAbbreviation/$year',
+    path: '/events/$districtAbbreviation/$year',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DistrictDistrictAbbreviationChar123YearChar125Route =
   DistrictDistrictAbbreviationChar123YearChar125RouteImport.update({
     id: '/district/$districtAbbreviation/{-$year}',
     path: '/district/$districtAbbreviation/{-$year}',
     getParentRoute: () => rootRouteImport,
   } as any)
+const DistrictDistrictAbbreviationStatsRoute =
+  DistrictDistrictAbbreviationStatsRouteImport.update({
+    id: '/district/$districtAbbreviation/stats',
+    path: '/district/$districtAbbreviation/stats',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const DistrictDistrictAbbreviationInsightsRoute =
   DistrictDistrictAbbreviationInsightsRouteImport.update({
     id: '/district/$districtAbbreviation/insights',
     path: '/district/$districtAbbreviation/insights',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const DistrictDistrictAbbreviationChampsYearRoute =
+  DistrictDistrictAbbreviationChampsYearRouteImport.update({
+    id: '/district/$districtAbbreviation/champs/$year',
+    path: '/district/$districtAbbreviation/champs/$year',
     getParentRoute: () => rootRouteImport,
   } as any)
 
@@ -193,7 +226,7 @@ export interface FileRoutesByFullPath {
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
-  '/gameday': typeof GamedayRoute
+  '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
@@ -205,16 +238,21 @@ export interface FileRoutesByFullPath {
   '/districts/{-$year}': typeof DistrictsChar123YearChar125Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
+  '/gameday/$eventCode': typeof GamedayEventCodeRoute
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
+  '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -223,7 +261,7 @@ export interface FileRoutesByTo {
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
-  '/gameday': typeof GamedayRoute
+  '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
@@ -235,16 +273,21 @@ export interface FileRoutesByTo {
   '/districts/{-$year}': typeof DistrictsChar123YearChar125Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
+  '/gameday/$eventCode': typeof GamedayEventCodeRoute
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/account': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
+  '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -254,7 +297,7 @@ export interface FileRoutesById {
   '/apidocs': typeof ApidocsRoute
   '/contact': typeof ContactRoute
   '/donate': typeof DonateRoute
-  '/gameday': typeof GamedayRoute
+  '/gameday': typeof GamedayRouteWithChildren
   '/hall-of-fame': typeof HallOfFameRoute
   '/match_suggestion': typeof Match_suggestionRoute
   '/privacy': typeof PrivacyRoute
@@ -266,16 +309,21 @@ export interface FileRoutesById {
   '/districts/{-$year}': typeof DistrictsChar123YearChar125Route
   '/event/$eventKey': typeof EventEventKeyRoute
   '/events/{-$year}': typeof EventsChar123YearChar125Route
+  '/gameday/$eventCode': typeof GamedayEventCodeRoute
   '/insights/{-$year}': typeof InsightsChar123YearChar125Route
   '/local/debug': typeof LocalDebugRoute
   '/match/$matchKey': typeof MatchMatchKeyRoute
   '/teams/{-$pgNum}': typeof TeamsChar123PgNumChar125Route
   '/account/': typeof AccountIndexRoute
   '/district/$districtAbbreviation/insights': typeof DistrictDistrictAbbreviationInsightsRoute
+  '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -298,16 +346,21 @@ export interface FileRouteTypes {
     | '/districts/{-$year}'
     | '/event/$eventKey'
     | '/events/{-$year}'
+    | '/gameday/$eventCode'
     | '/insights/{-$year}'
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
     | '/account/'
     | '/district/$districtAbbreviation/insights'
+    | '/district/$districtAbbreviation/stats'
     | '/district/$districtAbbreviation/{-$year}'
+    | '/events/$districtAbbreviation/$year'
+    | '/suggest/team/media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/district/$districtAbbreviation/champs/$year'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -328,16 +381,21 @@ export interface FileRouteTypes {
     | '/districts/{-$year}'
     | '/event/$eventKey'
     | '/events/{-$year}'
+    | '/gameday/$eventCode'
     | '/insights/{-$year}'
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
     | '/account'
     | '/district/$districtAbbreviation/insights'
+    | '/district/$districtAbbreviation/stats'
     | '/district/$districtAbbreviation/{-$year}'
+    | '/events/$districtAbbreviation/$year'
+    | '/suggest/team/media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/district/$districtAbbreviation/champs/$year'
   id:
     | '__root__'
     | '/'
@@ -358,16 +416,21 @@ export interface FileRouteTypes {
     | '/districts/{-$year}'
     | '/event/$eventKey'
     | '/events/{-$year}'
+    | '/gameday/$eventCode'
     | '/insights/{-$year}'
     | '/local/debug'
     | '/match/$matchKey'
     | '/teams/{-$pgNum}'
     | '/account/'
     | '/district/$districtAbbreviation/insights'
+    | '/district/$districtAbbreviation/stats'
     | '/district/$districtAbbreviation/{-$year}'
+    | '/events/$districtAbbreviation/$year'
+    | '/suggest/team/media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/district/$districtAbbreviation/champs/$year'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -377,7 +440,7 @@ export interface RootRouteChildren {
   ApidocsRoute: typeof ApidocsRoute
   ContactRoute: typeof ContactRoute
   DonateRoute: typeof DonateRoute
-  GamedayRoute: typeof GamedayRoute
+  GamedayRoute: typeof GamedayRouteWithChildren
   HallOfFameRoute: typeof HallOfFameRoute
   Match_suggestionRoute: typeof Match_suggestionRoute
   PrivacyRoute: typeof PrivacyRoute
@@ -395,10 +458,14 @@ export interface RootRouteChildren {
   TeamsChar123PgNumChar125Route: typeof TeamsChar123PgNumChar125Route
   AccountIndexRoute: typeof AccountIndexRoute
   DistrictDistrictAbbreviationInsightsRoute: typeof DistrictDistrictAbbreviationInsightsRoute
+  DistrictDistrictAbbreviationStatsRoute: typeof DistrictDistrictAbbreviationStatsRoute
   DistrictDistrictAbbreviationChar123YearChar125Route: typeof DistrictDistrictAbbreviationChar123YearChar125Route
+  EventsDistrictAbbreviationYearRoute: typeof EventsDistrictAbbreviationYearRoute
+  SuggestTeamMediaRoute: typeof SuggestTeamMediaRoute
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
   TeamTeamNumberStatsRoute: typeof TeamTeamNumberStatsRoute
   TeamTeamNumberChar123YearChar125Route: typeof TeamTeamNumberChar123YearChar125Route
+  DistrictDistrictAbbreviationChampsYearRoute: typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -529,6 +596,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof InsightsChar123YearChar125RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/gameday/$eventCode': {
+      id: '/gameday/$eventCode'
+      path: '/$eventCode'
+      fullPath: '/gameday/$eventCode'
+      preLoaderRoute: typeof GamedayEventCodeRouteImport
+      parentRoute: typeof GamedayRoute
+    }
     '/events/{-$year}': {
       id: '/events/{-$year}'
       path: '/events/{-$year}'
@@ -585,11 +659,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TeamTeamNumberHistoryRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/suggest/team/media': {
+      id: '/suggest/team/media'
+      path: '/suggest/team/media'
+      fullPath: '/suggest/team/media'
+      preLoaderRoute: typeof SuggestTeamMediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/events/$districtAbbreviation/$year': {
+      id: '/events/$districtAbbreviation/$year'
+      path: '/events/$districtAbbreviation/$year'
+      fullPath: '/events/$districtAbbreviation/$year'
+      preLoaderRoute: typeof EventsDistrictAbbreviationYearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/district/$districtAbbreviation/{-$year}': {
       id: '/district/$districtAbbreviation/{-$year}'
       path: '/district/$districtAbbreviation/{-$year}'
       fullPath: '/district/$districtAbbreviation/{-$year}'
       preLoaderRoute: typeof DistrictDistrictAbbreviationChar123YearChar125RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/district/$districtAbbreviation/stats': {
+      id: '/district/$districtAbbreviation/stats'
+      path: '/district/$districtAbbreviation/stats'
+      fullPath: '/district/$districtAbbreviation/stats'
+      preLoaderRoute: typeof DistrictDistrictAbbreviationStatsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/district/$districtAbbreviation/insights': {
@@ -599,8 +694,26 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DistrictDistrictAbbreviationInsightsRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/district/$districtAbbreviation/champs/$year': {
+      id: '/district/$districtAbbreviation/champs/$year'
+      path: '/district/$districtAbbreviation/champs/$year'
+      fullPath: '/district/$districtAbbreviation/champs/$year'
+      preLoaderRoute: typeof DistrictDistrictAbbreviationChampsYearRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
+
+interface GamedayRouteChildren {
+  GamedayEventCodeRoute: typeof GamedayEventCodeRoute
+}
+
+const GamedayRouteChildren: GamedayRouteChildren = {
+  GamedayEventCodeRoute: GamedayEventCodeRoute,
+}
+
+const GamedayRouteWithChildren =
+  GamedayRoute._addFileChildren(GamedayRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
@@ -609,7 +722,7 @@ const rootRouteChildren: RootRouteChildren = {
   ApidocsRoute: ApidocsRoute,
   ContactRoute: ContactRoute,
   DonateRoute: DonateRoute,
-  GamedayRoute: GamedayRoute,
+  GamedayRoute: GamedayRouteWithChildren,
   HallOfFameRoute: HallOfFameRoute,
   Match_suggestionRoute: Match_suggestionRoute,
   PrivacyRoute: PrivacyRoute,
@@ -628,11 +741,17 @@ const rootRouteChildren: RootRouteChildren = {
   AccountIndexRoute: AccountIndexRoute,
   DistrictDistrictAbbreviationInsightsRoute:
     DistrictDistrictAbbreviationInsightsRoute,
+  DistrictDistrictAbbreviationStatsRoute:
+    DistrictDistrictAbbreviationStatsRoute,
   DistrictDistrictAbbreviationChar123YearChar125Route:
     DistrictDistrictAbbreviationChar123YearChar125Route,
+  EventsDistrictAbbreviationYearRoute: EventsDistrictAbbreviationYearRoute,
+  SuggestTeamMediaRoute: SuggestTeamMediaRoute,
   TeamTeamNumberHistoryRoute: TeamTeamNumberHistoryRoute,
   TeamTeamNumberStatsRoute: TeamTeamNumberStatsRoute,
   TeamTeamNumberChar123YearChar125Route: TeamTeamNumberChar123YearChar125Route,
+  DistrictDistrictAbbreviationChampsYearRoute:
+    DistrictDistrictAbbreviationChampsYearRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

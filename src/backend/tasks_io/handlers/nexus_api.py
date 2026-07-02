@@ -8,15 +8,21 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.firebase_pusher import FirebasePusher
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
+from backend.common.manipulators.nexus_event_details_manipulator import (
+    NexusEventDetailsManipulator,
+)
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
 from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey, Year
+from backend.common.models.nexus_event_details import NexusEventDetails
+from backend.common.nexus_api.types import PitMap
 from backend.common.queries.event_query import EventListQuery
 from backend.common.queries.team_query import EventEventTeamsQuery
 from backend.tasks_io.datafeeds.datafeed_nexus import (
+    NexusEventDetailsDatafeed,
     NexusEventQueueStatus,
     NexusPitLocations,
 )
@@ -44,7 +50,7 @@ def enqueue_nexus_pit_locations_current(
     else:
         events = EventListQuery(year=year or SeasonHelper.get_current_season()).fetch()
 
-    events = list(filter(lambda e: e.official, events))
+    events = list(filter(lambda e: e.official or e.nexus_code is not None, events))
 
     for event in events:
         taskqueue.add(
@@ -72,9 +78,19 @@ def event_pit_locations(event_key: EventKey) -> Response:
 
     eventteams_future = EventEventTeamsQuery(event_key).fetch_async()
     nexus_pit_locations_future = NexusPitLocations(event).fetch_async()
+    nexus_event_details_future = NexusEventDetailsDatafeed(event).fetch_async()
 
     eventteams = eventteams_future.get_result()
     nexus_pit_locations = nexus_pit_locations_future.get_result()
+    nexus_event_details: Optional[PitMap] = nexus_event_details_future.get_result()
+
+    if nexus_event_details is not None:
+        NexusEventDetailsManipulator.createOrUpdate(
+            NexusEventDetails(
+                id=event.key_name,
+                pitmap_json=nexus_event_details,
+            )
+        )
 
     for eventteam in eventteams:
         team_key = eventteam.team.string_id()
@@ -87,7 +103,9 @@ def event_pit_locations(event_key: EventKey) -> Response:
     if (
         "X-Appengine-Taskname" not in request.headers
     ):  # Only write out if not in taskqueue
-        return make_response(f"Fetched pit locations: {eventteams}")
+        return make_response(
+            f"Fetched pit locations: <pre>{json.dumps([{"team_key": e.team.string_id(), "pit_location": e.pit_location} for e in eventteams], indent=2)}</pre><br/>Fetched nexus event details: <pre>{json.dumps(nexus_event_details, indent=2)}</pre>"
+        )
 
     return make_response("")
 
@@ -95,7 +113,7 @@ def event_pit_locations(event_key: EventKey) -> Response:
 @blueprint.route("/tasks/enqueue/nexus_queue_status/now")
 def current_event_queue_status() -> Response:
     events = EventHelper.events_within_a_day()
-    events = list(filter(lambda e: e.official, events))
+    events = list(filter(lambda e: e.official or e.nexus_code is not None, events))
     for event in events:
         taskqueue.add(
             queue_name="datafeed",

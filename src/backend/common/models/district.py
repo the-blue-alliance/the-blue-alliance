@@ -1,35 +1,21 @@
 import re
-from typing import Dict, List, Set
+from typing import Dict, List, Optional, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import safe_cast
 
+from backend.common.consts.district_advancements import (
+    FIRST_MANUAL_DISTRICT_ADVANCEMENT_COUNTS,
+)
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.models.cached_model import CachedModel
-from backend.common.models.district_advancement import DistrictAdvancement
+from backend.common.models.district_advancement import (
+    AdvancementCounts,
+    DistrictAdvancement,
+)
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.keys import DistrictAbbreviation, DistrictKey, TeamKey, Year
-
-ALL_KNOWN_DISTRICT_ABBREVIATIONS: Set[DistrictAbbreviation] = {
-    "chs",
-    "fch",
-    "fim",
-    "fit",
-    "tx",
-    "in",
-    "fin",
-    "isr",
-    "mar",
-    "fma",
-    "nc",
-    "fnc",
-    "fsc",
-    "ne",
-    "ont",
-    "pnw",
-    "pch",
-    "ca",
-    "win",
-}
+from backend.common.models.webcast import WebcastChannel
 
 
 class District(CachedModel):
@@ -57,6 +43,16 @@ class District(CachedModel):
     # other changes from FIRST to correct errors
     adjustments: Dict[TeamKey, int] = ndb.JsonProperty()
 
+    webcast_channels: List[WebcastChannel] = safe_cast(
+        List[WebcastChannel], ndb.JsonProperty(repeated=True)
+    )
+
+    # Whether the district uses FIRST's official webcast unit (aka, webcasts
+    # are managed by FIRST and published in advance). Districts that do not
+    # use the official unit may need TBA to discover webcasts from YouTube.
+    # None means unset (FRC API updates won't overwrite an admin-configured value).
+    uses_official_webcast_unit: Optional[bool] = ndb.BooleanProperty()
+
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
@@ -66,6 +62,13 @@ class District(CachedModel):
         "display_name",
         "elasticsearch_name",
         "rankings",
+        "uses_official_webcast_unit",
+    }
+
+    # webcast_channels is TBA-admin-managed: only overwrite when incoming list is non-empty,
+    # so FRC API updates (which produce an empty list) don't wipe admin-set channels.
+    _list_attrs: Set[str] = {
+        "webcast_channels",
     }
 
     def __init__(self, *args, **kw):
@@ -85,6 +88,16 @@ class District(CachedModel):
     @property
     def render_name(self) -> str:
         return self.display_name if self.display_name else self.abbreviation.upper()
+
+    @property
+    def official_advancement_counts(self) -> AdvancementCounts:
+        # Returns the advancement counts as specified in the FIRST manual for the district
+        # If the district/year is not found, returns 0 for both dcmp and cmp
+
+        latest_code = RenamedDistricts.get_latest_code(self.abbreviation)
+        return FIRST_MANUAL_DISTRICT_ADVANCEMENT_COUNTS.get(self.year, {}).get(
+            latest_code, AdvancementCounts(dcmp=0, cmp=0)
+        )
 
     @classmethod
     def validate_key_name(self, district_key: str) -> bool:

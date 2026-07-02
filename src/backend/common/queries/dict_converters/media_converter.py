@@ -51,6 +51,9 @@ class MediaConverter(ConverterBase):
             profile_url = PROFILE_URLS[media.media_type_enum].format(media.foreign_key)
             dict["direct_url"] = profile_url
             dict["view_url"] = profile_url
+        elif media.slug_name == "instagram-image":
+            dict["direct_url"] = media.instagram_url
+            dict["view_url"] = media.instagram_url
         else:
             dict["direct_url"] = media.image_direct_url
             dict["view_url"] = media.view_image_url

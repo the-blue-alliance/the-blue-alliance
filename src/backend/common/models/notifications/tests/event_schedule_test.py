@@ -78,7 +78,7 @@ class TestEventScheduleNotification(unittest.TestCase):
         self._setup_notification()
 
         self.event.timezone_id = "America/Detroit"
-        # Set constant scheduled time for testing
+        # Set constant scheduled time for testing (13:30 UTC = 08:30 EST)
         self.notification.next_match.time = datetime(2017, 11, 28, 13, 30, 59)
 
         assert self.notification.fcm_notification is not None
@@ -87,7 +87,7 @@ class TestEventScheduleNotification(unittest.TestCase):
         )
         assert (
             self.notification.fcm_notification.body
-            == "The Present Test Event match schedule has been updated. The next match starts at 13:30 EST."
+            == "The Present Test Event match schedule has been updated. The next match starts at 8:30 EST."
         )
 
     def test_fcm_notification_short_name(self):

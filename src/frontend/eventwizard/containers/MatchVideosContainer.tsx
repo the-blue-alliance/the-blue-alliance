@@ -8,19 +8,21 @@ const mapStateToProps = (state: RootState) => ({
   selectedEvent: state.auth.selectedEvent,
   makeTrustedRequest: (
     requestPath: string,
-    requestBody: string
+    requestBody: string,
+    method: string = "POST"
   ) => {
     return makeTrustedApiRequest(
       state.auth.authId || "",
       state.auth.authSecret || "",
       requestPath,
-      requestBody
+      requestBody,
+      method
     );
   },
-  makeApiV3Request: <T = unknown>(
+  makeApiV3Request: (
     requestPath: string
   ) => {
-    return makeApiV3Request<T>(state.auth.authId || "", requestPath);
+    return makeApiV3Request(state.auth.authId || "", requestPath);
   },
 });
 

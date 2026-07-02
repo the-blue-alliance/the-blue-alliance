@@ -3,5 +3,6 @@ node_modules/
 src/build/*
 *__pycache__*
 venv/*
+.venv/*
 .pyre/*
 *.log

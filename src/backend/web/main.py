@@ -2,7 +2,7 @@ from flask import Flask
 from flask_wtf.csrf import CSRFProtect
 from google.appengine.api import wrap_wsgi_app
 
-from backend.common.auth import _user_context_processor
+from backend.common.auth import _user_context_processor, SESSION_COOKIE_LIFETIME
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
@@ -16,20 +16,26 @@ from backend.web.handlers.ajax import (
     account_favorites_delete_handler,
     account_favorites_handler,
     account_info_handler,
-    account_register_fcm_token,
     event_remap_teams_handler,
     playoff_types_handler,
     typeahead_handler,
 )
 from backend.web.handlers.apidocs import blueprint as apidocs_blueprint
-from backend.web.handlers.district import district_detail, regional_detail
-from backend.web.handlers.embed import avatar_png, instagram_oembed
+from backend.web.handlers.district import (
+    district_detail,
+    district_insights,
+    district_redirect,
+    districts_redirect,
+    regional_detail,
+)
+from backend.web.handlers.embed import avatar_png
 from backend.web.handlers.error import handle_404, handle_500
 from backend.web.handlers.event import (
     event_agenda,
     event_detail,
     event_insights,
     event_list,
+    event_pitmap,
     event_rss,
 )
 from backend.web.handlers.eventwizard import eventwizard, eventwizard2
@@ -41,6 +47,7 @@ from backend.web.handlers.match import match_detail
 from backend.web.handlers.match_suggestion import match_suggestion
 from backend.web.handlers.mytba import mytba_live
 from backend.web.handlers.search import search_handler
+from backend.web.handlers.short import short_event_or_district, short_team
 from backend.web.handlers.static import (
     add_data,
     bigquery,
@@ -65,17 +72,11 @@ from backend.web.handlers.team import (
     team_history,
     team_list,
 )
-from backend.web.handlers.team_admin import (
-    blueprint as team_admin,
-)
-from backend.web.handlers.team_threads import (
-    team_threads,
-    team_threads_canonical,
-)
+from backend.web.handlers.team_admin import blueprint as team_admin
+from backend.web.handlers.team_threads import team_threads, team_threads_canonical
+from backend.web.handlers.webcast_mod import blueprint as webcast_mod_blueprint
 from backend.web.handlers.webcasts import webcast_list
-from backend.web.handlers.webhooks import (
-    blueprint as webhooks,
-)
+from backend.web.handlers.webhooks import blueprint as webhooks
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
 
@@ -84,6 +85,7 @@ configure_logging()
 app = Flask(__name__)
 app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
 install_middleware(app, configure_secret_key=True, include_appspot_redirect=True)
+app.config["PERMANENT_SESSION_LIFETIME"] = SESSION_COOKIE_LIFETIME
 install_url_converters(app)
 configure_flask_cache(app)
 
@@ -101,6 +103,7 @@ app.add_url_rule("/gameday/<alias>", view_func=gameday_redirect)
 app.add_url_rule("/gameday", view_func=gameday)
 
 app.add_url_rule("/event/<event_key>", view_func=event_detail)
+app.add_url_rule("/event/<event_key>/pitmap", view_func=event_pitmap)
 app.add_url_rule("/event/<event_key>/agenda", view_func=event_agenda)
 app.add_url_rule("/event/<event_key>/feed", view_func=event_rss)
 app.add_url_rule("/event/<event_key>/insights", view_func=event_insights)
@@ -120,6 +123,26 @@ app.add_url_rule(
     '/events/<regex("[a-z]+"):district_abbrev>/<int:year>', view_func=district_detail
 )
 app.add_url_rule("/events", view_func=event_list, defaults={"year": None})
+
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>',
+    view_func=district_redirect,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>/insights',
+    view_func=district_insights,
+    defaults={"year": None},
+)
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>/insights/<int:year>',
+    view_func=district_insights,
+)
+app.add_url_rule(
+    '/district/<regex("[a-z]+"):district_abbrev>/<int:year>',
+    view_func=district_redirect,
+)
+app.add_url_rule("/districts", view_func=districts_redirect)
 
 app.add_url_rule("/eventwizard_legacy", view_func=eventwizard)
 app.add_url_rule("/eventwizard", view_func=eventwizard2)
@@ -183,16 +206,20 @@ app.add_url_rule(
     "/_/account/info",
     view_func=account_info_handler,
 )
-app.add_url_rule(
-    "/_/account/register_fcm_token",
-    view_func=account_register_fcm_token,
-    methods=["POST"],
-)
 app.add_url_rule("/_/remap_teams/<event_key>", view_func=event_remap_teams_handler)
 app.add_url_rule("/_/playoff_types", view_func=playoff_types_handler)
 app.add_url_rule("/_/typeahead/<search_key>", view_func=typeahead_handler)
-app.add_url_rule("/instagram_oembed/<media_key>", view_func=instagram_oembed)
 app.add_url_rule("/avatar/<int:year>/<team_key>.png", view_func=avatar_png)
+
+# Short routes: /<team_number> and /<event_or_district_key>
+app.add_url_rule(
+    '/<regex("[0-9]{1,5}"):team_number>',
+    view_func=short_team,
+)
+app.add_url_rule(
+    '/<regex("[0-9]{4}[a-z][a-z0-9]*"):short_key>',
+    view_func=short_event_or_district,
+)
 
 app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
@@ -200,6 +227,7 @@ app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
 app.register_blueprint(suggestion_review_blueprint)
 app.register_blueprint(team_admin)
+app.register_blueprint(webcast_mod_blueprint)
 app.register_blueprint(webhooks)
 
 app.register_error_handler(404, handle_404)
