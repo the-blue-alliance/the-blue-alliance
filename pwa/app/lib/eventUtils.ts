@@ -173,13 +173,9 @@ function earliestStartDate(group: EventGroup): Temporal.PlainDate {
 
 /**
  * Groups events into the labeled sections shown on the events list page.
- *
- * Official sections (numbered weeks, FIRST Championship, Festival of
- * Champions) are ordered chronologically by each section's earliest event
- * start date, so Championship lands at its true position even when district
- * weeks are delayed past it (e.g. the 2026 Israel districts in weeks 17–19).
- * Unofficial preseason/offseason sections are grouped by month and follow, in
- * the chronological order of the input events.
+ * Official sections are ordered by earliest event start date, not week
+ * number, so Championship stays chronological even when district weeks are
+ * delayed past it (e.g. the 2026 Israel districts in weeks 17–19).
  */
 export function groupEventsBySections(events: Event[]): EventGroup[] {
   const eventsByWeek = new Map<string, EventGroup>();
