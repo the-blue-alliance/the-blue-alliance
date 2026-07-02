@@ -43,6 +43,7 @@ from backend.common.queries.event_query import (
     RegionalEventsQuery,
 )
 from backend.common.queries.team_query import DistrictTeamsQuery, RegionalTeamsQuery
+from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 blueprint = Blueprint("math", __name__)
 
@@ -277,11 +278,18 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
     for event in events:
         event.prep_details()
     events = EventHelper.sorted_events(events)
+
+    # Pull FIRST's published district rankings so we can use FIRST's rank to
+    # break ties between teams that are exactly tied across all of TBA's
+    # tiebreakers. The data is fetched fresh on every recompute (not stored).
+    api_data = DatafeedFMSAPI().get_district_rankings(district_key).get_result()
+
     team_totals = DistrictHelper.calculate_rankings(
         events,
         teams_future,
         district.year,
         adjustments=district.adjustments,
+        api_team_data=api_data.api_team_data,
     )
 
     rankings: List[DistrictRanking] = []

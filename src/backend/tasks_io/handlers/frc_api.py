@@ -52,7 +52,7 @@ from backend.common.sitevars.apistatus import ApiStatus
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
-    TParsedDistrictAdvancement,
+    TParsedDistrictRankings,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_regional_rankings_parser import (
     TParsedRegionalAdvancement,
@@ -988,9 +988,7 @@ def district_rankings(district_key: DistrictKey) -> Response:
         return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
 
     df = DatafeedFMSAPI()
-    data: TParsedDistrictAdvancement = df.get_district_rankings(
-        district_key
-    ).get_result()
+    data: TParsedDistrictRankings = df.get_district_rankings(district_key).get_result()
     district.advancement = data.advancement
     district = DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
 
@@ -1018,9 +1016,7 @@ def district_adjustments(district_key: DistrictKey) -> Response:
         return make_response(f"No District for key: {Markup.escape(district_key)}", 404)
 
     df = DatafeedFMSAPI()
-    data: TParsedDistrictAdvancement = df.get_district_rankings(
-        district_key
-    ).get_result()
+    data: TParsedDistrictRankings = df.get_district_rankings(district_key).get_result()
     district.adjustments = data.adjustments
     district = DistrictManipulator.createOrUpdate(district, update_manual_attrs=False)
 

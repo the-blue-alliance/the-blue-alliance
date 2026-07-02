@@ -15,7 +15,7 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser imp
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
     FMSAPIDistrictRankingsParser,
-    TParsedDistrictAdvancement,
+    TParsedDistrictRankings,
 )
 
 
@@ -81,8 +81,18 @@ def test_get_district_rankings_paginated() -> None:
         patch.object(FMSAPIDistrictRankingsParser, "parse") as mock_parse,
     ):
         mock_parse.side_effect = [
-            (TParsedDistrictAdvancement(advancement={}, adjustments={}), True),
-            (TParsedDistrictAdvancement(advancement={}, adjustments={}), False),
+            (
+                TParsedDistrictRankings(
+                    advancement={}, adjustments={}, api_team_data={}
+                ),
+                True,
+            ),
+            (
+                TParsedDistrictRankings(
+                    advancement={}, adjustments={}, api_team_data={}
+                ),
+                False,
+            ),
         ]
         df.get_district_rankings("2020ne").get_result()
 
