@@ -9,8 +9,11 @@ queue:
 
 - name: api-track-call
   rate: 500/s
+  max_concurrent_requests: 5
   retry_parameters:
-    task_retry_limit: 0
+    task_age_limit: 1h
+    min_backoff_seconds: 10
+    max_backoff_seconds: 300
 
 - name: datafeed
   rate: 5/s
