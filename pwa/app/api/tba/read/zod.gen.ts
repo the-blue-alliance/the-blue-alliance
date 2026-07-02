@@ -923,19 +923,57 @@ export const zMedia = z.union([
     .and(zMediaGrabCad),
   z
     .object({
-      type: z.union([
-        z.literal('youtube'),
-        z.literal('imgur'),
-        z.literal('facebook-profile'),
-        z.literal('youtube-channel'),
-        z.literal('twitter-profile'),
-        z.literal('github-profile'),
-        z.literal('instagram-profile'),
-        z.literal('periscope-profile'),
-        z.literal('gitlab-profile'),
-        z.literal('instagram-image'),
-        z.literal('external-link'),
-      ]),
+      type: z.literal('youtube'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('imgur'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('facebook-profile'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('youtube-channel'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('twitter-profile'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('github-profile'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('instagram-profile'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('periscope-profile'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('gitlab-profile'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('instagram-image'),
+    })
+    .and(zMediaNoDetails),
+  z
+    .object({
+      type: z.literal('external-link'),
     })
     .and(zMediaNoDetails),
   z
