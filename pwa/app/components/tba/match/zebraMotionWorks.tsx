@@ -21,6 +21,31 @@ function ftToSvgY(ft: number): number {
   return SVG_HEIGHT - (ft / FIELD_HEIGHT_FT) * SVG_HEIGHT;
 }
 
+// Zebra data commonly contains null positions (no tracking data), especially
+// at the start and end of a match. Fall back to the nearest tracked frame so
+// robots don't disappear during brief tracking dropouts.
+function positionAtFrame(
+  xs: (number | null)[],
+  ys: (number | null)[],
+  frame: number,
+): { x: number; y: number } | null {
+  for (let i = frame; i >= 0; i--) {
+    const x = xs[i];
+    const y = ys[i];
+    if (x != null && y != null) {
+      return { x, y };
+    }
+  }
+  for (let i = frame + 1; i < xs.length; i++) {
+    const x = xs[i];
+    const y = ys[i];
+    if (x != null && y != null) {
+      return { x, y };
+    }
+  }
+  return null;
+}
+
 export default function ZebraMotionWorks({ zebra }: { zebra: Zebra }) {
   const [frameIndex, setFrameIndex] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -42,16 +67,20 @@ export default function ZebraMotionWorks({ zebra }: { zebra: Zebra }) {
       // Zebra data is typically at 10Hz (100ms intervals)
       const frameDuration = 100 / playbackSpeed;
 
-      if (elapsed >= frameDuration) {
+      // Advance by however many frames have elapsed (may be more than one per
+      // rAF tick at high playback speeds), carrying over the remainder so
+      // playback speed stays accurate.
+      const framesToAdvance = Math.floor(elapsed / frameDuration);
+      if (framesToAdvance > 0) {
         setFrameIndex((prev) => {
-          const next = prev + 1;
-          if (next >= totalFrames) {
+          const next = prev + framesToAdvance;
+          if (next >= totalFrames - 1) {
             setIsPlaying(false);
-            return prev;
+            return totalFrames - 1;
           }
           return next;
         });
-        lastTimeRef.current = timestamp;
+        lastTimeRef.current += framesToAdvance * frameDuration;
       }
 
       animationRef.current = requestAnimationFrame(animate);
@@ -135,9 +164,9 @@ export default function ZebraMotionWorks({ zebra }: { zebra: Zebra }) {
 
         {/* Red alliance robots */}
         {redTeams.map((team, i) => {
-          const x = team.xs[frameIndex];
-          const y = team.ys[frameIndex];
-          if (x == null || y == null) return null;
+          const pos = positionAtFrame(team.xs, team.ys, frameIndex);
+          if (pos === null) return null;
+          const { x, y } = pos;
           return (
             <g key={team.team_key}>
               <circle
@@ -164,9 +193,9 @@ export default function ZebraMotionWorks({ zebra }: { zebra: Zebra }) {
 
         {/* Blue alliance robots */}
         {blueTeams.map((team, i) => {
-          const x = team.xs[frameIndex];
-          const y = team.ys[frameIndex];
-          if (x == null || y == null) return null;
+          const pos = positionAtFrame(team.xs, team.ys, frameIndex);
+          if (pos === null) return null;
+          const { x, y } = pos;
           return (
             <g key={team.team_key}>
               <circle

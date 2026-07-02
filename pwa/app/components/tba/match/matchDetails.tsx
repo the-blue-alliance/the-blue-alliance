@@ -99,9 +99,12 @@ export default function MatchDetails({
 }) {
   const [showUserTimezone, setShowUserTimezone] = useState(false);
 
-  const { data: zebraData } = useQuery(
-    getMatchZebraOptions({ path: { match_key: match.key } }),
-  );
+  // Zebra MotionWorks data only exists for some 2019-2020 matches.
+  const { data: zebraData } = useQuery({
+    ...getMatchZebraOptions({ path: { match_key: match.key } }),
+    enabled: event.year >= 2019 && event.year <= 2020,
+    retry: false,
+  });
 
   const userTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
   const eventTimezone = event.timezone ?? 'UTC';

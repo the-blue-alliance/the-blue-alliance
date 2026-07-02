@@ -1960,8 +1960,8 @@ export const zHistory = z.object({
 
 export const zZebraTeam = z.object({
   team_key: z.string(),
-  xs: z.array(z.number()),
-  ys: z.array(z.number()),
+  xs: z.array(z.number().nullable()),
+  ys: z.array(z.number().nullable()),
 });
 
 export const zZebra = z.object({
