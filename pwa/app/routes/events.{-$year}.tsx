@@ -6,9 +6,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { Temporal } from 'temporal-polyfill';
 
-import { Event, EventType } from '~/api/tba/read';
 import {
   getDistrictsByYearOptions,
   getEventsByYearOptions,
@@ -27,13 +25,15 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { CMP_EVENT_TYPES } from '~/lib/api/EventType';
-import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
+import {
+  type EventGroup,
+  groupEventsBySections,
+  sortEventsComparator,
+} from '~/lib/eventUtils';
 import {
   parseParamsForYearElseDefault,
   pluralize,
   publicCacheControlHeaders,
-  slugify,
   useValidYears,
 } from '~/lib/utils';
 
@@ -90,98 +90,6 @@ export const Route = createFileRoute('/events/{-$year}')({
   component: YearEventsPage,
 });
 
-interface EventGroup {
-  groupName: string;
-  slug: string;
-  events: Event[];
-  isOfficial: boolean;
-}
-
-function groupBySections(events: Event[]): EventGroup[] {
-  const eventsByWeek = new Map<string, EventGroup>();
-  const eventsByChampionship = new Map<string, EventGroup>();
-  const unofficialEventsByMonth = new Map<string, EventGroup>();
-  const FOCEvents: EventGroup = {
-    groupName: 'FIRST Festival of Champions',
-    slug: 'foc',
-    events: [],
-    isOfficial: true,
-  };
-  events.forEach((event) => {
-    // Events by week
-    const weekStr = getEventWeekString(event);
-    if (weekStr != null) {
-      const weekGroup = eventsByWeek.get(weekStr);
-      if (weekGroup) {
-        weekGroup.events.push(event);
-      } else {
-        eventsByWeek.set(weekStr, {
-          groupName: weekStr,
-          slug: slugify(weekStr),
-          events: [event],
-          isOfficial: true,
-        });
-      }
-    }
-
-    // Events by Championship
-    if (CMP_EVENT_TYPES.has(event.event_type)) {
-      const groupName =
-        event.year >= 2017 && event.year <= 2020
-          ? `FIRST Championship - ${event.city}`
-          : 'FIRST Championship';
-      const championshipGroup = eventsByChampionship.get(groupName);
-      if (championshipGroup) {
-        championshipGroup.events.push(event);
-      } else {
-        eventsByChampionship.set(groupName, {
-          groupName,
-          slug: slugify(groupName),
-          events: [event],
-          isOfficial: true,
-        });
-      }
-    }
-
-    // FOC
-    if (event.event_type === EventType.FOC) {
-      FOCEvents.events.push(event);
-    }
-
-    // Group unofficial events by month
-    if (
-      event.event_type == EventType.PRESEASON ||
-      event.event_type == EventType.OFFSEASON
-    ) {
-      const monthName = Temporal.PlainDate.from(
-        event.start_date,
-      ).toLocaleString('default', { month: 'long' });
-      const offseasonGroup = unofficialEventsByMonth.get(monthName);
-      if (offseasonGroup) {
-        offseasonGroup.events.push(event);
-      } else {
-        unofficialEventsByMonth.set(monthName, {
-          groupName: monthName,
-          slug: slugify(monthName),
-          events: [event],
-          isOfficial: false,
-        });
-      }
-    }
-  });
-
-  const groups = Array.from(eventsByWeek.values()).concat(
-    Array.from(eventsByChampionship.values()),
-  );
-  if (FOCEvents.events.length > 0) {
-    groups.push(FOCEvents);
-  }
-  if (unofficialEventsByMonth.size > 0) {
-    groups.push(...Array.from(unofficialEventsByMonth.values()));
-  }
-  return groups;
-}
-
 function YearEventsPage() {
   const { year } = Route.useLoaderData();
   const { data: events } = useSuspenseQuery({
@@ -195,7 +103,7 @@ function YearEventsPage() {
   const navigate = useNavigate();
 
   const sortedEvents = events.sort(sortEventsComparator);
-  const groupedEvents = groupBySections(sortedEvents);
+  const groupedEvents = groupEventsBySections(sortedEvents);
   const officialGroups = groupedEvents.filter((group) => group.isOfficial);
   const unofficialGroups = groupedEvents.filter((group) => !group.isOfficial);
 
