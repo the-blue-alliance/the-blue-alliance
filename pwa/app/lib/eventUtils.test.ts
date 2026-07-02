@@ -8,6 +8,7 @@ import {
   getEventWeekString,
   getPublicAgendaUrl,
   groupEventsByParent,
+  groupEventsBySections,
   hasEventEnded,
   isEventActive,
   isEventWithinDays,
@@ -249,6 +250,155 @@ describe.concurrent('toCalendarEvent', () => {
     };
     const cal = toCalendarEvent(event);
     expect(cal.location).toBe('Boston, USA');
+  });
+});
+
+describe.concurrent('groupEventsBySections', () => {
+  function makeEvent(overrides: Partial<Event>): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      year: 2026,
+      event_type: EventType.REGIONAL,
+      week: null,
+      city: 'Somewhere',
+      ...overrides,
+    };
+  }
+
+  test('sections are chronological when district weeks are delayed past Championship', () => {
+    // 2026 Israel district events were postponed to weeks 17–19, after
+    // FIRST Championship. Sections must follow the calendar, not week number.
+    const events = [
+      makeEvent({ key: '2026week1', week: 0, start_date: '2026-02-25' }),
+      makeEvent({ key: '2026week7', week: 6, start_date: '2026-04-08' }),
+      makeEvent({
+        key: '2026arc',
+        event_type: EventType.CMP_DIVISION,
+        start_date: '2026-04-22',
+      }),
+      makeEvent({
+        key: '2026cmptx',
+        event_type: EventType.CMP_FINALS,
+        start_date: '2026-04-25',
+      }),
+      makeEvent({
+        key: '2026isde1',
+        event_type: EventType.DISTRICT,
+        week: 16,
+        start_date: '2026-05-18',
+      }),
+      makeEvent({
+        key: '2026iscmp',
+        event_type: EventType.DISTRICT_CMP,
+        week: 18,
+        start_date: '2026-06-01',
+      }),
+      makeEvent({
+        key: '2026offseason',
+        event_type: EventType.OFFSEASON,
+        start_date: '2026-06-15',
+      }),
+    ];
+
+    const groups = groupEventsBySections(events);
+    expect(groups.map((group) => group.groupName)).toEqual([
+      'Week 1',
+      'Week 7',
+      'FIRST Championship',
+      'Week 17',
+      'Week 19',
+      'June',
+    ]);
+    const championship = groups.find(
+      (group) => group.groupName === 'FIRST Championship',
+    );
+    expect(championship?.events.map((event) => event.key)).toEqual([
+      '2026arc',
+      '2026cmptx',
+    ]);
+  });
+
+  test('typical year keeps weeks, then Championship, then FOC', () => {
+    const events = [
+      makeEvent({ key: '2024week1', week: 0, start_date: '2024-02-28' }),
+      makeEvent({ key: '2024week6', week: 5, start_date: '2024-04-03' }),
+      makeEvent({
+        key: '2024cmptx',
+        year: 2024,
+        event_type: EventType.CMP_FINALS,
+        start_date: '2024-04-17',
+      }),
+      makeEvent({
+        key: '2024foc',
+        year: 2024,
+        event_type: EventType.FOC,
+        start_date: '2024-09-28',
+      }),
+    ];
+
+    const groups = groupEventsBySections(events);
+    expect(groups.map((group) => group.groupName)).toEqual([
+      'Week 1',
+      'Week 6',
+      'FIRST Championship',
+      'FIRST Festival of Champions',
+    ]);
+    expect(groups.every((group) => group.isOfficial)).toBe(true);
+  });
+
+  test('2017-2020 dual championships are separate sections in date order', () => {
+    const events = [
+      makeEvent({
+        key: '2019carv',
+        year: 2019,
+        event_type: EventType.CMP_DIVISION,
+        city: 'Houston',
+        start_date: '2019-04-17',
+      }),
+      makeEvent({
+        key: '2019arc',
+        year: 2019,
+        event_type: EventType.CMP_DIVISION,
+        city: 'Detroit',
+        start_date: '2019-04-24',
+      }),
+    ];
+
+    const groups = groupEventsBySections(events);
+    expect(groups.map((group) => group.groupName)).toEqual([
+      'FIRST Championship - Houston',
+      'FIRST Championship - Detroit',
+    ]);
+  });
+
+  test('unofficial events group by month after official sections', () => {
+    const events = [
+      makeEvent({
+        key: '2026pre',
+        event_type: EventType.PRESEASON,
+        start_date: '2026-01-10',
+      }),
+      makeEvent({ key: '2026week2', week: 1, start_date: '2026-03-04' }),
+      makeEvent({
+        key: '2026off1',
+        event_type: EventType.OFFSEASON,
+        start_date: '2026-07-11',
+      }),
+      makeEvent({
+        key: '2026off2',
+        event_type: EventType.OFFSEASON,
+        start_date: '2026-07-18',
+      }),
+    ];
+
+    const groups = groupEventsBySections(events);
+    expect(groups.map((group) => [group.groupName, group.isOfficial])).toEqual([
+      ['Week 2', true],
+      ['January', false],
+      ['July', false],
+    ]);
+    const july = groups.find((group) => group.groupName === 'July');
+    expect(july?.events).toHaveLength(2);
   });
 });
 

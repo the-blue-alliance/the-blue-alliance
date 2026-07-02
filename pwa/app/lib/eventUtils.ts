@@ -3,6 +3,7 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Event, EventType } from '~/api/tba/read';
 import { CMP_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { slugify } from '~/lib/utils';
 
 /** IANA timezone used when an event has no timezone field. */
 export const EVENT_FALLBACK_TIMEZONE = 'America/New_York';
@@ -153,6 +154,116 @@ export function getEventWeekString(event: Event) {
     default:
       return `Week ${event.week + 1}`;
   }
+}
+
+export interface EventGroup {
+  groupName: string;
+  slug: string;
+  events: Event[];
+  isOfficial: boolean;
+}
+
+function earliestStartDate(group: EventGroup): Temporal.PlainDate {
+  return group.events
+    .map((event) => Temporal.PlainDate.from(event.start_date))
+    .reduce((min, date) =>
+      Temporal.PlainDate.compare(date, min) < 0 ? date : min,
+    );
+}
+
+/**
+ * Groups events into the labeled sections shown on the events list page.
+ *
+ * Official sections (numbered weeks, FIRST Championship, Festival of
+ * Champions) are ordered chronologically by each section's earliest event
+ * start date, so Championship lands at its true position even when district
+ * weeks are delayed past it (e.g. the 2026 Israel districts in weeks 17–19).
+ * Unofficial preseason/offseason sections are grouped by month and follow, in
+ * the chronological order of the input events.
+ */
+export function groupEventsBySections(events: Event[]): EventGroup[] {
+  const eventsByWeek = new Map<string, EventGroup>();
+  const eventsByChampionship = new Map<string, EventGroup>();
+  const unofficialEventsByMonth = new Map<string, EventGroup>();
+  const FOCEvents: EventGroup = {
+    groupName: 'FIRST Festival of Champions',
+    slug: 'foc',
+    events: [],
+    isOfficial: true,
+  };
+  events.forEach((event) => {
+    // Events by week
+    const weekStr = getEventWeekString(event);
+    if (weekStr != null) {
+      const weekGroup = eventsByWeek.get(weekStr);
+      if (weekGroup) {
+        weekGroup.events.push(event);
+      } else {
+        eventsByWeek.set(weekStr, {
+          groupName: weekStr,
+          slug: slugify(weekStr),
+          events: [event],
+          isOfficial: true,
+        });
+      }
+    }
+
+    // Events by Championship
+    if (CMP_EVENT_TYPES.has(event.event_type)) {
+      const groupName =
+        event.year >= 2017 && event.year <= 2020
+          ? `FIRST Championship - ${event.city}`
+          : 'FIRST Championship';
+      const championshipGroup = eventsByChampionship.get(groupName);
+      if (championshipGroup) {
+        championshipGroup.events.push(event);
+      } else {
+        eventsByChampionship.set(groupName, {
+          groupName,
+          slug: slugify(groupName),
+          events: [event],
+          isOfficial: true,
+        });
+      }
+    }
+
+    // FOC
+    if (event.event_type === EventType.FOC) {
+      FOCEvents.events.push(event);
+    }
+
+    // Group unofficial events by month
+    if (
+      event.event_type == EventType.PRESEASON ||
+      event.event_type == EventType.OFFSEASON
+    ) {
+      const monthName = Temporal.PlainDate.from(
+        event.start_date,
+      ).toLocaleString('default', { month: 'long' });
+      const offseasonGroup = unofficialEventsByMonth.get(monthName);
+      if (offseasonGroup) {
+        offseasonGroup.events.push(event);
+      } else {
+        unofficialEventsByMonth.set(monthName, {
+          groupName: monthName,
+          slug: slugify(monthName),
+          events: [event],
+          isOfficial: false,
+        });
+      }
+    }
+  });
+
+  const officialGroups = Array.from(eventsByWeek.values()).concat(
+    Array.from(eventsByChampionship.values()),
+  );
+  if (FOCEvents.events.length > 0) {
+    officialGroups.push(FOCEvents);
+  }
+  officialGroups.sort((a, b) =>
+    Temporal.PlainDate.compare(earliestStartDate(a), earliestStartDate(b)),
+  );
+  return officialGroups.concat(Array.from(unofficialEventsByMonth.values()));
 }
 
 // Minimum overlap (in seconds) between an event's active window and the
