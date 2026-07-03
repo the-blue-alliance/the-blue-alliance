@@ -68,7 +68,7 @@
     "process": "^0.11.10",
     "puppeteer": "^24.43.1",
     "style-loader": "^4.0.0",
-    "ts-loader": "^9.6.1",
+    "ts-loader": "^9.6.2",
     "typescript": "^6.0.3",
     "webpack": "^5.108.1",
     "webpack-cli": "^7.0.3"
