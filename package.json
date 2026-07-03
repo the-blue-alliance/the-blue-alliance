@@ -71,7 +71,7 @@
     "ts-loader": "^9.6.2",
     "typescript": "^6.0.3",
     "webpack": "^5.108.1",
-    "webpack-cli": "^7.0.3"
+    "webpack-cli": "^7.1.0"
   },
   "scripts": {
     "dev": "cross-env NODE_ENV=development webpack --watch",
