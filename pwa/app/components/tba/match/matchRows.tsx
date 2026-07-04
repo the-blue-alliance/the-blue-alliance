@@ -151,13 +151,15 @@ const NEXUS_STATUS_ICONS: Record<NexusMatchStatus, React.ReactNode> = {
 function NexusStatusIconWithTooltip({ status }: { status: NexusMatchStatus }) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <span
-          className="mx-2 inline-flex items-center justify-center"
-          aria-label={`Nexus status: ${status}`}
-        >
-          {NEXUS_STATUS_ICONS[status]}
-        </span>
+      <TooltipTrigger
+        render={
+          <span
+            className="mx-2 inline-flex items-center justify-center"
+            aria-label={`Nexus status: ${status}`}
+          />
+        }
+      >
+        {NEXUS_STATUS_ICONS[status]}
       </TooltipTrigger>
       <TooltipContent sideOffset={6}>{status}</TooltipContent>
     </Tooltip>
@@ -478,16 +480,20 @@ export function BreakRow({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   {playlists.map(({ url, label }) => (
-                    <DropdownMenuItem key={url} asChild>
-                      <a
-                        href={url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex cursor-pointer items-center gap-2"
-                      >
-                        <YoutubeIcon className="size-3.5" />
-                        {label}
-                      </a>
+                    <DropdownMenuItem
+                      key={url}
+                      render={
+                        // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from DropdownMenuItem's own children, merged onto this element by Base UI's render prop
+                        <a
+                          href={url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="flex cursor-pointer items-center gap-2"
+                        />
+                      }
+                    >
+                      <YoutubeIcon className="size-3.5" />
+                      {label}
                     </DropdownMenuItem>
                   ))}
                 </DropdownMenuContent>

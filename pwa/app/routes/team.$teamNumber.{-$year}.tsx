@@ -754,10 +754,15 @@ function RecordCell({
     <TableCell className="text-center">
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="cursor-pointer" data-testid={`${dataTestId}_cell`}>
-              {stringifyRecord(record)}
-            </div>
+          <TooltipTrigger
+            render={
+              <div
+                className="cursor-pointer"
+                data-testid={`${dataTestId}_cell`}
+              />
+            }
+          >
+            {stringifyRecord(record)}
           </TooltipTrigger>
           <TooltipContent side="top" data-testid={`${dataTestId}_tooltip`}>
             {(winrateFromRecord(record) * 100).toFixed(0)}% winrate

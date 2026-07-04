@@ -225,11 +225,7 @@ function TeamStatsPage() {
             <div className="flex flex-row items-center gap-2">
               <Checkbox
                 checked={includeOffseasons}
-                onCheckedChange={(checked) =>
-                  setIncludeOffseasons(
-                    checked === 'indeterminate' ? false : checked,
-                  )
-                }
+                onCheckedChange={setIncludeOffseasons}
               />
               <span className="text-sm text-muted-foreground">
                 Include Offseasons

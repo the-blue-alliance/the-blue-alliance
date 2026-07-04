@@ -74,11 +74,12 @@ export function TeamLinkWithTooltip({
   }
 
   return (
-    <Tooltip delayDuration={1500}>
-      <TooltipTrigger asChild>
-        <TeamLink teamOrKey={teamKey} year={year} {...props}>
-          {label}
-        </TeamLink>
+    <Tooltip>
+      <TooltipTrigger
+        delay={1500}
+        render={<TeamLink teamOrKey={teamKey} year={year} {...props} />}
+      >
+        {label}
       </TooltipTrigger>
       <TooltipContent>
         {disqualified
@@ -145,30 +146,31 @@ export function TeamLinkWithAvatarTooltip({
   const teamNumber = teamKey.substring(3);
 
   return (
-    <Tooltip delayDuration={1000}>
-      <TooltipTrigger asChild>
-        <TeamLink teamOrKey={teamKey} year={year} {...props}>
-          {isWinner ? (
-            <InlineIcon className="relative right-[1ch] justify-center">
-              <BiTrophy />
-              {teamNumber}
-              {isCaptain && (
-                <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
-                  C
-                </sup>
-              )}
-            </InlineIcon>
-          ) : isCaptain ? (
-            <>
-              {teamNumber}
+    <Tooltip>
+      <TooltipTrigger
+        delay={1000}
+        render={<TeamLink teamOrKey={teamKey} year={year} {...props} />}
+      >
+        {isWinner ? (
+          <InlineIcon className="relative right-[1ch] justify-center">
+            <BiTrophy />
+            {teamNumber}
+            {isCaptain && (
               <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
                 C
               </sup>
-            </>
-          ) : (
-            <>{teamNumber}</>
-          )}
-        </TeamLink>
+            )}
+          </InlineIcon>
+        ) : isCaptain ? (
+          <>
+            {teamNumber}
+            <sup className="ml-[0.1em] text-[0.6em] text-muted-foreground">
+              C
+            </sup>
+          </>
+        ) : (
+          <>{teamNumber}</>
+        )}
       </TooltipTrigger>
       <Suspense>
         <TooltipContent>

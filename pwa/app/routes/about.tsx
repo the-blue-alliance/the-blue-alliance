@@ -36,20 +36,24 @@ function About(): React.JSX.Element {
             You can support The Blue Alliance or reach us with the following:
           </p>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" asChild>
-              <a
-                href="https://github.com/the-blue-alliance"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Contribute on GitHub
-              </a>
+            <Button
+              size="sm"
+              render={
+                // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
+                <a
+                  href="https://github.com/the-blue-alliance"
+                  target="_blank"
+                  rel="noreferrer"
+                />
+              }
+            >
+              Contribute on GitHub
             </Button>
-            <Button size="sm" asChild>
-              <Link to="/donate">Donate with PayPal</Link>
+            <Button size="sm" render={<Link to="/donate" />}>
+              Donate with PayPal
             </Button>
-            <Button size="sm" asChild>
-              <Link to="/contact">Contact Us</Link>
+            <Button size="sm" render={<Link to="/contact" />}>
+              Contact Us
             </Button>
           </div>
         </section>
@@ -78,14 +82,18 @@ function About(): React.JSX.Element {
             their goals, create a team identity, and advance respect and
             appreciation for STEM within the local community.
           </p>
-          <Button size="sm" asChild>
-            <a
-              href="http://www.firstinspires.org"
-              target="_blank"
-              rel="noreferrer"
-            >
-              Join the movement
-            </a>
+          <Button
+            size="sm"
+            render={
+              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
+              <a
+                href="http://www.firstinspires.org"
+                target="_blank"
+                rel="noreferrer"
+              />
+            }
+          >
+            Join the movement
           </Button>
         </section>
 
