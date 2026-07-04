@@ -30,7 +30,7 @@ export function Navbar() {
     <>
       <GlobalLoadingProgress />
       <NavigationMenu value={selected} onValueChange={setSelected} asChild>
-        <header className="sticky top-0 z-50 h-14 w-full bg-primary shadow-md">
+        <header className="sticky top-0 z-50 h-14 w-full bg-brand shadow-md">
           <div className="container">
             <NavigationMenuList
               asChild
@@ -66,7 +66,7 @@ export function Navbar() {
                     <NavigationMenuItem key={title}>
                       <NavigationMenuLink
                         className={`flex cursor-pointer items-center
-                        justify-start gap-2 bg-primary px-2.5 py-2 font-medium
+                        justify-start gap-2 bg-brand px-2.5 py-2 font-medium
                         text-white hover:bg-black/20 hover:text-white`}
                         asChild
                       >
