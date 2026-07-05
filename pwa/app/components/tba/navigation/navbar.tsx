@@ -29,77 +29,76 @@ export function Navbar() {
   return (
     <>
       <GlobalLoadingProgress />
-      <NavigationMenu value={selected} onValueChange={setSelected} asChild>
-        <header className="sticky top-0 z-50 h-14 w-full bg-brand shadow-md">
-          <div className="container">
-            <NavigationMenuList
-              asChild
-              className="flex h-14 w-full items-center justify-between"
+      <NavigationMenu
+        value={selected}
+        onValueChange={(value) => setSelected((value as string) ?? '')}
+        render={
+          <header className="sticky top-0 z-50 h-14 w-full bg-brand shadow-md" />
+        }
+      >
+        <div className="container">
+          <NavigationMenuList
+            render={<nav />}
+            className="flex h-14 w-full items-center justify-between"
+          >
+            <Link
+              to="/"
+              className="flex items-center gap-3 hover:no-underline
+                max-md:flex-1"
             >
-              <nav>
-                <Link
-                  to="/"
-                  className="flex items-center gap-3 hover:no-underline
-                    max-md:flex-1"
-                >
-                  <img
-                    src={lamp}
-                    className="size-6 max-w-none"
-                    alt="The Blue Alliance Logo"
-                  />
-                  <div
-                    className="text-xl font-medium tracking-tight
-                      whitespace-nowrap text-white"
+              <img
+                src={lamp}
+                className="size-6 max-w-none"
+                alt="The Blue Alliance Logo"
+              />
+              <div
+                className="text-xl font-medium tracking-tight whitespace-nowrap
+                  text-white"
+              >
+                <span className="sm:hidden md:block">The Blue Alliance</span>
+                <span className="hidden sm:block md:hidden">TBA</span>
+              </div>
+            </Link>
+            {/* Desktop Menu Items */}
+            <ul
+              className="flex list-none flex-row items-center gap-1 px-6
+                max-sm:hidden"
+            >
+              {NAV_ITEMS_LIST.map(({ title, to, params, icon: Icon }) => (
+                <NavigationMenuItem key={title}>
+                  <NavigationMenuLink
+                    className={`flex cursor-pointer items-center justify-start
+                    gap-2 bg-brand px-2.5 py-2 font-medium text-white
+                    hover:bg-black/20 hover:text-white`}
+                    render={
+                      <Link
+                        to={to}
+                        params={params}
+                        className="hover:no-underline"
+                        activeProps={{ className: 'bg-white/15' }}
+                      />
+                    }
                   >
-                    <span className="sm:hidden md:block">
-                      The Blue Alliance
-                    </span>
-                    <span className="hidden sm:block md:hidden">TBA</span>
-                  </div>
-                </Link>
-                {/* Desktop Menu Items */}
-                <ul
-                  className="flex list-none flex-row items-center gap-1 px-6
-                    max-sm:hidden"
-                >
-                  {NAV_ITEMS_LIST.map(({ title, to, params, icon: Icon }) => (
-                    <NavigationMenuItem key={title}>
-                      <NavigationMenuLink
-                        className={`flex cursor-pointer items-center
-                        justify-start gap-2 bg-brand px-2.5 py-2 font-medium
-                        text-white hover:bg-black/20 hover:text-white`}
-                        asChild
-                      >
-                        <Link
-                          to={to}
-                          params={params}
-                          className="hover:no-underline"
-                          activeProps={{ className: 'bg-white/15' }}
-                        >
-                          <Icon className="text-inherit" />
-                          <span>{title}</span>
-                        </Link>
-                      </NavigationMenuLink>
-                    </NavigationMenuItem>
-                  ))}
-                </ul>
-                <ul className="flex items-center gap-2">
-                  <a
-                    href={`https://www.thebluealliance.com${pathname}`}
-                    className="rounded-md px-2.5 py-2 text-xs font-medium
-                      text-white hover:bg-black/20 hover:no-underline
-                      max-sm:hidden"
-                  >
-                    Leave beta
-                  </a>
-                  <SearchModal />
-                  <MobileMenu />
-                </ul>
-              </nav>
-            </NavigationMenuList>
-          </div>
-          <NavigationMenuViewport />
-        </header>
+                    <Icon className="text-inherit" />
+                    <span>{title}</span>
+                  </NavigationMenuLink>
+                </NavigationMenuItem>
+              ))}
+            </ul>
+            <ul className="flex items-center gap-2">
+              <a
+                href={`https://www.thebluealliance.com${pathname}`}
+                className="rounded-md px-2.5 py-2 text-xs font-medium text-white
+                  hover:bg-black/20 hover:no-underline max-sm:hidden"
+              >
+                Leave beta
+              </a>
+              <SearchModal />
+              <MobileMenu />
+            </ul>
+          </NavigationMenuList>
+        </div>
+        <NavigationMenuViewport />
       </NavigationMenu>
     </>
   );

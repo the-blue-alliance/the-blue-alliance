@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useRef, useState } from 'react';
 
 import ChevronUpIcon from '~icons/lucide/chevron-up';
 import MessageSquareIcon from '~icons/lucide/message-square';
@@ -17,6 +17,7 @@ const SIDEBAR_WIDTH = 300;
 export function ChatSidebar() {
   const { state, setCurrentChat } = useGameday();
   const [selectorOpen, setSelectorOpen] = useState(false);
+  const contentRef = useRef<HTMLDivElement>(null);
 
   if (!state.chatSidebarVisible) return null;
 
@@ -81,11 +82,8 @@ export function ChatSidebar() {
       {/* Chat selector dialog */}
       <Dialog open={selectorOpen} onOpenChange={setSelectorOpen}>
         <DialogContent
-          // Auto focus on the content area and not first element
-          onOpenAutoFocus={(e) => {
-            e.preventDefault();
-            (e.currentTarget as HTMLElement)?.focus();
-          }}
+          ref={contentRef}
+          initialFocus={contentRef}
           className="max-w-sm p-0"
         >
           <DialogHeader className="border-b px-4 py-3">

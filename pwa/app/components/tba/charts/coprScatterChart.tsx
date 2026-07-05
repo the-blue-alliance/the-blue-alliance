@@ -223,7 +223,10 @@ export default function CoprScatterChart({
       <div className="flex flex-row justify-around pb-4">
         <div className="flex flex-row items-center">
           <div className="pr-4 font-bold">Y Axis</div>
-          <Select value={selectedYCopr} onValueChange={setSelectedYCopr}>
+          <Select
+            value={selectedYCopr}
+            onValueChange={(value) => value !== null && setSelectedYCopr(value)}
+          >
             <SelectTrigger className="w-auto">
               <SelectValue />
             </SelectTrigger>
@@ -242,7 +245,10 @@ export default function CoprScatterChart({
 
         <div className="flex flex-row items-center">
           <div className="pr-4 font-bold">X Axis</div>
-          <Select value={selectedXCopr} onValueChange={setSelectedXCopr}>
+          <Select
+            value={selectedXCopr}
+            onValueChange={(value) => value !== null && setSelectedXCopr(value)}
+          >
             <SelectTrigger className="w-auto">
               <SelectValue />
             </SelectTrigger>

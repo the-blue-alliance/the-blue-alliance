@@ -300,7 +300,7 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
 
                         return (
                           <Tooltip key={item.key}>
-                            <TooltipTrigger asChild>{content}</TooltipTrigger>
+                            <TooltipTrigger render={content} />
                             <TooltipContent
                               side="top"
                               align="start"

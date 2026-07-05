@@ -184,7 +184,7 @@ function RootComponent() {
       </head>
       <body>
         <ThemeProvider>
-          <TooltipProvider delayDuration={300} skipDelayDuration={0}>
+          <TooltipProvider delay={300} timeout={0}>
             <AuthContextProvider>
               {isFullscreen ? (
                 <Outlet />

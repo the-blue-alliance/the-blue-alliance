@@ -1,4 +1,4 @@
-import * as DialogPrimitive from '@radix-ui/react-dialog';
+import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
 
 import XIcon from '~icons/lucide/x';
 
@@ -31,14 +31,13 @@ function DialogClose({
 function DialogOverlay({
   className,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
+}: React.ComponentProps<typeof DialogPrimitive.Backdrop>) {
   return (
-    <DialogPrimitive.Overlay
+    <DialogPrimitive.Backdrop
       data-slot="dialog-overlay"
       className={cn(
-        `fixed inset-0 z-50 bg-black/50 data-[state=closed]:animate-out
-        data-[state=closed]:fade-out-0 data-[state=open]:animate-in
-        data-[state=open]:fade-in-0 dark:bg-black/75`,
+        `fixed inset-0 z-50 bg-black/50 dark:bg-black/75 data-open:animate-in
+        data-open:fade-in-0 data-closed:animate-out data-closed:fade-out-0`,
         className,
       )}
       {...props}
@@ -51,21 +50,21 @@ function DialogContent({
   children,
   showCloseButton = true,
   ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
+}: React.ComponentProps<typeof DialogPrimitive.Popup> & {
   showCloseButton?: boolean;
 }) {
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
-      <DialogPrimitive.Content
+      <DialogPrimitive.Popup
         data-slot="dialog-content"
         className={cn(
           `fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)]
           translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border
-          bg-background p-6 shadow-lg duration-200
-          data-[state=closed]:animate-out data-[state=closed]:fade-out-0
-          data-[state=closed]:zoom-out-95 data-[state=open]:animate-in
-          data-[state=open]:fade-in-0 data-[state=open]:zoom-in-95 sm:max-w-lg`,
+          bg-background p-6 shadow-lg duration-200 sm:max-w-lg
+          data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95
+          data-closed:animate-out data-closed:fade-out-0
+          data-closed:zoom-out-95`,
           className,
         )}
         {...props}
@@ -87,7 +86,7 @@ function DialogContent({
             <span className="sr-only">Close</span>
           </DialogPrimitive.Close>
         )}
-      </DialogPrimitive.Content>
+      </DialogPrimitive.Popup>
     </DialogPortal>
   );
 }

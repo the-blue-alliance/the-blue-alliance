@@ -18,22 +18,24 @@ function RpDot({
 }) {
   return (
     <Tooltip>
-      <TooltipTrigger asChild>
-        <svg
-          className="size-1"
-          viewBox="0 0 5 5"
-          fill="none"
-          xmlns="http://www.w3.org/2000/svg"
-        >
-          <circle
-            cx={2.5}
-            cy={2.5}
-            r={achieved ? 2.5 : 2}
-            fill={achieved ? 'currentColor' : 'none'}
-            stroke={achieved ? 'none' : '#9ca3af'}
-            strokeWidth={achieved ? 0 : 1}
+      <TooltipTrigger
+        render={
+          <svg
+            className="size-1"
+            viewBox="0 0 5 5"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
           />
-        </svg>
+        }
+      >
+        <circle
+          cx={2.5}
+          cy={2.5}
+          r={achieved ? 2.5 : 2}
+          fill={achieved ? 'currentColor' : 'none'}
+          stroke={achieved ? 'none' : '#9ca3af'}
+          strokeWidth={achieved ? 0 : 1}
+        />
       </TooltipTrigger>
       <TooltipContent>
         <span className="font-normal">{tooltipText}</span>

@@ -73,6 +73,7 @@ function TeamsPage() {
           <Select
             value={pageNum.toString()}
             onValueChange={(value) => {
+              if (value === null) return;
               void navigate({
                 to: '/teams/{-$pgNum}',
                 params: { pgNum: value },

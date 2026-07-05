@@ -45,10 +45,13 @@ function Donate(): React.JSX.Element {
             <Link to="/thanks">thank all of our sponsors</Link> whose generous
             support has made it possible to keep the site running.
           </p>
-          <Button asChild>
-            <a href="https://www.paypal.com/donate/?hosted_button_id=RNFK8Y7FU9VX8">
-              Donate on PayPal!
-            </a>
+          <Button
+            render={
+              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
+              <a href="https://www.paypal.com/donate/?hosted_button_id=RNFK8Y7FU9VX8" />
+            }
+          >
+            Donate on PayPal!
           </Button>
         </div>
       </div>

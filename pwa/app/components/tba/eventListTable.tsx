@@ -131,7 +131,17 @@ export default function EventListTable({
               <TableCell>
                 {event.webcasts.length > 0 && (
                   <Button
-                    asChild={isOnline || withinADay}
+                    render={
+                      isOnline || withinADay ? (
+                        // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
+                        <a
+                          href={`/gameday/${event.key}`}
+                          target="_blank"
+                          rel="noreferrer"
+                          className="hover:no-underline"
+                        />
+                      ) : undefined
+                    }
                     variant={isOnline ? 'success' : 'secondary'}
                     disabled={!isOnline && !withinADay}
                     className={cn({
@@ -139,26 +149,12 @@ export default function EventListTable({
                         !isOnline && !withinADay,
                     })}
                   >
-                    {isOnline || withinADay ? (
-                      <a
-                        href={`/gameday/${event.key}`}
-                        target="_blank"
-                        rel="noreferrer"
-                        className="hover:no-underline"
-                      >
-                        <InlineIcon iconSize="large">
-                          <MdiVideo />
-                          <span className="hidden md:contents">
-                            {isOnline ? 'Watch Now' : 'Offline'}
-                          </span>
-                        </InlineIcon>
-                      </a>
-                    ) : (
-                      <InlineIcon iconSize="large">
-                        <MdiVideo />
-                        <span className="hidden md:contents">Offline</span>
-                      </InlineIcon>
-                    )}
+                    <InlineIcon iconSize="large">
+                      <MdiVideo />
+                      <span className="hidden md:contents">
+                        {isOnline ? 'Watch Now' : 'Offline'}
+                      </span>
+                    </InlineIcon>
                   </Button>
                 )}
               </TableCell>

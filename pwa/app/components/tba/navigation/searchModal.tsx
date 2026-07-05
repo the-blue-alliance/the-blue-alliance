@@ -1,4 +1,3 @@
-import { DialogProps } from '@radix-ui/react-dialog';
 import { useQuery } from '@tanstack/react-query';
 import { ClientOnly, useNavigate } from '@tanstack/react-router';
 import { useEffect, useMemo, useRef, useState } from 'react';
@@ -28,7 +27,7 @@ import FuzzysortFilterer, {
 } from '~/lib/search/fuzzysortFilterer';
 import { cn } from '~/lib/utils';
 
-export function SearchModal({ ...props }: DialogProps) {
+export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
   const searchIndexQuery = useQuery(getSearchIndexOptions({}));
@@ -70,30 +69,31 @@ export function SearchModal({ ...props }: DialogProps) {
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="secondary"
-          className={cn(
-            `bg-surface relative h-9 w-full justify-start rounded-lg bg-white
-            pl-4 font-normal text-muted-foreground shadow-none hover:bg-white
-            max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
-          )}
-          onClick={() => setOpen(true)}
-          {...props}
-        >
-          <span className="hidden xl:inline-flex">
-            Search teams and events...
-          </span>
-          <span className="inline-flex xl:hidden">Search...</span>
-          <ClientOnly>
-            <div className="absolute top-2 right-1.5 hidden gap-1 sm:flex">
-              <KbdGroup>
-                <Kbd>{isMacintosh ? '⌘' : 'Ctrl'}</Kbd>
-                <Kbd>K</Kbd>
-              </KbdGroup>
-            </div>
-          </ClientOnly>
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            variant="secondary"
+            className={cn(
+              `bg-surface relative h-9 w-full justify-start rounded-lg bg-white
+              pl-4 font-normal text-muted-foreground shadow-none hover:bg-white
+              max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
+            )}
+            onClick={() => setOpen(true)}
+          />
+        }
+      >
+        <span className="hidden xl:inline-flex">
+          Search teams and events...
+        </span>
+        <span className="inline-flex xl:hidden">Search...</span>
+        <ClientOnly>
+          <div className="absolute top-2 right-1.5 hidden gap-1 sm:flex">
+            <KbdGroup>
+              <Kbd>{isMacintosh ? '⌘' : 'Ctrl'}</Kbd>
+              <Kbd>K</Kbd>
+            </KbdGroup>
+          </div>
+        </ClientOnly>
       </DialogTrigger>
 
       <DialogTrigger

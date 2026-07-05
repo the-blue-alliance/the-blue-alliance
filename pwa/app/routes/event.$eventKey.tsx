@@ -426,25 +426,27 @@ function EventPage() {
       {event.parent_event_key && (
         <div className="mb-2">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="cursor-pointer py-1.5">
-                Other Divisions
-              </Button>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" className="cursor-pointer py-1.5" />
+              }
+            >
+              Other Divisions
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {siblingEvents.map((e) => (
                 <DropdownMenuItem
                   key={e.key}
-                  asChild
                   className="cursor-pointer"
+                  render={
+                    <Link
+                      to="/event/$eventKey"
+                      params={{ eventKey: e.key }}
+                      className="text-foreground"
+                    />
+                  }
                 >
-                  <Link
-                    to="/event/$eventKey"
-                    params={{ eventKey: e.key }}
-                    className="text-foreground"
-                  >
-                    {stripParentPrefix(e.name, parentEventQuery.data?.name)}
-                  </Link>
+                  {stripParentPrefix(e.name, parentEventQuery.data?.name)}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -454,25 +456,27 @@ function EventPage() {
       {event.division_keys.length > 0 && (
         <div className="mb-2">
           <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="outline" className="cursor-pointer py-1.5">
-                Event Divisions
-              </Button>
+            <DropdownMenuTrigger
+              render={
+                <Button variant="outline" className="cursor-pointer py-1.5" />
+              }
+            >
+              Event Divisions
             </DropdownMenuTrigger>
             <DropdownMenuContent align="start">
               {ownDivisionEvents.map((e) => (
                 <DropdownMenuItem
                   key={e.key}
-                  asChild
                   className="cursor-pointer"
+                  render={
+                    <Link
+                      to="/event/$eventKey"
+                      params={{ eventKey: e.key }}
+                      className="text-foreground"
+                    />
+                  }
                 >
-                  <Link
-                    to="/event/$eventKey"
-                    params={{ eventKey: e.key }}
-                    className="text-foreground"
-                  >
-                    {stripParentPrefix(e.name, event.name)}
-                  </Link>
+                  {stripParentPrefix(e.name, event.name)}
                 </DropdownMenuItem>
               ))}
             </DropdownMenuContent>
@@ -647,11 +651,7 @@ function EventPage() {
           </AnimatedTabsTrigger>
         </TabsList>
 
-        <TabsContent
-          value="results"
-          forceMount
-          className="data-[state=inactive]:hidden"
-        >
+        <TabsContent value="results" keepMounted className="data-hidden:hidden">
           <ResultsTab
             event={event}
             sortedMatches={sortedMatches}
@@ -691,8 +691,8 @@ function EventPage() {
 
         <TabsContent
           value="insights"
-          forceMount
-          className="data-[state=inactive]:hidden"
+          keepMounted
+          className="data-hidden:hidden"
         >
           <MatchStatsTable
             matches={sortedMatches.filter(
@@ -1177,7 +1177,10 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
           <CardTitle>
             <div className="flex items-center">
               <span className="basis-1/2">Component OPRs</span>
-              <Select onValueChange={setComponent}>
+              <Select
+                value={component}
+                onValueChange={(value) => value !== null && setComponent(value)}
+              >
                 <SelectTrigger className="font-normal">
                   <SelectValue
                     placeholder={camelCaseToHumanReadable(component)}
@@ -1447,12 +1450,16 @@ function MediaTab({
           )}
         </>
       ) : (
-        <Button variant="secondary" asChild>
-          <a
-            href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
-          >
-            Add Webcast
-          </a>
+        <Button
+          variant="secondary"
+          render={
+            // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
+            <a
+              href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
+            />
+          }
+        >
+          Add Webcast
         </Button>
       )}
     </div>

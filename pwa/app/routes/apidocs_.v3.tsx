@@ -44,7 +44,7 @@ const ChangelogDisplay = ({ xChanges }: { xChanges: string }) => {
 
   return (
     <div className="my-4 rounded-lg bg-(--scalar-background-2) p-4">
-      <Accordion type="single" collapsible>
+      <Accordion>
         <AccordionItem value="changelog">
           <AccordionTrigger
             className="text-lg font-semibold text-(--scalar-color-1)"

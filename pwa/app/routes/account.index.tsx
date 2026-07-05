@@ -134,8 +134,8 @@ function Account() {
               <div className="text-sm text-muted-foreground">Subscriptions</div>
             </div>
           </div>
-          <Button size="sm" asChild>
-            <Link to="/account/mytba">Manage myTBA</Link>
+          <Button size="sm" render={<Link to="/account/mytba" />}>
+            Manage myTBA
           </Button>
         </CardContent>
       </Card>
@@ -183,9 +183,7 @@ function EditProfileDialog({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button size="sm">Edit Profile</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button size="sm" />}>Edit Profile</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
@@ -251,10 +249,8 @@ function DeleteAccountDialog({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button size="sm" variant="destructive">
-          Delete Account
-        </Button>
+      <DialogTrigger render={<Button size="sm" variant="destructive" />}>
+        Delete Account
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
