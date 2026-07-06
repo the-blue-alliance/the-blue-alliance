@@ -5,8 +5,7 @@ export type ClientOptions = {
 };
 
 export type Webhooks =
-  | PushLiveEventStatusWebhookRequest
-  | PushMatchStatusWebhookRequest;
+  PushLiveEventStatusWebhookRequest | PushMatchStatusWebhookRequest;
 
 export type PitAddresses = {
   [key: string]: PitAddress;
@@ -261,11 +260,7 @@ export type Match = {
    * The label for a break that begins after this match is played. Null if there is no break after this match.
    */
   breakAfter?:
-    | 'Break'
-    | 'Lunch'
-    | 'End of day'
-    | 'Alliance selection'
-    | 'Awards break';
+    'Break' | 'Lunch' | 'End of day' | 'Alliance selection' | 'Awards break';
   /**
    * The match this match is a replay of. Null if this match is not a replay
    */
