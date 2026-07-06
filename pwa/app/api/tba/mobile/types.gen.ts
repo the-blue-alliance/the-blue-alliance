@@ -2,8 +2,7 @@
 
 export type ClientOptions = {
   baseUrl:
-    | 'https://www.thebluealliance.com/clientapi/tbaClient/v9'
-    | (string & {});
+    'https://www.thebluealliance.com/clientapi/tbaClient/v9' | (string & {});
 };
 
 export type BaseResponse = {

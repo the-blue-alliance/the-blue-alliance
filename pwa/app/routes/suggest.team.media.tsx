@@ -47,12 +47,7 @@ export const Route = createFileRoute('/suggest/team/media')({
 });
 
 type SubmitStatus =
-  | 'idle'
-  | 'loading'
-  | 'success'
-  | 'exists'
-  | 'bad_url'
-  | 'error';
+  'idle' | 'loading' | 'success' | 'exists' | 'bad_url' | 'error';
 
 function SuggestTeamMedia(): JSX.Element {
   const { team_key, year } = Route.useSearch();
