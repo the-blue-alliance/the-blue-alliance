@@ -138,9 +138,7 @@ function matchLabel(match: Match): string {
 // --- Types ---
 
 type ColorsQueryResult =
-  | { status: number; data: EventColors }
-  | { status: 500 }
-  | undefined;
+  { status: number; data: EventColors } | { status: 500 } | undefined;
 
 // --- Team color helper ---
 

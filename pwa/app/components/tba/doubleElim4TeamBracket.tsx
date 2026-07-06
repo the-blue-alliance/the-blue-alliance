@@ -36,12 +36,7 @@ import { sortMatchComparator } from '~/lib/matchUtils';
 import { cn } from '~/lib/utils';
 
 type MatchLabel4 =
-  | 'Match 1'
-  | 'Match 2'
-  | 'Match 3'
-  | 'Match 4'
-  | 'Match 5'
-  | 'Finals';
+  'Match 1' | 'Match 2' | 'Match 3' | 'Match 4' | 'Match 5' | 'Finals';
 
 const WINNER_LINKS: WinnerLink[] = [
   { from: 'Match 1', to: 'Match 3' },

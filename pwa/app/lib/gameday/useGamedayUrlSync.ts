@@ -42,8 +42,7 @@ export function parseSearchParams(
   );
   for (let i = 0; i < MAX_VIEWS; i++) {
     const viewParam = searchParams[`view_${i}` as keyof GamedaySearchParams] as
-      | string
-      | undefined;
+      string | undefined;
     if (viewParam) {
       positionToWebcast[i] = viewParam;
     }
