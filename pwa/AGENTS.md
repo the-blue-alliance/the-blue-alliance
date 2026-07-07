@@ -7,7 +7,7 @@ Progressive Web App for The Blue Alliance, a data archive site for the FIRST Rob
 ## Tech Stack
 
 - **Framework**: TanStack Start / Router
-- **Styling**: Tailwind CSS v4, Shadcn UI, Radix UI
+- **Styling**: Tailwind CSS v4, Shadcn UI, Base UI (`@base-ui/react`)
 - **API**: Auto-generated OpenAPI clients in `app/api/tba/{read,mobile}/`
 - **Data Fetching**: TanStack Query
 - **Analytics**: Firebase Analytics (via `firebase/analytics`)
@@ -19,7 +19,7 @@ Progressive Web App for The Blue Alliance, a data archive site for the FIRST Rob
 app/
   ├── routes/           # File-based routing
   ├── components/
-  │   ├── ui/          # Shadcn/Radix components
+  │   ├── ui/          # Shadcn/Base UI components
   │   └── tba/         # TBA-specific components
   ├── lib/             # Utilities and helpers
   ├── api/             # Generated API clients
@@ -103,16 +103,3 @@ pnpm run format:fix       # Auto-format (Prettier; also sorts Tailwind classes) 
 pnpm dlx playwright test  # E2E tests
 ```
 
-## PR Screenshots
-
-PRs that touch `pwa/` files can get before/after screenshots posted as a comment. To request screenshots, add a `## Screenshot Pages` section to the PR description:
-
-```markdown
-## Screenshot Pages
-
-- /match/2024mil_f1m2
-- /team/254/2024 Team 254 Page
-- /gameday
-```
-
-Each line is `- /path` optionally followed by a display name. If no name is given, the path is used. If no pages are listed, the workflow skips screenshot capture.
