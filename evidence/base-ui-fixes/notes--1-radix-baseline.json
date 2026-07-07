@@ -1,0 +1,53 @@
+{
+  "teams-select": {
+    "triggerText": "2000s",
+    "listboxHeight": 394,
+    "optionCount": 12,
+    "ok": true,
+    "ms": 7677
+  },
+  "events-select": {
+    "triggerText": "All Events",
+    "ok": true,
+    "ms": 2439
+  },
+  "nav-mobile": {
+    "portalCountInitial": 0,
+    "portalCountAfterHover": 0,
+    "menuVisibleAfterHover": false,
+    "portalCountAfterOpen": 1,
+    "portalCountAfterClose": 0,
+    "ok": true,
+    "ms": 3224
+  },
+  "match-modal": {
+    "activeElement": {
+      "tag": "DIV",
+      "dataSlot": "dialog-content",
+      "role": "dialog",
+      "text": "Quals 1 - Milstein Division 2024TeamsScore173013917428588542",
+      "isDialogPopup": true
+    },
+    "ok": true,
+    "ms": 4673
+  },
+  "team-stats": {
+    "leakedAttrCount": 0,
+    "consoleAboutProp": [],
+    "ok": true,
+    "ms": 4304
+  },
+  "about-links": {
+    "href": "https://github.com/the-blue-alliance",
+    "target": "_blank",
+    "rel": "noreferrer",
+    "text": "Contribute on GitHub",
+    "ok": true,
+    "ms": 1281
+  },
+  "search-modal": {
+    "dialogCount": 1,
+    "ok": true,
+    "ms": 1727
+  }
+}

@@ -1,0 +1,55 @@
+{
+  "teams-select": {
+    "triggerText": "3",
+    "listboxHeight": 40,
+    "optionCount": 12,
+    "ok": true,
+    "ms": 4740
+  },
+  "events-select": {
+    "triggerText": "all",
+    "ok": true,
+    "ms": 2653
+  },
+  "nav-mobile": {
+    "portalCountInitial": 1,
+    "portalCountAfterHover": 1,
+    "menuVisibleAfterHover": false,
+    "portalCountAfterOpen": 1,
+    "portalCountAfterClose": 1,
+    "ok": true,
+    "ms": 3278
+  },
+  "match-modal": {
+    "activeElement": {
+      "tag": "A",
+      "dataSlot": null,
+      "role": null,
+      "text": "Quals 1 - Milstein Division 2024",
+      "isDialogPopup": false
+    },
+    "ok": true,
+    "ms": 6737
+  },
+  "team-stats": {
+    "leakedAttrCount": 1,
+    "consoleAboutProp": [
+      "error: React does not recognize the `%s` prop on a DOM element. If you intentionally want it to appear in the DOM as a custom attribute, spell it as lowercase `%s` instead. If you accidentally passed it from a parent component, remove it from the DOM element. minStepsBetweenThumbs minstepsbetweenthumbs"
+    ],
+    "ok": true,
+    "ms": 5968
+  },
+  "about-links": {
+    "href": "https://github.com/the-blue-alliance",
+    "target": "_blank",
+    "rel": "noreferrer",
+    "text": "Contribute on GitHub",
+    "ok": true,
+    "ms": 1249
+  },
+  "search-modal": {
+    "dialogCount": 1,
+    "ok": true,
+    "ms": 1709
+  }
+}
