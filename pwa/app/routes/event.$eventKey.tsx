@@ -1453,14 +1453,13 @@ function MediaTab({
         <Button
           variant="secondary"
           render={
-            // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
             <a
               href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
-            />
+            >
+              Add Webcast
+            </a>
           }
-        >
-          Add Webcast
-        </Button>
+        />
       )}
     </div>
   );

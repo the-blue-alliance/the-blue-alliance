@@ -86,6 +86,14 @@ export default function EventListTable({
           const districtColor = getDistrictColorClass(
             event.district?.abbreviation,
           );
+          const watchButtonContent = (
+            <InlineIcon iconSize="large">
+              <MdiVideo />
+              <span className="hidden md:contents">
+                {isOnline ? 'Watch Now' : 'Offline'}
+              </span>
+            </InlineIcon>
+          );
           return (
             <TableRow
               key={event.key}
@@ -133,13 +141,14 @@ export default function EventListTable({
                   <Button
                     render={
                       isOnline || withinADay ? (
-                        // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
                         <a
                           href={`/gameday/${event.key}`}
                           target="_blank"
                           rel="noreferrer"
                           className="hover:no-underline"
-                        />
+                        >
+                          {watchButtonContent}
+                        </a>
                       ) : undefined
                     }
                     variant={isOnline ? 'success' : 'secondary'}
@@ -149,12 +158,7 @@ export default function EventListTable({
                         !isOnline && !withinADay,
                     })}
                   >
-                    <InlineIcon iconSize="large">
-                      <MdiVideo />
-                      <span className="hidden md:contents">
-                        {isOnline ? 'Watch Now' : 'Offline'}
-                      </span>
-                    </InlineIcon>
+                    {watchButtonContent}
                   </Button>
                 )}
               </TableCell>
