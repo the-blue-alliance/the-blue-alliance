@@ -3,11 +3,13 @@ import logging
 from functools import wraps
 from typing import Callable, Type, TypeVar
 
-from flask import g, jsonify, request, Response
+from flask import g, jsonify, make_response, request, Response
 
+from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import VoidRequest
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.fms_report_type import FMSReportType
@@ -91,6 +93,62 @@ def require_write_auth(auth_types: set[AuthType] | None, file_param: str | None 
                 TrustedApiAuthHelper.do_trusted_api_auth(
                     event_key, fms_report_type, auth_types, file_param
                 )
+            return func(*args, **kwargs)
+
+        return decorated_function
+
+    return decorator
+
+
+def require_moderation_permission(permissions: set[AccountPermission]):
+    """
+    Authenticate the request via a Firebase ID token in the Authorization
+    header (the same mechanism as the client API) and require the resolved
+    account to hold any of the given AccountPermissions. Admins always pass.
+    The resolved User is stored on flask.g.moderation_user.
+    """
+
+    def decorator(func):
+        @wraps(func)
+        def decorated_function(*args, **kwargs):
+            with Span("require_moderation_permission"):
+                user = ClientApiAuthHelper.get_current_user()
+                if user is None:
+                    return make_response(
+                        jsonify(
+                            {
+                                "Error": "Authorization required. Pass a Firebase ID token "
+                                "as 'Authorization: Bearer <token>'."
+                            }
+                        ),
+                        401,
+                    )
+                # Accounts are linked to tokens by email claim, so an
+                # unverified email must never confer the linked account's
+                # permissions
+                if not user.email_verified:
+                    return make_response(
+                        jsonify(
+                            {
+                                "Error": "Moderation requires a verified email on your "
+                                "sign-in provider."
+                            }
+                        ),
+                        403,
+                    )
+                if not user.is_admin and not permissions.intersection(
+                    user.permissions or []
+                ):
+                    return make_response(
+                        jsonify(
+                            {
+                                "Error": "You do not have permission to moderate suggestions. "
+                                "If this is incorrect, please contact TBA admins."
+                            }
+                        ),
+                        403,
+                    )
+                g.moderation_user = user
             return func(*args, **kwargs)
 
         return decorated_function
