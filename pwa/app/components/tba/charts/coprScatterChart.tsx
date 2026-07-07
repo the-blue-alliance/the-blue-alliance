@@ -105,6 +105,13 @@ export default function CoprScatterChart({
   const [selectedYCopr, setSelectedYCopr] = useState(defaultYCopr);
   const [data, setData] = useState<Datapoint[]>([]);
 
+  // Base UI's Select.Value renders the raw value unless the items are
+  // registered on Select.Root, so provide value -> label pairs there too.
+  const coprItems = Object.keys(coprs).map((k) => ({
+    value: k,
+    label: camelCaseToHumanReadable(k),
+  }));
+
   useEffect(() => {
     const data: Datapoint[] = Object.keys(coprs[selectedXCopr])
       .map((tk) => ({
@@ -224,6 +231,7 @@ export default function CoprScatterChart({
         <div className="flex flex-row items-center">
           <div className="pr-4 font-bold">Y Axis</div>
           <Select
+            items={coprItems}
             value={selectedYCopr}
             onValueChange={(value) => value !== null && setSelectedYCopr(value)}
           >
@@ -233,9 +241,9 @@ export default function CoprScatterChart({
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>Y Axis</SelectLabel>
-                {Object.keys(coprs).map((k) => (
-                  <SelectItem value={k} key={k}>
-                    {camelCaseToHumanReadable(k)}
+                {coprItems.map(({ value, label }) => (
+                  <SelectItem value={value} key={value}>
+                    {label}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -246,6 +254,7 @@ export default function CoprScatterChart({
         <div className="flex flex-row items-center">
           <div className="pr-4 font-bold">X Axis</div>
           <Select
+            items={coprItems}
             value={selectedXCopr}
             onValueChange={(value) => value !== null && setSelectedXCopr(value)}
           >
@@ -255,9 +264,9 @@ export default function CoprScatterChart({
             <SelectContent>
               <SelectGroup>
                 <SelectLabel>X Axis</SelectLabel>
-                {Object.keys(coprs).map((k) => (
-                  <SelectItem value={k} key={k}>
-                    {camelCaseToHumanReadable(k)}
+                {coprItems.map(({ value, label }) => (
+                  <SelectItem value={value} key={value}>
+                    {label}
                   </SelectItem>
                 ))}
               </SelectGroup>

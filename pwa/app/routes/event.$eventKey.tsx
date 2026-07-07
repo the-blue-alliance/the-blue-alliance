@@ -1156,6 +1156,12 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
     Object.values(coprs[k]).every((v) => v === 0),
   );
 
+  // Base UI's Select.Value renders the raw value unless the items are
+  // registered on Select.Root, so provide value -> label pairs there too.
+  const componentItems = Object.keys(coprs)
+    .filter((k) => !excludedComponents.includes(k))
+    .map((k) => ({ value: k, label: camelCaseToHumanReadable(k) }));
+
   const columns: ColumnDef<{ teamKey: string; value: number }>[] = [
     {
       header: 'Team',
@@ -1178,22 +1184,19 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
             <div className="flex items-center">
               <span className="basis-1/2">Component OPRs</span>
               <Select
+                items={componentItems}
                 value={component}
                 onValueChange={(value) => value !== null && setComponent(value)}
               >
                 <SelectTrigger className="font-normal">
-                  <SelectValue
-                    placeholder={camelCaseToHumanReadable(component)}
-                  />
+                  <SelectValue />
                 </SelectTrigger>
                 <SelectContent>
-                  {Object.keys(coprs)
-                    .filter((k) => !excludedComponents.includes(k))
-                    .map((k) => (
-                      <SelectItem key={k} value={k}>
-                        {camelCaseToHumanReadable(k)}
-                      </SelectItem>
-                    ))}
+                  {componentItems.map(({ value, label }) => (
+                    <SelectItem key={value} value={value}>
+                      {label}
+                    </SelectItem>
+                  ))}
                 </SelectContent>
               </Select>
             </div>
