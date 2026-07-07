@@ -50,7 +50,8 @@ export function MatchModal() {
 
   return (
     <Credenza open={isOpen} onOpenChange={handleOpenChange}>
-      <CredenzaContent className="max-w-5xl sm:max-w-5xl">
+      {/* Focus the content area and not the first element */}
+      <CredenzaContent className="max-w-5xl sm:max-w-5xl" focusContentOnOpen>
         {displayMatchKey && (
           <Suspense fallback={<MatchModalSpinner />}>
             <MatchModalContent matchKey={displayMatchKey} />
