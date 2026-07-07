@@ -27,7 +27,7 @@ export function GamedayToolbar() {
     <>
       <header
         className="flex h-10 shrink-0 items-center gap-2 border-b
-          border-slate-700 bg-primary px-4"
+          border-slate-700 bg-brand px-4"
       >
         {/* TBA branding */}
         <a

@@ -70,8 +70,8 @@ export function ChatSidebar() {
       <button
         onClick={() => setSelectorOpen(true)}
         className="flex h-9 shrink-0 cursor-pointer items-center justify-between
-          border-t border-neutral-800 bg-primary px-3 text-white
-          transition-colors hover:bg-primary/90"
+          border-t border-neutral-800 bg-brand px-3 text-white transition-colors
+          hover:bg-brand/90"
       >
         <span className="truncate text-sm font-medium">
           {currentChatInfo?.name ?? 'Select a chat'}
