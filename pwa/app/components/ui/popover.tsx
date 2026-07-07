@@ -54,10 +54,4 @@ function PopoverContent({
   );
 }
 
-function PopoverAnchor({ ...props }: ComponentProps<'div'>) {
-  // Base UI has no Popover.Anchor part (Positioner takes an `anchor` prop
-  // instead); kept as an inert passthrough since no consumer uses it.
-  return <div data-slot="popover-anchor" {...props} />;
-}
-
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
+export { Popover, PopoverTrigger, PopoverContent };
