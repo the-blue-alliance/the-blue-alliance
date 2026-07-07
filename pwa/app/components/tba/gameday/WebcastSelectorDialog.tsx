@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import HelpCircleIcon from '~icons/lucide/help-circle';
 import VideoIcon from '~icons/lucide/video';
 import VideoOffIcon from '~icons/lucide/video-off';
@@ -27,7 +25,6 @@ export function WebcastSelectorDialog({
   onWebcastSelected: (webcastId: string) => void;
 }) {
   const { availableWebcasts } = useGameday();
-  const contentRef = useRef<HTMLDivElement>(null);
 
   // Group webcasts by special vs regular, then by online/offline status
   const specialWebcasts = availableWebcasts.filter(
@@ -45,11 +42,7 @@ export function WebcastSelectorDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        ref={contentRef}
-        initialFocus={contentRef}
-        className="max-w-md p-0"
-      >
+      <DialogContent focusContentOnOpen className="max-w-md p-0">
         <DialogHeader className="border-b px-4 py-3">
           <DialogTitle>Select a webcast</DialogTitle>
         </DialogHeader>

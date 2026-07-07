@@ -1,4 +1,5 @@
 import { Dialog as DialogPrimitive } from '@base-ui/react/dialog';
+import { useRef } from 'react';
 
 import XIcon from '~icons/lucide/x';
 
@@ -49,15 +50,37 @@ function DialogContent({
   className,
   children,
   showCloseButton = true,
+  focusContentOnOpen = false,
+  initialFocus,
+  ref,
   ...props
 }: React.ComponentProps<typeof DialogPrimitive.Popup> & {
   showCloseButton?: boolean;
+  /**
+   * Focus the popup container itself when the dialog opens instead of Base
+   * UI's default (the first tabbable element inside the popup). Ignored
+   * when an explicit `initialFocus` is passed.
+   */
+  focusContentOnOpen?: boolean;
 }) {
+  const popupRef = useRef<HTMLDivElement | null>(null);
+
   return (
     <DialogPortal data-slot="dialog-portal">
       <DialogOverlay />
       <DialogPrimitive.Popup
         data-slot="dialog-content"
+        ref={(node) => {
+          popupRef.current = node;
+          if (typeof ref === 'function') {
+            ref(node);
+          } else if (ref) {
+            ref.current = node;
+          }
+        }}
+        initialFocus={
+          initialFocus ?? (focusContentOnOpen ? popupRef : undefined)
+        }
         className={cn(
           `fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)]
           translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border

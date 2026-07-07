@@ -114,16 +114,41 @@ const CredenzaClose = ({
 const CredenzaContent = ({
   className,
   children,
+  focusContentOnOpen,
   ...props
 }: Omit<ComponentProps<typeof DialogContent>, 'className' | 'style'> &
   CredenzaProps) => {
   const isDesktop = useContext(CredenzaIsDesktopContext);
-  const CredenzaContent = isDesktop ? DialogContent : DrawerContent;
+
+  if (isDesktop) {
+    return (
+      <DialogContent
+        className={className}
+        focusContentOnOpen={focusContentOnOpen}
+        {...props}
+      >
+        {children}
+      </DialogContent>
+    );
+  }
 
   return (
-    <CredenzaContent className={className} {...props}>
+    <DrawerContent
+      className={className}
+      // vaul's Content is Radix-based; translate focusContentOnOpen to the
+      // equivalent Radix escape hatch so mobile matches the desktop dialog
+      onOpenAutoFocus={
+        focusContentOnOpen
+          ? (e) => {
+              e.preventDefault();
+              (e.currentTarget as HTMLElement | null)?.focus();
+            }
+          : undefined
+      }
+      {...props}
+    >
       {children}
-    </CredenzaContent>
+    </DrawerContent>
   );
 };
 

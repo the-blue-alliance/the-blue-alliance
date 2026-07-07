@@ -1,5 +1,3 @@
-import { useRef } from 'react';
-
 import {
   Dialog,
   DialogContent,
@@ -46,7 +44,6 @@ export function SwapPositionDialog({
   onPositionSelected: (position: number) => void;
 }) {
   const { state } = useGameday();
-  const contentRef = useRef<HTMLDivElement>(null);
 
   const layout = getLayoutById(state.layoutId);
   if (!layout) return null;
@@ -62,11 +59,7 @@ export function SwapPositionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        ref={contentRef}
-        initialFocus={contentRef}
-        className="max-w-md p-0"
-      >
+      <DialogContent focusContentOnOpen className="max-w-md p-0">
         <DialogHeader className="border-b px-4 py-3">
           <DialogTitle>Select a position to swap with</DialogTitle>
         </DialogHeader>
