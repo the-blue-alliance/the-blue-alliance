@@ -40,45 +40,42 @@ export default function AddToCalendarLinks({
           <DropdownMenuSeparator />
           <DropdownMenuItem
             render={
-              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from DropdownMenuItem's own children, merged onto this element by Base UI's render prop
               <a
                 href={google(calEvent)}
                 target="_blank"
                 rel="noreferrer"
                 className="cursor-pointer gap-2"
-              />
+              >
+                <GoogleCalendarIcon className="size-4" />
+                Google Calendar
+              </a>
             }
-          >
-            <GoogleCalendarIcon className="size-4" />
-            Google Calendar
-          </DropdownMenuItem>
+          />
           <DropdownMenuItem
             render={
-              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from DropdownMenuItem's own children, merged onto this element by Base UI's render prop
               <a
                 href={ics(calEvent)}
                 download={`${event.key}.ics`}
                 className="cursor-pointer gap-2"
-              />
+              >
+                <AppleIcon className="size-4 dark:invert" />
+                Apple Calendar
+              </a>
             }
-          >
-            <AppleIcon className="size-4 dark:invert" />
-            Apple Calendar
-          </DropdownMenuItem>
+          />
           <DropdownMenuItem
             render={
-              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from DropdownMenuItem's own children, merged onto this element by Base UI's render prop
               <a
                 href={outlook(calEvent)}
                 target="_blank"
                 rel="noreferrer"
                 className="cursor-pointer gap-2"
-              />
+              >
+                <OutlookIcon className="size-4" />
+                Outlook
+              </a>
             }
-          >
-            <OutlookIcon className="size-4" />
-            Outlook
-          </DropdownMenuItem>
+          />
         </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>

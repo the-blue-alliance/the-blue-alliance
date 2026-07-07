@@ -39,16 +39,15 @@ function About(): React.JSX.Element {
             <Button
               size="sm"
               render={
-                // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
                 <a
                   href="https://github.com/the-blue-alliance"
                   target="_blank"
                   rel="noreferrer"
-                />
+                >
+                  Contribute on GitHub
+                </a>
               }
-            >
-              Contribute on GitHub
-            </Button>
+            />
             <Button size="sm" render={<Link to="/donate" />}>
               Donate with PayPal
             </Button>
@@ -85,16 +84,15 @@ function About(): React.JSX.Element {
           <Button
             size="sm"
             render={
-              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
               <a
                 href="http://www.firstinspires.org"
                 target="_blank"
                 rel="noreferrer"
-              />
+              >
+                Join the movement
+              </a>
             }
-          >
-            Join the movement
-          </Button>
+          />
         </section>
 
         <section className="py-6">

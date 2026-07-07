@@ -483,18 +483,17 @@ export function BreakRow({
                     <DropdownMenuItem
                       key={url}
                       render={
-                        // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from DropdownMenuItem's own children, merged onto this element by Base UI's render prop
                         <a
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex cursor-pointer items-center gap-2"
-                        />
+                        >
+                          <YoutubeIcon className="size-3.5" />
+                          {label}
+                        </a>
                       }
-                    >
-                      <YoutubeIcon className="size-3.5" />
-                      {label}
-                    </DropdownMenuItem>
+                    />
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>

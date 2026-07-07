@@ -96,25 +96,22 @@ function Contact(): React.JSX.Element {
           <h3 className="text-2xl">Everything else...</h3>
           <p>Feel free to reach out to us!</p>
           <Button
-            // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
-            render={<a href="mailto:contact@thebluealliance.com" />}
-          >
-            Email Us!
-          </Button>
+            render={<a href="mailto:contact@thebluealliance.com">Email Us!</a>}
+          />
           <Button
             render={
-              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
-              <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers" />
+              <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">
+                Join our Developer Mailing List!
+              </a>
             }
-          >
-            Join our Developer Mailing List!
-          </Button>
+          />
           <Button
-            // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
-            render={<a href="https://www.chiefdelphi.com/" />}
-          >
-            Ask Chief Delphi Fourms!
-          </Button>
+            render={
+              <a href="https://www.chiefdelphi.com/">
+                Ask Chief Delphi Fourms!
+              </a>
+            }
+          />
         </div>
       </div>
     </>
