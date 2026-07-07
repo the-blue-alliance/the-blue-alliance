@@ -1,7 +1,53 @@
 {
+  "_note": "Fixed-state captures were taken per fix branch (capturedFrom); each scenario's screenshots come from the branch that fixes it.",
+  "teams-select": {
+    "capturedFrom": "fix/base-ui-select-regressions",
+    "triggerText": "2000s",
+    "listboxHeight": 392,
+    "optionCount": 12,
+    "ok": true
+  },
+  "events-select": {
+    "capturedFrom": "fix/base-ui-select-regressions",
+    "triggerText": "All Events",
+    "ok": true
+  },
+  "nav-mobile": {
+    "capturedFrom": "fix/base-ui-navigation-menu",
+    "portalCountInitial": 0,
+    "portalCountAfterHover": 0,
+    "menuVisibleAfterHover": false,
+    "portalCountAfterOpen": 1,
+    "portalCountAfterClose": 0,
+    "ok": true
+  },
+  "match-modal": {
+    "capturedFrom": "fix/base-ui-dialog-initial-focus",
+    "activeElement": {
+      "tag": "DIV",
+      "dataSlot": "dialog-content",
+      "role": "dialog",
+      "isDialogPopup": true
+    },
+    "ok": true
+  },
+  "team-stats": {
+    "capturedFrom": "fix/base-ui-slider-min-steps",
+    "leakedAttrCount": 0,
+    "consoleAboutProp": [],
+    "ok": true
+  },
+  "about-links": {
+    "capturedFrom": "refactor/base-ui-render-link (re-verified after content-inside-anchor restructure; PNG byte-identical)",
+    "href": "https://github.com/the-blue-alliance",
+    "target": "_blank",
+    "rel": "noreferrer",
+    "text": "Contribute on GitHub",
+    "ok": true
+  },
   "search-modal": {
+    "capturedFrom": "chore/base-ui-dead-code",
     "dialogCount": 1,
-    "ok": true,
-    "ms": 2252
+    "ok": true
   }
 }
