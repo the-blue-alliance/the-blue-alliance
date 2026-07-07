@@ -13,6 +13,7 @@ import { z } from 'zod';
 
 import { client as colorsClient } from '~/api/colors/client.gen';
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
+import { client as moderationClient } from '~/api/tba/moderation/client.gen';
 import {
   getSearchIndexOptions,
   getStatusOptions,
@@ -95,6 +96,13 @@ if (typeof window === 'undefined') {
 if (import.meta.env.VITE_TBA_MOBILE_API_BASE_URL) {
   mobileClient.setConfig({
     baseUrl: import.meta.env.VITE_TBA_MOBILE_API_BASE_URL,
+  });
+}
+
+// Point moderation API client at local backend when configured
+if (import.meta.env.VITE_TBA_MODERATION_API_BASE_URL) {
+  moderationClient.setConfig({
+    baseUrl: import.meta.env.VITE_TBA_MODERATION_API_BASE_URL,
   });
 }
 
