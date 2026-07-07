@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 
 import GlobalLoadingProgress from '~/components/tba/globalLoadingProgress';
 import { MobileMenu } from '~/components/tba/navigation/mobileMenu';
+import { ProfileMenu } from '~/components/tba/navigation/profileMenu';
 import { SearchModal } from '~/components/tba/navigation/searchModal';
 import {
   NavigationMenu,
@@ -94,6 +95,7 @@ export function Navbar() {
                 Leave beta
               </a>
               <SearchModal />
+              <ProfileMenu />
               <MobileMenu />
             </ul>
           </NavigationMenuList>

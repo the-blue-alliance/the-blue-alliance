@@ -9,6 +9,7 @@ import UserIcon from '~icons/lucide/user';
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
+import { LogoutConfirmDialog } from '~/components/tba/auth/logoutConfirmDialog';
 import { Button } from '~/components/ui/button';
 import {
   Card,
@@ -27,6 +28,7 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
+import { getDisplayName } from '~/lib/profileUtils';
 
 export const Route = createFileRoute('/account/')({
   component: Account,
@@ -34,6 +36,7 @@ export const Route = createFileRoute('/account/')({
 
 function Account() {
   const { isInitialLoading, user, logout } = useAuth();
+  const [logoutConfirmOpen, setLogoutConfirmOpen] = useState(false);
 
   const { data: favorites } = useQuery({
     queryKey: ['favorites', user?.uid],
@@ -73,9 +76,14 @@ function Account() {
     <div>
       <div className="flex flex-row items-center justify-between py-4">
         <h1 className="text-2xl font-bold">Account</h1>
-        <Button variant="default" onClick={() => void logout()}>
+        <Button variant="default" onClick={() => setLogoutConfirmOpen(true)}>
           Logout
         </Button>
+        <LogoutConfirmDialog
+          open={logoutConfirmOpen}
+          onOpenChange={setLogoutConfirmOpen}
+          onConfirm={() => void logout()}
+        />
       </div>
       <Card>
         <CardHeader>
@@ -87,7 +95,7 @@ function Account() {
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-foreground">
                 <UserIcon className="h-4 w-4 text-muted-foreground" />
-                <span className="font-medium">{user.displayName}</span>
+                <span className="font-medium">{getDisplayName(user)}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
                 <MailIcon className="h-4 w-4" />

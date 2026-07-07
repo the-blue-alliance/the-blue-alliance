@@ -25,6 +25,11 @@ import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
 import { ApiError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
+import {
+  LOCAL_API_AUTH_KEY,
+  LOCAL_API_BASE_URL,
+  isLocalDataSource,
+} from '~/lib/dataSource';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { ThemeProvider } from '~/lib/theme';
 import { cn, createLogger } from '~/lib/utils';
@@ -34,7 +39,14 @@ const logger = createLogger('root');
 
 // Configure request interceptor for auth
 client.interceptors.request.use((request) => {
-  request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
+  // The prod read key isn't valid against the local dev datastore, which
+  // has its own well-known dev key (seeded by /local/bootstrap)
+  request.headers.set(
+    'X-TBA-Auth-Key',
+    isLocalDataSource()
+      ? LOCAL_API_AUTH_KEY
+      : import.meta.env.VITE_TBA_API_READ_KEY,
+  );
 
   logger.info(
     {
@@ -63,6 +75,9 @@ client.setConfig({
   fetch: createCachedFetch({
     cacheableMethods: ['GET'],
   }),
+  // Dev-only: read from the local dev stack instead of prod when toggled
+  // via the profile menu. Server-side rendering always reads prod.
+  ...(isLocalDataSource() ? { baseUrl: LOCAL_API_BASE_URL } : {}),
 });
 
 // Point mobile API client at local backend when configured
