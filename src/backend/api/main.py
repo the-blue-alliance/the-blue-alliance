@@ -6,6 +6,7 @@ from backend.api.apiv3_main import api_v3
 from backend.api.client_api_main import client_api
 from backend.api.eventwizard_api_main import eventwizard_api
 from backend.api.handlers.error import handle_404
+from backend.api.moderation_api_main import moderation_api
 from backend.api.trusted_api_main import trusted_api
 from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
@@ -43,4 +44,5 @@ app.register_blueprint(api_v3)
 app.register_blueprint(eventwizard_api)
 app.register_blueprint(trusted_api)
 app.register_blueprint(client_api)
+app.register_blueprint(moderation_api)
 app.register_error_handler(404, handle_404)
