@@ -43,13 +43,17 @@ class ApiStatus(Sitevar[ContentType]):
 
     @staticmethod
     def default_value() -> ContentType:
+        # The APIv3 spec declares android/ios as non-null objects (prod has
+        # always set them), so the default must satisfy the contract too —
+        # otherwise fresh dev datastores serve a /status that breaks strict
+        # API clients like the PWA's generated response validators.
         current_year = datetime.datetime.now().year
         return ContentType(
             current_season=current_year,
             max_season=current_year,
             web=None,
-            android=None,
-            ios=None,
+            android=AndroidConfig(min_app_version=-1, latest_app_version=-1),
+            ios=IOSConfig(min_app_version=-1, latest_app_version=-1),
             max_team_page=0,
         )
 
