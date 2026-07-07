@@ -135,6 +135,19 @@ function YearEventsPage() {
     return tocNodes;
   }, [officialGroups, unofficialGroups]);
 
+  // Base UI's Select.Value renders the raw value unless the items are
+  // registered on Select.Root, so provide value -> label pairs there too.
+  const districtItems = [
+    { value: 'all', label: 'All Events' },
+    ...districts
+      .slice()
+      .sort((a, b) => a.display_name.localeCompare(b.display_name))
+      .map((district) => ({
+        value: district.abbreviation,
+        label: district.display_name,
+      })),
+  ];
+
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView}>
@@ -148,6 +161,7 @@ function YearEventsPage() {
           }))}
         />
         <Select
+          items={districtItems}
           defaultValue="all"
           onValueChange={(value) => {
             if (value !== 'all') {
@@ -160,19 +174,12 @@ function YearEventsPage() {
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="max-h-[70vh] overflow-y-auto">
-            <SelectItem value="all">All Events</SelectItem>
-            {districts
-              .slice()
-              .sort((a, b) => a.display_name.localeCompare(b.display_name))
-              .map((district) => (
-                <SelectItem
-                  key={district.abbreviation}
-                  value={district.abbreviation}
-                >
-                  {district.display_name}
-                </SelectItem>
-              ))}
+          <SelectContent>
+            {districtItems.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </TableOfContents>

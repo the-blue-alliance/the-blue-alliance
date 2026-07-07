@@ -66,11 +66,19 @@ function TeamsPage() {
   const { teams, pageNum, maxPageNum } = Route.useLoaderData();
   const navigate = useNavigate();
 
+  // Base UI's Select.Value renders the raw value unless the items are
+  // registered on Select.Root, so provide value -> label pairs there too.
+  const pageItems = Array.from({ length: maxPageNum }, (_, i) => ({
+    value: (i + 1).toString(),
+    label: TeamPageNumberToRange(i + 1),
+  }));
+
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
         <div className="top-14 pt-8 lg:sticky">
           <Select
+            items={pageItems}
             value={pageNum.toString()}
             onValueChange={(value) => {
               if (value === null) return;
@@ -81,17 +89,14 @@ function TeamsPage() {
             }}
           >
             <SelectTrigger className="w-[180px]">
-              <SelectValue placeholder={pageNum} />
+              <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              {Array.from({ length: maxPageNum }, (_, i) => {
-                const p = i + 1;
-                return (
-                  <SelectItem key={p} value={p.toString()}>
-                    {TeamPageNumberToRange(p)}
-                  </SelectItem>
-                );
-              })}
+              {pageItems.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

@@ -98,9 +98,9 @@ function SelectContent({
       >
         <SelectPrimitive.Popup
           className={cn(
-            `relative z-50 max-h-[75vh] min-w-[8rem] overflow-hidden rounded-md
-            border bg-popover text-popover-foreground shadow-md
-            data-[side=bottom]:translate-y-1
+            `relative z-50 max-h-(--available-height) min-w-[8rem]
+            overflow-x-hidden overflow-y-auto rounded-md border bg-popover
+            text-popover-foreground shadow-md data-[side=bottom]:translate-y-1
             data-[side=bottom]:slide-in-from-top-2
             data-[side=left]:-translate-x-1
             data-[side=left]:slide-in-from-right-2
@@ -115,9 +115,7 @@ function SelectContent({
           {...props}
         >
           <SelectScrollUpButton />
-          <SelectPrimitive.List
-            className="h-(--anchor-height) w-full min-w-(--anchor-width) p-1"
-          >
+          <SelectPrimitive.List className="w-full min-w-(--anchor-width) p-1">
             {children}
           </SelectPrimitive.List>
           <SelectScrollDownButton />
