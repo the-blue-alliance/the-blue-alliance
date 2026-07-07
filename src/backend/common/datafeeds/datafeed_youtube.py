@@ -89,7 +89,7 @@ class YoutubeVideoDetailsDatafeed(YoutubeApiBase[Dict[str, ParsedVideoDetails]])
 
     def url_params(self) -> Dict[str, str]:
         return {
-            "part": "snippet,liveStreamingDetails",
+            "part": "snippet,contentDetails,liveStreamingDetails",
             "id": ",".join(self.video_ids),
         }
 
