@@ -102,4 +102,3 @@ pnpm run lint             # Lint code
 pnpm run format:fix       # Auto-format (Prettier; also sorts Tailwind classes) — run before pushing, CI checks `format`
 pnpm dlx playwright test  # E2E tests
 ```
-
