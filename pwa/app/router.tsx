@@ -4,7 +4,11 @@ import { ParsedLocation, createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { logEvent } from 'firebase/analytics';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
+import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
+
+import { Button } from '~/components/ui/button';
 import { analytics } from '~/firebase/firebaseConfig';
 import { ApiError } from '~/lib/apiError';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
@@ -138,10 +142,60 @@ function ErrorComponent({ error }: { error: Error }) {
     Sentry.captureException(error);
   }, [error]);
 
+  const stack = error.stack ?? error.message;
+
+  const agentPrompt = [
+    'I ran into the following error. Please find the root cause. ',
+    '',
+    `URL: ${window.location.href}`,
+    '',
+    'Stack trace:',
+    '```',
+    stack,
+    '```',
+  ].join('\n');
+
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`Copied ${label} to clipboard!`);
+    } catch {
+      toast.error('Failed to copy to clipboard.');
+    }
+  };
+
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>
       <h2 className="text-2xl">An error occurred.</h2>
+      {process.env.NODE_ENV !== 'production' && error.stack && (
+        <>
+          <div className="mt-4 flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void copyToClipboard(stack, 'stack trace')}
+            >
+              <ClipboardCopyIcon />
+              Copy stack trace
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void copyToClipboard(agentPrompt, 'agent prompt')}
+            >
+              <ClipboardCopyIcon />
+              Copy with agent prompt
+            </Button>
+          </div>
+          <pre
+            className="mt-4 overflow-x-auto rounded bg-muted p-4 text-sm
+              whitespace-pre-wrap"
+          >
+            {error.stack}
+          </pre>
+        </>
+      )}
     </div>
   );
 }

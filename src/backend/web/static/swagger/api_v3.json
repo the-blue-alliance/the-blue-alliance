@@ -7361,7 +7361,7 @@
                 },
                 "qual_average": {
                   "type": [
-                    "integer",
+                    "number",
                     "null"
                   ],
                   "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
