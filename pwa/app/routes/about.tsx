@@ -11,8 +11,9 @@ export const Route = createFileRoute('/about')({
 function About(): React.JSX.Element {
   return (
     <div className="container max-w-4xl py-8">
-      <h1 className="text-3xl font-medium">About Us</h1>
-      <div className="[&_p]:mb-2">
+      <div className="typeset">
+        <h1>About Us</h1>
+
         <section className="border-b py-6">
           <p>
             Founded in the fall of 2006, The Blue Alliance began as a website
@@ -35,7 +36,7 @@ function About(): React.JSX.Element {
           <p>
             You can support The Blue Alliance or reach us with the following:
           </p>
-          <div className="flex flex-wrap gap-2">
+          <div className="not-typeset flex flex-wrap gap-2">
             <Button
               size="sm"
               render={
@@ -58,10 +59,10 @@ function About(): React.JSX.Element {
         </section>
 
         <section className="border-b py-6">
-          <h3 className="mb-2 text-2xl font-medium">
+          <h2>
             About <em>FIRST</em>
             <sup>®</sup>
-          </h3>
+          </h2>
           <p>
             <em>FIRST</em>
             <sup>®</sup> is the world&apos;s leading youth-serving nonprofit
@@ -81,40 +82,42 @@ function About(): React.JSX.Element {
             their goals, create a team identity, and advance respect and
             appreciation for STEM within the local community.
           </p>
-          <Button
-            size="sm"
-            render={
-              <a
-                href="http://www.firstinspires.org"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Join the movement
-              </a>
-            }
-          />
+          <div className="not-typeset">
+            <Button
+              size="sm"
+              render={
+                <a
+                  href="http://www.firstinspires.org"
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  Join the movement
+                </a>
+              }
+            />
+          </div>
         </section>
 
         <section className="py-6">
-          <h3 className="mb-2 text-2xl font-medium">Other community sites</h3>
+          <h2>Other community sites</h2>
           <p>
             Here are some other amazing resources that the <em>FIRST</em>{' '}
             community has to offer.
           </p>
-          <ul className="list-inside">
-            <li className="list-disc">
+          <ul>
+            <li>
               <a href="https://www.chiefdelphi.com/" title="Chief Delphi">
                 Chief Delphi
               </a>{' '}
               - The go-to fourm for FRC discussion
             </li>
-            <li className="list-disc">
+            <li>
               <a href="https://frc.link/" title="FRC Links">
                 FRC Links
               </a>{' '}
               - Easy access to specific FRC team and event pages
             </li>
-            <li className="list-disc">
+            <li>
               <a href="https://www.statbotics.io/" title="Statbotics">
                 Statbotics
               </a>{' '}
