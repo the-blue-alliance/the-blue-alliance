@@ -126,8 +126,8 @@ importers:
         specifier: 2.0.7
         version: 2.0.7(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       srvx:
-        specifier: 0.11.20
-        version: 0.11.20
+        specifier: 0.11.21
+        version: 0.11.21
       tailwind-merge:
         specifier: 3.6.0
         version: 3.6.0
@@ -6718,8 +6718,8 @@ packages:
     resolution: {integrity: sha512-UcjcJOWknrNkF6PLX83qcHM6KHgVKNkV62Y8a5uYDVv9ydGQVwAHMKqHdJje1VTWpljG0WYpCDhrCdAOYH4TWg==}
     engines: {node: '>= 10.x'}
 
-  srvx@0.11.20:
-    resolution: {integrity: sha512-gdPvbwpJOJpMyBYcp39q78C4pmv/Aw5WwZKB3+/pfeUVxo3EvNXlOi1fxzoy2ECGvUeBhouXy9rBxstjQQOPog==}
+  srvx@0.11.21:
+    resolution: {integrity: sha512-GWTHjKMeekX8CwJf4VU9Oo6mJpSGaflGMddbCvR+Cmmh9sslRMiGbAoqqZacE0r1ncARh6buCEETr2W52F8b1w==}
     engines: {node: '>=20.16.0'}
     hasBin: true
 
@@ -10696,7 +10696,7 @@ snapshots:
       picomatch: 4.0.5
       seroval: 1.5.5
       source-map: 0.7.6
-      srvx: 0.11.20
+      srvx: 0.11.21
       tinyglobby: 0.2.17
       ufo: 1.6.4
       vitefu: 1.1.3(vite@8.1.3(@types/node@24.13.2)(esbuild@0.28.1)(jiti@2.7.0)(terser@5.48.0)(tsx@4.23.0)(yaml@2.9.0))
@@ -12973,7 +12973,7 @@ snapshots:
   h3@2.0.1-rc.20:
     dependencies:
       rou3: 0.8.1
-      srvx: 0.11.20
+      srvx: 0.11.21
 
   has-bigints@1.1.0: {}
 
@@ -15225,7 +15225,7 @@ snapshots:
 
   split2@4.2.0: {}
 
-  srvx@0.11.20: {}
+  srvx@0.11.21: {}
 
   stable-hash-x@0.2.0: {}
 
