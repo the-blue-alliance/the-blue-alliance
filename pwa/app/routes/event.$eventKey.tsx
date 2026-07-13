@@ -160,6 +160,7 @@ import {
 import {
   getDefaultAutoComponentName,
   getDefaultTeleopComponentName,
+  getDefaultTotalComponentName,
 } from '~/lib/oprUtils';
 import {
   RANKING_POINT_LABELS,
@@ -1149,8 +1150,6 @@ function MatchStatsTable({
 }
 
 function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
-  const [component, setComponent] = useState('totalPoints');
-
   // filter any components that are just all zeros
   const excludedComponents = Object.keys(coprs).filter((k) =>
     Object.values(coprs[k]).every((v) => v === 0),
@@ -1161,6 +1160,10 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
   const componentItems = Object.keys(coprs)
     .filter((k) => !excludedComponents.includes(k))
     .map((k) => ({ value: k, label: camelCaseToHumanReadable(k) }));
+
+  const [component, setComponent] = useState(
+    getDefaultTotalComponentName(year),
+  );
 
   const columns: ColumnDef<{ teamKey: string; value: number }>[] = [
     {
@@ -1206,7 +1209,7 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
         <CardContent>
           <DataTable
             columns={columns}
-            data={Object.entries(coprs[component])
+            data={Object.entries(coprs[component] ?? {})
               .map(([k, v]) => ({
                 teamKey: k,
                 value: v,

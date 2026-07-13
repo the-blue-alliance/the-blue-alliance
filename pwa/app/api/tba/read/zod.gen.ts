@@ -1815,7 +1815,7 @@ export const zEventRanking = z.object({
   rankings: z.array(
     z.object({
       matches_played: z.int(),
-      qual_average: z.int().nullable(),
+      qual_average: z.number().nullable(),
       extra_stats: z.array(z.number()),
       sort_orders: z.array(z.number()),
       record: zWltRecord.nullable(),
