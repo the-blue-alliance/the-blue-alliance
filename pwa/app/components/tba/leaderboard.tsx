@@ -1,20 +1,10 @@
 import { Link } from '@tanstack/react-router';
-import { Fragment, type ReactNode, useState } from 'react';
+import { Fragment, type ReactNode } from 'react';
 
-import BiChevronBarDown from '~icons/bi/chevron-bar-down';
-import BiChevronBarUp from '~icons/bi/chevron-bar-up';
 import MaterialSymbolsTrophy from '~icons/material-symbols/trophy';
 
-import { type LeaderboardInsight } from '~/api/tba/read';
+import { InsightCard } from '~/components/tba/insightCard';
 import { MatchLink, TeamLink } from '~/components/tba/links';
-import { Button } from '~/components/ui/button';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card';
 import {
   Table,
   TableBody,
@@ -29,84 +19,76 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { LEADERBOARD_NAME_TO_DISPLAY_NAME } from '~/lib/insightUtils';
+import {
+  PRE_EXPANDED_ROWS,
+  rankRowClassName,
+  rankTextClassName,
+} from '~/lib/insightUtils';
 import { cn, pluralize } from '~/lib/utils';
 
 const MAX_KEYS_PER_ROW = 20;
-const PRE_EXPANDED_ROWS = 10;
+
+type KeyType = 'team' | 'event' | 'match' | 'team_pair' | 'alliance';
+
+const KEY_TYPE_HEADER: Record<KeyType, string> = {
+  team: 'Team',
+  event: 'Event',
+  match: 'Match',
+  team_pair: 'Team Pair',
+  alliance: 'Alliance',
+};
+
+type LeaderboardContext =
+  | { event_keys?: Array<string> }
+  | { match_key: string; alliance: Array<string> };
+
+export interface LeaderboardData {
+  key_type: KeyType;
+  rankings: Array<{
+    keys: Array<string> | Array<Array<string>>;
+    value: number;
+    contexts?: Array<LeaderboardContext>;
+  }>;
+}
+
+export interface LeaderboardShape {
+  name: string;
+  year: number;
+  data: LeaderboardData;
+}
 
 export function Leaderboard({
   subtitle,
   leaderboard,
+  displayName: displayNameProp,
   contextTooltipMap,
   year,
   renderKey,
 }: {
   subtitle?: string;
-  leaderboard: LeaderboardInsight;
+  leaderboard: LeaderboardShape;
+  displayName?: string;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
   renderKey?: (key: string) => ReactNode;
 }) {
-  const [expanded, setExpanded] = useState(false);
-
-  const displayName =
-    LEADERBOARD_NAME_TO_DISPLAY_NAME[leaderboard.name] || leaderboard.name;
+  const displayName = displayNameProp ?? leaderboard.name;
 
   return (
-    <Card
-      className="overflow-hidden border-border/50 shadow-sm transition-shadow
-        hover:shadow-md"
+    <InsightCard
+      icon={MaterialSymbolsTrophy}
+      title={displayName}
+      subtitle={subtitle}
     >
-      <CardHeader
-        className="border-b bg-gradient-to-br from-muted/30 to-muted/10 px-6
-          pt-5 pb-4"
-      >
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <div
-              className="flex h-10 w-10 items-center justify-center rounded-lg
-                bg-primary/10"
-            >
-              <MaterialSymbolsTrophy className="h-5 w-5 text-primary" />
-            </div>
-            <div>
-              <CardTitle className="text-lg leading-tight font-semibold">
-                {displayName}
-              </CardTitle>
-              {subtitle && (
-                <CardDescription className="mt-0.5 text-sm">
-                  {subtitle}
-                </CardDescription>
-              )}
-            </div>
-          </div>
-          <Button
-            variant="ghost"
-            onClick={() => {
-              setExpanded(!expanded);
-            }}
-            size="sm"
-            className="h-9 w-9 p-0 hover:bg-primary/10"
-          >
-            {expanded ? (
-              <BiChevronBarUp className="h-4 w-4" />
-            ) : (
-              <BiChevronBarDown className="h-4 w-4" />
-            )}
-            <span className="sr-only">Toggle</span>
-          </Button>
-        </div>
-      </CardHeader>
-      <CardContent className="p-0">
+      {(expanded) => (
         <Table>
           <TableHeader>
             <TableRow className="hover:bg-transparent">
               <TableHead className="h-10 w-[4.5rem] text-center font-semibold">
                 Count
               </TableHead>
-              <TableHead className="h-10 text-left font-semibold capitalize">
-                {leaderboard.data.key_type}
+              <TableHead className="h-10 text-left font-semibold">
+                {KEY_TYPE_HEADER[leaderboard.data.key_type]}
               </TableHead>
             </TableRow>
           </TableHeader>
@@ -115,25 +97,20 @@ export function Leaderboard({
               .slice(0, expanded ? 100 : PRE_EXPANDED_ROWS)
               .map((r, i) => {
                 const rank = i + 1;
-                const isTopThree = rank <= 3;
-                const rankColors = {
-                  1: 'bg-yellow-500/10 border-l-4 border-l-yellow-500 text-yellow-600 dark:text-yellow-400',
-                  2: 'bg-gray-400/10 border-l-4 border-l-gray-400 text-gray-600 dark:text-gray-400',
-                  3: 'bg-orange-600/10 border-l-4 border-l-orange-600 text-orange-600 dark:text-orange-500',
-                };
 
                 return (
                   <TableRow
                     key={i}
                     className={cn(
                       'transition-colors hover:bg-muted/50',
-                      isTopThree && rankColors[rank as 1 | 2 | 3],
+                      rankRowClassName(rank),
                     )}
                   >
                     <TableCell
                       className={cn(
                         'text-center font-semibold numeric-data',
-                        isTopThree && 'text-base',
+                        rank <= 3 && 'text-base',
+                        rankTextClassName(rank),
                       )}
                     >
                       {r.value}
@@ -143,6 +120,7 @@ export function Leaderboard({
                         cutoffSize={MAX_KEYS_PER_ROW}
                         keyType={leaderboard.data.key_type}
                         keyVals={r.keys}
+                        contexts={r.contexts}
                         contextTooltipMap={contextTooltipMap}
                         year={year}
                         renderKey={renderKey}
@@ -153,68 +131,78 @@ export function Leaderboard({
               })}
           </TableBody>
         </Table>
-      </CardContent>
-    </Card>
+      )}
+    </InsightCard>
   );
+}
+
+/**
+ * Normalizes a ranking's `keys` (which may be a flat list, or a list of
+ * grouped keys for `team_pair`/`alliance` key types) into a flat list of
+ * entries, each either a single key or a group of keys rendered together.
+ */
+function normalizeKeyEntries(
+  keyVals: Array<string> | Array<Array<string>>,
+): Array<string | Array<string>> {
+  return keyVals;
+}
+
+function entryToId(entry: string | Array<string>): string {
+  return Array.isArray(entry) ? entry.join('-') : entry;
 }
 
 function LeaderboardKeyList({
   keyVals,
   keyType,
   cutoffSize,
+  contexts,
   contextTooltipMap,
   year,
   renderKey,
 }: {
-  keyType: LeaderboardInsight['data']['key_type'];
-  keyVals: string[];
+  keyType: KeyType;
+  keyVals: Array<string> | Array<Array<string>>;
   cutoffSize: number;
+  contexts?: Array<LeaderboardContext>;
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
   renderKey?: (key: string) => ReactNode;
 }) {
+  const entries = normalizeKeyEntries(keyVals);
+
   return (
     <>
-      {keyVals.slice(0, cutoffSize).map((k, i) => (
-        <Fragment key={k}>
+      {entries.slice(0, cutoffSize).map((entry, i) => (
+        <Fragment key={entryToId(entry)}>
           {i > 0 && ', '}
-          <TooltipProvider>
-            <Tooltip>
-              <TooltipTrigger>
-                <LeaderboardKeyLink
-                  keyType={keyType}
-                  keyVal={k}
-                  year={year}
-                  renderKey={renderKey}
-                />
-              </TooltipTrigger>
-              {contextTooltipMap?.[k] ? (
-                <TooltipContent>
-                  <p>{contextTooltipMap[k]}</p>
-                </TooltipContent>
-              ) : null}
-            </Tooltip>
-          </TooltipProvider>
+          <LeaderboardKeyTooltip
+            keyType={keyType}
+            entry={entry}
+            year={year}
+            renderKey={renderKey}
+            context={contexts?.[i]}
+            contextTooltipMap={contextTooltipMap}
+          />
         </Fragment>
       ))}
-      {keyVals.length > cutoffSize && (
+      {entries.length > cutoffSize && (
         <TooltipProvider>
           <Tooltip>
             <TooltipTrigger className="italic">
               &nbsp;(and{' '}
-              {pluralize(keyVals.length - cutoffSize, 'other', 'others')})
+              {pluralize(entries.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
             <TooltipContent
               className="max-w-[500px] text-center break-words
                 whitespace-normal"
             >
               <p>
-                {keyVals.map((k, i) => (
-                  <Fragment key={k}>
+                {entries.map((entry, i) => (
+                  <Fragment key={entryToId(entry)}>
                     {i > 0 && ', '}
-                    <LeaderboardKeyLink
+                    <LeaderboardKeyGroupLink
                       keyType={keyType}
-                      keyVal={k}
+                      entry={entry}
                       year={year}
                       renderKey={renderKey}
                     />
@@ -229,13 +217,142 @@ function LeaderboardKeyList({
   );
 }
 
+function LeaderboardKeyTooltip({
+  keyType,
+  entry,
+  year,
+  renderKey,
+  context,
+  contextTooltipMap,
+}: {
+  keyType: KeyType;
+  entry: string | Array<string>;
+  year: number;
+  renderKey?: (key: string) => ReactNode;
+  context?: LeaderboardContext;
+  contextTooltipMap?: Record<string, ReactNode>;
+}) {
+  const tooltipContent = context
+    ? contextFromLeaderboardContext(context)
+    : (contextTooltipMap?.[entryToId(entry)] ?? null);
+
+  return (
+    <TooltipProvider>
+      <Tooltip>
+        <TooltipTrigger>
+          <LeaderboardKeyGroupLink
+            keyType={keyType}
+            entry={entry}
+            year={year}
+            renderKey={renderKey}
+          />
+        </TooltipTrigger>
+        {tooltipContent ? (
+          <TooltipContent>
+            <p>{tooltipContent}</p>
+          </TooltipContent>
+        ) : null}
+      </Tooltip>
+    </TooltipProvider>
+  );
+}
+
+function contextFromLeaderboardContext(context: LeaderboardContext): ReactNode {
+  if ('match_key' in context) {
+    return (
+      <>
+        <MatchLink matchOrKey={context.match_key}>
+          {context.match_key}
+        </MatchLink>
+        {context.alliance.length > 0 && (
+          <>
+            {' '}
+            (
+            {context.alliance.map((teamKey, i) => (
+              <Fragment key={teamKey}>
+                {i > 0 && ', '}
+                <TeamLink teamOrKey={teamKey} year={0}>
+                  {teamKey.substring(3)}
+                </TeamLink>
+              </Fragment>
+            ))}
+            )
+          </>
+        )}
+      </>
+    );
+  }
+
+  if (!context.event_keys || context.event_keys.length === 0) {
+    return null;
+  }
+
+  return (
+    <>
+      {context.event_keys.map((eventKey, i) => (
+        <Fragment key={eventKey}>
+          {i > 0 && ', '}
+          <Link to="/event/$eventKey" params={{ eventKey }}>
+            {eventKey}
+          </Link>
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
+/**
+ * Renders a single entry, which is either one key or (for `team_pair`/
+ * `alliance` key types) a group of keys joined together.
+ */
+function LeaderboardKeyGroupLink({
+  entry,
+  keyType,
+  year,
+  renderKey,
+}: {
+  keyType: KeyType;
+  entry: string | Array<string>;
+  year: number;
+  renderKey?: (key: string) => ReactNode;
+}) {
+  if (!Array.isArray(entry)) {
+    return (
+      <LeaderboardKeyLink
+        keyType={keyType}
+        keyVal={entry}
+        year={year}
+        renderKey={renderKey}
+      />
+    );
+  }
+
+  const separator = keyType === 'team_pair' ? ' & ' : ', ';
+
+  return (
+    <>
+      {entry.map((k, i) => (
+        <Fragment key={k}>
+          {i > 0 && separator}
+          <LeaderboardKeyLink
+            keyType={keyType}
+            keyVal={k}
+            year={year}
+            renderKey={renderKey}
+          />
+        </Fragment>
+      ))}
+    </>
+  );
+}
+
 function LeaderboardKeyLink({
   keyVal,
   keyType,
   year,
   renderKey,
 }: {
-  keyType: LeaderboardInsight['data']['key_type'];
+  keyType: KeyType;
   keyVal: string;
   year: number;
   renderKey?: (key: string) => ReactNode;
@@ -243,7 +360,7 @@ function LeaderboardKeyLink({
   if (renderKey) {
     return <>{renderKey(keyVal)}</>;
   }
-  if (keyType === 'team') {
+  if (keyType === 'team' || keyType === 'team_pair' || keyType === 'alliance') {
     return (
       <TeamLink teamOrKey={keyVal} year={year}>
         {keyVal.substring(3)}

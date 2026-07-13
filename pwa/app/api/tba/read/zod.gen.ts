@@ -1071,7 +1071,7 @@ export const zInsightV2Base = z.object({
   display_name: z.string(),
   year: z.int(),
   category: z.enum(['leaderboard', 'streak', 'timeseries']),
-  district_abbreviation: z.string(),
+  district_abbreviation: z.string().nullable(),
 });
 
 /**
