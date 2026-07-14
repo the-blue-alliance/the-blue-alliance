@@ -2697,7 +2697,7 @@ export type InsightV2Base = {
   /**
    * District abbreviation if the insight is district-scoped, otherwise null.
    */
-  district_abbreviation: string;
+  district_abbreviation: string | null;
 };
 
 export type InsightV2Leaderboard = InsightV2Base & InsightV2LeaderboardExtras;

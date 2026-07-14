@@ -10346,8 +10346,10 @@
             "description": "Insight category. Discriminates the shape of `data`."
           },
           "district_abbreviation": {
-            "type": "string",
-            "nullable": true,
+            "type": [
+              "string",
+              "null"
+            ],
             "description": "District abbreviation if the insight is district-scoped, otherwise null."
           }
         }

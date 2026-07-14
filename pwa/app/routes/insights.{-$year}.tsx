@@ -1,25 +1,16 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import { ReactNode } from 'react';
 
 import {
-  LeaderboardInsight,
-  NotablesInsight,
-  getInsightsLeaderboardsYear,
-  getInsightsNotablesYear,
+  type InsightV2Leaderboard,
+  type InsightV2Streak,
+  type InsightV2Timeseries,
+  getInsightsV2Year,
 } from '~/api/tba/read';
-import { TitledCard } from '~/components/tba/cards';
 import { Leaderboard } from '~/components/tba/leaderboard';
-import { EventLink, TeamLink } from '~/components/tba/links';
+import { StreakInsight } from '~/components/tba/streakInsight';
+import { TimeseriesInsight } from '~/components/tba/timeseriesInsight';
 import { YearSelector } from '~/components/tba/yearSelector';
-import {
-  NOTABLE_NAME_TO_DISPLAY_NAME,
-  leaderboardFromNotable,
-} from '~/lib/insightUtils';
-import {
-  joinComponents,
-  publicCacheControlHeaders,
-  useValidYears,
-} from '~/lib/utils';
+import { publicCacheControlHeaders, useValidYears } from '~/lib/utils';
 
 export const Route = createFileRoute('/insights/{-$year}')({
   loader: async ({ params }) => {
@@ -37,23 +28,41 @@ export const Route = createFileRoute('/insights/{-$year}')({
       throw notFound();
     }
 
-    const [leaderboards, notables] = await Promise.all([
-      getInsightsLeaderboardsYear({ path: { year: numericYear } }),
-      getInsightsNotablesYear({ path: { year: numericYear } }),
-    ]);
+    const insights = await getInsightsV2Year({
+      path: { year: numericYear },
+    });
 
-    if (leaderboards.data === undefined || notables.data === undefined) {
+    if (insights.data === undefined) {
       throw new Error('Failed to load insights');
     }
 
-    if (leaderboards.data.length === 0 || notables.data.length === 0) {
+    if (insights.data.length === 0) {
       throw notFound();
+    }
+
+    const leaderboards: InsightV2Leaderboard[] = [];
+    const streaks: InsightV2Streak[] = [];
+    const timeseries: InsightV2Timeseries[] = [];
+
+    for (const insight of insights.data) {
+      switch (insight.category) {
+        case 'leaderboard':
+          leaderboards.push(insight);
+          break;
+        case 'streak':
+          streaks.push(insight);
+          break;
+        case 'timeseries':
+          timeseries.push(insight);
+          break;
+      }
     }
 
     return {
       year: numericYear,
-      leaderboards: leaderboards.data,
-      notables: notables.data,
+      leaderboards,
+      streaks,
+      timeseries,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -86,39 +95,44 @@ export const Route = createFileRoute('/insights/{-$year}')({
 });
 
 function InsightsPage() {
-  const { leaderboards, year, notables } = Route.useLoaderData();
+  const { leaderboards, streaks, timeseries, year } = Route.useLoaderData();
 
   return (
     <div>
       <SingleYearInsights
         leaderboards={leaderboards}
+        streaks={streaks}
+        timeseries={timeseries}
         year={year}
-        notables={notables}
       />
     </div>
+  );
+}
+
+function SectionHeading({ children }: { children: string }) {
+  return (
+    <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
+      <span
+        className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
+          from-primary to-primary/50"
+      />
+      {children}
+    </h2>
   );
 }
 
 function SingleYearInsights({
   year,
   leaderboards,
-  notables,
+  streaks,
+  timeseries,
 }: {
   year: number;
-  leaderboards: LeaderboardInsight[];
-  notables: NotablesInsight[];
+  leaderboards: InsightV2Leaderboard[];
+  streaks: InsightV2Streak[];
+  timeseries: InsightV2Timeseries[];
 }) {
   const validYears = useValidYears();
-
-  const notableDiv =
-    year !== 0 ? (
-      <NotablesYearSpecific notables={notables} />
-    ) : (
-      <NotablesOverall
-        notables={notables.filter((n) => n.name !== 'notables_hall_of_fame')}
-        year={0}
-      />
-    );
 
   return (
     <div className="py-8">
@@ -153,128 +167,52 @@ function SingleYearInsights({
         />
       </div>
 
-      <div className="mb-8">
-        <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
-          <span
-            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
-              from-primary to-primary/50"
-          />
-          Notables
-        </h2>
-        {notableDiv}
-      </div>
-
-      <div>
-        <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
-          <span
-            className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
-              from-primary to-primary/50"
-          />
-          Leaderboards
-        </h2>
-        <div className="grid gap-6 lg:grid-cols-2">
-          {leaderboards.map((l, i) => (
-            <Leaderboard
-              subtitle={l.year > 0 ? `${l.year}` : 'Overall'}
-              leaderboard={l}
-              key={i}
-              year={year}
-            />
-          ))}
+      {leaderboards.length > 0 && (
+        <div className="mb-8">
+          <SectionHeading>Leaderboards</SectionHeading>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {leaderboards.map((l) => (
+              <Leaderboard
+                subtitle={l.year > 0 ? `${l.year}` : 'Overall'}
+                leaderboard={l}
+                displayName={l.display_name}
+                key={l.name}
+                year={year}
+              />
+            ))}
+          </div>
         </div>
-      </div>
-    </div>
-  );
-}
-
-function NotablesYearSpecific({ notables }: { notables: NotablesInsight[] }) {
-  const hof = notables.find((n) => n.name === 'notables_hall_of_fame');
-  const worldChamps = notables.find(
-    (n) => n.name === 'notables_world_champions',
-  );
-
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {hof && (
-        <TitledCard
-          cardTitle={joinComponents(
-            hof.data.entries.map((e) => (
-              <TeamLink key={e.team_key} teamOrKey={e.team_key} year={hof.year}>
-                {e.team_key.substring(3)}
-              </TeamLink>
-            )),
-            <span className="font-medium">, </span>,
-          )}
-          cardSubtitle={
-            <>
-              {NOTABLE_NAME_TO_DISPLAY_NAME[hof.name] || hof.name} {hof.year}
-            </>
-          }
-        />
       )}
-      {worldChamps && (
-        <TitledCard
-          cardTitle={joinComponents(
-            worldChamps.data.entries.map((e) => (
-              <TeamLink
-                key={e.team_key}
-                teamOrKey={e.team_key}
-                year={worldChamps.year}
-              >
-                {e.team_key.substring(3)}
-              </TeamLink>
-            )),
-            <span className="font-medium">, </span>,
-          )}
-          cardSubtitle={
-            <>
-              {NOTABLE_NAME_TO_DISPLAY_NAME[worldChamps.name] ||
-                worldChamps.name}{' '}
-              {worldChamps.year}
-            </>
-          }
-        />
+
+      {streaks.length > 0 && (
+        <div className="mb-8">
+          <SectionHeading>Streaks</SectionHeading>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {streaks.map((s) => (
+              <StreakInsight
+                subtitle={s.year > 0 ? `${s.year}` : 'Overall'}
+                streak={s}
+                key={s.name}
+              />
+            ))}
+          </div>
+        </div>
       )}
-    </div>
-  );
-}
 
-function NotablesOverall({
-  notables,
-  year,
-}: {
-  notables: NotablesInsight[];
-  year: number;
-}) {
-  return (
-    <div className="grid gap-6 lg:grid-cols-2">
-      {notables.map((n, i) => {
-        const leaderboard = leaderboardFromNotable(n);
-        const context = n.data.entries.reduce<Record<string, ReactNode>>(
-          (acc, entry) => {
-            acc[entry.team_key] = joinComponents(
-              entry.context.map((c, i) => (
-                <EventLink eventOrKey={c} key={i}>
-                  {c}
-                </EventLink>
-              )),
-              ', ',
-            );
-            return acc;
-          },
-          {},
-        );
-
-        return (
-          <Leaderboard
-            subtitle={leaderboard.year > 0 ? `${leaderboard.year}` : 'Overall'}
-            leaderboard={leaderboard}
-            key={i}
-            contextTooltipMap={context}
-            year={year}
-          />
-        );
-      })}
+      {timeseries.length > 0 && (
+        <div>
+          <SectionHeading>Timeseries</SectionHeading>
+          <div className="grid gap-6 lg:grid-cols-2">
+            {timeseries.map((t) => (
+              <TimeseriesInsight
+                subtitle={t.year > 0 ? `${t.year}` : 'Overall'}
+                timeseries={t}
+                key={t.name}
+              />
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }
