@@ -441,6 +441,39 @@ def test_details() -> None:
     assert event.details == d
 
 
+@pytest.mark.parametrize(
+    "short_name, event_type_enum, expected",
+    [
+        # Normal case - suffix should be appended
+        ("Archimedes", EventType.CMP_DIVISION, "Archimedes Division"),
+        # 2002-style data where short_name already contains the suffix -
+        # should not be duplicated. See #10206.
+        ("Archimedes Division", EventType.CMP_DIVISION, "Archimedes Division"),
+        (
+            "Newton",
+            EventType.DISTRICT_CMP_DIVISION,
+            "Newton District Championship Division",
+        ),
+        (
+            "Newton District Championship Division",
+            EventType.DISTRICT_CMP_DIVISION,
+            "Newton District Championship Division",
+        ),
+    ],
+)
+def test_normalized_name_division_suffix(
+    short_name: str, event_type_enum: EventType, expected: str
+) -> None:
+    event = Event(
+        id="2002cmp",
+        year=2002,
+        event_short="cmp",
+        short_name=short_name,
+        event_type_enum=event_type_enum,
+    )
+    assert event.normalized_name == expected
+
+
 def test_first_api_code() -> None:
     # Pre-2023 regular event
     event = Event(id="2019ingre", year=2019, event_short="ingre")

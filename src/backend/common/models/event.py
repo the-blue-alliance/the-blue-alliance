@@ -857,9 +857,14 @@ class Event(CachedModel):
             if self.event_type_enum == EventType.OFFSEASON:
                 return self.short_name
             else:
+                type_suffix = event_type.SHORT_TYPE_NAMES[
+                    EventType(self.event_type_enum)
+                ]
+                if self.short_name.strip().endswith(type_suffix):
+                    return self.short_name
                 return "{} {}".format(
                     self.short_name,
-                    event_type.SHORT_TYPE_NAMES[EventType(self.event_type_enum)],
+                    type_suffix,
                 )
         else:
             return self.name
