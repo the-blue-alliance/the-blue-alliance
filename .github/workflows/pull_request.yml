@@ -125,7 +125,7 @@ jobs:
               - 'package.json'
       - name: Set up Node
         if: steps.changes.outputs.node == 'true'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: "npm"
@@ -150,7 +150,7 @@ jobs:
               - 'package.json'
       - name: Set up Node
         if: steps.changes.outputs.node == 'true'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           # Transitive dependency of puppeteer (extract-zip) broken on 24.16
           # https://github.com/puppeteer/puppeteer/issues/15071
@@ -209,7 +209,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Set up Node
         if: steps.changes.outputs.buildweb == 'true'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           node-version: "24"
           cache: "npm"
@@ -251,7 +251,7 @@ jobs:
           pip install requests
       - name: Set up Node
         if: steps.changes.outputs.web == 'true'
-        uses: actions/setup-node@v6
+        uses: actions/setup-node@v7
         with:
           # Transitive dependency of puppeteer (extract-zip) broken on 24.16
           # https://github.com/puppeteer/puppeteer/issues/15071
