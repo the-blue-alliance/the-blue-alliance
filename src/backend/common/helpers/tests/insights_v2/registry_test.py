@@ -155,3 +155,35 @@ def test_most_game_pieces_scored_excluded_for_unsupported_years(
 ) -> None:
     make_all_insights(year)
     mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.AverageMatchScoreByWeekV2Calculator"
+)
+@patch("backend.common.helpers.insights_v2.registry.AverageWinMarginByWeekV2Calculator")
+def test_average_by_week_calculators_instantiated_for_specific_year(
+    mock_margin, mock_score, mock_compute
+) -> None:
+    make_all_insights(2024)
+    mock_score.assert_called_once_with()
+    mock_margin.assert_called_once_with()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.AverageMatchScoreByWeekV2Calculator"
+)
+@patch("backend.common.helpers.insights_v2.registry.AverageWinMarginByWeekV2Calculator")
+def test_average_by_week_calculators_not_instantiated_for_all_time(
+    mock_margin, mock_score, mock_compute
+) -> None:
+    make_all_insights(0)
+    mock_score.assert_not_called()
+    mock_margin.assert_not_called()
