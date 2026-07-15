@@ -12,7 +12,7 @@ dependencies = [
     "Flask-WTF==1.2.2",
     "google-api-core==2.31.0",
     "google-api-python-client==2.198.0",
-    "google-cloud-logging==3.16.0",
+    "google-cloud-logging==3.16.1",
     "google-cloud-run==0.16.1",
     "grpcio==1.81.1",
     "gunicorn==26.0.0",
