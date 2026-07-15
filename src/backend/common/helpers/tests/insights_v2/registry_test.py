@@ -129,3 +129,29 @@ def test_most_district_cmp_wins_only_for_all_time(mock_calc, mock_compute) -> No
 def test_most_district_cmp_wins_not_for_specific_year(mock_calc, mock_compute) -> None:
     make_all_insights(2024)
     mock_calc.assert_not_called()
+
+
+@pytest.mark.parametrize("year", [2016, 2017, 2019, 2020, 2022, 2023, 2024, 2025, 2026])
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.MostGamePiecesScoredV2Calculator")
+def test_most_game_pieces_scored_included_for_supported_years(
+    mock_calc, mock_compute, year: int
+) -> None:
+    make_all_insights(year)
+    mock_calc.assert_called_once_with()
+
+
+@pytest.mark.parametrize("year", [0, 2018, 2021])
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.MostGamePiecesScoredV2Calculator")
+def test_most_game_pieces_scored_excluded_for_unsupported_years(
+    mock_calc, mock_compute, year: int
+) -> None:
+    make_all_insights(year)
+    mock_calc.assert_not_called()

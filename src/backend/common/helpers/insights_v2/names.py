@@ -64,8 +64,9 @@ class InsightV2Names:
     )
     WIN_STREAK = InsightV2NameEntry("win_streak", "Longest Win Streak")
 
-    MOST_CORAL_SCORED = InsightV2NameEntry("most_coral_scored", "Most Coral Scored")
-    MOST_FUEL_SCORED = InsightV2NameEntry("most_fuel_scored", "Most Fuel Scored")
+    MOST_GAME_PIECES_SCORED = InsightV2NameEntry(
+        "most_game_pieces_scored", "Most Game Pieces Scored"
+    )
 
     # Timeseries
     HIGH_SCORE_OVER_TIME = InsightV2NameEntry(

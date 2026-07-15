@@ -3,6 +3,7 @@ from collections import defaultdict
 from typing import DefaultDict, Dict, List, NamedTuple, Optional
 
 from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.insights_v2.match_alliance_points import (
     get_foul_points,
@@ -32,6 +33,9 @@ class _RecordMatch(NamedTuple):
     alliance_teams: List[str]
     post_result_time: datetime.datetime
     year: int
+
+
+_EARLIEST_PLAUSIBLE_TIMESTAMP = datetime.datetime(1992, 1, 1)
 
 
 class HighScoreOverTimeV2Calculator(TimeseriesV2Calculator):
@@ -65,6 +69,17 @@ class HighScoreOverTimeV2Calculator(TimeseriesV2Calculator):
             t: Optional[datetime.datetime] = (
                 match.post_result_time or match.actual_time or match.time
             )
+            # Some 2006 matches have weird timestamps; ignore them
+            if t is not None and t < _EARLIEST_PLAUSIBLE_TIMESTAMP:
+                t = None
+            if t is None:
+                # Older matches (2013 and earlier) don't have timestamps. Estimate
+                # using the event dates instead: quals on the start date, playoffs
+                # on the end date. This is imprecise but good enough for ordering.
+                if match.comp_level == CompLevel.QM:
+                    t = event.start_date
+                else:
+                    t = event.end_date
             if t is None:
                 continue
 

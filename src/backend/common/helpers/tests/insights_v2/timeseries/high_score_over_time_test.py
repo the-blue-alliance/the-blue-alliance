@@ -209,6 +209,114 @@ def test_no_matches_produces_no_insight(ndb_stub) -> None:
     assert insights == []
 
 
+def test_matches_with_no_timestamps_fall_back_to_event_dates(ndb_stub) -> None:
+    # Reproduces prod data for pre-2014 events: post_result_time, actual_time,
+    # and time are all unset. In that case we estimate using event dates:
+    # quals on the start date, playoffs on the end date.
+    Event(
+        id="2013gal",
+        year=2013,
+        event_short="gal",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime.datetime(2013, 3, 1),
+        end_date=datetime.datetime(2013, 3, 3),
+    ).put()
+    Match(
+        id="2013gal_qm1",
+        comp_level=CompLevel.QM,
+        event=ndb.Key(Event, "2013gal"),
+        year=2013,
+        match_number=1,
+        set_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=_alliances_json(100, 80),
+    ).put()
+    Match(
+        id="2013gal_f1m1",
+        comp_level=CompLevel.F,
+        event=ndb.Key(Event, "2013gal"),
+        year=2013,
+        match_number=1,
+        set_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=_alliances_json(150, 80),
+    ).put()
+
+    insights = compute_insights_for_year(2013, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 2
+    assert points[0]["context"]["match_key"] == "2013gal_qm1"
+    assert points[0]["y"] == 100.0
+    assert points[0]["context"]["post_result_time"] == int(
+        datetime.datetime(2013, 3, 1).timestamp()
+    )
+    assert points[1]["context"]["match_key"] == "2013gal_f1m1"
+    assert points[1]["y"] == 150.0
+    assert points[1]["context"]["post_result_time"] == int(
+        datetime.datetime(2013, 3, 3).timestamp()
+    )
+
+
+def test_matches_with_no_timestamps_and_no_event_dates_produce_no_insight(
+    ndb_stub,
+) -> None:
+    # If the event itself has no start/end dates either, we still can't
+    # place the match in time, so it's skipped like before.
+    _put_event("2013gal", 2013)
+    Match(
+        id="2013gal_qm1",
+        comp_level=CompLevel.QM,
+        event=ndb.Key(Event, "2013gal"),
+        year=2013,
+        match_number=1,
+        set_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=_alliances_json(100, 80),
+    ).put()
+
+    insights = compute_insights_for_year(2013, [HighScoreOverTimeV2Calculator()])
+
+    assert insights == []
+
+
+def test_bogus_sentinel_time_falls_back_to_event_dates(ndb_stub) -> None:
+    # Reproduces prod data for some old matches (e.g. 2006nh_f1m1): post_result_time
+    # and actual_time are unset, but `time` holds a bogus pre-FIRST sentinel value
+    # (1900-01-01) instead of being unset. That should be treated as missing, not
+    # used as a real timestamp.
+    Event(
+        id="2006nh",
+        year=2006,
+        event_short="nh",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime.datetime(2006, 3, 1),
+        end_date=datetime.datetime(2006, 3, 3),
+    ).put()
+    Match(
+        id="2006nh_qm1",
+        comp_level=CompLevel.QM,
+        event=ndb.Key(Event, "2006nh"),
+        year=2006,
+        match_number=1,
+        set_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=_alliances_json(100, 80),
+        time=datetime.datetime(1900, 1, 1, 4, 56, 0),
+    ).put()
+
+    insights = compute_insights_for_year(2006, [HighScoreOverTimeV2Calculator()])
+
+    assert len(insights) == 1
+    points = insights[0].data["series"][0]["points"]
+    assert len(points) == 1
+    assert points[0]["context"]["match_key"] == "2006nh_qm1"
+    assert points[0]["context"]["post_result_time"] == int(
+        datetime.datetime(2006, 3, 1).timestamp()
+    )
+
+
 def test_records_across_multiple_events_same_year(ndb_stub) -> None:
     _put_event("2022casj", 2022)
     _put_match("2022casj", 2022, 1, 80, 60, datetime.datetime(2022, 3, 5))
