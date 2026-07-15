@@ -239,7 +239,7 @@ function TeamStatsPage() {
                 setMinYear(value[0]);
                 setMaxYear(value[1]);
               }}
-              minStepsBetweenThumbs={0}
+              minStepsBetweenValues={0}
               step={1}
             />
           </div>
