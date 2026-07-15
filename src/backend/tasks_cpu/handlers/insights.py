@@ -25,6 +25,7 @@ from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.insight_manipulator import InsightManipulator
 from backend.common.manipulators.insight_v2_manipulator import InsightV2Manipulator
 from backend.common.models.insight import Insight, LeaderboardKeyType
+from backend.common.models.insight_v2 import InsightV2
 from backend.common.models.keys import DistrictAbbreviation, Year
 from backend.common.queries.district_query import DistrictsInYearQuery
 
@@ -452,3 +453,28 @@ def do_insights_delete(name: str) -> Response:
     InsightManipulator.delete_keys(old_insight_keys)
 
     return make_response("")
+
+
+@blueprint.route("/backend-tasks-b2/do/math/insights_v2/delete/<name>")
+@blueprint.route(
+    "/backend-tasks-b2/do/math/insights_v2/delete/<name>/<int:year>",
+)
+def do_insights_v2_delete(name: str, year: Optional[Year] = None) -> Response:
+    """
+    Deletes InsightV2 entities by name, optionally scoped to a single year.
+
+    createOrUpdate only upserts insights currently produced by the registry -
+    it never removes entities for a name/year the registry stopped producing
+    (e.g. a calculator that was moved to year=0-only, or newly excluded for a
+    given year). This endpoint is for cleaning up those orphans manually.
+    """
+
+    query = InsightV2.query(InsightV2.name == name)
+    if year is not None:
+        query = query.filter(InsightV2.year == year)
+    old_insight_keys = query.fetch(keys_only=True)
+    InsightV2Manipulator.delete_keys(old_insight_keys)
+
+    return make_response(
+        f"deleted {len(old_insight_keys)} insights_v2 named {escape(name)}"
+    )
