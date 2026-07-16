@@ -445,6 +445,74 @@ def test_bootstrap_event(
     assert award == remove_auto_add_properties(stored_award)
 
 
+def test_bootstrap_event_batches_match_writes(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    """
+    Regression test: bootstrapping an event should write all of its matches in a
+    single batch (one createOrUpdate call over a list), rather than one at a time.
+    A single batch write means MatchManipulator's post-update hook - which itself
+    dedupes stats recalculation per event - only fires once for the whole event,
+    instead of once per match (which used to fan out into N x as many redundant
+    stats-recalc tasks).
+    """
+    event = make_event("2020nyny")
+    matches = [make_match(f"2020nyny_qm{i}") for i in range(1, 4)]
+    for i, match in enumerate(matches, start=1):
+        # make_match() hardcodes match_number/set_number=1; vary them here so
+        # each match's key_name (rendered from comp_level/set/match_number)
+        # actually matches its distinct id, like a real event's matches would.
+        match.match_number = i
+
+    mock_event_detail_url(requests_mock, event)
+    mock_event_teams_url(requests_mock, event.key_name, [])
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
+    mock_event_matches_url(requests_mock, event.key_name, matches)
+    mock_event_rankings_url(requests_mock, event.key_name, [])
+    mock_event_alliances_url(requests_mock, event.key_name, [])
+    mock_event_awards_url(requests_mock, event.key_name, [])
+    mock_event_predictions_url(
+        requests_mock,
+        event.key_name,
+        {
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
+    )
+    mock_event_district_points_url(requests_mock, event.key_name)
+
+    resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
+    assert resp == "/event/2020nyny"
+
+    for match in matches:
+        stored_match = Match.get_by_id(match.key_name)
+        assert match == remove_auto_add_properties(stored_match)
+
+    # All 3 matches should have been written in a single batch, resulting in a
+    # single MatchManipulator post-update-hook task (not one per match).
+    hook_tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    match_hook_tasks = [t for t in hook_tasks if "MatchManipulator" in t.url]
+    assert len(match_hook_tasks) == 1
+
+    for task in match_hook_tasks:
+        run_from_task(task)
+
+    # Regardless of match count, stats recalculation should only be enqueued
+    # once for the event, not once per match.
+    stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="stats")
+    tasks_urls = [t.url for t in stats_tasks]
+    for expected_url in (
+        "/tasks/math/do/playoff_advancement_update/2020nyny",
+        "/tasks/math/do/event_team_status/2020nyny",
+        "/tasks/math/do/district_points_calc/2020nyny",
+        "/tasks/math/do/event_matchstats/2020nyny",
+    ):
+        assert tasks_urls.count(expected_url) == 1
+
+
 def test_bootstrap_year(
     ndb_context, requests_mock: RequestsMocker, taskqueue_stub
 ) -> None:
