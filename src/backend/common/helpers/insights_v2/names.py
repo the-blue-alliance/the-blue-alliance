@@ -72,3 +72,15 @@ class InsightV2Names:
     HIGH_SCORE_OVER_TIME = InsightV2NameEntry(
         "high_score_over_time", "High Score Over Time"
     )
+    AVERAGE_MATCH_SCORE_BY_WEEK = InsightV2NameEntry(
+        "match_averages_by_week", "Average Match Score By Week"
+    )
+    AVERAGE_ELIM_MATCH_SCORE_BY_WEEK = InsightV2NameEntry(
+        "elim_match_averages_by_week", "Average Elim Match Score By Week"
+    )
+    AVERAGE_WIN_MARGIN_BY_WEEK = InsightV2NameEntry(
+        "match_average_margins_by_week", "Average Win Margin By Week"
+    )
+    AVERAGE_ELIM_WIN_MARGIN_BY_WEEK = InsightV2NameEntry(
+        "elim_match_average_margins_by_week", "Average Elim Win Margin By Week"
+    )
