@@ -15,7 +15,7 @@
     "firedux": "^1.1.0",
     "heatmap.js": "^2.0.5",
     "less-loader": "^13.0.0",
-    "prettier": "^3.9.4",
+    "prettier": "^3.9.5",
     "prop-types": "^15.8.1",
     "query-string": "^9.4.1",
     "react": "^19.2.7",
