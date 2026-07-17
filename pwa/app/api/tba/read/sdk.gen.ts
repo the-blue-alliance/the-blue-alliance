@@ -81,6 +81,9 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleErrors,
   GetEventMatchesSimpleResponses,
+  GetEventNexusInfoData,
+  GetEventNexusInfoErrors,
+  GetEventNexusInfoResponses,
   GetEventOprsData,
   GetEventOprsErrors,
   GetEventOprsResponses,
@@ -334,6 +337,9 @@ import {
   zGetEventMatchesSimpleHeaders,
   zGetEventMatchesSimplePath,
   zGetEventMatchesSimpleResponse,
+  zGetEventNexusInfoHeaders,
+  zGetEventNexusInfoPath,
+  zGetEventNexusInfoResponse,
   zGetEventOprsHeaders,
   zGetEventOprsPath,
   zGetEventOprsResponse,
@@ -1264,6 +1270,37 @@ export const getEventMatchTimeseries = <ThrowOnError extends boolean = false>(
       await zGetEventMatchTimeseriesResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/matches/timeseries',
+    ...options,
+  });
+
+/**
+ * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
+ */
+export const getEventNexusInfo = <ThrowOnError extends boolean = false>(
+  options: Options<GetEventNexusInfoData, ThrowOnError>,
+): RequestResult<
+  GetEventNexusInfoResponses,
+  GetEventNexusInfoErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventNexusInfoResponses,
+    GetEventNexusInfoErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventNexusInfoHeaders.optional(),
+          path: zGetEventNexusInfoPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventNexusInfoResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/nexus_info',
     ...options,
   });
 

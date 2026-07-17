@@ -10,6 +10,10 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.nexus_info_converter import (
+    event_queue_status_to_api,
+    NexusInfoDict,
+)
 from backend.api.handlers.helpers.profiled_jsonify import (
     profiled_jsonify,
     TypedFlaskResponse,
@@ -20,6 +24,9 @@ from backend.common.decorators import cached_public
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    EventNexusQueueStatusMemcache,
+)
 from backend.common.models.keys import EventKey
 from backend.common.queries.award_query import EventAwardsQuery
 from backend.common.queries.dict_converters.award_converter import AwardDict
@@ -237,6 +244,25 @@ def event_awards(event_key: EventKey) -> TypedFlaskResponse[list[AwardDict]]:
 
     awards = EventAwardsQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
     return profiled_jsonify(awards)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
+def event_nexus_info(
+    event_key: EventKey,
+) -> TypedFlaskResponse[Optional[NexusInfoDict]]:
+    """
+    Returns live match queuing info from Nexus for a given event, or null if
+    no data is currently available.
+    """
+    track_call_after_response("event/nexus_info", event_key)
+
+    queue_status = EventNexusQueueStatusMemcache(event_key).get()
+    nexus_info: Optional[NexusInfoDict] = (
+        event_queue_status_to_api(queue_status) if queue_status is not None else None
+    )
+    return profiled_jsonify(nexus_info)
 
 
 @api_authenticated
