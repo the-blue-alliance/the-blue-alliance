@@ -23,6 +23,11 @@ describe.concurrent('createQueryClient', () => {
     expect(STALE_TIME.STATUS).toBeGreaterThan(STALE_TIME.HISTORICAL);
   });
 
+  test('STALE_TIME.SEARCH_INDEX is one day', () => {
+    expect(STALE_TIME.SEARCH_INDEX).toEqual(24 * 60 * 60 * 1000);
+    expect(STALE_TIME.SEARCH_INDEX).toBeGreaterThan(STALE_TIME.STATUS);
+  });
+
   test('retry predicate skips 4xx ApiErrors', () => {
     const queryClient = createQueryClient();
     const retry = queryClient.getDefaultOptions().queries?.retry;

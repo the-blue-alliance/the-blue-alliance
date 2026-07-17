@@ -16,6 +16,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { STALE_TIME } from '~/lib/queryClient';
 
 export interface TeamTooltipProps {
   teamKey: string;
@@ -36,7 +37,10 @@ export function TeamLinkWithTooltip({
   ...props
 }: TeamTooltipProps & Omit<ComponentProps<typeof TeamLink>, 'teamOrKey'>) {
   const teamNumber = teamKey.substring(3);
-  const { data: searchIndex } = useQuery(getSearchIndexOptions({}));
+  const { data: searchIndex } = useQuery({
+    ...getSearchIndexOptions({}),
+    staleTime: STALE_TIME.SEARCH_INDEX,
+  });
   const teamName = useMemo(
     () => searchIndex?.teams.find((t) => t.key === teamKey)?.nickname,
     [searchIndex, teamKey],
@@ -102,7 +106,10 @@ export function TeamTooltip({
     getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
   );
 
-  const { data: searchIndex } = useSuspenseQuery(getSearchIndexOptions({}));
+  const { data: searchIndex } = useSuspenseQuery({
+    ...getSearchIndexOptions({}),
+    staleTime: STALE_TIME.SEARCH_INDEX,
+  });
 
   const team = useMemo(
     () => searchIndex && searchIndex.teams.find((t) => t.key === teamKey),
