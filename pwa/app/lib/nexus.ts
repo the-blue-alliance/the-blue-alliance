@@ -1,5 +1,6 @@
 import { queryOptions } from '@tanstack/react-query';
 import { createServerFn } from '@tanstack/react-start';
+import { z } from 'zod';
 
 import { pullLiveEventStatus } from '~/api/nexus/sdk.gen';
 import type { EventStatus } from '~/api/nexus/types.gen';
@@ -139,7 +140,7 @@ export async function fetchNexusEventStatusHandler(
 }
 
 export const fetchNexusEventStatus = createServerFn({ method: 'GET' })
-  .inputValidator((eventKey: string) => eventKey)
+  .validator(z.string())
   .handler(({ data: eventKey }) => fetchNexusEventStatusHandler(eventKey));
 
 export const getNexusEventStatusQueryKey = (eventKey: string) =>

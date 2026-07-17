@@ -128,16 +128,6 @@ export const Route = createRootRouteWithContext<{
       currentSeason: status.current_season ?? Temporal.Now.plainDateISO().year,
     };
   },
-  loader: () => ({
-    renderTime: Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-    }),
-  }),
   head: ({ matches }) => ({
     meta: [
       {
@@ -172,12 +162,6 @@ export const Route = createRootRouteWithContext<{
         rel: 'stylesheet',
         href: appCss,
       },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossOrigin: 'anonymous',
-      },
       { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'apple-touch-icon', href: appleTouchIcon180 },
       ...APPLE_SPLASH_STARTUP_LINKS,
@@ -190,7 +174,6 @@ const FULLSCREEN_ROUTES = ['/gameday'];
 const FULLWIDTH_ROUTES = ['/match_suggestion'];
 
 function RootComponent() {
-  const { renderTime } = Route.useLoaderData();
   const { pathname } = useLocation();
 
   // Set data-hydrated on <body> after React mounts so Playwright tests can
@@ -249,7 +232,7 @@ function RootComponent() {
                       </div>
                     </div>
                   </TOCRendererProvider>
-                  <Footer renderTime={renderTime} />
+                  <Footer />
                 </div>
               )}
             </AuthContextProvider>
