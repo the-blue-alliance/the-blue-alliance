@@ -41,6 +41,9 @@ export function useMyTBA(
       if (!user) throw new Error('User not authenticated');
       const token = await user.getIdToken();
       const response = await listFavorites({ auth: token });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -52,6 +55,9 @@ export function useMyTBA(
       if (!user) throw new Error('User not authenticated');
       const token = await user.getIdToken();
       const response = await listSubscriptions({ auth: token });
+      if (response.data === undefined) {
+        throw new Error('Failed to load subscriptions');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -69,7 +75,7 @@ export function useMyTBA(
     return sub?.notifications ?? [];
   }, [subscriptions, modelKey]);
 
-  const mutation = useMutation({
+  const { mutate, isPending } = useMutation({
     mutationFn: async ({
       favorite,
       notifs,
@@ -150,14 +156,14 @@ export function useMyTBA(
   });
 
   const toggleFavorite = useCallback(() => {
-    mutation.mutate({ favorite: !isFavorite, notifs: notifications });
-  }, [mutation, isFavorite, notifications]);
+    mutate({ favorite: !isFavorite, notifs: notifications });
+  }, [mutate, isFavorite, notifications]);
 
   const setPreferences = useCallback(
     (favorite: boolean, notifs: NotificationType[]) => {
-      mutation.mutate({ favorite, notifs });
+      mutate({ favorite, notifs });
     },
-    [mutation],
+    [mutate],
   );
 
   return {
@@ -165,6 +171,6 @@ export function useMyTBA(
     notifications,
     toggleFavorite,
     setPreferences,
-    isPending: mutation.isPending,
+    isPending,
   };
 }

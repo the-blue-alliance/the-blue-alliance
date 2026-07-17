@@ -37,12 +37,12 @@ export const Route = createFileRoute(
 )({
   loader: async ({ params }) => {
     const [history, insights] = await Promise.all([
-      await getDistrictHistory({
+      getDistrictHistory({
         path: {
           district_abbreviation: params.districtAbbreviation,
         },
       }),
-      await getDistrictInsights({
+      getDistrictInsights({
         path: {
           district_abbreviation: params.districtAbbreviation,
         },

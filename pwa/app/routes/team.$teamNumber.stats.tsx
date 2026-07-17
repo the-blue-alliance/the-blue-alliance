@@ -165,14 +165,9 @@ function TeamStatsPage() {
     ),
   });
 
-  const matchQueriesNumLoaded = useMemo(() => {
-    return matchQueries.filter((q) => q.isSuccess).length;
-  }, [matchQueries]);
+  const matchQueriesNumLoaded = matchQueries.filter((q) => q.isSuccess).length;
 
-  const allMatchesByYear = useMemo(
-    () => matchQueries.map((q) => q.data ?? []),
-    [matchQueries],
-  );
+  const allMatchesByYear = matchQueries.map((q) => q.data ?? []);
 
   const usedMatches = useMemo(() => {
     const eventKeys = new Set(usedEvents.map((event) => event.key));

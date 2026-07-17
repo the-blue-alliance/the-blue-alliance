@@ -1,4 +1,6 @@
 import { fixupPluginRules, includeIgnoreFile } from '@eslint/compat';
+import pluginQuery from '@tanstack/eslint-plugin-query';
+import pluginRouter from '@tanstack/eslint-plugin-router';
 import tsParser from '@typescript-eslint/parser';
 import eslintConfigPrettier from 'eslint-config-prettier/flat';
 import importPlugin from 'eslint-plugin-import';
@@ -53,7 +55,6 @@ export default tseslint.config([
       '@typescript-eslint/no-non-null-assertion': ['error'],
       '@typescript-eslint/no-throw-literal': 'off',
       '@typescript-eslint/restrict-template-expressions': 'off',
-      '@typescript-eslint/await-thenable': 'off',
     },
   },
 
@@ -114,6 +115,26 @@ export default tseslint.config([
       'react-hooks/exhaustive-deps': 'warn',
     },
   },
+
+  // TanStack Query
+  ...pluginQuery.configs['flat/recommended'],
+  {
+    rules: {
+      // Firebase Auth `user` is keyed by `user?.uid`; the User object itself is not
+      // serializable and must not be placed in the queryKey.
+      '@tanstack/query/exhaustive-deps': [
+        'error',
+        {
+          allowlist: {
+            variables: ['user'],
+          },
+        },
+      ],
+    },
+  },
+
+  // TanStack Router
+  ...pluginRouter.configs['flat/recommended'],
 
   // Node
   {

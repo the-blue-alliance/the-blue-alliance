@@ -60,27 +60,27 @@ export const Route = createFileRoute(
 
     const [districtHistory, rankings, teams, events, awards] =
       await Promise.all([
-        await getDistrictHistory({
+        getDistrictHistory({
           path: {
             district_abbreviation: params.districtAbbreviation,
           },
         }),
-        await getDistrictRankings({
+        getDistrictRankings({
           path: {
             district_key: `${year}${params.districtAbbreviation}`,
           },
         }),
-        await getDistrictTeams({
+        getDistrictTeams({
           path: {
             district_key: `${year}${params.districtAbbreviation}`,
           },
         }),
-        await getDistrictEvents({
+        getDistrictEvents({
           path: {
             district_key: `${year}${params.districtAbbreviation}`,
           },
         }),
-        await getDistrictAwards({
+        getDistrictAwards({
           path: {
             district_key: `${year}${params.districtAbbreviation}`,
           },

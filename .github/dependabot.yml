@@ -51,9 +51,6 @@ updates:
       patterns:
         - "embla-carousel-autoplay"
         - "embla-carousel-react"
-    radix-ui:
-      patterns:
-        - "@radix-ui/*"
     vite:
       patterns:
         - "vite"
@@ -82,6 +79,8 @@ updates:
         - "prettier-plugin-merge"
         - "prettier-plugin-tailwindcss"
         - "@trivago/prettier-plugin-sort-imports"
+        - "@tanstack/eslint-plugin-query"
+        - "@tanstack/eslint-plugin-router"
     sentry:
       patterns:
         - "@sentry/*"

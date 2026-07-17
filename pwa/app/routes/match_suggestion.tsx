@@ -167,7 +167,7 @@ function TeamDetails({
     getTeamEventsByYearOptions({ path: { team_key: teamKey, year: 2026 } }),
   );
   const eventOprsQuery = useQuery({
-    queryKey: ['eventOprs', teamKey, 2026],
+    queryKey: ['eventOprs', teamKey, 2026, teamEventsByYearQuery.data],
     enabled: !!teamEventsByYearQuery.data,
     queryFn: async () => {
       const results = await Promise.all(
