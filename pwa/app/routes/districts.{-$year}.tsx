@@ -16,6 +16,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { staleTimeForYear } from '~/lib/queryClient';
 import {
   parseParamsForYearElseDefault,
   publicCacheControlHeaders,
@@ -29,17 +30,21 @@ export const Route = createFileRoute('/districts/{-$year}')({
       throw notFound();
     }
 
-    const districts = await queryClient.ensureQueryData(
-      getDistrictsByYearOptions({ path: { year } }),
-    );
+    const yearStaleTime = staleTimeForYear(year);
+
+    const districts = await queryClient.ensureQueryData({
+      ...getDistrictsByYearOptions({ path: { year } }),
+      staleTime: yearStaleTime,
+    });
 
     await Promise.all(
       districts.map((district) =>
-        queryClient.ensureQueryData(
-          getDistrictTeamsKeysOptions({
+        queryClient.ensureQueryData({
+          ...getDistrictTeamsKeysOptions({
             path: { district_key: district.key },
           }),
-        ),
+          staleTime: yearStaleTime,
+        }),
       ),
     );
 
@@ -76,8 +81,10 @@ export const Route = createFileRoute('/districts/{-$year}')({
 
 function DistrictsPage() {
   const { year } = Route.useLoaderData();
+  const yearStaleTime = staleTimeForYear(year);
   const { data: districts } = useSuspenseQuery({
     ...getDistrictsByYearOptions({ path: { year } }),
+    staleTime: yearStaleTime,
   });
   const validYears = useValidYears();
   const sortedDistricts = useMemo(
@@ -89,9 +96,10 @@ function DistrictsPage() {
   );
 
   const teamKeyResults = useSuspenseQueries({
-    queries: districts.map((district) =>
-      getDistrictTeamsKeysOptions({ path: { district_key: district.key } }),
-    ),
+    queries: districts.map((district) => ({
+      ...getDistrictTeamsKeysOptions({ path: { district_key: district.key } }),
+      staleTime: yearStaleTime,
+    })),
   });
 
   const teamCountByDistrict = useMemo(() => {
