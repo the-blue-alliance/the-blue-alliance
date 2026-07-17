@@ -80,6 +80,8 @@
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.3.2",
+    "@tanstack/eslint-plugin-query": "5.101.2",
+    "@tanstack/eslint-plugin-router": "1.162.0",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
     "@types/babel__core": "7.20.5",
     "@types/compression": "1.8.1",

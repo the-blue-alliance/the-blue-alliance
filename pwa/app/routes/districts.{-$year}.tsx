@@ -102,13 +102,15 @@ function DistrictsPage() {
     })),
   });
 
+  const teamKeyCounts = teamKeyResults.map((result) => result.data.length);
+
   const teamCountByDistrict = useMemo(() => {
     const map = new Map<string, number>();
     districts.forEach((district, i) => {
-      map.set(district.key, teamKeyResults[i].data.length);
+      map.set(district.key, teamKeyCounts[i]);
     });
     return map;
-  }, [districts, teamKeyResults]);
+  }, [districts, teamKeyCounts]);
 
   return (
     <div className="py-8">
