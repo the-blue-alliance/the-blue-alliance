@@ -126,6 +126,48 @@ With all that said... There are various levels of caching available when making 
    - This is what the prod site does
    - But TanStack Router / React don't support this extremely well out of the box
 
+### `staleTime` policy
+
+TanStack Query is the cache that matters most for perceived freshness — the other
+layers above are transport optimizations underneath it. `staleTime` defaults to `0`
+in TanStack Query, which means data is considered stale the instant it arrives; left
+unset, this caused every `useSuspenseQuery` to refetch immediately on hydration, even
+though the server had just sent the same data moments earlier.
+
+The policy is centralized in `app/lib/queryClient.ts` and applied via `createQueryClient()`
+(wired into the router in `app/router.tsx`):
+
+- **Default: `staleTime: 60_000`** (~60s) on every query, anchored to the TBA API's own
+  `cache-control: max-age=61` header — this is the single default `defaultOptions.queries.staleTime`
+  set on the `QueryClient`.
+- **Historical data: `staleTimeForYear(year)`**, which returns a 1-hour `staleTime` for any past
+  calendar year (comparing against `Temporal.Now.plainDateISO().year`, deliberately not the
+  `/status` API's `current_season`, to avoid deepening that dependency) and falls back to the 60s
+  default for the current year. Applied today on the event page (`event.$eventKey.tsx`), the
+  team-year page (`team.$teamNumber.{-$year}.tsx`), and the districts list page
+  (`districts.{-$year}.tsx`); other year-scoped routes still inherit the 60s default.
+- **Live data keeps its own `staleTime`/`refetchInterval`** and is unaffected by the above — e.g.
+  the district champs page (`district.$districtAbbreviation.champs.$year.tsx`) polls on a
+  `refetchInterval` independent of `staleTime`, and Nexus/Firebase-backed queries
+  (`app/lib/nexus.ts`, `app/lib/gameday/useFirebaseWebcasts.ts`) keep their own shorter or
+  `Infinity` values.
+
+The generated `<name>Options()` helpers (from `hey-api`) return plain objects, so overrides
+compose by spreading:
+
+```ts
+useSuspenseQuery({
+  ...getEventOptions({ path: { event_key: eventKey } }),
+  staleTime: staleTimeForYear(year),
+});
+```
+
+A few routes still fetch data directly with the generated SDK functions instead of going through
+the `QueryClient` (e.g. `team.$teamNumber.stats.tsx`, `district.$districtAbbreviation.stats.tsx`,
+`district.$districtAbbreviation.{-$year}.tsx`, `district.$districtAbbreviation.insights.tsx`,
+`teams.{-$pgNum}.tsx`). Those routes get no benefit from `staleTime` until they're converted to use
+`ensureQueryData`/`useSuspenseQuery`; that conversion is tracked separately.
+
 ## Styling
 
 TBA Beta uses [TailwindCSS](https://tailwindcss.com/) and [ShadCN](https://ui.shadcn.com/) components.

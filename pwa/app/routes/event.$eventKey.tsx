@@ -162,6 +162,7 @@ import {
   getDefaultTeleopComponentName,
   getDefaultTotalComponentName,
 } from '~/lib/oprUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import {
   RANKING_POINT_LABELS,
   getBonusRankingPoints,
@@ -182,42 +183,52 @@ export const Route = createFileRoute('/event/$eventKey')({
       throw notFound();
     }
 
+    // Event keys are prefixed with their 4-digit year (e.g. "2024mil"), so we
+    // can determine the staleTime tier without waiting on the event fetch.
+    const eventYear = Number(params.eventKey.slice(0, 4));
+    const eventStaleTime = staleTimeForYear(eventYear);
+
     // spawn these now, we don't need to await them yet though
     const matchesQuery = queryClient
-      .ensureQueryData(
-        getEventMatchesOptions({ path: { event_key: params.eventKey } }),
-      )
+      .ensureQueryData({
+        ...getEventMatchesOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
       .catch(() => []);
     const alliancesQuery = queryClient
-      .ensureQueryData(
-        getEventAlliancesOptions({ path: { event_key: params.eventKey } }),
-      )
+      .ensureQueryData({
+        ...getEventAlliancesOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
       .catch(() => []);
     const nexusQuery = queryClient
       .ensureQueryData(getNexusEventStatusOptions(params.eventKey))
       .catch(() => null);
 
     const event = await queryClient
-      .ensureQueryData(
-        getEventOptions({ path: { event_key: params.eventKey } }),
-      )
+      .ensureQueryData({
+        ...getEventOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
       .catch(doThrowNotFound);
 
     // Greedily kick off parent/division event fetches so the dropdowns
     // render immediately and populate client-side as data arrives.
     if (event.parent_event_key) {
       void queryClient
-        .ensureQueryData(
-          getEventOptions({ path: { event_key: event.parent_event_key } }),
-        )
+        .ensureQueryData({
+          ...getEventOptions({ path: { event_key: event.parent_event_key } }),
+          staleTime: eventStaleTime,
+        })
         .then((parentEvent) => {
           // Also kick off sibling division fetches
           for (const key of parentEvent.division_keys) {
             if (key !== params.eventKey) {
               void queryClient
-                .ensureQueryData(
-                  getEventSimpleOptions({ path: { event_key: key } }),
-                )
+                .ensureQueryData({
+                  ...getEventSimpleOptions({ path: { event_key: key } }),
+                  staleTime: eventStaleTime,
+                })
                 .catch(() => undefined);
             }
           }
@@ -226,7 +237,10 @@ export const Route = createFileRoute('/event/$eventKey')({
     }
     for (const key of event.division_keys) {
       void queryClient
-        .ensureQueryData(getEventSimpleOptions({ path: { event_key: key } }))
+        .ensureQueryData({
+          ...getEventSimpleOptions({ path: { event_key: key } }),
+          staleTime: eventStaleTime,
+        })
         .catch(() => undefined);
     }
 
@@ -308,58 +322,74 @@ export const Route = createFileRoute('/event/$eventKey')({
 function EventPage() {
   const { eventKey } = Route.useLoaderData();
 
-  const { data: event } = useSuspenseQuery(
-    getEventOptions({ path: { event_key: eventKey } }),
-  );
+  // Event keys are prefixed with their 4-digit year (e.g. "2024mil").
+  const eventStaleTime = staleTimeForYear(Number(eventKey.slice(0, 4)));
 
-  const { data: matches } = useSuspenseQuery(
-    getEventMatchesOptions({ path: { event_key: eventKey } }),
-  );
+  const { data: event } = useSuspenseQuery({
+    ...getEventOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const { data: unsafeAlliances } = useSuspenseQuery(
-    getEventAlliancesOptions({ path: { event_key: eventKey } }),
-  );
+  const { data: matches } = useSuspenseQuery({
+    ...getEventMatchesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+
+  const { data: unsafeAlliances } = useSuspenseQuery({
+    ...getEventAlliancesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
   const alliances = unsafeAlliances ?? [];
 
-  const awardsQuery = useQuery(
-    getEventAwardsOptions({ path: { event_key: eventKey } }),
-  );
+  const awardsQuery = useQuery({
+    ...getEventAwardsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const coprsQuery = useQuery(
-    getEventCoprsOptions({ path: { event_key: eventKey } }),
-  );
+  const coprsQuery = useQuery({
+    ...getEventCoprsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
   const colorsQuery = useQuery({
     queryKey: ['eventColors', eventKey],
     queryFn: () => getEventColors({ eventKey: eventKey }),
+    staleTime: eventStaleTime,
   });
 
-  const rankingsQuery = useQuery(
-    getEventRankingsOptions({ path: { event_key: eventKey } }),
-  );
+  const rankingsQuery = useQuery({
+    ...getEventRankingsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const teamsQuery = useQuery(
-    getEventTeamsOptions({ path: { event_key: eventKey } }),
-  );
+  const teamsQuery = useQuery({
+    ...getEventTeamsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const teamMediaQuery = useQuery(
-    getEventTeamMediaOptions({ path: { event_key: eventKey } }),
-  );
+  const teamMediaQuery = useQuery({
+    ...getEventTeamMediaOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const teamStatusesQuery = useQuery(
-    getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
-  );
+  const teamStatusesQuery = useQuery({
+    ...getEventTeamsStatusesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const districtPointsQuery = useQuery(
-    getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
-  );
+  const districtPointsQuery = useQuery({
+    ...getEventDistrictPointsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
-  const regionalChampsPoolPointsQuery = useQuery(
-    getRegionalChampsPoolPointsOptions({ path: { event_key: eventKey } }),
-  );
+  const regionalChampsPoolPointsQuery = useQuery({
+    ...getRegionalChampsPoolPointsOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
 
   const regionalAdvancementQuery = useQuery({
     ...getRegionalAdvancementOptions({ path: { year: event.year } }),
+    staleTime: eventStaleTime,
     enabled: event.event_type === EventType.REGIONAL,
   });
 
@@ -368,6 +398,7 @@ function EventPage() {
     ...getEventOptions({
       path: { event_key: event.parent_event_key ?? '' },
     }),
+    staleTime: eventStaleTime,
     enabled: event.parent_event_key !== null,
   });
 
@@ -381,9 +412,10 @@ function EventPage() {
   );
 
   const siblingDivisionQueries = useQueries({
-    queries: siblingDivisionKeys.map((key) =>
-      getEventSimpleOptions({ path: { event_key: key } }),
-    ),
+    queries: siblingDivisionKeys.map((key) => ({
+      ...getEventSimpleOptions({ path: { event_key: key } }),
+      staleTime: eventStaleTime,
+    })),
   });
 
   const siblingEvents = siblingDivisionQueries
@@ -392,9 +424,10 @@ function EventPage() {
 
   // For parent events: fetch each division event
   const ownDivisionQueries = useQueries({
-    queries: event.division_keys.map((key) =>
-      getEventSimpleOptions({ path: { event_key: key } }),
-    ),
+    queries: event.division_keys.map((key) => ({
+      ...getEventSimpleOptions({ path: { event_key: key } }),
+      staleTime: eventStaleTime,
+    })),
   });
 
   const ownDivisionEvents = ownDivisionQueries

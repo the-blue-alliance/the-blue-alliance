@@ -1,5 +1,4 @@
 import * as Sentry from '@sentry/tanstackstart-react';
-import { QueryClient } from '@tanstack/react-query';
 import { ParsedLocation, createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { logEvent } from 'firebase/analytics';
@@ -10,7 +9,7 @@ import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
 
 import { Button } from '~/components/ui/button';
 import { analytics } from '~/firebase/firebaseConfig';
-import { ApiError } from '~/lib/apiError';
+import { createQueryClient } from '~/lib/queryClient';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
 import { routeTree } from '~/routeTree.gen';
@@ -19,25 +18,7 @@ const queryCacheLogger = createLogger('queryCache');
 const routerLogger = createLogger('router');
 
 export function getRouter() {
-  // Don't retry 4xx responses — they indicate a client or data error (e.g. 404
-  // "not found") that won't resolve on retry. Retrying them causes unnecessary
-  // background re-renders for the full exponential-backoff window (~10s).
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        retry: (failureCount, error) => {
-          if (
-            error instanceof ApiError &&
-            error.status >= 400 &&
-            error.status < 500
-          ) {
-            return false;
-          }
-          return failureCount < 3;
-        },
-      },
-    },
-  });
+  const queryClient = createQueryClient();
   queryClient.getQueryCache().subscribe((event) => {
     // Only log "added" events (new queries) and "updated" events when query completes successfully
     // This reduces noise from intermediate state transitions (loading states)

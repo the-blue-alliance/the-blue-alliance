@@ -76,6 +76,7 @@ import {
   getTeamsUnpenalizedHighScore,
 } from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import {
   MODEL_TYPE,
   addRecords,
@@ -102,11 +103,14 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       throw notFound();
     }
 
+    const yearStaleTime = staleTimeForYear(year);
+
     // spawn these now, we don't need to await them yet though
     const teamMediaQuery = queryClient
-      .ensureQueryData(
-        getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamSocialsQuery = queryClient
       .ensureQueryData(
@@ -114,26 +118,30 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       )
       .catch(() => ({}));
     const teamMatchesQuery = queryClient
-      .ensureQueryData(
-        getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamStatusesQuery = queryClient
-      .ensureQueryData(
-        getTeamEventsStatusesByYearOptions({
+      .ensureQueryData({
+        ...getTeamEventsStatusesByYearOptions({
           path: { team_key: teamKey, year },
         }),
-      )
+        staleTime: yearStaleTime,
+      })
       .catch(() => ({}));
     const teamAwardsQuery = queryClient
-      .ensureQueryData(
-        getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamEventsQuery = queryClient
-      .ensureQueryData(
-        getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamDistrictsQuery = queryClient
       .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
@@ -247,31 +255,39 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
 function TeamPage(): React.JSX.Element {
   const { teamKey, year } = Route.useLoaderData();
+  const yearStaleTime = staleTimeForYear(year);
 
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key: teamKey } }),
   );
-  const { data: media } = useSuspenseQuery(
-    getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-  );
+  const { data: media } = useSuspenseQuery({
+    ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
   const { data: socials } = useSuspenseQuery(
     getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
   );
   const { data: yearsParticipated } = useSuspenseQuery(
     getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
   );
-  const { data: events } = useSuspenseQuery(
-    getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: matches } = useSuspenseQuery(
-    getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: statuses } = useSuspenseQuery(
-    getTeamEventsStatusesByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: awards } = useSuspenseQuery(
-    getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
-  );
+  const { data: events } = useSuspenseQuery({
+    ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const { data: matches } = useSuspenseQuery({
+    ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const { data: statuses } = useSuspenseQuery({
+    ...getTeamEventsStatusesByYearOptions({
+      path: { team_key: teamKey, year },
+    }),
+    staleTime: yearStaleTime,
+  });
+  const { data: awards } = useSuspenseQuery({
+    ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
   const { data: districts } = useSuspenseQuery(
     getTeamDistrictsOptions({ path: { team_key: teamKey } }),
   );
@@ -282,6 +298,7 @@ function TeamPage(): React.JSX.Element {
     ...getDistrictRankingsOptions({
       path: { district_key: currentDistrict?.key ?? '' },
     }),
+    staleTime: yearStaleTime,
     enabled: !!currentDistrict,
   });
 
@@ -291,6 +308,7 @@ function TeamPage(): React.JSX.Element {
 
   const { data: regionalRankings } = useQuery({
     ...getRegionalRankingsOptions({ path: { year } }),
+    staleTime: yearStaleTime,
     enabled: !currentDistrict,
   });
 
@@ -304,6 +322,7 @@ function TeamPage(): React.JSX.Element {
 
   const { data: regionalAdvancement } = useQuery({
     ...getRegionalAdvancementOptions({ path: { year } }),
+    staleTime: yearStaleTime,
     enabled: hasRegionalEvents,
   });
 
@@ -319,6 +338,7 @@ function TeamPage(): React.JSX.Element {
   const eventDistrictPtsQueries = useQueries({
     queries: sortedEvents.map((e) => ({
       ...getEventDistrictPointsOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
       enabled: DISTRICT_EVENT_TYPES.has(e.event_type),
     })),
     combine: (results) =>
@@ -332,6 +352,7 @@ function TeamPage(): React.JSX.Element {
   const regionalPoolPtsQueries = useQueries({
     queries: sortedEvents.map((e) => ({
       ...getRegionalChampsPoolPointsOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
       enabled: e.event_type === EventType.REGIONAL,
     })),
     combine: (results) =>
@@ -343,9 +364,10 @@ function TeamPage(): React.JSX.Element {
       ),
   });
   const eventAlliancesQueries = useQueries({
-    queries: sortedEvents.map((e) =>
-      getEventAlliancesOptions({ path: { event_key: e.key } }),
-    ),
+    queries: sortedEvents.map((e) => ({
+      ...getEventAlliancesOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
+    })),
     combine: (results) =>
       Object.fromEntries(
         results.map((result, index) => [
