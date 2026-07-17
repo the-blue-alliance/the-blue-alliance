@@ -17,6 +17,12 @@ describe.concurrent('createQueryClient', () => {
     );
   });
 
+  test('STALE_TIME.STATUS is longer than STALE_TIME.HISTORICAL', () => {
+    // /status changes at most a few times a year, so it should be held even
+    // longer than "historical" (immutable past season) data.
+    expect(STALE_TIME.STATUS).toBeGreaterThan(STALE_TIME.HISTORICAL);
+  });
+
   test('retry predicate skips 4xx ApiErrors', () => {
     const queryClient = createQueryClient();
     const retry = queryClient.getDefaultOptions().queries?.retry;

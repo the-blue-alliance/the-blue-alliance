@@ -24,8 +24,8 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/districts/{-$year}')({
-  loader: async ({ params, context: { queryClient } }) => {
-    const year = await parseParamsForYearElseDefault(queryClient, params);
+  loader: async ({ params, context: { queryClient, currentSeason } }) => {
+    const year = parseParamsForYearElseDefault(currentSeason, params);
     if (year === undefined) {
       throw notFound();
     }

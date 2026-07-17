@@ -90,10 +90,10 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
-  loader: async ({ params, context: { queryClient } }) => {
+  loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const startTime = Temporal.Now.instant().epochMilliseconds;
     const teamKey = `frc${params.teamNumber}`;
-    const year = await parseParamsForYearElseDefault(queryClient, params);
+    const year = parseParamsForYearElseDefault(currentSeason, params);
 
     Sentry.metrics.count('team.page.view', 1, {
       attributes: { team_number: params.teamNumber, year },

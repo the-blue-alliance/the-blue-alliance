@@ -1,4 +1,4 @@
-import { QueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
 import pino from 'pino';
@@ -9,9 +9,13 @@ import { Temporal } from 'temporal-polyfill';
 import { WltRecord } from '~/api/tba/read';
 import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { RequestResult } from '~/api/tba/read/client';
+import { STALE_TIME } from '~/lib/queryClient';
 
 export function useValidYears() {
-  const { data: status } = useSuspenseQuery(getStatusOptions({}));
+  const { data: status } = useSuspenseQuery({
+    ...getStatusOptions({}),
+    staleTime: STALE_TIME.STATUS,
+  });
   return Array.from(
     { length: status.max_season - 1992 + 1 },
     (_, i) => status.max_season - i,
@@ -45,15 +49,14 @@ export function slugify(str: string): string {
     .replace(/-+$/, '');
 }
 
-export async function parseParamsForYearElseDefault(
-  queryClient: QueryClient,
+export function parseParamsForYearElseDefault(
+  currentSeason: number,
   params: {
     year?: string | undefined;
   },
-): Promise<number | undefined> {
+): number | undefined {
   if (params.year === undefined) {
-    const status = await queryClient.ensureQueryData(getStatusOptions({}));
-    return status.current_season;
+    return currentSeason;
   }
 
   const year = Number(params.year);

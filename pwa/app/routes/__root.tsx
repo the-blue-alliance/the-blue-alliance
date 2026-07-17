@@ -14,6 +14,7 @@ import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
+import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { client } from '~/api/tba/read/client.gen';
 import { AuthContextProvider } from '~/components/tba/auth/auth';
 import { MatchModal } from '~/components/tba/match/matchModal';
@@ -26,6 +27,7 @@ import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?ur
 import { ApiError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
+import { STALE_TIME } from '~/lib/queryClient';
 import { ThemeProvider } from '~/lib/theme';
 import { cn, createLogger } from '~/lib/utils';
 import appCss from '~/style/tailwind.css?url';
@@ -83,6 +85,20 @@ export const Route = createRootRouteWithContext<{
   queryClient: QueryClient;
 }>()({
   validateSearch: rootSearchSchema,
+  // `/status` gates the default year/page-size params for most of the site
+  // (see app/lib/queryClient.ts's STALE_TIME.STATUS doc comment), so it's
+  // resolved once here rather than independently by every route loader. With
+  // STALE_TIME.STATUS this is a cache read after the first navigation.
+  beforeLoad: async ({ context: { queryClient } }) => {
+    const status = await queryClient.ensureQueryData({
+      ...getStatusOptions({}),
+      staleTime: STALE_TIME.STATUS,
+    });
+    return {
+      status,
+      currentSeason: status.current_season ?? Temporal.Now.plainDateISO().year,
+    };
+  },
   loader: () => ({
     renderTime: Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
       month: 'short',
