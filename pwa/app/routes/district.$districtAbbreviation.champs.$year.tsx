@@ -7,7 +7,6 @@ import {
   useRef,
   useState,
 } from 'react';
-import { Temporal } from 'temporal-polyfill';
 
 import { type EventColors, getEventColors } from '~/api/colors';
 import {
@@ -24,7 +23,6 @@ import {
   getEventMatchesOptions,
   getEventRankingsOptions,
   getEventsByYearOptions,
-  getStatusOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, MatchLink, TeamLink } from '~/components/tba/links';
 import { YearSelector } from '~/components/tba/yearSelector';
@@ -46,7 +44,7 @@ const REFETCH_INTERVAL = 60_000;
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/champs/$year',
 )({
-  loader: async ({ params, context: { queryClient } }) => {
+  loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const history = await queryClient.ensureQueryData(
       getDistrictHistoryOptions({
         path: { district_abbreviation: params.districtAbbreviation },
@@ -63,9 +61,6 @@ export const Route = createFileRoute(
     }
 
     const displayName = history[history.length - 1].display_name;
-    const status = await queryClient.ensureQueryData(getStatusOptions({}));
-    const currentSeason =
-      status?.current_season ?? Temporal.Now.plainDateISO().year;
 
     return {
       abbreviation: params.districtAbbreviation,

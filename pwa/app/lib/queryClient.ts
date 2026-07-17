@@ -15,8 +15,15 @@ import { ApiError } from '~/lib/apiError';
  * `HISTORICAL` is for data that cannot change: a past season's events, team-years,
  * districts, etc. are immutable, so they can hold far longer than the default.
  *
- * Live data (in-progress matches, rankings, `/status`) should NOT use either tier —
- * it should keep a low `staleTime` (or the `DEFAULT`) alongside an explicit
+ * `STATUS` is for `/status`, specifically the `current_season` / `max_season` /
+ * `max_team_page` fields the PWA reads from it to pick default years and page bounds.
+ * Those flip only a handful of times a year, so `/status` is fetched once (see the
+ * root route's `beforeLoad`) and held for hours rather than re-awaited by every
+ * route. `is_datafeed_down` / `down_events` are not consumed by these call sites, so
+ * a long `staleTime` here doesn't risk showing stale outage banners.
+ *
+ * Live data (in-progress matches, rankings) should NOT use any of the above — it
+ * should keep a low `staleTime` (or the `DEFAULT`) alongside an explicit
  * `refetchInterval`, which fires independent of `staleTime`.
  */
 export const STALE_TIME = {
@@ -24,6 +31,8 @@ export const STALE_TIME = {
   DEFAULT: 60_000,
   /** 1h — for data that is known to be immutable (past seasons). */
   HISTORICAL: 60 * 60 * 1000,
+  /** 6h — for `/status`, which changes at most a few times a year. */
+  STATUS: 6 * 60 * 60 * 1000,
 } as const;
 
 /**
@@ -31,9 +40,9 @@ export const STALE_TIME = {
  *
  * Past calendar years are immutable regardless of the current FRC season, so this
  * is a pure calendar comparison — deliberately independent of the `/status` API's
- * `current_season`, which is already a serialization bottleneck gating several
- * routes. Reusing the same `Temporal.Now.plainDateISO().year` pattern already used
- * elsewhere in the app (e.g. `app/routes/index.tsx`) as the current-year fallback.
+ * `current_season` (resolved once in the root route's `beforeLoad`, see
+ * `app/routes/__root.tsx`). Reusing the same `Temporal.Now.plainDateISO().year`
+ * pattern already used elsewhere in the app as the current-year fallback.
  */
 export function staleTimeForYear(year: number): number {
   return year < Temporal.Now.plainDateISO().year

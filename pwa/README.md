@@ -146,6 +146,11 @@ The policy is centralized in `app/lib/queryClient.ts` and applied via `createQue
   default for the current year. Applied today on the event page (`event.$eventKey.tsx`), the
   team-year page (`team.$teamNumber.{-$year}.tsx`), and the districts list page
   (`districts.{-$year}.tsx`); other year-scoped routes still inherit the 60s default.
+- **`/status`: `staleTime: STALE_TIME.STATUS`** (6h) — `/status` gates the default year/page-size
+  params for most of the site (`current_season`, `max_season`, `max_team_page`), so instead of
+  every route independently awaiting it, the root route's `beforeLoad` (`app/routes/__root.tsx`)
+  resolves it once per navigation and exposes `status`/`currentSeason` on router context for every
+  child loader to read. The long `staleTime` means this is a cache read after the first hit.
 - **Live data keeps its own `staleTime`/`refetchInterval`** and is unaffected by the above — e.g.
   the district champs page (`district.$districtAbbreviation.champs.$year.tsx`) polls on a
   `refetchInterval` independent of `staleTime`, and Nexus/Firebase-backed queries

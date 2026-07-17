@@ -1,7 +1,6 @@
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 
 import { getTeamsSimple } from '~/api/tba/read';
-import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import FavoriteTeamsSection from '~/components/tba/favoriteTeamsSection';
 import TeamListTable from '~/components/tba/teamListTable';
 import {
@@ -17,9 +16,7 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/teams/{-$pgNum}')({
-  loader: async ({ params, context: { queryClient } }) => {
-    const status = await queryClient.ensureQueryData(getStatusOptions({}));
-
+  loader: async ({ params, context: { status } }) => {
     const maxPageNum = Math.floor(status.max_team_page / 2) + 1;
     const pageNum = parseParamsForTeamPgNumElseDefault(params, maxPageNum);
 

@@ -4,10 +4,42 @@ import {
   camelCaseToHumanReadable,
   hasAnyMatches,
   median,
+  parseParamsForYearElseDefault,
   removeNonNumeric,
   slugify,
   splitIntoNChunks,
 } from '~/lib/utils';
+
+describe.concurrent('parseParamsForYearElseDefault', () => {
+  const currentSeason = 2026;
+
+  test('returns currentSeason when no year param is given', () => {
+    expect(parseParamsForYearElseDefault(currentSeason, {})).toEqual(
+      currentSeason,
+    );
+  });
+
+  test('parses a valid year param', () => {
+    expect(
+      parseParamsForYearElseDefault(currentSeason, { year: '2015' }),
+    ).toEqual(2015);
+  });
+
+  test('returns undefined for a non-numeric year param', () => {
+    expect(
+      parseParamsForYearElseDefault(currentSeason, { year: 'not-a-year' }),
+    ).toBeUndefined();
+  });
+
+  test('returns undefined for a non-positive year param', () => {
+    expect(
+      parseParamsForYearElseDefault(currentSeason, { year: '0' }),
+    ).toBeUndefined();
+    expect(
+      parseParamsForYearElseDefault(currentSeason, { year: '-5' }),
+    ).toBeUndefined();
+  });
+});
 
 describe.concurrent('removeNonNumeric', () => {
   test('basic', () => {

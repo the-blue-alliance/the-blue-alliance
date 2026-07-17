@@ -1,24 +1,15 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { Temporal } from 'temporal-polyfill';
 
-import {
-  getEventsByYearOptions,
-  getStatusOptions,
-} from '~/api/tba/read/@tanstack/react-query.gen';
+import { getEventsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import EventListTable from '~/components/tba/eventListTable';
 import { getCurrentWeekEvents } from '~/lib/eventUtils';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/')({
-  loader: async ({ context: { queryClient } }) => {
-    const status = await queryClient.ensureQueryData(getStatusOptions({}));
+  loader: async ({ context: { queryClient, currentSeason } }) => {
     await queryClient.ensureQueryData(
-      getEventsByYearOptions({
-        path: {
-          year: status?.current_season ?? Temporal.Now.plainDateISO().year,
-        },
-      }),
+      getEventsByYearOptions({ path: { year: currentSeason } }),
     );
   },
   headers: publicCacheControlHeaders(),
@@ -26,13 +17,9 @@ export const Route = createFileRoute('/')({
 });
 
 function Home() {
-  const { data: status } = useSuspenseQuery(getStatusOptions({}));
+  const { currentSeason } = Route.useRouteContext();
   const { data: events } = useSuspenseQuery(
-    getEventsByYearOptions({
-      path: {
-        year: status?.current_season ?? Temporal.Now.plainDateISO().year,
-      },
-    }),
+    getEventsByYearOptions({ path: { year: currentSeason } }),
   );
   const weekEvents = getCurrentWeekEvents(events);
 

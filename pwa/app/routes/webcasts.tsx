@@ -4,10 +4,7 @@ import { useMemo } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import { Event } from '~/api/tba/read';
-import {
-  getEventsByYearOptions,
-  getStatusOptions,
-} from '~/api/tba/read/@tanstack/react-query.gen';
+import { getEventsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, EventLocationLink } from '~/components/tba/links';
 import { WebcastIcon } from '~/components/tba/socialBadges';
 import { Badge } from '~/components/ui/badge';
@@ -22,15 +19,12 @@ import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/webcasts')({
-  loader: async ({ context: { queryClient } }) => {
-    const status = await queryClient.ensureQueryData(getStatusOptions());
-    const year = status.current_season;
-
+  loader: async ({ context: { queryClient, currentSeason } }) => {
     await queryClient.ensureQueryData(
-      getEventsByYearOptions({ path: { year } }),
+      getEventsByYearOptions({ path: { year: currentSeason } }),
     );
 
-    return { year };
+    return { year: currentSeason };
   },
   headers: publicCacheControlHeaders(),
   head: () => ({
