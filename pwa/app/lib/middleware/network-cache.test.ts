@@ -1,16 +1,29 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   clearCache,
   createCachedFetch,
+  getCacheEntries,
   getCacheStats,
 } from '~/lib/middleware/network-cache';
 
 describe('Network Cache Middleware', () => {
+  let originalWindow: typeof globalThis.window;
+
   beforeEach(() => {
     clearCache();
     vi.clearAllMocks();
+    originalWindow = global.window;
   });
+
+  afterEach(() => {
+    global.window = originalWindow;
+  });
+
+  function mockServerEnvironment() {
+    // @ts-expect-error - mocking window
+    delete global.window;
+  }
 
   it('should create a cached fetch function', () => {
     const cachedFetch = createCachedFetch();
@@ -18,7 +31,6 @@ describe('Network Cache Middleware', () => {
   });
 
   it('should cache GET requests on server side', async () => {
-    // Mock fetch - return fresh Response on each call
     const mockFetch = vi.fn().mockImplementation(() =>
       Promise.resolve(
         new Response(JSON.stringify({ data: 'test' }), {
@@ -28,30 +40,20 @@ describe('Network Cache Middleware', () => {
       ),
     );
     global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
-
     const url = 'https://api.example.com/data';
 
-    // First request - should hit network
     const response1 = await cachedFetch(url);
     const data1 = await response1.text();
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(data1).toBe('{"data":"test"}');
 
-    // Second request - should use cache
     const response2 = await cachedFetch(url);
     const data2 = await response2.text();
-    expect(mockFetch).toHaveBeenCalledTimes(1); // Still 1, not 2
+    expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(data2).toBe('{"data":"test"}');
-
-    // Restore window
-    global.window = originalWindow;
   });
 
   it('should not cache non-GET requests', async () => {
@@ -64,27 +66,18 @@ describe('Network Cache Middleware', () => {
       ),
     );
     global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
-
     const url = 'https://api.example.com/data';
 
-    // POST request - should not cache
     await cachedFetch(url, { method: 'POST' });
     await cachedFetch(url, { method: 'POST' });
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    // Restore window
-    global.window = originalWindow;
   });
 
-  it('should skip cache on client side', async () => {
+  it('should skip cache on client side and not grow the LRU', async () => {
     const mockFetch = vi
       .fn()
       .mockImplementation(() =>
@@ -92,58 +85,81 @@ describe('Network Cache Middleware', () => {
       );
     global.fetch = mockFetch;
 
-    // Ensure window is defined (client side)
-    const originalWindow = global.window;
     if (!global.window) {
       // @ts-expect-error - mocking window
       global.window = {};
     }
 
     const cachedFetch = createCachedFetch();
-
     const url = 'https://api.example.com/data';
 
     await cachedFetch(url);
     await cachedFetch(url);
 
-    // Should call fetch both times (no caching on client)
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    // Restore window
-    global.window = originalWindow;
+    expect(getCacheStats().size).toBe(0);
   });
 
-  it('should respect global TTL and expire old entries', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockImplementation(() =>
-        Promise.resolve(new Response('test', { status: 200 })),
-      );
+  it('should respect Cache-Control max-age for TTL', async () => {
+    const mockFetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(
+        new Response('cached-body', {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=1',
+          },
+        }),
+      ),
+    );
     global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/max-age-test';
 
-    const url = 'https://api.example.com/data-ttl-test';
-
-    // First request
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Second request immediately - should use cache
+    // Still within max-age — serve from cache
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Note: We can't easily test TTL expiration without mocking time
-    // The global TTL is 3 hours, which is too long for a unit test
-    // This test verifies caching works, TTL is configured at module level
+    const entries = getCacheEntries();
+    expect(entries).toHaveLength(1);
+    // max-age=1 → ~1000ms remaining (lru-cache may report slightly above)
+    expect(entries[0]?.remainingTTL).toBeGreaterThan(0);
+    expect(entries[0]?.remainingTTL).toBeLessThan(2000);
+  });
 
-    // Restore window
-    global.window = originalWindow;
+  it('should fall back to default TTL when Cache-Control is missing', async () => {
+    const mockFetch = vi.fn().mockImplementation(() =>
+      Promise.resolve(
+        new Response('no-cc', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    global.fetch = mockFetch;
+    mockServerEnvironment();
+
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/no-cache-control';
+
+    await cachedFetch(url);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(getCacheStats().size).toBe(1);
+
+    // Within the default 61s TTL window — still cached
+    await cachedFetch(url);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    const entries = getCacheEntries();
+    expect(entries).toHaveLength(1);
+    // Default fallback is 61s — longer than a 1s max-age entry
+    expect(entries[0]?.remainingTTL).toBeGreaterThan(1000);
+    expect(entries[0]?.remainingTTL).toBeLessThanOrEqual(62_000);
   });
 
   it('should respect maxEntries limit', async () => {
@@ -153,25 +169,16 @@ describe('Network Cache Middleware', () => {
         Promise.resolve(new Response(url, { status: 200 })),
       );
     global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
 
-    // Make requests to different URLs - should respect default maxEntries
     for (let i = 0; i < 5; i++) {
       await cachedFetch(`https://api.example.com/data/${i}`);
     }
 
     const stats = getCacheStats();
-    // Should have cached all 5 entries (well under default of 500)
     expect(stats.size).toBe(5);
-
-    // Restore window
-    global.window = originalWindow;
   });
 
   it('should clear cache correctly', async () => {
@@ -181,29 +188,19 @@ describe('Network Cache Middleware', () => {
         Promise.resolve(new Response('test', { status: 200 })),
       );
     global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
     const url = 'https://api.example.com/data';
 
-    // Add to cache
     await cachedFetch(url);
     expect(getCacheStats().size).toBe(1);
 
-    // Clear cache
     clearCache();
     expect(getCacheStats().size).toBe(0);
 
-    // Next request should hit network
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    // Restore window
-    global.window = originalWindow;
   });
 
   it('should only cache successful responses (2xx)', async () => {
@@ -213,25 +210,16 @@ describe('Network Cache Middleware', () => {
         Promise.resolve(new Response('error', { status: 404 })),
       );
     global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
     const url = 'https://api.example.com/not-found';
 
-    // First 404 request
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Second request - should not use cache (404 not cached)
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    // Restore window
-    global.window = originalWindow;
   });
 
   it('should use same cache key regardless of headers', async () => {
@@ -241,32 +229,22 @@ describe('Network Cache Middleware', () => {
         Promise.resolve(new Response('test', { status: 200 })),
       );
     global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
     const url = 'https://api.example.com/data';
 
-    // Request with header 1
     await cachedFetch(url, {
       headers: { 'Accept-Language': 'en' },
     });
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Request with different header - should use cache (headers ignored)
     await cachedFetch(url, {
       headers: { 'Accept-Language': 'es' },
     });
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Request without headers - should use cache
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
-
-    // Restore window
-    global.window = originalWindow;
   });
 });

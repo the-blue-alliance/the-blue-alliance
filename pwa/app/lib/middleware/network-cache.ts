@@ -1,28 +1,34 @@
 /**
- * Network cache middleware for API requests
+ * SSR-only network cache middleware for TBA API requests.
  *
- * Implements an in-memory LRU cache to cache JSON API responses across sessions.
- * Includes logging to track cache hits and outbound requests.
+ * Per-process in-memory LRU shared across users on a given SSR instance.
+ * Safe only because TBA read data is public and `X-TBA-Auth-Key` is a single
+ * shared read key — do not use this for user-private responses. If per-user
+ * auth keys ever land, cache keys must include the auth identity (or stop
+ * caching those requests).
+ *
+ * Installed only on the server via `client.setConfig` in `__root.tsx`. Client
+ * freshness is owned by React Query `staleTime`; this must not run in the
+ * browser as a second TTL under Query.
  */
 import ccParser from 'cache-control-parser';
 import { LRUCache } from 'lru-cache';
 
-import {
-  createLogger,
-  hoursToMilliseconds,
-  secondsToMilliseconds,
-} from '~/lib/utils';
+import { createLogger, secondsToMilliseconds } from '~/lib/utils';
 
 type CacheEntry = string;
 
 /**
- * Global cache configuration - applied to the singleton cache instance
+ * Cap kept deliberately modest: heavy pages (e.g. district stats) can fan out
+ * 20–40 entries and benefit from headroom, but each SSR instance holds the
+ * full LRU in memory — raising this fights F1 OOM pressure (see #9984).
  */
-const CACHE_MAX_ENTRIES = 500;
-const CACHE_TTL = hoursToMilliseconds(3);
+const CACHE_MAX_ENTRIES = 300;
+/** Fallback when the origin omits Cache-Control / max-age — matches TBA API max-age. */
+const CACHE_TTL = secondsToMilliseconds(61);
 
 /**
- * Global singleton LRU cache - shared across all sessions
+ * Global singleton LRU cache - shared across all SSR sessions on this process
  */
 const cache = new LRUCache<string, CacheEntry>({
   max: CACHE_MAX_ENTRIES,
@@ -40,7 +46,9 @@ interface NetworkCacheConfig {
 const logger = createLogger('network-cache');
 
 /**
- * Generate cache key from request
+ * Generate cache key from request.
+ * Keyed on METHOD:url only — fine today with one shared read key; not safe
+ * if responses ever vary by auth header.
  */
 function generateCacheKey(url: string, options: RequestInit = {}): string {
   const method = options.method?.toUpperCase() || 'GET';
@@ -48,7 +56,7 @@ function generateCacheKey(url: string, options: RequestInit = {}): string {
 }
 
 /**
- * Create a caching fetch function
+ * Create a caching fetch function (SSR-only; no-ops if invoked in the browser)
  */
 export function createCachedFetch(
   config: NetworkCacheConfig = {},
@@ -59,6 +67,11 @@ export function createCachedFetch(
     input: RequestInfo | URL,
     init?: RequestInit,
   ): Promise<Response> {
+    // Defense in depth: never cache in the browser even if setConfig leaks.
+    if (typeof window !== 'undefined') {
+      return fetch(input, init);
+    }
+
     const url =
       typeof input === 'string'
         ? input
@@ -69,7 +82,7 @@ export function createCachedFetch(
 
     // Only cache specified methods (default: GET)
     if (!cacheableMethods.includes(method)) {
-      logger.info(
+      logger.debug(
         {
           method,
           url,
@@ -80,26 +93,12 @@ export function createCachedFetch(
       return fetch(input, init);
     }
 
-    // Check if running on server
-    const isServer = typeof window === 'undefined';
-    if (!isServer) {
-      // Don't cache on client - only server-side
-      logger.info(
-        {
-          method,
-          url,
-        },
-        'Client-side request, skipping cache',
-      );
-      return fetch(input, init);
-    }
-
     const cacheKey = generateCacheKey(url, init);
 
     // Check cache
     const cachedData = cache.get(cacheKey);
     if (cachedData) {
-      logger.info(
+      logger.debug(
         {
           method,
           url,
@@ -113,7 +112,7 @@ export function createCachedFetch(
     }
 
     // Cache miss or expired - fetch from network
-    logger.info(
+    logger.debug(
       {
         method,
         url,
@@ -154,7 +153,7 @@ export function createCachedFetch(
             cache.set(cacheKey, data, { ttl: CACHE_TTL });
           } else {
             const ttlMs = secondsToMilliseconds(ttl['max-age']);
-            logger.info(
+            logger.debug(
               {
                 method,
                 url,
@@ -193,7 +192,7 @@ export function createCachedFetch(
  */
 export function clearCache(): void {
   cache.clear();
-  logger.info('Cache cleared');
+  logger.debug('Cache cleared');
 }
 
 /**

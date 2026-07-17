@@ -115,21 +115,26 @@ With all that said... There are various levels of caching available when making 
    - This is best done by utilizing a combination of `cache-control`, `etag`, or other headers (like [`Expires`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Expires), [`Last-Modified`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Last-Modified), or [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Modified-Since)).
    - All major browsers will automatically & intelligently obey all of the caching-related headers I mentioned above (except the Cloudflare one, which is proprietary).
    - Most Node.js `fetch()` implementations don't automatically do this (some do, like [Undici](https://github.com/nodejs/undici))
-2. TanStack Query cache layer
+2. **SSR network LRU** (`app/lib/middleware/network-cache.ts`)
+   - Server-only transport cache under the hey-api TBA client (`client.setConfig` in `__root.tsx` installs it only when `typeof window === 'undefined'`).
+   - Reduces duplicate upstream API calls during SSR on a given Node process. TTL comes from the response `Cache-Control: max-age` (61s fallback).
+   - Shared across users on that process — safe because TBA read data is public and we use one shared `X-TBA-Auth-Key`. The browser must **not** get a second LRU underneath React Query.
+3. TanStack Query cache layer
    - This is a library that effectively wraps `fetch()` into a more state-management oriented philosophy
    - There are a [_lot_ of docs](https://tanstack.com/query/latest) on this
-3. TanStack Router cache layer
+   - Client freshness is owned here via `staleTime` (see below) — not by the SSR network LRU
+4. TanStack Router cache layer
    - Router caches `loader` data _per-route_ for us automatically
    - [Docs here](https://tanstack.com/router/v1/docs/framework/react/guide/data-loading)
    - Anything that is cached on the server is JSON-ified and sent to the client. So a larger server cache implies a slower first paint.
-4. Cache the entire html response
+5. Cache the entire html response
    - This is what the prod site does
    - But TanStack Router / React don't support this extremely well out of the box
 
 ### `staleTime` policy
 
-TanStack Query is the cache that matters most for perceived freshness — the other
-layers above are transport optimizations underneath it. `staleTime` defaults to `0`
+TanStack Query is the cache that matters most for perceived freshness on the client —
+the SSR network LRU above is a transport optimization for the Node process only. `staleTime` defaults to `0`
 in TanStack Query, which means data is considered stale the instant it arrives; left
 unset, this caused every `useSuspenseQuery` to refetch immediately on hydration, even
 though the server had just sent the same data moments earlier.

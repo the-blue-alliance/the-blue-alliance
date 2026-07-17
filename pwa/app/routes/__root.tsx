@@ -77,14 +77,15 @@ client.interceptors.error.use((_error, response) => {
   );
 });
 
-// Configure network cache middleware
-// Caches API responses in memory across sessions to reduce external API calls
-// Cache is a global singleton with 500 max entries and 3 hour TTL
-client.setConfig({
-  fetch: createCachedFetch({
-    cacheableMethods: ['GET'],
-  }),
-});
+// SSR-only network LRU under the API client. Client freshness is owned by
+// React Query staleTime — do not install a second TTL in the browser.
+if (typeof window === 'undefined') {
+  client.setConfig({
+    fetch: createCachedFetch({
+      cacheableMethods: ['GET'],
+    }),
+  });
+}
 
 // Point mobile API client at local backend when configured
 if (import.meta.env.VITE_TBA_MOBILE_API_BASE_URL) {
