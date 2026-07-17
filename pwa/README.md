@@ -127,6 +127,7 @@ With all that said... There are various levels of caching available when making 
    - Router caches `loader` data _per-route_ for us automatically
    - [Docs here](https://tanstack.com/router/v1/docs/framework/react/guide/data-loading)
    - Anything that is cached on the server is JSON-ified and sent to the client. So a larger server cache implies a slower first paint.
+   - Intent preloading is enabled in `app/router.tsx` (`defaultPreload: 'intent'`) so hovering/touching a `Link` warms the destination route's loader before click. `defaultPreloadStaleTime: 0` means Router always invokes loaders on preload and lets React Query's `staleTime` alone govern freshness — without the Query defaults above, preloaded data would go stale before the click lands.
 5. Cache the entire html response
    - This is what the prod site does
    - But TanStack Router / React don't support this extremely well out of the box

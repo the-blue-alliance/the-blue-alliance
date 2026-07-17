@@ -55,6 +55,12 @@ export function getRouter() {
     context: {
       queryClient,
     },
+    // Preload on hover/touch so browse-heavy navigations (event → team → match)
+    // feel instant. defaultPreloadStaleTime: 0 means Router always invokes
+    // loaders on preload and lets React Query's staleTime own freshness —
+    // see https://tanstack.com/router/latest/docs/framework/react/guide/preloading
+    defaultPreload: 'intent',
+    defaultPreloadStaleTime: 0,
     scrollRestoration: ({ location }) => {
       return location.pathname !== '/apidocs/v3';
     },
