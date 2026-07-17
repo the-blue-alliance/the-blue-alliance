@@ -8,6 +8,7 @@ import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen'
 import { Button } from '~/components/ui/button';
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -22,6 +23,7 @@ import {
 } from '~/components/ui/dialog';
 import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
+import { STALE_TIME } from '~/lib/queryClient';
 import FuzzysortFilterer, {
   FilteredSearchIndex,
 } from '~/lib/search/fuzzysortFilterer';
@@ -30,7 +32,10 @@ import { cn } from '~/lib/utils';
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
-  const searchIndexQuery = useQuery(getSearchIndexOptions({}));
+  const searchIndexQuery = useQuery({
+    ...getSearchIndexOptions({}),
+    staleTime: STALE_TIME.SEARCH_INDEX,
+  });
   const filterer = useMemo(() => new FuzzysortFilterer(), []);
   const navigate = useNavigate();
   const isMacintosh =
@@ -66,6 +71,12 @@ export function SearchModal() {
       document.removeEventListener('keydown', down);
     };
   }, []);
+
+  const isIndexPending = searchIndexQuery.isPending && !searchIndexQuery.data;
+  const hasNoResults =
+    searchResults !== null &&
+    searchResults.teams.length === 0 &&
+    searchResults.events.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -128,7 +139,7 @@ export function SearchModal() {
               onValueChange={setQuery}
               className="h-20 text-base"
             />
-            {searchIndexQuery.isLoading && (
+            {isIndexPending && (
               <div
                 className="pointer-events-none absolute top-1/2 right-3 z-10
                   flex -translate-y-1/2 items-center justify-center"
@@ -138,6 +149,22 @@ export function SearchModal() {
             )}
           </div>
           <CommandList className="no-scrollbar scroll-pt-2 scroll-pb-1.5">
+            {isIndexPending && (
+              <div
+                data-testid="search-index-loading"
+                className="py-6 text-center text-sm text-muted-foreground"
+              >
+                Loading teams and events…
+              </div>
+            )}
+            {searchIndexQuery.isError && !searchIndexQuery.data && (
+              <div
+                data-testid="search-index-error"
+                className="py-6 text-center text-sm text-muted-foreground"
+              >
+                Failed to load search data. Try again later.
+              </div>
+            )}
             {searchResults && (
               <>
                 {[
@@ -195,6 +222,7 @@ export function SearchModal() {
                 )}
               </>
             )}
+            {hasNoResults && <CommandEmpty>No results found.</CommandEmpty>}
           </CommandList>
         </Command>
       </DialogContent>

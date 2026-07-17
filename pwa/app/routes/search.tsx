@@ -2,6 +2,7 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import { STALE_TIME } from '~/lib/queryClient';
 import { getSearchRedirect } from '~/lib/search/searchRedirect';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
@@ -12,9 +13,10 @@ const searchSchema = z.object({
 export const Route = createFileRoute('/search')({
   validateSearch: searchSchema,
   beforeLoad: async ({ context: { queryClient }, search }) => {
-    const searchIndex = await queryClient.ensureQueryData(
-      getSearchIndexOptions({}),
-    );
+    const searchIndex = await queryClient.ensureQueryData({
+      ...getSearchIndexOptions({}),
+      staleTime: STALE_TIME.SEARCH_INDEX,
+    });
     // Tanstack may auto-parse '604' to a number, so just stringify it just in case
     const result = getSearchRedirect(searchIndex, search.q.toString());
 
