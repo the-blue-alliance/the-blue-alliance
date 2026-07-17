@@ -13,6 +13,10 @@ import {
 import { useTheme } from '~/lib/theme';
 
 export const Route = createFileRoute('/apidocs_/v3')({
+  // @scalar/api-reference-react is very large and has no SSR benefit here —
+  // render it client-only so it's excluded from the server bundle and the
+  // initial HTML payload.
+  ssr: false,
   head: () => {
     return {
       meta: [

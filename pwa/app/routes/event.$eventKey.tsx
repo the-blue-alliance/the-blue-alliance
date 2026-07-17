@@ -2,7 +2,7 @@ import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
 import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
-import { useMemo, useState } from 'react';
+import { Suspense, lazy, useMemo, useState } from 'react';
 
 import ParentEventIcon from '~icons/lucide/arrow-up-right';
 import SourceIcon from '~icons/lucide/badge-check';
@@ -56,7 +56,6 @@ import {
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
-import CoprScatterChart from '~/components/tba/charts/coprScatterChart';
 import { DataTable } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
@@ -176,6 +175,12 @@ import {
   publicCacheControlHeaders,
   splitIntoNChunks,
 } from '~/lib/utils';
+
+// Lazy-loaded: recharts is heavy and this chart only renders once the
+// insights tab is opened, which most visitors never do.
+const CoprScatterChart = lazy(
+  () => import('~/components/tba/charts/coprScatterChart'),
+);
 
 export const Route = createFileRoute('/event/$eventKey')({
   loader: async ({ params, context: { queryClient } }) => {
@@ -737,16 +742,24 @@ function EventPage() {
           />
           {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
             <>
-              <CoprScatterChart
-                colors={
-                  colorsQuery.data?.status === 200
-                    ? colorsQuery.data.data
-                    : { teams: {} }
+              <Suspense
+                fallback={
+                  <div
+                    className="h-96 w-full animate-pulse rounded-lg bg-muted/50"
+                  />
                 }
-                coprs={coprsQuery.data}
-                defaultXCopr={getDefaultTeleopComponentName(event.year)}
-                defaultYCopr={getDefaultAutoComponentName(event.year)}
-              />
+              >
+                <CoprScatterChart
+                  colors={
+                    colorsQuery.data?.status === 200
+                      ? colorsQuery.data.data
+                      : { teams: {} }
+                  }
+                  coprs={coprsQuery.data}
+                  defaultXCopr={getDefaultTeleopComponentName(event.year)}
+                  defaultYCopr={getDefaultAutoComponentName(event.year)}
+                />
+              </Suspense>
               <ComponentsTable coprs={coprsQuery.data} year={event.year} />
             </>
           )}
