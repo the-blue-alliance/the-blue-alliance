@@ -1,14 +1,12 @@
 import * as Sentry from '@sentry/tanstackstart-react';
 import { ParsedLocation, createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
-import { logEvent } from 'firebase/analytics';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
 
 import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
 
 import { Button } from '~/components/ui/button';
-import { analytics } from '~/firebase/firebaseConfig';
 import { createQueryClient } from '~/lib/queryClient';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
@@ -92,28 +90,36 @@ export function getRouter() {
     router.subscribe(
       'onResolved',
       ({ toLocation }: { toLocation: ParsedLocation }) => {
-        if (analytics === null) {
-          return;
-        }
-        logEvent(analytics, 'page_view', {
-          page_path: toLocation.pathname,
-          page_location: toLocation.href,
-          client_platform: 'pwa', // GA4 custom dimension
-        });
+        void logPageView(toLocation.pathname, toLocation.href);
       },
     );
 
     // onResolved doesn't fire for the initial hydration, so log it manually.
-    if (analytics !== null) {
-      logEvent(analytics, 'page_view', {
-        page_path: window.location.pathname,
-        page_location: window.location.href,
-        client_platform: 'pwa', // GA4 custom dimension
-      });
-    }
+    void logPageView(window.location.pathname, window.location.href);
   }
 
   return router;
+}
+
+// Firebase is dynamically imported here (mirroring the pattern in
+// useFirebaseWebcasts.ts) so `firebase/analytics` and firebaseConfig.tsx
+// (which also pulls in firebase/app and firebase/auth) stay out of the
+// entry chunk and only load once a client-side navigation actually happens.
+async function logPageView(pagePath: string, pageLocation: string) {
+  const [{ logEvent }, { analytics }] = await Promise.all([
+    import('firebase/analytics'),
+    import('~/firebase/firebaseConfig'),
+  ]);
+
+  if (analytics === null) {
+    return;
+  }
+
+  logEvent(analytics, 'page_view', {
+    page_path: pagePath,
+    page_location: pageLocation,
+    client_platform: 'pwa', // GA4 custom dimension
+  });
 }
 
 function ErrorComponent({ error }: { error: Error }) {

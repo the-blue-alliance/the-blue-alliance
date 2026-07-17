@@ -1,6 +1,5 @@
 /// <reference types="vite/client" />
 import type { QueryClient } from '@tanstack/react-query';
-import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import {
   HeadContent,
   Outlet,
@@ -8,8 +7,7 @@ import {
   createRootRouteWithContext,
   useLocation,
 } from '@tanstack/react-router';
-import { TanStackRouterDevtools } from '@tanstack/react-router-devtools';
-import { useEffect } from 'react';
+import { Suspense, lazy, useEffect } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
@@ -33,6 +31,24 @@ import { cn, createLogger } from '~/lib/utils';
 import appCss from '~/style/tailwind.css?url';
 
 const logger = createLogger('root');
+
+// Devtools are dev-only and must never ship to production. Lazy-loading them
+// (instead of a static import) keeps both packages out of the production
+// bundle entirely, rather than just tree-shaking an unused render.
+const TanStackRouterDevtools = import.meta.env.PROD
+  ? null
+  : lazy(() =>
+      import('@tanstack/react-router-devtools').then((m) => ({
+        default: m.TanStackRouterDevtools,
+      })),
+    );
+const ReactQueryDevtools = import.meta.env.PROD
+  ? null
+  : lazy(() =>
+      import('@tanstack/react-query-devtools').then((m) => ({
+        default: m.ReactQueryDevtools,
+      })),
+    );
 
 // Configure request interceptor for auth
 client.interceptors.request.use((request) => {
@@ -227,8 +243,16 @@ function RootComponent() {
           </TooltipProvider>
           <Toaster />
         </ThemeProvider>
-        <TanStackRouterDevtools position="bottom-right" />
-        <ReactQueryDevtools buttonPosition="bottom-left" />
+        {!import.meta.env.PROD && (
+          <Suspense fallback={null}>
+            {TanStackRouterDevtools && (
+              <TanStackRouterDevtools position="bottom-right" />
+            )}
+            {ReactQueryDevtools && (
+              <ReactQueryDevtools buttonPosition="bottom-left" />
+            )}
+          </Suspense>
+        )}
         <Scripts />
       </body>
     </html>

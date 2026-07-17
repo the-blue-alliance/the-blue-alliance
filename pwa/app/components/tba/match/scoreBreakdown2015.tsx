@@ -12,7 +12,7 @@ import {
   AUTO_TOTE_SET_2015_POINTS,
 } from '~/lib/pointValues';
 
-export function ScoreBreakdown2015({
+export default function ScoreBreakdown2015({
   scoreBreakdown,
 }: {
   scoreBreakdown: MatchScoreBreakdown2015;

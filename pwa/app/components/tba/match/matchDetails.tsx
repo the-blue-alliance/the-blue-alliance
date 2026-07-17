@@ -1,20 +1,8 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import { Event, Match } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
-import { ScoreBreakdown2015 } from '~/components/tba/match/scoreBreakdown2015';
-import ScoreBreakdown2016 from '~/components/tba/match/scoreBreakdown2016';
-import ScoreBreakdown2017 from '~/components/tba/match/scoreBreakdown2017';
-import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
-import ScoreBreakdown2019 from '~/components/tba/match/scoreBreakdown2019';
-import ScoreBreakdown2020 from '~/components/tba/match/scoreBreakdown2020';
-import ScoreBreakdown2022 from '~/components/tba/match/scoreBreakdown2022';
-import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
-import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
-import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
-import ScoreBreakdown2026 from '~/components/tba/match/scoreBreakdown2026';
-import ScoreByShift2026 from '~/components/tba/match/scoreByShift2026';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
@@ -30,6 +18,51 @@ import {
   isScoreBreakdown2025,
   isScoreBreakdown2026,
 } from '~/lib/rankingPoints';
+
+// Lazy-loaded so a match's chunk only pulls in the single year's breakdown
+// component it actually renders, instead of all 11 years' worth of UI. This
+// matters because MatchDetails is reachable from MatchModal, which mounts on
+// every page.
+const ScoreBreakdown2015 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2015'),
+);
+const ScoreBreakdown2016 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2016'),
+);
+const ScoreBreakdown2017 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2017'),
+);
+const ScoreBreakdown2018 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2018'),
+);
+const ScoreBreakdown2019 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2019'),
+);
+const ScoreBreakdown2020 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2020'),
+);
+const ScoreBreakdown2022 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2022'),
+);
+const ScoreBreakdown2023 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2023'),
+);
+const ScoreBreakdown2024 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2024'),
+);
+const ScoreBreakdown2025 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2025'),
+);
+const ScoreBreakdown2026 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2026'),
+);
+const ScoreByShift2026 = lazy(
+  () => import('~/components/tba/match/scoreByShift2026'),
+);
+
+function ScoreBreakdownSkeleton() {
+  return <div className="h-32 w-full animate-pulse rounded-lg bg-muted/50" />;
+}
 
 function formatMatchDate(timestamp: number, timezone: string): string {
   return Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
@@ -211,7 +244,9 @@ export default function MatchDetails({
       <div className="order-2 w-full md:order-1 md:w-lg">
         <div className="flex flex-col gap-2">
           <SimpleMatchRow match={match} year={event.year} />
-          {sbDiv}
+          {sbDiv && (
+            <Suspense fallback={<ScoreBreakdownSkeleton />}>{sbDiv}</Suspense>
+          )}
           <div className="flex flex-col gap-2 rounded-lg border bg-muted/50 p-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold">Match Times</h3>
