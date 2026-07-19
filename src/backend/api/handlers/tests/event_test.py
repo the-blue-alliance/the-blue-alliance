@@ -17,6 +17,9 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.memcache_models.event_nexus_queue_status_memcache import (
+    EventNexusQueueStatusMemcache,
+)
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.award import Award
@@ -25,6 +28,13 @@ from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
     TeamAtEventDistrictPoints,
+)
+from backend.common.models.event_queue_status import (
+    EventQueueStatus,
+    NexusCurrentlyQueueing,
+    NexusMatch,
+    NexusMatchStatus,
+    NexusMatchTiming,
 )
 from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
@@ -566,6 +576,88 @@ def test_event_awards(ndb_stub, api_client: Client) -> None:
     names = set([award["name"] for award in resp.json])
     assert "Winner" in names
     assert "Finalist" in names
+
+
+def test_event_nexus_info(
+    ndb_stub, api_client: Client, memcache_stub, taskqueue_stub
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    status = EventQueueStatus(
+        data_as_of_ms=1721000000000,
+        now_queueing=NexusCurrentlyQueueing(
+            match_key="2019casj_qm5",
+            match_name="Qualification 5",
+        ),
+        matches={
+            "2019casj_qm5": NexusMatch(
+                label="Qualification 5",
+                status=NexusMatchStatus.NOW_QUEUING,
+                played=False,
+                times=NexusMatchTiming(
+                    estimated_queue_time_ms=1721000060000,
+                    estimated_start_time_ms=1721000300000,
+                ),
+            ),
+        },
+    )
+    EventNexusQueueStatusMemcache("2019casj").put(status)
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/nexus_info",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json["data_as_of_ms"] == 1721000000000
+    assert resp.json["now_queueing"] == {
+        "match_key": "2019casj_qm5",
+        "match_name": "Qualification 5",
+    }
+    assert resp.json["matches"]["2019casj_qm5"]["status"] == "Now queuing"
+
+
+def test_event_nexus_info_no_cached_data(
+    ndb_stub, api_client: Client, memcache_stub, taskqueue_stub
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/nexus_info",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json is None
+
+
+def test_event_nexus_info_bad_event_key(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/nexus_info",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 404
 
 
 def test_event_playoff_advancement(

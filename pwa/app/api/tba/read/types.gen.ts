@@ -2649,6 +2649,70 @@ export enum MobilityRobot2023 {
   YES = 'Yes',
 }
 
+/**
+ * Estimated timing for a match, as reported by Nexus.
+ */
+export type NexusMatchTiming = {
+  /**
+   * Estimated Unix timestamp (in milliseconds) of when the match will be queued, or null if unknown.
+   */
+  estimated_queue_time_ms: number | null;
+  /**
+   * Estimated Unix timestamp (in milliseconds) of when the match will start, or null if unknown.
+   */
+  estimated_start_time_ms: number | null;
+};
+
+/**
+ * Live match-queuing info for a single match, as reported by Nexus.
+ */
+export type NexusMatchInfo = {
+  /**
+   * The match label as reported by Nexus, e.g. `Qualification 5`.
+   */
+  label: string;
+  /**
+   * The current queuing status of the match.
+   */
+  status: 'Queuing soon' | 'Now queuing' | 'On deck' | 'On field';
+  /**
+   * Whether the match has been played.
+   */
+  played: boolean;
+  times: NexusMatchTiming;
+};
+
+/**
+ * The match currently being queued, as reported by Nexus.
+ */
+export type NexusNowQueueing = {
+  /**
+   * TBA match key for the match currently being queued.
+   */
+  match_key: string;
+  /**
+   * The match name as reported by Nexus, e.g. `Qualification 5`.
+   */
+  match_name: string;
+};
+
+/**
+ * Live match-queuing info for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
+ */
+export type NexusEventInfo = {
+  /**
+   * Unix timestamp (in milliseconds) of when this data was last fetched from Nexus.
+   */
+  data_as_of_ms: number;
+  now_queueing: NexusNowQueueing | null;
+  /**
+   * Map of TBA match key to live queuing info for that match.
+   */
+  matches: {
+    [key: string]: NexusMatchInfo;
+  };
+};
+
 export type NotablesInsight = {
   data: {
     entries: Array<{
@@ -4568,6 +4632,53 @@ export type GetEventMatchTimeseriesResponses = {
 
 export type GetEventMatchTimeseriesResponse =
   GetEventMatchTimeseriesResponses[keyof GetEventMatchTimeseriesResponses];
+
+export type GetEventNexusInfoData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/nexus_info';
+};
+
+export type GetEventNexusInfoErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventNexusInfoError =
+  GetEventNexusInfoErrors[keyof GetEventNexusInfoErrors];
+
+export type GetEventNexusInfoResponses = {
+  /**
+   * Successful response
+   */
+  200: NexusEventInfo | null;
+};
+
+export type GetEventNexusInfoResponse =
+  GetEventNexusInfoResponses[keyof GetEventNexusInfoResponses];
 
 export type GetEventOprsData = {
   body?: never;

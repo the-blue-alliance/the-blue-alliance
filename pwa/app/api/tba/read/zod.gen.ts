@@ -1053,6 +1053,41 @@ export const zMatchScoreBreakdown2023 = z.object({
   red: zMatchScoreBreakdown2023Alliance,
 });
 
+/**
+ * Estimated timing for a match, as reported by Nexus.
+ */
+export const zNexusMatchTiming = z.object({
+  estimated_queue_time_ms: z.int().nullable(),
+  estimated_start_time_ms: z.int().nullable(),
+});
+
+/**
+ * Live match-queuing info for a single match, as reported by Nexus.
+ */
+export const zNexusMatchInfo = z.object({
+  label: z.string(),
+  status: z.enum(['Queuing soon', 'Now queuing', 'On deck', 'On field']),
+  played: z.boolean(),
+  times: zNexusMatchTiming,
+});
+
+/**
+ * The match currently being queued, as reported by Nexus.
+ */
+export const zNexusNowQueueing = z.object({
+  match_key: z.string(),
+  match_name: z.string(),
+});
+
+/**
+ * Live match-queuing info for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.
+ */
+export const zNexusEventInfo = z.object({
+  data_as_of_ms: z.int(),
+  now_queueing: zNexusNowQueueing.nullable(),
+  matches: z.record(z.string(), zNexusMatchInfo),
+});
+
 export const zNotablesInsight = z.object({
   data: z.object({
     entries: z.array(
@@ -2350,6 +2385,19 @@ export const zGetEventMatchTimeseriesPath = z.object({
  * Successful response
  */
 export const zGetEventMatchTimeseriesResponse = z.array(z.string());
+
+export const zGetEventNexusInfoHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventNexusInfoPath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventNexusInfoResponse = zNexusEventInfo.nullable();
 
 export const zGetEventOprsHeaders = z.object({
   'If-None-Match': z.string().optional(),

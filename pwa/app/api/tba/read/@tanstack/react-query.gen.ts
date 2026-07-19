@@ -28,6 +28,7 @@ import {
   getEventMatches,
   getEventMatchesKeys,
   getEventMatchesSimple,
+  getEventNexusInfo,
   getEventOprs,
   getEventPredictions,
   getEventRankings,
@@ -161,6 +162,9 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleError,
   GetEventMatchesSimpleResponse,
+  GetEventNexusInfoData,
+  GetEventNexusInfoError,
+  GetEventNexusInfoResponse,
   GetEventOprsData,
   GetEventOprsError,
   GetEventOprsResponse,
@@ -1045,6 +1049,34 @@ export const getEventMatchTimeseriesOptions = (
       return data;
     },
     queryKey: getEventMatchTimeseriesQueryKey(options),
+  });
+
+export const getEventNexusInfoQueryKey = (
+  options: Options<GetEventNexusInfoData>,
+) => createQueryKey('getEventNexusInfo', options);
+
+/**
+ * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
+ */
+export const getEventNexusInfoOptions = (
+  options: Options<GetEventNexusInfoData>,
+) =>
+  queryOptions<
+    GetEventNexusInfoResponse,
+    GetEventNexusInfoError,
+    GetEventNexusInfoResponse,
+    ReturnType<typeof getEventNexusInfoQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventNexusInfo({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventNexusInfoQueryKey(options),
   });
 
 export const getEventOprsQueryKey = (options: Options<GetEventOprsData>) =>
