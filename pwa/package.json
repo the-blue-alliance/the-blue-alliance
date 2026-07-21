@@ -48,7 +48,7 @@
     "firebase": "12.16.0",
     "firebase-admin": "14.1.0",
     "fuzzysort": "3.1.0",
-    "isbot": "5.2.0",
+    "isbot": "5.2.1",
     "lodash-es": "4.18.1",
     "lru-cache": "11.5.2",
     "morgan": "1.11.0",
