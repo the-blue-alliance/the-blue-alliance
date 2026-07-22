@@ -55,7 +55,13 @@ class _DatafeedNexus(DatafeedBase[TAPIResponse, TReturn]):
                     EventSyncStatusMemcache(event_key).record_success(endpoint)
 
             return result
-        except (apiproxy_errors.ApplicationError, urlfetch_errors.Error) as e:
+        except (
+            apiproxy_errors.ApplicationError,
+            urlfetch_errors.Error,
+            KeyError,
+            TypeError,
+            ValueError,
+        ) as e:
             if event_key and endpoint:
                 EventSyncStatusMemcache(event_key).record_failure(endpoint)
             logging.warning(f"Nexus datafeed fetch failed: {e}")
