@@ -130,7 +130,7 @@ class FMSAPIHybridScheduleParser(
             sorted_teams = list(
                 sorted(
                     teams_data,
-                    key=lambda team: team["station"],
+                    key=lambda team: (team["station"] is None, team["station"] or ""),
                 )
             )
 
