@@ -25,7 +25,7 @@
     "@base-ui/react": "1.6.0",
     "@fontsource-variable/roboto": "5.2.10",
     "@scalar/api-reference-react": "0.9.57",
-    "@scalar/react-renderer": "0.4.1",
+    "@scalar/react-renderer": "0.4.2",
     "@sentry/tanstackstart-react": "10.66.0",
     "@tanstack/react-query": "5.101.2",
     "@tanstack/react-query-devtools": "5.101.2",
