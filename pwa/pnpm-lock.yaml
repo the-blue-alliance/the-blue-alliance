@@ -81,8 +81,8 @@ importers:
         specifier: 12.16.0
         version: 12.16.0
       firebase-admin:
-        specifier: 14.1.0
-        version: 14.1.0
+        specifier: 14.2.0
+        version: 14.2.0
       fuzzysort:
         specifier: 3.1.0
         version: 3.1.0
@@ -1408,8 +1408,8 @@ packages:
   '@fontsource-variable/roboto@5.2.10':
     resolution: {integrity: sha512-LJ0iLg6aHbLzN515gyHzmdTqJzd9NlI95cCg1DW0F5G7KkFqRLBBKBbqEJx4nSu4aby3IKmw3ZH6Fe928IfaSQ==}
 
-  '@google-cloud/firestore@8.6.0':
-    resolution: {integrity: sha512-TdvZHfwQj5B5CSDEgDqyrhdVqtOSupmBXDQPasMAJiC64tjsGvyMooNiC43fdk1TsUHeklyoZ6/vQ1TjWKVMbg==}
+  '@google-cloud/firestore@8.7.0':
+    resolution: {integrity: sha512-EvMpZQUXkTRdweSvOu6VL6EEQwHjHAgWz2UYZR+Mj6Ao52S+TWieHbSn15jiNnEw8F8RhbZj7IGXZ1PFB1eA+A==}
     engines: {node: '>=18'}
 
   '@google-cloud/paginator@5.0.2':
@@ -1613,8 +1613,8 @@ packages:
       '@emnapi/core': ^1.7.1
       '@emnapi/runtime': ^1.7.1
 
-  '@nodable/entities@2.2.0':
-    resolution: {integrity: sha512-9uGyhaQavEUMC8AIddIjau4NsnsXhou+j5sBAGojCM1oxmQpVKTWR/9JxABD6UAv12vpIms55fPZKFQEhG6uBg==}
+  '@nodable/entities@3.0.0':
+    resolution: {integrity: sha512-8L9xFeTYKhm49xfIypoe2W5wV1m/3Z58kT+7kR9A8OyFxcPduI4VmxaUMQyKYrRjUoLLSXv6EKKID5Tvj9cUVw==}
 
   '@nodelib/fs.scandir@2.1.5':
     resolution: {integrity: sha512-vq24Bq3ym5HEQm2NKCr3yXDwjc7vTsEThRDnkp2DK9p1uqLR+DHurm/NOTo0KG7HYHU7eppKZj3MyqYuMBf62g==}
@@ -4432,10 +4432,6 @@ packages:
   extend@3.0.2:
     resolution: {integrity: sha512-fjquC59cD7CyW6urNXK0FBufkZcoiGG80wTuPujX590cB5Ttln20E2UB4S/WARVqhXffZl2LNgS+gQdPIIim/g==}
 
-  farmhash-modern@1.1.0:
-    resolution: {integrity: sha512-6ypT4XfgqJk/F3Yuv4SX26I3doUjt0GTG4a+JgWxXQpxXzTBq8fPUeGHfcYMMDPHJHm3yPOSjaeBwBGAHWXCdA==}
-    engines: {node: '>=18.0.0'}
-
   fast-copy@4.0.4:
     resolution: {integrity: sha512-eVAiWVNPSEGIzDl5yPuLrx8fNMogScXvD9xp1Kzd41FjRIz2I3sSIcxsFeM5EzFfHAfobdvs8ZySffUopljvIA==}
 
@@ -4461,8 +4457,8 @@ packages:
   fast-xml-builder@1.3.0:
     resolution: {integrity: sha512-F74cZEdCvuw9P41GAC3rod4X04jjWGM1JPEv/GWSqFTWLsdyMSBMBMlm9Hk3GLBgLBbdBNY8yee0pQh2RBVESQ==}
 
-  fast-xml-parser@5.10.0:
-    resolution: {integrity: sha512-SLhnTEqE5QpJHq/6zl9bsmImEP2adv+y6Wy+cJa7nVTRzQh1OZfCe9k29M5xN74LWnu0xa1zrUrq3KnOKl92Fg==}
+  fast-xml-parser@5.10.1:
+    resolution: {integrity: sha512-IEMIf7298kXuZSRFoGfMYrl7is8LpavODgbNz1cwIudv7KwVFnuU+UsMporfq6PD6aXSlawZlARiA3UywCTfMw==}
     hasBin: true
 
   fastq@1.20.1:
@@ -4515,8 +4511,8 @@ packages:
     resolution: {integrity: sha512-78/PXT1wlLLDgTzDs7sjq9hzz0vXD+zn+7wypEe4fXQxCmdmqfGsEPQxmiCSQI3ajFV91bVSsvNtrJRiW6nGng==}
     engines: {node: '>=10'}
 
-  firebase-admin@14.1.0:
-    resolution: {integrity: sha512-GdHh6vHWm9LVRt+3hINWczaA7fPwnN/l4xZdqzn+wNPYErrLI1x6u1mvAJM/5IGgYI9EqQgLt1EyBG8ok/hWCg==}
+  firebase-admin@14.2.0:
+    resolution: {integrity: sha512-zfs5PdccEgjX479bbMmz95Rqc7ttQ4LV3qkGFlPiqOaOu/suBZc3fG52Qzn2hQjiSHkBM4NP2AZV5r2NvAt0TQ==}
     engines: {node: '>=22'}
 
   firebase@12.16.0:
@@ -5236,6 +5232,9 @@ packages:
 
   jose@6.2.3:
     resolution: {integrity: sha512-YYVDInQKFJfR/xa3ojUTl8c2KoTwiL1R5Wg9YCydwH0x0B9grbzlg5HC7mMjCtUJjbQ/YnGEZIhI5tCgfTb4Hw==}
+
+  jose@6.2.4:
+    resolution: {integrity: sha512-N8acGzVsQy6M/fjFcxtysNc4Q379TcM5dM/qKkNtsHFji88yANnXTr7BLeP75iPnFwBfQzM/jg2BZ9+HZrHCZA==}
 
   joycon@3.1.1:
     resolution: {integrity: sha512-34wB/Y7MW7bzjKRjUKTa46I2Z7eV62Rkhva+KkopW7Qvv/OSWBqvkSY7vusOPrNuZcUG3tApvdVgNB8POj3SPw==}
@@ -9093,7 +9092,7 @@ snapshots:
 
   '@fontsource-variable/roboto@5.2.10': {}
 
-  '@google-cloud/firestore@8.6.0':
+  '@google-cloud/firestore@8.7.0':
     dependencies:
       '@opentelemetry/api': 1.9.1
       fast-deep-equal: 3.1.3
@@ -9124,7 +9123,7 @@ snapshots:
       abort-controller: 3.0.0
       async-retry: 1.3.3
       duplexify: 4.1.3
-      fast-xml-parser: 5.10.0
+      fast-xml-parser: 5.10.1
       gaxios: 6.7.1
       google-auth-library: 9.15.1
       html-entities: 2.6.0
@@ -9398,7 +9397,7 @@ snapshots:
       '@tybys/wasm-util': 0.10.3
     optional: true
 
-  '@nodable/entities@2.2.0':
+  '@nodable/entities@3.0.0':
     optional: true
 
   '@nodelib/fs.scandir@2.1.5':
@@ -12593,8 +12592,6 @@ snapshots:
 
   extend@3.0.2: {}
 
-  farmhash-modern@1.1.0: {}
-
   fast-copy@4.0.4: {}
 
   fast-deep-equal@3.1.3: {}
@@ -12621,9 +12618,9 @@ snapshots:
       xml-naming: 0.3.0
     optional: true
 
-  fast-xml-parser@5.10.0:
+  fast-xml-parser@5.10.1:
     dependencies:
-      '@nodable/entities': 2.2.0
+      '@nodable/entities': 3.0.0
       fast-xml-builder: 1.3.0
       is-unsafe: 2.0.0
       path-expression-matcher: 1.6.2
@@ -12686,18 +12683,17 @@ snapshots:
       locate-path: 6.0.0
       path-exists: 4.0.0
 
-  firebase-admin@14.1.0:
+  firebase-admin@14.2.0:
     dependencies:
       '@fastify/busboy': 3.2.0
       '@firebase/database-compat': 2.1.4
       '@firebase/database-types': 1.0.20
-      farmhash-modern: 1.1.0
       fast-deep-equal: 3.1.3
       google-auth-library: 10.9.0
       jsonwebtoken: 9.0.3
       jwks-rsa: 4.1.0
     optionalDependencies:
-      '@google-cloud/firestore': 8.6.0
+      '@google-cloud/firestore': 8.7.0
       '@google-cloud/storage': 7.21.0
     transitivePeerDependencies:
       - encoding
@@ -13566,6 +13562,8 @@ snapshots:
 
   jose@6.2.3: {}
 
+  jose@6.2.4: {}
+
   joycon@3.1.1: {}
 
   js-base64@3.9.1: {}
@@ -13650,7 +13648,7 @@ snapshots:
     dependencies:
       '@types/jsonwebtoken': 9.0.10
       debug: 4.4.3
-      jose: 6.2.3
+      jose: 6.2.4
       limiter: 1.1.5
       lru-cache: 11.5.2
       lru-memoizer: 3.0.0
