@@ -106,7 +106,7 @@ jobs:
           uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.python == 'true'
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f  # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
@@ -164,7 +164,7 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.node == 'true'
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f  # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/

@@ -23,7 +23,7 @@ jobs:
       - name: Generate merge bot token
         id: generate_token
         if: steps.dependabot-metadata.outputs.update-type != 'version-update:semver-major'
-        uses: actions/create-github-app-token@v3.2.0
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
         with:
           app-id: ${{ secrets.MERGE_BOT_APP_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
@@ -49,7 +49,7 @@ jobs:
     steps:
       - name: Generate merge bot token
         id: app-token
-        uses: actions/create-github-app-token@v3.2.0
+        uses: actions/create-github-app-token@bcd2ba49218906704ab6c1aa796996da409d3eb1  # v3.2.0
         with:
           app-id: ${{ secrets.MERGE_BOT_APP_ID }}
           private-key: ${{ secrets.MERGE_BOT_PRIVATE_KEY }}
@@ -60,7 +60,7 @@ jobs:
           ref: ${{ github.head_ref }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5
         with:
           version: "10.24.0"
 

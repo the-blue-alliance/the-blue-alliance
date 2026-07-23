@@ -30,7 +30,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5
         with:
           version: "10.24.0"
 
@@ -62,7 +62,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5
         with:
           version: "10.24.0"
 
@@ -91,7 +91,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5
         with:
           version: "10.24.0"
 
@@ -112,7 +112,7 @@ jobs:
         run: pnpm --dir pwa test
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f  # v7.0.0
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
@@ -126,7 +126,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5
         with:
           version: "10.24.0"
 
@@ -155,7 +155,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5
         with:
           version: "10.24.0"
 
@@ -202,7 +202,7 @@ jobs:
           ref: ${{ github.event.pull_request.head.sha }}
 
       - name: Set up pnpm
-        uses: pnpm/action-setup@v5
+        uses: pnpm/action-setup@fc06bc1257f339d1d5d8b3a19a8cae5388b55320  # v5
         with:
           version: "10.24.0"
 

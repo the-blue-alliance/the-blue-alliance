@@ -43,12 +43,12 @@ jobs:
           path: pwa/
 
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093  # v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
 
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v3
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db  # v3
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -61,7 +61,7 @@ jobs:
             --quiet
 
       - name: Post Preview URL Comment
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9
         env:
           PROJECT_ID: ${{ secrets.GCLOUD_PROJECT_ID }}
           PR_NUMBER: ${{ steps.meta.outputs.pr_number }}
@@ -121,12 +121,12 @@ jobs:
 
     steps:
       - name: Authenticate to Google Cloud
-        uses: google-github-actions/auth@v3
+        uses: google-github-actions/auth@7c6bc770dae815cd3e89ee6cdf493a5fab2cc093  # v3
         with:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
 
       - name: Setup Google Cloud Platform
-        uses: google-github-actions/setup-gcloud@v3
+        uses: google-github-actions/setup-gcloud@aa5489c8933f4cc7a4f7d45035b3b1440c9c10db  # v3
         with:
           version: "latest"
           project_id: ${{ secrets.GCLOUD_PROJECT_ID }}
@@ -139,7 +139,7 @@ jobs:
           || echo "Version $PR_VERSION not found, skipping."
 
       - name: Update PR Comment
-        uses: actions/github-script@v9
+        uses: actions/github-script@3a2844b7e9c422d3c10d287c895573f7108da1b3  # v9
         with:
           script: |
             const prNumber = context.payload.pull_request.number;
