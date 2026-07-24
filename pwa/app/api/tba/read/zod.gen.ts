@@ -577,7 +577,7 @@ export const zMatchScoreBreakdown2018Alliance = z.object({
   faceTheBossRankingPoint: z.boolean(),
   foulCount: z.int().optional(),
   foulPoints: z.int(),
-  rp: z.int(),
+  rp: z.number(),
   techFoulCount: z.int().optional(),
   teleopOwnershipPoints: z.int(),
   teleopPoints: z.int(),
@@ -645,7 +645,7 @@ export const zMatchScoreBreakdown2024Alliance = z.object({
   micCenterStage: z.boolean().optional(),
   micStageLeft: z.boolean().optional(),
   micStageRight: z.boolean().optional(),
-  rp: z.int(),
+  rp: z.number(),
   techFoulCount: z.int().optional(),
   teleopAmpNoteCount: z.int().optional(),
   teleopAmpNotePoints: z.int().optional(),
@@ -685,7 +685,7 @@ export const zMatchScoreBreakdown2026Alliance = z.object({
   hubScore: zHubScore2026,
   majorFoulCount: z.int(),
   minorFoulCount: z.int(),
-  rp: z.int(),
+  rp: z.number(),
   superchargedAchieved: z.boolean(),
   totalAutoPoints: z.int(),
   totalPoints: z.int(),
@@ -1041,7 +1041,7 @@ export const zMatchScoreBreakdown2023Alliance = z.object({
   teleopGamePiecePoints: z.int().optional(),
   totalChargeStationPoints: z.int().optional(),
   teleopPoints: z.int(),
-  rp: z.int(),
+  rp: z.number(),
   totalPoints: z.int(),
 });
 
@@ -1285,7 +1285,7 @@ export const zMatchScoreBreakdown2019Alliance = z.object({
   preMatchLevelRobot1: zEndgameRobot2019,
   preMatchLevelRobot2: zEndgameRobot2019,
   preMatchLevelRobot3: zEndgameRobot2019,
-  rp: z.int(),
+  rp: z.number(),
   sandStormBonusPoints: z.int(),
   techFoulCount: z.int().optional(),
   teleopPoints: z.int(),
@@ -1353,7 +1353,7 @@ export const zMatchScoreBreakdown2025Alliance = z.object({
   g418Penalty: z.boolean(),
   g428Penalty: z.boolean(),
   netAlgaeCount: z.int(),
-  rp: z.int(),
+  rp: z.number(),
   techFoulCount: z.int(),
   teleopCoralCount: z.int(),
   teleopCoralPoints: z.int(),
@@ -1490,7 +1490,7 @@ export const zMatchScoreBreakdown2020Alliance = z.object({
   techFoulCount: z.int(),
   adjustPoints: z.int().optional(),
   foulPoints: z.int(),
-  rp: z.int().optional(),
+  rp: z.number().optional(),
   totalPoints: z.int(),
 });
 
@@ -1543,7 +1543,7 @@ export const zMatchScoreBreakdown2022Alliance = z.object({
   techFoulCount: z.int().optional(),
   adjustPoints: z.int().optional(),
   foulPoints: z.int().optional(),
-  rp: z.int().nullish(),
+  rp: z.number().nullish(),
   totalPoints: z.int().optional(),
 });
 
