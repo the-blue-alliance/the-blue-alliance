@@ -1,6 +1,7 @@
+import * as Sentry from '@sentry/tanstackstart-react';
 import { dehydrate, hydrate } from '@tanstack/react-query';
 import { Temporal } from 'temporal-polyfill';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { ApiError } from '~/lib/apiError';
 import {
@@ -8,6 +9,10 @@ import {
   createQueryClient,
   staleTimeForYear,
 } from '~/lib/queryClient';
+
+vi.mock('@sentry/tanstackstart-react', () => ({
+  captureException: vi.fn(),
+}));
 
 describe.concurrent('createQueryClient', () => {
   test('defaults staleTime to STALE_TIME.DEFAULT', () => {
@@ -39,6 +44,60 @@ describe.concurrent('createQueryClient', () => {
     expect(retry(2, new ApiError('server error', 500))).toEqual(true);
     expect(retry(3, new ApiError('server error', 500))).toEqual(false);
     expect(retry(0, new Error('network error'))).toEqual(true);
+  });
+
+  test('onError reports non-404 ApiErrors to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('server error', 500);
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-500'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow();
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test('onError reports non-ApiErrors (e.g. network failures) to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new Error('network error');
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-network'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow();
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test('onError does not report 404 ApiErrors to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('not found', 404);
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-404'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow();
+
+    expect(Sentry.captureException).not.toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
   });
 
   test('freshly hydrated data is not stale under the default staleTime', () => {

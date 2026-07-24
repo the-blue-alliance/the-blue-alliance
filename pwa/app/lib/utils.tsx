@@ -1,7 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
 import { type ClassValue, clsx } from 'clsx';
-import pino from 'pino';
 import { Fragment, type ReactNode } from 'react';
 import { twMerge } from 'tailwind-merge';
 import { Temporal } from 'temporal-polyfill';
@@ -9,6 +8,7 @@ import { Temporal } from 'temporal-polyfill';
 import { WltRecord } from '~/api/tba/read';
 import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { RequestResult } from '~/api/tba/read/client';
+import { ApiError } from '~/lib/apiError';
 import { STALE_TIME } from '~/lib/queryClient';
 
 export function useValidYears() {
@@ -282,7 +282,12 @@ export async function queryFromAPI<T>(
     return Promise.resolve(resp.data as T);
   }
 
-  return Promise.reject(new Error((resp.response?.status ?? 0).toString()));
+  return Promise.reject(
+    new ApiError(
+      resp.response?.statusText || String(resp.response?.status ?? 0),
+      resp.response?.status ?? 0,
+    ),
+  );
 }
 
 // https://web.archive.org/web/20250409124545/https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
@@ -314,61 +319,7 @@ export function hoursToMilliseconds(hours: number): number {
   return minutesToMilliseconds(hours * 60);
 }
 
-// Map Pino log levels to Google Cloud Logging severity levels
-const PINO_TO_GCP_SEVERITY: Record<string, string> = {
-  10: 'DEBUG', // trace
-  20: 'DEBUG', // debug
-  30: 'INFO', // info
-  40: 'WARNING', // warn
-  50: 'ERROR', // error
-  60: 'CRITICAL', // fatal
-};
-
-export function createLogger(name: string) {
-  const isDev = process.env.NODE_ENV !== 'production';
-
-  if (isDev) {
-    // In development, use pino-pretty for human-readable output
-    return pino({
-      name,
-      transport: { target: 'pino-pretty' },
-    });
-  }
-
-  // In production (App Engine), output structured JSON for Cloud Logging
-  // See: https://cloud.google.com/run/docs/logging#writing-structured-logs
-  return pino({
-    name,
-    level: 'info',
-    // Use 'message' instead of 'msg' for Google Cloud Logging compatibility
-    messageKey: 'message',
-    // Omit default base fields (pid, hostname) - not needed for Cloud Logging
-    base: undefined,
-    // Format logs for Google Cloud Logging
-    formatters: {
-      level(label, number) {
-        return { severity: PINO_TO_GCP_SEVERITY[number] || 'INFO' };
-      },
-      log(object) {
-        // The log formatter receives custom fields (from both mixin and log call)
-        // Transform them into Google Cloud Logging labels format
-        if (Object.keys(object).length === 0) {
-          return {};
-        }
-
-        return {
-          'logging.googleapis.com/labels': object,
-        };
-      },
-    },
-    // Add logger name to every log entry (will be picked up by log formatter)
-    mixin() {
-      return {
-        logger: name,
-      };
-    },
-  });
-}
+export { createLogger } from '~/lib/logger';
 
 export function doThrowNotFound(): never {
   throw notFound();

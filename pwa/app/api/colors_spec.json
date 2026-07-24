@@ -1,0 +1,175 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "version": "v1",
+    "title": "FRC Colors API",
+    "description": "Team primary/secondary colors, either verified by teams or automatically extracted from their avatars. See [frc-colors.com](https://frc-colors.com) and the [API docs](https://github.com/jonahsnider/frc-colors.com#api-usage)."
+  },
+  "servers": [
+    {
+      "url": "https://api.frc-colors.com"
+    }
+  ],
+  "paths": {
+    "/v1/event/{eventKey}": {
+      "get": {
+        "operationId": "getEventColors",
+        "summary": "Get colors for all teams at an event",
+        "parameters": [
+          {
+            "name": "eventKey",
+            "description": "The TBA event key, e.g. `2023cc`.",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Colors for all teams at the event.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventColors"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/team/{teamNumber}": {
+      "get": {
+        "operationId": "getTeamColors",
+        "summary": "Get colors for a single team",
+        "parameters": [
+          {
+            "name": "teamNumber",
+            "description": "The team's number, e.g. `581`.",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "integer"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Colors for the requested team.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamWithColor"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/v1/team": {
+      "get": {
+        "operationId": "getTeamColorsBatch",
+        "summary": "Get colors for multiple teams, or all teams",
+        "description": "Pass one or more `team` query params to fetch specific teams, or `all` to fetch every team in the system.",
+        "parameters": [
+          {
+            "name": "team",
+            "description": "A team number to include. Repeat to request multiple teams, e.g. `?team=581&team=751`.",
+            "in": "query",
+            "required": false,
+            "style": "form",
+            "explode": true,
+            "schema": {
+              "type": "array",
+              "items": {
+                "type": "integer"
+              }
+            }
+          },
+          {
+            "name": "all",
+            "description": "If present, fetch colors for every team in the system instead of specific teams.",
+            "in": "query",
+            "required": false,
+            "allowEmptyValue": true,
+            "schema": {
+              "type": "boolean"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Colors for the requested teams.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventColors"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "schemas": {
+      "EventColors": {
+        "type": "object",
+        "properties": {
+          "teams": {
+            "type": "object",
+            "description": "Team colors keyed by team number.",
+            "additionalProperties": {
+              "x-additionalPropertiesName": "teamNumber",
+              "$ref": "#/components/schemas/TeamWithColor"
+            }
+          }
+        },
+        "required": ["teams"]
+      },
+      "TeamWithColor": {
+        "type": "object",
+        "properties": {
+          "teamNumber": {
+            "type": "integer",
+            "description": "The team's number."
+          },
+          "colors": {
+            "description": "The team's colors, or `null` if the team has none on record.",
+            "anyOf": [
+              {
+                "$ref": "#/components/schemas/TeamColors"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          }
+        },
+        "required": ["teamNumber", "colors"]
+      },
+      "TeamColors": {
+        "type": "object",
+        "properties": {
+          "primaryHex": {
+            "type": "string",
+            "description": "The team's primary color, in hexadecimal format."
+          },
+          "secondaryHex": {
+            "type": "string",
+            "description": "The team's secondary/accent color, in hexadecimal format."
+          },
+          "verified": {
+            "type": "boolean",
+            "description": "Whether these colors were manually verified by the team, as opposed to automatically extracted from their avatar."
+          }
+        },
+        "required": ["primaryHex", "secondaryHex", "verified"]
+      }
+    }
+  }
+}

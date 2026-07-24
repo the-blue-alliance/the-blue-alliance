@@ -8,7 +8,8 @@ import {
   useState,
 } from 'react';
 
-import { type EventColors, getEventColors } from '~/api/colors';
+import { type EventColors } from '~/api/colors';
+import { getEventColorsOptions } from '~/api/colors/@tanstack/react-query.gen';
 import {
   AllianceColor,
   CompLevel,
@@ -132,8 +133,7 @@ function matchLabel(match: Match): string {
 
 // --- Types ---
 
-type ColorsQueryResult =
-  { status: number; data: EventColors } | { status: 500 } | undefined;
+type ColorsQueryResult = EventColors | undefined;
 
 // --- Team color helper ---
 
@@ -147,9 +147,8 @@ function resolveTeamColors(
   teamKey: string,
   colors: ColorsQueryResult,
 ): TeamCellColors | null {
-  if (colors === undefined || colors.status === 500 || !('data' in colors))
-    return null;
-  const tc = colors.data.teams[teamKey.substring(3)]?.colors;
+  if (colors === undefined) return null;
+  const tc = colors.teams[teamKey.substring(3)]?.colors;
   if (!tc) return null;
   const bg = tc.primaryHex.startsWith('#')
     ? tc.primaryHex
@@ -717,8 +716,7 @@ function ChampsPage() {
 
   const colorsQueries = useQueries({
     queries: cmpDivisions.map((div) => ({
-      queryKey: ['eventColors', div.key],
-      queryFn: () => getEventColors({ eventKey: div.key }),
+      ...getEventColorsOptions({ path: { eventKey: div.key } }),
       refetchInterval: REFETCH_INTERVAL,
     })),
   });
