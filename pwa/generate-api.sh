@@ -3,5 +3,4 @@ npx @hey-api/openapi-ts -f openapi-ts/read.config.ts
 npx @hey-api/openapi-ts -f openapi-ts/mobile.config.ts
 npx @hey-api/openapi-ts -f openapi-ts/nexus.config.ts
 
-npm run lint:fix
-npm run format:fix
+pnpm exec prettier --write app/api/tba/read app/api/tba/mobile app/api/nexus

@@ -1,6 +1,7 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
+import { Temporal } from 'temporal-polyfill';
 
 import MoonIcon from '~icons/lucide/moon';
 import SunIcon from '~icons/lucide/sun';
@@ -83,7 +84,27 @@ function ThemeToggle() {
   );
 }
 
-export const Footer = ({ renderTime }: { renderTime: string }) => {
+// Computed client-side (rather than in the root loader) so the timestamp
+// doesn't make the root loader non-deterministic — a stale value baked into
+// every cached SSR response and a hydration-mismatch hazard.
+function formatRenderTime(): string {
+  return Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric',
+    hour: 'numeric',
+    minute: 'numeric',
+    hour12: true,
+  });
+}
+
+export const Footer = () => {
+  const [renderTime, setRenderTime] = useState<string | null>(null);
+
+  useEffect(() => {
+    setRenderTime(formatRenderTime());
+  }, []);
+
   return (
     <footer
       className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
@@ -161,7 +182,7 @@ export const Footer = ({ renderTime }: { renderTime: string }) => {
             >
               <i>FIRST</i>® Events API
             </a>
-            . Generated on {renderTime}. Commit:{' '}
+            {renderTime && <>. Generated on {renderTime}</>}. Commit:{' '}
             <a
               href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
               target="_blank"

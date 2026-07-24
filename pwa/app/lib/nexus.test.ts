@@ -4,6 +4,7 @@ import { pullLiveEventStatus } from '~/api/nexus/sdk.gen';
 import type { EventStatus } from '~/api/nexus/types.gen';
 import {
   buildNexusStatusMap,
+  fetchNexusEventStatus,
   fetchNexusEventStatusHandler,
   tbaEventKeyToNexusKey,
 } from '~/lib/nexus';
@@ -66,6 +67,14 @@ describe('tbaEventKeyToNexusKey', () => {
   it('returns non-division event keys unchanged', () => {
     expect(tbaEventKeyToNexusKey('2024casf')).toBe('2024casf');
     expect(tbaEventKeyToNexusKey('2026cmptx')).toBe('2026cmptx');
+  });
+});
+
+describe('fetchNexusEventStatus', () => {
+  it('rejects non-string input', async () => {
+    await expect(
+      fetchNexusEventStatus({ data: 123 as unknown as string }),
+    ).rejects.toThrow();
   });
 });
 
