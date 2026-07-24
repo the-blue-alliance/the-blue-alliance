@@ -7,6 +7,7 @@ import { toast } from 'sonner';
 import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
 
 import { Button } from '~/components/ui/button';
+import { ApiError } from '~/lib/apiError';
 import { createQueryClient } from '~/lib/queryClient';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
@@ -132,7 +133,12 @@ function ErrorComponent({ error }: { error: Error }) {
   routerLogger.error(error, 'Router error');
 
   useEffect(() => {
-    Sentry.captureException(error);
+    // ApiErrors that bubble up here already went through the QueryCache's
+    // onError handler (see ~/lib/queryClient.ts), which reports them to
+    // Sentry — avoid double-reporting the same failure.
+    if (!(error instanceof ApiError)) {
+      Sentry.captureException(error);
+    }
   }, [error]);
 
   const stack = error.stack ?? error.message;

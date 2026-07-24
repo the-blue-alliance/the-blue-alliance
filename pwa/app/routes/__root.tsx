@@ -11,6 +11,7 @@ import { Suspense, lazy, useEffect } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
+import { client as colorsClient } from '~/api/colors/client.gen';
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
 import {
   getSearchIndexOptions,
@@ -71,6 +72,15 @@ client.interceptors.request.use((request) => {
 // Attach the HTTP status code to thrown errors so the QueryClient's retry
 // function can distinguish 4xx "client error" failures from transient ones.
 client.interceptors.error.use((_error, response) => {
+  return new ApiError(
+    response?.statusText || String(response?.status ?? 0),
+    response?.status ?? 0,
+  );
+});
+
+// Same ApiError mapping for the colors client — consumers rely on 404s being
+// skipped and 4xx not being retried (see queryClient.ts).
+colorsClient.interceptors.error.use((_error, response) => {
   return new ApiError(
     response?.statusText || String(response?.status ?? 0),
     response?.status ?? 0,

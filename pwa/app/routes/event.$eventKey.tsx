@@ -22,7 +22,7 @@ import LiveWebcastIcon from '~icons/lucide/video';
 import MediaIcon from '~icons/mdi/folder-media-outline';
 import ResultsIcon from '~icons/mdi/tournament';
 
-import { getEventColors } from '~/api/colors';
+import { getEventColorsOptions } from '~/api/colors/@tanstack/react-query.gen';
 import {
   Award,
   CompLevel,
@@ -335,16 +335,17 @@ function EventPage() {
     staleTime: eventStaleTime,
   });
 
-  const { data: matches } = useSuspenseQuery({
+  const matchesQuery = useQuery({
     ...getEventMatchesOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
   });
+  const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data]);
 
-  const { data: unsafeAlliances } = useSuspenseQuery({
+  const alliancesQuery = useQuery({
     ...getEventAlliancesOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
   });
-  const alliances = unsafeAlliances ?? [];
+  const alliances = alliancesQuery.data ?? [];
 
   const awardsQuery = useQuery({
     ...getEventAwardsOptions({ path: { event_key: eventKey } }),
@@ -357,8 +358,7 @@ function EventPage() {
   });
 
   const colorsQuery = useQuery({
-    queryKey: ['eventColors', eventKey],
-    queryFn: () => getEventColors({ eventKey: eventKey }),
+    ...getEventColorsOptions({ path: { eventKey: eventKey } }),
     staleTime: eventStaleTime,
   });
 
@@ -750,11 +750,7 @@ function EventPage() {
                 }
               >
                 <CoprScatterChart
-                  colors={
-                    colorsQuery.data?.status === 200
-                      ? colorsQuery.data.data
-                      : { teams: {} }
-                  }
+                  colors={colorsQuery.data ?? { teams: {} }}
                   coprs={coprsQuery.data}
                   defaultXCopr={getDefaultTeleopComponentName(event.year)}
                   defaultYCopr={getDefaultAutoComponentName(event.year)}

@@ -1,7 +1,11 @@
-import { QueryClient } from '@tanstack/react-query';
+import * as Sentry from '@sentry/tanstackstart-react';
+import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { Temporal } from 'temporal-polyfill';
 
 import { ApiError } from '~/lib/apiError';
+import { createLogger } from '~/lib/logger';
+
+const queryErrorLogger = createLogger('queryError');
 
 /**
  * `staleTime` tiers for TanStack Query.
@@ -58,6 +62,27 @@ export function staleTimeForYear(year: number): number {
 
 export function createQueryClient(): QueryClient {
   return new QueryClient({
+    queryCache: new QueryCache({
+      // Fires once per query, after retries are exhausted, for every consumer
+      // (loader ensureQueryData, useQuery, useSuspenseQuery alike) — so this is
+      // the single seam where a failed request gets reported, regardless of
+      // how (or whether) the caller falls back to empty data for rendering.
+      onError: (error, query) => {
+        // A 404 means the resource is legitimately absent (optional data like
+        // nexus status/colors, or a key that resolves to a not-found page) —
+        // not "something went wrong," so don't report it.
+        if (error instanceof ApiError && error.status === 404) {
+          return;
+        }
+        queryErrorLogger.error(
+          { err: error, queryKey: query.queryKey },
+          'Query failed',
+        );
+        Sentry.captureException(error, {
+          contexts: { query: { queryKey: query.queryKey } },
+        });
+      },
+    }),
     defaultOptions: {
       queries: {
         staleTime: STALE_TIME.DEFAULT,

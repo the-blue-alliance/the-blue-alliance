@@ -156,10 +156,14 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         .ensureQueryData(
           getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
         )
-        .catch((): number[] => []),
+        // Distinguish "fetch failed" from "team genuinely has no years" —
+        // coercing a failure to [] would make the check below always redirect
+        // or 404, even though the failure was already reported (see
+        // ~/lib/queryClient.ts's onError) and has nothing to do with the year.
+        .catch((): number[] | null => null),
     ]);
 
-    if (!yearsParticipated.includes(year)) {
+    if (yearsParticipated !== null && !yearsParticipated.includes(year)) {
       if (params.year === undefined) {
         throw redirect({
           to: '/team/$teamNumber/history',
@@ -260,37 +264,45 @@ function TeamPage(): React.JSX.Element {
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key: teamKey } }),
   );
-  const { data: media } = useSuspenseQuery({
+  const mediaQuery = useQuery({
     ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: socials } = useSuspenseQuery(
+  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
+  const socialsQuery = useQuery(
     getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
   );
-  const { data: yearsParticipated } = useSuspenseQuery(
+  const socials = socialsQuery.data ?? [];
+  const yearsParticipatedQuery = useQuery(
     getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
   );
-  const { data: events } = useSuspenseQuery({
+  const yearsParticipated = yearsParticipatedQuery.data ?? [];
+  const eventsQuery = useQuery({
     ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: matches } = useSuspenseQuery({
+  const events = useMemo(() => eventsQuery.data ?? [], [eventsQuery.data]);
+  const matchesQuery = useQuery({
     ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: statuses } = useSuspenseQuery({
+  const matches = matchesQuery.data ?? [];
+  const statusesQuery = useQuery({
     ...getTeamEventsStatusesByYearOptions({
       path: { team_key: teamKey, year },
     }),
     staleTime: yearStaleTime,
   });
-  const { data: awards } = useSuspenseQuery({
+  const statuses = statusesQuery.data ?? {};
+  const awardsQuery = useQuery({
     ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: districts } = useSuspenseQuery(
+  const awards = awardsQuery.data ?? [];
+  const districtsQuery = useQuery(
     getTeamDistrictsOptions({ path: { team_key: teamKey } }),
   );
+  const districts = districtsQuery.data ?? [];
 
   const currentDistrict = districts.find((d) => d.year === year);
 

@@ -1,14 +1,44 @@
 import { describe, expect, test } from 'vitest';
 
+import { RequestResult } from '~/api/tba/read/client';
+import { ApiError } from '~/lib/apiError';
 import {
   camelCaseToHumanReadable,
   hasAnyMatches,
   median,
   parseParamsForYearElseDefault,
+  queryFromAPI,
   removeNonNumeric,
   slugify,
   splitIntoNChunks,
 } from '~/lib/utils';
+
+describe.concurrent('queryFromAPI', () => {
+  test('resolves with the response data on success', async () => {
+    const apiPromise = Promise.resolve({
+      data: 42,
+      error: undefined,
+      response: new Response(),
+    }) as RequestResult<number, unknown, false>;
+
+    await expect(queryFromAPI(apiPromise)).resolves.toEqual(42);
+  });
+
+  test('rejects with an ApiError carrying the response status on failure', async () => {
+    const apiPromise = Promise.resolve({
+      data: undefined,
+      error: 'not found',
+      response: new Response(null, { status: 404, statusText: 'Not Found' }),
+    }) as RequestResult<unknown, unknown, false>;
+
+    const rejection = queryFromAPI(apiPromise);
+    await expect(rejection).rejects.toBeInstanceOf(ApiError);
+    await expect(rejection).rejects.toMatchObject({
+      status: 404,
+      message: 'Not Found',
+    });
+  });
+});
 
 describe.concurrent('parseParamsForYearElseDefault', () => {
   const currentSeason = 2026;
