@@ -70,6 +70,13 @@ class JSONRankingsParser:
                 if not isinstance(ranking.get(attr), int):
                     raise ParserInputException(f"Ranking must have an integer '{attr}'")
 
+            missing_breakdowns = [b for b in breakdowns if b not in ranking]
+            if missing_breakdowns:
+                raise ParserInputException(
+                    f"Ranking for team '{ranking['team_key']}' is missing values "
+                    f"for breakdown(s): {', '.join(missing_breakdowns)}"
+                )
+
             rankings.append(
                 RankingsHelper.build_ranking(
                     year,
