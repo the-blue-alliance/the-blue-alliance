@@ -8392,7 +8392,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "techFoulCount": {
             "type": "integer"
@@ -8651,7 +8651,7 @@
             "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "sandStormBonusPoints": {
             "type": "integer"
@@ -8829,7 +8829,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "totalPoints": {
             "type": "integer"
@@ -8971,7 +8971,7 @@
           },
           "rp": {
             "type": [
-              "integer",
+              "number",
               "null"
             ]
           },
@@ -9232,7 +9232,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "totalPoints": {
             "type": "integer"
@@ -9377,7 +9377,7 @@
             "type": "boolean"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "techFoulCount": {
             "type": "integer"
@@ -9577,7 +9577,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "techFoulCount": {
             "type": "integer"
@@ -9723,7 +9723,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "superchargedAchieved": {
             "type": "boolean"

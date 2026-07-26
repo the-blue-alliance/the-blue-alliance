@@ -26,7 +26,7 @@ import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { Toaster } from '~/components/ui/sonner';
 import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
-import { ApiError } from '~/lib/apiError';
+import { mapClientError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { STALE_TIME } from '~/lib/queryClient';
@@ -71,20 +71,14 @@ client.interceptors.request.use((request) => {
 
 // Attach the HTTP status code to thrown errors so the QueryClient's retry
 // function can distinguish 4xx "client error" failures from transient ones.
-client.interceptors.error.use((_error, response) => {
-  return new ApiError(
-    response?.statusText || String(response?.status ?? 0),
-    response?.status ?? 0,
-  );
+client.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
 });
 
 // Same ApiError mapping for the colors client — consumers rely on 404s being
 // skipped and 4xx not being retried (see queryClient.ts).
-colorsClient.interceptors.error.use((_error, response) => {
-  return new ApiError(
-    response?.statusText || String(response?.status ?? 0),
-    response?.status ?? 0,
-  );
+colorsClient.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
 });
 
 // SSR-only network LRU under the API client. Client freshness is owned by
