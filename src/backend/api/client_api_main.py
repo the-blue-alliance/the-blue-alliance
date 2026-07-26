@@ -2,6 +2,9 @@ from flask import Blueprint
 from flask_cors import CORS
 
 from backend.api.handlers.client_api import (
+    add_api_read_key,
+    delete_api_read_key,
+    list_api_keys,
     list_favorites,
     list_mobile_clients,
     list_subscriptions,
@@ -59,4 +62,19 @@ client_api.add_url_rule(
     "/unregister",
     methods=["POST"],
     view_func=unregister_mobile_client,
+)
+client_api.add_url_rule(
+    "/api_keys/list",
+    methods=["POST"],
+    view_func=list_api_keys,
+)
+client_api.add_url_rule(
+    "/api_keys/read/add",
+    methods=["POST"],
+    view_func=add_api_read_key,
+)
+client_api.add_url_rule(
+    "/api_keys/read/delete",
+    methods=["POST"],
+    view_func=delete_api_read_key,
 )

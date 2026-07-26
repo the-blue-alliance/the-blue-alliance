@@ -6,7 +6,7 @@ export type ClientOptions = {
 };
 
 export type BaseResponse = {
-  code?: string;
+  code?: number;
   message?: string;
 };
 
@@ -67,6 +67,42 @@ export type SubscriptionMessage = {
   model_key: string;
   model_type: ModelType;
   notifications?: Array<NotificationType>;
+};
+
+export type ApiReadKeyMessage = {
+  /**
+   * The X-TBA-Auth-Key value
+   */
+  key: string;
+  description: string;
+  /**
+   * ISO-formatted creation datetime
+   */
+  created?: string | null;
+};
+
+export type ApiWriteKeyMessage = {
+  auth_id: string;
+  secret: string;
+  description: string;
+  event_keys: Array<string>;
+  /**
+   * Human-readable write permission names
+   */
+  auth_types: Array<string>;
+  /**
+   * ISO-formatted expiration datetime
+   */
+  expiration?: string | null;
+};
+
+export type ApiKeysResponse = {
+  read_keys?: Array<ApiReadKeyMessage>;
+  write_keys?: Array<ApiWriteKeyMessage>;
+};
+
+export type AddApiReadKeyResponse = {
+  read_key?: ApiReadKeyMessage;
 };
 
 export type ListFavoritesData = {
@@ -154,3 +190,64 @@ export type ListSubscriptionsResponses = {
 
 export type ListSubscriptionsResponse =
   ListSubscriptionsResponses[keyof ListSubscriptionsResponses];
+
+export type ListApiKeysData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api_keys/list';
+};
+
+export type ListApiKeysResponses = {
+  /**
+   * Successful response
+   */
+  200: ApiKeysResponse;
+};
+
+export type ListApiKeysResponse =
+  ListApiKeysResponses[keyof ListApiKeysResponses];
+
+export type AddApiReadKeyData = {
+  body: {
+    /**
+     * Human-readable description of the key
+     */
+    description: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/api_keys/read/add';
+};
+
+export type AddApiReadKeyResponses = {
+  /**
+   * Successful response
+   */
+  200: AddApiReadKeyResponse;
+};
+
+export type AddApiReadKeyResponse2 =
+  AddApiReadKeyResponses[keyof AddApiReadKeyResponses];
+
+export type DeleteApiReadKeyData = {
+  body: {
+    /**
+     * The id of the read key to delete
+     */
+    key_id: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/api_keys/read/delete';
+};
+
+export type DeleteApiReadKeyResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type DeleteApiReadKeyResponse =
+  DeleteApiReadKeyResponses[keyof DeleteApiReadKeyResponses];

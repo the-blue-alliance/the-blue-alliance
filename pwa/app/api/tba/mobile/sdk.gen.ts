@@ -8,6 +8,12 @@ import type {
 } from './client';
 import { client } from './client.gen';
 import type {
+  AddApiReadKeyData,
+  AddApiReadKeyResponses,
+  DeleteApiReadKeyData,
+  DeleteApiReadKeyResponses,
+  ListApiKeysData,
+  ListApiKeysResponses,
   ListFavoritesData,
   ListFavoritesResponses,
   ListSubscriptionsData,
@@ -106,4 +112,58 @@ export const listSubscriptions = <ThrowOnError extends boolean = false>(
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/subscriptions/list',
     ...options,
+  });
+
+/**
+ * List API keys
+ */
+export const listApiKeys = <ThrowOnError extends boolean = false>(
+  options?: Options<ListApiKeysData, ThrowOnError>,
+): RequestResult<ListApiKeysResponses, unknown, ThrowOnError> =>
+  (options?.client ?? client).post<ListApiKeysResponses, unknown, ThrowOnError>(
+    {
+      security: [{ scheme: 'bearer', type: 'http' }],
+      url: '/api_keys/list',
+      ...options,
+    },
+  );
+
+/**
+ * Add a read API key
+ */
+export const addApiReadKey = <ThrowOnError extends boolean = false>(
+  options: Options<AddApiReadKeyData, ThrowOnError>,
+): RequestResult<AddApiReadKeyResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    AddApiReadKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api_keys/read/add',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Delete a read API key
+ */
+export const deleteApiReadKey = <ThrowOnError extends boolean = false>(
+  options: Options<DeleteApiReadKeyData, ThrowOnError>,
+): RequestResult<DeleteApiReadKeyResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    DeleteApiReadKeyResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/api_keys/read/delete',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
   });

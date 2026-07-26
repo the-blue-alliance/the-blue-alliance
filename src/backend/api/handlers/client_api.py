@@ -5,7 +5,13 @@ from pyre_extensions import none_throws
 
 from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import (
+    AddApiReadKeyMessage,
+    AddApiReadKeyResponse,
+    ApiKeysResponse,
+    ApiReadKeyMessage,
+    ApiWriteKeyMessage,
     BaseResponse,
+    DeleteApiReadKeyMessage,
     FavoriteCollection,
     FavoriteMessage,
     ListDevicesResponse,
@@ -20,6 +26,7 @@ from backend.api.client_api_types import (
     VoidRequest,
 )
 from backend.api.handlers.decorators import client_api_method
+from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.client_type import (
     ENUMS as CLIENT_TYPE_MAP,
     NAMES as CLIENT_TYPE_NAMES,
@@ -31,6 +38,7 @@ from backend.common.consts.notification_type import (
 from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
 from backend.common.models.subscription import Subscription
@@ -325,3 +333,76 @@ def update_model_preferences(req: ModelPreferenceMessage) -> BaseResponse:
         subscription=subscription_response,
     )
     return BaseResponse(code=0, message=json.dumps(output))
+
+
+def _api_read_key_message(key: ApiAuthAccess) -> ApiReadKeyMessage:
+    return ApiReadKeyMessage(
+        key=none_throws(key.key.string_id()),
+        description=key.description,
+        created=key.created.isoformat() if key.created else None,
+    )
+
+
+@client_api_method(VoidRequest, ApiKeysResponse)
+def list_api_keys(req: VoidRequest) -> ApiKeysResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return ApiKeysResponse(
+            code=401,
+            message="Unauthorized to list API keys",
+            read_keys=[],
+            write_keys=[],
+        )
+
+    read_keys = [_api_read_key_message(k) for k in current_user.api_read_keys]
+    write_keys = [
+        ApiWriteKeyMessage(
+            auth_id=none_throws(k.key.string_id()),
+            secret=k.secret or "",
+            description=k.description,
+            event_keys=[none_throws(e.string_id()) for e in k.event_list],
+            auth_types=[
+                WRITE_TYPE_NAMES[t] for t in k.auth_types_enum if t in WRITE_TYPE_NAMES
+            ],
+            expiration=k.expiration.isoformat() if k.expiration else None,
+        )
+        for k in current_user.api_write_keys
+    ]
+    return ApiKeysResponse(
+        code=200,
+        message="",
+        read_keys=read_keys,
+        write_keys=write_keys,
+    )
+
+
+@client_api_method(AddApiReadKeyMessage, AddApiReadKeyResponse)
+def add_api_read_key(req: AddApiReadKeyMessage) -> AddApiReadKeyResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return AddApiReadKeyResponse(code=401, message="Unauthorized to add an API key")
+
+    description = req.get("description", "").strip()
+    if not description:
+        return AddApiReadKeyResponse(code=400, message="A description is required")
+
+    api_key = current_user.add_api_read_key(description)
+    return AddApiReadKeyResponse(
+        code=200,
+        message="Read API key added",
+        read_key=_api_read_key_message(api_key),
+    )
+
+
+@client_api_method(DeleteApiReadKeyMessage, BaseResponse)
+def delete_api_read_key(req: DeleteApiReadKeyMessage) -> BaseResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return BaseResponse(code=401, message="Unauthorized to delete an API key")
+
+    api_key = current_user.api_read_key(req["key_id"])
+    if api_key is None:
+        return BaseResponse(code=404, message="API key not found")
+
+    current_user.delete_api_key(api_key)
+    return BaseResponse(code=200, message="Read API key deleted")

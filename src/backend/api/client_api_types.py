@@ -1,4 +1,4 @@
-from typing import List, TypedDict
+from typing import List, Optional, TypedDict
 
 from backend.common.consts.model_type import ModelType
 
@@ -80,3 +80,39 @@ class UpdatePreferencesInternalResponse(TypedDict):
 
     favorite: BaseResponse
     subscription: BaseResponse
+
+
+class ApiReadKeyMessage(TypedDict):
+    key: str  # the X-TBA-Auth-Key value (the model's id)
+    description: str
+    created: Optional[str]  # ISO-formatted datetime
+
+
+class ApiWriteKeyMessage(TypedDict):
+    auth_id: str  # the model's id
+    secret: str
+    description: str
+    event_keys: List[str]
+    auth_types: List[str]  # stringified AuthType.WRITE_TYPE_NAMES
+    expiration: Optional[str]  # ISO-formatted datetime
+
+
+class ApiKeysResponse(BaseResponse):
+    read_keys: List[ApiReadKeyMessage]
+    write_keys: List[ApiWriteKeyMessage]
+
+
+class AddApiReadKeyMessage(TypedDict):
+    description: str
+
+
+class _AddApiReadKeyResponseOptional(TypedDict, total=False):
+    read_key: ApiReadKeyMessage
+
+
+class AddApiReadKeyResponse(BaseResponse, _AddApiReadKeyResponseOptional):
+    pass
+
+
+class DeleteApiReadKeyMessage(TypedDict):
+    key_id: str
