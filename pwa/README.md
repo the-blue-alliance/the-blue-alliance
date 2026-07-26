@@ -159,9 +159,9 @@ The policy is centralized in `app/lib/queryClient.ts` and applied via `createQue
   child loader to read. The long `staleTime` means this is a cache read after the first hit.
 - **Live data keeps its own `staleTime`/`refetchInterval`** and is unaffected by the above — e.g.
   the district champs page (`district.$districtAbbreviation.champs.$year.tsx`) polls on a
-  `refetchInterval` independent of `staleTime`, and Nexus/Firebase-backed queries
-  (`app/lib/nexus.ts`, `app/lib/gameday/useFirebaseWebcasts.ts`) keep their own shorter or
-  `Infinity` values.
+  `refetchInterval` independent of `staleTime`, the live Nexus queuing status on the event page
+  (`getEventNexusInfo`) overrides a short 30s `staleTime`, and Firebase-backed queries
+  (`app/lib/gameday/useFirebaseWebcasts.ts`) keep their own `Infinity` values.
 
 The generated `<name>Options()` helpers (from `hey-api`) return plain objects, so overrides
 compose by spreading:

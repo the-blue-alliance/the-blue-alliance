@@ -23,7 +23,6 @@ export default tseslint.config([
   {
     ignores: [
       'app/api/tba/',
-      'app/api/nexus/',
       'app/api/colors/',
       'eslint.config.js',
       'pnpm-lock.yaml',

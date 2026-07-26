@@ -44,6 +44,7 @@ import {
   getEventCoprsOptions,
   getEventDistrictPointsOptions,
   getEventMatchesOptions,
+  getEventNexusInfoOptions,
   getEventOptions,
   getEventRankingsOptions,
   getEventSimpleOptions,
@@ -151,11 +152,7 @@ import {
   sortMatchComparator,
 } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
-import {
-  type NexusMatchStatus,
-  buildNexusStatusMap,
-  getNexusEventStatusOptions,
-} from '~/lib/nexus';
+import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
   getDefaultAutoComponentName,
   getDefaultTeleopComponentName,
@@ -207,7 +204,12 @@ export const Route = createFileRoute('/event/$eventKey')({
       })
       .catch(() => []);
     const nexusQuery = queryClient
-      .ensureQueryData(getNexusEventStatusOptions(params.eventKey))
+      .ensureQueryData({
+        ...getEventNexusInfoOptions({
+          path: { event_key: params.eventKey },
+        }),
+        staleTime: 30_000,
+      })
       .catch(() => null);
 
     const event = await queryClient
@@ -439,10 +441,13 @@ function EventPage() {
     .map((q) => q.data)
     .filter((e): e is NonNullable<typeof e> => e !== undefined);
 
-  const { data: nexusStatus } = useQuery(getNexusEventStatusOptions(eventKey));
+  const { data: nexusInfo } = useQuery({
+    ...getEventNexusInfoOptions({ path: { event_key: eventKey } }),
+    staleTime: 30_000,
+  });
   const nexusStatusByKey = useMemo(
-    () => buildNexusStatusMap(eventKey, nexusStatus),
-    [eventKey, nexusStatus],
+    () => buildNexusStatusMap(nexusInfo),
+    [nexusInfo],
   );
   const sortedMatches = useMemo(
     () => matches.sort(sortMatchComparator),
