@@ -117,8 +117,8 @@ importers:
         specifier: 2.0.7
         version: 2.0.7(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       srvx:
-        specifier: 0.11.22
-        version: 0.11.22
+        specifier: 0.12.1
+        version: 0.12.1
       tailwind-merge:
         specifier: 3.6.0
         version: 3.6.0
@@ -6517,6 +6517,11 @@ packages:
 
   srvx@0.11.22:
     resolution: {integrity: sha512-LqZxxBDMKuMAZzFzJnDCkFOrs9MZQZr0LvHiO/SuSZVdQaXD7xQ5UWTUxheJrQPve1qk9MG2B/yttUvJxw8egQ==}
+    engines: {node: '>=20.16.0'}
+    hasBin: true
+
+  srvx@0.12.1:
+    resolution: {integrity: sha512-3+8b3A/32m5fmUncipelbvubkXfg5m6eaOGAKMbOA5ZaNFcCWjGEcrzsLW3Cwgik1e2L9ImSuQiJ5AQthH27ag==}
     engines: {node: '>=20.16.0'}
     hasBin: true
 
@@ -14582,6 +14587,8 @@ snapshots:
   split2@4.2.0: {}
 
   srvx@0.11.22: {}
+
+  srvx@0.12.1: {}
 
   stable-hash-x@0.2.0: {}
 
