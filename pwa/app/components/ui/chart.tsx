@@ -184,7 +184,7 @@ function ChartTooltipContent({
     }
 
     const [item] = payload;
-    const key = `${labelKey ?? item.dataKey ?? item.name ?? 'value'}`;
+    const key = String(labelKey ?? item.dataKey ?? item.name ?? 'value');
     const itemConfig = getPayloadConfigFromPayload(config, item, key);
     const value =
       !labelKey && typeof label === 'string'
@@ -231,7 +231,7 @@ function ChartTooltipContent({
       {!nestLabel ? tooltipLabel : null}
       <div className="grid gap-1.5">
         {payload.map((item, index) => {
-          const key = `${nameKey ?? item.name ?? item.dataKey ?? 'value'}`;
+          const key = String(nameKey ?? item.name ?? item.dataKey ?? 'value');
           const itemConfig = getPayloadConfigFromPayload(config, item, key);
           const indicatorColor = color ?? item.payload.fill ?? item.color;
 
@@ -254,8 +254,7 @@ function ChartTooltipContent({
                     !hideIndicator && (
                       <div
                         className={cn(
-                          `shrink-0 rounded-[2px] border-(--color-border)
-                            bg-(--color-bg)`,
+                          'shrink-0 rounded-[2px] border-border bg-(--color-bg)',
                           {
                             'h-2.5 w-2.5': indicator === 'dot',
                             'w-1': indicator === 'line',
@@ -333,7 +332,7 @@ function ChartLegendContent({
       )}
     >
       {payload.map((item) => {
-        const key = `${nameKey ?? item.dataKey ?? 'value'}`;
+        const key = String(nameKey ?? item.dataKey ?? 'value');
         const itemConfig = getPayloadConfigFromPayload(config, item, key);
 
         return (

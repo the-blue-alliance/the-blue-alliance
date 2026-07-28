@@ -147,6 +147,9 @@ const Carousel = forwardRef<
           ref={ref}
           onKeyDownCapture={handleKeyDown}
           className={cn('relative', className)}
+          // `<section>` only exposes role=region when it has an accessible
+          // name, which the carousel has none of, so the explicit role stays.
+          // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
           role="region"
           aria-roledescription="carousel"
           {...props}
@@ -188,6 +191,9 @@ const CarouselItem = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     return (
       <div
         ref={ref}
+        // None of the suggested tags (address/details/fieldset/hgroup/optgroup)
+        // describes a carousel slide.
+        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="group"
         aria-roledescription="slide"
         className={cn(

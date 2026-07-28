@@ -113,8 +113,8 @@ function SectionHeading({ children }: { children: string }) {
   return (
     <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
       <span
-        className="inline-block h-1 w-8 rounded-full bg-gradient-to-r
-          from-primary to-primary/50"
+        className="inline-block h-1 w-8 rounded-full bg-linear-to-r from-primary
+          to-primary/50"
       />
       {children}
     </h2>
@@ -139,7 +139,7 @@ function SingleYearInsights({
       <div className="mb-8 flex flex-wrap items-center justify-between gap-4">
         <div>
           <h1
-            className="bg-gradient-to-r from-foreground to-foreground/70
+            className="bg-linear-to-r from-foreground to-foreground/70
               bg-clip-text text-4xl font-bold tracking-tight text-transparent"
           >
             Insights

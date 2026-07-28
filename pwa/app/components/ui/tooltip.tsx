@@ -76,7 +76,7 @@ function TooltipContent({
             {children}
           </div>
           <TooltipPrimitive.Arrow
-            className="relative -z-10 size-3 translate-y-[calc(-50%_-_2px)]
+            className="relative -z-10 size-3 translate-y-[calc(-50%-2px)]
               rotate-45 rounded-[2px] bg-popover fill-popover"
           />
         </TooltipPrimitive.Popup>

@@ -90,7 +90,11 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
       className="block overflow-hidden rounded-lg border-2 border-neutral-300
         hover:border-neutral-400"
     >
-      <img src={thumbnailUrl} alt="" className="h-64 w-full object-cover" />
+      <img
+        src={thumbnailUrl}
+        alt="Team media"
+        className="h-64 w-full object-cover"
+      />
     </a>
   );
 }

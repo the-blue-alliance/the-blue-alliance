@@ -11,7 +11,7 @@ import {
 } from '~/lib/queryClient';
 
 vi.mock('@sentry/tanstackstart-react', () => ({
-  captureException: vi.fn(),
+  captureException: vi.fn<typeof Sentry.captureException>(),
 }));
 
 describe.concurrent('createQueryClient', () => {
@@ -56,7 +56,7 @@ describe.concurrent('createQueryClient', () => {
         queryFn: () => Promise.reject(error),
         retry: false,
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow('server error');
 
     expect(Sentry.captureException).toHaveBeenCalledWith(
       error,
@@ -74,7 +74,7 @@ describe.concurrent('createQueryClient', () => {
         queryFn: () => Promise.reject(error),
         retry: false,
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow('network error');
 
     expect(Sentry.captureException).toHaveBeenCalledWith(
       error,
@@ -92,7 +92,7 @@ describe.concurrent('createQueryClient', () => {
         queryFn: () => Promise.reject(error),
         retry: false,
       }),
-    ).rejects.toThrow();
+    ).rejects.toThrow('not found');
 
     expect(Sentry.captureException).not.toHaveBeenCalledWith(
       error,

@@ -37,8 +37,8 @@ export function InsightCard({
         hover:shadow-md"
     >
       <CardHeader
-        className="border-b bg-gradient-to-br from-muted/30 to-muted/10 px-6
-          pt-5 pb-4"
+        className="border-b bg-linear-to-br from-muted/30 to-muted/10 px-6 pt-5
+          pb-4"
       >
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-3">

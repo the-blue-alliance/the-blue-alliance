@@ -193,7 +193,7 @@ function LeaderboardKeyList({
               {pluralize(entries.length - cutoffSize, 'other', 'others')})
             </TooltipTrigger>
             <TooltipContent
-              className="max-w-[500px] text-center break-words
+              className="max-w-[500px] text-center wrap-break-word
                 whitespace-normal"
             >
               <p>

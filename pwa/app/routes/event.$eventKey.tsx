@@ -968,7 +968,14 @@ function AwardsTab({ awards }: { awards: Award[] }) {
                     ),
                   )
                   .map((r, i) => [
-                    i > 0 && (r.awardee ? <br /> : ', '),
+                    i > 0 &&
+                      (r.awardee ? (
+                        <br
+                          key={`br-${award.award_type}-${r.awardee}-${r.team_key}`}
+                        />
+                      ) : (
+                        ', '
+                      )),
                     <AwardRecipientLink
                       recipient={r}
                       key={`${award.award_type}-${r.awardee}-${r.team_key}`}

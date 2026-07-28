@@ -796,7 +796,7 @@ function MatchSuggestion(): JSX.Element {
         2.5%
       </div>
       <h2 className="text-2xl font-medium">Current Matches</h2>
-      <table className="w-[100%]">
+      <table className="w-full">
         <thead>
           <tr>
             <th className="border">Event</th>
@@ -823,7 +823,7 @@ function MatchSuggestion(): JSX.Element {
         </tbody>
       </table>
       <h2 className="text-2xl font-medium">Upcoming Matches</h2>
-      <table className="w-[100%]">
+      <table className="w-full">
         <thead>
           <tr>
             <th className="border">Event</th>

@@ -40,8 +40,8 @@ export function ScoreBreakdownTable({
 
 export function ScoreBreakdownRow({
   children,
-  blueValue = undefined,
-  redValue = undefined,
+  blueValue,
+  redValue,
 }: {
   children: ReactNode;
   blueValue?: number;
