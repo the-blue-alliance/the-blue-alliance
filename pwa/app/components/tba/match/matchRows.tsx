@@ -431,7 +431,8 @@ function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
     return undefined;
   }
 
-  return `https://www.youtube.com/watch?v=${match.videos[0].key}`;
+  // Video key may contain start time query param (e.g., "?t=123"); convert "?" to "&" for watch?v= URL structure
+  return `https://www.youtube.com/watch?v=${match.videos[0].key.replace('?', '&')}`;
 }
 
 interface BreakRowProps extends React.HTMLAttributes<HTMLDivElement> {
