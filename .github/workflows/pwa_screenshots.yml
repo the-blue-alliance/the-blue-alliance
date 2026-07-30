@@ -89,7 +89,7 @@ jobs:
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
         uses: pnpm/action-setup@v5
         with:
-          version: "10.24.0"
+          version: "11.13.0"
 
       - name: Set up Node
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
