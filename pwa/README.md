@@ -4,13 +4,12 @@ https://beta.thebluealliance.com/
 
 ## Development
 
-If you don't have `pnpm`, you can install it with
+You may optionally install [mise](https://mise.jdx.dev/), which provisions the exact node and pnpm versions
+this project pins in `pwa/mise.toml`:
 
 ```shellscript
-npm i -g pnpm
+mise install
 ```
-
-or any of their strategies here: https://pnpm.io/installation
 
 Install node deps:
 

@@ -5,7 +5,7 @@ description: |
   
   Prerequisites:
   - Python 3.13 or higher
-  - Node.js 22 or higher
+  - Node.js 22 or higher (the PWA's own node/pnpm come from pwa/mise.toml via mise)
   - Git
 
 steps:
@@ -21,8 +21,12 @@ steps:
     run: npm ci
 
   # PWA environment setup
-  - name: Install pnpm
-    run: npm install -g pnpm@11.13.0
+  - name: Install mise and PWA toolchain (node + pnpm)
+    run: |
+      curl https://mise.run | sh
+      "$HOME/.local/bin/mise" trust pwa/mise.toml
+      "$HOME/.local/bin/mise" -C pwa install
+      echo "$HOME/.local/share/mise/shims" >> "$GITHUB_PATH"
 
   - name: Create PWA environment file
     run: ./ops/pwa/create_dotenv.sh --env
