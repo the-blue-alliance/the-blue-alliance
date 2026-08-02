@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@hey-api/openapi-ts": "0.99.0",
-    "@iconify/json": "2.2.505",
+    "@iconify/json": "2.2.506",
     "@julr/vite-plugin-validate-env": "2.2.2",
     "@playwright/test": "1.61.1",
     "@rolldown/plugin-babel": "0.2.3",
