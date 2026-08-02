@@ -7,7 +7,9 @@ type SliderProps = {
   className?: string;
   min: number;
   max: number;
-  minStepsBetweenThumbs: number;
+  // Base UI's name for Radix's minStepsBetweenThumbs; forwarded explicitly
+  // so it can't silently leak to the DOM as an unknown prop
+  minStepsBetweenValues?: number;
   step: number;
   formatLabel?: (value: number) => string;
   value?: number[] | readonly number[];
@@ -19,10 +21,10 @@ function DoubleSlider({
   min,
   max,
   step,
+  minStepsBetweenValues,
   formatLabel,
   value,
   onValueChange,
-  ...props
 }: SliderProps) {
   const initialValue = Array.isArray(value) ? value : [min, max];
   const [localValues, setLocalValues] = useState(initialValue);
@@ -39,6 +41,7 @@ function DoubleSlider({
       min={min}
       max={max}
       step={step}
+      minStepsBetweenValues={minStepsBetweenValues}
       value={localValues}
       onValueChange={handleValueChange}
       thumbAlignment="edge"
@@ -46,7 +49,6 @@ function DoubleSlider({
         'relative mb-6 flex w-full touch-none items-center select-none',
         className,
       )}
-      {...props}
     >
       <SliderPrimitive.Control
         className="relative flex w-full touch-none items-center select-none"
