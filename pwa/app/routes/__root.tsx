@@ -226,7 +226,7 @@ function RootComponent() {
                   <TOCRendererProvider>
                     <div
                       className={cn(
-                        !isFullwidth && 'container mx-auto',
+                        !isFullwidth && 'container',
                         'flex-1 px-4 text-sm',
                       )}
                     >

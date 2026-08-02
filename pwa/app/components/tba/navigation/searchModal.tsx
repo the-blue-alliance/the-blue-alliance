@@ -85,8 +85,8 @@ export function SearchModal() {
           <Button
             variant="secondary"
             className={cn(
-              `bg-surface relative h-9 w-full justify-start rounded-lg bg-white
-              pl-4 font-normal text-muted-foreground shadow-none hover:bg-white
+              `relative h-9 w-full justify-start rounded-lg bg-white pl-4
+              font-normal text-muted-foreground shadow-none hover:bg-white
               max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
             )}
           />

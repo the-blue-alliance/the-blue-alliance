@@ -69,7 +69,7 @@ export function GamedayToolbar() {
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
         <DrawerContent
           className="fixed inset-y-0 right-0 left-auto mt-0 h-full w-80
-            rounded-t-none rounded-l-[10px] sm:w-96"
+            rounded-l-[10px] sm:w-96"
           showHandle={false}
         >
           <DrawerHeader>

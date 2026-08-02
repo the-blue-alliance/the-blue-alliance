@@ -73,8 +73,8 @@ function NavigationMenuContent({
       data-slot="navigation-menu-content"
       className={cn(
         `top-0 left-0 w-full p-2 pr-2.5
-        **:data-[slot=navigation-menu-link]:focus:ring-0
-        **:data-[slot=navigation-menu-link]:focus:outline-none md:w-auto`,
+        **:focus:data-[slot=navigation-menu-link]:ring-0
+        **:focus:data-[slot=navigation-menu-link]:outline-none md:w-auto`,
         className,
       )}
       {...props}
@@ -92,8 +92,8 @@ function NavigationMenuViewport({
         className="absolute inset-x-0 top-full isolate z-50 flex justify-center"
       >
         <NavigationMenuPrimitive.Popup
-          className="origin-top-center relative h-(--popup-height) w-full
-            rounded-b-xl bg-brand text-white md:w-(--popup-width)"
+          className="relative h-(--popup-height) w-full rounded-b-xl bg-brand
+            text-white md:w-(--popup-width)"
         >
           <NavigationMenuPrimitive.Viewport
             data-slot="navigation-menu-viewport"
@@ -118,7 +118,7 @@ function NavigationMenuLink({
         hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px]
         focus-visible:ring-ring/50 focus-visible:outline-1
         data-active:bg-accent/50 data-active:text-accent-foreground
-        data-active:hover:bg-accent data-active:focus:bg-accent
+        hover:data-active:bg-accent focus:data-active:bg-accent
         [&_svg:not([class*='size-'])]:size-4
         [&_svg:not([class*='text-'])]:text-muted-foreground`,
         className,
@@ -136,7 +136,7 @@ function NavigationMenuIndicator({
     <NavigationMenuPrimitive.Icon
       data-slot="navigation-menu-indicator"
       className={cn(
-        `top-full z-[1] flex h-1.5 items-end justify-center overflow-hidden
+        `top-full z-1 flex h-1.5 items-end justify-center overflow-hidden
         data-[state=hidden]:animate-out data-[state=hidden]:fade-out
         data-[state=visible]:animate-in data-[state=visible]:fade-in`,
         className,

@@ -9,16 +9,19 @@ import { getLayoutById } from '~/lib/gameday/layouts';
 
 function SwapPositionPreviewCell({
   gridArea,
+  position,
   enabled,
   onClick,
 }: {
   gridArea: string;
+  position: number;
   enabled: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
+      aria-label={`Swap with position ${position + 1}`}
       style={{ gridArea }}
       className={
         'm-1 rounded transition-colors ' +
@@ -52,6 +55,7 @@ export function SwapPositionDialog({
     <SwapPositionPreviewCell
       key={i}
       gridArea={area}
+      position={i}
       enabled={i !== currentPosition}
       onClick={() => onPositionSelected(i)}
     />

@@ -278,7 +278,7 @@ const _PlayoffMatch = forwardRef<
               <span
                 key={i}
                 className={cn(
-                  'w-8 flex-shrink-0 text-center text-sm',
+                  'w-8 shrink-0 text-center text-sm',
                   r.won && 'font-bold',
                 )}
               >

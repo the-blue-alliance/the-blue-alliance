@@ -47,38 +47,43 @@ export function DataTable<TData, TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow key={headerGroup.id}>
               {headerGroup.headers.map((header) => {
+                if (header.isPlaceholder) {
+                  return <TableHead key={header.id} />;
+                }
+
+                const content = (
+                  <>
+                    {flexRender(
+                      header.column.columnDef.header,
+                      header.getContext(),
+                    )}
+                    {{
+                      asc: ' ↑',
+                      desc: ' ↓',
+                    }[header.column.getIsSorted() as string] ?? null}
+                  </>
+                );
+
                 return (
                   <TableHead key={header.id}>
-                    {header.isPlaceholder ? null : (
-                      <div
-                        role="button"
-                        tabIndex={0}
-                        className={
-                          header.column.getCanSort()
-                            ? 'cursor-pointer text-center select-none'
-                            : ''
-                        }
+                    {header.column.getCanSort() ? (
+                      <button
+                        type="button"
+                        className="w-full cursor-pointer text-center
+                          select-none"
                         onClick={header.column.getToggleSortingHandler()}
-                        onKeyDown={header.column.getToggleSortingHandler()}
                         title={
-                          header.column.getCanSort()
-                            ? header.column.getNextSortingOrder() === 'asc'
-                              ? 'Sort ascending'
-                              : header.column.getNextSortingOrder() === 'desc'
-                                ? 'Sort descending'
-                                : 'Clear sort'
-                            : undefined
+                          header.column.getNextSortingOrder() === 'asc'
+                            ? 'Sort ascending'
+                            : header.column.getNextSortingOrder() === 'desc'
+                              ? 'Sort descending'
+                              : 'Clear sort'
                         }
                       >
-                        {flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                        {{
-                          asc: ' ↑',
-                          desc: ' ↓',
-                        }[header.column.getIsSorted() as string] ?? null}
-                      </div>
+                        {content}
+                      </button>
+                    ) : (
+                      content
                     )}
                   </TableHead>
                 );

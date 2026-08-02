@@ -31,7 +31,7 @@ describe('Network Cache Middleware', () => {
   });
 
   it('should cache GET requests on server side', async () => {
-    const mockFetch = vi.fn().mockImplementation(() =>
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
       Promise.resolve(
         new Response(JSON.stringify({ data: 'test' }), {
           status: 200,
@@ -57,7 +57,7 @@ describe('Network Cache Middleware', () => {
   });
 
   it('should not cache non-GET requests', async () => {
-    const mockFetch = vi.fn().mockImplementation(() =>
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
       Promise.resolve(
         new Response(JSON.stringify({ success: true }), {
           status: 200,
@@ -79,7 +79,7 @@ describe('Network Cache Middleware', () => {
 
   it('should skip cache on client side and not grow the LRU', async () => {
     const mockFetch = vi
-      .fn()
+      .fn<typeof fetch>()
       .mockImplementation(() =>
         Promise.resolve(new Response('test', { status: 200 })),
       );
@@ -101,7 +101,7 @@ describe('Network Cache Middleware', () => {
   });
 
   it('should respect Cache-Control max-age for TTL', async () => {
-    const mockFetch = vi.fn().mockImplementation(() =>
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
       Promise.resolve(
         new Response('cached-body', {
           status: 200,
@@ -133,7 +133,7 @@ describe('Network Cache Middleware', () => {
   });
 
   it('should fall back to default TTL when Cache-Control is missing', async () => {
-    const mockFetch = vi.fn().mockImplementation(() =>
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
       Promise.resolve(
         new Response('no-cc', {
           status: 200,
@@ -163,11 +163,13 @@ describe('Network Cache Middleware', () => {
   });
 
   it('should respect maxEntries limit', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockImplementation((url: string) =>
-        Promise.resolve(new Response(url, { status: 200 })),
-      );
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation((url) =>
+      Promise.resolve(
+        new Response(url instanceof Request ? url.url : String(url), {
+          status: 200,
+        }),
+      ),
+    );
     global.fetch = mockFetch;
     mockServerEnvironment();
 
@@ -183,7 +185,7 @@ describe('Network Cache Middleware', () => {
 
   it('should clear cache correctly', async () => {
     const mockFetch = vi
-      .fn()
+      .fn<typeof fetch>()
       .mockImplementation(() =>
         Promise.resolve(new Response('test', { status: 200 })),
       );
@@ -205,7 +207,7 @@ describe('Network Cache Middleware', () => {
 
   it('should only cache successful responses (2xx)', async () => {
     const mockFetch = vi
-      .fn()
+      .fn<typeof fetch>()
       .mockImplementation(() =>
         Promise.resolve(new Response('error', { status: 404 })),
       );
@@ -224,7 +226,7 @@ describe('Network Cache Middleware', () => {
 
   it('should use same cache key regardless of headers', async () => {
     const mockFetch = vi
-      .fn()
+      .fn<typeof fetch>()
       .mockImplementation(() =>
         Promise.resolve(new Response('test', { status: 200 })),
       );
