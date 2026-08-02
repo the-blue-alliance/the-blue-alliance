@@ -121,16 +121,10 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: "11.13.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
+      - name: Check toolchain version consistency
+        run: ./ops/pwa/check_node_versions.sh
+      - name: Set up PWA toolchain
+        uses: ./.github/actions/setup-pwa
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
       - name: Install Dependencies
@@ -147,16 +141,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: "11.13.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
+      - name: Set up PWA toolchain
+        uses: ./.github/actions/setup-pwa
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env
       - name: Install Dependencies
@@ -170,16 +156,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: "11.13.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
+      - name: Set up PWA toolchain
+        uses: ./.github/actions/setup-pwa
       - name: Install Dependencies
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: pnpm --dir pwa install --frozen-lockfile
@@ -200,16 +178,8 @@ jobs:
     runs-on: ubuntu-24.04
     steps:
       - uses: actions/checkout@v7
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: "11.13.0"
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
+      - name: Set up PWA toolchain
+        uses: ./.github/actions/setup-pwa
       - name: Install Dependencies
         run: pnpm --dir pwa install --frozen-lockfile
       - name: Create dotenv
@@ -236,17 +206,8 @@ jobs:
     steps:
       - uses: actions/checkout@v7
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v5
-        with:
-          version: "11.13.0"
-
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
+      - name: Set up PWA toolchain
+        uses: ./.github/actions/setup-pwa
 
       - name: Create dotenv
         run: ./ops/pwa/create_dotenv.sh --env

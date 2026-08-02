@@ -70,7 +70,8 @@ tests/                 # Playwright E2E tests
 
 ## Dependencies
 
-- **Node.js**: Version pinned to `22.14.0` (see `package.json` engines field)
+- **Node.js & pnpm**: Pinned in `pwa/mise.toml` — the single source of truth. Optionally run `mise install` to get them locally; CI installs from the same file via `.github/actions/setup-pwa`. `pwa/mise.lock` holds the verified download checksums, so re-run `mise lock` after changing a pin.
+- **Mirrored pins**: `package.json`'s `packageManager` / `engines.pnpm` and the `runtime:` in `pwa.yaml` / `pwa-preview.yaml` must match `mise.toml`. `ops/pwa/check_node_versions.sh` enforces this in CI; run it with `--update` to fix drift.
 - **npm packages**: Always pin to specific versions (e.g., `"react": "19.2.0"`, not `"^19.2.0"`)
 
 ## Testing
