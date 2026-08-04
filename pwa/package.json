@@ -61,7 +61,7 @@
     "sonner": "2.0.7",
     "srvx": "0.12.4",
     "tailwind-merge": "3.6.0",
-    "temporal-polyfill": "1.0.1",
+    "temporal-polyfill": "1.0.2",
     "vaul": "1.1.2",
     "workbox-window": "7.4.1",
     "zod": "4.4.3"
