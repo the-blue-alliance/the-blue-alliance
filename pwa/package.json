@@ -23,7 +23,7 @@
     "playwright": "playwright test"
   },
   "dependencies": {
-    "@base-ui/react": "1.6.0",
+    "@base-ui/react": "1.7.0",
     "@fontsource-variable/roboto": "5.3.0",
     "@scalar/api-reference-react": "0.9.60",
     "@scalar/react-renderer": "0.4.3",
