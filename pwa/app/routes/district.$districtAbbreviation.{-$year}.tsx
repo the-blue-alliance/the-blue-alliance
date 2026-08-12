@@ -377,8 +377,11 @@ function DistrictPage() {
                 {
                   header: 'Team',
                   cell: (cell) => (
-                    <TeamLink teamOrKey={`frc${cell.getValue()}`} year={year}>
-                      {cell.getValue()}
+                    <TeamLink
+                      teamOrKey={`frc${cell.getValue<number>()}`}
+                      year={year}
+                    >
+                      {cell.getValue<number>()}
                     </TeamLink>
                   ),
                   accessorFn: (ranking) =>
@@ -386,21 +389,21 @@ function DistrictPage() {
                 },
                 {
                   header: 'Event 1',
-                  cell: (info) => <div>{info.getValue() || '-'}</div>,
+                  cell: (info) => <div>{info.getValue<number>() || '-'}</div>,
                   accessorFn: (ranking) =>
                     getNthNonDcmpEvent(ranking.event_points ?? [], 0)?.total ??
                     0,
                 },
                 {
                   header: 'Event 2',
-                  cell: (info) => <div>{info.getValue() || '-'}</div>,
+                  cell: (info) => <div>{info.getValue<number>() || '-'}</div>,
                   accessorFn: (ranking) =>
                     getNthNonDcmpEvent(ranking.event_points ?? [], 1)?.total ??
                     0,
                 },
                 {
                   header: 'DCMP',
-                  cell: (info) => <div>{info.getValue() || '-'}</div>,
+                  cell: (info) => <div>{info.getValue<number>() || '-'}</div>,
                   accessorFn: (ranking) =>
                     sumBy(
                       ranking.event_points?.filter(
@@ -411,13 +414,13 @@ function DistrictPage() {
                 },
                 {
                   header: 'Age Bonus',
-                  cell: (info) => <div>{info.getValue() || '-'}</div>,
+                  cell: (info) => <div>{info.getValue<number>() || '-'}</div>,
                   accessorFn: (ranking) => ranking.rookie_bonus ?? 0,
                 },
                 {
                   header: 'Total',
                   accessorFn: (ranking) => ranking.point_total,
-                  cell: (info) => <div>{info.getValue()}</div>,
+                  cell: (info) => <div>{info.getValue<number>()}</div>,
                 },
               ]}
             />

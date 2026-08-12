@@ -1,6 +1,5 @@
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
-import { ColumnDef } from '@tanstack/react-table';
 import { range } from 'lodash-es';
 import { Suspense, lazy, useMemo, useState } from 'react';
 
@@ -57,7 +56,7 @@ import {
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
-import { DataTable } from '~/components/tba/dataTable';
+import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
 import EliminationBracket from '~/components/tba/eliminationBracket';
@@ -1219,7 +1218,7 @@ function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
     getDefaultTotalComponentName(year),
   );
 
-  const columns: ColumnDef<{ teamKey: string; value: number }>[] = [
+  const columns: TbaColumnDef<{ teamKey: string; value: number }>[] = [
     {
       header: 'Team',
       accessorFn: (row) => row.teamKey,
@@ -1283,7 +1282,7 @@ function DistrictPointsTab({
   districtPoints: EventDistrictPoints;
   year: number;
 }) {
-  const columns: ColumnDef<{
+  const columns: TbaColumnDef<{
     teamKey: string;
     qualPoints: number;
     elimPoints: number;
@@ -1363,7 +1362,7 @@ function ChampsQualPointsTab({
 
   const hasPoints = champsPoolPoints !== null;
 
-  const columns: ColumnDef<RowData>[] = [
+  const columns: TbaColumnDef<RowData>[] = [
     {
       header: 'Team',
       accessorFn: (row) => row.teamKey,
@@ -1378,7 +1377,7 @@ function ChampsQualPointsTab({
           { header: 'Alliance', accessorFn: (row) => row.alliancePoints },
           { header: 'Award', accessorFn: (row) => row.awardPoints },
           { header: 'Total', accessorFn: (row) => row.total },
-        ] satisfies ColumnDef<RowData>[])
+        ] satisfies TbaColumnDef<RowData>[])
       : []),
     {
       header: 'CMP Advancement',

@@ -1,11 +1,9 @@
-import type { ColumnDef } from '@tanstack/react-table';
-
 import { EventRanking } from '~/api/tba/read';
-import { DataTable } from '~/components/tba/dataTable';
+import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { cn } from '~/lib/utils';
 
-type RankingColumnType = ColumnDef<EventRanking['rankings'][number]>[];
+type RankingColumnType = TbaColumnDef<EventRanking['rankings'][number]>[];
 
 export default function RankingsTable({
   rankings,
@@ -58,7 +56,7 @@ export default function RankingsTable({
               row.record &&
               `${row.record.wins}-${row.record.losses}-${row.record.ties}`,
             sortDescFirst: true,
-            sortingFn: (a, b) => {
+            sortFn: (a, b) => {
               if (a.original.record === null || b.original.record === null) {
                 return 0;
               }

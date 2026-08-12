@@ -1,13 +1,4 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
-import {
-  ColumnDef,
-  SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
-import { useState } from 'react';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
 import {
@@ -15,20 +6,13 @@ import {
   getDistrictHistory,
   getDistrictInsights,
 } from '~/api/tba/read';
+import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import { TeamLink } from '~/components/tba/links';
 import {
   ChartContainer,
   ChartTooltip,
   ChartTooltipContent,
 } from '~/components/ui/chart';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { confidence, publicCacheControlHeaders } from '~/lib/utils';
 
@@ -207,7 +191,7 @@ function TeamDataView({
       (a, b) => Number(a.teamKey.substring(3)) - Number(b.teamKey.substring(3)),
     );
 
-  const columns: ColumnDef<TeamDataEntryWithKey>[] = [
+  const columns: TbaColumnDef<TeamDataEntryWithKey>[] = [
     {
       header: 'Team',
       accessorKey: 'teamKey',
@@ -266,7 +250,7 @@ function TeamDataView({
       accessorFn: (row) => {
         return `${row.quals_record.wins}-${row.quals_record.losses}-${row.quals_record.ties}`;
       },
-      sortingFn: (rowA, rowB) => {
+      sortFn: (rowA, rowB) => {
         return (
           confidence(
             rowA.original.quals_record.wins,
@@ -284,7 +268,7 @@ function TeamDataView({
       accessorFn: (row) => {
         return `${row.elims_record.wins}-${row.elims_record.losses}-${row.elims_record.ties}`;
       },
-      sortingFn: (rowA, rowB) => {
+      sortFn: (rowA, rowB) => {
         return (
           confidence(
             rowA.original.quals_record.wins,
@@ -305,7 +289,7 @@ function TeamDataView({
         const ties = row.quals_record.ties + row.elims_record.ties;
         return `${wins}-${losses}-${ties}`;
       },
-      sortingFn: (rowA, rowB) => {
+      sortFn: (rowA, rowB) => {
         return (
           confidence(
             rowA.original.quals_record.wins + rowA.original.elims_record.wins,
@@ -332,81 +316,7 @@ function TeamDataView({
 
   return (
     <div>
-      <TeamDataTable columns={columns} data={rows} />
-    </div>
-  );
-}
-
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-}
-
-function TeamDataTable<TData, TValue>({
-  columns,
-  data,
-}: DataTableProps<TData, TValue>) {
-  const [sorting, setSorting] = useState<SortingState>([]);
-
-  const table = useReactTable({
-    data,
-    columns,
-    getCoreRowModel: getCoreRowModel(),
-    onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
-    state: {
-      sorting,
-    },
-  });
-
-  return (
-    <div className="rounded-md border">
-      <Table>
-        <TableHeader>
-          {table.getHeaderGroups().map((headerGroup) => (
-            <TableRow key={headerGroup.id}>
-              {headerGroup.headers.map((header) => {
-                return (
-                  <TableHead
-                    key={header.id}
-                    className="cursor-pointer text-center"
-                    onClick={header.column.getToggleSortingHandler()}
-                  >
-                    {header.isPlaceholder
-                      ? null
-                      : flexRender(
-                          header.column.columnDef.header,
-                          header.getContext(),
-                        )}
-                  </TableHead>
-                );
-              })}
-            </TableRow>
-          ))}
-        </TableHeader>
-        <TableBody>
-          {table.getRowModel().rows?.length ? (
-            table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-              >
-                {row.getVisibleCells().map((cell) => (
-                  <TableCell key={cell.id} className="text-center">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
-                  </TableCell>
-                ))}
-              </TableRow>
-            ))
-          ) : (
-            <TableRow>
-              <TableCell colSpan={columns.length} className="h-24 text-center">
-                No results.
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <DataTable columns={columns} data={rows} />
     </div>
   );
 }
