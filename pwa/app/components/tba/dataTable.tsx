@@ -1,11 +1,16 @@
 import {
   type ColumnDef,
+  FlexRender,
   type Row,
+  type RowData,
   type SortingState,
-  flexRender,
-  getCoreRowModel,
-  getSortedRowModel,
-  useReactTable,
+  createSortedRowModel,
+  rowSortingFeature,
+  sortFn_alphanumeric,
+  sortFn_datetime,
+  sortFn_text,
+  tableFeatures,
+  useTable,
 } from '@tanstack/react-table';
 import { useState } from 'react';
 
@@ -18,25 +23,42 @@ import {
   TableRow,
 } from '~/components/ui/table';
 
-interface DataTableProps<TData, TValue> {
-  columns: ColumnDef<TData, TValue>[];
+// Sorting is the only table feature we use. The built-in sort functions have to
+// be registered here, otherwise a column's default `sortFn: 'auto'` cannot
+// resolve one.
+export const tbaTableFeatures = tableFeatures({
+  rowSortingFeature,
+  sortedRowModel: createSortedRowModel(),
+  sortFns: {
+    alphanumeric: sortFn_alphanumeric,
+    datetime: sortFn_datetime,
+    text: sortFn_text,
+  },
+});
+
+export type TbaColumnDef<TData extends RowData> = ColumnDef<
+  typeof tbaTableFeatures,
+  TData
+>;
+
+interface DataTableProps<TData extends RowData> {
+  columns: TbaColumnDef<TData>[];
   data: TData[];
 }
 
-export function DataTable<TData, TValue>({
+export function DataTable<TData extends RowData>({
   columns,
   data,
   conditionalRowStyling,
-}: DataTableProps<TData, TValue> & {
-  conditionalRowStyling?: (row: Row<TData>) => string;
+}: DataTableProps<TData> & {
+  conditionalRowStyling?: (row: Row<typeof tbaTableFeatures, TData>) => string;
 }) {
   const [sorting, setSorting] = useState<SortingState>([]);
-  const table = useReactTable({
+  const table = useTable({
+    features: tbaTableFeatures,
     data,
     columns,
-    getCoreRowModel: getCoreRowModel(),
     onSortingChange: setSorting,
-    getSortedRowModel: getSortedRowModel(),
     state: { sorting },
   });
 
@@ -53,10 +75,7 @@ export function DataTable<TData, TValue>({
 
                 const content = (
                   <>
-                    {flexRender(
-                      header.column.columnDef.header,
-                      header.getContext(),
-                    )}
+                    <FlexRender header={header} />
                     {{
                       asc: ' ↑',
                       desc: ' ↓',
@@ -94,14 +113,10 @@ export function DataTable<TData, TValue>({
         <TableBody>
           {table.getRowModel().rows.length ? (
             table.getRowModel().rows.map((row) => (
-              <TableRow
-                key={row.id}
-                data-state={row.getIsSelected() && 'selected'}
-                className={conditionalRowStyling?.(row)}
-              >
-                {row.getVisibleCells().map((cell) => (
+              <TableRow key={row.id} className={conditionalRowStyling?.(row)}>
+                {row.getAllCells().map((cell) => (
                   <TableCell key={cell.id} className="text-center">
-                    {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                    <FlexRender cell={cell} />
                   </TableCell>
                 ))}
               </TableRow>
