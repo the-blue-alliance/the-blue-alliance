@@ -35,7 +35,10 @@ from backend.common.memcache_models.event_sync_status_memcache import (
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
 from backend.common.models.district import District
-from backend.common.models.district_advancement import DistrictAdvancement
+from backend.common.models.district_advancement import (
+    ApiDistrictRankingTeamData,
+    DistrictAdvancement,
+)
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_ranking import EventRanking
@@ -58,7 +61,7 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_list_parser imp
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
     FMSAPIDistrictRankingsParser,
-    TParsedDistrictAdvancement,
+    TParsedDistrictRankings,
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_event_alliances_parser import (
     FMSAPIEventAlliancesParser,
@@ -460,11 +463,12 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_district_rankings(
         self, district_key: DistrictKey
-    ) -> Generator[Any, Any, TParsedDistrictAdvancement]:
+    ) -> Generator[Any, Any, TParsedDistrictRankings]:
         year = int(district_key[:4])
         district_short = district_key[4:]
         advancement: DistrictAdvancement = {}
         adjustments: Dict[TeamKey, int] = {}
+        api_team_data: Dict[TeamKey, ApiDistrictRankingTeamData] = {}
 
         more_pages = True
         page = 1
@@ -478,14 +482,16 @@ class DatafeedFMSAPI:
             if not result:
                 break
 
-            advancement_page, more_pages = result
-            advancement.update(advancement_page.advancement)
-            adjustments.update(advancement_page.adjustments)
+            rankings_page, more_pages = result
+            advancement.update(rankings_page.advancement)
+            adjustments.update(rankings_page.adjustments)
+            api_team_data.update(rankings_page.api_team_data)
             page = page + 1
 
-        return TParsedDistrictAdvancement(
+        return TParsedDistrictRankings(
             advancement=advancement,
             adjustments=adjustments,
+            api_team_data=api_team_data,
         )
 
     @typed_tasklet
