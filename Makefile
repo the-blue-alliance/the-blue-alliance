@@ -69,11 +69,11 @@ lint-fix:
 lint-bash:
 	docker compose --profile tools run --rm lint-bash $(ARGS)
 
-# Regenerate the PWA's OpenAPI clients in Docker (no local node/pnpm needed)
+# Regenerate the PWA's OpenAPI clients in Docker
 pwa-generate-api:
 	docker compose --profile tools run --rm --build pwa-tools
 
-# Run any PWA node command in Docker, e.g. make pwa ARGS='pnpm run typecheck'
+# Run any PWA node command in Docker
 pwa:
 	docker compose --profile tools run --rm --build pwa-tools $(ARGS)
 

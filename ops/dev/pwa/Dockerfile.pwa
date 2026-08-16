@@ -1,15 +1,18 @@
-# Versions mirror pwa/mise.toml, enforced by ops/pwa/check_node_versions.sh
-FROM node:24.18.1-bookworm-slim
+# trixie for the glibc the upstream mise binary is built against
+FROM debian:trixie-slim
 
-ENV PNPM_VERSION=11.18.0
-ENV PNPM_HOME=/pnpm
+# libatomic1 is needed by mise's standalone pnpm binary
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libatomic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=jdxcode/mise:latest /usr/local/bin/mise /usr/local/bin/mise
+ENV MISE_DATA_DIR=/mise
+# mise otherwise prompts to trust the bind-mounted pwa/mise.toml
+ENV MISE_TRUSTED_CONFIG_PATHS=/tba
+
 ENV PNPM_STORE_DIR=/pnpm/store
-ENV PATH=$PNPM_HOME:$PATH
-
-ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
-ENV PUPPETEER_SKIP_DOWNLOAD=true
-
-RUN npm install --global "pnpm@${PNPM_VERSION}" && npm cache clean --force
 
 WORKDIR /tba/pwa
 

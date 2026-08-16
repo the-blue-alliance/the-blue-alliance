@@ -76,18 +76,6 @@ if [[ -f "$PACKAGE_JSON" ]]; then
         "s|^([[:space:]]*\"pnpm\"[[:space:]]*:[[:space:]]*\")[^\"]+\"|\1$PNPM_VERSION\"|"
 fi
 
-# The PWA tooling image (docker-compose `pwa-tools`) pins both versions
-PWA_DOCKERFILE="$REPO_ROOT/ops/dev/pwa/Dockerfile.pwa"
-if [[ -f "$PWA_DOCKERFILE" ]]; then
-    CURRENT_IMAGE_NODE="$(sed -n -E 's|^FROM node:([^-]+)-.*|\1|p' "$PWA_DOCKERFILE" | head -n 1)"
-    check "$PWA_DOCKERFILE" "base image node" "$CURRENT_IMAGE_NODE" "$NODE_VERSION" \
-        "s|^FROM node:[^-]+-|FROM node:$NODE_VERSION-|"
-
-    CURRENT_IMAGE_PNPM="$(sed -n -E 's|^ENV PNPM_VERSION=(.+)$|\1|p' "$PWA_DOCKERFILE" | head -n 1)"
-    check "$PWA_DOCKERFILE" "PNPM_VERSION" "$CURRENT_IMAGE_PNPM" "$PNPM_VERSION" \
-        "s|^ENV PNPM_VERSION=.*|ENV PNPM_VERSION=$PNPM_VERSION|"
-fi
-
 # GAE service configs must target the same node major version
 for yaml in "$PWA_DIR"/pwa.yaml "$PWA_DIR"/pwa-preview.yaml; do
     [[ -f "$yaml" ]] || continue
