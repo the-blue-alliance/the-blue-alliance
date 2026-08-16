@@ -90,5 +90,20 @@ services:
       - './ops/lint_bash.sh "$@"'
       - --
 
+  # Runs PWA node commands, defaulting to ./generate-api.sh. node_modules lives
+  # in a volume so the container's Linux install stays off the host's bind mount.
+  pwa-tools:
+    build:
+      context: ./ops/dev/pwa/
+      dockerfile: Dockerfile.pwa
+    profiles: ["tools"]
+    volumes:
+      - ./:/tba:delegated
+      - pwa-node-modules:/tba/pwa/node_modules
+      - pwa-pnpm-store:/pnpm/store
+    working_dir: /tba/pwa
+
 volumes:
   datastore-data:
+  pwa-node-modules:
+  pwa-pnpm-store:
