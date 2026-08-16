@@ -1,5 +1,7 @@
 from typing import Dict, List, Optional
 
+from google.appengine.ext import ndb
+
 from backend.common.consts.media_type import (
     IMAGE_TYPES,
     MediaType,
@@ -29,6 +31,18 @@ class MediaHelper(object):
     @classmethod
     def get_images(cls, medias: List[Media]) -> List[Media]:
         return list(filter(lambda m: m.media_type_enum in IMAGE_TYPES, medias))
+
+    @classmethod
+    def get_preferred_or_fallback_images(
+        cls, medias: List[Media], reference: ndb.Key
+    ) -> List[Media]:
+        images = [
+            media for media in cls.get_images(medias) if reference in media.references
+        ]
+        preferred_images = [
+            media for media in images if reference in media.preferred_references
+        ]
+        return preferred_images or images
 
     @classmethod
     def get_socials(cls, medias: List[Media]) -> List[Media]:

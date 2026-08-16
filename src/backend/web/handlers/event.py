@@ -1,4 +1,3 @@
-import collections
 import csv
 import io
 import json
@@ -141,7 +140,7 @@ def event_detail(event_key: EventKey) -> Response:
     event.prep_matches()
     event.prep_teams()
     event.prep_details()
-    medias_future = media_query.EventTeamsPreferredMediasQuery(event_key).fetch_async()
+    medias_future = media_query.EventTeamsMediasQuery(event_key).fetch_async()
     district_future = (
         district_query.DistrictQuery(
             none_throws(none_throws(event.district_key).string_id())
@@ -170,17 +169,14 @@ def event_detail(event_key: EventKey) -> Response:
     match_count, matches = MatchHelper.organized_matches(cleaned_matches)
     teams = TeamHelper.sort_teams(event.teams)  # pyre-ignore[6]
 
-    # Organize medias by team
-    image_medias = MediaHelper.get_images(
-        [media for media in medias_future.get_result()]
-    )
-    team_medias = collections.defaultdict(list)
-    for image_media in image_medias:
-        for reference in image_media.references:
-            team_medias[reference].append(image_media)
-    team_and_medias = []
-    for team in teams:
-        team_and_medias.append((team, team_medias.get(team.key, [])))
+    medias = medias_future.get_result()
+    team_and_medias = [
+        (
+            team,
+            MediaHelper.get_preferred_or_fallback_images(medias, team.key),
+        )
+        for team in teams
+    ]
 
     num_teams = len(team_and_medias)
     middle_value = num_teams // 2
@@ -201,10 +197,7 @@ def event_detail(event_key: EventKey) -> Response:
     # Build Team List CSV
     team_rows = []
     for team, medias in team_and_medias:
-        preferred_media = next(
-            (m for m in medias if m.is_image and team.key in m.preferred_references),
-            None,
-        )
+        selected_media = next(iter(medias), None)
         team_rows.append(
             OrderedDict(
                 [
@@ -215,7 +208,7 @@ def event_detail(event_key: EventKey) -> Response:
                     ("country", (team.country or "").replace(",", ";")),
                     (
                         "robot_image_url",
-                        preferred_media.image_direct_url_med if preferred_media else "",
+                        selected_media.image_direct_url_med if selected_media else "",
                     ),
                 ]
             )

@@ -9,6 +9,7 @@ from werkzeug.test import Client
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.webcast_online_status_memcache import (
@@ -18,7 +19,9 @@ from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
 
@@ -37,6 +40,30 @@ def test_render_event(ndb_stub, web_client: Client) -> None:
 
     soup = BeautifulSoup(resp.data, "html.parser")
     assert soup.find(id="event-name").string == "Test Event 2020"
+
+
+def test_render_event_uses_team_image_fallback(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_team(148)
+    helpers.preseed_event_for_team(148, "2020test")
+    team_key = ndb.Key(Team, "frc148")
+    Media(
+        id="imgur_fallback",
+        media_type_enum=MediaType.IMGUR,
+        foreign_key="fallback",
+        references=[team_key],
+        year=2020,
+    ).put()
+
+    resp = web_client.get("/event/2020test")
+
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+    carousel = soup.find(id="team-carousel-frc148")
+    assert carousel is not None
+    assert carousel.find(attrs={"data-foreign-key": "fallback"}) is not None
+    team_list_csv = soup.find(id="team-list-csv")
+    assert team_list_csv is not None
+    assert "https://i.imgur.com/fallbackm.jpg" in team_list_csv.get_text()
 
 
 def test_render_2026_event_with_legacy_insight_data(
