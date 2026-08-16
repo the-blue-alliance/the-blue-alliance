@@ -6341,7 +6341,7 @@ export type GetTeamEventMatchesSimpleResponses = {
   /**
    * Successful response
    */
-  200: Array<Match>;
+  200: Array<MatchSimple>;
 };
 
 export type GetTeamEventMatchesSimpleResponse =
