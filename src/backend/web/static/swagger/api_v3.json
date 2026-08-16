@@ -3723,7 +3723,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Match"
+                    "$ref": "#/components/schemas/Match_Simple"
                   }
                 }
               }

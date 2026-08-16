@@ -2864,7 +2864,7 @@ export const zGetTeamEventMatchesSimplePath = z.object({
 /**
  * Successful response
  */
-export const zGetTeamEventMatchesSimpleResponse = z.array(zMatch);
+export const zGetTeamEventMatchesSimpleResponse = z.array(zMatchSimple);
 
 export const zGetTeamEventStatusHeaders = z.object({
   'If-None-Match': z.string().optional(),
