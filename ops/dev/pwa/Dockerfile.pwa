@@ -1,0 +1,17 @@
+# Versions mirror pwa/mise.toml, enforced by ops/pwa/check_node_versions.sh
+FROM node:24.18.1-bookworm-slim
+
+ENV PNPM_VERSION=11.18.0
+ENV PNPM_HOME=/pnpm
+ENV PNPM_STORE_DIR=/pnpm/store
+ENV PATH=$PNPM_HOME:$PATH
+
+ENV PLAYWRIGHT_SKIP_BROWSER_DOWNLOAD=1
+ENV PUPPETEER_SKIP_DOWNLOAD=true
+
+RUN npm install --global "pnpm@${PNPM_VERSION}" && npm cache clean --force
+
+WORKDIR /tba/pwa
+
+ENTRYPOINT ["/tba/ops/dev/pwa/entrypoint.sh"]
+CMD ["./generate-api.sh"]
