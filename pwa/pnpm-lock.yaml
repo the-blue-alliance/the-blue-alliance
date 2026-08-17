@@ -78,8 +78,8 @@ importers:
         specifier: 12.17.1
         version: 12.17.1
       fuzzysort:
-        specifier: 3.1.0
-        version: 3.1.0
+        specifier: 4.0.1
+        version: 4.0.1
       isbot:
         specifier: 5.2.1
         version: 5.2.1
@@ -4315,6 +4315,9 @@ packages:
 
   fuzzysort@3.1.0:
     resolution: {integrity: sha512-sR9BNCjBg6LNgwvxlBd0sBABvQitkLzoVY9MYYROQVX/FvfJ4Mai9LsGhDgd8qYdds0bY77VzYd5iuB+v5rwQQ==}
+
+  fuzzysort@4.0.1:
+    resolution: {integrity: sha512-aQwFrCgx1HmMSnxK5UQIsRL9KBwj2AffSMo8SmbyvZvd1NcZXvVRYm8/hs9QTn+rDwa3QKg1TZoctf8Y3t1vgg==}
 
   generator-function@2.0.1:
     resolution: {integrity: sha512-SFdFmIJi+ybC0vjlHN0ZGVGHc3lgE0DxPAT0djjVg+kjOnSqclqmj0KQ7ykTOLP6YxoqOvuAODGdcHJn+43q3g==}
@@ -11732,6 +11735,8 @@ snapshots:
   fuse.js@7.5.0: {}
 
   fuzzysort@3.1.0: {}
+
+  fuzzysort@4.0.1: {}
 
   generator-function@2.0.1: {}
 
