@@ -34,9 +34,12 @@ class WebcastOnlineHelper:
 
         Delegates token fetching, caching, and refresh to TwitchGetAccessToken.
         """
-        twitch_token: TwitchAccessToken = (
+        twitch_token: Optional[TwitchAccessToken] = (
             yield TwitchGetAccessToken.get_cached_token_async()
         )
+        if twitch_token is None:
+            # Token fetch failed (e.g. Twitch auth outage) - leave status as UNKNOWN
+            return
         yield TwitchWebcastStatus(twitch_token, webcast).fetch_async()
 
     @classmethod
