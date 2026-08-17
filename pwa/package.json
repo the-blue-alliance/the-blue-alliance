@@ -91,7 +91,7 @@
     "@vitest/coverage-v8": "4.1.10",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint-plugin-no-relative-import-paths": "1.6.1",
-    "oxlint": "1.77.0",
+    "oxlint": "1.78.0",
     "oxlint-tailwindcss": "1.7.1",
     "oxlint-tsgolint": "7.0.2001",
     "pino-pretty": "13.1.3",
