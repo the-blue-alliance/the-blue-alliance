@@ -139,8 +139,8 @@ importers:
         specifier: 0.99.0
         version: 0.99.0(magicast@0.5.3)(typescript@6.0.3)
       '@iconify/json':
-        specifier: 2.2.511
-        version: 2.2.511
+        specifier: 2.2.513
+        version: 2.2.513
       '@julr/vite-plugin-validate-env':
         specifier: 2.2.2
         version: 2.2.2(vite@8.2.1(@types/node@24.13.3)(esbuild@0.28.2)(jiti@2.7.0)(terser@5.49.0)(tsx@4.23.11)(yaml@2.9.0))
@@ -1443,8 +1443,8 @@ packages:
     resolution: {integrity: sha512-bV0Tgo9K4hfPCek+aMAn81RppFKv2ySDQeMoSZuvTASywNTnVJCArCZE2FWqpvIatKu7VMRLWlR1EazvVhDyhQ==}
     engines: {node: '>=18.18'}
 
-  '@iconify/json@2.2.511':
-    resolution: {integrity: sha512-yYsoI0cAv3QrdOfGljIw6Ksmy1hnFfQ3+XmEIoIp9x735Vd5gqKCKRzemvUohP0kmOW4UC9S7po9VGYfmoU4sA==}
+  '@iconify/json@2.2.513':
+    resolution: {integrity: sha512-PnksKLhD/7/LPNeTLZbkTnkzPqd+4m/ToEvzqPtBJzkOT/wTEoLXkrz0BWUv6SdQ4NOM5Xsqc+abVarzXSlh4A==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -8567,7 +8567,7 @@ snapshots:
 
   '@humanwhocodes/retry@0.4.3': {}
 
-  '@iconify/json@2.2.511':
+  '@iconify/json@2.2.513':
     dependencies:
       '@iconify/types': 2.0.0
       pathe: 2.0.3
