@@ -1,0 +1,791 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "TBA Moderation API",
+    "version": "v1",
+    "description": "Authenticated API for The Blue Alliance site moderators to review the suggestion queue. Authenticate with a Firebase ID token as 'Authorization: Bearer <token>'; authorization comes from the account's review permissions."
+  },
+  "servers": [
+    {
+      "url": "https://www.thebluealliance.com/api/moderation/v1"
+    }
+  ],
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "Firebase ID token of a signed-in TBA user with review permissions"
+      }
+    },
+    "schemas": {
+      "SuggestionType": {
+        "type": "string",
+        "enum": [
+          "event",
+          "match",
+          "media",
+          "social-media",
+          "offseason-event",
+          "api_auth_access",
+          "robot",
+          "event_media"
+        ],
+        "description": "The type of suggestion (event=Webcasts, match=Match Videos, media=Team Media, social-media=Social Media, offseason-event=Offseason Events, api_auth_access=API Key Requests, robot=CAD Models, event_media=Event Videos)"
+      },
+      "QueueResponse": {
+        "type": "object",
+        "properties": {
+          "counts": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "integer"
+            },
+            "description": "Pending suggestion count per suggestion type, limited to types the caller can review"
+          },
+          "type_names": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Human-readable name per suggestion type"
+          }
+        },
+        "required": [
+          "counts",
+          "type_names"
+        ]
+      },
+      "SuggestionAuthor": {
+        "type": "object",
+        "properties": {
+          "nickname": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "accepted_count": {
+            "type": "integer",
+            "description": "Lifetime count of this author's accepted suggestions (reputation signal)"
+          },
+          "rejected_count": {
+            "type": "integer",
+            "description": "Lifetime count of this author's rejected suggestions (reputation signal)"
+          }
+        }
+      },
+      "CandidateMedia": {
+        "type": "object",
+        "description": "A preview of the Media entity that accepting this suggestion would create",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "media_type_enum": {
+            "type": "integer"
+          },
+          "type_name": {
+            "type": "string"
+          },
+          "slug_name": {
+            "type": "string"
+          },
+          "foreign_key": {
+            "type": "string"
+          },
+          "is_image": {
+            "type": "boolean"
+          },
+          "external_link": {
+            "type": "string"
+          },
+          "view_image_url": {
+            "type": "string"
+          },
+          "image_direct_url": {
+            "type": "string"
+          },
+          "social_profile_url": {
+            "type": "string"
+          }
+        }
+      },
+      "SuggestionReference": {
+        "type": "object",
+        "description": "The Team or Event this suggestion is attached to",
+        "properties": {
+          "type": {
+            "type": "string",
+            "enum": [
+              "team",
+              "event"
+            ]
+          },
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "year": {
+            "type": "integer"
+          },
+          "start_date": {
+            "type": "string",
+            "format": "date",
+            "description": "First day of the event (events only)"
+          },
+          "end_date": {
+            "type": "string",
+            "format": "date",
+            "description": "Last day of the event (events only)"
+          },
+          "team_number": {
+            "type": "integer"
+          },
+          "nickname": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "type",
+          "key"
+        ]
+      },
+      "ExistingPreferredMedia": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "foreign_key": {
+            "type": "string"
+          },
+          "media_type_enum": {
+            "type": "integer"
+          },
+          "view_image_url": {
+            "type": "string"
+          },
+          "image_direct_url": {
+            "type": "string"
+          }
+        }
+      },
+      "AuthTypeInfo": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "integer"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ExistingAuth": {
+        "type": "object",
+        "properties": {
+          "owner_email": {
+            "type": "string"
+          },
+          "auth_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthTypeInfo"
+            }
+          }
+        }
+      },
+      "SimilarEvent": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "ModerationSuggestion": {
+        "type": "object",
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The suggestion's key, used for accept/reject calls"
+          },
+          "target_model": {
+            "$ref": "#/components/schemas/SuggestionType"
+          },
+          "target_key": {
+            "type": "string"
+          },
+          "created": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "contents": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "The raw suggested contents (shape varies by suggestion type)"
+          },
+          "author": {
+            "$ref": "#/components/schemas/SuggestionAuthor"
+          },
+          "details": {
+            "type": "object",
+            "additionalProperties": true,
+            "description": "Parsed details_json, with a derived thumbnail for images"
+          },
+          "candidate_media": {
+            "$ref": "#/components/schemas/CandidateMedia"
+          },
+          "reference": {
+            "$ref": "#/components/schemas/SuggestionReference"
+          },
+          "event": {
+            "$ref": "#/components/schemas/SuggestionReference"
+          },
+          "uses_official_webcast_unit": {
+            "type": "boolean"
+          },
+          "existing_preferred": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExistingPreferredMedia"
+            }
+          },
+          "max_preferred": {
+            "type": "integer"
+          },
+          "similar_events": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SimilarEvent"
+            }
+          },
+          "similar_events_last_year": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SimilarEvent"
+            }
+          },
+          "requested_auth_types": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AuthTypeInfo"
+            }
+          },
+          "existing_auth": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ExistingAuth"
+            }
+          },
+          "has_first_official_webcast": {
+            "type": "boolean",
+            "description": "match: the event has a FIRST official webcast; suggested videos may be stream rips"
+          },
+          "existing_webcasts": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "properties": {
+                "type": {
+                  "type": "string"
+                },
+                "channel": {
+                  "type": "string"
+                },
+                "file": {
+                  "type": "string"
+                },
+                "date": {
+                  "type": "string"
+                }
+              }
+            },
+            "description": "event: the event's current webcasts, to catch duplicate suggestions"
+          },
+          "video_title": {
+            "type": "string",
+            "description": "match: YouTube title of the suggested video, when a YouTube API key is configured"
+          },
+          "video_duration_seconds": {
+            "type": "integer",
+            "nullable": true,
+            "description": "match: duration of the suggested video in seconds, when a YouTube API key is configured"
+          }
+        },
+        "required": [
+          "key",
+          "target_model",
+          "contents"
+        ]
+      },
+      "SuggestionListResponse": {
+        "type": "object",
+        "properties": {
+          "suggestions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ModerationSuggestion"
+            }
+          },
+          "total": {
+            "type": "integer",
+            "description": "Total pending suggestions of this type, which may exceed the page returned"
+          }
+        },
+        "required": [
+          "suggestions",
+          "total"
+        ]
+      },
+      "AcceptRequest": {
+        "type": "object",
+        "description": "Type-specific reviewer overrides. All fields optional; which fields apply depends on the suggestion type.",
+        "properties": {
+          "target_match_key": {
+            "type": "string",
+            "description": "match: redirect the video to a different match key"
+          },
+          "year": {
+            "type": "integer",
+            "description": "media: override the media year"
+          },
+          "set_preferred": {
+            "type": "boolean",
+            "description": "media: set as preferred team image (defaults to the suggester\u2019s default_preferred request)"
+          },
+          "replace_preferred_media_key": {
+            "type": "string",
+            "description": "media: demote this existing preferred Media and prefer the new one"
+          },
+          "webcast_type": {
+            "type": "string",
+            "description": "event (webcast): webcast type, e.g. twitch/youtube"
+          },
+          "webcast_channel": {
+            "type": "string",
+            "description": "event (webcast): channel identifier"
+          },
+          "webcast_file": {
+            "type": "string",
+            "description": "event (webcast): optional file identifier"
+          },
+          "webcast_date": {
+            "type": "string",
+            "description": "event (webcast): optional YYYY-MM-DD date for date-specific webcasts"
+          },
+          "event_key": {
+            "type": "string",
+            "description": "event (webcast): override the target event"
+          },
+          "event_short": {
+            "type": "string",
+            "description": "offseason-event: REQUIRED event short code, forms the event key"
+          },
+          "name": {
+            "type": "string",
+            "description": "offseason-event: override event name"
+          },
+          "short_name": {
+            "type": "string",
+            "description": "offseason-event: event short display name"
+          },
+          "start_date": {
+            "type": "string",
+            "description": "offseason-event: override start date (YYYY-MM-DD)"
+          },
+          "end_date": {
+            "type": "string",
+            "description": "offseason-event: override end date (YYYY-MM-DD)"
+          },
+          "website": {
+            "type": "string",
+            "description": "offseason-event: override website"
+          },
+          "venue": {
+            "type": "string",
+            "description": "offseason-event: override venue name"
+          },
+          "venue_address": {
+            "type": "string",
+            "description": "offseason-event: override venue address"
+          },
+          "city": {
+            "type": "string",
+            "description": "offseason-event: override city"
+          },
+          "state": {
+            "type": "string",
+            "description": "offseason-event: override state/province"
+          },
+          "country": {
+            "type": "string",
+            "description": "offseason-event: override country"
+          },
+          "first_code": {
+            "type": "string",
+            "description": "offseason-event: official FIRST event code, if any"
+          },
+          "event_type_enum": {
+            "type": "integer",
+            "description": "offseason-event: override the event type enum"
+          },
+          "auth_types": {
+            "type": "array",
+            "items": {
+              "type": "integer"
+            },
+            "description": "api_auth_access: auth types to grant (defaults to the requested types)"
+          },
+          "expiration_days": {
+            "type": "integer",
+            "description": "api_auth_access: days after event end until the key expires; -1 for no expiration. Defaults to 7 while event end + 7 days is still in the future, otherwise -1"
+          },
+          "user_message": {
+            "type": "string",
+            "description": "api_auth_access: message for the requesting user, included in the admin alert email"
+          }
+        }
+      },
+      "AcceptResponse": {
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/ReviewResult"
+          },
+          "suggestion_key": {
+            "type": "string"
+          },
+          "created_target_key": {
+            "type": "string",
+            "description": "The key of the created entity (Media key, event key, match key, or auth id)"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "result",
+          "suggestion_key"
+        ]
+      },
+      "ReviewResult": {
+        "type": "string",
+        "enum": [
+          "accepted",
+          "rejected",
+          "not_found",
+          "already_reviewed",
+          "invalid",
+          "forbidden"
+        ]
+      },
+      "RejectRequest": {
+        "type": "object",
+        "properties": {
+          "suggestion_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "user_message": {
+            "type": "string",
+            "description": "Message for the suggesting user; included in the admin alert email for api_auth_access rejections"
+          }
+        },
+        "required": [
+          "suggestion_keys"
+        ]
+      },
+      "RejectResponse": {
+        "type": "object",
+        "properties": {
+          "results": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/AcceptResponse"
+            }
+          }
+        },
+        "required": [
+          "results"
+        ]
+      },
+      "ErrorResponse": {
+        "type": "object",
+        "properties": {
+          "Error": {
+            "type": "string"
+          }
+        }
+      }
+    }
+  },
+  "security": [
+    {
+      "BearerAuth": []
+    }
+  ],
+  "paths": {
+    "/queue": {
+      "get": {
+        "summary": "Pending suggestion counts per type the caller can review",
+        "operationId": "getModerationQueue",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/QueueResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Firebase ID token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Account has no review permissions",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/{suggestion_type}": {
+      "get": {
+        "summary": "List pending suggestions of one type with review metadata",
+        "operationId": "listModerationSuggestions",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "suggestion_type",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "$ref": "#/components/schemas/SuggestionType"
+            }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "required": false,
+            "schema": {
+              "type": "integer",
+              "default": 50,
+              "maximum": 100
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SuggestionListResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Firebase ID token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing the review permission for this suggestion type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Unknown suggestion type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/{suggestion_key}/accept": {
+      "post": {
+        "summary": "Accept a pending suggestion, creating its target entity",
+        "operationId": "acceptModerationSuggestion",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "name": "suggestion_key",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Suggestion accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid accept payload for this suggestion type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Missing the review permission for this suggestion's type",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Suggestion not found",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Suggestion was already reviewed",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AcceptResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/suggestions/reject": {
+      "post": {
+        "summary": "Reject a batch of pending suggestions",
+        "operationId": "rejectModerationSuggestions",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RejectRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Per-suggestion outcomes",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RejectResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Malformed request body",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Missing or invalid Firebase ID token",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
