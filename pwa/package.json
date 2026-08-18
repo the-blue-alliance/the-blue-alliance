@@ -46,7 +46,7 @@
     "embla-carousel-react": "8.6.0",
     "express": "5.2.1",
     "firebase": "12.17.1",
-    "fuzzysort": "3.1.0",
+    "fuzzysort": "4.0.1",
     "isbot": "5.2.1",
     "lodash-es": "4.18.1",
     "lru-cache": "11.5.2",
