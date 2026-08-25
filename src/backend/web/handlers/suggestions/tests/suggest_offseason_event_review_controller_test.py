@@ -1,9 +1,11 @@
+import datetime
 import re
 from typing import Dict, List, Optional, Tuple
 from urllib.parse import urlparse
 
 import pytest
 from bs4 import BeautifulSoup
+from freezegun import freeze_time
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.test import Client
@@ -49,21 +51,70 @@ def get_suggestion_queue_and_fields(
     return queue, (inputs or {})
 
 
-def createSuggestion(logged_in_user) -> int:
+def createSuggestion(
+    logged_in_user,
+    name: str = "Test Event",
+    city: str = "New York",
+    state: str = "NY",
+) -> int:
     status = SuggestionCreator.createOffseasonEventSuggestion(
         logged_in_user.account_key,
-        "Test Event",
+        name,
         "2016-10-12",
         "2016-10-13",
         "http://foo.bar.com",
         "Venue Name",
         "123 Fake St",
-        "New York",
-        "NY",
+        city,
+        state,
         "USA",
     )
     assert status[0] == SuggestionCreationStatus.SUCCESS
     return none_throws(Suggestion.query().fetch(keys_only=True)[0].integer_id())
+
+
+def createEvent(
+    event_key: str,
+    name: str,
+    city: str = "New York",
+    state: str = "NY",
+    event_type: EventType = EventType.OFFSEASON,
+) -> Event:
+    year = int(event_key[:4])
+    event = Event(
+        id=event_key,
+        event_short=event_key[4:],
+        year=year,
+        name=name,
+        event_type_enum=event_type,
+        city=city,
+        state_prov=state,
+        country="USA",
+        start_date=datetime.datetime(year, 10, 12),
+        end_date=datetime.datetime(year, 10, 13),
+    )
+    event.put()
+    return event
+
+
+def get_similar_events(web_client: Client) -> Dict[str, List[str]]:
+    """
+    Returns the event keys the review page suggests as prior instances of each
+    pending suggestion, keyed by the heading they are listed under.
+    """
+    response = web_client.get("/suggest/offseason/review")
+    assert response.status_code == 200
+    soup = BeautifulSoup(response.data, "html.parser")
+    review_form = soup.find(id="review_offseasons")
+    assert review_form is not None
+
+    similar_events = {}
+    for heading in review_form.find_all("h3", string=re.compile("^Similar Events")):
+        similar_events[heading.get_text(strip=True)] = [
+            link["href"].split("/event/")[1]
+            for link in heading.find_next_sibling("ul").find_all("a")
+        ]
+    return similar_events
 
 
 def test_login_redirect(web_client: Client) -> None:
@@ -368,3 +419,82 @@ def test_reject_does_not_create_audit_log(
     assert response.status_code == 302
 
     assert AuditLogEntry.query().count() == 0
+
+
+def test_similar_event_from_last_year_is_surfaced_despite_rename(
+    login_user_with_permission, web_client: Client, ndb_stub
+) -> None:
+    """Offseason events get renamed year to year, often to or from an acronym"""
+    createSuggestion(
+        login_user_with_permission,
+        name="South Carolina Robotics Invitational & Workshops",
+        city="Columbia",
+        state="SC",
+    )
+    createEvent("2015scriw", "SCRIW XII", city="Columbia", state="SC")
+
+    assert get_similar_events(web_client)["Similar Events in 2015"] == ["2015scriw"]
+
+
+def test_similar_preseason_event_is_surfaced(
+    login_user_with_permission, web_client: Client, ndb_stub
+) -> None:
+    """Prior instances of an event may have been categorized as preseason"""
+    createSuggestion(login_user_with_permission, name="Blue Twilight Week Zero")
+    createEvent(
+        "2015mnbt",
+        "Blue Twilight Week Zero Invitational",
+        event_type=EventType.PRESEASON,
+    )
+
+    assert get_similar_events(web_client)["Similar Events in 2015"] == ["2015mnbt"]
+
+
+def test_similar_event_from_the_suggested_year_is_surfaced(
+    login_user_with_permission, web_client: Client, ndb_stub
+) -> None:
+    """The event short of a recurring event changes year to year, so an event
+    that already exists this year won't be caught by the duplicate key check"""
+    createSuggestion(login_user_with_permission, name="Texas Robotics Invitational")
+    createEvent("2016txhou1", "Texas Robotics Invitational")
+
+    assert get_similar_events(web_client)["Similar Events in 2016"] == ["2016txhou1"]
+
+
+def test_unrelated_event_is_not_surfaced(
+    login_user_with_permission, web_client: Client, ndb_stub
+) -> None:
+    """Nearly every FRC event name shares words with every other one"""
+    createSuggestion(
+        login_user_with_permission,
+        name="Where is Wolcott Invitational",
+        city="Wolcott",
+        state="CT",
+    )
+    createEvent("2015txri", "Texas Robotics Invitational", city="Houston", state="TX")
+
+    assert get_similar_events(web_client)["Similar Events in 2015"] == []
+
+
+def test_official_events_are_not_surfaced(
+    login_user_with_permission, web_client: Client, ndb_stub
+) -> None:
+    createSuggestion(login_user_with_permission, name="Rocket City Regional")
+    createEvent("2015alhu", "Rocket City Regional", event_type=EventType.REGIONAL)
+
+    assert get_similar_events(web_client)["Similar Events in 2015"] == []
+
+
+@freeze_time("2020-06-01")
+def test_similar_events_are_compared_against_the_suggested_year(
+    login_user_with_permission, web_client: Client, ndb_stub
+) -> None:
+    """Suggestions are reviewed whenever a reviewer gets to them, which may be
+    a different year than the one the suggested event happens in"""
+    createSuggestion(login_user_with_permission, name="Beach Blitz")
+    createEvent("2015cabl", "Beach Blitz")
+    createEvent("2019cabl", "Beach Blitz")
+
+    similar_events = get_similar_events(web_client)
+    assert similar_events["Similar Events in 2015"] == ["2015cabl"]
+    assert "Similar Events in 2019" not in similar_events
