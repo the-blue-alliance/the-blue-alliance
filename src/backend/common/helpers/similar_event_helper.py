@@ -61,6 +61,18 @@ MAX_SIMILAR_EVENTS = 8
 # that compare only the distinguishing words.
 RAW_NAME_WEIGHT = 0.85
 
+# Words an acronym may or may not pick up a letter from -- "South Carolina
+# Robotics & Practical Off-Season" is abbreviated SCRAP, but "Georgia Robotics
+# Invitational Tournament & Showcase" is GRITS
+CONNECTOR_WORDS: FrozenSet[str] = frozenset(
+    {"a", "an", "and", "at", "by", "for", "in", "of", "on", "the"}
+)
+
+# How much of an acronym has to be written out before a name that starts with
+# it counts as that acronym, since acronyms routinely drop the tail of a name
+# ("South Carolina Robotics And Practical" Off-Season -> SCRAP)
+MIN_ACRONYM_PREFIX = 4
+
 # Abbreviations that get written in caps but name a whole category of events
 # rather than one particular event
 AMBIGUOUS_ABBREVIATIONS: FrozenSet[str] = frozenset(
@@ -104,7 +116,8 @@ def _normalize(name: Optional[str]) -> str:
     """
     decomposed = unicodedata.normalize("NFKD", name or "")
     ascii_only = decomposed.encode("ascii", "ignore").decode()
-    return " ".join(_NON_ALPHANUMERIC.sub(" ", ascii_only.lower()).split())
+    spelled_out = ascii_only.lower().replace("&", " and ")
+    return " ".join(_NON_ALPHANUMERIC.sub(" ", spelled_out).split())
 
 
 def _tokens(name: Optional[str]) -> List[str]:
@@ -128,19 +141,31 @@ def _significant_tokens(name: Optional[str]) -> List[str]:
 
 def _acronyms(name: Optional[str]) -> Set[str]:
     """
-    Acronyms a name could plausibly be abbreviated to. Both the all-words form
-    ("Thundering Herd Of Robots" -> "thor") and the significant-words-only form
-    are included, since either may be the one that stuck.
+    Acronyms a name could plausibly be abbreviated to. Which words get a letter
+    varies -- every word ("Thundering Herd Of Robots" -> "thor"), every word
+    but the connectors ("Georgia Robotics Invitational Tournament & Showcase"
+    -> "grits"), or only the distinguishing ones -- so all three are included.
     """
     all_words = _tokens(name)
-    if len(all_words) < 2:
-        return set()
-
-    acronyms = {"".join(word[0] for word in all_words)}
-    significant = _significant_tokens(name)
-    if len(significant) > 1:
-        acronyms.add("".join(word[0] for word in significant))
+    without_connectors = [word for word in all_words if word not in CONNECTOR_WORDS]
+    acronyms = {
+        "".join(word[0] for word in words)
+        for words in (all_words, without_connectors, _significant_tokens(name))
+        if len(words) > 1
+    }
     return {acronym for acronym in acronyms if len(acronym) >= 3}
+
+
+def _is_acronym_of(word: str, acronyms: Set[str]) -> bool:
+    """
+    Whether a word abbreviates a name, either as the whole acronym or as enough
+    of the front of one to be unmistakable.
+    """
+    return any(
+        acronym == word
+        or (len(word) >= MIN_ACRONYM_PREFIX and acronym.startswith(word))
+        for acronym in acronyms
+    )
 
 
 def _acronym_like_words(name: Optional[str]) -> Set[str]:
@@ -226,7 +251,10 @@ def name_similarity(a: Optional[str], b: Optional[str]) -> float:
         # we have, so don't discount it.
         score = max(score, raw_similarity)
 
-    if _acronym_like_words(a) & _acronyms(b) or _acronym_like_words(b) & _acronyms(a):
+    acronyms_a, acronyms_b = _acronyms(a), _acronyms(b)
+    if any(_is_acronym_of(word, acronyms_b) for word in _acronym_like_words(a)) or any(
+        _is_acronym_of(word, acronyms_a) for word in _acronym_like_words(b)
+    ):
         score = max(score, ACRONYM_SCORE)
 
     if _abbreviations(a) & _abbreviations(b):

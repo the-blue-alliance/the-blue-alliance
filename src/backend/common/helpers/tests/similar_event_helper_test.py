@@ -123,6 +123,26 @@ RENAMED_EVENTS = [
         id="boilerplate_dropped",
     ),
     pytest.param(
+        make_event(
+            "2021scsc",
+            "South Carolina Robotics & Practical Off-Season",
+            "Columbia",
+            "SC",
+        ),
+        make_event("2022scsc", "SCRAP - Friday", "Sumter", "SC"),
+        id="acronym_of_an_ampersand_and_a_shortened_name",
+    ),
+    pytest.param(
+        make_event(
+            "2024mncc",
+            "Central Minnesota Robotics Conference Championship",
+            "Becker",
+            "MN",
+        ),
+        make_event("2025cmrc", "CMRC Championship", "Becker", "MN"),
+        id="acronym_of_the_front_of_a_name",
+    ),
+    pytest.param(
         make_event("2024txri", "Texas Robotics Invitational", "Houston", "TX"),
         make_event("2025txhou1", "Texas Robotics Invitational", "Houston", "TX"),
         id="same_name_new_event_short",
@@ -255,6 +275,16 @@ def test_name_similarity_ignores_case_punctuation_and_accents() -> None:
     assert name_similarity("Beach Blitz", "beach-blitz!") == identical_names
     assert (
         name_similarity("Cezeri Robot Ligi Başakşehir", "Cezeri Robot Ligi Basaksehir")
+        == identical_names
+    )
+
+
+def test_name_similarity_spells_out_ampersands() -> None:
+    identical_names = name_similarity(
+        "Robotics and Practical", "Robotics and Practical"
+    )
+    assert (
+        name_similarity("Robotics & Practical", "Robotics and Practical")
         == identical_names
     )
 
