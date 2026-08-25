@@ -88,7 +88,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.4",
     "@vitejs/plugin-react": "6.0.5",
-    "@vitest/coverage-v8": "4.1.10",
+    "@vitest/coverage-v8": "4.1.11",
     "babel-plugin-react-compiler": "1.0.0",
     "eslint-plugin-no-relative-import-paths": "1.6.1",
     "oxlint": "1.78.0",
@@ -106,7 +106,7 @@
     "typescript": "6.0.3",
     "unplugin-icons": "23.0.1",
     "vite": "8.2.1",
-    "vitest": "4.1.10",
+    "vitest": "4.1.11",
     "workbox-build": "7.4.1"
   },
   "engines": {
