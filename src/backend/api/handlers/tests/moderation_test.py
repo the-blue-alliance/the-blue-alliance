@@ -910,6 +910,48 @@ def test_accept_event_webcast_requires_fields(
     assert resp.json["result"] == "invalid"
 
 
+def test_accept_offseason_event_requires_dates(
+    api_client: Client, moderator, author: Account, taskqueue_stub
+) -> None:
+    # Dateless events violate the APIv3 contract and break strict clients
+    moderator([AccountPermission.REVIEW_OFFSEASON_EVENTS])
+    suggestion_id = create_suggestion(
+        author,
+        "offseason-event",
+        None,
+        {"name": "Dateless Offseason", "website": "https://example.com"},
+        suggestion_id="dateless_offseason",
+    )
+
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/{suggestion_id}/accept",
+        json={"event_short": "dateless"},
+    )
+    assert resp.status_code == 400
+    assert resp.json["result"] == "invalid"
+    assert "start_date and end_date are required" in resp.json["message"]
+
+    suggestion = Suggestion.get_by_id("dateless_offseason")
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_PENDING
+    assert Event.query().count() == 0
+
+    # Reviewer-provided dates satisfy the requirement
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/{suggestion_id}/accept",
+        json={
+            "event_short": "dateless",
+            "start_date": "2016-10-01",
+            "end_date": "2016-10-02",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.json["result"] == "accepted"
+    event = Event.get_by_id("2016dateless")
+    assert event is not None
+    assert event.start_date is not None
+
+
 def test_accept_offseason_event(
     api_client: Client, moderator, author: Account, taskqueue_stub
 ) -> None:

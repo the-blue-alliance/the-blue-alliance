@@ -375,8 +375,15 @@ class SuggestionReviewer:
             if end_date_str
             else None
         )
+        # Dateless events violate the APIv3 contract (start_date/end_date are
+        # non-nullable) and break strict API clients, so refuse to create one
+        if start_date is None or end_date is None:
+            return (
+                None,
+                "start_date and end_date are required to accept an offseason event",
+            )
 
-        year = int(overrides.get("year") or (start_date.year if start_date else 0))
+        year = int(overrides.get("year") or start_date.year)
         event_key = f"{year}{event_short}"
         if not Event.validate_key_name(event_key):
             return None, f"Bad event key {event_key}"
