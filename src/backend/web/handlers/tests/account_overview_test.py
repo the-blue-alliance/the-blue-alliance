@@ -669,6 +669,6 @@ def test_overview_api_write_add_button(
         "div", attrs={"class": "row"}, id="api-write-keys-row"
     )
     api_write_key_row_button = api_write_key_row.find(
-        "a", attrs={"href": "request/apiwrite", "class": "btn btn-success pull-right"}
+        "a", attrs={"href": "/request/apiwrite", "class": "btn btn-success pull-right"}
     )
     assert api_write_key_row_button.text == " Request Tokens"
