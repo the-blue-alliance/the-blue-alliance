@@ -216,14 +216,20 @@
     <div class="col-md-10 col-md-offset-1">
       <table id="api-write-keys" class="table table-striped">
         <tr>
-          <th>Event</th>
+          <th>
+            Event
+            <span class="btn-group btn-group-xs" role="group" aria-label="Sort write API keys by event">
+              <a id="api-write-keys-sort-asc" href="{{ url_for('account.overview', api_write_keys_sort='asc') }}" class="btn btn-{% if api_write_keys_sort_direction == 'asc' %}primary{% else %}default{% endif %}" aria-label="Sort ascending" title="Sort ascending" aria-pressed="{{ 'true' if api_write_keys_sort_direction == 'asc' else 'false' }}"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></a>
+              <a id="api-write-keys-sort-desc" href="{{ url_for('account.overview', api_write_keys_sort='desc') }}" class="btn btn-{% if api_write_keys_sort_direction == 'desc' %}primary{% else %}default{% endif %}" aria-label="Sort descending" title="Sort descending" aria-pressed="{{ 'true' if api_write_keys_sort_direction == 'desc' else 'false' }}"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></a>
+            </span>
+          </th>
           <th>Permissions</th>
           <th>Expires</th>
           <th>Auth ID</th>
           <th>Auth Secret</th>
         </tr>
         <tbody>
-          {% for key in user.api_write_keys %}
+          {% for key in api_write_keys %}
             <tr class="api-write-key">
               <td>
               {% for event in key.event_list %}
