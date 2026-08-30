@@ -211,6 +211,19 @@ class DistrictHelper:
         return district_points
 
     @classmethod
+    def ranking_sort_key(
+        cls,
+        point_total: int,
+        tiebreakers: Sequence[int],
+        match_scores: Sequence[int],
+    ) -> List[int]:
+        return (
+            [-point_total]
+            + [-t for t in tiebreakers]
+            + [-score for score in match_scores]
+        )
+
+    @classmethod
     def calculate_rankings(
         cls,
         events: List[Event],
@@ -352,11 +365,11 @@ class DistrictHelper:
         team_totals = dict(
             sorted(
                 team_totals.items(),
-                key=lambda item: [
-                    -item[1]["point_total"],
-                ]
-                + [-t for t in item[1]["tiebreakers"]]
-                + [-score for score in item[1]["match_scores"]],
+                key=lambda item: cls.ranking_sort_key(
+                    item[1]["point_total"],
+                    item[1]["tiebreakers"],
+                    item[1]["match_scores"],
+                ),
             )
         )
 
