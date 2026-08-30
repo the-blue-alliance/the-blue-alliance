@@ -1,4 +1,4 @@
-import { useSuspenseQueries, useSuspenseQuery } from '@tanstack/react-query';
+import { useQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
@@ -16,6 +16,11 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '~/components/ui/tooltip';
 import { staleTimeForYear } from '~/lib/queryClient';
 import {
   parseParamsForYearElseDefault,
@@ -32,21 +37,10 @@ export const Route = createFileRoute('/districts/{-$year}')({
 
     const yearStaleTime = staleTimeForYear(year);
 
-    const districts = await queryClient.ensureQueryData({
+    await queryClient.ensureQueryData({
       ...getDistrictsByYearOptions({ path: { year } }),
       staleTime: yearStaleTime,
     });
-
-    await Promise.all(
-      districts.map((district) =>
-        queryClient.ensureQueryData({
-          ...getDistrictTeamsKeysOptions({
-            path: { district_key: district.key },
-          }),
-          staleTime: yearStaleTime,
-        }),
-      ),
-    );
 
     return { year };
   },
@@ -79,6 +73,29 @@ export const Route = createFileRoute('/districts/{-$year}')({
   component: DistrictsPage,
 });
 
+function AdvancementCountCell({
+  slots,
+  teamCount,
+}: {
+  slots: number;
+  teamCount: number | undefined;
+}) {
+  if (teamCount === undefined) {
+    return <TableCell className="text-right numeric-data">{slots}</TableCell>;
+  }
+
+  const percentage = Math.round((slots / teamCount) * 100);
+
+  return (
+    <TableCell className="text-right numeric-data">
+      <Tooltip>
+        <TooltipTrigger>{slots}</TooltipTrigger>
+        <TooltipContent>{percentage}% of teams</TooltipContent>
+      </Tooltip>
+    </TableCell>
+  );
+}
+
 function DistrictsPage() {
   const { year } = Route.useLoaderData();
   const yearStaleTime = staleTimeForYear(year);
@@ -95,17 +112,17 @@ function DistrictsPage() {
     [districts],
   );
 
-  const teamKeyResults = useSuspenseQueries({
+  const teamKeyResults = useQueries({
     queries: districts.map((district) => ({
       ...getDistrictTeamsKeysOptions({ path: { district_key: district.key } }),
       staleTime: yearStaleTime,
     })),
   });
 
-  const teamKeyCounts = teamKeyResults.map((result) => result.data.length);
+  const teamKeyCounts = teamKeyResults.map((result) => result.data?.length);
 
   const teamCountByDistrict = useMemo(() => {
-    const map = new Map<string, number>();
+    const map = new Map<string, number | undefined>();
     districts.forEach((district, i) => {
       map.set(district.key, teamKeyCounts[i]);
     });
@@ -138,6 +155,8 @@ function DistrictsPage() {
             <TableHead>District</TableHead>
             <TableHead>Key</TableHead>
             <TableHead className="text-right">Teams</TableHead>
+            <TableHead className="text-right">DCMP Slots</TableHead>
+            <TableHead className="text-right">CMP Slots</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -155,8 +174,16 @@ function DistrictsPage() {
                 {district.abbreviation}
               </TableCell>
               <TableCell className="text-right numeric-data">
-                {teamCountByDistrict.get(district.key)}
+                {teamCountByDistrict.get(district.key) ?? '-'}
               </TableCell>
+              <AdvancementCountCell
+                slots={district.official_advancement_counts.dcmp}
+                teamCount={teamCountByDistrict.get(district.key)}
+              />
+              <AdvancementCountCell
+                slots={district.official_advancement_counts.cmp}
+                teamCount={teamCountByDistrict.get(district.key)}
+              />
             </TableRow>
           ))}
         </TableBody>
