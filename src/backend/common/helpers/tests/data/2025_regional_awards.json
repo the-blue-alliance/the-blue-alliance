@@ -1,0 +1,1800 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2025alhu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1038"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025alhu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10011",
+      "frc2338",
+      "frc4020"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025alhu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc34"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025arli",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3937"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025arli",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc118",
+      "frc2481",
+      "frc7483"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025arli",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4499"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ausc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4788"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ausc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4613",
+      "frc5584",
+      "frc6083"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ausc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3132"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025azfg",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc9134"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025azfg",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc359",
+      "frc7645",
+      "frc9432"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025azfg",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4146"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025azgl",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6352"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025azgl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4415",
+      "frc9432",
+      "frc9704"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025azgl",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5026"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025bcvi",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2438"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025bcvi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc359",
+      "frc4270",
+      "frc8339"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025bcvi",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4253"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025brba",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1156"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025brba",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc5800",
+      "frc7563",
+      "frc9199"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025brba",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7563"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025brsp",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc7565"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025brsp",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1156",
+      "frc7563",
+      "frc9175"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025brsp",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc9085"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025caav",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2637"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025caav",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4415",
+      "frc5199",
+      "frc687"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025caav",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1700"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025cabe",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc5985"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025cabe",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2204",
+      "frc254",
+      "frc4270"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025cabe",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc589"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025cada",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4135"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025cada",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1678",
+      "frc254",
+      "frc7137"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025cada",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2073"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025cafr",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc5665"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025cafr",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2035",
+      "frc3970",
+      "frc973"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025cafr",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5817"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025cala",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc5089"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025cala",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1197",
+      "frc5124",
+      "frc9408"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025cala",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5553"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025camb",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1678"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025camb",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1678",
+      "frc3257",
+      "frc604"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025camb",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4481"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025caoc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3473"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025caoc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4415",
+      "frc6995",
+      "frc8871"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025caoc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8033"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025caph",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4400"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025caph",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3255",
+      "frc4414",
+      "frc9599"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025caph",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc498"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025capt",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3598"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025capt",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1323",
+      "frc1678",
+      "frc649",
+      "frc6619"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025capt",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc649"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025casd",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc8020"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025casd",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1538",
+      "frc3255",
+      "frc8119"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025casd",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2485"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025casf",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1868"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025casf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10523",
+      "frc4255",
+      "frc5940"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025casf",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3256"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025casj",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3880"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025casj",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1323",
+      "frc5940",
+      "frc649"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025casj",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc766"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025cave",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4481"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025cave",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4414",
+      "frc4481",
+      "frc5805"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025cave",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7426"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025cnsh",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc5449"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025cnsh",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10120",
+      "frc5449",
+      "frc6941"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025cnsh",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5516"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025code",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3284"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025code",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1619",
+      "frc4499",
+      "frc4501"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025code",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7415"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025flor",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc180"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025flor",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc179",
+      "frc180",
+      "frc2152"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025flor",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4091"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025flta",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc233"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025flta",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1902",
+      "frc386",
+      "frc5276",
+      "frc6184"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025flta",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1369"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025flwp",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc9077"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025flwp",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc179",
+      "frc180",
+      "frc5410"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025flwp",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2486"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025hiho",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3008"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025hiho",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc359",
+      "frc4270",
+      "frc4817"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025hiho",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3501"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025iacf",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc7531"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025iacf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1706",
+      "frc4646",
+      "frc5914"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025iacf",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc167"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025idbo",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6358"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025idbo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2122",
+      "frc359",
+      "frc3859"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025idbo",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1148"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ilch",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3061"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ilch",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc111",
+      "frc2338",
+      "frc8029"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ilch",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc9692"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ilpe",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6421"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ilpe",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1756",
+      "frc2358",
+      "frc2481"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ilpe",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1138"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ksla",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6652"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ksla",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1825",
+      "frc5013",
+      "frc7421"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ksla",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1108"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025lake",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc34"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025lake",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc16",
+      "frc8044",
+      "frc9787"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025lake",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2080"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mndu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4607"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mndu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2847",
+      "frc6147",
+      "frc6574"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mndu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6421"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mndu2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2383"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mndu2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc111",
+      "frc2240",
+      "frc4360",
+      "frc5253"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mndu2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7048"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mnmi",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3792"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mnmi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2491",
+      "frc3891",
+      "frc8570"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mnmi",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6909"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mnmi2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2883"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mnmi2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3276",
+      "frc4728",
+      "frc6749"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mnmi2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7028"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mnum",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3197"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mnum",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2052",
+      "frc3197",
+      "frc4198"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mnum",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2470"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mokc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1730"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mokc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1987",
+      "frc3160",
+      "frc5801"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mokc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1987"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mose",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1710"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mose",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1756",
+      "frc4522",
+      "frc5968"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mose",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3928"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mosl",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4256"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mosl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1329",
+      "frc1706",
+      "frc27"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mosl",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4329"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mslr",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4013"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mslr",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2992",
+      "frc3753",
+      "frc456"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mslr",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1466"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mxle",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6606"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mxle",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3478",
+      "frc4400",
+      "frc4782"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mxle",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3354"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mxmo",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3794"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mxmo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4403",
+      "frc4635",
+      "frc9301"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mxmo",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5705"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025mxto",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6702"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025mxto",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4400",
+      "frc6483",
+      "frc9134"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025mxto",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6832"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ndgf",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3313"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ndgf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3276",
+      "frc7530",
+      "frc876"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ndgf",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2987"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ntwc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4253"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ntwc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc8169",
+      "frc8613",
+      "frc9126"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ntwc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7632"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025nvlv",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025nvlv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4414",
+      "frc60",
+      "frc987"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025nvlv",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2429"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025nyli2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc564"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025nyli2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc353",
+      "frc564",
+      "frc5736"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025nyli2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6806"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025nyny",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1796"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025nyny",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1796",
+      "frc6873",
+      "frc694"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025nyny",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc333"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025nyro",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc8393"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025nyro",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc340",
+      "frc4611",
+      "frc6911"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025nyro",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6911"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025nysu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1880"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025nysu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1796",
+      "frc5298",
+      "frc694"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025nysu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8739"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025nytr",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2601"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025nytr",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1796",
+      "frc5528",
+      "frc6621"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025nytr",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6401"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ohcl",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1511"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ohcl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1559",
+      "frc1787",
+      "frc695"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ohcl",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc9545"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025ohmv",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3814"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025ohmv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc340",
+      "frc4028",
+      "frc432"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025ohmv",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7525"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025okok",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc8711"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025okok",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2341",
+      "frc4068",
+      "frc4522"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025okok",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2341"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025oktu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc5454"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025oktu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2341",
+      "frc3937",
+      "frc6424"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025oktu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8711"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025paca",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4145"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025paca",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3492",
+      "frc3539",
+      "frc694"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025paca",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4467"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025qcmo",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3990"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025qcmo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3015",
+      "frc3544",
+      "frc3990"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025qcmo",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5528"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025tnkn",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3492"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025tnkn",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10479",
+      "frc3843",
+      "frc4467"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025tnkn",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc801"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025tuak",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6989"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025tuak",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc6436",
+      "frc8777",
+      "frc9029"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025tuak",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc9583"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025tuhc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6431"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025tuhc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10541",
+      "frc7050",
+      "frc7539"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025tuhc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc7539"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025tuis",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6014"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025tuis",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10337",
+      "frc7539",
+      "frc9609"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025tuis",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5665"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025tuis2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc8557"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025tuis2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10598",
+      "frc8159",
+      "frc9483"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025tuis2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6431"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025tuis3",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc8159"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025tuis3",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10502",
+      "frc6038",
+      "frc8159",
+      "frc9609"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025tuis3",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc9609"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025utwv",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4585"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025utwv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3166",
+      "frc7426",
+      "frc987"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025utwv",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc9037"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025wila",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc537"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025wila",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3197",
+      "frc4728",
+      "frc8024"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025wila",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc706"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025wimi",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc930"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025wimi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1732",
+      "frc2830",
+      "frc4786"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025wimi",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2826"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025wimu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3354"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025wimu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1220",
+      "frc2530",
+      "frc4635"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025wimu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6024"
+    ]
+  }
+]

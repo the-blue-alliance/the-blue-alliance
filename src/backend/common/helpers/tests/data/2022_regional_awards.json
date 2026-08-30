@@ -1,0 +1,1860 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2022alhu",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc6652"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022alhu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc364",
+      "frc3959",
+      "frc59"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022alhu",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc3959"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022alhu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4013"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022arli",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2341"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022arli",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc16",
+      "frc4635",
+      "frc6586"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022arli",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc5454",
+      "frc6586",
+      "frc7483"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022arli",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc5006"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022ausc",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc5985"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022ausc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4613",
+      "frc5876",
+      "frc6510"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022ausc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4788"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022azfl",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc498"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022azfl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc114",
+      "frc1726",
+      "frc2122"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022azfl",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2486"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022azva",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc6413"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022azva",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2478",
+      "frc4415",
+      "frc7703"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022azva",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2073"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022bcvi",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc6390"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022bcvi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4421",
+      "frc6364",
+      "frc7167"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022bcvi",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6485"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022caav",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc399"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022caav",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4414",
+      "frc5199",
+      "frc5526"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022caav",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc5526"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022caav",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1700"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022cada",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1678"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022cada",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1678",
+      "frc254",
+      "frc5458"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022cada",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc5458",
+      "frc7157",
+      "frc973"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022cada",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8033"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022cafr",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3512"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022cafr",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1323",
+      "frc5817",
+      "frc973"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022cafr",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc3970",
+      "frc5817",
+      "frc8768"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022cafr",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc115"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022cala",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3749"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022cala",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3476",
+      "frc599",
+      "frc696"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022cala",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc599",
+      "frc8898"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022cala",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2637"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022camb",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1671"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022camb",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1280",
+      "frc1323",
+      "frc5940"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022camb",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4135"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022caoc",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4201"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022caoc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3476",
+      "frc3952",
+      "frc987"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022caoc",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc3952"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022caoc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1868"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022caph",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4400"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022caph",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1678",
+      "frc4414",
+      "frc589"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022caph",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3374"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022casd",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1622"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022casd",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2839",
+      "frc3128",
+      "frc6560",
+      "frc8006"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022casd",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3749"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022casf",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc649"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022casf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc604",
+      "frc846",
+      "frc8852"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022casf",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8159"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022casj",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4159"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022casj",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1678",
+      "frc254",
+      "frc7419"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022casj",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc7419",
+      "frc8793",
+      "frc971"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022casj",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1678"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022cave",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc359"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022cave",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc359",
+      "frc4414",
+      "frc5089"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022cave",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc2135",
+      "frc3512",
+      "frc5089"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022cave",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3256"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022code",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3374"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022code",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1339",
+      "frc1619",
+      "frc4944"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022code",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc4944",
+      "frc7485"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022code",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4499"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022flor",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1156"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022flor",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc179",
+      "frc180",
+      "frc7072"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022flor",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc7072"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022flor",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3937"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022flta",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2992"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022flta",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2556",
+      "frc386",
+      "frc86"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022flta",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc2556"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022flta",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1902"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022flwp",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc59"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022flwp",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc179",
+      "frc4481",
+      "frc4592"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022flwp",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc4592"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022flwp",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4481"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022hiho",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2438"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022hiho",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2443",
+      "frc4774",
+      "frc8871"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022hiho",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3008"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022iacf",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc5006"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022iacf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4213",
+      "frc7541",
+      "frc7848"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022iacf",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3928"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022idbo",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4598"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022idbo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2122",
+      "frc6036",
+      "frc8546"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022idbo",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc8546"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022idbo",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6358"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022ilch",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3061"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022ilch",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc111",
+      "frc2338",
+      "frc8122"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022ilch",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc2022",
+      "frc3488",
+      "frc8122",
+      "frc8868"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022ilch",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2451"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022ilpe",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2338"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022ilpe",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc111",
+      "frc1756",
+      "frc8122"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022ilpe",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1625"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022ksla",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1730"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022ksla",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1706",
+      "frc1987",
+      "frc5098"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022ksla",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc5098"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022ksla",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1987"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022lake",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2080"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022lake",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc118",
+      "frc179",
+      "frc7094"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022lake",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc7094"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022lake",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3932"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mndu",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3197"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mndu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1732",
+      "frc2052",
+      "frc2531"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mndu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2506"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mndu2",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4593"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mndu2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2502",
+      "frc5172",
+      "frc5913"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mndu2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2491"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mnmi",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc525"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mnmi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2202",
+      "frc3630",
+      "frc8516"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022mnmi",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc8516"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mnmi",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6420"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mnmi2",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3928"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mnmi2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2987",
+      "frc3928",
+      "frc6749"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022mnmi2",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc2129",
+      "frc2239",
+      "frc6749"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mnmi2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc1816"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mokc",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1710"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mokc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1825",
+      "frc1984",
+      "frc1986"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mokc",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2718"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mokc3",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc6424"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mokc3",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1987",
+      "frc4522",
+      "frc5809"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022mokc3",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc1939",
+      "frc5013",
+      "frc5809"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mokc3",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3284"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mosl",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3792"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mosl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1706",
+      "frc1756",
+      "frc4931"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022mosl",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc4143",
+      "frc4931"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mosl",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4329"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mxmo",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4775"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mxmo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4635",
+      "frc5948",
+      "frc7421"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mxmo",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3794"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022mxto",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc5705"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022mxto",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3478",
+      "frc4635",
+      "frc4775"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022mxto",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc8748"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022mxto",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4735"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022ndgf",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2883"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022ndgf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc5172",
+      "frc6453",
+      "frc876"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022ndgf",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc6453"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022ndgf",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4607"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022nvlv",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1138"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022nvlv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2383",
+      "frc4415",
+      "frc8022",
+      "frc8717"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022nvlv",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc8022",
+      "frc8717"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022nvlv",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2383"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022nyli",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2638"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022nyli",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2872",
+      "frc3171",
+      "frc870"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022nyli",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6024"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022nyli2",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1468"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022nyli2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2869",
+      "frc694",
+      "frc870"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022nyli2",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc8739"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022nyli2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2869"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022nyny",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc5298"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022nyny",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1796",
+      "frc5806",
+      "frc694"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022nyny",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc5806"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022nyny",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6401"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022nyro",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4930"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022nyro",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1787",
+      "frc2228",
+      "frc340",
+      "frc578"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022nyro",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3015"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022nytr",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3015"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022nytr",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2601",
+      "frc2614",
+      "frc5484"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022nytr",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc1493",
+      "frc2601"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022nytr",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6300"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022ohcl",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3504"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022ohcl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3015",
+      "frc340",
+      "frc4611"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022ohcl",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc4028",
+      "frc4611",
+      "frc8718"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022ohcl",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8037"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022okok",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc3284"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022okok",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1619",
+      "frc3160",
+      "frc4522"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022okok",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2341"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022oktu",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4735"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022oktu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1986",
+      "frc2481",
+      "frc8711"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022oktu",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc5437",
+      "frc8711"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022oktu",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6424"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022paca",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1511"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022paca",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc27",
+      "frc3539",
+      "frc695"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022paca",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc695"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022paca",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3504"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022qcmo1",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3986",
+      "frc3990",
+      "frc6622"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022qcmo1",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6869"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022qcmo2",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2626"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022qcmo2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3360",
+      "frc3990",
+      "frc8132"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022qcmo3",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3986",
+      "frc3990",
+      "frc8067"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022scan",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4265"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022scan",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1293",
+      "frc4020",
+      "frc4265"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022scan",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc1293"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022scan",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc3489"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022tant",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc6998"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022tant",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4253",
+      "frc7527",
+      "frc8806"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022tant",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8020"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022tnkn",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc4451"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022tnkn",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3824",
+      "frc4265",
+      "frc4451"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022tnkn",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc2252",
+      "frc3824"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022tnkn",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2614"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022tuis",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc7466"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022tuis",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc6064",
+      "frc8561",
+      "frc8599"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022tuis",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6025"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022tuis2",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc8153"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022tuis2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc6838",
+      "frc7285",
+      "frc8058"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022tuis2",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc8058",
+      "frc8861"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022tuis2",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6988"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022tuis3",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc6429"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022tuis3",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc6838",
+      "frc7285",
+      "frc8054"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022tuis3",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc2905"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022utwv",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2486"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022utwv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2122",
+      "frc359",
+      "frc6844"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022utwv",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc1828",
+      "frc3166",
+      "frc6844",
+      "frc8885"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022utwv",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc846"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022wila",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc2220"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022wila",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc5903",
+      "frc6421",
+      "frc7021"
+    ]
+  },
+  {
+    "award_type": 68,
+    "event_key": "2022wila",
+    "name": "Wildcard",
+    "team_keys": [
+      "frc5903",
+      "frc8531"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022wila",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc8701"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022wimi",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc1792"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2022wimi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2202",
+      "frc2506",
+      "frc6421"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022wimi",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc4786"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2022zhha",
+    "name": "Regional Chairman's Award",
+    "team_keys": [
+      "frc6907"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2022zhha",
+    "name": "Regional Engineering Inspiration Award",
+    "team_keys": [
+      "frc6907"
+    ]
+  }
+]

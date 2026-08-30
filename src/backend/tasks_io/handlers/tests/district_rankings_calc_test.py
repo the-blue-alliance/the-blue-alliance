@@ -4,8 +4,10 @@ from unittest import mock
 import pytest
 from freezegun import freeze_time
 from google.appengine.ext import testbed
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
+from backend.common.consts.cmp_qualification import CmpQualificationMethod
 from backend.common.consts.event_type import EventType
 from backend.common.futures import InstantFuture
 from backend.common.helpers.district_helper import (
@@ -14,6 +16,7 @@ from backend.common.helpers.district_helper import (
 )
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.district import District
+from backend.common.models.district_advancement import DistrictAdvancementCutoffs
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.event import Event
 from backend.common.models.event_district_points import TeamAtEventDistrictPoints
@@ -297,6 +300,49 @@ def test_calc_writes_advancement_cutoffs(
         "cmp_original": 0,
         "cmp_effective": 0,
         "cmp_declines": [],
+        "cmp_qualification": {},
+    }
+
+
+@mock.patch.object(DistrictHelper, "calculate_rankings")
+def test_calc_carries_forward_cmp_cutoffs(
+    calc_mock: mock.Mock, tasks_client: Client
+) -> None:
+    district = District(id="2020ne", year=2020, abbreviation="ne")
+    district.advancement_cutoffs = DistrictAdvancementCutoffs(
+        dcmp_original=0,
+        dcmp_effective=0,
+        dcmp_declines=[],
+        cmp_original=190,
+        cmp_effective=173,
+        cmp_declines=["frc95"],
+        cmp_qualification={"frc95": CmpQualificationMethod.DISTRICT_POINTS},
+    )
+    district.put()
+    qual_event = Event(
+        id="2020ndis", year=2020, event_short="ndis", event_type_enum=EventType.DISTRICT
+    )
+    dcmp_event = Event(
+        id="2020necmp",
+        year=2020,
+        event_short="necmp",
+        event_type_enum=EventType.DISTRICT_CMP,
+    )
+    calc_mock.return_value = {
+        f"frc{i}": _team_total(qual_event, 100 - i, dcmp_event, 5) for i in range(1, 5)
+    }
+
+    resp = tasks_client.get("/tasks/math/do/district_rankings_calc/2020ne")
+    assert resp.status_code == 200
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    cutoffs = none_throws(district.advancement_cutoffs)
+    assert cutoffs["cmp_original"] == 190
+    assert cutoffs["cmp_effective"] == 173
+    assert cutoffs["cmp_declines"] == ["frc95"]
+    assert cutoffs["cmp_qualification"] == {
+        "frc95": CmpQualificationMethod.DISTRICT_POINTS
     }
 
 

@@ -1,0 +1,625 @@
+[
+  {
+    "address": "Hartford Public High School\n55 Forest Street\nHartford, CT 06105\nUSA",
+    "city": "Hartford",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-04-07",
+    "event_code": "cthar",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "cthar",
+    "first_event_id": "37458",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019cthar",
+    "lat": null,
+    "lng": null,
+    "location_name": "Hartford Public High School",
+    "name": "NE District Hartford Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "06105",
+    "remap_teams": null,
+    "short_name": "Hartford",
+    "start_date": "2019-04-05",
+    "state_prov": "CT",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 5,
+    "year": 2019
+  },
+  {
+    "address": "Wilby High School\n460 Buck Hill Road\nWaterbury, CT 06704\nUSA",
+    "city": "Waterbury",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-10",
+    "event_code": "ctwat",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "ctwat",
+    "first_event_id": "37474",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019ctwat",
+    "lat": null,
+    "lng": null,
+    "location_name": "Wilby High School",
+    "name": "NE District Waterbury Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "06704",
+    "remap_teams": null,
+    "short_name": "Waterbury",
+    "start_date": "2019-03-08",
+    "state_prov": "CT",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 1,
+    "year": 2019
+  },
+  {
+    "address": "Revere High School\n101 School Street\nRevere, MA 02151\nUSA",
+    "city": "Revere",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-24",
+    "event_code": "mabos",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mabos",
+    "first_event_id": "37368",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019mabos",
+    "lat": null,
+    "lng": null,
+    "location_name": "Revere High School",
+    "name": "NE District Greater Boston Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "02151",
+    "remap_teams": null,
+    "short_name": "Greater Boston",
+    "start_date": "2019-03-22",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 3,
+    "year": 2019
+  },
+  {
+    "address": "Bridgewater-Raynham High School\n415 Center Street\nBridgewater, MA 02324\nUSA",
+    "city": "Bridgewater",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-10",
+    "event_code": "mabri",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mabri",
+    "first_event_id": "37576",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019mabri",
+    "lat": null,
+    "lng": null,
+    "location_name": "Bridgewater-Raynham High School",
+    "name": "NE District SE Mass Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "02324",
+    "remap_teams": null,
+    "short_name": "SE Mass",
+    "start_date": "2019-03-08",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 1,
+    "year": 2019
+  },
+  {
+    "address": "Shrewsbury High School\n64 Holden Street\nShrewsbury, MA 01545\nUSA",
+    "city": "Shrewsbury",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-31",
+    "event_code": "macma",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "macma",
+    "first_event_id": "39199",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019macma",
+    "lat": null,
+    "lng": null,
+    "location_name": "Shrewsbury High School",
+    "name": "NE District Central Mass Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "01545",
+    "remap_teams": null,
+    "short_name": "Central Mass",
+    "start_date": "2019-03-29",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 4,
+    "year": 2019
+  },
+  {
+    "address": "Reading Memorial High School\n62 Oakland Road\nReading, MA 01867\nUSA",
+    "city": "Reading",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-17",
+    "event_code": "marea",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "marea",
+    "first_event_id": "37330",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019marea",
+    "lat": null,
+    "lng": null,
+    "location_name": "Reading Memorial High School",
+    "name": "NE District North Shore Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "01867",
+    "remap_teams": null,
+    "short_name": "North Shore",
+    "start_date": "2019-03-15",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 2,
+    "year": 2019
+  },
+  {
+    "address": "Alumni Healthful Living Center at WNE\n1215 Wilbraham Road\nSpringfield, MA 01119\nUSA",
+    "city": "Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-24",
+    "event_code": "mawne",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mawne",
+    "first_event_id": "39197",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019mawne",
+    "lat": null,
+    "lng": null,
+    "location_name": "Alumni Healthful Living Center at WNE",
+    "name": "NE District Western NE Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "01119",
+    "remap_teams": null,
+    "short_name": "Western NE",
+    "start_date": "2019-03-22",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_green",
+        "type": "twitch"
+      },
+      {
+        "channel": "NEFIRST_GREEN",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 3,
+    "year": 2019
+  },
+  {
+    "address": "Androscoggin Bank Colisee\n190 Birch Street\nLewiston, ME 04240\nUSA",
+    "city": "Lewiston",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-04-06",
+    "event_code": "melew",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "melew",
+    "first_event_id": "37398",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019melew",
+    "lat": null,
+    "lng": null,
+    "location_name": "Androscoggin Bank Colisee",
+    "name": "NE District Pine Tree Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "04240",
+    "remap_teams": null,
+    "short_name": "Pine Tree",
+    "start_date": "2019-04-04",
+    "state_prov": "ME",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 5,
+    "year": 2019
+  },
+  {
+    "address": "100 Institute Rd, Worcester, MA 01609, USA",
+    "city": "Worcester",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-04-13",
+    "event_code": "necmp",
+    "event_type": 2,
+    "event_type_string": "District Championship",
+    "first_event_code": "necmp",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019necmp",
+    "lat": null,
+    "lng": null,
+    "location_name": "Worcester Polytechnic Institute",
+    "name": "New England District Championship",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "01609",
+    "remap_teams": null,
+    "short_name": "New England",
+    "start_date": "2019-04-10",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 6,
+    "year": 2019
+  },
+  {
+    "address": "Whittemore Arena at UNH\n128 Main Street\nDurham, NH 03824\nUSA",
+    "city": "Durham",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-31",
+    "event_code": "nhdur",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "nhdur",
+    "first_event_id": "37578",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019nhdur",
+    "lat": null,
+    "lng": null,
+    "location_name": "Whittemore Arena at UNH",
+    "name": "NE District UNH Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "03824",
+    "remap_teams": null,
+    "short_name": "UNH",
+    "start_date": "2019-03-29",
+    "state_prov": "NH",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 4,
+    "year": 2019
+  },
+  {
+    "address": "Salem High School\n44 Geremonty Drive\nSalem, NH 03079\nUSA",
+    "city": "Salem",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-02",
+    "event_code": "nhgrs",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "nhgrs",
+    "first_event_id": "37472",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019nhgrs",
+    "lat": null,
+    "lng": null,
+    "location_name": "Salem High School",
+    "name": "NE District Granite State Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "03079",
+    "remap_teams": null,
+    "short_name": "Granite State",
+    "start_date": "2019-02-28",
+    "state_prov": "NH",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 0,
+    "year": 2019
+  },
+  {
+    "address": "Bedford High School\n47 Nashua Road\nBedford, NH 03110\nUSA",
+    "city": "Bedford",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-17",
+    "event_code": "nhsnh",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "nhsnh",
+    "first_event_id": "39195",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019nhsnh",
+    "lat": null,
+    "lng": null,
+    "location_name": "Bedford High School",
+    "name": "NE District Southern NH Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "03110",
+    "remap_teams": null,
+    "short_name": "Southern NH",
+    "start_date": "2019-03-15",
+    "state_prov": "NH",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 2,
+    "year": 2019
+  },
+  {
+    "address": "Bryant University\n1150 Douglas Pike\nSmithfield, RI 02917\nUSA",
+    "city": "Smithfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2019ne",
+      "official_advancement_counts": {
+        "cmp": 33,
+        "dcmp": 64
+      },
+      "year": 2019
+    },
+    "division_keys": [],
+    "end_date": "2019-03-24",
+    "event_code": "rismi",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "rismi",
+    "first_event_id": "37366",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2019rismi",
+    "lat": null,
+    "lng": null,
+    "location_name": "Bryant University",
+    "name": "NE District Rhode Island Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "02917",
+    "remap_teams": null,
+    "short_name": "Rhode Island",
+    "start_date": "2019-03-22",
+    "state_prov": "RI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 3,
+    "year": 2019
+  }
+]
