@@ -2089,12 +2089,13 @@ export const zPageNum = z.int();
 export const zTeamKey = z.string();
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
  */
 export const zInsightV2Category = z.enum([
   'leaderboard',
   'streak',
   'timeseries',
+  'success_rate',
 ]);
 
 /**
@@ -2658,7 +2659,7 @@ export const zGetInsightsV2YearCategoryHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries']),
+  category: z.enum(['leaderboard', 'streak', 'timeseries', 'success_rate']),
 });
 
 /**
@@ -2686,7 +2687,7 @@ export const zGetInsightsV2YearCategoryDistrictHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryDistrictPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries']),
+  category: z.enum(['leaderboard', 'streak', 'timeseries', 'success_rate']),
   district_abbreviation: z.string(),
 });
 

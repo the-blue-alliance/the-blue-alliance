@@ -3,11 +3,13 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 import {
   type InsightV2Leaderboard,
   type InsightV2Streak,
+  type InsightV2SuccessRate,
   type InsightV2Timeseries,
   getInsightsV2Year,
 } from '~/api/tba/read';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { StreakInsight } from '~/components/tba/streakInsight';
+import { SuccessRateInsight } from '~/components/tba/successRateInsight';
 import { TimeseriesInsight } from '~/components/tba/timeseriesInsight';
 import { YearSelector } from '~/components/tba/yearSelector';
 import { publicCacheControlHeaders, useValidYears } from '~/lib/utils';
@@ -43,6 +45,7 @@ export const Route = createFileRoute('/insights/{-$year}')({
     const leaderboards: InsightV2Leaderboard[] = [];
     const streaks: InsightV2Streak[] = [];
     const timeseries: InsightV2Timeseries[] = [];
+    const successRates: InsightV2SuccessRate[] = [];
 
     for (const insight of insights.data) {
       switch (insight.category) {
@@ -55,6 +58,9 @@ export const Route = createFileRoute('/insights/{-$year}')({
         case 'timeseries':
           timeseries.push(insight);
           break;
+        case 'success_rate':
+          successRates.push(insight);
+          break;
       }
     }
 
@@ -63,6 +69,7 @@ export const Route = createFileRoute('/insights/{-$year}')({
       leaderboards,
       streaks,
       timeseries,
+      successRates,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -95,7 +102,8 @@ export const Route = createFileRoute('/insights/{-$year}')({
 });
 
 function InsightsPage() {
-  const { leaderboards, streaks, timeseries, year } = Route.useLoaderData();
+  const { leaderboards, streaks, timeseries, successRates, year } =
+    Route.useLoaderData();
 
   return (
     <div>
@@ -103,6 +111,7 @@ function InsightsPage() {
         leaderboards={leaderboards}
         streaks={streaks}
         timeseries={timeseries}
+        successRates={successRates}
         year={year}
       />
     </div>
@@ -126,11 +135,13 @@ function SingleYearInsights({
   leaderboards,
   streaks,
   timeseries,
+  successRates,
 }: {
   year: number;
   leaderboards: InsightV2Leaderboard[];
   streaks: InsightV2Streak[];
   timeseries: InsightV2Timeseries[];
+  successRates: InsightV2SuccessRate[];
 }) {
   const validYears = useValidYears();
 
@@ -166,6 +177,21 @@ function SingleYearInsights({
           ]}
         />
       </div>
+
+      {successRates.length > 0 && (
+        <div className="mb-8">
+          <SectionHeading>Success Rates</SectionHeading>
+          <div className="grid gap-6">
+            {successRates.map((sr) => (
+              <SuccessRateInsight
+                subtitle={sr.year > 0 ? `${sr.year} Season` : 'Overall'}
+                insight={sr}
+                key={sr.name}
+              />
+            ))}
+          </div>
+        </div>
+      )}
 
       {leaderboards.length > 0 && (
         <div className="mb-8">

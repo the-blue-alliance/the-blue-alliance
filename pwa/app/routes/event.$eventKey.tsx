@@ -1,6 +1,5 @@
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
-import { range } from 'lodash-es';
 import { Suspense, lazy, useMemo, useState } from 'react';
 
 import ParentEventIcon from '~icons/lucide/arrow-up-right';
@@ -60,6 +59,7 @@ import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
 import EliminationBracket from '~/components/tba/eliminationBracket';
+import { EventSuccessRateTable } from '~/components/tba/eventSuccessRateTable';
 import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
@@ -158,10 +158,6 @@ import {
   getDefaultTotalComponentName,
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
-import {
-  RANKING_POINT_LABELS,
-  getBonusRankingPoints,
-} from '~/lib/rankingPoints';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
   MODEL_TYPE,
@@ -742,7 +738,6 @@ function EventPage() {
               (m) =>
                 m.alliances.red.score !== -1 && m.alliances.blue.score !== -1,
             )}
-            year={event.year}
           />
           {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
             <>
@@ -763,6 +758,7 @@ function EventPage() {
               <ComponentsTable coprs={coprsQuery.data} year={event.year} />
             </>
           )}
+          <EventSuccessRateTable eventKey={eventKey} year={event.year} />
         </TabsContent>
 
         {districtPointsQuery.data &&
@@ -1112,13 +1108,7 @@ function TeamsTab({
   );
 }
 
-function MatchStatsTable({
-  matches,
-  year,
-}: {
-  matches: Match[];
-  year: number;
-}) {
+function MatchStatsTable({ matches }: { matches: Match[] }) {
   const highScoreQual = useMemo(
     () =>
       getHighScoreMatch(matches.filter((m) => m.comp_level === CompLevel.QM)),
@@ -1132,23 +1122,6 @@ function MatchStatsTable({
   const medianTurnaround = useMemo(
     () => calculateMedianTurnaroundTime(matches),
     [matches],
-  );
-
-  const rpPercentages = useMemo(
-    () =>
-      range(0, (RANKING_POINT_LABELS[year] ?? []).length).map(
-        (i) =>
-          matches
-            .filter((m) => m.score_breakdown !== null)
-            .map((m) => [
-              getBonusRankingPoints(m.score_breakdown?.red ?? {}),
-              getBonusRankingPoints(m.score_breakdown?.blue ?? {}),
-            ])
-            .map((rps) => (rps[0][i] ? 1 : 0) + (rps[1][i] ? 1 : 0))
-            .reduce((prev, curr) => prev + curr, 0) /
-          Math.max(1, matches.length * 2),
-      ),
-    [matches, year],
   );
 
   return (
@@ -1191,12 +1164,6 @@ function MatchStatsTable({
             <TableCell>{(medianTurnaround / 60).toFixed(2)} mins</TableCell>
           </TableRow>
         )}
-        {rpPercentages.map((rp, i) => (
-          <TableRow key={i}>
-            <TableCell>{RANKING_POINT_LABELS[year][i]} percentage</TableCell>
-            <TableCell>{(rp * 100).toPrecision(2)}%</TableCell>
-          </TableRow>
-        ))}
       </TableBody>
     </Table>
   );
