@@ -402,6 +402,17 @@ function DistrictPage() {
                     0,
                 },
                 {
+                  header: 'Pre-DCMP',
+                  cell: (info) => <div>{info.getValue<number>() || '-'}</div>,
+                  accessorFn: (ranking) =>
+                    sumBy(
+                      ranking.event_points?.filter(
+                        (event) => !event.district_cmp,
+                      ),
+                      (r) => r.total,
+                    ),
+                },
+                {
                   header: 'DCMP',
                   cell: (info) => <div>{info.getValue<number>() || '-'}</div>,
                   accessorFn: (ranking) =>
