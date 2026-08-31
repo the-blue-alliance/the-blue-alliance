@@ -1105,7 +1105,7 @@ export const zInsightV2Base = z.object({
   name: z.string(),
   display_name: z.string(),
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries']),
+  category: z.enum(['leaderboard', 'streak', 'timeseries', 'success_rate']),
   district_abbreviation: z.string().nullable(),
 });
 
@@ -1207,7 +1207,42 @@ export const zInsightV2Timeseries = zInsightV2Base.and(
 );
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, and timeseries shapes.
+ * How many times an objective was achieved, out of how many chances there were to achieve it.
+ */
+export const zInsightV2SuccessRateEntry = z.object({
+  name: z.string(),
+  label: z.string(),
+  count: z.int(),
+  opportunities: z.int(),
+});
+
+export const zInsightV2SuccessRateScope = z.object({
+  scope_type: z.enum(['overall', 'week', 'event']),
+  label: z.string(),
+  key: z.string().nullable(),
+  week: z.int().nullable(),
+  qual: z.array(zInsightV2SuccessRateEntry),
+  playoff: z.array(zInsightV2SuccessRateEntry),
+});
+
+/**
+ * Count/opportunities statistics for a year, broken out by scope: the season overall, each competition week, and each event.
+ */
+export const zInsightV2SuccessRateData = z.object({
+  scopes: z.array(zInsightV2SuccessRateScope),
+});
+
+export const zInsightV2SuccessRateExtras = z.object({
+  category: z.literal('success_rate').optional(),
+  data: zInsightV2SuccessRateData,
+});
+
+export const zInsightV2SuccessRate = zInsightV2Base.and(
+  zInsightV2SuccessRateExtras,
+);
+
+/**
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and success rate shapes.
  */
 export const zInsightV2 = z.union([
   z
@@ -1225,6 +1260,11 @@ export const zInsightV2 = z.union([
       category: z.literal('timeseries'),
     })
     .and(zInsightV2Timeseries),
+  z
+    .object({
+      category: z.literal('success_rate'),
+    })
+    .and(zInsightV2SuccessRate),
 ]);
 
 export const zPosition2016 = z.enum([

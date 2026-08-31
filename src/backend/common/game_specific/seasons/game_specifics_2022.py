@@ -27,6 +27,10 @@ class GameSpecifics2022(
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2022
     BONUS_RP_BREAKDOWN_FIELDS = ("cargoBonusRankingPoint", "hangarBonusRankingPoint")
     BONUS_RP_PREDICTION_FIELDS = ("prob_cargo_bonus", "prob_hangar_bonus")
+    BONUS_RP_LABELS = (
+        "Cargo Bonus",
+        "Hangar Bonus",
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2022, blue: ScoreDetailModelAlliance2022

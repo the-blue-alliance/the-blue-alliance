@@ -32,6 +32,11 @@ class GameSpecifics2025(
         "prob_coral_bonus",
         "prob_barge_bonus",
     )
+    BONUS_RP_LABELS = (
+        "Auto",
+        "Coral",
+        "Barge",
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2025, blue: ScoreDetailModelAlliance2025

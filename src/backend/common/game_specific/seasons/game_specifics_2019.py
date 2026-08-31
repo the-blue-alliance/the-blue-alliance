@@ -32,6 +32,10 @@ class GameSpecifics2019(
         "habDockingRankingPoint",
     )
     BONUS_RP_PREDICTION_FIELDS = ("prob_complete_rocket", "prob_hab_docking")
+    BONUS_RP_LABELS = (
+        "Complete Rocket",
+        "HAB Docking",
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2019, blue: ScoreDetailModelAlliance2019

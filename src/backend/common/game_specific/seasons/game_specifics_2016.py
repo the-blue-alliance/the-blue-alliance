@@ -22,6 +22,10 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2016
     BONUS_RP_BREAKDOWN_FIELDS = ("teleopDefensesBreached", "teleopTowerCaptured")
     BONUS_RP_PREDICTION_FIELDS = ("prob_breach", "prob_capture")
+    BONUS_RP_LABELS = (
+        "Breach",
+        "Capture",
+    )
 
     def finals_can_be_tiebroken(self) -> bool:
         return True

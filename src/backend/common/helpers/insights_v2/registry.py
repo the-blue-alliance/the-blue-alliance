@@ -79,6 +79,9 @@ from backend.common.helpers.insights_v2.streaks.undefeated_streak import (
 from backend.common.helpers.insights_v2.streaks.win_streak import (
     LongestWinStreakV2Calculator,
 )
+from backend.common.helpers.insights_v2.success_rate.calculator import (
+    SuccessRateV2Calculator,
+)
 from backend.common.helpers.insights_v2.timeseries.average_match_score_by_week import (
     AverageMatchScoreByWeekV2Calculator,
 )
@@ -182,6 +185,7 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             HighestLosingScoreV2Calculator(),
             HighestAutoScoreV2Calculator(),
             HighestTeleopScoreV2Calculator(),
+            SuccessRateV2Calculator(),
         ]
         if year not in {2017, 2018, 2023, 2025}:
             calculators.append(HighestEndgameScoreV2Calculator())

@@ -84,3 +84,6 @@ class InsightV2Names:
     AVERAGE_ELIM_WIN_MARGIN_BY_WEEK = InsightV2NameEntry(
         "elim_match_average_margins_by_week", "Average Elim Win Margin By Week"
     )
+
+    # Success Rates
+    SUCCESS_RATES = InsightV2NameEntry("success_rates", "Success Rates")

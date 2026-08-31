@@ -24,6 +24,10 @@ class GameSpecifics2024(
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2024
     BONUS_RP_BREAKDOWN_FIELDS = ("melodyBonusAchieved", "ensembleBonusAchieved")
     BONUS_RP_PREDICTION_FIELDS = ("prob_melody_bonus", "prob_ensemble_bonus")
+    BONUS_RP_LABELS = (
+        "Melody",
+        "Ensemble",
+    )
     EXTRA_SCORE_BREAKDOWN_KEYS = frozenset(
         [
             "tba_extraRp1",
