@@ -5,6 +5,7 @@ from google.appengine.ext import ndb, testbed
 from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
+from backend.common.futures import InstantFuture
 from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
@@ -16,6 +17,10 @@ from backend.common.models.event_district_points import (
     EventDistrictPoints,
     TeamAtEventDistrictPoints,
     TeamAtEventDistrictPointTiebreakers,
+)
+from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_district_rankings_parser import (
+    TParsedDistrictRankings,
 )
 
 
@@ -365,12 +370,17 @@ def test_calc_regional_pre_2025_no_output_in_taskqueue(
     assert len(tasks) == 0
 
 
+@mock.patch.object(DatafeedFMSAPI, "get_district_rankings")
 @mock.patch.object(DistrictHelper, "calculate_event_points")
 def test_calc_district_enqueues_rankings(
     calc_mock: mock.Mock,
+    district_rankings_mock: mock.Mock,
     tasks_client: Client,
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
+    district_rankings_mock.return_value = InstantFuture(
+        TParsedDistrictRankings(advancement={}, adjustments={}, api_team_data={})
+    )
     Event(
         id="2020test",
         year=2020,
