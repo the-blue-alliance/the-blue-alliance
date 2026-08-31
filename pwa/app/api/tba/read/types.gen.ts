@@ -3556,12 +3556,13 @@ export type PageNum = number;
 export type TeamKey = string;
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
  */
 export enum InsightV2Category {
   LEADERBOARD = 'leaderboard',
   STREAK = 'streak',
   TIMESERIES = 'timeseries',
+  SUCCESS_RATE = 'success_rate',
 }
 
 /**
@@ -5512,9 +5513,9 @@ export type GetInsightsV2YearCategoryData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'success_rate';
   };
   query?: never;
   url: '/insights/{year}/{category}';
@@ -5614,9 +5615,9 @@ export type GetInsightsV2YearCategoryDistrictData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'success_rate';
     /**
      * District abbreviation, eg `ne` or `fim`
      */
