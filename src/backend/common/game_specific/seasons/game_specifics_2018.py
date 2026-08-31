@@ -28,6 +28,10 @@ class GameSpecifics2018(
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2018
     BONUS_RP_BREAKDOWN_FIELDS = ("autoQuestRankingPoint", "faceTheBossRankingPoint")
     BONUS_RP_PREDICTION_FIELDS = ("prob_auto_quest", "prob_face_boss")
+    BONUS_RP_LABELS = (
+        "Auto Quest",
+        "Face the Boss",
+    )
     EXTRA_SCORE_BREAKDOWN_KEYS = frozenset(["tba_gameData"])
 
     def tiebreak_criteria(

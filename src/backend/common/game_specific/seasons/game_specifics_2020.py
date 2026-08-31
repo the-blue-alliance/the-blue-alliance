@@ -30,6 +30,10 @@ class GameSpecifics2020(
         "shieldOperationalRankingPoint",
     )
     BONUS_RP_PREDICTION_FIELDS = ("prob_shield_energized", "prob_shield_operational")
+    BONUS_RP_LABELS = (
+        "Shield Energized",
+        "Shield Operational",
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2020, blue: ScoreDetailModelAlliance2020

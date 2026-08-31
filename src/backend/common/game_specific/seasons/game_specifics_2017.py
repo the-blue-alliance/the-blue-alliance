@@ -24,6 +24,10 @@ class GameSpecifics2017(
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2017
     BONUS_RP_BREAKDOWN_FIELDS = ("kPaRankingPointAchieved", "rotorRankingPointAchieved")
     BONUS_RP_PREDICTION_FIELDS = ("prob_pressure", "prob_gears")
+    BONUS_RP_LABELS = (
+        "Pressure",
+        "Rotor",
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2017, blue: ScoreDetailModelAlliance2017

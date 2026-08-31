@@ -2728,7 +2728,7 @@ export type NotablesInsight = {
 };
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, and timeseries shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and success rate shapes.
  */
 export type InsightV2 =
   | ({
@@ -2739,7 +2739,10 @@ export type InsightV2 =
     } & InsightV2Streak)
   | ({
       category: 'timeseries';
-    } & InsightV2Timeseries);
+    } & InsightV2Timeseries)
+  | ({
+      category: 'success_rate';
+    } & InsightV2SuccessRate);
 
 export type InsightV2Base = {
   /**
@@ -2757,7 +2760,7 @@ export type InsightV2Base = {
   /**
    * Insight category. Discriminates the shape of `data`.
    */
-  category: 'leaderboard' | 'streak' | 'timeseries';
+  category: 'leaderboard' | 'streak' | 'timeseries' | 'success_rate';
   /**
    * District abbreviation if the insight is district-scoped, otherwise null.
    */
@@ -2783,6 +2786,13 @@ export type InsightV2Timeseries = InsightV2Base & InsightV2TimeseriesExtras;
 export type InsightV2TimeseriesExtras = {
   category?: 'timeseries';
   data: InsightV2TimeseriesData;
+};
+
+export type InsightV2SuccessRate = InsightV2Base & InsightV2SuccessRateExtras;
+
+export type InsightV2SuccessRateExtras = {
+  category?: 'success_rate';
+  data: InsightV2SuccessRateData;
 };
 
 /**
@@ -2907,6 +2917,62 @@ export type InsightV2TimeseriesData = {
       };
     }>;
   }>;
+};
+
+/**
+ * Count/opportunities statistics for a year, broken out by scope: the season overall, each competition week, and each event.
+ */
+export type InsightV2SuccessRateData = {
+  scopes: Array<InsightV2SuccessRateScope>;
+};
+
+export type InsightV2SuccessRateScope = {
+  /**
+   * What slice of the season this scope covers.
+   */
+  scope_type: 'overall' | 'week' | 'event';
+  /**
+   * Display name of the scope, e.g. `Overall`, `Week 3`, or an event's short name.
+   */
+  label: string;
+  /**
+   * Event key when `scope_type` is `event`, otherwise null.
+   */
+  key: string | null;
+  /**
+   * Zero-indexed competition week, or null for the overall and championship scopes.
+   */
+  week: number | null;
+  /**
+   * Statistics over qualification matches in this scope.
+   */
+  qual: Array<InsightV2SuccessRateEntry>;
+  /**
+   * Statistics over playoff matches in this scope.
+   */
+  playoff: Array<InsightV2SuccessRateEntry>;
+};
+
+/**
+ * How many times an objective was achieved, out of how many chances there were to achieve it.
+ */
+export type InsightV2SuccessRateEntry = {
+  /**
+   * Programmatic name of the statistic, e.g. `rp_1` or `auto_climb`.
+   */
+  name: string;
+  /**
+   * Human-readable name of the statistic, e.g. `Energized RP`.
+   */
+  label: string;
+  /**
+   * Times the objective was achieved.
+   */
+  count: number;
+  /**
+   * Chances there were to achieve the objective.
+   */
+  opportunities: number;
 };
 
 export enum Position2016 {

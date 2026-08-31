@@ -36,6 +36,10 @@ class GameSpecifics2023(
         "prob_sustainability_bonus",
         "prob_activation_bonus",
     )
+    BONUS_RP_LABELS = (
+        "Sustainability Bonus",
+        "Activation Bonus",
+    )
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2023, blue: ScoreDetailModelAlliance2023
