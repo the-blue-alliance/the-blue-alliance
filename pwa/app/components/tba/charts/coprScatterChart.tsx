@@ -29,6 +29,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import { useMediaQuery } from '~/lib/hooks';
 import { camelCaseToHumanReadable } from '~/lib/utils';
 
 interface Datapoint {
@@ -61,12 +62,22 @@ function generateGridPoints(maxVal: number, segments: number) {
     : generateFractionalGridlinePoints(maxVal, segments);
 }
 
+// Both axes set allowDataOverflow, which makes recharts clip the scatter layer
+// to exactly the axis range. Pad the domain proportionally so the outermost
+// dots and their labels sit inside that clip rather than straddling it.
+const DOMAIN_PADDING_RATIO = 0.05;
+
 function generateDomain(dataMin: number, dataMax: number): [number, number] {
   if (dataMax > 1) {
-    return [dataMin > 0 ? 0 : Math.floor(dataMin - 1), Math.ceil(dataMax + 1)];
+    const padding = (dataMax - Math.min(dataMin, 0)) * DOMAIN_PADDING_RATIO;
+
+    return [
+      dataMin > 0 ? 0 : Math.floor(dataMin - padding),
+      Math.ceil(dataMax + padding),
+    ];
   }
 
-  return [-0.1, 1];
+  return [-0.1, 1 + DOMAIN_PADDING_RATIO];
 }
 
 // If a team has a white primary color, it doesn't show up on the chart
@@ -104,6 +115,7 @@ export default function CoprScatterChart({
   const [selectedXCopr, setSelectedXCopr] = useState(defaultXCopr);
   const [selectedYCopr, setSelectedYCopr] = useState(defaultYCopr);
   const [data, setData] = useState<Datapoint[]>([]);
+  const isDesktop = useMediaQuery('(min-width: 640px)');
 
   // Base UI's Select.Value renders the raw value unless the items are
   // registered on Select.Root, so provide value -> label pairs there too.
@@ -126,15 +138,16 @@ export default function CoprScatterChart({
 
   return (
     <Card>
-      <CardHeader>
+      <CardHeader className="p-4 sm:p-6">
         <div className="flex justify-between">
           <div>
             <CardTitle>Component OPRs</CardTitle>
           </div>
         </div>
       </CardHeader>
-      <CardContent className="pb-1">
+      <CardContent className="px-1 pb-1 sm:px-6">
         <ChartContainer
+          className="aspect-4/5 sm:aspect-video"
           config={{
             teamKey: { color: 'hsl(var(--primary))' },
             valueX: { label: selectedXCopr, color: 'hsl(var(--primary))' },
@@ -146,12 +159,11 @@ export default function CoprScatterChart({
         >
           <ScatterChart
             data={data}
-            margin={{
-              left: 20,
-              right: 20,
-              bottom: 20,
-              top: 20,
-            }}
+            margin={
+              isDesktop
+                ? { left: 20, right: 20, bottom: 20, top: 20 }
+                : { left: 0, right: 10, bottom: 10, top: 10 }
+            }
           >
             {generateGridPoints(
               Math.ceil(Math.max(...data.map((d) => d.valueX))),
@@ -180,10 +192,14 @@ export default function CoprScatterChart({
                 5,
               )}
             >
-              <Label value={camelCaseToHumanReadable(selectedXCopr)} dy={17} />
+              <Label
+                value={camelCaseToHumanReadable(selectedXCopr)}
+                dy={isDesktop ? 17 : 10}
+              />
             </XAxis>
             <YAxis
               dataKey="valueY"
+              width={isDesktop ? 60 : 36}
               axisLine={false}
               tickLine={false}
               domain={([dataMin, dataMax]) => generateDomain(dataMin, dataMax)}
@@ -196,7 +212,7 @@ export default function CoprScatterChart({
               <Label
                 value={camelCaseToHumanReadable(selectedYCopr)}
                 angle={-90}
-                dx={-20}
+                dx={isDesktop ? -20 : -8}
               />
             </YAxis>
             <Tooltip
@@ -227,15 +243,18 @@ export default function CoprScatterChart({
           </ScatterChart>
         </ChartContainer>
       </CardContent>
-      <div className="flex flex-row justify-around pb-4">
-        <div className="flex flex-row items-center">
-          <div className="pr-4 font-bold">Y Axis</div>
+      <div
+        className="flex flex-col gap-2 px-4 pb-4 sm:flex-row sm:justify-around
+          sm:gap-4"
+      >
+        <div className="flex min-w-0 flex-row items-center gap-2">
+          <div className="shrink-0 font-bold">Y Axis</div>
           <Select
             items={coprItems}
             value={selectedYCopr}
             onValueChange={(value) => value !== null && setSelectedYCopr(value)}
           >
-            <SelectTrigger className="w-auto">
+            <SelectTrigger className="w-auto min-w-0 flex-1 sm:flex-none">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
@@ -251,14 +270,14 @@ export default function CoprScatterChart({
           </Select>
         </div>
 
-        <div className="flex flex-row items-center">
-          <div className="pr-4 font-bold">X Axis</div>
+        <div className="flex min-w-0 flex-row items-center gap-2">
+          <div className="shrink-0 font-bold">X Axis</div>
           <Select
             items={coprItems}
             value={selectedXCopr}
             onValueChange={(value) => value !== null && setSelectedXCopr(value)}
           >
-            <SelectTrigger className="w-auto">
+            <SelectTrigger className="w-auto min-w-0 flex-1 sm:flex-none">
               <SelectValue />
             </SelectTrigger>
             <SelectContent>

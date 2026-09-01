@@ -3,10 +3,11 @@ import { useState } from 'react';
 
 import { type InsightV2GameStats } from '~/api/tba/read';
 import { getInsightsV2YearCategoryOptions } from '~/api/tba/read/@tanstack/react-query.gen';
-import { SuccessRateTable } from '~/components/tba/successRateInsight';
+import { GameStatsScopeContent } from '~/components/tba/successRateInsight';
+import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { staleTimeForYear } from '~/lib/queryClient';
-import { type MatchLevel, otherMatchLevel } from '~/lib/successRateUtils';
+import { type MatchLevel } from '~/lib/successRateUtils';
 
 /**
  * Success rates for a single event, read out of that season's `game_stats`
@@ -44,36 +45,29 @@ export function EventSuccessRateTable({
     return null;
   }
 
-  const rates = scope[matchLevel];
-  const fallbackLevel = otherMatchLevel(matchLevel);
-
   return (
-    <div className="mt-6">
-      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
-        <h3 className="text-lg font-semibold">Success Rates</h3>
-        <Tabs
-          value={matchLevel}
-          onValueChange={(value) => {
-            setMatchLevel(value as MatchLevel);
-          }}
-        >
-          <TabsList>
-            <TabsTrigger value="qual">Quals</TabsTrigger>
-            <TabsTrigger value="playoff">Playoffs</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
-
-      {rates.length === 0 ? (
-        <p className="text-sm text-muted-foreground">
-          No {matchLevel === 'qual' ? 'qualification' : 'playoff'} match data
-          for this event.
-          {scope[fallbackLevel].length > 0 &&
-            ` Try the ${fallbackLevel === 'qual' ? 'Quals' : 'Playoffs'} tab.`}
-        </p>
-      ) : (
-        <SuccessRateTable rates={rates} />
-      )}
-    </div>
+    <Card>
+      <CardHeader>
+        <CardTitle>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <span>Game Stats</span>
+            <Tabs
+              value={matchLevel}
+              onValueChange={(value) => {
+                setMatchLevel(value as MatchLevel);
+              }}
+            >
+              <TabsList>
+                <TabsTrigger value="qual">Quals</TabsTrigger>
+                <TabsTrigger value="playoff">Playoffs</TabsTrigger>
+              </TabsList>
+            </Tabs>
+          </div>
+        </CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
+        <GameStatsScopeContent scope={scope} matchLevel={matchLevel} />
+      </CardContent>
+    </Card>
   );
 }

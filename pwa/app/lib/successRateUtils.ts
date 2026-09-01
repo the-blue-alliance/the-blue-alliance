@@ -21,3 +21,7 @@ export function formatSuccessRate({
   }
   return `${((100 * count) / opportunities).toFixed(2)}%`;
 }
+
+export function formatAverageStatValue(value: number): string {
+  return value.toFixed(1);
+}

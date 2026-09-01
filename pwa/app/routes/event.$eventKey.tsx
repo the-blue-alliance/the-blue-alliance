@@ -26,7 +26,6 @@ import {
   CompLevel,
   EliminationAlliance,
   Event,
-  EventCoprs,
   EventDistrictPoints,
   EventType,
   Match,
@@ -55,6 +54,7 @@ import {
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
 import AwardRecipientLink from '~/components/tba/awardRecipientLink';
+import { ComponentOprsTable } from '~/components/tba/componentOprsTable';
 import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
@@ -97,13 +97,6 @@ import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
 import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from '~/components/ui/card';
-import {
   Dialog,
   DialogContent,
   DialogDescription,
@@ -117,13 +110,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from '~/components/ui/select';
 import {
   Table,
   TableBody,
@@ -145,23 +131,17 @@ import {
   isValidEventKey,
   stripParentPrefix,
 } from '~/lib/eventUtils';
-import {
-  calculateMedianTurnaroundTime,
-  getHighScoreMatch,
-  sortMatchComparator,
-} from '~/lib/matchUtils';
+import { sortMatchComparator } from '~/lib/matchUtils';
 import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
 import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
   getDefaultAutoComponentName,
   getDefaultTeleopComponentName,
-  getDefaultTotalComponentName,
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
   MODEL_TYPE,
-  camelCaseToHumanReadable,
   cn,
   doThrowNotFound,
   publicCacheControlHeaders,
@@ -733,32 +713,29 @@ function EventPage() {
           keepMounted
           className="data-hidden:hidden"
         >
-          <MatchStatsTable
-            matches={sortedMatches.filter(
-              (m) =>
-                m.alliances.red.score !== -1 && m.alliances.blue.score !== -1,
-            )}
-          />
-          {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
-            <>
-              <Suspense
-                fallback={
-                  <div
-                    className="h-96 w-full animate-pulse rounded-lg bg-muted/50"
+          <div className="space-y-6">
+            {coprsQuery.data && Object.keys(coprsQuery.data).length > 0 && (
+              <>
+                <Suspense
+                  fallback={
+                    <div
+                      className="h-96 w-full animate-pulse rounded-lg
+                        bg-muted/50"
+                    />
+                  }
+                >
+                  <CoprScatterChart
+                    colors={colorsQuery.data ?? { teams: {} }}
+                    coprs={coprsQuery.data}
+                    defaultXCopr={getDefaultTeleopComponentName(event.year)}
+                    defaultYCopr={getDefaultAutoComponentName(event.year)}
                   />
-                }
-              >
-                <CoprScatterChart
-                  colors={colorsQuery.data ?? { teams: {} }}
-                  coprs={coprsQuery.data}
-                  defaultXCopr={getDefaultTeleopComponentName(event.year)}
-                  defaultYCopr={getDefaultAutoComponentName(event.year)}
-                />
-              </Suspense>
-              <ComponentsTable coprs={coprsQuery.data} year={event.year} />
-            </>
-          )}
-          <EventSuccessRateTable eventKey={eventKey} year={event.year} />
+                </Suspense>
+                <ComponentOprsTable coprs={coprsQuery.data} year={event.year} />
+              </>
+            )}
+            <EventSuccessRateTable eventKey={eventKey} year={event.year} />
+          </div>
         </TabsContent>
 
         {districtPointsQuery.data &&
@@ -1104,140 +1081,6 @@ function TeamsTab({
           </TableBody>
         </Table>
       ))}
-    </div>
-  );
-}
-
-function MatchStatsTable({ matches }: { matches: Match[] }) {
-  const highScoreQual = useMemo(
-    () =>
-      getHighScoreMatch(matches.filter((m) => m.comp_level === CompLevel.QM)),
-    [matches],
-  );
-  const highScorePlayoff = useMemo(
-    () =>
-      getHighScoreMatch(matches.filter((m) => m.comp_level !== CompLevel.QM)),
-    [matches],
-  );
-  const medianTurnaround = useMemo(
-    () => calculateMedianTurnaroundTime(matches),
-    [matches],
-  );
-
-  return (
-    <Table>
-      <TableBody>
-        <TableRow>
-          <TableCell>Total Matches</TableCell>
-          <TableCell>{matches.length}</TableCell>
-        </TableRow>
-        {highScoreQual && (
-          <TableRow>
-            <TableCell>High Score (Quals)</TableCell>
-            <TableCell>
-              Qual {highScoreQual.match_number} -{' '}
-              {Math.max(
-                highScoreQual.alliances.red.score,
-                highScoreQual.alliances.blue.score,
-              )}{' '}
-              points
-            </TableCell>
-          </TableRow>
-        )}
-        {highScorePlayoff && (
-          <TableRow>
-            <TableCell>High Score (Playoffs)</TableCell>
-            <TableCell>
-              {highScorePlayoff.comp_level.toUpperCase()}
-              {highScorePlayoff.set_number}-{highScorePlayoff.match_number} -{' '}
-              {Math.max(
-                highScorePlayoff.alliances.red.score,
-                highScorePlayoff.alliances.blue.score,
-              )}{' '}
-              points
-            </TableCell>
-          </TableRow>
-        )}
-        {medianTurnaround !== undefined && (
-          <TableRow>
-            <TableCell>Median Turnaround Time</TableCell>
-            <TableCell>{(medianTurnaround / 60).toFixed(2)} mins</TableCell>
-          </TableRow>
-        )}
-      </TableBody>
-    </Table>
-  );
-}
-
-function ComponentsTable({ coprs, year }: { coprs: EventCoprs; year: number }) {
-  // filter any components that are just all zeros
-  const excludedComponents = Object.keys(coprs).filter((k) =>
-    Object.values(coprs[k]).every((v) => v === 0),
-  );
-
-  // Base UI's Select.Value renders the raw value unless the items are
-  // registered on Select.Root, so provide value -> label pairs there too.
-  const componentItems = Object.keys(coprs)
-    .filter((k) => !excludedComponents.includes(k))
-    .map((k) => ({ value: k, label: camelCaseToHumanReadable(k) }));
-
-  const [component, setComponent] = useState(
-    getDefaultTotalComponentName(year),
-  );
-
-  const columns: TbaColumnDef<{ teamKey: string; value: number }>[] = [
-    {
-      header: 'Team',
-      accessorFn: (row) => row.teamKey,
-      cell: (cell) => (
-        <TeamLinkWithTooltip teamKey={cell.getValue<string>()} year={year} />
-      ),
-    },
-    {
-      header: 'Value',
-      accessorFn: (row) => row.value.toFixed(2),
-    },
-  ];
-
-  return (
-    <div>
-      <Card>
-        <CardHeader>
-          <CardTitle>
-            <div className="flex items-center">
-              <span className="basis-1/2">Component OPRs</span>
-              <Select
-                items={componentItems}
-                value={component}
-                onValueChange={(value) => value !== null && setComponent(value)}
-              >
-                <SelectTrigger className="font-normal">
-                  <SelectValue />
-                </SelectTrigger>
-                <SelectContent>
-                  {componentItems.map(({ value, label }) => (
-                    <SelectItem key={value} value={value}>
-                      {label}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-          </CardTitle>
-          <CardDescription></CardDescription>
-        </CardHeader>
-        <CardContent>
-          <DataTable
-            columns={columns}
-            data={Object.entries(coprs[component] ?? {})
-              .map(([k, v]) => ({
-                teamKey: k,
-                value: v,
-              }))
-              .toSorted((a, b) => b.value - a.value)}
-          />
-        </CardContent>
-      </Card>
     </div>
   );
 }
