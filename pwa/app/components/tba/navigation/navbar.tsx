@@ -101,8 +101,9 @@ export function Navbar() {
             <ul className="flex items-center gap-2">
               <a
                 href={`https://www.thebluealliance.com${pathname}`}
-                className="rounded-md px-2.5 py-2 text-xs font-medium text-white
-                  hover:bg-black/20 hover:no-underline max-sm:hidden"
+                className="rounded-md px-2.5 py-2 text-xs font-medium
+                  whitespace-nowrap text-white hover:bg-black/20
+                  hover:no-underline max-sm:hidden"
               >
                 Leave beta
               </a>
