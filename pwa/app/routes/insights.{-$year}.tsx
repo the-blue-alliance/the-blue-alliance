@@ -1,9 +1,9 @@
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 import {
+  type InsightV2GameStats,
   type InsightV2Leaderboard,
   type InsightV2Streak,
-  type InsightV2SuccessRate,
   type InsightV2Timeseries,
   getInsightsV2Year,
 } from '~/api/tba/read';
@@ -45,7 +45,7 @@ export const Route = createFileRoute('/insights/{-$year}')({
     const leaderboards: InsightV2Leaderboard[] = [];
     const streaks: InsightV2Streak[] = [];
     const timeseries: InsightV2Timeseries[] = [];
-    const successRates: InsightV2SuccessRate[] = [];
+    const successRates: InsightV2GameStats[] = [];
 
     for (const insight of insights.data) {
       switch (insight.category) {
@@ -58,7 +58,7 @@ export const Route = createFileRoute('/insights/{-$year}')({
         case 'timeseries':
           timeseries.push(insight);
           break;
-        case 'success_rate':
+        case 'game_stats':
           successRates.push(insight);
           break;
       }
@@ -141,7 +141,7 @@ function SingleYearInsights({
   leaderboards: InsightV2Leaderboard[];
   streaks: InsightV2Streak[];
   timeseries: InsightV2Timeseries[];
-  successRates: InsightV2SuccessRate[];
+  successRates: InsightV2GameStats[];
 }) {
   const validYears = useValidYears();
 

@@ -307,21 +307,21 @@ def test_insights_year_category_district_requires_auth(api_client: Client) -> No
     assert resp.status_code == 401
 
 
-def test_insights_year_category_success_rate(ndb_stub, api_client: Client) -> None:
+def test_insights_year_category_game_stats(ndb_stub, api_client: Client) -> None:
     _put_auth()
     _put_insight(2026, name="blue_banners", category=InsightCategory.LEADERBOARD)
     _put_insight(
         2026,
-        name="success_rates",
-        category=InsightCategory.SUCCESS_RATE,
-        display_name="Success Rates",
+        name="game_stats",
+        category=InsightCategory.GAME_STATS,
+        display_name="Game Stats",
     )
 
     resp = api_client.get(
-        "/api/v3/insights/2026/success_rate",
+        "/api/v3/insights/2026/game_stats",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
     assert len(resp.json) == 1
-    assert resp.json[0]["category"] == InsightCategory.SUCCESS_RATE
-    assert resp.json[0]["name"] == "success_rates"
+    assert resp.json[0]["category"] == InsightCategory.GAME_STATS
+    assert resp.json[0]["name"] == "game_stats"

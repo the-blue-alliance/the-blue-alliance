@@ -1105,7 +1105,7 @@ export const zInsightV2Base = z.object({
   name: z.string(),
   display_name: z.string(),
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'success_rate']),
+  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
   district_abbreviation: z.string().nullable(),
 });
 
@@ -1209,40 +1209,51 @@ export const zInsightV2Timeseries = zInsightV2Base.and(
 /**
  * How many times an objective was achieved, out of how many chances there were to achieve it.
  */
-export const zInsightV2SuccessRateEntry = z.object({
+export const zInsightV2GameStat = z.object({
   name: z.string(),
   label: z.string(),
   count: z.int(),
   opportunities: z.int(),
 });
 
-export const zInsightV2SuccessRateScope = z.object({
+/**
+ * The average value of a numeric match statistic, e.g. average score or average win margin.
+ */
+export const zInsightV2AverageStat = z.object({
+  name: z.string(),
+  label: z.string(),
+  value: z.number(),
+});
+
+export const zInsightV2GameStatsScope = z.object({
   scope_type: z.enum(['overall', 'week', 'event']),
   label: z.string(),
   key: z.string().nullable(),
   week: z.int().nullable(),
-  qual: z.array(zInsightV2SuccessRateEntry),
-  playoff: z.array(zInsightV2SuccessRateEntry),
+  qual: z.array(zInsightV2GameStat),
+  playoff: z.array(zInsightV2GameStat),
+  qual_averages: z.array(zInsightV2AverageStat),
+  playoff_averages: z.array(zInsightV2AverageStat),
 });
 
 /**
- * Count/opportunities statistics for a year, broken out by scope: the season overall, each competition week, and each event.
+ * Count/opportunities and average-value statistics for a year, broken out by scope: the season overall, each competition week, and each event.
  */
-export const zInsightV2SuccessRateData = z.object({
-  scopes: z.array(zInsightV2SuccessRateScope),
+export const zInsightV2GameStatsData = z.object({
+  scopes: z.array(zInsightV2GameStatsScope),
 });
 
-export const zInsightV2SuccessRateExtras = z.object({
-  category: z.literal('success_rate').optional(),
-  data: zInsightV2SuccessRateData,
+export const zInsightV2GameStatsExtras = z.object({
+  category: z.literal('game_stats').optional(),
+  data: zInsightV2GameStatsData,
 });
 
-export const zInsightV2SuccessRate = zInsightV2Base.and(
-  zInsightV2SuccessRateExtras,
+export const zInsightV2GameStats = zInsightV2Base.and(
+  zInsightV2GameStatsExtras,
 );
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and success rate shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and game stats shapes.
  */
 export const zInsightV2 = z.union([
   z
@@ -1262,9 +1273,9 @@ export const zInsightV2 = z.union([
     .and(zInsightV2Timeseries),
   z
     .object({
-      category: z.literal('success_rate'),
+      category: z.literal('game_stats'),
     })
-    .and(zInsightV2SuccessRate),
+    .and(zInsightV2GameStats),
 ]);
 
 export const zPosition2016 = z.enum([
@@ -2089,13 +2100,13 @@ export const zPageNum = z.int();
 export const zTeamKey = z.string();
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
  */
 export const zInsightV2Category = z.enum([
   'leaderboard',
   'streak',
   'timeseries',
-  'success_rate',
+  'game_stats',
 ]);
 
 /**
@@ -2659,7 +2670,7 @@ export const zGetInsightsV2YearCategoryHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'success_rate']),
+  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
 });
 
 /**
@@ -2687,7 +2698,7 @@ export const zGetInsightsV2YearCategoryDistrictHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryDistrictPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'success_rate']),
+  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
   district_abbreviation: z.string(),
 });
 

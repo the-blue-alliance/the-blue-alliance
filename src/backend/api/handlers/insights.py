@@ -23,7 +23,7 @@ _VALID_INSIGHT_V2_CATEGORIES = frozenset(
         InsightCategory.LEADERBOARD,
         InsightCategory.STREAK,
         InsightCategory.TIMESERIES,
-        InsightCategory.SUCCESS_RATE,
+        InsightCategory.GAME_STATS,
     }
 )
 

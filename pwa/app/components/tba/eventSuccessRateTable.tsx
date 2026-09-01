@@ -1,7 +1,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { useState } from 'react';
 
-import { type InsightV2SuccessRate } from '~/api/tba/read';
+import { type InsightV2GameStats } from '~/api/tba/read';
 import { getInsightsV2YearCategoryOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { SuccessRateTable } from '~/components/tba/successRateInsight';
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs';
@@ -9,7 +9,7 @@ import { staleTimeForYear } from '~/lib/queryClient';
 import { type MatchLevel, otherMatchLevel } from '~/lib/successRateUtils';
 
 /**
- * Success rates for a single event, read out of that season's `success_rate`
+ * Success rates for a single event, read out of that season's `game_stats`
  * insight. There is no per-event endpoint for v2 insights - the year payload
  * carries one scope per event, so we fetch it and pick this event's scope out.
  */
@@ -24,7 +24,7 @@ export function EventSuccessRateTable({
 
   const insightsQuery = useQuery({
     ...getInsightsV2YearCategoryOptions({
-      path: { year, category: 'success_rate' },
+      path: { year, category: 'game_stats' },
     }),
     staleTime: staleTimeForYear(year),
   });
@@ -32,7 +32,7 @@ export function EventSuccessRateTable({
   // The route is category-filtered, but the response type is the full
   // discriminated union, so narrow before reaching into `data`.
   const insight = insightsQuery.data?.find(
-    (i): i is InsightV2SuccessRate => i.category === 'success_rate',
+    (i): i is InsightV2GameStats => i.category === 'game_stats',
   );
   const scope = insight?.data.scopes.find(
     (s) => s.scope_type === 'event' && s.key === eventKey,

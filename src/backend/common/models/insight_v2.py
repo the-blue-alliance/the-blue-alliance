@@ -11,14 +11,14 @@ LeaderboardContextType = Literal["event_list", "match_alliance", "none"]
 TimeseriesXType = Literal["week", "year", "event"]
 TimeseriesPointContextType = Literal["none", "match_record"]
 
-SuccessRateScopeType = Literal["overall", "week", "event"]
+GameStatsScopeType = Literal["overall", "week", "event"]
 
 
 class InsightCategory:
     LEADERBOARD = "leaderboard"
     STREAK = "streak"
     TIMESERIES = "timeseries"
-    SUCCESS_RATE = "success_rate"
+    GAME_STATS = "game_stats"
 
 
 class InsightV2(CachedModel):
@@ -166,21 +166,29 @@ class TimeseriesData(TypedDict):
     point_context_type: TimeseriesPointContextType
 
 
-class SuccessRate(TypedDict):
+class GameStat(TypedDict):
     name: str
     label: str
     count: int
     opportunities: int
 
 
-class SuccessRateScope(TypedDict):
-    scope_type: SuccessRateScopeType
+class AverageStat(TypedDict):
+    name: str
+    label: str
+    value: float
+
+
+class GameStatsScope(TypedDict):
+    scope_type: GameStatsScopeType
     label: str
     key: Optional[str]
     week: Optional[int]
-    qual: List[SuccessRate]
-    playoff: List[SuccessRate]
+    qual: List[GameStat]
+    playoff: List[GameStat]
+    qual_averages: List[AverageStat]
+    playoff_averages: List[AverageStat]
 
 
-class SuccessRateData(TypedDict):
-    scopes: List[SuccessRateScope]
+class GameStatsData(TypedDict):
+    scopes: List[GameStatsScope]
