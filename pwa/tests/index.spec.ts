@@ -89,9 +89,9 @@ test('footer links are present', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('footer toggle theme button is visible', async ({ page }) => {
+test('navbar profile menu button is visible', async ({ page }) => {
   await expect(
-    page.getByRole('button', { name: 'Toggle Theme' }),
+    page.getByRole('button', { name: 'Account menu' }),
   ).toBeVisible();
 });
 

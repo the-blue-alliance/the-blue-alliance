@@ -3,12 +3,9 @@ import { useEffect, useState } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { Temporal } from 'temporal-polyfill';
 
-import MoonIcon from '~icons/lucide/moon';
-import SunIcon from '~icons/lucide/sun';
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
-import { useTheme } from '~/lib/theme';
 
 type InternalLink = {
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -46,43 +43,6 @@ const links: NavigationLink[] = [
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const commitHash = __COMMIT_HASH__ as string;
-
-const themes = [['light', SunIcon] as const, ['dark', MoonIcon] as const];
-
-function ThemeToggle() {
-  const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState<boolean>(false);
-  const value = mounted ? resolvedTheme : null;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
-
-  return (
-    <button
-      className="group inline-flex cursor-pointer items-center rounded-full
-        border p-1"
-      aria-label="Toggle Theme"
-      data-mounted={mounted}
-      onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
-    >
-      {themes.map(([key, Icon]) => {
-        return (
-          <Icon
-            key={key}
-            fill="currentColor"
-            data-active={value === key}
-            className={`size-6.5 rounded-full p-1.5 text-muted-foreground
-            transition-colors group-hover:text-accent-foreground
-            data-[active=true]:bg-black/5
-            data-[active=true]:text-accent-foreground
-            dark:data-[active=true]:bg-accent`}
-          />
-        );
-      })}
-    </button>
-  );
-}
 
 // Computed client-side (rather than in the root loader) so the timestamp
 // doesn't make the root loader non-deterministic — a stale value baked into
@@ -151,7 +111,6 @@ export const Footer = () => {
               </Fragment>
             ))}
           </div>
-          <ThemeToggle />
         </div>
         <div
           className="relative isolate flex justify-between gap-0.5 border-t
