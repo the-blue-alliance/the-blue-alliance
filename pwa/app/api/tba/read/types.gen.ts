@@ -2728,7 +2728,7 @@ export type NotablesInsight = {
 };
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and success rate shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and game stats shapes.
  */
 export type InsightV2 =
   | ({
@@ -2741,8 +2741,8 @@ export type InsightV2 =
       category: 'timeseries';
     } & InsightV2Timeseries)
   | ({
-      category: 'success_rate';
-    } & InsightV2SuccessRate);
+      category: 'game_stats';
+    } & InsightV2GameStats);
 
 export type InsightV2Base = {
   /**
@@ -2760,7 +2760,7 @@ export type InsightV2Base = {
   /**
    * Insight category. Discriminates the shape of `data`.
    */
-  category: 'leaderboard' | 'streak' | 'timeseries' | 'success_rate';
+  category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
   /**
    * District abbreviation if the insight is district-scoped, otherwise null.
    */
@@ -2788,11 +2788,11 @@ export type InsightV2TimeseriesExtras = {
   data: InsightV2TimeseriesData;
 };
 
-export type InsightV2SuccessRate = InsightV2Base & InsightV2SuccessRateExtras;
+export type InsightV2GameStats = InsightV2Base & InsightV2GameStatsExtras;
 
-export type InsightV2SuccessRateExtras = {
-  category?: 'success_rate';
-  data: InsightV2SuccessRateData;
+export type InsightV2GameStatsExtras = {
+  category?: 'game_stats';
+  data: InsightV2GameStatsData;
 };
 
 /**
@@ -2920,13 +2920,13 @@ export type InsightV2TimeseriesData = {
 };
 
 /**
- * Count/opportunities statistics for a year, broken out by scope: the season overall, each competition week, and each event.
+ * Count/opportunities and average-value statistics for a year, broken out by scope: the season overall, each competition week, and each event.
  */
-export type InsightV2SuccessRateData = {
-  scopes: Array<InsightV2SuccessRateScope>;
+export type InsightV2GameStatsData = {
+  scopes: Array<InsightV2GameStatsScope>;
 };
 
-export type InsightV2SuccessRateScope = {
+export type InsightV2GameStatsScope = {
   /**
    * What slice of the season this scope covers.
    */
@@ -2944,19 +2944,27 @@ export type InsightV2SuccessRateScope = {
    */
   week: number | null;
   /**
-   * Statistics over qualification matches in this scope.
+   * Count/opportunities statistics over qualification matches in this scope.
    */
-  qual: Array<InsightV2SuccessRateEntry>;
+  qual: Array<InsightV2GameStat>;
   /**
-   * Statistics over playoff matches in this scope.
+   * Count/opportunities statistics over playoff matches in this scope.
    */
-  playoff: Array<InsightV2SuccessRateEntry>;
+  playoff: Array<InsightV2GameStat>;
+  /**
+   * Average-value statistics over qualification matches in this scope.
+   */
+  qual_averages: Array<InsightV2AverageStat>;
+  /**
+   * Average-value statistics over playoff matches in this scope.
+   */
+  playoff_averages: Array<InsightV2AverageStat>;
 };
 
 /**
  * How many times an objective was achieved, out of how many chances there were to achieve it.
  */
-export type InsightV2SuccessRateEntry = {
+export type InsightV2GameStat = {
   /**
    * Programmatic name of the statistic, e.g. `rp_1` or `auto_climb`.
    */
@@ -2973,6 +2981,24 @@ export type InsightV2SuccessRateEntry = {
    * Chances there were to achieve the objective.
    */
   opportunities: number;
+};
+
+/**
+ * The average value of a numeric match statistic, e.g. average score or average win margin.
+ */
+export type InsightV2AverageStat = {
+  /**
+   * Programmatic name of the statistic, e.g. `average_score`.
+   */
+  name: string;
+  /**
+   * Human-readable name of the statistic, e.g. `Average Score`.
+   */
+  label: string;
+  /**
+   * The average value of the statistic over matches in this scope.
+   */
+  value: number;
 };
 
 export enum Position2016 {
@@ -3556,13 +3582,13 @@ export type PageNum = number;
 export type TeamKey = string;
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
  */
 export enum InsightV2Category {
   LEADERBOARD = 'leaderboard',
   STREAK = 'streak',
   TIMESERIES = 'timeseries',
-  SUCCESS_RATE = 'success_rate',
+  GAME_STATS = 'game_stats',
 }
 
 /**
@@ -5513,9 +5539,9 @@ export type GetInsightsV2YearCategoryData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries' | 'success_rate';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
   };
   query?: never;
   url: '/insights/{year}/{category}';
@@ -5615,9 +5641,9 @@ export type GetInsightsV2YearCategoryDistrictData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries, success_rate.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries' | 'success_rate';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
     /**
      * District abbreviation, eg `ne` or `fim`
      */

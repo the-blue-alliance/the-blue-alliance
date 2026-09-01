@@ -49,8 +49,8 @@ def test_data_property(ndb_stub) -> None:
     assert insight.data["key_type"] == "team"
 
 
-def test_render_key_name_success_rate() -> None:
+def test_render_key_name_game_stats() -> None:
     assert (
-        InsightV2.render_key_name(2026, InsightCategory.SUCCESS_RATE, "success_rates")
-        == "2026_v2_success_rate_success_rates"
+        InsightV2.render_key_name(2026, InsightCategory.GAME_STATS, "game_stats")
+        == "2026_v2_game_stats_game_stats"
     )

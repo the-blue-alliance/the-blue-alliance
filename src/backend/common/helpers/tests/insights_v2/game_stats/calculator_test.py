@@ -6,10 +6,10 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.helpers.insights_v2.registry import compute_insights_for_year
-from backend.common.helpers.insights_v2.success_rate.calculator import (
-    SuccessRateV2Calculator,
+from backend.common.helpers.insights_v2.game_stats.calculator import (
+    GameStatsV2Calculator,
 )
+from backend.common.helpers.insights_v2.registry import compute_insights_for_year
 from backend.common.models.event import Event
 from backend.common.models.insight_v2 import InsightCategory
 
@@ -96,6 +96,10 @@ def _rates(scope) -> Dict[str, List[int]]:
     return {r["name"]: [r["count"], r["opportunities"]] for r in scope["qual"]}
 
 
+def _averages(scope, key: str = "qual_averages") -> Dict[str, float]:
+    return {a["name"]: a["value"] for a in scope[key]}
+
+
 def _scopes_of(insight, scope_type: str):
     return [s for s in insight.data["scopes"] if s["scope_type"] == scope_type]
 
@@ -105,12 +109,12 @@ def test_counts_bonus_rps_across_scopes(ndb_stub) -> None:
     _put_match("2024casj", 1, 100, 80, red_melody=True, blue_melody=False)
     _put_match("2024casj", 2, 60, 40, red_melody=True, blue_melody=True)
 
-    insights = compute_insights_for_year(2024, [SuccessRateV2Calculator()])
+    insights = compute_insights_for_year(2024, [GameStatsV2Calculator()])
 
     assert len(insights) == 1
     insight = insights[0]
-    assert insight.name == "success_rates"
-    assert insight.category == InsightCategory.SUCCESS_RATE
+    assert insight.name == "game_stats"
+    assert insight.category == InsightCategory.GAME_STATS
     assert insight.year == 2024
     assert insight.district_abbreviation is None
 
@@ -134,6 +138,24 @@ def test_counts_bonus_rps_across_scopes(ndb_stub) -> None:
     }
 
 
+def test_averages_across_scopes(ndb_stub) -> None:
+    _put_event("2024casj", short_name="San Jose")
+    _put_match("2024casj", 1, 100, 80, red_melody=True, blue_melody=False)
+    _put_match("2024casj", 2, 60, 40, red_melody=True, blue_melody=True)
+
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
+
+    overall = _scopes_of(insight, "overall")[0]
+    averages = _averages(overall)
+    assert averages["average_score"] == 70.0  # (180 + 100) / (2 * 2)
+    assert averages["average_win_margin"] == 20.0  # (20 + 20) / 2
+    assert averages["average_winning_score"] == 80.0  # (100 + 60) / 2
+
+    labels = {a["name"]: a["label"] for a in overall["qual_averages"]}
+    assert labels["average_score"] == "Average Score"
+    assert labels["average_win_margin"] == "Average Win Margin"
+
+
 def test_week_and_event_scopes(ndb_stub) -> None:
     _put_event("2024casj", start_date=_WEEK_1_START, short_name="San Jose")
     _put_match("2024casj", 1, 100, 80, red_melody=True, blue_melody=False)
@@ -141,26 +163,50 @@ def test_week_and_event_scopes(ndb_stub) -> None:
     _put_event("2024caln", start_date=_WEEK_2_START, short_name="Central Valley")
     _put_match("2024caln", 1, 60, 40, red_melody=False, blue_melody=False)
 
-    insight = compute_insights_for_year(2024, [SuccessRateV2Calculator()])[0]
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
 
     weeks = _scopes_of(insight, "week")
     assert [w["label"] for w in weeks] == ["Week 1", "Week 2"]
     assert [w["week"] for w in weeks] == [0, 1]
     assert _rates(weeks[0])["rp_1"] == [1, 2]
     assert _rates(weeks[1])["rp_1"] == [0, 2]
+    assert _averages(weeks[0])["average_score"] == 90.0  # 180 / 2
+    assert _averages(weeks[1])["average_score"] == 50.0  # 100 / 2
 
     events = _scopes_of(insight, "event")
     assert [e["key"] for e in events] == ["2024casj", "2024caln"]
     assert [e["label"] for e in events] == ["San Jose", "Central Valley"]
     assert _rates(events[0])["rp_1"] == [1, 2]
     assert _rates(events[1])["rp_1"] == [0, 2]
+    assert _averages(events[0])["average_score"] == 90.0
+    assert _averages(events[1])["average_score"] == 50.0
+
+
+def test_averages_weighted_across_events(ndb_stub) -> None:
+    _put_event("2024casj", start_date=_WEEK_1_START, short_name="San Jose")
+    _put_match("2024casj", 1, 100, 80)
+    _put_match("2024casj", 2, 100, 80)
+
+    _put_event("2024caln", start_date=_WEEK_1_START, short_name="Central Valley")
+    _put_match("2024caln", 1, 0, 0)
+
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
+
+    overall = _scopes_of(insight, "overall")[0]
+    # True combined average: (180 + 180 + 0) / (3 * 2) = 60.0. A naive
+    # unweighted mean of the two events' own averages (90.0 and 0.0) would
+    # give 45.0 instead - confirming events are weighted by match count.
+    assert _averages(overall)["average_score"] == 60.0
+
+    week = _scopes_of(insight, "week")[0]
+    assert _averages(week)["average_score"] == 60.0
 
 
 def test_event_label_falls_back_to_name(ndb_stub) -> None:
     _put_event("2024casj", short_name=None)
     _put_match("2024casj", 1, 100, 80)
 
-    insight = compute_insights_for_year(2024, [SuccessRateV2Calculator()])[0]
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
 
     assert _scopes_of(insight, "event")[0]["label"] == "2024casj Regional"
 
@@ -178,13 +224,16 @@ def test_qual_and_playoff_split(ndb_stub) -> None:
         comp_level=CompLevel.F,
     )
 
-    insight = compute_insights_for_year(2024, [SuccessRateV2Calculator()])[0]
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
     overall = _scopes_of(insight, "overall")[0]
 
     qual = {r["name"]: [r["count"], r["opportunities"]] for r in overall["qual"]}
     playoff = {r["name"]: [r["count"], r["opportunities"]] for r in overall["playoff"]}
     assert qual["rp_1"] == [2, 2]
     assert playoff["rp_1"] == [0, 2]
+
+    assert _averages(overall, "qual_averages")["average_score"] == 90.0
+    assert _averages(overall, "playoff_averages")["average_score"] == 50.0
 
 
 def test_championship_scope_sorts_last(ndb_stub) -> None:
@@ -198,7 +247,7 @@ def test_championship_scope_sorts_last(ndb_stub) -> None:
     )
     _put_match("2024cmptx", 1, 200, 160)
 
-    insight = compute_insights_for_year(2024, [SuccessRateV2Calculator()])[0]
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
 
     weeks = _scopes_of(insight, "week")
     assert [w["label"] for w in weeks] == ["Week 1", "Championship"]
@@ -209,7 +258,7 @@ def test_tie_counts_as_a_missed_opportunity(ndb_stub) -> None:
     _put_event("2024casj")
     _put_match("2024casj", 1, 80, 80, red_melody=True, blue_melody=True)
 
-    insight = compute_insights_for_year(2024, [SuccessRateV2Calculator()])[0]
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
 
     rates = _rates(_scopes_of(insight, "overall")[0])
     assert rates["max_alliance_rp"] == [0, 1]
@@ -220,14 +269,14 @@ def test_unplayed_matches_skipped(ndb_stub) -> None:
     _put_event("2024casj")
     _put_match("2024casj", 1, -1, -1)
 
-    assert compute_insights_for_year(2024, [SuccessRateV2Calculator()]) == []
+    assert compute_insights_for_year(2024, [GameStatsV2Calculator()]) == []
 
 
 def test_matches_without_breakdowns_offer_no_opportunities(ndb_stub) -> None:
     _put_event("2024casj")
     _put_match("2024casj", 1, 100, 80, with_breakdown=False)
 
-    assert compute_insights_for_year(2024, [SuccessRateV2Calculator()]) == []
+    assert compute_insights_for_year(2024, [GameStatsV2Calculator()]) == []
 
 
 def test_offseason_event_skipped(ndb_stub) -> None:
@@ -238,7 +287,7 @@ def test_offseason_event_skipped(ndb_stub) -> None:
     )
     _put_match("2024iri", 1, 100, 80)
 
-    assert compute_insights_for_year(2024, [SuccessRateV2Calculator()]) == []
+    assert compute_insights_for_year(2024, [GameStatsV2Calculator()]) == []
 
 
 def test_year_without_bonus_rps_produces_no_insight(ndb_stub) -> None:
@@ -252,13 +301,13 @@ def test_year_without_bonus_rps_produces_no_insight(ndb_stub) -> None:
         official=True,
     ).put()
 
-    assert compute_insights_for_year(2014, [SuccessRateV2Calculator()]) == []
+    assert compute_insights_for_year(2014, [GameStatsV2Calculator()]) == []
 
 
 def test_key_name(ndb_stub) -> None:
     _put_event("2024casj")
     _put_match("2024casj", 1, 100, 80)
 
-    insight = compute_insights_for_year(2024, [SuccessRateV2Calculator()])[0]
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
 
-    assert insight.key_name == "2024_v2_success_rate_success_rates"
+    assert insight.key_name == "2024_v2_game_stats_game_stats"

@@ -3,8 +3,8 @@ import { useMemo, useState } from 'react';
 import MaterialSymbolsTarget from '~icons/material-symbols/target';
 
 import {
-  type InsightV2SuccessRate,
-  type InsightV2SuccessRateEntry,
+  type InsightV2GameStat,
+  type InsightV2GameStats,
 } from '~/api/tba/read';
 import {
   Card,
@@ -40,7 +40,7 @@ export function SuccessRateInsight({
   insight,
   subtitle,
 }: {
-  insight: InsightV2SuccessRate;
+  insight: InsightV2GameStats;
   subtitle?: string;
 }) {
   // The payload also carries a scope per event; this card covers the season
@@ -144,11 +144,7 @@ export function SuccessRateInsight({
   );
 }
 
-export function SuccessRateTable({
-  rates,
-}: {
-  rates: InsightV2SuccessRateEntry[];
-}) {
+export function SuccessRateTable({ rates }: { rates: InsightV2GameStat[] }) {
   return (
     <Table>
       <TableHeader>
