@@ -14,6 +14,7 @@ export const zApiStatus = z.object({
   ios: zApiStatusAppVersion,
   android: zApiStatusAppVersion,
   max_team_page: z.int(),
+  kickoff_datetime: z.string().optional(),
 });
 
 /**

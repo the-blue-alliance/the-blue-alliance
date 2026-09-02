@@ -85,7 +85,7 @@ class SeasonHelper(object):
         """
         Computes the date of Kickoff for a given year.
         Kickoff is always the first Saturday in January after Jan 2nd.
-        2026 and later, it is the second Saturday in January after Jan 2nd.
+        In 2026, it is the second Saturday in January after Jan 2nd.
         """
         jan_2nd = EST.localize(
             datetime(year=year, month=1, day=2, hour=10, minute=30, second=0)
@@ -99,8 +99,8 @@ class SeasonHelper(object):
         if days_ahead <= 0:
             days_ahead += 7
         kickoff_date = jan_2nd + timedelta(days=days_ahead)
-        # 2026 onward, everything got pushed back a week, including kickoff
-        if year >= 2026:
+        # In 2026, everything got pushed back a week, including kickoff
+        if year == 2026:
             kickoff_date += timedelta(days=7)
         return kickoff_date
 

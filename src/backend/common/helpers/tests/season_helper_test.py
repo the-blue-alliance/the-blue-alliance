@@ -12,6 +12,8 @@ EST = timezone("US/Eastern")
 
 def test_kickoff_datetime() -> None:
     # For folks looking at this test later to confirm everything is right
+    # 2028 = Jan 8th
+    # 2027 = Jan 9th
     # 2026 = Jan 10th
     # 2025 = Jan 4th
     # 2024 = Jan 6th
@@ -37,6 +39,18 @@ def test_kickoff_datetime() -> None:
     # After this, things start to get hard to confirm online
     # I'm sure I could dig through Chief posts
     # ~zach
+
+    # 2028 - Saturday the 8th, 12:00pm (noon) EST
+    kickoff_2028 = EST.localize(datetime(2028, 1, 8, 12, 00, 00))
+    kickoff_2028_utc = kickoff_2028.astimezone(UTC)
+    assert SeasonHelper.kickoff_datetime_est(year=2028) == kickoff_2028
+    assert SeasonHelper.kickoff_datetime_utc(year=2028) == kickoff_2028_utc
+
+    # 2027 - Saturday the 9th, 12:00pm (noon) EST
+    kickoff_2027 = EST.localize(datetime(2027, 1, 9, 12, 00, 00))
+    kickoff_2027_utc = kickoff_2027.astimezone(UTC)
+    assert SeasonHelper.kickoff_datetime_est(year=2027) == kickoff_2027
+    assert SeasonHelper.kickoff_datetime_utc(year=2027) == kickoff_2027_utc
 
     # 2026 - Saturday the 10th, 12:00pm (noon) EST
     kickoff_2026 = EST.localize(datetime(2026, 1, 10, 12, 00, 00))

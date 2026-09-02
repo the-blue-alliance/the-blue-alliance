@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import cast
 
 from backend.api.handlers.decorators import api_authenticated
@@ -8,6 +9,7 @@ from backend.api.handlers.helpers.profiled_jsonify import (
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.teams import TEAM_PAGE_SIZE
 from backend.common.decorators import cached_public
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.sitevar import Sitevar
 from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
@@ -36,5 +38,10 @@ def status() -> TypedFlaskResponse[dict]:
     max_team_page = int(max_team_num / TEAM_PAGE_SIZE)
 
     status["max_team_page"] = max_team_page
+
+    kickoff_year = SeasonHelper.effective_season_year(datetime.now())
+    status["kickoff_datetime"] = SeasonHelper.kickoff_datetime_utc(
+        kickoff_year
+    ).isoformat()
 
     return profiled_jsonify(status)
