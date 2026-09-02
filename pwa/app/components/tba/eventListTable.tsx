@@ -50,15 +50,9 @@ function getDistrictColorClass(
   return DISTRICT_COLORS[districtAbbreviation.toLowerCase()] || '';
 }
 
-export default function EventListTable({
-  events,
-  enableGrouping = false,
-}: {
-  events: Event[];
-  enableGrouping?: boolean;
-}) {
+export default function EventListTable({ events }: { events: Event[] }) {
   const isEventOnline = useOnlineEventWebcasts();
-  const items = enableGrouping ? groupEventsByParent(events) : events;
+  const items = groupEventsByParent(events);
   // Build a set of all division keys so we can identify division rows on the fly.
   const allDivisionKeys = new Set(items.flatMap((e) => e.division_keys));
   // Map each division key to its parent event name for display trimming.
