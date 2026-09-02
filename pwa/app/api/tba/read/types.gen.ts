@@ -27,6 +27,10 @@ export type ApiStatus = {
    * Maximum team page number for valid queries.
    */
   max_team_page: number;
+  /**
+   * ISO 8601 datetime (UTC) of FRC Kickoff for the upcoming season.
+   */
+  kickoff_datetime?: string;
 };
 
 export type ApiStatusAppVersion = {
