@@ -91,6 +91,9 @@ from backend.common.helpers.insights_v2.timeseries.average_win_margin_by_week im
 from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
     HighScoreOverTimeV2Calculator,
 )
+from backend.common.helpers.insights_v2.timeseries.num_matches_by_year import (
+    NumMatchesByYearV2Calculator,
+)
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.insight_v2 import InsightV2
 from backend.common.models.keys import Year
@@ -174,6 +177,7 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             LongestEinsteinStreakV2Calculator(),
             LongestUndefeatedStreakV2Calculator(),
             LongestWinStreakV2Calculator(),
+            NumMatchesByYearV2Calculator(),
         ]
     else:
         calculators += [

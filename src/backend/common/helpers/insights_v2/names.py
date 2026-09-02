@@ -84,6 +84,9 @@ class InsightV2Names:
     AVERAGE_ELIM_WIN_MARGIN_BY_WEEK = InsightV2NameEntry(
         "elim_match_average_margins_by_week", "Average Elim Win Margin By Week"
     )
+    NUM_MATCHES_BY_YEAR = InsightV2NameEntry(
+        "num_matches_by_year", "Number of Matches by Year"
+    )
 
     # Game Stats
     GAME_STATS = InsightV2NameEntry("game_stats", "Game Stats")
