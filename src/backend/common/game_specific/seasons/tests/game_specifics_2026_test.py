@@ -165,11 +165,11 @@ def test_success_rate_counter_names_and_labels() -> None:
         ("rp_3", "Traversal RP"),
         ("max_alliance_rp", "6 RP"),
         ("max_match_rp", "9 RP"),
+        ("auto_win_conversion", "Auto Win Conversion"),
         ("auto_climb", "Auto Climb"),
         ("level1_climb", "Level 1 Climb"),
         ("level2_climb", "Level 2 Climb"),
         ("level3_climb", "Level 3 Climb"),
-        ("auto_win_conversion", "Auto Win Conversion"),
     ]
 
 

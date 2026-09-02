@@ -36,11 +36,25 @@ def _alliances_json(red_score: int, blue_score: int) -> str:
     )
 
 
-def _breakdown_json(red_melody: bool, blue_melody: bool) -> str:
+def _breakdown_json(
+    red_melody: bool,
+    blue_melody: bool,
+    red_auto: Optional[int],
+    blue_auto: Optional[int],
+) -> str:
+    def alliance(melody: bool, auto: Optional[int]) -> Dict[str, object]:
+        breakdown: Dict[str, object] = {
+            "melodyBonusAchieved": melody,
+            "ensembleBonusAchieved": True,
+        }
+        if auto is not None:
+            breakdown["autoPoints"] = auto
+        return breakdown
+
     return json.dumps(
         {
-            "red": {"melodyBonusAchieved": red_melody, "ensembleBonusAchieved": True},
-            "blue": {"melodyBonusAchieved": blue_melody, "ensembleBonusAchieved": True},
+            "red": alliance(red_melody, red_auto),
+            "blue": alliance(blue_melody, blue_auto),
         }
     )
 
@@ -73,6 +87,8 @@ def _put_match(
     blue_melody: bool = True,
     comp_level: CompLevel = CompLevel.QM,
     with_breakdown: bool = True,
+    red_auto: Optional[int] = None,
+    blue_auto: Optional[int] = None,
 ) -> None:
     suffix = str(match_number) if comp_level == CompLevel.QM else f"m{match_number}"
     from backend.common.models.match import Match
@@ -87,7 +103,9 @@ def _put_match(
         team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
         alliances_json=_alliances_json(red_score, blue_score),
         score_breakdown_json=(
-            _breakdown_json(red_melody, blue_melody) if with_breakdown else None
+            _breakdown_json(red_melody, blue_melody, red_auto, blue_auto)
+            if with_breakdown
+            else None
         ),
     ).put()
 
@@ -311,3 +329,15 @@ def test_key_name(ndb_stub) -> None:
     insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
 
     assert insight.key_name == "2024_v2_game_stats_game_stats"
+
+
+def test_auto_win_conversion_counted(ndb_stub) -> None:
+    _put_event("2024casj")
+    _put_match("2024casj", 1, 100, 80, red_auto=20, blue_auto=10)
+    _put_match("2024casj", 2, 60, 90, red_auto=20, blue_auto=10)
+    _put_match("2024casj", 3, 60, 90, red_auto=10, blue_auto=10)
+
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
+
+    rates = _rates(_scopes_of(insight, "overall")[0])
+    assert rates["auto_win_conversion"] == [1, 2]
