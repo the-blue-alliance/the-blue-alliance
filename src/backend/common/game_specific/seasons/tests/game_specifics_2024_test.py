@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from typing import cast
 
 import pytest
@@ -88,3 +89,97 @@ def test_get_prediction_relevant_stats() -> None:
     stats = GameSpecifics2024().get_prediction_relevant_stats()
     assert len(stats) > 0
     assert stats[0][0] == "score"
+
+
+def _success_rate_match(
+    red_score: int,
+    blue_score: int,
+    red: dict | None = None,
+    blue: dict | None = None,
+    with_breakdown: bool = True,
+) -> Match:
+    def alliance(overrides: dict | None) -> dict:
+        breakdown = {
+            "melodyBonusAchieved": False,
+            "ensembleBonusAchieved": False,
+            "autoPoints": 0,
+        }
+        breakdown.update(overrides or {})
+        return breakdown
+
+    return Match(
+        id="2024casj_qm1",
+        comp_level="qm",
+        event=ndb.Key(Event, "2024casj"),
+        year=2024,
+        match_number=1,
+        set_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                "red": {
+                    "score": red_score,
+                    "teams": ["frc1", "frc2", "frc3"],
+                    "surrogates": [],
+                    "dqs": [],
+                },
+                "blue": {
+                    "score": blue_score,
+                    "teams": ["frc4", "frc5", "frc6"],
+                    "surrogates": [],
+                    "dqs": [],
+                },
+            }
+        ),
+        score_breakdown_json=(
+            json.dumps({"red": alliance(red), "blue": alliance(blue)})
+            if with_breakdown
+            else None
+        ),
+    )
+
+
+def _measure(match: Match) -> dict:
+    return {
+        counter.name: counter.measure(match)
+        for counter in GameSpecifics2024().success_rate_counters()
+    }
+
+
+def test_success_rate_counter_names_and_labels() -> None:
+    counters = GameSpecifics2024().success_rate_counters()
+    assert [(c.name, c.label) for c in counters] == [
+        ("rp_1", "Melody RP"),
+        ("rp_2", "Ensemble RP"),
+        ("max_alliance_rp", "4 RP"),
+        ("max_match_rp", "6 RP"),
+        ("auto_win_conversion", "Auto Win Conversion"),
+    ]
+
+
+def test_success_rate_auto_win_conversion() -> None:
+    match = _success_rate_match(100, 80, red={"autoPoints": 10})
+    assert _measure(match)["auto_win_conversion"] == (1, 1)
+
+    match = _success_rate_match(80, 100, red={"autoPoints": 10})
+    assert _measure(match)["auto_win_conversion"] == (0, 1)
+
+
+def test_success_rate_auto_win_conversion_needs_both_winners() -> None:
+    match = _success_rate_match(
+        100, 80, red={"autoPoints": 10}, blue={"autoPoints": 10}
+    )
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+    match = _success_rate_match(80, 80, red={"autoPoints": 10})
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+
+def test_success_rate_auto_win_conversion_needs_auto_points() -> None:
+    match = _success_rate_match(
+        100, 80, red={"autoPoints": None}, blue={"autoPoints": None}
+    )
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+    match = _success_rate_match(100, 80, with_breakdown=False)
+    assert _measure(match)["auto_win_conversion"] == (0, 0)
