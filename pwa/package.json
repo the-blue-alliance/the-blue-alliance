@@ -55,7 +55,7 @@
     "pino": "10.3.1",
     "react": "19.2.8",
     "react-dom": "19.2.8",
-    "react-intersection-observer": "11.0.0",
+    "react-intersection-observer": "11.0.1",
     "react-social-media-embed": "2.5.18",
     "recharts": "3.10.1",
     "sonner": "2.0.8",
