@@ -68,6 +68,45 @@ describe.concurrent('groupEventsByParent', () => {
     ).toEqual(['2024early', '2024cmp', '2024cmpnew']);
   });
 
+  test('parent that starts after all of its divisions still sorts first', () => {
+    // Real DCMP shape: the parent event is the finals day only, so it starts
+    // after every division.
+    const parent = makeEvent('2026necmp', '2026-04-18', [
+      '2026necmp1',
+      '2026necmp2',
+    ]);
+    const div1 = makeEvent('2026necmp1', '2026-04-15');
+    const div2 = makeEvent('2026necmp2', '2026-04-15');
+    expect(groupEventsByParent([div1, div2, parent]).map((e) => e.key)).toEqual(
+      ['2026necmp', '2026necmp1', '2026necmp2'],
+    );
+  });
+
+  test('divisions listed before their parent are regrouped under it', () => {
+    // Ordering produced by sortEventsComparator for the 2026 Week 7 section:
+    // divisions bubble to the top and parents sink to the bottom.
+    const events = [
+      makeEvent('2026necmp1', '2026-04-15'),
+      makeEvent('2026necmp2', '2026-04-15'),
+      makeEvent('2026nytr', '2026-04-15'),
+      makeEvent('2026oncmp1', '2026-04-16'),
+      makeEvent('2026oncmp2', '2026-04-16'),
+      makeEvent('2026incmp', '2026-04-17'),
+      makeEvent('2026necmp', '2026-04-18', ['2026necmp1', '2026necmp2']),
+      makeEvent('2026oncmp', '2026-04-19', ['2026oncmp1', '2026oncmp2']),
+    ];
+    expect(groupEventsByParent(events).map((e) => e.key)).toEqual([
+      '2026nytr',
+      '2026necmp',
+      '2026necmp1',
+      '2026necmp2',
+      '2026oncmp',
+      '2026oncmp1',
+      '2026oncmp2',
+      '2026incmp',
+    ]);
+  });
+
   test('division not present in the event list is silently omitted', () => {
     const parent = makeEvent('2024cmp', '2024-04-17', [
       '2024cmpnew',
