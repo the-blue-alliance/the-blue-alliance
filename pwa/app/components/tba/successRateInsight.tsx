@@ -3,8 +3,10 @@ import { useMemo, useState } from 'react';
 import MaterialSymbolsTarget from '~icons/material-symbols/target';
 
 import {
+  type InsightV2AverageStat,
   type InsightV2GameStat,
   type InsightV2GameStats,
+  type InsightV2GameStatsScope,
 } from '~/api/tba/read';
 import {
   Card,
@@ -20,6 +22,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import { Separator } from '~/components/ui/separator';
 import {
   Table,
   TableBody,
@@ -31,6 +34,7 @@ import {
 import { Tabs, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import {
   type MatchLevel,
+  formatAverageStatValue,
   formatSuccessRate,
   otherMatchLevel,
 } from '~/lib/successRateUtils';
@@ -61,9 +65,6 @@ export function SuccessRateInsight({
   if (scope === undefined) {
     return null;
   }
-
-  const rates = scope[matchLevel];
-  const fallbackLevel = otherMatchLevel(matchLevel);
 
   return (
     <Card className="overflow-hidden border-border/50 shadow-sm">
@@ -129,18 +130,46 @@ export function SuccessRateInsight({
       </CardHeader>
 
       <CardContent className="p-0">
-        {rates.length === 0 ? (
-          <p className="p-6 text-sm text-muted-foreground">
-            No {matchLevel === 'qual' ? 'qualification' : 'playoff'} match data
-            for {scope.label}.
-            {scope[fallbackLevel].length > 0 &&
-              ` Try the ${fallbackLevel === 'qual' ? 'Quals' : 'Playoffs'} tab.`}
-          </p>
-        ) : (
-          <SuccessRateTable rates={rates} />
-        )}
+        <GameStatsScopeContent scope={scope} matchLevel={matchLevel} />
       </CardContent>
     </Card>
+  );
+}
+
+export function GameStatsScopeContent({
+  scope,
+  matchLevel,
+}: {
+  scope: InsightV2GameStatsScope;
+  matchLevel: MatchLevel;
+}) {
+  const rates = scope[matchLevel];
+  const averages =
+    matchLevel === 'qual' ? scope.qual_averages : scope.playoff_averages;
+
+  const fallbackLevel = otherMatchLevel(matchLevel);
+  const fallbackAverages =
+    fallbackLevel === 'qual' ? scope.qual_averages : scope.playoff_averages;
+  const fallbackHasData =
+    scope[fallbackLevel].length > 0 || fallbackAverages.length > 0;
+
+  if (rates.length === 0 && averages.length === 0) {
+    return (
+      <p className="p-6 text-sm text-muted-foreground">
+        No {matchLevel === 'qual' ? 'qualification' : 'playoff'} match data for{' '}
+        {scope.label}.
+        {fallbackHasData &&
+          ` Try the ${fallbackLevel === 'qual' ? 'Quals' : 'Playoffs'} tab.`}
+      </p>
+    );
+  }
+
+  return (
+    <>
+      {rates.length > 0 && <SuccessRateTable rates={rates} />}
+      {rates.length > 0 && averages.length > 0 && <Separator />}
+      {averages.length > 0 && <AverageStatTable averages={averages} />}
+    </>
   );
 }
 
@@ -185,6 +214,42 @@ export function SuccessRateTable({ rates }: { rates: InsightV2GameStat[] }) {
               )}
             >
               {formatSuccessRate(rate)}
+            </TableCell>
+          </TableRow>
+        ))}
+      </TableBody>
+    </Table>
+  );
+}
+
+export function AverageStatTable({
+  averages,
+}: {
+  averages: InsightV2AverageStat[];
+}) {
+  return (
+    <Table>
+      <TableHeader>
+        <TableRow className="hover:bg-transparent">
+          <TableHead className="h-10 pl-4 text-left font-semibold">
+            Statistic
+          </TableHead>
+          <TableHead className="h-10 w-28 pr-4 text-right font-semibold">
+            Value
+          </TableHead>
+        </TableRow>
+      </TableHeader>
+      <TableBody>
+        {averages.map((stat) => (
+          <TableRow
+            key={stat.name}
+            className="transition-colors hover:bg-muted/50"
+          >
+            <TableCell className="py-3 pl-4 text-left font-medium">
+              {stat.label}
+            </TableCell>
+            <TableCell className="pr-4 text-right font-semibold numeric-data">
+              {formatAverageStatValue(stat.value)}
             </TableCell>
           </TableRow>
         ))}

@@ -7,7 +7,6 @@ import {
   PlayoffType,
   WltRecord,
 } from '~/api/tba/read';
-import { median } from '~/lib/utils';
 
 const COMP_LEVEL_SORT_ORDER: Record<CompLevel, number> = {
   [CompLevel.F]: 5,
@@ -337,37 +336,4 @@ export function getMatchScoreWithoutAdjustPoints(match: Match): {
     redScore: match.alliances.red.score,
     blueScore: match.alliances.blue.score,
   };
-}
-
-export function getHighScoreMatch(matches: Match[]): Match | undefined {
-  if (matches.length === 0) {
-    return undefined;
-  }
-
-  const scores = matches.map((m) => ({
-    match: m,
-    score: Math.max(m.alliances.red.score, m.alliances.blue.score),
-  }));
-
-  scores.sort((a, b) => b.score - a.score);
-
-  return scores[0].match;
-}
-
-export function calculateMedianTurnaroundTime(
-  matches: Match[],
-): number | undefined {
-  const turnarounds = [];
-
-  for (let i = 1; i < matches.length; i++) {
-    const currTime = matches[i].actual_time;
-    const prevTime = matches[i - 1].actual_time;
-
-    if (currTime !== null && prevTime !== null) {
-      turnarounds.push(currTime - prevTime);
-    }
-  }
-
-  turnarounds.sort((a, b) => a - b);
-  return median(turnarounds);
 }
