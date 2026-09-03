@@ -13,6 +13,18 @@ def cached_public(
     ttl: Union[int, timedelta] = 61,
     cache_redirects: bool = False,
 ):
+    """
+    Caches the handler's response and marks it publicly cacheable.
+
+    The cache is keyed on path + query string only, with no user component, so
+    the response body is stored once and served to every visitor. Never render
+    anything session-specific - a CSRF token, account details, per-user state -
+    into a response wrapped in this decorator.
+
+    See src/backend/web/tests/cached_public_csrf_test.py, which enforces this
+    for CSRF tokens, and
+    https://github.com/the-blue-alliance/the-blue-alliance/issues/10495.
+    """
     timeout = ttl if isinstance(ttl, int) else int(ttl.total_seconds())
     if func is None:  # Handle no-argument decorator
         return partial(cached_public, ttl=ttl, cache_redirects=cache_redirects)

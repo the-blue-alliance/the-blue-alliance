@@ -216,3 +216,23 @@ def test_schema_org_sports_team_full_data(web_client: Client, setup_full_team) -
     assert sports_team_schema["location"]["address"]["addressLocality"] == "Greenville"
     assert sports_team_schema["location"]["address"]["addressRegion"] == "Texas"
     assert sports_team_schema["location"]["address"]["addressCountry"] == "USA"
+
+
+def test_favorite_button_has_no_csrf_token(web_client: Client, ndb_stub) -> None:
+    # The team page is served by a `@cached_public` handler, whose cache is
+    # keyed on path alone, so a per-session CSRF token rendered into the body
+    # would be handed to every subsequent visitor and their favorite POSTs
+    # would be rejected with a 400. tba_favorites.js fetches a token from
+    # /_/account/info instead.
+    # See https://github.com/the-blue-alliance/the-blue-alliance/issues/10495
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    button = soup.find("button", {"class": "tba-fab-team"})
+    assert button is not None
+    assert button["data-team"] == "frc254"
+    assert "data-csrf-token" not in button.attrs
+    assert b"csrf" not in resp.data.lower()
