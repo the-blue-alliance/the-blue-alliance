@@ -25,7 +25,8 @@ export function createLogger(name: string) {
   // See: https://cloud.google.com/run/docs/logging#writing-structured-logs
   return pino({
     name,
-    level: 'info',
+    // Hot-path diagnostics log at debug; set LOG_LEVEL=debug to see them.
+    level: process.env.LOG_LEVEL ?? 'info',
     // Use 'message' instead of 'msg' for Google Cloud Logging compatibility
     messageKey: 'message',
     // Omit default base fields (pid, hostname) - not needed for Cloud Logging

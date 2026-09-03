@@ -22,7 +22,7 @@ export function getRouter() {
     // Only log "added" events (new queries) and "updated" events when query completes successfully
     // This reduces noise from intermediate state transitions (loading states)
     if (event.type === 'added') {
-      queryCacheLogger.info(
+      queryCacheLogger.debug(
         {
           type: event.type,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -38,7 +38,7 @@ export function getRouter() {
       event.query.state.data !== undefined
     ) {
       // Only log successful updates with data (not loading states)
-      queryCacheLogger.info(
+      queryCacheLogger.debug(
         {
           type: event.type,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
