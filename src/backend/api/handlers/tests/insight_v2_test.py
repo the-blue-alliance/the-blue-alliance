@@ -325,3 +325,23 @@ def test_insights_year_category_game_stats(ndb_stub, api_client: Client) -> None
     assert len(resp.json) == 1
     assert resp.json[0]["category"] == InsightCategory.GAME_STATS
     assert resp.json[0]["name"] == "game_stats"
+
+
+def test_insights_year_category_clubs(ndb_stub, api_client: Client) -> None:
+    _put_auth()
+    _put_insight(0, name="blue_banners", category=InsightCategory.LEADERBOARD)
+    _put_insight(
+        0,
+        name="hall_of_fame",
+        category=InsightCategory.CLUBS,
+        display_name="Hall of Fame",
+    )
+
+    resp = api_client.get(
+        "/api/v3/insights/0/clubs",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    assert resp.json[0]["category"] == InsightCategory.CLUBS
+    assert resp.json[0]["name"] == "hall_of_fame"

@@ -1521,7 +1521,7 @@ export const getInsightsV2YearCategoryQueryKey = (
 ) => createQueryKey('getInsightsV2YearCategory', options);
 
 /**
- * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryOptions = (
   options: Options<GetInsightsV2YearCategoryData>,
@@ -1577,7 +1577,7 @@ export const getInsightsV2YearCategoryDistrictQueryKey = (
 ) => createQueryKey('getInsightsV2YearCategoryDistrict', options);
 
 /**
- * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryDistrictOptions = (
   options: Options<GetInsightsV2YearCategoryDistrictData>,

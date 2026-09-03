@@ -1106,9 +1106,49 @@ export const zInsightV2Base = z.object({
   name: z.string(),
   display_name: z.string(),
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
+  category: z.enum([
+    'leaderboard',
+    'streak',
+    'timeseries',
+    'game_stats',
+    'clubs',
+  ]),
   district_abbreviation: z.string().nullable(),
 });
+
+/**
+ * Chairman's Award material for a Hall of Fame team, scraped from the FIRST resource library.
+ */
+export const zInsightV2HallOfFameContext = z.object({
+  year: z.int(),
+  video: z.string().nullable(),
+  presentation: z.string().nullable(),
+  essay: z.string().nullable(),
+});
+
+/**
+ * A single club member.
+ */
+export const zInsightV2ClubEntry = z.object({
+  team_key: z.string(),
+  event_added_key: z.string(),
+  extra_context: zInsightV2HallOfFameContext.optional(),
+});
+
+/**
+ * Data for a clubs-category InsightV2. A cumulative all-time membership of teams that reached a milestone.
+ */
+export const zInsightV2ClubsData = z.object({
+  entries: z.array(zInsightV2ClubEntry),
+  context_type: z.enum(['hall_of_fame', 'none']),
+});
+
+export const zInsightV2ClubsExtras = z.object({
+  category: z.literal('clubs').optional(),
+  data: zInsightV2ClubsData,
+});
+
+export const zInsightV2Clubs = zInsightV2Base.and(zInsightV2ClubsExtras);
 
 /**
  * Data for a leaderboard-category InsightV2. Rankings of teams, events, or matches by a numeric value.
@@ -1254,7 +1294,7 @@ export const zInsightV2GameStats = zInsightV2Base.and(
 );
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and game stats shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, game stats, and clubs shapes.
  */
 export const zInsightV2 = z.union([
   z
@@ -1277,6 +1317,11 @@ export const zInsightV2 = z.union([
       category: z.literal('game_stats'),
     })
     .and(zInsightV2GameStats),
+  z
+    .object({
+      category: z.literal('clubs'),
+    })
+    .and(zInsightV2Clubs),
 ]);
 
 export const zPosition2016 = z.enum([
@@ -2101,13 +2146,14 @@ export const zPageNum = z.int();
 export const zTeamKey = z.string();
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const zInsightV2Category = z.enum([
   'leaderboard',
   'streak',
   'timeseries',
   'game_stats',
+  'clubs',
 ]);
 
 /**
@@ -2671,7 +2717,13 @@ export const zGetInsightsV2YearCategoryHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
+  category: z.enum([
+    'leaderboard',
+    'streak',
+    'timeseries',
+    'game_stats',
+    'clubs',
+  ]),
 });
 
 /**
@@ -2699,7 +2751,13 @@ export const zGetInsightsV2YearCategoryDistrictHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryDistrictPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
+  category: z.enum([
+    'leaderboard',
+    'streak',
+    'timeseries',
+    'game_stats',
+    'clubs',
+  ]),
   district_abbreviation: z.string(),
 });
 

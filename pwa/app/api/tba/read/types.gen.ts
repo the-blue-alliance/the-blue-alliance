@@ -2732,7 +2732,7 @@ export type NotablesInsight = {
 };
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and game stats shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, game stats, and clubs shapes.
  */
 export type InsightV2 =
   | ({
@@ -2746,7 +2746,10 @@ export type InsightV2 =
     } & InsightV2Timeseries)
   | ({
       category: 'game_stats';
-    } & InsightV2GameStats);
+    } & InsightV2GameStats)
+  | ({
+      category: 'clubs';
+    } & InsightV2Clubs);
 
 export type InsightV2Base = {
   /**
@@ -2764,7 +2767,7 @@ export type InsightV2Base = {
   /**
    * Insight category. Discriminates the shape of `data`.
    */
-  category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
+  category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
   /**
    * District abbreviation if the insight is district-scoped, otherwise null.
    */
@@ -2797,6 +2800,67 @@ export type InsightV2GameStats = InsightV2Base & InsightV2GameStatsExtras;
 export type InsightV2GameStatsExtras = {
   category?: 'game_stats';
   data: InsightV2GameStatsData;
+};
+
+export type InsightV2Clubs = InsightV2Base & InsightV2ClubsExtras;
+
+export type InsightV2ClubsExtras = {
+  category?: 'clubs';
+  data: InsightV2ClubsData;
+};
+
+/**
+ * Data for a clubs-category InsightV2. A cumulative all-time membership of teams that reached a milestone.
+ */
+export type InsightV2ClubsData = {
+  /**
+   * Club members, sorted ascending by team number.
+   */
+  entries: Array<InsightV2ClubEntry>;
+  /**
+   * Discriminates the shape of each entry's `extra_context`. `none` means entries have no `extra_context`.
+   */
+  context_type: 'hall_of_fame' | 'none';
+};
+
+/**
+ * A single club member.
+ */
+export type InsightV2ClubEntry = {
+  /**
+   * Team key of the club member, e.g. `frc254`.
+   */
+  team_key: string;
+  /**
+   * Key of the event where the team first qualified for the club.
+   */
+  event_added_key: string;
+  /**
+   * Club-specific extra material for this member. Present when the club's `context_type` is `hall_of_fame`.
+   */
+  extra_context?: InsightV2HallOfFameContext;
+};
+
+/**
+ * Chairman's Award material for a Hall of Fame team, scraped from the FIRST resource library.
+ */
+export type InsightV2HallOfFameContext = {
+  /**
+   * Year the team was inducted (year of `event_added_key`).
+   */
+  year: number;
+  /**
+   * URL of the team's Chairman's video, or null.
+   */
+  video: string | null;
+  /**
+   * URL of the team's Chairman's presentation, or null.
+   */
+  presentation: string | null;
+  /**
+   * URL of the team's Chairman's essay, or null.
+   */
+  essay: string | null;
 };
 
 /**
@@ -3586,13 +3650,14 @@ export type PageNum = number;
 export type TeamKey = string;
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export enum InsightV2Category {
   LEADERBOARD = 'leaderboard',
   STREAK = 'streak',
   TIMESERIES = 'timeseries',
   GAME_STATS = 'game_stats',
+  CLUBS = 'clubs',
 }
 
 /**
@@ -5543,9 +5608,9 @@ export type GetInsightsV2YearCategoryData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
   };
   query?: never;
   url: '/insights/{year}/{category}';
@@ -5645,9 +5710,9 @@ export type GetInsightsV2YearCategoryDistrictData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
     /**
      * District abbreviation, eg `ne` or `fim`
      */
