@@ -58,7 +58,7 @@ const ReactQueryDevtools = import.meta.env.PROD
 client.interceptors.request.use((request) => {
   request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
 
-  logger.info(
+  logger.debug(
     {
       method: request.method,
       url: request.url,
