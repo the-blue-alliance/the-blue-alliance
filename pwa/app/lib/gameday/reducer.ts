@@ -10,6 +10,7 @@ export interface GamedayState {
   chatSidebarVisible: boolean;
   currentChat: string;
   webcastsById: Record<string, WebcastWithMeta>;
+  hasRestoredUrlState: boolean;
 }
 
 export function createEmptyPositionArray(): (string | null)[] {
@@ -22,6 +23,7 @@ export const initialState: GamedayState = {
   chatSidebarVisible: true,
   currentChat: 'funroboticsnetwork', // TODO: Pull this from some configurable source
   webcastsById: {},
+  hasRestoredUrlState: false,
 };
 
 // Actions
@@ -158,6 +160,7 @@ export function gamedayReducer(
         newState.currentChat = urlState.currentChat;
       }
 
+      newState.hasRestoredUrlState = true;
       return newState;
     }
 

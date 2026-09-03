@@ -1,5 +1,5 @@
 import { useNavigate, useSearch } from '@tanstack/react-router';
-import { useEffect, useRef } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 import { MAX_VIEWS } from '~/lib/gameday/layouts';
 import type { GamedaySearchParams } from '~/routes/gameday';
@@ -111,10 +111,7 @@ export function useGamedayUrlSync(state: {
   const lastSerializedRef = useRef<string>('');
 
   // Parse URL params once on first render
-  const initialUrlStateRef = useRef<GamedayUrlState | null>(null);
-  if (initialUrlStateRef.current === null) {
-    initialUrlStateRef.current = parseSearchParams(searchParams);
-  }
+  const [initialUrlState] = useState(() => parseSearchParams(searchParams));
 
   // Sync state to URL on changes
   useEffect(() => {
@@ -152,5 +149,5 @@ export function useGamedayUrlSync(state: {
     navigate,
   ]);
 
-  return { initialUrlState: initialUrlStateRef.current };
+  return { initialUrlState };
 }

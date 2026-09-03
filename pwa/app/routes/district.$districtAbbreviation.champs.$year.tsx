@@ -3,6 +3,7 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 import {
   type CSSProperties,
   Fragment,
+  useCallback,
   useEffect,
   useRef,
   useState,
@@ -661,9 +662,8 @@ function ChampsPage() {
   const [countdown, setCountdown] = useState(REFETCH_INTERVAL / 1000);
   const countdownRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const startCountdown = () => {
+  const runCountdownTimer = useCallback(() => {
     if (countdownRef.current) clearInterval(countdownRef.current);
-    setCountdown(REFETCH_INTERVAL / 1000);
     countdownRef.current = setInterval(() => {
       setCountdown((prev) => {
         if (prev <= 1) {
@@ -672,14 +672,19 @@ function ChampsPage() {
         return prev - 1;
       });
     }, 1000);
-  };
+  }, []);
+
+  const resetCountdown = useCallback(() => {
+    setCountdown(REFETCH_INTERVAL / 1000);
+    runCountdownTimer();
+  }, [runCountdownTimer]);
 
   useEffect(() => {
-    startCountdown();
+    runCountdownTimer();
     return () => {
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
-  }, []);
+  }, [runCountdownTimer]);
 
   // Fetch district team keys
   const districtTeamsQuery = useQuery({
@@ -731,10 +736,10 @@ function ChampsPage() {
   const prevFetchingRef = useRef(false);
   useEffect(() => {
     if (prevFetchingRef.current && !isFetchingAny) {
-      startCountdown();
+      resetCountdown();
     }
     prevFetchingRef.current = isFetchingAny;
-  }, [isFetchingAny]);
+  }, [isFetchingAny, resetCountdown]);
 
   // Build a map from eventKey -> colors query result
   const eventColorsMap = new Map<string, ColorsQueryResult>();
