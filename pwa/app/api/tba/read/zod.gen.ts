@@ -1213,7 +1213,7 @@ export const zInsightV2Streak = zInsightV2Base.and(zInsightV2StreakExtras);
  * Data for a timeseries-category InsightV2. One or more named series of (x, y) data points over time.
  */
 export const zInsightV2TimeseriesData = z.object({
-  x_type: z.enum(['week', 'year', 'event']),
+  x_type: z.enum(['week', 'year', 'event', 'date']),
   x_label: z.string(),
   y_label: z.string(),
   point_context_type: z.enum(['none', 'match_record']),
