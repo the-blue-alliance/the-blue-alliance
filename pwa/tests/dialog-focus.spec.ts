@@ -10,7 +10,7 @@ test('match modal focuses the dialog content container on open', async ({
   page,
 }) => {
   await page.goto('/event/2024mil');
-  await page.waitForLoadState('networkidle');
+  await page.locator('body[data-hydrated]').waitFor();
 
   // Open the match modal via a match link (adds ?matchKey= search param)
   await page.getByRole('link', { name: 'Quals 1', exact: true }).click();

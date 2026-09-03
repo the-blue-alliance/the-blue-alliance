@@ -13,7 +13,7 @@ test('nav popup portal is not mounted while the menu is closed', async ({
   page,
 }) => {
   await page.goto('/');
-  await page.waitForLoadState('networkidle');
+  await page.locator('body[data-hydrated]').waitFor();
 
   await expect(
     page.locator('[data-slot="navigation-menu-viewport"]'),
@@ -25,7 +25,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
 
   test('does not open on hover', async ({ page }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.locator('body[data-hydrated]').waitFor();
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.hover();
@@ -41,7 +41,7 @@ test.describe('hamburger menu (narrow viewport)', () => {
     page,
   }) => {
     await page.goto('/');
-    await page.waitForLoadState('networkidle');
+    await page.locator('body[data-hydrated]').waitFor();
 
     const trigger = page.getByRole('button', { name: 'Toggle Menu' });
     await trigger.click();

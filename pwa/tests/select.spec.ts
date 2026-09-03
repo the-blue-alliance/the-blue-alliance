@@ -10,7 +10,7 @@ test('teams page selector shows range labels, not raw page numbers', async ({
   page,
 }) => {
   await page.goto('/teams/2');
-  await page.waitForLoadState('networkidle');
+  await page.locator('body[data-hydrated]').waitFor();
 
   // The trigger renders the selected item's label ("1000s"), not the raw
   // value ("2")
@@ -23,7 +23,7 @@ test('teams page selector opens a list taller than the trigger', async ({
   page,
 }) => {
   await page.goto('/teams');
-  await page.waitForLoadState('networkidle');
+  await page.locator('body[data-hydrated]').waitFor();
 
   const trigger = page.getByRole('combobox');
   await expect(trigger).toContainText('1-999');
@@ -43,7 +43,7 @@ test('events page district selector shows "All Events" label', async ({
   page,
 }) => {
   await page.goto('/events');
-  await page.waitForLoadState('networkidle');
+  await page.locator('body[data-hydrated]').waitFor();
 
   // The trigger renders the "All Events" label, not the raw value "all"
   const trigger = page.getByRole('combobox').filter({ hasText: 'All Events' });
