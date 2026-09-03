@@ -22,7 +22,7 @@ import {
 import { pluralize } from '~/lib/utils';
 
 const CHART_COLORS = [
-  'var(--color-chart-1)',
+  'var(--color-brand)',
   'var(--color-chart-2)',
   'var(--color-chart-3)',
   'var(--color-chart-4)',
@@ -232,6 +232,7 @@ export function TimeseriesInsight({
             <LineChart
               accessibilityLayer
               data={rows}
+              margin={{ top: 5, right: 5, bottom: 5, left: -8 }}
               onClick={(state) => {
                 if (!usePostResultTime) {
                   return;
@@ -267,6 +268,8 @@ export function TimeseriesInsight({
                   value: timeseries.data.y_label,
                   angle: -90,
                   position: 'insideLeft',
+                  dx: 8,
+                  style: { textAnchor: 'middle' },
                 }}
               />
               {timeseries.data.series.map((series, i) => (
