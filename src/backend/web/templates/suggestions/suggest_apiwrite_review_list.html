@@ -79,7 +79,7 @@
                 </ul>
 
             <h4>Key Expiration</h4>
-            <p>Number of days after the event to keep key valid:</p>
+            <p>Number of days after the event, or days after the key is granted &mdash; whichever is later:</p>
             <select name="expiration_days">
                 {% for offset, expiration in dates.expiration_options %}
                 <option value="{{ offset }}"{% if offset == 7 %} selected{% endif %}>
@@ -87,11 +87,6 @@
                 </option>
                 {% endfor %}
             </select>
-            <p class="help-block">
-              A key is always valid for at least the selected number of days
-              <em>from now</em>, so granting one long after an event has ended still
-              produces a usable key.
-            </p>
 
             <h4>Existing Keys for This Event</h4>
             {% for auth,user in existing_users %}
