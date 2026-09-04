@@ -3,9 +3,9 @@
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.23.0",
+    "version": "3.24.0",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.23.0: Add `cmp_qualification` to District_Advancement_Cutoffs on /district/{district_key}/advancement, a mapping of team key to CmpQualificationMethod. This is the same data already projected onto each entry in `teams`, surfaced under `cutoffs` as well because it is computed by TBA from rankings, events and awards rather than sourced from the per-team advancement feed, and so is available even when `teams` is empty. 3.22.1: Fix /district/{district_key}/advancement returning `teams: null` for a district whose advancement has been fetched but is empty; it now returns an empty object, and `null` is reserved for advancement that has never been fetched. 3.22.0: Adds CMP/DCMP qualification cutoffs and methods. 3.21.0: Add the `date` value to the InsightV2 timeseries `x_type` enum. When `x_type` is `date`, each data point's `x` is a Unix timestamp (seconds) at UTC midnight of that day. Adds the `cumulative_matches_by_day` timeseries insight (per-year, `x_type` `date`), tracking the running cumulative count of played matches over the course of a season. 3.20.0: Add the `clubs` InsightV2 category, returning cumulative all-time memberships of teams that reached a milestone. Each member has an `event_added_key` (where the team first qualified) and an optional club-specific `extra_context`. The first club is `hall_of_fame` - teams that won the Impact/Chairman's Award at Championship finals, with `extra_context` carrying the Chairman's video, presentation, and essay links. Adds InsightV2_Clubs, InsightV2_Clubs_Extras, InsightV2ClubsData, InsightV2ClubEntry, and InsightV2HallOfFameContext schemas, and adds `clubs` to the InsightV2 category path parameter enum. 3.19.0: Add `kickoff_datetime` to API_Status, an ISO 8601 UTC datetime for the upcoming season's FRC Kickoff. 3.18.0: Rename the InsightV2 `success_rate` category to `game_stats`, and add `qual_averages`/`playoff_averages` to each InsightV2GameStatsScope - non-binary average statistics (e.g. average score, average win margin) for a season overall, per competition week, and per event, alongside the existing count/opportunities statistics. Renames InsightV2_SuccessRate, InsightV2_SuccessRate_Extras, InsightV2SuccessRateData, InsightV2SuccessRateScope, and InsightV2SuccessRateEntry to InsightV2_GameStats, InsightV2_GameStats_Extras, InsightV2GameStatsData, InsightV2GameStatsScope, and InsightV2GameStat respectively, and adds the InsightV2AverageStat schema. 3.17.1: Add success_rate to the InsightV2 category path parameter enum, so /insights/{year}/{category} and its district variant document the category the API already serves. 3.17.0: Add the `success_rate` InsightV2 category, returning count/opportunities statistics (bonus ranking points and game-specific objectives) for a season overall, per competition week, and per event. Adds InsightV2_SuccessRate, InsightV2SuccessRateData, InsightV2SuccessRateScope, and InsightV2SuccessRate schemas. 3.16.0: Add /event/{event_key}/nexus_info endpoint, returning cached live match-queuing info sourced from Nexus (https://frc.nexus/) for an event, or null if unavailable. Adds Nexus_Event_Info, Nexus_Now_Queueing, Nexus_Match_Info, and Nexus_Match_Timing schemas. 3.15.0: Add InsightV2 endpoints and schemas. Introduces /insights/{year}, /insights/{year}/{category}, /insights/{year}/district/{district_abbreviation}, and /insights/{year}/{category}/district/{district_abbreviation} routes returning typed InsightV2 objects with leaderboard, streak, and timeseries categories. Use year=0 for all-time insights. 3.14.0: Introduce named string enum schemas (AllianceColor, WebcastStatus). Webcast.status now references the WebcastStatus schema. AllianceColor includes red, blue, and empty string for no winner or tie; Match.winning_alliance references AllianceColor. Wire values are unchanged; clients regenerated against the spec get correctly-named enum members. 3.13.0: Introduce named integer enum schemas (AwardType, EventType, PlayoffType) using OpenAPI 3.1.1's annotated-enumeration pattern (`oneOf` of `const` branches with per-branch titles). The `award_type`, `event_type`, and `playoff_type` fields now reference these schemas. Integer values on the wire are unchanged; clients regenerated against the spec get value constraints, and Swagger UI renders the value->name mapping inline. 3.12.2: Renames District `highest_qual_scores` tiebreaker to `highest_match_scores` to more accurately reflect district rankings. 3.12.1: Add pit_location to Team_Event_Status. 3.12.0: Add 2026 score breakdowns. 3.11.0: Deprecate Event.lat, Event.lng, Event.gmaps_place_id, Event.gmaps_url. Event models will no longer be geocoded. Moving forward, these fields will return null. Eventually these fields will be removed. Event.address will now return FRC-API address, and Event.location_name will return FRC-API venue. 3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.24.0: Add the `smugmug-photo` and `smugmug-album` media types, for SmugMug photos and galleries. A `smugmug-photo` may be attached to a team; a `smugmug-album` may be attached to a team or an event, but not both. A `smugmug-album`'s details carry `cover_url`/`cover_url_med`/`cover_url_sm` for the album's cover image. Adds the Media_SmugmugPhoto and Media_SmugmugAlbum schemas. 3.23.0: Add `cmp_qualification` to District_Advancement_Cutoffs on /district/{district_key}/advancement, a mapping of team key to CmpQualificationMethod. This is the same data already projected onto each entry in `teams`, surfaced under `cutoffs` as well because it is computed by TBA from rankings, events and awards rather than sourced from the per-team advancement feed, and so is available even when `teams` is empty. 3.22.1: Fix /district/{district_key}/advancement returning `teams: null` for a district whose advancement has been fetched but is empty; it now returns an empty object, and `null` is reserved for advancement that has never been fetched. 3.22.0: Adds CMP/DCMP qualification cutoffs and methods. 3.21.0: Add the `date` value to the InsightV2 timeseries `x_type` enum. When `x_type` is `date`, each data point's `x` is a Unix timestamp (seconds) at UTC midnight of that day. Adds the `cumulative_matches_by_day` timeseries insight (per-year, `x_type` `date`), tracking the running cumulative count of played matches over the course of a season. 3.20.0: Add the `clubs` InsightV2 category, returning cumulative all-time memberships of teams that reached a milestone. Each member has an `event_added_key` (where the team first qualified) and an optional club-specific `extra_context`. The first club is `hall_of_fame` - teams that won the Impact/Chairman's Award at Championship finals, with `extra_context` carrying the Chairman's video, presentation, and essay links. Adds InsightV2_Clubs, InsightV2_Clubs_Extras, InsightV2ClubsData, InsightV2ClubEntry, and InsightV2HallOfFameContext schemas, and adds `clubs` to the InsightV2 category path parameter enum. 3.19.0: Add `kickoff_datetime` to API_Status, an ISO 8601 UTC datetime for the upcoming season's FRC Kickoff. 3.18.0: Rename the InsightV2 `success_rate` category to `game_stats`, and add `qual_averages`/`playoff_averages` to each InsightV2GameStatsScope - non-binary average statistics (e.g. average score, average win margin) for a season overall, per competition week, and per event, alongside the existing count/opportunities statistics. Renames InsightV2_SuccessRate, InsightV2_SuccessRate_Extras, InsightV2SuccessRateData, InsightV2SuccessRateScope, and InsightV2SuccessRateEntry to InsightV2_GameStats, InsightV2_GameStats_Extras, InsightV2GameStatsData, InsightV2GameStatsScope, and InsightV2GameStat respectively, and adds the InsightV2AverageStat schema. 3.17.1: Add success_rate to the InsightV2 category path parameter enum, so /insights/{year}/{category} and its district variant document the category the API already serves. 3.17.0: Add the `success_rate` InsightV2 category, returning count/opportunities statistics (bonus ranking points and game-specific objectives) for a season overall, per competition week, and per event. Adds InsightV2_SuccessRate, InsightV2SuccessRateData, InsightV2SuccessRateScope, and InsightV2SuccessRate schemas. 3.16.0: Add /event/{event_key}/nexus_info endpoint, returning cached live match-queuing info sourced from Nexus (https://frc.nexus/) for an event, or null if unavailable. Adds Nexus_Event_Info, Nexus_Now_Queueing, Nexus_Match_Info, and Nexus_Match_Timing schemas. 3.15.0: Add InsightV2 endpoints and schemas. Introduces /insights/{year}, /insights/{year}/{category}, /insights/{year}/district/{district_abbreviation}, and /insights/{year}/{category}/district/{district_abbreviation} routes returning typed InsightV2 objects with leaderboard, streak, and timeseries categories. Use year=0 for all-time insights. 3.14.0: Introduce named string enum schemas (AllianceColor, WebcastStatus). Webcast.status now references the WebcastStatus schema. AllianceColor includes red, blue, and empty string for no winner or tie; Match.winning_alliance references AllianceColor. Wire values are unchanged; clients regenerated against the spec get correctly-named enum members. 3.13.0: Introduce named integer enum schemas (AwardType, EventType, PlayoffType) using OpenAPI 3.1.1's annotated-enumeration pattern (`oneOf` of `const` branches with per-branch titles). The `award_type`, `event_type`, and `playoff_type` fields now reference these schemas. Integer values on the wire are unchanged; clients regenerated against the spec get value constraints, and Swagger UI renders the value->name mapping inline. 3.12.2: Renames District `highest_qual_scores` tiebreaker to `highest_match_scores` to more accurately reflect district rankings. 3.12.1: Add pit_location to Team_Event_Status. 3.12.0: Add 2026 score breakdowns. 3.11.0: Deprecate Event.lat, Event.lng, Event.gmaps_place_id, Event.gmaps_url. Event models will no longer be geocoded. Moving forward, these fields will return null. Eventually these fields will be removed. Event.address will now return FRC-API address, and Event.location_name will return FRC-API venue. 3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -10153,6 +10153,12 @@
           },
           {
             "$ref": "#/components/schemas/Media_Onshape"
+          },
+          {
+            "$ref": "#/components/schemas/Media_SmugmugAlbum"
+          },
+          {
+            "$ref": "#/components/schemas/Media_SmugmugPhoto"
           }
         ],
         "discriminator": {
@@ -10173,7 +10179,9 @@
             "gitlab-profile": "#/components/schemas/Media_NoDetails",
             "instagram-image": "#/components/schemas/Media_NoDetails",
             "external-link": "#/components/schemas/Media_NoDetails",
-            "onshape": "#/components/schemas/Media_Onshape"
+            "onshape": "#/components/schemas/Media_Onshape",
+            "smugmug-album": "#/components/schemas/Media_SmugmugAlbum",
+            "smugmug-photo": "#/components/schemas/Media_SmugmugPhoto"
           }
         },
         "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA."
@@ -10234,7 +10242,9 @@
               "external-link",
               "avatar",
               "onshape",
-              "cd-thread"
+              "cd-thread",
+              "smugmug-photo",
+              "smugmug-album"
             ]
           },
           "foreign_key": {
@@ -10434,6 +10444,106 @@
                   },
                   "model_name": {
                     "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_SmugmugAlbum": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "smugmug-album"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "cover_url",
+                  "cover_url_med",
+                  "cover_url_sm",
+                  "image_count",
+                  "title",
+                  "web_uri"
+                ],
+                "properties": {
+                  "cover_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cover_url_med": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cover_url_sm": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "image_count": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "web_uri": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_SmugmugPhoto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "smugmug-photo"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "caption",
+                  "image_url",
+                  "image_url_med",
+                  "image_url_sm",
+                  "title",
+                  "web_uri"
+                ],
+                "properties": {
+                  "caption": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "image_url_med": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "image_url_sm": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "web_uri": {
+                    "type": "string",
+                    "format": "uri"
                   }
                 }
               }

@@ -625,6 +625,8 @@ export {
   type MediaGrabCad,
   type MediaNoDetails,
   type MediaOnshape,
+  type MediaSmugmugAlbum,
+  type MediaSmugmugPhoto,
   type MediaTag,
   MobilityRobot2023,
   type NexusEventInfo,

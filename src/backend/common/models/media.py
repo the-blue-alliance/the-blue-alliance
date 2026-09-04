@@ -185,6 +185,8 @@ class Media(CachedModel):
             return self.instagram_url
         elif self.media_type_enum == MediaType.CD_THREAD:
             return "https://www.chiefdelphi.com/t/{}".format(self.foreign_key)
+        elif self.media_type_enum in {MediaType.SMUGMUG_PHOTO, MediaType.SMUGMUG_ALBUM}:
+            return none_throws(self.details)["web_uri"]
         else:
             return ""
 
@@ -205,6 +207,8 @@ class Media(CachedModel):
             )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
+        elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
+            return none_throws(self.details)["image_url"]
         else:
             return ""
 
@@ -240,6 +244,8 @@ class Media(CachedModel):
             return none_throws(self.details)["model_image"]
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
+        elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
+            return none_throws(self.details)["image_url_med"]
         else:
             return ""
 
@@ -259,6 +265,8 @@ class Media(CachedModel):
             )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
+        elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
+            return none_throws(self.details)["image_url_sm"]
         else:
             return ""
 
