@@ -293,7 +293,7 @@
           <hr>
           <a class="btn btn-success pull-right" href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer"><span class="glyphicon glyphicon-plus"></span> Add Media!</a>
           <h2 id="media">Photos &amp; Videos</h2>
-          {% if image_medias or medias_by_slugname.youtube %}
+          {% if image_medias or medias_by_slugname.youtube or medias_by_slugname['smugmug-album'] %}
             <div class="row">
               <div class="col-xs-12">
                 {% if image_medias %}
@@ -321,6 +321,19 @@
                 {% endif %}
               </div>
             </div>
+
+            {% if medias_by_slugname['smugmug-album'] %}
+            <div class="row">
+              <div class="col-xs-12">
+                <h3 id="photo-galleries">Photo Galleries</h3>
+                {% for media in medias_by_slugname['smugmug-album'] %}
+                  <div class="col-xs-6 col-sm-3">
+                    {% include "media_partials/media_display_partial.html" %}
+                  </div>
+                {% endfor %}
+              </div>
+            </div>
+            {% endif %}
           {% else %}
             <p>No photos or videos for team {{team.team_number}} from {{year}}... <a href="/suggest/team/media?team_key={{team.key_name}}&year={{year}}" target="_blank" rel="noopener noreferrer">Why not add one</a>?</p>
           {% endif %}

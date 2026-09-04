@@ -98,6 +98,7 @@ class SuggestTeamMediaReviewController(SuggestionsReviewBase[Media]):
                 suggestions_and_references_and_preferred
             ),
             "max_preferred": Media.MAX_PREFERRED,
+            "image_types": IMAGE_TYPES,
         }
 
         return render_template(

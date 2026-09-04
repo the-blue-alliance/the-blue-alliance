@@ -283,6 +283,51 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         ).get_result()
         self.assertEqual(status, "bad_url")
 
+    def _patch_smugmug(self, response):
+        return patch.object(
+            MediaParser,
+            "_parse_smugmug",
+            return_value=InstantFuture(response),
+        )
+
+    def test_create_album_suggestion(self) -> None:
+        album_dict = {
+            "media_type_enum": MediaType.SMUGMUG_ALBUM,
+            "is_social": False,
+            "foreign_key": "4RWMLM",
+            "site_name": "SmugMug Album",
+        }
+        url = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
+        with self._patch_smugmug(album_dict):
+            status, _ = SuggestionCreator.createEventMediaSuggestion(
+                self.account.key, url, "2016nyny"
+            ).get_result()
+        self.assertEqual(status, "success")
+
+        suggestion = Suggestion.get_by_id(
+            Suggestion.render_media_key_name(
+                2016, "event", "2016nyny", "smugmug-album", "4RWMLM"
+            )
+        )
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.target_model, "event_media")
+        self.assertEqual(suggestion.contents["reference_type"], "event")
+        self.assertEqual(suggestion.contents["reference_key"], "2016nyny")
+
+    def test_create_photo_suggestion_rejected(self) -> None:
+        photo_dict = {
+            "media_type_enum": MediaType.SMUGMUG_PHOTO,
+            "is_social": False,
+            "foreign_key": "xxrbgK6",
+            "site_name": "SmugMug Photo",
+        }
+        url = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6/A"
+        with self._patch_smugmug(photo_dict):
+            status, _ = SuggestionCreator.createEventMediaSuggestion(
+                self.account.key, url, "2016nyny"
+            ).get_result()
+        self.assertEqual(status, "bad_url")
+
 
 class TestOffseasonEventSuggestionCreator(SuggestionCreatorTest):
     def test_create_suggestion(self) -> None:

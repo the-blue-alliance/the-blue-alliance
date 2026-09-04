@@ -7,7 +7,11 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
-from backend.common.consts.media_type import MediaType, ROBOT_TYPES, SLUG_NAMES
+from backend.common.consts.media_type import (
+    EVENT_MEDIA_TYPES,
+    ROBOT_TYPES,
+    SLUG_NAMES,
+)
 from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
@@ -128,7 +132,7 @@ class SuggestionCreator:
 
         media_dict = yield MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
-            if media_dict["media_type_enum"] != MediaType.YOUTUBE_VIDEO:
+            if media_dict["media_type_enum"] not in EVENT_MEDIA_TYPES:
                 return SuggestionCreationStatus.BAD_URL, None
 
             existing_media = Media.get_by_id(

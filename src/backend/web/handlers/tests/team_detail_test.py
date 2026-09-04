@@ -1,14 +1,19 @@
 import json
+from typing import Generator
 
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
+from backend.common.models.media import Media
+from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
 
@@ -216,3 +221,103 @@ def test_schema_org_sports_team_full_data(web_client: Client, setup_full_team) -
     assert sports_team_schema["location"]["address"]["addressLocality"] == "Greenville"
     assert sports_team_schema["location"]["address"]["addressRegion"] == "Texas"
     assert sports_team_schema["location"]["address"]["addressCountry"] == "USA"
+
+
+@ndb.synctasklet
+def preseed_smugmug_photo(team_number: int, year: int) -> Generator:
+    yield Media(
+        id="smugmug-photo_xxrbgK6",
+        media_type_enum=MediaType.SMUGMUG_PHOTO,
+        foreign_key="xxrbgK6",
+        year=year,
+        details_json=json.dumps(
+            {
+                "title": "Robot on the field",
+                "caption": "",
+                "web_uri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+                "image_url": "https://photos.smugmug.com/L/x-L.jpg",
+                "image_url_med": "https://photos.smugmug.com/M/x-M.jpg",
+                "image_url_sm": "https://photos.smugmug.com/S/x-S.jpg",
+            }
+        ),
+        references=[ndb.Key(Team, f"frc{team_number}")],
+    ).put_async()
+
+
+def test_smugmug_photo_in_gallery(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    preseed_smugmug_photo(254, 2020)
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    thumbnail = soup.find(
+        "a", class_="gallery", href="https://photos.smugmug.com/L/x-L.jpg"
+    )
+    assert thumbnail is not None
+    assert "https://photos.smugmug.com/M/x-M.jpg" in thumbnail.find("span")["style"]
+
+    caption = soup.find(
+        "a",
+        href="https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+    )
+    assert caption is not None
+    assert caption.text == "Robot on the field"
+
+
+@ndb.synctasklet
+def preseed_smugmug_album(team_number: int, year: int) -> Generator:
+    yield Media(
+        id="smugmug-album_4RWMLM",
+        media_type_enum=MediaType.SMUGMUG_ALBUM,
+        foreign_key="4RWMLM",
+        year=year,
+        details_json=json.dumps(
+            {
+                "title": "2026 FIRST Championship - BAE Systems",
+                "web_uri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE",
+                "image_count": 81,
+                "cover_url": "https://photos.smugmug.com/L/cover-L.png",
+                "cover_url_med": "https://photos.smugmug.com/M/cover-M.png",
+                "cover_url_sm": "https://photos.smugmug.com/S/cover-S.png",
+            }
+        ),
+        references=[ndb.Key(Team, f"frc{team_number}")],
+    ).put_async()
+
+
+def test_smugmug_album_in_photo_galleries(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    preseed_smugmug_album(254, 2020)
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    assert soup.find(id="photo-galleries") is not None
+
+    links = soup.find_all(
+        "a", href="https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
+    )
+    assert len(links) == 2
+
+    cover, caption = links
+    assert "https://photos.smugmug.com/M/cover-M.png" in cover.find("span")["style"]
+    assert caption.text == "2026 FIRST Championship - BAE Systems"
+    assert "81 photos" in caption.parent.text
+
+    # An album alone must not fall through to the empty-media message
+    assert "No photos or videos for team" not in resp.get_data(as_text=True)
+
+
+def test_no_smugmug_album(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find(id="photo-galleries") is None

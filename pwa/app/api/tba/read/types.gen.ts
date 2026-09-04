@@ -2543,7 +2543,13 @@ export type Media =
     } & MediaNoDetails)
   | ({
       type: 'onshape';
-    } & MediaOnshape);
+    } & MediaOnshape)
+  | ({
+      type: 'smugmug-album';
+    } & MediaSmugmugAlbum)
+  | ({
+      type: 'smugmug-photo';
+    } & MediaSmugmugPhoto);
 
 export type MediaAvatar = MediaBase & MediaAvatarExtras;
 
@@ -2574,7 +2580,9 @@ export type MediaBase = {
     | 'external-link'
     | 'avatar'
     | 'onshape'
-    | 'cd-thread';
+    | 'cd-thread'
+    | 'smugmug-photo'
+    | 'smugmug-album';
   /**
    * The key used to identify this media on the media site.
    */
@@ -2645,6 +2653,30 @@ export type MediaOnshape = MediaBase & {
     model_description: string | null;
     model_image: string;
     model_name: string;
+  };
+};
+
+export type MediaSmugmugAlbum = MediaBase & {
+  type?: 'smugmug-album';
+  details?: {
+    cover_url: string;
+    cover_url_med: string;
+    cover_url_sm: string;
+    image_count: number;
+    title: string;
+    web_uri: string;
+  };
+};
+
+export type MediaSmugmugPhoto = MediaBase & {
+  type?: 'smugmug-photo';
+  details?: {
+    caption: string;
+    image_url: string;
+    image_url_med: string;
+    image_url_sm: string;
+    title: string;
+    web_uri: string;
   };
 };
 
