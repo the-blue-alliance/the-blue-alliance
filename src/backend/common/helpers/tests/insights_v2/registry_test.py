@@ -247,3 +247,31 @@ def test_hall_of_fame_club_only_for_all_time(mock_calc, mock_compute) -> None:
 def test_hall_of_fame_club_not_for_specific_year(mock_calc, mock_compute) -> None:
     make_all_insights(2024)
     mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.WorldChampionshipWinnersClubV2Calculator"
+)
+def test_world_championship_winners_club_only_for_all_time(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(0)
+    mock_calc.assert_called_once_with()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.WorldChampionshipWinnersClubV2Calculator"
+)
+def test_world_championship_winners_club_not_for_specific_year(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(2024)
+    mock_calc.assert_not_called()

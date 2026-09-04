@@ -10,6 +10,9 @@ from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.clubs.hall_of_fame import (
     HallOfFameClubV2Calculator,
 )
+from backend.common.helpers.insights_v2.clubs.world_championship_winners import (
+    WorldChampionshipWinnersClubV2Calculator,
+)
 from backend.common.helpers.insights_v2.game_stats.calculator import (
     GameStatsV2Calculator,
 )
@@ -182,6 +185,7 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             LongestWinStreakV2Calculator(),
             NumMatchesByYearV2Calculator(),
             HallOfFameClubV2Calculator(),
+            WorldChampionshipWinnersClubV2Calculator(),
         ]
     else:
         calculators += [

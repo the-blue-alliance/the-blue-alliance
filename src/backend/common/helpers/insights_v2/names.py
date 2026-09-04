@@ -93,3 +93,6 @@ class InsightV2Names:
 
     # Clubs
     HALL_OF_FAME = InsightV2NameEntry("hall_of_fame", "Hall of Fame")
+    WORLD_CHAMPIONSHIP_WINNERS = InsightV2NameEntry(
+        "world_championship_winners", "World Championship Winners"
+    )
