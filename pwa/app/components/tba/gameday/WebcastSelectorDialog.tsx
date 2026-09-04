@@ -147,6 +147,16 @@ export function WebcastSelectorDialog({
   );
 }
 
+function WebcastStatusIcon({ status }: { status?: WebcastStatus }) {
+  if (status === WebcastStatus.ONLINE) {
+    return <VideoIcon className="h-4 w-4 shrink-0 text-green-500" />;
+  }
+  if (status === WebcastStatus.OFFLINE) {
+    return <VideoOffIcon className="h-4 w-4 shrink-0 text-muted-foreground" />;
+  }
+  return <HelpCircleIcon className="h-4 w-4 shrink-0 text-muted-foreground" />;
+}
+
 function WebcastItem({
   webcast,
   onClick,
@@ -155,22 +165,6 @@ function WebcastItem({
   onClick: () => void;
 }) {
   const status = webcast.webcast.status;
-
-  // Determine the status icon
-  const StatusIcon = () => {
-    if (status === WebcastStatus.ONLINE) {
-      return <VideoIcon className="h-4 w-4 shrink-0 text-green-500" />;
-    }
-    if (status === WebcastStatus.OFFLINE) {
-      return (
-        <VideoOffIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-      );
-    }
-    // Unknown status
-    return (
-      <HelpCircleIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-    );
-  };
 
   // Secondary text: stream title for online streams
   const secondaryText =
@@ -205,7 +199,7 @@ function WebcastItem({
               <div>Viewers</div>
             </div>
           )}
-        <StatusIcon />
+        <WebcastStatusIcon status={status} />
       </div>
     </button>
   );

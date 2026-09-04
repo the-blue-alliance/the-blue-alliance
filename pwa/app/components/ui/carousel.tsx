@@ -121,6 +121,7 @@ const Carousel = forwardRef<
         return;
       }
 
+      // eslint-disable-next-line react/set-state-in-effect -- syncing initial scroll state from the embla API
       onSelect(api);
       api.on('reInit', onSelect);
       api.on('select', onSelect);

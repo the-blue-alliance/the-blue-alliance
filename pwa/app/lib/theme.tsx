@@ -55,6 +55,7 @@ export function ThemeProvider({ children }: { children: React.ReactNode }) {
   // Initialize theme from localStorage on mount
   useEffect(() => {
     const storedTheme = getStoredTheme();
+    // eslint-disable-next-line react/set-state-in-effect -- deferred by design: no localStorage on the server, must match SSR during hydration
     setThemeState(storedTheme);
     const resolved = applyTheme(storedTheme);
     setResolvedTheme(resolved);

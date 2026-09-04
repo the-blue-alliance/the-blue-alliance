@@ -45,6 +45,7 @@ describe.concurrent('initialState', () => {
     expect(initialState.chatSidebarVisible).toBe(true);
     expect(initialState.currentChat).toBe('funroboticsnetwork');
     expect(initialState.webcastsById).toEqual({});
+    expect(initialState.hasRestoredUrlState).toBe(false);
   });
 });
 
@@ -430,6 +431,21 @@ describe.concurrent('RESTORE_URL_STATE action', () => {
       urlState,
     });
     expect(state.currentChat).toBe('existing-chat');
+  });
+
+  test('marks URL state as restored', () => {
+    const urlState: GamedayUrlState = {
+      layoutId: null,
+      positionToWebcast: createEmptyPositionArray(),
+      chatSidebarVisible: true,
+      currentChat: '',
+    };
+
+    const state = gamedayReducer(initialState, {
+      type: 'RESTORE_URL_STATE',
+      urlState,
+    });
+    expect(state.hasRestoredUrlState).toBe(true);
   });
 });
 
