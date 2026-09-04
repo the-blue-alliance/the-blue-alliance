@@ -1793,7 +1793,7 @@ export const getInsightsV2Year = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategory = <ThrowOnError extends boolean = false>(
   options: Options<GetInsightsV2YearCategoryData, ThrowOnError>,
@@ -1855,7 +1855,7 @@ export const getInsightsV2YearDistrict = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryDistrict = <
   ThrowOnError extends boolean = false,

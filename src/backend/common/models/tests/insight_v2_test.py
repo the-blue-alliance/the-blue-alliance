@@ -54,3 +54,10 @@ def test_render_key_name_game_stats() -> None:
         InsightV2.render_key_name(2026, InsightCategory.GAME_STATS, "game_stats")
         == "2026_v2_game_stats_game_stats"
     )
+
+
+def test_render_key_name_clubs() -> None:
+    assert (
+        InsightV2.render_key_name(0, InsightCategory.CLUBS, "hall_of_fame")
+        == "0_v2_clubs_hall_of_fame"
+    )
