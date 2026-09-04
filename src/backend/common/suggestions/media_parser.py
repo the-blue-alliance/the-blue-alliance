@@ -14,6 +14,7 @@ from backend.common.consts.media_type import (
 )
 from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.sitevars.cd_request_user_agent import CdRequestUserAgent
+from backend.common.sitevars.smugmug_api_secret import SmugmugApiSecret
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchResult
 
@@ -75,6 +76,8 @@ class MediaParser:
         ("grabcad.com/library/", MediaType.GRABCAD),
         ("cad.onshape.com/documents/", MediaType.ONSHAPE),
         ("instagram.com/p/", MediaType.INSTAGRAM_IMAGE),
+        # The API resolves photo vs album, so the type here is only a routing hint
+        ("smugmug.com/", MediaType.SMUGMUG_PHOTO),
         # Keep these last, so they don't greedy match over other more specific urls
         ("youtube.com/", MediaType.YOUTUBE_CHANNEL),
         ("instagram.com/", MediaType.INSTAGRAM_PROFILE),
@@ -89,6 +92,8 @@ class MediaParser:
     GRABCAD_DETAIL_URL = (
         "https://grabcad.com/community/api/v1/models/{}"  # Format w/ foreign key
     )
+    SMUGMUG_WEBURI_LOOKUP_URL = "https://api.smugmug.com/api/v2!weburilookup"
+
     ONSHAPE_DETAIL_URL = (
         "https://cad.onshape.com/api/documents/{}"  # Format w/ stripped foreign key
     )
@@ -125,6 +130,9 @@ class MediaParser:
                     return result
                 elif media_type == MediaType.CD_THREAD:
                     result = yield cls._parse_cd_thread(url)
+                    return result
+                elif media_type == MediaType.SMUGMUG_PHOTO:
+                    result = yield cls._parse_smugmug(url)
                     return result
                 else:
                     raise ndb.Return(cls._create_media_dict(media_type, url))
@@ -435,3 +443,141 @@ class MediaParser:
         )
 
         raise ndb.Return(media_dict)
+
+    @classmethod
+    @typed_tasklet
+    def _parse_smugmug(cls, url: str) -> Generator[Any, Any, Optional[SuggestionDict]]:
+        api_key = SmugmugApiSecret.api_key()
+        if not api_key:
+            logging.warning("No SmugMug API key! Configure SmugmugApiSecret sitevar")
+            raise ndb.Return(None)
+
+        web_uri = cls._sanitize_media_url(MediaType.SMUGMUG_PHOTO, url)
+        lookup_url = "{}?{}".format(
+            cls.SMUGMUG_WEBURI_LOOKUP_URL,
+            urlencode(
+                {
+                    "WebUri": web_uri,
+                    "APIKey": api_key,
+                    "_expand": "ImageSizeDetails,AlbumHighlightImage.ImageSizeDetails",
+                }
+            ),
+        )
+
+        ndb_context = ndb.get_context()
+        urlfetch_response = yield ndb_context.urlfetch(
+            lookup_url, deadline=10, headers={"Accept": "application/json"}
+        )
+        urlfetch_result = URLFetchResult(lookup_url, urlfetch_response)
+
+        if urlfetch_result.status_code != 200:
+            logging.warning(
+                "Unable to retreive url: {} (status code: {})".format(
+                    cls.SMUGMUG_WEBURI_LOOKUP_URL, urlfetch_result.status_code
+                )
+            )
+            raise ndb.Return(None)
+
+        smugmug_data = cls._as_dict(urlfetch_result.json())
+        response = cls._as_dict(smugmug_data.get("Response"))
+        if not response:
+            logging.warning("No data returned for SmugMug url: {}".format(web_uri))
+            raise ndb.Return(None)
+
+        # A url that doesn't resolve still returns a 200, with a Locator naming every
+        # type it could have been and no object alongside it
+        locator = response.get("Locator")
+        expansions = cls._as_dict(smugmug_data.get("Expansions"))
+        if locator == "Album":
+            media_dict = cls._smugmug_album_dict(
+                cls._as_dict(response.get("Album")), expansions
+            )
+        elif locator == "AlbumImage":
+            media_dict = cls._smugmug_photo_dict(
+                cls._as_dict(response.get("AlbumImage")), expansions
+            )
+        else:
+            logging.warning(
+                "SmugMug url is neither an album nor a photo: {} (locator: {})".format(
+                    web_uri, locator
+                )
+            )
+            raise ndb.Return(None)
+
+        raise ndb.Return(media_dict)
+
+    @staticmethod
+    def _as_dict(value: Any) -> Dict:
+        return value if isinstance(value, dict) else {}
+
+    @classmethod
+    def _smugmug_size_urls(cls, expansions: Dict) -> Dict[str, str]:
+        """
+        Every size carries its own signature, so the urls can't be derived from each
+        other - they only come from the ImageSizeDetails expansion. For an album that
+        expansion belongs to its highlight (cover) image.
+        """
+        size_details: Dict = {}
+        for expansion in expansions.values():
+            size_details = cls._as_dict(cls._as_dict(expansion).get("ImageSizeDetails"))
+            if size_details:
+                break
+
+        return {
+            size: cls._as_dict(size_details.get(size)).get("Url", "")
+            for size in ("ImageSizeSmall", "ImageSizeMedium", "ImageSizeLarge")
+        }
+
+    @classmethod
+    def _smugmug_album_dict(
+        cls, album: Dict, expansions: Dict
+    ) -> Optional[SuggestionDict]:
+        album_key = album.get("AlbumKey")
+        if not album_key:
+            logging.warning("SmugMug album response is missing an AlbumKey")
+            return None
+
+        size_urls = cls._smugmug_size_urls(expansions)
+        return {
+            "media_type_enum": MediaType.SMUGMUG_ALBUM,
+            "is_social": False,
+            "foreign_key": album_key,
+            "site_name": TYPE_NAMES[MediaType.SMUGMUG_ALBUM],
+            "details_json": json.dumps(
+                {
+                    "title": album.get("Title") or album.get("Name", ""),
+                    "web_uri": album.get("WebUri", ""),
+                    "image_count": album.get("ImageCount", 0),
+                    "cover_url": size_urls["ImageSizeLarge"],
+                    "cover_url_med": size_urls["ImageSizeMedium"],
+                    "cover_url_sm": size_urls["ImageSizeSmall"],
+                }
+            ),
+        }
+
+    @classmethod
+    def _smugmug_photo_dict(
+        cls, image: Dict, expansions: Dict
+    ) -> Optional[SuggestionDict]:
+        image_key = image.get("ImageKey")
+        if not image_key:
+            logging.warning("SmugMug image response is missing an ImageKey")
+            return None
+
+        size_urls = cls._smugmug_size_urls(expansions)
+        return {
+            "media_type_enum": MediaType.SMUGMUG_PHOTO,
+            "is_social": False,
+            "foreign_key": image_key,
+            "site_name": TYPE_NAMES[MediaType.SMUGMUG_PHOTO],
+            "details_json": json.dumps(
+                {
+                    "title": image.get("Title", ""),
+                    "caption": image.get("Caption", ""),
+                    "web_uri": image.get("WebUri", ""),
+                    "image_url": size_urls["ImageSizeLarge"],
+                    "image_url_med": size_urls["ImageSizeMedium"],
+                    "image_url_sm": size_urls["ImageSizeSmall"],
+                }
+            ),
+        }

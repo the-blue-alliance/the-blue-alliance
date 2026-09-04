@@ -816,6 +816,8 @@ export const zMediaBase = z.object({
     'avatar',
     'onshape',
     'cd-thread',
+    'smugmug-photo',
+    'smugmug-album',
   ]),
   foreign_key: z.string(),
   preferred: z.boolean().optional(),
@@ -893,6 +895,38 @@ export const zMediaOnshape = zMediaBase.and(
         model_description: z.string().nullable(),
         model_image: z.url(),
         model_name: z.string(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaSmugmugAlbum = zMediaBase.and(
+  z.object({
+    type: z.literal('smugmug-album').optional(),
+    details: z
+      .object({
+        cover_url: z.url(),
+        cover_url_med: z.url(),
+        cover_url_sm: z.url(),
+        image_count: z.int(),
+        title: z.string(),
+        web_uri: z.url(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaSmugmugPhoto = zMediaBase.and(
+  z.object({
+    type: z.literal('smugmug-photo').optional(),
+    details: z
+      .object({
+        caption: z.string(),
+        image_url: z.url(),
+        image_url_med: z.url(),
+        image_url_sm: z.url(),
+        title: z.string(),
+        web_uri: z.url(),
       })
       .optional(),
   }),
@@ -982,6 +1016,16 @@ export const zMedia = z.union([
       type: z.literal('onshape'),
     })
     .and(zMediaOnshape),
+  z
+    .object({
+      type: z.literal('smugmug-album'),
+    })
+    .and(zMediaSmugmugAlbum),
+  z
+    .object({
+      type: z.literal('smugmug-photo'),
+    })
+    .and(zMediaSmugmugPhoto),
 ]);
 
 export const zMobilityRobot2023 = z.enum(['No', 'Yes']);

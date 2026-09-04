@@ -15,4 +15,8 @@
     {% include "media_partials/onshape_partial.html" %}
 {% elif media.media_type_enum == 15 %}
     {% include "media_partials/cd_thread_partial.html" %}
+{% elif media.media_type_enum == 16 %}
+    {% include "media_partials/smugmug_photo_partial.html" %}
+{% elif media.media_type_enum == 17 %}
+    {% include "media_partials/smugmug_album_partial.html" %}
 {% endif %}
