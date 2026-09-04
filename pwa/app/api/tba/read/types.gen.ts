@@ -2936,9 +2936,9 @@ export type InsightV2StreakData = {
  */
 export type InsightV2TimeseriesData = {
   /**
-   * What the x-axis represents.
+   * What the x-axis represents. For `date`, each point's `x` is a Unix timestamp (seconds) at UTC midnight of that day.
    */
-  x_type: 'week' | 'year' | 'event';
+  x_type: 'week' | 'year' | 'event' | 'date';
   /**
    * Human-readable label for the x-axis.
    */
@@ -2958,7 +2958,7 @@ export type InsightV2TimeseriesData = {
     label: string;
     points: Array<{
       /**
-       * X-axis value (week string, year integer, or event key).
+       * X-axis value (week string, year integer, event key, or Unix timestamp in seconds when x_type is date).
        */
       x: string | number | number;
       /**

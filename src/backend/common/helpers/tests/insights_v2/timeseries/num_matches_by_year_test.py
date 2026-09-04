@@ -8,6 +8,7 @@ from backend.common.helpers.insights_v2.registry import compute_insights_for_yea
 from backend.common.helpers.insights_v2.timeseries.num_matches_by_year import (
     NumMatchesByYearV2Calculator,
 )
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
 from backend.common.models.insight_v2 import InsightCategory
 from backend.common.models.match import Match
@@ -74,7 +75,7 @@ def test_counts_played_matches_per_year(ndb_stub) -> None:
     assert len(insights) == 1
     insight = insights[0]
     assert insight.name == "num_matches_by_year"
-    assert insight.display_name == "Number of Matches by Year"
+    assert insight.display_name == "Matches over Time"
     assert insight.category == InsightCategory.TIMESERIES
     assert insight.year == 0
     assert insight.key_name == "0_v2_timeseries_num_matches_by_year"
@@ -85,10 +86,11 @@ def test_counts_played_matches_per_year(ndb_stub) -> None:
     assert data["series"][0]["label"] == "Matches"
 
     points = data["series"][0]["points"]
-    assert points == [
-        {"x": 2023, "y": 3.0},
-        {"x": 2024, "y": 5.0},
-    ]
+    by_year = {p["x"]: p["y"] for p in points}
+    assert [p["x"] for p in points] == list(SeasonHelper.get_valid_years())
+    assert by_year[2023] == 3.0
+    assert by_year[2024] == 5.0
+    assert by_year[2010] == 0.0
 
 
 def test_unplayed_matches_not_counted(ndb_stub) -> None:
@@ -98,7 +100,8 @@ def test_unplayed_matches_not_counted(ndb_stub) -> None:
 
     insights = compute_insights_for_year(0, [_calc()])
 
-    assert insights[0].data["series"][0]["points"] == [{"x": 2024, "y": 1.0}]
+    by_year = {p["x"]: p["y"] for p in insights[0].data["series"][0]["points"]}
+    assert by_year[2024] == 1.0
 
 
 def test_offseason_event_skipped(ndb_stub) -> None:

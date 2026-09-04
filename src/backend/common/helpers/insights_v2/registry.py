@@ -94,6 +94,9 @@ from backend.common.helpers.insights_v2.timeseries.average_match_score_by_week i
 from backend.common.helpers.insights_v2.timeseries.average_win_margin_by_week import (
     AverageWinMarginByWeekV2Calculator,
 )
+from backend.common.helpers.insights_v2.timeseries.cumulative_matches_by_day import (
+    CumulativeMatchesByDayV2Calculator,
+)
 from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
     HighScoreOverTimeV2Calculator,
 )
@@ -190,6 +193,7 @@ def make_all_insights(year: Year) -> List[InsightV2]:
     else:
         calculators += [
             HighScoreOverTimeV2Calculator(),
+            CumulativeMatchesByDayV2Calculator(),
             AverageMatchScoreByWeekV2Calculator(),
             AverageWinMarginByWeekV2Calculator(),
             HighestMatchCleanScoreV2Calculator(),

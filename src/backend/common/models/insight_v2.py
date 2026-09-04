@@ -8,7 +8,7 @@ from backend.common.models.keys import DistrictAbbreviation
 LeaderboardKeyType = Literal["team", "event", "match", "team_pair", "alliance"]
 LeaderboardContextType = Literal["event_list", "match_alliance", "none"]
 
-TimeseriesXType = Literal["week", "year", "event"]
+TimeseriesXType = Literal["week", "year", "event", "date"]
 TimeseriesPointContextType = Literal["none", "match_record"]
 
 GameStatsScopeType = Literal["overall", "week", "event"]

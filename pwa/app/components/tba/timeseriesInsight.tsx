@@ -19,6 +19,13 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '~/components/ui/chart';
+import {
+  type ChartRow,
+  type RecordContext,
+  contextKey,
+  mergeSeries,
+  timeseriesHasTemporalXAxis,
+} from '~/lib/insightUtils';
 import { pluralize } from '~/lib/utils';
 
 const CHART_COLORS = [
@@ -29,27 +36,7 @@ const CHART_COLORS = [
   'var(--color-chart-5)',
 ];
 
-type TimeseriesPoint =
-  InsightV2Timeseries['data']['series'][number]['points'][number];
 type TimeseriesSeries = InsightV2Timeseries['data']['series'];
-
-interface RecordContext {
-  matchKey?: string;
-  alliance?: string[];
-  postResultTime?: number;
-  isCurrent?: boolean;
-  /** post_result_time of the record that overtook this one, if any. */
-  heldUntilPostResultTime?: number;
-}
-
-interface ChartRow {
-  x: string | number;
-  [seriesKey: string]: string | number | RecordContext | undefined;
-}
-
-function contextKey(seriesLabel: string): string {
-  return `${seriesLabel}__ctx`;
-}
 
 function formatEpochSeconds(epochSeconds: number): string {
   if (!Number.isFinite(epochSeconds)) {
@@ -96,82 +83,6 @@ function formatHeldDuration(
   return `Held for ${pluralize(heldSeconds, 'second', 'seconds')}`;
 }
 
-/**
- * `match_record` points all share a coarse `x` (e.g. the season year), since
- * `x` only labels which timeseries the point belongs to. The actual moment
- * the record was set is `context.post_result_time`, which is what should
- * drive the chart's x-axis so every record shows up as its own point.
- */
-function effectiveX(
-  point: TimeseriesPoint,
-  usePostResultTime: boolean,
-): string | number {
-  if (usePostResultTime && point.context?.post_result_time !== undefined) {
-    return point.context.post_result_time;
-  }
-  return point.x;
-}
-
-/**
- * Merges the timeseries' per-series points into a single array of rows keyed
- * by (effective) `x`, one column per series label, for recharts' wide-format
- * `LineChart`. When points carry match-record context, each row also carries
- * a parallel `<label>__ctx` entry so the tooltip can show who set the record,
- * when, and how long they held it.
- */
-function mergeSeries(data: InsightV2Timeseries['data']): ChartRow[] {
-  const usePostResultTime = data.point_context_type === 'match_record';
-
-  const orderedX: Array<string | number> = [];
-  const seenX = new Set<string>();
-  const valuesByKey = new Map<string, number>();
-  const contextByKey = new Map<string, RecordContext>();
-
-  for (const series of data.series) {
-    series.points.forEach((point, i) => {
-      const x = effectiveX(point, usePostResultTime);
-      const xKey = String(x);
-      if (!seenX.has(xKey)) {
-        seenX.add(xKey);
-        orderedX.push(x);
-      }
-      const rowKey = `${series.label} ${xKey}`;
-      valuesByKey.set(rowKey, point.y);
-
-      if (point.context) {
-        const nextPoint = series.points[i + 1];
-        contextByKey.set(rowKey, {
-          matchKey: point.context.match_key,
-          alliance: point.context.alliance,
-          postResultTime: point.context.post_result_time,
-          isCurrent: point.context.is_current,
-          heldUntilPostResultTime: nextPoint?.context?.post_result_time,
-        });
-      }
-    });
-  }
-
-  if (usePostResultTime) {
-    orderedX.sort((a, b) => Number(a) - Number(b));
-  }
-
-  return orderedX.map((x) => {
-    const row: ChartRow = { x };
-    for (const series of data.series) {
-      const rowKey = `${series.label} ${String(x)}`;
-      const y = valuesByKey.get(rowKey);
-      if (y !== undefined) {
-        row[series.label] = y;
-      }
-      const context = contextByKey.get(rowKey);
-      if (context) {
-        row[contextKey(series.label)] = context;
-      }
-    }
-    return row;
-  });
-}
-
 interface PinnedPoint {
   x: string | number;
   coordinate: { x: number; y: number };
@@ -186,6 +97,7 @@ export function TimeseriesInsight({
 }) {
   const usePostResultTime =
     timeseries.data.point_context_type === 'match_record';
+  const temporalXAxis = timeseriesHasTemporalXAxis(timeseries.data);
 
   const rows = useMemo(() => mergeSeries(timeseries.data), [timeseries.data]);
 
@@ -251,10 +163,10 @@ export function TimeseriesInsight({
               <CartesianGrid strokeDasharray="3 3" />
               <XAxis
                 dataKey="x"
-                type={usePostResultTime ? 'number' : 'category'}
-                domain={usePostResultTime ? ['dataMin', 'dataMax'] : undefined}
+                type={temporalXAxis ? 'number' : 'category'}
+                domain={temporalXAxis ? ['dataMin', 'dataMax'] : undefined}
                 tickFormatter={
-                  usePostResultTime
+                  temporalXAxis
                     ? (x: number) => formatEpochSeconds(x)
                     : undefined
                 }
@@ -288,6 +200,14 @@ export function TimeseriesInsight({
                   content={
                     usePostResultTime ? (
                       <RecordTooltipContent series={timeseries.data.series} />
+                    ) : temporalXAxis ? (
+                      <ChartTooltipContent
+                        labelFormatter={(_, payload) =>
+                          formatEpochSeconds(
+                            Number(payload?.[0]?.payload?.x ?? NaN),
+                          )
+                        }
+                      />
                     ) : (
                       <ChartTooltipContent />
                     )

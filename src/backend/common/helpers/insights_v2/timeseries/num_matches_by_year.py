@@ -5,6 +5,7 @@ from backend.common.helpers.insights_v2.names import InsightV2NameEntry, Insight
 from backend.common.helpers.insights_v2.timeseries.calculator import (
     TimeseriesV2Calculator,
 )
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.event import Event
 from backend.common.models.insight_v2 import (
     TimeseriesData,
@@ -16,7 +17,8 @@ from backend.common.models.insight_v2 import (
 class NumMatchesByYearV2Calculator(TimeseriesV2Calculator):
     """
     Counts played matches per season across all in-season events. All-time
-    (year=0) only, global, one point per year.
+    (year=0) only, global, one point per year from 1992 to the current season
+    (years with no played matches report 0).
     """
 
     def __init__(self) -> None:
@@ -32,9 +34,17 @@ class NumMatchesByYearV2Calculator(TimeseriesV2Calculator):
             self._counts[event.year] += count
 
     def _build_timeseries_data(self) -> TimeseriesData:
+        if not self._counts:
+            return TimeseriesData(
+                series=[],
+                x_type="year",
+                x_label="Year",
+                y_label="Matches",
+                point_context_type="none",
+            )
         points = [
-            TimeseriesPointNoContext(x=year, y=float(self._counts[year]))
-            for year in sorted(self._counts)
+            TimeseriesPointNoContext(x=year, y=float(self._counts.get(year, 0)))
+            for year in SeasonHelper.get_valid_years()
         ]
         return TimeseriesData(
             series=[TimeseriesSeries(label="Matches", points=points)],

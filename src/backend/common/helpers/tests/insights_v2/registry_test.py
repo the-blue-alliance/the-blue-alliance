@@ -213,6 +213,22 @@ def test_num_matches_by_year_not_for_specific_year(mock_calc, mock_compute) -> N
     "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
     return_value=[],
 )
+@patch("backend.common.helpers.insights_v2.registry.CumulativeMatchesByDayV2Calculator")
+def test_cumulative_matches_by_day_for_specific_year_only(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(2024)
+    mock_calc.assert_called_once_with()
+
+    mock_calc.reset_mock()
+    make_all_insights(0)
+    mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
 @patch("backend.common.helpers.insights_v2.registry.GameStatsV2Calculator")
 def test_game_stats_instantiated_for_specific_year(mock_calc, mock_compute) -> None:
     make_all_insights(2026)
