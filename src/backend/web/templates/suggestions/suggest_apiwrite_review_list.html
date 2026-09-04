@@ -47,9 +47,24 @@
   </div>
   <div class="row" id="review_apiwrite">
     <div class="col-xs-12">
-      {% for suggestion_id, event, account, existing_users, suggestion in suggestions %}
+      {% for suggestion_id, event, account, existing_users, suggestion, dates in suggestions %}
         <div class="well" class="suggestion-item">
             <h3>{{ event.year }} {{ event.name }} [<a href="/event/{{ event.key_name }}">{{ event.event_short }}</a>]</h3>
+            <p>
+              <strong>Event dates:</strong>
+              {% if dates.start_date and dates.end_date %}
+                {{ dates.start_date|strftime("%b %d") }}&ndash;{{ dates.end_date|strftime("%b %d, %Y") }}
+                {% if dates.status == "past" %}
+                  <span class="label label-default">ended {{ dates.days_since_end }} day{{ "s" if dates.days_since_end != 1 }} ago</span>
+                {% elif dates.status == "ongoing" %}
+                  <span class="label label-success">happening now</span>
+                {% elif dates.status == "future" %}
+                  <span class="label label-info">starts in {{ -dates.days_since_end }} day{{ "s" if dates.days_since_end != -1 }}</span>
+                {% endif %}
+              {% else %}
+                <span class="label label-warning">no dates on this event</span>
+              {% endif %}
+            </p>
             <p><strong>User:</strong> {{ account.display_name }}</p>
             <p><strong>Email:</strong> {{ account.email }}</p>
             <p><strong>User's role:</strong> {{ suggestion.contents.affiliation }}</p>
@@ -66,12 +81,17 @@
             <h4>Key Expiration</h4>
             <p>Number of days after the event to keep key valid:</p>
             <select name="expiration_days">
-                <option value="0">0</option>
-                <option value="1">1</option>
-                <option value="3">3</option>
-                <option value="7" selected>7</option>
-                <option value="-1">--</option>
+                {% for offset, expiration in dates.expiration_options %}
+                <option value="{{ offset }}"{% if offset == 7 %} selected{% endif %}>
+                  {% if offset == -1 %}-- (never expires){% else %}{{ offset }} &mdash; expires {{ expiration|strftime("%b %d, %Y") }}{% endif %}
+                </option>
+                {% endfor %}
             </select>
+            <p class="help-block">
+              A key is always valid for at least the selected number of days
+              <em>from now</em>, so granting one long after an event has ended still
+              produces a usable key.
+            </p>
 
             <h4>Existing Keys for This Event</h4>
             {% for auth,user in existing_users %}
