@@ -169,7 +169,7 @@ def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
                     }
                     for team_key, advancement in district.advancement.items()
                 }
-                if district.advancement
+                if district.advancement is not None
                 else None
             ),
             "cutoffs": (
@@ -180,6 +180,7 @@ def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
                     "cmp_original": cutoffs["cmp_original"],
                     "cmp_effective": cutoffs["cmp_effective"],
                     "cmp_declines": cutoffs["cmp_declines"],
+                    "cmp_qualification": cutoffs["cmp_qualification"],
                 }
                 if cutoffs
                 else None

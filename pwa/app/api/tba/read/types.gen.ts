@@ -749,7 +749,7 @@ export type DistrictAdvancement = {
 };
 
 /**
- * Where the District Championship and FIRST Championship advancement cutoffs fell for a district.
+ * Where the District Championship and FIRST Championship advancement cutoffs fell for a district, and how each qualifying team earned its Championship invitation.
  */
 export type DistrictAdvancementCutoffs = {
   /**
@@ -776,6 +776,12 @@ export type DistrictAdvancementCutoffs = {
    * TBA team keys for teams that declined their FIRST Championship invitation.
    */
   cmp_declines: Array<string>;
+  /**
+   * A mapping of team key to how that team earned its FIRST Championship invitation. Populated independently of the per-team advancement data, so it is present even when `teams` is empty.
+   */
+  cmp_qualification: {
+    [key: string]: CmpQualificationMethod;
+  };
 };
 
 /**
@@ -783,7 +789,7 @@ export type DistrictAdvancementCutoffs = {
  */
 export type DistrictAdvancementResponse = {
   /**
-   * A mapping of team key to District_Advancement, or `null` if no advancement data is available for the district.
+   * A mapping of team key to District_Advancement. An empty object means advancement has been fetched but no teams are listed yet; `null` means it has never been fetched for this district.
    */
   teams: null | {
     [key: string]: DistrictAdvancement;
