@@ -3,7 +3,6 @@ import { describe, expect, test } from 'vitest';
 
 import {
   SUGGESTION_TYPE_ORDER,
-  defaultExpirationDays,
   defaultSetPreferred,
   formatAuthorReputation,
   formatEventDateRange,
@@ -180,31 +179,6 @@ describe.concurrent('suggestionTypeOrderComparator', () => {
     expect(
       ['mystery-type', 'match'].sort(suggestionTypeOrderComparator),
     ).toEqual(['match', 'mystery-type']);
-  });
-});
-
-describe.concurrent('defaultExpirationDays', () => {
-  const today = Temporal.PlainDate.from('2026-07-03');
-
-  test('event end + 7 days in the future defaults to 7', () => {
-    expect(defaultExpirationDays('2026-07-10', today)).toBe(7);
-  });
-
-  test('event ending today defaults to 7', () => {
-    expect(defaultExpirationDays('2026-07-03', today)).toBe(7);
-  });
-
-  test('event end + 7 days exactly today defaults to 7', () => {
-    expect(defaultExpirationDays('2026-06-26', today)).toBe(7);
-  });
-
-  test('event end + 7 days in the past defaults to never', () => {
-    expect(defaultExpirationDays('2026-06-25', today)).toBe(-1);
-  });
-
-  test('missing end date defaults to never', () => {
-    expect(defaultExpirationDays(null, today)).toBe(-1);
-    expect(defaultExpirationDays(undefined, today)).toBe(-1);
   });
 });
 

@@ -302,11 +302,10 @@ export function defaultSetPreferred(suggestion: {
  * Default expiration for an accepted API write key, mirroring the backend:
  * event end + 7 days while that date is still in the future, never otherwise.
  */
-export function defaultExpirationDays(
-  eventEndDate: string | null | undefined,
-  today: Temporal.PlainDate = Temporal.Now.plainDateISO(),
-): number {
-  if (!eventEndDate) return -1;
-  const endPlus7 = Temporal.PlainDate.from(eventEndDate).add({ days: 7 });
-  return Temporal.PlainDate.compare(endPlus7, today) >= 0 ? 7 : -1;
-}
+/**
+ * Default key lifetime offered when accepting a Trusted API key request.
+ * The server counts this from event end or from the grant, whichever is
+ * later, so a late-approved key is still usable. Never-expiring keys are a
+ * deliberate exception, not the default.
+ */
+export const DEFAULT_EXPIRATION_DAYS = 7;

@@ -263,7 +263,7 @@ export type AcceptRequest = {
    */
   auth_types?: Array<number>;
   /**
-   * api_auth_access: days after event end until the key expires; -1 for no expiration. Defaults to 7 while event end + 7 days is still in the future, otherwise -1
+   * api_auth_access: days until the key expires, counted from event end or from the grant, whichever is later; -1 for no expiration. Defaults to 7.
    */
   expiration_days?: number;
   /**

@@ -14,7 +14,7 @@ import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Input } from '~/components/ui/input';
 import {
-  defaultExpirationDays,
+  DEFAULT_EXPIRATION_DAYS,
   defaultSetPreferred,
   formatAuthorReputation,
   formatEventDateRange,
@@ -989,10 +989,7 @@ function ApiWriteDetails({
           <select
             className="h-9 rounded-md border border-input bg-transparent px-3
               text-sm"
-            value={String(
-              overrides.expiration_days ??
-                defaultExpirationDays(suggestion.event?.end_date),
-            )}
+            value={String(overrides.expiration_days ?? DEFAULT_EXPIRATION_DAYS)}
             onChange={(e) =>
               onOverridesChange({
                 ...overrides,
@@ -1000,11 +997,14 @@ function ApiWriteDetails({
               })
             }
           >
+            <option value="7">7 days</option>
+            <option value="30">30 days</option>
+            <option value="365">1 year</option>
             <option value="-1">Never expires</option>
-            <option value="7">Event end + 7 days</option>
-            <option value="30">Event end + 30 days</option>
-            <option value="365">Event end + 1 year</option>
           </select>
+          <span className="text-xs text-muted-foreground">
+            After the event ends or after granting, whichever is later.
+          </span>
         </label>
       </div>
       <label className="flex max-w-xl flex-col gap-1 text-sm">

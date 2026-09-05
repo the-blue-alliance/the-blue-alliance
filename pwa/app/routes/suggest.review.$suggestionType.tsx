@@ -30,6 +30,7 @@ import {
   useReviewSubmission,
 } from '~/lib/hooks/useModeration';
 import {
+  DEFAULT_EXPIRATION_DAYS,
   defaultSetPreferred,
   formatEventDateRange,
   groupSuggestionsByTargetKey,
@@ -252,6 +253,14 @@ function SuggestionReviewList(): JSX.Element {
           acceptOverrides.set_preferred === undefined
         ) {
           acceptOverrides.set_preferred = defaultSetPreferred(s);
+        }
+        // Likewise the expiration dropdown: always send what the moderator
+        // saw, so the server default never decides a key's lifetime.
+        if (
+          suggestionType === 'api_auth_access' &&
+          acceptOverrides.expiration_days === undefined
+        ) {
+          acceptOverrides.expiration_days = DEFAULT_EXPIRATION_DAYS;
         }
         return { key: s.key, overrides: acceptOverrides };
       });
