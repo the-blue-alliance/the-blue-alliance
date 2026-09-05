@@ -7,6 +7,7 @@ import type {
   AcceptRequest,
   ModerationSuggestion,
 } from '~/api/tba/moderation/types.gen';
+import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -1041,7 +1042,11 @@ const DETAIL_COMPONENTS: Record<
 };
 
 // Types whose suggestions target a team; the team becomes the card header
-const TEAM_HEADER_TYPES = new Set(['media', 'social-media', 'robot']);
+const TEAM_HEADER_TYPES = new Set<SuggestionType>([
+  SuggestionType.MEDIA,
+  SuggestionType.SOCIAL_MEDIA,
+  SuggestionType.ROBOT,
+]);
 
 export function SuggestionReviewCard(
   props: SuggestionReviewCardProps,

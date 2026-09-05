@@ -5,8 +5,8 @@ import { toast } from 'sonner';
 import type {
   AcceptRequest,
   ModerationSuggestion,
-  SuggestionType,
 } from '~/api/tba/moderation/types.gen';
+import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
 import { KeyboardShortcutsDialog } from '~/components/tba/moderation/keyboardShortcutsDialog';
@@ -38,14 +38,14 @@ import {
 } from '~/lib/moderationUtils';
 
 const TYPE_NAMES: Record<SuggestionType, string> = {
-  event: 'Webcasts',
-  match: 'Match Videos',
-  media: 'Team Media',
-  'social-media': 'Social Media',
-  'offseason-event': 'Offseason Events',
-  api_auth_access: 'API Key Requests',
-  robot: 'CAD Models',
-  event_media: 'Event Videos',
+  [SuggestionType.EVENT]: 'Webcasts',
+  [SuggestionType.MATCH]: 'Match Videos',
+  [SuggestionType.MEDIA]: 'Team Media',
+  [SuggestionType.SOCIAL_MEDIA]: 'Social Media',
+  [SuggestionType.OFFSEASON_EVENT]: 'Offseason Events',
+  [SuggestionType.API_AUTH_ACCESS]: 'API Key Requests',
+  [SuggestionType.ROBOT]: 'CAD Models',
+  [SuggestionType.EVENT_MEDIA]: 'Event Videos',
 };
 
 function WebcastEventGroup({
@@ -138,7 +138,7 @@ function SuggestionReviewList(): JSX.Element {
   // Cards in visual order (webcasts render grouped by event), for j/k
   const orderedSuggestions = useMemo(() => {
     const loaded = data?.suggestions ?? [];
-    return suggestionType === 'event'
+    return suggestionType === SuggestionType.EVENT
       ? groupSuggestionsByTargetKey(loaded).flatMap(
           (group) => group.suggestions,
         )
@@ -192,7 +192,7 @@ function SuggestionReviewList(): JSX.Element {
         }));
       } else if (
         e.key === 'p' &&
-        suggestionType === 'media' &&
+        suggestionType === SuggestionType.MEDIA &&
         focusedSuggestion.candidate_media?.is_image
       ) {
         e.preventDefault();
@@ -249,7 +249,7 @@ function SuggestionReviewList(): JSX.Element {
         // The preferred checkbox shows a computed default; send it explicitly
         // when the moderator didn't touch it
         if (
-          suggestionType === 'media' &&
+          suggestionType === SuggestionType.MEDIA &&
           acceptOverrides.set_preferred === undefined
         ) {
           acceptOverrides.set_preferred = defaultSetPreferred(s);
@@ -257,7 +257,7 @@ function SuggestionReviewList(): JSX.Element {
         // Likewise the expiration dropdown: always send what the moderator
         // saw, so the server default never decides a key's lifetime.
         if (
-          suggestionType === 'api_auth_access' &&
+          suggestionType === SuggestionType.API_AUTH_ACCESS &&
           acceptOverrides.expiration_days === undefined
         ) {
           acceptOverrides.expiration_days = DEFAULT_EXPIRATION_DAYS;
@@ -389,7 +389,7 @@ function SuggestionReviewList(): JSX.Element {
           </div>
 
           <div className="flex flex-col gap-4">
-            {suggestionType === 'event'
+            {suggestionType === SuggestionType.EVENT
               ? groupSuggestionsByTargetKey(suggestions).map((group) => (
                   <WebcastEventGroup
                     key={group.targetKey}

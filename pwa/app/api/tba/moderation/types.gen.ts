@@ -7,15 +7,40 @@ export type ClientOptions = {
 /**
  * The type of suggestion (event=Webcasts, match=Match Videos, media=Team Media, social-media=Social Media, offseason-event=Offseason Events, api_auth_access=API Key Requests, robot=CAD Models, event_media=Event Videos)
  */
-export type SuggestionType =
-  | 'event'
-  | 'match'
-  | 'media'
-  | 'social-media'
-  | 'offseason-event'
-  | 'api_auth_access'
-  | 'robot'
-  | 'event_media';
+export enum SuggestionType {
+  /**
+   * EVENT
+   */
+  EVENT = 'event',
+  /**
+   * MATCH
+   */
+  MATCH = 'match',
+  /**
+   * MEDIA
+   */
+  MEDIA = 'media',
+  /**
+   * SOCIAL_MEDIA
+   */
+  SOCIAL_MEDIA = 'social-media',
+  /**
+   * OFFSEASON_EVENT
+   */
+  OFFSEASON_EVENT = 'offseason-event',
+  /**
+   * API_AUTH_ACCESS
+   */
+  API_AUTH_ACCESS = 'api_auth_access',
+  /**
+   * ROBOT
+   */
+  ROBOT = 'robot',
+  /**
+   * EVENT_MEDIA
+   */
+  EVENT_MEDIA = 'event_media',
+}
 
 export type QueueResponse = {
   /**
@@ -282,13 +307,14 @@ export type AcceptResponse = {
   message?: string;
 };
 
-export type ReviewResult =
-  | 'accepted'
-  | 'rejected'
-  | 'not_found'
-  | 'already_reviewed'
-  | 'invalid'
-  | 'forbidden';
+export enum ReviewResult {
+  ACCEPTED = 'accepted',
+  REJECTED = 'rejected',
+  NOT_FOUND = 'not_found',
+  ALREADY_REVIEWED = 'already_reviewed',
+  INVALID = 'invalid',
+  FORBIDDEN = 'forbidden',
+}
 
 export type RejectRequest = {
   suggestion_keys: Array<string>;

@@ -1,21 +1,25 @@
 import { Temporal } from 'temporal-polyfill';
 
+import { SuggestionType } from '~/api/tba/moderation/types.gen';
+
 // Queue display order, matching the web review home
-// (suggestions/pending_suggestion_rows_partial.html)
-export const SUGGESTION_TYPE_ORDER = [
-  'match',
-  'event',
-  'media',
-  'social-media',
-  'event_media',
-  'robot',
-  'offseason-event',
-  'api_auth_access',
+// (suggestions/pending_suggestion_rows_partial.html). Which types exist comes
+// from the API's SuggestionType enum; the order is a presentation choice made
+// here, and a test asserts the two stay in sync.
+export const SUGGESTION_TYPE_ORDER: readonly SuggestionType[] = [
+  SuggestionType.MATCH,
+  SuggestionType.EVENT,
+  SuggestionType.MEDIA,
+  SuggestionType.SOCIAL_MEDIA,
+  SuggestionType.EVENT_MEDIA,
+  SuggestionType.ROBOT,
+  SuggestionType.OFFSEASON_EVENT,
+  SuggestionType.API_AUTH_ACCESS,
 ];
 
 export function suggestionTypeOrderComparator(a: string, b: string): number {
   const indexOf = (type: string) => {
-    const index = SUGGESTION_TYPE_ORDER.indexOf(type);
+    const index = (SUGGESTION_TYPE_ORDER as readonly string[]).indexOf(type);
     return index === -1 ? SUGGESTION_TYPE_ORDER.length : index;
   };
   return indexOf(a) - indexOf(b);

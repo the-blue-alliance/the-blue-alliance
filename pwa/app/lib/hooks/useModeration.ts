@@ -11,6 +11,7 @@ import type {
   AcceptResponse,
   SuggestionType,
 } from '~/api/tba/moderation/types.gen';
+import { ReviewResult } from '~/api/tba/moderation/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
 
 export interface ReviewDecisions {
@@ -91,9 +92,9 @@ export function useReviewSubmission(suggestionType: SuggestionType) {
         });
         const outcome = (response.data ?? response.error) as
           AcceptResponse | undefined;
-        if (outcome?.result === 'accepted') {
+        if (outcome?.result === ReviewResult.ACCEPTED) {
           result.accepted.push(accept.key);
-        } else if (outcome?.result === 'already_reviewed') {
+        } else if (outcome?.result === ReviewResult.ALREADY_REVIEWED) {
           result.alreadyReviewed.push(accept.key);
         } else {
           result.failed.push({
@@ -109,9 +110,9 @@ export function useReviewSubmission(suggestionType: SuggestionType) {
           body: { suggestion_keys: rejects },
         });
         for (const outcome of response.data?.results ?? []) {
-          if (outcome.result === 'rejected') {
+          if (outcome.result === ReviewResult.REJECTED) {
             result.rejected.push(outcome.suggestion_key);
-          } else if (outcome.result === 'already_reviewed') {
+          } else if (outcome.result === ReviewResult.ALREADY_REVIEWED) {
             result.alreadyReviewed.push(outcome.suggestion_key);
           } else {
             result.failed.push({

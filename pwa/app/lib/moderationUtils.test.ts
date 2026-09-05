@@ -1,6 +1,7 @@
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test } from 'vitest';
 
+import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import {
   SUGGESTION_TYPE_ORDER,
   defaultSetPreferred,
@@ -155,6 +156,14 @@ describe.concurrent('formatEventDateRange', () => {
   test('returns undefined when either date is missing', () => {
     expect(formatEventDateRange(null, '2016-03-27')).toBeUndefined();
     expect(formatEventDateRange('2016-03-24', undefined)).toBeUndefined();
+  });
+});
+
+describe.concurrent('SUGGESTION_TYPE_ORDER', () => {
+  test('is a permutation of every SuggestionType the API defines', () => {
+    expect([...SUGGESTION_TYPE_ORDER].sort()).toEqual(
+      Object.values(SuggestionType).sort(),
+    );
   });
 });
 

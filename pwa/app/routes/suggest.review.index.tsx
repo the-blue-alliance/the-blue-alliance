@@ -2,7 +2,7 @@ import { Link, createFileRoute } from '@tanstack/react-router';
 import { type JSX, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
-import type { SuggestionType } from '~/api/tba/moderation/types.gen';
+import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
 import { Badge } from '~/components/ui/badge';
@@ -113,7 +113,7 @@ function SuggestionReviewHome(): JSX.Element {
           </Link>
         ))}
       </div>
-      {types.includes('media') && <ReviewMediaTools />}
+      {types.includes(SuggestionType.MEDIA) && <ReviewMediaTools />}
     </div>
   );
 }
