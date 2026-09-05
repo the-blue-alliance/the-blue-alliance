@@ -634,7 +634,7 @@ export const getDistrictInsights = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Gets a list of advancement information per team in a district.
+ * Gets per-team advancement information and the advancement cutoffs for a district.
  */
 export const getDistrictAdvancement = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictAdvancementData, ThrowOnError>,

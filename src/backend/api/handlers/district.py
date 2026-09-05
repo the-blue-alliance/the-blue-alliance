@@ -155,7 +155,37 @@ def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
     district = DistrictQuery(district_key=district_key).fetch()
     if district is None:
         abort(404)
-    return profiled_jsonify(district.advancement)
+
+    cutoffs = district.advancement_cutoffs
+    qualification = cutoffs["cmp_qualification"] if cutoffs else {}
+
+    return profiled_jsonify(
+        {
+            "teams": (
+                {
+                    team_key: {
+                        **advancement,
+                        "cmp_qualification": qualification.get(team_key),
+                    }
+                    for team_key, advancement in district.advancement.items()
+                }
+                if district.advancement
+                else None
+            ),
+            "cutoffs": (
+                {
+                    "dcmp_original": cutoffs["dcmp_original"],
+                    "dcmp_effective": cutoffs["dcmp_effective"],
+                    "dcmp_declines": cutoffs["dcmp_declines"],
+                    "cmp_original": cutoffs["cmp_original"],
+                    "cmp_effective": cutoffs["cmp_effective"],
+                    "cmp_declines": cutoffs["cmp_declines"],
+                }
+                if cutoffs
+                else None
+            ),
+        }
+    )
 
 
 @api_authenticated

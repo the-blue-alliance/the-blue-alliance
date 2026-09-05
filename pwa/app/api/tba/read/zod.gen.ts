@@ -186,6 +186,33 @@ export const zPlayoffType = z.union([
   z.literal(8),
 ]);
 
+/**
+ * CmpQualificationMethod
+ *
+ * How a team earned its invitation to the FIRST Championship. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/cmp_qualification.py for full definitions.
+ */
+export const zCmpQualificationMethod = z.enum([
+  'district_points',
+  'waitlist',
+  'original_and_sustaining',
+  'hall_of_fame',
+  'prior_year_cmp_winner',
+  'prior_year_cmp_impact',
+  'prior_year_cmp_engineering_inspiration',
+  'regional_winner',
+  'regional_impact',
+  'regional_engineering_inspiration',
+  'regional_wildcard',
+  'late_regional_winner',
+  'late_regional_impact',
+  'late_regional_engineering_inspiration',
+  'late_regional_wildcard',
+  'dcmp_winner',
+  'dcmp_impact',
+  'dcmp_engineering_inspiration',
+  'dcmp_rookie_all_star',
+]);
+
 export const zDistrict = z.object({
   abbreviation: z.string(),
   display_name: z.string(),
@@ -210,6 +237,27 @@ export const zDistrictInsightRegionData = z.object({
 export const zDistrictAdvancement = z.object({
   dcmp: z.boolean(),
   cmp: z.boolean(),
+  cmp_qualification: zCmpQualificationMethod.nullish(),
+});
+
+/**
+ * Where the District Championship and FIRST Championship advancement cutoffs fell for a district.
+ */
+export const zDistrictAdvancementCutoffs = z.object({
+  dcmp_original: z.int(),
+  dcmp_effective: z.int(),
+  dcmp_declines: z.array(z.string()),
+  cmp_original: z.int(),
+  cmp_effective: z.int(),
+  cmp_declines: z.array(z.string()),
+});
+
+/**
+ * Per-team advancement status and the advancement cutoffs for a district.
+ */
+export const zDistrictAdvancementResponse = z.object({
+  teams: z.record(z.string(), zDistrictAdvancement).nullable(),
+  cutoffs: zDistrictAdvancementCutoffs.nullable(),
 });
 
 /**
@@ -2214,11 +2262,9 @@ export const zGetDistrictAdvancementPath = z.object({
 });
 
 /**
- * A mapping of team key to District_Advancement
+ * Successful response
  */
-export const zGetDistrictAdvancementResponse = z
-  .record(z.string(), zDistrictAdvancement)
-  .nullable();
+export const zGetDistrictAdvancementResponse = zDistrictAdvancementResponse;
 
 export const zGetDistrictAwardsHeaders = z.object({
   'If-None-Match': z.string().optional(),

@@ -477,7 +477,7 @@ export const getDistrictAdvancementQueryKey = (
 ) => createQueryKey('getDistrictAdvancement', options);
 
 /**
- * Gets a list of advancement information per team in a district.
+ * Gets per-team advancement information and the advancement cutoffs for a district.
  */
 export const getDistrictAdvancementOptions = (
   options: Options<GetDistrictAdvancementData>,
