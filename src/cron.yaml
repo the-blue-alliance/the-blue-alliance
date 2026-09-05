@@ -50,11 +50,6 @@ cron:
     schedule: every day 02:00
     timezone: America/Los_Angeles
 
-  - description: Hall of Fame team list scraping
-    url: /tasks/get/hof_teams
-    schedule: every thursday 01:00
-    timezone: America/Los_Angeles
-
   - description: Typeahead Calculation
     url: /backend-tasks-b2/enqueue/math/typeaheadcalc
     schedule: every day 01:00
@@ -174,11 +169,6 @@ cron:
     schedule: every day 08:00
     timezone: America/Los_Angeles
 
-  - description: Backup Cron job
-    url: /backend-tasks/backup/enqueue
-    schedule: every monday 03:00
-    timezone: America/Los_Angeles
-
   # - description: BlueZone Update
   #   url: /tasks/do/bluezone_update
   #   schedule: every 1 minutes
@@ -186,10 +176,6 @@ cron:
   - description: Update Match Suggestions
     url: /tasks/do/update_match_suggestions
     schedule: every 1 minutes
-
-  - description: Update Team Search Indexes
-    url: /tasks/enqueue/update_all_team_search_index
-    schedule: every monday 04:00
 
   - description: Archive Old API Keys
     url: /tasks/do/archive_api_keys
