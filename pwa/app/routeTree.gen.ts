@@ -37,6 +37,8 @@ import { Route as DistrictDistrictAbbreviationInsightsRouteImport } from './rout
 import { Route as DistrictDistrictAbbreviationStatsRouteImport } from './routes/district.$districtAbbreviation.stats'
 import { Route as DistrictDistrictAbbreviationChar123YearChar125RouteImport } from './routes/district.$districtAbbreviation.{-$year}'
 import { Route as EventsDistrictAbbreviationYearRouteImport } from './routes/events.$districtAbbreviation.$year'
+import { Route as SuggestReviewIndexRouteImport } from './routes/suggest.review.index'
+import { Route as SuggestReviewSuggestionTypeRouteImport } from './routes/suggest.review.$suggestionType'
 import { Route as SuggestTeamMediaRouteImport } from './routes/suggest.team.media'
 import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNumber.history'
 import { Route as TeamTeamNumberStatsRouteImport } from './routes/team.$teamNumber.stats'
@@ -191,6 +193,17 @@ const EventsDistrictAbbreviationYearRoute =
     path: '/events/$districtAbbreviation/$year',
     getParentRoute: () => rootRouteImport,
   } as any)
+const SuggestReviewIndexRoute = SuggestReviewIndexRouteImport.update({
+  id: '/suggest/review/',
+  path: '/suggest/review/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SuggestReviewSuggestionTypeRoute =
+  SuggestReviewSuggestionTypeRouteImport.update({
+    id: '/suggest/review/$suggestionType',
+    path: '/suggest/review/$suggestionType',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const SuggestTeamMediaRoute = SuggestTeamMediaRouteImport.update({
   id: '/suggest/team/media',
   path: '/suggest/team/media',
@@ -248,10 +261,12 @@ export interface FileRoutesByFullPath {
   '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/suggest/review/': typeof SuggestReviewIndexRoute
   '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRoutesByTo {
@@ -283,10 +298,12 @@ export interface FileRoutesByTo {
   '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/suggest/review': typeof SuggestReviewIndexRoute
   '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRoutesById {
@@ -319,10 +336,12 @@ export interface FileRoutesById {
   '/district/$districtAbbreviation/stats': typeof DistrictDistrictAbbreviationStatsRoute
   '/district/$districtAbbreviation/{-$year}': typeof DistrictDistrictAbbreviationChar123YearChar125Route
   '/events/$districtAbbreviation/$year': typeof EventsDistrictAbbreviationYearRoute
+  '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
+  '/suggest/review/': typeof SuggestReviewIndexRoute
   '/district/$districtAbbreviation/champs/$year': typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 export interface FileRouteTypes {
@@ -356,10 +375,12 @@ export interface FileRouteTypes {
     | '/district/$districtAbbreviation/stats'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
+    | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/suggest/review/'
     | '/district/$districtAbbreviation/champs/$year'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -391,10 +412,12 @@ export interface FileRouteTypes {
     | '/district/$districtAbbreviation/stats'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
+    | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/suggest/review'
     | '/district/$districtAbbreviation/champs/$year'
   id:
     | '__root__'
@@ -426,10 +449,12 @@ export interface FileRouteTypes {
     | '/district/$districtAbbreviation/stats'
     | '/district/$districtAbbreviation/{-$year}'
     | '/events/$districtAbbreviation/$year'
+    | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
+    | '/suggest/review/'
     | '/district/$districtAbbreviation/champs/$year'
   fileRoutesById: FileRoutesById
 }
@@ -461,10 +486,12 @@ export interface RootRouteChildren {
   DistrictDistrictAbbreviationStatsRoute: typeof DistrictDistrictAbbreviationStatsRoute
   DistrictDistrictAbbreviationChar123YearChar125Route: typeof DistrictDistrictAbbreviationChar123YearChar125Route
   EventsDistrictAbbreviationYearRoute: typeof EventsDistrictAbbreviationYearRoute
+  SuggestReviewSuggestionTypeRoute: typeof SuggestReviewSuggestionTypeRoute
   SuggestTeamMediaRoute: typeof SuggestTeamMediaRoute
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
   TeamTeamNumberStatsRoute: typeof TeamTeamNumberStatsRoute
   TeamTeamNumberChar123YearChar125Route: typeof TeamTeamNumberChar123YearChar125Route
+  SuggestReviewIndexRoute: typeof SuggestReviewIndexRoute
   DistrictDistrictAbbreviationChampsYearRoute: typeof DistrictDistrictAbbreviationChampsYearRoute
 }
 
@@ -666,6 +693,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EventsDistrictAbbreviationYearRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/suggest/review/': {
+      id: '/suggest/review/'
+      path: '/suggest/review'
+      fullPath: '/suggest/review/'
+      preLoaderRoute: typeof SuggestReviewIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/suggest/review/$suggestionType': {
+      id: '/suggest/review/$suggestionType'
+      path: '/suggest/review/$suggestionType'
+      fullPath: '/suggest/review/$suggestionType'
+      preLoaderRoute: typeof SuggestReviewSuggestionTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/suggest/team/media': {
       id: '/suggest/team/media'
       path: '/suggest/team/media'
@@ -746,10 +787,12 @@ const rootRouteChildren: RootRouteChildren = {
   DistrictDistrictAbbreviationChar123YearChar125Route:
     DistrictDistrictAbbreviationChar123YearChar125Route,
   EventsDistrictAbbreviationYearRoute: EventsDistrictAbbreviationYearRoute,
+  SuggestReviewSuggestionTypeRoute: SuggestReviewSuggestionTypeRoute,
   SuggestTeamMediaRoute: SuggestTeamMediaRoute,
   TeamTeamNumberHistoryRoute: TeamTeamNumberHistoryRoute,
   TeamTeamNumberStatsRoute: TeamTeamNumberStatsRoute,
   TeamTeamNumberChar123YearChar125Route: TeamTeamNumberChar123YearChar125Route,
+  SuggestReviewIndexRoute: SuggestReviewIndexRoute,
   DistrictDistrictAbbreviationChampsYearRoute:
     DistrictDistrictAbbreviationChampsYearRoute,
 }

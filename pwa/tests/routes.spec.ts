@@ -44,6 +44,8 @@ const allRoutes = defineAllRoutes([
   '/match/$matchKey',
   '/privacy',
   '/search',
+  '/suggest/review/',
+  '/suggest/review/$suggestionType',
   '/suggest/team/media',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
@@ -64,6 +66,7 @@ const parameterValues: Record<string, string[]> = {
   '{-$pgNum}': ['', '1'],
   $districtAbbreviation: ['fim'],
   $teamNumber: ['604'],
+  $suggestionType: ['match'],
 };
 
 /**
