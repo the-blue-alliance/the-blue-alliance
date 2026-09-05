@@ -1,5 +1,6 @@
 from typing import Dict, List, TypedDict
 
+from backend.common.consts.cmp_qualification import CmpQualificationMethod
 from backend.common.models.keys import TeamKey
 
 
@@ -23,3 +24,4 @@ class DistrictAdvancementCutoffs(TypedDict):
     cmp_original: int
     cmp_effective: int
     cmp_declines: List[TeamKey]
+    cmp_qualification: Dict[TeamKey, CmpQualificationMethod]

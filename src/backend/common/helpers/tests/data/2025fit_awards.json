@@ -1,0 +1,3062 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2025txama",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5411"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txama",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6369"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9105"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9786"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025txama",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10340"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txama",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7506"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txama",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2468"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txama",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3035"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txama",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3310"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txama",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2468"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3310"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7540"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txama",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9128"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txama",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8749"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txama",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4063"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txama",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4734"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txama",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7540"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txama",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Shlok M",
+        "team_key": "frc6369"
+      },
+      {
+        "awardee": "Madison M",
+        "team_key": "frc6369"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txama",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6369"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txama",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1164"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txama",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9136"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txama",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5866"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txbel",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8019"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txbel",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6369"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3847"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10518"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025txbel",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10518"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txbel",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5414"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txbel",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc457"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txbel",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3847"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txbel",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9080"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txbel",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9418"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9140"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4364"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txbel",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9418"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txbel",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6357"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txbel",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9034"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txbel",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5892"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txbel",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9311"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txbel",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Meerub S",
+        "team_key": "frc5572"
+      },
+      {
+        "awardee": "James A",
+        "team_key": "frc4717"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txbel",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5572"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txbel",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7503"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txbel",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8573"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txbel",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6369"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txcle",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6357"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txcle",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc324"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10385"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txcle",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5892"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txcle",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3545"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txcle",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10118"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txcle",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7492"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txcle",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5892"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc231"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6645"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txcle",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7616"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txcle",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txcle",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc127"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txcle",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5427"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txcle",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6243"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txcle",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Thomas P",
+        "team_key": "frc7616"
+      },
+      {
+        "awardee": "Sara K",
+        "team_key": "frc2585"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txcle",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc231"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txcle",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7691"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txcle",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9051"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txcle",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc324"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txcmp",
+    "name": "District Championship FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4192"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8573"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txcmp",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6800"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3005"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6357"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025txcmp",
+    "name": "District Championship Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10518"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10032"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txcmp",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc148"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8177"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 3,
+    "event_key": "2025txcmp",
+    "name": "Woodie Flowers Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Kara Boyer",
+        "team_key": "frc5414"
+      },
+      {
+        "awardee": "Elizabeth Phillips",
+        "team_key": "frc9492"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txcmp",
+    "name": "FIRST Dean's List Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Harishankar A",
+        "team_key": "frc2714"
+      },
+      {
+        "awardee": "Shlok M",
+        "team_key": "frc6369"
+      },
+      {
+        "awardee": "asma I",
+        "team_key": "frc324"
+      },
+      {
+        "awardee": "Madison M",
+        "team_key": "frc6369"
+      },
+      {
+        "awardee": "Aum P",
+        "team_key": "frc2714"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 5,
+    "event_key": "2025txcmp",
+    "name": "Volunteer of the Year",
+    "recipient_list": [
+      {
+        "awardee": "Allison Rich",
+        "team_key": "frc324"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txcmp",
+    "name": "District Championship Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1296"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txcmp1",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc148"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8177"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txcmp1",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5829"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txcmp1",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4734"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txcmp1",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3847"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txcmp1",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8749"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txcmp1",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2881"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc624"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3035"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txcmp1",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8576"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txcmp1",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2881"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txcmp1",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9492"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txcmp1",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2714"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txcmp1",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5414"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txcmp1",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6369"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txcmp1",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc148"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txcmp1",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9658"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txcmp2",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6800"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3005"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6357"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txcmp2",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5892"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txcmp2",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7492"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txcmp2",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6800"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txcmp2",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1477"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txcmp2",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3310"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9140"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2687"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txcmp2",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc324"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txcmp2",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5411"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txcmp2",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5788"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txcmp2",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10014"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txcmp2",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9181"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txcmp2",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3005"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txcmp2",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2583"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txcmp2",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9478"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txfor",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5417"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txfor",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3005"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2714"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4717"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txfor",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4206"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txfor",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4717"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txfor",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9418"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txfor",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4364"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txfor",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4641"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5431"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9156"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txfor",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2848"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txfor",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3005"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txfor",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9034"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txfor",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7119"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txfor",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5431"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txfor",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Aum P",
+        "team_key": "frc2714"
+      },
+      {
+        "awardee": "Harishankar A",
+        "team_key": "frc2714"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txfor",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2714"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txfor",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9136"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txfor",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6901"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txfor",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4192"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txhou",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5414"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txhou",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3847"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7691"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txhou",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8827"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txhou",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9658"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txhou",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10118"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txhou",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txhou",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5261"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9137"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4587"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txhou",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8177"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txhou",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6488"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txhou",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9181"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txhou",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10014"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txhou",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2882"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txhou",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Paola S",
+        "team_key": "frc9516"
+      },
+      {
+        "awardee": "Makayla S",
+        "team_key": "frc7691"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txhou",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3847"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txhou",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7691"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txhou",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9516"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txhou",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3481"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txman",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2881"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txman",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6800"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9137"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025txman",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10032"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txman",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9506"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txman",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8370"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txman",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc418"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txman",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8576"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txman",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2881"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc418"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4251"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txman",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2687"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txman",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc624"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txman",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9311"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txman",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6377"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txman",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9577"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txman",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Aryan C",
+        "team_key": "frc624"
+      },
+      {
+        "awardee": "Soumik C",
+        "team_key": "frc418"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txman",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6800"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txman",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2468"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txman",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9054"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txman",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txpla",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4192"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txpla",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5411"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9105"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8816"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6526"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025txpla",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10014"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txpla",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4206"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txpla",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8818"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txpla",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc148"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txpla",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5431"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txpla",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc148"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3310"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6768"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txpla",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9105"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txpla",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3310"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txpla",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2848"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txpla",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10312"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txpla",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7506"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txpla",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Aryan K",
+        "team_key": "frc9105"
+      },
+      {
+        "awardee": "Nataly M",
+        "team_key": "frc8818"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txpla",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9128"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txpla",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1296"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txpla",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9457"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txpla",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5411"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txsan",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3481"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txsan",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2582"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5572"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6974"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txsan",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4610"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txsan",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9664"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txsan",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5572"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txsan",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc231"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txsan",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3545"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4610"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5726"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txsan",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7521"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txsan",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3735"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txsan",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4332"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txsan",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1164"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txsan",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2582"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txsan",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Allan Jerrick A",
+        "team_key": "frc3481"
+      },
+      {
+        "awardee": "Hana A",
+        "team_key": "frc7492"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txsan",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8114"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txsan",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8088"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txsan",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9444"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txsan",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5427"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txtom",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1477"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txtom",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6800"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5417"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8392"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txtom",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7312"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txtom",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9512"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txtom",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6800"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txtom",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc231"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txtom",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1477"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc624"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9289"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txtom",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8177"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txtom",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc118"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txtom",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9181"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txtom",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3735"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txtom",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2882"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txtom",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Elizabeth C",
+        "team_key": "frc10118"
+      },
+      {
+        "awardee": "Landon P",
+        "team_key": "frc3735"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txtom",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc624"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txtom",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5417"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txtom",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9478"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txtom",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4639"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txvic",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8573"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txvic",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1477"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9128"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9515"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025txvic",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10385"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txvic",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4063"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txvic",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8818"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txvic",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc324"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txvic",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2587"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txvic",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2583"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4639"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9121"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txvic",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9515"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txvic",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4639"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txvic",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9478"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txvic",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1477"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txvic",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9289"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txvic",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "asma I",
+        "team_key": "frc324"
+      },
+      {
+        "awardee": "Archit G",
+        "team_key": "frc2583"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txvic",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10340"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txvic",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5829"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txvic",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5908"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txvic",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2583"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 0,
+    "event_key": "2025txwac",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2468"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 1,
+    "event_key": "2025txwac",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc148"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3005"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8732"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 10,
+    "event_key": "2025txwac",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10062"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 11,
+    "event_key": "2025txwac",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8515"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 13,
+    "event_key": "2025txwac",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9577"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 16,
+    "event_key": "2025txwac",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6672"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 17,
+    "event_key": "2025txwac",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2582"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 2,
+    "event_key": "2025txwac",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2881"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3310"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5212"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2950"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 20,
+    "event_key": "2025txwac",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2158"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 21,
+    "event_key": "2025txwac",
+    "name": "Excellence in Engineering Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2714"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 27,
+    "event_key": "2025txwac",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2881"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 29,
+    "event_key": "2025txwac",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3005"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 30,
+    "event_key": "2025txwac",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2689"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 4,
+    "event_key": "2025txwac",
+    "name": "District Championship Dean's List Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Sara S",
+        "team_key": "frc2468"
+      },
+      {
+        "awardee": "Yuju N",
+        "team_key": "frc2468"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 71,
+    "event_key": "2025txwac",
+    "name": "Autonomous Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc148"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 82,
+    "event_key": "2025txwac",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6377"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 83,
+    "event_key": "2025txwac",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc418"
+      }
+    ],
+    "year": 2025
+  },
+  {
+    "award_type": 9,
+    "event_key": "2025txwac",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1296"
+      }
+    ],
+    "year": 2025
+  }
+]

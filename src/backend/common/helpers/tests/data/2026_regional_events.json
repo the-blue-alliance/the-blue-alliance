@@ -1,0 +1,394 @@
+[
+  {
+    "end_date": "2026-04-11",
+    "event_code": "alhu",
+    "key": "2026alhu",
+    "start_date": "2026-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "arli",
+    "key": "2026arli",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-03-15",
+    "event_code": "ausc",
+    "key": "2026ausc",
+    "start_date": "2026-03-12",
+    "week": 1
+  },
+  {
+    "end_date": "2026-03-14",
+    "event_code": "azfg",
+    "key": "2026azfg",
+    "start_date": "2026-03-11",
+    "week": 1
+  },
+  {
+    "end_date": "2026-03-07",
+    "event_code": "bcvi",
+    "key": "2026bcvi",
+    "start_date": "2026-03-04",
+    "week": 0
+  },
+  {
+    "end_date": "2026-03-08",
+    "event_code": "brba",
+    "key": "2026brba",
+    "start_date": "2026-03-05",
+    "week": 0
+  },
+  {
+    "end_date": "2026-03-15",
+    "event_code": "brsp",
+    "key": "2026brsp",
+    "start_date": "2026-03-12",
+    "week": 1
+  },
+  {
+    "end_date": "2026-03-15",
+    "event_code": "cnsh",
+    "key": "2026cnsh",
+    "start_date": "2026-03-12",
+    "week": 1
+  },
+  {
+    "end_date": "2026-04-11",
+    "event_code": "code",
+    "key": "2026code",
+    "start_date": "2026-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2026-03-08",
+    "event_code": "cosp",
+    "key": "2026cosp",
+    "start_date": "2026-03-05",
+    "week": 0
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "flor",
+    "key": "2026flor",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-04-18",
+    "event_code": "flta",
+    "key": "2026flta",
+    "start_date": "2026-04-15",
+    "week": 6
+  },
+  {
+    "end_date": "2026-04-11",
+    "event_code": "flwp",
+    "key": "2026flwp",
+    "start_date": "2026-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2026-03-22",
+    "event_code": "hiho",
+    "key": "2026hiho",
+    "start_date": "2026-03-19",
+    "week": 2
+  },
+  {
+    "end_date": "2026-03-28",
+    "event_code": "iacf",
+    "key": "2026iacf",
+    "start_date": "2026-03-25",
+    "week": 3
+  },
+  {
+    "end_date": "2026-03-28",
+    "event_code": "idbo",
+    "key": "2026idbo",
+    "start_date": "2026-03-26",
+    "week": 3
+  },
+  {
+    "end_date": "2026-03-28",
+    "event_code": "ilch",
+    "key": "2026ilch",
+    "start_date": "2026-03-25",
+    "week": 3
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "ilpe",
+    "key": "2026ilpe",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "ksla",
+    "key": "2026ksla",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-04-04",
+    "event_code": "lake",
+    "key": "2026lake",
+    "start_date": "2026-04-01",
+    "week": 4
+  },
+  {
+    "end_date": "2026-03-07",
+    "event_code": "mndu",
+    "key": "2026mndu",
+    "start_date": "2026-03-04",
+    "week": 0
+  },
+  {
+    "end_date": "2026-03-07",
+    "event_code": "mndu2",
+    "key": "2026mndu2",
+    "start_date": "2026-03-04",
+    "week": 0
+  },
+  {
+    "end_date": "2026-03-28",
+    "event_code": "mnmi",
+    "key": "2026mnmi",
+    "start_date": "2026-03-25",
+    "week": 3
+  },
+  {
+    "end_date": "2026-04-11",
+    "event_code": "mnmi2",
+    "key": "2026mnmi2",
+    "start_date": "2026-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2026-04-04",
+    "event_code": "mnum",
+    "key": "2026mnum",
+    "start_date": "2026-04-01",
+    "week": 4
+  },
+  {
+    "end_date": "2026-03-07",
+    "event_code": "mnwi",
+    "key": "2026mnwi",
+    "start_date": "2026-03-04",
+    "week": 0
+  },
+  {
+    "end_date": "2026-04-11",
+    "event_code": "mokc",
+    "key": "2026mokc",
+    "start_date": "2026-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2026-04-04",
+    "event_code": "mose",
+    "key": "2026mose",
+    "start_date": "2026-04-01",
+    "week": 4
+  },
+  {
+    "end_date": "2026-03-28",
+    "event_code": "mosl",
+    "key": "2026mosl",
+    "start_date": "2026-03-25",
+    "week": 3
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "mslr",
+    "key": "2026mslr",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-03-14",
+    "event_code": "mxmo",
+    "key": "2026mxmo",
+    "start_date": "2026-03-11",
+    "week": 1
+  },
+  {
+    "end_date": "2026-03-28",
+    "event_code": "mxto",
+    "key": "2026mxto",
+    "start_date": "2026-03-25",
+    "week": 3
+  },
+  {
+    "end_date": "2026-03-14",
+    "event_code": "ndgf",
+    "key": "2026ndgf",
+    "start_date": "2026-03-11",
+    "week": 1
+  },
+  {
+    "end_date": "2026-04-11",
+    "event_code": "nvlv",
+    "key": "2026nvlv",
+    "start_date": "2026-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "nyli2",
+    "key": "2026nyli2",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-04-08",
+    "event_code": "nyn2",
+    "key": "2026nyn2",
+    "start_date": "2026-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2026-04-12",
+    "event_code": "nyny",
+    "key": "2026nyny",
+    "start_date": "2026-04-09",
+    "week": 5
+  },
+  {
+    "end_date": "2026-03-14",
+    "event_code": "nyro",
+    "key": "2026nyro",
+    "start_date": "2026-03-11",
+    "week": 1
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "nysu",
+    "key": "2026nysu",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-04-18",
+    "event_code": "nytr",
+    "key": "2026nytr",
+    "start_date": "2026-04-15",
+    "week": 6
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "ohcl",
+    "key": "2026ohcl",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-04-04",
+    "event_code": "ohmv",
+    "key": "2026ohmv",
+    "start_date": "2026-04-01",
+    "week": 4
+  },
+  {
+    "end_date": "2026-03-07",
+    "event_code": "okok",
+    "key": "2026okok",
+    "start_date": "2026-03-04",
+    "week": 0
+  },
+  {
+    "end_date": "2026-04-04",
+    "event_code": "oktu",
+    "key": "2026oktu",
+    "start_date": "2026-04-01",
+    "week": 4
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "paca",
+    "key": "2026paca",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-04-11",
+    "event_code": "qcmo",
+    "key": "2026qcmo",
+    "start_date": "2026-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2026-03-21",
+    "event_code": "tnkn",
+    "key": "2026tnkn",
+    "start_date": "2026-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2026-04-09",
+    "event_code": "tuak",
+    "key": "2026tuak",
+    "start_date": "2026-04-07",
+    "week": 5
+  },
+  {
+    "end_date": "2026-04-12",
+    "event_code": "tuak2",
+    "key": "2026tuak2",
+    "start_date": "2026-04-10",
+    "week": 5
+  },
+  {
+    "end_date": "2026-03-27",
+    "event_code": "tuhc",
+    "key": "2026tuhc",
+    "start_date": "2026-03-25",
+    "week": 3
+  },
+  {
+    "end_date": "2026-03-05",
+    "event_code": "tuis",
+    "key": "2026tuis",
+    "start_date": "2026-03-03",
+    "week": 0
+  },
+  {
+    "end_date": "2026-03-08",
+    "event_code": "tuis2",
+    "key": "2026tuis2",
+    "start_date": "2026-03-06",
+    "week": 0
+  },
+  {
+    "end_date": "2026-03-30",
+    "event_code": "tuis3",
+    "key": "2026tuis3",
+    "start_date": "2026-03-28",
+    "week": 3
+  },
+  {
+    "end_date": "2026-03-11",
+    "event_code": "tuis4",
+    "key": "2026tuis4",
+    "start_date": "2026-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2026-04-02",
+    "event_code": "tuis5",
+    "key": "2026tuis5",
+    "start_date": "2026-03-31",
+    "week": 4
+  },
+  {
+    "end_date": "2026-04-18",
+    "event_code": "utwv",
+    "key": "2026utwv",
+    "start_date": "2026-04-16",
+    "week": 6
+  }
+]

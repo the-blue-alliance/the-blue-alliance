@@ -1,0 +1,429 @@
+[
+  {
+    "end_date": "2022-04-09",
+    "event_code": "alhu",
+    "key": "2022alhu",
+    "start_date": "2022-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "arli",
+    "key": "2022arli",
+    "start_date": "2022-03-31",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-13",
+    "event_code": "ausc",
+    "key": "2022ausc",
+    "start_date": "2022-03-11",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "azfl",
+    "key": "2022azfl",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-19",
+    "event_code": "azva",
+    "key": "2022azva",
+    "start_date": "2022-03-16",
+    "week": 2
+  },
+  {
+    "end_date": "2022-03-05",
+    "event_code": "bcvi",
+    "key": "2022bcvi",
+    "start_date": "2022-03-03",
+    "week": 0
+  },
+  {
+    "end_date": "2022-04-09",
+    "event_code": "caav",
+    "key": "2022caav",
+    "start_date": "2022-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "cada",
+    "key": "2022cada",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "cafr",
+    "key": "2022cafr",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-04-03",
+    "event_code": "cala",
+    "key": "2022cala",
+    "start_date": "2022-03-31",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "camb",
+    "key": "2022camb",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "caoc",
+    "key": "2022caoc",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-06",
+    "event_code": "caph",
+    "key": "2022caph",
+    "start_date": "2022-03-03",
+    "week": 0
+  },
+  {
+    "end_date": "2022-03-20",
+    "event_code": "casd",
+    "key": "2022casd",
+    "start_date": "2022-03-17",
+    "week": 2
+  },
+  {
+    "end_date": "2022-03-20",
+    "event_code": "casf",
+    "key": "2022casf",
+    "start_date": "2022-03-17",
+    "week": 2
+  },
+  {
+    "end_date": "2022-04-10",
+    "event_code": "casj",
+    "key": "2022casj",
+    "start_date": "2022-04-07",
+    "week": 5
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "cave",
+    "key": "2022cave",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "code",
+    "key": "2022code",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "flor",
+    "key": "2022flor",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-19",
+    "event_code": "flta",
+    "key": "2022flta",
+    "start_date": "2022-03-16",
+    "week": 2
+  },
+  {
+    "end_date": "2022-03-05",
+    "event_code": "flwp",
+    "key": "2022flwp",
+    "start_date": "2022-03-02",
+    "week": 0
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "hiho",
+    "key": "2022hiho",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "iacf",
+    "key": "2022iacf",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "idbo",
+    "key": "2022idbo",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-04-09",
+    "event_code": "ilch",
+    "key": "2022ilch",
+    "start_date": "2022-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2022-03-19",
+    "event_code": "ilpe",
+    "key": "2022ilpe",
+    "start_date": "2022-03-16",
+    "week": 2
+  },
+  {
+    "end_date": "2022-03-19",
+    "event_code": "ksla",
+    "key": "2022ksla",
+    "start_date": "2022-03-16",
+    "week": 2
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "lake",
+    "key": "2022lake",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-05",
+    "event_code": "mndu",
+    "key": "2022mndu",
+    "start_date": "2022-03-02",
+    "week": 0
+  },
+  {
+    "end_date": "2022-03-05",
+    "event_code": "mndu2",
+    "key": "2022mndu2",
+    "start_date": "2022-03-02",
+    "week": 0
+  },
+  {
+    "end_date": "2022-04-09",
+    "event_code": "mnmi",
+    "key": "2022mnmi",
+    "start_date": "2022-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2022-04-09",
+    "event_code": "mnmi2",
+    "key": "2022mnmi2",
+    "start_date": "2022-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "mokc",
+    "key": "2022mokc",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-04-03",
+    "event_code": "mokc3",
+    "key": "2022mokc3",
+    "start_date": "2022-03-31",
+    "week": 4
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "mosl",
+    "key": "2022mosl",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "mxmo",
+    "key": "2022mxmo",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "mxto",
+    "key": "2022mxto",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "ndgf",
+    "key": "2022ndgf",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "nvlv",
+    "key": "2022nvlv",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-23",
+    "event_code": "nyli",
+    "key": "2022nyli",
+    "start_date": "2022-03-20",
+    "week": 2
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "nyli2",
+    "key": "2022nyli2",
+    "start_date": "2022-03-24",
+    "week": 3
+  },
+  {
+    "end_date": "2022-04-10",
+    "event_code": "nyny",
+    "key": "2022nyny",
+    "start_date": "2022-04-07",
+    "week": 5
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "nyro",
+    "key": "2022nyro",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-16",
+    "event_code": "nytr",
+    "key": "2022nytr",
+    "start_date": "2022-03-13",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "ohcl",
+    "key": "2022ohcl",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "okok",
+    "key": "2022okok",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-04-09",
+    "event_code": "oktu",
+    "key": "2022oktu",
+    "start_date": "2022-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2022-03-19",
+    "event_code": "paca",
+    "key": "2022paca",
+    "start_date": "2022-03-16",
+    "week": 2
+  },
+  {
+    "end_date": "2022-04-07",
+    "event_code": "qcmo1",
+    "key": "2022qcmo1",
+    "start_date": "2022-04-07",
+    "week": 5
+  },
+  {
+    "end_date": "2022-04-08",
+    "event_code": "qcmo2",
+    "key": "2022qcmo2",
+    "start_date": "2022-04-08",
+    "week": 5
+  },
+  {
+    "end_date": "2022-04-09",
+    "event_code": "qcmo3",
+    "key": "2022qcmo3",
+    "start_date": "2022-04-09",
+    "week": 5
+  },
+  {
+    "end_date": "2022-03-12",
+    "event_code": "scan",
+    "key": "2022scan",
+    "start_date": "2022-03-09",
+    "week": 1
+  },
+  {
+    "end_date": "2022-03-06",
+    "event_code": "tant",
+    "key": "2022tant",
+    "start_date": "2022-03-03",
+    "week": 0
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "tnkn",
+    "key": "2022tnkn",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-17",
+    "event_code": "tuis",
+    "key": "2022tuis",
+    "start_date": "2022-03-14",
+    "week": 2
+  },
+  {
+    "end_date": "2022-03-20",
+    "event_code": "tuis2",
+    "key": "2022tuis2",
+    "start_date": "2022-03-18",
+    "week": 2
+  },
+  {
+    "end_date": "2022-03-06",
+    "event_code": "tuis3",
+    "key": "2022tuis3",
+    "start_date": "2022-03-03",
+    "week": 0
+  },
+  {
+    "end_date": "2022-04-09",
+    "event_code": "utwv",
+    "key": "2022utwv",
+    "start_date": "2022-04-06",
+    "week": 5
+  },
+  {
+    "end_date": "2022-04-02",
+    "event_code": "wila",
+    "key": "2022wila",
+    "start_date": "2022-03-30",
+    "week": 4
+  },
+  {
+    "end_date": "2022-03-26",
+    "event_code": "wimi",
+    "key": "2022wimi",
+    "start_date": "2022-03-23",
+    "week": 3
+  },
+  {
+    "end_date": "2022-03-27",
+    "event_code": "zhha",
+    "key": "2022zhha",
+    "start_date": "2022-03-24",
+    "week": 3
+  }
+]
