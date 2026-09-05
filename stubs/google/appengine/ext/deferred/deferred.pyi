@@ -5,6 +5,7 @@ from typing import Any, Dict
 _TASKQUEUE_HEADERS: Dict
 _DEFAULT_URL: str
 _DEFAULT_QUEUE: str
+_DEFAULT_LOG_LEVEL: int
 
 class Error(Exception): ...
 class PermanentTaskFailure(Error): ...
