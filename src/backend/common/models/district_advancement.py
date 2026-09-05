@@ -1,4 +1,4 @@
-from typing import Dict, TypedDict
+from typing import Dict, List, TypedDict
 
 from backend.common.models.keys import TeamKey
 
@@ -14,3 +14,12 @@ DistrictAdvancement = Dict[TeamKey, TeamDistrictAdvancement]
 class AdvancementCounts(TypedDict):
     dcmp: int
     cmp: int
+
+
+class DistrictAdvancementCutoffs(TypedDict):
+    dcmp_original: int
+    dcmp_effective: int
+    dcmp_declines: List[TeamKey]
+    cmp_original: int
+    cmp_effective: int
+    cmp_declines: List[TeamKey]

@@ -1,0 +1,706 @@
+[
+  {
+    "city": "Battle Creek",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "mibat",
+    "event_type": 1,
+    "key": "2026mibat",
+    "name": "FIM District Battle Creek Event presented by BlueOval Battery Park Michigan",
+    "start_date": "2026-03-27",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Belleville",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-21",
+    "event_code": "mibel",
+    "event_type": 1,
+    "key": "2026mibel",
+    "name": "FIM District Belleville Event presented by DTE",
+    "start_date": "2026-03-19",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Berrien Springs",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-22",
+    "event_code": "miber",
+    "event_type": 1,
+    "key": "2026miber",
+    "name": "FIM District Berrien Springs Event presented by Edgewater Automation",
+    "start_date": "2026-03-20",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Big Rapids",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-11",
+    "event_code": "mibig",
+    "event_type": 1,
+    "key": "2026mibig",
+    "name": "FIM District Ferris State Event presented by Ferris State University",
+    "start_date": "2026-04-09",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Brooklyn",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-22",
+    "event_code": "mibkn",
+    "event_type": 1,
+    "key": "2026mibkn",
+    "name": "FIM District Jackson at Columbia Event presented by Consumers Energy Foundation",
+    "start_date": "2026-03-20",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Brownstown Charter Twp",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-15",
+    "event_code": "mibro",
+    "event_type": 1,
+    "key": "2026mibro",
+    "name": "FIM District Woodhaven Event",
+    "start_date": "2026-03-13",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Chelsea",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-08",
+    "event_code": "miche",
+    "event_type": 1,
+    "key": "2026miche",
+    "name": "FIM District Chelsea Event presented by DTE",
+    "start_date": "2026-03-06",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "micmp",
+    "event_type": 2,
+    "key": "2026micmp",
+    "name": "FIRST in Michigan State Championship",
+    "start_date": "2026-04-18",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "micmp1",
+    "event_type": 5,
+    "key": "2026micmp1",
+    "name": "FIRST in Michigan State Championship - DTE Energy Foundation Division",
+    "start_date": "2026-04-16",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "micmp2",
+    "event_type": 5,
+    "key": "2026micmp2",
+    "name": "FIRST in Michigan State Championship - Consumers Energy Foundation Division",
+    "start_date": "2026-04-16",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "micmp3",
+    "event_type": 5,
+    "key": "2026micmp3",
+    "name": "FIRST in Michigan State Championship - Hemlock Semiconductor Division",
+    "start_date": "2026-04-16",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "micmp4",
+    "event_type": 5,
+    "key": "2026micmp4",
+    "name": "FIRST in Michigan State Championship - Aptiv Foundation Division",
+    "start_date": "2026-04-16",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Detroit",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-14",
+    "event_code": "midtr",
+    "event_type": 1,
+    "key": "2026midtr",
+    "name": "FIM District Wayne State Event presented by Magna",
+    "start_date": "2026-03-12",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Escanaba",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-11",
+    "event_code": "miesc",
+    "event_type": 1,
+    "key": "2026miesc",
+    "name": "FIM District Escanaba Event",
+    "start_date": "2026-04-09",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Fenton",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-12",
+    "event_code": "mifen",
+    "event_type": 1,
+    "key": "2026mifen",
+    "name": "FIM District Fenton Event presented by Gene Haas Foundation",
+    "start_date": "2026-04-10",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Flint",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-22",
+    "event_code": "mifli",
+    "event_type": 1,
+    "key": "2026mifli",
+    "name": "FIM District Kearsley Event presented by BAE Systems",
+    "start_date": "2026-03-20",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Kentwood",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-11",
+    "event_code": "miken",
+    "event_type": 1,
+    "key": "2026miken",
+    "name": "FIM District Kentwood Event presented by Dematic",
+    "start_date": "2026-04-09",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Lake City",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-15",
+    "event_code": "milac",
+    "event_type": 1,
+    "key": "2026milac",
+    "name": "FIM District Lake City Event presented by AT&T",
+    "start_date": "2026-03-13",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Battle Creek",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-07",
+    "event_code": "milak",
+    "event_type": 1,
+    "key": "2026milak",
+    "name": "FIM District Lakeview Event",
+    "start_date": "2026-03-05",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Livonia",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-04",
+    "event_code": "miliv",
+    "event_type": 1,
+    "key": "2026miliv",
+    "name": "FIM District Livonia Event presented by Aisin",
+    "start_date": "2026-04-02",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Sault Ste. Marie",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-28",
+    "event_code": "milsu",
+    "event_type": 1,
+    "key": "2026milsu",
+    "name": "FIM District LSSU Event presented by Lake Superior State University",
+    "start_date": "2026-03-26",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Marysville",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-15",
+    "event_code": "mimar",
+    "event_type": 1,
+    "key": "2026mimar",
+    "name": "FIM District Marysville Event",
+    "start_date": "2026-03-13",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Mason",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "mimas",
+    "event_type": 1,
+    "key": "2026mimas",
+    "name": "FIM District Mason Event presented by Altair",
+    "start_date": "2026-03-27",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Midland",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-14",
+    "event_code": "mimid",
+    "event_type": 1,
+    "key": "2026mimid",
+    "name": "FIM District Midland Event presented by Dow",
+    "start_date": "2026-03-12",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Highland",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-14",
+    "event_code": "mimil",
+    "event_type": 1,
+    "key": "2026mimil",
+    "name": "FIM District Milford Event presented by GM Proving Grounds",
+    "start_date": "2026-03-12",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Mt Pleasant",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-08",
+    "event_code": "mimtp",
+    "event_type": 1,
+    "key": "2026mimtp",
+    "name": "FIM District Mt Pleasant Event presented by AT&T",
+    "start_date": "2026-03-06",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Muskegon",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-21",
+    "event_code": "mimus",
+    "event_type": 1,
+    "key": "2026mimus",
+    "name": "FIM District Muskegon Event presented by RENK",
+    "start_date": "2026-03-19",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Saline",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "misal",
+    "event_type": 1,
+    "key": "2026misal",
+    "name": "FIM District Saline Event presented by Oracle",
+    "start_date": "2026-03-27",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Troy",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-04",
+    "event_code": "mitr2",
+    "event_type": 1,
+    "key": "2026mitr2",
+    "name": "FIM District Troy Event #2 presented by DTE Foundation",
+    "start_date": "2026-04-02",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Troy",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "mitry",
+    "event_type": 1,
+    "key": "2026mitry",
+    "name": "FIM District Troy Event presented by Aptiv Foundation",
+    "start_date": "2026-03-27",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Traverse City",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-21",
+    "event_code": "mitvc",
+    "event_type": 1,
+    "key": "2026mitvc",
+    "name": "FIM District Traverse City Event presented by Cone Drive",
+    "start_date": "2026-03-19",
+    "state_prov": "MI",
+    "year": 2026
+  },
+  {
+    "city": "Allendale",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2026fim",
+      "official_advancement_counts": {
+        "cmp": 83,
+        "dcmp": 160
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-28",
+    "event_code": "miwmi",
+    "event_type": 1,
+    "key": "2026miwmi",
+    "name": "FIM District West Michigan Event presented by Grand Valley State University",
+    "start_date": "2026-03-26",
+    "state_prov": "MI",
+    "year": 2026
+  }
+]
