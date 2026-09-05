@@ -13,10 +13,15 @@ from backend.api.handlers.tests.helpers import (
 )
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
+from backend.common.consts.cmp_qualification import CmpQualificationMethod
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.award import Award
 from backend.common.models.district import District
+from backend.common.models.district_advancement import (
+    DistrictAdvancementCutoffs,
+    TeamDistrictAdvancement,
+)
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
@@ -478,6 +483,172 @@ def test_district_insights(ndb_stub, api_client: Client) -> None:
             }
         },
     }
+
+
+def _cutoffs() -> DistrictAdvancementCutoffs:
+    return DistrictAdvancementCutoffs(
+        dcmp_original=60,
+        dcmp_effective=64,
+        dcmp_declines=["frc1", "frc2"],
+        cmp_original=22,
+        cmp_effective=24,
+        cmp_declines=["frc3"],
+        cmp_qualification={
+            "frc95": CmpQualificationMethod.DISTRICT_POINTS,
+            "frc133": CmpQualificationMethod.DCMP_WINNER,
+        },
+    )
+
+
+def test_district_advancement(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={
+            "frc95": TeamDistrictAdvancement(dcmp=True, cmp=True),
+            "frc133": TeamDistrictAdvancement(dcmp=True, cmp=True),
+            "frc190": TeamDistrictAdvancement(dcmp=True, cmp=False),
+        },
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {
+        "teams": {
+            "frc95": {
+                "dcmp": True,
+                "cmp": True,
+                "cmp_qualification": "district_points",
+            },
+            "frc133": {"dcmp": True, "cmp": True, "cmp_qualification": "dcmp_winner"},
+            "frc190": {"dcmp": True, "cmp": False, "cmp_qualification": None},
+        },
+        "cutoffs": {
+            "dcmp_original": 60,
+            "dcmp_effective": 64,
+            "dcmp_declines": ["frc1", "frc2"],
+            "cmp_original": 22,
+            "cmp_effective": 24,
+            "cmp_declines": ["frc3"],
+        },
+    }
+
+
+def test_district_advancement_cutoffs_omit_cmp_qualification(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={"frc95": TeamDistrictAdvancement(dcmp=True, cmp=True)},
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert set(resp.json["cutoffs"].keys()) == {
+        "dcmp_original",
+        "dcmp_effective",
+        "dcmp_declines",
+        "cmp_original",
+        "cmp_effective",
+        "cmp_declines",
+    }
+
+
+def test_district_advancement_does_not_mutate_model(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={"frc95": TeamDistrictAdvancement(dcmp=True, cmp=True)},
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+
+    district = District.get_by_id("2026ne")
+    assert district is not None
+    assert district.advancement_cutoffs == _cutoffs()
+    assert district.advancement == {
+        "frc95": TeamDistrictAdvancement(dcmp=True, cmp=True)
+    }
+
+
+def test_district_advancement_without_cutoffs(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={"frc95": TeamDistrictAdvancement(dcmp=True, cmp=False)},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {
+        "teams": {
+            "frc95": {"dcmp": True, "cmp": False, "cmp_qualification": None},
+        },
+        "cutoffs": None,
+    }
+
+
+def test_district_advancement_empty(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {"teams": None, "cutoffs": None}
 
 
 @pytest.mark.parametrize(

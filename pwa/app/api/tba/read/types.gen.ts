@@ -587,6 +587,90 @@ export enum PlayoffType {
   CUSTOM = 8,
 }
 
+/**
+ * CmpQualificationMethod
+ *
+ * How a team earned its invitation to the FIRST Championship. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/cmp_qualification.py for full definitions.
+ */
+export enum CmpQualificationMethod {
+  /**
+   * DISTRICT_POINTS
+   */
+  DISTRICT_POINTS = 'district_points',
+  /**
+   * WAITLIST
+   */
+  WAITLIST = 'waitlist',
+  /**
+   * ORIGINAL_AND_SUSTAINING
+   */
+  ORIGINAL_AND_SUSTAINING = 'original_and_sustaining',
+  /**
+   * HALL_OF_FAME
+   */
+  HALL_OF_FAME = 'hall_of_fame',
+  /**
+   * PRIOR_YEAR_CMP_WINNER
+   */
+  PRIOR_YEAR_CMP_WINNER = 'prior_year_cmp_winner',
+  /**
+   * PRIOR_YEAR_CMP_IMPACT
+   */
+  PRIOR_YEAR_CMP_IMPACT = 'prior_year_cmp_impact',
+  /**
+   * PRIOR_YEAR_CMP_ENGINEERING_INSPIRATION
+   */
+  PRIOR_YEAR_CMP_ENGINEERING_INSPIRATION = 'prior_year_cmp_engineering_inspiration',
+  /**
+   * REGIONAL_WINNER
+   */
+  REGIONAL_WINNER = 'regional_winner',
+  /**
+   * REGIONAL_IMPACT
+   */
+  REGIONAL_IMPACT = 'regional_impact',
+  /**
+   * REGIONAL_ENGINEERING_INSPIRATION
+   */
+  REGIONAL_ENGINEERING_INSPIRATION = 'regional_engineering_inspiration',
+  /**
+   * REGIONAL_WILDCARD
+   */
+  REGIONAL_WILDCARD = 'regional_wildcard',
+  /**
+   * LATE_REGIONAL_WINNER
+   */
+  LATE_REGIONAL_WINNER = 'late_regional_winner',
+  /**
+   * LATE_REGIONAL_IMPACT
+   */
+  LATE_REGIONAL_IMPACT = 'late_regional_impact',
+  /**
+   * LATE_REGIONAL_ENGINEERING_INSPIRATION
+   */
+  LATE_REGIONAL_ENGINEERING_INSPIRATION = 'late_regional_engineering_inspiration',
+  /**
+   * LATE_REGIONAL_WILDCARD
+   */
+  LATE_REGIONAL_WILDCARD = 'late_regional_wildcard',
+  /**
+   * DCMP_WINNER
+   */
+  DCMP_WINNER = 'dcmp_winner',
+  /**
+   * DCMP_IMPACT
+   */
+  DCMP_IMPACT = 'dcmp_impact',
+  /**
+   * DCMP_ENGINEERING_INSPIRATION
+   */
+  DCMP_ENGINEERING_INSPIRATION = 'dcmp_engineering_inspiration',
+  /**
+   * DCMP_ROOKIE_ALL_STAR
+   */
+  DCMP_ROOKIE_ALL_STAR = 'dcmp_rookie_all_star',
+}
+
 export type District = {
   /**
    * The short identifier for the district.
@@ -658,6 +742,56 @@ export type DistrictAdvancement = {
    * Whether or not the team qualified for the FIRST Championship
    */
   cmp: boolean;
+  /**
+   * How the team qualified for the FIRST Championship, or `null` if the team did not qualify.
+   */
+  cmp_qualification?: CmpQualificationMethod | null;
+};
+
+/**
+ * Where the District Championship and FIRST Championship advancement cutoffs fell for a district.
+ */
+export type DistrictAdvancementCutoffs = {
+  /**
+   * The rank at which the District Championship cutoff would have fallen before any declines were applied.
+   */
+  dcmp_original: number;
+  /**
+   * The rank at which the District Championship cutoff actually fell, after declines were backfilled.
+   */
+  dcmp_effective: number;
+  /**
+   * TBA team keys for teams that declined their District Championship invitation.
+   */
+  dcmp_declines: Array<string>;
+  /**
+   * The rank at which the FIRST Championship cutoff would have fallen before any declines were applied.
+   */
+  cmp_original: number;
+  /**
+   * The rank at which the FIRST Championship cutoff actually fell, after declines were backfilled.
+   */
+  cmp_effective: number;
+  /**
+   * TBA team keys for teams that declined their FIRST Championship invitation.
+   */
+  cmp_declines: Array<string>;
+};
+
+/**
+ * Per-team advancement status and the advancement cutoffs for a district.
+ */
+export type DistrictAdvancementResponse = {
+  /**
+   * A mapping of team key to District_Advancement, or `null` if no advancement data is available for the district.
+   */
+  teams: null | {
+    [key: string]: DistrictAdvancement;
+  };
+  /**
+   * Where the advancement cutoffs fell for the district, or `null` if they have not been calculated yet.
+   */
+  cutoffs: DistrictAdvancementCutoffs | null;
 };
 
 export type DistrictInsight = {
@@ -3848,11 +3982,9 @@ export type GetDistrictAdvancementError =
 
 export type GetDistrictAdvancementResponses = {
   /**
-   * A mapping of team key to District_Advancement
+   * Successful response
    */
-  200: null | {
-    [key: string]: DistrictAdvancement;
-  };
+  200: DistrictAdvancementResponse;
 };
 
 export type GetDistrictAdvancementResponse =
