@@ -5,10 +5,12 @@ import { Temporal } from 'temporal-polyfill';
 import {
   Award,
   AwardType,
+  CmpQualificationMethod,
   DistrictRanking,
   Event,
   EventType,
   Team,
+  getDistrictAdvancement,
   getDistrictAwards,
   getDistrictEvents,
   getDistrictHistory,
@@ -36,6 +38,7 @@ import {
   TableRow,
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { CMP_QUALIFICATION_METHOD_LABELS } from '~/lib/api/CmpQualificationMethod';
 import {
   getCurrentWeekEvents,
   getEventDateString,
@@ -58,7 +61,7 @@ export const Route = createFileRoute(
       throw notFound();
     }
 
-    const [districtHistory, rankings, teams, events, awards] =
+    const [districtHistory, rankings, teams, events, awards, advancement] =
       await Promise.all([
         getDistrictHistory({
           path: {
@@ -81,6 +84,11 @@ export const Route = createFileRoute(
           },
         }),
         getDistrictAwards({
+          path: {
+            district_key: `${year}${params.districtAbbreviation}`,
+          },
+        }),
+        getDistrictAdvancement({
           path: {
             district_key: `${year}${params.districtAbbreviation}`,
           },
@@ -129,6 +137,7 @@ export const Route = createFileRoute(
       teams: actuallyActiveTeams,
       events: events.data,
       awards: awards.data,
+      advancementCutoffs: advancement.data?.cutoffs ?? null,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -163,6 +172,7 @@ export const Route = createFileRoute(
 function DistrictPage() {
   const {
     abbreviation,
+    advancementCutoffs,
     awards,
     districtHistory,
     events,
@@ -172,6 +182,10 @@ function DistrictPage() {
   } = Route.useLoaderData();
 
   const hasRankings = rankings !== null;
+
+  const cmpQualification = advancementCutoffs?.cmp_qualification ?? {};
+  const cmpDeclines = new Set(advancementCutoffs?.cmp_declines ?? []);
+  const dcmpDeclines = new Set(advancementCutoffs?.dcmp_declines ?? []);
 
   const validYears = districtHistory.map((d) => d.year).sort((a, b) => b - a);
 
@@ -432,6 +446,40 @@ function DistrictPage() {
                   header: 'Total',
                   accessorFn: (ranking) => ranking.point_total,
                   cell: (info) => <div>{info.getValue<number>()}</div>,
+                },
+                {
+                  header: 'Advancement',
+                  accessorFn: (ranking) =>
+                    cmpQualification[ranking.team_key] ?? null,
+                  cell: (info) => {
+                    const { team_key, event_points } = info.row.original;
+
+                    if (cmpDeclines.has(team_key)) {
+                      return <Badge variant="destructive">Declined CMP</Badge>;
+                    }
+
+                    const method =
+                      info.getValue<CmpQualificationMethod | null>();
+                    if (method) {
+                      return (
+                        <Badge variant="success" className="whitespace-nowrap">
+                          {CMP_QUALIFICATION_METHOD_LABELS[method]}
+                        </Badge>
+                      );
+                    }
+
+                    if (dcmpDeclines.has(team_key)) {
+                      return <Badge variant="destructive">Declined DCMP</Badge>;
+                    }
+
+                    const dcmpPoints = sumBy(
+                      event_points?.filter((event) => event.district_cmp),
+                      (event) => event.total,
+                    );
+                    return dcmpPoints > 0 ? (
+                      <Badge variant="secondary">DCMP</Badge>
+                    ) : null;
+                  },
                 },
               ]}
             />
