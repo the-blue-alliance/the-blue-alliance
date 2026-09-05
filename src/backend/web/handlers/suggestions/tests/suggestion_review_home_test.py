@@ -81,6 +81,21 @@ def test_shows_all_reviews_for_admin(
     )
 
 
+def test_shows_pwa_review_link(login_user, web_client: Client) -> None:
+    login_user.permissions = [AccountPermission.REVIEW_MEDIA]
+
+    response = web_client.get("/suggest/review")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+    pwa_link_container = soup.find(id="pwa-review-link")
+    assert pwa_link_container is not None
+
+    pwa_link = pwa_link_container.find("a")
+    assert pwa_link is not None
+    assert pwa_link["href"] == "https://beta.thebluealliance.com/suggest/review"
+
+
 def test_shows_review_media_tools_for_review_media_permission(
     login_user, web_client: Client
 ) -> None:
