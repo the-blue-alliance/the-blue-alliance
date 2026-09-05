@@ -1,5 +1,8 @@
 import json
+from typing import Generator
 
+import pytest
+from flask.testing import FlaskClient
 from werkzeug.test import Client
 
 from backend.common.consts.model_type import ModelType
@@ -116,17 +119,77 @@ def test_favorites_delete(login_user, web_client: Client) -> None:
     assert len(favorites) == 0
 
 
+@pytest.fixture
+def csrf_enforced(web_client: FlaskClient) -> Generator[FlaskClient, None, None]:
+    """Re-enables the CSRF checking that the `web_client` fixture disables."""
+    from backend.web.main import app
+
+    app.config["WTF_CSRF_CHECK_DEFAULT"] = True
+    try:
+        yield web_client
+    finally:
+        app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+
+
 def test_account_info_not_logged_in(web_client: Client) -> None:
     resp = web_client.get("/_/account/info")
-    assert resp.json == {
-        "logged_in": False,
-        "user_id": None,
-    }
+    assert resp.json is not None
+    assert resp.json["logged_in"] is False
+    assert resp.json["user_id"] is None
 
 
 def test_account_info_logged_in(login_user, web_client: Client) -> None:
     resp = web_client.get("/_/account/info")
-    assert resp.json == {
-        "logged_in": True,
-        "user_id": str(login_user.uid),
-    }
+    assert resp.json is not None
+    assert resp.json["logged_in"] is True
+    assert resp.json["user_id"] == str(login_user.uid)
+
+
+def test_account_info_returns_csrf_token(web_client: Client) -> None:
+    resp = web_client.get("/_/account/info")
+    assert resp.status_code == 200
+    assert resp.json is not None
+    assert resp.json["csrf_token"]
+
+
+def test_account_info_is_not_shared_cacheable(web_client: Client) -> None:
+    # The response carries a per-session CSRF token, so no shared cache (the
+    # Google Frontend, a proxy, ...) may store it.
+    # See https://github.com/the-blue-alliance/the-blue-alliance/issues/10495
+    resp = web_client.get("/_/account/info")
+    assert "no-store" in resp.headers["Cache-Control"]
+
+
+def test_account_info_csrf_token_is_accepted(
+    login_user, csrf_enforced: FlaskClient
+) -> None:
+    token = csrf_enforced.get("/_/account/info").json["csrf_token"]
+
+    resp = csrf_enforced.post(
+        "/_/account/favorites/add",
+        data={"model_type": ModelType.TEAM, "model_key": "frc254"},
+        headers={"X-CSRFToken": token},
+    )
+    assert resp.status_code == 200
+
+    favorites = Favorite.query(ancestor=login_user.account_key).fetch()
+    assert len(favorites) == 1
+
+
+def test_account_info_csrf_token_from_another_session_is_rejected(
+    login_user, csrf_enforced: FlaskClient
+) -> None:
+    # This is the failure mode of issue #10495: a token minted for someone
+    # else's session must not be usable, which is exactly why the token can't
+    # be baked into a publicly cached page.
+    from backend.web.main import app
+
+    other_session_token = app.test_client().get("/_/account/info").json["csrf_token"]
+
+    resp = csrf_enforced.post(
+        "/_/account/favorites/add",
+        data={"model_type": ModelType.TEAM, "model_key": "frc254"},
+        headers={"X-CSRFToken": other_session_token},
+    )
+    assert resp.status_code == 400
+    assert Favorite.query(ancestor=login_user.account_key).fetch() == []

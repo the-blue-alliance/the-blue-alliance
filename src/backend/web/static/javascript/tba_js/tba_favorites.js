@@ -1,4 +1,29 @@
 var favoriteTeamsCookieName = "tba-favorite-teams";
+var cachedCsrfToken = null;
+
+function withCsrfToken(success, error) {
+  /*
+  Fetches a CSRF token for the current session and hands it to success().
+  The token cannot be embedded in the page because team/event pages are
+  publicly cached, so every visitor would receive whichever token happened to
+  warm the cache. See /_/account/info.
+  */
+  if (cachedCsrfToken != null) {
+    success(cachedCsrfToken);
+    return;
+  }
+  $.ajax({
+    type: 'GET',
+    dataType: 'json',
+    url: '/_/account/info',
+    timeout: 10000,  // 10s
+    success: function(data, textStatus, xhr) {
+      cachedCsrfToken = data['csrf_token'];
+      success(cachedCsrfToken);
+    },
+    error: error
+  });
+}
 
 function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
   /*
@@ -27,7 +52,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
           if (xhr.status == 401) {
             $('#login-modal').modal('show');
           } else {
-            $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+            showFavoriteError('add');
           }
           updateFavoriteTeams(null, null, false);
         }
@@ -49,7 +74,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
           if (xhr.status == 401) {
             $('#login-modal').modal('show');
           } else {
-            $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
+            showFavoriteError('delete');
           }
           updateFavoriteTeams(null, null, false);
         }
@@ -158,26 +183,34 @@ function updateTeamFABFavoriteTeams(favoriteTeams) {
   });
 }
 
-function setupFavAddClick() {
+function setupFavClick(action, hideSelector) {
   $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
   $(".tba-fab-team").click(function() {
     $(".tba-fab-team").off("click");
-    $(this).find(".not-favorite").hide();
+    $(this).find(hideSelector).hide();
     addSpinner($(this));
 
-    updateFavoriteTeams($(this).attr("data-team"), 'add', false, $(this).attr("data-csrf-token"));
+    var teamKey = $(this).attr("data-team");
+    withCsrfToken(function(csrfToken) {
+      updateFavoriteTeams(teamKey, action, false, csrfToken);
+    }, function(xhr, textStatus, errorThrown) {
+      showFavoriteError(action);
+      updateFavoriteTeams(null, null, false);
+    });
   });
 }
 
-function setupFavDeleteClick() {
-  $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
-  $(".tba-fab-team").click(function() {
-    $(".tba-fab-team").off("click");
-    $(this).find(".favorite").hide();
-    addSpinner($(this));
+function setupFavAddClick() {
+  setupFavClick('add', ".not-favorite");
+}
 
-    updateFavoriteTeams($(this).attr("data-team"), 'delete', false, $(this).attr("data-csrf-token"));
-  });
+function setupFavDeleteClick() {
+  setupFavClick('delete', ".favorite");
+}
+
+function showFavoriteError(action) {
+  var verb = (action == 'delete') ? 'delete' : 'add';
+  $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to ' + verb + ' favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
 }
 
 function addSpinner(el) {
