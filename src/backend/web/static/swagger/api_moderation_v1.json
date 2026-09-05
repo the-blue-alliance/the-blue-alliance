@@ -32,6 +32,16 @@
           "robot",
           "event_media"
         ],
+        "x-enum-varnames": [
+          "EVENT",
+          "MATCH",
+          "MEDIA",
+          "SOCIAL_MEDIA",
+          "OFFSEASON_EVENT",
+          "API_AUTH_ACCESS",
+          "ROBOT",
+          "EVENT_MEDIA"
+        ],
         "description": "The type of suggestion (event=Webcasts, match=Match Videos, media=Team Media, social-media=Social Media, offseason-event=Offseason Events, api_auth_access=API Key Requests, robot=CAD Models, event_media=Event Videos)"
       },
       "QueueResponse": {
