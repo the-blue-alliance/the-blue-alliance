@@ -28,6 +28,7 @@ src/backend/web/static/javascript/tba_js/tba_keys.js
 
 # Node.js
 node_modules/
+.pnpm-store/
 
 ops/dev/keys/
 # Check in empty storage folder, ignore everything in folder
