@@ -1,0 +1,16 @@
+{# Points moderators at the PWA's review queue, which now supersedes these
+   pages. `pwa_review_path` is the PWA route for the queue being viewed;
+   omit it to link to the queue index. #}
+<div class="row">
+  <div class="col-xs-12">
+    <div class="alert alert-info" role="status" data-testid="pwa-review-banner">
+      <strong>Suggestion review has moved to the new web app.</strong>
+      Please review these in the PWA instead — same queue, with bulk accept/reject, keyboard shortcuts, and better previews:
+      <a href="https://beta.thebluealliance.com{{ pwa_review_path | default('/suggest/review') }}" class="alert-link">
+        beta.thebluealliance.com{{ pwa_review_path | default('/suggest/review') }} &raquo;
+      </a>
+      <br>
+      <small>These pages still work, but the PWA is where fixes and new review tooling land now. If something is missing there, please let us know.</small>
+    </div>
+  </div>
+</div>
