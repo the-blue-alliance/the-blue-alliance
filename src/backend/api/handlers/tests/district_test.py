@@ -540,13 +540,15 @@ def test_district_advancement(ndb_stub, api_client: Client) -> None:
             "cmp_original": 22,
             "cmp_effective": 24,
             "cmp_declines": ["frc3"],
+            "cmp_qualification": {
+                "frc95": "district_points",
+                "frc133": "dcmp_winner",
+            },
         },
     }
 
 
-def test_district_advancement_cutoffs_omit_cmp_qualification(
-    ndb_stub, api_client: Client
-) -> None:
+def test_district_advancement_cutoffs_key_set(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
@@ -572,6 +574,7 @@ def test_district_advancement_cutoffs_omit_cmp_qualification(
         "cmp_original",
         "cmp_effective",
         "cmp_declines",
+        "cmp_qualification",
     }
 
 
@@ -629,6 +632,57 @@ def test_district_advancement_without_cutoffs(ndb_stub, api_client: Client) -> N
         },
         "cutoffs": None,
     }
+
+
+def test_district_advancement_qualification_survives_empty_advancement(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={},
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json["teams"] == {}
+    assert resp.json["cutoffs"]["cmp_qualification"] == {
+        "frc95": "district_points",
+        "frc133": "dcmp_winner",
+    }
+
+
+def test_district_advancement_empty_map_is_not_null(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {"teams": {}, "cutoffs": None}
 
 
 def test_district_advancement_empty(ndb_stub, api_client: Client) -> None:

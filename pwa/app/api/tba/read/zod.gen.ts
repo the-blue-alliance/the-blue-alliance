@@ -241,7 +241,7 @@ export const zDistrictAdvancement = z.object({
 });
 
 /**
- * Where the District Championship and FIRST Championship advancement cutoffs fell for a district.
+ * Where the District Championship and FIRST Championship advancement cutoffs fell for a district, and how each qualifying team earned its Championship invitation.
  */
 export const zDistrictAdvancementCutoffs = z.object({
   dcmp_original: z.int(),
@@ -250,6 +250,7 @@ export const zDistrictAdvancementCutoffs = z.object({
   cmp_original: z.int(),
   cmp_effective: z.int(),
   cmp_declines: z.array(z.string()),
+  cmp_qualification: z.record(z.string(), zCmpQualificationMethod),
 });
 
 /**
