@@ -452,9 +452,9 @@ class FMSAPIMatchDetailsParser(
                         for side2 in ["Left", "Right"]:
                             for level in ["low", "mid", "top"]:
                                 if (
-                                    breakdown[color][
+                                    breakdown[color].get(
                                         "{}{}Rocket{}".format(level, side2, side1)
-                                    ]
+                                    )
                                     != "PanelAndCargo"
                                 ):
                                     completedRocket = False
