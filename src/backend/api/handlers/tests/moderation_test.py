@@ -1052,7 +1052,9 @@ def test_accept_apiwrite(
 def test_accept_apiwrite_default_expiration_past_event(
     api_client: Client, moderator, author: Account, event: Event, taskqueue_stub
 ) -> None:
-    # 2016necmp ended long ago, so the default expiration is "never"
+    # 2016necmp ended long ago. The default is still 7 days -- counted from
+    # the grant, since that is later than event end + 7. Never-expiring keys
+    # are a deliberate exception, not a default.
     moderator([AccountPermission.REVIEW_APIWRITE])
     suggestion_id = create_suggestion(
         author,
@@ -1065,12 +1067,15 @@ def test_accept_apiwrite_default_expiration_past_event(
         },
     )
 
+    before = datetime.now()
     resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept")
+    after = datetime.now()
     assert resp.status_code == 200
 
     auth = ApiAuthAccess.get_by_id(resp.json["created_target_key"])
     assert auth is not None
-    assert auth.expiration is None
+    expiration = none_throws(auth.expiration)
+    assert before + timedelta(days=7) <= expiration <= after + timedelta(days=7)
 
 
 def test_accept_apiwrite_default_expiration_future_event(

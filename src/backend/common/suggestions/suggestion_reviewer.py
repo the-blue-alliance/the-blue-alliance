@@ -425,7 +425,11 @@ class SuggestionReviewer:
     ) -> Tuple[Optional[str], Optional[str]]:
         # Reviewer inputs: auth_types (list of AuthType ints; defaults to the
         # requested types), expiration_days (int; -1 = no expiration; defaults
-        # to 7 while event end + 7 days is still in the future)
+        # to 7). The key stays valid until `expiration_days` after the event
+        # end *or* after the grant, whichever is later, so a key approved long
+        # after an event has finished is still usable rather than dead on
+        # arrival. Never-expiring keys are a deliberate exception, not a
+        # default.
         event_key = suggestion.contents["event_key"]
         event = Event.get_by_id(event_key)
         if not event:
@@ -441,18 +445,7 @@ class SuggestionReviewer:
         ]
 
         raw_expiration_days = overrides.get("expiration_days")
-        if raw_expiration_days is None:
-            # end_date is midnight starting the last event day, so +8 days is
-            # the end of "event end + 7 days"
-            if (
-                event.end_date
-                and event.end_date + datetime.timedelta(days=8)
-                > datetime.datetime.now()
-            ):
-                raw_expiration_days = 7
-            else:
-                raw_expiration_days = -1
-        expiration_days = int(raw_expiration_days)
+        expiration_days = 7 if raw_expiration_days is None else int(raw_expiration_days)
         if expiration_days != -1:
             expiration_event_end = event.end_date + datetime.timedelta(
                 days=expiration_days + 1
