@@ -2,7 +2,11 @@ from typing import Any, Optional
 
 from flask import abort
 
-from backend.api.handlers.decorators import api_authenticated, validate_keys
+from backend.api.handlers.decorators import (
+    api_authenticated,
+    validate_etag,
+    validate_keys,
+)
 from backend.api.handlers.helpers.model_properties import (
     filter_event_properties,
     filter_team_properties,
@@ -35,6 +39,7 @@ from backend.common.queries.team_query import DistrictTeamsQuery
 
 @api_authenticated
 @cached_public
+@validate_etag
 def district_history(
     district_abbreviation: DistrictAbbreviation,
 ) -> TypedFlaskResponse[list[DistrictDict]]:
@@ -52,6 +57,7 @@ def district_history(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def district_events(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
@@ -71,6 +77,7 @@ def district_events(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def district_teams(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
@@ -90,6 +97,7 @@ def district_teams(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def district_rankings(district_key: DistrictKey) -> TypedFlaskResponse[Any]:
     """
@@ -105,6 +113,7 @@ def district_rankings(district_key: DistrictKey) -> TypedFlaskResponse[Any]:
 
 @api_authenticated
 @cached_public
+@validate_etag
 def district_list_year(year: int) -> TypedFlaskResponse[list[DistrictDict]]:
     """
     Returns a list of all districts for a given year.
@@ -117,6 +126,7 @@ def district_list_year(year: int) -> TypedFlaskResponse[list[DistrictDict]]:
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def district_awards(district_key: DistrictKey) -> TypedFlaskResponse[list[dict]]:
     """
@@ -145,6 +155,7 @@ def district_awards(district_key: DistrictKey) -> TypedFlaskResponse[list[dict]]
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
     """
@@ -191,6 +202,7 @@ def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
 
 @api_authenticated
 @cached_public
+@validate_etag
 def dcmp_history(
     district_abbreviation: DistrictAbbreviation,
 ) -> TypedFlaskResponse[list[dict]]:
@@ -244,6 +256,7 @@ def dcmp_history(
 
 @api_authenticated
 @cached_public
+@validate_etag
 def district_insights(
     district_abbreviation: DistrictAbbreviation,
 ) -> TypedFlaskResponse[dict]:

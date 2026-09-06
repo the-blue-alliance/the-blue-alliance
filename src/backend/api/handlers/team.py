@@ -2,6 +2,7 @@ from typing import Any, Optional
 
 from backend.api.handlers.decorators import (
     api_authenticated,
+    validate_etag,
     validate_keys,
 )
 from backend.api.handlers.helpers.model_properties import (
@@ -66,6 +67,7 @@ from backend.common.queries.team_query import (
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team(
     team_key: TeamKey, model_type: Optional[ModelType] = None
@@ -83,6 +85,7 @@ def team(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_history(team_key: TeamKey) -> TypedFlaskResponse[Any]:
     track_call_after_response("team/history", team_key)
@@ -103,6 +106,7 @@ def team_history(team_key: TeamKey) -> TypedFlaskResponse[Any]:
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_years_participated(team_key: TeamKey) -> TypedFlaskResponse[list[int]]:
     """
@@ -117,6 +121,7 @@ def team_years_participated(team_key: TeamKey) -> TypedFlaskResponse[list[int]]:
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_history_districts(team_key: TeamKey) -> TypedFlaskResponse[list[DistrictDict]]:
     """
@@ -130,6 +135,7 @@ def team_history_districts(team_key: TeamKey) -> TypedFlaskResponse[list[Distric
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_history_robots(team_key: TeamKey) -> TypedFlaskResponse[list[RobotDict]]:
     """
@@ -143,6 +149,7 @@ def team_history_robots(team_key: TeamKey) -> TypedFlaskResponse[list[RobotDict]
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_social_media(team_key: TeamKey) -> TypedFlaskResponse[list[MediaDict]]:
     """
@@ -156,6 +163,7 @@ def team_social_media(team_key: TeamKey) -> TypedFlaskResponse[list[MediaDict]]:
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_events(
     team_key: TeamKey,
@@ -185,6 +193,7 @@ def team_events(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_events_statuses_year(team_key: TeamKey, year: int) -> TypedFlaskResponse[dict]:
     """
@@ -219,6 +228,7 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> TypedFlaskRespons
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_event_matches(
     team_key: TeamKey, event_key: EventKey, model_type: Optional[ModelType] = None
@@ -238,6 +248,7 @@ def team_event_matches(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_event_awards(
     team_key: TeamKey, event_key: EventKey
@@ -253,6 +264,7 @@ def team_event_awards(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_event_status(
     team_key: TeamKey, event_key: EventKey
@@ -286,6 +298,7 @@ def team_event_status(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_awards(
     team_key: TeamKey,
@@ -306,6 +319,7 @@ def team_awards(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_matches(
     team_key: TeamKey,
@@ -325,6 +339,7 @@ def team_matches(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_media_year(
     team_key: TeamKey, year: int
@@ -338,6 +353,7 @@ def team_media_year(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def team_media_tag(
     team_key: TeamKey, media_tag: str, year: Optional[int] = None
@@ -365,6 +381,7 @@ def team_media_tag(
 
 @api_authenticated
 @cached_public
+@validate_etag
 def team_list_all(
     model_type: Optional[ModelType] = None,
 ) -> TypedFlaskResponse[list[TeamDict]]:
@@ -378,7 +395,12 @@ def team_list_all(
     max_team_page = int(max_team_num / TEAM_PAGE_SIZE)
 
     futures = []
-    for page_num in range(max_team_page + 1):
+    # Query up to max_team_page + 1 (i.e. range(max_team_page + 2)).
+    # Page max_team_page + 1 is currently empty ([]), but querying it registers its
+    # cache key in @validate_etag's accessed_keys. When a new team is created that starts
+    # this next page, TeamManipulator invalidates TeamListQuery(max_team_page + 1),
+    # which invalidates the ETag and ensures clients receive the new team.
+    for page_num in range(max_team_page + 2):
         futures.append(
             TeamListQuery(page=page_num).fetch_dict_async(ApiMajorVersion.API_V3)
         )
@@ -395,6 +417,7 @@ def team_list_all(
 
 @api_authenticated
 @cached_public
+@validate_etag
 def team_list(
     page_num: int, year: Optional[int] = None, model_type: Optional[ModelType] = None
 ) -> TypedFlaskResponse[list[TeamDict]]:

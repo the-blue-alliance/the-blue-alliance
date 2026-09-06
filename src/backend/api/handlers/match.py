@@ -1,6 +1,10 @@
 from typing import Any, Optional
 
-from backend.api.handlers.decorators import api_authenticated, validate_keys
+from backend.api.handlers.decorators import (
+    api_authenticated,
+    validate_etag,
+    validate_keys,
+)
 from backend.api.handlers.helpers.model_properties import (
     filter_match_properties,
     ModelType,
@@ -20,6 +24,7 @@ from backend.common.queries.match_query import MatchQuery
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def match(
     match_key: MatchKey, model_type: Optional[ModelType] = None
@@ -37,6 +42,7 @@ def match(
 
 @api_authenticated
 @cached_public
+@validate_etag
 @validate_keys
 def zebra_motionworks(match_key: MatchKey) -> TypedFlaskResponse[Any]:
     """

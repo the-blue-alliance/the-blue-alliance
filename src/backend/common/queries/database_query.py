@@ -3,6 +3,8 @@ from __future__ import annotations
 import abc
 import json
 import logging
+from contextlib import contextmanager
+from contextvars import ContextVar
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
 import orjson
@@ -11,15 +13,34 @@ from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
+from backend.common.memcache import MemcacheClient
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.types import DictQueryReturn, QueryReturn
 
+accessed_query_cache_keys_ctx: ContextVar[Optional[Set[str]]] = ContextVar[
+    Optional[Set[str]]
+]("accessed_query_cache_keys_ctx", default=None)
+
+
+@contextmanager
+def track_accessed_query_cache_keys() -> Generator[Set[str], None, None]:
+    """
+    Context manager to collect cache keys of all CachedDatabaseQuery instances
+    accessed during the block execution.
+    """
+    keys: Set[str] = set()
+    token = accessed_query_cache_keys_ctx.set(keys)
+    try:
+        yield keys
+    finally:
+        accessed_query_cache_keys_ctx.reset(token)
+
 
 class DatabaseQuery(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     _query_args: Dict[str, Any]
-    DICT_CONVERTER: Optional[Type[ConverterBase[QueryReturn, DictQueryReturn]]]
+    DICT_CONVERTER: Optional[Type[ConverterBase[QueryReturn, DictQueryReturn]]] = None
 
     def __init__(self, *args, **kwargs) -> None:
         self._query_args = kwargs
@@ -108,11 +129,17 @@ class CachedDatabaseQuery(
         return f"{cache_key}~dictv{dict_version}.{subvserion}"
 
     @classmethod
+    def _record_accessed_cache_key(cls, cache_key: str) -> None:
+        accessed_keys = accessed_query_cache_keys_ctx.get()
+        if accessed_keys is not None:
+            accessed_keys.add(cache_key)
+
+    @classmethod
     def delete_cache_multi(cls, cache_keys: Set[str]) -> None:
         all_cache_keys = []
         for cache_key in cache_keys:
             all_cache_keys.append(cache_key)
-            if cls.DICT_CONVERTER is not None:
+            if getattr(cls, "DICT_CONVERTER", None) is not None:
                 all_cache_keys += [
                     cls._dict_cache_key(cache_key, valid_dict_version)
                     for valid_dict_version in set(ApiMajorVersion)
@@ -121,6 +148,13 @@ class CachedDatabaseQuery(
         ndb.delete_multi(
             [ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys]
         )
+        try:
+            memcache_client = MemcacheClient.get()
+            memcache_client.delete_multi(
+                [f"q_ver:{k}".encode("utf-8") for k in all_cache_keys]
+            )
+        except Exception as e:
+            logging.warning(f"Failed to delete Memcache query version keys: {e}")
 
     @classmethod
     def get_query_class_by_name(
@@ -170,12 +204,14 @@ class CachedDatabaseQuery(
 
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
+        cache_key = self.cache_key
+        self._record_accessed_cache_key(cache_key)
+
         if not self.MODEL_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             return result
 
         with Span("{}._do_query".format(self.__class__.__name__)):
-            cache_key = self.cache_key
             cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
 
             # Validate cached result for corruption and treat as cache miss if corrupted
@@ -210,6 +246,10 @@ class CachedDatabaseQuery(
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> Generator[Any, Any, Union[None, DictQueryReturn, List[DictQueryReturn]]]:
+        if self.DICT_CONVERTER is not None:
+            cache_key = self.dict_cache_key(_dict_version)
+            self._record_accessed_cache_key(cache_key)
+
         if not self.DICT_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             return result
@@ -270,6 +310,10 @@ class CachedDatabaseQuery(
     def _do_json_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> Generator[Any, Any, Optional[bytes]]:
+        if self.DICT_CONVERTER is not None:
+            cache_key = self.dict_cache_key(_dict_version)
+            self._record_accessed_cache_key(cache_key)
+
         if not self.DICT_CACHING_ENABLED:
             dict_result = yield self._do_dict_query(_dict_version, *args, **kwargs)
             if dict_result is None:

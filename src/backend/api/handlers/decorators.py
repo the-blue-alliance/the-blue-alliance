@@ -7,6 +7,12 @@ from flask import g, jsonify, make_response, request, Response
 
 from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import VoidRequest
+from backend.api.handlers.helpers.etag_helper import (
+    get_incoming_etags,
+    is_etag_valid,
+    normalize_etag,
+    save_etag_dependencies,
+)
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
 from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
@@ -14,6 +20,7 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
 from backend.common.consts.fms_report_type import FMSReportType
 from backend.common.consts.renamed_districts import RenamedDistricts
+from backend.common.environment import Environment
 from backend.common.logging import set_logging_context
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
@@ -21,6 +28,7 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.profiler import Span
+from backend.common.queries.database_query import track_accessed_query_cache_keys
 
 
 def api_authenticated(func):
@@ -242,5 +250,50 @@ def validate_keys(func):
                 return {"Error": f"district key: {district_key} does not exist"}, 404
 
         return func(*args, **kwargs)
+
+    return decorated_function
+
+
+def validate_etag(func: Callable) -> Callable:
+    """
+    Decorator for APIv3 endpoints to short-circuit 304 responses when query dependencies haven't changed.
+    """
+
+    @wraps(func)
+    def decorated_function(*args, **kwargs):
+        with Span("validate_etag"):
+            if_none_match = request.headers.get("If-None-Match")
+            if if_none_match:
+                try:
+                    incoming_etags = get_incoming_etags()
+                    for etag in incoming_etags:
+                        if etag and is_etag_valid(etag):
+                            response = Response(status=304)
+                            response.headers["ETag"] = f'"{etag}"'
+                            if Environment.cache_control_header_enabled():
+                                response.headers["Cache-Control"] = (
+                                    "public, max-age=61, s-maxage=61"
+                                )
+                            return response
+                except Exception as e:
+                    logging.warning(f"Error during validate_etag fast-path: {e}")
+
+            with track_accessed_query_cache_keys() as accessed_keys:
+                resp = make_response(func(*args, **kwargs))
+
+                if resp.status_code == 200:
+                    try:
+                        etag_header = resp.headers.get("ETag")
+                        if not etag_header:
+                            resp.add_etag()
+                            etag_header = resp.headers.get("ETag")
+                        if etag_header and accessed_keys:
+                            normalized = normalize_etag(etag_header)
+                            if normalized:
+                                save_etag_dependencies(normalized, accessed_keys)
+                    except Exception as e:
+                        logging.warning(f"Error saving validate_etag dependencies: {e}")
+
+                return resp
 
     return decorated_function

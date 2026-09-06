@@ -1,4 +1,4 @@
-from backend.api.handlers.decorators import api_authenticated
+from backend.api.handlers.decorators import api_authenticated, validate_etag
 from backend.api.handlers.helpers.model_properties import (
     filter_event_properties,
     filter_team_properties,
@@ -20,6 +20,7 @@ from backend.common.queries.team_query import TeamListQuery
 # TODO: bump cache time to 1 day after testing/dev is complete
 @api_authenticated
 @cached_public
+@validate_etag
 def search_index() -> TypedFlaskResponse[dict]:
     track_call_after_response("search_index", "search_index")
 
@@ -28,7 +29,12 @@ def search_index() -> TypedFlaskResponse[dict]:
     max_team_page = int(max_team_num / 500)
 
     team_futures = []
-    for page_num in range(max_team_page + 1):
+    # Query up to max_team_page + 1 (i.e. range(max_team_page + 2)).
+    # Page max_team_page + 1 is currently empty ([]), but querying it registers its
+    # cache key in @validate_etag's accessed_keys. When a new team is created that starts
+    # this next page, TeamManipulator invalidates TeamListQuery(max_team_page + 1),
+    # which invalidates the ETag and ensures clients receive the new team.
+    for page_num in range(max_team_page + 2):
         team_futures.append(
             TeamListQuery(page=page_num).fetch_dict_async(ApiMajorVersion.API_V3)
         )

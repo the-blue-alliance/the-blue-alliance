@@ -1,6 +1,6 @@
 from flask import abort, Response
 
-from backend.api.handlers.decorators import api_authenticated
+from backend.api.handlers.decorators import api_authenticated, validate_etag
 from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.api_version import ApiMajorVersion
@@ -31,6 +31,7 @@ _VALID_INSIGHT_V2_CATEGORIES = frozenset(
 
 @api_authenticated
 @cached_public
+@validate_etag
 def insights_leaderboards_year(year: int) -> Response:
     track_call_after_response("insights/leaderboards", str(year))
 
@@ -43,6 +44,7 @@ def insights_leaderboards_year(year: int) -> Response:
 
 @api_authenticated
 @cached_public
+@validate_etag
 def insights_notables_year(year: int) -> Response:
     track_call_after_response("insights/notables", str(year))
 
@@ -52,6 +54,7 @@ def insights_notables_year(year: int) -> Response:
 
 @api_authenticated
 @cached_public
+@validate_etag
 def insights_v2_year(year: int) -> Response:
     track_call_after_response("insights/v2", str(year))
 
@@ -61,6 +64,7 @@ def insights_v2_year(year: int) -> Response:
 
 @api_authenticated
 @cached_public
+@validate_etag
 def insights_v2_year_category(year: int, category: str) -> Response:
     if category not in _VALID_INSIGHT_V2_CATEGORIES:
         abort(404)
@@ -75,6 +79,7 @@ def insights_v2_year_category(year: int, category: str) -> Response:
 
 @api_authenticated
 @cached_public
+@validate_etag
 def insights_v2_year_district(
     year: int, district_abbreviation: DistrictAbbreviation
 ) -> Response:
@@ -88,6 +93,7 @@ def insights_v2_year_district(
 
 @api_authenticated
 @cached_public
+@validate_etag
 def insights_v2_year_category_district(
     year: int, category: str, district_abbreviation: DistrictAbbreviation
 ) -> Response:
