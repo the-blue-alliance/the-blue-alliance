@@ -16,8 +16,9 @@ token should fetch one from `/_/account/info` instead.
 
 import ast
 import re
+from collections.abc import Iterator
 from pathlib import Path
-from typing import Iterator, List, NamedTuple, Optional, Set
+from typing import NamedTuple
 
 import pytest
 from jinja2 import Environment, FileSystemLoader, TemplateNotFound
@@ -43,7 +44,7 @@ class RenderedTemplate(NamedTuple):
     template: str
 
 
-def _decorator_name(node: ast.expr) -> Optional[str]:
+def _decorator_name(node: ast.expr) -> str | None:
     # Handles @cached_public, @cached_public(ttl=...), and @module.cached_public
     if isinstance(node, ast.Call):
         return _decorator_name(node.func)
@@ -54,7 +55,7 @@ def _decorator_name(node: ast.expr) -> Optional[str]:
     return None
 
 
-def _called_name(node: ast.Call) -> Optional[str]:
+def _called_name(node: ast.Call) -> str | None:
     func = node.func
     if isinstance(func, ast.Attribute):
         return func.attr
@@ -63,12 +64,48 @@ def _called_name(node: ast.Call) -> Optional[str]:
     return None
 
 
+def _module_functions(tree: ast.Module) -> dict[str, ast.AST]:
+    return {
+        node.name: node
+        for node in tree.body
+        if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef))
+    }
+
+
+def _render_calls(
+    func: ast.AST, module_functions: dict[str, ast.AST]
+) -> list[ast.Call]:
+    """`render_template` calls in `func` and in the helpers it delegates to.
+
+    A handler doesn't have to render inline: `index` picks one of six
+    `index_*` helpers out of a dict and returns its result, so walking only the
+    decorated function would miss every template those helpers render. Follow
+    any reference to a module-level function, not just direct calls, since
+    helpers are often passed around as values before being invoked.
+    """
+    calls: list[ast.Call] = []
+    visited: set[int] = set()
+    pending = [func]
+    while pending:
+        current = pending.pop()
+        if id(current) in visited:
+            continue
+        visited.add(id(current))
+        for node in ast.walk(current):
+            if isinstance(node, ast.Call) and _called_name(node) == "render_template":
+                calls.append(node)
+            elif isinstance(node, ast.Name) and node.id in module_functions:
+                pending.append(module_functions[node.id])
+    return calls
+
+
 def _cached_public_renders() -> Iterator[RenderedTemplate]:
     for path in sorted(HANDLERS_ROOT.rglob("*.py")):
         if "tests" in path.parts:
             continue
         tree = ast.parse(path.read_text(), filename=str(path))
-        module = str(path.relative_to(WEB_ROOT.parent.parent))
+        module = str(path.relative_to(SRC_ROOT))
+        module_functions = _module_functions(tree)
         for func in ast.walk(tree):
             if not isinstance(func, (ast.FunctionDef, ast.AsyncFunctionDef)):
                 continue
@@ -76,11 +113,7 @@ def _cached_public_renders() -> Iterator[RenderedTemplate]:
                 _decorator_name(d) == "cached_public" for d in func.decorator_list
             ):
                 continue
-            for call in ast.walk(func):
-                if not isinstance(call, ast.Call):
-                    continue
-                if _called_name(call) != "render_template":
-                    continue
+            for call in _render_calls(func, module_functions):
                 if not call.args:
                     continue
                 name = call.args[0]
@@ -101,7 +134,7 @@ def _template_source(template: str) -> str:
     return source
 
 
-def _referenced_templates(template: str, seen: Set[str]) -> Set[str]:
+def _referenced_templates(template: str, seen: set[str]) -> set[str]:
     """All templates reachable from `template` via extends/include/import."""
     if template in seen:
         return seen
@@ -120,7 +153,7 @@ def _has_dynamic_reference(template: str) -> bool:
     return any(ref is None for ref in jinja_meta.find_referenced_templates(parsed))
 
 
-def _template_name_patterns(source: str) -> Set[str]:
+def _template_name_patterns(source: str) -> set[str]:
     """Globs for template names built at runtime from a format string.
 
     `"event_partials/event_insights_{}.html".format(year)` in a handler or a
@@ -133,7 +166,7 @@ def _template_name_patterns(source: str) -> Set[str]:
     }
 
 
-def _glob_templates(patterns: Set[str]) -> Set[str]:
+def _glob_templates(patterns: set[str]) -> set[str]:
     return {
         path.relative_to(TEMPLATES_ROOT).as_posix()
         for pattern in patterns
@@ -142,7 +175,7 @@ def _glob_templates(patterns: Set[str]) -> Set[str]:
     }
 
 
-def _reachable_templates(render: RenderedTemplate) -> Set[str]:
+def _reachable_templates(render: RenderedTemplate) -> set[str]:
     """Every template `render` can pull in, including dynamic includes."""
     reachable = _referenced_templates(render.template, set())
 
@@ -173,7 +206,7 @@ def _reachable_templates(render: RenderedTemplate) -> Set[str]:
     return reachable
 
 
-CACHED_PUBLIC_RENDERS: List[RenderedTemplate] = list(_cached_public_renders())
+CACHED_PUBLIC_RENDERS: list[RenderedTemplate] = list(_cached_public_renders())
 
 
 def test_found_cached_public_handlers() -> None:
@@ -194,6 +227,10 @@ def test_found_cached_public_handlers() -> None:
         RenderedTemplate("backend/web/handlers/team.py", "team_list", "team_list.html"),
         RenderedTemplate(
             "backend/web/handlers/match.py", "match_detail", "match_details.html"
+        ),
+        # rendered by a helper `index` delegates to, not by `index` itself
+        RenderedTemplate(
+            "backend/web/handlers/index.py", "index", "index/index_kickoff.html"
         ),
     ]
     missing = [render for render in expected if render not in CACHED_PUBLIC_RENDERS]

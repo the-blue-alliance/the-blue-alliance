@@ -25,7 +25,7 @@ function withCsrfToken(success, error) {
   });
 }
 
-function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
+function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken, isCsrfRetry) {
   /*
   Updates Favorites locally and on the server and
   updates the page to reflect these changes
@@ -49,12 +49,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
           updateFavoriteTeams(null, null, false);
         },
         error: function(xhr, textStatus, errorThrown) {
-          if (xhr.status == 401) {
-            $('#login-modal').modal('show');
-          } else {
-            showFavoriteError('add');
-          }
-          updateFavoriteTeams(null, null, false);
+          handleFavoriteError(xhr, teamKey, 'add', isCsrfRetry);
         }
       });
     } else if (action == 'delete') {
@@ -71,12 +66,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
           updateFavoriteTeams(null, null, false);
         },
         error: function(xhr, textStatus, errorThrown) {
-          if (xhr.status == 401) {
-            $('#login-modal').modal('show');
-          } else {
-            showFavoriteError('delete');
-          }
-          updateFavoriteTeams(null, null, false);
+          handleFavoriteError(xhr, teamKey, 'delete', isCsrfRetry);
         }
       });
     }
@@ -102,6 +92,32 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
       updatePageFavoriteTeams(storedFavoriteTeams, skipDelay);
     }
   }
+}
+
+function handleFavoriteError(xhr, teamKey, action, isCsrfRetry) {
+  /*
+  Handles a failed favorites POST.
+
+  A CSRF token is only valid for WTF_CSRF_TIME_LIMIT (one hour by default), but
+  cachedCsrfToken lives as long as the page does. A tab left open past that
+  limit would otherwise keep POSTing the same expired token and fail forever,
+  so on a 400 we drop the cached token, fetch a fresh one, and retry once.
+  */
+  if (xhr.status == 401) {
+    $('#login-modal').modal('show');
+  } else if (xhr.status == 400 && !isCsrfRetry) {
+    cachedCsrfToken = null;
+    withCsrfToken(function(csrfToken) {
+      updateFavoriteTeams(teamKey, action, false, csrfToken, true);
+    }, function(xhr, textStatus, errorThrown) {
+      showFavoriteError(action);
+      updateFavoriteTeams(null, null, false);
+    });
+    return;
+  } else {
+    showFavoriteError(action);
+  }
+  updateFavoriteTeams(null, null, false);
 }
 
 function getLocalFavoriteTeams() {

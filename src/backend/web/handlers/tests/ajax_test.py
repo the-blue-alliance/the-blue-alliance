@@ -1,5 +1,5 @@
 import json
-from typing import Generator
+from collections.abc import Generator
 
 import pytest
 from flask.testing import FlaskClient
@@ -124,11 +124,12 @@ def csrf_enforced(web_client: FlaskClient) -> Generator[FlaskClient, None, None]
     """Re-enables the CSRF checking that the `web_client` fixture disables."""
     from backend.web.main import app
 
+    previous = app.config["WTF_CSRF_CHECK_DEFAULT"]
     app.config["WTF_CSRF_CHECK_DEFAULT"] = True
     try:
         yield web_client
     finally:
-        app.config["WTF_CSRF_CHECK_DEFAULT"] = False
+        app.config["WTF_CSRF_CHECK_DEFAULT"] = previous
 
 
 def test_account_info_not_logged_in(web_client: Client) -> None:
