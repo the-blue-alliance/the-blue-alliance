@@ -16,6 +16,10 @@ vi.mock('@sentry/tanstackstart-react', () => ({
   },
 }));
 
+function secondsToMs(seconds: number): number {
+  return seconds * 1000;
+}
+
 describe('Network Cache Middleware', () => {
   let originalWindow: typeof globalThis.window;
 
@@ -259,6 +263,192 @@ describe('Network Cache Middleware', () => {
     expect(mockFetch).toHaveBeenCalledTimes(1);
   });
 
+  describe('serve-stale and revalidation', () => {
+    const PAST_SEASON_URL = 'https://api.example.com/api/v3/event/2015casj';
+    const CURRENT_SEASON_URL = 'https://api.example.com/api/v3/event/2026casj';
+
+    function jsonResponse(body: string, headers: Record<string, string> = {}) {
+      return new Response(body, {
+        status: 200,
+        headers: {
+          'Content-Type': 'application/json',
+          'Cache-Control': 'public, max-age=61',
+          ...headers,
+        },
+      });
+    }
+
+    beforeEach(() => {
+      // lru-cache reads `performance.now()` for TTLs, so faking Date alone
+      // leaves entries permanently fresh.
+      // Freshness is computed from `Date.now()` in the middleware itself, so
+      // this is the only clock the cache depends on.
+      vi.useFakeTimers({ toFake: ['Date'] });
+      vi.setSystemTime(new Date('2026-06-15T00:00:00Z'));
+    });
+
+    afterEach(() => {
+      vi.useRealTimers();
+    });
+
+    /** Lets the un-awaited revalidation promise settle. */
+    async function flushRevalidation() {
+      await Promise.resolve();
+      await Promise.resolve();
+      await Promise.resolve();
+    }
+
+    it('serves a stale entry without waiting on the network', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(jsonResponse('{"v":1}', { ETag: '"v1"' }))
+        .mockImplementation(
+          () =>
+            new Promise(() => {
+              // never settles: proves the stale read did not await it
+            }),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      await cachedFetch(PAST_SEASON_URL);
+
+      vi.advanceTimersByTime(secondsToMs(120));
+
+      const stale = await cachedFetch(PAST_SEASON_URL);
+      expect(await stale.text()).toBe('{"v":1}');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(getCacheStats().staleServed).toBe(1);
+    });
+
+    it('sends If-None-Match when revalidating', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(jsonResponse('{"v":1}', { ETag: '"v1"' }))
+        .mockResolvedValue(new Response(null, { status: 304 }));
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      await cachedFetch(PAST_SEASON_URL);
+      vi.advanceTimersByTime(secondsToMs(120));
+      await cachedFetch(PAST_SEASON_URL);
+      await flushRevalidation();
+
+      const revalidationInit = mockFetch.mock.calls[1]?.[1];
+      const headers = new Headers(revalidationInit?.headers);
+      expect(headers.get('If-None-Match')).toBe('"v1"');
+    });
+
+    it('keeps the cached body and refreshes freshness on a 304', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(jsonResponse('{"v":1}', { ETag: '"v1"' }))
+        .mockResolvedValue(
+          new Response(null, {
+            status: 304,
+            headers: { 'Cache-Control': 'public, max-age=61' },
+          }),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      await cachedFetch(PAST_SEASON_URL);
+      vi.advanceTimersByTime(secondsToMs(120));
+      await cachedFetch(PAST_SEASON_URL);
+      await flushRevalidation();
+
+      // Entry is fresh again, so this serves without another network call.
+      const afterRevalidation = await cachedFetch(PAST_SEASON_URL);
+      expect(await afterRevalidation.text()).toBe('{"v":1}');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('replaces the cached body when revalidation returns 200', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(jsonResponse('{"v":1}', { ETag: '"v1"' }))
+        .mockResolvedValue(jsonResponse('{"v":2}', { ETag: '"v2"' }));
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      await cachedFetch(PAST_SEASON_URL);
+      vi.advanceTimersByTime(secondsToMs(120));
+      await cachedFetch(PAST_SEASON_URL);
+      await flushRevalidation();
+
+      const afterRevalidation = await cachedFetch(PAST_SEASON_URL);
+      expect(await afterRevalidation.text()).toBe('{"v":2}');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+
+    it('fires a single revalidation for concurrent stale reads', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(jsonResponse('{"v":1}', { ETag: '"v1"' }))
+        .mockResolvedValue(new Response(null, { status: 304 }));
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      await cachedFetch(PAST_SEASON_URL);
+      vi.advanceTimersByTime(secondsToMs(120));
+
+      await Promise.all([
+        cachedFetch(PAST_SEASON_URL),
+        cachedFetch(PAST_SEASON_URL),
+        cachedFetch(PAST_SEASON_URL),
+      ]);
+      await flushRevalidation();
+
+      // 1 initial + exactly 1 revalidation, not 3.
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(getCacheStats().staleServed).toBe(3);
+    });
+
+    it('keeps serving a past-season entry well beyond the current-season window', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(jsonResponse('{"v":1}', { ETag: '"v1"' }))
+        .mockResolvedValue(new Response(null, { status: 304 }));
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      await cachedFetch(PAST_SEASON_URL);
+
+      // 1h: past the 5min current-season ceiling, inside the 24h past-season one.
+      vi.advanceTimersByTime(secondsToMs(3600));
+
+      const stale = await cachedFetch(PAST_SEASON_URL);
+      expect(await stale.text()).toBe('{"v":1}');
+      expect(getCacheStats().staleServed).toBe(1);
+    });
+
+    it('blocks on the network for a current-season entry past its stale ceiling', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockResolvedValueOnce(jsonResponse('{"v":1}', { ETag: '"v1"' }))
+        .mockResolvedValue(jsonResponse('{"v":2}', { ETag: '"v2"' }));
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      await cachedFetch(CURRENT_SEASON_URL);
+
+      // 1h is well past the 5min current-season ceiling.
+      vi.advanceTimersByTime(secondsToMs(3600));
+
+      const refetched = await cachedFetch(CURRENT_SEASON_URL);
+      expect(await refetched.text()).toBe('{"v":2}');
+      expect(getCacheStats().staleServed).toBe(0);
+      expect(getCacheStats().misses).toBe(2);
+    });
+  });
+
   describe('hit rate tracking', () => {
     function mockOkFetch() {
       const mockFetch = vi
@@ -391,14 +581,14 @@ describe('Network Cache Middleware', () => {
         'network.cache.miss',
         1,
         {
-          attributes: { client_platform: 'pwa' },
+          attributes: { client_platform: 'pwa', outcome: 'miss' },
         },
       );
       expect(Sentry.metrics.count).toHaveBeenCalledWith(
         'network.cache.hit',
         1,
         {
-          attributes: { client_platform: 'pwa' },
+          attributes: { client_platform: 'pwa', outcome: 'fresh' },
         },
       );
       expect(Sentry.metrics.count).toHaveBeenCalledTimes(2);

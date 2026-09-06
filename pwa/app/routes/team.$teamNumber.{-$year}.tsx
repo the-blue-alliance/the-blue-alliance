@@ -80,11 +80,12 @@ import { staleTimeForYear } from '~/lib/queryClient';
 import {
   MODEL_TYPE,
   addRecords,
+  cacheControlHeadersForSeason,
   doThrowNotFound,
   hasAnyMatches,
   parseParamsForYearElseDefault,
   pluralize,
-  publicCacheControlHeaders,
+  seasonFromKey,
   stringifyRecord,
   winrateFromRecord,
 } from '~/lib/utils';
@@ -197,7 +198,8 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       team,
     };
   },
-  headers: publicCacheControlHeaders(),
+  headers: ({ params }) =>
+    cacheControlHeadersForSeason(seasonFromKey(params.year)),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

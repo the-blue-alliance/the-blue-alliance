@@ -1,7 +1,7 @@
 import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
-import { useQuery } from '@tanstack/react-query';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
-import { type JSX, useState } from 'react';
+import { type JSX, useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
 import MedalIcon from '~icons/lucide/medal';
@@ -19,14 +19,13 @@ import {
   getEventOprs,
   getEventPredictions,
   getEventRankings,
-  getEventsByYear,
   getInsightsNotablesYear,
-  getStatus,
   getTeamEventsStatusesByYear,
 } from '~/api/tba/read';
 import {
   getDistrictRankingsOptions,
   getEventOptions,
+  getEventsByYearOptions,
   getTeamAwardsByYearOptions,
   getTeamDistrictsOptions,
   getTeamEventsByYearOptions,
@@ -45,25 +44,12 @@ import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
 import { cn, publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
 
 export const Route = createFileRoute('/match_suggestion')({
-  loader: async () => {
-    const status = await getStatus();
+  loader: async ({ context: { queryClient, currentSeason } }) => {
+    await queryClient.ensureQueryData(
+      getEventsByYearOptions({ path: { year: currentSeason } }),
+    );
 
-    if (status.data === undefined) {
-      throw new Error('Failed to load status');
-    }
-
-    const year = status.data.current_season;
-    const events = await getEventsByYear({ path: { year } });
-
-    if (events.data === undefined) {
-      throw new Error('Failed to load events');
-    }
-
-    const filteredEvents = getCurrentWeekEvents(events.data);
-
-    return {
-      events: filteredEvents,
-    };
+    return { year: currentSeason };
   },
   headers: publicCacheControlHeaders(),
   component: MatchSuggestion,
@@ -643,7 +629,12 @@ function MatchSuggestionRow({
 }
 
 function MatchSuggestion(): JSX.Element {
-  const { events } = Route.useLoaderData();
+  const { year } = Route.useLoaderData();
+
+  const { data: allEvents } = useSuspenseQuery(
+    getEventsByYearOptions({ path: { year } }),
+  );
+  const events = useMemo(() => getCurrentWeekEvents(allEvents), [allEvents]);
 
   const eventMatchesQuery = useQuery({
     queryKey: ['eventMatches', events],

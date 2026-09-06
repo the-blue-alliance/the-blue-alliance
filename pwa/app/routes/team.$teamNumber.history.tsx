@@ -1,12 +1,13 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { Fragment } from 'react/jsx-runtime';
 
 import {
-  getTeam,
-  getTeamHistory,
-  getTeamSocialMedia,
-  getTeamYearsParticipated,
-} from '~/api/tba/read';
+  getTeamHistoryOptions,
+  getTeamOptions,
+  getTeamSocialMediaOptions,
+  getTeamYearsParticipatedOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { AwardBanner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
@@ -24,46 +25,32 @@ import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
-import { joinComponents, publicCacheControlHeaders } from '~/lib/utils';
+import {
+  doThrowNotFound,
+  joinComponents,
+  publicCacheControlHeaders,
+} from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/history')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     const teamKey = `frc${params.teamNumber}`;
 
-    const [team, history, yearsParticipated, socials] = await Promise.all([
-      getTeam({ path: { team_key: teamKey } }),
-      getTeamHistory({ path: { team_key: teamKey } }),
-      getTeamYearsParticipated({ path: { team_key: teamKey } }),
-      getTeamSocialMedia({ path: { team_key: teamKey } }),
+    const [team] = await Promise.all([
+      queryClient
+        .ensureQueryData(getTeamOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      queryClient.ensureQueryData(
+        getTeamHistoryOptions({ path: { team_key: teamKey } }),
+      ),
+      queryClient.ensureQueryData(
+        getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
+      ),
+      queryClient.ensureQueryData(
+        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+      ),
     ]);
 
-    if (team.data === undefined) {
-      throw notFound();
-    }
-
-    if (
-      history.data === undefined ||
-      yearsParticipated.data === undefined ||
-      socials.data === undefined
-    ) {
-      throw new Error('Failed to load team history');
-    }
-
-    history.data.events
-      .sort(
-        (a, b) =>
-          a.year - b.year ||
-          (a.week ?? 100) - (b.week ?? 100) ||
-          Date.parse(a.start_date) - Date.parse(b.start_date),
-      )
-      .reverse();
-
-    return {
-      team: team.data,
-      history: history.data,
-      yearsParticipated: yearsParticipated.data,
-      socials: socials.data,
-    };
+    return { teamKey, team };
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
@@ -97,10 +84,28 @@ export const Route = createFileRoute('/team/$teamNumber/history')({
 });
 
 function TeamHistoryPage(): React.JSX.Element {
-  const { team, history, yearsParticipated, socials } = Route.useLoaderData();
+  const { teamKey } = Route.useLoaderData();
 
-  yearsParticipated.sort((a, b) => b - a);
-  history.events.sort(sortEventsComparator).reverse();
+  const { data: team } = useSuspenseQuery(
+    getTeamOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: rawHistory } = useSuspenseQuery(
+    getTeamHistoryOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: rawYearsParticipated } = useSuspenseQuery(
+    getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: socials } = useSuspenseQuery(
+    getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+  );
+
+  // These arrays are React Query cache objects now, so order them by copy.
+  const yearsParticipated = rawYearsParticipated.toSorted((a, b) => b - a);
+  const history = {
+    ...rawHistory,
+    events: rawHistory.events.toSorted(sortEventsComparator).toReversed(),
+  };
+
   const awardsSortedByEventDate = sortAwardsByEventDate(
     history.awards,
     history.events,

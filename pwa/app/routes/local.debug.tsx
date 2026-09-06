@@ -14,6 +14,8 @@ interface CacheInfo {
   dataPreview: string;
   remainingTTL: number;
   expiresAt: string;
+  etag: string | undefined;
+  fetchedAt: string;
 }
 
 const PREVIEW_JSON_LENGTH = 50;
@@ -26,7 +28,7 @@ export const Route = createFileRoute('/local/debug')({
 
     // Parse cache entries to extract useful information
     const cacheEntries: CacheInfo[] = entries.map(
-      ({ key, data, remainingTTL }) => {
+      ({ key, data, remainingTTL, etag, fetchedAt }) => {
         // Format: METHOD:URL
         const parts = key.split(':');
         const method = parts[0] || 'UNKNOWN';
@@ -50,6 +52,9 @@ export const Route = createFileRoute('/local/debug')({
           dataPreview: preview,
           remainingTTL,
           expiresAt,
+          etag,
+          fetchedAt:
+            Temporal.Instant.fromEpochMilliseconds(fetchedAt).toString(),
         };
       },
     );
@@ -193,6 +198,25 @@ function LocalDebug(): React.JSX.Element {
                 {Math.round(stats.hitRate * 100)}%
               </div>
               <div className="text-sm text-muted-foreground">all-time</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Stale Served</div>
+              <div className="text-3xl font-bold">{stats.staleServed}</div>
+              <div className="text-sm text-muted-foreground">
+                served without blocking
+              </div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Revalidations</div>
+              <div className="text-3xl font-bold">{stats.revalidations}</div>
+              <div className="text-sm text-muted-foreground">background</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Evictions</div>
+              <div className="text-3xl font-bold">{stats.evictions}</div>
+              <div className="text-sm text-muted-foreground">
+                pushed out by the cap
+              </div>
             </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">

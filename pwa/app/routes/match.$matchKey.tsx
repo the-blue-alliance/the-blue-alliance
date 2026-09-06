@@ -1,35 +1,50 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { Temporal } from 'temporal-polyfill';
 
-import { PlayoffType, getEvent, getMatch } from '~/api/tba/read';
+import { PlayoffType } from '~/api/tba/read';
+import {
+  getEventOptions,
+  getMatchOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { staleTimeForYear } from '~/lib/queryClient';
+import {
+  cacheControlHeadersForSeason,
+  doThrowNotFound,
+  seasonFromKey,
+} from '~/lib/utils';
 
 export const Route = createFileRoute('/match/$matchKey')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     if (!isValidMatchKey(params.matchKey)) {
       throw notFound();
     }
 
     const eventKey = params.matchKey.split('_')[0];
+    const staleTime = staleTimeForYear(seasonFromKey(params.matchKey));
 
     const [event, match] = await Promise.all([
-      getEvent({ path: { event_key: eventKey } }),
-      getMatch({ path: { match_key: params.matchKey } }),
+      queryClient
+        .ensureQueryData({
+          ...getEventOptions({ path: { event_key: eventKey } }),
+          staleTime,
+        })
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData({
+          ...getMatchOptions({ path: { match_key: params.matchKey } }),
+          staleTime,
+        })
+        .catch(doThrowNotFound),
     ]);
 
-    if (event.data === undefined || match.data === undefined) {
-      throw notFound();
-    }
-
-    return {
-      event: event.data,
-      match: match.data,
-    };
+    return { matchKey: params.matchKey, eventKey, event, match };
   },
-  headers: publicCacheControlHeaders(),
+  headers: ({ params }) =>
+    cacheControlHeadersForSeason(seasonFromKey(params.matchKey)),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
@@ -124,7 +139,17 @@ export const Route = createFileRoute('/match/$matchKey')({
 });
 
 function MatchPage() {
-  const { event, match } = Route.useLoaderData();
+  const { matchKey, eventKey } = Route.useLoaderData();
+  const staleTime = staleTimeForYear(seasonFromKey(matchKey));
+
+  const { data: event } = useSuspenseQuery({
+    ...getEventOptions({ path: { event_key: eventKey } }),
+    staleTime,
+  });
+  const { data: match } = useSuspenseQuery({
+    ...getMatchOptions({ path: { match_key: matchKey } }),
+    staleTime,
+  });
 
   return (
     <div>

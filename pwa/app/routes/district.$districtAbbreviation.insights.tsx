@@ -1,11 +1,12 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { Bar, BarChart, CartesianGrid, XAxis, YAxis } from 'recharts';
 
+import { DistrictInsight } from '~/api/tba/read';
 import {
-  DistrictInsight,
-  getDistrictHistory,
-  getDistrictInsights,
-} from '~/api/tba/read';
+  getDistrictHistoryOptions,
+  getDistrictInsightsOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import { TeamLink } from '~/components/tba/links';
 import {
@@ -14,33 +15,36 @@ import {
   ChartTooltipContent,
 } from '~/components/ui/chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
-import { confidence, publicCacheControlHeaders } from '~/lib/utils';
+import {
+  confidence,
+  doThrowNotFound,
+  publicCacheControlHeaders,
+} from '~/lib/utils';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/insights',
 )({
-  loader: async ({ params }) => {
-    const [history, insights] = await Promise.all([
-      getDistrictHistory({
-        path: {
-          district_abbreviation: params.districtAbbreviation,
-        },
-      }),
-      getDistrictInsights({
-        path: {
-          district_abbreviation: params.districtAbbreviation,
-        },
-      }),
+  loader: async ({ params, context: { queryClient } }) => {
+    const districtAbbreviation = params.districtAbbreviation;
+
+    const [history] = await Promise.all([
+      queryClient
+        .ensureQueryData(
+          getDistrictHistoryOptions({
+            path: { district_abbreviation: districtAbbreviation },
+          }),
+        )
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData(
+          getDistrictInsightsOptions({
+            path: { district_abbreviation: districtAbbreviation },
+          }),
+        )
+        .catch(doThrowNotFound),
     ]);
 
-    if (history.data === undefined || insights.data === undefined) {
-      throw notFound();
-    }
-
-    return {
-      history: history.data,
-      insights: insights.data,
-    };
+    return { districtAbbreviation, history };
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
@@ -72,7 +76,18 @@ export const Route = createFileRoute(
 });
 
 function DistrictInsightsPage() {
-  const { history, insights } = Route.useLoaderData();
+  const { districtAbbreviation } = Route.useLoaderData();
+
+  const { data: history } = useSuspenseQuery(
+    getDistrictHistoryOptions({
+      path: { district_abbreviation: districtAbbreviation },
+    }),
+  );
+  const { data: insights } = useSuspenseQuery(
+    getDistrictInsightsOptions({
+      path: { district_abbreviation: districtAbbreviation },
+    }),
+  );
 
   return (
     <div>

@@ -9,6 +9,8 @@ import {
   parseParamsForYearElseDefault,
   queryFromAPI,
   removeNonNumeric,
+  seasonFromKey,
+  seasonFromPath,
   slugify,
   splitIntoNChunks,
 } from '~/lib/utils';
@@ -122,5 +124,46 @@ describe.concurrent('hasAnyMatches', () => {
 
   test('returns false for an empty record', () => {
     expect(hasAnyMatches({ wins: 0, losses: 0, ties: 0 })).toEqual(false);
+  });
+});
+
+describe.concurrent('seasonFromKey', () => {
+  test('reads the year prefix off event and match keys', () => {
+    expect(seasonFromKey('2024casj')).toEqual(2024);
+    expect(seasonFromKey('2024mil_f1m2')).toEqual(2024);
+    expect(seasonFromKey('1999flor')).toEqual(1999);
+    expect(seasonFromKey('2024')).toEqual(2024);
+  });
+
+  test('does not mistake a team key for a season', () => {
+    expect(seasonFromKey('frc2024')).toBeUndefined();
+    expect(seasonFromKey('frc254')).toBeUndefined();
+  });
+
+  test('returns undefined when there is no year', () => {
+    expect(seasonFromKey(undefined)).toBeUndefined();
+    expect(seasonFromKey('')).toBeUndefined();
+    expect(seasonFromKey('status')).toBeUndefined();
+    expect(seasonFromKey('3024casj')).toBeUndefined();
+  });
+});
+
+describe.concurrent('seasonFromPath', () => {
+  test('finds the season segment in API paths', () => {
+    expect(seasonFromPath('/api/v3/event/2024casj')).toEqual(2024);
+    expect(seasonFromPath('/api/v3/match/2024mil_f1m2')).toEqual(2024);
+    expect(seasonFromPath('/api/v3/team/frc254/2019')).toEqual(2019);
+    expect(seasonFromPath('/api/v3/events/2015')).toEqual(2015);
+    expect(seasonFromPath('/api/v3/district/2024fim/events')).toEqual(2024);
+  });
+
+  test('skips team numbers that look like years', () => {
+    expect(seasonFromPath('/api/v3/team/frc2024')).toBeUndefined();
+    expect(seasonFromPath('/api/v3/team/frc2024/2019')).toEqual(2019);
+  });
+
+  test('returns undefined for season-less paths', () => {
+    expect(seasonFromPath('/api/v3/status')).toBeUndefined();
+    expect(seasonFromPath('/api/v3/team/frc254/history')).toBeUndefined();
   });
 });

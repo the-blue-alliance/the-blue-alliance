@@ -325,17 +325,88 @@ export function doThrowNotFound(): never {
   throw notFound();
 }
 
-// TODO: Increase the default max age once we are confident things work.
-// The end goal is for this to be relatively large, since the client will re-fetch data on load.
-export function publicCacheControlHeaders(maxAge: number = 61) {
-  return (): Record<string, string> => {
-    const isProd = process.env.NODE_ENV === 'production';
-    if (!isProd) {
-      return {};
+const SEASON_PREFIX = /^(?:19|20)\d{2}/;
+
+/**
+ * Pulls the 4-digit FRC season out of a TBA key or path segment.
+ *
+ * Only matches segments that *begin* with the year, which is what keeps team
+ * keys out of the results — `frc2024` is team 2024, not season 2024.
+ */
+export function seasonFromKey(key: string | undefined): number | undefined {
+  if (key === undefined) {
+    return undefined;
+  }
+  const match = SEASON_PREFIX.exec(key);
+  return match ? Number(match[0]) : undefined;
+}
+
+/** First season-shaped segment in a path, e.g. `/api/v3/team/frc254/2024`. */
+export function seasonFromPath(path: string): number | undefined {
+  for (const segment of path.split('/')) {
+    const season = seasonFromKey(segment);
+    if (season !== undefined) {
+      return season;
     }
-    return {
-      'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
-      'CDN-Cache-Control': `max-age=${maxAge}`, // Cloudflare-specific
-    };
+  }
+  return undefined;
+}
+
+/**
+ * Past calendar years are immutable regardless of where the current FRC season
+ * sits, so this is a pure calendar comparison — the same rule (and the same
+ * deliberate independence from `/status`) as `staleTimeForYear` in
+ * `~/lib/queryClient`. An unknown season is treated as current, which is the
+ * conservative direction: short TTLs, never long ones.
+ */
+export function isPastSeason(season: number | undefined): boolean {
+  return season !== undefined && season < Temporal.Now.plainDateISO().year;
+}
+
+/**
+ * Edge/browser cache tiers for SSR documents.
+ *
+ * `CDN-Cache-Control` carries its own `stale-while-revalidate`: Cloudflare
+ * prefers that header over `Cache-Control`, so omitting the directive there
+ * left the edge doing a *blocking* origin revalidation the moment `max-age`
+ * lapsed (observed as `cf-cache-status: EXPIRED`, never a stale HIT).
+ */
+const CACHE_TIER = {
+  CURRENT_SEASON: { maxAge: 61, staleWhileRevalidate: 600 },
+  PAST_SEASON: { maxAge: 86_400, staleWhileRevalidate: 604_800 },
+} as const;
+
+/**
+ * Serving a stale document is only safe because the client re-fetches on
+ * hydration: React Query keeps the server's original `dataUpdatedAt` through
+ * dehydration, so anything past its `staleTime` refetches on mount. Routes
+ * whose components read `useLoaderData()` instead of `useQuery` have no such
+ * correction — do not put those on the past-season tier.
+ *
+ * Call this inline from a route's `headers` so TanStack still infers `params`
+ * from the route itself:
+ *
+ *   headers: ({ params }) =>
+ *     cacheControlHeadersForSeason(seasonFromKey(params.matchKey)),
+ */
+export function cacheControlHeadersForSeason(
+  season: number | undefined,
+): Record<string, string> {
+  const isProd = process.env.NODE_ENV === 'production';
+  if (!isProd) {
+    return {};
+  }
+
+  const { maxAge, staleWhileRevalidate } = isPastSeason(season)
+    ? CACHE_TIER.PAST_SEASON
+    : CACHE_TIER.CURRENT_SEASON;
+
+  return {
+    'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${staleWhileRevalidate}`,
+    'CDN-Cache-Control': `max-age=${maxAge}, stale-while-revalidate=${staleWhileRevalidate}`,
   };
+}
+
+export function publicCacheControlHeaders() {
+  return (): Record<string, string> => cacheControlHeadersForSeason(undefined);
 }

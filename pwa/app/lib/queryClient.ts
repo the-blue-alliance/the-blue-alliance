@@ -54,8 +54,8 @@ export const STALE_TIME = {
  * `app/routes/__root.tsx`). Reusing the same `Temporal.Now.plainDateISO().year`
  * pattern already used elsewhere in the app as the current-year fallback.
  */
-export function staleTimeForYear(year: number): number {
-  return year < Temporal.Now.plainDateISO().year
+export function staleTimeForYear(year: number | undefined): number {
+  return year !== undefined && year < Temporal.Now.plainDateISO().year
     ? STALE_TIME.HISTORICAL
     : STALE_TIME.DEFAULT;
 }

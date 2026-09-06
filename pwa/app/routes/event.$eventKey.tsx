@@ -148,9 +148,10 @@ import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
   MODEL_TYPE,
+  cacheControlHeadersForSeason,
   cn,
   doThrowNotFound,
-  publicCacheControlHeaders,
+  seasonFromKey,
   splitIntoNChunks,
 } from '~/lib/utils';
 
@@ -229,7 +230,8 @@ export const Route = createFileRoute('/event/$eventKey')({
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
   },
-  headers: publicCacheControlHeaders(),
+  headers: ({ params }) =>
+    cacheControlHeadersForSeason(seasonFromKey(params.eventKey)),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {

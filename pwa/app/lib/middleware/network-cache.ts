@@ -10,14 +10,34 @@
  * Installed only on the server via `client.setConfig` in `__root.tsx`. Client
  * freshness is owned by React Query `staleTime`; this must not run in the
  * browser as a second TTL under Query.
+ *
+ * Entries past their freshness window are still served, immediately, while a
+ * conditional revalidation runs behind the response. A `304` against the API's
+ * ETag fastpath then costs no payload and no origin work. Revalidation is
+ * deliberately *not* awaited: a round trip to the API is ~30ms whether it
+ * returns 200 or 304, so putting it on the critical path would buy bandwidth
+ * at the cost of latency, which is backwards for SSR.
  */
 import * as Sentry from '@sentry/tanstackstart-react';
 import ccParser from 'cache-control-parser';
 import { LRUCache } from 'lru-cache';
 
-import { createLogger, secondsToMilliseconds } from '~/lib/utils';
+import {
+  createLogger,
+  hoursToMilliseconds,
+  isPastSeason,
+  minutesToMilliseconds,
+  seasonFromPath,
+  secondsToMilliseconds,
+} from '~/lib/utils';
 
-type CacheEntry = string;
+interface CacheEntry {
+  body: string;
+  etag: string | undefined;
+  fetchedAt: number;
+  /** Upstream `max-age`, in ms. Freshness is computed here, not by the LRU. */
+  freshForMs: number;
+}
 
 /**
  * Cap kept deliberately modest: heavy pages (e.g. district stats) can fan out
@@ -29,15 +49,48 @@ const CACHE_MAX_ENTRIES = 300;
 const CACHE_TTL = secondsToMilliseconds(61);
 
 /**
- * Global singleton LRU cache - shared across all SSR sessions on this process
+ * How far past its freshness window an entry may still be served.
+ *
+ * Past seasons are immutable, so a day-old body is the same body. Current-season
+ * data can still move, so the window stays short — a stale render is corrected
+ * on hydration by React Query, but only for routes whose components read from
+ * the query cache.
  */
-const cache = new LRUCache<string, CacheEntry>({
-  max: CACHE_MAX_ENTRIES,
-  ttl: CACHE_TTL,
-});
+const MAX_STALE_PAST_SEASON = hoursToMilliseconds(24);
+const MAX_STALE_CURRENT_SEASON = minutesToMilliseconds(5);
 
 let hits = 0;
 let misses = 0;
+let staleServed = 0;
+let revalidations = 0;
+let evictions = 0;
+
+/**
+ * Global singleton LRU cache - shared across all SSR sessions on this process.
+ *
+ * Deliberately configured without a `ttl`: entries age out via `fetchedAt`
+ * below, so that a stale-but-usable body stays reachable instead of being
+ * dropped at the freshness boundary. The LRU's job here is bounding memory.
+ */
+const cache = new LRUCache<string, CacheEntry>({
+  max: CACHE_MAX_ENTRIES,
+  dispose: (_value, _key, reason) => {
+    if (reason === 'evict') {
+      evictions++;
+    }
+  },
+});
+
+function ageOf(entry: CacheEntry): number {
+  return Date.now() - entry.fetchedAt;
+}
+
+function isFresh(entry: CacheEntry): boolean {
+  return ageOf(entry) < entry.freshForMs;
+}
+
+/** Dedupes revalidations so a hot stale key fires one request, not 80. */
+const inFlight = new Map<string, Promise<void>>();
 
 interface NetworkCacheConfig {
   /**
@@ -49,6 +102,14 @@ interface NetworkCacheConfig {
 
 const logger = createLogger('network-cache');
 
+function countAccess(outcome: string) {
+  Sentry.metrics.count(
+    outcome === 'miss' ? 'network.cache.miss' : 'network.cache.hit',
+    1,
+    { attributes: { client_platform: 'pwa', outcome } },
+  );
+}
+
 /**
  * Generate cache key from request.
  * Keyed on METHOD:url only — fine today with one shared read key; not safe
@@ -57,6 +118,121 @@ const logger = createLogger('network-cache');
 function generateCacheKey(url: string, options: RequestInit = {}): string {
   const method = options.method?.toUpperCase() || 'GET';
   return `${method}:${url}`;
+}
+
+function requestUrl(input: RequestInfo | URL): string {
+  if (typeof input === 'string') {
+    return input;
+  }
+  return input instanceof URL ? input.toString() : input.url;
+}
+
+function maxStaleForUrl(url: string): number {
+  return isPastSeason(seasonFromPath(url))
+    ? MAX_STALE_PAST_SEASON
+    : MAX_STALE_CURRENT_SEASON;
+}
+
+function ttlFromResponse(response: Response, url: string, method: string) {
+  const cacheControl = response.headers.get('cache-control');
+  if (!cacheControl) {
+    logger.warn(
+      { method, url },
+      'No Cache-Control header found; falling back to default TTL',
+    );
+    return CACHE_TTL;
+  }
+
+  const parsed = ccParser.parse(cacheControl);
+  if (!parsed['max-age']) {
+    logger.warn(
+      { method, url },
+      'No max-age found in Cache-Control header; falling back to default TTL',
+    );
+    return CACHE_TTL;
+  }
+
+  return secondsToMilliseconds(parsed['max-age']);
+}
+
+function cachedResponse(entry: CacheEntry, status = 200): Response {
+  const headers: Record<string, string> = {
+    'Content-Type': 'application/json',
+  };
+  if (entry.etag) {
+    headers.ETag = entry.etag;
+  }
+  return new Response(entry.body, { status, headers });
+}
+
+/**
+ * Re-issues the request with `If-None-Match` so the API's 304 fastpath can
+ * answer without a body or a Datastore read. Never rejects: a failed
+ * revalidation leaves the stale entry in place to be served again.
+ */
+function revalidate(
+  cacheKey: string,
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+  entry: CacheEntry,
+): Promise<void> {
+  const existing = inFlight.get(cacheKey);
+  if (existing) {
+    return existing;
+  }
+
+  const url = requestUrl(input);
+  const method = init?.method?.toUpperCase() || 'GET';
+
+  const pending = (async () => {
+    const headers = new Headers(
+      init?.headers ?? (input instanceof Request ? input.headers : undefined),
+    );
+    if (entry.etag) {
+      headers.set('If-None-Match', entry.etag);
+    }
+
+    const response = await fetch(input, { ...init, headers });
+    revalidations++;
+
+    if (response.status === 304) {
+      cache.set(cacheKey, {
+        ...entry,
+        fetchedAt: Date.now(),
+        freshForMs: ttlFromResponse(response, url, method),
+      });
+      Sentry.metrics.count('network.cache.revalidation', 1, {
+        attributes: { client_platform: 'pwa', outcome: 'not_modified' },
+      });
+      logger.debug({ method, url }, 'Revalidated 304');
+      return;
+    }
+
+    if (response.ok) {
+      cache.set(cacheKey, {
+        body: await response.text(),
+        etag: response.headers.get('etag') ?? undefined,
+        fetchedAt: Date.now(),
+        freshForMs: ttlFromResponse(response, url, method),
+      });
+      Sentry.metrics.count('network.cache.revalidation', 1, {
+        attributes: { client_platform: 'pwa', outcome: 'replaced' },
+      });
+      logger.debug({ method, url }, 'Revalidated with fresh body');
+    }
+  })()
+    .catch((error: unknown) => {
+      Sentry.metrics.count('network.cache.revalidation', 1, {
+        attributes: { client_platform: 'pwa', outcome: 'error' },
+      });
+      logger.error({ method, url, error }, 'Revalidation failed');
+    })
+    .finally(() => {
+      inFlight.delete(cacheKey);
+    });
+
+  inFlight.set(cacheKey, pending);
+  return pending;
 }
 
 /**
@@ -76,62 +252,48 @@ export function createCachedFetch(
       return fetch(input, init);
     }
 
-    const url =
-      typeof input === 'string'
-        ? input
-        : input instanceof URL
-          ? input.toString()
-          : input.url;
+    const url = requestUrl(input);
     const method = init?.method?.toUpperCase() || 'GET';
 
     // Only cache specified methods (default: GET)
     if (!cacheableMethods.includes(method)) {
-      logger.debug(
-        {
-          method,
-          url,
-        },
-        'Skipping cache for non-cacheable method',
-      );
+      logger.debug({ method, url }, 'Skipping cache for non-cacheable method');
 
       return fetch(input, init);
     }
 
     const cacheKey = generateCacheKey(url, init);
 
-    // Check cache
-    const cachedData = cache.get(cacheKey);
-    if (cachedData) {
-      hits++;
-      Sentry.metrics.count('network.cache.hit', 1, {
-        attributes: { client_platform: 'pwa' },
-      });
+    const cached = cache.get(cacheKey);
+
+    if (cached) {
+      if (isFresh(cached)) {
+        hits++;
+        countAccess('fresh');
+        logger.debug({ method, url }, 'Cache HIT');
+        return cachedResponse(cached);
+      }
+
+      const staleFor = ageOf(cached) - cached.freshForMs;
+      if (staleFor <= maxStaleForUrl(url)) {
+        hits++;
+        staleServed++;
+        countAccess('stale_served');
+        logger.debug({ method, url, staleFor }, 'Cache STALE served');
+        void revalidate(cacheKey, input, init, cached);
+        return cachedResponse(cached);
+      }
+
       logger.debug(
-        {
-          method,
-          url,
-        },
-        'Cache HIT',
+        { method, url, staleFor },
+        'Cache entry too stale to serve; fetching',
       );
-      return new Response(cachedData, {
-        status: 200,
-        headers: { 'Content-Type': 'application/json' },
-      });
     }
 
     misses++;
-    Sentry.metrics.count('network.cache.miss', 1, {
-      attributes: { client_platform: 'pwa' },
-    });
+    countAccess('miss');
 
-    // Cache miss or expired - fetch from network
-    logger.debug(
-      {
-        method,
-        url,
-      },
-      'Outbound request',
-    );
+    logger.debug({ method, url }, 'Outbound request');
 
     try {
       const response = await fetch(input, init);
@@ -139,62 +301,24 @@ export function createCachedFetch(
       // Only cache successful responses
       if (response.ok && response.status >= 200 && response.status < 300) {
         // Read response body as text to avoid clone() issues
-        const data = await response.text();
+        const entry: CacheEntry = {
+          body: await response.text(),
+          etag: response.headers.get('etag') ?? undefined,
+          fetchedAt: Date.now(),
+          freshForMs: ttlFromResponse(response, url, method),
+        };
+        cache.set(cacheKey, entry);
+        logger.debug(
+          { method, url, freshForMs: entry.freshForMs },
+          'Cached response',
+        );
 
-        // Get TTL from Cache-Control header, fall back to default
-        const cacheControl = response.headers.get('cache-control');
-        if (!cacheControl) {
-          logger.warn(
-            {
-              method,
-              url,
-            },
-            'No Cache-Control header found; falling back to default TTL',
-          );
-          cache.set(cacheKey, data, { ttl: CACHE_TTL });
-        } else {
-          const ttl = ccParser.parse(cacheControl);
-
-          if (!ttl['max-age']) {
-            logger.warn(
-              {
-                method,
-                url,
-              },
-              'No max-age found in Cache-Control header; falling back to default TTL',
-            );
-            cache.set(cacheKey, data, { ttl: CACHE_TTL });
-          } else {
-            const ttlMs = secondsToMilliseconds(ttl['max-age']);
-            logger.debug(
-              {
-                method,
-                url,
-                ttlMs,
-              },
-              'Cached response with max-age',
-            );
-            cache.set(cacheKey, data, { ttl: ttlMs });
-          }
-        }
-
-        // Return a new Response with the cached data
-        return new Response(data, {
-          status: response.status,
-          headers: { 'Content-Type': 'application/json' },
-        });
+        return cachedResponse(entry, response.status);
       }
 
       return response;
     } catch (error) {
-      logger.error(
-        {
-          method,
-          url,
-          error,
-        },
-        'Request failed',
-      );
+      logger.error({ method, url, error }, 'Request failed');
       throw error;
     }
   };
@@ -205,8 +329,12 @@ export function createCachedFetch(
  */
 export function clearCache(): void {
   cache.clear();
+  inFlight.clear();
   hits = 0;
   misses = 0;
+  staleServed = 0;
+  revalidations = 0;
+  evictions = 0;
   logger.debug('Cache cleared');
 }
 
@@ -220,6 +348,9 @@ export function getCacheStats(): {
   hits: number;
   misses: number;
   hitRate: number;
+  staleServed: number;
+  revalidations: number;
+  evictions: number;
 } {
   const total = hits + misses;
   return {
@@ -229,6 +360,9 @@ export function getCacheStats(): {
     hits,
     misses,
     hitRate: total === 0 ? 0 : hits / total,
+    staleServed,
+    revalidations,
+    evictions,
   };
 }
 
@@ -239,13 +373,25 @@ export function getCacheEntries(): Array<{
   key: string;
   data: string;
   remainingTTL: number;
+  etag: string | undefined;
+  fetchedAt: number;
 }> {
-  const entries: Array<{ key: string; data: string; remainingTTL: number }> =
-    [];
+  const entries: Array<{
+    key: string;
+    data: string;
+    remainingTTL: number;
+    etag: string | undefined;
+    fetchedAt: number;
+  }> = [];
 
   cache.forEach((value, key) => {
-    const remainingTTL = cache.getRemainingTTL(key);
-    entries.push({ key, data: value, remainingTTL });
+    entries.push({
+      key,
+      data: value.body,
+      remainingTTL: value.freshForMs - ageOf(value),
+      etag: value.etag,
+      fetchedAt: value.fetchedAt,
+    });
   });
 
   return entries;

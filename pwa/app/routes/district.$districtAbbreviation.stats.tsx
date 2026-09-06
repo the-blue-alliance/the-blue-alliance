@@ -1,4 +1,5 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useQueries, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { type ReactNode, useMemo } from 'react';
 
 import {
@@ -7,61 +8,58 @@ import {
   Event,
   EventType,
   type LeaderboardInsight,
-  getDistrictAwards,
-  getDistrictEvents,
-  getDistrictHistory,
-  getDistrictInsights,
 } from '~/api/tba/read';
+import {
+  getDistrictAwardsOptions,
+  getDistrictEventsOptions,
+  getDistrictHistoryOptions,
+  getDistrictInsightsOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import { YearSelector } from '~/components/tba/yearSelector';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/district/$districtAbbreviation/stats')({
-  loader: async ({ params }) => {
-    const [historyResult, insightsResult] = await Promise.all([
-      getDistrictHistory({
-        path: { district_abbreviation: params.districtAbbreviation },
-      }),
-      getDistrictInsights({
-        path: { district_abbreviation: params.districtAbbreviation },
-      }),
+  loader: async ({ params, context: { queryClient } }) => {
+    const abbreviation = params.districtAbbreviation;
+
+    const [history] = await Promise.all([
+      queryClient
+        .ensureQueryData(
+          getDistrictHistoryOptions({
+            path: { district_abbreviation: abbreviation },
+          }),
+        )
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData(
+          getDistrictInsightsOptions({
+            path: { district_abbreviation: abbreviation },
+          }),
+        )
+        .catch(doThrowNotFound),
     ]);
 
-    if (historyResult.data === undefined || insightsResult.data === undefined) {
-      throw notFound();
-    }
-
-    const history = historyResult.data;
-    const insights = insightsResult.data;
-
     // Fetch events and awards for each year in parallel
-    const yearResults = await Promise.all(
-      history.map(async (district) => {
-        const [eventsResult, awardsResult] = await Promise.all([
-          getDistrictEvents({
-            path: { district_key: district.key },
-          }),
-          getDistrictAwards({
-            path: { district_key: district.key },
-          }),
-        ]);
-        return {
-          year: district.year,
-          events: eventsResult.data ?? [],
-          awards: awardsResult.data ?? [],
-        };
-      }),
+    await Promise.all(
+      history.flatMap((district) => [
+        queryClient
+          .ensureQueryData(
+            getDistrictEventsOptions({ path: { district_key: district.key } }),
+          )
+          .catch(() => undefined),
+        queryClient
+          .ensureQueryData(
+            getDistrictAwardsOptions({ path: { district_key: district.key } }),
+          )
+          .catch(() => undefined),
+      ]),
     );
 
-    return {
-      abbreviation: params.districtAbbreviation,
-      history,
-      insights,
-      yearResults,
-    };
+    return { abbreviation, history };
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
@@ -750,8 +748,41 @@ function computeTeamupLeaderboard(
 }
 
 function DistrictStatsPage() {
-  const { abbreviation, history, insights, yearResults } =
-    Route.useLoaderData();
+  const { abbreviation } = Route.useLoaderData();
+
+  const { data: history } = useSuspenseQuery(
+    getDistrictHistoryOptions({
+      path: { district_abbreviation: abbreviation },
+    }),
+  );
+  const { data: insights } = useSuspenseQuery(
+    getDistrictInsightsOptions({
+      path: { district_abbreviation: abbreviation },
+    }),
+  );
+
+  const eventsByYear = useQueries({
+    queries: history.map((d) =>
+      getDistrictEventsOptions({ path: { district_key: d.key } }),
+    ),
+    combine: (results) => results.map((r) => r.data),
+  });
+  const awardsByYear = useQueries({
+    queries: history.map((d) =>
+      getDistrictAwardsOptions({ path: { district_key: d.key } }),
+    ),
+    combine: (results) => results.map((r) => r.data),
+  });
+
+  const yearResults = useMemo(
+    () =>
+      history.map((d, i) => ({
+        year: d.year,
+        events: eventsByYear[i] ?? [],
+        awards: awardsByYear[i] ?? [],
+      })),
+    [history, eventsByYear, awardsByYear],
+  );
 
   const validYears = history.map((d) => d.year).sort((a, b) => b - a);
 
