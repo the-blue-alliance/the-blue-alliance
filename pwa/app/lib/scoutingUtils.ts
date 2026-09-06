@@ -61,7 +61,7 @@ export function transformTeamsToTeamList(
 
     return [
       team.team_number,
-      team.name ?? '',
+      team.nickname ?? '',
       team.city ?? '',
       team.state_prov ?? '',
       team.country ?? '',
