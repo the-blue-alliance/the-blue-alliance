@@ -69,3 +69,25 @@ def test_profiled_jsonify_bytearray_passthrough(app: Flask) -> None:
         assert response.content_type == "application/json"
         assert response.data == b'{"test": "bytearray"}'
         assert json.loads(response.data) == {"test": "bytearray"}
+
+
+def test_profiled_jsonify_none(app: Flask) -> None:
+    with app.app_context():
+        response = profiled_jsonify(None)
+
+        assert response.content_type == "application/json"
+        assert response.data == b"null"
+        assert json.loads(response.data) is None
+
+
+def test_profiled_jsonify_fallback_on_orjson_error(app: Flask, caplog) -> None:
+    with app.app_context():
+        with patch("orjson.dumps", side_effect=TypeError("Cannot serialize")):
+            response = profiled_jsonify({"fallback": "test"})
+
+            assert response.content_type == "application/json"
+            assert json.loads(response.data) == {"fallback": "test"}
+            assert (
+                "orjson.dumps failed in profiled_jsonify, falling back to jsonify"
+                in caplog.text
+            )

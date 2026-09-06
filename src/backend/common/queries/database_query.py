@@ -5,6 +5,7 @@ import json
 import logging
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
+import orjson
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -235,6 +236,22 @@ class CachedDatabaseQuery(
                         )
                         logging.exception(e)
                 return converted_result
+
+            values = getattr(cached_query_result, "_values", None)
+            val = values.get(b"result_dict") if values else None
+            if val is not None and not isinstance(
+                val, (ndb.model._BaseValue, bytes, bytearray, str)
+            ):
+                return cached_query_result.result_dict
+
+            raw_bytes = cached_query_result.get_json_bytes()
+            if raw_bytes is not None:
+                try:
+                    return orjson.loads(raw_bytes)
+                except (orjson.JSONDecodeError, Exception) as e:
+                    logging.warning(
+                        f"orjson.loads failed for cache_key {cache_key}, falling back to result_dict: {e}"
+                    )
             return cached_query_result.result_dict
 
     def fetch_json(self, version: ApiMajorVersion) -> Optional[bytes]:
@@ -257,7 +274,13 @@ class CachedDatabaseQuery(
             dict_result = yield self._do_dict_query(_dict_version, *args, **kwargs)
             if dict_result is None:
                 return None
-            return json.dumps(dict_result, separators=(",", ":")).encode("utf-8")
+            try:
+                return orjson.dumps(dict_result)
+            except (orjson.JSONEncodeError, TypeError) as e:
+                logging.warning(
+                    f"orjson.dumps failed in _do_json_query, falling back to json.dumps: {e}"
+                )
+                return json.dumps(dict_result, separators=(",", ":")).encode("utf-8")
 
         with Span("{}._do_json_query".format(self.__class__.__name__)):
             cache_key = self.dict_cache_key(_dict_version)
@@ -283,15 +306,27 @@ class CachedDatabaseQuery(
                 if converted_result is None:
                     return None
 
-                return json.dumps(converted_result, separators=(",", ":")).encode(
-                    "utf-8"
-                )
+                try:
+                    return orjson.dumps(converted_result)
+                except (orjson.JSONEncodeError, TypeError) as e:
+                    logging.warning(
+                        f"orjson.dumps failed for cache_key {cache_key}, falling back to json.dumps: {e}"
+                    )
+                    return json.dumps(converted_result, separators=(",", ":")).encode(
+                        "utf-8"
+                    )
 
             raw_bytes = cached_query_result.get_json_bytes()
             if raw_bytes is not None:
                 return raw_bytes
             if cached_query_result.result_dict is None:
                 return None
-            return json.dumps(
-                cached_query_result.result_dict, separators=(",", ":")
-            ).encode("utf-8")
+            try:
+                return orjson.dumps(cached_query_result.result_dict)
+            except (orjson.JSONEncodeError, TypeError) as e:
+                logging.warning(
+                    f"orjson.dumps failed for cache_key {cache_key}, falling back to json.dumps: {e}"
+                )
+                return json.dumps(
+                    cached_query_result.result_dict, separators=(",", ":")
+                ).encode("utf-8")

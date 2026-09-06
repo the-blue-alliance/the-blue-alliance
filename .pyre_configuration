@@ -21,6 +21,7 @@
     {"site-package": "markupsafe"},
     {"site-package": "numpy"},
     {"site-package": "openpyxl"},
+    {"site-package": "orjson"},
     {"site-package": "packaging"},
     {"site-package": "annotated_types"},
     {"site-package": "pydantic"},

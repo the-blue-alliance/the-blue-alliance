@@ -3,6 +3,7 @@ import logging
 from typing import Any, Generator, Iterable, List, Optional, TypedDict
 from unittest.mock import patch
 
+import orjson
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -393,3 +394,76 @@ def test_cached_query_fetch_json_negative_cache() -> None:
     # Cache hit should also return None without querying datastore
     hit_json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
     assert hit_json_bytes is None
+
+
+def test_cached_query_fetch_dict_uses_orjson(monkeypatch) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+
+    # Miss: populates cache
+    result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+
+    # Hit: should decode via orjson.loads
+    called = []
+    real_loads = orjson.loads
+
+    def mock_loads(b):
+        called.append(b)
+        return real_loads(b)
+
+    monkeypatch.setattr(orjson, "loads", mock_loads)
+    hit_result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(called) == 1
+    assert hit_result == result
+
+
+def test_cached_query_fetch_dict_fallback_on_orjson_error(caplog, monkeypatch) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    assert len(keys) == 3
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+
+    # Populate cache
+    result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+
+    # Hit with orjson.loads failure: should fall back to cached_query_result.result_dict with warning
+    def fail_loads(_b):
+        raise orjson.JSONDecodeError("mock decode failure", "doc", 0)
+
+    monkeypatch.setattr(orjson, "loads", fail_loads)
+    with caplog.at_level(logging.WARNING):
+        fallback_result = query.fetch_dict(ApiMajorVersion.API_V3)
+
+    assert fallback_result == result
+    assert "falling back to result_dict" in caplog.text
+
+
+def test_cached_query_fetch_dict_pre_inflated_bypasses_orjson(monkeypatch) -> None:
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    pre_inflated = CachedQueryResult(id=cache_key, result_dict=[{"int_val": 1}])
+    pre_inflated.put()
+
+    # Access result_dict to ensure it is inflated in memory
+    assert pre_inflated.result_dict == [{"int_val": 1}]
+
+    called = []
+
+    def mock_loads(b):
+        called.append(b)
+        return orjson.loads(b)
+
+    monkeypatch.setattr(orjson, "loads", mock_loads)
+    with patch.object(
+        CachedQueryResult, "get_by_id_async", return_value=ndb.Future()
+    ) as mock_get:
+        mock_get.return_value.set_result(pre_inflated)
+        result = query.fetch_dict(ApiMajorVersion.API_V3)
+
+    assert result == [{"int_val": 1}]
+    assert len(called) == 0
