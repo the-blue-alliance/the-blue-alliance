@@ -218,8 +218,9 @@ screenshotted against the running dev server's CSS:
    `<base href="http://localhost:8080/">` right after `<head>`. Run it with
    `make test ARGS='src/backend/web/handlers/tests/<file> -q -s'`, then **delete the file** — it
    is a tool, not a test. Redact secrets the page renders (API keys, tokens) in the seed data.
-3. Screenshot: `cd pwa && node ../ops/pr_screenshots/screenshot_html.mjs /tmp/page.html
-   /tmp/page.png '[data-testid=...]'`. Pass a selector for an element inside the content you want;
+3. Screenshot: `cd pwa && node scripts/screenshot_html.mjs /tmp/page.html /tmp/page.png
+   '[data-testid=...]'`. (The script lives in `pwa/` because Node resolves `@playwright/test`
+   from the script's own directory, not from where you run it.) Pass a selector for an element inside the content you want;
    the script captures its surrounding content container. Do not target `div.container` — the
    navbar is one too.
 4. Publish. GitHub has no API for attaching images to comments, so the repo keeps screenshots on
