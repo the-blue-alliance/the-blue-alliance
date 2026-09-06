@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import abc
+import json
 import logging
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
@@ -235,3 +236,62 @@ class CachedDatabaseQuery(
                         logging.exception(e)
                 return converted_result
             return cached_query_result.result_dict
+
+    def fetch_json(self, version: ApiMajorVersion) -> Optional[bytes]:
+        fut: TypedFuture[Optional[bytes]] = self.fetch_json_async(version)
+        return fut.get_result()
+
+    @ndb.tasklet
+    def fetch_json_async(
+        self, version: ApiMajorVersion
+    ) -> Generator[Any, Any, Optional[bytes]]:
+        with Span("{}.fetch_json_async".format(self.__class__.__name__)):
+            query_result = yield self._do_json_query(version, **self._query_args)
+            return query_result
+
+    @ndb.tasklet
+    def _do_json_query(
+        self, _dict_version: ApiMajorVersion, *args, **kwargs
+    ) -> Generator[Any, Any, Optional[bytes]]:
+        if not self.DICT_CACHING_ENABLED:
+            dict_result = yield self._do_dict_query(_dict_version, *args, **kwargs)
+            if dict_result is None:
+                return None
+            return json.dumps(dict_result, separators=(",", ":")).encode("utf-8")
+
+        with Span("{}._do_json_query".format(self.__class__.__name__)):
+            cache_key = self.dict_cache_key(_dict_version)
+            cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
+            if cached_query_result is None:
+                query_result = yield self._query_async(*args, **kwargs)
+
+                converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
+                    query_result
+                ).convert(_dict_version)
+
+                if self.CACHE_WRITES_ENABLED:
+                    try:
+                        yield CachedQueryResult(
+                            id=cache_key, result_dict=converted_result
+                        ).put_async()
+                    except Exception as e:
+                        logging.warning(
+                            f"CachedQueryResult.put_async() failed: {cache_key}"
+                        )
+                        logging.exception(e)
+
+                if converted_result is None:
+                    return None
+
+                return json.dumps(converted_result, separators=(",", ":")).encode(
+                    "utf-8"
+                )
+
+            raw_bytes = cached_query_result.get_json_bytes()
+            if raw_bytes is not None:
+                return raw_bytes
+            if cached_query_result.result_dict is None:
+                return None
+            return json.dumps(
+                cached_query_result.result_dict, separators=(",", ":")
+            ).encode("utf-8")

@@ -1,3 +1,4 @@
+import json
 import logging
 from typing import Any, Generator, List
 
@@ -436,3 +437,45 @@ def test_purge_query_class_global_version_rejects_recent_version(
         delete_batch_size=50,
     )
     assert deleted == 0  # No entries created, but validation passed
+
+
+def test_get_json_bytes_from_datastore(ndb_stub) -> None:
+    data = {"team_key": "frc254", "year": 2024, "metrics": [1, 2, 3]}
+    c = CachedQueryResult(id="test_key", result_dict=data)
+    c.put()
+
+    fetched = CachedQueryResult.get_by_id("test_key")
+    assert fetched is not None
+    json_bytes = fetched.get_json_bytes()
+    assert isinstance(json_bytes, bytes)
+    assert json.loads(json_bytes) == data
+
+
+def test_get_json_bytes_in_memory() -> None:
+    data = {"hello": "world"}
+    c = CachedQueryResult(result_dict=data)
+    json_bytes = c.get_json_bytes()
+    assert isinstance(json_bytes, bytes)
+    assert json.loads(json_bytes) == data
+
+
+def test_get_json_bytes_none(ndb_stub) -> None:
+    c = CachedQueryResult(id="none_key", result_dict=None)
+    c.put()
+
+    fetched = CachedQueryResult.get_by_id("none_key")
+    assert fetched is not None
+    assert fetched.get_json_bytes() is None
+
+    empty = CachedQueryResult()
+    assert empty.get_json_bytes() is None
+
+
+def test_get_json_bytes_raw_types() -> None:
+    c_bytes = CachedQueryResult()
+    setattr(c_bytes, "_values", {b"result_dict": b'{"raw": "bytes"}'})
+    assert c_bytes.get_json_bytes() == b'{"raw": "bytes"}'
+
+    c_str = CachedQueryResult()
+    setattr(c_str, "_values", {b"result_dict": '{"raw": "str"}'})
+    assert c_str.get_json_bytes() == b'{"raw": "str"}'

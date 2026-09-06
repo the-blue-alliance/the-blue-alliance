@@ -1,5 +1,7 @@
+import json
 import logging
 import traceback
+import zlib
 from typing import Any, Generator, Iterable, Optional
 
 from google.appengine.ext import ndb
@@ -16,6 +18,30 @@ class CachedQueryResult(ndb.Model):
 
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
+
+    def get_json_bytes(self) -> Optional[bytes]:
+        """
+        Returns the raw compact JSON bytes for result_dict without inflating into Python objects.
+        """
+        values = getattr(self, "_values", None)
+        if not values or b"result_dict" not in values:
+            return None
+        val = values[b"result_dict"]
+        if isinstance(val, ndb.model._BaseValue):
+            b_val = val.b_val
+            if isinstance(b_val, ndb.model._CompressedValue):
+                return zlib.decompress(b_val.z_val)
+            elif isinstance(b_val, (bytes, bytearray)):
+                return bytes(b_val)
+            elif isinstance(b_val, str):
+                return b_val.encode("utf-8")
+        elif isinstance(val, (bytes, bytearray)):
+            return bytes(val)
+        elif isinstance(val, str):
+            return val.encode("utf-8")
+        elif val is not None:
+            return json.dumps(val, separators=(",", ":")).encode("utf-8")
+        return None
 
     @staticmethod
     def cache_key_prefix_from_format(cache_key_format: str) -> str:

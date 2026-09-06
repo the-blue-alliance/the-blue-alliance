@@ -10,6 +10,10 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.model_query_response import (
+    model_query_response,
+    models_query_response,
+)
 from backend.api.handlers.helpers.nexus_info_converter import (
     event_queue_status_to_api,
     NexusInfoDict,
@@ -54,13 +58,11 @@ def event(
     Returns info about one event, specified by |event_key|.
     """
     track_call_after_response("event", event_key, model_type)
-
-    event = EventQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
-    if event is None:
-        abort(404)
-    if model_type is not None:
-        event = filter_event_properties([event], model_type)[0]
-    return profiled_jsonify(event)
+    return model_query_response(
+        EventQuery(event_key=event_key),
+        model_type=model_type,
+        filter_func=filter_event_properties,
+    )
 
 
 @api_authenticated
@@ -98,12 +100,11 @@ def event_list_year(
     Returns a list of all events for a given year.
     """
     track_call_after_response("event/list", str(year), model_type)
-
-    events = EventListQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
-
-    if model_type is not None:
-        events = filter_event_properties(events, model_type)
-    return profiled_jsonify(events)
+    return models_query_response(
+        EventListQuery(year=year),
+        model_type=model_type,
+        filter_func=filter_event_properties,
+    )
 
 
 @api_authenticated
@@ -162,11 +163,11 @@ def event_teams(
     Returns a list of teams attending a given event.
     """
     track_call_after_response("event/teams", event_key, model_type)
-
-    teams = EventTeamsQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
-    if model_type is not None:
-        teams = filter_team_properties(teams, model_type)
-    return profiled_jsonify(teams)
+    return models_query_response(
+        EventTeamsQuery(event_key=event_key),
+        model_type=model_type,
+        filter_func=filter_team_properties,
+    )
 
 
 @api_authenticated
@@ -208,12 +209,7 @@ def event_teams_statuses(event_key: EventKey) -> TypedFlaskResponse[dict]:
 @cached_public
 def event_teams_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
     track_call_after_response("event/teams/media", event_key)
-
-    query = EventTeamsMediasQuery(event_key=event_key).fetch_dict(
-        ApiMajorVersion.API_V3
-    )
-
-    return profiled_jsonify(query)
+    return models_query_response(EventTeamsMediasQuery(event_key=event_key))
 
 
 @api_authenticated
@@ -221,10 +217,7 @@ def event_teams_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]
 @cached_public
 def event_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
     track_call_after_response("event/media", event_key)
-
-    query = EventMediasQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
-
-    return profiled_jsonify(query)
+    return models_query_response(EventMediasQuery(event_key=event_key))
 
 
 @api_authenticated
@@ -237,11 +230,11 @@ def event_matches(
     Returns a list of matches for a given event.
     """
     track_call_after_response("event/matches", event_key, model_type)
-
-    matches = EventMatchesQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
-    if model_type is not None:
-        matches = filter_match_properties(matches, model_type)
-    return profiled_jsonify(matches)
+    return models_query_response(
+        EventMatchesQuery(event_key=event_key),
+        model_type=model_type,
+        filter_func=filter_match_properties,
+    )
 
 
 @api_authenticated
@@ -252,9 +245,9 @@ def event_awards(event_key: EventKey) -> TypedFlaskResponse[list[AwardDict]]:
     Returns a list of awards for a given event.
     """
     track_call_after_response("event/awards", event_key)
-
-    awards = EventAwardsQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
-    return profiled_jsonify(awards)
+    return models_query_response(
+        EventAwardsQuery(event_key=event_key),
+    )
 
 
 @api_authenticated

@@ -1,5 +1,6 @@
+import json
 import logging
-from typing import Any, Generator, Iterable, List, TypedDict
+from typing import Any, Generator, Iterable, List, Optional, TypedDict
 from unittest.mock import patch
 
 from google.appengine.ext import ndb
@@ -76,6 +77,19 @@ class CachedDummyModelRangeQuery(
             DummyModel.int_prop >= min, DummyModel.int_prop <= max
         ).fetch_async()
         return list(models)
+
+
+class CachedDummyModelPointQuery(
+    CachedDatabaseQuery[Optional[DummyModel], Optional[DummyDict]]
+):
+    CACHE_KEY_FORMAT = "test_point_query_{model_key}"
+    DICT_CONVERTER = DummyConverter
+    CACHE_WRITES_ENABLED = True
+
+    @ndb.tasklet
+    def _query_async(self, model_key: str) -> Generator[Any, Any, Optional[DummyModel]]:
+        model = yield DummyModel.get_by_id_async(model_key)
+        return model
 
 
 class CachedDummyModelWithRequiredPropQuery(
@@ -337,3 +351,45 @@ def test_cached_query_corrupt_cache_treated_as_miss(caplog, monkeypatch) -> None
     # Should have refetched valid data from datastore
     assert len(result) == 3
     assert all(model.required_prop is not None for model in result)
+
+
+def test_cached_query_fetch_json() -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+
+    # Cache miss
+    json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert isinstance(json_bytes, bytes)
+    parsed = json.loads(json_bytes)
+    assert len(parsed) == 3
+    assert parsed[0] == {"int_val": 0}
+
+    # Verify cache was populated
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    cached_entity = CachedQueryResult.get_by_id(cache_key)
+    assert cached_entity is not None
+    assert cached_entity.get_json_bytes() is not None
+
+    # Cache hit should return the same raw JSON bytes
+    hit_json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert hit_json_bytes == json_bytes
+
+
+def test_cached_query_fetch_json_negative_cache() -> None:
+    query = CachedDummyModelPointQuery(model_key="nonexistent")
+
+    # Cache miss on non-existent entity
+    json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert json_bytes is None
+
+    # Verify cache was populated with negative result (result_dict=None)
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    cached_entity = CachedQueryResult.get_by_id(cache_key)
+    assert cached_entity is not None
+    assert cached_entity.result_dict is None
+
+    # Cache hit should also return None without querying datastore
+    hit_json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert hit_json_bytes is None

@@ -1,18 +1,16 @@
 from typing import Any, Optional
 
-from flask import abort
-
 from backend.api.handlers.decorators import api_authenticated, validate_keys
 from backend.api.handlers.helpers.model_properties import (
     filter_match_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.model_query_response import model_query_response
 from backend.api.handlers.helpers.profiled_jsonify import (
     profiled_jsonify,
     TypedFlaskResponse,
 )
 from backend.api.handlers.helpers.track_call import track_call_after_response
-from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.decorators import cached_public
 from backend.common.models.keys import MatchKey
 from backend.common.models.zebra_motionworks import ZebraMotionWorks
@@ -30,13 +28,11 @@ def match(
     Returns details about one match, specified by |match_key|.
     """
     track_call_after_response("match", match_key, model_type)
-
-    match = MatchQuery(match_key=match_key).fetch_dict(ApiMajorVersion.API_V3)
-    if match is None:
-        abort(404)
-    if model_type is not None:
-        match = filter_match_properties([match], model_type)[0]
-    return profiled_jsonify(match)
+    return model_query_response(
+        MatchQuery(match_key=match_key),
+        model_type=model_type,
+        filter_func=filter_match_properties,
+    )
 
 
 @api_authenticated

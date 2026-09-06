@@ -1,7 +1,5 @@
 from typing import Any, Optional
 
-from flask import abort
-
 from backend.api.handlers.decorators import (
     api_authenticated,
     validate_keys,
@@ -11,6 +9,10 @@ from backend.api.handlers.helpers.model_properties import (
     filter_match_properties,
     filter_team_properties,
     ModelType,
+)
+from backend.api.handlers.helpers.model_query_response import (
+    model_query_response,
+    models_query_response,
 )
 from backend.api.handlers.helpers.profiled_jsonify import (
     profiled_jsonify,
@@ -72,13 +74,11 @@ def team(
     Returns details about one team, specified by |team_key|.
     """
     track_call_after_response("team", team_key, model_type)
-
-    team = TeamQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
-    if team is None:
-        abort(404)
-    if model_type is not None:
-        team = filter_team_properties([team], model_type)[0]
-    return profiled_jsonify(team)
+    return model_query_response(
+        TeamQuery(team_key=team_key),
+        model_type=model_type,
+        filter_func=filter_team_properties,
+    )
 
 
 @api_authenticated
@@ -123,11 +123,9 @@ def team_history_districts(team_key: TeamKey) -> TypedFlaskResponse[list[Distric
     Returns a list of all DistrictTeam models associated with the given Team.
     """
     track_call_after_response("team/history/districts", team_key)
-
-    team_districts = TeamDistrictsQuery(team_key=team_key).fetch_dict(
-        ApiMajorVersion.API_V3
+    return models_query_response(
+        TeamDistrictsQuery(team_key=team_key),
     )
-    return profiled_jsonify(team_districts)
 
 
 @api_authenticated
@@ -138,9 +136,9 @@ def team_history_robots(team_key: TeamKey) -> TypedFlaskResponse[list[RobotDict]
     Returns a list of all Robot models associated with the given Team.
     """
     track_call_after_response("team/history/robots", team_key)
-
-    team_robots = TeamRobotsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
-    return profiled_jsonify(team_robots)
+    return models_query_response(
+        TeamRobotsQuery(team_key=team_key),
+    )
 
 
 @api_authenticated
@@ -151,11 +149,9 @@ def team_social_media(team_key: TeamKey) -> TypedFlaskResponse[list[MediaDict]]:
     Returns a list of all social media models associated with the given Team.
     """
     track_call_after_response("team/social_media", team_key)
-
-    team_social_media = TeamSocialMediaQuery(team_key=team_key).fetch_dict(
-        ApiMajorVersion.API_V3
+    return models_query_response(
+        TeamSocialMediaQuery(team_key=team_key),
     )
-    return profiled_jsonify(team_social_media)
 
 
 @api_authenticated
@@ -175,18 +171,16 @@ def team_events(
         api_action += f"/{year}"
     track_call_after_response(api_action, team_key, model_type)
 
-    if year is None:
-        team_events = TeamEventsQuery(team_key=team_key).fetch_dict(
-            ApiMajorVersion.API_V3
-        )
-    else:
-        team_events = TeamYearEventsQuery(team_key=team_key, year=year).fetch_dict(
-            ApiMajorVersion.API_V3
-        )
-
-    if model_type is not None:
-        team_events = filter_event_properties(team_events, model_type)
-    return profiled_jsonify(team_events)
+    query = (
+        TeamEventsQuery(team_key=team_key)
+        if year is None
+        else TeamYearEventsQuery(team_key=team_key, year=year)
+    )
+    return models_query_response(
+        query,
+        model_type=model_type,
+        filter_func=filter_event_properties,
+    )
 
 
 @api_authenticated
@@ -235,14 +229,11 @@ def team_event_matches(
     track_call_after_response(
         "team/event/matches", f"{team_key}/{event_key}", model_type
     )
-
-    matches = TeamEventMatchesQuery(team_key=team_key, event_key=event_key).fetch_dict(
-        ApiMajorVersion.API_V3
+    return models_query_response(
+        TeamEventMatchesQuery(team_key=team_key, event_key=event_key),
+        model_type=model_type,
+        filter_func=filter_match_properties,
     )
-
-    if model_type is not None:
-        matches = filter_match_properties(matches, model_type)
-    return profiled_jsonify(matches)
 
 
 @api_authenticated
@@ -255,11 +246,9 @@ def team_event_awards(
     Returns a list of awards for a team at an event.
     """
     track_call_after_response("team/event/awards", f"{team_key}/{event_key}")
-
-    awards = TeamEventAwardsQuery(team_key=team_key, event_key=event_key).fetch_dict(
-        ApiMajorVersion.API_V3
+    return models_query_response(
+        TeamEventAwardsQuery(team_key=team_key, event_key=event_key),
     )
-    return profiled_jsonify(awards)
 
 
 @api_authenticated
@@ -308,13 +297,11 @@ def team_awards(
     """
     if year is None:
         track_call_after_response("team/history/awards", team_key)
-        awards = TeamAwardsQuery(team_key=team_key).fetch_dict(ApiMajorVersion.API_V3)
+        query = TeamAwardsQuery(team_key=team_key)
     else:
         track_call_after_response("team/year/awards", f"{team_key}/{year}")
-        awards = TeamYearAwardsQuery(team_key=team_key, year=year).fetch_dict(
-            ApiMajorVersion.API_V3
-        )
-    return profiled_jsonify(awards)
+        query = TeamYearAwardsQuery(team_key=team_key, year=year)
+    return models_query_response(query)
 
 
 @api_authenticated
@@ -329,14 +316,11 @@ def team_matches(
     Returns a list of matches associated with the given Team in a given year.
     """
     track_call_after_response("team/year/matches", f"{team_key}/{year}", model_type)
-
-    matches = TeamYearMatchesQuery(team_key=team_key, year=year).fetch_dict(
-        ApiMajorVersion.API_V3
+    return models_query_response(
+        TeamYearMatchesQuery(team_key=team_key, year=year),
+        model_type=model_type,
+        filter_func=filter_match_properties,
     )
-
-    if model_type is not None:
-        matches = filter_match_properties(matches, model_type)
-    return profiled_jsonify(matches)
 
 
 @api_authenticated
@@ -349,11 +333,7 @@ def team_media_year(
     Returns a list of media associated with the given Team in a given year.
     """
     track_call_after_response("team/media", f"{team_key}/{year}")
-
-    media = TeamYearMediaQuery(team_key=team_key, year=year).fetch_dict(
-        ApiMajorVersion.API_V3
-    )
-    return profiled_jsonify(media)
+    return models_query_response(TeamYearMediaQuery(team_key=team_key, year=year))
 
 
 @api_authenticated
@@ -375,15 +355,12 @@ def team_media_tag(
     if tag_enum is None:
         return profiled_jsonify([])
 
-    if year is None:
-        media = TeamTagMediasQuery(team_key=team_key, media_tag=tag_enum).fetch_dict(
-            ApiMajorVersion.API_V3
-        )
-    else:
-        media = TeamYearTagMediasQuery(
-            team_key=team_key, media_tag=tag_enum, year=year
-        ).fetch_dict(ApiMajorVersion.API_V3)
-    return profiled_jsonify(media)
+    query = (
+        TeamTagMediasQuery(team_key=team_key, media_tag=tag_enum)
+        if year is None
+        else TeamYearTagMediasQuery(team_key=team_key, media_tag=tag_enum, year=year)
+    )
+    return models_query_response(query)
 
 
 @api_authenticated
@@ -434,13 +411,13 @@ def team_list(
         api_action += f"/{year}"
     track_call_after_response(api_action, str(page_num), model_type)
 
-    if year is None:
-        team_list = TeamListQuery(page=page_num).fetch_dict(ApiMajorVersion.API_V3)
-    else:
-        team_list = TeamListYearQuery(year=year, page=page_num).fetch_dict(
-            ApiMajorVersion.API_V3
-        )
-
-    if model_type is not None:
-        team_list = filter_team_properties(team_list, model_type)
-    return profiled_jsonify(team_list)
+    query = (
+        TeamListQuery(page=page_num)
+        if year is None
+        else TeamListYearQuery(year=year, page=page_num)
+    )
+    return models_query_response(
+        query,
+        model_type=model_type,
+        filter_func=filter_team_properties,
+    )
