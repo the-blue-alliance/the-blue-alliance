@@ -199,6 +199,38 @@ FRC data has several quirks that are important to understand when working with h
 - **Reliability by year**: Data becomes more reliable around 2010. Prior to 2006, data is uncommon.
 - **Elimination format**: FIRST implemented Double Elimination brackets starting in the 2023 season. Prior seasons used a single-elimination best-of-three bracket.
 
+## Screenshots for PRs
+
+Two paths, depending on what the page is.
+
+**PWA pages** are screenshotted by CI. List them in the PR template's "Screenshot Pages" section
+(`- /path Display Name`) and the bot posts them on the PR.
+
+**Web-service (Jinja) pages**, including anything behind a login that CI cannot reach — account,
+admin, and suggestion-review pages — are rendered locally through the Flask test client and
+screenshotted against the running dev server's CSS:
+
+1. Have the dev server up (`docker compose up`); it serves the CSS/JS at `http://localhost:8080`.
+2. Render the page with a **throwaway** pytest in `src/backend/web/handlers/tests/`. Use the
+   fixtures the real tests use (`web_client`, `login_user`; set `login_user.permissions` and
+   `login_user.has_permission.return_value = True` for gated pages), seed whatever models the page
+   needs, `GET` it, and write `response.data` to a file after inserting
+   `<base href="http://localhost:8080/">` right after `<head>`. Run it with
+   `make test ARGS='src/backend/web/handlers/tests/<file> -q -s'`, then **delete the file** — it
+   is a tool, not a test. Redact secrets the page renders (API keys, tokens) in the seed data.
+3. Screenshot: `cd pwa && node ../ops/pr_screenshots/screenshot_html.mjs /tmp/page.html
+   /tmp/page.png '[data-testid=...]'`. Pass a selector for an element inside the content you want;
+   the script captures its surrounding content container. Do not target `div.container` — the
+   navbar is one too.
+4. Publish. GitHub has no API for attaching images to comments, so the repo keeps screenshots on
+   the `ci-screenshots` branch (the CI bot uses it too). In a worktree of that branch, copy the
+   PNGs in as `pr-<PR number>-<slug>-<unix timestamp>.png`, commit
+   (`Add screenshots for PR #<N>`), push, and reference them in a PR comment as
+   `![alt](https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>)`.
+
+Look at every screenshot before posting it: an identical byte size across two supposedly different
+pages means the locator grabbed the wrong element.
+
 ## Notes
 - The PWA (Progressive Web App) is a separate project in `pwa/` with its own AGENTS.md
 - GAE deployment via `ops/deploy/` scripts (maintainers only)
