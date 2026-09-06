@@ -23,7 +23,7 @@ from backend.common.queries.match_query import MatchQuery
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def match(
@@ -41,7 +41,7 @@ def match(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def zebra_motionworks(match_key: MatchKey) -> TypedFlaskResponse[Any]:

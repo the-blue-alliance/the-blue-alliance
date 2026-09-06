@@ -38,7 +38,7 @@ from backend.common.queries.team_query import DistrictTeamsQuery
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def district_history(
     district_abbreviation: DistrictAbbreviation,
@@ -56,7 +56,7 @@ def district_history(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def district_events(
@@ -76,7 +76,7 @@ def district_events(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def district_teams(
@@ -96,7 +96,7 @@ def district_teams(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def district_rankings(district_key: DistrictKey) -> TypedFlaskResponse[Any]:
@@ -112,7 +112,7 @@ def district_rankings(district_key: DistrictKey) -> TypedFlaskResponse[Any]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def district_list_year(year: int) -> TypedFlaskResponse[list[DistrictDict]]:
     """
@@ -125,7 +125,7 @@ def district_list_year(year: int) -> TypedFlaskResponse[list[DistrictDict]]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def district_awards(district_key: DistrictKey) -> TypedFlaskResponse[list[dict]]:
@@ -154,7 +154,7 @@ def district_awards(district_key: DistrictKey) -> TypedFlaskResponse[list[dict]]
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
@@ -201,7 +201,7 @@ def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def dcmp_history(
     district_abbreviation: DistrictAbbreviation,
@@ -255,7 +255,7 @@ def dcmp_history(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def district_insights(
     district_abbreviation: DistrictAbbreviation,

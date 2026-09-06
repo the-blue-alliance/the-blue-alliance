@@ -66,7 +66,7 @@ from backend.common.queries.team_query import (
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team(
@@ -84,7 +84,7 @@ def team(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_history(team_key: TeamKey) -> TypedFlaskResponse[Any]:
@@ -105,7 +105,7 @@ def team_history(team_key: TeamKey) -> TypedFlaskResponse[Any]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_years_participated(team_key: TeamKey) -> TypedFlaskResponse[list[int]]:
@@ -120,7 +120,7 @@ def team_years_participated(team_key: TeamKey) -> TypedFlaskResponse[list[int]]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_history_districts(team_key: TeamKey) -> TypedFlaskResponse[list[DistrictDict]]:
@@ -134,7 +134,7 @@ def team_history_districts(team_key: TeamKey) -> TypedFlaskResponse[list[Distric
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_history_robots(team_key: TeamKey) -> TypedFlaskResponse[list[RobotDict]]:
@@ -148,7 +148,7 @@ def team_history_robots(team_key: TeamKey) -> TypedFlaskResponse[list[RobotDict]
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_social_media(team_key: TeamKey) -> TypedFlaskResponse[list[MediaDict]]:
@@ -162,7 +162,7 @@ def team_social_media(team_key: TeamKey) -> TypedFlaskResponse[list[MediaDict]]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_events(
@@ -192,7 +192,7 @@ def team_events(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_events_statuses_year(team_key: TeamKey, year: int) -> TypedFlaskResponse[dict]:
@@ -227,7 +227,7 @@ def team_events_statuses_year(team_key: TeamKey, year: int) -> TypedFlaskRespons
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_event_matches(
@@ -247,7 +247,7 @@ def team_event_matches(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_event_awards(
@@ -263,7 +263,7 @@ def team_event_awards(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_event_status(
@@ -297,7 +297,7 @@ def team_event_status(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_awards(
@@ -318,7 +318,7 @@ def team_awards(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_matches(
@@ -338,7 +338,7 @@ def team_matches(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_media_year(
@@ -352,7 +352,7 @@ def team_media_year(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def team_media_tag(
@@ -380,7 +380,7 @@ def team_media_tag(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def team_list_all(
     model_type: Optional[ModelType] = None,
@@ -416,7 +416,7 @@ def team_list_all(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def team_list(
     page_num: int, year: Optional[int] = None, model_type: Optional[ModelType] = None

@@ -106,3 +106,54 @@ def test_decorator_order_invalid_keys_return_404_on_cache_miss(
         "/api/v3/team/frc9999999", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp_nonexistent.status_code == 404
+
+
+def test_apiv3_query_params_ignored_for_caching(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """
+    Ensure that APIv3 memcache keys ignore URL query parameters so that
+    requests with query params (such as ?X-TBA-Auth-Key=... or ?foo=bar) hit
+    the same cached response.
+    """
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    # 1. Warm cache with header authentication
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = resp1.headers.get("ETag")
+    assert etag is not None
+
+    # Track calls to Team.get_by_id_async to ensure cache hits bypass handler/validate_keys
+    original_get_by_id_async = Team.get_by_id_async
+    mock_get_by_id_async = MagicMock(side_effect=original_get_by_id_async)
+    monkeypatch.setattr(Team, "get_by_id_async", mock_get_by_id_async)
+
+    # 2. Request with query param auth: ?X-TBA-Auth-Key=test_auth_key
+    resp2 = api_client.get("/api/v3/team/frc254?X-TBA-Auth-Key=test_auth_key")
+    assert resp2.status_code == 200
+    assert resp2.json["key"] == "frc254"
+    mock_get_by_id_async.assert_not_called()
+
+    # 3. Request with arbitrary query parameters: ?foo=bar&baz=qux
+    resp3 = api_client.get(
+        "/api/v3/team/frc254?foo=bar&baz=qux",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp3.status_code == 200
+    assert resp3.json["key"] == "frc254"
+    mock_get_by_id_async.assert_not_called()
+
+    # 4. Request with query params and If-None-Match
+    resp4 = api_client.get(
+        "/api/v3/team/frc254?timestamp=123456789",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp4.status_code == 304
+    mock_get_by_id_async.assert_not_called()

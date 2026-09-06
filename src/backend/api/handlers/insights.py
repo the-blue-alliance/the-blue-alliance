@@ -30,7 +30,7 @@ _VALID_INSIGHT_V2_CATEGORIES = frozenset(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def insights_leaderboards_year(year: int) -> Response:
     track_call_after_response("insights/leaderboards", str(year))
@@ -43,7 +43,7 @@ def insights_leaderboards_year(year: int) -> Response:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def insights_notables_year(year: int) -> Response:
     track_call_after_response("insights/notables", str(year))
@@ -53,7 +53,7 @@ def insights_notables_year(year: int) -> Response:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def insights_v2_year(year: int) -> Response:
     track_call_after_response("insights/v2", str(year))
@@ -63,7 +63,7 @@ def insights_v2_year(year: int) -> Response:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def insights_v2_year_category(year: int, category: str) -> Response:
     if category not in _VALID_INSIGHT_V2_CATEGORIES:
@@ -78,7 +78,7 @@ def insights_v2_year_category(year: int, category: str) -> Response:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def insights_v2_year_district(
     year: int, district_abbreviation: DistrictAbbreviation
@@ -92,7 +92,7 @@ def insights_v2_year_district(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def insights_v2_year_category_district(
     year: int, category: str, district_abbreviation: DistrictAbbreviation

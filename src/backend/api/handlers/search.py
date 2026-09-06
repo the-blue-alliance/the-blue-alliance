@@ -19,7 +19,7 @@ from backend.common.queries.team_query import TeamListQuery
 
 # TODO: bump cache time to 1 day after testing/dev is complete
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def search_index() -> TypedFlaskResponse[dict]:
     track_call_after_response("search_index", "search_index")
