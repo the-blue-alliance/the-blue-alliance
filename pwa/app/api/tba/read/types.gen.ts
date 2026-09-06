@@ -587,6 +587,90 @@ export enum PlayoffType {
   CUSTOM = 8,
 }
 
+/**
+ * CmpQualificationMethod
+ *
+ * How a team earned its invitation to the FIRST Championship. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/cmp_qualification.py for full definitions.
+ */
+export enum CmpQualificationMethod {
+  /**
+   * DISTRICT_POINTS
+   */
+  DISTRICT_POINTS = 'district_points',
+  /**
+   * WAITLIST
+   */
+  WAITLIST = 'waitlist',
+  /**
+   * ORIGINAL_AND_SUSTAINING
+   */
+  ORIGINAL_AND_SUSTAINING = 'original_and_sustaining',
+  /**
+   * HALL_OF_FAME
+   */
+  HALL_OF_FAME = 'hall_of_fame',
+  /**
+   * PRIOR_YEAR_CMP_WINNER
+   */
+  PRIOR_YEAR_CMP_WINNER = 'prior_year_cmp_winner',
+  /**
+   * PRIOR_YEAR_CMP_IMPACT
+   */
+  PRIOR_YEAR_CMP_IMPACT = 'prior_year_cmp_impact',
+  /**
+   * PRIOR_YEAR_CMP_ENGINEERING_INSPIRATION
+   */
+  PRIOR_YEAR_CMP_ENGINEERING_INSPIRATION = 'prior_year_cmp_engineering_inspiration',
+  /**
+   * REGIONAL_WINNER
+   */
+  REGIONAL_WINNER = 'regional_winner',
+  /**
+   * REGIONAL_IMPACT
+   */
+  REGIONAL_IMPACT = 'regional_impact',
+  /**
+   * REGIONAL_ENGINEERING_INSPIRATION
+   */
+  REGIONAL_ENGINEERING_INSPIRATION = 'regional_engineering_inspiration',
+  /**
+   * REGIONAL_WILDCARD
+   */
+  REGIONAL_WILDCARD = 'regional_wildcard',
+  /**
+   * LATE_REGIONAL_WINNER
+   */
+  LATE_REGIONAL_WINNER = 'late_regional_winner',
+  /**
+   * LATE_REGIONAL_IMPACT
+   */
+  LATE_REGIONAL_IMPACT = 'late_regional_impact',
+  /**
+   * LATE_REGIONAL_ENGINEERING_INSPIRATION
+   */
+  LATE_REGIONAL_ENGINEERING_INSPIRATION = 'late_regional_engineering_inspiration',
+  /**
+   * LATE_REGIONAL_WILDCARD
+   */
+  LATE_REGIONAL_WILDCARD = 'late_regional_wildcard',
+  /**
+   * DCMP_WINNER
+   */
+  DCMP_WINNER = 'dcmp_winner',
+  /**
+   * DCMP_IMPACT
+   */
+  DCMP_IMPACT = 'dcmp_impact',
+  /**
+   * DCMP_ENGINEERING_INSPIRATION
+   */
+  DCMP_ENGINEERING_INSPIRATION = 'dcmp_engineering_inspiration',
+  /**
+   * DCMP_ROOKIE_ALL_STAR
+   */
+  DCMP_ROOKIE_ALL_STAR = 'dcmp_rookie_all_star',
+}
+
 export type District = {
   /**
    * The short identifier for the district.
@@ -658,6 +742,62 @@ export type DistrictAdvancement = {
    * Whether or not the team qualified for the FIRST Championship
    */
   cmp: boolean;
+  /**
+   * How the team qualified for the FIRST Championship, or `null` if the team did not qualify.
+   */
+  cmp_qualification?: CmpQualificationMethod | null;
+};
+
+/**
+ * Where the District Championship and FIRST Championship advancement cutoffs fell for a district, and how each qualifying team earned its Championship invitation.
+ */
+export type DistrictAdvancementCutoffs = {
+  /**
+   * The rank at which the District Championship cutoff would have fallen before any declines were applied.
+   */
+  dcmp_original: number;
+  /**
+   * The rank at which the District Championship cutoff actually fell, after declines were backfilled.
+   */
+  dcmp_effective: number;
+  /**
+   * TBA team keys for teams that declined their District Championship invitation.
+   */
+  dcmp_declines: Array<string>;
+  /**
+   * The rank at which the FIRST Championship cutoff would have fallen before any declines were applied.
+   */
+  cmp_original: number;
+  /**
+   * The rank at which the FIRST Championship cutoff actually fell, after declines were backfilled.
+   */
+  cmp_effective: number;
+  /**
+   * TBA team keys for teams that declined their FIRST Championship invitation.
+   */
+  cmp_declines: Array<string>;
+  /**
+   * A mapping of team key to how that team earned its FIRST Championship invitation. Populated independently of the per-team advancement data, so it is present even when `teams` is empty.
+   */
+  cmp_qualification: {
+    [key: string]: CmpQualificationMethod;
+  };
+};
+
+/**
+ * Per-team advancement status and the advancement cutoffs for a district.
+ */
+export type DistrictAdvancementResponse = {
+  /**
+   * A mapping of team key to District_Advancement. An empty object means advancement has been fetched but no teams are listed yet; `null` means it has never been fetched for this district.
+   */
+  teams: null | {
+    [key: string]: DistrictAdvancement;
+  };
+  /**
+   * Where the advancement cutoffs fell for the district, or `null` if they have not been calculated yet.
+   */
+  cutoffs: DistrictAdvancementCutoffs | null;
 };
 
 export type DistrictInsight = {
@@ -2543,7 +2683,13 @@ export type Media =
     } & MediaNoDetails)
   | ({
       type: 'onshape';
-    } & MediaOnshape);
+    } & MediaOnshape)
+  | ({
+      type: 'smugmug-album';
+    } & MediaSmugmugAlbum)
+  | ({
+      type: 'smugmug-photo';
+    } & MediaSmugmugPhoto);
 
 export type MediaAvatar = MediaBase & MediaAvatarExtras;
 
@@ -2574,7 +2720,9 @@ export type MediaBase = {
     | 'external-link'
     | 'avatar'
     | 'onshape'
-    | 'cd-thread';
+    | 'cd-thread'
+    | 'smugmug-photo'
+    | 'smugmug-album';
   /**
    * The key used to identify this media on the media site.
    */
@@ -2645,6 +2793,30 @@ export type MediaOnshape = MediaBase & {
     model_description: string | null;
     model_image: string;
     model_name: string;
+  };
+};
+
+export type MediaSmugmugAlbum = MediaBase & {
+  type?: 'smugmug-album';
+  details?: {
+    cover_url: string;
+    cover_url_med: string;
+    cover_url_sm: string;
+    image_count: number;
+    title: string;
+    web_uri: string;
+  };
+};
+
+export type MediaSmugmugPhoto = MediaBase & {
+  type?: 'smugmug-photo';
+  details?: {
+    caption: string;
+    image_url: string;
+    image_url_med: string;
+    image_url_sm: string;
+    title: string;
+    web_uri: string;
   };
 };
 
@@ -2732,7 +2904,7 @@ export type NotablesInsight = {
 };
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and game stats shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, game stats, and clubs shapes.
  */
 export type InsightV2 =
   | ({
@@ -2746,7 +2918,10 @@ export type InsightV2 =
     } & InsightV2Timeseries)
   | ({
       category: 'game_stats';
-    } & InsightV2GameStats);
+    } & InsightV2GameStats)
+  | ({
+      category: 'clubs';
+    } & InsightV2Clubs);
 
 export type InsightV2Base = {
   /**
@@ -2764,7 +2939,7 @@ export type InsightV2Base = {
   /**
    * Insight category. Discriminates the shape of `data`.
    */
-  category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
+  category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
   /**
    * District abbreviation if the insight is district-scoped, otherwise null.
    */
@@ -2797,6 +2972,67 @@ export type InsightV2GameStats = InsightV2Base & InsightV2GameStatsExtras;
 export type InsightV2GameStatsExtras = {
   category?: 'game_stats';
   data: InsightV2GameStatsData;
+};
+
+export type InsightV2Clubs = InsightV2Base & InsightV2ClubsExtras;
+
+export type InsightV2ClubsExtras = {
+  category?: 'clubs';
+  data: InsightV2ClubsData;
+};
+
+/**
+ * Data for a clubs-category InsightV2. A cumulative all-time membership of teams that reached a milestone.
+ */
+export type InsightV2ClubsData = {
+  /**
+   * Club members, sorted ascending by team number.
+   */
+  entries: Array<InsightV2ClubEntry>;
+  /**
+   * Discriminates the shape of each entry's `extra_context`. `none` means entries have no `extra_context`.
+   */
+  context_type: 'hall_of_fame' | 'none';
+};
+
+/**
+ * A single club member.
+ */
+export type InsightV2ClubEntry = {
+  /**
+   * Team key of the club member, e.g. `frc254`.
+   */
+  team_key: string;
+  /**
+   * Key of the event where the team first qualified for the club.
+   */
+  event_added_key: string;
+  /**
+   * Club-specific extra material for this member. Present when the club's `context_type` is `hall_of_fame`.
+   */
+  extra_context?: InsightV2HallOfFameContext;
+};
+
+/**
+ * Chairman's Award material for a Hall of Fame team, scraped from the FIRST resource library.
+ */
+export type InsightV2HallOfFameContext = {
+  /**
+   * Year the team was inducted (year of `event_added_key`).
+   */
+  year: number;
+  /**
+   * URL of the team's Chairman's video, or null.
+   */
+  video: string | null;
+  /**
+   * URL of the team's Chairman's presentation, or null.
+   */
+  presentation: string | null;
+  /**
+   * URL of the team's Chairman's essay, or null.
+   */
+  essay: string | null;
 };
 
 /**
@@ -2872,9 +3108,9 @@ export type InsightV2StreakData = {
  */
 export type InsightV2TimeseriesData = {
   /**
-   * What the x-axis represents.
+   * What the x-axis represents. For `date`, each point's `x` is a Unix timestamp (seconds) at UTC midnight of that day.
    */
-  x_type: 'week' | 'year' | 'event';
+  x_type: 'week' | 'year' | 'event' | 'date';
   /**
    * Human-readable label for the x-axis.
    */
@@ -2894,7 +3130,7 @@ export type InsightV2TimeseriesData = {
     label: string;
     points: Array<{
       /**
-       * X-axis value (week string, year integer, or event key).
+       * X-axis value (week string, year integer, event key, or Unix timestamp in seconds when x_type is date).
        */
       x: string | number | number;
       /**
@@ -3586,13 +3822,14 @@ export type PageNum = number;
 export type TeamKey = string;
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export enum InsightV2Category {
   LEADERBOARD = 'leaderboard',
   STREAK = 'streak',
   TIMESERIES = 'timeseries',
   GAME_STATS = 'game_stats',
+  CLUBS = 'clubs',
 }
 
 /**
@@ -3783,11 +4020,9 @@ export type GetDistrictAdvancementError =
 
 export type GetDistrictAdvancementResponses = {
   /**
-   * A mapping of team key to District_Advancement
+   * Successful response
    */
-  200: null | {
-    [key: string]: DistrictAdvancement;
-  };
+  200: DistrictAdvancementResponse;
 };
 
 export type GetDistrictAdvancementResponse =
@@ -5543,9 +5778,9 @@ export type GetInsightsV2YearCategoryData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
   };
   query?: never;
   url: '/insights/{year}/{category}';
@@ -5645,9 +5880,9 @@ export type GetInsightsV2YearCategoryDistrictData = {
      */
     year: number;
     /**
-     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+     * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
      */
-    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats';
+    category: 'leaderboard' | 'streak' | 'timeseries' | 'game_stats' | 'clubs';
     /**
      * District abbreviation, eg `ne` or `fim`
      */

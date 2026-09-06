@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Cell,
   DefaultTooltipContentProps,
@@ -114,7 +114,6 @@ export default function CoprScatterChart({
 }) {
   const [selectedXCopr, setSelectedXCopr] = useState(defaultXCopr);
   const [selectedYCopr, setSelectedYCopr] = useState(defaultYCopr);
-  const [data, setData] = useState<Datapoint[]>([]);
   const isDesktop = useMediaQuery('(min-width: 640px)');
 
   // Base UI's Select.Value renders the raw value unless the items are
@@ -124,17 +123,17 @@ export default function CoprScatterChart({
     label: camelCaseToHumanReadable(k),
   }));
 
-  useEffect(() => {
-    const data: Datapoint[] = Object.keys(coprs[selectedXCopr])
-      .map((tk) => ({
-        teamKey: tk,
-        valueX: coprs[selectedXCopr][tk],
-        valueY: coprs[selectedYCopr][tk],
-      }))
-      .sort((a, b) => a.valueX - b.valueX);
-
-    setData(data);
-  }, [selectedXCopr, selectedYCopr, coprs]);
+  const data: Datapoint[] = useMemo(
+    () =>
+      Object.keys(coprs[selectedXCopr])
+        .map((tk) => ({
+          teamKey: tk,
+          valueX: coprs[selectedXCopr][tk],
+          valueY: coprs[selectedYCopr][tk],
+        }))
+        .sort((a, b) => a.valueX - b.valueX),
+    [selectedXCopr, selectedYCopr, coprs],
+  );
 
   return (
     <Card>

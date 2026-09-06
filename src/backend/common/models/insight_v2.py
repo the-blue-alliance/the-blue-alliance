@@ -8,10 +8,12 @@ from backend.common.models.keys import DistrictAbbreviation
 LeaderboardKeyType = Literal["team", "event", "match", "team_pair", "alliance"]
 LeaderboardContextType = Literal["event_list", "match_alliance", "none"]
 
-TimeseriesXType = Literal["week", "year", "event"]
+TimeseriesXType = Literal["week", "year", "event", "date"]
 TimeseriesPointContextType = Literal["none", "match_record"]
 
 GameStatsScopeType = Literal["overall", "week", "event"]
+
+ClubContextType = Literal["hall_of_fame", "none"]
 
 
 class InsightCategory:
@@ -19,6 +21,7 @@ class InsightCategory:
     STREAK = "streak"
     TIMESERIES = "timeseries"
     GAME_STATS = "game_stats"
+    CLUBS = "clubs"
 
 
 class InsightV2(CachedModel):
@@ -192,3 +195,29 @@ class GameStatsScope(TypedDict):
 
 class GameStatsData(TypedDict):
     scopes: List[GameStatsScope]
+
+
+class HallOfFameClubContext(TypedDict):
+    year: int  # induction year (year of event_added_key)
+    video: Optional[str]  # Chairman's video URL, or None
+    presentation: Optional[str]  # Chairman's presentation URL, or None
+    essay: Optional[str]  # Chairman's essay URL, or None
+
+
+class ClubEntryV2(TypedDict):
+    team_key: str
+    event_added_key: str  # event where the team first qualified for the club
+
+
+class ClubEntryWithHallOfFame(TypedDict):
+    team_key: str
+    event_added_key: str
+    extra_context: HallOfFameClubContext
+
+
+ClubEntry = ClubEntryV2 | ClubEntryWithHallOfFame
+
+
+class ClubsData(TypedDict):
+    entries: List[ClubEntry]
+    context_type: ClubContextType

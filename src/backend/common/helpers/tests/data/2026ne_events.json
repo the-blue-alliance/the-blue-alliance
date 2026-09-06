@@ -1,0 +1,332 @@
+[
+  {
+    "city": "Hartford",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "cthar",
+    "event_type": 1,
+    "key": "2026cthar",
+    "name": "NE District Hartford Event",
+    "start_date": "2026-03-27",
+    "state_prov": "CT",
+    "year": 2026
+  },
+  {
+    "city": "Waterbury",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-22",
+    "event_code": "ctwat",
+    "event_type": 1,
+    "key": "2026ctwat",
+    "name": "NE District Waterbury Event",
+    "start_date": "2026-03-20",
+    "state_prov": "CT",
+    "year": 2026
+  },
+  {
+    "city": "Billerica",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-08",
+    "event_code": "mabil",
+    "event_type": 1,
+    "key": "2026mabil",
+    "name": "NE District Minuteman Event",
+    "start_date": "2026-03-06",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "Revere",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "mabos",
+    "event_type": 1,
+    "key": "2026mabos",
+    "name": "NE District Greater Boston Event",
+    "start_date": "2026-03-27",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "Reading",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-15",
+    "event_code": "marea",
+    "event_type": 1,
+    "key": "2026marea",
+    "name": "NE District North Shore Event",
+    "start_date": "2026-03-13",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-15",
+    "event_code": "mawne",
+    "event_type": 1,
+    "key": "2026mawne",
+    "name": "NE District Western NE Event",
+    "start_date": "2026-03-13",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "Worcester",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-05",
+    "event_code": "mawor",
+    "event_type": 1,
+    "key": "2026mawor",
+    "name": "NE District WPI Event",
+    "start_date": "2026-04-03",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "Falmouth",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-08",
+    "event_code": "mefal",
+    "event_type": 1,
+    "key": "2026mefal",
+    "name": "NE District Pine Tree Event",
+    "start_date": "2026-03-06",
+    "state_prov": "ME",
+    "year": 2026
+  },
+  {
+    "city": "West Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "necmp",
+    "event_type": 2,
+    "key": "2026necmp",
+    "name": "New England FIRST District Championship",
+    "start_date": "2026-04-18",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "West Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "necmp1",
+    "event_type": 5,
+    "key": "2026necmp1",
+    "name": "New England FIRST District Championship - Burns Division presented by GlobalFoundries",
+    "start_date": "2026-04-15",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "West Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "necmp2",
+    "event_type": 5,
+    "key": "2026necmp2",
+    "name": "New England FIRST District Championship - Newsom Division presented by GE Aerospace",
+    "start_date": "2026-04-15",
+    "state_prov": "MA",
+    "year": 2026
+  },
+  {
+    "city": "Bedford",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-15",
+    "event_code": "nhbed",
+    "event_type": 1,
+    "key": "2026nhbed",
+    "name": "NE District Granite State Event",
+    "start_date": "2026-03-13",
+    "state_prov": "NH",
+    "year": 2026
+  },
+  {
+    "city": "Durham",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "nhdur",
+    "event_type": 1,
+    "key": "2026nhdur",
+    "name": "NE District UNH Event",
+    "start_date": "2026-03-27",
+    "state_prov": "NH",
+    "year": 2026
+  },
+  {
+    "city": "Kingston",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-21",
+    "event_code": "rikin",
+    "event_type": 1,
+    "key": "2026rikin",
+    "name": "NE District URI Event",
+    "start_date": "2026-03-19",
+    "state_prov": "RI",
+    "year": 2026
+  },
+  {
+    "city": "Burlington",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2026ne",
+      "official_advancement_counts": {
+        "cmp": 32,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-04",
+    "event_code": "vtbur",
+    "event_type": 1,
+    "key": "2026vtbur",
+    "name": "NE District UVM Event",
+    "start_date": "2026-04-02",
+    "state_prov": "VT",
+    "year": 2026
+  }
+]

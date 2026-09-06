@@ -1,0 +1,332 @@
+[
+  {
+    "city": "Amarillo",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-04",
+    "event_code": "txama",
+    "event_type": 1,
+    "key": "2026txama",
+    "name": "FIT District Amarillo Event",
+    "start_date": "2026-04-02",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Belton",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-07",
+    "event_code": "txbel",
+    "event_type": 1,
+    "key": "2026txbel",
+    "name": "FIT District Belton Event",
+    "start_date": "2026-03-05",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Friendswood",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-04",
+    "event_code": "txcl2",
+    "event_type": 1,
+    "key": "2026txcl2",
+    "name": "FIT District Space City @ Friendswood Event #2",
+    "start_date": "2026-04-02",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "League City",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-09",
+    "event_code": "txcle",
+    "event_type": 1,
+    "key": "2026txcle",
+    "name": "FIT District Space City @ League City Event #1",
+    "start_date": "2026-03-07",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Houston",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "txcmp",
+    "event_type": 2,
+    "key": "2026txcmp",
+    "name": "FIRST In Texas District Championship",
+    "start_date": "2026-04-18",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Houston",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "txcmp1",
+    "event_type": 5,
+    "key": "2026txcmp1",
+    "name": "FIRST In Texas District Championship - Mercury Division",
+    "start_date": "2026-04-15",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Houston",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-18",
+    "event_code": "txcmp2",
+    "event_type": 5,
+    "key": "2026txcmp2",
+    "name": "FIRST In Texas District Championship - Apollo Division",
+    "start_date": "2026-04-15",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Dripping Springs",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-04",
+    "event_code": "txdri",
+    "event_type": 1,
+    "key": "2026txdri",
+    "name": "FIT District Dripping Springs Event",
+    "start_date": "2026-04-02",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Farmersville",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "txfar",
+    "event_type": 1,
+    "key": "2026txfar",
+    "name": "FIT District Farmersville Event",
+    "start_date": "2026-03-27",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Fort Worth",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-21",
+    "event_code": "txfor",
+    "event_type": 1,
+    "key": "2026txfor",
+    "name": "FIT District Fort Worth Event",
+    "start_date": "2026-03-19",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Houston",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-21",
+    "event_code": "txhou",
+    "event_type": 1,
+    "key": "2026txhou",
+    "name": "FIT District Houston Event",
+    "start_date": "2026-03-19",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Manor",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "txman",
+    "event_type": 1,
+    "key": "2026txman",
+    "name": "FIT District Manor Event",
+    "start_date": "2026-03-27",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "McAllen",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-14",
+    "event_code": "txmca",
+    "event_type": 1,
+    "key": "2026txmca",
+    "name": "FIT District McAllen Event",
+    "start_date": "2026-03-12",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "San Antonio",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-14",
+    "event_code": "txsan",
+    "event_type": 1,
+    "key": "2026txsan",
+    "name": "FIT District San Antonio Event",
+    "start_date": "2026-03-12",
+    "state_prov": "TX",
+    "year": 2026
+  },
+  {
+    "city": "Waco",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fit",
+      "display_name": "FIRST In Texas",
+      "key": "2026fit",
+      "official_advancement_counts": {
+        "cmp": 28,
+        "dcmp": 90
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-21",
+    "event_code": "txwac",
+    "event_type": 1,
+    "key": "2026txwac",
+    "name": "FIT District Waco Event",
+    "start_date": "2026-03-19",
+    "state_prov": "TX",
+    "year": 2026
+  }
+]

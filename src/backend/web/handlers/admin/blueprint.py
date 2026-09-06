@@ -103,6 +103,10 @@ from backend.web.handlers.admin.sitevars import (
     sitevar_edit_post,
     sitevars_list,
 )
+from backend.web.handlers.admin.suggestions_seed import (
+    suggestion_seed_get,
+    suggestion_seed_post,
+)
 from backend.web.handlers.admin.team import (
     team_detail,
     team_list,
@@ -490,6 +494,12 @@ admin_routes.add_url_rule(
     "/mobile_clients/dedupe",
     view_func=mobile_clients_dedupe_post,
     methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/suggestions/seed", view_func=suggestion_seed_get, methods=["GET"]
+)
+admin_routes.add_url_rule(
+    "/suggestions/seed", view_func=suggestion_seed_post, methods=["POST"]
 )
 admin_routes.add_url_rule("/user/<user_id>", view_func=user_detail)
 admin_routes.add_url_rule("/user/edit/<user_id>", methods=["GET"], view_func=user_edit)

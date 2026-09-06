@@ -14,6 +14,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
+from backend.common.models.match_suggestion import MatchSuggestions
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import (
     MatchConverter,
@@ -297,6 +298,20 @@ class FirebasePusher:
             _queue="firebase",
             _target="py3-tasks-io",
             _url="/_ah/queue/deferred_firebase_update_special_webcasts",
+        )
+
+    @classmethod
+    def update_match_suggestions(cls, suggestions: MatchSuggestions) -> None:
+        """
+        Replaces the GameDay match suggestion feed
+        """
+        defer_safe(
+            cls._put_data,
+            "match_suggestions",
+            suggestions.model_dump(mode="json", by_alias=True),
+            _queue="firebase",
+            _target="py3-tasks-io",
+            _url="/_ah/queue/deferred_firebase_update_match_suggestions",
         )
 
     @classmethod

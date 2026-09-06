@@ -1,5 +1,5 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { Temporal } from 'temporal-polyfill';
 
@@ -8,6 +8,7 @@ import SunIcon from '~icons/lucide/sun';
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
+import { useIsHydrated } from '~/lib/hooks';
 import { useTheme } from '~/lib/theme';
 
 type InternalLink = {
@@ -51,12 +52,8 @@ const themes = [['light', SunIcon] as const, ['dark', MoonIcon] as const];
 
 function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState<boolean>(false);
+  const mounted = useIsHydrated();
   const value = mounted ? resolvedTheme : null;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <button
@@ -99,11 +96,11 @@ function formatRenderTime(): string {
 }
 
 export const Footer = () => {
-  const [renderTime, setRenderTime] = useState<string | null>(null);
-
-  useEffect(() => {
-    setRenderTime(formatRenderTime());
-  }, []);
+  const hydrated = useIsHydrated();
+  const renderTime = useMemo(
+    () => (hydrated ? formatRenderTime() : null),
+    [hydrated],
+  );
 
   return (
     <footer

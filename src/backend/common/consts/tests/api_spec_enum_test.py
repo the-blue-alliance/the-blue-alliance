@@ -6,6 +6,7 @@ import pytest
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.award_type import AwardType
+from backend.common.consts.cmp_qualification import CmpQualificationMethod
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_status import WebcastStatus
@@ -71,6 +72,7 @@ def test_spec_alliance_color_matches_python_plus_empty_winner(
     "schema_name,enum_class",
     [
         ("WebcastStatus", WebcastStatus),
+        ("CmpQualificationMethod", CmpQualificationMethod),
     ],
 )
 def test_spec_string_enum_matches_python(

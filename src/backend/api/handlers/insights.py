@@ -24,6 +24,7 @@ _VALID_INSIGHT_V2_CATEGORIES = frozenset(
         InsightCategory.STREAK,
         InsightCategory.TIMESERIES,
         InsightCategory.GAME_STATS,
+        InsightCategory.CLUBS,
     }
 )
 

@@ -1,0 +1,244 @@
+[
+  {
+    "city": "Barrie",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-29",
+    "event_code": "onbar",
+    "event_type": 1,
+    "key": "2026onbar",
+    "name": "ONT District Georgian College Event",
+    "start_date": "2026-03-27",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Niagara Falls",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-19",
+    "event_code": "oncmp",
+    "event_type": 2,
+    "key": "2026oncmp",
+    "name": "FIRST Ontario Provincial Championship",
+    "start_date": "2026-04-19",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Niagara Falls",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-19",
+    "event_code": "oncmp1",
+    "event_type": 5,
+    "key": "2026oncmp1",
+    "name": "FIRST Ontario Provincial Championship - Science Division",
+    "start_date": "2026-04-16",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Niagara Falls",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-19",
+    "event_code": "oncmp2",
+    "event_type": 5,
+    "key": "2026oncmp2",
+    "name": "FIRST Ontario Provincial Championship - Technology Division",
+    "start_date": "2026-04-16",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Hamilton",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-22",
+    "event_code": "onham",
+    "event_type": 1,
+    "key": "2026onham",
+    "name": "ONT District McMaster University Event",
+    "start_date": "2026-03-20",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "North Bay",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-22",
+    "event_code": "onnob",
+    "event_type": 1,
+    "key": "2026onnob",
+    "name": "ONT District North Bay Event",
+    "start_date": "2026-03-20",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Oshawa",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-15",
+    "event_code": "onosh",
+    "event_type": 1,
+    "key": "2026onosh",
+    "name": "ONT District Durham College Event",
+    "start_date": "2026-03-13",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Etobicoke",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-14",
+    "event_code": "ontor",
+    "event_type": 1,
+    "key": "2026ontor",
+    "name": "ONT District Humber Polytechnic Event",
+    "start_date": "2026-03-12",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Waterloo",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-03-28",
+    "event_code": "onwat",
+    "event_type": 1,
+    "key": "2026onwat",
+    "name": "ONT District University of Waterloo Event",
+    "start_date": "2026-03-26",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Welland",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-12",
+    "event_code": "onwel",
+    "event_type": 1,
+    "key": "2026onwel",
+    "name": "ONT District Niagara College Event",
+    "start_date": "2026-04-10",
+    "state_prov": "ON",
+    "year": 2026
+  },
+  {
+    "city": "Windsor",
+    "country": "Canada",
+    "district": {
+      "abbreviation": "ont",
+      "display_name": "FIRST Canada - Ontario",
+      "key": "2026ont",
+      "official_advancement_counts": {
+        "cmp": 21,
+        "dcmp": 100
+      },
+      "year": 2026
+    },
+    "end_date": "2026-04-11",
+    "event_code": "onwin",
+    "event_type": 1,
+    "key": "2026onwin",
+    "name": "ONT District Windsor Essex Great Lake Event",
+    "start_date": "2026-04-09",
+    "state_prov": "ON",
+    "year": 2026
+  }
+]

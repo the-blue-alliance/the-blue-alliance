@@ -5,44 +5,54 @@ import { Progress } from '~/components/ui/progress';
 
 // TODO: Integrate with nav bar
 export default function GlobalLoadingProgress() {
-  const [hidden, setHidden] = useState(true);
-  const [progress, setProgress] = useState(0);
   const active = useRouterState({ select: (s) => s.isLoading });
 
-  useEffect(() => {
+  const [progress, setProgress] = useState(0);
+  const [phase, setPhase] = useState<'idle' | 'loading' | 'done'>('idle');
+  const [prevActive, setPrevActive] = useState(active);
+
+  if (active !== prevActive) {
+    setPrevActive(active);
     if (active) {
       // Start at 15% to give the impression of a fast start
       setProgress(15);
-      setHidden(false);
+      setPhase('loading');
     } else {
-      // Wait before hiding the progress bar so the user sees it at 100%
       setProgress(100);
-      const timeout = setTimeout(() => {
-        setHidden(true);
-      }, 250);
-      return () => {
-        clearTimeout(timeout);
-      };
+      setPhase('done');
     }
-  }, [active]);
+  }
 
   useEffect(() => {
-    if (!active || hidden) {
+    if (phase !== 'loading') {
       return;
     }
     const interval = setInterval(() => {
       // Advance 30% of the remaining progress, stalling at 95% until the navigation is complete
-      setProgress((prevProgres) => {
-        const remaining = 95 - prevProgres;
-        return Math.min(95, prevProgres + 0.3 * remaining);
+      setProgress((prevProgress) => {
+        const remaining = 95 - prevProgress;
+        return Math.min(95, prevProgress + 0.3 * remaining);
       });
     }, 200);
     return () => {
       clearInterval(interval);
     };
-  }, [active, hidden]);
+  }, [phase]);
 
-  if (hidden) {
+  useEffect(() => {
+    if (phase !== 'done') {
+      return;
+    }
+    // Wait before hiding the progress bar so the user sees it at 100%
+    const timeout = setTimeout(() => {
+      setPhase('idle');
+    }, 250);
+    return () => {
+      clearTimeout(timeout);
+    };
+  }, [phase]);
+
+  if (phase === 'idle') {
     return null;
   }
   return (

@@ -1,0 +1,1467 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2026alhu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc9067"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026alhu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc120",
+      "frc2481",
+      "frc9401"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026alhu",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc3792"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026arli",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6647"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026arli",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4499",
+      "frc4522",
+      "frc6186"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026arli",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4522"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026ausc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc10002"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026ausc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10552",
+      "frc5584",
+      "frc8613"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026ausc",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc5985"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026azfg",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6352"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026azfg",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2122",
+      "frc2478",
+      "frc7426",
+      "frc7755"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026azfg",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc2080"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026bcvi",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc7287"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026bcvi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc359",
+      "frc3683",
+      "frc9180"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026bcvi",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7135"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026brba",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc7563"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026brba",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1156",
+      "frc7563",
+      "frc9066",
+      "frc9162"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026brba",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7567"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026brsp",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1884"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026brsp",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1156",
+      "frc1884",
+      "frc7033",
+      "frc7563"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026brsp",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc1156"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026cnsh",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6940"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026cnsh",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10526",
+      "frc6941",
+      "frc8214"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026cnsh",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc5449"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026code",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4499"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026code",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc118",
+      "frc2443",
+      "frc4499"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026code",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc6652"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026cosp",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc498"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026cosp",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3288",
+      "frc498",
+      "frc8044"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026cosp",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4499"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026flor",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1902"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026flor",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc179",
+      "frc180",
+      "frc9404"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026flor",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7717"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026flta",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc386"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026flta",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10162",
+      "frc2992",
+      "frc6647"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026flta",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc6473"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026flwp",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc5557"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026flwp",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1523",
+      "frc180",
+      "frc59"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026flwp",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7403"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026hiho",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc359"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026hiho",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc11019",
+      "frc359",
+      "frc9715"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026hiho",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc6497"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026iacf",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1108"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026iacf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3928",
+      "frc4646",
+      "frc5557"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026iacf",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc3928"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026idbo",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc9449"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026idbo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2122",
+      "frc359",
+      "frc3729"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026idbo",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc8005"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026ilch",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3061"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026ilch",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2338",
+      "frc48",
+      "frc8029"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026ilch",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc2338"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026ilpe",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc8020"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026ilpe",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2040",
+      "frc4143",
+      "frc8719"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026ilpe",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc3284"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026ksla",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1987"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026ksla",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1723",
+      "frc1825",
+      "frc1986",
+      "frc1987"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026ksla",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc1764"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026lake",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3937"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026lake",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4635",
+      "frc8044",
+      "frc9787"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026lake",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc10101"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mndu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4674"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mndu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3100",
+      "frc4741",
+      "frc5348"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mndu",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc3926"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mndu2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3008"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mndu2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2169",
+      "frc2491",
+      "frc5913"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mndu2",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc2052"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mnmi",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3880"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mnmi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2480",
+      "frc2491",
+      "frc4174"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mnmi",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc2239"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mnmi2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc7028"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mnmi2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2470",
+      "frc6045",
+      "frc7028"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mnmi2",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4607"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mnum",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3630"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mnum",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10950",
+      "frc2052",
+      "frc4655"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mnum",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc6909"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mnwi",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3284"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mnwi",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc112",
+      "frc4143",
+      "frc5847"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mnwi",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc2220"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mokc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1710"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mokc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1987",
+      "frc2333",
+      "frc4522"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mokc",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc5968"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mose",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2704"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mose",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1986",
+      "frc1987",
+      "frc9626"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mose",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc6017"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mosl",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3792"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mosl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1706",
+      "frc3931",
+      "frc8069"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mosl",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4256"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mslr",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6998"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mslr",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc4400",
+      "frc8044",
+      "frc9405"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mslr",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4400"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mxmo",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3354"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mxmo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3478",
+      "frc4635",
+      "frc6200"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mxmo",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc10225"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mxto",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4403"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mxto",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc11304",
+      "frc4400",
+      "frc6647"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mxto",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc5705"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026ndgf",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc5653"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026ndgf",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3276",
+      "frc7048",
+      "frc7257"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026ndgf",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7028"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026nvlv",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4253"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026nvlv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1165",
+      "frc7426",
+      "frc987"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026nvlv",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7426"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026nyli2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1880"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026nyli2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc5736",
+      "frc870",
+      "frc9646"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026nyli2",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc353"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026nyn2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1156"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026nyn2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1155",
+      "frc1156",
+      "frc1796"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026nyn2",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7551"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026nyny",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6024"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026nyny",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3015",
+      "frc5298",
+      "frc694"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026nyny",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc2601"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026nyro",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc1511"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026nyro",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10922",
+      "frc1787",
+      "frc3181"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026nyro",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc694"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026nysu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4122"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026nysu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10213",
+      "frc10229",
+      "frc1796"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026nysu",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc6911"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026nytr",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc9545"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026nytr",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1796",
+      "frc263",
+      "frc870"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026nytr",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc3624"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026ohcl",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc8393"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026ohcl",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10208",
+      "frc27",
+      "frc4611"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026ohcl",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4085"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026ohmv",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2399"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026ohmv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2338",
+      "frc4096",
+      "frc6964",
+      "frc9097"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026ohmv",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc1014"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026okok",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4256"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026okok",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc1706",
+      "frc3160",
+      "frc4635",
+      "frc5968"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026okok",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc2718"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026oktu",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2718"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026oktu",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2359",
+      "frc4403",
+      "frc498"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026oktu",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4403"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026paca",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3990"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026paca",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3015",
+      "frc340",
+      "frc3504",
+      "frc4991"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026paca",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc1511"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026qcmo",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3544"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026qcmo",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc3117",
+      "frc3544",
+      "frc6364"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026qcmo",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc5800"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tnkn",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc7525"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tnkn",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2783",
+      "frc6517",
+      "frc7111"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tnkn",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc4265"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuak",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6989"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuak",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10043",
+      "frc6989",
+      "frc7539",
+      "frc9024"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuak",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc7672"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuak2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc4191"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuak2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc11300",
+      "frc7539",
+      "frc9609"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuak2",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc5665"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuhc",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6429"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuhc",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2905",
+      "frc7050",
+      "frc7840",
+      "frc9231"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuhc",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc9247"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuis",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc3646"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuis",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10141",
+      "frc6436",
+      "frc9483"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuis",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc9077"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuis2",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc6988"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuis2",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc11166",
+      "frc7632",
+      "frc8725"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuis2",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc9427"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuis3",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc10131"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuis3",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10131",
+      "frc8153",
+      "frc8595"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuis3",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc9692"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuis4",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc2905"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuis4",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc10907",
+      "frc4481",
+      "frc8725"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuis4",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc10396"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026tuis5",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc9692"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026tuis5",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc6459",
+      "frc8158",
+      "frc9483"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026tuis5",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc9545"
+    ]
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026utwv",
+    "name": "Regional FIRST Impact Award",
+    "team_keys": [
+      "frc9277"
+    ]
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026utwv",
+    "name": "Regional Winners",
+    "team_keys": [
+      "frc2122",
+      "frc2972",
+      "frc3006"
+    ]
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026utwv",
+    "name": "Regional Engineering Inspiration Award sponsored by SpaceX",
+    "team_keys": [
+      "frc10034"
+    ]
+  }
+]

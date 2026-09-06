@@ -1,5 +1,7 @@
+import copy
 import json
 import unittest
+from typing import Any, Dict
 from unittest.mock import patch
 
 import pytest
@@ -7,6 +9,7 @@ import pytest
 from backend.common.consts.media_type import MediaType, TYPE_NAMES
 from backend.common.futures import InstantFuture
 from backend.common.helpers.webcast_helper import WebcastParser
+from backend.common.sitevars.smugmug_api_secret import ContentType, SmugmugApiSecret
 from backend.common.suggestions.media_parser import MediaParser
 from backend.common.urlfetch import URLFetchResult
 
@@ -437,3 +440,190 @@ class TestWebcastUrlParser(unittest.TestCase):
             "http://mywebsite.somewebcast"
         ).get_result()
         self.assertIsNone(bad)
+
+
+SMUGMUG_ALBUM_RESPONSE: Dict[str, Any] = {
+    "Response": {
+        "Locator": "Album",
+        "LocatorType": "Object",
+        "Album": {
+            "AlbumKey": "4RWMLM",
+            "Name": "2026 FIRST Championship - BAE Systems",
+            "Title": "2026 FIRST Championship - BAE Systems",
+            "ImageCount": 81,
+            "WebUri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE",
+        },
+    },
+    # The cover image's sizes, from the AlbumHighlightImage expansion
+    "Expansions": {
+        "/api/v2/image/2F65K6P-0!sizedetails": {
+            "ImageSizeDetails": {
+                "ImageSizeSmall": {"Url": "https://photos.smugmug.com/S/cover-S.png"},
+                "ImageSizeMedium": {"Url": "https://photos.smugmug.com/M/cover-M.png"},
+                "ImageSizeLarge": {"Url": "https://photos.smugmug.com/L/cover-L.png"},
+            }
+        },
+        "/api/v2/album/4RWMLM!highlightimage": {"AlbumImage": {"ImageKey": "2F65K6P"}},
+    },
+}
+
+SMUGMUG_PHOTO_RESPONSE: Dict[str, Any] = {
+    "Response": {
+        "Locator": "AlbumImage",
+        "LocatorType": "Object",
+        "AlbumImage": {
+            "ImageKey": "xxrbgK6",
+            "Title": "",
+            "Caption": "A robot",
+            "WebUri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+        },
+    },
+    "Expansions": {
+        "/api/v2/image/xxrbgK6-0!sizedetails": {
+            "ImageSizeDetails": {
+                "ImageSizeSmall": {"Url": "https://photos.smugmug.com/S/x-S.jpg"},
+                "ImageSizeMedium": {"Url": "https://photos.smugmug.com/M/x-M.jpg"},
+                "ImageSizeLarge": {"Url": "https://photos.smugmug.com/L/x-L.jpg"},
+            }
+        }
+    },
+}
+
+
+class TestSmugmugParser(unittest.TestCase):
+    ALBUM_URL = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
+    PHOTO_URL = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6/A"
+
+    def setUp(self) -> None:
+        SmugmugApiSecret.put(ContentType(api_key="abc", api_secret="def"))
+
+    def _parse(self, url: str, status_code: int, content: str):
+        mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+            MediaParser.SMUGMUG_WEBURI_LOOKUP_URL, status_code, content
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch",
+            return_value=InstantFuture(mock_urlfetch_result),
+        ):
+            return MediaParser.partial_media_dict_from_url(url).get_result()
+
+    def test_album_parse(self) -> None:
+        urls = [
+            self.ALBUM_URL,
+            self.ALBUM_URL + "/",
+            self.ALBUM_URL + "?utm_source=tba",
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                result = self._parse(url, 200, json.dumps(SMUGMUG_ALBUM_RESPONSE))
+                self.assertIsNotNone(result)
+                self.assertEqual(result["media_type_enum"], MediaType.SMUGMUG_ALBUM)
+                self.assertEqual(result["foreign_key"], "4RWMLM")
+                self.assertFalse(result["is_social"])
+                self.assertEqual(
+                    result["site_name"], TYPE_NAMES[MediaType.SMUGMUG_ALBUM]
+                )
+                self.assertEqual(
+                    json.loads(result["details_json"]),
+                    {
+                        "title": "2026 FIRST Championship - BAE Systems",
+                        "web_uri": self.ALBUM_URL,
+                        "image_count": 81,
+                        "cover_url": "https://photos.smugmug.com/L/cover-L.png",
+                        "cover_url_med": "https://photos.smugmug.com/M/cover-M.png",
+                        "cover_url_sm": "https://photos.smugmug.com/S/cover-S.png",
+                    },
+                )
+
+    def test_album_parse_falls_back_to_name(self) -> None:
+        response = copy.deepcopy(SMUGMUG_ALBUM_RESPONSE)
+        response["Response"]["Album"]["Title"] = ""
+        result = self._parse(self.ALBUM_URL, 200, json.dumps(response))
+        self.assertIsNotNone(result)
+        self.assertEqual(
+            json.loads(result["details_json"])["title"],
+            "2026 FIRST Championship - BAE Systems",
+        )
+
+    def test_photo_parse(self) -> None:
+        urls = [
+            self.PHOTO_URL,
+            "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+            self.PHOTO_URL + "?utm_source=tba",
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                result = self._parse(url, 200, json.dumps(SMUGMUG_PHOTO_RESPONSE))
+                self.assertIsNotNone(result)
+                self.assertEqual(result["media_type_enum"], MediaType.SMUGMUG_PHOTO)
+                self.assertEqual(result["foreign_key"], "xxrbgK6")
+                self.assertFalse(result["is_social"])
+                self.assertEqual(
+                    result["site_name"], TYPE_NAMES[MediaType.SMUGMUG_PHOTO]
+                )
+                self.assertEqual(
+                    json.loads(result["details_json"]),
+                    {
+                        "title": "",
+                        "caption": "A robot",
+                        "web_uri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+                        "image_url": "https://photos.smugmug.com/L/x-L.jpg",
+                        "image_url_med": "https://photos.smugmug.com/M/x-M.jpg",
+                        "image_url_sm": "https://photos.smugmug.com/S/x-S.jpg",
+                    },
+                )
+
+    def test_album_parse_missing_cover(self) -> None:
+        response = copy.deepcopy(SMUGMUG_ALBUM_RESPONSE)
+        del response["Expansions"]
+        result = self._parse(self.ALBUM_URL, 200, json.dumps(response))
+        self.assertIsNotNone(result)
+        details = json.loads(result["details_json"])
+        self.assertEqual(details["cover_url"], "")
+        self.assertEqual(details["cover_url_med"], "")
+        self.assertEqual(details["cover_url_sm"], "")
+
+    def test_photo_parse_missing_size_details(self) -> None:
+        response = copy.deepcopy(SMUGMUG_PHOTO_RESPONSE)
+        del response["Expansions"]
+        result = self._parse(self.PHOTO_URL, 200, json.dumps(response))
+        self.assertIsNotNone(result)
+        details = json.loads(result["details_json"])
+        self.assertEqual(details["image_url"], "")
+        self.assertEqual(details["image_url_med"], "")
+        self.assertEqual(details["image_url_sm"], "")
+
+    def test_no_api_key(self) -> None:
+        SmugmugApiSecret.put(ContentType(api_key="", api_secret=""))
+        with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+            result = MediaParser.partial_media_dict_from_url(
+                self.ALBUM_URL
+            ).get_result()
+        self.assertIsNone(result)
+        mock_urlfetch.assert_not_called()
+
+    def test_api_non_200(self) -> None:
+        self.assertIsNone(self._parse(self.ALBUM_URL, 500, ""))
+
+    def test_api_empty_response(self) -> None:
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, ""))
+
+    def test_url_is_not_an_album_or_photo(self) -> None:
+        # A folder page
+        response = {"Response": {"Locator": "Folder", "Folder": {"NodeID": "rSxh6r"}}}
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, json.dumps(response)))
+
+    def test_url_does_not_resolve(self) -> None:
+        # SmugMug answers 200 and names every type the url could have been
+        response = {"Response": {"Locator": "Folder,Album,Page,AlbumImage"}}
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, json.dumps(response)))
+
+    def test_album_missing_key(self) -> None:
+        response = copy.deepcopy(SMUGMUG_ALBUM_RESPONSE)
+        del response["Response"]["Album"]["AlbumKey"]
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, json.dumps(response)))
+
+    def test_photo_missing_key(self) -> None:
+        response = copy.deepcopy(SMUGMUG_PHOTO_RESPONSE)
+        del response["Response"]["AlbumImage"]["ImageKey"]
+        self.assertIsNone(self._parse(self.PHOTO_URL, 200, json.dumps(response)))

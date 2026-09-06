@@ -186,6 +186,33 @@ export const zPlayoffType = z.union([
   z.literal(8),
 ]);
 
+/**
+ * CmpQualificationMethod
+ *
+ * How a team earned its invitation to the FIRST Championship. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/cmp_qualification.py for full definitions.
+ */
+export const zCmpQualificationMethod = z.enum([
+  'district_points',
+  'waitlist',
+  'original_and_sustaining',
+  'hall_of_fame',
+  'prior_year_cmp_winner',
+  'prior_year_cmp_impact',
+  'prior_year_cmp_engineering_inspiration',
+  'regional_winner',
+  'regional_impact',
+  'regional_engineering_inspiration',
+  'regional_wildcard',
+  'late_regional_winner',
+  'late_regional_impact',
+  'late_regional_engineering_inspiration',
+  'late_regional_wildcard',
+  'dcmp_winner',
+  'dcmp_impact',
+  'dcmp_engineering_inspiration',
+  'dcmp_rookie_all_star',
+]);
+
 export const zDistrict = z.object({
   abbreviation: z.string(),
   display_name: z.string(),
@@ -210,6 +237,28 @@ export const zDistrictInsightRegionData = z.object({
 export const zDistrictAdvancement = z.object({
   dcmp: z.boolean(),
   cmp: z.boolean(),
+  cmp_qualification: zCmpQualificationMethod.nullish(),
+});
+
+/**
+ * Where the District Championship and FIRST Championship advancement cutoffs fell for a district, and how each qualifying team earned its Championship invitation.
+ */
+export const zDistrictAdvancementCutoffs = z.object({
+  dcmp_original: z.int(),
+  dcmp_effective: z.int(),
+  dcmp_declines: z.array(z.string()),
+  cmp_original: z.int(),
+  cmp_effective: z.int(),
+  cmp_declines: z.array(z.string()),
+  cmp_qualification: z.record(z.string(), zCmpQualificationMethod),
+});
+
+/**
+ * Per-team advancement status and the advancement cutoffs for a district.
+ */
+export const zDistrictAdvancementResponse = z.object({
+  teams: z.record(z.string(), zDistrictAdvancement).nullable(),
+  cutoffs: zDistrictAdvancementCutoffs.nullable(),
 });
 
 /**
@@ -816,6 +865,8 @@ export const zMediaBase = z.object({
     'avatar',
     'onshape',
     'cd-thread',
+    'smugmug-photo',
+    'smugmug-album',
   ]),
   foreign_key: z.string(),
   preferred: z.boolean().optional(),
@@ -893,6 +944,38 @@ export const zMediaOnshape = zMediaBase.and(
         model_description: z.string().nullable(),
         model_image: z.url(),
         model_name: z.string(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaSmugmugAlbum = zMediaBase.and(
+  z.object({
+    type: z.literal('smugmug-album').optional(),
+    details: z
+      .object({
+        cover_url: z.url(),
+        cover_url_med: z.url(),
+        cover_url_sm: z.url(),
+        image_count: z.int(),
+        title: z.string(),
+        web_uri: z.url(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaSmugmugPhoto = zMediaBase.and(
+  z.object({
+    type: z.literal('smugmug-photo').optional(),
+    details: z
+      .object({
+        caption: z.string(),
+        image_url: z.url(),
+        image_url_med: z.url(),
+        image_url_sm: z.url(),
+        title: z.string(),
+        web_uri: z.url(),
       })
       .optional(),
   }),
@@ -982,6 +1065,16 @@ export const zMedia = z.union([
       type: z.literal('onshape'),
     })
     .and(zMediaOnshape),
+  z
+    .object({
+      type: z.literal('smugmug-album'),
+    })
+    .and(zMediaSmugmugAlbum),
+  z
+    .object({
+      type: z.literal('smugmug-photo'),
+    })
+    .and(zMediaSmugmugPhoto),
 ]);
 
 export const zMobilityRobot2023 = z.enum(['No', 'Yes']);
@@ -1106,9 +1199,49 @@ export const zInsightV2Base = z.object({
   name: z.string(),
   display_name: z.string(),
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
+  category: z.enum([
+    'leaderboard',
+    'streak',
+    'timeseries',
+    'game_stats',
+    'clubs',
+  ]),
   district_abbreviation: z.string().nullable(),
 });
+
+/**
+ * Chairman's Award material for a Hall of Fame team, scraped from the FIRST resource library.
+ */
+export const zInsightV2HallOfFameContext = z.object({
+  year: z.int(),
+  video: z.string().nullable(),
+  presentation: z.string().nullable(),
+  essay: z.string().nullable(),
+});
+
+/**
+ * A single club member.
+ */
+export const zInsightV2ClubEntry = z.object({
+  team_key: z.string(),
+  event_added_key: z.string(),
+  extra_context: zInsightV2HallOfFameContext.optional(),
+});
+
+/**
+ * Data for a clubs-category InsightV2. A cumulative all-time membership of teams that reached a milestone.
+ */
+export const zInsightV2ClubsData = z.object({
+  entries: z.array(zInsightV2ClubEntry),
+  context_type: z.enum(['hall_of_fame', 'none']),
+});
+
+export const zInsightV2ClubsExtras = z.object({
+  category: z.literal('clubs').optional(),
+  data: zInsightV2ClubsData,
+});
+
+export const zInsightV2Clubs = zInsightV2Base.and(zInsightV2ClubsExtras);
 
 /**
  * Data for a leaderboard-category InsightV2. Rankings of teams, events, or matches by a numeric value.
@@ -1173,7 +1306,7 @@ export const zInsightV2Streak = zInsightV2Base.and(zInsightV2StreakExtras);
  * Data for a timeseries-category InsightV2. One or more named series of (x, y) data points over time.
  */
 export const zInsightV2TimeseriesData = z.object({
-  x_type: z.enum(['week', 'year', 'event']),
+  x_type: z.enum(['week', 'year', 'event', 'date']),
   x_label: z.string(),
   y_label: z.string(),
   point_context_type: z.enum(['none', 'match_record']),
@@ -1254,7 +1387,7 @@ export const zInsightV2GameStats = zInsightV2Base.and(
 );
 
 /**
- * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, and game stats shapes.
+ * A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, game stats, and clubs shapes.
  */
 export const zInsightV2 = z.union([
   z
@@ -1277,6 +1410,11 @@ export const zInsightV2 = z.union([
       category: z.literal('game_stats'),
     })
     .and(zInsightV2GameStats),
+  z
+    .object({
+      category: z.literal('clubs'),
+    })
+    .and(zInsightV2Clubs),
 ]);
 
 export const zPosition2016 = z.enum([
@@ -2101,13 +2239,14 @@ export const zPageNum = z.int();
 export const zTeamKey = z.string();
 
 /**
- * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats.
+ * InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const zInsightV2Category = z.enum([
   'leaderboard',
   'streak',
   'timeseries',
   'game_stats',
+  'clubs',
 ]);
 
 /**
@@ -2168,11 +2307,9 @@ export const zGetDistrictAdvancementPath = z.object({
 });
 
 /**
- * A mapping of team key to District_Advancement
+ * Successful response
  */
-export const zGetDistrictAdvancementResponse = z
-  .record(z.string(), zDistrictAdvancement)
-  .nullable();
+export const zGetDistrictAdvancementResponse = zDistrictAdvancementResponse;
 
 export const zGetDistrictAwardsHeaders = z.object({
   'If-None-Match': z.string().optional(),
@@ -2671,7 +2808,13 @@ export const zGetInsightsV2YearCategoryHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
+  category: z.enum([
+    'leaderboard',
+    'streak',
+    'timeseries',
+    'game_stats',
+    'clubs',
+  ]),
 });
 
 /**
@@ -2699,7 +2842,13 @@ export const zGetInsightsV2YearCategoryDistrictHeaders = z.object({
 
 export const zGetInsightsV2YearCategoryDistrictPath = z.object({
   year: z.int(),
-  category: z.enum(['leaderboard', 'streak', 'timeseries', 'game_stats']),
+  category: z.enum([
+    'leaderboard',
+    'streak',
+    'timeseries',
+    'game_stats',
+    'clubs',
+  ]),
   district_abbreviation: z.string(),
 });
 

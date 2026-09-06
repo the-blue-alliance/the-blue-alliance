@@ -1,7 +1,6 @@
 from dataclasses import dataclass
 from datetime import datetime
-from difflib import SequenceMatcher
-from typing import List, Optional, Tuple, Union
+from typing import Dict, List, Optional, Set, Tuple, Union
 
 from flask import redirect, request
 from google.appengine.ext import ndb
@@ -11,9 +10,10 @@ from werkzeug.wrappers import Response
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.helpers.similar_event_helper import SimilarEventHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
-from backend.common.models.keys import EventKey
+from backend.common.models.keys import EventKey, Year
 from backend.common.models.suggestion import Suggestion
 from backend.common.queries.event_query import EventListQuery
 from backend.web.handlers.suggestions.suggestion_review_base import (
@@ -135,29 +135,27 @@ The Blue Alliance Admins\
             .filter(Suggestion.target_model == "offseason-event")
         )
 
-        year = datetime.now().year
-        year_events_future = EventListQuery(year).fetch_async()
-        last_year_events_future = EventListQuery(year - 1).fetch_async()
         events_and_ids = [
             self._create_candidate_event(suggestion) for suggestion in suggestions
         ]
 
-        year_events = year_events_future.get_result()
-        year_offseason_events = [
-            e for e in year_events if e.event_type_enum == EventType.OFFSEASON
-        ]
-        last_year_events = last_year_events_future.get_result()
-        last_year_offseason_events = [
-            e for e in last_year_events if e.event_type_enum == EventType.OFFSEASON
-        ]
+        # Compare each suggestion against the year it happens in, not against
+        # the year we happen to be reviewing it in -- suggestions for next
+        # year's preseason events show up before the new year starts.
+        default_year = datetime.now().year
+        similar_years = [event.year or default_year for _, event in events_and_ids]
+
+        offseasons_by_year = self._fetch_offseason_events(
+            {year for y in similar_years for year in (y, y - 1)}
+        )
 
         similar_events = [
-            self._get_similar_events(event[1], year_offseason_events)
-            for event in events_and_ids
+            self._get_similar_events(event, offseasons_by_year.get(year, []))
+            for (_, event), year in zip(events_and_ids, similar_years)
         ]
         similar_last_year = [
-            self._get_similar_events(event[1], last_year_offseason_events)
-            for event in events_and_ids
+            self._get_similar_events(event, offseasons_by_year.get(year - 1, []))
+            for (_, event), year in zip(events_and_ids, similar_years)
         ]
 
         template_values = {
@@ -166,6 +164,7 @@ The Blue Alliance Admins\
             "events_and_ids": events_and_ids,
             "similar_events": similar_events,
             "similar_last_year": similar_last_year,
+            "similar_years": similar_years,
         }
         return render_template(
             "suggestions/suggest_offseason_event_review_list.html", template_values
@@ -230,17 +229,28 @@ The Blue Alliance Admins\
         )
 
     @classmethod
+    def _fetch_offseason_events(cls, years: Set[Year]) -> Dict[Year, List[Event]]:
+        """
+        Fetches the non-official events for each year, keyed by year
+        """
+        futures = {year: EventListQuery(year).fetch_async() for year in years}
+        return {
+            year: [e for e in future.get_result() if e.is_offseason]
+            for year, future in futures.items()
+        }
+
+    @classmethod
     def _get_similar_events(
         cls, candidate_event: Event, offseason_events: List[Event]
     ) -> List[Tuple[str, str]]:
         """
-        Finds events this year with a similar name
-        Returns a tuple of (event key, event name)
+        Finds the events most likely to be the same event as the suggestion,
+        best match first.
+        Returns a list of (event key, event name)
         """
-        similar_events = []
-        for event in offseason_events:
-            similarity = SequenceMatcher(a=candidate_event.name, b=event.name).ratio()
-            if similarity > 0.5:
-                # Somewhat arbitrary cutoff
-                similar_events.append((event.key_name, event.name))
-        return similar_events
+        return [
+            (event.key_name, event.name)
+            for event in SimilarEventHelper.similar_events(
+                candidate_event, offseason_events
+            )
+        ]

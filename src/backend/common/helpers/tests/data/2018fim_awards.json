@@ -1,0 +1,6966 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2018mialp",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3603"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mialp",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5505"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6077"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6121"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mialp",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7244"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mialp",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7084"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mialp",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4983"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mialp",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7154"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mialp",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7250"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mialp",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5525"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mialp",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6121"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mialp",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6493"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mialp",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5230"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5193"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5534"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mialp",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6077"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mialp",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6493"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mialp",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5230"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mialp",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2246"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mialp",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3322"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mialp",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2405"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mialp",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5505"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mibel",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc66"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mibel",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4405"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5915"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mibel",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": null
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mibel",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5467"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mibel",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5915"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mibel",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7145"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mibel",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7145"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mibel",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5053"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mibel",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mibel",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mibel",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5046"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5530"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2620"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mibel",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4405"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mibel",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5530"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mibel",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1481"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mibel",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4395"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mibel",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mibel",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5090"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mibel",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2137"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018micen",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018micen",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3098"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1025"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5197"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018micen",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6958"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018micen",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5756"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018micen",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6099"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018micen",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7206"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018micen",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7188"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018micen",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3098"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018micen",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1025"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018micen",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1025"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018micen",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc123"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2224"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018micen",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5555"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018micen",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4815"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018micen",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc123"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018micen",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5915"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018micen",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc818"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018micen",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2048"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018micen",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3175"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018micmp",
+    "name": "Regional Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2604"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4776"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2137"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018micmp",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4003"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3098"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2586"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018micmp",
+    "name": "District Championship Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7226"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7160"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018micmp",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4392"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3535"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 3,
+    "event_key": "2018micmp",
+    "name": "Woodie Flowers Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Scott Heister",
+        "team_key": "frc66"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 4,
+    "event_key": "2018micmp",
+    "name": "FIRST Dean's List Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Ethan Vanlerberghe",
+        "team_key": "frc1718"
+      },
+      {
+        "awardee": "Joshua Jacobson",
+        "team_key": "frc5086"
+      },
+      {
+        "awardee": "Tajah-Rayne Davise",
+        "team_key": "frc2586"
+      },
+      {
+        "awardee": "Maxwell Jorgensen",
+        "team_key": "frc5050"
+      },
+      {
+        "awardee": "Valentina Vargas",
+        "team_key": "frc27"
+      },
+      {
+        "awardee": "Sada Reed",
+        "team_key": "frc5282"
+      },
+      {
+        "awardee": "Gabrielle Malson",
+        "team_key": "frc1506"
+      },
+      {
+        "awardee": "Cymbre Scott",
+        "team_key": "frc2771"
+      },
+      {
+        "awardee": "Ritika Pansare",
+        "team_key": "frc1189"
+      },
+      {
+        "awardee": "Rebecca Kowalczyk",
+        "team_key": "frc2619"
+      },
+      {
+        "awardee": "Kristin Anderson",
+        "team_key": "frc503"
+      },
+      {
+        "awardee": "Gabe Meyerson",
+        "team_key": "frc3618"
+      },
+      {
+        "awardee": "Zoish Mehta",
+        "team_key": "frc5436"
+      },
+      {
+        "awardee": "Meghana Keeta",
+        "team_key": "frc226"
+      },
+      {
+        "awardee": "Sanket Nayak",
+        "team_key": "frc4384"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018micmp",
+    "name": "Regional Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc548"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018micmp1",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4392"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018micmp1",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018micmp1",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5980"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018micmp1",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7187"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018micmp1",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7056"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018micmp1",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018micmp1",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018micmp1",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018micmp1",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4362"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6121"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018micmp1",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018micmp1",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018micmp1",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4384"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018micmp1",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018micmp1",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018micmp1",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018micmp2",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6193"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018micmp2",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5505"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018micmp2",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5915"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018micmp2",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7250"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018micmp2",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018micmp2",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018micmp2",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018micmp2",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018micmp2",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1718"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc494"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018micmp2",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5050"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018micmp2",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018micmp2",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018micmp2",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4130"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018micmp2",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018micmp2",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc857"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018micmp3",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4003"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3098"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2586"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018micmp3",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1322"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018micmp3",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc51"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018micmp3",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7213"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018micmp3",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6861"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018micmp3",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2075"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018micmp3",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc85"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018micmp3",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018micmp3",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2771"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5205"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018micmp3",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018micmp3",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018micmp3",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018micmp3",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018micmp3",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3098"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018micmp3",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018micmp4",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5907"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018micmp4",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018micmp4",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5675"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018micmp4",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7144"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018micmp4",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7211"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018micmp4",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018micmp4",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc910"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018micmp4",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018micmp4",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1025"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc573"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2959"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018micmp4",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5603"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018micmp4",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1684"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018micmp4",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc862"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018micmp4",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2619"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018micmp4",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018micmp4",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6637"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018miesc",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5505"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018miesc",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc904"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018miesc",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7250"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018miesc",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3617"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018miesc",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4956"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018miesc",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7250"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018miesc",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7020"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018miesc",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc857"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018miesc",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018miesc",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6112"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018miesc",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4970"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1322"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7234"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018miesc",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3602"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018miesc",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6637"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018miesc",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018miesc",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6112"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018miesc",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4970"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018miesc",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4835"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018miesc",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1322"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mifor",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3618"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mifor",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7248"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mifor",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6852"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mifor",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mifor",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mifor",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6852"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mifor",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6914"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mifor",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mifor",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2771"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mifor",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6914"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mifor",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2771"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4395"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mifor",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc904"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mifor",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mifor",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4776"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mifor",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mifor",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc910"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mifor",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4395"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mifor",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018migay",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018migay",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5114"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3767"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5560"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018migay",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7084"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018migay",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5534"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018migay",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5878"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018migay",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7084"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018migay",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7244"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018migay",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3767"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018migay",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018migay",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018migay",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5314"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018migay",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5114"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018migay",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc862"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018migay",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3618"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018migay",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4376"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018migay",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5234"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018migay",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5509"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018migay",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018migib",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018migib",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1023"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3655"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018migib",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6914"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018migib",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1023"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018migib",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1188"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018migib",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7225"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018migib",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7225"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018migib",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6618"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018migib",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4405"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018migib",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018migib",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4405"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc862"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5523"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018migib",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3604"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018migib",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1718"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018migib",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc862"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018migib",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1528"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018migib",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018migib",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5090"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018migib",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4384"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018migul",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018migul",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4453"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018migul",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7187"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018migul",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5152"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018migul",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7256"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018migul",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7187"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018migul",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018migul",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018migul",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5675"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018migul",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018migul",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5152"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5843"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7256"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018migul",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1940"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018migul",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018migul",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4855"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018migul",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5843"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018migul",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018migul",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1677"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018migul",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1025"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mike2",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mike2",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4003"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc494"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7144"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mike2",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7192"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mike2",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1506"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mike2",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5774"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mike2",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7144"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mike2",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6954"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mike2",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc494"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mike2",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc314"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mike2",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mike2",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6193"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mike2",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1684"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mike2",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mike2",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mike2",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mike2",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4003"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mike2",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5926"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mike2",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2619"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018miken",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2771"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018miken",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7256"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018miken",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7289"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018miken",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc288"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018miken",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018miken",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7248"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018miken",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7256"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018miken",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018miken",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5069"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018miken",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5069"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018miken",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2771"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7234"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018miken",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2474"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018miken",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018miken",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018miken",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4384"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018miken",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4004"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018miken",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5567"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018miken",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc244"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018miket",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018miket",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4994"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6091"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018miket",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7211"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018miket",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5114"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018miket",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5251"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018miket",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7223"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018miket",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6877"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018miket",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2145"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018miket",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc70"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018miket",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018miket",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5114"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7211"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5612"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018miket",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3535"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018miket",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5234"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018miket",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5150"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018miket",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5561"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018miket",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4994"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018miket",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5166"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018miket",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1322"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018milak",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4327"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018milak",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2054"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7209"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018milak",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7056"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018milak",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3658"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018milak",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5685"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018milak",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7187"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018milak",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7222"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018milak",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018milak",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2959"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018milak",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018milak",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5501"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5708"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018milak",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018milak",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018milak",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018milak",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5462"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018milak",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4482"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018milak",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6425"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018milak",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5535"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018milan",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018milan",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6085"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018milan",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7254"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018milan",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2611"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018milan",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018milan",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7197"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018milan",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7226"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018milan",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5674"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018milan",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5205"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018milan",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018milan",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5674"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc494"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6078"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018milan",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6556"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018milan",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5523"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018milan",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5150"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018milan",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5710"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018milan",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc494"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018milan",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5282"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018milan",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3655"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018milin",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018milin",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3604"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5067"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018milin",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6861"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018milin",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1023"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018milin",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3604"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018milin",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6861"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018milin",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6852"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018milin",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018milin",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3547"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018milin",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5498"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018milin",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5050"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6618"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018milin",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2832"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018milin",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5050"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018milin",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018milin",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5498"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018milin",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018milin",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4395"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018milin",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc910"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018miliv",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018miliv",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6116"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018miliv",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7174"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018miliv",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018miliv",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3542"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018miliv",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6861"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018miliv",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7175"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018miliv",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018miliv",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2832"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018miliv",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3542"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018miliv",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6954"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018miliv",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018miliv",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5050"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018miliv",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018miliv",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1528"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018miliv",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc314"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018miliv",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3619"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018miliv",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc548"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018milsu",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5709"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018milsu",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5084"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4392"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5878"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018milsu",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4377"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018milsu",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1596"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018milsu",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018milsu",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4392"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018milsu",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5247"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018milsu",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1596"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2586"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5714"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018milsu",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6113"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018milsu",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc857"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018milsu",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc141"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018milsu",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5314"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018milsu",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3602"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018milsu",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2586"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018milsu",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4988"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mimar",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2604"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mimar",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1684"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7218"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mimar",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7188"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mimar",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5533"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mimar",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4130"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mimar",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7206"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mimar",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mimar",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3534"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mimar",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6098"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mimar",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mimar",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3668"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1718"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5167"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mimar",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6120"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mimar",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mimar",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mimar",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5926"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mimar",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1684"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mimar",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5167"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mimar",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1718"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mimid",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2619"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mimid",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5603"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5509"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7213"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mimid",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7213"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mimid",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3770"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mimid",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4382"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mimid",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7213"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mimid",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7150"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mimid",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5509"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mimid",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6193"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mimid",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mimid",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2619"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6093"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mimid",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5166"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mimid",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mimid",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4819"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mimid",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc703"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mimid",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5603"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mimid",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5504"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mimid",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mimil",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4776"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mimil",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7178"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mimil",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7225"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mimil",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3668"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mimil",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mimil",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7225"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mimil",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7223"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mimil",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mimil",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mimil",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4776"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mimil",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mimil",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2145"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mimil",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mimil",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mimil",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc51"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mimil",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mimil",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mimil",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mishe",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1506"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mishe",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1506"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6753"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7226"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mishe",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7226"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mishe",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5448"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mishe",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3570"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mishe",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7109"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mishe",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7211"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mishe",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc573"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mishe",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5623"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mishe",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2959"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mishe",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6077"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc74"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6538"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mishe",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3572"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mishe",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6753"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mishe",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4819"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mishe",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3535"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mishe",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6077"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mishe",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2959"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mishe",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018misjo",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018misjo",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6615"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018misjo",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7210"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018misjo",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5069"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018misjo",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3620"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018misjo",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7210"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018misjo",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7203"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018misjo",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018misjo",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018misjo",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3546"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018misjo",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2474"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3620"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5927"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018misjo",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018misjo",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2474"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018misjo",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5980"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018misjo",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2959"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018misjo",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc85"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018misjo",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4325"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018misjo",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc288"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018misou",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018misou",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5467"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018misou",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7232"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018misou",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4768"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018misou",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6057"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018misou",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7196"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018misou",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7218"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018misou",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5167"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018misou",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3547"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018misou",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5467"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018misou",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4680"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7218"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018misou",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1502"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018misou",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018misou",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1481"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018misou",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5436"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018misou",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018misou",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5531"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018misou",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4680"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mitry",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc910"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mitry",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4362"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2676"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mitry",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7147"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mitry",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc818"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mitry",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5498"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mitry",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7178"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mitry",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7247"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mitry",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mitry",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mitry",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4961"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mitry",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5555"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mitry",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4810"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mitry",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mitry",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3539"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mitry",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5436"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mitry",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc469"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mitry",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5478"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mitry",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018mitvc",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4377"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018mitvc",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2075"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5247"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018mitvc",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7160"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018mitvc",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3603"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018mitvc",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4956"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018mitvc",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7155"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018mitvc",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7155"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018mitvc",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6100"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018mitvc",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc51"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018mitvc",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018mitvc",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6087"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5424"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018mitvc",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6121"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018mitvc",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018mitvc",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5086"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018mitvc",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1596"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018mitvc",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3688"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018mitvc",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5424"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018mitvc",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3618"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018miwat",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2137"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018miwat",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5907"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3770"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6117"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018miwat",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6877"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018miwat",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018miwat",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4130"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018miwat",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6877"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018miwat",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7168"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018miwat",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4779"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018miwat",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5674"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018miwat",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc68"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018miwat",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5674"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5155"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5229"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018miwat",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1250"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018miwat",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3668"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018miwat",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc107"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018miwat",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5048"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018miwat",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc703"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018miwat",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2851"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018miwat",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3770"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 0,
+    "event_key": "2018miwmi",
+    "name": "District Chairman's Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4003"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 1,
+    "event_key": "2018miwmi",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc85"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4003"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5927"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 10,
+    "event_key": "2018miwmi",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 11,
+    "event_key": "2018miwmi",
+    "name": "Gracious Professionalism Award sponsored by Johnson & Johnson",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc74"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 13,
+    "event_key": "2018miwmi",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 14,
+    "event_key": "2018miwmi",
+    "name": "Highest Rookie Seed",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7054"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 15,
+    "event_key": "2018miwmi",
+    "name": "Rookie Inspiration Award sponsored by National Instruments",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": null
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 16,
+    "event_key": "2018miwmi",
+    "name": "Industrial Design Award sponsored by General Motors",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc85"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 17,
+    "event_key": "2018miwmi",
+    "name": "Quality Award sponsored by Motorola Solutions Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5980"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 18,
+    "event_key": "2018miwmi",
+    "name": "Safety Award sponsored by Underwriters Laboratories",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3546"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 2,
+    "event_key": "2018miwmi",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5980"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc74"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6548"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 20,
+    "event_key": "2018miwmi",
+    "name": "Creativity Award sponsored by Xerox",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6098"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 21,
+    "event_key": "2018miwmi",
+    "name": "Excellence in Engineering Award sponsored by Delphi",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3620"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 22,
+    "event_key": "2018miwmi",
+    "name": "Entrepreneurship Award sponsored by Kleiner Perkins Caufield and Byers",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc141"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 27,
+    "event_key": "2018miwmi",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3098"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 29,
+    "event_key": "2018miwmi",
+    "name": "Innovation in Control Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4004"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 30,
+    "event_key": "2018miwmi",
+    "name": "Team Spirit Award sponsored by FCA Foundation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2405"
+      }
+    ],
+    "year": 2018
+  },
+  {
+    "award_type": 9,
+    "event_key": "2018miwmi",
+    "name": "District Engineering Inspiration Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4956"
+      }
+    ],
+    "year": 2018
+  }
+]

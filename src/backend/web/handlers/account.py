@@ -36,6 +36,7 @@ from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.keys import EventKey, TeamNumber
@@ -49,9 +50,35 @@ from backend.web.redirect import is_safe_url, safe_next_redirect
 blueprint = Blueprint("account", __name__, url_prefix="/account")
 
 
+def _api_write_key_sort_key(api_key: ApiAuthAccess) -> tuple[bool, str, str]:
+    event_keys = sorted(str(event_key.id()) for event_key in api_key.event_list)
+    return (
+        not event_keys,
+        event_keys[0] if event_keys else "",
+        str(api_key.key.id()),
+    )
+
+
+def _sorted_api_write_keys(
+    api_write_keys: list[ApiAuthAccess], descending: bool
+) -> list[ApiAuthAccess]:
+    keys_with_events = [key for key in api_write_keys if key.event_list]
+    keys_without_events = [key for key in api_write_keys if not key.event_list]
+    return sorted(
+        keys_with_events,
+        key=_api_write_key_sort_key,
+        reverse=descending,
+    ) + sorted(keys_without_events, key=_api_write_key_sort_key)
+
+
 @blueprint.route("")
 @require_login
 def overview() -> str:
+    user = none_throws(current_user())
+    api_write_keys_sort_direction = request.args.get("api_write_keys_sort", "asc")
+    if api_write_keys_sort_direction not in {"asc", "desc"}:
+        api_write_keys_sort_direction = "asc"
+
     template_values = {
         "status": session.pop("account_status", None),
         "webhook_verification_success": request.args.get(
@@ -60,6 +87,11 @@ def overview() -> str:
         "ping_sent": session.pop("ping_sent", None),
         "ping_enabled": NotificationsEnable.notifications_enabled(),
         "auth_write_type_names": AUTH_TYPE_WRITE_TYPE_NAMES,
+        "api_write_keys": _sorted_api_write_keys(
+            user.api_write_keys,
+            descending=api_write_keys_sort_direction == "desc",
+        ),
+        "api_write_keys_sort_direction": api_write_keys_sort_direction,
     }
     return render_template("account_overview.html", **template_values)
 

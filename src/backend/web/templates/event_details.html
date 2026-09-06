@@ -486,6 +486,19 @@
               {% endif %}
             </div>
           </div>
+
+          {% if medias_by_slugname['smugmug-album'] %}
+          <div class="row">
+            <div class="col-xs-12">
+              <h3 id="photo-galleries">Photo Galleries</h3>
+              {% for media in medias_by_slugname['smugmug-album'] %}
+                <div class="col-xs-6 col-sm-3">
+                  {% include "media_partials/media_display_partial.html" %}
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+          {% endif %}
         </div>
       </div>
 

@@ -1,0 +1,1718 @@
+[
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022incol",
+        "qual_points": 22,
+        "total": 73
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022inwla",
+        "qual_points": 22,
+        "total": 73
+      },
+      {
+        "alliance_points": 48,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2022incmp",
+        "qual_points": 57,
+        "total": 165
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 311,
+    "rank": 1,
+    "rookie_bonus": 0,
+    "team_key": "frc7457"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inkok",
+        "qual_points": 16,
+        "total": 38
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 21,
+        "total": 41
+      },
+      {
+        "alliance_points": 42,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2022incmp",
+        "qual_points": 51,
+        "total": 198
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 277,
+    "rank": 2,
+    "rookie_bonus": 0,
+    "team_key": "frc829"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022incol",
+        "qual_points": 15,
+        "total": 43
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 18,
+        "total": 30
+      },
+      {
+        "alliance_points": 42,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2022incmp",
+        "qual_points": 60,
+        "total": 192
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 265,
+    "rank": 3,
+    "rookie_bonus": 0,
+    "team_key": "frc4926"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022inkok",
+        "qual_points": 20,
+        "total": 71
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022incol",
+        "qual_points": 21,
+        "total": 72
+      },
+      {
+        "alliance_points": 45,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 54,
+        "total": 114
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 257,
+    "rank": 4,
+    "rookie_bonus": 0,
+    "team_key": "frc3940"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022inkok",
+        "qual_points": 22,
+        "total": 68
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inwla",
+        "qual_points": 19,
+        "total": 48
+      },
+      {
+        "alliance_points": 39,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2022incmp",
+        "qual_points": 48,
+        "total": 132
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 248,
+    "rank": 5,
+    "rookie_bonus": 0,
+    "team_key": "frc4272"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 11,
+        "total": 25
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 17,
+        "total": 28
+      },
+      {
+        "alliance_points": 48,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2022incmp",
+        "qual_points": 66,
+        "total": 174
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 227,
+    "rank": 6,
+    "rookie_bonus": 0,
+    "team_key": "frc3176"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inkok",
+        "qual_points": 14,
+        "total": 38
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022inwla",
+        "qual_points": 15,
+        "total": 45
+      },
+      {
+        "alliance_points": 39,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2022incmp",
+        "qual_points": 51,
+        "total": 135
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 218,
+    "rank": 7,
+    "rookie_bonus": 0,
+    "team_key": "frc5010"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022inkok",
+        "qual_points": 21,
+        "total": 56
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 18,
+        "total": 37
+      },
+      {
+        "alliance_points": 45,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 63,
+        "total": 123
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 216,
+    "rank": 8,
+    "rookie_bonus": 0,
+    "team_key": "frc1024"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 16,
+        "total": 28
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022inwla",
+        "qual_points": 11,
+        "total": 41
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2022incmp",
+        "qual_points": 42,
+        "total": 141
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 210,
+    "rank": 9,
+    "rookie_bonus": 0,
+    "team_key": "frc7617"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022inkok",
+        "qual_points": 18,
+        "total": 58
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022inwla",
+        "qual_points": 20,
+        "total": 66
+      },
+      {
+        "alliance_points": 36,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 39,
+        "total": 75
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 199,
+    "rank": 10,
+    "rookie_bonus": 0,
+    "team_key": "frc1501"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inkok",
+        "qual_points": 19,
+        "total": 53
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 11,
+        "total": 26
+      },
+      {
+        "alliance_points": 30,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2022incmp",
+        "qual_points": 45,
+        "total": 105
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 184,
+    "rank": 11,
+    "rookie_bonus": 0,
+    "team_key": "frc461"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022incol",
+        "qual_points": 14,
+        "total": 53
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inwla",
+        "qual_points": 18,
+        "total": 41
+      },
+      {
+        "alliance_points": 27,
+        "award_points": 24,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 39,
+        "total": 90
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 184,
+    "rank": 12,
+    "rookie_bonus": 0,
+    "team_key": "frc234"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inkok",
+        "qual_points": 16,
+        "total": 43
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inwla",
+        "qual_points": 16,
+        "total": 44
+      },
+      {
+        "alliance_points": 30,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2022incmp",
+        "qual_points": 21,
+        "total": 96
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 183,
+    "rank": 13,
+    "rookie_bonus": 0,
+    "team_key": "frc5484"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 17,
+        "total": 30
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inwla",
+        "qual_points": 19,
+        "total": 43
+      },
+      {
+        "alliance_points": 36,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 48,
+        "total": 99
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 172,
+    "rank": 14,
+    "rookie_bonus": 0,
+    "team_key": "frc292"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022inkok",
+        "qual_points": 9,
+        "total": 40
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 14,
+        "total": 28
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2022incmp",
+        "qual_points": 42,
+        "total": 99
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 167,
+    "rank": 15,
+    "rookie_bonus": 0,
+    "team_key": "frc6498"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inkok",
+        "qual_points": 9,
+        "total": 24
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022incol",
+        "qual_points": 19,
+        "total": 49
+      },
+      {
+        "alliance_points": 33,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 36,
+        "total": 84
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 157,
+    "rank": 16,
+    "rookie_bonus": 0,
+    "team_key": "frc6956"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 17,
+        "total": 36
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 16,
+        "total": 28
+      },
+      {
+        "alliance_points": 33,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 45,
+        "total": 78
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 142,
+    "rank": 17,
+    "rookie_bonus": 0,
+    "team_key": "frc7198"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 14,
+        "total": 23
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 17,
+        "total": 28
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2022incmp",
+        "qual_points": 27,
+        "total": 90
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 141,
+    "rank": 18,
+    "rookie_bonus": 0,
+    "team_key": "frc3147"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 5,
+        "total": 11
+      },
+      {
+        "alliance_points": 1,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022inwla",
+        "qual_points": 4,
+        "total": 40
+      },
+      {
+        "alliance_points": 21,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2022incmp",
+        "qual_points": 30,
+        "total": 81
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 132,
+    "rank": 19,
+    "rookie_bonus": 0,
+    "team_key": "frc4982"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2022incol",
+        "qual_points": 7,
+        "total": 48
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inwla",
+        "qual_points": 13,
+        "total": 34
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 30,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 12,
+        "total": 42
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 124,
+    "rank": 20,
+    "rookie_bonus": 0,
+    "team_key": "frc1741"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 15,
+        "total": 31
+      },
+      {
+        "alliance_points": 7,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022inwla",
+        "qual_points": 13,
+        "total": 45
+      },
+      {
+        "alliance_points": 18,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 30,
+        "total": 48
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 124,
+    "rank": 21,
+    "rookie_bonus": 0,
+    "team_key": "frc3494"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 12,
+        "total": 25
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 12,
+        "total": 23
+      },
+      {
+        "alliance_points": 27,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 45,
+        "total": 72
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 120,
+    "rank": 22,
+    "rookie_bonus": 0,
+    "team_key": "frc868"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 7,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 12,
+        "total": 24
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022incol",
+        "qual_points": 20,
+        "total": 45
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 18,
+        "total": 48
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 117,
+    "rank": 23,
+    "rookie_bonus": 0,
+    "team_key": "frc1720"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022inkok",
+        "qual_points": 10,
+        "total": 32
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022incol",
+        "qual_points": 16,
+        "total": 47
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 33,
+        "total": 33
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 112,
+    "rank": 24,
+    "rookie_bonus": 0,
+    "team_key": "frc447"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 13,
+        "total": 29
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022incol",
+        "qual_points": 17,
+        "total": 40
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 33,
+        "total": 39
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 108,
+    "rank": 25,
+    "rookie_bonus": 0,
+    "team_key": "frc45"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 13,
+        "total": 30
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 6,
+        "total": 6
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 24,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 36,
+        "total": 60
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 106,
+    "rank": 26,
+    "rookie_bonus": 10,
+    "team_key": "frc8742"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 15,
+        "total": 34
+      },
+      {
+        "alliance_points": 24,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 36,
+        "total": 60
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 104,
+    "rank": 27,
+    "rookie_bonus": 0,
+    "team_key": "frc135"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 15,
+        "total": 30
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 13,
+        "total": 28
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 24,
+        "total": 39
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 97,
+    "rank": 28,
+    "rookie_bonus": 0,
+    "team_key": "frc7454"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2022incol",
+        "qual_points": 12,
+        "total": 38
+      },
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inwla",
+        "qual_points": 14,
+        "total": 28
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 30,
+        "total": 30
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 96,
+    "rank": 29,
+    "rookie_bonus": 0,
+    "team_key": "frc1018"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 12,
+        "total": 25
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 5,
+        "total": 10
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 27,
+        "total": 42
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 87,
+    "rank": 30,
+    "rookie_bonus": 10,
+    "team_key": "frc8564"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 17,
+        "total": 30
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 15,
+        "total": 30
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 15,
+        "total": 15
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 75,
+    "rank": 31,
+    "rookie_bonus": 0,
+    "team_key": "frc3487"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022inkok",
+        "qual_points": 8,
+        "total": 21
+      },
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022incol",
+        "qual_points": 11,
+        "total": 23
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 24,
+        "total": 24
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 73,
+    "rank": 32,
+    "rookie_bonus": 5,
+    "team_key": "frc8116"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 4,
+        "total": 12
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 24,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2022incmp",
+        "qual_points": 0,
+        "total": 24
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 46,
+    "rank": 33,
+    "rookie_bonus": 0,
+    "team_key": "frc1555"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 10,
+        "event_key": "2022incol",
+        "qual_points": 8,
+        "total": 22
+      },
+      {
+        "alliance_points": 5,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 12,
+        "total": 22
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 44,
+    "rank": 34,
+    "rookie_bonus": 0,
+    "team_key": "frc5188"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 15,
+        "total": 25
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 14,
+        "total": 14
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 39,
+    "rank": 35,
+    "rookie_bonus": 0,
+    "team_key": "frc3936"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 10,
+        "total": 22
+      },
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 14,
+        "total": 16
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 38,
+    "rank": 36,
+    "rookie_bonus": 0,
+    "team_key": "frc7657"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 12,
+        "total": 12
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 12,
+        "total": 20
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 32,
+    "rank": 37,
+    "rookie_bonus": 0,
+    "team_key": "frc3559"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 11,
+        "total": 20
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 12,
+        "total": 12
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 32,
+    "rank": 38,
+    "rookie_bonus": 0,
+    "team_key": "frc1646"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 7,
+        "total": 7
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 15,
+        "total": 24
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 31,
+    "rank": 39,
+    "rookie_bonus": 0,
+    "team_key": "frc5402"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 8,
+        "total": 8
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 13,
+        "total": 21
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 29,
+    "rank": 40,
+    "rookie_bonus": 0,
+    "team_key": "frc1747"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 13,
+        "total": 13
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 11,
+        "total": 11
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 29,
+    "rank": 41,
+    "rookie_bonus": 5,
+    "team_key": "frc8103"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 10,
+        "total": 15
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 7,
+        "total": 12
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 27,
+    "rank": 42,
+    "rookie_bonus": 0,
+    "team_key": "frc2197"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 9,
+        "total": 16
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 7,
+        "total": 7
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 23,
+    "rank": 43,
+    "rookie_bonus": 0,
+    "team_key": "frc2867"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 5,
+        "total": 13
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 22,
+    "rank": 44,
+    "rookie_bonus": 0,
+    "team_key": "frc1529"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 6,
+        "total": 6
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 10,
+        "total": 15
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 21,
+    "rank": 45,
+    "rookie_bonus": 0,
+    "team_key": "frc6721"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 11,
+        "total": 16
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 21,
+    "rank": 46,
+    "rookie_bonus": 5,
+    "team_key": "frc8232"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 4,
+        "total": 4
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 10,
+        "total": 15
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 19,
+    "rank": 47,
+    "rookie_bonus": 0,
+    "team_key": "frc2171"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 8,
+        "total": 8
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 18,
+    "rank": 48,
+    "rookie_bonus": 0,
+    "team_key": "frc7477"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 9,
+        "total": 9
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 8,
+        "total": 8
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 17,
+    "rank": 49,
+    "rookie_bonus": 0,
+    "team_key": "frc4485"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inkok",
+        "qual_points": 6,
+        "total": 6
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 15,
+    "rank": 50,
+    "rookie_bonus": 0,
+    "team_key": "frc3865"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022incol",
+        "qual_points": 8,
+        "total": 8
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2022inwla",
+        "qual_points": 6,
+        "total": 6
+      }
+    ],
+    "other_bonus": 0,
+    "point_total": 14,
+    "rank": 51,
+    "rookie_bonus": 0,
+    "team_key": "frc71"
+  }
+]

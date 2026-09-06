@@ -47,8 +47,6 @@ export function GamedayProvider({
 }) {
   const [state, dispatch] = useReducer(gamedayReducer, initialState);
 
-  // Track if we've restored URL state
-  const hasRestoredUrlState = useRef(false);
   // Track if we've loaded webcasts for the initial event code
   const hasLoadedEventWebcasts = useRef(false);
 
@@ -69,20 +67,15 @@ export function GamedayProvider({
   // We're initializing if restoring URL state, or if waiting for Firebase to
   // load webcasts for an event code (prevents flash of the layout selector)
   const isInitializing =
-    (hasUrlState && !hasRestoredUrlState.current) ||
+    (hasUrlState && !state.hasRestoredUrlState) ||
     (!!initialEventCode && isLoading && !hasUrlState);
 
   // Restore state from URL after webcasts are loaded (so webcast IDs are valid)
   useEffect(() => {
-    if (!isLoading && !hasRestoredUrlState.current) {
-      hasRestoredUrlState.current = true;
-
-      // Only restore if there's something to restore
-      if (hasUrlStateToRestore(initialUrlState)) {
-        dispatch({ type: 'RESTORE_URL_STATE', urlState: initialUrlState });
-      }
+    if (!isLoading && !state.hasRestoredUrlState) {
+      dispatch({ type: 'RESTORE_URL_STATE', urlState: initialUrlState });
     }
-  }, [isLoading, initialUrlState]);
+  }, [isLoading, state.hasRestoredUrlState, initialUrlState]);
 
   useEffect(() => {
     if (!isLoading) {

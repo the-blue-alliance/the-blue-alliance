@@ -22,6 +22,7 @@ from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.environment import Environment
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
+from backend.common.helpers.match_suggestion_helper import MatchSuggestionHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.memcache import MemcacheClient
@@ -238,6 +239,38 @@ def get_fms_companion_db(event_key: str) -> Response:
         f"attachment; filename={f'{event_key}_companion.db'}"
     )
     return response
+
+
+@local_routes.route("/match_suggestions/<string:event_keys>", methods=["GET"])
+def match_suggestions(event_keys: str) -> Response:
+    """
+    Score every match at one or more comma-separated events, for validating the
+    suggestion components against real data.
+
+    Unlike the cron feed this ignores the schedule, so it works on any event
+    rather than only ones running right now. Time decay is therefore always 0.
+
+    `suggestions` comes back as a list ordered best-first, rather than the
+    key-indexed map the Firebase feed publishes -- Flask alphabetizes JSON
+    object keys, which would otherwise throw away the ranking.
+    """
+    events = []
+    for event_key in event_keys.split(","):
+        event = Event.get_by_id(event_key.strip())
+        if event is None:
+            return make_response(
+                jsonify({"Error": f"Event {event_key} not found"}),
+                404,
+            )
+        events.append(event)
+
+    suggestions = MatchSuggestionHelper.score_all_matches(events)
+    payload = suggestions.model_dump(mode="json")
+    payload["suggestions"] = [
+        payload["suggestions"][suggestion.match_key]
+        for suggestion in sorted(suggestions.suggestions.values(), key=lambda s: s.rank)
+    ]
+    return make_response(jsonify(payload))
 
 
 @local_routes.route("/create_test_event/<string:event_key>", methods=["POST"])

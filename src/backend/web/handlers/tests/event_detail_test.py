@@ -9,6 +9,7 @@ from werkzeug.test import Client
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.webcast_online_status_memcache import (
@@ -18,6 +19,7 @@ from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
@@ -464,3 +466,56 @@ def test_render_long_cache_event_without_divisions_beyond_a_day(
     resp = web_client.get("/event/2020nyny")
     assert resp.status_code == 200
     assert "max-age=21600" in resp.headers["Cache-Control"]
+
+
+@ndb.synctasklet
+def preseed_smugmug_album(event_key: str):
+    yield Media(
+        id="smugmug-album_4RWMLM",
+        media_type_enum=MediaType.SMUGMUG_ALBUM,
+        foreign_key="4RWMLM",
+        year=int(event_key[:4]),
+        details_json=json.dumps(
+            {
+                "title": "2026 FIRST Championship - BAE Systems",
+                "web_uri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE",
+                "image_count": 81,
+                "cover_url": "https://photos.smugmug.com/L/cover-L.png",
+                "cover_url_med": "https://photos.smugmug.com/M/cover-M.png",
+                "cover_url_sm": "https://photos.smugmug.com/S/cover-S.png",
+            }
+        ),
+        references=[ndb.Key(Event, event_key)],
+    ).put_async()
+
+
+def test_render_event_smugmug_album(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
+    preseed_smugmug_album("2020nyny")
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    media_tab = soup.find(id="media")
+    assert media_tab is not None
+    assert media_tab.find(id="photo-galleries") is not None
+
+    links = media_tab.find_all(
+        "a", href="https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
+    )
+    assert len(links) == 2
+
+    cover, caption = links
+    assert "https://photos.smugmug.com/M/cover-M.png" in cover.find("span")["style"]
+    assert caption.text == "2026 FIRST Championship - BAE Systems"
+    assert "81 photos" in caption.parent.text
+
+
+def test_render_event_no_smugmug_album(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find(id="photo-galleries") is None

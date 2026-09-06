@@ -1,0 +1,485 @@
+[
+  {
+    "end_date": "2025-03-15",
+    "event_code": "alhu",
+    "key": "2025alhu",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-08",
+    "event_code": "arli",
+    "key": "2025arli",
+    "start_date": "2025-03-05",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-09",
+    "event_code": "ausc",
+    "key": "2025ausc",
+    "start_date": "2025-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "azfg",
+    "key": "2025azfg",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "azgl",
+    "key": "2025azgl",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-01",
+    "event_code": "bcvi",
+    "key": "2025bcvi",
+    "start_date": "2025-02-26",
+    "week": 0
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "brba",
+    "key": "2025brba",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-23",
+    "event_code": "brsp",
+    "key": "2025brsp",
+    "start_date": "2025-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "caav",
+    "key": "2025caav",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-04-06",
+    "event_code": "cabe",
+    "key": "2025cabe",
+    "start_date": "2025-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-17",
+    "event_code": "cada",
+    "key": "2025cada",
+    "start_date": "2025-03-14",
+    "week": 2
+  },
+  {
+    "end_date": "2025-04-06",
+    "event_code": "cafr",
+    "key": "2025cafr",
+    "start_date": "2025-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-16",
+    "event_code": "cala",
+    "key": "2025cala",
+    "start_date": "2025-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-02",
+    "event_code": "camb",
+    "key": "2025camb",
+    "start_date": "2025-02-27",
+    "week": 0
+  },
+  {
+    "end_date": "2025-03-01",
+    "event_code": "caoc",
+    "key": "2025caoc",
+    "start_date": "2025-02-26",
+    "week": 0
+  },
+  {
+    "end_date": "2025-03-02",
+    "event_code": "caph",
+    "key": "2025caph",
+    "start_date": "2025-02-27",
+    "week": 0
+  },
+  {
+    "end_date": "2025-03-30",
+    "event_code": "capt",
+    "key": "2025capt",
+    "start_date": "2025-03-27",
+    "week": 4
+  },
+  {
+    "end_date": "2025-03-23",
+    "event_code": "casd",
+    "key": "2025casd",
+    "start_date": "2025-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-23",
+    "event_code": "casf",
+    "key": "2025casf",
+    "start_date": "2025-03-21",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-16",
+    "event_code": "casj",
+    "key": "2025casj",
+    "start_date": "2025-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-09",
+    "event_code": "cave",
+    "key": "2025cave",
+    "start_date": "2025-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-16",
+    "event_code": "cnsh",
+    "key": "2025cnsh",
+    "start_date": "2025-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "code",
+    "key": "2025code",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "flor",
+    "key": "2025flor",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-16",
+    "event_code": "flta",
+    "key": "2025flta",
+    "start_date": "2025-03-13",
+    "week": 2
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "flwp",
+    "key": "2025flwp",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-23",
+    "event_code": "hiho",
+    "key": "2025hiho",
+    "start_date": "2025-03-20",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "iacf",
+    "key": "2025iacf",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "idbo",
+    "key": "2025idbo",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "ilch",
+    "key": "2025ilch",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "ilpe",
+    "key": "2025ilpe",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "ksla",
+    "key": "2025ksla",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "lake",
+    "key": "2025lake",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-01",
+    "event_code": "mndu",
+    "key": "2025mndu",
+    "start_date": "2025-02-26",
+    "week": 0
+  },
+  {
+    "end_date": "2025-03-01",
+    "event_code": "mndu2",
+    "key": "2025mndu2",
+    "start_date": "2025-02-26",
+    "week": 0
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "mnmi",
+    "key": "2025mnmi",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "mnmi2",
+    "key": "2025mnmi2",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "mnum",
+    "key": "2025mnum",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "mokc",
+    "key": "2025mokc",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-03-08",
+    "event_code": "mose",
+    "key": "2025mose",
+    "start_date": "2025-03-05",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "mosl",
+    "key": "2025mosl",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "mslr",
+    "key": "2025mslr",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "mxle",
+    "key": "2025mxle",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-01",
+    "event_code": "mxmo",
+    "key": "2025mxmo",
+    "start_date": "2025-02-26",
+    "week": 0
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "mxto",
+    "key": "2025mxto",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "ndgf",
+    "key": "2025ndgf",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-09",
+    "event_code": "ntwc",
+    "key": "2025ntwc",
+    "start_date": "2025-03-06",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "nvlv",
+    "key": "2025nvlv",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "nyli2",
+    "key": "2025nyli2",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-04-06",
+    "event_code": "nyny",
+    "key": "2025nyny",
+    "start_date": "2025-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "nyro",
+    "key": "2025nyro",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-08",
+    "event_code": "nysu",
+    "key": "2025nysu",
+    "start_date": "2025-03-05",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "nytr",
+    "key": "2025nytr",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "ohcl",
+    "key": "2025ohcl",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "ohmv",
+    "key": "2025ohmv",
+    "start_date": "2025-03-26",
+    "week": 4
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "okok",
+    "key": "2025okok",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "oktu",
+    "key": "2025oktu",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "paca",
+    "key": "2025paca",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-03-08",
+    "event_code": "qcmo",
+    "key": "2025qcmo",
+    "start_date": "2025-03-05",
+    "week": 1
+  },
+  {
+    "end_date": "2025-04-05",
+    "event_code": "tnkn",
+    "key": "2025tnkn",
+    "start_date": "2025-04-02",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-16",
+    "event_code": "tuak",
+    "key": "2025tuak",
+    "start_date": "2025-03-14",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-09",
+    "event_code": "tuhc",
+    "key": "2025tuhc",
+    "start_date": "2025-03-07",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-06",
+    "event_code": "tuis",
+    "key": "2025tuis",
+    "start_date": "2025-03-04",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-06",
+    "event_code": "tuis2",
+    "key": "2025tuis2",
+    "start_date": "2025-03-04",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-09",
+    "event_code": "tuis3",
+    "key": "2025tuis3",
+    "start_date": "2025-03-07",
+    "week": 1
+  },
+  {
+    "end_date": "2025-03-15",
+    "event_code": "utwv",
+    "key": "2025utwv",
+    "start_date": "2025-03-12",
+    "week": 2
+  },
+  {
+    "end_date": "2025-03-22",
+    "event_code": "wila",
+    "key": "2025wila",
+    "start_date": "2025-03-19",
+    "week": 3
+  },
+  {
+    "end_date": "2025-04-06",
+    "event_code": "wimi",
+    "key": "2025wimi",
+    "start_date": "2025-04-03",
+    "week": 5
+  },
+  {
+    "end_date": "2025-03-29",
+    "event_code": "wimu",
+    "key": "2025wimu",
+    "start_date": "2025-03-27",
+    "week": 4
+  }
+]

@@ -608,6 +608,78 @@ def test_api_write_keys(
         assert len(api_write) == 0
 
 
+@pytest.mark.parametrize(
+    "path, expected_key_ids",
+    [
+        (
+            "/account",
+            [
+                "key-multiple-events",
+                "key-2025",
+                "key-2026",
+                "key-no-event",
+            ],
+        ),
+        (
+            "/account?api_write_keys_sort=desc",
+            [
+                "key-2026",
+                "key-2025",
+                "key-multiple-events",
+                "key-no-event",
+            ],
+        ),
+    ],
+)
+def test_api_write_keys_sorted_by_event_key(
+    login_user,
+    web_client: FlaskClient,
+    path: str,
+    expected_key_ids: List[str],
+) -> None:
+    def api_write_key(key_id: str, event_ids: List[str]) -> Mock:
+        events = []
+        for event_id in event_ids:
+            event = Mock()
+            event.configure_mock(**{"id.return_value": event_id})
+            events.append(event)
+
+        key = Mock(event_list=events, auth_types_enum=[])
+        key.expiration = None
+        key.secret = "secret"
+        key.key.configure_mock(**{"id.return_value": key_id})
+        return key
+
+    login_user.api_write_keys = [
+        api_write_key("key-2026", ["2026nmrc"]),
+        api_write_key("key-no-event", []),
+        api_write_key("key-multiple-events", ["2025mrcmp", "2024nmrc"]),
+        api_write_key("key-2025", ["2025nmrc"]),
+    ]
+
+    response = web_client.get(path)
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_write_rows = soup.find_all("tr", attrs={"class": "api-write-key"})
+    assert [
+        row.find_all("td")[3].text.strip() for row in api_write_rows
+    ] == expected_key_ids
+
+    ascending_sort = soup.find(id="api-write-keys-sort-asc")
+    descending_sort = soup.find(id="api-write-keys-sort-desc")
+    assert ascending_sort.get("href") == "/account?api_write_keys_sort=asc"
+    assert descending_sort.get("href") == "/account?api_write_keys_sort=desc"
+    assert ascending_sort.get("aria-label") == "Sort ascending"
+    assert descending_sort.get("aria-label") == "Sort descending"
+    assert ascending_sort.find("span", class_="glyphicon-arrow-up") is not None
+    assert descending_sort.find("span", class_="glyphicon-arrow-down") is not None
+
+    descending = path.endswith("desc")
+    assert ("btn-primary" in ascending_sort.get("class")) is not descending
+    assert ("btn-primary" in descending_sort.get("class")) is descending
+
+
 def test_auth_write_type_names(
     login_user,
     captured_templates: List[CapturedTemplate],
