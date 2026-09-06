@@ -217,11 +217,13 @@
       <table id="api-write-keys" class="table table-striped">
         <tr>
           <th>
-            Event
-            <span class="btn-group btn-group-xs" role="group" aria-label="Sort write API keys by event">
-              <a id="api-write-keys-sort-asc" href="{{ url_for('account.overview', api_write_keys_sort='asc') }}" class="btn btn-{% if api_write_keys_sort_direction == 'asc' %}primary{% else %}default{% endif %}" aria-label="Sort ascending" title="Sort ascending" aria-pressed="{{ 'true' if api_write_keys_sort_direction == 'asc' else 'false' }}"><span class="glyphicon glyphicon-arrow-up" aria-hidden="true"></span></a>
-              <a id="api-write-keys-sort-desc" href="{{ url_for('account.overview', api_write_keys_sort='desc') }}" class="btn btn-{% if api_write_keys_sort_direction == 'desc' %}primary{% else %}default{% endif %}" aria-label="Sort descending" title="Sort descending" aria-pressed="{{ 'true' if api_write_keys_sort_direction == 'desc' else 'false' }}"><span class="glyphicon glyphicon-arrow-down" aria-hidden="true"></span></a>
-            </span>
+            <a id="api-write-keys-sort"
+               href="{{ url_for('account.overview', api_write_keys_sort=api_write_keys_next_sort) }}"
+               class="api-write-keys-sort"
+               title="Sort by event ({{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first)"
+               aria-label="Sort write API keys by event, {{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first">
+              Event{% if api_write_keys_sort_explicit %} <span class="glyphicon glyphicon-triangle-{{ 'top' if api_write_keys_sort_direction == 'asc' else 'bottom' }}" aria-hidden="true"></span>{% endif %}
+            </a>
           </th>
           <th>Permissions</th>
           <th>Expires</th>

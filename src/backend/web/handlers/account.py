@@ -75,9 +75,17 @@ def _sorted_api_write_keys(
 @require_login
 def overview() -> str:
     user = none_throws(current_user())
-    api_write_keys_sort_direction = request.args.get("api_write_keys_sort", "asc")
-    if api_write_keys_sort_direction not in {"asc", "desc"}:
-        api_write_keys_sort_direction = "asc"
+    # Newest events first by default: the key someone just requested for this
+    # season is the one they're looking for. Clicking the "Event" header sets
+    # ?api_write_keys_sort explicitly, which also reveals the direction caret.
+    requested_sort = request.args.get("api_write_keys_sort")
+    api_write_keys_sort_explicit = requested_sort in {"asc", "desc"}
+    api_write_keys_sort_direction = (
+        requested_sort if api_write_keys_sort_explicit else "desc"
+    )
+    api_write_keys_next_sort = (
+        "asc" if api_write_keys_sort_direction == "desc" else "desc"
+    )
 
     template_values = {
         "status": session.pop("account_status", None),
@@ -92,6 +100,8 @@ def overview() -> str:
             descending=api_write_keys_sort_direction == "desc",
         ),
         "api_write_keys_sort_direction": api_write_keys_sort_direction,
+        "api_write_keys_sort_explicit": api_write_keys_sort_explicit,
+        "api_write_keys_next_sort": api_write_keys_next_sort,
     }
     return render_template("account_overview.html", **template_values)
 

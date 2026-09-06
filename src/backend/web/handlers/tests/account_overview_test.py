@@ -1,6 +1,6 @@
 import datetime
 from random import randint
-from typing import List
+from typing import List, Optional
 from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
@@ -609,25 +609,35 @@ def test_api_write_keys(
 
 
 @pytest.mark.parametrize(
-    "path, expected_key_ids",
+    "path, expected_key_ids, expected_next_href, expected_caret",
     [
+        # Default: newest events first, plain header (no caret until the user sorts).
         (
             "/account",
-            [
-                "key-multiple-events",
-                "key-2025",
-                "key-2026",
-                "key-no-event",
-            ],
+            ["key-2026", "key-2025", "key-multiple-events", "key-no-event"],
+            "/account?api_write_keys_sort=asc",
+            None,
         ),
+        # An invalid value falls back to the default, still with no caret.
+        (
+            "/account?api_write_keys_sort=sideways",
+            ["key-2026", "key-2025", "key-multiple-events", "key-no-event"],
+            "/account?api_write_keys_sort=asc",
+            None,
+        ),
+        # Explicit ascending: oldest first, caret points up, next click flips it.
+        (
+            "/account?api_write_keys_sort=asc",
+            ["key-multiple-events", "key-2025", "key-2026", "key-no-event"],
+            "/account?api_write_keys_sort=desc",
+            "glyphicon-triangle-top",
+        ),
+        # Explicit descending: same order as the default, but the caret shows.
         (
             "/account?api_write_keys_sort=desc",
-            [
-                "key-2026",
-                "key-2025",
-                "key-multiple-events",
-                "key-no-event",
-            ],
+            ["key-2026", "key-2025", "key-multiple-events", "key-no-event"],
+            "/account?api_write_keys_sort=asc",
+            "glyphicon-triangle-bottom",
         ),
     ],
 )
@@ -636,6 +646,8 @@ def test_api_write_keys_sorted_by_event_key(
     web_client: FlaskClient,
     path: str,
     expected_key_ids: List[str],
+    expected_next_href: str,
+    expected_caret: Optional[str],
 ) -> None:
     def api_write_key(key_id: str, event_ids: List[str]) -> Mock:
         events = []
@@ -666,18 +678,23 @@ def test_api_write_keys_sorted_by_event_key(
         row.find_all("td")[3].text.strip() for row in api_write_rows
     ] == expected_key_ids
 
-    ascending_sort = soup.find(id="api-write-keys-sort-asc")
-    descending_sort = soup.find(id="api-write-keys-sort-desc")
-    assert ascending_sort.get("href") == "/account?api_write_keys_sort=asc"
-    assert descending_sort.get("href") == "/account?api_write_keys_sort=desc"
-    assert ascending_sort.get("aria-label") == "Sort ascending"
-    assert descending_sort.get("aria-label") == "Sort descending"
-    assert ascending_sort.find("span", class_="glyphicon-arrow-up") is not None
-    assert descending_sort.find("span", class_="glyphicon-arrow-down") is not None
+    # The "Event" header is the control: one link that flips the direction.
+    header_link = soup.find(id="api-write-keys-sort")
+    assert header_link is not None
+    assert header_link.get("href") == expected_next_href
+    assert header_link.text.strip().startswith("Event")
 
-    descending = path.endswith("desc")
-    assert ("btn-primary" in ascending_sort.get("class")) is not descending
-    assert ("btn-primary" in descending_sort.get("class")) is descending
+    # Keys without an event always trail the list, whatever the direction.
+    assert expected_key_ids[-1] == "key-no-event"
+
+    # The caret only appears once the user has actively sorted, and it points
+    # in the direction of the current order.
+    carets = header_link.find_all("span", class_="glyphicon")
+    if expected_caret is None:
+        assert carets == []
+    else:
+        assert len(carets) == 1
+        assert expected_caret in carets[0].get("class")
 
 
 def test_auth_write_type_names(
