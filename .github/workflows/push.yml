@@ -592,6 +592,9 @@ jobs:
             pwa:
               - 'ops/**'
               - 'pwa/**'
+              # The PWA's API clients are generated from these specs, so a
+              # spec-only change alters the deployed PWA too.
+              - 'src/backend/web/static/swagger/**'
       - name: Download production artifacts (build)
         if: steps.changes.outputs.pwa == 'true'
         uses: actions/download-artifact@v8
