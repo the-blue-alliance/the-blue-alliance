@@ -30,6 +30,7 @@ import {
   groupEventsBySections,
   sortEventsComparator,
 } from '~/lib/eventUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import {
   parseParamsForYearElseDefault,
   pluralize,
@@ -52,11 +53,16 @@ export const Route = createFileRoute('/events/{-$year}')({
       throw notFound();
     }
 
+    const yearStaleTime = staleTimeForYear(year);
     await Promise.all([
-      queryClient.ensureQueryData(getEventsByYearOptions({ path: { year } })),
-      queryClient.ensureQueryData(
-        getDistrictsByYearOptions({ path: { year } }),
-      ),
+      queryClient.ensureQueryData({
+        ...getEventsByYearOptions({ path: { year } }),
+        staleTime: yearStaleTime,
+      }),
+      queryClient.ensureQueryData({
+        ...getDistrictsByYearOptions({ path: { year } }),
+        staleTime: yearStaleTime,
+      }),
     ]);
 
     return { year };
@@ -92,11 +98,14 @@ export const Route = createFileRoute('/events/{-$year}')({
 
 function YearEventsPage() {
   const { year } = Route.useLoaderData();
+  const yearStaleTime = staleTimeForYear(year);
   const { data: events } = useSuspenseQuery({
     ...getEventsByYearOptions({ path: { year } }),
+    staleTime: yearStaleTime,
   });
   const { data: districts } = useSuspenseQuery({
     ...getDistrictsByYearOptions({ path: { year } }),
+    staleTime: yearStaleTime,
   });
   const validYears = useValidYears();
   const [inView, setInView] = useState<Set<string>>(new Set());

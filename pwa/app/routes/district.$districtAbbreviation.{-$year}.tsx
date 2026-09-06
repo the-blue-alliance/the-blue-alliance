@@ -10,13 +10,15 @@ import {
   Event,
   EventType,
   Team,
-  getDistrictAdvancement,
-  getDistrictAwards,
-  getDistrictEvents,
-  getDistrictHistory,
-  getDistrictRankings,
-  getDistrictTeams,
 } from '~/api/tba/read';
+import {
+  getDistrictAdvancementOptions,
+  getDistrictAwardsOptions,
+  getDistrictEventsOptions,
+  getDistrictHistoryOptions,
+  getDistrictRankingsOptions,
+  getDistrictTeamsOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { TitledCard } from '~/components/tba/cards';
 import { DataTable } from '~/components/tba/dataTable';
 import {
@@ -44,9 +46,11 @@ import {
   getEventDateString,
   sortEvents,
 } from '~/lib/eventUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeams } from '~/lib/teamUtils';
 import {
   USA_STATE_ABBREVIATION_TO_FULL,
+  doThrowNotFound,
   joinComponents,
   parseParamsForYearElseDefault,
   publicCacheControlHeaders,
@@ -55,66 +59,79 @@ import {
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/{-$year}',
 )({
-  loader: async ({ params, context: { currentSeason } }) => {
+  loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const year = parseParamsForYearElseDefault(currentSeason, params);
     if (year === undefined) {
       throw notFound();
     }
 
+    const districtKey = `${year}${params.districtAbbreviation}`;
+    const yearStaleTime = staleTimeForYear(year);
+
     const [districtHistory, rankings, teams, events, awards, advancement] =
       await Promise.all([
-        getDistrictHistory({
-          path: {
-            district_abbreviation: params.districtAbbreviation,
-          },
-        }),
-        getDistrictRankings({
-          path: {
-            district_key: `${year}${params.districtAbbreviation}`,
-          },
-        }),
-        getDistrictTeams({
-          path: {
-            district_key: `${year}${params.districtAbbreviation}`,
-          },
-        }),
-        getDistrictEvents({
-          path: {
-            district_key: `${year}${params.districtAbbreviation}`,
-          },
-        }),
-        getDistrictAwards({
-          path: {
-            district_key: `${year}${params.districtAbbreviation}`,
-          },
-        }),
-        getDistrictAdvancement({
-          path: {
-            district_key: `${year}${params.districtAbbreviation}`,
-          },
-        }),
+        queryClient
+          .ensureQueryData({
+            ...getDistrictHistoryOptions({
+              path: { district_abbreviation: params.districtAbbreviation },
+            }),
+            staleTime: yearStaleTime,
+          })
+          .catch(doThrowNotFound),
+        queryClient
+          .ensureQueryData({
+            ...getDistrictRankingsOptions({
+              path: { district_key: districtKey },
+            }),
+            staleTime: yearStaleTime,
+          })
+          .catch(() => null),
+        queryClient
+          .ensureQueryData({
+            ...getDistrictTeamsOptions({ path: { district_key: districtKey } }),
+            staleTime: yearStaleTime,
+          })
+          .catch(() => []),
+        queryClient
+          .ensureQueryData({
+            ...getDistrictEventsOptions({
+              path: { district_key: districtKey },
+            }),
+            staleTime: yearStaleTime,
+          })
+          .catch(() => []),
+        queryClient
+          .ensureQueryData({
+            ...getDistrictAwardsOptions({
+              path: { district_key: districtKey },
+            }),
+            staleTime: yearStaleTime,
+          })
+          .catch(() => []),
+        queryClient
+          .ensureQueryData({
+            ...getDistrictAdvancementOptions({
+              path: { district_key: districtKey },
+            }),
+            staleTime: yearStaleTime,
+          })
+          .catch(() => null),
       ]);
 
-    if (
-      districtHistory.data === undefined ||
-      rankings.data === undefined ||
-      teams.data === undefined ||
-      events.data === undefined ||
-      awards.data === undefined
-    ) {
+    if (districtHistory.length === 0) {
       throw notFound();
     }
 
     // The api returns a lot of teams that previously played in the district but didn't in the given year
     const actuallyActiveRankings =
-      rankings.data === null
+      rankings === null
         ? null
-        : rankings.data.filter(
+        : rankings.filter(
             (r) => r.point_total > 0 && (r.event_points?.length ?? 0) > 0,
           );
 
     const today = Temporal.Now.plainDateISO();
-    const seasonIsComplete = events.data.every(
+    const seasonIsComplete = events.every(
       (e) =>
         Temporal.PlainDate.compare(Temporal.PlainDate.from(e.end_date), today) <
         0,
@@ -124,20 +141,20 @@ export const Route = createFileRoute(
     // Otherwise, show all teams (since it may be mid-season and some may not have played yet, thus have no ranking)
     const actuallyActiveTeams =
       actuallyActiveRankings === null || !seasonIsComplete
-        ? teams.data
-        : teams.data.filter((team) =>
+        ? teams
+        : teams.filter((team) =>
             actuallyActiveRankings.find((r) => r.team_key === team.key),
           );
 
     return {
       abbreviation: params.districtAbbreviation,
       year,
-      districtHistory: districtHistory.data,
+      districtHistory,
       rankings: actuallyActiveRankings,
       teams: actuallyActiveTeams,
-      events: events.data,
-      awards: awards.data,
-      advancementCutoffs: advancement.data?.cutoffs ?? null,
+      events,
+      awards,
+      advancementCutoffs: advancement?.cutoffs ?? null,
     };
   },
   headers: publicCacheControlHeaders(),

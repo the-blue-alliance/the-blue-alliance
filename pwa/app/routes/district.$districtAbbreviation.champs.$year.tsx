@@ -39,6 +39,7 @@ import {
 } from '~/components/ui/table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortMatchComparator } from '~/lib/matchUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import { cn, publicCacheControlHeaders } from '~/lib/utils';
 
 const REFETCH_INTERVAL = 60_000;
@@ -644,6 +645,10 @@ function ChampsPage() {
     Route.useLoaderData();
   const districtKey = `${year}${abbreviation}`;
 
+  const isLivePolling = year >= currentSeason;
+  const pollInterval = isLivePolling ? REFETCH_INTERVAL : (false as const);
+  const yearStaleTime = staleTimeForYear(year);
+
   // Fetch district history to know which years this district existed
   const districtHistoryQuery = useQuery({
     ...getDistrictHistoryOptions({
@@ -680,22 +685,25 @@ function ChampsPage() {
   }, [runCountdownTimer]);
 
   useEffect(() => {
+    if (!isLivePolling) return;
     runCountdownTimer();
     return () => {
       if (countdownRef.current) clearInterval(countdownRef.current);
     };
-  }, [runCountdownTimer]);
+  }, [runCountdownTimer, isLivePolling]);
 
   // Fetch district team keys
   const districtTeamsQuery = useQuery({
     ...getDistrictTeamsKeysOptions({ path: { district_key: districtKey } }),
-    refetchInterval: REFETCH_INTERVAL,
+    staleTime: yearStaleTime,
+    refetchInterval: pollInterval,
   });
 
   // Fetch all events for the year and filter to CMP divisions
   const allEventsQuery = useQuery({
     ...getEventsByYearOptions({ path: { year } }),
-    refetchInterval: REFETCH_INTERVAL,
+    staleTime: yearStaleTime,
+    refetchInterval: pollInterval,
   });
 
   const cmpDivisions: Event[] = (allEventsQuery.data ?? []).filter(
@@ -708,21 +716,24 @@ function ChampsPage() {
   const matchesQueries = useQueries({
     queries: cmpDivisions.map((div) => ({
       ...getEventMatchesOptions({ path: { event_key: div.key } }),
-      refetchInterval: REFETCH_INTERVAL,
+      staleTime: yearStaleTime,
+      refetchInterval: pollInterval,
     })),
   });
 
   const rankingsQueries = useQueries({
     queries: cmpDivisions.map((div) => ({
       ...getEventRankingsOptions({ path: { event_key: div.key } }),
-      refetchInterval: REFETCH_INTERVAL,
+      staleTime: yearStaleTime,
+      refetchInterval: pollInterval,
     })),
   });
 
   const colorsQueries = useQueries({
     queries: cmpDivisions.map((div) => ({
       ...getEventColorsOptions({ path: { eventKey: div.key } }),
-      refetchInterval: REFETCH_INTERVAL,
+      staleTime: yearStaleTime,
+      refetchInterval: pollInterval,
     })),
   });
 
@@ -735,11 +746,12 @@ function ChampsPage() {
 
   const prevFetchingRef = useRef(false);
   useEffect(() => {
+    if (!isLivePolling) return;
     if (prevFetchingRef.current && !isFetchingAny) {
       resetCountdown();
     }
     prevFetchingRef.current = isFetchingAny;
-  }, [isFetchingAny, resetCountdown]);
+  }, [isFetchingAny, resetCountdown, isLivePolling]);
 
   // Build a map from eventKey -> colors query result
   const eventColorsMap = new Map<string, ColorsQueryResult>();
@@ -776,11 +788,13 @@ function ChampsPage() {
           {displayName} at FIRST Championship {year}
         </h1>
         <div className="flex items-center gap-2">
-          <span
-            className="rounded border px-2 py-1 text-xs text-muted-foreground"
-          >
-            {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
-          </span>
+          {isLivePolling && (
+            <span
+              className="rounded border px-2 py-1 text-xs text-muted-foreground"
+            >
+              {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
+            </span>
+          )}
           <YearSelector
             currentLabel={String(year)}
             triggerClassName="w-24"

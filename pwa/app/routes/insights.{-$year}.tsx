@@ -5,17 +5,18 @@ import {
   type InsightV2Leaderboard,
   type InsightV2Streak,
   type InsightV2Timeseries,
-  getInsightsV2Year,
 } from '~/api/tba/read';
+import { getInsightsV2YearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { StreakInsight } from '~/components/tba/streakInsight';
 import { SuccessRateInsight } from '~/components/tba/successRateInsight';
 import { TimeseriesInsight } from '~/components/tba/timeseriesInsight';
 import { YearSelector } from '~/components/tba/yearSelector';
+import { STALE_TIME, staleTimeForYear } from '~/lib/queryClient';
 import { publicCacheControlHeaders, useValidYears } from '~/lib/utils';
 
 export const Route = createFileRoute('/insights/{-$year}')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     let numericYear = -1;
     if (params.year === undefined || params.year === '') {
       numericYear = 0;
@@ -30,15 +31,13 @@ export const Route = createFileRoute('/insights/{-$year}')({
       throw notFound();
     }
 
-    const insights = await getInsightsV2Year({
-      path: { year: numericYear },
+    const insights = await queryClient.ensureQueryData({
+      ...getInsightsV2YearOptions({ path: { year: numericYear } }),
+      staleTime:
+        numericYear === 0 ? STALE_TIME.DEFAULT : staleTimeForYear(numericYear),
     });
 
-    if (insights.data === undefined) {
-      throw new Error('Failed to load insights');
-    }
-
-    if (insights.data.length === 0) {
+    if (insights.length === 0) {
       throw notFound();
     }
 
@@ -47,7 +46,7 @@ export const Route = createFileRoute('/insights/{-$year}')({
     const timeseries: InsightV2Timeseries[] = [];
     const successRates: InsightV2GameStats[] = [];
 
-    for (const insight of insights.data) {
+    for (const insight of insights) {
       switch (insight.category) {
         case 'leaderboard':
           leaderboards.push(insight);

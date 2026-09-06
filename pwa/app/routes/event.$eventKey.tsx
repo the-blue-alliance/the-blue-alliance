@@ -178,14 +178,6 @@ export const Route = createFileRoute('/event/$eventKey')({
         staleTime: eventStaleTime,
       })
       .catch(() => []);
-    const nexusQuery = queryClient
-      .ensureQueryData({
-        ...getEventNexusInfoOptions({
-          path: { event_key: params.eventKey },
-        }),
-        staleTime: 30_000,
-      })
-      .catch(() => null);
 
     const event = await queryClient
       .ensureQueryData({
@@ -226,7 +218,7 @@ export const Route = createFileRoute('/event/$eventKey')({
         .catch(() => undefined);
     }
 
-    await Promise.all([matchesQuery, alliancesQuery, nexusQuery]);
+    await Promise.all([matchesQuery, alliancesQuery]);
 
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
