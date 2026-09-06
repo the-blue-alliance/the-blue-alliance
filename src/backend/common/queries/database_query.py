@@ -3,13 +3,16 @@ from __future__ import annotations
 import abc
 import json
 import logging
+import time
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
 
+from flask import g, has_request_context
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.futures import TypedFuture
+from backend.common.memcache import MemcacheClient
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
@@ -120,6 +123,28 @@ class CachedDatabaseQuery(
         ndb.delete_multi(
             [ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys]
         )
+        try:
+            client = MemcacheClient.get()
+            gen_keys = [f"gen:{k}".encode() for k in cache_keys]
+            existing = client.get_multi(gen_keys)
+            missing = set(gen_keys) - set(existing.keys())
+            for gen_key in existing.keys():
+                client.incr(gen_key)
+            if missing:
+                now_ts = int(time.time())
+                client.set_multi({k: now_ts for k in missing})
+        except Exception as e:
+            logging.warning(
+                f"Failed to increment generation tokens in delete_cache_multi: {e}"
+            )
+
+    def _record_query_access(self) -> None:
+        if has_request_context():
+            accessed = getattr(g, "accessed_query_keys", None)
+            if accessed is None:
+                accessed = set()
+                g.accessed_query_keys = accessed
+            accessed.add(self.cache_key)
 
     @classmethod
     def get_query_class_by_name(
@@ -169,6 +194,7 @@ class CachedDatabaseQuery(
 
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
+        self._record_query_access()
         if not self.MODEL_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             return result
@@ -209,6 +235,7 @@ class CachedDatabaseQuery(
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> Generator[Any, Any, Union[None, DictQueryReturn, List[DictQueryReturn]]]:
+        self._record_query_access()
         if not self.DICT_CACHING_ENABLED:
             result = yield self._query_async(*args, **kwargs)
             return result
@@ -253,6 +280,7 @@ class CachedDatabaseQuery(
     def _do_json_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> Generator[Any, Any, Optional[bytes]]:
+        self._record_query_access()
         if not self.DICT_CACHING_ENABLED:
             dict_result = yield self._do_dict_query(_dict_version, *args, **kwargs)
             if dict_result is None:
