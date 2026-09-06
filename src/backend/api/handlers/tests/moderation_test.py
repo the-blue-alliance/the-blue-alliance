@@ -17,6 +17,10 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.helpers.similar_event_helper import (
+    MAX_SIMILAR_EVENTS,
+    SimilarEventHelper,
+)
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
 )
@@ -1213,44 +1217,67 @@ def _offseason_event(key: str, name: str, short_name: str = "") -> Event:
     )
 
 
+def _candidate(name: str) -> Event:
+    """An unsaved Event standing in for a suggested offseason event."""
+    return Event(name=name, year=2016, event_type_enum=EventType.OFFSEASON)
+
+
 def test_find_similar_events_case_insensitive(ndb_stub) -> None:
     events = [_offseason_event("2016cc", "CHEZY CHAMPS")]
-    assert _find_similar_events("chezy champs", events) == [
+    assert _find_similar_events(_candidate("chezy champs"), events) == [
         {"key": "2016cc", "name": "CHEZY CHAMPS"}
     ]
 
 
 def test_find_similar_events_matches_short_name(ndb_stub) -> None:
+    # Returning events are usually suggested under the name people call them,
+    # which is often the short name rather than the formal listing.
     events = [
         _offseason_event(
             "2016bb", "Southern California Robotics Invitational", "Beach Blitz"
         )
     ]
-    assert _find_similar_events("Beach Blitz", events) == [
+    assert _find_similar_events(_candidate("Beach Blitz"), events) == [
         {"key": "2016bb", "name": "Southern California Robotics Invitational"}
     ]
 
 
-def test_find_similar_events_containment(ndb_stub) -> None:
+def test_find_similar_events_acronym(ndb_stub) -> None:
     events = [_offseason_event("2016iri", "IROC - Indiana Robotics Off-Season")]
-    assert _find_similar_events("IROC", events) == [
+    assert _find_similar_events(_candidate("IROC"), events) == [
         {"key": "2016iri", "name": "IROC - Indiana Robotics Off-Season"}
     ]
 
 
 def test_find_similar_events_excludes_dissimilar(ndb_stub) -> None:
     events = [_offseason_event("2016cc", "Chezy Champs")]
-    assert _find_similar_events("Ranger Rumble", events) == []
+    assert _find_similar_events(_candidate("Ranger Rumble"), events) == []
 
 
 def test_find_similar_events_strongest_first_and_capped(ndb_stub) -> None:
     events = [
-        _offseason_event(f"2016ev{i}", f"Chezy Champs Qualifier {i}") for i in range(6)
+        _offseason_event(f"2016ev{i}", f"Chezy Champs Qualifier {i}") for i in range(10)
     ]
     events.append(_offseason_event("2016cc", "Chezy Champs"))
-    results = _find_similar_events("Chezy Champs", events)
-    assert len(results) == 5
+    results = _find_similar_events(_candidate("Chezy Champs"), events)
+    assert len(results) == MAX_SIMILAR_EVENTS
     assert results[0] == {"key": "2016cc", "name": "Chezy Champs"}
+
+
+def test_find_similar_events_matches_the_web_review_page(ndb_stub) -> None:
+    """Both review surfaces must rank the same way: they share the helper."""
+    events = [
+        _offseason_event(
+            "2016grits", "Georgia Robotics Invitational Tournament & Showcase"
+        ),
+        _offseason_event("2016cc", "Chezy Champs"),
+    ]
+    candidate = _candidate("GRITS")
+    from_api = [e["key"] for e in _find_similar_events(candidate, events)]
+    from_helper = [
+        e.key_name for e in SimilarEventHelper.similar_events(candidate, events)
+    ]
+    assert from_api == from_helper == ["2016grits"]
 
 
 def test_suggested_event_year(ndb_stub) -> None:
