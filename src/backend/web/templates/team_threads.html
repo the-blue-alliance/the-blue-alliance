@@ -21,7 +21,7 @@
           <tbody>
             {% for row in rows %}
               <tr>
-                <td><a href="/team/{{ row.team_number }}/{{ year }}">{{ row.team_number }}</a></td>
+                <td><a href="/team/{{ row.team_number }}/{{ year }}"{% if row.team_nickname %} rel="tooltip" title="{{ row.team_nickname }}"{% endif %}>{{ row.team_number }}</a></td>
                 <td><a href="{{ row.thread_url }}" target="_blank">{{ row.thread_title }}</a></td>
               </tr>
             {% endfor %}
@@ -34,4 +34,3 @@
   </div>
 </div>
 {% endblock %}
-
