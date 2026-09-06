@@ -28,7 +28,7 @@ SRC_ROOT = WEB_ROOT.parent.parent
 HANDLERS_ROOT = WEB_ROOT / "handlers"
 TEMPLATES_ROOT = WEB_ROOT / "templates"
 
-CSRF_TOKEN_RE = re.compile(r"\bcsrf_token\b")
+CSRF_TOKEN_RE = re.compile(r"\bcsrf_token\s*\(")
 
 # A quoted string ending in .html, e.g. "event_partials/event_insights_{}.html"
 QUOTED_TEMPLATE_NAME_RE = re.compile(r"""["']([^"'\n]*\.html)["']""")
