@@ -580,3 +580,43 @@ def test_validate_etag_weak_etag_supported(
     assert resp2.status_code == 304
     assert resp2.headers.get("ETag") == etag
     mock_get_by_id_async.assert_not_called()
+
+
+def test_validate_etag_span_does_not_wrap_handler(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from backend.common.profiler import trace_context
+
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    spans_during_handler: list[str] = []
+    original_get_by_id_async = Team.get_by_id_async
+
+    def mock_get_by_id(*args, **kwargs):
+        if hasattr(trace_context, "request") and hasattr(
+            trace_context.request, "spans"
+        ):
+            spans_during_handler.extend(
+                [s["name"] for s in trace_context.request.spans]
+            )
+        return original_get_by_id_async(*args, **kwargs)
+
+    monkeypatch.setattr(Team, "get_by_id_async", mock_get_by_id)
+
+    resp = api_client.get(
+        "/api/v3/team/frc254",
+        headers={
+            "X-TBA-Auth-Key": "test_auth_key",
+            "X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1",
+        },
+    )
+    assert resp.status_code == 200
+    assert "validate_etag" in spans_during_handler
+    assert "api_authenticated" in spans_during_handler
+    assert "validate_keys" in spans_during_handler

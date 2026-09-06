@@ -278,22 +278,22 @@ def validate_etag(func: Callable) -> Callable:
                 except Exception as e:
                     logging.warning(f"Error during validate_etag fast-path: {e}")
 
-            with track_accessed_query_cache_keys() as accessed_keys:
-                resp = make_response(func(*args, **kwargs))
+        with track_accessed_query_cache_keys() as accessed_keys:
+            resp = make_response(func(*args, **kwargs))
 
-                if resp.status_code == 200:
-                    try:
+            if resp.status_code == 200:
+                try:
+                    etag_header = resp.headers.get("ETag")
+                    if not etag_header:
+                        resp.add_etag()
                         etag_header = resp.headers.get("ETag")
-                        if not etag_header:
-                            resp.add_etag()
-                            etag_header = resp.headers.get("ETag")
-                        if etag_header and accessed_keys:
-                            normalized = normalize_etag(etag_header)
-                            if normalized:
-                                save_etag_dependencies(normalized, accessed_keys)
-                    except Exception as e:
-                        logging.warning(f"Error saving validate_etag dependencies: {e}")
+                    if etag_header and accessed_keys:
+                        normalized = normalize_etag(etag_header)
+                        if normalized:
+                            save_etag_dependencies(normalized, accessed_keys)
+                except Exception as e:
+                    logging.warning(f"Error saving validate_etag dependencies: {e}")
 
-                return resp
+            return resp
 
     return decorated_function
