@@ -128,9 +128,10 @@ def account_info_handler() -> Response:
     use with the other /_/account/ endpoints.
 
     A CSRF token is per-session, so it must never be rendered into a page served
-    by `cached_public` - the cache is keyed on path alone, so every visitor
-    would be handed the token belonging to whoever warmed the cache. Client-side
-    code needing a token should fetch it from here instead.
+    by `cached_public` - that cache is keyed on path + query string with no user
+    component, so every visitor would be handed the token belonging to whoever
+    warmed the cache. Client-side code needing a token should fetch it from here
+    instead.
     """
     user = current_user()
     response = jsonify(

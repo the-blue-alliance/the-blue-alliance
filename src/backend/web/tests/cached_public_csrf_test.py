@@ -8,9 +8,10 @@ publicly cached page hands whichever token warmed the cache to everyone else,
 and their POSTs are rejected with a 400.
 
 This test walks every web handler decorated with `cached_public`, resolves the
-templates it renders (transitively through extends/include/import), and asserts
-none of them reference `csrf_token`. Client-side code that needs a token should
-fetch one from `/_/account/info` instead.
+templates it renders (transitively through extends/include/import, and through
+dynamic includes by globbing the format strings that build their names), and
+asserts none of them reference `csrf_token`. Client-side code that needs a
+token should fetch one from `/_/account/info` instead.
 """
 
 import ast
@@ -23,10 +24,15 @@ from jinja2 import Environment, FileSystemLoader, TemplateNotFound
 from jinja2 import meta as jinja_meta
 
 WEB_ROOT = Path(__file__).resolve().parents[1]
+SRC_ROOT = WEB_ROOT.parent.parent
 HANDLERS_ROOT = WEB_ROOT / "handlers"
 TEMPLATES_ROOT = WEB_ROOT / "templates"
 
 CSRF_TOKEN_RE = re.compile(r"\bcsrf_token\b")
+
+# A quoted string ending in .html, e.g. "event_partials/event_insights_{}.html"
+QUOTED_TEMPLATE_NAME_RE = re.compile(r"""["']([^"'\n]*\.html)["']""")
+FORMAT_PLACEHOLDER_RE = re.compile(r"\{[^{}]*\}")
 
 _jinja_env = Environment(loader=FileSystemLoader(str(TEMPLATES_ROOT)))
 
@@ -103,10 +109,68 @@ def _referenced_templates(template: str, seen: Set[str]) -> Set[str]:
     parsed = _jinja_env.parse(_template_source(template))
     for referenced in jinja_meta.find_referenced_templates(parsed):
         if referenced is None:
-            # A dynamic {% include some_var %} - can't follow it
+            # A dynamic `{% include some_var %}`; resolved by the caller.
             continue
         _referenced_templates(referenced, seen)
     return seen
+
+
+def _has_dynamic_reference(template: str) -> bool:
+    parsed = _jinja_env.parse(_template_source(template))
+    return any(ref is None for ref in jinja_meta.find_referenced_templates(parsed))
+
+
+def _template_name_patterns(source: str) -> Set[str]:
+    """Globs for template names built at runtime from a format string.
+
+    `"event_partials/event_insights_{}.html".format(year)` in a handler or a
+    template yields `event_partials/event_insights_*.html`.
+    """
+    return {
+        FORMAT_PLACEHOLDER_RE.sub("*", name)
+        for name in QUOTED_TEMPLATE_NAME_RE.findall(source)
+        if "{" in name
+    }
+
+
+def _glob_templates(patterns: Set[str]) -> Set[str]:
+    return {
+        path.relative_to(TEMPLATES_ROOT).as_posix()
+        for pattern in patterns
+        for path in TEMPLATES_ROOT.glob(pattern)
+        if path.is_file()
+    }
+
+
+def _reachable_templates(render: RenderedTemplate) -> Set[str]:
+    """Every template `render` can pull in, including dynamic includes."""
+    reachable = _referenced_templates(render.template, set())
+
+    dynamic = sorted(t for t in reachable if _has_dynamic_reference(t))
+    if not dynamic:
+        return reachable
+
+    # `{% include some_var %}` can't be followed statically, but the values are
+    # always built from a format string in the rendering handler or in one of
+    # the templates it reaches. Glob those patterns and scan every template
+    # they could resolve to, so a year-specific partial can't reintroduce a
+    # cached csrf_token unnoticed.
+    patterns = _template_name_patterns((SRC_ROOT / render.module).read_text())
+    for template in sorted(reachable):
+        patterns |= _template_name_patterns(_template_source(template))
+    candidates = _glob_templates(patterns) - reachable
+
+    assert candidates, (
+        f"{render.module}:{render.handler} renders {render.template}, which "
+        f"dynamically includes a template via {dynamic}, but no candidates "
+        f"could be resolved from the name patterns {sorted(patterns)}. Those "
+        "templates would go unscanned - teach _template_name_patterns how the "
+        "name is built rather than letting this test silently shrink."
+    )
+
+    for candidate in sorted(candidates):
+        _referenced_templates(candidate, reachable)
+    return reachable
 
 
 CACHED_PUBLIC_RENDERS: List[RenderedTemplate] = list(_cached_public_renders())
@@ -114,13 +178,28 @@ CACHED_PUBLIC_RENDERS: List[RenderedTemplate] = list(_cached_public_renders())
 
 def test_found_cached_public_handlers() -> None:
     # Sanity check that the AST walk above is actually finding handlers, so a
-    # refactor that breaks the discovery doesn't turn this file into a no-op.
-    assert len(CACHED_PUBLIC_RENDERS) > 10
-    assert (
+    # refactor that breaks discovery doesn't turn this file into a no-op.
+    #
+    # These pins are deliberately specific rather than a count threshold. The
+    # two decorator forms are discovered by different branches of
+    # `_decorator_name`, and dropping either one silently halves coverage while
+    # leaving a count comfortably non-zero. Pinning renders from more than one
+    # module also catches a walk that collapses to a single file.
+    expected = [
+        # bare `@cached_public`
         RenderedTemplate(
             "backend/web/handlers/team.py", "team_detail", "team_details.html"
-        )
-        in CACHED_PUBLIC_RENDERS
+        ),
+        # `@cached_public(ttl=...)` call form
+        RenderedTemplate("backend/web/handlers/team.py", "team_list", "team_list.html"),
+        RenderedTemplate(
+            "backend/web/handlers/match.py", "match_detail", "match_details.html"
+        ),
+    ]
+    missing = [render for render in expected if render not in CACHED_PUBLIC_RENDERS]
+    assert not missing, (
+        f"Handler discovery stopped finding {missing}. This test only guards "
+        "the handlers it discovers, so a gap here silently shrinks coverage."
     )
 
 
@@ -130,7 +209,7 @@ def test_found_cached_public_handlers() -> None:
 def test_cached_public_template_has_no_csrf_token(render: RenderedTemplate) -> None:
     offenders = sorted(
         template
-        for template in _referenced_templates(render.template, set())
+        for template in _reachable_templates(render)
         if CSRF_TOKEN_RE.search(_template_source(template))
     )
     assert not offenders, (
