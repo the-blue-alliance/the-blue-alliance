@@ -1,3 +1,4 @@
+import * as Sentry from '@sentry/tanstackstart-react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
@@ -6,6 +7,14 @@ import {
   getCacheEntries,
   getCacheStats,
 } from '~/lib/middleware/network-cache';
+
+vi.mock('@sentry/tanstackstart-react', () => ({
+  metrics: {
+    count: vi.fn<typeof Sentry.metrics.count>(),
+    distribution: vi.fn<typeof Sentry.metrics.distribution>(),
+    gauge: vi.fn<typeof Sentry.metrics.gauge>(),
+  },
+}));
 
 describe('Network Cache Middleware', () => {
   let originalWindow: typeof globalThis.window;
@@ -248,5 +257,151 @@ describe('Network Cache Middleware', () => {
 
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  describe('hit rate tracking', () => {
+    function mockOkFetch() {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(new Response('{"data":"test"}', { status: 200 })),
+        );
+      global.fetch = mockFetch;
+      return mockFetch;
+    }
+
+    it('counts a miss then a hit', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+
+      const stats = getCacheStats();
+      expect(stats.hits).toBe(1);
+      expect(stats.misses).toBe(1);
+      expect(stats.hitRate).toBe(0.5);
+    });
+
+    it('reports a zero hit rate with no traffic', () => {
+      expect(getCacheStats()).toMatchObject({
+        hits: 0,
+        misses: 0,
+        hitRate: 0,
+      });
+    });
+
+    it('computes the hit rate over repeated requests', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      for (let i = 0; i < 4; i++) {
+        await cachedFetch(url);
+      }
+
+      const stats = getCacheStats();
+      expect(stats.hits).toBe(3);
+      expect(stats.misses).toBe(1);
+      expect(stats.hitRate).toBe(0.75);
+    });
+
+    it('does not move counters for non-cacheable methods', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url, { method: 'POST' });
+      await cachedFetch(url, { method: 'POST' });
+
+      expect(getCacheStats()).toMatchObject({ hits: 0, misses: 0 });
+    });
+
+    it('does not move counters on the client side', async () => {
+      mockOkFetch();
+      if (!global.window) {
+        // @ts-expect-error - mocking window
+        global.window = {};
+      }
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+
+      expect(getCacheStats()).toMatchObject({ hits: 0, misses: 0 });
+    });
+
+    it('counts a 404 as a miss, never a hit', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(new Response('error', { status: 404 })),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/not-found';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+
+      expect(getCacheStats()).toMatchObject({ hits: 0, misses: 2 });
+    });
+
+    it('resets counters on clearCache', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+      clearCache();
+
+      expect(getCacheStats()).toMatchObject({
+        hits: 0,
+        misses: 0,
+        hitRate: 0,
+      });
+    });
+
+    it('emits Sentry counters only for real server-side cache accesses', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+      await cachedFetch(url, { method: 'POST' });
+
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.miss',
+        1,
+        {
+          attributes: { client_platform: 'pwa' },
+        },
+      );
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.hit',
+        1,
+        {
+          attributes: { client_platform: 'pwa' },
+        },
+      );
+      expect(Sentry.metrics.count).toHaveBeenCalledTimes(2);
+    });
   });
 });

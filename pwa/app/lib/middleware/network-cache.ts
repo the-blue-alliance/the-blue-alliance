@@ -11,6 +11,7 @@
  * freshness is owned by React Query `staleTime`; this must not run in the
  * browser as a second TTL under Query.
  */
+import * as Sentry from '@sentry/tanstackstart-react';
 import ccParser from 'cache-control-parser';
 import { LRUCache } from 'lru-cache';
 
@@ -34,6 +35,9 @@ const cache = new LRUCache<string, CacheEntry>({
   max: CACHE_MAX_ENTRIES,
   ttl: CACHE_TTL,
 });
+
+let hits = 0;
+let misses = 0;
 
 interface NetworkCacheConfig {
   /**
@@ -98,6 +102,10 @@ export function createCachedFetch(
     // Check cache
     const cachedData = cache.get(cacheKey);
     if (cachedData) {
+      hits++;
+      Sentry.metrics.count('network.cache.hit', 1, {
+        attributes: { client_platform: 'pwa' },
+      });
       logger.debug(
         {
           method,
@@ -110,6 +118,11 @@ export function createCachedFetch(
         headers: { 'Content-Type': 'application/json' },
       });
     }
+
+    misses++;
+    Sentry.metrics.count('network.cache.miss', 1, {
+      attributes: { client_platform: 'pwa' },
+    });
 
     // Cache miss or expired - fetch from network
     logger.debug(
@@ -192,6 +205,8 @@ export function createCachedFetch(
  */
 export function clearCache(): void {
   cache.clear();
+  hits = 0;
+  misses = 0;
   logger.debug('Cache cleared');
 }
 
@@ -202,11 +217,18 @@ export function getCacheStats(): {
   size: number;
   maxEntries: number;
   keys: string[];
+  hits: number;
+  misses: number;
+  hitRate: number;
 } {
+  const total = hits + misses;
   return {
     size: cache.size,
     maxEntries: CACHE_MAX_ENTRIES,
     keys: Array.from(cache.keys()),
+    hits,
+    misses,
+    hitRate: total === 0 ? 0 : hits / total,
   };
 }
 

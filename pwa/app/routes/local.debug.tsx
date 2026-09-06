@@ -177,6 +177,23 @@ function LocalDebug(): React.JSX.Element {
               </div>
               <div className="text-sm text-muted-foreground">capacity</div>
             </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Hits</div>
+              <div className="text-3xl font-bold">{stats.hits}</div>
+              <div className="text-sm text-muted-foreground">hits</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Misses</div>
+              <div className="text-3xl font-bold">{stats.misses}</div>
+              <div className="text-sm text-muted-foreground">misses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Hit Rate</div>
+              <div className="text-3xl font-bold">
+                {Math.round(stats.hitRate * 100)}%
+              </div>
+              <div className="text-sm text-muted-foreground">all-time</div>
+            </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
             Last updated:{' '}
