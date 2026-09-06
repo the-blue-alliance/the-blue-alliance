@@ -21,8 +21,8 @@ from backend.common.queries.match_query import MatchQuery
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def match(
     match_key: MatchKey, model_type: Optional[ModelType] = None
 ) -> TypedFlaskResponse[MatchDict]:
@@ -40,8 +40,8 @@ def match(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def zebra_motionworks(match_key: MatchKey) -> TypedFlaskResponse[Any]:
     """
     Returns Zebra Motionworks data for a given match.

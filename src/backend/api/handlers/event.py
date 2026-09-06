@@ -45,8 +45,8 @@ from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQu
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event(
     event_key: EventKey, model_type: Optional[ModelType] = None
 ) -> TypedFlaskResponse[EventDict]:
@@ -107,8 +107,8 @@ def event_list_year(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_detail(event_key: EventKey, detail_type: str) -> TypedFlaskResponse[Any]:
     """
     Returns details about one event, specified by |event_key| and |detail_type|.
@@ -129,8 +129,8 @@ def event_detail(event_key: EventKey, detail_type: str) -> TypedFlaskResponse[An
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_advancement_points(event_key: EventKey) -> TypedFlaskResponse[Any]:
     """
     Returns details about one event, specified by |event_key| and |detail_type|.
@@ -153,8 +153,8 @@ def event_advancement_points(event_key: EventKey) -> TypedFlaskResponse[Any]:
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_teams(
     event_key: EventKey, model_type: Optional[ModelType] = None
 ) -> TypedFlaskResponse[list[TeamDict]]:
@@ -170,8 +170,8 @@ def event_teams(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_teams_statuses(event_key: EventKey) -> TypedFlaskResponse[dict]:
     """
     Returns a dict of team_key: status for teams at a given event.
@@ -204,8 +204,8 @@ def event_teams_statuses(event_key: EventKey) -> TypedFlaskResponse[dict]:
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_teams_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
     track_call_after_response("event/teams/media", event_key)
 
@@ -217,8 +217,8 @@ def event_teams_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
     track_call_after_response("event/media", event_key)
 
@@ -228,8 +228,8 @@ def event_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_matches(
     event_key: EventKey, model_type: Optional[ModelType] = None
 ) -> TypedFlaskResponse[list[MatchDict]]:
@@ -245,8 +245,8 @@ def event_matches(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_awards(event_key: EventKey) -> TypedFlaskResponse[list[AwardDict]]:
     """
     Returns a list of awards for a given event.
@@ -258,8 +258,8 @@ def event_awards(event_key: EventKey) -> TypedFlaskResponse[list[AwardDict]]:
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_nexus_info(
     event_key: EventKey,
 ) -> TypedFlaskResponse[Optional[NexusInfoDict]]:
@@ -277,8 +277,8 @@ def event_nexus_info(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def event_playoff_advancement(event_key: EventKey) -> TypedFlaskResponse[Any]:
     """
     Returns the playoff advancement for a given event.

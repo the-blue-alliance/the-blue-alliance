@@ -51,8 +51,8 @@ def district_history(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def district_events(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
 ) -> TypedFlaskResponse[list[EventDict]]:
@@ -70,8 +70,8 @@ def district_events(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def district_teams(
     district_key: DistrictKey, model_type: Optional[ModelType] = None
 ) -> TypedFlaskResponse[list[TeamDict]]:
@@ -89,8 +89,8 @@ def district_teams(
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def district_rankings(district_key: DistrictKey) -> TypedFlaskResponse[Any]:
     """
     Returns the rankings a given DistrictKey.
@@ -116,8 +116,8 @@ def district_list_year(year: int) -> TypedFlaskResponse[list[DistrictDict]]:
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def district_awards(district_key: DistrictKey) -> TypedFlaskResponse[list[dict]]:
     """
     Returns a list of awards for a given DistrictKey.
@@ -144,8 +144,8 @@ def district_awards(district_key: DistrictKey) -> TypedFlaskResponse[list[dict]]
 
 
 @api_authenticated
-@validate_keys
 @cached_public
+@validate_keys
 def district_advancement(district_key: DistrictKey) -> TypedFlaskResponse[dict]:
     """
     Returns DCMP/CMP advancement information for a given DistrictKey
