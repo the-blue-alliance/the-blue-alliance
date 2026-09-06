@@ -17,7 +17,7 @@ from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 def status() -> TypedFlaskResponse[dict]:
     track_call_after_response("status", "status")
 

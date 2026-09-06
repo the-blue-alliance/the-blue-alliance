@@ -10,7 +10,7 @@ from backend.common.models.regional_champs_pool import RegionalChampsPool
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def regional_rankings(year: Year) -> Response:
     """
@@ -30,7 +30,7 @@ def regional_rankings(year: Year) -> Response:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def regional_advancement(year: Year) -> Response:
     """

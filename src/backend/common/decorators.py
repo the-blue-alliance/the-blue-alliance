@@ -12,14 +12,15 @@ def cached_public(
     func: Optional[Callable] = None,
     ttl: Union[int, timedelta] = 61,
     cache_redirects: bool = False,
+    query_string: bool = True,
 ):
     """
     Caches the handler's response and marks it publicly cacheable.
 
-    The cache is keyed on path + query string only, with no user component, so
-    the response body is stored once and served to every visitor. Never render
-    anything session-specific - a CSRF token, account details, per-user state -
-    into a response wrapped in this decorator.
+    The cache is keyed on path (and query string by default unless query_string=False),
+    with no user component, so the response body is stored once and served to every
+    visitor. Never render anything session-specific - a CSRF token, account
+    details, per-user state - into a response wrapped in this decorator.
 
     See src/backend/web/tests/cached_public_csrf_test.py, which enforces this
     for CSRF tokens, and
@@ -27,7 +28,12 @@ def cached_public(
     """
     timeout = ttl if isinstance(ttl, int) else int(ttl.total_seconds())
     if func is None:  # Handle no-argument decorator
-        return partial(cached_public, ttl=ttl, cache_redirects=cache_redirects)
+        return partial(
+            cached_public,
+            ttl=ttl,
+            cache_redirects=cache_redirects,
+            query_string=query_string,
+        )
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -38,7 +44,7 @@ def cached_public(
                 timeout=timeout,
                 response_filter=lambda resp: make_response(resp).status_code
                 in status_codes,
-                query_string=True,
+                query_string=query_string,
             )
             resp = make_response(cached(func)(*args, **kwargs))
         else:

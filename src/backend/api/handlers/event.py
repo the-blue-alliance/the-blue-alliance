@@ -53,7 +53,7 @@ from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQu
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event(
@@ -71,7 +71,7 @@ def event(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def event_list_all(
     model_type: Optional[ModelType] = None,
@@ -98,7 +98,7 @@ def event_list_all(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 def event_list_year(
     year: int, model_type: Optional[ModelType] = None
@@ -115,7 +115,7 @@ def event_list_year(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_detail(event_key: EventKey, detail_type: str) -> TypedFlaskResponse[Any]:
@@ -138,7 +138,7 @@ def event_detail(event_key: EventKey, detail_type: str) -> TypedFlaskResponse[An
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_advancement_points(event_key: EventKey) -> TypedFlaskResponse[Any]:
@@ -163,7 +163,7 @@ def event_advancement_points(event_key: EventKey) -> TypedFlaskResponse[Any]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_teams(
@@ -181,7 +181,7 @@ def event_teams(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_teams_statuses(event_key: EventKey) -> TypedFlaskResponse[dict]:
@@ -216,7 +216,7 @@ def event_teams_statuses(event_key: EventKey) -> TypedFlaskResponse[dict]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_teams_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
@@ -225,7 +225,7 @@ def event_teams_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
@@ -234,7 +234,7 @@ def event_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_matches(
@@ -252,7 +252,7 @@ def event_matches(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_awards(event_key: EventKey) -> TypedFlaskResponse[list[AwardDict]]:
@@ -266,7 +266,7 @@ def event_awards(event_key: EventKey) -> TypedFlaskResponse[list[AwardDict]]:
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_nexus_info(
@@ -286,7 +286,7 @@ def event_nexus_info(
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 @validate_etag
 @validate_keys
 def event_playoff_advancement(event_key: EventKey) -> TypedFlaskResponse[Any]:

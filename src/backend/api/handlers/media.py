@@ -8,7 +8,7 @@ from backend.common.decorators import cached_public
 
 
 @api_authenticated
-@cached_public
+@cached_public(query_string=False)
 def media_tags() -> Response:
     """
     Returns a list of media tag names and codes.
