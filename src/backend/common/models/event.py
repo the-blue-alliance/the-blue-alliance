@@ -211,7 +211,7 @@ class Event(CachedModel):
         # keys must be model properties
         self._affected_references = {"key": set(), "year": set(), "district_key": set()}
         self._awards_future: Optional[TypedFuture[List[Award]]] = None
-        self._details_future: Optional[TypedFuture[EventDetails]] = None
+        self._details_future: Optional[TypedFuture[Optional[EventDetails]]] = None
         self._location = None
         self._city_state_country = None
         self._matches_future: Optional[TypedFuture[List[Match]]] = None
@@ -260,13 +260,17 @@ class Event(CachedModel):
             self.prep_awards()
         return none_throws(self._awards_future).get_result()
 
-    def prep_details(self) -> TypedFuture[EventDetails]:
+    def prep_details(self) -> TypedFuture[Optional[EventDetails]]:
         if self._details_future is None:
-            self._details_future = ndb.Key(EventDetails, self.key.id()).get_async()
+            from backend.common.queries.event_details_query import EventDetailsQuery
+
+            self._details_future = EventDetailsQuery(
+                event_key=none_throws(self.key.string_id())
+            ).fetch_async()
         return self._details_future
 
     @property
-    def details(self) -> EventDetails:
+    def details(self) -> Optional[EventDetails]:
         if self._details_future is None:
             self.prep_details()
         if not none_throws(self._details_future).done():
@@ -317,6 +321,9 @@ class Event(CachedModel):
 
     def clear_teams(self) -> None:
         self._teams_future = None
+
+    def clear_details(self) -> None:
+        self._details_future = None
 
     def prep_matches(self) -> TypedFuture[List[Match]]:
         if self._matches_future is None:

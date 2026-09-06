@@ -430,14 +430,19 @@ def test_get_awards() -> None:
 
 def test_details() -> None:
     event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.details is None
+
     d = EventDetails(
         id="2019ct",
     )
     d.put()
 
+    event.clear_details()
+    clear_cached_queries()
     assert event.details == d
 
-    event._details_future = None
+    event.clear_details()
+    clear_cached_queries()
     assert event.details == d
 
 
