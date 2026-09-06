@@ -4965,6 +4965,52 @@ export type GetEventMatchTimeseriesResponses = {
 export type GetEventMatchTimeseriesResponse =
   GetEventMatchTimeseriesResponses[keyof GetEventMatchTimeseriesResponses];
 
+export type GetEventMediaData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/media';
+};
+
+export type GetEventMediaErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventMediaError = GetEventMediaErrors[keyof GetEventMediaErrors];
+
+export type GetEventMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetEventMediaResponse =
+  GetEventMediaResponses[keyof GetEventMediaResponses];
+
 export type GetEventNexusInfoData = {
   body?: never;
   headers?: {

@@ -40,7 +40,7 @@ from backend.common.queries.event_query import (
     EventQuery,
 )
 from backend.common.queries.match_query import EventMatchesQuery
-from backend.common.queries.media_query import EventTeamsMediasQuery
+from backend.common.queries.media_query import EventMediasQuery, EventTeamsMediasQuery
 from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQuery
 
 
@@ -212,6 +212,17 @@ def event_teams_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]
     query = EventTeamsMediasQuery(event_key=event_key).fetch_dict(
         ApiMajorVersion.API_V3
     )
+
+    return profiled_jsonify(query)
+
+
+@api_authenticated
+@validate_keys
+@cached_public
+def event_media(event_key: EventKey) -> TypedFlaskResponse[list[MediaDict]]:
+    track_call_after_response("event/media", event_key)
+
+    query = EventMediasQuery(event_key=event_key).fetch_dict(ApiMajorVersion.API_V3)
 
     return profiled_jsonify(query)
 

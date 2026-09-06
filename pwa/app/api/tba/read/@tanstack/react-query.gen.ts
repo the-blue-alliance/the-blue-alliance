@@ -28,6 +28,7 @@ import {
   getEventMatches,
   getEventMatchesKeys,
   getEventMatchesSimple,
+  getEventMedia,
   getEventNexusInfo,
   getEventOprs,
   getEventPredictions,
@@ -162,6 +163,9 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleError,
   GetEventMatchesSimpleResponse,
+  GetEventMediaData,
+  GetEventMediaError,
+  GetEventMediaResponse,
   GetEventNexusInfoData,
   GetEventNexusInfoError,
   GetEventNexusInfoResponse,
@@ -1049,6 +1053,31 @@ export const getEventMatchTimeseriesOptions = (
       return data;
     },
     queryKey: getEventMatchTimeseriesQueryKey(options),
+  });
+
+export const getEventMediaQueryKey = (options: Options<GetEventMediaData>) =>
+  createQueryKey('getEventMedia', options);
+
+/**
+ * Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.
+ */
+export const getEventMediaOptions = (options: Options<GetEventMediaData>) =>
+  queryOptions<
+    GetEventMediaResponse,
+    GetEventMediaError,
+    GetEventMediaResponse,
+    ReturnType<typeof getEventMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMediaQueryKey(options),
   });
 
 export const getEventNexusInfoQueryKey = (

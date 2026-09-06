@@ -98,10 +98,10 @@ def test_smugmug_album_urls() -> None:
     assert m.slug_name == "smugmug-album"
     assert Media.validate_key_name(m.key_name) is True
     assert m.view_image_url == "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
-    # An album has no single image to link directly to
-    assert m.image_direct_url == ""
-    assert m.image_direct_url_med == ""
-    assert m.image_direct_url_sm == ""
+    # An album has no single image, so its direct URLs are the album cover
+    assert m.image_direct_url == "https://photos.smugmug.com/L/cover-L.png"
+    assert m.image_direct_url_med == "https://photos.smugmug.com/M/cover-M.png"
+    assert m.image_direct_url_sm == "https://photos.smugmug.com/S/cover-S.png"
 
 
 @pytest.mark.parametrize(

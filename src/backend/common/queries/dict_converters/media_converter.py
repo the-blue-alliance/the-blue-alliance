@@ -15,7 +15,7 @@ MediaDict = NewType("MediaDict", Dict)
 
 class MediaConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 7,
+        ApiMajorVersion.API_V3: 8,
     }
 
     @classmethod

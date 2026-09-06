@@ -16,6 +16,7 @@ from backend.api.handlers.tests.helpers import (
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
@@ -38,6 +39,7 @@ from backend.common.models.event_queue_status import (
 )
 from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.team import Team
 
 
@@ -696,3 +698,92 @@ def test_event_playoff_advancement(
     ) as f:
         expected_response = json.load(f)
     assert resp.json == expected_response
+
+
+SMUGMUG_ALBUM_DETAILS = {
+    "title": "2020nyny Photos",
+    "web_uri": "https://example.smugmug.com/2020nyny",
+    "image_count": 42,
+    "cover_url": "https://photos.smugmug.com/L/cover-L.png",
+    "cover_url_med": "https://photos.smugmug.com/M/cover-M.png",
+    "cover_url_sm": "https://photos.smugmug.com/S/cover-S.png",
+}
+
+
+def _preseed_event_and_team_media() -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    EventTeam(
+        id="2020nyny_frc254",
+        event=ndb.Key("Event", "2020nyny"),
+        team=ndb.Key("Team", "frc254"),
+        year=2020,
+    ).put()
+    Media(
+        references=[ndb.Key("Team", "frc254")],
+        year=2020,
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        foreign_key="teamvideo",
+        details_json="{}",
+    ).put()
+    Media(
+        references=[ndb.Key("Event", "2020nyny")],
+        year=2020,
+        media_type_enum=MediaType.SMUGMUG_ALBUM,
+        foreign_key="album1",
+        details_json=json.dumps(SMUGMUG_ALBUM_DETAILS),
+    ).put()
+
+
+def test_event_media(ndb_stub, api_client: Client) -> None:
+    _preseed_event_and_team_media()
+
+    resp = api_client.get(
+        "/api/v3/event/2020nyny/media",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    album = resp.json[0]
+    assert album["type"] == "smugmug-album"
+    assert album["foreign_key"] == "album1"
+    assert album["direct_url"] == SMUGMUG_ALBUM_DETAILS["cover_url"]
+    assert album["view_url"] == SMUGMUG_ALBUM_DETAILS["web_uri"]
+    assert album["team_keys"] == []
+
+
+def test_event_media_excludes_team_media(ndb_stub, api_client: Client) -> None:
+    _preseed_event_and_team_media()
+
+    event_media = api_client.get(
+        "/api/v3/event/2020nyny/media",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    team_media = api_client.get(
+        "/api/v3/event/2020nyny/team_media",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert [m["foreign_key"] for m in event_media.json] == ["album1"]
+    assert [m["foreign_key"] for m in team_media.json] == ["teamvideo"]
+
+
+def test_event_media_bad_key(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/badkey/media",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 404

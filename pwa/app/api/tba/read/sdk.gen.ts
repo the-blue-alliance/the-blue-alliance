@@ -81,6 +81,9 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleErrors,
   GetEventMatchesSimpleResponses,
+  GetEventMediaData,
+  GetEventMediaErrors,
+  GetEventMediaResponses,
   GetEventNexusInfoData,
   GetEventNexusInfoErrors,
   GetEventNexusInfoResponses,
@@ -337,6 +340,9 @@ import {
   zGetEventMatchesSimpleHeaders,
   zGetEventMatchesSimplePath,
   zGetEventMatchesSimpleResponse,
+  zGetEventMediaHeaders,
+  zGetEventMediaPath,
+  zGetEventMediaResponse,
   zGetEventNexusInfoHeaders,
   zGetEventNexusInfoPath,
   zGetEventNexusInfoResponse,
@@ -1270,6 +1276,33 @@ export const getEventMatchTimeseries = <ThrowOnError extends boolean = false>(
       await zGetEventMatchTimeseriesResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/matches/timeseries',
+    ...options,
+  });
+
+/**
+ * Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.
+ */
+export const getEventMedia = <ThrowOnError extends boolean = false>(
+  options: Options<GetEventMediaData, ThrowOnError>,
+): RequestResult<GetEventMediaResponses, GetEventMediaErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetEventMediaResponses,
+    GetEventMediaErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventMediaHeaders.optional(),
+          path: zGetEventMediaPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventMediaResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/media',
     ...options,
   });
 

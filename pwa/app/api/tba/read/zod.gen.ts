@@ -2576,6 +2576,19 @@ export const zGetEventMatchTimeseriesPath = z.object({
  */
 export const zGetEventMatchTimeseriesResponse = z.array(z.string());
 
+export const zGetEventMediaHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventMediaPath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventMediaResponse = z.array(zMedia);
+
 export const zGetEventNexusInfoHeaders = z.object({
   'If-None-Match': z.string().optional(),
 });

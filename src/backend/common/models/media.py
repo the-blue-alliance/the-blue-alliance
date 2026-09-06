@@ -209,6 +209,8 @@ class Media(CachedModel):
             return self.instagram_url
         elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
             return none_throws(self.details)["image_url"]
+        elif self.media_type_enum == MediaType.SMUGMUG_ALBUM:
+            return none_throws(self.details)["cover_url"]
         else:
             return ""
 
@@ -246,6 +248,8 @@ class Media(CachedModel):
             return self.instagram_url
         elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
             return none_throws(self.details)["image_url_med"]
+        elif self.media_type_enum == MediaType.SMUGMUG_ALBUM:
+            return none_throws(self.details)["cover_url_med"]
         else:
             return ""
 
@@ -267,6 +271,8 @@ class Media(CachedModel):
             return self.instagram_url
         elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
             return none_throws(self.details)["image_url_sm"]
+        elif self.media_type_enum == MediaType.SMUGMUG_ALBUM:
+            return none_throws(self.details)["cover_url_sm"]
         else:
             return ""
 

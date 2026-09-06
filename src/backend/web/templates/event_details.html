@@ -105,7 +105,7 @@
         {% if regional_champs_pool_points_sorted %}<li><a href="#cmp-points" data-toggle="tab">Champs Qual Points</a></li>{% endif %}
         <li class="{% if match_count == 0 %}active{% endif %}"><a href="#teams" data-toggle="tab">Teams <span class="badge">{{num_teams}}</span></a></li>
         {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
-        <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length}}</span></a></li>
+        <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length + medias_by_slugname['smugmug-album']|length}}</span></a></li>
         <li><a href="#scouting" data-toggle="tab">Scouting</a></li>
       </ul>
     </div>

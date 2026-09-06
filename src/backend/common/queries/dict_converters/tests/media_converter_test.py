@@ -127,5 +127,5 @@ def test_mediaConverter_v3_smugmug_album(ndb_context) -> None:
     assert (
         result["view_url"] == "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
     )
-    assert result["direct_url"] == ""
+    assert result["direct_url"] == "https://photos.smugmug.com/L/cover-L.png"
     assert result["team_keys"] == []

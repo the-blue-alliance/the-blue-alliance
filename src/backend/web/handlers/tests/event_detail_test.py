@@ -519,3 +519,31 @@ def test_render_event_no_smugmug_album(ndb_stub, web_client: Client) -> None:
     assert resp.status_code == 200
     soup = BeautifulSoup(resp.data, "html.parser")
     assert soup.find(id="photo-galleries") is None
+
+
+@ndb.synctasklet
+def preseed_event_youtube_video(event_key: str):
+    yield Media(
+        id="youtube_abc123",
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        foreign_key="abc123",
+        year=int(event_key[:4]),
+        details_json="{}",
+        references=[ndb.Key(Event, event_key)],
+    ).put_async()
+
+
+def test_media_tab_badge_counts_youtube_and_smugmug(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+    preseed_event_youtube_video("2020nyny")
+    preseed_smugmug_album("2020nyny")
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    media_link = soup.find("a", href="#media")
+    assert media_link is not None
+    assert media_link.find("span", {"class": "badge"}).get_text(strip=True) == "2"
