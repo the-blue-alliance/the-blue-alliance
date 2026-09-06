@@ -17,12 +17,12 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.helpers.outgoing_notification_helper import (
+    OutgoingNotificationHelper,
+)
 from backend.common.helpers.similar_event_helper import (
     MAX_SIMILAR_EVENTS,
     SimilarEventHelper,
-)
-from backend.common.helpers.outgoing_notification_helper import (
-    OutgoingNotificationHelper,
 )
 from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account

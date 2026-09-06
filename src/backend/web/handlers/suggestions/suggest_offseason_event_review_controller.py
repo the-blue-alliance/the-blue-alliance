@@ -15,10 +15,10 @@ from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.suggestion import Suggestion
+from backend.common.queries.event_query import EventListQuery
 from backend.common.suggestions.offseason_event_candidate import (
     candidate_event_from_suggestion,
 )
-from backend.common.queries.event_query import EventListQuery
 from backend.web.handlers.suggestions.suggestion_review_base import (
     SuggestionsReviewBase,
 )
