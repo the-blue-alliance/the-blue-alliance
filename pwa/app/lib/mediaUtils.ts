@@ -55,9 +55,22 @@ export function getMediaLinkUrl(media: Media): string | undefined {
       return `https://cad.onshape.com/documents/${media.foreign_key}`;
     case 'external-link':
       return media.foreign_key;
+    case 'smugmug-album':
+    case 'smugmug-photo':
+      return media.details?.web_uri || media.view_url || undefined;
     default:
       return undefined;
   }
+}
+
+/** Returns all SmugMug album media. */
+export function getSmugmugAlbums(media: Media[]): Media[] {
+  return media.filter((m) => m.type === 'smugmug-album');
+}
+
+/** Returns all YouTube video media (as attached to an event, not webcasts). */
+export function getEventVideos(media: Media[]): Media[] {
+  return media.filter((m) => m.type === 'youtube');
 }
 
 /** Returns the display name for a CAD model media item. */

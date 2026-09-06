@@ -6,6 +6,7 @@ import ParentEventIcon from '~icons/lucide/arrow-up-right';
 import SourceIcon from '~icons/lucide/badge-check';
 import TeamsIcon from '~icons/lucide/bot';
 import DateIcon from '~icons/lucide/calendar-days';
+import MediaIcon from '~icons/lucide/camera';
 import StatbotIcon from '~icons/lucide/chart-spline';
 import ScoutingIcon from '~icons/lucide/clipboard-list';
 import GlobeIcon from '~icons/lucide/globe';
@@ -17,7 +18,6 @@ import InsightsIcon from '~icons/lucide/scatter-chart';
 import ChampsQualPointsIcon from '~icons/lucide/star';
 import AwardsIcon from '~icons/lucide/trophy';
 import LiveWebcastIcon from '~icons/lucide/video';
-import MediaIcon from '~icons/mdi/folder-media-outline';
 import ResultsIcon from '~icons/mdi/tournament';
 
 import { getEventColorsOptions } from '~/api/colors/@tanstack/react-query.gen';
@@ -41,6 +41,7 @@ import {
   getEventCoprsOptions,
   getEventDistrictPointsOptions,
   getEventMatchesOptions,
+  getEventMediaOptions,
   getEventNexusInfoOptions,
   getEventOptions,
   getEventRankingsOptions,
@@ -80,6 +81,7 @@ import {
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
 import ScoutingTab from '~/components/tba/scoutingTab';
+import SmugmugAlbumGallery from '~/components/tba/smugmugAlbumGallery';
 import { WebcastIcon } from '~/components/tba/socialBadges';
 import {
   TableOfContents,
@@ -132,7 +134,11 @@ import {
   stripParentPrefix,
 } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-import { getTeamPreferredRobotPicMedium } from '~/lib/mediaUtils';
+import {
+  getEventVideos,
+  getSmugmugAlbums,
+  getTeamPreferredRobotPicMedium,
+} from '~/lib/mediaUtils';
 import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
   getDefaultAutoComponentName,
@@ -343,6 +349,11 @@ function EventPage() {
 
   const teamMediaQuery = useQuery({
     ...getEventTeamMediaOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+
+  const eventMediaQuery = useQuery({
+    ...getEventMediaOptions({ path: { event_key: eventKey } }),
     staleTime: eventStaleTime,
   });
 
@@ -755,7 +766,11 @@ function EventPage() {
           )}
 
         <TabsContent value="media">
-          <MediaTab webcasts={event.webcasts} eventKey={event.key} />
+          <MediaTab
+            webcasts={event.webcasts}
+            media={eventMediaQuery.data ?? []}
+            eventKey={event.key}
+          />
         </TabsContent>
 
         <TabsContent value="scouting">
@@ -1278,49 +1293,77 @@ function ChampsQualPointsTab({
 
 function MediaTab({
   webcasts,
+  media,
   eventKey,
 }: {
   webcasts: Webcast[];
+  media: Media[];
   eventKey: string;
 }) {
   const youtubeWebcasts = webcasts.filter((w) => w.type === 'youtube');
   const otherWebcasts = webcasts.filter((w) => w.type !== 'youtube');
+  const videos = getEventVideos(media);
+  const albums = getSmugmugAlbums(media);
 
   return (
-    <div className="space-y-4">
-      <h1 className="text-2xl font-bold">Webcasts</h1>
-      {webcasts.length > 0 ? (
-        <>
-          {youtubeWebcasts.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {youtubeWebcasts.map((w) => (
-                <YoutubeEmbed
-                  videoId={w.channel}
-                  title={w.channel}
-                  key={w.channel}
-                />
-              ))}
-            </div>
-          )}
-          {otherWebcasts.length > 0 && (
-            <div className="flex flex-wrap gap-2">
-              {otherWebcasts.map((w) => (
-                <WebcastIcon webcast={w} key={w.channel} />
-              ))}
-            </div>
-          )}
-        </>
-      ) : (
-        <Button
-          variant="secondary"
-          render={
-            <a
-              href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
-            >
-              Add Webcast
-            </a>
-          }
-        />
+    <div className="space-y-8">
+      <div className="space-y-4">
+        <h1 className="text-2xl font-bold">Webcasts</h1>
+        {webcasts.length > 0 ? (
+          <>
+            {youtubeWebcasts.length > 0 && (
+              <div className="grid gap-4 sm:grid-cols-2">
+                {youtubeWebcasts.map((w) => (
+                  <YoutubeEmbed
+                    videoId={w.channel}
+                    title={w.channel}
+                    key={w.channel}
+                  />
+                ))}
+              </div>
+            )}
+            {otherWebcasts.length > 0 && (
+              <div className="flex flex-wrap gap-2">
+                {otherWebcasts.map((w) => (
+                  <WebcastIcon webcast={w} key={w.channel} />
+                ))}
+              </div>
+            )}
+          </>
+        ) : (
+          <Button
+            variant="secondary"
+            render={
+              <a
+                href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
+              >
+                Add Webcast
+              </a>
+            }
+          />
+        )}
+      </div>
+
+      {videos.length > 0 && (
+        <div className="space-y-4">
+          <h1 className="text-2xl font-bold">Videos</h1>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {videos.map((m) => (
+              <YoutubeEmbed
+                videoId={m.foreign_key}
+                title={m.foreign_key}
+                key={m.foreign_key}
+              />
+            ))}
+          </div>
+        </div>
+      )}
+
+      {albums.length > 0 && (
+        <div className="space-y-4">
+          <h1 className="text-2xl font-bold">Photo Galleries</h1>
+          <SmugmugAlbumGallery albums={albums} />
+        </div>
       )}
     </div>
   );
