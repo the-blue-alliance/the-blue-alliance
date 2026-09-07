@@ -1,4 +1,5 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useQueries, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { type ReactNode, useMemo } from 'react';
 
 import {
@@ -7,60 +8,46 @@ import {
   Event,
   EventType,
   type LeaderboardInsight,
-  getDistrictAwards,
-  getDistrictEvents,
-  getDistrictHistory,
-  getDistrictInsights,
 } from '~/api/tba/read';
+import {
+  getDistrictAwardsOptions,
+  getDistrictEventsOptions,
+  getDistrictHistoryOptions,
+  getDistrictInsightsOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import { YearSelector } from '~/components/tba/yearSelector';
+import { Spinner } from '~/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/district/$districtAbbreviation/stats')({
-  loader: async ({ params }) => {
-    const [historyResult, insightsResult] = await Promise.all([
-      getDistrictHistory({
-        path: { district_abbreviation: params.districtAbbreviation },
-      }),
-      getDistrictInsights({
-        path: { district_abbreviation: params.districtAbbreviation },
-      }),
+  loader: async ({ params, context: { queryClient } }) => {
+    // Only the district-level data is awaited here. The per-year events and
+    // awards are fetched from the browser (see DistrictStatsPage) rather than
+    // blocking SSR on ~2N round trips, one pair per year of district history.
+    const [history] = await Promise.all([
+      queryClient
+        .ensureQueryData(
+          getDistrictHistoryOptions({
+            path: { district_abbreviation: params.districtAbbreviation },
+          }),
+        )
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData(
+          getDistrictInsightsOptions({
+            path: { district_abbreviation: params.districtAbbreviation },
+          }),
+        )
+        .catch(doThrowNotFound),
     ]);
-
-    if (historyResult.data === undefined || insightsResult.data === undefined) {
-      throw notFound();
-    }
-
-    const history = historyResult.data;
-    const insights = insightsResult.data;
-
-    // Fetch events and awards for each year in parallel
-    const yearResults = await Promise.all(
-      history.map(async (district) => {
-        const [eventsResult, awardsResult] = await Promise.all([
-          getDistrictEvents({
-            path: { district_key: district.key },
-          }),
-          getDistrictAwards({
-            path: { district_key: district.key },
-          }),
-        ]);
-        return {
-          year: district.year,
-          events: eventsResult.data ?? [],
-          awards: awardsResult.data ?? [],
-        };
-      }),
-    );
 
     return {
       abbreviation: params.districtAbbreviation,
       history,
-      insights,
-      yearResults,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -750,8 +737,49 @@ function computeTeamupLeaderboard(
 }
 
 function DistrictStatsPage() {
-  const { abbreviation, history, insights, yearResults } =
-    Route.useLoaderData();
+  const { abbreviation } = Route.useLoaderData();
+
+  const { data: history } = useSuspenseQuery(
+    getDistrictHistoryOptions({
+      path: { district_abbreviation: abbreviation },
+    }),
+  );
+  const { data: insights } = useSuspenseQuery(
+    getDistrictInsightsOptions({
+      path: { district_abbreviation: abbreviation },
+    }),
+  );
+
+  // `combine` keeps these referentially stable across renders, so the
+  // leaderboard useMemos below only recompute when a query actually resolves.
+  const eventsByYear = useQueries({
+    queries: history.map((district) =>
+      getDistrictEventsOptions({ path: { district_key: district.key } }),
+    ),
+    combine: (results) => ({
+      isPending: results.some((r) => r.isPending),
+      data: results.map((r) => r.data ?? []),
+    }),
+  });
+  const awardsByYear = useQueries({
+    queries: history.map((district) =>
+      getDistrictAwardsOptions({ path: { district_key: district.key } }),
+    ),
+    combine: (results) => ({
+      isPending: results.some((r) => r.isPending),
+      data: results.map((r) => r.data ?? []),
+    }),
+  });
+
+  const yearResults = useMemo(
+    () =>
+      history.map((district, i) => ({
+        year: district.year,
+        events: eventsByYear.data[i] ?? [],
+        awards: awardsByYear.data[i] ?? [],
+      })),
+    [history, eventsByYear.data, awardsByYear.data],
+  );
 
   const validYears = history.map((d) => d.year).sort((a, b) => b - a);
 
@@ -771,6 +799,11 @@ function DistrictStatsPage() {
   );
 
   const displayName = history[history.length - 1].display_name;
+
+  // Every leaderboard aggregates across all years, so rendering a partially
+  // loaded set would show counts that silently climb as queries land. The
+  // header still renders from loader data so SSR emits more than a spinner.
+  const isLoading = eventsByYear.isPending || awardsByYear.isPending;
 
   return (
     <div>
@@ -793,207 +826,214 @@ function DistrictStatsPage() {
         />
       </div>
 
-      <Tabs defaultValue="championships" className="mt-4">
-        <TabsList
-          className="flex h-auto flex-wrap items-center justify-evenly
-            *:basis-1/2 lg:*:basis-1"
-        >
-          <TabsTrigger value="championships">Championships</TabsTrigger>
-          <TabsTrigger value="events">Events</TabsTrigger>
-          <TabsTrigger value="awards">Awards</TabsTrigger>
-        </TabsList>
+      {isLoading ? (
+        <Spinner className="mx-auto mt-16 size-8" />
+      ) : (
+        <Tabs defaultValue="championships" className="mt-4">
+          <TabsList
+            className="flex h-auto flex-wrap items-center justify-evenly
+              *:basis-1/2 lg:*:basis-1"
+          >
+            <TabsTrigger value="championships">Championships</TabsTrigger>
+            <TabsTrigger value="events">Events</TabsTrigger>
+            <TabsTrigger value="awards">Awards</TabsTrigger>
+          </TabsList>
 
-        <TabsContent value="championships">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Leaderboard
-              leaderboard={{
-                data: {
-                  rankings: leaderboards.cmpAppearances,
-                  key_type: 'team',
-                },
-                name: 'Most World Championship Appearances',
-                year: 0,
-              }}
-              year={0}
-            />
-            <Leaderboard
-              leaderboard={{
-                data: {
-                  rankings: leaderboards.dcmpAppearances,
-                  key_type: 'team',
-                },
-                name: 'Most District Championship Appearances',
-                year: 0,
-              }}
-              year={0}
-            />
-            {leaderboards.dcmpDivisionFinalsAppearances.length > 0 && (
+          <TabsContent value="championships">
+            <div className="grid gap-6 lg:grid-cols-2">
               <Leaderboard
                 leaderboard={{
                   data: {
-                    rankings: leaderboards.dcmpDivisionFinalsAppearances,
+                    rankings: leaderboards.cmpAppearances,
                     key_type: 'team',
                   },
-                  name: 'Most District Championship Division Finals Appearances',
+                  name: 'Most World Championship Appearances',
                   year: 0,
                 }}
                 year={0}
-                contextTooltipMap={leaderboards.dcmpDivisionFinalsTooltips}
               />
-            )}
-            <Leaderboard
-              leaderboard={{
-                data: {
-                  rankings: leaderboards.dcmpFinalsAppearances,
-                  key_type: 'team',
-                },
-                name: 'Most District Championship Finals Appearances',
-                year: 0,
-              }}
-              year={0}
-              contextTooltipMap={leaderboards.dcmpFinalsTooltips}
-            />
-            {leaderboards.dcmpDivisionWins.length > 0 && (
               <Leaderboard
                 leaderboard={{
                   data: {
-                    rankings: leaderboards.dcmpDivisionWins,
+                    rankings: leaderboards.dcmpAppearances,
                     key_type: 'team',
                   },
-                  name: 'Most District Championship Division Wins',
+                  name: 'Most District Championship Appearances',
                   year: 0,
                 }}
                 year={0}
-                contextTooltipMap={leaderboards.dcmpDivisionWinTooltips}
               />
-            )}
-            <Leaderboard
-              leaderboard={{
-                data: { rankings: leaderboards.dcmpWins, key_type: 'team' },
-                name: 'Most District Championship Wins',
-                year: 0,
-              }}
-              year={0}
-              contextTooltipMap={leaderboards.dcmpWinTooltips}
-            />
-          </div>
-        </TabsContent>
-
-        <TabsContent value="events">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Leaderboard
-              leaderboard={{
-                data: {
-                  rankings: leaderboards.eventsAttended,
-                  key_type: 'team',
-                },
-                name: 'Most District Seasons',
-                year: 0,
-              }}
-              year={0}
-            />
-            <Leaderboard
-              leaderboard={{
-                data: {
-                  rankings: leaderboards.districtEventFinalsAppearances,
-                  key_type: 'team',
-                },
-                name: 'Most District Event Finals Appearances',
-                year: 0,
-              }}
-              year={0}
-              contextTooltipMap={leaderboards.districtEventFinalsTooltips}
-            />
-            <Leaderboard
-              leaderboard={{
-                data: {
-                  rankings: leaderboards.districtEventWins,
-                  key_type: 'team',
-                },
-                name: 'Most District Event Wins',
-                year: 0,
-              }}
-              year={0}
-              contextTooltipMap={leaderboards.districtEventWinTooltips}
-            />
-            <Leaderboard
-              leaderboard={{
-                data: {
-                  rankings: leaderboards.mostMatchesPlayed,
-                  key_type: 'team',
-                },
-                name: 'Most District Matches Played',
-                year: 0,
-              }}
-              year={0}
-            />
-            {teamupLeaderboard.rankings.length > 0 && (
+              {leaderboards.dcmpDivisionFinalsAppearances.length > 0 && (
+                <Leaderboard
+                  leaderboard={{
+                    data: {
+                      rankings: leaderboards.dcmpDivisionFinalsAppearances,
+                      key_type: 'team',
+                    },
+                    name: 'Most District Championship Division Finals Appearances',
+                    year: 0,
+                  }}
+                  year={0}
+                  contextTooltipMap={leaderboards.dcmpDivisionFinalsTooltips}
+                />
+              )}
               <Leaderboard
                 leaderboard={{
                   data: {
-                    rankings: teamupLeaderboard.rankings,
+                    rankings: leaderboards.dcmpFinalsAppearances,
                     key_type: 'team',
                   },
-                  name: 'Most Successful Teamups',
+                  name: 'Most District Championship Finals Appearances',
                   year: 0,
                 }}
                 year={0}
-                contextTooltipMap={teamupLeaderboard.tooltips}
-                renderKey={(key: string) => {
-                  const parts = key.split('+');
-                  const team1 = parts[0] ?? '';
-                  const team2 = parts[1] ?? '';
-                  return (
-                    <>
-                      <TeamLink teamOrKey={team1} year={0}>
-                        {team1.substring(3)}
-                      </TeamLink>
-                      {' / '}
-                      <TeamLink teamOrKey={team2} year={0}>
-                        {team2.substring(3)}
-                      </TeamLink>
-                    </>
-                  );
-                }}
+                contextTooltipMap={leaderboards.dcmpFinalsTooltips}
               />
-            )}
-          </div>
-        </TabsContent>
-
-        <TabsContent value="awards">
-          <div className="grid gap-6 lg:grid-cols-2">
-            <Leaderboard
-              leaderboard={{
-                data: { rankings: leaderboards.blueBanners, key_type: 'team' },
-                name: 'Most District Blue Banners',
-                year: 0,
-              }}
-              year={0}
-              contextTooltipMap={leaderboards.blueBannerTooltips}
-            />
-            <Leaderboard
-              leaderboard={{
-                data: { rankings: leaderboards.mostAwards, key_type: 'team' },
-                name: 'Most District Awards',
-                year: 0,
-              }}
-              year={0}
-            />
-            {perAwardLeaderboards.map((lb) => (
+              {leaderboards.dcmpDivisionWins.length > 0 && (
+                <Leaderboard
+                  leaderboard={{
+                    data: {
+                      rankings: leaderboards.dcmpDivisionWins,
+                      key_type: 'team',
+                    },
+                    name: 'Most District Championship Division Wins',
+                    year: 0,
+                  }}
+                  year={0}
+                  contextTooltipMap={leaderboards.dcmpDivisionWinTooltips}
+                />
+              )}
               <Leaderboard
-                key={lb.name}
                 leaderboard={{
-                  data: { rankings: lb.rankings, key_type: 'team' },
-                  name: `Most ${lb.name} Wins`,
+                  data: { rankings: leaderboards.dcmpWins, key_type: 'team' },
+                  name: 'Most District Championship Wins',
                   year: 0,
                 }}
                 year={0}
-                contextTooltipMap={lb.contextTooltipMap}
+                contextTooltipMap={leaderboards.dcmpWinTooltips}
               />
-            ))}
-          </div>
-        </TabsContent>
-      </Tabs>
+            </div>
+          </TabsContent>
+
+          <TabsContent value="events">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Leaderboard
+                leaderboard={{
+                  data: {
+                    rankings: leaderboards.eventsAttended,
+                    key_type: 'team',
+                  },
+                  name: 'Most District Seasons',
+                  year: 0,
+                }}
+                year={0}
+              />
+              <Leaderboard
+                leaderboard={{
+                  data: {
+                    rankings: leaderboards.districtEventFinalsAppearances,
+                    key_type: 'team',
+                  },
+                  name: 'Most District Event Finals Appearances',
+                  year: 0,
+                }}
+                year={0}
+                contextTooltipMap={leaderboards.districtEventFinalsTooltips}
+              />
+              <Leaderboard
+                leaderboard={{
+                  data: {
+                    rankings: leaderboards.districtEventWins,
+                    key_type: 'team',
+                  },
+                  name: 'Most District Event Wins',
+                  year: 0,
+                }}
+                year={0}
+                contextTooltipMap={leaderboards.districtEventWinTooltips}
+              />
+              <Leaderboard
+                leaderboard={{
+                  data: {
+                    rankings: leaderboards.mostMatchesPlayed,
+                    key_type: 'team',
+                  },
+                  name: 'Most District Matches Played',
+                  year: 0,
+                }}
+                year={0}
+              />
+              {teamupLeaderboard.rankings.length > 0 && (
+                <Leaderboard
+                  leaderboard={{
+                    data: {
+                      rankings: teamupLeaderboard.rankings,
+                      key_type: 'team',
+                    },
+                    name: 'Most Successful Teamups',
+                    year: 0,
+                  }}
+                  year={0}
+                  contextTooltipMap={teamupLeaderboard.tooltips}
+                  renderKey={(key: string) => {
+                    const parts = key.split('+');
+                    const team1 = parts[0] ?? '';
+                    const team2 = parts[1] ?? '';
+                    return (
+                      <>
+                        <TeamLink teamOrKey={team1} year={0}>
+                          {team1.substring(3)}
+                        </TeamLink>
+                        {' / '}
+                        <TeamLink teamOrKey={team2} year={0}>
+                          {team2.substring(3)}
+                        </TeamLink>
+                      </>
+                    );
+                  }}
+                />
+              )}
+            </div>
+          </TabsContent>
+
+          <TabsContent value="awards">
+            <div className="grid gap-6 lg:grid-cols-2">
+              <Leaderboard
+                leaderboard={{
+                  data: {
+                    rankings: leaderboards.blueBanners,
+                    key_type: 'team',
+                  },
+                  name: 'Most District Blue Banners',
+                  year: 0,
+                }}
+                year={0}
+                contextTooltipMap={leaderboards.blueBannerTooltips}
+              />
+              <Leaderboard
+                leaderboard={{
+                  data: { rankings: leaderboards.mostAwards, key_type: 'team' },
+                  name: 'Most District Awards',
+                  year: 0,
+                }}
+                year={0}
+              />
+              {perAwardLeaderboards.map((lb) => (
+                <Leaderboard
+                  key={lb.name}
+                  leaderboard={{
+                    data: { rankings: lb.rankings, key_type: 'team' },
+                    name: `Most ${lb.name} Wins`,
+                    year: 0,
+                  }}
+                  year={0}
+                  contextTooltipMap={lb.contextTooltipMap}
+                />
+              ))}
+            </div>
+          </TabsContent>
+        </Tabs>
+      )}
     </div>
   );
 }
