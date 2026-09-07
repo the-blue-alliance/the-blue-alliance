@@ -1,5 +1,5 @@
-import { useQueries } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { useMemo, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
@@ -8,14 +8,14 @@ import MdiCog from '~icons/mdi/cog';
 import MdiRobotExcited from '~icons/mdi/robot-excited';
 
 import { MediaAvatar } from '~/api/tba/read';
-import { getTeamMatchesByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import {
-  getTeam,
-  getTeamAwards,
-  getTeamEvents,
-  getTeamMediaByYear,
-  getTeamSocialMedia,
-} from '~/api/tba/read/sdk.gen';
+  getTeamAwardsOptions,
+  getTeamEventsOptions,
+  getTeamMatchesByYearOptions,
+  getTeamMediaByYearOptions,
+  getTeamOptions,
+  getTeamSocialMediaOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { DoubleSlider } from '~/components/tba/doubleSlider';
 import TeamAwardsSummary from '~/components/tba/teamAwardsSummary';
 import TeamMatchStats from '~/components/tba/teamMatchStats';
@@ -27,39 +27,46 @@ import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import { sortMultipleEventsMatches } from '~/lib/matchUtils';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/stats')({
-  loader: async ({ params }) => {
-    const [team, events, awards, socials, media] = await Promise.all([
-      getTeam({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamEvents({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamAwards({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamSocialMedia({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamMediaByYear({
-        path: {
-          team_key: `frc${params.teamNumber}`,
-          year: Temporal.Now.plainDateISO().year,
-        },
-      }),
-    ]);
-    if (
-      team.data === undefined ||
-      events.data === undefined ||
-      awards.data === undefined ||
-      socials.data === undefined ||
-      media.data === undefined
-    ) {
-      throw notFound();
-    }
+  loader: async ({ params, context: { queryClient } }) => {
+    const teamKey = `frc${params.teamNumber}`;
+    // Resolved once here so the loader and the component build the same query
+    // key, rather than each reading the clock independently.
+    const mediaYear = Temporal.Now.plainDateISO().year;
 
-    return {
-      team: team.data,
-      allAwards: awards.data,
-      allEvents: events.data,
-      socials: socials.data,
-      media: media.data,
-    };
+    // spawn these now, we don't need to await them yet though
+    const awardsQuery = queryClient
+      .ensureQueryData(getTeamAwardsOptions({ path: { team_key: teamKey } }))
+      .catch(() => []);
+    const socialsQuery = queryClient
+      .ensureQueryData(
+        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+      )
+      .catch(() => []);
+    const mediaQuery = queryClient
+      .ensureQueryData(
+        getTeamMediaByYearOptions({
+          path: { team_key: teamKey, year: mediaYear },
+        }),
+      )
+      .catch(() => []);
+
+    const [team] = await Promise.all([
+      queryClient
+        .ensureQueryData(getTeamOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData(getTeamEventsOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      awardsQuery,
+      socialsQuery,
+      mediaQuery,
+    ]);
+
+    // team needs to be returned so we can access it in meta
+    return { teamKey, mediaYear, team };
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
@@ -118,7 +125,28 @@ function MatchStatsLoadingState({
 }
 
 function TeamStatsPage() {
-  const { team, allEvents, allAwards, socials, media } = Route.useLoaderData();
+  const { teamKey, mediaYear } = Route.useLoaderData();
+
+  const { data: team } = useSuspenseQuery(
+    getTeamOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: allEvents } = useSuspenseQuery(
+    getTeamEventsOptions({ path: { team_key: teamKey } }),
+  );
+  const awardsQuery = useQuery(
+    getTeamAwardsOptions({ path: { team_key: teamKey } }),
+  );
+  const allAwards = useMemo(() => awardsQuery.data ?? [], [awardsQuery.data]);
+  const socialsQuery = useQuery(
+    getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+  );
+  const socials = socialsQuery.data ?? [];
+  const mediaQuery = useQuery(
+    getTeamMediaByYearOptions({
+      path: { team_key: teamKey, year: mediaYear },
+    }),
+  );
+  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
 
   const [includeOffseasons, setIncludeOffseasons] = useState(false);
   const [minYear, setMinYear] = useState(allEvents[0].year);

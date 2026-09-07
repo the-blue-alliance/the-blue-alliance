@@ -1,6 +1,7 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound, useNavigate } from '@tanstack/react-router';
 
-import { getTeamsSimple } from '~/api/tba/read';
+import { getTeamsSimpleOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import FavoriteTeamsSection from '~/components/tba/favoriteTeamsSection';
 import TeamListTable from '~/components/tba/teamListTable';
 import {
@@ -16,7 +17,7 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/teams/{-$pgNum}')({
-  loader: async ({ params, context: { status } }) => {
+  loader: async ({ params, context: { status, queryClient } }) => {
     const maxPageNum = Math.floor(status.max_team_page / 2) + 1;
     const pageNum = parseParamsForTeamPgNumElseDefault(params, maxPageNum);
 
@@ -24,16 +25,16 @@ export const Route = createFileRoute('/teams/{-$pgNum}')({
       throw notFound();
     }
 
-    const [teamsSetOne, teamsSetTwo] = await Promise.all([
-      getTeamsSimple({ path: { page_num: 2 * (pageNum - 1) } }),
-      getTeamsSimple({ path: { page_num: 2 * (pageNum - 1) + 1 } }),
+    await Promise.all([
+      queryClient.ensureQueryData(
+        getTeamsSimpleOptions({ path: { page_num: 2 * (pageNum - 1) } }),
+      ),
+      queryClient.ensureQueryData(
+        getTeamsSimpleOptions({ path: { page_num: 2 * (pageNum - 1) + 1 } }),
+      ),
     ]);
-    if (teamsSetOne.data === undefined || teamsSetTwo.data === undefined) {
-      throw new Error('Failed to load teams');
-    }
-    const teams = teamsSetOne.data.concat(teamsSetTwo.data);
 
-    return { teams, pageNum, maxPageNum };
+    return { pageNum, maxPageNum };
   },
   headers: publicCacheControlHeaders(),
   head: () => {
@@ -60,7 +61,15 @@ function TeamPageNumberToRange(pageNum: number): string {
 }
 
 function TeamsPage() {
-  const { teams, pageNum, maxPageNum } = Route.useLoaderData();
+  const { pageNum, maxPageNum } = Route.useLoaderData();
+
+  const { data: teamsSetOne } = useSuspenseQuery(
+    getTeamsSimpleOptions({ path: { page_num: 2 * (pageNum - 1) } }),
+  );
+  const { data: teamsSetTwo } = useSuspenseQuery(
+    getTeamsSimpleOptions({ path: { page_num: 2 * (pageNum - 1) + 1 } }),
+  );
+  const teams = teamsSetOne.concat(teamsSetTwo);
   const navigate = useNavigate();
 
   // Base UI's Select.Value renders the raw value unless the items are

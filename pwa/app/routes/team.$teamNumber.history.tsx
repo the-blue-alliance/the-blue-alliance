@@ -1,12 +1,13 @@
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { Fragment } from 'react/jsx-runtime';
 
 import {
-  getTeam,
-  getTeamHistory,
-  getTeamSocialMedia,
-  getTeamYearsParticipated,
-} from '~/api/tba/read';
+  getTeamHistoryOptions,
+  getTeamOptions,
+  getTeamSocialMediaOptions,
+  getTeamYearsParticipatedOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { AwardBanner } from '~/components/tba/banner';
 import { EventLink, TeamLink } from '~/components/tba/links';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
@@ -24,46 +25,41 @@ import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
-import { joinComponents, publicCacheControlHeaders } from '~/lib/utils';
+import {
+  doThrowNotFound,
+  joinComponents,
+  publicCacheControlHeaders,
+} from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/history')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     const teamKey = `frc${params.teamNumber}`;
 
-    const [team, history, yearsParticipated, socials] = await Promise.all([
-      getTeam({ path: { team_key: teamKey } }),
-      getTeamHistory({ path: { team_key: teamKey } }),
-      getTeamYearsParticipated({ path: { team_key: teamKey } }),
-      getTeamSocialMedia({ path: { team_key: teamKey } }),
+    // spawn these now, we don't need to await them yet though
+    const yearsParticipatedQuery = queryClient
+      .ensureQueryData(
+        getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
+      )
+      .catch(() => []);
+    const socialsQuery = queryClient
+      .ensureQueryData(
+        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+      )
+      .catch(() => []);
+
+    const [team] = await Promise.all([
+      queryClient
+        .ensureQueryData(getTeamOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData(getTeamHistoryOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      yearsParticipatedQuery,
+      socialsQuery,
     ]);
 
-    if (team.data === undefined) {
-      throw notFound();
-    }
-
-    if (
-      history.data === undefined ||
-      yearsParticipated.data === undefined ||
-      socials.data === undefined
-    ) {
-      throw new Error('Failed to load team history');
-    }
-
-    history.data.events
-      .sort(
-        (a, b) =>
-          a.year - b.year ||
-          (a.week ?? 100) - (b.week ?? 100) ||
-          Date.parse(a.start_date) - Date.parse(b.start_date),
-      )
-      .reverse();
-
-    return {
-      team: team.data,
-      history: history.data,
-      yearsParticipated: yearsParticipated.data,
-      socials: socials.data,
-    };
+    // team needs to be returned so we can access it in meta
+    return { teamKey, team };
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
@@ -97,20 +93,37 @@ export const Route = createFileRoute('/team/$teamNumber/history')({
 });
 
 function TeamHistoryPage(): React.JSX.Element {
-  const { team, history, yearsParticipated, socials } = Route.useLoaderData();
+  const { teamKey } = Route.useLoaderData();
 
-  yearsParticipated.sort((a, b) => b - a);
-  history.events.sort(sortEventsComparator).reverse();
+  const { data: team } = useSuspenseQuery(
+    getTeamOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: history } = useSuspenseQuery(
+    getTeamHistoryOptions({ path: { team_key: teamKey } }),
+  );
+  const yearsParticipatedQuery = useQuery(
+    getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
+  );
+  const socialsQuery = useQuery(
+    getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+  );
+
+  // These arrays live in the query cache, so sort copies rather than in place.
+  const yearsParticipated = (yearsParticipatedQuery.data ?? []).toSorted(
+    (a, b) => b - a,
+  );
+  const socials = socialsQuery.data ?? [];
+  const events = history.events.toSorted(sortEventsComparator).toReversed();
   const awardsSortedByEventDate = sortAwardsByEventDate(
     history.awards,
-    history.events,
+    events,
   ).toReversed();
 
   const bannerAwards = awardsSortedByEventDate
     .filter((a) => BLUE_BANNER_AWARDS.has(a.award_type))
     .filter((a) =>
       SEASON_EVENT_TYPES.has(
-        history.events.find((e) => e.key === a.event_key)?.event_type ?? -1,
+        events.find((e) => e.key === a.event_key)?.event_type ?? -1,
       ),
     );
 
@@ -164,14 +177,13 @@ function TeamHistoryPage(): React.JSX.Element {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {history.events.map((e, i) => (
+              {events.map((e, i) => (
                 <Fragment key={e.key}>
-                  {(i == 0 || history.events[i - 1].year !== e.year) && (
+                  {(i == 0 || events[i - 1].year !== e.year) && (
                     <TableRow>
                       <TableCell
                         rowSpan={
-                          history.events.filter((e2) => e2.year === e.year)
-                            .length + 1
+                          events.filter((e2) => e2.year === e.year).length + 1
                         }
                       >
                         <TeamLink teamOrKey={team} year={e.year}>
@@ -215,9 +227,7 @@ function TeamHistoryPage(): React.JSX.Element {
             {bannerAwards.length > 0 && (
               <div className="flex w-96 flex-row flex-wrap justify-center gap-2">
                 {bannerAwards.map((a) => {
-                  const event = history.events.find(
-                    (e) => e.key === a.event_key,
-                  );
+                  const event = events.find((e) => e.key === a.event_key);
                   if (event === undefined) {
                     return null;
                   }
