@@ -5,7 +5,6 @@ from typing import Callable, Type, TypeVar
 
 from flask import g, jsonify, make_response, request, Response
 
-from backend.api.client_api_auth_helper import ClientApiAuthHelper
 from backend.api.client_api_types import VoidRequest
 from backend.api.handlers.helpers.etag_helper import (
     get_incoming_etags,
@@ -13,8 +12,6 @@ from backend.api.handlers.helpers.etag_helper import (
     normalize_etag,
     save_etag_dependencies,
 )
-from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
-from backend.common.auth import current_user
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
@@ -64,6 +61,8 @@ def api_authenticated(func):
                         401,
                     )
             else:
+                from backend.common.auth import current_user
+
                 user = current_user()
                 if user:
                     auth_owner_id = user.account_key.id()
@@ -98,6 +97,8 @@ def require_write_auth(auth_types: set[AuthType] | None, file_param: str | None 
                         fms_report_type = None
 
                 # This will abort the request on failure
+                from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
+
                 TrustedApiAuthHelper.do_trusted_api_auth(
                     event_key, fms_report_type, auth_types, file_param
                 )
@@ -120,6 +121,8 @@ def require_moderation_permission(permissions: set[AccountPermission]):
         @wraps(func)
         def decorated_function(*args, **kwargs):
             with Span("require_moderation_permission"):
+                from backend.api.client_api_auth_helper import ClientApiAuthHelper
+
                 user = ClientApiAuthHelper.get_current_user()
                 if user is None:
                     return make_response(
