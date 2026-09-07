@@ -119,6 +119,24 @@ def test_AppspotRedirectMiddleware_no_redirect_localhost(app: Flask) -> None:
     assert location_header is None
 
 
+def test_AppspotRedirectMiddleware_no_redirect_ah_path(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    @app.route("/_ah/warmup")
+    def warmup_handler():
+        return "warmup ok"
+
+    # Test no redirect for /_ah/ paths on appspot host
+    environ = create_environ(
+        path="/_ah/warmup", base_url="https://tbatv-prod-hrd.appspot.com"
+    )
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "200 OK"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header is None
+
+
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
     middleware = TraceRequestMiddleware(app)
     assert middleware.app is app

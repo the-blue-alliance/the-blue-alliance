@@ -25,7 +25,10 @@ class AppspotRedirectMiddleware:
         request = Request(environ)
         host = request.host.lower()
 
-        if host in ("tbatv-prod-hrd.appspot.com", "www.tbatv-prod-hrd.appspot.com"):
+        if not request.path.startswith("/_ah/") and host in (
+            "tbatv-prod-hrd.appspot.com",
+            "www.tbatv-prod-hrd.appspot.com",
+        ):
             redirect_url = f"https://www.thebluealliance.com{request.full_path}"
 
             # Create a 301 (permanent) redirect response
