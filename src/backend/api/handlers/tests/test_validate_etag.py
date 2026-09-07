@@ -280,10 +280,13 @@ def test_validate_etag_fallback_on_memcache_error(
     )
     etag = resp1.headers.get("ETag")
 
-    # Track handler execution via Team.get_by_id_async
-    original_get_by_id_async = Team.get_by_id_async
-    mock_get_by_id_async = MagicMock(side_effect=original_get_by_id_async)
-    monkeypatch.setattr(Team, "get_by_id_async", mock_get_by_id_async)
+    # Track handler execution via track_call_after_response
+    from backend.api.handlers.team import track_call_after_response
+
+    mock_track_call = MagicMock(side_effect=track_call_after_response)
+    monkeypatch.setattr(
+        "backend.api.handlers.team.track_call_after_response", mock_track_call
+    )
 
     # Simulate Memcache failure during validation
     monkeypatch.setattr(
@@ -299,7 +302,7 @@ def test_validate_etag_fallback_on_memcache_error(
     )
     assert resp2.status_code in (200, 304)
     # Handler must have run (not fast-path short-circuited)
-    mock_get_by_id_async.assert_called()
+    mock_track_call.assert_called()
 
 
 def test_event_alliances_etag_invalidated_on_event_team_update(

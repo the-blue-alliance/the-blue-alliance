@@ -45,9 +45,15 @@ def clear_context_cache(monkeypatch: pytest.MonkeyPatch) -> None:
 
 @pytest.fixture(autouse=True)
 def clear_auth_key_cache() -> None:
-    from backend.api.handlers.decorators import auth_key_cache
+    from backend.api.handlers.decorators import (
+        auth_key_cache,
+        key_does_not_exist_cache,
+        key_exists_cache,
+    )
 
     auth_key_cache.clear()
+    key_exists_cache.clear()
+    key_does_not_exist_cache.clear()
 
 
 @pytest.fixture()

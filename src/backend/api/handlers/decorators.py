@@ -2,7 +2,7 @@ import json
 import logging
 from dataclasses import dataclass
 from functools import wraps
-from typing import Callable, Optional, Type, TypeVar
+from typing import Any, Callable, Optional, Type, TypeVar
 
 from flask import g, jsonify, make_response, request, Response
 
@@ -220,61 +220,118 @@ def client_api_method(
     return decorator
 
 
+KEY_EXISTS_CACHE_TTL: float = 600.0  # 10 minutes
+KEY_EXISTS_CACHE_MAX_SIZE: int = 5000
+key_exists_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
+    ttl_seconds=KEY_EXISTS_CACHE_TTL, max_size=KEY_EXISTS_CACHE_MAX_SIZE
+)
+
+KEY_DOES_NOT_EXIST_CACHE_TTL: float = 60.0  # 1 minute (aligned with 61s 404 cache)
+KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE: int = 2000
+key_does_not_exist_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
+    ttl_seconds=KEY_DOES_NOT_EXIST_CACHE_TTL, max_size=KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE
+)
+
+
+@dataclass(frozen=True)
+class _KeyValidator:
+    param_name: str
+    key_type: str
+    entity_name: str
+    validate_format: Callable[[str], bool]
+    fetch_async: Callable[[str], Any]
+    resolve_key: Optional[Callable[[str], str]] = None
+
+
+_KEY_VALIDATORS: tuple[_KeyValidator, ...] = (
+    _KeyValidator(
+        param_name="team_key",
+        key_type="team",
+        entity_name="Team",
+        validate_format=Team.validate_key_name,
+        fetch_async=Team.get_by_id_async,
+    ),
+    _KeyValidator(
+        param_name="event_key",
+        key_type="event",
+        entity_name="Event",
+        validate_format=Event.validate_key_name,
+        fetch_async=Event.get_by_id_async,
+        resolve_key=EventCodeExceptions.resolve,
+    ),
+    _KeyValidator(
+        param_name="match_key",
+        key_type="match",
+        entity_name="Match",
+        validate_format=Match.validate_key_name,
+        fetch_async=Match.get_by_id_async,
+    ),
+    _KeyValidator(
+        param_name="district_key",
+        key_type="district",
+        entity_name="District",
+        validate_format=District.validate_key_name,
+        fetch_async=RenamedDistricts.district_exists_async,
+    ),
+)
+
+
 def validate_keys(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         with Span("validate_keys"):
-            # Check key format
-            team_key = kwargs.get("team_key")
-            if team_key and not Team.validate_key_name(team_key):
-                return {"Error": f"{team_key} is not a valid team key"}, 404
+            # 1. Format validation
+            for validator in _KEY_VALIDATORS:
+                key = kwargs.get(validator.param_name)
+                if key and not validator.validate_format(key):
+                    return {
+                        "Error": f"{key} is not a valid {validator.key_type} key"
+                    }, 404
 
-            event_key = kwargs.get("event_key")
-            if event_key and not Event.validate_key_name(event_key):
-                return {"Error": f"{event_key} is not a valid event key"}, 404
+            # 2. Fast negative cache check
+            for validator in _KEY_VALIDATORS:
+                key = kwargs.get(validator.param_name)
+                if key and (validator.entity_name, key) in key_does_not_exist_cache:
+                    return {
+                        "Error": f"{validator.key_type} key: {key} does not exist"
+                    }, 404
 
-            match_key = kwargs.get("match_key")
-            if match_key and not Match.validate_key_name(match_key):
-                return {"Error": f"{match_key} is not a valid match key"}, 404
+            # 3. Check key existence for keys not already in key_exists_cache
+            pending_checks: list[tuple[_KeyValidator, str, Optional[str], Any]] = []
+            for validator in _KEY_VALIDATORS:
+                key = kwargs.get(validator.param_name)
+                if not key or (validator.entity_name, key) in key_exists_cache:
+                    continue
 
-            district_key = kwargs.get("district_key")
-            if district_key and not District.validate_key_name(district_key):
-                return {"Error": f"{district_key} is not a valid district key"}, 404
+                lookup_key = (
+                    validator.resolve_key(key) if validator.resolve_key else key
+                )
+                if lookup_key != key:
+                    if (validator.entity_name, lookup_key) in key_exists_cache:
+                        key_exists_cache.set((validator.entity_name, key), True)
+                        continue
+                    if (validator.entity_name, lookup_key) in key_does_not_exist_cache:
+                        key_does_not_exist_cache.set((validator.entity_name, key), True)
+                        return {
+                            "Error": f"{validator.key_type} key: {key} does not exist"
+                        }, 404
 
-            # Check key existence
-            team_future = None
-            if team_key:
-                team_future = Team.get_by_id_async(team_key)
-
-            event_future = None
-            if event_key:
-                event_key = EventCodeExceptions.resolve(event_key)
-                event_future = Event.get_by_id_async(event_key)
-
-            match_future = None
-            if match_key:
-                match_future = Match.get_by_id_async(match_key)
-
-            district_exists_future = None
-            if district_key:
-                district_exists_future = RenamedDistricts.district_exists_async(
-                    district_key
+                future = validator.fetch_async(lookup_key)
+                pending_checks.append(
+                    (validator, key, lookup_key if lookup_key != key else None, future)
                 )
 
-            if team_future is not None and not team_future.get_result():
-                return {"Error": f"team key: {team_key} does not exist"}, 404
+            # 4. Resolve futures and populate positive / negative caches
+            for validator, key, resolved_key, future in pending_checks:
+                if not future.get_result():
+                    key_does_not_exist_cache.set((validator.entity_name, key), True)
+                    return {
+                        "Error": f"{validator.key_type} key: {key} does not exist"
+                    }, 404
 
-            if event_future is not None and not event_future.get_result():
-                return {"Error": f"event key: {event_key} does not exist"}, 404
-
-            if match_future is not None and not match_future.get_result():
-                return {"Error": f"match key: {match_key} does not exist"}, 404
-
-            if (
-                district_exists_future is not None
-                and not district_exists_future.get_result()
-            ):
-                return {"Error": f"district key: {district_key} does not exist"}, 404
+                key_exists_cache.set((validator.entity_name, key), True)
+                if resolved_key:
+                    key_exists_cache.set((validator.entity_name, resolved_key), True)
 
         return func(*args, **kwargs)
 
