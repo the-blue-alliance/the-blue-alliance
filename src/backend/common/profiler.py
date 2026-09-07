@@ -3,6 +3,7 @@
 import logging
 import random
 from datetime import datetime
+from typing import Optional
 
 from werkzeug.local import Local
 
@@ -63,6 +64,17 @@ def _make_tracing_call(body):
 
 
 class Span(object):
+    @staticmethod
+    def _get_span_stack() -> list["Span"]:
+        if hasattr(trace_context, "request") and trace_context.request:
+            if not hasattr(trace_context.request, "span_stack"):
+                trace_context.request.span_stack = []
+            return trace_context.request.span_stack
+        else:
+            if not hasattr(trace_context, "span_stack"):
+                trace_context.span_stack = []
+            return trace_context.span_stack
+
     def __init__(self, name: str):
         """
         Start a Span
@@ -71,6 +83,9 @@ class Span(object):
         """
         self._name = name
         self._labels = {}  # Cloud Trace spans support labels
+        self._span_id = str(random.getrandbits(64))
+        self._root_span_id: Optional[str] = None
+        self._parent_span_id: Optional[str] = None
 
         if hasattr(trace_context, "request") and trace_context.request:
             tcontext = trace_context.request.headers.get(
@@ -84,9 +99,22 @@ class Span(object):
             trace_id, root_span_id = tcontext.split(";")[0].split("/")
             trace_context.request.trace_id = trace_id
             self._root_span_id = root_span_id
+            self._parent_span_id = root_span_id
 
         else:
             self._do_trace = False
+
+        stack = self._get_span_stack()
+        if stack:
+            self._parent_span_id = stack[-1]._span_id
+
+    @property
+    def span_id(self) -> str:
+        return self._span_id
+
+    @property
+    def parent_span_id(self) -> Optional[str]:
+        return self._parent_span_id
 
     def set_label(self, key: str, value: str) -> None:
         """
@@ -102,11 +130,23 @@ class Span(object):
     def __enter__(self):
         if self._do_trace:
             logging.debug("CREATED SPAN: {}".format(self._name))
+        stack = self._get_span_stack()
+        if stack:
+            self._parent_span_id = stack[-1]._span_id
+        else:
+            self._parent_span_id = self._root_span_id
+        stack.append(self)
         self._startTime = datetime.now()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback):
         self._endTime = datetime.now()
+        stack = self._get_span_stack()
+        if stack and stack[-1] is self:
+            stack.pop()
+        elif self in stack:
+            stack.remove(self)
+
         if self._do_trace:
             if not hasattr(trace_context.request, "spans"):
                 trace_context.request.spans = []
@@ -118,8 +158,8 @@ class Span(object):
         span_dict = {
             "kind": "SPAN_KIND_UNSPECIFIED",
             "name": self._name,
-            "parentSpanId": self._root_span_id,
-            "spanId": str(random.getrandbits(64)),
+            "parentSpanId": self._parent_span_id,
+            "spanId": self._span_id,
             "startTime": self._startTime.isoformat() + "Z",
             "endTime": self._endTime.isoformat() + "Z",
         }
