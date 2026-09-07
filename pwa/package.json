@@ -3,7 +3,7 @@
   "private": true,
   "sideEffects": false,
   "type": "module",
-  "packageManager": "pnpm@11.18.0",
+  "packageManager": "pnpm@12.3.4",
   "scripts": {
     "build": "pnpm run build:app && pnpm run build:server && pnpm run build:sw",
     "build:app": "vite build",
@@ -111,7 +111,7 @@
   },
   "engines": {
     "node": ">=22",
-    "pnpm": "11.18.0"
+    "pnpm": "12.3.4"
   },
   "overrides": {
     "react-is": "19.1.0"
