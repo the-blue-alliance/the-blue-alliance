@@ -84,10 +84,10 @@ export function getRouter() {
       sendDefaultPii: false,
       enableLogs: true,
       enableMetrics: true,
-      tracesSampleRate: 1,
+      tracesSampleRate: 0.1,
       replaysSessionSampleRate: 0.1,
       replaysOnErrorSampleRate: 1,
-      profilesSampleRate: 1,
+      profilesSampleRate: 0.1,
 
       integrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
       enabled: process.env.NODE_ENV === 'production',
