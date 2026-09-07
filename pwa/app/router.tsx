@@ -1,4 +1,8 @@
-import * as Sentry from '@sentry/tanstackstart-react';
+import {
+  captureException,
+  init as sentryInit,
+  tanstackRouterBrowserTracingIntegration,
+} from '@sentry/tanstackstart-react';
 import { ParsedLocation, createRouter } from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { useEffect } from 'react';
@@ -79,17 +83,14 @@ export function getRouter() {
   });
 
   if (!router.isServer) {
-    Sentry.init({
+    sentryInit({
       dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
       sendDefaultPii: false,
       enableLogs: true,
       enableMetrics: true,
       tracesSampleRate: 0.1,
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1,
-      profilesSampleRate: 0.1,
 
-      integrations: [Sentry.tanstackRouterBrowserTracingIntegration(router)],
+      integrations: [tanstackRouterBrowserTracingIntegration(router)],
       enabled: process.env.NODE_ENV === 'production',
     });
     void registerServiceWorker();
@@ -144,7 +145,7 @@ function ErrorComponent({ error }: { error: Error }) {
     // onError handler (see ~/lib/queryClient.ts), which reports them to
     // Sentry — avoid double-reporting the same failure.
     if (!(error instanceof ApiError)) {
-      Sentry.captureException(error);
+      captureException(error);
     }
   }, [error]);
 

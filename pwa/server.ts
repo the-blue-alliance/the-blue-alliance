@@ -15,7 +15,7 @@ Sentry.init({
   sendDefaultPii: false,
   enableLogs: true,
   enableMetrics: true,
-  tracesSampleRate: 1.0,
+  tracesSampleRate: 0.05,
 });
 
 const app = express();
@@ -65,9 +65,6 @@ const nodeHandler = toNodeHandler((request) => handler.fetch(request)) as (
 ) => Promise<void>;
 
 app.use(async (req, res, next) => {
-  // Enable JavaScript profiling for Sentry browser profiling
-  res.setHeader('Document-Policy', 'js-profiling');
-
   try {
     await nodeHandler(req, res);
   } catch (error) {
