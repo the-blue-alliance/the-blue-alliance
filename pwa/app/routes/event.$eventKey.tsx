@@ -432,10 +432,11 @@ function EventPage() {
     [matches],
   );
 
+  const isCmpFinals = event.event_type === EventType.CMP_FINALS;
   const shouldPreviewAwardsTab =
     SEASON_EVENT_TYPES.has(event.event_type) && hasEventEnded(event);
   const shouldPreviewInsightsTab = matches.length > 0;
-  const shouldPreviewRankingsTab = matches.length > 0;
+  const shouldPreviewRankingsTab = matches.length > 0 && !isCmpFinals;
 
   return (
     <div className="py-8">
@@ -602,15 +603,17 @@ function EventPage() {
               </InlineIcon>
             </AnimatedTabsTrigger>
           )}
-          {(shouldPreviewRankingsTab ||
-            (rankingsQuery.data && rankingsQuery.data.rankings.length > 0)) && (
-            <AnimatedTabsTrigger value="rankings">
-              <InlineIcon>
-                <RankingsIcon />
-                Rankings
-              </InlineIcon>
-            </AnimatedTabsTrigger>
-          )}
+          {!isCmpFinals &&
+            (shouldPreviewRankingsTab ||
+              (rankingsQuery.data &&
+                rankingsQuery.data.rankings.length > 0)) && (
+              <AnimatedTabsTrigger value="rankings">
+                <InlineIcon>
+                  <RankingsIcon />
+                  Rankings
+                </InlineIcon>
+              </AnimatedTabsTrigger>
+            )}
           {((shouldPreviewAwardsTab && awardsQuery.isPending) ||
             (awardsQuery.data !== undefined &&
               awardsQuery.data.length > 0)) && (
@@ -682,7 +685,7 @@ function EventPage() {
           />
         </TabsContent>
 
-        {rankingsQuery.data && (
+        {rankingsQuery.data && !isCmpFinals && (
           <TabsContent value="rankings">
             <RankingsTable
               year={event.year}
@@ -862,6 +865,21 @@ function ResultsTab({
     { slug: 'playoff-bracket', label: 'Playoff Bracket' },
   ];
 
+  const isEinstein = !hasQuals && event.event_type === EventType.CMP_FINALS;
+
+  const alliancesSection = alliances.length > 0 && (
+    <TableOfContentsSection id="alliances" setInView={setInView}>
+      <AllianceSelectionTable alliances={alliances} year={event.year} />
+    </TableOfContentsSection>
+  );
+
+  const playoffMatchesSection = (
+    <TableOfContentsSection id="playoff-matches" setInView={setInView}>
+      <h2 className="mb-2 text-xl font-medium">Playoff Matches</h2>
+      {rightSideElims}
+    </TableOfContentsSection>
+  );
+
   return (
     <>
       <TableOfContents tocItems={tocItems} inView={inView} mobileOnly />
@@ -878,18 +896,19 @@ function ResultsTab({
           </TableOfContentsSection>
         )}
 
-        <div className={`basis-full ${hasQuals ? 'lg:basis-1/2' : ''}`}>
-          {alliances.length > 0 && (
-            <TableOfContentsSection id="alliances" setInView={setInView}>
-              <AllianceSelectionTable alliances={alliances} year={event.year} />
-            </TableOfContentsSection>
-          )}
-
-          <TableOfContentsSection id="playoff-matches" setInView={setInView}>
-            <h2 className="mb-2 text-xl font-medium">Playoff Matches</h2>
-            {rightSideElims}
-          </TableOfContentsSection>
-        </div>
+        {isEinstein ? (
+          <>
+            <div className="basis-full lg:basis-1/2">
+              {playoffMatchesSection}
+            </div>
+            <div className="basis-full lg:basis-1/2">{alliancesSection}</div>
+          </>
+        ) : (
+          <div className={`basis-full ${hasQuals ? 'lg:basis-1/2' : ''}`}>
+            {alliancesSection}
+            {playoffMatchesSection}
+          </div>
+        )}
       </div>
 
       {showDoubleElim8Bracket && (
