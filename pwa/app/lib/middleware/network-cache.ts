@@ -11,7 +11,7 @@
  * freshness is owned by React Query `staleTime`; this must not run in the
  * browser as a second TTL under Query.
  */
-import * as Sentry from '@sentry/tanstackstart-react';
+import { metrics } from '@sentry/tanstackstart-react';
 import ccParser from 'cache-control-parser';
 import { LRUCache } from 'lru-cache';
 
@@ -110,7 +110,7 @@ export function createCachedFetch(
 
     if (cachedData !== undefined && isFresh) {
       hits++;
-      Sentry.metrics.count('network.cache.hit', 1, {
+      metrics.count('network.cache.hit', 1, {
         attributes: { client_platform: 'pwa' },
       });
       logger.debug({ method, url }, 'Cache HIT');
@@ -125,10 +125,10 @@ export function createCachedFetch(
       // request's critical path. Keeps SSR TTFB flat when an entry has just
       // expired instead of blocking on an origin round-trip.
       hits++;
-      Sentry.metrics.count('network.cache.hit', 1, {
+      metrics.count('network.cache.hit', 1, {
         attributes: { client_platform: 'pwa' },
       });
-      Sentry.metrics.count('network.cache.stale', 1, {
+      metrics.count('network.cache.stale', 1, {
         attributes: { client_platform: 'pwa' },
       });
       logger.debug(
@@ -148,7 +148,7 @@ export function createCachedFetch(
     }
 
     misses++;
-    Sentry.metrics.count('network.cache.miss', 1, {
+    metrics.count('network.cache.miss', 1, {
       attributes: { client_platform: 'pwa' },
     });
 

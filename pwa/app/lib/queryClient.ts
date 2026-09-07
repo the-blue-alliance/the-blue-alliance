@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/tanstackstart-react';
+import { captureException } from '@sentry/tanstackstart-react';
 import { QueryCache, QueryClient } from '@tanstack/react-query';
 import { Temporal } from 'temporal-polyfill';
 
@@ -78,7 +78,7 @@ export function createQueryClient(): QueryClient {
           { err: error, queryKey: query.queryKey },
           'Query failed',
         );
-        Sentry.captureException(error, {
+        captureException(error, {
           contexts: { query: { queryKey: query.queryKey } },
         });
       },
