@@ -38,9 +38,6 @@ $(document).ready(function(){
     window.location.hash = this.hash;
   });
 
-	// Fancybox
-	$(".fancybox").fancybox();
-
   // Tooltips
   $('body').tooltip({
       selector: '[rel~=tooltip]'
