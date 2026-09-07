@@ -2,7 +2,7 @@ import datetime
 import time
 from datetime import timedelta
 
-from flask import Flask, make_response, Response
+from flask import abort, Flask, make_response, Response
 from flask_caching import CachedResponse
 from freezegun import freeze_time
 from werkzeug.http import http_date
@@ -346,3 +346,85 @@ def test_memoize_with_memcache(app: Flask, memcache_stub) -> None:
     resp2 = app.test_client().get("/")
     assert resp2.status_code == 200
     assert resp2.data == b"1"
+
+
+def test_cached_public_404_cache_control(app: Flask) -> None:
+    @app.route("/")
+    @cached_public(ttl=3600)
+    def view():
+        return "Not Found", 404
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 404
+    assert resp.headers.get("Cache-Control") == "public, max-age=61, s-maxage=61"
+
+
+def test_cached_public_404_abort_cache_control(app: Flask) -> None:
+    @app.route("/")
+    @cached_public(ttl=3600)
+    def view():
+        abort(404)
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 404
+    assert resp.headers.get("Cache-Control") == "public, max-age=61, s-maxage=61"
+
+
+def test_flask_cache_with_memcache_404_overrides_ttl(app: Flask, memcache_stub) -> None:
+    configure_flask_cache(app)
+
+    calls = 0
+
+    @app.route("/")
+    @cached_public(ttl=3600)
+    def view():
+        nonlocal calls
+        calls += 1
+        return "Not Found", 404
+
+    assert hasattr(app, "cache")
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 404
+    assert calls == 1
+
+    cached_entry = app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc")
+    assert cached_entry is not None
+    assert isinstance(cached_entry, CachedResponse)
+    assert cached_entry.timeout == 61
+
+    resp2 = app.test_client().get("/")
+    assert resp2.status_code == 404
+    assert calls == 1
+
+
+def test_flask_cache_with_memcache_abort_404_overrides_ttl(
+    app: Flask, memcache_stub
+) -> None:
+    configure_flask_cache(app)
+
+    calls = 0
+
+    @app.route("/")
+    @cached_public(ttl=3600)
+    def view():
+        nonlocal calls
+        calls += 1
+        abort(404)
+
+    assert hasattr(app, "cache")
+    assert isinstance(app.cache.cache, MemcacheFlaskResponseCache)  # pyre-ignore[16]
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 404
+    assert calls == 1
+
+    cached_entry = app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc")
+    assert cached_entry is not None
+    assert isinstance(cached_entry, CachedResponse)
+    assert cached_entry.timeout == 61
+
+    resp2 = app.test_client().get("/")
+    assert resp2.status_code == 404
+    assert calls == 1
