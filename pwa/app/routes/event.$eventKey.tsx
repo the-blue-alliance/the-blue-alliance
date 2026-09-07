@@ -45,6 +45,7 @@ import {
   getEventMediaOptions,
   getEventNexusInfoOptions,
   getEventOptions,
+  getEventPlayoffAdvancementOptions,
   getEventRankingsOptions,
   getEventSimpleOptions,
   getEventTeamMediaOptions,
@@ -81,6 +82,7 @@ import {
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import RankingsTable from '~/components/tba/rankingsTable';
+import RoundRobinRankingsTable from '~/components/tba/roundRobinRankingsTable';
 import ScoutingTab from '~/components/tba/scoutingTab';
 import SmugmugAlbumGallery from '~/components/tba/smugmugAlbumGallery';
 import { WebcastIcon } from '~/components/tba/socialBadges';
@@ -123,7 +125,10 @@ import {
 } from '~/components/ui/table';
 import { TabsContent, TabsList } from '~/components/ui/tabs';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
-import { TRADITIONAL_BRACKET_TYPES } from '~/lib/api/PlayoffType';
+import {
+  ROUND_ROBIN_TYPES,
+  TRADITIONAL_BRACKET_TYPES,
+} from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
   getCurrentWeekEvents,
@@ -219,6 +224,17 @@ export const Route = createFileRoute('/event/$eventKey')({
       void queryClient
         .ensureQueryData({
           ...getEventSimpleOptions({ path: { event_key: key } }),
+          staleTime: eventStaleTime,
+        })
+        .catch(() => undefined);
+    }
+
+    if (ROUND_ROBIN_TYPES.has(event.playoff_type)) {
+      void queryClient
+        .ensureQueryData({
+          ...getEventPlayoffAdvancementOptions({
+            path: { event_key: params.eventKey },
+          }),
           staleTime: eventStaleTime,
         })
         .catch(() => undefined);
@@ -856,6 +872,18 @@ function ResultsTab({
   const showTraditionalBracket =
     alliances.length > 0 && TRADITIONAL_BRACKET_TYPES.has(event.playoff_type);
 
+  const isRoundRobin = ROUND_ROBIN_TYPES.has(event.playoff_type);
+
+  const playoffAdvancementQuery = useQuery({
+    ...getEventPlayoffAdvancementOptions({ path: { event_key: event.key } }),
+    staleTime: staleTimeForYear(event.year),
+    enabled: isRoundRobin,
+  });
+
+  const roundRobinAdvancement = playoffAdvancementQuery.data?.find(
+    (level) => level.type === 'round_robin',
+  );
+
   const tocItems = [
     ...(hasQuals
       ? [{ slug: 'qual-matches', label: 'Qualification Matches' }]
@@ -870,6 +898,12 @@ function ResultsTab({
   const alliancesSection = alliances.length > 0 && (
     <TableOfContentsSection id="alliances" setInView={setInView}>
       <AllianceSelectionTable alliances={alliances} year={event.year} />
+      {roundRobinAdvancement && (
+        <RoundRobinRankingsTable
+          advancement={roundRobinAdvancement}
+          year={event.year}
+        />
+      )}
     </TableOfContentsSection>
   );
 
