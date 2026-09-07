@@ -292,6 +292,64 @@ def test_week_stored_in_context_cache() -> None:
     assert context_cache.get("2019_season_start") == datetime(2019, 3, 4, 0, 0)
 
 
+def test_week_falsy_zero_short_circuit() -> None:
+    e = Event(
+        year=2020,
+        event_type_enum=EventType.REGIONAL,
+        official=True,
+    )
+    e._week = 0
+
+    from backend.common.context_cache import context_cache
+
+    assert context_cache.get("2020_season_start") is None
+
+    # Should return 0 immediately without computing or caching season_start
+    assert e.week == 0
+    assert context_cache.get("2020_season_start") is None
+
+
+@pytest.mark.no_bypass_first_event_start_dates
+def test_week_from_hardcoded_season_helper() -> None:
+    # 2024 has start date hardcoded in SeasonHelper (2024-02-24, Saturday -> season_start = 2024-02-26)
+    # Event starting on 2024-03-08 is Week 1 (11 days after 2024-02-26 -> 11 // 7 = 1)
+    e = Event(
+        id="2024test",
+        year=2024,
+        event_type_enum=EventType.REGIONAL,
+        official=True,
+        start_date=datetime(2024, 3, 8),
+        event_short="test",
+    )
+    # e is NOT put into Datastore, demonstrating hardcoded date is used without querying Datastore
+
+    assert e.week == 1
+
+    from backend.common.context_cache import context_cache
+
+    assert context_cache.get("2024_season_start") == datetime(2024, 2, 26, 0, 0)
+
+
+def test_week_fallback_unlisted_year() -> None:
+    # Year 2099 is not in SeasonHelper.FIRST_EVENT_START_DATES
+    # It must fall back to querying Datastore
+    e = Event(
+        id="2099test",
+        year=2099,
+        event_type_enum=EventType.REGIONAL,
+        official=True,
+        start_date=datetime(2099, 3, 2),  # 2099-03-02 is a Monday
+        event_short="test",
+    )
+    e.put()
+
+    assert e.week == 0
+
+    from backend.common.context_cache import context_cache
+
+    assert context_cache.get("2099_season_start") == datetime(2099, 3, 2, 0, 0)
+
+
 @pytest.mark.parametrize(LOCATION_PARAMETERS[0], LOCATION_PARAMETERS[1])
 def test_location(
     city: str, state: str, country: str, postalcode: str, output: str
