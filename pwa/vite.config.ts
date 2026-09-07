@@ -1,5 +1,4 @@
 import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
-import babel from '@rolldown/plugin-babel';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
@@ -40,11 +39,7 @@ export default defineConfig({
         filter: ({ path }) => staticRoutes.includes(path),
       },
     }),
-    react(),
-    babel({
-      presets: [reactCompilerPreset()],
-      include: [/\.(ts|tsx|js|jsx)$/],
-    }),
+    react({ compiler: true }),
     tailwindcss(),
     Icons({
       compiler: 'jsx',

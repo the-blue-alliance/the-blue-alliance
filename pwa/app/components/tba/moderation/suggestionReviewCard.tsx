@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { type JSX, useEffect, useRef, useState } from 'react';
 import { InstagramEmbed } from 'react-social-media-embed';
 import { Temporal } from 'temporal-polyfill';
@@ -23,7 +24,6 @@ import {
   matchVideoTitleWarning,
   socialProfileWarning,
 } from '~/lib/moderationUtils';
-import { cn } from '~/lib/utils';
 
 export type ReviewDecision = 'accept' | 'reject' | undefined;
 

@@ -1,8 +1,8 @@
+import { cn } from 'cn';
 import { Fragment } from 'react';
 
 import { Award, Event } from '~/api/tba/read';
 import { getNormalizedName } from '~/lib/api/AwardType';
-import { cn } from '~/lib/utils';
 
 export function AwardBanner({
   award,

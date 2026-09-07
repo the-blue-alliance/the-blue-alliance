@@ -1,5 +1,6 @@
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { Suspense, lazy, useMemo, useState } from 'react';
 
 import ParentEventIcon from '~icons/lucide/arrow-up-right';
@@ -148,7 +149,6 @@ import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
 import {
   MODEL_TYPE,
-  cn,
   doThrowNotFound,
   publicCacheControlHeaders,
   splitIntoNChunks,

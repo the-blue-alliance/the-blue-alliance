@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import {
   type Dispatch,
   type JSX,
@@ -34,7 +35,6 @@ import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-import { cn } from '~/lib/utils';
 
 const _BracketMatchCard = forwardRef<
   PlayoffMatchHandle,

@@ -1,8 +1,7 @@
 import { Accordion as AccordionPrimitive } from '@base-ui/react/accordion';
+import { cn } from 'cn';
 
 import ChevronDownIcon from '~icons/lucide/chevron-down';
-
-import { cn } from '~/lib/utils';
 
 function Accordion({
   ...props

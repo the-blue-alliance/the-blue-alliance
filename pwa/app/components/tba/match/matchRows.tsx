@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { Temporal } from 'temporal-polyfill';
 
 import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
@@ -26,7 +27,6 @@ import {
 } from '~/components/ui/tooltip';
 import { matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
-import { cn } from '~/lib/utils';
 
 interface PlaylistEntry {
   url: string;

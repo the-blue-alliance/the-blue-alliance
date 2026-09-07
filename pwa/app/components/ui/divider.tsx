@@ -1,6 +1,5 @@
+import { cn } from 'cn';
 import { type ComponentPropsWithoutRef, forwardRef } from 'react';
-
-import { cn } from '~/lib/utils';
 
 const Divider = forwardRef<HTMLSpanElement, ComponentPropsWithoutRef<'span'>>(
   ({ className, children }, ref) => (

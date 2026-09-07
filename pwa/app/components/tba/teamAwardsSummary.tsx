@@ -1,3 +1,5 @@
+import { cn } from 'cn';
+
 import { Award, AwardType, Event } from '~/api/tba/read';
 import { EventLink } from '~/components/tba/links';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
@@ -9,7 +11,7 @@ import {
   TooltipTrigger,
 } from '~/components/ui/tooltip';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { cn, pluralize } from '~/lib/utils';
+import { pluralize } from '~/lib/utils';
 
 interface TeamAwardsSummaryProps {
   awards: Award[];

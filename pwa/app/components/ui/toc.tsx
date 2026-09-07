@@ -1,11 +1,10 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 import {
   type ComponentPropsWithoutRef,
   type ElementRef,
   forwardRef,
 } from 'react';
-
-import { cn } from '~/lib/utils';
 
 interface TableOfContentsListProps extends ComponentPropsWithoutRef<'ul'> {
   indent?: number;

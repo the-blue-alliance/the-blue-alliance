@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { Fragment, type ReactNode } from 'react';
 
 import MaterialSymbolsTrophy from '~icons/material-symbols/trophy';
@@ -24,7 +25,7 @@ import {
   rankRowClassName,
   rankTextClassName,
 } from '~/lib/insightUtils';
-import { cn, pluralize } from '~/lib/utils';
+import { pluralize } from '~/lib/utils';
 
 const MAX_KEYS_PER_ROW = 20;
 

@@ -1,11 +1,10 @@
 import { Menu as DropdownMenuPrimitive } from '@base-ui/react/menu';
+import { cn } from 'cn';
 import { type ComponentProps, type HTMLAttributes } from 'react';
 
 import CheckIcon from '~icons/lucide/check';
 import ChevronRightIcon from '~icons/lucide/chevron-right';
 import CircleIcon from '~icons/lucide/circle';
-
-import { cn } from '~/lib/utils';
 
 const DropdownMenu = DropdownMenuPrimitive.Root;
 

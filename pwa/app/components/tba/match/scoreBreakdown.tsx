@@ -1,4 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 import {
   Children,
   type ComponentPropsWithoutRef,
@@ -12,7 +13,6 @@ import MdiArrowLeft from '~icons/mdi/arrow-left';
 import MdiArrowRight from '~icons/mdi/arrow-right';
 
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { cn } from '~/lib/utils';
 
 export function ScoreBreakdownTable({
   children,

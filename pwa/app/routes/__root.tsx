@@ -7,6 +7,7 @@ import {
   createRootRouteWithContext,
   useLocation,
 } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { Suspense, lazy, useEffect } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
@@ -32,7 +33,7 @@ import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { STALE_TIME } from '~/lib/queryClient';
 import { ThemeProvider } from '~/lib/theme';
-import { cn, createLogger } from '~/lib/utils';
+import { createLogger } from '~/lib/utils';
 import appCss from '~/style/tailwind.css?url';
 
 const logger = createLogger('root');

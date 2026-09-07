@@ -1,8 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
-import { type ClassValue, clsx } from 'clsx';
 import { Fragment, type ReactNode } from 'react';
-import { twMerge } from 'tailwind-merge';
 import { Temporal } from 'temporal-polyfill';
 
 import { WltRecord } from '~/api/tba/read';
@@ -32,10 +30,6 @@ export const MODEL_TYPE = {
   AWARD: 6,
   MEDIA: 7,
 } as const;
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export function removeNonNumeric(str: string): string {
   return str.replace(/\D/g, '');

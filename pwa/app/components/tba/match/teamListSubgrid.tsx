@@ -1,7 +1,7 @@
 import { VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
-import { cn } from '~/lib/utils';
 
 const teamListSubgridVariants = cva('flex items-center justify-center', {
   variants: {

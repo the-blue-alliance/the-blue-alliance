@@ -1,6 +1,5 @@
+import { cn } from 'cn';
 import { type HTMLAttributes, type ReactNode, forwardRef } from 'react';
-
-import { cn } from '~/lib/utils';
 
 const TitledCard = forwardRef<
   HTMLDivElement,
