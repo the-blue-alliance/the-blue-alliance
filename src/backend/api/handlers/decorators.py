@@ -1,7 +1,8 @@
 import json
 import logging
+from dataclasses import dataclass
 from functools import wraps
-from typing import Callable, Type, TypeVar
+from typing import Callable, Optional, Type, TypeVar
 
 from flask import g, jsonify, make_response, request, Response
 
@@ -12,6 +13,7 @@ from backend.api.handlers.helpers.etag_helper import (
     normalize_etag,
     save_etag_dependencies,
 )
+from backend.common.cache.instance_cache import InstanceCache
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_code_exceptions import EventCodeExceptions
@@ -28,6 +30,19 @@ from backend.common.profiler import Span
 from backend.common.queries.database_query import track_accessed_query_cache_keys
 
 
+@dataclass(frozen=True)
+class CachedAuth:
+    owner_id: Optional[str]
+    description: Optional[str]
+
+
+AUTH_KEY_CACHE_TTL: float = 600.0  # 10 minutes
+AUTH_KEY_CACHE_MAX_SIZE: int = 1000
+auth_key_cache: InstanceCache[str, CachedAuth] = InstanceCache(
+    ttl_seconds=AUTH_KEY_CACHE_TTL, max_size=AUTH_KEY_CACHE_MAX_SIZE
+)
+
+
 def api_authenticated(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
@@ -39,27 +54,36 @@ def api_authenticated(func):
             auth_owner_id = None
 
             if auth_key:
-                auth = ApiAuthAccess.get_by_id(auth_key)
-                if auth:
-                    auth_owner_id = auth.owner.id() if auth.owner else None
-                    # Set for our GA event tracking in `track_call_after_response`
-                    g.auth_description = auth.description
-                    # Add API key to logging context for searchability in logs
-                    set_logging_context("api_auth_key", auth_key)
-                    # Add to trace span for visibility in Cloud Trace
-                    span.set_label("api_auth_key", auth_key)
-                    span.set_label("auth_owner_id", str(auth_owner_id))
-                    # Log API key usage for visibility in GCP Console
-                    logging.info(
-                        f"API request authenticated with key: {auth_key[:16]}... (owner: {auth_owner_id})"
+                cached_auth = auth_key_cache.get(auth_key)
+                if cached_auth is None:
+                    auth = ApiAuthAccess.get_by_id(auth_key)
+                    if not auth:
+                        return (
+                            {
+                                "Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
+                            },
+                            401,
+                        )
+                    cached_auth = CachedAuth(
+                        owner_id=auth.owner.id() if auth.owner else None,
+                        description=auth.description,
                     )
+                    auth_key_cache.set(auth_key, cached_auth)
                 else:
-                    return (
-                        {
-                            "Error": "X-TBA-Auth-Key is invalid. Please get an access key at http://www.thebluealliance.com/account."
-                        },
-                        401,
-                    )
+                    span.set_label("auth_cached", "true")
+
+                auth_owner_id = cached_auth.owner_id
+                # Set for our GA event tracking in `track_call_after_response`
+                g.auth_description = cached_auth.description
+                # Add API key to logging context for searchability in logs
+                set_logging_context("api_auth_key", auth_key)
+                # Add to trace span for visibility in Cloud Trace
+                span.set_label("api_auth_key", auth_key)
+                span.set_label("auth_owner_id", str(auth_owner_id))
+                # Log API key usage for visibility in GCP Console
+                logging.info(
+                    f"API request authenticated with key: {auth_key[:16]}... (owner: {auth_owner_id})"
+                )
             else:
                 from backend.common.auth import current_user
 

@@ -43,6 +43,13 @@ def clear_context_cache(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr(context_cache, "CACHE_DATA", {})
 
 
+@pytest.fixture(autouse=True)
+def clear_auth_key_cache() -> None:
+    from backend.api.handlers.decorators import auth_key_cache
+
+    auth_key_cache.clear()
+
+
 @pytest.fixture()
 def gae_testbed() -> Generator[testbed.Testbed, None, None]:
     tb = testbed.Testbed()
