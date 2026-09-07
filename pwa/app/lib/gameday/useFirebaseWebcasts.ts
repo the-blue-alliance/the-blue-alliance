@@ -1,22 +1,14 @@
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { type Database, onValue, ref } from 'firebase/database';
+import { onValue, ref } from 'firebase/database';
 import { useEffect, useMemo } from 'react';
 
+import { getDatabaseInstance } from '~/firebase/firebaseConfig';
 import {
   type FirebaseLiveEvent,
   type FirebaseSpecialWebcast,
   type WebcastWithMeta,
   getWebcastId,
 } from '~/lib/gameday/types';
-
-// Lazy load database to avoid SSR issues
-let cachedDatabase: Database | null = null;
-async function getDatabase(): Promise<Database> {
-  if (cachedDatabase) return cachedDatabase;
-  const { database } = await import('~/firebase/firebaseConfig');
-  cachedDatabase = database;
-  return database;
-}
 
 export const FIREBASE_LIVE_EVENTS_QUERY_KEY = [
   'firebase',
@@ -51,7 +43,7 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
     let unsubscribeSpecialWebcasts: (() => void) | null = null;
 
     // Initialize Firebase subscriptions
-    void getDatabase().then((database) => {
+    void getDatabaseInstance().then((database) => {
       // Subscribe to live_events
       const liveEventsRef = ref(database, 'live_events');
       unsubscribeLiveEvents = onValue(liveEventsRef, (snapshot) => {
