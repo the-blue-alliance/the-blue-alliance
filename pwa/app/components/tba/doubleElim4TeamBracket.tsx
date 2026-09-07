@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import {
   type Dispatch,
   type JSX,
@@ -33,7 +34,6 @@ import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-import { cn } from '~/lib/utils';
 
 type MatchLabel4 =
   'Match 1' | 'Match 2' | 'Match 3' | 'Match 4' | 'Match 5' | 'Finals';

@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ClientOnly, useNavigate } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import SearchIcon from '~icons/lucide/search';
@@ -27,7 +28,6 @@ import { STALE_TIME } from '~/lib/queryClient';
 import FuzzysortFilterer, {
   FilteredSearchIndex,
 } from '~/lib/search/fuzzysortFilterer';
-import { cn } from '~/lib/utils';
 
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);

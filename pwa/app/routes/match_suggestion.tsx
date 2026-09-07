@@ -1,6 +1,7 @@
 import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { type JSX, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
@@ -41,7 +42,7 @@ import {
   getCurrentWeekEvents,
 } from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
-import { cn, publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
+import { publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
 
 export const Route = createFileRoute('/match_suggestion')({
   loader: async ({ context: { queryClient, currentSeason } }) => {

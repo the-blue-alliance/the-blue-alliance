@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import { useMemo, useState } from 'react';
 
 import MaterialSymbolsTarget from '~icons/material-symbols/target';
@@ -38,7 +39,6 @@ import {
   formatSuccessRate,
   otherMatchLevel,
 } from '~/lib/successRateUtils';
-import { cn } from '~/lib/utils';
 
 export function SuccessRateInsight({
   insight,

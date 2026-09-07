@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import {
   type ComponentProps,
   Suspense,
@@ -8,7 +9,6 @@ import {
 } from 'react';
 
 import { Tabs, TabsTrigger } from '~/components/ui/tabs';
-import { cn } from '~/lib/utils';
 
 const AnimatedTabIndicator = lazy(
   () => import('~/components/ui/animatedTabIndicator'),

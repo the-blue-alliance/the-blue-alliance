@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 
 import MdiVideo from '~icons/mdi/video';
 
@@ -20,7 +21,6 @@ import {
   stripParentPrefix,
 } from '~/lib/eventUtils';
 import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
-import { cn } from '~/lib/utils';
 
 const DISTRICT_COLORS: Record<string, string> = {
   ca: 'border-l-district-ca',

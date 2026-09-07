@@ -1,5 +1,6 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
+import { cn } from 'cn';
 import {
   type CSSProperties,
   Fragment,
@@ -40,7 +41,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
-import { cn, publicCacheControlHeaders } from '~/lib/utils';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 const REFETCH_INTERVAL = 60_000;
 

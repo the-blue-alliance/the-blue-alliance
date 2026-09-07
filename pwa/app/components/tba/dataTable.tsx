@@ -14,6 +14,7 @@ import {
   tableFeatures,
   useTable,
 } from '@tanstack/react-table';
+import { cn } from 'cn';
 import { useState } from 'react';
 
 import ColumnsIcon from '~icons/lucide/columns-3';
@@ -33,7 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { cn } from '~/lib/utils';
 
 // The built-in sort functions have to be registered here, otherwise a column's
 // default `sortFn: 'auto'` cannot resolve one.

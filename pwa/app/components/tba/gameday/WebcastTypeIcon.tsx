@@ -1,9 +1,10 @@
+import { cn } from 'cn';
+
 import MonitorPlayIcon from '~icons/lucide/monitor-play';
 import TwitchIcon from '~icons/simple-icons/twitch';
 import YouTubeIcon from '~icons/simple-icons/youtube';
 
 import type { WebcastType } from '~/lib/gameday/types';
-import { cn } from '~/lib/utils';
 
 export function WebcastTypeIcon({
   type,

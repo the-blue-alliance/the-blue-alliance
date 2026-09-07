@@ -1,7 +1,8 @@
+import { cn } from 'cn';
+
 import { EventRanking } from '~/api/tba/read';
 import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
-import { cn } from '~/lib/utils';
 
 type RankingColumnType = TbaColumnDef<EventRanking['rankings'][number]>[];
 

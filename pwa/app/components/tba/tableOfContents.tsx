@@ -1,4 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
+import { cn } from 'cn';
 import {
   createContext,
   startTransition,
@@ -23,7 +24,6 @@ import {
   TableOfContentsLink,
   TableOfContentsList,
 } from '~/components/ui/toc';
-import { cn } from '~/lib/utils';
 
 const TOCRendererContext = createContext<{
   content: React.ReactNode;

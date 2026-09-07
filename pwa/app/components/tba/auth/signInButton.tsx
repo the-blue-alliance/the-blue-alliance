@@ -1,7 +1,8 @@
+import { cn } from 'cn';
 import { AuthProvider, signInWithPopup } from 'firebase/auth';
 
 import { auth } from '~/firebase/firebaseConfig';
-import { cn, createLogger } from '~/lib/utils';
+import { createLogger } from '~/lib/utils';
 
 const authLogger = createLogger('auth');
 
