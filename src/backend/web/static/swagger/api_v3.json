@@ -10473,7 +10473,11 @@
                 ],
                 "properties": {
                   "model_created": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
                   },
                   "model_description": {
                     "type": [
@@ -10548,7 +10552,11 @@
                 ],
                 "properties": {
                   "model_created": {
-                    "type": "string"
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
                   },
                   "model_description": {
                     "type": [

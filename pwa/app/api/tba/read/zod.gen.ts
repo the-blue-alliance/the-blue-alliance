@@ -905,7 +905,7 @@ export const zMediaGrabCad = zMediaBase.and(
     type: z.literal('grabcad').optional(),
     details: z
       .object({
-        model_created: z.string(),
+        model_created: z.iso.datetime({ offset: true }).nullable(),
         model_description: z.string().nullable(),
         model_image: z.url(),
         model_name: z.string(),
@@ -940,7 +940,7 @@ export const zMediaOnshape = zMediaBase.and(
     type: z.literal('onshape').optional(),
     details: z
       .object({
-        model_created: z.string(),
+        model_created: z.iso.datetime({ offset: true }).nullable(),
         model_description: z.string().nullable(),
         model_image: z.url(),
         model_name: z.string(),

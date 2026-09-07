@@ -2763,7 +2763,7 @@ export type MediaCdThread = MediaBase & {
 export type MediaGrabCad = MediaBase & {
   type?: 'grabcad';
   details?: {
-    model_created: string;
+    model_created: string | null;
     model_description: string | null;
     model_image: string;
     model_name: string;
@@ -2789,7 +2789,7 @@ export type MediaNoDetails = MediaBase & {
 export type MediaOnshape = MediaBase & {
   type?: 'onshape';
   details?: {
-    model_created: string;
+    model_created: string | null;
     model_description: string | null;
     model_image: string;
     model_name: string;
