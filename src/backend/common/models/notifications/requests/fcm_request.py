@@ -1,5 +1,3 @@
-from firebase_admin import messaging
-
 from backend.common.models.notifications.requests.request import Request
 
 MAXIMUM_TOKENS = 500
@@ -46,6 +44,8 @@ class FCMRequest(Request):
         Returns:
             messaging.BatchResponse - Batch response object for the messages sent.
         """
+        from firebase_admin import messaging
+
         response = messaging.send_each_for_multicast(self._fcm_message(), app=self._app)
         if response.success_count > 0:
             try:
@@ -55,6 +55,8 @@ class FCMRequest(Request):
         return response
 
     def _fcm_message(self):
+        from firebase_admin import messaging
+
         platform_config = self.notification.platform_config
 
         from backend.common.consts.fcm.platform_type import PlatformType

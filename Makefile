@@ -1,4 +1,4 @@
-.PHONY: test test-inline lint lint-bash typecheck sync freeze help
+.PHONY: test test-inline lint lint-bash typecheck sync freeze benchmark-coldstart help
 
 # Default target
 help:
@@ -13,6 +13,7 @@ help:
 	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
 	@echo "  make sync                       - Sync all dev dependencies via uv"
 	@echo "  make freeze                     - Generate src/requirements.txt from pyproject.toml"
+	@echo "  make benchmark-coldstart        - Benchmark service startup and coldstart latency"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make test"
@@ -74,3 +75,8 @@ typecheck:
 # Generate src/requirements.txt from pyproject.toml for GAE deploys
 freeze:
 	uv export --no-dev --no-hashes --frozen -o src/requirements.txt
+
+# Benchmark service startup and endpoint coldstart latency
+benchmark-coldstart:
+	uv run python3 ./ops/benchmark_coldstart.py $(ARGS)
+

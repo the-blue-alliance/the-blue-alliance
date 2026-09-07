@@ -4,8 +4,6 @@ import logging
 import random
 from datetime import datetime
 
-from googleapiclient import discovery
-from oauth2client.client import GoogleCredentials
 from werkzeug.local import Local
 
 from backend.common.environment import Environment
@@ -43,6 +41,9 @@ def send_traces():
 def _make_tracing_call(body):
     if PROJECT_ID is None:
         return
+
+    from googleapiclient import discovery
+    from oauth2client.client import GoogleCredentials
 
     # Authentication is provided by the 'gcloud' tool when running locally
     # and by built-in service accounts when running on GAE, GCE, or GKE.
