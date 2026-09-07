@@ -1,10 +1,14 @@
+from __future__ import annotations
+
 import datetime
 import enum
 import logging
 import time
+from typing import Any, Optional, TYPE_CHECKING
 
-import firebase_admin
-from firebase_admin.exceptions import FirebaseError
+if TYPE_CHECKING:
+    import firebase_admin
+    from firebase_admin.exceptions import FirebaseError
 
 from backend.common.consts.client_type import ClientType, FCM_CLIENTS
 from backend.common.consts.notification_type import (
@@ -67,7 +71,15 @@ class _NotificationMode(enum.Flag):
     ALL = FCM | WEBHOOK  # pyre-ignore[8]
 
 
+_tbans_firebase_app: Optional[firebase_admin.App] = None
+
+
 def _firebase_app():
+    global _tbans_firebase_app
+    if _tbans_firebase_app is not None:
+        return _tbans_firebase_app
+
+    import firebase_admin
     from firebase_admin import credentials
 
     try:
@@ -75,12 +87,16 @@ def _firebase_app():
     except Exception:
         creds = None
     try:
-        return firebase_admin.get_app("tbans")
+        _tbans_firebase_app = firebase_admin.get_app("tbans")
     except ValueError:
-        return firebase_admin.initialize_app(creds, name="tbans")
+        _tbans_firebase_app = firebase_admin.initialize_app(creds, name="tbans")
+    return _tbans_firebase_app
 
 
-firebase_app = _firebase_app()
+def __getattr__(name: str) -> Any:
+    if name == "firebase_app":
+        return _firebase_app()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 class TBANSHelper:
@@ -525,7 +541,7 @@ class TBANSHelper:
             notification = PingNotification()
 
             fcm_request = FCMRequest(
-                firebase_app,
+                _firebase_app(),
                 notification,
                 tokens=[client.messaging_id],
             )
@@ -888,7 +904,7 @@ class TBANSHelper:
             for i in range(0, len(clients), MAXIMUM_TOKENS)
         ]:
             fcm_request = FCMRequest(
-                firebase_app,
+                _firebase_app(),
                 notification,
                 tokens=[client.messaging_id for client in subclients],
             )

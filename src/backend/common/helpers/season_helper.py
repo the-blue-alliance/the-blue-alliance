@@ -7,7 +7,20 @@ from backend.common.models.keys import Year
 from backend.common.queries.event_query import EventListQuery, LastSeasonEventQuery
 from backend.common.sitevars.apistatus import ApiStatus
 
-EST = timezone("US/Eastern")
+_est_tz = None
+
+
+def _get_est():
+    global _est_tz
+    if _est_tz is None:
+        _est_tz = timezone("US/Eastern")
+    return _est_tz
+
+
+def __getattr__(name: str):
+    if name == "EST":
+        return _get_est()
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")
 
 
 class SeasonHelper(object):
@@ -87,7 +100,7 @@ class SeasonHelper(object):
         Kickoff is always the first Saturday in January after Jan 2nd.
         In 2026, it is the second Saturday in January after Jan 2nd.
         """
-        jan_2nd = EST.localize(
+        jan_2nd = _get_est().localize(
             datetime(year=year, month=1, day=2, hour=10, minute=30, second=0)
         )
         # Since 2021, Kickoff starts at 12:00am EST

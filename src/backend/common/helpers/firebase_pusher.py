@@ -1,6 +1,7 @@
-from typing import Dict, List, Set
+from __future__ import annotations
 
-from firebase_admin import db as firebase_db
+from typing import Dict, List, Set, TYPE_CHECKING
+
 from pyre_extensions import none_throws
 
 from backend.common.consts.nexus_match_status import NexusMatchStatus
@@ -14,7 +15,6 @@ from backend.common.models.event import Event
 from backend.common.models.event_queue_status import EventQueueStatus
 from backend.common.models.keys import EventKey
 from backend.common.models.match import Match
-from backend.common.models.match_suggestion import MatchSuggestions
 from backend.common.queries.dict_converters.event_converter import EventConverter
 from backend.common.queries.dict_converters.match_converter import (
     MatchConverter,
@@ -24,12 +24,19 @@ from backend.common.sitevars.gameday_special_webcasts import (
     WebcastType as TSpecialWebcast,
 )
 
+if TYPE_CHECKING:
+    from firebase_admin import db as firebase_db
+
+    from backend.common.models.match_suggestion import MatchSuggestions
+
 
 class FirebasePusher:
     DB_URL = "https://{project}.firebaseio.com/"
 
     @classmethod
     def _get_reference(cls, key: str) -> firebase_db.Reference:
+        from firebase_admin import db as firebase_db
+
         url = cls.DB_URL.format(project=Environment.project())
         return firebase_db.reference(key, app=get_firebase_app(), url=url)
 

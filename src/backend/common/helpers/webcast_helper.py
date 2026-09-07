@@ -1,6 +1,8 @@
+from __future__ import annotations
+
 import logging
 import re
-from typing import Any, Generator, Optional, Tuple
+from typing import Any, Generator, Optional, Tuple, TYPE_CHECKING
 
 from google.appengine.ext import ndb
 
@@ -8,11 +10,13 @@ from backend.common.consts.webcast_type import WebcastType
 from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
     ParsedVideoDetails,
 )
-from backend.common.frc_api.types import WebcastDetailModelExtV33
 from backend.common.models.event import Event
 from backend.common.models.webcast import Webcast
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchResult
+
+if TYPE_CHECKING:
+    from backend.common.frc_api.types import WebcastDetailModelExtV33
 
 
 class WebcastParser:
