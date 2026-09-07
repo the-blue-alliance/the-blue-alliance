@@ -5,6 +5,8 @@ app_engine_apis: true
 
 instance_class: F1
 automatic_scaling:
+  min_pending_latency: 300ms
+  max_pending_latency: 800ms
   max_idle_instances: 1
   target_cpu_utilization: 0.9
   target_throughput_utilization: 0.9
