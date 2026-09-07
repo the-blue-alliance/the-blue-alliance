@@ -214,6 +214,46 @@ describe('Network Cache Middleware', () => {
     expect(mockFetch).toHaveBeenCalledTimes(2);
   });
 
+  it('serves a stale entry immediately and revalidates in the background', async () => {
+    let body = 'v1';
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response(body, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=1',
+          },
+        }),
+      ),
+    );
+    global.fetch = mockFetch;
+    mockServerEnvironment();
+
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/swr';
+
+    const first = await (await cachedFetch(url)).text();
+    expect(first).toBe('v1');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    body = 'v2';
+    await new Promise((resolve) => setTimeout(resolve, 1100));
+
+    const stale = await (await cachedFetch(url)).text();
+    expect(stale).toBe('v1');
+    expect(Sentry.metrics.count).toHaveBeenCalledWith(
+      'network.cache.stale',
+      1,
+      expect.anything(),
+    );
+
+    await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+
+    const fresh = await (await cachedFetch(url)).text();
+    expect(fresh).toBe('v2');
+  });
+
   it('should only cache successful responses (2xx)', async () => {
     const mockFetch = vi
       .fn<typeof fetch>()
