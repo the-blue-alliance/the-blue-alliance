@@ -72,7 +72,6 @@ module.exports = [
   // CSS and Less
   {
     entry: [
-      "./src/backend/web/static/css/precompiled_css/jquery.fancybox.css",
       "./src/backend/web/static/css/precompiled_css/tablesorter.css",
       "./src/backend/web/static/xcharts/xcharts.min.css",
       "./src/backend/web/static/css/less_css/tba_style.main.less",
