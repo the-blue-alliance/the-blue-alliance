@@ -5,6 +5,7 @@ from unittest.mock import patch
 
 from werkzeug.test import create_environ
 
+from backend.common.environment import Environment
 from backend.common.logging import (
     clear_logging_context,
     configure_logging,
@@ -519,3 +520,22 @@ def test_configure_logging_dev_uses_non_label_mode() -> None:
 
         assert context_filter is not None
         assert context_filter.use_labels is False
+
+
+def test_configure_logging_demotes_deferred_header_dump() -> None:
+    """The GAE deferred library dumps all X-AppEngine-* headers on every task.
+
+    At INFO that is ~26 GiB/month of log ingestion, so configure_logging drops it
+    to DEBUG. It stays reachable by setting LOG_LEVEL=DEBUG.
+    """
+    from google.appengine.ext.deferred import deferred  # noqa: ETBA2
+
+    from backend.common.helpers.deferred import set_deferred_log_level
+
+    set_deferred_log_level(logging.INFO)
+    assert deferred._DEFAULT_LOG_LEVEL == logging.INFO
+
+    with patch.object(Environment, "is_prod", return_value=False):
+        configure_logging()
+
+    assert deferred._DEFAULT_LOG_LEVEL == logging.DEBUG

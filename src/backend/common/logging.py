@@ -167,6 +167,15 @@ def configure_logging() -> None:
 
         root_logger.addHandler(handler)
 
+    # The App Engine deferred library logs the full set of X-AppEngine-* request
+    # headers on every deferred task execution. Each entry is ~1.4KB, and at TBA's
+    # deferred task volume that is ~26 GiB/month of Cloud Logging ingestion for a
+    # header dump nobody reads. Demote it to DEBUG so it stays reachable via
+    # LOG_LEVEL=DEBUG when actually debugging a deferred task.
+    from backend.common.helpers.deferred import set_deferred_log_level
+
+    set_deferred_log_level(logging.DEBUG)
+
     ndb_log_level = Environment.ndb_log_level()
     if ndb_log_level:
         from google.appengine.ext import ndb

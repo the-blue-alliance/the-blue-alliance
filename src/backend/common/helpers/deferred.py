@@ -12,9 +12,21 @@ from google.appengine.ext.deferred.deferred import (
     _TASKQUEUE_HEADERS,
     run,
     run_from_datastore,
+    set_log_level,
 )
 
 _DEFAULT_URL = "/_ah/queue/deferred_encoded"
+
+
+def set_deferred_log_level(log_level: int) -> None:
+    """Set the level the App Engine deferred library logs task headers at.
+
+    On every deferred task execution the library logs the full set of
+    X-AppEngine-* request headers via `logging.log(_DEFAULT_LOG_LEVEL, ...)`.
+    Exposed here so callers do not have to import the App Engine deferred
+    module directly.
+    """
+    set_log_level(log_level)
 
 
 def _serialize(obj: Any, *args, **kwargs) -> bytes:
