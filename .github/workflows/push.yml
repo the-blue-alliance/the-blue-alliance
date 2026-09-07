@@ -306,9 +306,24 @@ jobs:
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build Containers
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        uses: docker/bake-action@v7
+        with:
+          files: |
+            docker-compose.yml
+            docker-compose.ci.yml
+          targets: |
+            tba
+            firebase
+            webpack
+            datastore
+          load: true
       - name: Start Containers
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
       - name: Test Docker Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: python ./ops/test_docker_startup.py

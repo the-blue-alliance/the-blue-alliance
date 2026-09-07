@@ -234,6 +234,8 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
+              - 'docker-compose*.yml'
+              - '.github/workflows/pull_request.yml'
       # See https://github.com/puppeteer/puppeteer/issues/12818
       # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
       - name: Disable AppArmor
@@ -265,9 +267,24 @@ jobs:
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build Containers
+        if: steps.changes.outputs.web == 'true'
+        uses: docker/bake-action@v7
+        with:
+          files: |
+            docker-compose.yml
+            docker-compose.ci.yml
+          targets: |
+            tba
+            firebase
+            webpack
+            datastore
+          load: true
       - name: Start Containers
         if: steps.changes.outputs.web == 'true'
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
       - name: Test Docker Startup
         if: steps.changes.outputs.web == 'true'
         run: python ./ops/test_docker_startup.py
