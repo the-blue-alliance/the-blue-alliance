@@ -9,6 +9,7 @@ from flask import g, jsonify, make_response, request, Response
 from backend.api.client_api_types import VoidRequest
 from backend.api.handlers.helpers.etag_helper import (
     get_incoming_etags,
+    get_request_path,
     is_etag_valid,
     normalize_etag,
     save_etag_dependencies,
@@ -338,6 +339,21 @@ def validate_keys(func):
     return decorated_function
 
 
+ETAG_304_CACHE_TTL: float = 15.0  # 15 seconds
+ETAG_304_CACHE_MAX_SIZE: int = 2000
+etag_304_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
+    ttl_seconds=ETAG_304_CACHE_TTL, max_size=ETAG_304_CACHE_MAX_SIZE
+)
+
+
+def _make_304_response(etag: str) -> Response:
+    response = Response(status=304)
+    response.headers["ETag"] = f'"{etag}"'
+    if Environment.cache_control_header_enabled():
+        response.headers["Cache-Control"] = "public, max-age=61, s-maxage=61"
+    return response
+
+
 def validate_etag(func: Callable) -> Callable:
     """
     Decorator for APIv3 endpoints to short-circuit 304 responses when query dependencies haven't changed.
@@ -345,20 +361,26 @@ def validate_etag(func: Callable) -> Callable:
 
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        with Span("validate_etag"):
+        with Span("validate_etag") as span:
             if_none_match = request.headers.get("If-None-Match")
             if if_none_match:
                 try:
+                    request_path = get_request_path()
                     incoming_etags = get_incoming_etags()
                     for etag in incoming_etags:
-                        if etag and is_etag_valid(etag):
-                            response = Response(status=304)
-                            response.headers["ETag"] = f'"{etag}"'
-                            if Environment.cache_control_header_enabled():
-                                response.headers["Cache-Control"] = (
-                                    "public, max-age=61, s-maxage=61"
-                                )
-                            return response
+                        if not etag:
+                            continue
+
+                        hit_source: Optional[str] = None
+                        if etag_304_cache.get((request_path, etag)):
+                            hit_source = "memory"
+                        elif is_etag_valid(etag):
+                            etag_304_cache.set((request_path, etag), True)
+                            hit_source = "memcache"
+
+                        if hit_source:
+                            span.set_label("etag_cache_hit", hit_source)
+                            return _make_304_response(etag)
                 except Exception as e:
                     logging.warning(f"Error during validate_etag fast-path: {e}")
 
@@ -367,10 +389,9 @@ def validate_etag(func: Callable) -> Callable:
 
             if resp.status_code == 200:
                 try:
-                    etag_header = resp.headers.get("ETag")
-                    if not etag_header:
+                    if not resp.headers.get("ETag"):
                         resp.add_etag()
-                        etag_header = resp.headers.get("ETag")
+                    etag_header = resp.headers.get("ETag")
                     if etag_header and accessed_keys:
                         normalized = normalize_etag(etag_header)
                         if normalized:

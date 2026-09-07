@@ -5,6 +5,7 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
+from backend.api.handlers.decorators import etag_304_cache
 from backend.api.handlers.helpers.etag_helper import (
     get_etag_dependencies,
     normalize_etag,
@@ -94,6 +95,7 @@ def test_delete_cache_multi_invalidates_etag_304(
     team_obj.nickname = "Updated Poofs"
     team_obj.put()
     TeamQuery.delete_cache_multi({TeamQuery(team_key="frc254").cache_key})
+    etag_304_cache.clear()
 
     # Next request with old ETag should NOT return 304, but fresh 200 with new data
     resp3 = api_client.get(
@@ -162,6 +164,7 @@ def test_validate_etag_multi_query_endpoint(
     award.name_str = "Finalist"
     award.put()
     TeamAwardsQuery.delete_cache_multi({TeamAwardsQuery(team_key="frc254").cache_key})
+    etag_304_cache.clear()
 
     # Next request with old ETag must return 200 because one dependent query was invalidated
     resp3 = api_client.get(
@@ -377,6 +380,7 @@ def test_event_alliances_etag_invalidated_on_event_team_update(
     EventEventTeamsQuery.delete_cache_multi(
         {EventEventTeamsQuery(event_key="2020casj").cache_key}
     )
+    etag_304_cache.clear()
 
     # Should NOT 304 anymore, should return fresh 200 with new status
     resp3 = api_client.get(
@@ -451,6 +455,7 @@ def test_event_playoff_advancement_etag_invalidated_on_event_details_update(
     EventDetailsQuery.delete_cache_multi(
         {EventDetailsQuery(event_key="2020casj").cache_key}
     )
+    etag_304_cache.clear()
 
     # Should NOT 304 anymore, should return fresh 200 with new playoff advancement
     resp3 = api_client.get(
@@ -495,6 +500,7 @@ def test_search_index_etag_invalidated_on_new_team_page(
     # Create team on page 1 (team 600) and invalidate TeamListQuery(page=1)
     Team(id="frc600", team_number=600, nickname="Team 600").put()
     TeamListQuery.delete_cache_multi({TeamListQuery(page=1).cache_key})
+    etag_304_cache.clear()
 
     # Should NOT 304, should return fresh 200 with team 600
     resp3 = api_client.get(
@@ -539,6 +545,7 @@ def test_team_list_all_etag_invalidated_on_new_team_page(
     # Create team on page 1 (team 600) and invalidate TeamListQuery(page=1)
     Team(id="frc600", team_number=600, nickname="Team 600").put()
     TeamListQuery.delete_cache_multi({TeamListQuery(page=1).cache_key})
+    etag_304_cache.clear()
 
     # Should NOT 304, should return fresh 200 with team 600
     resp3 = api_client.get(
@@ -623,3 +630,131 @@ def test_validate_etag_span_does_not_wrap_handler(
     assert "validate_etag" in spans_during_handler
     assert "api_authenticated" in spans_during_handler
     assert "validate_keys" in spans_during_handler
+
+
+def test_validate_etag_in_memory_cache_hit_bypasses_is_etag_valid(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    # 1. Initial request: generates 200 and records query dependencies in Memcache
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = resp1.headers.get("ETag")
+    assert etag is not None
+
+    # 2. First 304 request: calls is_etag_valid and populates etag_304_cache
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp2.status_code == 304
+    assert resp2.headers.get("ETag") == etag
+
+    norm_etag = normalize_etag(etag)
+    assert norm_etag is not None
+    assert etag_304_cache.get(("/api/v3/team/frc254", norm_etag)) is True
+
+    # 3. Mock is_etag_valid to ensure it is NOT called on subsequent 304 requests
+    from backend.api.handlers.helpers import etag_helper
+
+    mock_is_etag_valid = MagicMock(side_effect=etag_helper.is_etag_valid)
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.is_etag_valid", mock_is_etag_valid
+    )
+
+    resp3 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp3.status_code == 304
+    assert resp3.headers.get("ETag") == etag
+    assert resp3.headers.get("Cache-Control") == "public, max-age=61, s-maxage=61"
+    mock_is_etag_valid.assert_not_called()
+
+
+def test_validate_etag_in_memory_cache_expiration(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    # Initial request
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    etag = resp1.headers.get("ETag")
+    assert etag is not None
+
+    # First 304 populates the cache
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp2.status_code == 304
+
+    # Expire entry by setting with expired TTL
+    norm_etag = normalize_etag(etag)
+    assert norm_etag is not None
+    etag_304_cache.set(("/api/v3/team/frc254", norm_etag), True, ttl_seconds=-1.0)
+    assert etag_304_cache.get(("/api/v3/team/frc254", norm_etag)) is None
+
+    # Next request must fall back to calling is_etag_valid
+    from backend.api.handlers.helpers import etag_helper
+
+    mock_is_etag_valid = MagicMock(side_effect=etag_helper.is_etag_valid)
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.is_etag_valid", mock_is_etag_valid
+    )
+
+    resp3 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp3.status_code == 304
+    mock_is_etag_valid.assert_called_once()
+    # Cache should be repopulated
+    assert etag_304_cache.get(("/api/v3/team/frc254", norm_etag)) is True
+
+
+def test_validate_etag_in_memory_cache_different_path(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Team(id="frc9999", team_number=9999).put()
+
+    # Populate in-memory cache for frc254
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    etag = resp1.headers.get("ETag")
+    assert etag is not None
+
+    api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    norm_etag = normalize_etag(etag)
+    assert norm_etag is not None
+    assert etag_304_cache.get(("/api/v3/team/frc254", norm_etag)) is True
+    # Different endpoint path must not be in cache
+    assert etag_304_cache.get(("/api/v3/team/frc9999", norm_etag)) is None
