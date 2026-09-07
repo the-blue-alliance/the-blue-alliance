@@ -102,22 +102,29 @@ export function getRouter() {
     );
 
     // onResolved doesn't fire for the initial hydration, so log it manually.
-    void logPageView(window.location.pathname, window.location.href);
+    // Defer to idle so Firebase Analytics (gtag.js) stays off the hydration
+    // critical path.
+    const logInitialPageView = () =>
+      void logPageView(window.location.pathname, window.location.href);
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(logInitialPageView);
+    } else {
+      setTimeout(logInitialPageView, 1);
+    }
   }
 
   return router;
 }
 
-// Firebase is dynamically imported here (mirroring the pattern in
-// useFirebaseWebcasts.ts) so `firebase/analytics` and firebaseConfig.tsx
-// (which also pulls in firebase/app and firebase/auth) stay out of the
-// entry chunk and only load once a client-side navigation actually happens.
+// `firebase/analytics` and the gtag.js network request it triggers are loaded
+// lazily here so they stay out of the hydration critical path.
 async function logPageView(pagePath: string, pageLocation: string) {
-  const [{ logEvent }, { analytics }] = await Promise.all([
+  const [{ logEvent }, { getAnalyticsInstance }] = await Promise.all([
     import('firebase/analytics'),
     import('~/firebase/firebaseConfig'),
   ]);
 
+  const analytics = await getAnalyticsInstance();
   if (analytics === null) {
     return;
   }
