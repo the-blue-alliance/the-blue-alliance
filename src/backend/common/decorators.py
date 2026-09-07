@@ -83,12 +83,16 @@ def cached_public(
             resp.add_etag()
 
             # Return 304 Not Modified if ETag matches
-            if resp.headers.get("ETag", None) in str(request.if_none_match):
-                return Response(status=304)
-
-            if request.if_modified_since is not None and resp.last_modified is not None:
-                if request.if_modified_since >= resp.last_modified:
+            if resp.status_code == 200:
+                if resp.headers.get("ETag", None) in str(request.if_none_match):
                     return Response(status=304)
+
+                if (
+                    request.if_modified_since is not None
+                    and resp.last_modified is not None
+                ):
+                    if request.if_modified_since >= resp.last_modified:
+                        return Response(status=304)
 
         return resp
 

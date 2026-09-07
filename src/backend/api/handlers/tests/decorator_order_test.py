@@ -108,6 +108,61 @@ def test_decorator_order_invalid_keys_return_404_on_cache_miss(
     assert resp_nonexistent.status_code == 404
 
 
+@pytest.mark.parametrize("cache_enabled", [True, False])
+def test_apiv3_404_returns_404_not_304_when_etag_matches(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch, cache_enabled: bool
+) -> None:
+    """
+    Ensure that 404 responses in APIv3 always return 404, not 304,
+    even when the client sends an If-None-Match header matching the 404 ETag.
+    Tests both with flask_response_cache enabled and disabled.
+    """
+    from backend.common.environment import Environment
+
+    monkeypatch.setattr(
+        Environment, "flask_response_cache_enabled", lambda: cache_enabled
+    )
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    # 1. Non-existent team key: returns 404 with ETag
+    resp1 = api_client.get(
+        "/api/v3/team/frc9999999", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 404
+    etag = resp1.headers.get("ETag")
+    assert etag is not None
+
+    # Subsequent request with matching If-None-Match must STILL return 404, not 304
+    resp2 = api_client.get(
+        "/api/v3/team/frc9999999",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp2.status_code == 404
+    assert resp2.headers.get("ETag") == etag
+    assert "Error" in resp2.json
+
+    # 2. Invalid key format: returns 404 with ETag
+    resp3 = api_client.get(
+        "/api/v3/team/not_a_valid_team_key",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp3.status_code == 404
+    bad_format_etag = resp3.headers.get("ETag")
+    assert bad_format_etag is not None
+
+    resp4 = api_client.get(
+        "/api/v3/team/not_a_valid_team_key",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": bad_format_etag},
+    )
+    assert resp4.status_code == 404
+    assert resp4.headers.get("ETag") == bad_format_etag
+    assert "Error" in resp4.json
+
+
 def test_apiv3_query_params_ignored_for_caching(
     ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
 ) -> None:

@@ -357,6 +357,13 @@ def test_cached_public_404_cache_control(app: Flask) -> None:
     resp = app.test_client().get("/")
     assert resp.status_code == 404
     assert resp.headers.get("Cache-Control") == "public, max-age=61, s-maxage=61"
+    etag = resp.headers.get("ETag")
+    assert etag is not None
+
+    # ETag match must still return 404, not 304
+    resp2 = app.test_client().get("/", headers={"If-None-Match": etag})
+    assert resp2.status_code == 404
+    assert resp2.get_data(as_text=True) == "Not Found"
 
 
 def test_cached_public_404_abort_cache_control(app: Flask) -> None:
@@ -368,6 +375,12 @@ def test_cached_public_404_abort_cache_control(app: Flask) -> None:
     resp = app.test_client().get("/")
     assert resp.status_code == 404
     assert resp.headers.get("Cache-Control") == "public, max-age=61, s-maxage=61"
+    etag = resp.headers.get("ETag")
+    assert etag is not None
+
+    # ETag match must still return 404, not 304
+    resp2 = app.test_client().get("/", headers={"If-None-Match": etag})
+    assert resp2.status_code == 404
 
 
 def test_flask_cache_with_memcache_404_overrides_ttl(app: Flask, memcache_stub) -> None:
