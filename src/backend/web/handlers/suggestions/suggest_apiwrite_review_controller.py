@@ -2,7 +2,7 @@ import random
 import string
 from dataclasses import dataclass
 from datetime import datetime, timedelta
-from typing import Any, Optional
+from typing import Any, List, Optional, Tuple
 
 from flask import redirect, request
 from google.appengine.ext import ndb
@@ -32,6 +32,55 @@ class ApiWriteTargetModel:
     message: str
 
 
+# Offsets offered in the review UI. -1 means "never expires".
+EXPIRATION_DAY_OFFSETS = [0, 1, 3, 7, -1]
+
+
+def compute_expiration(
+    event: Optional[Event], expiration_offset: int, now: datetime
+) -> Optional[datetime]:
+    """The expiration a key would get for this event at this offset.
+
+    Deliberately takes the later of two candidates, so a key granted long after
+    an event has finished is still usable for `expiration_offset` days from now
+    rather than arriving already expired. The event-relative candidate gets an
+    extra day because `end_date` is midnight at the *start* of the final day.
+
+    Returns None for "never expires". Events may have no `end_date` (some
+    offseason events don't), in which case only the now-relative candidate
+    applies.
+    """
+    if expiration_offset == -1:
+        return None
+
+    candidates = [now + timedelta(days=expiration_offset)]
+    if event is not None and event.end_date:
+        candidates.append(event.end_date + timedelta(days=expiration_offset + 1))
+    return max(candidates)
+
+
+@dataclass
+class EventDateSummary:
+    """What a reviewer needs to know about when an event is, at a glance."""
+
+    start_date: Optional[datetime]
+    end_date: Optional[datetime]
+    # Negative = event has not ended yet.
+    days_since_end: Optional[int]
+    # (offset_days, expiration_or_None) for each option in the dropdown.
+    expiration_options: List[Tuple[int, Optional[datetime]]]
+
+    @property
+    def status(self) -> str:
+        if self.days_since_end is None:
+            return "unknown"
+        if self.days_since_end > 0:
+            return "past"
+        if self.start_date is not None and self.start_date > datetime.now():
+            return "future"
+        return "ongoing"
+
+
 class SuggestApiWriteReviewController(SuggestionsReviewBase[ApiWriteTargetModel]):
     REQUIRED_PERMISSIONS = [AccountPermission.REVIEW_APIWRITE]
 
@@ -58,14 +107,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBase[ApiWriteTargetModel]
         )
         auth_types = request.form.getlist("auth_types") or []
         expiration_offset = int(request.form.get("expiration_days", ""))
-        if expiration_offset != -1:
-            expiration_event_end = event.end_date + timedelta(
-                days=expiration_offset + 1
-            )
-            expiration_now = datetime.now() + timedelta(days=expiration_offset)
-            expiration = max(expiration_event_end, expiration_now)
-        else:
-            expiration = None
+        expiration = compute_expiration(event, expiration_offset, datetime.now())
         auth = ApiAuthAccess(
             id=auth_id,
             description="{} @ {}".format(
@@ -208,10 +250,27 @@ TBA Admins
         existing_users = [
             key.owner.get() if key.owner else None for key in existing_keys
         ]
+        event = Event.get_by_id(event_key)
+        now = datetime.now()
+        days_since_end = (
+            (now.date() - event.end_date.date()).days
+            if event is not None and event.end_date
+            else None
+        )
+        date_summary = EventDateSummary(
+            start_date=event.start_date if event is not None else None,
+            end_date=event.end_date if event is not None else None,
+            days_since_end=days_since_end,
+            expiration_options=[
+                (offset, compute_expiration(event, offset, now))
+                for offset in EXPIRATION_DAY_OFFSETS
+            ],
+        )
         return (
             none_throws(suggestion.key.id()),
-            Event.get_by_id(event_key),
+            event,
             account,
             zip(existing_keys, existing_users),
             suggestion,
+            date_summary,
         )
