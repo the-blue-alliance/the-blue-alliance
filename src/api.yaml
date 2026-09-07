@@ -8,8 +8,8 @@ inbound_services:
 
 instance_class: F1
 automatic_scaling:
-  min_pending_latency: 300ms
-  max_pending_latency: 800ms
+  min_pending_latency: 2s
+  max_pending_latency: 3s
   max_idle_instances: 1
   target_cpu_utilization: 0.9
   target_throughput_utilization: 0.9
