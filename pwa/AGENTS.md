@@ -111,6 +111,7 @@ pnpm run typecheck        # Type checking
 pnpm run lint             # Lint code
 pnpm run format:fix       # Auto-format (Prettier; also sorts Tailwind classes) — run before pushing, CI checks `format`
 pnpm dlx playwright test  # E2E tests
+pnpm run lighthouse /event/2024mil --repeat 25 --warmup 2  # Lighthouse metrics for one route, median/p90/stddev over N runs, discarding warmup runs first (needs a prior `pnpm run build`); add --report out.html for the full Lighthouse report
 ```
 
 ## PR Screenshots

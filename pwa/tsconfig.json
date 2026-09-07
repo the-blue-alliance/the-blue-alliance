@@ -2,7 +2,7 @@
   "include": ["**/*.ts", "**/*.tsx", "prettier.config.js", "vite.config.js"],
   "compilerOptions": {
     "lib": ["DOM", "DOM.Iterable", "ESNext"],
-    "types": ["vite/client", "unplugin-icons/types/react"],
+    "types": ["node", "vite/client", "unplugin-icons/types/react"],
     "isolatedModules": true,
     "esModuleInterop": true,
     "jsx": "react-jsx",
