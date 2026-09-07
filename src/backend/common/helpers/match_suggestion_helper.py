@@ -8,9 +8,7 @@ user-submitted Suggestion moderation queue.
 
 import datetime
 import math
-from typing import Dict, List, Optional, Set, Tuple
-
-from google.appengine.ext import ndb
+from typing import Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -24,15 +22,14 @@ from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.helpers.team_favorite_counts_helper import TeamFavoriteCountsHelper
 from backend.common.models.event import Event
-from backend.common.models.event_details import EventDetails
-from backend.common.models.keys import TeamKey, Year
+from backend.common.models.event_predictions import MatchPrediction
+from backend.common.models.keys import MatchKey, TeamKey
 from backend.common.models.match import Match
 from backend.common.models.match_suggestion import (
     MatchSuggestion,
     MatchSuggestionComponents,
     MatchSuggestions,
 )
-from backend.common.queries.event_query import TeamYearEventsQuery
 
 # Weights sum to 1.0, so the final score also lands in [0, 1]
 W_FAVORITES: float = 0.25
@@ -78,6 +75,11 @@ TIME_DECAY_TAU_FUTURE_S: int = 15 * 60
 TIME_DECAY_TAU_PAST_S: int = 5 * 60
 TIME_HORIZON_FUTURE_S: int = 3 * 60 * 60
 TIME_HORIZON_PAST_S: int = 30 * 60
+
+# Split of the performance component between predicted match magnitude and
+# predicted closeness; sum to 1.0 so `performance` stays in [0, 1]
+W_PERF_MAGNITUDE: float = 0.5
+W_PERF_CLOSENESS: float = 0.5
 
 DEGENERATE_NORMALIZED_VALUE: float = 0.5
 EPSILON: float = 1e-9
@@ -164,19 +166,14 @@ class MatchSuggestionHelper:
             team_key for match in matches for team_key in cls._match_teams(match)
         }
 
-        oprs = cls.team_recent_oprs(team_keys, matches[0].year, now)
+        predictions = cls._match_predictions([event for event, _ in candidates])
         favorite_counts = TeamFavoriteCountsHelper.get_counts(team_keys)
 
-        raw_performance: List[float] = []
         raw_favorites: List[float] = []
-        for match in matches:
-            red = sum(
-                oprs.get(tk, 0.0) for tk in match.alliances[AllianceColor.RED]["teams"]
-            )
-            blue = sum(
-                oprs.get(tk, 0.0) for tk in match.alliances[AllianceColor.BLUE]["teams"]
-            )
-            raw_performance.append(cls._performance_kernel(red, blue))
+        predicted_indices: List[int] = []
+        raw_magnitude: List[float] = []
+        closeness_by_index: Dict[int, float] = {}
+        for i, match in enumerate(matches):
             # log1p because favorite counts are heavy-tailed -- without it a single
             # megastar team would swamp the whole component
             raw_favorites.append(
@@ -186,8 +183,24 @@ class MatchSuggestionHelper:
                 )
             )
 
-        performance = cls._min_max_normalize(raw_performance)
+            prediction = predictions.get(match.key_name)
+            if prediction is None:
+                continue
+            red_score = prediction["red"]["score"]
+            blue_score = prediction["blue"]["score"]
+            predicted_indices.append(i)
+            raw_magnitude.append(red_score + blue_score)
+            closeness_by_index[i] = min(1.0, max(0.0, 2.0 * (1.0 - prediction["prob"])))
+
         favorites = cls._min_max_normalize(raw_favorites)
+
+        magnitude_normalized = cls._min_max_normalize(raw_magnitude)
+        performance = [DEGENERATE_NORMALIZED_VALUE] * len(matches)
+        for slot, i in enumerate(predicted_indices):
+            performance[i] = (
+                W_PERF_MAGNITUDE * magnitude_normalized[slot]
+                + W_PERF_CLOSENESS * closeness_by_index[i]
+            )
 
         scored: List[Tuple[float, Event, Match, MatchSuggestionComponents]] = []
         for i, (event, match) in enumerate(candidates):
@@ -275,64 +288,30 @@ class MatchSuggestionHelper:
         )
 
     @staticmethod
-    def team_recent_oprs(
-        team_keys: Set[TeamKey], year: Year, now: datetime.datetime
-    ) -> Dict[TeamKey, float]:
+    def _match_predictions(events: List[Event]) -> Dict[MatchKey, MatchPrediction]:
         """
-        The most recent non-offseason event OPR for each team, within `year`.
+        Every stored per-match score prediction across the given events, flattened
+        into one map keyed by match key.
 
-        Walks each team's in-season events newest-first and returns the first OPR
-        it finds, rather than reading only the newest event -- during a live event
-        the newest event often has no matchstats computed yet. Teams with no
-        in-season OPR this year get 0.0.
-
-        Never looks at other years: OPR is in game-score units, so a prior
-        season's value is not comparable.
+        Predictions come from `PredictionHelper` via the event matchstats task and
+        live on `EventDetails.predictions`. They only exist for 2016+ in-season
+        events, and not until that task has first run, so this map is routinely
+        missing entries for otherwise-valid matches.
         """
-        today = now.date()
-        event_futures = {
-            team_key: TeamYearEventsQuery(team_key, year).fetch_async()
-            for team_key in sorted(team_keys)
-        }
+        unique_events = list({event.key_name: event for event in events}.values())
+        for event in unique_events:
+            event.prep_details()
 
-        team_events: Dict[TeamKey, List[Event]] = {
-            team_key: sorted(
-                (
-                    event
-                    for event in future.get_result()
-                    if event.is_in_season
-                    and event.start_date is not None
-                    and event.start_date.date() <= today
-                ),
-                key=lambda e: e.start_date,
-                reverse=True,
-            )
-            for team_key, future in event_futures.items()
-        }
+        predictions: Dict[MatchKey, MatchPrediction] = {}
+        for event in unique_events:
+            details = event.details
+            if details is None or details.predictions is None:
+                continue
+            by_level = details.predictions.get("match_predictions") or {}
+            for level_predictions in by_level.values():
+                predictions.update(level_predictions)
 
-        # Teams share events heavily, so fetch each event's stats only once
-        event_keys = sorted(
-            {event.key_name for events in team_events.values() for event in events}
-        )
-        details = ndb.get_multi([ndb.Key(EventDetails, key) for key in event_keys])
-        oprs_by_event = {
-            key: ((detail.matchstats if detail else None) or {}).get("oprs") or {}
-            for key, detail in zip(event_keys, details)
-        }
-
-        oprs: Dict[TeamKey, float] = {}
-        for team_key, events in team_events.items():
-            # matchstats is keyed by bare team id ("254"), not team key
-            team_id = team_key[3:]
-            oprs[team_key] = 0.0
-            for event in events:
-                opr = oprs_by_event[event.key_name].get(team_id)
-                if opr is not None:
-                    # Early-event fits are near rank-deficient and can go negative
-                    oprs[team_key] = max(0.0, opr)
-                    break
-
-        return oprs
+        return predictions
 
     @staticmethod
     def _time_decay(
@@ -389,13 +368,6 @@ class MatchSuggestionHelper:
                 pass
 
         return weight / MAX_LEVEL_WEIGHT
-
-    @staticmethod
-    def _performance_kernel(red_opr_sum: float, blue_opr_sum: float) -> float:
-        """
-        Favors close, high-scoring matches: (150, 150) beats (250, 50).
-        """
-        return max(red_opr_sum, blue_opr_sum) + 2 * min(red_opr_sum, blue_opr_sum)
 
     @staticmethod
     def _min_max_normalize(values: List[float]) -> List[float]:

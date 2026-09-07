@@ -4,7 +4,6 @@ from typing import Dict, List, Optional
 
 import pytest
 from freezegun import freeze_time
-from google.appengine.ext import ndb
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
@@ -264,217 +263,172 @@ def test_significance_falls_back_on_out_of_bracket_set_number() -> None:
     assert MatchSuggestionHelper._significance(event, match) == 0.4
 
 
-def test_performance_kernel_favors_close_matches() -> None:
-    close = MatchSuggestionHelper._performance_kernel(150.0, 150.0)
-    lopsided = MatchSuggestionHelper._performance_kernel(250.0, 50.0)
-    assert close == 450.0
-    assert lopsided == 350.0
-    assert close > lopsided
-
-
-def test_performance_kernel_is_symmetric() -> None:
-    assert MatchSuggestionHelper._performance_kernel(
-        200.0, 75.0
-    ) == MatchSuggestionHelper._performance_kernel(75.0, 200.0)
-
-
-def test_performance_kernel_zero() -> None:
-    assert MatchSuggestionHelper._performance_kernel(0.0, 0.0) == 0.0
-
-
 # --------------------------------------------------------------------------
-# team_recent_oprs
+# performance from stored match predictions
 # --------------------------------------------------------------------------
 
 
-def seed_team_event(
-    team_key: TeamKey,
+def seed_predictions(
     event_key: str,
-    event_type: EventType,
-    start_date: datetime.datetime,
-    oprs: Optional[Dict[str, float]] = None,
-    matchstats_is_none: bool = False,
-) -> Event:
-    from backend.common.models.event_team import EventTeam
-    from backend.common.models.team import Team
+    qual: Optional[Dict[str, tuple]] = None,
+    playoff: Optional[Dict[str, tuple]] = None,
+    predictions_is_none: bool = False,
+) -> None:
+    if predictions_is_none:
+        EventDetails(id=event_key, predictions=None).put()
+        return
 
-    Team(
-        id=team_key, team_number=int("".join(c for c in team_key[3:] if c.isdigit()))
+    def build(entries: Dict[str, tuple]) -> Dict[str, object]:
+        out = {}
+        for match_key, (red_score, blue_score, prob) in entries.items():
+            out[match_key] = {
+                "red": {"score": red_score, "score_var": 1.0},
+                "blue": {"score": blue_score, "score_var": 1.0},
+                "winning_alliance": "red" if red_score >= blue_score else "blue",
+                "prob": prob,
+            }
+        return out
+
+    match_predictions = {}
+    if qual is not None:
+        match_predictions["qual"] = build(qual)
+    if playoff is not None:
+        match_predictions["playoff"] = build(playoff)
+
+    EventDetails(
+        id=event_key,
+        predictions={
+            "match_predictions": match_predictions,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
     ).put()
-    event = make_event(event_key, event_type, start_date)
-    event.put()
-    EventTeam(
-        id=f"{event_key}_{team_key}",
-        event=event.key,
-        team=ndb.Key(Team, team_key),
-        year=event.year,
-    ).put()
-    if not matchstats_is_none:
-        EventDetails(
-            id=event_key,
-            matchstats={"oprs": oprs or {}, "dprs": {}, "ccwms": {}},
-        ).put()
-    else:
-        EventDetails(id=event_key, matchstats=None).put()
-    return event
 
 
-def test_recent_oprs_prefers_most_recent_in_season_event(
+def _upcoming_match(event: Event, match_number: int) -> Match:
+    return make_match(
+        event,
+        match_number=match_number,
+        predicted_time=NOW + datetime.timedelta(minutes=5),
+    )
+
+
+def test_performance_favors_predicted_close_matches(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1), _upcoming_match(event, 2)])
+    seed_predictions(
+        event.key_name,
+        qual={
+            "2026casj_qm1": (100.0, 100.0, 0.5),
+            "2026casj_qm2": (150.0, 50.0, 0.99),
+        },
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    close = result.suggestions["2026casj_qm1"]
+    lopsided = result.suggestions["2026casj_qm2"]
+    assert close.components.performance > lopsided.components.performance
+    assert close.rank < lopsided.rank
+
+
+def test_performance_favors_higher_scoring_predictions(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1), _upcoming_match(event, 2)])
+    seed_predictions(
+        event.key_name,
+        qual={
+            "2026casj_qm1": (150.0, 150.0, 0.6),
+            "2026casj_qm2": (50.0, 50.0, 0.6),
+        },
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    assert (
+        result.suggestions["2026casj_qm1"].components.performance
+        > result.suggestions["2026casj_qm2"].components.performance
+    )
+
+
+def test_performance_reads_playoff_predictions(ndb_stub, memcache_stub) -> None:
+    event = make_event("2026cmptx", EventType.CMP_FINALS)
+    seed_matches(
+        event,
+        [
+            make_match(
+                event,
+                comp_level=CompLevel.F,
+                match_number=1,
+                predicted_time=NOW + datetime.timedelta(minutes=5),
+            )
+        ],
+    )
+    seed_predictions(event.key_name, playoff={"2026cmptx_f1m1": (120.0, 120.0, 0.5)})
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    # Single predicted match: magnitude is neutral, closeness is full
+    performance = result.suggestions["2026cmptx_f1m1"].components.performance
+    assert performance == pytest.approx(0.75)  # pyre-ignore[16]
+
+
+def test_performance_is_neutral_without_event_details(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    assert result.suggestions["2026casj_qm1"].components.performance == 0.5
+
+
+def test_performance_is_neutral_when_predictions_is_none(
     ndb_stub, memcache_stub
 ) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 30.0},
-    )
-    seed_team_event(
-        "frc254",
-        "2026cmptx",
-        EventType.CMP_FINALS,
-        datetime.datetime(2026, 4, 29),
-        oprs={"254": 55.0},
-    )
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+    seed_predictions(event.key_name, predictions_is_none=True)
 
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 55.0}
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    assert result.suggestions["2026casj_qm1"].components.performance == 0.5
 
 
-def test_recent_oprs_ignores_later_offseason_event(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 30.0},
-    )
-    seed_team_event(
-        "frc254",
-        "2026cc",
-        EventType.OFFSEASON,
-        datetime.datetime(2026, 4, 29),
-        oprs={"254": 99.0},
-    )
-
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 30.0}
-
-
-def test_recent_oprs_falls_through_when_newest_event_has_no_matchstats(
+def test_performance_is_neutral_when_match_absent_from_predictions(
     ndb_stub, memcache_stub
 ) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 30.0},
-    )
-    seed_team_event(
-        "frc254",
-        "2026cmptx",
-        EventType.CMP_FINALS,
-        datetime.datetime(2026, 4, 29),
-        matchstats_is_none=True,
-    )
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+    seed_predictions(event.key_name, qual={"2026casj_qm99": (100.0, 100.0, 0.5)})
 
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 30.0}
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    assert result.suggestions["2026casj_qm1"].components.performance == 0.5
 
 
-def test_recent_oprs_falls_through_when_team_missing_from_oprs(
+def test_unpredicted_match_is_neutral_not_the_pool_minimum(
     ndb_stub, memcache_stub
 ) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 30.0},
+    event = make_event()
+    seed_matches(
+        event,
+        [
+            _upcoming_match(event, 1),
+            _upcoming_match(event, 2),
+            _upcoming_match(event, 3),
+        ],
     )
-    seed_team_event(
-        "frc254",
-        "2026cmptx",
-        EventType.CMP_FINALS,
-        datetime.datetime(2026, 4, 29),
-        oprs={"1114": 40.0},
-    )
-
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 30.0}
-
-
-def test_recent_oprs_zero_when_no_in_season_opr(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2026cc",
-        EventType.OFFSEASON,
-        datetime.datetime(2026, 4, 29),
-        oprs={"254": 99.0},
+    seed_predictions(
+        event.key_name,
+        qual={
+            "2026casj_qm1": (200.0, 200.0, 0.5),
+            "2026casj_qm2": (100.0, 100.0, 0.75),
+        },
     )
 
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 0.0}
-
-
-def test_recent_oprs_includes_event_starting_today(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2026cmptx",
-        EventType.CMP_FINALS,
-        NOW.replace(hour=0, minute=0),
-        oprs={"254": 55.0},
-    )
-
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 55.0}
-
-
-def test_recent_oprs_ignores_future_events(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 30.0},
-    )
-    seed_team_event(
-        "frc254",
-        "2026week7",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 5, 10),
-        oprs={"254": 99.0},
-    )
-
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 30.0}
-
-
-def test_recent_oprs_does_not_cross_years(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2025casj",
-        EventType.REGIONAL,
-        datetime.datetime(2025, 3, 1),
-        oprs={"254": 30.0},
-    )
-
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 0.0}
-
-
-def test_recent_oprs_clamps_negatives(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": -12.5},
-    )
-
-    oprs = MatchSuggestionHelper.team_recent_oprs({"frc254"}, 2026, NOW)
-    assert oprs == {"frc254": 0.0}
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    predicted_high = result.suggestions["2026casj_qm1"].components.performance
+    predicted_low = result.suggestions["2026casj_qm2"].components.performance
+    unpredicted = result.suggestions["2026casj_qm3"].components.performance
+    assert predicted_high == pytest.approx(1.0)  # pyre-ignore[16]
+    assert unpredicted == 0.5
+    assert predicted_low < unpredicted < predicted_high
 
 
 # --------------------------------------------------------------------------
@@ -698,14 +652,6 @@ def test_populates_render_fields(ndb_stub, memcache_stub) -> None:
 
 
 def test_stronger_teams_score_higher(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 90.0},
-    )
-
     event = make_event("2026cmptx", EventType.CMP_FINALS)
     seed_matches(
         event,
@@ -713,18 +659,21 @@ def test_stronger_teams_score_higher(ndb_stub, memcache_stub) -> None:
             make_match(
                 event,
                 match_number=1,
-                red=["frc254", "frc2", "frc3"],
-                blue=["frc4", "frc5", "frc6"],
                 predicted_time=NOW + datetime.timedelta(minutes=5),
             ),
             make_match(
                 event,
                 match_number=2,
-                red=["frc7", "frc8", "frc9"],
-                blue=["frc10", "frc11", "frc12"],
                 predicted_time=NOW + datetime.timedelta(minutes=5),
             ),
         ],
+    )
+    seed_predictions(
+        event.key_name,
+        qual={
+            "2026cmptx_qm1": (150.0, 150.0, 0.5),
+            "2026cmptx_qm2": (20.0, 80.0, 0.95),
+        },
     )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
@@ -831,13 +780,6 @@ def test_score_all_is_not_truncated(ndb_stub, memcache_stub) -> None:
 def test_score_all_ranks_by_significance_and_performance(
     ndb_stub, memcache_stub
 ) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 90.0},
-    )
     event = make_event("2026cmptx", EventType.CMP_FINALS)
     seed_matches(
         event,
@@ -847,10 +789,14 @@ def test_score_all_ranks_by_significance_and_performance(
                 event,
                 comp_level=CompLevel.F,
                 match_number=1,
-                red=["frc254", "frc2", "frc3"],
                 played=True,
             ),
         ],
+    )
+    seed_predictions(
+        event.key_name,
+        qual={"2026cmptx_qm1": (30.0, 30.0, 0.9)},
+        playoff={"2026cmptx_f1m1": (150.0, 150.0, 0.5)},
     )
 
     result = MatchSuggestionHelper.score_all_matches([event], now=NOW)
@@ -863,29 +809,19 @@ def test_score_all_ranks_by_significance_and_performance(
 
 
 def test_score_all_normalizes_across_the_events_passed(ndb_stub, memcache_stub) -> None:
-    seed_team_event(
-        "frc254",
-        "2026casj",
-        EventType.REGIONAL,
-        datetime.datetime(2026, 3, 1),
-        oprs={"254": 90.0},
-    )
     strong = make_event("2026cmptx", EventType.CMP_FINALS)
-    seed_matches(
-        strong,
-        [
-            make_match(
-                strong, match_number=1, red=["frc254", "frc2", "frc3"], played=True
-            )
-        ],
-    )
+    seed_matches(strong, [make_match(strong, match_number=1, played=True)])
+    seed_predictions(strong.key_name, qual={"2026cmptx_qm1": (150.0, 150.0, 0.5)})
     weak = make_event("2026ev01")
     seed_matches(weak, [make_match(weak, match_number=1, played=True)])
+    seed_predictions(weak.key_name, qual={"2026ev01_qm1": (20.0, 20.0, 0.5)})
 
     together = MatchSuggestionHelper.score_all_matches([strong, weak], now=NOW)
+    # Both are predicted coin flips, so magnitude is the only mover: 0.5 * norm + 0.5
     assert together.suggestions["2026cmptx_qm1"].components.performance == 1.0
-    assert together.suggestions["2026ev01_qm1"].components.performance == 0.0
+    assert together.suggestions["2026ev01_qm1"].components.performance == 0.5
 
-    # Scored alone there is nothing to normalize against, so it lands neutral
+    # Scored alone there is nothing to normalize magnitude against
     alone = MatchSuggestionHelper.score_all_matches([strong], now=NOW)
-    assert alone.suggestions["2026cmptx_qm1"].components.performance == 0.5
+    performance = alone.suggestions["2026cmptx_qm1"].components.performance
+    assert performance == pytest.approx(0.75)  # pyre-ignore[16]
