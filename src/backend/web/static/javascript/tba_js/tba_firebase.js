@@ -15,7 +15,7 @@ auth.setPersistence(firebase.auth.Auth.Persistence.NONE);
 
 // Connect to database emulator if available
 // Set firebaseDatabaseEmulatorHost in tba_keys.js (e.g., "localhost:9000")
-if (firebaseDatabaseEmulatorHost) {
+if (typeof firebaseDatabaseEmulatorHost !== "undefined" && firebaseDatabaseEmulatorHost) {
   var parts = firebaseDatabaseEmulatorHost.split(':');
   var host = parts[0];
   var port = parseInt(parts[1], 10);
