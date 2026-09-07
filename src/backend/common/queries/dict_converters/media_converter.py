@@ -1,4 +1,6 @@
+import datetime
 import json
+import re
 from typing import Dict, List, NewType, Optional
 
 from google.appengine.ext import ndb
@@ -12,10 +14,26 @@ from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 MediaDict = NewType("MediaDict", Dict)
 
+CAD_MEDIA_SLUGS = frozenset({"grabcad", "onshape"})
+_COLONLESS_OFFSET_RE = re.compile(r"([+-]\d{2})(\d{2})$")
+
+
+# Onshape/GrabCAD timestamps are passed through from third parties and some use a
+# colon-less UTC offset (e.g. "+0000") that violates the spec's date-time format and
+# breaks strongly-typed API clients. Coerce to RFC 3339, or null if unparseable.
+def _normalize_model_created(value: object) -> Optional[str]:
+    if not isinstance(value, str):
+        return None
+    try:
+        datetime.datetime.fromisoformat(_COLONLESS_OFFSET_RE.sub(r"\1:\2", value))
+    except (TypeError, ValueError):
+        return None
+    return _COLONLESS_OFFSET_RE.sub(r"\1:\2", value)
+
 
 class MediaConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 8,
+        ApiMajorVersion.API_V3: 9,
     }
 
     @classmethod
@@ -33,10 +51,15 @@ class MediaConverter(ConverterBase):
 
     @classmethod
     def mediaConverter_v3(cls, media: Media) -> MediaDict:
+        details = media.details.copy() if media.details else {}
+        if media.slug_name in CAD_MEDIA_SLUGS and "model_created" in details:
+            details["model_created"] = _normalize_model_created(
+                details["model_created"]
+            )
         dict = {
             "type": media.slug_name,
             "foreign_key": media.foreign_key,
-            "details": media.details if media.details else {},
+            "details": details,
             "preferred": True if media.preferred_references != [] else False,
             "view_url": None,
             "direct_url": None,

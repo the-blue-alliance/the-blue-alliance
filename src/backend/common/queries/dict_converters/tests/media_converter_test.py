@@ -1,6 +1,7 @@
 import json
 
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.media_type import MediaType
 from backend.common.models.media import Media
@@ -103,6 +104,56 @@ def test_mediaConverter_v3_smugmug_photo(ndb_context) -> None:
         == "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6"
     )
     assert result["direct_url"] == "https://photos.smugmug.com/L/x-L.jpg"
+
+
+def _cad_media(media_type: MediaType, model_created: str) -> Media:
+    return Media(
+        id="onshape_abc123",
+        media_type_enum=media_type,
+        foreign_key="abc123",
+        details_json=json.dumps(
+            {
+                "model_name": "Robot",
+                "model_description": "",
+                "model_image": "https://cad.onshape.com/api/thumbnails/d/abc123/s/300x300",
+                "model_created": model_created,
+            }
+        ),
+        references=[ndb.Key("Team", "frc4")],
+    )
+
+
+def test_mediaConverter_v3_onshape_colonless_offset_normalized(ndb_context) -> None:
+    media = _cad_media(MediaType.ONSHAPE, "2019-09-25T00:12:49.122+0000")
+    result = MediaConverter.mediaConverter_v3(media)
+    assert result["details"]["model_created"] == "2019-09-25T00:12:49.122+00:00"
+
+
+def test_mediaConverter_v3_onshape_valid_offset_unchanged(ndb_context) -> None:
+    media = _cad_media(MediaType.ONSHAPE, "2019-09-25T00:12:49.122+00:00")
+    result = MediaConverter.mediaConverter_v3(media)
+    assert result["details"]["model_created"] == "2019-09-25T00:12:49.122+00:00"
+
+
+def test_mediaConverter_v3_grabcad_zulu_unchanged(ndb_context) -> None:
+    media = _cad_media(MediaType.GRABCAD, "2016-09-19T11:52:23Z")
+    result = MediaConverter.mediaConverter_v3(media)
+    assert result["details"]["model_created"] == "2016-09-19T11:52:23Z"
+
+
+def test_mediaConverter_v3_onshape_unparseable_model_created_is_none(
+    ndb_context,
+) -> None:
+    media = _cad_media(MediaType.ONSHAPE, "")
+    result = MediaConverter.mediaConverter_v3(media)
+    assert result["details"]["model_created"] is None
+
+
+def test_mediaConverter_v3_does_not_mutate_model_details(ndb_context) -> None:
+    media = _cad_media(MediaType.ONSHAPE, "2019-09-25T00:12:49.122+0000")
+    MediaConverter.mediaConverter_v3(media)
+    details = none_throws(media.details)
+    assert details["model_created"] == "2019-09-25T00:12:49.122+0000"
 
 
 def test_mediaConverter_v3_smugmug_album(ndb_context) -> None:
