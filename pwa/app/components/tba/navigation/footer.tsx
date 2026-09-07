@@ -164,7 +164,9 @@ export const Footer = () => {
               <img
                 src={andymarkLogo}
                 alt="AndyMark"
-                className="ml-2 inline h-4"
+                width={450}
+                height={81}
+                className="ml-2 inline h-4 w-auto"
               />
             </a>
           </span>

@@ -86,6 +86,13 @@ export default defineConfig({
   build: {
     outDir: 'build',
     sourcemap: true,
+    rollupOptions: {
+      output: {
+        manualChunks(id) {
+          if (id.includes('/temporal-polyfill/')) return 'temporal-polyfill';
+        },
+      },
+    },
   },
   define: {
     __COMMIT_HASH__: JSON.stringify(getCommitHash()),
