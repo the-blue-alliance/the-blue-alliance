@@ -1,7 +1,8 @@
 import json
+from datetime import timedelta
 
 import pytest
-
+from freezegun import freeze_time
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
@@ -709,35 +710,37 @@ def test_district_advancement_empty(ndb_stub, api_client: Client) -> None:
     "endpoint", ["advancement", "awards", "rankings", "teams", "events"]
 )
 def test_district_endpoints_validate(endpoint, ndb_stub, api_client: Client) -> None:
-    ApiAuthAccess(
-        id="test_auth_key",
-        auth_types_enum=[AuthType.READ_API],
-    ).put()
+    with freeze_time("2024-01-01 00:00:00") as frozen_time:
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
 
-    # Invalid district endpoint
-    resp = api_client.get(
-        f"/api/v3/district/2024Minnesota/{endpoint}",
-        headers={"X-TBA-Auth-Key": "test_auth_key"},
-    )
-    assert resp.status_code == 404
-    assert resp.json == {"Error": "2024Minnesota is not a valid district key"}
+        # Invalid district endpoint
+        resp = api_client.get(
+            f"/api/v3/district/2024Minnesota/{endpoint}",
+            headers={"X-TBA-Auth-Key": "test_auth_key"},
+        )
+        assert resp.status_code == 404
+        assert resp.json == {"Error": "2024Minnesota is not a valid district key"}
 
-    # Missing district
-    resp = api_client.get(
-        f"/api/v3/district/2024ne/{endpoint}",
-        headers={"X-TBA-Auth-Key": "test_auth_key"},
-    )
-    assert resp.status_code == 404
-    assert resp.json == {"Error": "district key: 2024ne does not exist"}
+        # Missing district
+        resp = api_client.get(
+            f"/api/v3/district/2024ne/{endpoint}",
+            headers={"X-TBA-Auth-Key": "test_auth_key"},
+        )
+        assert resp.status_code == 404
+        assert resp.json == {"Error": "district key: 2024ne does not exist"}
 
-    District(
-        id="2024ne",
-        year=2024,
-        abbreviation="ne",
-    ).put()
+        District(
+            id="2024ne",
+            year=2024,
+            abbreviation="ne",
+        ).put()
+        frozen_time.tick(delta=timedelta(seconds=65))
 
-    resp = api_client.get(
-        f"/api/v3/district/2024ne/{endpoint}",
-        headers={"X-TBA-Auth-Key": "test_auth_key"},
-    )
-    assert resp.status_code == 200
+        resp = api_client.get(
+            f"/api/v3/district/2024ne/{endpoint}",
+            headers={"X-TBA-Auth-Key": "test_auth_key"},
+        )
+        assert resp.status_code == 200

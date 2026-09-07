@@ -1,3 +1,4 @@
+import time
 from concurrent import futures
 from typing import Generator
 
@@ -95,6 +96,7 @@ def memcache_stub(
 ) -> testbed.memcache_stub.MemcacheServiceStub:
     gae_testbed.init_memcache_stub()
     stub = gae_testbed.get_stub(testbed.MEMCACHE_SERVICE_NAME)
+    monkeypatch.setattr(stub, "_gettime", lambda: time.time())
     return stub
 
 
