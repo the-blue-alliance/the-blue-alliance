@@ -1,13 +1,18 @@
-import { LayoutGroup, motion } from 'motion/react';
 import {
   type ComponentProps,
+  Suspense,
   createContext,
+  lazy,
   useContext,
   useState,
 } from 'react';
 
 import { Tabs, TabsTrigger } from '~/components/ui/tabs';
 import { cn } from '~/lib/utils';
+
+const AnimatedTabIndicator = lazy(
+  () => import('~/components/ui/animatedTabIndicator'),
+);
 
 const AnimatedTabsContext = createContext<{ activeValue: string | undefined }>({
   activeValue: undefined,
@@ -37,18 +42,16 @@ function AnimatedTabs({
 
   return (
     <AnimatedTabsContext.Provider value={{ activeValue }}>
-      <LayoutGroup>
-        <Tabs
-          defaultValue={defaultValue}
-          value={value}
-          onValueChange={(v, eventDetails) => {
-            const stringValue = String(v);
-            setInternalValue(stringValue);
-            onValueChange?.(stringValue, eventDetails);
-          }}
-          {...props}
-        />
-      </LayoutGroup>
+      <Tabs
+        defaultValue={defaultValue}
+        value={value}
+        onValueChange={(v, eventDetails) => {
+          const stringValue = String(v);
+          setInternalValue(stringValue);
+          onValueChange?.(stringValue, eventDetails);
+        }}
+        {...props}
+      />
     </AnimatedTabsContext.Provider>
   );
 }
@@ -72,12 +75,15 @@ function AnimatedTabsTrigger({
       {...props}
     >
       {isActive && (
-        <motion.span
-          layoutId="tab-indicator"
-          initial={false}
-          className="absolute inset-0 rounded-sm bg-background shadow-xs"
-          transition={{ type: 'spring', bounce: 0.15, duration: 0.4 }}
-        />
+        <Suspense
+          fallback={
+            <span
+              className="absolute inset-0 rounded-sm bg-background shadow-xs"
+            />
+          }
+        >
+          <AnimatedTabIndicator />
+        </Suspense>
       )}
       <span className="relative z-10">{children}</span>
     </TabsTrigger>
