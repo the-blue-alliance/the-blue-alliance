@@ -1,8 +1,6 @@
 import datetime
 import enum
 import json
-import random
-import string
 from typing import Any, Dict, List, NamedTuple, Optional, Tuple
 
 from google.appengine.ext import ndb
@@ -457,21 +455,11 @@ class SuggestionReviewer:
         else:
             expiration = None
 
-        auth_id = "".join(
-            random.choice(
-                string.ascii_lowercase + string.ascii_uppercase + string.digits
-            )
-            for _ in range(16)
-        )
+        auth_id = ApiAuthAccess.generate_auth_id()
         auth = ApiAuthAccess(
             id=auth_id,
             description="{} @ {}".format(author.display_name, event_key),
-            secret="".join(
-                random.choice(
-                    string.ascii_lowercase + string.ascii_uppercase + string.digits
-                )
-                for _ in range(64)
-            ),
+            secret=ApiAuthAccess.generate_secret(),
             event_list=[ndb.Key(Event, event_key)],
             auth_types_enum=clean_auth_types,
             owner=suggestion.author,

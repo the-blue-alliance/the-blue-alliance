@@ -1,6 +1,4 @@
 import logging
-import random
-import string
 from datetime import datetime
 from typing import cast, Optional
 
@@ -20,12 +18,7 @@ from backend.web.profiled_render import render_template
 def api_auth_add() -> Response:
     event_key = request.args.get("event_key", "")
     template_values = {
-        "auth_id": "".join(
-            random.choice(
-                string.ascii_lowercase + string.ascii_uppercase + string.digits
-            )
-            for _ in range(16)
-        ),
+        "auth_id": ApiAuthAccess.generate_auth_id(),
         "event_key": event_key,
     }
 
@@ -142,12 +135,7 @@ def api_auth_edit_post(auth_id: str) -> Response:
             owner=owner_key,
             expiration=expiration,
             allow_admin=True if request.form.get("allow_admin") else False,
-            secret="".join(
-                random.choice(
-                    string.ascii_lowercase + string.ascii_uppercase + string.digits
-                )
-                for _ in range(64)
-            ),
+            secret=ApiAuthAccess.generate_secret(),
             district_list=district_list,
             event_list=event_list,
             offseason_webcast_channels=offseason_webcast_channels,
