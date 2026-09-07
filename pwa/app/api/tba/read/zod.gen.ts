@@ -1976,6 +1976,15 @@ export const zMatch = z.object({
 });
 
 /**
+ * Describes one entry in an advancement level's `sort_orders` or `extra_stats` arrays.
+ */
+export const zPlayoffAdvancementSortOrderInfo = z.object({
+  name: z.string(),
+  type: z.enum(['int', 'bool']),
+  precision: z.int(),
+});
+
+/**
  * A Win-Loss-Tie record for a team, or an alliance.
  */
 export const zWltRecord = z.object({
@@ -2112,6 +2121,32 @@ export const zTeamEventStatus = z.object({
   next_match_key: z.string().nullish(),
   last_match_key: z.string().nullish(),
   pit_location: z.string().nullish(),
+});
+
+/**
+ * One alliance's standing within a playoff advancement level.
+ */
+export const zPlayoffAdvancementAllianceRank = z.object({
+  team_keys: z.array(z.string()),
+  alliance_name: z.string(),
+  alliance_color: z.string().nullish(),
+  rank: z.int().nullish(),
+  record: zWltRecord.nullish(),
+  matches_played: z.int(),
+  sort_orders: z.array(z.number()),
+  extra_stats: z.array(z.number()),
+});
+
+/**
+ * A single level of computed playoff advancement for an event.
+ */
+export const zPlayoffAdvancement = z.object({
+  level: z.string(),
+  level_name: z.string(),
+  type: z.string(),
+  rankings: z.array(zPlayoffAdvancementAllianceRank).nullish(),
+  sort_order_info: z.array(zPlayoffAdvancementSortOrderInfo),
+  extra_stats_info: z.array(zPlayoffAdvancementSortOrderInfo),
 });
 
 /**
@@ -2614,6 +2649,19 @@ export const zGetEventOprsPath = z.object({
  * Successful response
  */
 export const zGetEventOprsResponse = zEventOprs.nullable();
+
+export const zGetEventPlayoffAdvancementHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventPlayoffAdvancementPath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventPlayoffAdvancementResponse = z.array(zPlayoffAdvancement);
 
 export const zGetEventPredictionsHeaders = z.object({
   'If-None-Match': z.string().optional(),

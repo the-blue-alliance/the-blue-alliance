@@ -31,6 +31,7 @@ import {
   getEventMedia,
   getEventNexusInfo,
   getEventOprs,
+  getEventPlayoffAdvancement,
   getEventPredictions,
   getEventRankings,
   getEventSimple,
@@ -172,6 +173,9 @@ import type {
   GetEventOprsData,
   GetEventOprsError,
   GetEventOprsResponse,
+  GetEventPlayoffAdvancementData,
+  GetEventPlayoffAdvancementError,
+  GetEventPlayoffAdvancementResponse,
   GetEventPredictionsData,
   GetEventPredictionsError,
   GetEventPredictionsResponse,
@@ -1131,6 +1135,34 @@ export const getEventOprsOptions = (options: Options<GetEventOprsData>) =>
       return data;
     },
     queryKey: getEventOprsQueryKey(options),
+  });
+
+export const getEventPlayoffAdvancementQueryKey = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) => createQueryKey('getEventPlayoffAdvancement', options);
+
+/**
+ * Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.
+ */
+export const getEventPlayoffAdvancementOptions = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) =>
+  queryOptions<
+    GetEventPlayoffAdvancementResponse,
+    GetEventPlayoffAdvancementError,
+    GetEventPlayoffAdvancementResponse,
+    ReturnType<typeof getEventPlayoffAdvancementQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPlayoffAdvancement({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPlayoffAdvancementQueryKey(options),
   });
 
 export const getEventPredictionsQueryKey = (

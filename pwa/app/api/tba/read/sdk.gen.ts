@@ -90,6 +90,9 @@ import type {
   GetEventOprsData,
   GetEventOprsErrors,
   GetEventOprsResponses,
+  GetEventPlayoffAdvancementData,
+  GetEventPlayoffAdvancementErrors,
+  GetEventPlayoffAdvancementResponses,
   GetEventPredictionsData,
   GetEventPredictionsErrors,
   GetEventPredictionsResponses,
@@ -350,6 +353,9 @@ import {
   zGetEventOprsPath,
   zGetEventOprsResponse,
   zGetEventPath,
+  zGetEventPlayoffAdvancementHeaders,
+  zGetEventPlayoffAdvancementPath,
+  zGetEventPlayoffAdvancementResponse,
   zGetEventPredictionsHeaders,
   zGetEventPredictionsPath,
   zGetEventPredictionsResponse,
@@ -1361,6 +1367,39 @@ export const getEventOprs = <ThrowOnError extends boolean = false>(
       await zGetEventOprsResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/oprs',
+    ...options,
+  });
+
+/**
+ * Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.
+ */
+export const getEventPlayoffAdvancement = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetEventPlayoffAdvancementData, ThrowOnError>,
+): RequestResult<
+  GetEventPlayoffAdvancementResponses,
+  GetEventPlayoffAdvancementErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventPlayoffAdvancementResponses,
+    GetEventPlayoffAdvancementErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventPlayoffAdvancementHeaders.optional(),
+          path: zGetEventPlayoffAdvancementPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPlayoffAdvancementResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/playoff_advancement',
     ...options,
   });
 
