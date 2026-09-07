@@ -107,3 +107,39 @@ def test_require_write_auth_sets_logging_context(api_client: Client, ndb_stub) -
     context = get_logging_context()
     assert "api_auth_key" in context
     assert context["api_auth_key"] == "test_auth_id"
+
+
+def test_api_authenticated_does_not_log_key_per_request(
+    api_client: Client, caplog
+) -> None:
+    """The auth key is attached as a log label and two trace-span labels.
+
+    It must not also be written as its own INFO log line -- at TBA's APIv3
+    volume that was ~14 GiB/month of Cloud Logging ingestion for information
+    already present on every entry.
+    """
+    from backend.common.models.team import Team
+
+    Team(
+        id="frc254",
+        team_number=254,
+    ).put()
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        description="Test auth key",
+        event_list=[],
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    with caplog.at_level("INFO"):
+        resp = api_client.get(
+            "/api/v3/status", headers={"X-TBA-Auth-Key": "test_auth_key"}
+        )
+
+    assert resp.status_code == 200
+    assert not any(
+        "authenticated with key" in record.getMessage() for record in caplog.records
+    )
+    # ...but the key is still attached as a log label
+    assert get_logging_context().get("api_auth_key") == "test_auth_key"
