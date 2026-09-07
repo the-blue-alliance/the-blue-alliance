@@ -284,13 +284,14 @@ jobs:
           load: true
       - name: Start Containers
         if: steps.changes.outputs.web == 'true'
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+        run: |
+          docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest &
+          PULL_PID=$!
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+          wait $PULL_PID
       - name: Test Docker Startup
         if: steps.changes.outputs.web == 'true'
         run: python ./ops/test_docker_startup.py
-      - name: Pre-pull companion import image
-        if: steps.changes.outputs.web == 'true'
-        run: docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest
       - name: Test Ops Fullstack
         if: steps.changes.outputs.web == 'true'
         run: ./ops/test_ops.sh

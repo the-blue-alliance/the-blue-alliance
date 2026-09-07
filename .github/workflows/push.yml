@@ -323,13 +323,14 @@ jobs:
           load: true
       - name: Start Containers
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+        run: |
+          docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest &
+          PULL_PID=$!
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+          wait $PULL_PID
       - name: Test Docker Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: python ./ops/test_docker_startup.py
-      - name: Pre-pull companion import image
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest
       - name: Test Ops Fullstack
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_ops.sh

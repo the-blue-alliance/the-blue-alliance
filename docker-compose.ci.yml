@@ -54,3 +54,9 @@ services:
         - type=gha,scope=datastore
       cache_to:
         - type=gha,mode=max,scope=datastore
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 1s
