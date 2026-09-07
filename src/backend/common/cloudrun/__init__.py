@@ -4,7 +4,6 @@ from backend.common.cloudrun.clients.cloudrun_client import (
     CloudRunClient,
     JobStatus,
 )
-from backend.common.cloudrun.clients.gcloud_client import GCloudRunClient
 from backend.common.cloudrun.clients.local_client import LocalCloudRunClient
 from backend.common.environment import Environment
 from backend.common.sitevars.google_cloudrun_config import GoogleCloudRunConfig
@@ -36,6 +35,8 @@ def _client_for_env() -> CloudRunClient:
         raise ValueError(
             "GoogleCloudRunConfig.region must be set to use Cloud Run client."
         )
+
+    from backend.common.cloudrun.clients.gcloud_client import GCloudRunClient
 
     return GCloudRunClient(project, region)
 
