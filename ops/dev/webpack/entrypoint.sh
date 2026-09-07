@@ -7,8 +7,13 @@ if [ ! -f src/backend/web/static/javascript/tba_js/tba_keys.js ]; then
         src/backend/web/static/javascript/tba_js/tba_keys.js
 fi
 
-echo "Installing node dependencies..."
-npm ci
+# Skip npm ci if node_modules is already installed and package-lock.json has not changed
+if [ ! -d node_modules ] || [ "${FORCE_NPM_INSTALL}" = "true" ] || [ package-lock.json -nt node_modules ]; then
+    echo "Installing node dependencies..."
+    npm ci
+else
+    echo "node_modules already exists, skipping npm ci."
+fi
 
 # Run webpack in watch mode (dev) or one-shot build (CI/deploy)
 if [ "${WATCH}" = "true" ]; then
