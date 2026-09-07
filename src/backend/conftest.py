@@ -44,6 +44,24 @@ def clear_context_cache(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
+def bypass_first_event_start_dates(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    if (
+        "no_bypass_first_event_start_dates" in request.keywords
+        or "no_bypass_event_start_dates" in request.keywords
+    ):
+        return
+    from backend.common.helpers.season_helper import SeasonHelper
+
+    monkeypatch.setattr(
+        SeasonHelper,
+        "get_first_event_start_date",
+        classmethod(lambda cls, year: None),
+    )
+
+
+@pytest.fixture(autouse=True)
 def clear_auth_key_cache() -> None:
     from backend.api.handlers.decorators import (
         auth_key_cache,
