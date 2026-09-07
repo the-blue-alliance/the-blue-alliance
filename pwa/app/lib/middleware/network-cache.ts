@@ -34,7 +34,12 @@ const CACHE_TTL = secondsToMilliseconds(61);
 const cache = new LRUCache<string, CacheEntry>({
   max: CACHE_MAX_ENTRIES,
   ttl: CACHE_TTL,
+  allowStale: true,
+  noDeleteOnStaleGet: true,
 });
+
+/** Cache keys currently being revalidated in the background (stampede guard). */
+const inFlightRevalidations = new Set<string>();
 
 let hits = 0;
 let misses = 0;
@@ -99,20 +104,43 @@ export function createCachedFetch(
 
     const cacheKey = generateCacheKey(url, init);
 
-    // Check cache
-    const cachedData = cache.get(cacheKey);
-    if (cachedData) {
+    const cachedData = cache.get(cacheKey, { allowStale: true });
+    const isFresh =
+      cachedData !== undefined && cache.getRemainingTTL(cacheKey) > 0;
+
+    if (cachedData !== undefined && isFresh) {
       hits++;
       Sentry.metrics.count('network.cache.hit', 1, {
         attributes: { client_platform: 'pwa' },
       });
+      logger.debug({ method, url }, 'Cache HIT');
+      return new Response(cachedData, {
+        status: 200,
+        headers: { 'Content-Type': 'application/json' },
+      });
+    }
+
+    if (cachedData !== undefined) {
+      // Stale-while-revalidate: serve the stale body now, refresh off the
+      // request's critical path. Keeps SSR TTFB flat when an entry has just
+      // expired instead of blocking on an origin round-trip.
+      hits++;
+      Sentry.metrics.count('network.cache.hit', 1, {
+        attributes: { client_platform: 'pwa' },
+      });
+      Sentry.metrics.count('network.cache.stale', 1, {
+        attributes: { client_platform: 'pwa' },
+      });
       logger.debug(
-        {
-          method,
-          url,
-        },
-        'Cache HIT',
+        { method, url },
+        'Cache STALE - serving stale, revalidating',
       );
+      if (!inFlightRevalidations.has(cacheKey)) {
+        inFlightRevalidations.add(cacheKey);
+        void fetchAndStore(input, init, cacheKey, method, url)
+          .catch(() => undefined)
+          .finally(() => inFlightRevalidations.delete(cacheKey));
+      }
       return new Response(cachedData, {
         status: 200,
         headers: { 'Content-Type': 'application/json' },
@@ -124,80 +152,88 @@ export function createCachedFetch(
       attributes: { client_platform: 'pwa' },
     });
 
-    // Cache miss or expired - fetch from network
-    logger.debug(
-      {
-        method,
-        url,
-      },
-      'Outbound request',
-    );
+    logger.debug({ method, url }, 'Outbound request');
 
-    try {
-      const response = await fetch(input, init);
+    return fetchAndStore(input, init, cacheKey, method, url);
+  };
+}
 
-      // Only cache successful responses
-      if (response.ok && response.status >= 200 && response.status < 300) {
-        // Read response body as text to avoid clone() issues
-        const data = await response.text();
+/**
+ * Fetch from the origin, cache a successful JSON response under `cacheKey`
+ * (honoring its Cache-Control max-age), and return a Response with the body.
+ * Used for both cache misses and background stale revalidation.
+ */
+async function fetchAndStore(
+  input: RequestInfo | URL,
+  init: RequestInit | undefined,
+  cacheKey: string,
+  method: string,
+  url: string,
+): Promise<Response> {
+  try {
+    const response = await fetch(input, init);
 
-        // Get TTL from Cache-Control header, fall back to default
-        const cacheControl = response.headers.get('cache-control');
-        if (!cacheControl) {
+    // Only cache successful responses
+    if (response.ok && response.status >= 200 && response.status < 300) {
+      // Read response body as text to avoid clone() issues
+      const data = await response.text();
+
+      // Get TTL from Cache-Control header, fall back to default
+      const cacheControl = response.headers.get('cache-control');
+      if (!cacheControl) {
+        logger.warn(
+          {
+            method,
+            url,
+          },
+          'No Cache-Control header found; falling back to default TTL',
+        );
+        cache.set(cacheKey, data, { ttl: CACHE_TTL });
+      } else {
+        const ttl = ccParser.parse(cacheControl);
+
+        if (!ttl['max-age']) {
           logger.warn(
             {
               method,
               url,
             },
-            'No Cache-Control header found; falling back to default TTL',
+            'No max-age found in Cache-Control header; falling back to default TTL',
           );
           cache.set(cacheKey, data, { ttl: CACHE_TTL });
         } else {
-          const ttl = ccParser.parse(cacheControl);
-
-          if (!ttl['max-age']) {
-            logger.warn(
-              {
-                method,
-                url,
-              },
-              'No max-age found in Cache-Control header; falling back to default TTL',
-            );
-            cache.set(cacheKey, data, { ttl: CACHE_TTL });
-          } else {
-            const ttlMs = secondsToMilliseconds(ttl['max-age']);
-            logger.debug(
-              {
-                method,
-                url,
-                ttlMs,
-              },
-              'Cached response with max-age',
-            );
-            cache.set(cacheKey, data, { ttl: ttlMs });
-          }
+          const ttlMs = secondsToMilliseconds(ttl['max-age']);
+          logger.debug(
+            {
+              method,
+              url,
+              ttlMs,
+            },
+            'Cached response with max-age',
+          );
+          cache.set(cacheKey, data, { ttl: ttlMs });
         }
-
-        // Return a new Response with the cached data
-        return new Response(data, {
-          status: response.status,
-          headers: { 'Content-Type': 'application/json' },
-        });
       }
 
-      return response;
-    } catch (error) {
-      logger.error(
-        {
-          method,
-          url,
-          error,
-        },
-        'Request failed',
-      );
-      throw error;
+      // Return a new Response with the cached data
+      return new Response(data, {
+        status: response.status,
+        headers: { 'Content-Type': 'application/json' },
+      });
     }
-  };
+
+    return response;
+  } catch (error) {
+    logger.error(
+      {
+        method,
+        url,
+        error,
+      },
+      'Request failed',
+    );
+    throw error;
+  }
 }
 
 /**
