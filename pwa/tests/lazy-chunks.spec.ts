@@ -53,3 +53,25 @@ test.describe('devtools gating', () => {
     await expect(page.locator('.tsqd-open-btn-container')).toHaveCount(0);
   });
 });
+
+test.describe('lazy animated tab indicator', () => {
+  test('defers the motion chunk but tabs still switch', async ({ page }) => {
+    const scriptUrls: string[] = [];
+    page.on('request', (req) => {
+      if (req.resourceType() === 'script') scriptUrls.push(req.url());
+    });
+
+    await page.goto('/event/2024mil');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    expect(
+      scriptUrls.some((u) => u.includes('animatedTabIndicator')),
+    ).toBeFalsy();
+
+    await page.getByRole('tab', { name: /rankings/i }).click();
+    await expect(page.getByRole('tab', { name: /rankings/i })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+});
