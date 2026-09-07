@@ -6,6 +6,7 @@ from backend.api.apiv3_main import api_v3
 from backend.api.client_api_main import client_api
 from backend.api.eventwizard_api_main import eventwizard_api
 from backend.api.handlers.error import handle_404
+from backend.api.handlers.warmup import warmup
 from backend.api.moderation_api_main import moderation_api
 from backend.api.trusted_api_main import trusted_api
 from backend.common.flask_cache import configure_flask_cache
@@ -46,3 +47,5 @@ app.register_blueprint(trusted_api)
 app.register_blueprint(client_api)
 app.register_blueprint(moderation_api)
 app.register_error_handler(404, handle_404)
+
+app.add_url_rule("/_ah/warmup", view_func=warmup)
