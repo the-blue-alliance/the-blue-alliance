@@ -16,6 +16,9 @@ from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, Year
 from backend.common.models.suggestion import Suggestion
 from backend.common.queries.event_query import EventListQuery
+from backend.common.suggestions.offseason_event_candidate import (
+    candidate_event_from_suggestion,
+)
 from backend.web.handlers.suggestions.suggestion_review_base import (
     SuggestionsReviewBase,
 )
@@ -194,38 +197,8 @@ The Blue Alliance Admins\
     def _create_candidate_event(
         cls, suggestion: Suggestion
     ) -> Tuple[Union[int, str], Event]:
-        start_date = None
-        end_date = None
-        try:
-            start_date = datetime.strptime(
-                suggestion.contents["start_date"], "%Y-%m-%d"
-            )
-            end_date = datetime.strptime(suggestion.contents["end_date"], "%Y-%m-%d")
-        except ValueError:
-            pass
-
-        venue = suggestion.contents["venue_name"]
-        address = suggestion.contents["address"]
-        city = suggestion.contents["city"]
-        state = suggestion.contents["state"]
-        country = suggestion.contents["country"]
-        address = "{}\n{}\n{}, {}, {}".format(venue, address, city, state, country)
-        event_type = suggestion.contents.get("event_type", EventType.OFFSEASON)
-        return none_throws(suggestion.key.id()), Event(
-            end_date=end_date,
-            event_type_enum=event_type or EventType.OFFSEASON,
-            district_key=None,
-            venue=venue,
-            city=city,
-            state_prov=state,
-            country=country,
-            venue_address=address,
-            name=suggestion.contents["name"],
-            start_date=start_date,
-            website=suggestion.contents["website"],
-            year=start_date.year if start_date else None,
-            first_code=suggestion.contents.get("first_code", None),
-            official=False,
+        return none_throws(suggestion.key.id()), candidate_event_from_suggestion(
+            suggestion
         )
 
     @classmethod

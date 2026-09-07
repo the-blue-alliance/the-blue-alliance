@@ -2,7 +2,6 @@ import datetime
 import json
 import logging
 import re
-from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional
 
 from flask import g, jsonify, make_response, request, Response
@@ -12,13 +11,16 @@ from pyre_extensions import none_throws
 from backend.api.handlers.decorators import require_moderation_permission
 from backend.common.consts.account_permission import SUGGESTION_PERMISSIONS
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
-from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import IMAGE_TYPES
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SuggestionType, TYPE_NAMES
 from backend.common.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafeed
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
+)
+from backend.common.helpers.similar_event_helper import (
+    MAX_SIMILAR_EVENTS,
+    SimilarEventHelper,
 )
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.common.memcache import MemcacheClient
@@ -31,6 +33,9 @@ from backend.common.models.user import User
 from backend.common.queries.event_query import EventListQuery
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
+from backend.common.suggestions.offseason_event_candidate import (
+    candidate_event_from_suggestion,
+)
 from backend.common.suggestions.suggestion_reviewer import (
     REQUIRED_REVIEW_PERMISSIONS,
     SuggestionReviewer,
@@ -551,38 +556,18 @@ def _add_webcast_metadata(
         )
 
 
-def _normalized_event_name(name: str) -> str:
-    return " ".join(re.sub(r"[^a-z0-9]+", " ", name.lower()).split())
-
-
 def _find_similar_events(
-    name: str, events: List[Event], limit: int = 5
+    candidate: Event, events: List[Event], limit: int = MAX_SIMILAR_EVENTS
 ) -> List[Dict[str, str]]:
     """
-    Offseason events whose name or short name resembles the suggested name.
-    Comparison is case/punctuation-insensitive; containment (either direction)
-    counts as a strong match. Results are strongest-match first.
+    Existing events most likely to be the same event as the candidate, best
+    match first -- the same ranking the web review page shows, via
+    SimilarEventHelper (name, short name, acronyms, and location).
     """
-    normalized = _normalized_event_name(name)
-    if not normalized:
-        return []
-    scored = []
-    for event in events:
-        best = 0.0
-        for candidate in (event.name, event.short_name):
-            if not candidate:
-                continue
-            normalized_candidate = _normalized_event_name(candidate)
-            if not normalized_candidate:
-                continue
-            score = SequenceMatcher(a=normalized, b=normalized_candidate).ratio()
-            if normalized in normalized_candidate or normalized_candidate in normalized:
-                score = max(score, 0.9)
-            best = max(best, score)
-        if best > 0.5:
-            scored.append((best, event))
-    scored.sort(key=lambda pair: -pair[0])
-    return [{"key": e.key_name, "name": e.name} for _, e in scored[:limit]]
+    return [
+        {"key": e.key_name, "name": e.name}
+        for e in SimilarEventHelper.similar_events(candidate, events, limit=limit)
+    ]
 
 
 def _suggested_event_year(suggestion: Suggestion) -> int:
@@ -605,21 +590,22 @@ def _add_offseason_metadata(
         for y in (base_year, base_year - 1)
     }
     event_futures = {year: EventListQuery(year).fetch_async() for year in years}
+    # "Offseason" here means anything not in-season -- preseason and unlabeled
+    # events included -- matching the web review page. Returning events cross
+    # the offseason/preseason line often enough to matter.
     offseason_events_by_year = {
-        year: [
-            e for e in future.get_result() if e.event_type_enum == EventType.OFFSEASON
-        ]
+        year: [e for e in future.get_result() if e.is_offseason]
         for year, future in event_futures.items()
     }
 
     for i, suggestion in enumerate(suggestions):
-        name = suggestion.contents.get("name") or ""
+        candidate = candidate_event_from_suggestion(suggestion)
         year = _suggested_event_year(suggestion)
         serialized[i]["similar_events"] = _find_similar_events(
-            name, offseason_events_by_year[year]
+            candidate, offseason_events_by_year[year]
         )
         serialized[i]["similar_events_last_year"] = _find_similar_events(
-            name, offseason_events_by_year[year - 1]
+            candidate, offseason_events_by_year[year - 1]
         )
 
 
