@@ -51,6 +51,7 @@ class TraceRequestMiddleware:
     def __call__(self, environ: Any, start_response: Any):
         request = Request(environ)
         trace_context.request = request
+        trace_context.current_span = None
         # Initialize logging_context with the request and an empty logging_context dict
         logging_context.request = request
         if not hasattr(logging_context.request, "logging_context"):

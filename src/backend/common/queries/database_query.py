@@ -211,7 +211,9 @@ class CachedDatabaseQuery(
             result = yield self._query_async(*args, **kwargs)
             return result
 
-        with Span("{}._do_query".format(self.__class__.__name__)):
+        with Span("{}._do_query".format(self.__class__.__name__)) as span:
+            span.set_label("model", self.__class__.__name__)
+            span.set_label("cache_key", cache_key)
             cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
 
             # Validate cached result for corruption and treat as cache miss if corrupted
@@ -227,6 +229,7 @@ class CachedDatabaseQuery(
                 cached_query_result = None
 
             if cached_query_result is None:
+                span.set_label("cache_hit", "miss")
                 query_result = yield self._query_async(*args, **kwargs)
                 if self.CACHE_WRITES_ENABLED:
                     try:
@@ -240,6 +243,7 @@ class CachedDatabaseQuery(
                         logging.exception(e)
                 return query_result
 
+            span.set_label("cache_hit", "hit")
             return cached_query_result.result
 
     @ndb.tasklet
@@ -254,10 +258,13 @@ class CachedDatabaseQuery(
             result = yield self._query_async(*args, **kwargs)
             return result
 
-        with Span("{}._do_dict_query".format(self.__class__.__name__)):
+        with Span("{}._do_dict_query".format(self.__class__.__name__)) as span:
             cache_key = self.dict_cache_key(_dict_version)
+            span.set_label("model", self.__class__.__name__)
+            span.set_label("cache_key", cache_key)
             cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
             if cached_query_result is None:
+                span.set_label("cache_hit", "miss")
                 query_result = yield self._query_async(*args, **kwargs)
 
                 # See https://github.com/facebook/pyre-check/issues/267
@@ -277,6 +284,7 @@ class CachedDatabaseQuery(
                         logging.exception(e)
                 return converted_result
 
+            span.set_label("cache_hit", "hit")
             values = getattr(cached_query_result, "_values", None)
             val = values.get(b"result_dict") if values else None
             if val is not None and not isinstance(
@@ -326,10 +334,13 @@ class CachedDatabaseQuery(
                 )
                 return json.dumps(dict_result, separators=(",", ":")).encode("utf-8")
 
-        with Span("{}._do_json_query".format(self.__class__.__name__)):
+        with Span("{}._do_json_query".format(self.__class__.__name__)) as span:
             cache_key = self.dict_cache_key(_dict_version)
+            span.set_label("model", self.__class__.__name__)
+            span.set_label("cache_key", cache_key)
             cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
             if cached_query_result is None:
+                span.set_label("cache_hit", "miss")
                 query_result = yield self._query_async(*args, **kwargs)
 
                 converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
@@ -360,6 +371,7 @@ class CachedDatabaseQuery(
                         "utf-8"
                     )
 
+            span.set_label("cache_hit", "hit")
             raw_bytes = cached_query_result.get_json_bytes()
             if raw_bytes is not None:
                 return raw_bytes

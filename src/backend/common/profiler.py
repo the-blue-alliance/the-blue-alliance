@@ -3,6 +3,7 @@
 import logging
 import random
 from datetime import datetime
+from typing import Optional
 
 from werkzeug.local import Local
 
@@ -12,6 +13,27 @@ from backend.common.environment import Environment
 trace_context = Local()
 
 PROJECT_ID = Environment.project()
+
+
+def _init_request_trace_context() -> None:
+    """Safely extracts trace_id, root_span_id, and sampling flag from request headers."""
+    req = getattr(trace_context, "request", None)
+    if req is not None and not hasattr(req, "trace_id"):
+        tcontext = req.headers.get("X-Cloud-Trace-Context", "NNNN/NNNN;xxxxx")
+        # Header format: TRACE_ID/SPAN_ID;o=TRACE_TRUE
+        parts = tcontext.split(";")[0].split("/")
+        req.trace_id = parts[0] if len(parts) > 0 and parts[0] else None
+        req.root_span_id = parts[1] if len(parts) > 1 and parts[1] else None
+        req._trace_sampled = ";o=1" in tcontext
+
+
+def get_current_span() -> Optional["Span"]:
+    """Returns the currently active Span in the current context, if any."""
+    span = getattr(trace_context, "current_span", None)
+    while span is not None and getattr(span, "_endTime", None) is not None:
+        span = span._previous_span
+    trace_context.current_span = span
+    return span
 
 
 def send_traces():
@@ -70,23 +92,36 @@ class Span(object):
         Spans are sent by send_traces() which is called when the request context ends
         """
         self._name = name
-        self._labels = {}  # Cloud Trace spans support labels
+        self._labels: dict[str, str] = {}  # Cloud Trace spans support labels
+        self._span_id: str = str(random.getrandbits(64))
+        self._parent_span_id: Optional[str] = None
+        self._previous_span: Optional["Span"] = None
+        self._root_span_id: Optional[str] = None
+        self._startTime: Optional[datetime] = None
+        self._endTime: Optional[datetime] = None
 
         if hasattr(trace_context, "request") and trace_context.request:
-            tcontext = trace_context.request.headers.get(
-                "X-Cloud-Trace-Context", "NNNN/NNNN;xxxxx"
-            )
-            self._do_trace = ";o=1" in tcontext
+            _init_request_trace_context()
+            self._do_trace = getattr(trace_context.request, "_trace_sampled", False)
             if self._do_trace:
+                tcontext = trace_context.request.headers.get(
+                    "X-Cloud-Trace-Context", ""
+                )
                 logging.debug("Trace Context: {}".format(tcontext))
-
-            # Breakup our given cloud tracing context so we can get the flags out of it
-            trace_id, root_span_id = tcontext.split(";")[0].split("/")
-            trace_context.request.trace_id = trace_id
-            self._root_span_id = root_span_id
-
+            self._root_span_id = getattr(trace_context.request, "root_span_id", None)
         else:
             self._do_trace = False
+
+    @property
+    def span_id(self) -> str:
+        return self._span_id
+
+    @property
+    def span_id_hex(self) -> str:
+        try:
+            return f"{int(self._span_id):016x}"
+        except (ValueError, TypeError):
+            return self._span_id
 
     def set_label(self, key: str, value: str) -> None:
         """
@@ -100,13 +135,39 @@ class Span(object):
         self._labels[key] = str(value)
 
     def __enter__(self):
+        prev = get_current_span()
+        while prev is self:
+            prev = prev._previous_span
+
+        self._previous_span = prev
+        self._startTime = datetime.now()
+        self._endTime = None
+        trace_context.current_span = self
+
+        if self._previous_span is not None:
+            self._parent_span_id = self._previous_span.span_id
+        else:
+            self._parent_span_id = self._root_span_id
+
         if self._do_trace:
             logging.debug("CREATED SPAN: {}".format(self._name))
-        self._startTime = datetime.now()
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, exc_value, tb):
         self._endTime = datetime.now()
+        try:
+            if exc_type is not None:
+                self.set_label("/error/name", exc_type.__name__)
+                self.set_label("/error/status", exc_type.__name__)
+                self.set_label("/error/message", str(exc_value))
+                import traceback
+
+                tb_str = "".join(traceback.format_exception(exc_type, exc_value, tb))
+                # Cloud Trace label value limit is 16 KiB (16,384 bytes)
+                self.set_label("/stacktrace", tb_str[:16000])
+        finally:
+            get_current_span()
+
         if self._do_trace:
             if not hasattr(trace_context.request, "spans"):
                 trace_context.request.spans = []
@@ -118,10 +179,10 @@ class Span(object):
         span_dict = {
             "kind": "SPAN_KIND_UNSPECIFIED",
             "name": self._name,
-            "parentSpanId": self._root_span_id,
-            "spanId": str(random.getrandbits(64)),
-            "startTime": self._startTime.isoformat() + "Z",
-            "endTime": self._endTime.isoformat() + "Z",
+            "parentSpanId": self._parent_span_id or self._root_span_id,
+            "spanId": self._span_id,
+            "startTime": self._startTime.isoformat() + "Z" if self._startTime else "",
+            "endTime": self._endTime.isoformat() + "Z" if self._endTime else "",
         }
 
         # Add labels if any were set

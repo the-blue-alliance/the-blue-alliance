@@ -519,3 +519,107 @@ def test_configure_logging_dev_uses_non_label_mode() -> None:
 
         assert context_filter is not None
         assert context_filter.use_labels is False
+
+
+def test_GoogleCloudStructuredFormatter_trace_correlation() -> None:
+    """Test that GoogleCloudStructuredFormatter includes Cloud Trace fields."""
+    from backend.common.profiler import Span, trace_context
+
+    class MockTraceRequest:
+        headers = {"X-Cloud-Trace-Context": "TRACE_12345/ROOT_SPAN_6789;o=1"}
+        trace_id = "TRACE_12345"
+        root_span_id = "ROOT_SPAN_6789"
+        _trace_sampled = True
+
+    trace_context.request = MockTraceRequest()
+
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Trace message",
+        args=(),
+        exc_info=None,
+    )
+
+    with patch(
+        "backend.common.environment.Environment.project", return_value="tbatv-prod-hrd"
+    ):
+        # 1. Outside active span -> fallback to root_span_id (non-numeric string fallback)
+        output = formatter.format(record)
+        parsed = json.loads(output)
+        assert (
+            parsed["logging.googleapis.com/trace"]
+            == "projects/tbatv-prod-hrd/traces/TRACE_12345"
+        )
+        assert parsed["logging.googleapis.com/spanId"] == "ROOT_SPAN_6789"
+        assert parsed["logging.googleapis.com/trace_sampled"] is True
+
+        # 2. Outside active span with numeric root_span_id -> formatted as 16-hex
+        trace_context.request.root_span_id = "1234567890"
+        output_numeric = formatter.format(record)
+        parsed_numeric = json.loads(output_numeric)
+        assert parsed_numeric["logging.googleapis.com/spanId"] == f"{1234567890:016x}"
+        assert len(parsed_numeric["logging.googleapis.com/spanId"]) == 16
+
+        # 3. Inside active child span -> attaches to child span_id formatted as 16-hex
+        with Span("test_child_span") as child:
+            output_child = formatter.format(record)
+            parsed_child = json.loads(output_child)
+            assert (
+                parsed_child["logging.googleapis.com/trace"]
+                == "projects/tbatv-prod-hrd/traces/TRACE_12345"
+            )
+            assert parsed_child["logging.googleapis.com/spanId"] == child.span_id_hex
+            assert len(parsed_child["logging.googleapis.com/spanId"]) == 16
+            assert parsed_child["logging.googleapis.com/trace_sampled"] is True
+
+            # Ensure a spanId whose hex encoding contains only digits 0-9 is NOT corrupted
+            child._span_id = str(0x1234567890123456)
+            output_numeric_hex = formatter.format(record)
+            parsed_numeric_hex = json.loads(output_numeric_hex)
+            assert (
+                parsed_numeric_hex["logging.googleapis.com/spanId"]
+                == "1234567890123456"
+            )
+
+    # Clean up
+    del trace_context.request
+
+
+def test_GoogleCloudStructuredFormatter_early_log_trace_correlation() -> None:
+    """Test that logs emitted before any Span is created still correlate via request headers."""
+    from backend.common.profiler import trace_context
+
+    class MockTraceRequest:
+        headers = {"X-Cloud-Trace-Context": "TRACE_EARLY_123/9876543210;o=1"}
+
+    trace_context.request = MockTraceRequest()
+
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Early message before any Span",
+        args=(),
+        exc_info=None,
+    )
+
+    with patch(
+        "backend.common.environment.Environment.project", return_value="tbatv-prod-hrd"
+    ):
+        output = formatter.format(record)
+        parsed = json.loads(output)
+        assert (
+            parsed["logging.googleapis.com/trace"]
+            == "projects/tbatv-prod-hrd/traces/TRACE_EARLY_123"
+        )
+        assert parsed["logging.googleapis.com/spanId"] == f"{9876543210:016x}"
+        assert parsed["logging.googleapis.com/trace_sampled"] is True
+
+    # Clean up
+    del trace_context.request

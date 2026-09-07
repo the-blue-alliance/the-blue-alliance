@@ -95,7 +95,7 @@ class GoogleCloudStructuredFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """Format the log record as JSON for App Engine."""
         # Start with the basic log structure
-        log_object = {
+        log_object: dict[str, Any] = {
             "message": super().format(record),
             "severity": record.levelname,
         }
@@ -105,6 +105,40 @@ class GoogleCloudStructuredFormatter(logging.Formatter):
         if labels:
             # Use the special key that App Engine recognizes for labels
             log_object["logging.googleapis.com/labels"] = labels
+
+        # Correlate with Cloud Trace if trace context is available
+        from backend.common.profiler import (
+            _init_request_trace_context,
+            get_current_span,
+            trace_context,
+        )
+
+        project_id = Environment.project()
+        if project_id and hasattr(trace_context, "request") and trace_context.request:
+            _init_request_trace_context()
+            trace_id = getattr(trace_context.request, "trace_id", None)
+            if trace_id:
+                log_object["logging.googleapis.com/trace"] = (
+                    f"projects/{project_id}/traces/{trace_id}"
+                )
+
+                current_span = get_current_span()
+                if current_span is not None:
+                    log_object["logging.googleapis.com/spanId"] = (
+                        current_span.span_id_hex
+                    )
+                else:
+                    root_span_id = getattr(trace_context.request, "root_span_id", None)
+                    if root_span_id:
+                        try:
+                            span_id_int = int(root_span_id)
+                            span_id_str = f"{span_id_int:016x}"
+                        except (ValueError, TypeError):
+                            span_id_str = str(root_span_id)
+                        log_object["logging.googleapis.com/spanId"] = span_id_str
+
+                is_sampled = getattr(trace_context.request, "_trace_sampled", False)
+                log_object["logging.googleapis.com/trace_sampled"] = bool(is_sampled)
 
         return json.dumps(log_object)
 

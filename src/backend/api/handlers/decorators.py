@@ -280,11 +280,14 @@ _KEY_VALIDATORS: tuple[_KeyValidator, ...] = (
 def validate_keys(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
-        with Span("validate_keys"):
+        with Span("validate_keys") as span:
+            has_keys = any(kwargs.get(v.param_name) for v in _KEY_VALIDATORS)
+
             # 1. Format validation
             for validator in _KEY_VALIDATORS:
                 key = kwargs.get(validator.param_name)
                 if key and not validator.validate_format(key):
+                    span.set_label("key_cache_hit", "invalid_format")
                     return {
                         "Error": f"{key} is not a valid {validator.key_type} key"
                     }, 404
@@ -293,6 +296,7 @@ def validate_keys(func):
             for validator in _KEY_VALIDATORS:
                 key = kwargs.get(validator.param_name)
                 if key and (validator.entity_name, key) in key_does_not_exist_cache:
+                    span.set_label("key_cache_hit", "memory_negative")
                     return {
                         "Error": f"{validator.key_type} key: {key} does not exist"
                     }, 404
@@ -313,6 +317,7 @@ def validate_keys(func):
                         continue
                     if (validator.entity_name, lookup_key) in key_does_not_exist_cache:
                         key_does_not_exist_cache.set((validator.entity_name, key), True)
+                        span.set_label("key_cache_hit", "memory_negative")
                         return {
                             "Error": f"{validator.key_type} key: {key} does not exist"
                         }, 404
@@ -323,6 +328,11 @@ def validate_keys(func):
                 )
 
             # 4. Resolve futures and populate positive / negative caches
+            if pending_checks:
+                span.set_label("key_cache_hit", "datastore")
+            elif has_keys:
+                span.set_label("key_cache_hit", "memory_positive")
+
             for validator, key, resolved_key, future in pending_checks:
                 if not future.get_result():
                     key_does_not_exist_cache.set((validator.entity_name, key), True)
