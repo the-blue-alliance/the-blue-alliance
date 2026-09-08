@@ -1,6 +1,6 @@
 import json
 import logging
-from typing import Any, Dict
+from typing import Any, Dict, Optional
 from unittest.mock import patch
 
 from werkzeug.test import create_environ
@@ -9,12 +9,14 @@ from backend.common.logging import (
     clear_logging_context,
     configure_logging,
     get_logging_context,
+    get_trace_context,
     GoogleCloudStructuredFormatter,
     logging_context,
     LoggingContextFilter,
     set_logging_context,
 )
 from backend.common.middleware import TraceRequestMiddleware
+from backend.common.profiler import trace_context
 
 
 def test_GoogleCloudStructuredFormatter_basic() -> None:
@@ -519,3 +521,241 @@ def test_configure_logging_dev_uses_non_label_mode() -> None:
 
         assert context_filter is not None
         assert context_filter.use_labels is False
+
+
+def test_GoogleCloudStructuredFormatter_with_trace_fields() -> None:
+    """Test that GoogleCloudStructuredFormatter includes trace, spanId, and trace_sampled."""
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Test message",
+        args=(),
+        exc_info=None,
+    )
+
+    setattr(record, "trace", "projects/test-project/traces/trace123")
+    setattr(record, "span_id", "000000000000004a")
+    setattr(record, "trace_sampled", True)
+
+    output = formatter.format(record)
+    parsed = json.loads(output)
+
+    assert (
+        parsed["logging.googleapis.com/trace"]
+        == "projects/test-project/traces/trace123"
+    )
+    assert parsed["logging.googleapis.com/spanId"] == "000000000000004a"
+    assert parsed["logging.googleapis.com/trace_sampled"] is True
+
+
+def test_GoogleCloudStructuredFormatter_trace_formatting_with_project() -> None:
+    """Test that bare trace ID is formatted with projects/{project}/traces/{trace}."""
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Test message",
+        args=(),
+        exc_info=None,
+    )
+
+    setattr(record, "trace", "06796866738c859f2f19b7cfb3214824")
+
+    with patch(
+        "backend.common.logging.Environment.project", return_value="my-projectid"
+    ):
+        output = formatter.format(record)
+        parsed = json.loads(output)
+
+    assert (
+        parsed["logging.googleapis.com/trace"]
+        == "projects/my-projectid/traces/06796866738c859f2f19b7cfb3214824"
+    )
+
+
+def test_GoogleCloudStructuredFormatter_trace_already_prefixed() -> None:
+    """Test that trace ID already starting with projects/ is not double-prefixed."""
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Test message",
+        args=(),
+        exc_info=None,
+    )
+
+    setattr(record, "trace", "projects/existing-project/traces/mytrace")
+
+    with patch(
+        "backend.common.logging.Environment.project", return_value="my-projectid"
+    ):
+        output = formatter.format(record)
+        parsed = json.loads(output)
+
+    assert (
+        parsed["logging.googleapis.com/trace"]
+        == "projects/existing-project/traces/mytrace"
+    )
+
+
+def test_get_trace_context() -> None:
+    """Test get_trace_context parses X-Cloud-Trace-Context headers."""
+
+    class MockRequest:
+        def __init__(self, trace_header: Optional[str] = None):
+            self.headers = {}
+            if trace_header:
+                self.headers["X-Cloud-Trace-Context"] = trace_header
+
+    # Sampled trace with span
+    logging_context.request = MockRequest(
+        "c9a008328dc3d540263be60de0117497/1054457492;o=1"
+    )
+    with patch(
+        "backend.common.logging.Environment.project", return_value="tbatv-prod-hrd"
+    ):
+        trace, span, sampled = get_trace_context()
+    assert trace == "projects/tbatv-prod-hrd/traces/c9a008328dc3d540263be60de0117497"
+    assert span == "000000003ed9be94"
+    assert sampled is True
+
+    # Not sampled trace
+    logging_context.request = MockRequest("c9a008328dc3d540263be60de0117497/1;o=0")
+    with patch(
+        "backend.common.logging.Environment.project", return_value="tbatv-prod-hrd"
+    ):
+        trace, span, sampled = get_trace_context()
+    assert span == "0000000000000001"
+    assert sampled is False
+
+    # Trace only without span or options
+    logging_context.request = MockRequest("c9a008328dc3d540263be60de0117497")
+    with patch(
+        "backend.common.logging.Environment.project", return_value="tbatv-prod-hrd"
+    ):
+        trace, span, sampled = get_trace_context()
+    assert trace == "projects/tbatv-prod-hrd/traces/c9a008328dc3d540263be60de0117497"
+    assert span is None
+    assert sampled is None
+
+    # Missing or invalid header
+    logging_context.request = MockRequest(None)
+    assert get_trace_context() == (None, None, None)
+
+    logging_context.request = MockRequest("not-a-valid-trace-context")
+    assert get_trace_context() == (None, None, None)
+
+    # Clean up
+    del logging_context.request
+
+
+def test_get_trace_context_no_request() -> None:
+    """Test get_trace_context when no request context exists."""
+    if hasattr(logging_context, "request"):
+        del logging_context.request
+    if hasattr(trace_context, "request"):
+        del trace_context.request
+
+    assert get_trace_context() == (None, None, None)
+
+
+def test_LoggingContextFilter_with_trace_context() -> None:
+    """Test that LoggingContextFilter extracts trace and span ID from X-Cloud-Trace-Context."""
+    log_filter = LoggingContextFilter(use_labels=True)
+
+    class MockRequest:
+        headers = {"X-Cloud-Trace-Context": "105445aa7843bc8bf206b12000100000/1;o=1"}
+
+    logging_context.request = MockRequest()
+
+    record = logging.LogRecord(
+        name="test_logger",
+        level=logging.INFO,
+        pathname="test.py",
+        lineno=10,
+        msg="Test message",
+        args=(),
+        exc_info=None,
+    )
+
+    with patch(
+        "backend.common.logging.Environment.project", return_value="tbatv-prod-hrd"
+    ):
+        log_filter.filter(record)
+
+    assert hasattr(record, "trace")
+    # pyre-ignore[16]: trace is set dynamically by our filter
+    trace: str = getattr(record, "trace")
+    assert trace == "projects/tbatv-prod-hrd/traces/105445aa7843bc8bf206b12000100000"
+    assert hasattr(record, "span_id")
+    # pyre-ignore[16]: span_id is set dynamically by our filter
+    span_id: str = getattr(record, "span_id")
+    assert span_id == "0000000000000001"
+    assert hasattr(record, "trace_sampled")
+    # pyre-ignore[16]: trace_sampled is set dynamically by our filter
+    trace_sampled: bool = getattr(record, "trace_sampled")
+    assert trace_sampled is True
+
+    # Clean up
+    del logging_context.request
+
+
+def test_integration_prod_logging_with_trace_header(app) -> None:
+    """Test end-to-end integration: middleware with trace header emits correlated JSON."""
+    import io
+
+    middleware = TraceRequestMiddleware(app)
+
+    def start_response(status, headers):
+        pass
+
+    environ = create_environ(
+        path="/",
+        base_url="http://localhost",
+        headers={
+            "X-Cloud-Trace-Context": "c9a008328dc3d540263be60de0117497/1054457492;o=1"
+        },
+    )
+    middleware(environ, start_response)
+
+    logger = logging.getLogger("test_trace_integration")
+    logger.setLevel(logging.INFO)
+    logger.handlers.clear()
+
+    stream = io.StringIO()
+    handler = logging.StreamHandler(stream)
+    formatter = GoogleCloudStructuredFormatter("%(name)s: %(message)s")
+    handler.setFormatter(formatter)
+    context_filter = LoggingContextFilter(use_labels=True)
+    handler.addFilter(context_filter)
+    logger.addHandler(handler)
+
+    with patch(
+        "backend.common.logging.Environment.project", return_value="tbatv-prod-hrd"
+    ):
+        logger.info("Test message during traced request")
+
+    output = stream.getvalue()
+    parsed = json.loads(output)
+
+    assert (
+        parsed["logging.googleapis.com/trace"]
+        == "projects/tbatv-prod-hrd/traces/c9a008328dc3d540263be60de0117497"
+    )
+    assert parsed["logging.googleapis.com/spanId"] == "000000003ed9be94"
+    assert parsed["logging.googleapis.com/trace_sampled"] is True
+    assert "Test message during traced request" in parsed["message"]
+
+    # Clean up
+    if hasattr(logging_context, "request"):
+        del logging_context.request
+    if hasattr(trace_context, "request"):
+        del trace_context.request
+    logger.handlers.clear()
