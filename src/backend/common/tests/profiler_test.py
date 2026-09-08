@@ -1,6 +1,9 @@
+import contextvars
+import gc
 from unittest.mock import patch
 
 from flask import Flask
+from google.appengine.ext import ndb
 
 from backend.common.middleware import install_middleware
 from backend.common.profiler import send_traces, Span, trace_context
@@ -218,3 +221,159 @@ def test_standalone_span_hierarchy() -> None:
     assert grandchild_dict["parentSpanId"] == child.span_id
     assert child_dict["parentSpanId"] == parent.span_id
     assert parent_dict["parentSpanId"] is None
+
+
+@patch("backend.common.profiler._make_tracing_call")
+def test_concurrent_tasklet_spans_are_siblings(mock_send_traces) -> None:
+    app = setup_app()
+
+    @ndb.tasklet
+    def async_query(name: str):
+        with Span(f"{name}.fetch_async"):
+            yield ndb.sleep(0.01)
+
+    @app.route("/")
+    def route():
+        f1 = async_query("Query1")
+        f2 = async_query("Query2")
+        f3 = async_query("Query3")
+        ndb.Future.wait_all([f1, f2, f3])
+
+        spans = trace_context.request.spans
+        assert len(spans) == 3
+
+        q1_span = next(s for s in spans if s["name"] == "Query1.fetch_async")
+        q2_span = next(s for s in spans if s["name"] == "Query2.fetch_async")
+        q3_span = next(s for s in spans if s["name"] == "Query3.fetch_async")
+
+        assert q1_span["parentSpanId"] == "SPAN_ID"
+        assert q2_span["parentSpanId"] == "SPAN_ID"
+        assert q3_span["parentSpanId"] == "SPAN_ID"
+        return "Hi!"
+
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
+
+    mock_send_traces.assert_called_once()
+
+
+@patch("backend.common.profiler._make_tracing_call")
+def test_tasklet_child_spans_are_nested(mock_send_traces) -> None:
+    app = setup_app()
+
+    @ndb.tasklet
+    def do_query(name: str):
+        with Span(f"{name}._do_query"):
+            yield ndb.sleep(0.01)
+
+    @ndb.tasklet
+    def fetch_async(name: str):
+        with Span(f"{name}.fetch_async"):
+            yield do_query(name)
+
+    @app.route("/")
+    def route():
+        f1 = fetch_async("Query1")
+        f2 = fetch_async("Query2")
+        ndb.Future.wait_all([f1, f2])
+
+        spans = trace_context.request.spans
+        assert len(spans) == 4
+
+        q1_fetch = next(s for s in spans if s["name"] == "Query1.fetch_async")
+        q1_do = next(s for s in spans if s["name"] == "Query1._do_query")
+        q2_fetch = next(s for s in spans if s["name"] == "Query2.fetch_async")
+        q2_do = next(s for s in spans if s["name"] == "Query2._do_query")
+
+        # Top-level query spans are siblings under root span
+        assert q1_fetch["parentSpanId"] == "SPAN_ID"
+        assert q2_fetch["parentSpanId"] == "SPAN_ID"
+
+        # Inner _do_query spans are nested under their respective fetch_async spans
+        assert q1_do["parentSpanId"] == q1_fetch["spanId"]
+        assert q2_do["parentSpanId"] == q2_fetch["spanId"]
+        return "Hi!"
+
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
+
+    mock_send_traces.assert_called_once()
+
+
+@patch("backend.common.profiler._make_tracing_call")
+def test_tasklet_exception_unwinds_span(mock_send_traces) -> None:
+    app = setup_app()
+
+    @ndb.tasklet
+    def failing_tasklet():
+        with Span("failing_async"):
+            yield ndb.sleep(0.01)
+            raise ValueError("Tasklet error")
+
+    @app.route("/")
+    def route():
+        try:
+            failing_tasklet().get_result()
+        except ValueError:
+            pass
+
+        with Span("after_exception"):
+            pass
+
+        spans = trace_context.request.spans
+        assert len(spans) == 2
+
+        failing_span = next(s for s in spans if s["name"] == "failing_async")
+        after_span = next(s for s in spans if s["name"] == "after_exception")
+
+        assert failing_span["parentSpanId"] == "SPAN_ID"
+        assert after_span["parentSpanId"] == "SPAN_ID"
+        return "Hi!"
+
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
+
+    mock_send_traces.assert_called_once()
+
+
+def test_span_generator_exit_handling() -> None:
+    app = setup_app()
+
+    def sample_generator():
+        with Span("gen_span"):
+            yield 1
+            yield 2
+
+    @app.route("/")
+    def route():
+        gen = sample_generator()
+        assert next(gen) == 1
+        gen.close()
+        spans = getattr(trace_context.request, "spans", [])
+        assert len(spans) == 0
+        return "Hi!"
+
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
+
+
+def test_span_generator_gc_cross_context() -> None:
+    def sample_generator():
+        with Span("gen_span"):
+            yield 1
+
+    ctx = contextvars.copy_context()
+    gen = ctx.run(sample_generator)
+    assert next(gen) == 1
+    del gen
+    gc.collect()
+
+
+def test_span_exit_without_request() -> None:
+    trace_context.request = None
+    with Span("no_request_span"):
+        pass

@@ -2,25 +2,31 @@
 
 import logging
 import random
+from contextvars import ContextVar, Token
 from datetime import datetime
-from typing import Optional
+from typing import Any, cast, Dict, Optional
 
 from werkzeug.local import Local
 
 from backend.common.environment import Environment
+from backend.common.tasklets import enable_tasklet_context_propagation
+
+enable_tasklet_context_propagation()
 
 # create a request-local global context
 trace_context = Local()
+_active_span_var: ContextVar[Optional["Span"]] = ContextVar(
+    "active_span", default=cast(Optional["Span"], None)
+)
 
 PROJECT_ID = Environment.project()
 
 
-def send_traces():
+def send_traces() -> None:
     try:
-        if (
-            not hasattr(trace_context.request, "spans")
-            or len(trace_context.request.spans) == 0
-        ):
+        request = getattr(trace_context, "request", None)
+        spans = getattr(request, "spans", None)
+        if not spans:
             return
 
         _make_tracing_call(
@@ -28,8 +34,8 @@ def send_traces():
                 "traces": [
                     {
                         "projectId": PROJECT_ID,
-                        "traceId": trace_context.request.trace_id,
-                        "spans": trace_context.request.spans,
+                        "traceId": request.trace_id,
+                        "spans": spans,
                     }
                 ]
             }
@@ -39,7 +45,7 @@ def send_traces():
         logging.exception(e)
 
 
-def _make_tracing_call(body):
+def _make_tracing_call(body: Dict[str, Any]) -> None:
     if PROJECT_ID is None:
         return
 
@@ -63,29 +69,21 @@ def _make_tracing_call(body):
     request.execute()
 
 
-class Span(object):
-    @staticmethod
-    def _get_span_stack() -> list["Span"]:
-        if hasattr(trace_context, "request") and trace_context.request:
-            if not hasattr(trace_context.request, "span_stack"):
-                trace_context.request.span_stack = []
-            return trace_context.request.span_stack
-        else:
-            if not hasattr(trace_context, "span_stack"):
-                trace_context.span_stack = []
-            return trace_context.span_stack
-
-    def __init__(self, name: str):
+class Span:
+    def __init__(self, name: str) -> None:
         """
         Start a Span
         Spans are saved in trace_context.request.spans on exit
         Spans are sent by send_traces() which is called when the request context ends
         """
         self._name = name
-        self._labels = {}  # Cloud Trace spans support labels
+        self._labels: Dict[str, str] = {}  # Cloud Trace spans support labels
         self._span_id = str(random.getrandbits(64))
         self._root_span_id: Optional[str] = None
         self._parent_span_id: Optional[str] = None
+        self._token: Optional[Token[Optional["Span"]]] = None
+        self._startTime: Optional[datetime] = None
+        self._endTime: Optional[datetime] = None
 
         if hasattr(trace_context, "request") and trace_context.request:
             tcontext = trace_context.request.headers.get(
@@ -99,14 +97,12 @@ class Span(object):
             trace_id, root_span_id = tcontext.split(";")[0].split("/")
             trace_context.request.trace_id = trace_id
             self._root_span_id = root_span_id
-            self._parent_span_id = root_span_id
 
         else:
             self._do_trace = False
 
-        stack = self._get_span_stack()
-        if stack:
-            self._parent_span_id = stack[-1]._span_id
+        parent = _active_span_var.get()
+        self._parent_span_id = parent._span_id if parent else self._root_span_id
 
     @property
     def span_id(self) -> str:
@@ -127,32 +123,32 @@ class Span(object):
         """
         self._labels[key] = str(value)
 
-    def __enter__(self):
+    def __enter__(self) -> "Span":
         if self._do_trace:
             logging.debug("CREATED SPAN: {}".format(self._name))
-        stack = self._get_span_stack()
-        if stack:
-            self._parent_span_id = stack[-1]._span_id
-        else:
-            self._parent_span_id = self._root_span_id
-        stack.append(self)
+        parent = _active_span_var.get()
+        self._parent_span_id = parent._span_id if parent else self._root_span_id
+        self._token = _active_span_var.set(self)
         self._startTime = datetime.now()
         return self
 
-    def __exit__(self, exc_type, exc_value, traceback):
+    def __exit__(self, exc_type, exc_value, traceback) -> None:
         self._endTime = datetime.now()
-        stack = self._get_span_stack()
-        if stack and stack[-1] is self:
-            stack.pop()
-        elif self in stack:
-            stack.remove(self)
+        if self._token is not None:
+            try:
+                _active_span_var.reset(self._token)
+            except ValueError:
+                pass
+            self._token = None
 
-        if self._do_trace:
-            if not hasattr(trace_context.request, "spans"):
-                trace_context.request.spans = []
-            trace_context.request.spans.append(self.dict())
+        if self._do_trace and exc_type is not GeneratorExit:
+            request = getattr(trace_context, "request", None)
+            if request is not None:
+                if not hasattr(request, "spans"):
+                    request.spans = []
+                request.spans.append(self.dict())
 
-    def dict(self):
+    def dict(self) -> Dict[str, Any]:
         """Format as a dictionary of the correct shape for sending to the Cloud
         Trace REST API as a JSON object"""
         span_dict = {
@@ -160,8 +156,8 @@ class Span(object):
             "name": self._name,
             "parentSpanId": self._parent_span_id,
             "spanId": self._span_id,
-            "startTime": self._startTime.isoformat() + "Z",
-            "endTime": self._endTime.isoformat() + "Z",
+            "startTime": (self._startTime.isoformat() + "Z") if self._startTime else "",
+            "endTime": (self._endTime.isoformat() + "Z") if self._endTime else "",
         }
 
         # Add labels if any were set
