@@ -30,6 +30,36 @@
   </div>
 </div>
 
+<div class="panel panel-default">
+  <div class="panel-heading">
+  <h3 class="panel-title">FCM messaging ID types</h3>
+  </div>
+  <div class="panel-body">
+  <p>
+    Tracks the FCM registration token &rarr; Firebase Installation ID (FID) migration.
+    Once the token counts are negligible, the legacy <code>tokens=</code> send path can be removed.
+  </p>
+  <table class="table table-condensed">
+    <thead>
+      <tr>
+        <th>Client type</th>
+        <th>Token (legacy)</th>
+        <th>FID</th>
+      </tr>
+    </thead>
+    <tbody>
+      {% for type_name, token_count, fid_count in messaging_id_type_counts %}
+      <tr>
+        <td>{{ type_name }}</td>
+        <td>{{ token_count }}</td>
+        <td>{{ fid_count }}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+  </table>
+  </div>
+</div>
+
 <div class="panel panel-warning">
   <div class="panel-heading">
     <h3 class="panel-title">Dedupe</h3>

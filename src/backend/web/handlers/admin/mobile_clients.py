@@ -5,7 +5,12 @@ from flask import flash, redirect, url_for
 from google.appengine.ext import ndb
 from werkzeug import Response
 
-from backend.common.consts.client_type import ClientType, NAMES as CLIENT_TYPE_NAMES
+from backend.common.consts.client_type import (
+    ClientType,
+    FCM_CLIENTS,
+    NAMES as CLIENT_TYPE_NAMES,
+)
+from backend.common.consts.messaging_id_type import MessagingIdType
 from backend.common.helpers.deferred import defer_safe
 from backend.common.models.mobile_client import MobileClient
 from backend.web.profiled_render import render_template
@@ -14,16 +19,36 @@ DEDUPE_PAGE_SIZE = 500
 
 
 def mobile_clients_dashboard() -> str:
-    type_counts = [
-        (
-            CLIENT_TYPE_NAMES[client_type],
-            MobileClient.query(MobileClient.client_type == client_type).count(),
-        )
+    counts_by_type = {
+        client_type: MobileClient.query(MobileClient.client_type == client_type).count()
         for client_type in ClientType
-    ]
+    }
+
+    # Tracks the FCM registration token -> Firebase Installation ID migration.
+    # The token count is derived rather than queried because rows written before
+    # `messaging_id_type` existed store no value for it, so they never match an
+    # equality filter on the TOKEN default even though they read back as TOKEN.
+    messaging_id_type_counts = []
+    for client_type in sorted(FCM_CLIENTS):
+        fid_count = MobileClient.query(
+            MobileClient.client_type == client_type,
+            MobileClient.messaging_id_type == MessagingIdType.FID,
+        ).count()
+        messaging_id_type_counts.append(
+            (
+                CLIENT_TYPE_NAMES[client_type],
+                counts_by_type[client_type] - fid_count,
+                fid_count,
+            )
+        )
+
     template_values = {
-        "type_counts": type_counts,
-        "total_clients": sum(count for _, count in type_counts),
+        "type_counts": [
+            (CLIENT_TYPE_NAMES[client_type], count)
+            for client_type, count in counts_by_type.items()
+        ],
+        "messaging_id_type_counts": messaging_id_type_counts,
+        "total_clients": sum(counts_by_type.values()),
     }
     return render_template("admin/mobile_clients.html", template_values)
 

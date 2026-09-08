@@ -24,6 +24,7 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.client_type import ClientType, FCM_CLIENTS
 from backend.common.consts.client_type import NAMES as CLIENT_TYPE_NAMES
 from backend.common.consts.event_type import EventType
+from backend.common.consts.messaging_id_type import MessagingIdType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.notification_type import NotificationType
 from backend.common.helpers.deferred import run_from_task
@@ -932,6 +933,31 @@ class TestTBANSHelper(unittest.TestCase):
             mock_send.assert_called_once()
             assert success
 
+    def test_ping_fcm_forwards_client(self):
+        """Which messaging id kind gets used is FCMRequest.for_clients' job -
+        see fcm_request_test.py. Here we only check the client is forwarded."""
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="a_firebase_installation",
+            client_type=ClientType.OS_IOS,
+            messaging_id_type=MessagingIdType.FID,
+            device_uuid="uuid",
+            display_name="Phone",
+        )
+
+        batch_response = messaging.BatchResponse(
+            [messaging.SendResponse({"name": "abc"}, None)]
+        )
+        with patch(
+            "backend.common.helpers.tbans_helper.FCMRequest",
+        ) as mock_fcm_request:
+            mock_fcm_request.for_clients.return_value.send.return_value = batch_response
+            success = TBANSHelper._ping_client(client)
+
+            mock_fcm_request.for_clients.assert_called_once_with(ANY, ANY, [client])
+            assert success
+
     def test_ping_fcm_fail(self):
         client = MobileClient(
             parent=ndb.Key(Account, "user_id"),
@@ -1575,7 +1601,65 @@ class TestTBANSHelper(unittest.TestCase):
             "backend.common.helpers.tbans_helper.FCMRequest",
         ) as mock_init:
             TBANSHelper._send_fcm(clients, MockNotification())
-            mock_init.assert_called_once_with(ANY, ANY, tokens=expected)
+            mock_init.for_clients.assert_called_once()
+            sent = mock_init.for_clients.call_args[0][2]
+            assert [c.messaging_id for c in sent] == expected
+
+    def test_send_fcm_fids_only(self):
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="fid_{}".format(i),
+                client_type=ClientType.OS_IOS,
+                messaging_id_type=MessagingIdType.FID,
+            )
+            for i in range(2)
+        ]
+
+        with patch(
+            "backend.common.helpers.tbans_helper.FCMRequest",
+        ) as mock_init:
+            TBANSHelper._send_fcm(clients, MockNotification())
+            mock_init.for_clients.assert_called_once()
+            sent = mock_init.for_clients.call_args[0][2]
+            assert [c.messaging_id for c in sent] == ["fid_0", "fid_1"]
+
+    def test_send_fcm_partitions_tokens_and_fids(self):
+        """Tokens and FIDs must never share a request - FCM expands tokens first
+        and fids second, which would break the response index mapping."""
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="token_0",
+                client_type=ClientType.OS_IOS,
+            ),
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="fid_0",
+                client_type=ClientType.OS_IOS,
+                messaging_id_type=MessagingIdType.FID,
+            ),
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="token_1",
+                client_type=ClientType.OS_ANDROID_FCM,
+            ),
+        ]
+
+        with patch(
+            "backend.common.helpers.tbans_helper.FCMRequest",
+        ) as mock_init:
+            TBANSHelper._send_fcm(clients, MockNotification())
+            assert mock_init.for_clients.call_count == 2
+            batches = [
+                [c.messaging_id for c in call[0][2]]
+                for call in mock_init.for_clients.call_args_list
+            ]
+            assert batches == [["token_0", "token_1"], ["fid_0"]]
 
     def test_send_fcm_filter_from_notification(self):
         clients = [
@@ -1620,6 +1704,43 @@ class TestTBANSHelper(unittest.TestCase):
         ):
             TBANSHelper._send_fcm(clients, MockNotification())
             assert mock_send.call_count == 2
+
+    def test_send_fcm_batch_per_kind(self):
+        """Batching happens per-kind, since a request never mixes tokens and fids"""
+        clients = [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="token_{}".format(i),
+                client_type=ClientType.OS_IOS,
+            )
+            for i in range(3)
+        ] + [
+            MobileClient(
+                parent=ndb.Key(Account, "user_id"),
+                user_id="user_id",
+                messaging_id="fid_{}".format(i),
+                client_type=ClientType.OS_IOS,
+                messaging_id_type=MessagingIdType.FID,
+            )
+            for i in range(3)
+        ]
+
+        batch_response = messaging.BatchResponse([])
+        with (
+            patch(
+                "backend.common.models.notifications.requests.fcm_request.MAXIMUM_TOKENS",
+                2,
+            ),
+            patch(
+                "backend.common.helpers.tbans_helper.MAXIMUM_TOKENS",
+                2,
+            ),
+            patch.object(FCMRequest, "send", return_value=batch_response) as mock_send,
+        ):
+            TBANSHelper._send_fcm(clients, MockNotification())
+            # 3 tokens -> 2 requests, 3 fids -> 2 requests
+            assert mock_send.call_count == 4
 
     def test_send_fcm_unregister_error(self):
         client = MobileClient(
@@ -1701,6 +1822,55 @@ class TestTBANSHelper(unittest.TestCase):
 
         # The good client should still exist, the bad one should be gone
         assert fcm_messaging_ids("user_id") == ["messaging_id_ok"]
+
+        # Make sure we haven't queued for a retry
+        tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")
+        assert len(tasks) == 0
+
+    def test_send_fcm_unregister_error_multi_client_fid(self):
+        """The `subclients[index]` <-> `responses[index]` mapping must hold for a
+        FID-only request the same way it does for a token-only request."""
+        client_ok = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="fid_ok",
+            client_type=ClientType.OS_IOS,
+            messaging_id_type=MessagingIdType.FID,
+        )
+        client_ok.put()
+
+        client_bad = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="fid_bad",
+            client_type=ClientType.OS_IOS,
+            messaging_id_type=MessagingIdType.FID,
+        )
+        client_bad.put()
+
+        # Sanity check - both clients exist
+        assert set(fcm_messaging_ids("user_id")) == {"fid_ok", "fid_bad"}
+
+        batch_response = messaging.BatchResponse(
+            [
+                messaging.SendResponse({"name": "abc"}, None),  # first succeeds
+                messaging.SendResponse(
+                    None, UnregisteredError("code", "message")
+                ),  # second fails
+            ]
+        )
+        with (
+            patch.object(FCMRequest, "send", return_value=batch_response),
+            patch.object(
+                MobileClientQuery,
+                "delete_for_messaging_id",
+                wraps=MobileClientQuery.delete_for_messaging_id,
+            ) as mock_delete,
+        ):
+            TBANSHelper._send_fcm([client_ok, client_bad], MockNotification())
+            mock_delete.assert_called_once_with("fid_bad")
+
+        assert fcm_messaging_ids("user_id") == ["fid_ok"]
 
         # Make sure we haven't queued for a retry
         tasks = self.taskqueue_stub.get_filtered_tasks(queue_names="push-notifications")

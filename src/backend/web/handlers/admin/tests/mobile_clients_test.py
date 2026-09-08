@@ -1,11 +1,27 @@
+import re
+
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.consts.client_type import ClientType
+from backend.common.consts.messaging_id_type import MessagingIdType
 from backend.common.helpers.deferred import run_from_task
 from backend.common.models.account import Account
 from backend.common.models.mobile_client import MobileClient
 from backend.web.handlers.admin.mobile_clients import _dedupe_mobile_clients
+
+
+def _messaging_id_type_rows(body: str) -> dict[str, tuple[str, str]]:
+    """Parse the `FCM messaging ID types` table into {client_type: (tokens, fids)}"""
+    table = body.split("FCM messaging ID types", 1)[1].split("</table>", 1)[0]
+    return {
+        cells[0]: (cells[1], cells[2])
+        for cells in (
+            re.findall(r"<td>(.*?)</td>", row)
+            for row in re.findall(r"<tr>(.*?)</tr>", table, re.DOTALL)
+        )
+        if len(cells) == 3
+    }
 
 
 def test_dashboard_requires_admin(web_client: Client) -> None:
@@ -38,6 +54,59 @@ def test_dashboard_renders_stats(web_client: Client, login_gae_admin, ndb_stub) 
     assert b"Total registered clients" in resp.data
     # 3 clients total
     assert b"<dd>3</dd>" in resp.data
+
+
+def test_dashboard_renders_messaging_id_type_counts(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    account_key = ndb.Key(Account, "user1")
+    MobileClient(
+        parent=account_key,
+        user_id="user1",
+        messaging_id="ios-token",
+        client_type=ClientType.OS_IOS,
+        device_uuid="uuid-a",
+        display_name="iPhone",
+    ).put()
+    MobileClient(
+        parent=account_key,
+        user_id="user1",
+        messaging_id="ios-fid",
+        client_type=ClientType.OS_IOS,
+        messaging_id_type=MessagingIdType.FID,
+        device_uuid="uuid-b",
+        display_name="iPhone",
+    ).put()
+    MobileClient(
+        parent=account_key,
+        user_id="user1",
+        messaging_id="android-fid",
+        client_type=ClientType.OS_ANDROID_FCM,
+        messaging_id_type=MessagingIdType.FID,
+        device_uuid="uuid-c",
+        display_name="Pixel",
+    ).put()
+    # Webhooks are not FCM clients and must not appear in the breakdown
+    MobileClient(
+        parent=account_key,
+        user_id="user1",
+        messaging_id="https://thebluealliance.com",
+        client_type=ClientType.WEBHOOK,
+        secret="secret",
+        display_name="Webhook",
+    ).put()
+
+    resp = web_client.get("/admin/mobile_clients")
+    assert resp.status_code == 200
+    assert b"FCM messaging ID types" in resp.data
+
+    rows = _messaging_id_type_rows(resp.data.decode())
+    assert rows == {
+        # client type: (token count, fid count)
+        "iOS": ("1", "1"),
+        "Android-FCM": ("0", "1"),
+    }
+    assert "Webhook" not in rows
 
 
 def test_dedupe_post_enqueues_task(

@@ -527,10 +527,8 @@ class TBANSHelper:
         if client_type in FCM_CLIENTS:
             notification = PingNotification()
 
-            fcm_request = FCMRequest(
-                _firebase_app(),
-                notification,
-                tokens=[client.messaging_id],
+            fcm_request = FCMRequest.for_clients(
+                _firebase_app(), notification, [client]
             )
 
             batch_response = fcm_request.send()
@@ -885,92 +883,112 @@ class TBANSHelper:
             and notification.should_send_to_client(client)
         ]
 
-        # We can only send to so many FCM clients at a time - send to our clients across several requests
-        for subclients in [
-            clients[i : i + MAXIMUM_TOKENS]
-            for i in range(0, len(clients), MAXIMUM_TOKENS)
-        ]:
-            fcm_request = FCMRequest(
-                _firebase_app(),
-                notification,
-                tokens=[client.messaging_id for client in subclients],
-            )
+        # FCM expands a multicast into per-token messages first and per-fid messages
+        # second, so a request mixing the two kinds would break the
+        # `subclients[index]` <-> `responses[index]` mapping that
+        # `_handle_fcm_batch_response` relies on to decide which client to delete.
+        # Partition by kind before chunking and never mix kinds in one request.
+        token_clients = [client for client in clients if not client.is_fid]
+        fid_clients = [client for client in clients if client.is_fid]
 
-            logging.info(f"Sending FCM request: {time.strftime('%X')}")
-            batch_response = fcm_request.send()
-            logging.info(f"Got FCM response: {time.strftime('%X')}")
-            retry_clients = []
+        retry_clients: list[MobileClient] = []
+        for partition in (token_clients, fid_clients):
+            # We can only send to so many FCM clients at a time - send to our clients across several requests
+            for subclients in [
+                partition[i : i + MAXIMUM_TOKENS]
+                for i in range(0, len(partition), MAXIMUM_TOKENS)
+            ]:
+                fcm_request = FCMRequest.for_clients(
+                    _firebase_app(), notification, subclients
+                )
 
-            # Handle our failed sends - this might include logging/alerting, removing old clients, or retrying sends
-            from firebase_admin.exceptions import (
-                InternalError,
-                InvalidArgumentError,
-                UnavailableError,
-            )
-            from firebase_admin.messaging import (
-                QuotaExceededError,
-                SenderIdMismatchError,
-                ThirdPartyAuthError,
-                UnregisteredError,
-            )
+                logging.info(f"Sending FCM request: {time.strftime('%X')}")
+                batch_response = fcm_request.send()
+                logging.info(f"Got FCM response: {time.strftime('%X')}")
 
-            for index, response in enumerate(batch_response.responses):
-                if response.success:
-                    continue
-                client = subclients[index]
-                if isinstance(response.exception, UnregisteredError):
-                    logging.info(
-                        f"Deleting mobile client with ID: {client.messaging_id}"
-                    )
-                    MobileClientQuery.delete_for_messaging_id(client.messaging_id)
-                elif isinstance(response.exception, SenderIdMismatchError):
-                    logging.info(
-                        f"Deleting mobile client with ID: {client.messaging_id}"
-                    )
-                    MobileClientQuery.delete_for_messaging_id(client.messaging_id)
-                elif isinstance(response.exception, QuotaExceededError):
-                    logging.error("Quota exceeded - retrying client...")
-                    retry_clients.append(client)
-                elif isinstance(response.exception, ThirdPartyAuthError):
-                    logging.critical(
-                        "Third party error sending to FCM - {}".format(
-                            response.exception
-                        )
-                    )
-                elif isinstance(response.exception, InvalidArgumentError):
-                    logging.critical(
-                        "Invalid argument when sending to FCM - {}".format(
-                            response.exception
-                        )
-                    )
-                elif isinstance(response.exception, InternalError):
-                    logging.error("Internal FCM error - retrying client...")
-                    retry_clients.append(client)
-                elif isinstance(response.exception, UnavailableError):
-                    logging.error("FCM unavailable - retrying client...")
-                    retry_clients.append(client)
-                else:
-                    debug_string = cls._debug_string(response.exception)
-                    logging.error(
-                        "Unhandled FCM error for {} - {}".format(
-                            client.messaging_id, debug_string
-                        )
-                    )
+                retry_clients.extend(
+                    cls._handle_fcm_batch_response(subclients, batch_response)
+                )
 
-            # if retry_clients:
-            #     # Try again, with exponential backoff
-            #     defer_safe(
-            #         cls._send_fcm,
-            #         retry_clients,
-            #         notification,
-            #         backoff_iteration + 1,
-            #         _countdown=backoff_time,
-            #         _target="py3-tasks-io",
-            #         _queue="push-notifications",
-            #         _url="/_ah/queue/deferred_notification_send",
-            #     )
+        # if retry_clients:
+        #     # Try again, with exponential backoff
+        #     defer_safe(
+        #         cls._send_fcm,
+        #         retry_clients,
+        #         notification,
+        #         backoff_iteration + 1,
+        #         _countdown=backoff_time,
+        #         _target="py3-tasks-io",
+        #         _queue="push-notifications",
+        #         _url="/_ah/queue/deferred_notification_send",
+        #     )
 
         return
+
+    @classmethod
+    def _handle_fcm_batch_response(
+        cls, subclients: list[MobileClient], batch_response
+    ) -> list[MobileClient]:
+        """
+        Handle failed sends - this might include logging/alerting, removing old
+        clients, or marking a client to be retried.
+
+        `batch_response.responses[index]` corresponds to `subclients[index]`, which
+        only holds if the request was not built from a mix of tokens and fids.
+
+        Returns the clients whose sends should be retried.
+        """
+        from firebase_admin.exceptions import (
+            InternalError,
+            InvalidArgumentError,
+            UnavailableError,
+        )
+        from firebase_admin.messaging import (
+            QuotaExceededError,
+            SenderIdMismatchError,
+            ThirdPartyAuthError,
+            UnregisteredError,
+        )
+
+        retry_clients: list[MobileClient] = []
+        for index, response in enumerate(batch_response.responses):
+            if response.success:
+                continue
+            client = subclients[index]
+            if isinstance(response.exception, UnregisteredError):
+                logging.info(f"Deleting mobile client with ID: {client.messaging_id}")
+                MobileClientQuery.delete_for_messaging_id(client.messaging_id)
+            elif isinstance(response.exception, SenderIdMismatchError):
+                logging.info(f"Deleting mobile client with ID: {client.messaging_id}")
+                MobileClientQuery.delete_for_messaging_id(client.messaging_id)
+            elif isinstance(response.exception, QuotaExceededError):
+                logging.error("Quota exceeded - retrying client...")
+                retry_clients.append(client)
+            elif isinstance(response.exception, ThirdPartyAuthError):
+                logging.critical(
+                    "Third party error sending to FCM - {}".format(response.exception)
+                )
+            elif isinstance(response.exception, InvalidArgumentError):
+                logging.critical(
+                    "Invalid argument when sending to FCM - {}".format(
+                        response.exception
+                    )
+                )
+            elif isinstance(response.exception, InternalError):
+                logging.error("Internal FCM error - retrying client...")
+                retry_clients.append(client)
+            elif isinstance(response.exception, UnavailableError):
+                logging.error("FCM unavailable - retrying client...")
+                retry_clients.append(client)
+            else:
+                debug_string = cls._debug_string(response.exception)
+                logging.error(
+                    "Unhandled FCM error for {} - {}".format(
+                        client.messaging_id, debug_string
+                    )
+                )
+
+        return retry_clients
 
     @classmethod
     def _send_webhook(cls, client: MobileClient, notification: Notification) -> None:

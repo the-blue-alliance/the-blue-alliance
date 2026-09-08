@@ -2,6 +2,7 @@ from google.appengine.ext import ndb
 
 from backend.common.consts import client_type
 from backend.common.consts.client_type import ClientType
+from backend.common.consts.messaging_id_type import MessagingIdType
 
 
 class MobileClient(ndb.Model):
@@ -21,6 +22,11 @@ class MobileClient(ndb.Model):
     device_uuid = ndb.StringProperty(default="")
     secret = ndb.StringProperty(default="")  # Used to hash webhooks
 
+    # Only meaningful for FCM clients; webhooks store a URL in `messaging_id`
+    messaging_id_type = ndb.IntegerProperty(
+        default=MessagingIdType.TOKEN, choices=list(MessagingIdType)
+    )
+
     # Used to verify that webhooks are actually controlled by the account holder
     verification_code = ndb.StringProperty(default="")
     verified = ndb.BooleanProperty(default=True)
@@ -38,6 +44,10 @@ class MobileClient(ndb.Model):
     @property
     def is_webhook(self):
         return self.client_type == ClientType.WEBHOOK
+
+    @property
+    def is_fid(self) -> bool:
+        return self.messaging_id_type == MessagingIdType.FID
 
     @property
     def short_id(self):

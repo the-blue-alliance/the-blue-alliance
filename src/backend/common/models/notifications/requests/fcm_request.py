@@ -1,3 +1,5 @@
+import warnings
+
 from backend.common.models.notifications.requests.request import Request
 
 MAXIMUM_TOKENS = 500
@@ -9,34 +11,44 @@ class FCMRequest(Request):
     https://firebase.google.com/docs/reference/fcm/rest/v1/projects.messages
     Attributes:
         notification (Notification): The Notification to send.
-        tokens (list, string): The FCM registration tokens (up to 500) to send a message to.
+        tokens (list, string): The legacy FCM registration tokens to send a message to.
+        fids (list, string): The Firebase Installation IDs to send a message to.
     """
 
-    def __init__(self, app, notification, tokens=None):
+    def __init__(self, app, notification, tokens=None, fids=None):
         """
         Note:
-            Should only supply one delivery method - either token, topic, or connection.
-        Args:
-            app (firebase_admin.App): The Firebase app to send to.
-            notification (Notification): The Notification to send.
-            tokens (list, string): The FCM registration tokens (up to 100) to send a message to.
+            `tokens` and `fids` may not be mixed in a single request. FCM expands a
+            multicast into per-token messages first and per-fid messages second, so a
+            mixed request would break the caller's ability to map a `BatchResponse`
+            index back to the client it was sent to.
         """
         super(FCMRequest, self).__init__(notification=notification)
 
         self._app = app
 
-        if len(tokens) > MAXIMUM_TOKENS:
+        self.tokens = tokens or []
+        self.fids = fids or []
+
+        if not self.tokens and not self.fids:
+            raise ValueError("FCMRequest must contain at least one token or fid")
+
+        if len(self.tokens) + len(self.fids) > MAXIMUM_TOKENS:
             raise ValueError(
-                "FCMRequest tokens must contain less than {} tokens".format(
-                    MAXIMUM_TOKENS
-                )
+                f"FCMRequest must contain less than {MAXIMUM_TOKENS} tokens/fids"
             )
 
-        self.tokens = tokens
+    @classmethod
+    def for_clients(cls, app, notification, clients):
+        """Build a request targeting clients that all share one messaging id kind."""
+        messaging_ids = [client.messaging_id for client in clients]
+        if clients[0].is_fid:
+            return cls(app, notification, fids=messaging_ids)
+        return cls(app, notification, tokens=messaging_ids)
 
     def __str__(self):
-        return "FCMRequest(tokens={}, notification={})".format(
-            self.tokens, str(self.notification)
+        return "FCMRequest(tokens={}, fids={}, notification={})".format(
+            self.tokens, self.fids, str(self.notification)
         )
 
     def send(self):
@@ -104,11 +116,18 @@ class FCMRequest(Request):
             self.notification.__class__._type()
         ]
 
-        return messaging.MulticastMessage(
-            tokens=self.tokens,
-            data=data_payload,
-            notification=self.notification.fcm_notification,
-            android=android_config,
-            webpush=webpush_config,
-            apns=apns_config,
-        )
+        with warnings.catch_warnings():
+            if self.tokens:
+                # firebase-admin 7.5.0 deprecated `tokens` in favor of `fids`, and
+                # pytest runs with `filterwarnings = error`. Suppress only on the
+                # legacy path, so a future deprecation on the FID path still surfaces.
+                warnings.simplefilter("ignore", DeprecationWarning)
+            return messaging.MulticastMessage(
+                tokens=self.tokens or None,
+                fids=self.fids or None,
+                data=data_payload,
+                notification=self.notification.fcm_notification,
+                android=android_config,
+                webpush=webpush_config,
+                apns=apns_config,
+            )
