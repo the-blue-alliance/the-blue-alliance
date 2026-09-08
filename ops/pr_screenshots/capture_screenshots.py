@@ -1,54 +1,35 @@
 #!/usr/bin/env python3
 
-import base64
+import json
 import os
 import pickle
 import subprocess
-import time
 
 from artifact_data import ARTIFACT_FILENAME, ArtifactData
 
-CAPTURE_URLS = [
-    ("Homepage", "http://localhost:8080"),
-    ("GameDay", "http://localhost:8080/gameday"),
-]  # (name, url)
 GITHUB_REF = os.environ.get("GITHUB_REF", "")
 GITHUB_PULL_REQUEST_NUMBER = (
     int(GITHUB_REF.split("/")[2]) if "refs/pull/" in GITHUB_REF else None
 )
 
 
-def capture_screenshots(urls: list[tuple[str, str]]) -> list[tuple[str, str, str]]:
-    screenshots = []  # (name, filename, base64encode image)
-    for name, url in urls:
-        print(f"Screenshotting {name}: {url}")
-        try:
-            cmd = [
-                "capture-website",
-                url,
-                "--width",
-                "1920",
-                "--height",
-                "1080",
-                "--scale-factor",
-                "1",
-            ]
-            image_data = subprocess.check_output(cmd)
-            image = base64.b64encode(image_data).decode("utf-8")
-            filename = (
-                f"pr-{GITHUB_PULL_REQUEST_NUMBER}-{url}-{int(time.time())}.png".replace(
-                    "/", "-"
-                ).replace(" ", "")
-            )
-            screenshots.append((name, filename, image))
-        except subprocess.CalledProcessError as e:
-            print(f"Error: {e}")
-    return screenshots
+def capture_screenshots() -> list[tuple[str, str, str]]:
+    script_path = os.path.join(os.path.dirname(__file__), "capture_screenshots.js")
+    env = os.environ.copy()
+    if GITHUB_PULL_REQUEST_NUMBER is not None:
+        env["GITHUB_PULL_REQUEST_NUMBER"] = str(GITHUB_PULL_REQUEST_NUMBER)
+    output = subprocess.check_output(
+        ["node", script_path],
+        env=env,
+        text=True,
+    )
+    raw_results: list[list[str]] = json.loads(output)
+    return [(item[0], item[1], item[2]) for item in raw_results]
 
 
 if __name__ == "__main__":
     if os.environ.get("CI"):
-        screenshots = capture_screenshots(CAPTURE_URLS)
+        screenshots = capture_screenshots()
         pickle.dump(
             ArtifactData(screenshots=screenshots, pr=GITHUB_PULL_REQUEST_NUMBER),
             open(ARTIFACT_FILENAME, "wb"),

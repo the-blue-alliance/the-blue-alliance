@@ -35,8 +35,8 @@ services:
 
   tba:
     build:
-      context: ./ops/dev/docker/
-      dockerfile: Dockerfile
+      context: ./
+      dockerfile: ./ops/dev/docker/Dockerfile
     depends_on:
       firebase:
         condition: service_started

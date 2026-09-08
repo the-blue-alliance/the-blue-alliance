@@ -299,7 +299,7 @@ jobs:
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         env:
           PUPPETEER_SKIP_DOWNLOAD: "true"
-        run: npm ci
+        run: npm ci --prefer-offline --no-audit --no-fund
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js

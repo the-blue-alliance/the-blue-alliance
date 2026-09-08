@@ -257,9 +257,7 @@ jobs:
         if: steps.changes.outputs.web == 'true'
         env:
           PUPPETEER_SKIP_DOWNLOAD: "true"
-        run: |
-          npm ci
-          npm install -g capture-website-cli
+        run: npm ci --prefer-offline --no-audit --no-fund
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js

@@ -28,6 +28,12 @@ COPY --from=ghcr.io/astral-sh/uv:latest /uv /uvx /usr/local/bin/
 
 WORKDIR /tba
 
+# Pre-install Python dependencies into system Python for faster container startup
+COPY pyproject.toml uv.lock ./
+RUN uv export --no-dev --no-hashes --frozen -o /tmp/requirements.txt \
+    && uv pip install --system --break-system-packages -r /tmp/requirements.txt \
+    && rm /tmp/requirements.txt pyproject.toml uv.lock
+
 # Expose GAE admin + module ports
 EXPOSE 8000
 EXPOSE 8080-8088

@@ -10,7 +10,7 @@ fi
 # Skip npm ci if node_modules is already installed and package-lock.json has not changed
 if [ ! -d node_modules ] || [ "${FORCE_NPM_INSTALL}" = "true" ] || [ package-lock.json -nt node_modules ]; then
     echo "Installing node dependencies..."
-    npm ci
+    npm ci --prefer-offline --no-audit --no-fund
 else
     echo "node_modules already exists, skipping npm ci."
 fi
