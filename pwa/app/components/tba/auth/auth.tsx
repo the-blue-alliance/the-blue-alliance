@@ -1,7 +1,8 @@
 import {
   type AuthProvider,
   type User,
-  onAuthStateChanged,
+  getRedirectResult,
+  onIdTokenChanged,
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
@@ -16,6 +17,10 @@ import {
 import { flushSync } from 'react-dom';
 
 import { auth } from '~/firebase/firebaseConfig';
+import { shouldForceTokenRefresh } from '~/lib/authRefresh';
+import { createLogger } from '~/lib/utils';
+
+const authLogger = createLogger('auth');
 
 export type AuthContextType = {
   isInitialLoading: boolean;
@@ -35,13 +40,39 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     if (!auth) return;
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const activeAuth = auth;
+
+    const unsubscribe = onIdTokenChanged(activeAuth, (user) => {
       flushSync(() => {
         setUser(user);
         setIsInitialLoading(false);
       });
     });
-    return () => unsubscribe();
+
+    getRedirectResult(activeAuth).catch((error: unknown) => {
+      authLogger.error({ error }, 'Error resolving sign-in redirect');
+    });
+
+    const refreshToken = () => {
+      if (
+        !shouldForceTokenRefresh(
+          document.visibilityState,
+          !!activeAuth.currentUser,
+        )
+      )
+        return;
+      activeAuth.currentUser?.getIdToken(true).catch((error: unknown) => {
+        authLogger.error({ error }, 'Error refreshing ID token');
+      });
+    };
+    document.addEventListener('visibilitychange', refreshToken);
+    window.addEventListener('focus', refreshToken);
+
+    return () => {
+      unsubscribe();
+      document.removeEventListener('visibilitychange', refreshToken);
+      window.removeEventListener('focus', refreshToken);
+    };
   }, []);
 
   const logout = useCallback(async () => {
