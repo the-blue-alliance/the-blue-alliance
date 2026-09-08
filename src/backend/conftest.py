@@ -9,11 +9,30 @@ from google.appengine.api import datastore_types
 from google.appengine.ext import ndb, testbed
 
 from backend.common.context_cache import context_cache
+from backend.common.logging import logging_context
 from backend.common.models.cached_query_result import CachedQueryResult
+from backend.common.profiler import trace_context
+from backend.common.run_after_response import response_context
 from backend.common.storage.clients.cloudstorage.stub_dispatcher import (
     dispatch as dispatch_gcs_stub,
 )
 from backend.tests.json_data_importer import JsonDataImporter
+
+
+@pytest.fixture(autouse=True)
+def clear_request_contexts() -> Generator[None, None, None]:
+    _clear_request_contexts()
+    yield
+    _clear_request_contexts()
+
+
+def _clear_request_contexts() -> None:
+    if hasattr(logging_context, "request"):
+        del logging_context.request
+    if hasattr(trace_context, "request"):
+        del trace_context.request
+    if hasattr(response_context, "request"):
+        del response_context.request
 
 
 @pytest.fixture(autouse=True)
@@ -30,7 +49,7 @@ def drain_gae_rpc_thread_pool(
     # This thread pool can leave work dangling after the test session
     # is done, which can cause pytest to hang.
     # So we add this fixture to manually shut it down
-    thread_pool.shutdown()
+    thread_pool.shutdown(cancel_futures=True)
 
 
 @pytest.fixture(autouse=True)

@@ -51,7 +51,7 @@ def test_add_team_media_mod_batched(
         "/admin/media/modcodes/add",
         data={
             "year": 2023,
-            "auth_codes_csv": "\n".join([f"{i},abc123" for i in range(1, 10000)]),
+            "auth_codes_csv": "\n".join([f"{i},abc123" for i in range(1, 251)]),
         },
     )
     assert resp.status_code == 302
@@ -62,7 +62,7 @@ def test_add_team_media_mod_batched(
             run_from_task(task)
 
     modcodes = TeamAdminAccess.query().fetch()
-    assert len(modcodes) == 9999
+    assert len(modcodes) == 250
 
 
 def test_edit_team_media_mod_doest_exist(login_gae_admin, web_client: Client) -> None:

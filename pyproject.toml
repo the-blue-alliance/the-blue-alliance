@@ -39,6 +39,7 @@ test = [
     "pytest-custom_exit_code",
     "pytest-split",
     "pytest-testmon",
+    "pytest-xdist>=3.8.0",
     "requests-mock==1.12.1",
 ]
 ci = [
