@@ -59,27 +59,22 @@ class FCMRequest(Request):
 
         platform_config = self.notification.platform_config
 
-        from backend.common.consts.fcm.platform_type import PlatformType
-
+        # `platform_config and ...` short circuits if platform_config is None
         android_config = (
             self.notification.android_config
             if self.notification.android_config
-            else platform_config
-            and platform_config.platform_config(platform_type=PlatformType.ANDROID)
+            else platform_config and platform_config.android_config()
         )
         apns_config = (
             self.notification.apns_config
             if self.notification.apns_config
-            else platform_config
-            and platform_config.platform_config(platform_type=PlatformType.APNS)
+            else platform_config and platform_config.apns_config()
         )
         webpush_config = (
             self.notification.webpush_config
             if self.notification.webpush_config
-            else platform_config
-            and platform_config.platform_config(platform_type=PlatformType.WEBPUSH)
+            else platform_config and platform_config.webpush_config()
         )
-        # `platform_config and platform_config` is to short circuit execution if platform_config is None
 
         # Additional APNS-specific configuration - make sure we have some payload
         if not apns_config:
