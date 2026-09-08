@@ -404,8 +404,8 @@ jobs:
         with:
           filters: |
             rules:
-              - 'ops/firebase/database.rules.json'
-              - 'ops/firebase/firebase.json'
+              - 'database.rules.json'
+              - 'firebase.json'
       - name: Authenticate to Google Cloud
         if: steps.changes.outputs.rules == 'true'
         uses: google-github-actions/auth@v3
@@ -413,7 +413,6 @@ jobs:
           credentials_json: ${{ secrets.GCLOUD_AUTH }}
       - name: Deploy
         if: steps.changes.outputs.rules == 'true'
-        working-directory: ops/firebase
         # firebase-tools picks up GOOGLE_APPLICATION_CREDENTIALS exported by the auth step
         run: npx --yes firebase-tools@15.29.0 deploy --only database --project ${{ secrets.GCLOUD_PROJECT_ID }} --non-interactive
 
