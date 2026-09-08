@@ -1,3 +1,0 @@
-from typing import Any
-
-def parse_to_epoch(datestr: Any): ...
