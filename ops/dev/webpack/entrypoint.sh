@@ -25,6 +25,11 @@ if [ "${WATCH}" = "true" ]; then
 else
     # Build legacy concatenated JS bundles
     uv run --group webpack python3 ./ops/build/do_compress.py
-    echo "Running production webpack build..."
-    npm run build
+    if [ "${WEBPACK_ENV:-development}" = "production" ]; then
+        echo "Running production webpack build..."
+        npm run build
+    else
+        echo "Running development webpack build..."
+        npm run build:dev
+    fi
 fi

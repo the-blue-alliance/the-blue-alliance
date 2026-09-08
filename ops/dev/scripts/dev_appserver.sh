@@ -106,6 +106,7 @@ runtime_version="python313"
 
 set -x
 dev_appserver.py \
+    --skip_sdk_update_check=true \
     --runtime_python_path="$(which python3)" \
     --admin_host=0.0.0.0 \
     --host=0.0.0.0 \

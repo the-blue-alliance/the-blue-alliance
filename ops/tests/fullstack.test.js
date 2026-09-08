@@ -1,3 +1,4 @@
+import fs from "fs";
 import { setDefaultOptions } from "expect-puppeteer";
 import puppeteer from "puppeteer";
 import "regenerator-runtime/runtime";
@@ -9,8 +10,15 @@ setDefaultOptions({ timeout: 120000 });
 let sharedBrowser;
 
 beforeAll(async () => {
+  const executablePath =
+    process.env.PUPPETEER_EXECUTABLE_PATH ||
+    (fs.existsSync("/usr/bin/google-chrome")
+      ? "/usr/bin/google-chrome"
+      : undefined);
+
   sharedBrowser = await puppeteer.launch({
     headless: "new",
+    ...(executablePath ? { executablePath } : {}),
     args: ["--no-sandbox", "--disable-setuid-sandbox"],
   });
 });

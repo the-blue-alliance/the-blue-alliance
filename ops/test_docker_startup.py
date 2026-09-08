@@ -1,14 +1,11 @@
 #!/usr/bin/env python3
-# /// script
-# dependencies = ["requests"]
-# ///
 
 import re
 import subprocess
 import sys
 import time
-
-import requests
+import urllib.error
+import urllib.request
 
 TIME_LIMIT = 10 * 60  # seconds
 POLL_INTERVAL = 1  # seconds
@@ -52,12 +49,17 @@ while time.time() - start_time < TIME_LIMIT:
 
     # Check that homepage returns a 200
     try:
-        r = requests.get(HOMEPAGE_URL, timeout=5)
-        print(f"Homepage: {r.status_code}")
-        if r.status_code == 200:
-            print("Startup successful!")
-            sys.exit(0)
-    except (requests.ConnectionError, requests.Timeout):
+        req = urllib.request.Request(
+            HOMEPAGE_URL,
+            headers={"User-Agent": "tba-docker-startup-check"},
+        )
+        with urllib.request.urlopen(req, timeout=5) as response:
+            status_code = response.status
+            print(f"Homepage: {status_code}")
+            if status_code == 200:
+                print("Startup successful!")
+                sys.exit(0)
+    except (urllib.error.URLError, TimeoutError, ConnectionError, OSError):
         print("Homepage not ready")
         time.sleep(POLL_INTERVAL)
         continue
