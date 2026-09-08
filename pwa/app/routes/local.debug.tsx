@@ -12,6 +12,7 @@ interface CacheInfo {
   method: string;
   url: string;
   dataPreview: string;
+  etag: string;
   remainingTTL: number;
   expiresAt: string;
 }
@@ -26,7 +27,7 @@ export const Route = createFileRoute('/local/debug')({
 
     // Parse cache entries to extract useful information
     const cacheEntries: CacheInfo[] = entries.map(
-      ({ key, data, remainingTTL }) => {
+      ({ key, data, etag, remainingTTL }) => {
         // Format: METHOD:URL
         const parts = key.split(':');
         const method = parts[0] || 'UNKNOWN';
@@ -48,6 +49,7 @@ export const Route = createFileRoute('/local/debug')({
           method,
           url,
           dataPreview: preview,
+          etag: etag ?? '—',
           remainingTTL,
           expiresAt,
         };
@@ -132,6 +134,7 @@ function CacheEntryRow({
       <td className="px-4 py-2 font-mono text-xs break-all">
         {entry.dataPreview}
       </td>
+      <td className="px-4 py-2 font-mono text-xs break-all">{entry.etag}</td>
       <td className="px-4 py-2 font-mono text-xs">
         <div>{formatTimeRemaining(timeRemaining)}</div>
         <div className="text-muted-foreground">
@@ -194,6 +197,35 @@ function LocalDebug(): React.JSX.Element {
               </div>
               <div className="text-sm text-muted-foreground">all-time</div>
             </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Revalidations: Not Modified
+              </div>
+              <div className="text-3xl font-bold">
+                {stats.revalidatedNotModified}
+              </div>
+              <div className="text-sm text-muted-foreground">304 responses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Revalidations: Modified
+              </div>
+              <div className="text-3xl font-bold">
+                {stats.revalidatedModified}
+              </div>
+              <div className="text-sm text-muted-foreground">200 responses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Not Modified Rate
+              </div>
+              <div className="text-3xl font-bold">
+                {Math.round(stats.notModifiedRate * 100)}%
+              </div>
+              <div className="text-sm text-muted-foreground">
+                of revalidations
+              </div>
+            </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
             Last updated:{' '}
@@ -215,7 +247,7 @@ function LocalDebug(): React.JSX.Element {
             <div className="overflow-x-auto">
               <table className="w-full table-auto border-collapse">
                 <thead>
-                  <tr className="border-b bg-neutral-50">
+                  <tr className="border-b bg-muted">
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       Method
                     </th>
@@ -224,6 +256,9 @@ function LocalDebug(): React.JSX.Element {
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       Data Preview
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">
+                      ETag
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       TTL

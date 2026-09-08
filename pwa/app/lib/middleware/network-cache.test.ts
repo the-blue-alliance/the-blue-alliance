@@ -444,4 +444,277 @@ describe('Network Cache Middleware', () => {
       expect(Sentry.metrics.count).toHaveBeenCalledTimes(2);
     });
   });
+
+  describe('ETag revalidation', () => {
+    const sleep = (ms: number) =>
+      new Promise((resolve) => setTimeout(resolve, ms));
+
+    function respond(
+      body: string,
+      { etag, maxAge = 1 }: { etag?: string; maxAge?: number } = {},
+    ): Response {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${maxAge}`,
+      };
+      if (etag) {
+        headers.ETag = etag;
+      }
+      return new Response(body, { status: 200, headers });
+    }
+
+    function notModified(headers: Record<string, string> = {}): Response {
+      return {
+        status: 304,
+        ok: false,
+        headers: new Headers(headers),
+        text: () => Promise.resolve(''),
+      } as unknown as Response;
+    }
+
+    it('stores the ETag and sends If-None-Match once stale', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(respond('v1', { etag: '"abc"' })),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/etag';
+
+      await cachedFetch(url);
+      expect(getCacheEntries()[0]?.etag).toBe('"abc"');
+
+      await sleep(1100);
+      await cachedFetch(url);
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+
+      const headers = new Headers(mockFetch.mock.calls[1]?.[1]?.headers);
+      expect(headers.get('If-None-Match')).toBe('"abc"');
+    });
+
+    it('serves the cached body and refreshes TTL on a 304', async () => {
+      let isNotModified = false;
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            isNotModified
+              ? notModified({ 'Cache-Control': 'public, max-age=60' })
+              : respond('body-v1', { etag: '"v1"' }),
+          ),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/not-modified';
+
+      await cachedFetch(url);
+      await sleep(1100);
+      isNotModified = true;
+
+      const stale = await (await cachedFetch(url)).text();
+      expect(stale).toBe('body-v1');
+
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+      await vi.waitFor(() =>
+        expect(getCacheEntries()[0]?.remainingTTL ?? 0).toBeGreaterThan(30_000),
+      );
+      const revalidated = await (await cachedFetch(url)).text();
+      expect(revalidated).toBe('body-v1');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.revalidate.not_modified',
+        1,
+        expect.anything(),
+      );
+      expect(getCacheStats()).toMatchObject({
+        revalidatedNotModified: 1,
+        revalidatedModified: 0,
+        notModifiedRate: 1,
+      });
+    });
+
+    it('tracks the not-modified rate across mixed revalidations', async () => {
+      let mode: '200' | '304' = '200';
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            mode === '304'
+              ? notModified({ 'Cache-Control': 'public, max-age=1' })
+              : respond('v1', { etag: '"v1"', maxAge: 1 }),
+          ),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/rate';
+
+      await cachedFetch(url);
+
+      await sleep(1100);
+      mode = '304';
+      await cachedFetch(url);
+      await vi.waitFor(() =>
+        expect(getCacheStats().revalidatedNotModified).toBe(1),
+      );
+
+      await sleep(1100);
+      mode = '200';
+      await cachedFetch(url);
+      await vi.waitFor(() =>
+        expect(getCacheStats().revalidatedModified).toBe(1),
+      );
+
+      expect(getCacheStats().notModifiedRate).toBe(0.5);
+    });
+
+    it('reuses the original freshness window when a 304 omits Cache-Control', async () => {
+      let isNotModified = false;
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            isNotModified
+              ? notModified()
+              : respond('body-v1', { etag: '"v1"', maxAge: 3 }),
+          ),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/no-cc-304';
+
+      await cachedFetch(url);
+      await sleep(3100);
+      isNotModified = true;
+      await cachedFetch(url);
+
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+      await vi.waitFor(() =>
+        expect(getCacheEntries()[0]?.remainingTTL ?? 0).toBeGreaterThan(1000),
+      );
+      expect(getCacheEntries()[0]?.remainingTTL).toBeLessThan(4000);
+    });
+
+    it('replaces the body and ETag when revalidation returns a 200', async () => {
+      let second = false;
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            second
+              ? respond('v2', { etag: '"v2"' })
+              : respond('v1', { etag: '"v1"' }),
+          ),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/changed';
+
+      await cachedFetch(url);
+      await sleep(1100);
+      second = true;
+      await cachedFetch(url);
+
+      await vi.waitFor(() => expect(getCacheEntries()[0]?.data).toBe('v2'));
+      expect(getCacheEntries()[0]?.etag).toBe('"v2"');
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.revalidate.modified',
+        1,
+        expect.anything(),
+      );
+    });
+
+    it('revalidates unconditionally when no ETag was stored', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() => Promise.resolve(respond('v1')));
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/no-etag';
+
+      await cachedFetch(url);
+      await sleep(1100);
+      await cachedFetch(url);
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+
+      const headers = new Headers(mockFetch.mock.calls[1]?.[1]?.headers);
+      expect(headers.get('If-None-Match')).toBeNull();
+    });
+
+    it('treats max-age=0 as stale on the next read', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(respond('v1', { etag: '"v1"', maxAge: 0 })),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/no-store';
+
+      await cachedFetch(url);
+      await sleep(10);
+      await cachedFetch(url);
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.stale',
+        1,
+        expect.anything(),
+      );
+    });
+
+    it('collapses concurrent cold misses to one origin request', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(
+          () =>
+            new Promise((resolve) =>
+              setTimeout(() => resolve(respond('shared', { maxAge: 60 })), 50),
+            ),
+        );
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/stampede';
+
+      const [a, b] = await Promise.all([cachedFetch(url), cachedFetch(url)]);
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(await a.text()).toBe('shared');
+      expect(await b.text()).toBe('shared');
+    });
+
+    it('refetches unconditionally when a 304 arrives with no cached body', async () => {
+      let calls = 0;
+      const mockFetch = vi.fn<typeof fetch>().mockImplementation(() => {
+        calls++;
+        return Promise.resolve(
+          calls === 1 ? notModified() : respond('recovered', { maxAge: 60 }),
+        );
+      });
+      global.fetch = mockFetch;
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/orphan-304';
+
+      const body = await (await cachedFetch(url)).text();
+      expect(body).toBe('recovered');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+  });
 });
