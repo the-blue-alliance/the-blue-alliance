@@ -37,7 +37,7 @@ def nag_pending_suggestions() -> str:
 
     if suggestions_to_nag:
         nag_text += (
-            "_Review them on <https://www.thebluealliance.com/suggest/review|TBA>_"
+            "_Review them on <https://www.thebluealliance.com/suggest/review|TBA> or on <https://beta.thebluealliance.com/suggest/review|Beta>_"
         )
         OutgoingNotificationHelper.send_slack_alert(channel_url, nag_text)
 
