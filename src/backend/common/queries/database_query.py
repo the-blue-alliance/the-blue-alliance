@@ -142,16 +142,28 @@ class CachedDatabaseQuery(
 
     @classmethod
     def _compute_result_hash(cls, result: Any) -> str:
-        if result is None:
-            return "none"
-        if isinstance(result, (bytes, bytearray)):
-            return hashlib.md5(result).hexdigest()
-        if isinstance(result, str):
-            return hashlib.md5(result.encode("utf-8")).hexdigest()
-        try:
-            return hashlib.md5(orjson.dumps(result)).hexdigest()
-        except (TypeError, orjson.JSONEncodeError):
-            return hashlib.md5(pickle.dumps(result, protocol=4)).hexdigest()
+        with Span("query.compute_result_hash") as span:
+            if result is None:
+                span.set_label("result_type", "none")
+                return "none"
+            if isinstance(result, (bytes, bytearray)):
+                span.set_label("result_type", "bytes")
+                span.set_label("byte_size", str(len(result)))
+                return hashlib.md5(result).hexdigest()
+            if isinstance(result, str):
+                span.set_label("result_type", "str")
+                span.set_label("byte_size", str(len(result)))
+                return hashlib.md5(result.encode("utf-8")).hexdigest()
+            try:
+                span.set_label("result_type", "json")
+                serialized = orjson.dumps(result)
+                span.set_label("byte_size", str(len(serialized)))
+                return hashlib.md5(serialized).hexdigest()
+            except (TypeError, orjson.JSONEncodeError):
+                span.set_label("result_type", "pickle")
+                pickled = pickle.dumps(result, protocol=4)
+                span.set_label("byte_size", str(len(pickled)))
+                return hashlib.md5(pickled).hexdigest()
 
     @classmethod
     def _record_accessed_cache_key(cls, cache_key: str, result: Any = None) -> None:
