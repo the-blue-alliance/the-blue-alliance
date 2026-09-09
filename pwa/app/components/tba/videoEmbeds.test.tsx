@@ -1,5 +1,4 @@
-// @vitest-environment jsdom
-import { act, cleanup, render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
@@ -34,10 +33,7 @@ function stubIdleCallback() {
 }
 
 afterEach(() => {
-  cleanup();
   vi.useRealTimers();
-  vi.unstubAllGlobals();
-  vi.restoreAllMocks();
 });
 
 describe('YoutubeEmbed', () => {
@@ -64,20 +60,6 @@ describe('YoutubeEmbed', () => {
     );
   });
 
-  test('applies a custom class to the responsive wrapper', () => {
-    render(
-      <YoutubeEmbed
-        videoId="dQw4w9WgXcQ"
-        title="Qualification 1"
-        className="max-w-xl"
-      />,
-    );
-
-    expect(
-      screen.getByTitle('Qualification 1').parentElement?.className,
-    ).toContain('max-w-xl');
-  });
-
   test('shows an accessible placeholder while loading is deferred', () => {
     setDocumentReadyState('loading');
 
@@ -89,9 +71,7 @@ describe('YoutubeEmbed', () => {
       />,
     );
 
-    expect(screen.getByTestId('youtube-embed-placeholder').textContent).toBe(
-      'Loading Qualification 1',
-    );
+    expect(screen.getByText('Loading Qualification 1')).toBeTruthy();
   });
 
   test('does not schedule idle work before the window load event', () => {

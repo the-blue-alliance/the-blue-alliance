@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { ApiError, mapClientError } from '~/lib/apiError';
 
-describe.concurrent('mapClientError', () => {
+describe('mapClientError', () => {
   test('maps a non-OK response to an ApiError with the matching status', () => {
     const response = new Response(null, {
       status: 404,

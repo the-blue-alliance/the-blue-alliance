@@ -1,4 +1,3 @@
-// @vitest-environment jsdom
 import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test } from 'vitest';
 

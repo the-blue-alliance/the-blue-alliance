@@ -126,6 +126,8 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
 - If you need assertions at three different points, write three tests.
 - No loops, conditionals, or try/catch in tests, except to assert an expected error.
 - Assert on what the user can see, not internal state or implementation details.
+- Prefer user-visible behavior and accessibility contracts in component tests: roles, accessible names, text, links, disabled state, and ARIA attributes.
+- Avoid coupling unit/component tests to Tailwind or CSS class names, DOM nesting, or private component structure; cover important visual styling with browser-level Playwright or screenshot tests.
 - Assert on the actual value, not whether a mock was called, unless the call itself is the behavior.
 - Do not assert on fields unrelated to the behavior under test.
 - Inline test data where it is used. Prefer literal values over computed ones.

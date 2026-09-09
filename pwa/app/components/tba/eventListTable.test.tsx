@@ -1,7 +1,6 @@
-// @vitest-environment jsdom
-import { cleanup, render, screen, within } from '@testing-library/react';
+import { render, screen, within } from '@testing-library/react';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { Event, EventType } from '~/api/tba/read';
 import EventListTable from '~/components/tba/eventListTable';
@@ -74,33 +73,11 @@ function makeEvent(overrides: Partial<Event> = {}): Event {
   };
 }
 
-function district(abbreviation: string): NonNullable<Event['district']> {
-  return {
-    abbreviation,
-    display_name: 'FIRST in Michigan',
-    key: `2026${abbreviation.toLowerCase()}`,
-    year: 2026,
-    official_advancement_counts: { dcmp: 160, cmp: 82 },
-  };
-}
-
-function rowForEvent(name: string): HTMLTableRowElement {
-  const row = screen.getByRole('link', { name }).closest('tr');
-  if (!(row instanceof HTMLTableRowElement)) {
-    throw new Error(`Could not find the table row for ${name}`);
-  }
-  return row;
-}
-
 describe('EventListTable', () => {
   beforeEach(() => {
     vi.resetAllMocks();
     isEventActiveMock.mockReturnValue(false);
     isEventOnlineMock.mockReturnValue(false);
-  });
-
-  afterEach(() => {
-    cleanup();
   });
 
   test('renders the table headers', () => {
@@ -180,83 +157,10 @@ describe('EventListTable', () => {
     render(<EventListTable events={[parent, division]} />);
 
     expect(
-      within(rowForEvent('Ganson Division')).queryByText(/Division City/),
-    ).toBeNull();
-  });
-
-  test.each([
-    ['FIM', 'border-l-district-fim'],
-    ['in', 'border-l-district-fin'],
-    ['mar', 'border-l-district-fma'],
-    ['tx', 'border-l-district-fit'],
-  ])('applies the district color for %s', (abbreviation, colorClass) => {
-    render(
-      <EventListTable
-        events={[makeEvent({ district: district(abbreviation) })]}
-      />,
-    );
-
-    expect(
-      rowForEvent('Kettering University Event #1').className.split(' '),
-    ).toEqual(expect.arrayContaining(['border-l-4', colorClass]));
-  });
-
-  test('styles division rows and carries their district color inside the row', () => {
-    const parent = makeEvent({
-      key: '2026necmp',
-      name: 'New England District Championship',
-      district: district('ne'),
-      division_keys: ['2026necmp1'],
-    });
-    const division = makeEvent({
-      key: '2026necmp1',
-      name: 'New England District Championship - Ganson Division',
-      district: district('ne'),
-      parent_event_key: parent.key,
-    });
-
-    render(<EventListTable events={[parent, division]} />);
-
-    const row = rowForEvent('Ganson Division');
-    const firstCell = row.cells.item(0);
-    const districtMarker = Array.from(firstCell?.children ?? []).find((child) =>
-      child.className.includes('border-l-district-ne'),
-    );
-    expect({
-      rowClasses: row.className,
-      cellClasses: firstCell?.className,
-      hasDistrictMarker: districtMarker !== undefined,
-    }).toEqual({
-      rowClasses: expect.stringContaining('bg-muted/40'),
-      cellClasses: expect.stringContaining('pl-[26px]'),
-      hasDistrictMarker: true,
-    });
-  });
-
-  test('adds a separator only between sibling division rows', () => {
-    const parent = makeEvent({
-      key: '2026necmp',
-      name: 'New England District Championship',
-      division_keys: ['2026necmp1', '2026necmp2'],
-    });
-    const firstDivision = makeEvent({
-      key: '2026necmp1',
-      name: 'New England District Championship - Ganson Division',
-    });
-    const secondDivision = makeEvent({
-      key: '2026necmp2',
-      name: 'New England District Championship - Richardson Division',
-    });
-
-    render(<EventListTable events={[parent, firstDivision, secondDivision]} />);
-
-    expect({
-      first:
-        rowForEvent('Ganson Division').className.includes('border-b-border/40'),
-      last: rowForEvent('Richardson Division').className.includes(
-        'border-b-border/40',
+      within(screen.getByRole('row', { name: /Ganson Division/ })).queryByText(
+        /Division City/,
       ),
-    }).toEqual({ first: true, last: false });
+    ).toBeNull();
   });
 
   test('does not show a webcast control when no webcasts are configured', () => {
@@ -295,11 +199,9 @@ describe('EventListTable', () => {
     expect({
       href: link.getAttribute('href'),
       target: link.getAttribute('target'),
-      variantClass: link.className.includes('bg-secondary'),
     }).toEqual({
       href: '/gameday/2026miket',
       target: '_blank',
-      variantClass: true,
     });
   });
 
@@ -314,9 +216,6 @@ describe('EventListTable', () => {
     );
 
     const link = screen.getByRole('link', { name: 'Watch Now' });
-    expect({
-      href: link.getAttribute('href'),
-      variantClass: link.className.includes('bg-green-600'),
-    }).toEqual({ href: '/gameday/2026miket', variantClass: true });
+    expect(link.getAttribute('href')).toBe('/gameday/2026miket');
   });
 });

@@ -13,7 +13,7 @@ const VALID_SUGGESTION_TYPES = [
   'api_auth_access',
 ];
 
-describe.concurrent('REVIEW_GUIDELINES', () => {
+describe('REVIEW_GUIDELINES', () => {
   test('covers the types that have guidance in the web review templates', () => {
     expect(Object.keys(REVIEW_GUIDELINES).sort()).toEqual([
       'api_auth_access',

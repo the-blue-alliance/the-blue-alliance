@@ -1,12 +1,5 @@
-// @vitest-environment jsdom
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  waitFor,
-} from '@testing-library/react';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import ScoutingExport from '~/components/tba/scoutingExport';
 
@@ -49,10 +42,6 @@ function renderScoutingExport() {
 describe('ScoutingExport', () => {
   beforeEach(() => {
     vi.resetAllMocks();
-  });
-
-  afterEach(() => {
-    cleanup();
   });
 
   test('renders the export title', () => {

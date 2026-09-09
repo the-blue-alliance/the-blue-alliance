@@ -22,7 +22,7 @@ vi.mock('~/lib/logger', () => ({
   createLogger: () => loggerMocks,
 }));
 
-describe.concurrent('createQueryClient', () => {
+describe('createQueryClient', () => {
   test('defaults staleTime to STALE_TIME.DEFAULT', () => {
     const queryClient = createQueryClient();
     expect(queryClient.getDefaultOptions().queries?.staleTime).toEqual(
@@ -177,7 +177,7 @@ describe.concurrent('createQueryClient', () => {
   });
 });
 
-describe.concurrent('staleTimeForYear', () => {
+describe('staleTimeForYear', () => {
   const currentYear = Temporal.Now.plainDateISO().year;
 
   test('returns HISTORICAL for a past year', () => {

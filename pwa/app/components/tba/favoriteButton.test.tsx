@@ -1,13 +1,6 @@
-// @vitest-environment jsdom
-import {
-  cleanup,
-  fireEvent,
-  render,
-  screen,
-  within,
-} from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { ReactNode } from 'react';
-import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { ModelType } from '~/api/tba/mobile/types.gen';
 import FavoriteButton from '~/components/tba/favoriteButton';
@@ -43,14 +36,6 @@ vi.mock('~/components/tba/auth/signInWithAppleButton', () => ({
   default: () => <button>Sign in with Apple</button>,
 }));
 
-vi.mock('~icons/bi/star', () => ({
-  default: () => <svg data-testid="outline-star" />,
-}));
-
-vi.mock('~icons/bi/star-fill', () => ({
-  default: () => <svg data-testid="filled-star" />,
-}));
-
 vi.mock('~/components/ui/credenza', () => ({
   Credenza: ({ children, open }: { children: ReactNode; open?: boolean }) =>
     open ? children : null,
@@ -82,10 +67,6 @@ describe('FavoriteButton', () => {
     });
   });
 
-  afterEach(() => {
-    cleanup();
-  });
-
   test('loads myTBA state for the requested model', () => {
     renderFavoriteButton();
 
@@ -96,10 +77,8 @@ describe('FavoriteButton', () => {
     renderFavoriteButton();
 
     expect(
-      screen
-        .getByRole('button', { name: 'Add to favorites' })
-        .contains(screen.getByTestId('outline-star')),
-    ).toBe(true);
+      screen.getByRole('button', { name: 'Add to favorites' }),
+    ).toBeTruthy();
   });
 
   test('shows the remove action when the model is a favorite', () => {
@@ -111,10 +90,8 @@ describe('FavoriteButton', () => {
     renderFavoriteButton();
 
     expect(
-      screen
-        .getByRole('button', { name: 'Remove from favorites' })
-        .contains(screen.getByTestId('filled-star')),
-    ).toBe(true);
+      screen.getByRole('button', { name: 'Remove from favorites' }),
+    ).toBeTruthy();
   });
 
   test('disables the action while the favorite change is pending', () => {

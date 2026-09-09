@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { Layout, getBestLayoutForCount } from '~/lib/gameday/layouts';
 
-describe.concurrent('getBestLayoutForCount', () => {
+describe('getBestLayoutForCount', () => {
   test('returns single view for 0 or 1 webcasts', () => {
     expect(getBestLayoutForCount(0)).toBe(Layout.SINGLE_VIEW);
     expect(getBestLayoutForCount(1)).toBe(Layout.SINGLE_VIEW);

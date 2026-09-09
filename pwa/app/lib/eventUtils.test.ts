@@ -20,7 +20,7 @@ import {
   toCalendarEvent,
 } from '~/lib/eventUtils';
 
-describe.concurrent('groupEventsByParent', () => {
+describe('groupEventsByParent', () => {
   function makeEvent(
     key: string,
     start_date: string,
@@ -123,7 +123,7 @@ describe.concurrent('groupEventsByParent', () => {
   });
 });
 
-describe.concurrent('stripParentPrefix', () => {
+describe('stripParentPrefix', () => {
   test('strips matching prefix and space separator', () => {
     expect(
       stripParentPrefix(
@@ -177,7 +177,7 @@ describe.concurrent('stripParentPrefix', () => {
   });
 });
 
-describe.concurrent('isValidEventKey', () => {
+describe('isValidEventKey', () => {
   test.each(['2010ct', '2014onto2', '202121fim', '2022dc305'])(
     'valid event key',
     (key) => {
@@ -190,7 +190,7 @@ describe.concurrent('isValidEventKey', () => {
   });
 });
 
-describe.concurrent('getEventDateString', () => {
+describe('getEventDateString', () => {
   test('Same start and end date', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
@@ -219,7 +219,7 @@ describe.concurrent('getEventDateString', () => {
   });
 });
 
-describe.concurrent('toCalendarEvent', () => {
+describe('toCalendarEvent', () => {
   test('sets title, allDay, description, url, and location', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
@@ -295,7 +295,7 @@ describe.concurrent('toCalendarEvent', () => {
   });
 });
 
-describe.concurrent('groupEventsBySections', () => {
+describe('groupEventsBySections', () => {
   function makeEvent(overrides: Partial<Event>): Event {
     // @ts-expect-error: Don't need to fill out all the fields
     return {
@@ -444,7 +444,7 @@ describe.concurrent('groupEventsBySections', () => {
   });
 });
 
-describe.concurrent('getEventWeekString', () => {
+describe('getEventWeekString', () => {
   test('Null year', () => {
     // @ts-expect-error: Don't need to fill out all the fields
     const event: Event = {
@@ -983,7 +983,7 @@ describe('isEventActive', () => {
   });
 });
 
-describe.concurrent('getPublicAgendaUrl', () => {
+describe('getPublicAgendaUrl', () => {
   function makeEvent(
     event_type: EventType,
     event_code: string,

@@ -5,7 +5,7 @@ import {
   attemptToParseSponsors,
 } from '~/lib/teamUtils';
 
-describe.concurrent('attemptToParseSponsors', () => {
+describe('attemptToParseSponsors', () => {
   test('Single school, multiple sponsors', () => {
     const teamName = 'Company 1/Company 2/Company 3&Public High School';
     const sponsors = attemptToParseSponsors(teamName);
@@ -248,7 +248,7 @@ describe.concurrent('attemptToParseSponsors', () => {
   });
 });
 
-describe.concurrent('attemptToParseSchoolNameFromOldTeamName', () => {
+describe('attemptToParseSchoolNameFromOldTeamName', () => {
   test('Single school, multiple sponsors', () => {
     const teamName = 'Company 1/Company 2/Company 3&Public High School';
     const schoolName = attemptToParseSchoolNameFromOldTeamName(teamName);

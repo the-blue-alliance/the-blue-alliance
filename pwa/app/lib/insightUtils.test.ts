@@ -16,7 +16,7 @@ function data(overrides: Partial<TimeseriesData>): TimeseriesData {
   };
 }
 
-describe.concurrent('timeseriesHasTemporalXAxis', () => {
+describe('timeseriesHasTemporalXAxis', () => {
   test('is false for categorical x-axes', () => {
     expect(timeseriesHasTemporalXAxis(data({ x_type: 'year' }))).toBe(false);
     expect(timeseriesHasTemporalXAxis(data({ x_type: 'week' }))).toBe(false);
@@ -36,7 +36,7 @@ describe.concurrent('timeseriesHasTemporalXAxis', () => {
   });
 });
 
-describe.concurrent('mergeSeries', () => {
+describe('mergeSeries', () => {
   test('keeps input order for a categorical x-axis', () => {
     const rows = mergeSeries(
       data({

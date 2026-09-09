@@ -5,7 +5,7 @@ import { tanstackStart } from '@tanstack/react-start/plugin/vite';
 import react from '@vitejs/plugin-react';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
-import { defineConfig } from 'vite';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 function getCommitHash(): string {
   try {
@@ -28,6 +28,15 @@ const staticRoutes = [
 ];
 
 export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    exclude: [...configDefaults.exclude, 'tests/**', 'app/api/**'],
+    setupFiles: ['./vitest.setup.ts'],
+    clearMocks: true,
+    restoreMocks: true,
+    unstubEnvs: true,
+    unstubGlobals: true,
+  },
   resolve: {
     tsconfigPaths: true,
   },

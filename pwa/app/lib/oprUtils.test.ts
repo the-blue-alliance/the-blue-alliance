@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { buildCoprTableModel } from '~/lib/oprUtils';
 
-describe.concurrent('buildCoprTableModel', () => {
+describe('buildCoprTableModel', () => {
   test('drops components whose values are all zero', () => {
     const model = buildCoprTableModel(
       {

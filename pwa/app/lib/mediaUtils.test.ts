@@ -103,7 +103,7 @@ function youtubeMedia(foreignKey: string): Media {
   } as Media;
 }
 
-describe.concurrent('getMediaLinkUrl', () => {
+describe('getMediaLinkUrl', () => {
   test('smugmug-album links to its web_uri', () => {
     expect(getMediaLinkUrl(smugmugAlbum())).toBe(
       'https://nefirst.smugmug.com/2026-INGENUITY-Awards',
@@ -124,7 +124,7 @@ describe.concurrent('getMediaLinkUrl', () => {
   });
 });
 
-describe.concurrent('getSmugmugAlbums', () => {
+describe('getSmugmugAlbums', () => {
   test('keeps only smugmug-album media', () => {
     const media = [smugmugAlbum(), smugmugPhoto(), youtubeMedia('abc')];
     expect(getSmugmugAlbums(media)).toEqual([smugmugAlbum()]);
@@ -135,7 +135,7 @@ describe.concurrent('getSmugmugAlbums', () => {
   });
 });
 
-describe.concurrent('getMediaThumbUrl', () => {
+describe('getMediaThumbUrl', () => {
   test('imgur inserts the large size suffix before the extension', () => {
     expect(getMediaThumbUrl(imgurMedia())).toBe(
       'https://i.imgur.com/aB3d9Xkl.jpg',
@@ -201,7 +201,7 @@ describe.concurrent('getMediaThumbUrl', () => {
   });
 });
 
-describe.concurrent('getMediaThumbSrcSet', () => {
+describe('getMediaThumbSrcSet', () => {
   test('imgur returns 1x/2x descriptors', () => {
     expect(getMediaThumbSrcSet(imgurMedia())).toBe(
       'https://i.imgur.com/aB3d9Xkl.jpg 1x, https://i.imgur.com/aB3d9Xkh.jpg 2x',
@@ -219,7 +219,7 @@ describe.concurrent('getMediaThumbSrcSet', () => {
   });
 });
 
-describe.concurrent('getEventVideos', () => {
+describe('getEventVideos', () => {
   test('keeps only youtube media', () => {
     const media = [youtubeMedia('abc'), youtubeMedia('def'), smugmugAlbum()];
     expect(getEventVideos(media).map((m) => m.foreign_key)).toEqual([
