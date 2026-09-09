@@ -3,48 +3,58 @@ import { expect, test } from '@playwright/test';
 test('past-year district championship page stops polling', async ({ page }) => {
   await page.clock.install();
 
-  const eventsRequests: string[] = [];
-  page.on('request', (request) => {
-    if (request.url().includes('/api/v3/events/2019')) {
-      eventsRequests.push(request.url());
-    }
-  });
+  const requestUrls: string[] = [];
+  page.on('request', (request) => requestUrls.push(request.url()));
+  const firstEventsRequest = page.waitForRequest((request) =>
+    request.url().includes('/api/v3/events/2019'),
+  );
 
   await page.goto('/district/fim/champs/2019');
   await page.locator('body[data-hydrated]').waitFor();
-  await expect.poll(() => eventsRequests.length).toBeGreaterThan(0);
+  await firstEventsRequest;
 
-  const afterLoad = eventsRequests.length;
+  const eventsRequestCount = requestUrls.filter((url) =>
+    url.includes('/api/v3/events/2019'),
+  ).length;
   await page.clock.fastForward('03:00');
   await page.waitForTimeout(500);
 
-  expect(eventsRequests.length).toBe(afterLoad);
+  expect(
+    requestUrls.filter((url) => url.includes('/api/v3/events/2019')),
+  ).toHaveLength(eventsRequestCount);
 });
 
-test('district rankings table shows the Advancement column', async ({
-  page,
-}) => {
-  await page.goto('/district/fim/2024');
-  await page.locator('body[data-hydrated]').waitFor();
+test.describe('/district/fim/2024 rankings', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/district/fim/2024');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+  });
 
-  await page.getByRole('tab', { name: 'Rankings' }).click();
+  test('shows the Advancement column', async ({ page }) => {
+    await expect(
+      page.getByRole('columnheader', { name: 'Advancement' }),
+    ).toBeVisible();
+  });
 
-  const header = page.getByRole('columnheader', { name: 'Advancement' });
-  await expect(header).toBeVisible();
+  test('shows an advancement status for qualifying teams', async ({ page }) => {
+    const advancementStatuses = await page
+      .locator('tbody tr td:last-child')
+      .allTextContents();
 
-  const rows = page.getByRole('row');
-  const rowCount = await rows.count();
-  const cells: string[] = [];
-  for (let i = 1; i < rowCount; i++) {
-    cells.push(
-      (await rows.nth(i).getByRole('cell').last().textContent())?.trim() ?? '',
+    expect(advancementStatuses.some((status) => status.trim().length > 0)).toBe(
+      true,
     );
-  }
+  });
 
-  const allowedCell = /^$|^DCMP$|^Declined (CMP|DCMP)$|^[A-Z]/;
-  for (const cell of cells) {
-    expect(cell).toMatch(allowedCell);
-  }
+  test('uses recognized advancement status labels', async ({ page }) => {
+    const advancementStatuses = await page
+      .locator('tbody tr td:last-child')
+      .allTextContents();
+    const allowedStatus = /^$|^DCMP$|^Declined (CMP|DCMP)$|^[A-Z]/;
 
-  expect(cells.some((cell) => cell.length > 0)).toBe(true);
+    expect(
+      advancementStatuses.every((status) => allowedStatus.test(status.trim())),
+    ).toBe(true);
+  });
 });

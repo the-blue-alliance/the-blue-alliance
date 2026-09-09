@@ -1,30 +1,39 @@
 import { expect, test } from '@playwright/test';
 
-test('teams page selector shows range labels, not raw page numbers', async ({
-  page,
-}) => {
-  await page.goto('/teams/2');
-  await page.locator('body[data-hydrated]').waitFor();
+test.describe('/teams/2', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/teams/2');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
 
-  const trigger = page.getByRole('combobox');
-  await expect(trigger).toContainText('1000s');
-  await expect(trigger).not.toHaveText(/^2$/);
+  test('labels the selected page by team number range', async ({ page }) => {
+    await expect(page.getByRole('combobox')).toContainText('1000s');
+  });
+
+  test('does not use the raw page number as the selector label', async ({
+    page,
+  }) => {
+    await expect(page.getByRole('combobox')).not.toHaveText(/^2$/);
+  });
 });
 
-test('teams page selector opens a list taller than the trigger', async ({
-  page,
-}) => {
-  await page.goto('/teams');
-  await page.locator('body[data-hydrated]').waitFor();
+test.describe('/teams', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/teams');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
 
-  const trigger = page.getByRole('combobox');
-  await expect(trigger).toContainText('1-999');
-  await trigger.click();
+  test('labels the first page by team number range', async ({ page }) => {
+    await expect(page.getByRole('combobox')).toContainText('1-999');
+  });
 
-  const listbox = page.getByRole('listbox');
-  await expect(listbox).toBeVisible();
+  test('shows multiple page ranges when the selector opens', async ({
+    page,
+  }) => {
+    await page.getByRole('combobox').click();
 
-  const options = listbox.getByRole('option');
-  expect(await options.count()).toBeGreaterThan(3);
-  await expect(options.nth(3)).toBeInViewport();
+    await expect(
+      page.getByRole('listbox').getByRole('option').nth(3),
+    ).toBeInViewport();
+  });
 });

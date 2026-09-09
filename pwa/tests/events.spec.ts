@@ -1,41 +1,44 @@
 import { expect, test } from '@playwright/test';
 
-test.beforeEach(async ({ page }) => {
-  await page.goto('/events/2025');
+test.describe('/events/2025', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/events/2025');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('lists championship divisions immediately after Einstein Field', async ({
+    page,
+  }) => {
+    const einsteinRow = page
+      .locator('table')
+      .filter({ hasText: 'Einstein Field' })
+      .first()
+      .getByRole('row')
+      .filter({
+        has: page.getByRole('link', { name: 'Einstein Field', exact: true }),
+      });
+
+    await expect(
+      einsteinRow.locator('xpath=following-sibling::tr[1]'),
+    ).toContainText('Archimedes Division');
+  });
+
+  test('drops the parent event name from division rows', async ({ page }) => {
+    await expect(
+      page.getByRole('link', { name: 'Mercury Division', exact: true }),
+    ).toBeVisible();
+  });
 });
 
-test('championship divisions are listed under Einstein Field', async ({
-  page,
-}) => {
-  const rows = page
-    .locator('table')
-    .filter({ hasText: 'Einstein Field' })
-    .first()
-    .locator('tbody tr');
+test.describe('/events', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/events');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
 
-  const keys = await rows.evaluateAll((els) =>
-    els.map((el) => el.querySelector('a')?.getAttribute('href') ?? ''),
-  );
-
-  const einstein = keys.indexOf('/event/2025cmptx');
-  const archimedes = keys.indexOf('/event/2025arc');
-
-  expect(einstein).toBeGreaterThanOrEqual(0);
-  expect(archimedes).toBe(einstein + 1);
-});
-
-test('division rows drop the parent event name prefix', async ({ page }) => {
-  await expect(
-    page.getByRole('link', { name: 'Mercury Division', exact: true }),
-  ).toBeVisible();
-});
-
-test('events page district selector shows "All Events" label', async ({
-  page,
-}) => {
-  await page.goto('/events');
-  await page.locator('body[data-hydrated]').waitFor();
-
-  const trigger = page.getByRole('combobox').filter({ hasText: 'All Events' });
-  await expect(trigger).toBeVisible();
+  test('labels the district selector as All Events', async ({ page }) => {
+    await expect(
+      page.getByRole('combobox').filter({ hasText: 'All Events' }),
+    ).toBeVisible();
+  });
 });
