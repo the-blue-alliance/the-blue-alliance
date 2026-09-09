@@ -9,6 +9,7 @@ from backend.api.handlers.decorators import etag_304_cache
 from backend.api.handlers.helpers.etag_helper import (
     get_etag_dependencies,
     normalize_etag,
+    save_etag_dependencies,
 )
 from backend.common.consts.auth_type import AuthType
 from backend.common.environment import Environment
@@ -758,3 +759,32 @@ def test_validate_etag_in_memory_cache_different_path(
     assert etag_304_cache.get(("/api/v3/team/frc254", norm_etag)) is True
     # Different endpoint path must not be in cache
     assert etag_304_cache.get(("/api/v3/team/frc9999", norm_etag)) is None
+
+
+def test_save_etag_dependencies_batches_in_single_set_multi(
+    memcache_stub, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    memcache = MemcacheClient.get()
+    set_mock = MagicMock(wraps=memcache.set)
+    set_multi_mock = MagicMock(wraps=memcache.set_multi)
+    monkeypatch.setattr(memcache, "set", set_mock)
+    monkeypatch.setattr(memcache, "set_multi", set_multi_mock)
+
+    query_keys = {"team_query_1", "team_query_2"}
+    save_etag_dependencies("test_etag_123", query_keys, path="/api/v3/team/frc254")
+
+    # Verify set_multi was called exactly once
+    set_multi_mock.assert_called_once()
+    mapping = set_multi_mock.call_args[0][0]
+
+    # Verify query version keys and etag_deps key are all batched in a single mapping
+    assert b"q_ver:team_query_1" in mapping
+    assert b"q_ver:team_query_2" in mapping
+    assert b"etag_deps:/api/v3/team/frc254:test_etag_123" in mapping
+    assert mapping[b"etag_deps:/api/v3/team/frc254:test_etag_123"] == {
+        "team_query_1": str(mapping[b"q_ver:team_query_1"]),
+        "team_query_2": str(mapping[b"q_ver:team_query_2"]),
+    }
+
+    # Verify memcache.set was NOT called (eliminates redundant round-trip)
+    set_mock.assert_not_called()
