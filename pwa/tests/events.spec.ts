@@ -29,3 +29,13 @@ test('division rows drop the parent event name prefix', async ({ page }) => {
     page.getByRole('link', { name: 'Mercury Division', exact: true }),
   ).toBeVisible();
 });
+
+test('events page district selector shows "All Events" label', async ({
+  page,
+}) => {
+  await page.goto('/events');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  const trigger = page.getByRole('combobox').filter({ hasText: 'All Events' });
+  await expect(trigger).toBeVisible();
+});

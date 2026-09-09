@@ -316,3 +316,143 @@ test.describe('/team/2713/2024', () => {
     await expect(page.locator('body')).toContainText('points.');
   });
 });
+
+const TEAM_PAGE = '/team/254/2026';
+
+function isImgurThumb(url: string): boolean {
+  return /i\.imgur\.com\/[A-Za-z0-9]{7}[lh]\.\w+(\?.*)?$/.test(url);
+}
+
+function isImgurOriginal(url: string): boolean {
+  return (
+    /i\.imgur\.com\/[A-Za-z0-9]+\.\w+(\?.*)?$/.test(url) && !isImgurThumb(url)
+  );
+}
+
+test.describe('team robot-pic carousel', () => {
+  test('first slide eager + resized, later slides deferred', async ({
+    page,
+  }) => {
+    const imageRequests: string[] = [];
+    page.on('request', (request) => {
+      if (request.resourceType() === 'image') imageRequests.push(request.url());
+    });
+
+    await page.goto(TEAM_PAGE);
+    await page.locator('body[data-hydrated]').waitFor();
+
+    const carousel = page.locator('[aria-roledescription="carousel"]').first();
+    await expect(carousel).toBeVisible();
+
+    const slides = carousel.locator('[aria-roledescription="slide"]');
+    const imgs = carousel.locator('img');
+    const slideCount = await slides.count();
+    expect(slideCount).toBeGreaterThan(3);
+    expect(await imgs.count()).toBeLessThan(slideCount);
+
+    await expect(imgs.first()).toHaveAttribute('loading', 'eager');
+    await expect(imgs.first()).toHaveAttribute('fetchpriority', 'high');
+    await expect(imgs.nth(1)).toHaveAttribute('loading', 'lazy');
+    await expect(imgs.nth(1)).toHaveAttribute('fetchpriority', 'low');
+
+    const firstSrc = await imgs
+      .first()
+      .evaluate((element) => (element as HTMLImageElement).currentSrc);
+    expect(isImgurThumb(firstSrc)).toBe(true);
+    expect(imageRequests).toContain(firstSrc);
+
+    for (const url of imageRequests) {
+      expect(isImgurOriginal(url)).toBe(false);
+    }
+
+    expect(await slides.last().locator('img').count()).toBe(0);
+  });
+
+  test('navigation and the original-media link still work', async ({
+    page,
+  }) => {
+    await page.goto(TEAM_PAGE);
+    await page.locator('body[data-hydrated]').waitFor();
+
+    const carousel = page.locator('[aria-roledescription="carousel"]').first();
+    await expect(carousel).toBeVisible();
+
+    await expect(
+      carousel.locator('a[target="_blank"]').first(),
+    ).toHaveAttribute('href', /^https?:\/\//);
+
+    const slide0 = carousel.locator('[aria-roledescription="slide"]').first();
+    const x = () =>
+      slide0.evaluate((element) => element.getBoundingClientRect().x);
+    const startX = await x();
+
+    const next = page.getByRole('button', { name: 'Next slide' });
+    const prev = page.getByRole('button', { name: 'Previous slide' });
+
+    await next.click();
+    await expect(prev).toBeEnabled();
+    await expect.poll(x).toBeLessThan(startX - 100);
+
+    await prev.click();
+    await expect.poll(x).toBeGreaterThan(startX - 100);
+  });
+
+  test('mobile: first slide is eager and later slides are lazy', async ({
+    page,
+  }) => {
+    await page.goto(TEAM_PAGE);
+    await page.locator('body[data-hydrated]').waitFor();
+
+    const imgs = page
+      .locator('[aria-roledescription="carousel"]')
+      .first()
+      .locator('img');
+    await expect(imgs.first()).toHaveAttribute('loading', 'eager');
+    await expect(imgs.first()).toHaveAttribute('fetchpriority', 'high');
+    await expect(imgs.nth(1)).toHaveAttribute('loading', 'lazy');
+  });
+});
+
+test('team media gallery loads resized images, not full-res originals', async ({
+  page,
+}) => {
+  const imgurRequests: string[] = [];
+  page.on('request', (request) => {
+    if (
+      request.resourceType() === 'image' &&
+      request.url().includes('i.imgur.com')
+    ) {
+      imgurRequests.push(request.url());
+    }
+  });
+
+  await page.goto(TEAM_PAGE);
+  await page.locator('body[data-hydrated]').waitFor();
+
+  const gallery = page.getByTestId('team-media-gallery');
+  await expect(gallery).toBeVisible();
+  await gallery.locator('img').first().waitFor();
+  await expect.poll(() => imgurRequests.length).toBeGreaterThan(3);
+
+  for (const url of imgurRequests) {
+    expect(isImgurOriginal(url)).toBe(false);
+  }
+
+  await expect(gallery.locator('a[target="_blank"]').first()).toHaveAttribute(
+    'href',
+    /^https?:\/\//,
+  );
+});
+
+test('team page shows the favorite button', async ({ page }) => {
+  await page.goto('/team/604/2024');
+  await expect(
+    page.getByRole('button', { name: /add to favorites/i }),
+  ).toBeVisible();
+});
+
+test('clicking team favorite opens the login dialog', async ({ page }) => {
+  await page.goto('/team/604/2024');
+  await page.getByRole('button', { name: /add to favorites/i }).click();
+  await expect(page.getByText('Sign in to use myTBA')).toBeVisible();
+});

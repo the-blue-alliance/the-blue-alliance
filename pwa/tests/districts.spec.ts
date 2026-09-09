@@ -1,14 +1,5 @@
 import { expect, test } from '@playwright/test';
 
-// The /districts table gained "DCMP Cutoff" / "CMP Cutoff" columns (minimum
-// district points to advance) fed by a per-district getDistrictAdvancement query.
-// Cutoff data may not exist for every district, so cells render "-" until (and
-// unless) the advancement cutoffs are calculated.
-//
-// The Teams and cutoff cells are filled by per-district follow-up queries. While
-// those are in flight the cells show a shadcn Skeleton block, then resolve to a
-// number (or "-" when there is genuinely no data).
-
 test('districts table shows DCMP/CMP cutoff columns', async ({ page }) => {
   await page.goto('/districts/2024');
   await page.locator('body[data-hydrated]').waitFor();

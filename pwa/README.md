@@ -302,7 +302,9 @@ Each line is `- /path` optionally followed by a display name. If no pages are li
 
 ## Playwright tests
 
-Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
+Playwright (end to end) tests are within `./tests` and cover route-level behavior. Keep assertions for a specific route in that route's spec file; `routes.spec.ts` is the exception and provides the exhaustive route smoke-test matrix. Component and unit tests live next to the source file they cover.
+
+Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
 
 ```sh
 # Installs playwright binaries
