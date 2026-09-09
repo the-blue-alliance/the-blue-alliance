@@ -123,13 +123,10 @@ def save_etag_dependencies(
             versions_to_set[q_key] = ver
             deps[k] = str(ver)
 
-        if versions_to_set:
-            memcache.set_multi(versions_to_set, time=ttl)
+        versions_to_set[
+            f"etag_deps:{endpoint_path}:{normalized_etag}".encode("utf-8")
+        ] = deps
 
-        memcache.set(
-            f"etag_deps:{endpoint_path}:{normalized_etag}".encode("utf-8"),
-            deps,
-            time=ttl,
-        )
+        memcache.set_multi(versions_to_set, time=ttl)
     except Exception as e:
         logging.warning(f"Error saving ETag dependencies to Memcache: {e}")
