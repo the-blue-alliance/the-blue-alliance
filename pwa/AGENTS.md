@@ -133,17 +133,36 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
 #### Isolation
 
 - Each test runs alone, in any order, with no shared mutable state.
-- Prefer explicit setup inside the test over shared fixtures or `beforeEach`.
-- Extract shared navigation and setup into named helpers (`loginAs(user)`, `addItemToCart(sku)`). Helpers may click, type, and navigate, but must not assert.
+- Use `beforeEach` for shared navigation and setup when every test in a
+  `describe` block starts from the same route and state. Keep
+  behavior-specific setup inside each test.
+- Extract shared navigation and setup into named helpers (`loginAs(user)`,
+  `addItemToCart(sku)`) when tests need different routes or preconditions.
+  Helpers may click, type, and navigate, but must not assert.
 - Duplication in tests is fine. Copy-paste beats a helper that hides what is being tested.
 
 #### Parameterized tests
 
 - Same interaction, different inputs, and the same expected shape means one parameterized test, with one case per input.
-- Give each case a name. Use `test.each` with a `%s` label or a `{name, input, expected}` table; never use bare tuples that print as `case 4`.
+- Give each case a descriptive name and include it in the generated test title. In Vitest, use `test.each` with a `%s` label or a `{name, input, expected}` table.
 - The body must be identical for every case. If one input needs an extra click or a different assertion, make it its own test.
 - Do not branch on the parameter inside the body. An `if (input.type === ...)` means these are two tests wearing a costume.
 - Do not compute expected values from the input. Write the expected value literally for each case, even when repetitive.
+
+For Playwright route specs, which do not provide Vitest's `test.each`, prefer an inline array of named tuple cases followed by `.forEach`:
+
+```ts
+[
+  ['Facebook', 'https://www.facebook.com/frc604'],
+  ['GitHub', 'https://github.com/frc604'],
+].forEach(([name, expectedHref]) => {
+  test(`links to the ${name} profile`, async ({ page }) => {
+    await expect(profileLink(page, name)).toHaveAttribute('href', expectedHref);
+  });
+});
+```
+
+Keep one-use case data next to the `.forEach`; extract it only when the same cases are reused. Use the `.forEach` callback index for positional selectors such as `.nth(index)` instead of storing a duplicate index in each tuple. Keep generated test bodies identical and branch-free; loops and conditionals belong in test generation or named helpers, not in the test body.
 
 ## PR Screenshots
 
