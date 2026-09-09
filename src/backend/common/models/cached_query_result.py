@@ -6,6 +6,8 @@ from typing import Any, Generator, Iterable, Optional
 
 from google.appengine.ext import ndb
 
+from backend.common.profiler import Span
+
 
 class CachedQueryResult(ndb.Model):
     """
@@ -27,21 +29,23 @@ class CachedQueryResult(ndb.Model):
         if not values or b"result_dict" not in values:
             return None
         val = values[b"result_dict"]
-        if isinstance(val, ndb.model._BaseValue):
-            b_val = val.b_val
-            if isinstance(b_val, ndb.model._CompressedValue):
-                return zlib.decompress(b_val.z_val)
-            elif isinstance(b_val, (bytes, bytearray)):
-                return bytes(b_val)
-            elif isinstance(b_val, str):
-                return b_val.encode("utf-8")
-        elif isinstance(val, (bytes, bytearray)):
-            return bytes(val)
-        elif isinstance(val, str):
-            return val.encode("utf-8")
-        elif val is not None:
-            return json.dumps(val, separators=(",", ":")).encode("utf-8")
-        return None
+        with Span("cached_query.get_json_bytes") as span:
+            target = val.b_val if isinstance(val, ndb.model._BaseValue) else val
+            if isinstance(target, ndb.model._CompressedValue):
+                res_bytes = zlib.decompress(target.z_val)
+                span.set_label("compressed_bytes", str(len(target.z_val)))
+            elif isinstance(target, (bytes, bytearray)):
+                res_bytes = bytes(target)
+            elif isinstance(target, str):
+                res_bytes = target.encode("utf-8")
+            elif target is not None:
+                res_bytes = json.dumps(target, separators=(",", ":")).encode("utf-8")
+            else:
+                res_bytes = None
+
+            if res_bytes is not None:
+                span.set_label("uncompressed_bytes", str(len(res_bytes)))
+            return res_bytes
 
     @staticmethod
     def cache_key_prefix_from_format(cache_key_format: str) -> str:
@@ -176,45 +180,50 @@ class CachedQueryResult(ndb.Model):
         if self.result is None:
             return False
 
-        # Handle both single model and list of models
-        models_to_check = []
-        if isinstance(self.result, list):
-            models_to_check = self.result
-        else:
-            models_to_check = [self.result]
+        with Span("cached_query.validate_properties") as span:
+            # Handle both single model and list of models
+            models_to_check = []
+            if isinstance(self.result, list):
+                models_to_check = self.result
+            else:
+                models_to_check = [self.result]
 
-        for model in models_to_check:
-            # Skip non-CachedModel objects and models without _properties
-            if not hasattr(model, "_properties"):
-                continue
+            span.set_label("entity_count", str(len(models_to_check)))
+            if models_to_check and hasattr(models_to_check[0], "__class__"):
+                span.set_label("model_kind", models_to_check[0].__class__.__name__)
 
-            missing_properties = []
-            for prop_name, prop in model._properties.items():
-                # Check if property is required and value is None
-                if hasattr(prop, "_required") and prop._required:
-                    value = getattr(model, prop_name, None)
-                    if value is None:
-                        missing_properties.append(prop_name)
+            for model in models_to_check:
+                # Skip non-CachedModel objects and models without _properties
+                if not hasattr(model, "_properties"):
+                    continue
 
-            # Log error if any required properties are missing
-            if missing_properties:
-                stack_trace = "".join(traceback.format_stack())
-                model_key = (
-                    model.key.urlsafe() if model.key else "No key (unsaved model)"
-                )
-                cached_result_key = (
-                    self.key.urlsafe() if self.key else "No key (unsaved result)"
-                )
-                logging.error(
-                    f"Required properties not set on {model.__class__.__name__} "
-                    f"in CachedQueryResult: {', '.join(missing_properties)}\n"
-                    f"Model key: {model_key}\n"
-                    f"CachedQueryResult key: {cached_result_key}\n"
-                    f"Stack trace:\n{stack_trace}"
-                )
-                return True
+                missing_properties = []
+                for prop_name, prop in model._properties.items():
+                    # Check if property is required and value is None
+                    if hasattr(prop, "_required") and prop._required:
+                        value = getattr(model, prop_name, None)
+                        if value is None:
+                            missing_properties.append(prop_name)
 
-        return False
+                # Log error if any required properties are missing
+                if missing_properties:
+                    stack_trace = "".join(traceback.format_stack())
+                    model_key = (
+                        model.key.urlsafe() if model.key else "No key (unsaved model)"
+                    )
+                    cached_result_key = (
+                        self.key.urlsafe() if self.key else "No key (unsaved result)"
+                    )
+                    logging.error(
+                        f"Required properties not set on {model.__class__.__name__} "
+                        f"in CachedQueryResult: {', '.join(missing_properties)}\n"
+                        f"Model key: {model_key}\n"
+                        f"CachedQueryResult key: {cached_result_key}\n"
+                        f"Stack trace:\n{stack_trace}"
+                    )
+                    return True
+
+            return False
 
     def _pre_put_hook(self) -> None:
         """
@@ -224,42 +233,47 @@ class CachedQueryResult(ndb.Model):
         if self.result is None:
             return
 
-        from google.appengine.api import datastore_errors
+        with Span("cached_query.pre_put_validation") as span:
+            from google.appengine.api import datastore_errors
 
-        # Handle both single model and list of models
-        models_to_check = []
-        if isinstance(self.result, list):
-            models_to_check = self.result
-        else:
-            models_to_check = [self.result]
+            # Handle both single model and list of models
+            models_to_check = []
+            if isinstance(self.result, list):
+                models_to_check = self.result
+            else:
+                models_to_check = [self.result]
 
-        for model in models_to_check:
-            # Skip non-CachedModel objects and models without _properties
-            if not hasattr(model, "_properties"):
-                continue
+            span.set_label("entity_count", str(len(models_to_check)))
+            if models_to_check and hasattr(models_to_check[0], "__class__"):
+                span.set_label("model_kind", models_to_check[0].__class__.__name__)
 
-            missing_properties = []
-            for prop_name, prop in model._properties.items():
-                # Check if property is required and value is None
-                if hasattr(prop, "_required") and prop._required:
-                    value = getattr(model, prop_name, None)
-                    if value is None:
-                        missing_properties.append(prop_name)
+            for model in models_to_check:
+                # Skip non-CachedModel objects and models without _properties
+                if not hasattr(model, "_properties"):
+                    continue
 
-            # Raise exception if any required properties are missing
-            if missing_properties:
-                model_key = (
-                    model.key.urlsafe() if model.key else "No key (unsaved model)"
-                )
-                cached_result_key = (
-                    self.key.urlsafe() if self.key else "No key (unsaved result)"
-                )
-                raise datastore_errors.BadValueError(
-                    f"Required properties not set on {model.__class__.__name__} "
-                    f"in CachedQueryResult (model key: {model_key}, "
-                    f"result key: {cached_result_key}): "
-                    f"{', '.join(missing_properties)}"
-                )
+                missing_properties = []
+                for prop_name, prop in model._properties.items():
+                    # Check if property is required and value is None
+                    if hasattr(prop, "_required") and prop._required:
+                        value = getattr(model, prop_name, None)
+                        if value is None:
+                            missing_properties.append(prop_name)
+
+                # Raise exception if any required properties are missing
+                if missing_properties:
+                    model_key = (
+                        model.key.urlsafe() if model.key else "No key (unsaved model)"
+                    )
+                    cached_result_key = (
+                        self.key.urlsafe() if self.key else "No key (unsaved result)"
+                    )
+                    raise datastore_errors.BadValueError(
+                        f"Required properties not set on {model.__class__.__name__} "
+                        f"in CachedQueryResult (model key: {model_key}, "
+                        f"result key: {cached_result_key}): "
+                        f"{', '.join(missing_properties)}"
+                    )
 
     @classmethod
     def _post_get_hook(cls, key: ndb.Key, future: Any) -> None:

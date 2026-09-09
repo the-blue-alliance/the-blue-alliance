@@ -8,6 +8,7 @@ from backend.api.handlers.helpers.profiled_jsonify import (
     TypedFlaskResponse,
 )
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.profiler import Span
 from backend.common.queries.database_query import CachedDatabaseQuery
 
 
@@ -34,7 +35,10 @@ def model_query_response(
             abort(404)
         return profiled_jsonify(None)
     if filter_func is not None:
-        data = filter_func([data], model_type)[0]
+        with Span("model_query_response.filter_properties") as span:
+            span.set_label("model_type", str(model_type))
+            span.set_label("item_count", "1")
+            data = filter_func([data], model_type)[0]
     return profiled_jsonify(data)
 
 
@@ -54,5 +58,8 @@ def models_query_response(
 
     data = query.fetch_dict(ApiMajorVersion.API_V3)
     if filter_func is not None and data is not None:
-        data = filter_func(data, model_type)
+        with Span("model_query_response.filter_properties") as span:
+            span.set_label("model_type", str(model_type))
+            span.set_label("item_count", str(len(data)))
+            data = filter_func(data, model_type)
     return profiled_jsonify(data)

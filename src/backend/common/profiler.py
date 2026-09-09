@@ -2,6 +2,7 @@
 
 import logging
 import random
+import time
 from contextvars import ContextVar, Token
 from datetime import datetime
 from typing import Any, cast, Dict, Optional
@@ -84,6 +85,7 @@ class Span:
         self._token: Optional[Token[Optional["Span"]]] = None
         self._startTime: Optional[datetime] = None
         self._endTime: Optional[datetime] = None
+        self._start_cpu: Optional[float] = None
 
         if hasattr(trace_context, "request") and trace_context.request:
             tcontext = trace_context.request.headers.get(
@@ -130,6 +132,8 @@ class Span:
         self._parent_span_id = parent._span_id if parent else self._root_span_id
         self._token = _active_span_var.set(self)
         self._startTime = datetime.now()
+        if self._do_trace:
+            self._start_cpu = time.thread_time()
         return self
 
     def __exit__(self, exc_type, exc_value, traceback) -> None:
@@ -142,6 +146,23 @@ class Span:
             self._token = None
 
         if self._do_trace and exc_type is not GeneratorExit:
+            start_cpu = self._start_cpu
+            start_time = self._startTime
+            end_time = self._endTime
+            if (
+                start_cpu is not None
+                and start_time is not None
+                and end_time is not None
+            ):
+                cpu_duration_ms = (time.thread_time() - start_cpu) * 1000.0
+                self.set_label("cpu_time_ms", f"{cpu_duration_ms:.2f}")
+
+                wall_duration_ms = (end_time - start_time).total_seconds() * 1000.0
+                self.set_label("wall_time_ms", f"{wall_duration_ms:.2f}")
+                if wall_duration_ms > 0:
+                    cpu_ratio = min(1.0, cpu_duration_ms / wall_duration_ms)
+                    self.set_label("cpu_ratio", f"{cpu_ratio:.2f}")
+
             request = getattr(trace_context, "request", None)
             if request is not None:
                 if not hasattr(request, "spans"):

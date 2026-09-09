@@ -324,15 +324,21 @@ def validate_keys(func):
 
             # 4. Resolve futures and populate positive / negative caches
             for validator, key, resolved_key, future in pending_checks:
-                if not future.get_result():
-                    key_does_not_exist_cache.set((validator.entity_name, key), True)
-                    return {
-                        "Error": f"{validator.key_type} key: {key} does not exist"
-                    }, 404
+                with Span(f"validate_keys.resolve:{validator.entity_name}") as span:
+                    span.set_label("lookup_key", key)
+                    entity_result = future.get_result()
+                    span.set_label("exists", str(bool(entity_result)))
+                    if not entity_result:
+                        key_does_not_exist_cache.set((validator.entity_name, key), True)
+                        return {
+                            "Error": f"{validator.key_type} key: {key} does not exist"
+                        }, 404
 
-                key_exists_cache.set((validator.entity_name, key), True)
-                if resolved_key:
-                    key_exists_cache.set((validator.entity_name, resolved_key), True)
+                    key_exists_cache.set((validator.entity_name, key), True)
+                    if resolved_key:
+                        key_exists_cache.set(
+                            (validator.entity_name, resolved_key), True
+                        )
 
         return func(*args, **kwargs)
 
@@ -390,12 +396,20 @@ def validate_etag(func: Callable) -> Callable:
             if resp.status_code == 200:
                 try:
                     if not resp.headers.get("ETag"):
-                        resp.add_etag()
+                        with Span("etag.compute_md5") as span:
+                            resp.add_etag()
+                            data = resp.get_data()
+                            if data:
+                                span.set_label("response_size_bytes", str(len(data)))
                     etag_header = resp.headers.get("ETag")
                     if etag_header and accessed_keys:
                         normalized = normalize_etag(etag_header)
                         if normalized:
-                            save_etag_dependencies(normalized, accessed_keys)
+                            with Span("etag.save_dependencies") as span:
+                                span.set_label(
+                                    "num_query_keys", str(len(accessed_keys))
+                                )
+                                save_etag_dependencies(normalized, accessed_keys)
                 except Exception as e:
                     logging.warning(f"Error saving validate_etag dependencies: {e}")
 
