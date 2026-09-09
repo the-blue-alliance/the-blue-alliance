@@ -1,6 +1,7 @@
 from unittest.mock import Mock
 
 import pytest
+from flask.testing import FlaskClient
 from werkzeug.test import Client
 
 from backend.api.client_api_auth_helper import ClientApiAuthHelper
@@ -8,10 +9,18 @@ from backend.common.models.account import Account
 from backend.common.models.user import User
 
 
+class AutoClosingFlaskClient(FlaskClient):
+    def open(self, *args, **kwargs):
+        resp = super().open(*args, **kwargs)
+        resp.close()
+        return resp
+
+
 @pytest.fixture
 def api_client(gae_testbed, ndb_stub, memcache_stub, taskqueue_stub) -> Client:
     from backend.api.main import app
 
+    app.test_client_class = AutoClosingFlaskClient
     return app.test_client()
 
 
