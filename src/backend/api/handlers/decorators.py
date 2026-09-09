@@ -29,7 +29,6 @@ from backend.common.models.match import Match
 from backend.common.models.team import Team
 from backend.common.profiler import Span
 from backend.common.queries.database_query import track_accessed_query_cache_keys
-from backend.common.run_after_response import run_after_response
 
 
 @dataclass(frozen=True)
@@ -406,19 +405,11 @@ def validate_etag(func: Callable) -> Callable:
                     if etag_header and accessed_keys:
                         normalized = normalize_etag(etag_header)
                         if normalized:
-                            keys_to_save = set(accessed_keys)
-                            request_path = get_request_path()
-
-                            def save_dependencies() -> None:
-                                with Span("etag.save_dependencies") as span:
-                                    span.set_label(
-                                        "num_query_keys", str(len(keys_to_save))
-                                    )
-                                    save_etag_dependencies(
-                                        normalized, keys_to_save, path=request_path
-                                    )
-
-                            run_after_response(save_dependencies)
+                            with Span("etag.save_dependencies") as span:
+                                span.set_label(
+                                    "num_query_keys", str(len(accessed_keys))
+                                )
+                                save_etag_dependencies(normalized, accessed_keys)
                 except Exception as e:
                     logging.warning(f"Error saving validate_etag dependencies: {e}")
 
