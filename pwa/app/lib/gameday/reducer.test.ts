@@ -23,7 +23,7 @@ function createMockWebcast(id: string): WebcastWithMeta {
   };
 }
 
-describe.concurrent('createEmptyPositionArray', () => {
+describe('createEmptyPositionArray', () => {
   test('creates array with MAX_VIEWS null elements', () => {
     const arr = createEmptyPositionArray();
     expect(arr).toHaveLength(MAX_VIEWS);
@@ -38,7 +38,7 @@ describe.concurrent('createEmptyPositionArray', () => {
   });
 });
 
-describe.concurrent('initialState', () => {
+describe('initialState', () => {
   test('has expected default values', () => {
     expect(initialState.layoutId).toBeNull();
     expect(initialState.positionToWebcast).toHaveLength(MAX_VIEWS);
@@ -49,7 +49,7 @@ describe.concurrent('initialState', () => {
   });
 });
 
-describe.concurrent('SET_LAYOUT action', () => {
+describe('SET_LAYOUT action', () => {
   test('sets layout id', () => {
     const state = gamedayReducer(initialState, {
       type: 'SET_LAYOUT',
@@ -90,7 +90,7 @@ describe.concurrent('SET_LAYOUT action', () => {
   });
 });
 
-describe.concurrent('SET_WEBCASTS action', () => {
+describe('SET_WEBCASTS action', () => {
   test('sets webcastsById', () => {
     const webcasts = {
       'event1-0': createMockWebcast('event1-0'),
@@ -135,7 +135,7 @@ describe.concurrent('SET_WEBCASTS action', () => {
   });
 });
 
-describe.concurrent('ADD_WEBCAST_AT_POSITION action', () => {
+describe('ADD_WEBCAST_AT_POSITION action', () => {
   const stateWithLayout: GamedayState = {
     ...initialState,
     layoutId: 3, // Quad view (4 views)
@@ -203,7 +203,7 @@ describe.concurrent('ADD_WEBCAST_AT_POSITION action', () => {
   });
 });
 
-describe.concurrent('REMOVE_WEBCAST action', () => {
+describe('REMOVE_WEBCAST action', () => {
   test('removes webcast from positionToWebcast', () => {
     const stateWithWebcast: GamedayState = {
       ...initialState,
@@ -252,7 +252,7 @@ describe.concurrent('REMOVE_WEBCAST action', () => {
   });
 });
 
-describe.concurrent('SWAP_POSITIONS action', () => {
+describe('SWAP_POSITIONS action', () => {
   test('swaps webcasts between two positions', () => {
     const stateWithWebcasts: GamedayState = {
       ...initialState,
@@ -285,7 +285,7 @@ describe.concurrent('SWAP_POSITIONS action', () => {
   });
 });
 
-describe.concurrent('RESET_WEBCASTS action', () => {
+describe('RESET_WEBCASTS action', () => {
   test('clears all positions', () => {
     const stateWithWebcasts: GamedayState = {
       ...initialState,
@@ -310,7 +310,7 @@ describe.concurrent('RESET_WEBCASTS action', () => {
   });
 });
 
-describe.concurrent('TOGGLE_CHAT_SIDEBAR action', () => {
+describe('TOGGLE_CHAT_SIDEBAR action', () => {
   test('toggles from visible to hidden', () => {
     const state = gamedayReducer(initialState, { type: 'TOGGLE_CHAT_SIDEBAR' });
     expect(state.chatSidebarVisible).toBe(false);
@@ -329,7 +329,7 @@ describe.concurrent('TOGGLE_CHAT_SIDEBAR action', () => {
   });
 });
 
-describe.concurrent('SET_CURRENT_CHAT action', () => {
+describe('SET_CURRENT_CHAT action', () => {
   test('sets current chat channel', () => {
     const state = gamedayReducer(initialState, {
       type: 'SET_CURRENT_CHAT',
@@ -339,7 +339,7 @@ describe.concurrent('SET_CURRENT_CHAT action', () => {
   });
 });
 
-describe.concurrent('RESTORE_URL_STATE action', () => {
+describe('RESTORE_URL_STATE action', () => {
   test('restores layout and positions from URL state', () => {
     const urlState: GamedayUrlState = {
       layoutId: 3, // Quad view (4 views)
@@ -449,7 +449,7 @@ describe.concurrent('RESTORE_URL_STATE action', () => {
   });
 });
 
-describe.concurrent('LOAD_EVENT_WEBCASTS', () => {
+describe('LOAD_EVENT_WEBCASTS', () => {
   test('sets layout and populates positions with event webcasts', () => {
     const webcasts = [
       createMockWebcast('2026tuis-0'),
@@ -495,7 +495,7 @@ describe.concurrent('LOAD_EVENT_WEBCASTS', () => {
   });
 });
 
-describe.concurrent('default case', () => {
+describe('default case', () => {
   test('returns unchanged state for unknown action', () => {
     const unknownAction = {
       type: 'UNKNOWN_ACTION',

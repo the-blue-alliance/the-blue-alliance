@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { escapeCsvField } from '~/lib/csvUtils';
 
-describe.concurrent('escapeCsvField', () => {
+describe('escapeCsvField', () => {
   test('plain text without special characters', () => {
     expect(escapeCsvField('hello')).toEqual('hello');
     expect(escapeCsvField('Team 254')).toEqual('Team 254');

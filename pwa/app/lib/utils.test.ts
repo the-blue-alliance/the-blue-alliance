@@ -13,7 +13,7 @@ import {
   splitIntoNChunks,
 } from '~/lib/utils';
 
-describe.concurrent('queryFromAPI', () => {
+describe('queryFromAPI', () => {
   test('resolves with the response data on success', async () => {
     const apiPromise = Promise.resolve({
       data: 42,
@@ -40,7 +40,7 @@ describe.concurrent('queryFromAPI', () => {
   });
 });
 
-describe.concurrent('parseParamsForYearElseDefault', () => {
+describe('parseParamsForYearElseDefault', () => {
   const currentSeason = 2026;
 
   test('returns currentSeason when no year param is given', () => {
@@ -71,13 +71,13 @@ describe.concurrent('parseParamsForYearElseDefault', () => {
   });
 });
 
-describe.concurrent('removeNonNumeric', () => {
+describe('removeNonNumeric', () => {
   test('basic', () => {
     expect(removeNonNumeric('frc604')).toEqual('604');
   });
 });
 
-describe.concurrent('slugify', () => {
+describe('slugify', () => {
   test('basic', () => {
     expect(slugify('Week 1')).toEqual('week-1');
     expect(slugify('FIRST Championship - Houston')).toEqual(
@@ -86,7 +86,7 @@ describe.concurrent('slugify', () => {
   });
 });
 
-describe.concurrent('median', () => {
+describe('median', () => {
   test('basic', () => {
     expect(median([1, 2, 3, 4, 5])).toEqual(3);
     expect(median([1, 2, 3, 4, 5, 6])).toEqual(3.5);
@@ -94,7 +94,7 @@ describe.concurrent('median', () => {
   });
 });
 
-describe.concurrent('camelCaseToHumanReadable', () => {
+describe('camelCaseToHumanReadable', () => {
   test('basic', () => {
     expect(camelCaseToHumanReadable('camelCaseString')).toEqual(
       'Camel Case String',
@@ -104,7 +104,7 @@ describe.concurrent('camelCaseToHumanReadable', () => {
   });
 });
 
-describe.concurrent('splitIntoNChunks', () => {
+describe('splitIntoNChunks', () => {
   test('basic', () => {
     expect(splitIntoNChunks([1, 2, 3, 4, 5], 2)).toEqual([
       [1, 2, 3],
@@ -113,7 +113,7 @@ describe.concurrent('splitIntoNChunks', () => {
   });
 });
 
-describe.concurrent('hasAnyMatches', () => {
+describe('hasAnyMatches', () => {
   test('returns true when any value is nonzero', () => {
     expect(hasAnyMatches({ wins: 1, losses: 0, ties: 0 })).toEqual(true);
     expect(hasAnyMatches({ wins: 0, losses: 2, ties: 0 })).toEqual(true);

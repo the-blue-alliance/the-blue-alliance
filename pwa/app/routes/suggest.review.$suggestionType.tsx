@@ -203,7 +203,7 @@ function SuggestionReviewList(): JSX.Element {
           return {
             ...prev,
             [focusedSuggestion.key]: {
-              ...(prev[focusedSuggestion.key] ?? {}),
+              ...prev[focusedSuggestion.key],
               set_preferred: !current,
             },
           };
@@ -245,7 +245,7 @@ function SuggestionReviewList(): JSX.Element {
     const accepts = suggestions
       .filter((s) => decisions[s.key] === 'accept')
       .map((s) => {
-        const acceptOverrides = { ...(overrides[s.key] ?? {}) };
+        const acceptOverrides = { ...overrides[s.key] };
         // The preferred checkbox shows a computed default; send it explicitly
         // when the moderator didn't touch it
         if (

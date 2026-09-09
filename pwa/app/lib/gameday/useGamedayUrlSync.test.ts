@@ -19,7 +19,7 @@ function createEmptyUrlState(): GamedayUrlState {
   };
 }
 
-describe.concurrent('hasUrlStateToRestore', () => {
+describe('hasUrlStateToRestore', () => {
   test('returns false for empty state', () => {
     const state = createEmptyUrlState();
     expect(hasUrlStateToRestore(state)).toBe(false);
@@ -75,7 +75,7 @@ describe.concurrent('hasUrlStateToRestore', () => {
   });
 });
 
-describe.concurrent('parseSearchParams', () => {
+describe('parseSearchParams', () => {
   test('returns default state for empty params', () => {
     const params: GamedaySearchParams = {};
     const state = parseSearchParams(params);
@@ -146,7 +146,7 @@ describe.concurrent('parseSearchParams', () => {
   });
 });
 
-describe.concurrent('serializeToSearchParams', () => {
+describe('serializeToSearchParams', () => {
   test('returns empty object for default state', () => {
     const state = createEmptyUrlState();
     const params = serializeToSearchParams(state);
@@ -247,7 +247,7 @@ describe.concurrent('serializeToSearchParams', () => {
   });
 });
 
-describe.concurrent('round-trip serialization', () => {
+describe('round-trip serialization', () => {
   test('parse -> serialize preserves simple state', () => {
     const originalParams: GamedaySearchParams = {
       layout: 3,

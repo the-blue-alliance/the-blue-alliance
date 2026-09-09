@@ -2,7 +2,7 @@ import { describe, expect, test } from 'vitest';
 
 import { formatDate, formatTime } from '~/lib/scoutingUtils';
 
-describe.concurrent('formatDate', () => {
+describe('formatDate', () => {
   test('formats timestamp to YYYY-MM-DD in UTC', () => {
     expect(formatDate(1704067200)).toEqual('2024-01-01');
     expect(formatDate(1609459200)).toEqual('2021-01-01');
@@ -14,7 +14,7 @@ describe.concurrent('formatDate', () => {
   });
 });
 
-describe.concurrent('formatTime', () => {
+describe('formatTime', () => {
   test('formats timestamp to HH:MM:SS in UTC', () => {
     expect(formatTime(1704067200)).toEqual('00:00:00');
     expect(formatTime(1704110400)).toEqual('12:00:00');

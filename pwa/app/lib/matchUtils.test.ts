@@ -4,7 +4,7 @@ import type { Match } from '~/api/tba/read';
 import { AllianceColor, CompLevel } from '~/api/tba/read';
 import { getAllianceMatchResult, isValidMatchKey } from '~/lib/matchUtils';
 
-describe.concurrent('isValidMatchKey', () => {
+describe('isValidMatchKey', () => {
   test.each([
     '2019nyny_qm1',
     '2010ct_sf1m3',
@@ -31,7 +31,7 @@ describe.concurrent('isValidMatchKey', () => {
   });
 });
 
-describe.concurrent('getAllianceMatchResult', () => {
+describe('getAllianceMatchResult', () => {
   // Helper function to create a mock match
   function createMockMatch(
     key: string,

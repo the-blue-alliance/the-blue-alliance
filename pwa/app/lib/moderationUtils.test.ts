@@ -1,4 +1,3 @@
-import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test } from 'vitest';
 
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
@@ -15,7 +14,7 @@ import {
   summarizeReviewOutcomes,
 } from '~/lib/moderationUtils';
 
-describe.concurrent('groupSuggestionsByTargetKey', () => {
+describe('groupSuggestionsByTargetKey', () => {
   test('groups by target key preserving first-seen order', () => {
     const suggestions = [
       { key: 'a', target_key: '2026np' },
@@ -38,7 +37,7 @@ describe.concurrent('groupSuggestionsByTargetKey', () => {
   });
 });
 
-describe.concurrent('socialProfileWarning', () => {
+describe('socialProfileWarning', () => {
   test('accepts plain profile identifiers', () => {
     expect(
       socialProfileWarning('facebook-profile', 'thebluealliance'),
@@ -117,7 +116,7 @@ describe.concurrent('socialProfileWarning', () => {
   });
 });
 
-describe.concurrent('defaultSetPreferred', () => {
+describe('defaultSetPreferred', () => {
   test('checked for images when the team has no preferred images', () => {
     expect(
       defaultSetPreferred({
@@ -146,7 +145,7 @@ describe.concurrent('defaultSetPreferred', () => {
   });
 });
 
-describe.concurrent('formatEventDateRange', () => {
+describe('formatEventDateRange', () => {
   test('formats a short month-day range', () => {
     expect(formatEventDateRange('2016-03-24', '2016-03-27')).toBe(
       'Mar 24 – Mar 27',
@@ -159,7 +158,7 @@ describe.concurrent('formatEventDateRange', () => {
   });
 });
 
-describe.concurrent('SUGGESTION_TYPE_ORDER', () => {
+describe('SUGGESTION_TYPE_ORDER', () => {
   test('is a permutation of every SuggestionType the API defines', () => {
     expect([...SUGGESTION_TYPE_ORDER].sort()).toEqual(
       Object.values(SuggestionType).sort(),
@@ -167,7 +166,7 @@ describe.concurrent('SUGGESTION_TYPE_ORDER', () => {
   });
 });
 
-describe.concurrent('suggestionTypeOrderComparator', () => {
+describe('suggestionTypeOrderComparator', () => {
   test('sorts types into the web review home order', () => {
     const shuffled = [
       'api_auth_access',
@@ -191,7 +190,7 @@ describe.concurrent('suggestionTypeOrderComparator', () => {
   });
 });
 
-describe.concurrent('summarizeReviewOutcomes', () => {
+describe('summarizeReviewOutcomes', () => {
   test('joins outcome counts', () => {
     expect(
       summarizeReviewOutcomes({
@@ -223,7 +222,7 @@ describe.concurrent('summarizeReviewOutcomes', () => {
   });
 });
 
-describe.concurrent('formatAuthorReputation', () => {
+describe('formatAuthorReputation', () => {
   test('shows lifetime counts', () => {
     expect(
       formatAuthorReputation({ accepted_count: 234, rejected_count: 12 }),
@@ -241,7 +240,7 @@ describe.concurrent('formatAuthorReputation', () => {
   });
 });
 
-describe.concurrent('matchVideoTitleWarning', () => {
+describe('matchVideoTitleWarning', () => {
   const event = { name: 'New England District Championship', year: 2016 };
 
   test('no warning when the title mentions the match key', () => {
@@ -300,7 +299,7 @@ describe.concurrent('matchVideoTitleWarning', () => {
   });
 });
 
-describe.concurrent('matchVideoDurationWarning', () => {
+describe('matchVideoDurationWarning', () => {
   test('no warning for match-length videos', () => {
     expect(matchVideoDurationWarning(182, 'abc123')).toBeUndefined();
   });
