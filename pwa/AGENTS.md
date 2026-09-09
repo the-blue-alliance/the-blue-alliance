@@ -30,6 +30,14 @@ tests/                 # Playwright E2E tests
 ## Key Conventions
 
 - **Tests must accompany every change** - no code changes without corresponding tests
+- `tests/` is reserved for route-level Playwright tests. Keep assertions for a
+  specific route in that route's own spec file (for example, `team.spec.ts` or
+  `event.spec.ts`), rather than organizing specs by feature. `routes.spec.ts`
+  is the exception: it contains the exhaustive route smoke-test matrix.
+- Unit and component tests live next to the source file they cover. For
+  example, `app/foo/component.tsx` should have
+  `app/foo/component.test.ts`. Use Vitest for these tests and Testing Library
+  when rendering React components.
 - Use functional components with TypeScript interfaces (not types)
 - Mobile-first responsive design with Tailwind
 - `~/` alias resolves to `app/` directory
@@ -85,9 +93,57 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
 
 ## Testing
 
-- **Playwright tests** in `./tests/`
+- **Playwright route tests** in `./tests/`; keep one spec file per covered route
+- **Vitest unit/component tests** beside the source files they cover
+- Use Testing Library for rendered React component tests
 - Test names with `mobile` run on mobile viewports
 - Run with `npx playwright test` or `--ui` for interactive mode
+
+### Writing tests
+
+#### Scope
+
+- One behavior per test. If describing it needs an "and", split it into two tests.
+- One or two assertions per test. Prefer one.
+- Five small tests beat one test that checks ten things.
+- Act once per test: set up, perform one interaction under test, then assert.
+- Test the public interface. Do not reach into private helpers.
+- Do not test the framework, the language, or third-party libraries.
+- Every bug fix gets a test that fails before the fix and passes after.
+
+#### Names
+
+- Name the behavior, not the mechanism: `shows_error_when_email_is_blank`.
+- State the condition and expected result. Avoid vague words like "works", "handles", or "correct".
+- Never number tests (`test_case_3`, `checkout_flow_2`).
+- If a test needs a comment to explain what it checks, rename the test.
+- A failing test name alone should tell you what broke.
+
+#### Body
+
+- Setup and interaction can be as long as the scenario needs. Keep the assertion block small: one or two `expect`s at the end.
+- Do not assert mid-flow to check progress. Navigate and interact, then assert once at the end.
+- If you need assertions at three different points, write three tests.
+- No loops, conditionals, or try/catch in tests, except to assert an expected error.
+- Assert on what the user can see, not internal state or implementation details.
+- Assert on the actual value, not whether a mock was called, unless the call itself is the behavior.
+- Do not assert on fields unrelated to the behavior under test.
+- Inline test data where it is used. Prefer literal values over computed ones.
+
+#### Isolation
+
+- Each test runs alone, in any order, with no shared mutable state.
+- Prefer explicit setup inside the test over shared fixtures or `beforeEach`.
+- Extract shared navigation and setup into named helpers (`loginAs(user)`, `addItemToCart(sku)`). Helpers may click, type, and navigate, but must not assert.
+- Duplication in tests is fine. Copy-paste beats a helper that hides what is being tested.
+
+#### Parameterized tests
+
+- Same interaction, different inputs, and the same expected shape means one parameterized test, with one case per input.
+- Give each case a name. Use `test.each` with a `%s` label or a `{name, input, expected}` table; never use bare tuples that print as `case 4`.
+- The body must be identical for every case. If one input needs an extra click or a different assertion, make it its own test.
+- Do not branch on the parameter inside the body. An `if (input.type === ...)` means these are two tests wearing a costume.
+- Do not compute expected values from the input. Write the expected value literally for each case, even when repetitive.
 
 ## PR Screenshots
 

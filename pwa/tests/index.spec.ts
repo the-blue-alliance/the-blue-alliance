@@ -2,6 +2,7 @@ import { expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
+  await page.locator('body[data-hydrated]').waitFor();
 });
 
 // Navbar
@@ -98,4 +99,184 @@ test('footer toggle theme button is visible', async ({ page }) => {
 test('footer displays platinum sponsor AndyMark', async ({ page }) => {
   await expect(page.getByText('Thanks to our platinum sponsor')).toBeVisible();
   await expect(page.getByRole('link', { name: 'AndyMark' })).toBeVisible();
+});
+
+test('nav popup portal is not mounted while the menu is closed', async ({
+  page,
+}) => {
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.locator('[data-slot="navigation-menu-viewport"]'),
+  ).toHaveCount(0);
+});
+
+test.describe('hamburger menu (narrow viewport)', () => {
+  test.use({ viewport: { width: 500, height: 800 } });
+
+  test('does not open on hover', async ({ page }) => {
+    await page.goto('/');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    const trigger = page.getByRole('button', { name: 'Toggle Menu' });
+    await trigger.hover();
+    await page.waitForTimeout(400);
+
+    await expect(
+      page.locator('[data-slot="navigation-menu-viewport"]'),
+    ).toHaveCount(0);
+  });
+
+  test('opens on click and fully unmounts on second click', async ({
+    page,
+  }) => {
+    await page.goto('/');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    const trigger = page.getByRole('button', { name: 'Toggle Menu' });
+    await trigger.click();
+
+    const viewport = page.locator('[data-slot="navigation-menu-viewport"]');
+    await expect(viewport).toHaveCount(1);
+    await expect(viewport.getByRole('link').first()).toBeVisible();
+
+    await trigger.click();
+    await expect(
+      page.locator('[data-slot="navigation-menu-viewport"]'),
+    ).toHaveCount(0);
+  });
+});
+
+const MOCK_SEARCH_INDEX = {
+  teams: [{ key: 'frc254', nickname: 'The Cheesy Poofs' }],
+  events: [{ key: '2024casj', name: 'Silicon Valley Regional' }],
+};
+
+test('search dialog opens while search_index is still loading', async ({
+  page,
+}) => {
+  let releaseSearchIndex!: () => void;
+  const searchIndexGate = new Promise<void>((resolve) => {
+    releaseSearchIndex = resolve;
+  });
+
+  await page.route('**/api/v3/search_index**', async (route) => {
+    await searchIndexGate;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_SEARCH_INDEX),
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  const searchButton = page.getByRole('button', {
+    name: 'Search teams and events...',
+  });
+  await expect(searchButton).toBeVisible();
+  await expect(searchButton).toBeEnabled();
+  await searchButton.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  const input = dialog.getByPlaceholder('Search teams and events...');
+  await expect(input).toBeEnabled();
+  await expect(dialog.getByTestId('search-index-loading')).toBeVisible();
+
+  releaseSearchIndex();
+
+  await expect(dialog.getByTestId('search-index-loading')).toBeHidden();
+  await input.fill('254');
+  await expect(dialog.getByText('254 - The Cheesy Poofs')).toBeVisible();
+});
+
+test('search trigger stays enabled while search_index is pending', async ({
+  page,
+}) => {
+  let releaseSearchIndex!: () => void;
+  const searchIndexGate = new Promise<void>((resolve) => {
+    releaseSearchIndex = resolve;
+  });
+
+  await page.route('**/api/v3/search_index**', async (route) => {
+    await searchIndexGate;
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_SEARCH_INDEX),
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  const searchButton = page.getByRole('button', {
+    name: 'Search teams and events...',
+  });
+  await expect(searchButton).toBeEnabled();
+  releaseSearchIndex();
+});
+
+test.describe('Dark mode toggle', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.evaluate(() => localStorage.removeItem('theme'));
+    await page.reload();
+    await page.locator('footer').scrollIntoViewIfNeeded();
+    await page.waitForSelector(
+      '[aria-label="Toggle Theme"][data-mounted="true"]',
+    );
+  });
+
+  test('toggle changes theme to dark mode', async ({ page }) => {
+    const html = page.locator('html');
+    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await expect(html).toHaveClass(/dark/);
+  });
+
+  test('toggle changes theme to light mode', async ({ page }) => {
+    const html = page.locator('html');
+    const toggleButton = page.getByRole('button', { name: 'Toggle Theme' });
+
+    await toggleButton.click();
+    await expect(html).toHaveClass(/dark/);
+    await toggleButton.click();
+
+    await expect(html).not.toHaveClass(/dark/);
+  });
+
+  test('theme persists across page reload', async ({ page }) => {
+    const html = page.locator('html');
+    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await expect(html).toHaveClass(/dark/);
+
+    await page.reload();
+
+    await expect(html).toHaveClass(/dark/);
+  });
+
+  test('theme persists after navigation', async ({ page }) => {
+    const html = page.locator('html');
+    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await expect(html).toHaveClass(/dark/);
+
+    await page
+      .locator('footer')
+      .getByRole('link', { name: 'About us' })
+      .click();
+    await page.waitForURL('/about');
+
+    await expect(html).toHaveClass(/dark/);
+  });
+});
+
+test('production build does not render TanStack devtools', async ({ page }) => {
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(page.locator('[class*="TanStackRouterDevtools"]')).toHaveCount(
+    0,
+  );
+  await expect(page.locator('.tsqd-open-btn-container')).toHaveCount(0);
 });

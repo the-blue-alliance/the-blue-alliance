@@ -1,12 +1,25 @@
 import { expect, test } from '@playwright/test';
 
-// The district Rankings tab gained an "Advancement" column fed by the
-// getDistrictAdvancement query: a green badge with the CMP qualification method,
-// a red "Declined CMP"/"Declined DCMP" badge, a grey "DCMP" badge for teams that
-// scored DCMP points, or an empty cell. Advancement data may be missing for a
-// district, in which case every cell is empty.
+test('past-year district championship page stops polling', async ({ page }) => {
+  await page.clock.install();
 
-const ALLOWED_CELL = /^$|^DCMP$|^Declined (CMP|DCMP)$|^[A-Z]/;
+  const eventsRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/api/v3/events/2019')) {
+      eventsRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/district/fim/champs/2019');
+  await page.locator('body[data-hydrated]').waitFor();
+  await expect.poll(() => eventsRequests.length).toBeGreaterThan(0);
+
+  const afterLoad = eventsRequests.length;
+  await page.clock.fastForward('03:00');
+  await page.waitForTimeout(500);
+
+  expect(eventsRequests.length).toBe(afterLoad);
+});
 
 test('district rankings table shows the Advancement column', async ({
   page,
@@ -28,8 +41,9 @@ test('district rankings table shows the Advancement column', async ({
     );
   }
 
+  const allowedCell = /^$|^DCMP$|^Declined (CMP|DCMP)$|^[A-Z]/;
   for (const cell of cells) {
-    expect(cell).toMatch(ALLOWED_CELL);
+    expect(cell).toMatch(allowedCell);
   }
 
   expect(cells.some((cell) => cell.length > 0)).toBe(true);
