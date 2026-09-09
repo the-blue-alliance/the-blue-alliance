@@ -3,7 +3,7 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Event, EventType } from '~/api/tba/read';
 import { CMP_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
-import { slugify } from '~/lib/utils';
+import { buildPublicCacheControlHeaders, slugify } from '~/lib/utils';
 
 /** IANA timezone used when an event has no timezone field. */
 export const EVENT_FALLBACK_TIMEZONE = 'America/New_York';
@@ -474,4 +474,42 @@ export function hasEventEnded(event: Event): boolean {
   const userTz = Temporal.Now.timeZoneId();
   const todayInUserTz = Temporal.Now.plainDateISO(userTz);
   return Temporal.PlainDate.compare(endDate, todayInUserTz) <= 0;
+}
+
+export const EVENT_SSR_TTL_SECONDS = {
+  PAST_SEASON: 24 * 60 * 60,
+  STABLE: 60 * 60,
+  LIVE: 60,
+} as const;
+
+const SSR_STABLE_AFTER_END = Temporal.Duration.from({ hours: 24 * 7 });
+const SSR_STABLE_BEFORE_START = Temporal.Duration.from({ hours: 24 * 3 });
+
+export function eventSsrTtlSeconds(event: Event): number {
+  if (event.year < Temporal.Now.plainDateISO().year) {
+    return EVENT_SSR_TTL_SECONDS.PAST_SEASON;
+  }
+
+  if (!event.start_date || !event.end_date) {
+    return EVENT_SSR_TTL_SECONDS.LIVE;
+  }
+
+  const now = Temporal.Now.instant();
+  const { start, end } = getEventActiveWindow(event);
+  const endedLongAgo =
+    Temporal.Instant.compare(now, end.add(SSR_STABLE_AFTER_END)) > 0;
+  const startsFarOut =
+    Temporal.Instant.compare(start.subtract(SSR_STABLE_BEFORE_START), now) > 0;
+
+  return endedLongAgo || startsFarOut
+    ? EVENT_SSR_TTL_SECONDS.STABLE
+    : EVENT_SSR_TTL_SECONDS.LIVE;
+}
+
+export function eventCacheControlHeaders(
+  event: Event | undefined,
+): Record<string, string> {
+  return buildPublicCacheControlHeaders(
+    event ? eventSsrTtlSeconds(event) : EVENT_SSR_TTL_SECONDS.LIVE,
+  );
 }

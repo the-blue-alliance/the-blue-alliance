@@ -3,6 +3,9 @@ import { describe, expect, test, vi } from 'vitest';
 
 import { Event, EventType } from '~/api/tba/read';
 import {
+  EVENT_SSR_TTL_SECONDS,
+  eventCacheControlHeaders,
+  eventSsrTtlSeconds,
   getCurrentWeekEvents,
   getEventDateString,
   getEventWeekString,
@@ -1058,5 +1061,115 @@ describe.concurrent('getPublicAgendaUrl', () => {
   test('event_code is uppercased in the URL', () => {
     const event = makeEvent(EventType.REGIONAL, 'milwi', 2024);
     expect(getPublicAgendaUrl(event)).toContain('MILWI');
+  });
+});
+
+describe('eventSsrTtlSeconds', () => {
+  function makeEvent(overrides: Partial<Event>): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: '2030-04-10',
+      end_date: '2030-04-12',
+      year: 2030,
+      ...overrides,
+    };
+  }
+
+  test('previous season returns the past-season TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-06-01T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({ year: 2029 }))).toBe(
+      EVENT_SSR_TTL_SECONDS.PAST_SEASON,
+    );
+    vi.useRealTimers();
+  });
+
+  test('current season, ended over a week ago returns the stable TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-25T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(
+      EVENT_SSR_TTL_SECONDS.STABLE,
+    );
+    vi.useRealTimers();
+  });
+
+  test('current season, ended within a week returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-16T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+
+  test('current season, starting over three days out returns the stable TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-05T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(
+      EVENT_SSR_TTL_SECONDS.STABLE,
+    );
+    vi.useRealTimers();
+  });
+
+  test('current season, starting within three days returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-08T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+
+  test('current season, in progress returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-11T12:00:00Z'));
+    expect(eventSsrTtlSeconds(makeEvent({}))).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+
+  test('current season with missing dates returns the live TTL', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-11T12:00:00Z'));
+    expect(
+      eventSsrTtlSeconds(makeEvent({ start_date: '', end_date: '' })),
+    ).toBe(EVENT_SSR_TTL_SECONDS.LIVE);
+    vi.useRealTimers();
+  });
+});
+
+describe('eventCacheControlHeaders', () => {
+  function makeEvent(overrides: Partial<Event>): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: '2030-04-10',
+      end_date: '2030-04-12',
+      year: 2030,
+      ...overrides,
+    };
+  }
+
+  test('returns no headers outside production', () => {
+    expect(eventCacheControlHeaders(makeEvent({}))).toEqual({});
+  });
+
+  test('maps the event TTL onto cache-control headers in production', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2030-04-25T12:00:00Z'));
+    vi.stubEnv('NODE_ENV', 'production');
+
+    const ttl = EVENT_SSR_TTL_SECONDS.STABLE;
+    expect(eventCacheControlHeaders(makeEvent({}))).toEqual({
+      'Cache-Control': `public, max-age=${ttl}, stale-while-revalidate=${ttl * 2}`,
+      'CDN-Cache-Control': `max-age=${ttl}`,
+    });
+
+    vi.unstubAllEnvs();
+    vi.useRealTimers();
+  });
+
+  test('falls back to the live TTL when the event is missing', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const ttl = EVENT_SSR_TTL_SECONDS.LIVE;
+    expect(eventCacheControlHeaders(undefined)).toEqual({
+      'Cache-Control': `public, max-age=${ttl}, stale-while-revalidate=${ttl * 2}`,
+      'CDN-Cache-Control': `max-age=${ttl}`,
+    });
+    vi.unstubAllEnvs();
   });
 });
