@@ -131,6 +131,7 @@ import {
 } from '~/lib/api/PlayoffType';
 import { sortAwardsComparator } from '~/lib/awardUtils';
 import {
+  eventCacheControlHeaders,
   getCurrentWeekEvents,
   getEventDateString,
   getPublicAgendaUrl,
@@ -152,12 +153,7 @@ import {
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
-import {
-  MODEL_TYPE,
-  doThrowNotFound,
-  publicCacheControlHeaders,
-  splitIntoNChunks,
-} from '~/lib/utils';
+import { MODEL_TYPE, doThrowNotFound, splitIntoNChunks } from '~/lib/utils';
 
 // Lazy-loaded: recharts is heavy and this chart only renders once the
 // insights tab is opened, which most visitors never do.
@@ -245,7 +241,7 @@ export const Route = createFileRoute('/event/$eventKey')({
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
   },
-  headers: publicCacheControlHeaders(),
+  headers: ({ loaderData }) => eventCacheControlHeaders(loaderData?.event),
   head: ({ loaderData }) => {
     if (!loaderData) {
       return {
