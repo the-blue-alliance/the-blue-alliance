@@ -95,6 +95,7 @@ function SuggestionReviewHome(): JSX.Element {
             key={type}
             to="/suggest/review/$suggestionType"
             params={{ suggestionType: type }}
+            className="text-foreground hover:no-underline"
           >
             <Card
               className="flex items-center justify-between p-4 transition-colors
