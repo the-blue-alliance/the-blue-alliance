@@ -3,9 +3,16 @@ from typing import Any, Dict, List, Optional
 
 from flask import request
 
+from backend.common.cache.instance_cache import InstanceCache
 from backend.common.memcache import MemcacheClient
 
 ETAG_CACHE_TTL: int = 7 * 24 * 3600  # 7 days in seconds
+ETAG_DEPS_PERSISTED_CACHE_TTL: float = 600.0  # 10 minutes
+ETAG_DEPS_PERSISTED_CACHE_MAX_SIZE: int = 5000
+etag_deps_persisted_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
+    ttl_seconds=ETAG_DEPS_PERSISTED_CACHE_TTL,
+    max_size=ETAG_DEPS_PERSISTED_CACHE_MAX_SIZE,
+)
 
 
 def normalize_etag(etag: Optional[str]) -> Optional[str]:
@@ -77,8 +84,10 @@ def is_etag_valid(normalized_etag: str, path: Optional[str] = None) -> bool:
     """
     Verifies whether all dependent query cache keys for a given ETag match their current versions.
     """
+    endpoint_path = get_request_path(path)
     deps = get_etag_dependencies(normalized_etag, path=path)
     if deps is None or not isinstance(deps, dict) or not deps:
+        etag_deps_persisted_cache.delete((endpoint_path, normalized_etag))
         return False
     try:
         memcache = MemcacheClient.get()
@@ -88,6 +97,7 @@ def is_etag_valid(normalized_etag: str, path: Optional[str] = None) -> bool:
         for k, expected_ver in deps.items():
             actual_ver = current_versions.get(f"q_ver:{k}".encode("utf-8"))
             if actual_ver is None or actual_ver != expected_ver:
+                etag_deps_persisted_cache.delete((endpoint_path, normalized_etag))
                 return False
         return True
     except Exception as e:
@@ -100,15 +110,21 @@ def save_etag_dependencies(
     query_versions: Dict[str, str],
     path: Optional[str] = None,
     ttl: int = ETAG_CACHE_TTL,
-) -> None:
+) -> bool:
     """
     Stores the mapping between an ETag and its dependent query cache keys with their current versions.
+    Skips redundant writes if the (endpoint_path, normalized_etag) pair was recently persisted.
     """
     if not query_versions:
-        return
+        return False
+
+    endpoint_path = get_request_path(path)
+    cache_key = (endpoint_path, normalized_etag)
+    if etag_deps_persisted_cache.get(cache_key):
+        return False
+
     try:
         memcache = MemcacheClient.get()
-        endpoint_path = get_request_path(path)
         versions_to_set: Dict[bytes, Any] = {
             f"q_ver:{k}".encode("utf-8"): ver for k, ver in query_versions.items()
         }
@@ -117,5 +133,9 @@ def save_etag_dependencies(
         ] = query_versions
 
         memcache.set_multi(versions_to_set, time=ttl)
+        cache_ttl = min(float(ttl), ETAG_DEPS_PERSISTED_CACHE_TTL)
+        etag_deps_persisted_cache.set(cache_key, True, ttl_seconds=cache_ttl)
+        return True
     except Exception as e:
         logging.warning(f"Error saving ETag dependencies to Memcache: {e}")
+        return False

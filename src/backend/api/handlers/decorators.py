@@ -8,6 +8,7 @@ from flask import g, jsonify, make_response, request, Response
 
 from backend.api.client_api_types import VoidRequest
 from backend.api.handlers.helpers.etag_helper import (
+    etag_deps_persisted_cache,
     get_incoming_etags,
     get_request_path,
     is_etag_valid,
@@ -345,8 +346,8 @@ def validate_keys(func):
     return decorated_function
 
 
-ETAG_304_CACHE_TTL: float = 15.0  # 15 seconds
-ETAG_304_CACHE_MAX_SIZE: int = 2000
+ETAG_304_CACHE_TTL: float = 61.0  # 61 seconds (aligned with Cache-Control: max-age=61)
+ETAG_304_CACHE_MAX_SIZE: int = 5000
 etag_304_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
     ttl_seconds=ETAG_304_CACHE_TTL, max_size=ETAG_304_CACHE_MAX_SIZE
 )
@@ -380,7 +381,7 @@ def validate_etag(func: Callable) -> Callable:
                         hit_source: Optional[str] = None
                         if etag_304_cache.get((request_path, etag)):
                             hit_source = "memory"
-                        elif is_etag_valid(etag):
+                        elif is_etag_valid(etag, path=request_path):
                             etag_304_cache.set((request_path, etag), True)
                             hit_source = "memcache"
 
@@ -405,11 +406,19 @@ def validate_etag(func: Callable) -> Callable:
                     if etag_header and accessed_keys:
                         normalized = normalize_etag(etag_header)
                         if normalized:
-                            with Span("etag.save_dependencies") as span:
-                                span.set_label(
-                                    "num_query_keys", str(len(accessed_keys))
-                                )
-                                save_etag_dependencies(normalized, accessed_keys)
+                            request_path = get_request_path()
+                            if not etag_deps_persisted_cache.get(
+                                (request_path, normalized)
+                            ):
+                                with Span("etag.save_dependencies") as span:
+                                    span.set_label(
+                                        "num_query_keys", str(len(accessed_keys))
+                                    )
+                                    save_etag_dependencies(
+                                        normalized,
+                                        accessed_keys,
+                                        path=request_path,
+                                    )
                 except Exception as e:
                     logging.warning(f"Error saving validate_etag dependencies: {e}")
 

@@ -85,6 +85,7 @@ def clear_auth_key_cache() -> None:
     from backend.api.handlers.decorators import (
         auth_key_cache,
         etag_304_cache,
+        etag_deps_persisted_cache,
         key_does_not_exist_cache,
         key_exists_cache,
     )
@@ -93,6 +94,7 @@ def clear_auth_key_cache() -> None:
     key_exists_cache.clear()
     key_does_not_exist_cache.clear()
     etag_304_cache.clear()
+    etag_deps_persisted_cache.clear()
 
 
 @pytest.fixture()
