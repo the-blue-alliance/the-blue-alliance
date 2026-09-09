@@ -2,11 +2,11 @@ import { expect, test } from '@playwright/test';
 
 import type { FileRouteTypes } from '~/routeTree.gen';
 
-// Extract all route paths from the generated route tree types
 type RoutePath = FileRouteTypes['fullPaths'];
 
-// Type-safe helper that ensures all routes are included
-// This will cause a compile error if any route is missing or extra
+// Keep the runtime route list in sync with TanStack Router's generated route
+// types. A newly added or removed route must be reflected here before its
+// smoke test can be generated.
 function defineAllRoutes<T extends readonly RoutePath[]>(
   routes: T &
     ([RoutePath] extends [T[number]] ? unknown : 'Missing routes') &
@@ -15,8 +15,6 @@ function defineAllRoutes<T extends readonly RoutePath[]>(
   return routes;
 }
 
-// All routes are automatically extracted from the type system
-// TypeScript will error if this list is incomplete or contains invalid routes
 const allRoutes = defineAllRoutes([
   '/',
   '/about',
@@ -55,84 +53,79 @@ const allRoutes = defineAllRoutes([
   '/webcasts',
 ] as const);
 
-// Define test data for dynamic route parameters
-// Only need to specify values for parameters, not list out every route manually
-const parameterValues: Record<string, string[]> = {
+type RouteParameterToken<Segment extends string> =
+  Segment extends `{-$${infer Parameter}}`
+    ? `{-$${Parameter}}`
+    : Segment extends `$${infer Parameter}`
+      ? `$${Parameter}`
+      : never;
+
+type RouteParameters<Path extends string> =
+  Path extends `${infer Segment}/${infer Rest}`
+    ? RouteParameterToken<Segment> | RouteParameters<Rest>
+    : RouteParameterToken<Path>;
+
+type RouteParameter = RouteParameters<(typeof allRoutes)[number]>;
+
+const parameterValues = {
   $eventKey: ['2024mil'],
   $eventCode: ['2024mil'],
   '{-$year}': ['', '2024'],
-  $year: ['2024'],
   $matchKey: ['2024mil_f1m2'],
+  $year: ['2024'],
   '{-$pgNum}': ['', '1'],
   $districtAbbreviation: ['fim'],
   $teamNumber: ['604'],
   $suggestionType: ['match'],
-};
+} satisfies Record<RouteParameter, readonly string[]>;
 
-/**
- * Generates the cartesian product of arrays
- * @example cartesianProduct([['a', 'b'], ['1', '2']]) => [['a', '1'], ['a', '2'], ['b', '1'], ['b', '2']]
- */
-function cartesianProduct<T>(arrays: T[][]): T[][] {
-  if (arrays.length === 0) return [[]];
-  if (arrays.length === 1) return arrays[0].map((item) => [item]);
-
-  const [first, ...rest] = arrays;
-  const restProduct = cartesianProduct(rest);
-
-  return first.flatMap((item) => restProduct.map((prod) => [item, ...prod]));
+interface RouteTestCase {
+  path: string;
 }
 
-function generateTestCases(): string[] {
-  const testCases: string[] = [];
-
-  for (const route of allRoutes) {
-    // Find all parameter placeholders in the route
-    const paramMatches = route.match(/(\$\w+|\{-\$\w+\})/g);
-
-    if (!paramMatches) {
-      // Static route: add as-is
-      testCases.push(route);
-    } else {
-      // Dynamic route: generate test cases for all parameter combinations
-      // Get all possible values for each parameter
-      const paramValueArrays = paramMatches.map(
-        (param) => parameterValues[param],
-      );
-
-      // Generate cartesian product of all parameter combinations
-      const combinations = cartesianProduct(paramValueArrays);
-
-      // For each combination, replace parameters in the route
-      for (const combination of combinations) {
-        let testPath: string = route;
-        for (let i = 0; i < paramMatches.length; i++) {
-          testPath = testPath.replace(paramMatches[i], combination[i]);
-        }
-        testCases.push(testPath);
-      }
-    }
-  }
-  return testCases;
+function cartesianProduct<T>(arrays: readonly (readonly T[])[]): T[][] {
+  return arrays.reduce<T[][]>(
+    (products, values) =>
+      products.flatMap((product) => values.map((value) => [...product, value])),
+    [[]],
+  );
 }
 
-const routeTestCases = generateTestCases();
+function getRouteParameters(route: RoutePath): RouteParameter[] {
+  return (route.match(/(\$\w+|\{-\$\w+\})/g) ?? []) as RouteParameter[];
+}
+
+function generateRouteTestCases(): RouteTestCase[] {
+  return allRoutes.flatMap((route) => {
+    const parameters = getRouteParameters(route);
+    const combinations = cartesianProduct(
+      parameters.map((parameter) => parameterValues[parameter]),
+    );
+
+    return combinations.map((combination) => ({
+      path: parameters.reduce<string>(
+        (path, parameter, index) =>
+          path.replace(parameter, combination[index] ?? ''),
+        route,
+      ),
+    }));
+  });
+}
+
+const routeTestCases = generateRouteTestCases();
 
 test.describe('Route smoke tests', () => {
-  for (const testCase of routeTestCases) {
-    test(`${testCase} renders without errors`, async ({ page }) => {
-      const errors: string[] = [];
-      page.on('pageerror', (exception) => {
-        errors.push(exception.message);
-      });
+  for (const { path } of routeTestCases) {
+    test(`${path} reaches hydrated state without runtime errors`, async ({
+      page,
+    }) => {
+      const pageErrors: Error[] = [];
+      page.on('pageerror', (error) => pageErrors.push(error));
 
-      await page.goto(testCase);
+      await page.goto(path);
+      await expect(page.locator('body[data-hydrated]')).toBeVisible();
 
-      // Verify no page errors occurred
-      expect(errors).toHaveLength(0);
-
-      // Verify page loaded (body is visible)
-      await expect(page.locator('body')).toBeVisible();
+      expect(pageErrors).toHaveLength(0);
     });
   }
 });
