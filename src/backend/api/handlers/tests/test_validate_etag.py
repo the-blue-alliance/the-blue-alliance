@@ -5,7 +5,12 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
-from backend.api.handlers.decorators import etag_304_cache
+from backend.api.handlers.decorators import (
+    etag_304_cache,
+    ETAG_304_CACHE_MAX_SIZE,
+    ETAG_304_CACHE_TTL,
+    etag_deps_persisted_cache,
+)
 from backend.api.handlers.helpers.etag_helper import (
     get_etag_dependencies,
     normalize_etag,
@@ -909,3 +914,92 @@ def test_delete_cache_multi_without_data_change_restores_etag_304(
     )
     assert resp4.status_code == 304
     mock_get_by_id_async.assert_not_called()
+
+
+def test_validate_etag_304_cache_contract() -> None:
+    assert ETAG_304_CACHE_TTL == 61.0
+    assert ETAG_304_CACHE_MAX_SIZE == 5000
+
+
+def test_validate_etag_deduplicates_dependency_writes_on_identical_200(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    memcache = MemcacheClient.get()
+    set_multi_mock = MagicMock(wraps=memcache.set_multi)
+    monkeypatch.setattr(memcache, "set_multi", set_multi_mock)
+
+    # 1. First 200 request: persists dependencies to Memcache
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag1 = resp1.headers.get("ETag")
+    assert etag1 is not None
+    norm_etag1 = normalize_etag(etag1)
+    assert norm_etag1 is not None
+
+    assert set_multi_mock.call_count == 1
+    assert etag_deps_persisted_cache.get(("/api/v3/team/frc254", norm_etag1)) is True
+
+    # 2. Second 200 request with identical response/ETag: skips Memcache set_multi
+    set_multi_mock.reset_mock()
+    resp2 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp2.status_code == 200
+    assert resp2.headers.get("ETag") == etag1
+    set_multi_mock.assert_not_called()
+
+
+def test_validate_etag_persists_dependencies_on_altered_etag(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    team = Team(id="frc254", team_number=254, nickname="The Cheesy Poofs")
+    team.put()
+
+    memcache = MemcacheClient.get()
+    set_multi_mock = MagicMock(wraps=memcache.set_multi)
+    monkeypatch.setattr(memcache, "set_multi", set_multi_mock)
+
+    # 1. First request generates initial ETag
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag1 = resp1.headers.get("ETag")
+    norm_etag1 = normalize_etag(etag1)
+    assert norm_etag1 is not None
+    assert set_multi_mock.call_count == 1
+
+    # 2. Alter team data and invalidate query cache
+    team.nickname = "Updated Poofs"
+    team.put()
+    TeamQuery.delete_cache_multi({TeamQuery(team_key="frc254").cache_key})
+
+    # 3. Next request produces new ETag and must persist its dependencies
+    set_multi_mock.reset_mock()
+    resp2 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp2.status_code == 200
+    etag2 = resp2.headers.get("ETag")
+    assert etag2 != etag1
+    norm_etag2 = normalize_etag(etag2)
+    assert norm_etag2 is not None
+
+    set_multi_mock.assert_called_once()
+    assert etag_deps_persisted_cache.get(("/api/v3/team/frc254", norm_etag2)) is True
