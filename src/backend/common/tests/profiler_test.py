@@ -259,6 +259,34 @@ def test_concurrent_tasklet_spans_are_siblings(mock_send_traces) -> None:
 
 
 @patch("backend.common.profiler._make_tracing_call")
+def test_span_cpu_tracking(mock_send_traces) -> None:
+    app = setup_app()
+
+    @app.route("/")
+    def route():
+        with Span("cpu_span"):
+            # Burn a tiny bit of CPU cycles
+            _ = sum(i * i for i in range(1000))
+        assert len(trace_context.request.spans) == 1
+        s_dict = trace_context.request.spans[0]
+        assert "labels" in s_dict
+        assert "cpu_time_ms" in s_dict["labels"]
+        assert "wall_time_ms" in s_dict["labels"]
+        assert "cpu_ratio" in s_dict["labels"]
+        # Verify values are valid floats
+        assert float(s_dict["labels"]["cpu_time_ms"]) >= 0.0
+        assert float(s_dict["labels"]["wall_time_ms"]) >= 0.0
+        assert 0.0 <= float(s_dict["labels"]["cpu_ratio"]) <= 1.0
+        return "OK"
+
+    with app.test_client() as client:
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
+
+    mock_send_traces.assert_called_once()
+
+
+@patch("backend.common.profiler._make_tracing_call")
 def test_tasklet_child_spans_are_nested(mock_send_traces) -> None:
     app = setup_app()
 
