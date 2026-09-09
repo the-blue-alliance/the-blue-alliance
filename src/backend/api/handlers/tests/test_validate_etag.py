@@ -765,26 +765,147 @@ def test_save_etag_dependencies_batches_in_single_set_multi(
     memcache_stub, monkeypatch: pytest.MonkeyPatch
 ) -> None:
     memcache = MemcacheClient.get()
+    get_mock = MagicMock(wraps=memcache.get)
+    get_multi_mock = MagicMock(wraps=memcache.get_multi)
     set_mock = MagicMock(wraps=memcache.set)
     set_multi_mock = MagicMock(wraps=memcache.set_multi)
+    monkeypatch.setattr(memcache, "get", get_mock)
+    monkeypatch.setattr(memcache, "get_multi", get_multi_mock)
     monkeypatch.setattr(memcache, "set", set_mock)
     monkeypatch.setattr(memcache, "set_multi", set_multi_mock)
 
-    query_keys = {"team_query_1", "team_query_2"}
-    save_etag_dependencies("test_etag_123", query_keys, path="/api/v3/team/frc254")
+    query_versions = {
+        "team_query_1": "e2a9c7677594150d2629d0ffe18699f9",
+        "team_query_2": "608de49a4600dbb5b173492759792e4a",
+    }
+    save_etag_dependencies("test_etag_123", query_versions, path="/api/v3/team/frc254")
 
-    # Verify set_multi was called exactly once
+    # Verify no memcache read round-trips occurred
+    get_mock.assert_not_called()
+    get_multi_mock.assert_not_called()
+
+    # Verify set was not called (eliminates redundant round-trip)
+    set_mock.assert_not_called()
+
+    # Verify set_multi was called once with the exact precomputed MD5 hashes and etag_deps
     set_multi_mock.assert_called_once()
     mapping = set_multi_mock.call_args[0][0]
+    assert mapping[b"q_ver:team_query_1"] == "e2a9c7677594150d2629d0ffe18699f9"
+    assert mapping[b"q_ver:team_query_2"] == "608de49a4600dbb5b173492759792e4a"
+    assert mapping[b"etag_deps:/api/v3/team/frc254:test_etag_123"] == query_versions
 
-    # Verify query version keys and etag_deps key are all batched in a single mapping
-    assert b"q_ver:team_query_1" in mapping
-    assert b"q_ver:team_query_2" in mapping
-    assert b"etag_deps:/api/v3/team/frc254:test_etag_123" in mapping
-    assert mapping[b"etag_deps:/api/v3/team/frc254:test_etag_123"] == {
-        "team_query_1": str(mapping[b"q_ver:team_query_1"]),
-        "team_query_2": str(mapping[b"q_ver:team_query_2"]),
-    }
 
-    # Verify memcache.set was NOT called (eliminates redundant round-trip)
-    set_mock.assert_not_called()
+def test_database_query_tracks_deterministic_md5_hashes(
+    ndb_stub,
+) -> None:
+    from backend.common.consts.api_version import ApiMajorVersion
+    from backend.common.models.team import Team
+    from backend.common.queries.database_query import track_accessed_query_cache_keys
+    from backend.common.queries.team_query import TeamQuery
+
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    with track_accessed_query_cache_keys() as accessed_keys_1:
+        TeamQuery(team_key="frc254").fetch_dict(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as accessed_keys_2:
+        TeamQuery(team_key="frc254").fetch_dict(ApiMajorVersion.API_V3)
+
+    assert len(accessed_keys_1) == 1
+    key = TeamQuery(team_key="frc254").dict_cache_key(ApiMajorVersion.API_V3)
+    assert key in accessed_keys_1
+    assert accessed_keys_1[key] == accessed_keys_2[key]
+    assert len(accessed_keys_1[key]) == 32  # Valid MD5 hex digest length
+
+
+def test_database_query_tracks_deterministic_md5_hashes_with_unicode(
+    ndb_stub,
+) -> None:
+    from backend.common.consts.api_version import ApiMajorVersion
+    from backend.common.models.team import Team
+    from backend.common.queries.database_query import track_accessed_query_cache_keys
+    from backend.common.queries.team_query import TeamQuery
+
+    Team(id="frc9999", team_number=9999, nickname="Café Robotics").put()
+
+    # Test fetch_dict cache miss vs cache hit
+    with track_accessed_query_cache_keys() as dict_miss_keys:
+        TeamQuery(team_key="frc9999").fetch_dict(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as dict_hit_keys:
+        TeamQuery(team_key="frc9999").fetch_dict(ApiMajorVersion.API_V3)
+
+    key = TeamQuery(team_key="frc9999").dict_cache_key(ApiMajorVersion.API_V3)
+    assert dict_miss_keys[key] == dict_hit_keys[key]
+
+    # Invalidate cache to test fetch_json cache miss vs cache hit
+    TeamQuery.delete_cache_multi({TeamQuery(team_key="frc9999").cache_key})
+
+    with track_accessed_query_cache_keys() as json_miss_keys:
+        raw_miss = TeamQuery(team_key="frc9999").fetch_json(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as json_hit_keys:
+        raw_hit = TeamQuery(team_key="frc9999").fetch_json(ApiMajorVersion.API_V3)
+
+    assert raw_miss == raw_hit
+    assert json_miss_keys[key] == json_hit_keys[key]
+
+
+def test_delete_cache_multi_without_data_change_restores_etag_304(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    from backend.common.queries.team_query import TeamQuery
+
+    # 1. Initial request -> 200
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = resp1.headers.get("ETag")
+    assert etag is not None
+
+    # Track handler execution via Team.get_by_id_async
+    original_get_by_id_async = Team.get_by_id_async
+    mock_get_by_id_async = MagicMock(side_effect=original_get_by_id_async)
+    monkeypatch.setattr(Team, "get_by_id_async", mock_get_by_id_async)
+
+    # 2. Re-request with If-None-Match -> 304 via @validate_etag fastpath (handler bypassed)
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp2.status_code == 304
+    mock_get_by_id_async.assert_not_called()
+
+    # 3. Simulate cache wipe without modifying the underlying data
+    TeamQuery.delete_cache_multi({TeamQuery(team_key="frc254").cache_key})
+    etag_304_cache.clear()
+
+    # 4. Request with old ETag misses fastpath because q_ver key was wiped;
+    # handler executes, re-records identical MD5 hash, and Werkzeug returns 304
+    resp3 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp3.status_code == 304
+    mock_get_by_id_async.assert_called_once()
+    mock_get_by_id_async.reset_mock()
+
+    # Clear in-memory cache to force checking Memcache fastpath
+    etag_304_cache.clear()
+
+    # 5. Subsequent request hits @validate_etag fastpath in Memcache because MD5 matched!
+    resp4 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp4.status_code == 304
+    mock_get_by_id_async.assert_not_called()

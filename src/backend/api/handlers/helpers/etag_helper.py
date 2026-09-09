@@ -1,6 +1,5 @@
 import logging
-import uuid
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from flask import request
 
@@ -98,34 +97,24 @@ def is_etag_valid(normalized_etag: str, path: Optional[str] = None) -> bool:
 
 def save_etag_dependencies(
     normalized_etag: str,
-    query_cache_keys: Set[str],
+    query_versions: Dict[str, str],
     path: Optional[str] = None,
     ttl: int = ETAG_CACHE_TTL,
 ) -> None:
     """
     Stores the mapping between an ETag and its dependent query cache keys with their current versions.
     """
-    if not query_cache_keys:
+    if not query_versions:
         return
     try:
         memcache = MemcacheClient.get()
         endpoint_path = get_request_path(path)
-        q_ver_keys = [f"q_ver:{k}".encode("utf-8") for k in query_cache_keys]
-        existing_versions = memcache.get_multi(q_ver_keys)
-        versions_to_set: Dict[bytes, Any] = {}
-        deps: Dict[str, str] = {}
-        for k in query_cache_keys:
-            q_key = f"q_ver:{k}".encode("utf-8")
-            ver = existing_versions.get(q_key)
-            if ver is None:
-                ver = uuid.uuid4().hex
-            # Refresh TTL for existing and new query versions
-            versions_to_set[q_key] = ver
-            deps[k] = str(ver)
-
+        versions_to_set: Dict[bytes, Any] = {
+            f"q_ver:{k}".encode("utf-8"): ver for k, ver in query_versions.items()
+        }
         versions_to_set[
             f"etag_deps:{endpoint_path}:{normalized_etag}".encode("utf-8")
-        ] = deps
+        ] = query_versions
 
         memcache.set_multi(versions_to_set, time=ttl)
     except Exception as e:

@@ -1,8 +1,10 @@
 from __future__ import annotations
 
 import abc
+import hashlib
 import json
 import logging
+import pickle
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
@@ -19,18 +21,26 @@ from backend.common.profiler import Span
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 from backend.common.queries.types import DictQueryReturn, QueryReturn
 
-accessed_query_cache_keys_ctx: ContextVar[Optional[Set[str]]] = ContextVar[
-    Optional[Set[str]]
+# ContextVar holding a mapping of {query_cache_key: result_md5_hash} for CachedDatabaseQuery
+# instances accessed within the active track_accessed_query_cache_keys() context:
+# - Key (str): The query cache key (e.g., "team_query_frc254~dictv3.1" or "team_query_frc254").
+# - Value (str): The deterministic 32-character hex MD5 hash of the query result.
+accessed_query_cache_keys_ctx: ContextVar[Optional[Dict[str, str]]] = ContextVar[
+    Optional[Dict[str, str]]
 ]("accessed_query_cache_keys_ctx", default=None)
 
 
 @contextmanager
-def track_accessed_query_cache_keys() -> Generator[Set[str], None, None]:
+def track_accessed_query_cache_keys() -> Generator[Dict[str, str], None, None]:
     """
-    Context manager to collect cache keys of all CachedDatabaseQuery instances
+    Context manager to collect cache keys and MD5 result hashes of all CachedDatabaseQuery instances
     accessed during the block execution.
+
+    Yields:
+        Dict[str, str]: Mapping of query cache key (e.g., "team_query_frc254~dictv3.1")
+        to the deterministic 32-character hex MD5 hash of its query result.
     """
-    keys: Set[str] = set()
+    keys: Dict[str, str] = {}
     token = accessed_query_cache_keys_ctx.set(keys)
     try:
         yield keys
@@ -131,10 +141,35 @@ class CachedDatabaseQuery(
         return f"{cache_key}~dictv{dict_version}.{subvserion}"
 
     @classmethod
-    def _record_accessed_cache_key(cls, cache_key: str) -> None:
+    def _compute_result_hash(cls, result: Any) -> str:
+        with Span("query.compute_result_hash") as span:
+            if result is None:
+                span.set_label("result_type", "none")
+                return "none"
+            if isinstance(result, (bytes, bytearray)):
+                span.set_label("result_type", "bytes")
+                span.set_label("byte_size", str(len(result)))
+                return hashlib.md5(result).hexdigest()
+            if isinstance(result, str):
+                span.set_label("result_type", "str")
+                span.set_label("byte_size", str(len(result)))
+                return hashlib.md5(result.encode("utf-8")).hexdigest()
+            try:
+                span.set_label("result_type", "json")
+                serialized = orjson.dumps(result)
+                span.set_label("byte_size", str(len(serialized)))
+                return hashlib.md5(serialized).hexdigest()
+            except (TypeError, orjson.JSONEncodeError):
+                span.set_label("result_type", "pickle")
+                pickled = pickle.dumps(result, protocol=4)
+                span.set_label("byte_size", str(len(pickled)))
+                return hashlib.md5(pickled).hexdigest()
+
+    @classmethod
+    def _record_accessed_cache_key(cls, cache_key: str, result: Any = None) -> None:
         accessed_keys = accessed_query_cache_keys_ctx.get()
         if accessed_keys is not None:
-            accessed_keys.add(cache_key)
+            accessed_keys[cache_key] = cls._compute_result_hash(result)
 
     @classmethod
     def delete_cache_multi(cls, cache_keys: Set[str]) -> None:
@@ -207,11 +242,11 @@ class CachedDatabaseQuery(
     @ndb.tasklet
     def _do_query(self, *args, **kwargs) -> Generator[Any, Any, QueryReturn]:
         cache_key = self.cache_key
-        self._record_accessed_cache_key(cache_key)
 
         if not self.MODEL_CACHING_ENABLED:
             with Span(f"{self.__class__.__name__}._query_async"):
                 result = yield self._query_async(*args, **kwargs)
+            self._record_accessed_cache_key(cache_key, result)
             return result
 
         with Span("{}._do_query".format(self.__class__.__name__)):
@@ -246,29 +281,33 @@ class CachedDatabaseQuery(
                             f"CachedQueryResult.put_async() failed: {cache_key}"
                         )
                         logging.exception(e)
+                self._record_accessed_cache_key(cache_key, query_result)
                 return query_result
 
             with Span("query.unpickle_models") as span:
                 result = cached_query_result.result
                 if isinstance(result, list):
                     span.set_label("result_count", str(len(result)))
+                self._record_accessed_cache_key(cache_key, result)
                 return result
 
     @ndb.tasklet
     def _do_dict_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> Generator[Any, Any, Union[None, DictQueryReturn, List[DictQueryReturn]]]:
-        if self.DICT_CONVERTER is not None:
-            cache_key = self.dict_cache_key(_dict_version)
-            self._record_accessed_cache_key(cache_key)
+        cache_key = (
+            self.dict_cache_key(_dict_version)
+            if self.DICT_CONVERTER is not None
+            else self.cache_key
+        )
 
         if not self.DICT_CACHING_ENABLED:
             with Span(f"{self.__class__.__name__}._query_async"):
                 result = yield self._query_async(*args, **kwargs)
+            self._record_accessed_cache_key(cache_key, result)
             return result
 
         with Span("{}._do_dict_query".format(self.__class__.__name__)):
-            cache_key = self.dict_cache_key(_dict_version)
             with Span("query.cache_lookup") as span:
                 span.set_label("cache_key", cache_key)
                 cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
@@ -294,6 +333,7 @@ class CachedDatabaseQuery(
                             f"CachedQueryResult.put_async() failed: {cache_key}"
                         )
                         logging.exception(e)
+                self._record_accessed_cache_key(cache_key, converted_result)
                 return converted_result
 
             values = getattr(cached_query_result, "_values", None)
@@ -301,19 +341,25 @@ class CachedDatabaseQuery(
             if val is not None and not isinstance(
                 val, (ndb.model._BaseValue, bytes, bytearray, str)
             ):
-                return cached_query_result.result_dict
+                result = cached_query_result.result_dict
+                self._record_accessed_cache_key(cache_key, result)
+                return result
 
             raw_bytes = cached_query_result.get_json_bytes()
             if raw_bytes is not None:
                 try:
                     with Span("query.json_decode") as span:
                         span.set_label("byte_size", str(len(raw_bytes)))
-                        return orjson.loads(raw_bytes)
+                        result = orjson.loads(raw_bytes)
+                        self._record_accessed_cache_key(cache_key, result)
+                        return result
                 except (orjson.JSONDecodeError, Exception) as e:
                     logging.warning(
                         f"orjson.loads failed for cache_key {cache_key}, falling back to result_dict: {e}"
                     )
-            return cached_query_result.result_dict
+            result = cached_query_result.result_dict
+            self._record_accessed_cache_key(cache_key, result)
+            return result
 
     def fetch_json(self, version: ApiMajorVersion) -> Optional[bytes]:
         fut: TypedFuture[Optional[bytes]] = self.fetch_json_async(version)
@@ -331,25 +377,29 @@ class CachedDatabaseQuery(
     def _do_json_query(
         self, _dict_version: ApiMajorVersion, *args, **kwargs
     ) -> Generator[Any, Any, Optional[bytes]]:
-        if self.DICT_CONVERTER is not None:
-            cache_key = self.dict_cache_key(_dict_version)
-            self._record_accessed_cache_key(cache_key)
+        cache_key = (
+            self.dict_cache_key(_dict_version)
+            if self.DICT_CONVERTER is not None
+            else self.cache_key
+        )
 
         if not self.DICT_CACHING_ENABLED:
             dict_result = yield self._do_dict_query(_dict_version, *args, **kwargs)
             if dict_result is None:
+                self._record_accessed_cache_key(cache_key, None)
                 return None
             try:
                 with Span("query.serialize_json"):
-                    return orjson.dumps(dict_result)
+                    res = orjson.dumps(dict_result)
             except (orjson.JSONEncodeError, TypeError) as e:
                 logging.warning(
                     f"orjson.dumps failed in _do_json_query, falling back to json.dumps: {e}"
                 )
-                return json.dumps(dict_result, separators=(",", ":")).encode("utf-8")
+                res = json.dumps(dict_result, separators=(",", ":")).encode("utf-8")
+            self._record_accessed_cache_key(cache_key, res)
+            return res
 
         with Span("{}._do_json_query".format(self.__class__.__name__)):
-            cache_key = self.dict_cache_key(_dict_version)
             with Span("query.cache_lookup") as span:
                 span.set_label("cache_key", cache_key)
                 cached_query_result = yield CachedQueryResult.get_by_id_async(cache_key)
@@ -363,12 +413,11 @@ class CachedDatabaseQuery(
                     query_result
                 ).convert(_dict_version)
 
+                cqr = CachedQueryResult(id=cache_key, result_dict=converted_result)
                 if self.CACHE_WRITES_ENABLED:
                     try:
                         with Span("query.async_cache_write"):
-                            yield CachedQueryResult(
-                                id=cache_key, result_dict=converted_result
-                            ).put_async()
+                            yield cqr.put_async()
                     except Exception as e:
                         logging.warning(
                             f"CachedQueryResult.put_async() failed: {cache_key}"
@@ -376,31 +425,40 @@ class CachedDatabaseQuery(
                         logging.exception(e)
 
                 if converted_result is None:
+                    self._record_accessed_cache_key(cache_key, None)
                     return None
 
-                try:
-                    with Span("query.serialize_json"):
-                        return orjson.dumps(converted_result)
-                except (orjson.JSONEncodeError, TypeError) as e:
-                    logging.warning(
-                        f"orjson.dumps failed for cache_key {cache_key}, falling back to json.dumps: {e}"
-                    )
-                    return json.dumps(converted_result, separators=(",", ":")).encode(
-                        "utf-8"
-                    )
+                res = cqr.get_json_bytes()
+                if res is None:
+                    try:
+                        with Span("query.serialize_json"):
+                            res = orjson.dumps(converted_result)
+                    except (orjson.JSONEncodeError, TypeError) as e:
+                        logging.warning(
+                            f"orjson.dumps failed for cache_key {cache_key}, falling back to json.dumps: {e}"
+                        )
+                        res = json.dumps(
+                            converted_result, separators=(",", ":")
+                        ).encode("utf-8")
+                self._record_accessed_cache_key(cache_key, res)
+                return res
 
             raw_bytes = cached_query_result.get_json_bytes()
             if raw_bytes is not None:
+                self._record_accessed_cache_key(cache_key, raw_bytes)
                 return raw_bytes
             if cached_query_result.result_dict is None:
+                self._record_accessed_cache_key(cache_key, None)
                 return None
             try:
                 with Span("query.serialize_json"):
-                    return orjson.dumps(cached_query_result.result_dict)
+                    res = orjson.dumps(cached_query_result.result_dict)
             except (orjson.JSONEncodeError, TypeError) as e:
                 logging.warning(
                     f"orjson.dumps failed for cache_key {cache_key}, falling back to json.dumps: {e}"
                 )
-                return json.dumps(
+                res = json.dumps(
                     cached_query_result.result_dict, separators=(",", ":")
                 ).encode("utf-8")
+            self._record_accessed_cache_key(cache_key, res)
+            return res
