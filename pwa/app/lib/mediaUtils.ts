@@ -29,6 +29,50 @@ export function getMediaImageUrl(media: Media): string | undefined {
   return media.direct_url || undefined;
 }
 
+function imgurThumbUrl(
+  directUrl: string | undefined,
+  size: 'l' | 'h',
+): string | undefined {
+  if (!directUrl) return undefined;
+  let parsed: URL;
+  try {
+    parsed = new URL(directUrl);
+  } catch {
+    return undefined;
+  }
+  if (parsed.hostname !== 'i.imgur.com') return undefined;
+  const match = parsed.pathname.match(
+    /^\/([A-Za-z0-9]+)\.(jpe?g|png|gif|webp)$/i,
+  );
+  if (!match) return undefined;
+  const [, id, ext] = match;
+  if (id.length === 8 && /[sbtmlh]$/.test(id)) return undefined;
+  return `https://i.imgur.com/${id}${size}.${ext}`;
+}
+
+/** Returns an appropriately sized thumbnail URL for a media item, falling back to the full-resolution URL when the provider has no resized variant. */
+export function getMediaThumbUrl(media: Media): string | undefined {
+  if (media.type === 'imgur') {
+    return imgurThumbUrl(media.direct_url, 'l') ?? getMediaImageUrl(media);
+  }
+  if (media.type === 'smugmug-photo') {
+    return media.details?.image_url_med ?? getMediaImageUrl(media);
+  }
+  if (media.type === 'smugmug-album') {
+    return media.details?.cover_url_med ?? getMediaImageUrl(media);
+  }
+  return getMediaImageUrl(media);
+}
+
+/** Returns a `srcset` string for providers that expose multiple thumbnail sizes, or undefined when only a single URL is available. */
+export function getMediaThumbSrcSet(media: Media): string | undefined {
+  if (media.type !== 'imgur') return undefined;
+  const medium = imgurThumbUrl(media.direct_url, 'l');
+  const large = imgurThumbUrl(media.direct_url, 'h');
+  if (!medium || !large) return undefined;
+  return `${medium} 1x, ${large} 2x`;
+}
+
 /** Returns all embeddable image media (imgur + instagram-image). */
 export function getEmbedMedia(media: Media[]): Media[] {
   return media.filter((m) => EMBED_MEDIA_TYPES.has(m.type));

@@ -4,8 +4,8 @@ import { InstagramEmbed } from 'react-social-media-embed';
 import { Media } from '~/api/tba/read';
 import {
   getEmbedMedia,
-  getMediaImageUrl,
   getMediaLinkUrl,
+  getMediaThumbUrl,
 } from '~/lib/mediaUtils';
 
 export default function TeamMediaGallery({
@@ -45,7 +45,7 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
   const [failed, setFailed] = useState(false);
   const [visible, setVisible] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
-  const thumbnailUrl = getMediaImageUrl(media);
+  const thumbnailUrl = getMediaThumbUrl(media);
 
   useEffect(() => {
     const img = imgRef.current;
