@@ -311,6 +311,7 @@ export default function MatchDetails({
               key={v.key}
               videoId={v.key}
               title={`${event.name} ${match.match_number} ${v.key}`}
+              deferUntilIdle
             />
           ))}
       </div>
