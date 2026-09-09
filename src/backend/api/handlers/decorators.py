@@ -1,3 +1,4 @@
+import datetime
 import json
 import logging
 from dataclasses import dataclass
@@ -221,10 +222,15 @@ def client_api_method(
     return decorator
 
 
-KEY_EXISTS_CACHE_TTL: float = 600.0  # 10 minutes
-KEY_EXISTS_CACHE_MAX_SIZE: int = 5000
+KEY_EXISTS_CACHE_TTL_DEFAULT: float = (
+    86400.0  # 24 hours (teams, past season events/matches, districts)
+)
+KEY_EXISTS_CACHE_TTL_CURRENT_YEAR: float = (
+    3600.0  # 1 hour (events/matches in the current year)
+)
+KEY_EXISTS_CACHE_MAX_SIZE: int = 25000
 key_exists_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
-    ttl_seconds=KEY_EXISTS_CACHE_TTL, max_size=KEY_EXISTS_CACHE_MAX_SIZE
+    ttl_seconds=KEY_EXISTS_CACHE_TTL_DEFAULT, max_size=KEY_EXISTS_CACHE_MAX_SIZE
 )
 
 KEY_DOES_NOT_EXIST_CACHE_TTL: float = 60.0  # 1 minute (aligned with 61s 404 cache)
@@ -232,6 +238,15 @@ KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE: int = 2000
 key_does_not_exist_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
     ttl_seconds=KEY_DOES_NOT_EXIST_CACHE_TTL, max_size=KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE
 )
+
+
+def _get_key_exists_ttl(entity_name: str, key: str) -> float:
+    if entity_name in ("Event", "Match"):
+        current_year = datetime.date.today().year
+        year_prefix = key[:4]
+        if year_prefix.isdigit() and int(year_prefix) == current_year:
+            return KEY_EXISTS_CACHE_TTL_CURRENT_YEAR
+    return KEY_EXISTS_CACHE_TTL_DEFAULT
 
 
 @dataclass(frozen=True)
@@ -281,7 +296,7 @@ def validate_keys(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         with Span("validate_keys"):
-            # 1. Format validation
+            # 1. Format validation for all provided keys
             for validator in _KEY_VALIDATORS:
                 key = kwargs.get(validator.param_name)
                 if key and not validator.validate_format(key):
@@ -289,27 +304,33 @@ def validate_keys(func):
                         "Error": f"{key} is not a valid {validator.key_type} key"
                     }, 404
 
-            # 2. Fast negative cache check
+            # 2. Check existence in positive/negative cache or queue for async fetch
+            pending_checks: list[tuple[_KeyValidator, str, Optional[str], Any]] = []
             for validator in _KEY_VALIDATORS:
                 key = kwargs.get(validator.param_name)
-                if key and (validator.entity_name, key) in key_does_not_exist_cache:
+                if not key:
+                    continue
+
+                # Hot path: Fast positive cache check (skips negative cache lock)
+                if (validator.entity_name, key) in key_exists_cache:
+                    continue
+
+                # Fast negative cache check
+                if (validator.entity_name, key) in key_does_not_exist_cache:
                     return {
                         "Error": f"{validator.key_type} key: {key} does not exist"
                     }, 404
 
-            # 3. Check key existence for keys not already in key_exists_cache
-            pending_checks: list[tuple[_KeyValidator, str, Optional[str], Any]] = []
-            for validator in _KEY_VALIDATORS:
-                key = kwargs.get(validator.param_name)
-                if not key or (validator.entity_name, key) in key_exists_cache:
-                    continue
-
+                # Check alias / resolved key
                 lookup_key = (
                     validator.resolve_key(key) if validator.resolve_key else key
                 )
                 if lookup_key != key:
                     if (validator.entity_name, lookup_key) in key_exists_cache:
-                        key_exists_cache.set((validator.entity_name, key), True)
+                        ttl = _get_key_exists_ttl(validator.entity_name, key)
+                        key_exists_cache.set(
+                            (validator.entity_name, key), True, ttl_seconds=ttl
+                        )
                         continue
                     if (validator.entity_name, lookup_key) in key_does_not_exist_cache:
                         key_does_not_exist_cache.set((validator.entity_name, key), True)
@@ -322,7 +343,7 @@ def validate_keys(func):
                     (validator, key, lookup_key if lookup_key != key else None, future)
                 )
 
-            # 4. Resolve futures and populate positive / negative caches
+            # 3. Resolve futures and populate positive / negative caches
             for validator, key, resolved_key, future in pending_checks:
                 with Span(f"validate_keys.resolve:{validator.entity_name}") as span:
                     span.set_label("lookup_key", key)
@@ -330,14 +351,26 @@ def validate_keys(func):
                     span.set_label("exists", str(bool(entity_result)))
                     if not entity_result:
                         key_does_not_exist_cache.set((validator.entity_name, key), True)
+                        if resolved_key:
+                            key_does_not_exist_cache.set(
+                                (validator.entity_name, resolved_key), True
+                            )
                         return {
                             "Error": f"{validator.key_type} key: {key} does not exist"
                         }, 404
 
-                    key_exists_cache.set((validator.entity_name, key), True)
+                    ttl = _get_key_exists_ttl(validator.entity_name, key)
+                    key_exists_cache.set(
+                        (validator.entity_name, key), True, ttl_seconds=ttl
+                    )
                     if resolved_key:
+                        resolved_ttl = _get_key_exists_ttl(
+                            validator.entity_name, resolved_key
+                        )
                         key_exists_cache.set(
-                            (validator.entity_name, resolved_key), True
+                            (validator.entity_name, resolved_key),
+                            True,
+                            ttl_seconds=resolved_ttl,
                         )
 
         return func(*args, **kwargs)
