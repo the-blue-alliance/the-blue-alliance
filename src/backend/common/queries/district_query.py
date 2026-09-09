@@ -18,6 +18,8 @@ from backend.common.tasklets import typed_tasklet
 class DistrictQuery(CachedDatabaseQuery[Optional[District], Optional[DistrictDict]]):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_{district_key}"
+    MODEL_CACHING_ENABLED = False  # No need to cache a point query
+    DICT_CACHING_ENABLED = False  # No need to cache a point query dict
     DICT_CONVERTER = DistrictConverter
 
     def __init__(self, district_key: DistrictKey) -> None:

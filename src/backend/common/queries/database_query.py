@@ -303,9 +303,13 @@ class CachedDatabaseQuery(
 
         if not self.DICT_CACHING_ENABLED:
             with Span(f"{self.__class__.__name__}._query_async"):
-                result = yield self._query_async(*args, **kwargs)
-            self._record_accessed_cache_key(cache_key, result)
-            return result
+                query_result = yield self._query_async(*args, **kwargs)
+            # See https://github.com/facebook/pyre-check/issues/267
+            converted_result = none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
+                query_result
+            ).convert(_dict_version)
+            self._record_accessed_cache_key(cache_key, converted_result)
+            return converted_result
 
         with Span("{}._do_dict_query".format(self.__class__.__name__)):
             with Span("query.cache_lookup") as span:

@@ -10,7 +10,11 @@ from pyre_extensions import none_throws
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.cached_query_result import CachedQueryResult
-from backend.common.queries.database_query import CachedDatabaseQuery, DatabaseQuery
+from backend.common.queries.database_query import (
+    CachedDatabaseQuery,
+    DatabaseQuery,
+    track_accessed_query_cache_keys,
+)
 from backend.common.queries.dict_converters.converter_base import ConverterBase
 
 
@@ -85,6 +89,21 @@ class CachedDummyModelPointQuery(
 ):
     CACHE_KEY_FORMAT = "test_point_query_{model_key}"
     DICT_CONVERTER = DummyConverter
+    CACHE_WRITES_ENABLED = True
+
+    @ndb.tasklet
+    def _query_async(self, model_key: str) -> Generator[Any, Any, Optional[DummyModel]]:
+        model = yield DummyModel.get_by_id_async(model_key)
+        return model
+
+
+class CachedDummyModelPointQueryNoDictCache(
+    CachedDatabaseQuery[Optional[DummyModel], Optional[DummyDict]]
+):
+    CACHE_KEY_FORMAT = "test_point_query_no_dict_cache_{model_key}"
+    DICT_CONVERTER = DummyConverter
+    MODEL_CACHING_ENABLED = False
+    DICT_CACHING_ENABLED = False
     CACHE_WRITES_ENABLED = True
 
     @ndb.tasklet
@@ -467,3 +486,81 @@ def test_cached_query_fetch_dict_pre_inflated_bypasses_orjson(monkeypatch) -> No
 
     assert result == [{"int_val": 1}]
     assert len(called) == 0
+
+
+def test_dict_caching_disabled_fetch_dict_exists() -> None:
+    m = DummyModel(id="test_disabled", int_prop=42)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_disabled")
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert result_dict == {"int_val": 42}
+
+    # Verify nothing was written to CachedQueryResult
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    assert CachedQueryResult.get_by_id(cache_key) is None
+
+
+def test_dict_caching_disabled_fetch_dict_not_exists() -> None:
+    query = CachedDummyModelPointQueryNoDictCache(model_key="nonexistent")
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert result_dict is None
+
+
+def test_dict_caching_disabled_fetch_json_exists() -> None:
+    m = DummyModel(id="test_disabled_json", int_prop=99)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_disabled_json")
+    result_json = query.fetch_json(ApiMajorVersion.API_V3)
+    assert result_json is not None
+    assert isinstance(result_json, bytes)
+    assert orjson.loads(result_json) == {"int_val": 99}
+
+    # Verify nothing was written to CachedQueryResult
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    assert CachedQueryResult.get_by_id(cache_key) is None
+
+
+def test_dict_caching_disabled_fetch_json_not_exists() -> None:
+    query = CachedDummyModelPointQueryNoDictCache(model_key="nonexistent")
+    result_json = query.fetch_json(ApiMajorVersion.API_V3)
+    assert result_json is None
+
+
+def test_dict_caching_disabled_bypasses_cached_query_result_lookup() -> None:
+    m = DummyModel(id="test_bypass", int_prop=1)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_bypass")
+    with patch.object(
+        CachedQueryResult, "get_by_id_async", return_value=ndb.Future()
+    ) as mock_get:
+        dict_result = query.fetch_dict(ApiMajorVersion.API_V3)
+        json_result = query.fetch_json(ApiMajorVersion.API_V3)
+        mock_get.assert_not_called()
+
+    assert dict_result == {"int_val": 1}
+    assert json_result is not None
+    assert orjson.loads(json_result) == {"int_val": 1}
+
+
+def test_dict_caching_disabled_records_accessed_cache_key() -> None:
+    m = DummyModel(id="test_etag_track", int_prop=7)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_etag_track")
+    expected_cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as accessed_keys_dict:
+        query.fetch_dict(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as accessed_keys_json:
+        query.fetch_json(ApiMajorVersion.API_V3)
+
+    assert expected_cache_key in accessed_keys_dict
+    assert expected_cache_key in accessed_keys_json
+    assert (
+        accessed_keys_dict[expected_cache_key] == accessed_keys_json[expected_cache_key]
+    )
+    assert len(accessed_keys_json[expected_cache_key]) == 32
