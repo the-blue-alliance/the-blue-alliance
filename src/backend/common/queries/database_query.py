@@ -326,18 +326,28 @@ class CachedDatabaseQuery(
                     query_result
                 ).convert(_dict_version)
 
+                cqr = None
                 if self.CACHE_WRITES_ENABLED:
                     try:
                         with Span("query.async_cache_write"):
-                            yield CachedQueryResult(
+                            cqr = CachedQueryResult(
                                 id=cache_key, result_dict=converted_result
-                            ).put_async()
+                            )
+                            yield cqr.put_async()
                     except Exception as e:
                         logging.warning(
                             f"CachedQueryResult.put_async() failed: {cache_key}"
                         )
                         logging.exception(e)
-                self._record_accessed_cache_key(cache_key, converted_result)
+
+                if converted_result is None:
+                    self._record_accessed_cache_key(cache_key, None)
+                    return None
+
+                raw_bytes = cqr.get_json_bytes() if cqr else None
+                self._record_accessed_cache_key(
+                    cache_key, raw_bytes if raw_bytes is not None else converted_result
+                )
                 return converted_result
 
             values = getattr(cached_query_result, "_values", None)
@@ -355,7 +365,7 @@ class CachedDatabaseQuery(
                     with Span("query.json_decode") as span:
                         span.set_label("byte_size", str(len(raw_bytes)))
                         result = orjson.loads(raw_bytes)
-                        self._record_accessed_cache_key(cache_key, result)
+                        self._record_accessed_cache_key(cache_key, raw_bytes)
                         return result
                 except (orjson.JSONDecodeError, Exception) as e:
                     logging.warning(

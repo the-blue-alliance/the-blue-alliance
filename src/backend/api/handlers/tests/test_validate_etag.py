@@ -854,6 +854,7 @@ def test_database_query_tracks_deterministic_md5_hashes_with_unicode(
 
     assert raw_miss == raw_hit
     assert json_miss_keys[key] == json_hit_keys[key]
+    assert dict_hit_keys[key] == json_hit_keys[key]
 
 
 def test_delete_cache_multi_without_data_change_restores_etag_304(
@@ -1003,3 +1004,105 @@ def test_validate_etag_persists_dependencies_on_altered_etag(
 
     set_multi_mock.assert_called_once()
     assert etag_deps_persisted_cache.get(("/api/v3/team/frc254", norm_etag2)) is True
+
+
+def test_cached_database_query_tracks_identical_hashes_for_fetch_dict_and_fetch_json(
+    ndb_stub,
+) -> None:
+    from backend.common.consts.api_version import ApiMajorVersion
+    from backend.common.models.event import Event
+    from backend.common.models.event_team import EventTeam
+    from backend.common.models.team import Team
+    from backend.common.queries.database_query import track_accessed_query_cache_keys
+    from backend.common.queries.team_query import EventTeamsQuery
+
+    event = Event(id="2026test", year=2026, event_short="test", event_type_enum=0)
+    event.put()
+    team = Team(id="frc9999", team_number=9999, nickname="Café Robotics")
+    team.put()
+    EventTeam(id="2026test_frc9999", event=event.key, team=team.key, year=2026).put()
+
+    query = EventTeamsQuery(event_key="2026test")
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    # 1. fetch_dict cache miss
+    with track_accessed_query_cache_keys() as dict_miss_keys:
+        query.fetch_dict(ApiMajorVersion.API_V3)
+
+    # 2. fetch_dict cache hit
+    with track_accessed_query_cache_keys() as dict_hit_keys:
+        query.fetch_dict(ApiMajorVersion.API_V3)
+
+    # 3. fetch_json cache hit
+    with track_accessed_query_cache_keys() as json_hit_keys:
+        query.fetch_json(ApiMajorVersion.API_V3)
+
+    # Invalidate query cache to test fetch_json cache miss
+    EventTeamsQuery.delete_cache_multi({query.cache_key})
+
+    # 4. fetch_json cache miss
+    with track_accessed_query_cache_keys() as json_miss_keys:
+        query.fetch_json(ApiMajorVersion.API_V3)
+
+    assert dict_miss_keys[cache_key] == dict_hit_keys[cache_key]
+    assert dict_hit_keys[cache_key] == json_hit_keys[cache_key]
+    assert json_hit_keys[cache_key] == json_miss_keys[cache_key]
+
+
+def test_validate_etag_short_circuits_across_json_and_dict_endpoints(
+    ndb_stub, memcache_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from unittest.mock import patch
+    import backend.api.handlers.event
+    from backend.common.models.event import Event
+    from backend.common.models.event_team import EventTeam
+    from backend.common.models.team import Team
+
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    event = Event(id="2026test", year=2026, event_short="test", event_type_enum=0)
+    event.put()
+    team = Team(id="frc9999", team_number=9999, nickname="Café Robotics")
+    team.put()
+    EventTeam(id="2026test_frc9999", event=event.key, team=team.key, year=2026).put()
+
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    # 1. Full teams endpoint (uses fetch_json)
+    resp1 = api_client.get("/api/v3/event/2026test/teams", headers=headers)
+    assert resp1.status_code == 200
+    etag_full = resp1.headers.get("ETag")
+    assert etag_full is not None
+
+    # 2. Simple teams endpoint (uses fetch_dict on the same EventTeamsQuery)
+    resp2 = api_client.get("/api/v3/event/2026test/teams/simple", headers=headers)
+    assert resp2.status_code == 200
+    etag_simple = resp2.headers.get("ETag")
+    assert etag_simple is not None
+
+    # 3. Conditional request to full teams with etag_full -> should short-circuit
+    with patch(
+        "backend.api.handlers.event.models_query_response",
+        wraps=backend.api.handlers.event.models_query_response,
+    ) as mock_mqr:
+        cond_headers = {"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag_full}
+        resp3 = api_client.get("/api/v3/event/2026test/teams", headers=cond_headers)
+        assert resp3.status_code == 304
+        assert mock_mqr.called is False
+
+    # 4. Conditional request to simple teams with etag_simple -> should also short-circuit
+    with patch(
+        "backend.api.handlers.event.models_query_response",
+        wraps=backend.api.handlers.event.models_query_response,
+    ) as mock_mqr:
+        cond_headers = {"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag_simple}
+        resp4 = api_client.get(
+            "/api/v3/event/2026test/teams/simple", headers=cond_headers
+        )
+        assert resp4.status_code == 304
+        assert mock_mqr.called is False
