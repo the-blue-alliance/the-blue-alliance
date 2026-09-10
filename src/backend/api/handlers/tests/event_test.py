@@ -154,6 +154,9 @@ def test_event_list_all(ndb_stub, api_client: Client) -> None:
         "/api/v3/events/all", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data.startswith(b"[") and resp.data.endswith(b"]")
+    assert json.loads(resp.data) == resp.json
     assert len(resp.json) == 2
     for event in resp.json:
         validate_nominal_event_keys(event)
@@ -180,6 +183,21 @@ def test_event_list_all(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2019casj" in resp.json
     assert "2020casj" in resp.json
+
+
+def test_event_list_all_empty(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/events/all", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data == b"[]"
+    assert json.loads(resp.data) == []
 
 
 def test_event_list_year(ndb_stub, api_client: Client) -> None:

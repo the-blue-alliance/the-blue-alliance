@@ -17,6 +17,7 @@ from backend.api.handlers.helpers.model_properties import (
 from backend.api.handlers.helpers.model_query_response import (
     model_query_response,
     models_query_response,
+    multi_models_query_response,
 )
 from backend.api.handlers.helpers.nexus_info_converter import (
     event_queue_status_to_api,
@@ -81,20 +82,12 @@ def event_list_all(
     """
     track_call_after_response("event/list", "all", model_type)
 
-    futures = []
-    for year in SeasonHelper.get_valid_years():
-        futures.append(
-            EventListQuery(year=year).fetch_dict_async(ApiMajorVersion.API_V3)
-        )
-
-    events = []
-    for future in futures:
-        partial_event_list = future.get_result()
-        events += partial_event_list
-
-    if model_type is not None:
-        events = filter_event_properties(events, model_type)
-    return profiled_jsonify(events)
+    queries = [EventListQuery(year=year) for year in SeasonHelper.get_valid_years()]
+    return multi_models_query_response(
+        queries,
+        model_type=model_type,
+        filter_func=filter_event_properties,
+    )
 
 
 @api_authenticated
