@@ -22,7 +22,6 @@ const staticRoutes = [
   '/apidocs/v3',
   '/contact',
   '/donate',
-  '/gameday',
   '/privacy',
   '/thanks',
 ];
