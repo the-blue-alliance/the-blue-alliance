@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
+from typing import Any
 
+import orjson
 import pytest
 from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb
@@ -240,3 +242,27 @@ def test_recipients_individual() -> None:
     recipient_dict = a1.recipient_dict
     assert None in recipient_dict
     assert recipient_dict[None] == ["Woodie Flowers"]
+
+
+def test_recipient_list_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
+    recipients = [AwardRecipient(awardee="Woodie Flowers", team_number=None)]
+    a = Award(
+        id="2010ct_3",
+        year=2010,
+        award_type_enum=AwardType.WOODIE_FLOWERS,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2010ct"),
+        name_str="WFFA",
+        recipient_json_list=[json.dumps(r) for r in recipients],
+    )
+    loads_called = False
+    real_loads = orjson.loads
+
+    def mock_loads(val: Any) -> Any:
+        nonlocal loads_called
+        loads_called = True
+        return real_loads(val)
+
+    monkeypatch.setattr("backend.common.models.award.orjson.loads", mock_loads)
+    assert a.recipient_list == recipients
+    assert loads_called is True

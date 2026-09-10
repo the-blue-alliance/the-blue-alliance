@@ -1,9 +1,9 @@
-import json
 import logging
 import traceback
 import zlib
 from typing import Any, Generator, Iterable, Optional
 
+import orjson
 from google.appengine.ext import ndb
 
 from backend.common.profiler import Span
@@ -39,7 +39,7 @@ class CachedQueryResult(ndb.Model):
             elif isinstance(target, str):
                 res_bytes = target.encode("utf-8")
             elif target is not None:
-                res_bytes = json.dumps(target, separators=(",", ":")).encode("utf-8")
+                res_bytes = orjson.dumps(target)
             else:
                 res_bytes = None
 

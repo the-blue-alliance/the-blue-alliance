@@ -2,6 +2,7 @@ import json
 import logging
 from typing import Any, Generator, List
 
+import orjson
 import pytest
 from google.appengine.ext import ndb
 
@@ -479,3 +480,22 @@ def test_get_json_bytes_raw_types() -> None:
     c_str = CachedQueryResult()
     setattr(c_str, "_values", {b"result_dict": '{"raw": "str"}'})
     assert c_str.get_json_bytes() == b'{"raw": "str"}'
+
+
+def test_get_json_bytes_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
+    data = {"hello": "world"}
+    c = CachedQueryResult(result_dict=data)
+    dumps_called = False
+    real_dumps = orjson.dumps
+
+    def mock_dumps(val: Any) -> bytes:
+        nonlocal dumps_called
+        dumps_called = True
+        return real_dumps(val)
+
+    monkeypatch.setattr(
+        "backend.common.models.cached_query_result.orjson.dumps", mock_dumps
+    )
+    json_bytes = c.get_json_bytes()
+    assert dumps_called is True
+    assert json_bytes == b'{"hello":"world"}'

@@ -1,5 +1,7 @@
 import json
+from typing import Any
 
+import orjson
 import pytest
 from google.appengine.api import datastore_errors
 
@@ -111,3 +113,51 @@ def test_smugmug_album_urls() -> None:
 def test_smugmug_is_image(media_type: MediaType, is_image: bool) -> None:
     m = Media(id="smugmug_abc", media_type_enum=media_type, foreign_key="abc")
     assert m.is_image is is_image
+
+
+def test_media_details_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
+    data = {"author": "frc254", "views": 100}
+    m = Media(
+        id="media_123",
+        media_type_enum=MediaType.CD_PHOTO_THREAD,
+        foreign_key="123",
+        details_json=json.dumps(data),
+    )
+    loads_called = False
+    real_loads = orjson.loads
+
+    def mock_loads(val: Any) -> Any:
+        nonlocal loads_called
+        loads_called = True
+        return real_loads(val)
+
+    monkeypatch.setattr("backend.common.models.media.orjson.loads", mock_loads)
+    assert m.details == data
+    assert loads_called is True
+    loads_called = False
+    assert m.details == data
+    assert loads_called is False
+
+
+def test_media_private_details_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
+    priv = {"deletehash": "xyz"}
+    m = Media(
+        id="media_456",
+        media_type_enum=MediaType.IMGUR,
+        foreign_key="456",
+        private_details_json=json.dumps(priv),
+    )
+    loads_called = False
+    real_loads = orjson.loads
+
+    def mock_loads(val: Any) -> Any:
+        nonlocal loads_called
+        loads_called = True
+        return real_loads(val)
+
+    monkeypatch.setattr("backend.common.models.media.orjson.loads", mock_loads)
+    assert m.private_details == priv
+    assert loads_called is True
+    loads_called = False
+    assert m.private_details == priv
+    assert loads_called is False

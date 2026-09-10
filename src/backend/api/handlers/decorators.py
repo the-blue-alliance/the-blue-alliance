@@ -1,10 +1,10 @@
 import datetime
-import json
 import logging
 from dataclasses import dataclass
 from functools import wraps
 from typing import Any, Callable, Optional, Type, TypeVar
 
+import orjson
 from flask import g, jsonify, make_response, request, Response
 
 from backend.api.client_api_types import VoidRequest
@@ -211,12 +211,12 @@ def client_api_method(
         def decorated_function(*args, **kwargs) -> Response:
             data = request.get_data()
             if data:
-                req = json.loads(data)
+                req = orjson.loads(data)
             else:
                 req = VoidRequest()
 
             resp = func(req)
-            return jsonify(resp)
+            return Response(orjson.dumps(resp), mimetype="application/json")
 
         return decorated_function
 
