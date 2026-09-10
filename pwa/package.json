@@ -87,7 +87,7 @@
     "@types/react": "19.2.18",
     "@types/react-dom": "19.2.7",
     "@vitejs/plugin-react": "6.1.1",
-    "@vitest/coverage-v8": "4.1.11",
+    "@vitest/coverage-v8": "5.0.0",
     "eslint-plugin-no-relative-import-paths": "1.6.1",
     "json-schema-to-ts": "3.1.1",
     "jsdom": "30.0.1",
@@ -108,7 +108,7 @@
     "typescript": "6.0.3",
     "unplugin-icons": "23.0.1",
     "vite": "8.2.2",
-    "vitest": "4.1.11",
+    "vitest": "5.0.0",
     "workbox-build": "7.4.1"
   },
   "engines": {
