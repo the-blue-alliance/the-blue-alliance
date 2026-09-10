@@ -12,6 +12,7 @@ from backend.api.handlers.tests.helpers import (
     validate_simple_event_keys,
     validate_simple_team_keys,
 )
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.cmp_qualification import CmpQualificationMethod
@@ -28,6 +29,12 @@ from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.insight import Insight
 from backend.common.models.team import Team
+from backend.common.queries.district_query import (
+    DistrictAbbreviationQuery,
+    DistrictsInYearQuery,
+)
+from backend.common.queries.event_query import DistrictEventsQuery
+from backend.common.queries.team_query import DistrictTeamsQuery
 
 
 def test_district_events(ndb_stub, api_client: Client) -> None:
@@ -744,3 +751,106 @@ def test_district_endpoints_validate(endpoint, ndb_stub, api_client: Client) -> 
             headers={"X-TBA-Auth-Key": "test_auth_key"},
         )
         assert resp.status_code == 200
+
+
+def test_district_models_query_response_passthrough(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    District(
+        id="2020fim",
+        year=2020,
+        abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+        district_key=ndb.Key(District, "2020fim"),
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+    DistrictTeam(
+        id="2020fim_frc254",
+        district_key=ndb.Key(District, "2020fim"),
+        team=ndb.Key(Team, "frc254"),
+        year=2020,
+    ).put()
+
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    from backend.common.queries.database_query import CachedDatabaseQuery
+
+    orig_fetch_json = CachedDatabaseQuery.fetch_json
+    orig_fetch_dict = CachedDatabaseQuery.fetch_dict
+    calls_fetch_json = []
+    calls_fetch_dict = []
+
+    def spy_fetch_json(self, version):
+        calls_fetch_json.append((type(self), version))
+        return orig_fetch_json(self, version)
+
+    def spy_fetch_dict(self, version):
+        calls_fetch_dict.append((type(self), version))
+        return orig_fetch_dict(self, version)
+
+    monkeypatch.setattr(CachedDatabaseQuery, "fetch_json", spy_fetch_json)
+    monkeypatch.setattr(CachedDatabaseQuery, "fetch_dict", spy_fetch_dict)
+
+    # 1. district_history (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/fim/history", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictAbbreviationQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 2. district_list_year (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/districts/2020", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictsInYearQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 3. district_events (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/events", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictEventsQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 4. district_events (simple -> fetch_dict)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/events/simple", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 0
+    assert len(calls_fetch_dict) == 1
+    assert calls_fetch_dict[0] == (DistrictEventsQuery, ApiMajorVersion.API_V3)
+
+    # 5. district_teams (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/teams", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 6. district_teams (simple -> fetch_dict)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/teams/simple", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 0
+    assert len(calls_fetch_dict) == 1
+    assert calls_fetch_dict[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3)

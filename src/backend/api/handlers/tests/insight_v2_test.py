@@ -1,3 +1,4 @@
+import pytest
 from werkzeug.test import Client
 
 from backend.common.consts.auth_type import AuthType
@@ -345,3 +346,84 @@ def test_insights_year_category_clubs(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 1
     assert resp.json[0]["category"] == InsightCategory.CLUBS
     assert resp.json[0]["name"] == "hall_of_fame"
+
+
+def test_insights_v2_models_query_response_passthrough(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    _put_auth()
+    _put_insight(2024, name="blue_banners", category=InsightCategory.LEADERBOARD)
+    _put_insight(
+        2024,
+        name="fim_banners",
+        category=InsightCategory.LEADERBOARD,
+        district_abbreviation="fim",
+    )
+
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    from backend.common.consts.api_version import ApiMajorVersion
+    from backend.common.queries.database_query import CachedDatabaseQuery
+    from backend.common.queries.insight_v2_query import (
+        InsightV2YearCategoryDistrictQuery,
+        InsightV2YearCategoryQuery,
+        InsightV2YearDistrictQuery,
+        InsightV2YearQuery,
+    )
+
+    orig_fetch_json = CachedDatabaseQuery.fetch_json
+    orig_fetch_dict = CachedDatabaseQuery.fetch_dict
+    calls_fetch_json = []
+    calls_fetch_dict = []
+
+    def spy_fetch_json(self, version):
+        calls_fetch_json.append((type(self), version))
+        return orig_fetch_json(self, version)
+
+    def spy_fetch_dict(self, version):
+        calls_fetch_dict.append((type(self), version))
+        return orig_fetch_dict(self, version)
+
+    monkeypatch.setattr(CachedDatabaseQuery, "fetch_json", spy_fetch_json)
+    monkeypatch.setattr(CachedDatabaseQuery, "fetch_dict", spy_fetch_dict)
+
+    # 1. insights_v2_year (/insights/2024)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/insights/2024", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (InsightV2YearQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 2. insights_v2_year_category (/insights/2024/leaderboard)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/insights/2024/leaderboard", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (InsightV2YearCategoryQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 3. insights_v2_year_district (/insights/2024/district/fim)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/insights/2024/district/fim", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (InsightV2YearDistrictQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 4. insights_v2_year_category_district (/insights/2024/leaderboard/district/fim)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get(
+        "/api/v3/insights/2024/leaderboard/district/fim", headers=headers
+    )
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (
+        InsightV2YearCategoryDistrictQuery,
+        ApiMajorVersion.API_V3,
+    )
+    assert len(calls_fetch_dict) == 0
