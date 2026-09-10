@@ -1,4 +1,4 @@
-from typing import Any, cast, Optional
+from typing import Any, Optional
 
 from backend.api.handlers.decorators import (
     api_authenticated,
@@ -391,13 +391,8 @@ def team_list_all(
     """
     track_call_after_response("team/list", "all", model_type)
 
-    team_keys = Team.query().order(-Team.team_number).fetch(1, keys_only=True)
-    if not team_keys:
-        return cast(
-            TypedFlaskResponse[list[TeamDict]],
-            profiled_jsonify(b"[]" if model_type is None else []),
-        )
-    max_team_num = int(team_keys[0].id()[3:])
+    max_team_key = Team.query().order(-Team.team_number).fetch(1, keys_only=True)[0]
+    max_team_num = int(max_team_key.id()[3:])
     max_team_page = int(max_team_num / TEAM_PAGE_SIZE)
 
     # Query up to max_team_page + 1 (i.e. range(max_team_page + 2)).
