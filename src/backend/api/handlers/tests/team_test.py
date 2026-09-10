@@ -828,6 +828,9 @@ def test_team_list_all(ndb_stub, api_client: Client) -> None:
         "/api/v3/teams/all", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data.startswith(b"[") and resp.data.endswith(b"]")
+    assert json.loads(resp.data) == resp.json
     assert len(resp.json) == 4
     for team in resp.json:
         validate_nominal_team_keys(team)
@@ -1081,6 +1084,9 @@ def test_team_history(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data.startswith(b"{") and resp.data.endswith(b"}")
+    assert json.loads(resp.data) == resp.json
 
     assert "awards" in resp.json
     assert resp.json["awards"] == [
@@ -1103,3 +1109,35 @@ def test_team_history(ndb_stub, api_client: Client) -> None:
     assert "events" in resp.json
     assert len(resp.json["events"]) == 1
     assert resp.json["events"][0]["key"] == "2020casj"
+
+
+def test_team_history_empty(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc9999", team_number=9999).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc9999/history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data.startswith(b"{") and resp.data.endswith(b"}")
+    assert json.loads(resp.data) == {"events": [], "awards": []}
+
+
+def test_team_list_all_empty(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/teams/all", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data == b"[]"
+    assert json.loads(resp.data) == []
