@@ -117,8 +117,8 @@ importers:
         specifier: 2.0.8
         version: 2.0.8(@types/react@19.2.18)(react-dom@19.2.8(react@19.2.8))(react@19.2.8)
       srvx:
-        specifier: 1.0.0
-        version: 1.0.0
+        specifier: 1.0.1
+        version: 1.0.1
       temporal-polyfill:
         specifier: 1.0.4
         version: 1.0.4
@@ -6906,8 +6906,8 @@ packages:
     engines: {node: '>=20.16.0'}
     hasBin: true
 
-  srvx@1.0.0:
-    resolution: {integrity: sha512-3R9/OeAJXrfcdfL7P/bQr7sVoeLRRFVNrDb6sdfNrQhvOJlBsVp1p/dMvtXP4PNTsHDht48eWX0ddo5X0W8qrg==}
+  srvx@1.0.1:
+    resolution: {integrity: sha512-3XQNsxNBTY5SlfeeUsciNrmvG4oOPwWns7Vc+lZCBJvMMu0U8ZUgCzgJjZLac8dowsZNJ44X93isrkjIIdtJ/A==}
     engines: {node: '>=20.16.0'}
     hasBin: true
 
@@ -15269,7 +15269,7 @@ snapshots:
 
   srvx@0.11.22: {}
 
-  srvx@1.0.0: {}
+  srvx@1.0.1: {}
 
   stackback@0.0.2: {}
 
