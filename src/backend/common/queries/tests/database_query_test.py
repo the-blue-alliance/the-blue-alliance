@@ -1,3 +1,4 @@
+import hashlib
 import json
 import logging
 from typing import Any, Generator, Iterable, List, Optional, TypedDict
@@ -8,14 +9,24 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.cached_query_result import CachedQueryResult
+from backend.common.models.district import District
+from backend.common.models.event import Event
+from backend.common.models.match import Match
+from backend.common.models.team import Team
 from backend.common.queries.database_query import (
     CachedDatabaseQuery,
     DatabaseQuery,
     track_accessed_query_cache_keys,
 )
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+from backend.common.queries.district_query import DistrictQuery
+from backend.common.queries.event_query import EventQuery
+from backend.common.queries.match_query import MatchQuery
+from backend.common.queries.team_query import TeamQuery
 
 
 class DummyModel(ndb.Model):
@@ -564,3 +575,73 @@ def test_dict_caching_disabled_records_accessed_cache_key() -> None:
         accessed_keys_dict[expected_cache_key] == accessed_keys_json[expected_cache_key]
     )
     assert len(accessed_keys_json[expected_cache_key]) == 32
+
+
+def test_dict_caching_disabled_single_serialization() -> None:
+    m = DummyModel(id="test_single_ser", int_prop=42)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_single_ser")
+    expected_cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    with patch(
+        "backend.common.queries.database_query.orjson.dumps", wraps=orjson.dumps
+    ) as mock_dumps:
+        with track_accessed_query_cache_keys() as accessed_keys:
+            result_json = query.fetch_json(ApiMajorVersion.API_V3)
+
+        # Verify orjson.dumps was called exactly once during the entire fetch_json execution
+        assert mock_dumps.call_count == 1
+
+    assert result_json is not None
+    assert orjson.loads(result_json) == {"int_val": 42}
+    assert expected_cache_key in accessed_keys
+    expected_hash = hashlib.md5(result_json).hexdigest()
+    assert accessed_keys[expected_cache_key] == expected_hash
+
+
+def test_production_point_queries_single_serialization() -> None:
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+    Event(
+        id="2024casf",
+        year=2024,
+        event_type_enum=EventType.REGIONAL,
+        event_short="casf",
+    ).put()
+    Match(
+        id="2024casf_qm1",
+        event=ndb.Key(Event, "2024casf"),
+        year=2024,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": [], "score": 0, "surrogates": [], "dqs": []},
+                "blue": {"teams": [], "score": 0, "surrogates": [], "dqs": []},
+            }
+        ),
+    ).put()
+    District(id="2024fim", year=2024, abbreviation="fim").put()
+
+    queries = [
+        TeamQuery(team_key="frc254"),
+        EventQuery(event_key="2024casf"),
+        MatchQuery(match_key="2024casf_qm1"),
+        DistrictQuery(district_key="2024fim"),
+    ]
+
+    for query in queries:
+        assert not query.DICT_CACHING_ENABLED
+        cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+        with patch(
+            "backend.common.queries.database_query.orjson.dumps", wraps=orjson.dumps
+        ) as mock_dumps:
+            with track_accessed_query_cache_keys() as accessed_keys:
+                res = query.fetch_json(ApiMajorVersion.API_V3)
+            assert mock_dumps.call_count == 1
+
+        assert res is not None
+        assert cache_key in accessed_keys
+        assert accessed_keys[cache_key] == hashlib.md5(res).hexdigest()
