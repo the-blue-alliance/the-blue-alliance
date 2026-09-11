@@ -157,7 +157,7 @@ The policy is centralized in `app/lib/queryClient.ts` and applied via `createQue
   resolves it once per navigation and exposes `status`/`currentSeason` on router context for every
   child loader to read. The long `staleTime` means this is a cache read after the first hit.
 - **Live data keeps its own `staleTime`/`refetchInterval`** and is unaffected by the above — e.g.
-  the district champs page (`district.$districtAbbreviation.champs.$year.tsx`) polls on a
+  the district Champs tab (`districtChampsTab.tsx`) polls on a
   `refetchInterval` independent of `staleTime`, the live Nexus queuing status on the event page
   (`getEventNexusInfo`) overrides a short 30s `staleTime`, and Firebase-backed queries
   (`app/lib/gameday/useFirebaseWebcasts.ts`) keep their own `Infinity` values.
@@ -173,7 +173,7 @@ useSuspenseQuery({
 ```
 
 A few routes still fetch data directly with the generated SDK functions instead of going through
-the `QueryClient` (e.g. `team.$teamNumber.stats.tsx`, `district.$districtAbbreviation.stats.tsx`,
+the `QueryClient` (e.g. `team.$teamNumber.stats.tsx`,
 `district.$districtAbbreviation.{-$year}.tsx`, `district.$districtAbbreviation.insights.tsx`,
 `teams.{-$pgNum}.tsx`). Those routes get no benefit from `staleTime` until they're converted to use
 `ensureQueryData`/`useSuspenseQuery`; that conversion is tracked separately.
