@@ -84,6 +84,18 @@ export type CandidateMedia = {
   view_image_url?: string;
   image_direct_url?: string;
   social_profile_url?: string;
+  /**
+   * Album or photo title, when the provider supplied one (SmugMug)
+   */
+  title?: string;
+  /**
+   * Number of photos in the album (SmugMug albums)
+   */
+  image_count?: number;
+  /**
+   * The first few photos of the album, for previewing its contents (SmugMug albums)
+   */
+  preview_images?: Array<SmugmugPreviewImage>;
 };
 
 /**
@@ -330,6 +342,18 @@ export type RejectResponse = {
 
 export type ErrorResponse = {
   Error?: string;
+};
+
+export type SmugmugPreviewImage = {
+  thumbnail_url?: string;
+  /**
+   * Small-size rendition, suitable for a preview grid
+   */
+  image_url?: string;
+  /**
+   * The photo's page on SmugMug
+   */
+  web_uri?: string;
 };
 
 export type GetModerationQueueData = {

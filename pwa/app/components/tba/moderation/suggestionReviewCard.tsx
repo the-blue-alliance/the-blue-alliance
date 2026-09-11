@@ -350,6 +350,9 @@ function MediaPreview({
       </div>
     ) : null;
   }
+  if (media.slug_name === 'smugmug-album') {
+    return <SmugmugAlbumPreview media={media} />;
+  }
   if (media.is_image) {
     const imageUrl =
       media.image_direct_url ??
@@ -396,6 +399,69 @@ function MediaPreview({
     );
   }
   return null;
+}
+
+/**
+ * SmugMug albums arrive with a cover, title, photo count and the album's
+ * first few photos (the moderation API fetches them; SmugMug's own embed
+ * endpoint serves an empty page). Show a thumbnail grid so a reviewer can
+ * see what the album actually contains, with the cover as the fallback.
+ */
+function SmugmugAlbumPreview({
+  media,
+}: {
+  media: NonNullable<ModerationSuggestion['candidate_media']>;
+}): JSX.Element {
+  const previews = (media.preview_images ?? []).filter((p) => p.image_url);
+  const caption = [
+    media.title,
+    media.image_count !== undefined
+      ? `${media.image_count.toLocaleString()} ${
+          media.image_count === 1 ? 'photo' : 'photos'
+        }`
+      : undefined,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  return (
+    <div className="flex max-w-xl flex-col gap-2">
+      {previews.length > 0 ? (
+        <div
+          className="grid grid-cols-4 gap-1 overflow-hidden rounded-lg border"
+          data-testid="smugmug-album-previews"
+        >
+          {previews.map((photo, i) => (
+            <a
+              key={photo.web_uri || i}
+              href={photo.web_uri || media.external_link}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Photo ${i + 1}${media.title ? ` of ${media.title}` : ''}`}
+              className="aspect-square bg-muted"
+            >
+              <img
+                src={photo.image_url}
+                alt=""
+                loading="lazy"
+                className="size-full object-cover"
+              />
+            </a>
+          ))}
+        </div>
+      ) : (
+        media.image_direct_url && (
+          <img
+            src={media.image_direct_url}
+            alt={media.title ?? 'SmugMug album cover'}
+            className="max-h-80 w-fit max-w-full rounded-lg border"
+          />
+        )
+      )}
+      {caption && (
+        <div className="text-sm text-muted-foreground">{caption}</div>
+      )}
+    </div>
+  );
 }
 
 function TeamMediaDetails({
