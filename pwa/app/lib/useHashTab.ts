@@ -6,6 +6,15 @@ function subscribeToHashChange(onChange: () => void): () => void {
   return () => window.removeEventListener('hashchange', onChange);
 }
 
+function readRawHash(): string {
+  return decodeURIComponent(window.location.hash.slice(1));
+}
+
+// The server has no hash; hydrating on the default tab avoids a mismatch
+function serverHash(): undefined {
+  return undefined;
+}
+
 /**
  * Keeps a tab bar in sync with the URL hash: `/event/2024mil#rankings` opens
  * the Rankings tab, and picking a tab rewrites the hash (replace, not push, so
@@ -16,6 +25,10 @@ function subscribeToHashChange(onChange: () => void): () => void {
  * returned `key` changes and the tab bar remounts on the hashed tab. Our own
  * tab clicks use history.replaceState, which fires no `hashchange`, so they
  * never remount; only external changes (initial load, back/forward) do.
+ *
+ * `values` may change between renders (data-driven tabs): the hash is
+ * matched against the current list on every render, so a hash naming a tab
+ * that appears once its data loads takes effect at that point.
  *
  * `legacyHashes` maps hash names the Jinja site used to today's tab values so
  * old links keep landing on the right tab.
@@ -34,20 +47,19 @@ export function useHashTab<T extends string>({
   onValueChange: (value: string) => void;
 } {
   const navigate = useNavigate();
-  const readHash = useCallback((): T | undefined => {
-    const hash = window.location.hash.slice(1);
-    const value = legacyHashes[hash] ?? hash;
-    return (values as readonly string[]).includes(value)
-      ? (value as T)
-      : undefined;
-    // values/legacyHashes are static per call site
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-  const hashTab = useSyncExternalStore(
+  // The store holds only the raw hash; which tab it names is decided during
+  // render against the current `values`, so data-driven tab lists work too
+  const rawHash = useSyncExternalStore(
     subscribeToHashChange,
-    readHash,
-    () => undefined,
+    readRawHash,
+    serverHash,
   );
+  const candidate =
+    rawHash === undefined ? undefined : (legacyHashes[rawHash] ?? rawHash);
+  const hashTab =
+    candidate !== undefined && (values as readonly string[]).includes(candidate)
+      ? (candidate as T)
+      : undefined;
   const onValueChange = useCallback(
     (value: string) => {
       void navigate({

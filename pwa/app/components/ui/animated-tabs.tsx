@@ -5,7 +5,6 @@ import {
   createContext,
   lazy,
   useContext,
-  useEffect,
   useState,
 } from 'react';
 
@@ -22,26 +21,6 @@ const AnimatedTabsContext = createContext<{
   activeValue: undefined,
   motionReady: false,
 });
-
-/**
- * True once the browser has had an idle moment after mount. The framer-motion
- * indicator chunk is only requested after that, so it is never on the
- * hydration critical path, deterministically rather than by timing luck.
- */
-function useIdleAfterMount(): boolean {
-  const [ready, setReady] = useState(false);
-  useEffect(() => {
-    if (typeof window.requestIdleCallback === 'function') {
-      const id = window.requestIdleCallback(() => setReady(true), {
-        timeout: 2_000,
-      });
-      return () => window.cancelIdleCallback(id);
-    }
-    const id = window.setTimeout(() => setReady(true), 200);
-    return () => window.clearTimeout(id);
-  }, []);
-  return ready;
-}
 
 type TabsChangeEventDetails = Parameters<
   NonNullable<ComponentProps<typeof Tabs>['onValueChange']>
@@ -64,7 +43,12 @@ function AnimatedTabs({
     value ?? defaultValue,
   );
   const activeValue = value ?? internalValue;
-  const motionReady = useIdleAfterMount();
+  // The framer-motion indicator (~60 KB) is only requested once the user
+  // shows intent to switch tabs: a pointer entering the tab bar or focus
+  // landing in it. That keeps it off the hydration critical path
+  // deterministically, and it has usually arrived by the first click.
+  const [motionReady, setMotionReady] = useState(false);
+  const warmUp = () => setMotionReady(true);
 
   return (
     <AnimatedTabsContext.Provider value={{ activeValue, motionReady }}>
@@ -74,8 +58,11 @@ function AnimatedTabs({
         onValueChange={(v, eventDetails) => {
           const stringValue = String(v);
           setInternalValue(stringValue);
+          warmUp();
           onValueChange?.(stringValue, eventDetails);
         }}
+        onPointerEnter={warmUp}
+        onFocusCapture={warmUp}
         {...props}
       />
     </AnimatedTabsContext.Provider>

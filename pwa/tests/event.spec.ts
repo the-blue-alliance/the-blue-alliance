@@ -133,14 +133,16 @@ test('defers the animated tab indicator until a tab changes', async ({
   );
 });
 
-test('loads the animated tab indicator once the page is idle', async ({
+test('loads the animated tab indicator when a tab changes', async ({
   page,
 }) => {
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
   const indicatorRequest = page.waitForRequest((request) =>
     request.url().includes('animatedTabIndicator'),
   );
-  await page.goto('/event/2024mil');
-  await page.locator('body[data-hydrated]').waitFor();
+  await page.getByRole('tab', { name: 'Rankings' }).click();
 
   expect((await indicatorRequest).url()).toContain('animatedTabIndicator');
 });

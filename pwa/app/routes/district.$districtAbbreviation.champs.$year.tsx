@@ -643,10 +643,6 @@ function AllRankingsTable({
 // --- Main page component ---
 
 function ChampsPage() {
-  const tabs = useHashTab({
-    values: ['all-rankings', 'all-matches'] as const,
-    defaultValue: 'all-rankings',
-  });
   const { abbreviation, displayName, currentSeason, year } =
     Route.useLoaderData();
   const districtKey = `${year}${abbreviation}`;
@@ -785,6 +781,11 @@ function ChampsPage() {
   const isLoading = allEventsQuery.isPending || districtTeamsQuery.isPending;
 
   const divisionTabIds = cmpDivisions.map((div) => div.short_name ?? div.name);
+  // Division tabs are data-driven, so the accepted hash values are too
+  const tabs = useHashTab({
+    values: ['all-rankings', 'all-matches', ...divisionTabIds],
+    defaultValue: 'all-rankings',
+  });
 
   return (
     <div>

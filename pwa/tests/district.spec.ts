@@ -76,3 +76,23 @@ test.describe('district page tabs and the URL hash', () => {
     );
   });
 });
+
+test.describe('district champs page division tabs and the URL hash', () => {
+  test('a division tab round-trips through the hash', async ({ page }) => {
+    await page.goto('/district/fim/champs/2019');
+    await page.locator('body[data-hydrated]').waitFor();
+    // Division tabs follow the two fixed ones and are named from data
+    const division = page.getByRole('tab').nth(2);
+    const name = (await division.textContent())?.trim() ?? '';
+    expect(name).not.toBe('');
+    await division.click();
+    await expect(page).toHaveURL(new RegExp(`#${encodeURIComponent(name)}$`));
+
+    await page.goto(`/district/fim/champs/2019#${encodeURIComponent(name)}`);
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name, exact: true })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+});
