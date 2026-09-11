@@ -45,7 +45,7 @@ const TYPE_NAMES: Record<SuggestionType, string> = {
   [SuggestionType.OFFSEASON_EVENT]: 'Offseason Events',
   [SuggestionType.API_AUTH_ACCESS]: 'API Key Requests',
   [SuggestionType.ROBOT]: 'CAD Models',
-  [SuggestionType.EVENT_MEDIA]: 'Event Videos',
+  [SuggestionType.EVENT_MEDIA]: 'Event Media',
 };
 
 function WebcastEventGroup({

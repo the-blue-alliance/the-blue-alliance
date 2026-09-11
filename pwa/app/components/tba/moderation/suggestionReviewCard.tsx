@@ -1006,8 +1006,8 @@ function ApiWriteDetails({
       </FieldRow>
       <FieldRow label="User">
         {suggestion.author?.nickname ?? 'unknown'}
+        {suggestion.author?.email ? ` (${suggestion.author.email})` : ''}
       </FieldRow>
-      <FieldRow label="Email">{suggestion.author?.email ?? 'unknown'}</FieldRow>
       <FieldRow label="Affiliation">
         {contentsString(suggestion, 'affiliation')}
       </FieldRow>
