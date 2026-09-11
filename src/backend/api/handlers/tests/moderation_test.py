@@ -486,11 +486,14 @@ def test_list_event_media_suggestions_includes_smugmug_album_preview(
         }
     ]
     with patch(
-        "backend.api.handlers.moderation.album_preview_images", return_value=previews
+        "backend.api.handlers.moderation.album_preview_images_many",
+        return_value={"2HCx3m": previews},
     ) as mock_previews:
         resp = api_client.get(f"{BASE_URL}/suggestions/event_media")
     assert resp.status_code == 200
-    mock_previews.assert_called_once_with("2HCx3m")
+    # One batched call for the whole page, not one per suggestion
+    mock_previews.assert_called_once()
+    assert list(mock_previews.call_args[0][0]) == ["2HCx3m"]
     media = resp.json["suggestions"][0]["candidate_media"]
     assert media["preview_images"] == previews
     assert media["slug_name"] == "smugmug-album"
