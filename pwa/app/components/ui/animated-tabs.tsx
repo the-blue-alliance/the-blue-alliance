@@ -5,6 +5,7 @@ import {
   createContext,
   lazy,
   useContext,
+  useEffect,
   useState,
 } from 'react';
 
@@ -14,9 +15,33 @@ const AnimatedTabIndicator = lazy(
   () => import('~/components/ui/animatedTabIndicator'),
 );
 
-const AnimatedTabsContext = createContext<{ activeValue: string | undefined }>({
+const AnimatedTabsContext = createContext<{
+  activeValue: string | undefined;
+  motionReady: boolean;
+}>({
   activeValue: undefined,
+  motionReady: false,
 });
+
+/**
+ * True once the browser has had an idle moment after mount. The framer-motion
+ * indicator chunk is only requested after that, so it is never on the
+ * hydration critical path, deterministically rather than by timing luck.
+ */
+function useIdleAfterMount(): boolean {
+  const [ready, setReady] = useState(false);
+  useEffect(() => {
+    if (typeof window.requestIdleCallback === 'function') {
+      const id = window.requestIdleCallback(() => setReady(true), {
+        timeout: 2_000,
+      });
+      return () => window.cancelIdleCallback(id);
+    }
+    const id = window.setTimeout(() => setReady(true), 200);
+    return () => window.clearTimeout(id);
+  }, []);
+  return ready;
+}
 
 type TabsChangeEventDetails = Parameters<
   NonNullable<ComponentProps<typeof Tabs>['onValueChange']>
@@ -39,9 +64,10 @@ function AnimatedTabs({
     value ?? defaultValue,
   );
   const activeValue = value ?? internalValue;
+  const motionReady = useIdleAfterMount();
 
   return (
-    <AnimatedTabsContext.Provider value={{ activeValue }}>
+    <AnimatedTabsContext.Provider value={{ activeValue, motionReady }}>
       <Tabs
         defaultValue={defaultValue}
         value={value}
@@ -62,8 +88,11 @@ function AnimatedTabsTrigger({
   value,
   ...props
 }: Omit<ComponentProps<typeof TabsTrigger>, 'value'> & { value: string }) {
-  const { activeValue } = useContext(AnimatedTabsContext);
+  const { activeValue, motionReady } = useContext(AnimatedTabsContext);
   const isActive = value !== undefined && activeValue === value;
+  const staticIndicator = (
+    <span className="absolute inset-0 rounded-sm bg-background shadow-xs" />
+  );
 
   return (
     <TabsTrigger
@@ -74,17 +103,14 @@ function AnimatedTabsTrigger({
       )}
       {...props}
     >
-      {isActive && (
-        <Suspense
-          fallback={
-            <span
-              className="absolute inset-0 rounded-sm bg-background shadow-xs"
-            />
-          }
-        >
-          <AnimatedTabIndicator />
-        </Suspense>
-      )}
+      {isActive &&
+        (motionReady ? (
+          <Suspense fallback={staticIndicator}>
+            <AnimatedTabIndicator />
+          </Suspense>
+        ) : (
+          staticIndicator
+        ))}
       <span className="relative z-10">{children}</span>
     </TabsTrigger>
   );

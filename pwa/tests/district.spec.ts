@@ -58,3 +58,21 @@ test.describe('/district/fim/2024 rankings', () => {
     ).toBe(true);
   });
 });
+
+test.describe('district page tabs and the URL hash', () => {
+  test('clicking a tab puts it in the hash', async ({ page }) => {
+    await page.goto('/district/fim/2024');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.getByRole('tab', { name: 'Teams' }).click();
+    await expect(page).toHaveURL(/#teams$/);
+  });
+
+  test('opens the tab named by the hash on load', async ({ page }) => {
+    await page.goto('/district/fim/2024#events');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Events' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+});

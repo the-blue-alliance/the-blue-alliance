@@ -42,6 +42,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { publicCacheControlHeaders } from '~/lib/utils';
+import { useHashTab } from '~/lib/useHashTab';
 
 const REFETCH_INTERVAL = 60_000;
 
@@ -642,6 +643,10 @@ function AllRankingsTable({
 // --- Main page component ---
 
 function ChampsPage() {
+  const tabs = useHashTab({
+    values: ['all-rankings', 'all-matches'] as const,
+    defaultValue: 'all-rankings',
+  });
   const { abbreviation, displayName, currentSeason, year } =
     Route.useLoaderData();
   const districtKey = `${year}${abbreviation}`;
@@ -780,7 +785,6 @@ function ChampsPage() {
   const isLoading = allEventsQuery.isPending || districtTeamsQuery.isPending;
 
   const divisionTabIds = cmpDivisions.map((div) => div.short_name ?? div.name);
-  const defaultTab = 'all-rankings';
 
   return (
     <div>
@@ -808,7 +812,10 @@ function ChampsPage() {
         </div>
       </div>
 
-      <Tabs defaultValue={defaultTab} className="mt-4">
+      <Tabs
+        key={tabs.key}
+        defaultValue={tabs.defaultValue}
+        onValueChange={(value) => tabs.onValueChange(String(value))} className="mt-4">
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
             *:basis-1/2 lg:*:basis-1"

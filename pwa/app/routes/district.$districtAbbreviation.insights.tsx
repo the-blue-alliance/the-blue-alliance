@@ -20,6 +20,7 @@ import {
   doThrowNotFound,
   publicCacheControlHeaders,
 } from '~/lib/utils';
+import { useHashTab } from '~/lib/useHashTab';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/insights',
@@ -77,6 +78,10 @@ export const Route = createFileRoute(
 });
 
 function DistrictInsightsPage() {
+  const tabs = useHashTab({
+    values: ['Growth', 'Team'] as const,
+    defaultValue: 'Growth',
+  });
   const { abbreviation } = Route.useLoaderData();
 
   const { data: history } = useSuspenseQuery(
@@ -96,7 +101,10 @@ function DistrictInsightsPage() {
         {history[history.length - 1].display_name} District Insights
       </h1>
 
-      <Tabs defaultValue="Growth">
+      <Tabs
+        key={tabs.key}
+        defaultValue={tabs.defaultValue}
+        onValueChange={(value) => tabs.onValueChange(String(value))}>
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
             *:basis-1/2 lg:*:basis-1"
