@@ -14,6 +14,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { getDistrictColorBorderClass } from '~/lib/districtUtils';
 import {
   getEventDateString,
   groupEventsByParent,
@@ -21,34 +22,6 @@ import {
   stripParentPrefix,
 } from '~/lib/eventUtils';
 import { useOnlineEventWebcasts } from '~/lib/gameday/useOnlineEventWebcasts';
-
-const DISTRICT_COLORS: Record<string, string> = {
-  ca: 'border-l-district-ca',
-  chs: 'border-l-district-chs',
-  fch: 'border-l-district-chs',
-  fin: 'border-l-district-fin',
-  in: 'border-l-district-fin',
-  isr: 'border-l-district-isr',
-  fim: 'border-l-district-fim',
-  fma: 'border-l-district-fma',
-  mar: 'border-l-district-fma',
-  ne: 'border-l-district-ne',
-  fnc: 'border-l-district-fnc',
-  ont: 'border-l-district-ont',
-  pnw: 'border-l-district-pnw',
-  pch: 'border-l-district-pch',
-  fsc: 'border-l-district-fsc',
-  fit: 'border-l-district-fit',
-  tx: 'border-l-district-fit',
-  win: 'border-l-district-win',
-};
-
-function getDistrictColorClass(
-  districtAbbreviation: string | undefined,
-): string {
-  if (!districtAbbreviation) return '';
-  return DISTRICT_COLORS[districtAbbreviation.toLowerCase()] || '';
-}
 
 export default function EventListTable({ events }: { events: Event[] }) {
   const isEventOnline = useOnlineEventWebcasts();
@@ -77,7 +50,7 @@ export default function EventListTable({ events }: { events: Event[] }) {
             isDivision && !allDivisionKeys.has(items[idx + 1]?.key);
           const withinADay = isEventActive(event);
           const isOnline = isEventOnline(event);
-          const districtColor = getDistrictColorClass(
+          const districtColor = getDistrictColorBorderClass(
             event.district?.abbreviation,
           );
           const watchButtonContent = (

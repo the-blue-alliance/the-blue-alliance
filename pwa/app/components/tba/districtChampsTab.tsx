@@ -1,5 +1,4 @@
 import { useQueries, useQuery } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
 import { cn } from 'cn';
 import {
   type CSSProperties,
@@ -21,14 +20,12 @@ import {
   type Match,
 } from '~/api/tba/read';
 import {
-  getDistrictHistoryOptions,
   getDistrictTeamsKeysOptions,
   getEventMatchesOptions,
   getEventRankingsOptions,
   getEventsByYearOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, MatchLink, TeamLink } from '~/components/tba/links';
-import { YearSelector } from '~/components/tba/yearSelector';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import {
   Table,
@@ -41,66 +38,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
-import { publicCacheControlHeaders } from '~/lib/utils';
 
 const REFETCH_INTERVAL = 60_000;
-
-export const Route = createFileRoute(
-  '/district/$districtAbbreviation/champs/$year',
-)({
-  loader: async ({ params, context: { queryClient, currentSeason } }) => {
-    const history = await queryClient.ensureQueryData(
-      getDistrictHistoryOptions({
-        path: { district_abbreviation: params.districtAbbreviation },
-      }),
-    );
-
-    if (!history || history.length === 0) {
-      throw notFound();
-    }
-
-    const year = Number(params.year);
-    if (!Number.isInteger(year) || year < 1992) {
-      throw notFound();
-    }
-
-    const displayName = history[history.length - 1].display_name;
-
-    return {
-      abbreviation: params.districtAbbreviation,
-      displayName,
-      currentSeason,
-      year,
-    };
-  },
-  headers: publicCacheControlHeaders(),
-  head: ({ loaderData }) => {
-    if (!loaderData) {
-      return {
-        meta: [
-          { title: 'FIRST Championship Tracking - The Blue Alliance' },
-          {
-            name: 'description',
-            content: 'Track district teams at the FIRST Championship.',
-          },
-        ],
-      };
-    }
-
-    return {
-      meta: [
-        {
-          title: `${loaderData.displayName} at FIRST Championship - The Blue Alliance`,
-        },
-        {
-          name: 'description',
-          content: `Track ${loaderData.displayName} teams competing at the FIRST Championship.`,
-        },
-      ],
-    };
-  },
-  component: ChampsPage,
-});
 
 // --- Color helpers ---
 
@@ -641,28 +580,20 @@ function AllRankingsTable({
 
 // --- Main page component ---
 
-function ChampsPage() {
-  const { abbreviation, displayName, currentSeason, year } =
-    Route.useLoaderData();
+export function DistrictChampsTab({
+  abbreviation,
+  currentSeason,
+  year,
+}: {
+  abbreviation: string;
+  currentSeason: number;
+  year: number;
+}) {
   const districtKey = `${year}${abbreviation}`;
 
   const isLivePolling = year >= currentSeason;
   const pollInterval = isLivePolling ? REFETCH_INTERVAL : (false as const);
   const yearStaleTime = staleTimeForYear(year);
-
-  // Fetch district history to know which years this district existed
-  const districtHistoryQuery = useQuery({
-    ...getDistrictHistoryOptions({
-      path: { district_abbreviation: abbreviation },
-    }),
-  });
-
-  const validYears: number[] = districtHistoryQuery.data
-    ? districtHistoryQuery.data
-        .map((d) => d.year)
-        .filter((y) => y <= currentSeason)
-        .sort((a, b) => b - a)
-    : [currentSeason];
 
   // Auto-refresh countdown
   const [countdown, setCountdown] = useState(REFETCH_INTERVAL / 1000);
@@ -784,31 +715,17 @@ function ChampsPage() {
 
   return (
     <div>
-      <div className="mt-4 flex items-center justify-between gap-4">
-        <h1 className="text-4xl font-medium">
-          {displayName} at FIRST Championship {year}
-        </h1>
-        <div className="flex items-center gap-2">
-          {isLivePolling && (
-            <span
-              className="rounded border px-2 py-1 text-xs text-muted-foreground"
-            >
-              {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
-            </span>
-          )}
-          <YearSelector
-            currentLabel={String(year)}
-            triggerClassName="w-24"
-            options={validYears.map((y) => ({
-              label: String(y),
-              to: `/district/${abbreviation}/champs/${y}`,
-              isCurrent: y === year,
-            }))}
-          />
+      {isLivePolling && (
+        <div className="flex justify-end">
+          <span
+            className="rounded border px-2 py-1 text-xs text-muted-foreground"
+          >
+            {isFetchingAny ? 'Refreshing…' : `Auto-refresh in ${countdown}s`}
+          </span>
         </div>
-      </div>
+      )}
 
-      <Tabs defaultValue={defaultTab} className="mt-4">
+      <Tabs defaultValue={defaultTab} className="mt-2">
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
             *:basis-1/2 lg:*:basis-1"
