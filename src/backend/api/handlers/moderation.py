@@ -20,7 +20,10 @@ from backend.common.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafee
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
 )
-from backend.common.helpers.smugmug_helper import album_preview_images
+from backend.common.helpers.smugmug_helper import (
+    album_preview_images_many,
+    SmugmugPreviewImage,
+)
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.common.memcache import MemcacheClient
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -129,9 +132,19 @@ def moderation_suggestion_list(suggestion_type: str) -> Response:
     authors_by_key = {none_throws(a.key): a for a in authors if a is not None}
     review_counts = _author_review_counts(author_keys)
 
+    # One batched, cached lookup for every SmugMug album on the page
+    album_previews = album_preview_images_many(
+        s.contents.get("foreign_key", "")
+        for s in suggestions
+        if s.contents.get("media_type_enum") == MediaType.SMUGMUG_ALBUM
+    )
+
     serialized = [
         _serialize_suggestion(
-            s, authors_by_key.get(s.author), review_counts.get(s.author)
+            s,
+            authors_by_key.get(s.author),
+            review_counts.get(s.author),
+            album_previews,
         )
         for s in suggestions
     ]
@@ -314,6 +327,7 @@ def _serialize_suggestion(
     suggestion: Suggestion,
     author: Optional[Any],
     author_review_counts: Optional[Dict[str, int]] = None,
+    album_previews: Optional[Dict[str, List[SmugmugPreviewImage]]] = None,
 ) -> Dict[str, Any]:
     serialized: Dict[str, Any] = {
         "key": str(none_throws(suggestion.key.id())),
@@ -346,12 +360,16 @@ def _serialize_suggestion(
 
     # A preview of the Media that would be created, for media-backed types
     if "media_type_enum" in suggestion.contents:
-        serialized["candidate_media"] = _serialize_candidate_media(suggestion)
+        serialized["candidate_media"] = _serialize_candidate_media(
+            suggestion, album_previews or {}
+        )
 
     return serialized
 
 
-def _serialize_candidate_media(suggestion: Suggestion) -> Dict[str, Any]:
+def _serialize_candidate_media(
+    suggestion: Suggestion, album_previews: Dict[str, List[SmugmugPreviewImage]]
+) -> Dict[str, Any]:
     media = suggestion.candidate_media
     serialized = {
         "key": media.key_name,
@@ -378,7 +396,7 @@ def _serialize_candidate_media(suggestion: Suggestion) -> Dict[str, Any]:
         serialized["image_direct_url"] = details.get("cover_url_med")
         serialized["title"] = details.get("title")
         serialized["image_count"] = details.get("image_count")
-        serialized["preview_images"] = album_preview_images(media.foreign_key)
+        serialized["preview_images"] = album_previews.get(media.foreign_key, [])
     if suggestion.contents.get("is_social"):
         serialized["social_profile_url"] = media.social_profile_url
     return serialized
