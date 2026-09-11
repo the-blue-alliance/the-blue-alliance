@@ -16,6 +16,7 @@
     "lint:fix": "oxlint --fix",
     "format": "prettier --check .",
     "format:fix": "prettier --write .",
+    "format:fix": "prettier --write .",
     "start": "cross-env NODE_ENV=production node ./server.js",
     "typecheck": "tsc && tsc --project tsconfig.server.json",
     "bundle-visualizer": "npx vite-bundle-visualizer",
