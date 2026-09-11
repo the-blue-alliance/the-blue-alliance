@@ -15,12 +15,12 @@ import {
   ChartTooltipContent,
 } from '~/components/ui/chart';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
+import { useHashTab } from '~/lib/useHashTab';
 import {
   confidence,
   doThrowNotFound,
   publicCacheControlHeaders,
 } from '~/lib/utils';
-import { useHashTab } from '~/lib/useHashTab';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/insights',
@@ -104,7 +104,8 @@ function DistrictInsightsPage() {
       <Tabs
         key={tabs.key}
         defaultValue={tabs.defaultValue}
-        onValueChange={(value) => tabs.onValueChange(String(value))}>
+        onValueChange={(value) => tabs.onValueChange(String(value))}
+      >
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
             *:basis-1/2 lg:*:basis-1"

@@ -153,8 +153,8 @@ import {
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
-import { MODEL_TYPE, doThrowNotFound, splitIntoNChunks } from '~/lib/utils';
 import { useHashTab } from '~/lib/useHashTab';
+import { MODEL_TYPE, doThrowNotFound, splitIntoNChunks } from '~/lib/utils';
 
 // Lazy-loaded: recharts is heavy and this chart only renders once the
 // insights tab is opened, which most visitors never do.

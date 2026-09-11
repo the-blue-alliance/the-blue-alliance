@@ -41,8 +41,8 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { sortMatchComparator } from '~/lib/matchUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
-import { publicCacheControlHeaders } from '~/lib/utils';
 import { useHashTab } from '~/lib/useHashTab';
+import { publicCacheControlHeaders } from '~/lib/utils';
 
 const REFETCH_INTERVAL = 60_000;
 
@@ -815,7 +815,9 @@ function ChampsPage() {
       <Tabs
         key={tabs.key}
         defaultValue={tabs.defaultValue}
-        onValueChange={(value) => tabs.onValueChange(String(value))} className="mt-4">
+        onValueChange={(value) => tabs.onValueChange(String(value))}
+        className="mt-4"
+      >
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
             *:basis-1/2 lg:*:basis-1"

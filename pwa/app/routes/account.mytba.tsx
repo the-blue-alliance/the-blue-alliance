@@ -37,8 +37,8 @@ import {
   SUBSCRIPTION_TYPES,
   SUBSCRIPTION_TYPE_DISPLAY_NAMES,
 } from '~/lib/myTBAConstants';
-import { MODEL_TYPE, pluralize } from '~/lib/utils';
 import { useHashTab } from '~/lib/useHashTab';
+import { MODEL_TYPE, pluralize } from '~/lib/utils';
 
 export const Route = createFileRoute('/account/mytba')({
   component: MyTBA,
@@ -120,7 +120,9 @@ function MyTBA() {
       <Tabs
         key={tabs.key}
         defaultValue={tabs.defaultValue}
-        onValueChange={(value) => tabs.onValueChange(String(value))} className="mt-4">
+        onValueChange={(value) => tabs.onValueChange(String(value))}
+        className="mt-4"
+      >
         <TabsList>
           <TabsTrigger value="teams">My Teams</TabsTrigger>
           <TabsTrigger value="events">My Events</TabsTrigger>
