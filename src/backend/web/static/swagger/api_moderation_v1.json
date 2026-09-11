@@ -119,6 +119,21 @@
           },
           "social_profile_url": {
             "type": "string"
+          },
+          "title": {
+            "type": "string",
+            "description": "Album or photo title, when the provider supplied one (SmugMug)"
+          },
+          "image_count": {
+            "type": "integer",
+            "description": "Number of photos in the album (SmugMug albums)"
+          },
+          "preview_images": {
+            "type": "array",
+            "description": "The first few photos of the album, for previewing its contents (SmugMug albums)",
+            "items": {
+              "$ref": "#/components/schemas/SmugmugPreviewImage"
+            }
           }
         }
       },
@@ -534,6 +549,22 @@
         "properties": {
           "Error": {
             "type": "string"
+          }
+        }
+      },
+      "SmugmugPreviewImage": {
+        "type": "object",
+        "properties": {
+          "thumbnail_url": {
+            "type": "string"
+          },
+          "image_url": {
+            "type": "string",
+            "description": "Small-size rendition, suitable for a preview grid"
+          },
+          "web_uri": {
+            "type": "string",
+            "description": "The photo's page on SmugMug"
           }
         }
       }

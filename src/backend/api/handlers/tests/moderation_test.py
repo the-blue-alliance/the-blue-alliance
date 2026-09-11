@@ -1,6 +1,7 @@
 import json
 from datetime import datetime, timedelta
 from typing import Any, cast, Dict, List, Optional
+from unittest.mock import patch
 
 import pytest
 from google.appengine.ext import ndb
@@ -449,6 +450,58 @@ def test_list_webcast_suggestions_existing_webcasts(
     ]
     assert suggestion["event"]["start_date"] == "2016-03-24"
     assert suggestion["event"]["end_date"] == "2016-03-27"
+
+
+def test_list_event_media_suggestions_includes_smugmug_album_preview(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_EVENT_MEDIA])
+    create_suggestion(
+        author,
+        "event_media",
+        "2016necmp",
+        {
+            "media_type_enum": MediaType.SMUGMUG_ALBUM,
+            "foreign_key": "2HCx3m",
+            "reference_type": "event",
+            "reference_key": "2016necmp",
+            "year": 2016,
+            "details_json": json.dumps(
+                {
+                    "title": "2025 CT States",
+                    "web_uri": "https://nefirst.smugmug.com/2025-FIRST-DIVE/2025-CT-States",
+                    "image_count": 412,
+                    "cover_url": "https://photos.smugmug.com/x/L/cover-L.jpg",
+                    "cover_url_med": "https://photos.smugmug.com/x/M/cover-M.jpg",
+                    "cover_url_sm": "https://photos.smugmug.com/x/S/cover-S.jpg",
+                }
+            ),
+        },
+    )
+    previews = [
+        {
+            "thumbnail_url": "https://photos.smugmug.com/x/Th/one-Th.jpg",
+            "image_url": "https://photos.smugmug.com/x/S/one-S.jpg",
+            "web_uri": "https://nefirst.smugmug.com/x/i-one",
+        }
+    ]
+    with patch(
+        "backend.api.handlers.moderation.album_preview_images", return_value=previews
+    ) as mock_previews:
+        resp = api_client.get(f"{BASE_URL}/suggestions/event_media")
+    assert resp.status_code == 200
+    mock_previews.assert_called_once_with("2HCx3m")
+    media = resp.json["suggestions"][0]["candidate_media"]
+    assert media["preview_images"] == previews
+    assert media["slug_name"] == "smugmug-album"
+    assert media["is_image"] is False
+    assert media["title"] == "2025 CT States"
+    assert media["image_count"] == 412
+    assert media["image_direct_url"] == "https://photos.smugmug.com/x/M/cover-M.jpg"
+    assert (
+        media["view_image_url"]
+        == "https://nefirst.smugmug.com/2025-FIRST-DIVE/2025-CT-States"
+    )
 
 
 def test_list_team_media_suggestions_includes_reference_and_preferred(

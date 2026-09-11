@@ -13,13 +13,14 @@ from backend.api.handlers.decorators import require_moderation_permission
 from backend.common.consts.account_permission import SUGGESTION_PERMISSIONS
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
 from backend.common.consts.event_type import EventType
-from backend.common.consts.media_type import IMAGE_TYPES
+from backend.common.consts.media_type import IMAGE_TYPES, MediaType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SuggestionType, TYPE_NAMES
 from backend.common.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafeed
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
 )
+from backend.common.helpers.smugmug_helper import album_preview_images
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.common.memcache import MemcacheClient
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -368,6 +369,16 @@ def _serialize_candidate_media(suggestion: Suggestion) -> Dict[str, Any]:
     if media.is_image:
         serialized["view_image_url"] = media.view_image_url
         serialized["image_direct_url"] = media.image_direct_url_med
+    elif media.media_type_enum == MediaType.SMUGMUG_ALBUM:
+        # Albums aren't single images, but the parser already fetched the
+        # cover and album metadata at suggestion time; surface it so
+        # reviewers can preview the gallery instead of following a bare link
+        details = media.details or {}
+        serialized["view_image_url"] = details.get("web_uri")
+        serialized["image_direct_url"] = details.get("cover_url_med")
+        serialized["title"] = details.get("title")
+        serialized["image_count"] = details.get("image_count")
+        serialized["preview_images"] = album_preview_images(media.foreign_key)
     if suggestion.contents.get("is_social"):
         serialized["social_profile_url"] = media.social_profile_url
     return serialized
