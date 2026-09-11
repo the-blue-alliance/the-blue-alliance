@@ -48,6 +48,7 @@ import {
 } from '~/lib/eventUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeams } from '~/lib/teamUtils';
+import { useHashTab } from '~/lib/useHashTab';
 import {
   USA_STATE_ABBREVIATION_TO_FULL,
   doThrowNotFound,
@@ -187,6 +188,10 @@ export const Route = createFileRoute(
 });
 
 function DistrictPage() {
+  const tabs = useHashTab({
+    values: ['overview', 'rankings', 'events', 'teams'] as const,
+    defaultValue: 'overview',
+  });
   const {
     abbreviation,
     advancementCutoffs,
@@ -259,7 +264,12 @@ function DistrictPage() {
         />
       </div>
 
-      <Tabs defaultValue={'overview'} className="mt-4">
+      <Tabs
+        key={tabs.key}
+        defaultValue={tabs.defaultValue}
+        onValueChange={(value) => tabs.onValueChange(String(value))}
+        className="mt-4"
+      >
         <TabsList
           className="flex h-auto flex-wrap items-center justify-evenly
             *:basis-1/2 lg:*:basis-1"

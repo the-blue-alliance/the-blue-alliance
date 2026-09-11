@@ -224,3 +224,46 @@ test('shows the favorite button for an event', async ({ page }) => {
     page.getByRole('button', { name: /add to favorites/i }),
   ).toBeVisible();
 });
+
+test.describe('/event/2024mil tabs and the URL hash', () => {
+  test('clicking a tab puts it in the hash without a new history entry', async ({
+    page,
+  }) => {
+    await page.goto('/event/2024mil');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+    await expect(page).toHaveURL(/#rankings$/);
+    await page.getByRole('tab', { name: 'Awards' }).click();
+    await expect(page).toHaveURL(/#awards$/);
+    await page.goBack();
+    // Replaced, not pushed: back leaves the event page entirely
+    await expect(page).not.toHaveURL(/\/event\/2024mil/);
+  });
+
+  test('opens the tab named by the hash on load', async ({ page }) => {
+    await page.goto('/event/2024mil#media');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Media' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  test("understands the old site's hash names", async ({ page }) => {
+    await page.goto('/event/2024mil#event-insights');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Insights' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  test('ignores a hash that is not a tab', async ({ page }) => {
+    await page.goto('/event/2024mil#not-a-tab');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Results' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+});

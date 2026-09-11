@@ -58,3 +58,41 @@ test.describe('/district/fim/2024 rankings', () => {
     ).toBe(true);
   });
 });
+
+test.describe('district page tabs and the URL hash', () => {
+  test('clicking a tab puts it in the hash', async ({ page }) => {
+    await page.goto('/district/fim/2024');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.getByRole('tab', { name: 'Teams' }).click();
+    await expect(page).toHaveURL(/#teams$/);
+  });
+
+  test('opens the tab named by the hash on load', async ({ page }) => {
+    await page.goto('/district/fim/2024#events');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Events' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+});
+
+test.describe('district champs page division tabs and the URL hash', () => {
+  test('a division tab round-trips through the hash', async ({ page }) => {
+    await page.goto('/district/fim/champs/2019');
+    await page.locator('body[data-hydrated]').waitFor();
+    // Division tabs follow the two fixed ones and are named from data
+    const division = page.getByRole('tab').nth(2);
+    const name = (await division.textContent())?.trim() ?? '';
+    expect(name).not.toBe('');
+    await division.click();
+    await expect(page).toHaveURL(new RegExp(`#${encodeURIComponent(name)}$`));
+
+    await page.goto(`/district/fim/champs/2019#${encodeURIComponent(name)}`);
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name, exact: true })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+});
