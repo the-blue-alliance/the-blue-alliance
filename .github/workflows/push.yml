@@ -391,6 +391,31 @@ jobs:
       - name: Deploy
         if: steps.changes.outputs.index == 'true'
         run: gcloud app deploy src/index.yaml
+  deploy-firebase-rules:
+    name: Deploy Firebase Database Rules
+    runs-on: ubuntu-24.04
+    needs: [py3-type, py3-lint, py3-test]
+    if: contains(github.event.commits[0].message, '[nodeploy]') == false
+    concurrency: deploy-firebase-rules-${{ github.ref }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: dorny/paths-filter@v4
+        id: changes
+        with:
+          filters: |
+            rules:
+              - 'database.rules.json'
+              - 'firebase.json'
+      - name: Authenticate to Google Cloud
+        if: steps.changes.outputs.rules == 'true'
+        uses: google-github-actions/auth@v3
+        with:
+          credentials_json: ${{ secrets.GCLOUD_AUTH }}
+      - name: Deploy
+        if: steps.changes.outputs.rules == 'true'
+        # firebase-tools picks up GOOGLE_APPLICATION_CREDENTIALS exported by the auth step
+        run: npx --yes firebase-tools@15.29.0 deploy --only database --project ${{ secrets.GCLOUD_PROJECT_ID }} --non-interactive
+
   deploy-default:
     name: Deploy Default Service
     runs-on: ubuntu-24.04
