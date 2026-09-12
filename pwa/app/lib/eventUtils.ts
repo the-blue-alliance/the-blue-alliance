@@ -513,3 +513,44 @@ export function eventCacheControlHeaders(
     event ? eventSsrTtlSeconds(event) : EVENT_SSR_TTL_SECONDS.LIVE,
   );
 }
+
+// Mirrors SHORT_TYPE_NAMES in backend/common/consts/event_type.py
+const SHORT_TYPE_NAMES: Partial<Record<EventType, string>> = {
+  [EventType.REGIONAL]: 'Regional',
+  [EventType.DISTRICT]: 'District',
+  [EventType.DISTRICT_CMP_DIVISION]: 'District Championship Division',
+  [EventType.DISTRICT_CMP]: 'District Championship',
+  [EventType.CMP_DIVISION]: 'Division',
+  [EventType.CMP_FINALS]: 'Championship',
+  [EventType.FOC]: 'FoC',
+  [EventType.OFFSEASON]: 'Offseason',
+  [EventType.PRESEASON]: 'Preseason',
+  [EventType.REMOTE]: 'Remote',
+  [EventType.UNLABLED]: '--',
+};
+
+/**
+ * The short, banner-friendly event name the Jinja site uses (Event.normalized_name):
+ * "NEDC - Newsom District Championship Division" rather than
+ * "New England FIRST District Championship - Newsom Division presented by GE Aerospace".
+ */
+export function getEventNormalizedName(
+  event: Pick<Event, 'event_type' | 'year' | 'city' | 'short_name' | 'name'>,
+): string {
+  if (event.event_type === EventType.CMP_FINALS) {
+    return event.year >= 2017 && event.city
+      ? `${event.city} Championship`
+      : 'Championship';
+  }
+  if (event.short_name && event.event_type !== EventType.FOC) {
+    if (event.event_type === EventType.OFFSEASON) {
+      return event.short_name;
+    }
+    const suffix = SHORT_TYPE_NAMES[event.event_type];
+    if (!suffix || event.short_name.trim().endsWith(suffix)) {
+      return event.short_name;
+    }
+    return `${event.short_name} ${suffix}`;
+  }
+  return event.name;
+}

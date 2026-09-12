@@ -3,6 +3,7 @@ import { Fragment } from 'react';
 
 import { Award, Event } from '~/api/tba/read';
 import { getNormalizedName } from '~/lib/api/AwardType';
+import { getEventNormalizedName } from '~/lib/eventUtils';
 
 export function AwardBanner({
   award,
@@ -16,7 +17,7 @@ export function AwardBanner({
   return (
     <Banner
       title={getNormalizedName(award.award_type, event.event_type, event.year)}
-      description={event.name}
+      description={getEventNormalizedName(event)}
       className={className}
       year={event.year}
     />
@@ -48,19 +49,22 @@ export function Banner({
       ),
     );
 
+  const eventText = [year, description?.toUpperCase()]
+    .filter((part) => part !== undefined && part !== '')
+    .join(' ');
   return (
     <div
+      data-testid="award-banner"
       className={cn(
-        `relative h-60 w-36 bg-blue-banner text-center tracking-tight
-        text-white`,
+        // The V notch is cut from the bottom 24px with a clip-path so it
+        // scales with whatever size a caller sets
+        `relative flex h-66 w-36 flex-col items-center bg-blue-banner px-2 pt-4
+        pb-8 text-center tracking-tight text-white
+        [clip-path:polygon(0_0,100%_0,100%_100%,50%_calc(100%-24px),0_100%)]`,
         className,
       )}
     >
-      <svg
-        width="100"
-        viewBox="0 0 223 153"
-        className="absolute top-6 left-1/2 -translate-x-1/2"
-      >
+      <svg width="100" viewBox="0 0 223 153" className="shrink-0">
         <path
           d="M106.324 32.8997V28.3371L98.8387 21.2428L95.4483 18.0294L91.0092 13.8244L76.4254 0.00488139L66.2168 57.2534L87.8161 47.7603C85.6659 45.8597 84.1417 43.8343 83.0094 41.4476L75.9783 44.4653L76.6836 40.7741L81.2399 17.031L81.6202 15.0368L85.3819 18.8257L90.2224 23.6991L92.2998 25.794L100.843 33.1527L92.5502 36.9525C94.7045 39.1045 97.2556 40.9984 100.695 42.0698L111.042 37.4239L106.324 32.8997Z"
           fill="#ED1C24"
@@ -218,10 +222,7 @@ export function Banner({
           fill="white"
         />
       </svg>
-      <div
-        className="absolute inset-x-2 top-24 flex h-16 items-center
-          justify-center"
-      >
+      <div className="flex h-14 shrink-0 items-center justify-center">
         <span
           className={cn('font-bold', {
             'text-sm/4': title && title.length > 17,
@@ -232,9 +233,18 @@ export function Banner({
           {formattedTitle}
         </span>
       </div>
-      <div className="absolute inset-x-4 bottom-6 text-xs/3 font-bold">
-        <div className="mb-0.5 text-xs">{year}</div>
-        {description?.toUpperCase()}
+      <div
+        className="flex min-h-0 flex-1 items-center justify-center
+          overflow-hidden"
+      >
+        <span
+          className={cn('line-clamp-4 font-bold', {
+            'text-[10px]/3': eventText.length > 34,
+            'text-xs/[14px]': eventText.length <= 34,
+          })}
+        >
+          {eventText}
+        </span>
       </div>
     </div>
   );
