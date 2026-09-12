@@ -5,7 +5,6 @@ __pycache__/
 .mypy_cache/
 .pytest_cache/
 .pyre/
-.vagrant/
 
 ci_screenshots.pickle
 ci_screenshots_message.md
