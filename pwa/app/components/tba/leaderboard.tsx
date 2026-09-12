@@ -4,6 +4,7 @@ import { Fragment, type ReactNode } from 'react';
 
 import MaterialSymbolsTrophy from '~icons/material-symbols/trophy';
 
+import { type Event } from '~/api/tba/read';
 import { InsightCard } from '~/components/tba/insightCard';
 import { MatchLink, TeamLink } from '~/components/tba/links';
 import {
@@ -20,11 +21,13 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { getEventNormalizedName } from '~/lib/eventUtils';
 import {
   PRE_EXPANDED_ROWS,
   rankRowClassName,
   rankTextClassName,
 } from '~/lib/insightUtils';
+import { formatMatchKeyName, parseMatchKey } from '~/lib/matchUtils';
 import { pluralize } from '~/lib/utils';
 
 const MAX_KEYS_PER_ROW = 20;
@@ -65,6 +68,7 @@ export function Leaderboard({
   contextTooltipMap,
   year,
   renderKey,
+  eventsByKey,
 }: {
   subtitle?: string;
   leaderboard: LeaderboardShape;
@@ -72,6 +76,8 @@ export function Leaderboard({
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
   renderKey?: (key: string) => ReactNode;
+  /** Lets event and match keys render as names instead of keys. */
+  eventsByKey?: ReadonlyMap<string, Event>;
 }) {
   const displayName = displayNameProp ?? leaderboard.name;
 
@@ -125,6 +131,7 @@ export function Leaderboard({
                         contextTooltipMap={contextTooltipMap}
                         year={year}
                         renderKey={renderKey}
+                        eventsByKey={eventsByKey}
                       />
                     </TableCell>
                   </TableRow>
@@ -160,6 +167,7 @@ function LeaderboardKeyList({
   contextTooltipMap,
   year,
   renderKey,
+  eventsByKey,
 }: {
   keyType: KeyType;
   keyVals: Array<string> | Array<Array<string>>;
@@ -168,6 +176,7 @@ function LeaderboardKeyList({
   contextTooltipMap?: Record<string, ReactNode>;
   year: number;
   renderKey?: (key: string) => ReactNode;
+  eventsByKey?: ReadonlyMap<string, Event>;
 }) {
   const entries = normalizeKeyEntries(keyVals);
 
@@ -181,6 +190,7 @@ function LeaderboardKeyList({
             entry={entry}
             year={year}
             renderKey={renderKey}
+            eventsByKey={eventsByKey}
             context={contexts?.[i]}
             contextTooltipMap={contextTooltipMap}
           />
@@ -206,6 +216,7 @@ function LeaderboardKeyList({
                       entry={entry}
                       year={year}
                       renderKey={renderKey}
+                      eventsByKey={eventsByKey}
                     />
                   </Fragment>
                 ))}
@@ -223,6 +234,7 @@ function LeaderboardKeyTooltip({
   entry,
   year,
   renderKey,
+  eventsByKey,
   context,
   contextTooltipMap,
 }: {
@@ -230,11 +242,12 @@ function LeaderboardKeyTooltip({
   entry: string | Array<string>;
   year: number;
   renderKey?: (key: string) => ReactNode;
+  eventsByKey?: ReadonlyMap<string, Event>;
   context?: LeaderboardContext;
   contextTooltipMap?: Record<string, ReactNode>;
 }) {
   const tooltipContent = context
-    ? contextFromLeaderboardContext(context)
+    ? contextFromLeaderboardContext(context, eventsByKey)
     : (contextTooltipMap?.[entryToId(entry)] ?? null);
 
   return (
@@ -246,6 +259,7 @@ function LeaderboardKeyTooltip({
             entry={entry}
             year={year}
             renderKey={renderKey}
+            eventsByKey={eventsByKey}
           />
         </TooltipTrigger>
         {tooltipContent ? (
@@ -258,13 +272,14 @@ function LeaderboardKeyTooltip({
   );
 }
 
-function contextFromLeaderboardContext(context: LeaderboardContext): ReactNode {
+function contextFromLeaderboardContext(
+  context: LeaderboardContext,
+  eventsByKey?: ReadonlyMap<string, Event>,
+): ReactNode {
   if ('match_key' in context) {
     return (
       <>
-        <MatchLink matchOrKey={context.match_key}>
-          {context.match_key}
-        </MatchLink>
+        <MatchKeyLink matchKey={context.match_key} eventsByKey={eventsByKey} />
         {context.alliance.length > 0 && (
           <>
             {' '}
@@ -293,12 +308,42 @@ function contextFromLeaderboardContext(context: LeaderboardContext): ReactNode {
       {context.event_keys.map((eventKey, i) => (
         <Fragment key={eventKey}>
           {i > 0 && ', '}
-          <Link to="/event/$eventKey" params={{ eventKey }}>
-            {eventKey}
-          </Link>
+          <EventKeyLink eventKey={eventKey} eventsByKey={eventsByKey} />
         </Fragment>
       ))}
     </>
+  );
+}
+
+/** An event key as a link, named after the event when we know it. */
+function EventKeyLink({
+  eventKey,
+  eventsByKey,
+}: {
+  eventKey: string;
+  eventsByKey?: ReadonlyMap<string, Event>;
+}) {
+  const event = eventsByKey?.get(eventKey);
+  return (
+    <Link to="/event/$eventKey" params={{ eventKey }} title={eventKey}>
+      {event ? getEventNormalizedName(event) : eventKey}
+    </Link>
+  );
+}
+
+/** A match key as a link, named after its event and match when we know it. */
+function MatchKeyLink({
+  matchKey,
+  eventsByKey,
+}: {
+  matchKey: string;
+  eventsByKey?: ReadonlyMap<string, Event>;
+}) {
+  const event = eventsByKey?.get(parseMatchKey(matchKey)?.eventKey ?? '');
+  return (
+    <MatchLink matchOrKey={matchKey} event={event} title={matchKey}>
+      {formatMatchKeyName(matchKey, event)}
+    </MatchLink>
   );
 }
 
@@ -311,11 +356,13 @@ function LeaderboardKeyGroupLink({
   keyType,
   year,
   renderKey,
+  eventsByKey,
 }: {
   keyType: KeyType;
   entry: string | Array<string>;
   year: number;
   renderKey?: (key: string) => ReactNode;
+  eventsByKey?: ReadonlyMap<string, Event>;
 }) {
   if (!Array.isArray(entry)) {
     return (
@@ -324,6 +371,7 @@ function LeaderboardKeyGroupLink({
         keyVal={entry}
         year={year}
         renderKey={renderKey}
+        eventsByKey={eventsByKey}
       />
     );
   }
@@ -340,6 +388,7 @@ function LeaderboardKeyGroupLink({
             keyVal={k}
             year={year}
             renderKey={renderKey}
+            eventsByKey={eventsByKey}
           />
         </Fragment>
       ))}
@@ -352,11 +401,13 @@ function LeaderboardKeyLink({
   keyType,
   year,
   renderKey,
+  eventsByKey,
 }: {
   keyType: KeyType;
   keyVal: string;
   year: number;
   renderKey?: (key: string) => ReactNode;
+  eventsByKey?: ReadonlyMap<string, Event>;
 }) {
   if (renderKey) {
     return <>{renderKey(keyVal)}</>;
@@ -369,13 +420,9 @@ function LeaderboardKeyLink({
     );
   }
   if (keyType === 'event') {
-    return (
-      <Link to="/event/$eventKey" params={{ eventKey: keyVal }}>
-        {keyVal}
-      </Link>
-    );
+    return <EventKeyLink eventKey={keyVal} eventsByKey={eventsByKey} />;
   }
   if (keyType === 'match') {
-    return <MatchLink matchOrKey={keyVal}>{keyVal}</MatchLink>;
+    return <MatchKeyLink matchKey={keyVal} eventsByKey={eventsByKey} />;
   }
 }
