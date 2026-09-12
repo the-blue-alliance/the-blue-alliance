@@ -4,6 +4,7 @@
 
 {% block content %}
 <div class="container">
+  {% with pwa_review_path = "/suggest/review" %}{% include "suggestions/partials/pwa_review_banner.html" %}{% endwith %}
   {% if status %}
   <div class="row">
     <div class="col-xs-12 col-lg-6 col-lg-offset-3">
