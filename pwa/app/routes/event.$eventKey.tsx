@@ -81,6 +81,7 @@ import {
   START_OF_QUALS_BREAKER,
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
+import PlayoffAdvancement2015Table from '~/components/tba/playoffAdvancement2015Table';
 import RankingsTable from '~/components/tba/rankingsTable';
 import RoundRobinRankingsTable from '~/components/tba/roundRobinRankingsTable';
 import ScoutingTab from '~/components/tba/scoutingTab';
@@ -225,7 +226,10 @@ export const Route = createFileRoute('/event/$eventKey')({
         .catch(() => undefined);
     }
 
-    if (ROUND_ROBIN_TYPES.has(event.playoff_type)) {
+    if (
+      ROUND_ROBIN_TYPES.has(event.playoff_type) ||
+      event.playoff_type === PlayoffType.AVG_SCORE_8_TEAM
+    ) {
       void queryClient
         .ensureQueryData({
           ...getEventPlayoffAdvancementOptions({
@@ -869,11 +873,13 @@ function ResultsTab({
     alliances.length > 0 && TRADITIONAL_BRACKET_TYPES.has(event.playoff_type);
 
   const isRoundRobin = ROUND_ROBIN_TYPES.has(event.playoff_type);
+  const isAverageScorePlayoff =
+    event.playoff_type === PlayoffType.AVG_SCORE_8_TEAM;
 
   const playoffAdvancementQuery = useQuery({
     ...getEventPlayoffAdvancementOptions({ path: { event_key: event.key } }),
     staleTime: staleTimeForYear(event.year),
-    enabled: isRoundRobin,
+    enabled: isRoundRobin || isAverageScorePlayoff,
   });
 
   const roundRobinAdvancement = playoffAdvancementQuery.data?.find(
@@ -907,6 +913,12 @@ function ResultsTab({
     <TableOfContentsSection id="playoff-matches" setInView={setInView}>
       <h2 className="mb-2 text-xl font-medium">Playoff Matches</h2>
       {rightSideElims}
+      {isAverageScorePlayoff && playoffAdvancementQuery.data && (
+        <PlayoffAdvancement2015Table
+          advancements={playoffAdvancementQuery.data}
+          year={event.year}
+        />
+      )}
     </TableOfContentsSection>
   );
 
