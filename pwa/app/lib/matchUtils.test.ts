@@ -1,8 +1,18 @@
 import { describe, expect, test } from 'vitest';
 
 import type { Match } from '~/api/tba/read';
-import { AllianceColor, CompLevel } from '~/api/tba/read';
-import { getAllianceMatchResult, isValidMatchKey } from '~/lib/matchUtils';
+import {
+  AllianceColor,
+  CompLevel,
+  EventType,
+  PlayoffType,
+} from '~/api/tba/read';
+import {
+  formatMatchKeyName,
+  getAllianceMatchResult,
+  isValidMatchKey,
+  parseMatchKey,
+} from '~/lib/matchUtils';
 
 describe('isValidMatchKey', () => {
   test.each([
@@ -221,5 +231,76 @@ describe('getAllianceMatchResult', () => {
     expect(
       getAllianceMatchResult(match, AllianceColor.BLUE, 'score-based'),
     ).toBe('loss');
+  });
+});
+
+describe('parseMatchKey', () => {
+  test('parses playoff keys with a set number', () => {
+    expect(parseMatchKey('2026arc_sf3m1')).toEqual({
+      eventKey: '2026arc',
+      compLevel: CompLevel.SF,
+      setNumber: 3,
+      matchNumber: 1,
+    });
+  });
+
+  test('parses qualification keys with an implied set of 1', () => {
+    expect(parseMatchKey('2026gal_qm87')).toEqual({
+      eventKey: '2026gal',
+      compLevel: CompLevel.QM,
+      setNumber: 1,
+      matchNumber: 87,
+    });
+  });
+
+  test('rejects malformed keys', () => {
+    expect(parseMatchKey('frc254')).toBeNull();
+    expect(parseMatchKey('2026arc_xx1')).toBeNull();
+  });
+});
+
+describe('formatMatchKeyName', () => {
+  const archimedes = {
+    event_type: EventType.CMP_DIVISION,
+    year: 2026,
+    city: 'Houston',
+    short_name: 'Archimedes',
+    name: 'Archimedes Division',
+    playoff_type: PlayoffType.DOUBLE_ELIM_8_TEAM,
+  };
+
+  test('double-elim playoff match', () => {
+    expect(formatMatchKeyName('2026arc_sf3m1', archimedes)).toBe(
+      'Archimedes Division Match 3',
+    );
+  });
+
+  test('qualification match', () => {
+    expect(formatMatchKeyName('2026arc_qm87', archimedes)).toBe(
+      'Archimedes Division Quals 87',
+    );
+  });
+
+  test('finals', () => {
+    expect(formatMatchKeyName('2026arc_f1m2', archimedes)).toBe(
+      'Archimedes Division Finals 2',
+    );
+  });
+
+  test('legacy single-elim bracket names the set and match', () => {
+    expect(
+      formatMatchKeyName('2019casj_sf2m3', {
+        ...archimedes,
+        year: 2019,
+        event_type: EventType.REGIONAL,
+        short_name: 'Silicon Valley',
+        playoff_type: PlayoffType.BRACKET_8_TEAM,
+      }),
+    ).toBe('Silicon Valley Regional Semis 2 Match 3');
+  });
+
+  test('without the event, just the match title; unparseable keys pass through', () => {
+    expect(formatMatchKeyName('2026arc_qm87')).toBe('Quals 87');
+    expect(formatMatchKeyName('garbage')).toBe('garbage');
   });
 });
