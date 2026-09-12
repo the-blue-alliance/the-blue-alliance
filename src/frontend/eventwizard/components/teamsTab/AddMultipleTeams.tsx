@@ -35,7 +35,7 @@ const AddMultipleTeams: React.FC<AddMultipleTeamsProps> = ({
     const teamInput = inputTeams.split("\n");
     for (let i = 0; inputTeams && i < teamInput.length; i++) {
       const teamNum = parseInt(teamInput[i], 10);
-      if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 9999) {
+      if (!teamNum || isNaN(teamNum) || teamNum <= 0 || teamNum > 25599) {
         showErrorMessage(`Invalid team ${teamInput[i]}`);
         return;
       }
