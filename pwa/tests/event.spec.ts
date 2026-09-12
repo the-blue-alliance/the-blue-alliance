@@ -217,6 +217,46 @@ test('hides round robin standings for a non-round-robin event', async ({
   ).toHaveCount(0);
 });
 
+test.describe('/event/2015rismi', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2015rismi');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('shows playoff advancement below the playoff matches', async ({
+    page,
+  }) => {
+    await expect(
+      page
+        .locator('#playoff-matches')
+        .getByRole('heading', { name: 'Playoff Advancement' }),
+    ).toBeVisible();
+  });
+
+  test('shows the quarterfinal advancement standings', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Quarterfinals' }),
+    ).toBeVisible();
+  });
+
+  test('shows the semifinal advancement standings', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Semifinals' }),
+    ).toBeVisible();
+  });
+});
+
+test('hides average-score advancement for a non-2015-format event', async ({
+  page,
+}) => {
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.getByRole('heading', { name: 'Playoff Advancement' }),
+  ).toHaveCount(0);
+});
+
 test('shows the favorite button for an event', async ({ page }) => {
   await page.goto('/event/2024casj');
 
