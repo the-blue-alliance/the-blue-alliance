@@ -41,7 +41,7 @@ export function Banner({
     .map((part, index) =>
       part === 'FIRST' ? (
         <Fragment key={index}>
-          <em>{part}</em>
+          <em className="text-[0.85em]">{part}</em>
           <br />
         </Fragment>
       ) : (
@@ -49,22 +49,26 @@ export function Banner({
       ),
     );
 
-  const eventText = [year, description?.toUpperCase()]
-    .filter((part) => part !== undefined && part !== '')
-    .join(' ');
+  const awardLength = (title ?? '').length;
+  const eventName = (description ?? '').toUpperCase();
   return (
     <div
       data-testid="award-banner"
       className={cn(
-        // The V notch is cut from the bottom 20px with a clip-path (the same
-        // depth as the Jinja banner's border trick) so it scales with any size
-        `relative flex h-52 w-36 flex-col items-center bg-blue-banner px-2 pt-3
-        pb-7 text-center tracking-tight text-white
-        [clip-path:polygon(0_0,100%_0,100%_100%,50%_calc(100%-20px),0_100%)]`,
+        // Proportions of the printed FRC banner (36x60in, FIRST blue, white
+        // Roboto). Type is sized in container-query units so the same
+        // layout holds at any width a caller sets; every zone clips so
+        // long names can never spill into the next one.
+        `@container relative aspect-3/5 w-36 overflow-hidden bg-blue-banner
+        text-center font-sans tracking-tight text-white uppercase`,
         className,
       )}
     >
-      <svg width="84" viewBox="0 0 223 153" className="shrink-0">
+      {/* Program lockup: icon, FIRST, ROBOTICS COMPETITION (top 14-37%) */}
+      <svg
+        viewBox="0 0 223 153"
+        className="absolute top-[13.5%] left-1/2 w-[62%] -translate-x-1/2"
+      >
         <path
           d="M106.324 32.8997V28.3371L98.8387 21.2428L95.4483 18.0294L91.0092 13.8244L76.4254 0.00488139L66.2168 57.2534L87.8161 47.7603C85.6659 45.8597 84.1417 43.8343 83.0094 41.4476L75.9783 44.4653L76.6836 40.7741L81.2399 17.031L81.6202 15.0368L85.3819 18.8257L90.2224 23.6991L92.2998 25.794L100.843 33.1527L92.5502 36.9525C94.7045 39.1045 97.2556 40.9984 100.695 42.0698L111.042 37.4239L106.324 32.8997Z"
           fill="#ED1C24"
@@ -222,28 +226,44 @@ export function Banner({
           fill="white"
         />
       </svg>
-      <div className="flex h-12 shrink-0 items-center justify-center">
+      {/* Award name (46-62%): optional italic FIRST line, then the name */}
+      <div
+        className="absolute inset-x-[6%] top-[46%] flex h-[16%] items-center
+          justify-center overflow-hidden"
+      >
         <span
-          className={cn('font-bold', {
-            'text-sm/4': title && title.length > 17,
-            'text-base/4': title && 9 <= title.length && title.length <= 17,
-            'text-lg/5': title && title.length < 9,
+          className={cn('line-clamp-2 leading-[1.05] font-black', {
+            'text-[12cqw]': awardLength <= 8,
+            'text-[10cqw]': 8 < awardLength && awardLength <= 13,
+            'text-[8cqw]': 13 < awardLength && awardLength <= 18,
+            'text-[6.5cqw]': awardLength > 18,
           })}
         >
           {formattedTitle}
         </span>
       </div>
+      {/* Award year (63-69%) */}
+      {year !== undefined && (
+        <div
+          className="absolute inset-x-[6%] top-[63%] flex h-[6.5%] items-center
+            justify-center"
+        >
+          <span className="text-[7cqw] leading-none font-bold">{year}</span>
+        </div>
+      )}
+      {/* Region / event name (71-88%), up to three lines */}
       <div
-        className="flex min-h-0 flex-1 items-center justify-center
-          overflow-hidden"
+        className="absolute inset-x-[8%] top-[71%] flex h-[17.5%] items-start
+          justify-center overflow-hidden"
       >
         <span
-          className={cn('line-clamp-4 font-bold', {
-            'text-[10px]/3': eventText.length > 34,
-            'text-xs/[14px]': eventText.length <= 34,
+          className={cn('line-clamp-3 leading-[1.15] font-black', {
+            'text-[8.5cqw]': eventName.length <= 24,
+            'text-[6.8cqw]': 24 < eventName.length && eventName.length <= 40,
+            'text-[5.6cqw]': eventName.length > 40,
           })}
         >
-          {eventText}
+          {eventName}
         </span>
       </div>
     </div>
