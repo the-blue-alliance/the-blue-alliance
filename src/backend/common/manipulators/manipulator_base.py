@@ -21,6 +21,7 @@ from typing import (
 
 from google.appengine.ext import ndb
 
+from backend.common.cache_clearing.cache_warming import warm_cache_queries
 from backend.common.cache_clearing.get_affected_queries import TCacheKeyAndQuery
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.listify import delistify, listify
@@ -502,6 +503,27 @@ class ManipulatorBase(abc.ABC, Generic[TModel]):
 
         for query, cache_keys in to_clear.items():
             query.delete_cache_multi(cache_keys)
+
+        queries_to_warm: List[CachedDatabaseQuery] = []
+        for query_cls, cache_keys in to_clear.items():
+            if getattr(query_cls, "CACHE_ON_WRITE_ENABLED", False):
+                for cache_key in cache_keys:
+                    query_instance = query_cls.from_cache_key(cache_key)
+                    if query_instance is not None:
+                        queries_to_warm.append(query_instance)
+
+        if queries_to_warm:
+            cls._enqueue_cache_warm(queries_to_warm)
+
+    @classmethod
+    def _enqueue_cache_warm(cls, queries: List[CachedDatabaseQuery]) -> None:
+        defer_safe(
+            warm_cache_queries,
+            queries,
+            _queue="cache-clearing",
+            _target="py3-tasks-io",
+            _url=f"/_ah/queue/deferred_{cls.__name__}_warmCache",
+        )
 
     @classmethod
     @abc.abstractmethod

@@ -43,6 +43,7 @@ class DistrictsInYearQuery(CachedDatabaseQuery[List[District], List[DistrictDict
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = "districts_in_year_{year}"
     DICT_CONVERTER = DistrictConverter
+    CACHE_ON_WRITE_ENABLED = True
 
     def __init__(self, year: Year) -> None:
         super().__init__(year=year)

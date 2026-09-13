@@ -38,6 +38,16 @@ Two things follow from there being no expiry, and both matter:
 
 **Cache keys are versioned, and bumping a version orphans data.** The key is `{query key}:{CACHE_VERSION}:{DATABASE_QUERY_VERSION}`. Bumping either number changes every affected key, so the previous generation becomes permanently unreachable — it is not deleted, just stranded, and it keeps costing storage. If you bump a version, plan to purge the old generation by key prefix. `/admin/cache` shows the breakdown per version.
 
+### Cache-on-Write for Bulk Queries
+
+For bulk season queries (e.g. `EventListQuery`, `TeamListYearQuery`, `TeamListQuery`, `DistrictsInYearQuery`, `DistrictEventsQuery`, `DistrictTeamsQuery`), recomputing data from scratch on a cache miss can incur a 1.5s–2.0s latency penalty due to Datastore entity fetching and Python model conversions.
+
+To prevent user-facing requests from paying this cold rebuild penalty, queries marked with `CACHE_ON_WRITE_ENABLED = True` participate in **Cache-on-Write**:
+- When `ManipulatorBase._clearCacheDeferred` invalidates caches, it checks whether any affected queries have `CACHE_ON_WRITE_ENABLED = True`.
+- If so, it enqueues a deferred background task to `warm_cache_queries` on `py3-tasks-io` (queue `cache-clearing`).
+- The deferred task eagerly runs `fetch_json_async(ApiMajorVersion.API_V3)` to recompute and populate `CachedQueryResult` with pre-serialized compressed JSON bytes in Datastore.
+- Subsequent user and API requests hit an already-warm cache immediately (< 15ms), avoiding Datastore range queries and model inflation.
+
 ## Flask Page Caching
 
 Compute instance hours are one of the more expensive parts of App Engine, and rendering HTML pages is repetitive and CPU time consuming. We can cache the rendered page outputs to minimize that!

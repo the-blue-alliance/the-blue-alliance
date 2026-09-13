@@ -41,6 +41,7 @@ class TeamListQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_{page}"
     DICT_CONVERTER = TeamConverter
+    CACHE_ON_WRITE_ENABLED = True
     PAGE_SIZE: int = 500
 
     def __init__(self, page: int) -> None:
@@ -62,6 +63,7 @@ class TeamListYearQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_list_year_{year}_{page}"
     DICT_CONVERTER = TeamConverter
+    CACHE_ON_WRITE_ENABLED = True
 
     def __init__(self, year: Year, page: int) -> None:
         super().__init__(year=year, page=page)
@@ -83,6 +85,7 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "district_teams_{district_key}"
     DICT_CONVERTER = TeamConverter
+    CACHE_ON_WRITE_ENABLED = True
 
     def __init__(self, district_key: DistrictKey) -> None:
         super().__init__(district_key=district_key)

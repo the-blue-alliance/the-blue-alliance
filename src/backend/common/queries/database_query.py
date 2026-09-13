@@ -5,6 +5,7 @@ import hashlib
 import json
 import logging
 import pickle
+import re
 from contextlib import contextmanager
 from contextvars import ContextVar
 from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
@@ -117,10 +118,31 @@ class CachedDatabaseQuery(
     DICT_CACHING_ENABLED: bool = True
     MODEL_CACHING_ENABLED: bool = True
     CACHE_WRITES_ENABLED: bool = True
+    CACHE_ON_WRITE_ENABLED: bool = False
     _cache_key: Optional[str] = None
 
     def __init__(self, *args, **kwargs) -> None:
         super().__init__(*args, **kwargs)
+
+    @classmethod
+    def from_cache_key(cls, cache_key: str) -> Optional[CachedDatabaseQuery]:
+        if not cls.CACHE_KEY_FORMAT:
+            return None
+        partial_key = cache_key.split(":")[0]
+        pattern = (
+            "^" + re.sub(r"\{(\w+)\}", r"(?P<\1>[^_]+)", cls.CACHE_KEY_FORMAT) + "$"
+        )
+        match = re.match(pattern, partial_key)
+        if not match:
+            return None
+        args = {k: int(v) if v.isdigit() else v for k, v in match.groupdict().items()}
+        try:
+            return cls(**args)  # pyre-ignore[45]
+        except Exception as e:
+            logging.warning(
+                f"Could not instantiate {cls.__name__} from cache_key {cache_key}: {e}"
+            )
+            return None
 
     @property
     def cache_key(self) -> str:
