@@ -396,3 +396,47 @@ def test_fetch_records_sync_status_failure(
     status = EventSyncStatusMemcache("2019casj").get()
     assert status is not None
     assert status["tasks.get.nexus_pit_locations"]["num_consecutive_failures"] == 1
+
+
+class DummyDatafeedNexusMalformedParser(_DatafeedNexus[PitAddresses, Any]):
+
+    def endpoint(self) -> str:
+        return "/"
+
+    def parser(self) -> ParserBase[PitAddresses, Any]:
+        class MalformedParser(ParserBase[PitAddresses, Any]):
+            def parse(self, response: PitAddresses) -> Any:
+                # Simulate a real parser (e.g. NexusAPIQueueStatusParser)
+                # direct-indexing a field that's missing/renamed on a
+                # malformed-but-200 response body.
+                raise KeyError("label")
+
+        return MalformedParser()
+
+    def event_key(self) -> Optional[str]:
+        return "2019casj"
+
+
+@mock.patch.object(_DatafeedNexus, "_fetch")
+def test_fetch_malformed_response_records_sync_status_failure(
+    fetch_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    response = URLFetchResult.mock_for_content(
+        "https://frc.nexus/api/v1/",
+        200,
+        json.dumps({"ok": True}),
+    )
+    fetch_mock.return_value = InstantFuture(response)
+
+    with mock.patch.object(
+        DummyDatafeedNexusMalformedParser,
+        "_request_endpoint",
+        return_value="tasks.get.nexus_event_queue_status",
+    ):
+        result = DummyDatafeedNexusMalformedParser().fetch_async().get_result()
+
+    assert result is None
+
+    status = EventSyncStatusMemcache("2019casj").get()
+    assert status is not None
+    assert status["tasks.get.nexus_event_queue_status"]["num_consecutive_failures"] == 1
