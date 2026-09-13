@@ -7,6 +7,7 @@ import {
   PlayoffType,
   WltRecord,
 } from '~/api/tba/read';
+import { getEventNormalizedName } from '~/lib/eventUtils';
 
 const COMP_LEVEL_SORT_ORDER: Record<CompLevel, number> = {
   [CompLevel.F]: 5,
@@ -59,8 +60,8 @@ export function sortMultipleEventsMatches(matches: Match[], events: Event[]) {
 }
 
 export function matchTitleShort(
-  match: Match,
-  playoffType: PlayoffType,
+  match: Pick<Match, 'comp_level' | 'set_number' | 'match_number'>,
+  playoffType: PlayoffType | null,
 ): string {
   if (match.comp_level === CompLevel.QM || match.comp_level === CompLevel.F) {
     return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.match_number}`;
@@ -336,4 +337,56 @@ export function getMatchScoreWithoutAdjustPoints(match: Match): {
     redScore: match.alliances.red.score,
     blueScore: match.alliances.blue.score,
   };
+}
+
+const MATCH_KEY_PATTERN =
+  /^(?<eventKey>[1-9]\d{3}[a-z]+[0-9]*)_(?<compLevel>qm|ef|qf|sf|f)(?:(?<setNumber>\d{1,2})m)?(?<matchNumber>\d+)$/;
+
+export interface ParsedMatchKey {
+  eventKey: string;
+  compLevel: CompLevel;
+  setNumber: number;
+  matchNumber: number;
+}
+
+/** Splits a match key like `2026arc_sf3m1` into its parts; null if malformed. */
+export function parseMatchKey(key: string): ParsedMatchKey | null {
+  const groups = MATCH_KEY_PATTERN.exec(key)?.groups;
+  if (!groups) {
+    return null;
+  }
+  return {
+    eventKey: groups.eventKey,
+    compLevel: groups.compLevel as CompLevel,
+    setNumber: groups.setNumber ? Number(groups.setNumber) : 1,
+    matchNumber: Number(groups.matchNumber),
+  };
+}
+
+/**
+ * Human-friendly name for a match key, e.g. "Archimedes Division Match 3" or
+ * "Galileo Division Quals 87", using the same title strings the event and
+ * match pages use. Without the event (not loaded, or unknown) it falls back
+ * to the match title alone, and to the raw key if it can't be parsed.
+ */
+export function formatMatchKeyName(
+  key: string,
+  event?: Pick<
+    Event,
+    'event_type' | 'year' | 'city' | 'short_name' | 'name' | 'playoff_type'
+  >,
+): string {
+  const parsed = parseMatchKey(key);
+  if (!parsed) {
+    return key;
+  }
+  const title = matchTitleShort(
+    {
+      comp_level: parsed.compLevel,
+      set_number: parsed.setNumber,
+      match_number: parsed.matchNumber,
+    },
+    event?.playoff_type ?? null,
+  );
+  return event ? `${getEventNormalizedName(event)} ${title}` : title;
 }
