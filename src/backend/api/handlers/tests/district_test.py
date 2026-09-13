@@ -790,9 +790,11 @@ def test_district_models_query_response_passthrough(
     calls_fetch_json = []
     calls_fetch_dict = []
 
-    def spy_fetch_json(self, version):
-        calls_fetch_json.append((type(self), version))
-        return orig_fetch_json(self, version)
+    def spy_fetch_json(self, version, model_type=None, filter_func=None):
+        calls_fetch_json.append((type(self), version, model_type))
+        return orig_fetch_json(
+            self, version, model_type=model_type, filter_func=filter_func
+        )
 
     def spy_fetch_dict(self, version):
         calls_fetch_dict.append((type(self), version))
@@ -807,7 +809,11 @@ def test_district_models_query_response_passthrough(
     resp = api_client.get("/api/v3/district/fim/history", headers=headers)
     assert resp.status_code == 200
     assert len(calls_fetch_json) == 1
-    assert calls_fetch_json[0] == (DistrictAbbreviationQuery, ApiMajorVersion.API_V3)
+    assert calls_fetch_json[0] == (
+        DistrictAbbreviationQuery,
+        ApiMajorVersion.API_V3,
+        None,
+    )
     assert len(calls_fetch_dict) == 0
 
     # 2. district_list_year (nominal -> fetch_json)
@@ -816,7 +822,7 @@ def test_district_models_query_response_passthrough(
     resp = api_client.get("/api/v3/districts/2020", headers=headers)
     assert resp.status_code == 200
     assert len(calls_fetch_json) == 1
-    assert calls_fetch_json[0] == (DistrictsInYearQuery, ApiMajorVersion.API_V3)
+    assert calls_fetch_json[0] == (DistrictsInYearQuery, ApiMajorVersion.API_V3, None)
     assert len(calls_fetch_dict) == 0
 
     # 3. district_events (nominal -> fetch_json)
@@ -825,17 +831,21 @@ def test_district_models_query_response_passthrough(
     resp = api_client.get("/api/v3/district/2020fim/events", headers=headers)
     assert resp.status_code == 200
     assert len(calls_fetch_json) == 1
-    assert calls_fetch_json[0] == (DistrictEventsQuery, ApiMajorVersion.API_V3)
+    assert calls_fetch_json[0] == (DistrictEventsQuery, ApiMajorVersion.API_V3, None)
     assert len(calls_fetch_dict) == 0
 
-    # 4. district_events (simple -> fetch_dict)
+    # 4. district_events (simple -> fetch_json)
     calls_fetch_json.clear()
     calls_fetch_dict.clear()
     resp = api_client.get("/api/v3/district/2020fim/events/simple", headers=headers)
     assert resp.status_code == 200
-    assert len(calls_fetch_json) == 0
-    assert len(calls_fetch_dict) == 1
-    assert calls_fetch_dict[0] == (DistrictEventsQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (
+        DistrictEventsQuery,
+        ApiMajorVersion.API_V3,
+        "simple",
+    )
+    assert len(calls_fetch_dict) == 0
 
     # 5. district_teams (nominal -> fetch_json)
     calls_fetch_json.clear()
@@ -843,14 +853,18 @@ def test_district_models_query_response_passthrough(
     resp = api_client.get("/api/v3/district/2020fim/teams", headers=headers)
     assert resp.status_code == 200
     assert len(calls_fetch_json) == 1
-    assert calls_fetch_json[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3)
+    assert calls_fetch_json[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3, None)
     assert len(calls_fetch_dict) == 0
 
-    # 6. district_teams (simple -> fetch_dict)
+    # 6. district_teams (simple -> fetch_json)
     calls_fetch_json.clear()
     calls_fetch_dict.clear()
     resp = api_client.get("/api/v3/district/2020fim/teams/simple", headers=headers)
     assert resp.status_code == 200
-    assert len(calls_fetch_json) == 0
-    assert len(calls_fetch_dict) == 1
-    assert calls_fetch_dict[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (
+        DistrictTeamsQuery,
+        ApiMajorVersion.API_V3,
+        "simple",
+    )
+    assert len(calls_fetch_dict) == 0

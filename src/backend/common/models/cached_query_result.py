@@ -18,6 +18,8 @@ class CachedQueryResult(ndb.Model):
     result = ndb.PickleProperty(compressed=True)  # Raw models
     result_dict = ndb.JsonProperty(compressed=True)  # Dict version of models
 
+    FILTERED_MODEL_TYPES: tuple[str, ...] = ("simple", "keys", "search")
+
     created = ndb.DateTimeProperty(auto_now_add=True)
     updated = ndb.DateTimeProperty(auto_now=True)
 
@@ -46,6 +48,10 @@ class CachedQueryResult(ndb.Model):
             if res_bytes is not None:
                 span.set_label("uncompressed_bytes", str(len(res_bytes)))
             return res_bytes
+
+    @staticmethod
+    def filtered_cache_key(dict_cache_key: str, model_type: str) -> str:
+        return f"{dict_cache_key}~{model_type}"
 
     @staticmethod
     def cache_key_prefix_from_format(cache_key_format: str) -> str:

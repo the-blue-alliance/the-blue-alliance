@@ -2,7 +2,7 @@ import hashlib
 import json
 import logging
 from typing import Any, Generator, Iterable, List, Optional, TypedDict
-from unittest.mock import patch
+from unittest.mock import MagicMock, patch
 
 import orjson
 from google.appengine.ext import ndb
@@ -645,3 +645,92 @@ def test_production_point_queries_single_serialization() -> None:
         assert res is not None
         assert cache_key in accessed_keys
         assert accessed_keys[cache_key] == hashlib.md5(res).hexdigest()
+
+
+def test_fetch_filtered_json_cache_miss_and_hit(ndb_stub, memcache_stub) -> None:
+    DummyModel(id="m1", int_prop=10).put()
+    DummyModel(id="m2", int_prop=20).put()
+
+    query = CachedDummyModelRangeQuery(min=5, max=25)
+    filtered_cache_key = query.filtered_dict_cache_key(ApiMajorVersion.API_V3, "keys")
+
+    filter_func = MagicMock(
+        side_effect=lambda items, mt: [item["int_val"] for item in items]
+    )
+
+    # 1. Cache miss: runs filter_func, writes CachedQueryResult
+    with track_accessed_query_cache_keys() as accessed_keys:
+        res1 = query.fetch_json(
+            ApiMajorVersion.API_V3, model_type="keys", filter_func=filter_func
+        )
+
+    assert res1 is not None
+    assert orjson.loads(res1) == [10, 20]
+    assert filter_func.call_count == 1
+    assert list(accessed_keys.keys()) == [filtered_cache_key]
+    assert accessed_keys[filtered_cache_key] == hashlib.md5(res1).hexdigest()
+
+    cached_entity = CachedQueryResult.get_by_id(filtered_cache_key)
+    assert cached_entity is not None
+    assert cached_entity.result_dict == [10, 20]
+
+    # 2. Cache hit: reads from CachedQueryResult, bypasses filter_func
+    filter_func.reset_mock()
+    with track_accessed_query_cache_keys() as hit_accessed_keys:
+        res2 = query.fetch_json(
+            ApiMajorVersion.API_V3, model_type="keys", filter_func=filter_func
+        )
+
+    assert res2 == res1
+    filter_func.assert_not_called()
+    assert list(hit_accessed_keys.keys()) == [filtered_cache_key]
+    assert hit_accessed_keys[filtered_cache_key] == hashlib.md5(res2).hexdigest()
+
+
+def test_delete_cache_multi_invalidates_filtered_keys(ndb_stub, memcache_stub) -> None:
+    DummyModel(id="m1", int_prop=10).put()
+    query = CachedDummyModelRangeQuery(min=5, max=25)
+
+    def filter_func(items, mt):
+        return [item["int_val"] for item in items]
+
+    # Populate full dict and filtered keys
+    query.fetch_dict(ApiMajorVersion.API_V3)
+    query.fetch_json(ApiMajorVersion.API_V3, model_type="keys", filter_func=filter_func)
+    query.fetch_json(
+        ApiMajorVersion.API_V3, model_type="simple", filter_func=filter_func
+    )
+
+    base_cache_key = query.cache_key
+    dict_cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    keys_cache_key = query.filtered_dict_cache_key(ApiMajorVersion.API_V3, "keys")
+    simple_cache_key = query.filtered_dict_cache_key(ApiMajorVersion.API_V3, "simple")
+
+    assert CachedQueryResult.get_by_id(dict_cache_key) is not None
+    assert CachedQueryResult.get_by_id(keys_cache_key) is not None
+    assert CachedQueryResult.get_by_id(simple_cache_key) is not None
+
+    CachedDummyModelRangeQuery.delete_cache_multi({base_cache_key})
+
+    assert CachedQueryResult.get_by_id(dict_cache_key) is None
+    assert CachedQueryResult.get_by_id(keys_cache_key) is None
+    assert CachedQueryResult.get_by_id(simple_cache_key) is None
+
+
+def test_fetch_filtered_json_dict_caching_disabled(ndb_stub, memcache_stub) -> None:
+    DummyModel(id="point_1", int_prop=42).put()
+    query = CachedDummyModelPointQueryNoDictCache(model_key="point_1")
+    filtered_cache_key = query.filtered_dict_cache_key(ApiMajorVersion.API_V3, "keys")
+
+    filter_func = MagicMock(side_effect=lambda item, mt: {"val": item["int_val"]})
+
+    with track_accessed_query_cache_keys() as accessed_keys:
+        res = query.fetch_json(
+            ApiMajorVersion.API_V3, model_type="keys", filter_func=filter_func
+        )
+
+    assert res is not None
+    assert orjson.loads(res) == {"val": 42}
+    assert filter_func.call_count == 1
+    assert list(accessed_keys.keys()) == [filtered_cache_key]
+    assert CachedQueryResult.get_by_id(filtered_cache_key) is None
