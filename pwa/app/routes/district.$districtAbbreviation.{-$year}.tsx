@@ -61,13 +61,13 @@ import { getDistrictColorBorderClass } from '~/lib/districtUtils';
 import { getEventDateString, sortEvents } from '~/lib/eventUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeams } from '~/lib/teamUtils';
+import { useHashTab } from '~/lib/useHashTab';
 import {
   doThrowNotFound,
   joinComponents,
   parseParamsForYearElseDefault,
   publicCacheControlHeaders,
 } from '~/lib/utils';
-import { useHashTab } from '~/lib/useHashTab';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/{-$year}',

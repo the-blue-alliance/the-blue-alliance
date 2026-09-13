@@ -23,8 +23,8 @@ import { Spinner } from '~/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { getDistrictColorBorderClass } from '~/lib/districtUtils';
-import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 import { useHashTab } from '~/lib/useHashTab';
+import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/insights',
