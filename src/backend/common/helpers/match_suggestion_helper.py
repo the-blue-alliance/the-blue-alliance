@@ -18,7 +18,6 @@ from backend.common.consts.playoff_type import (
     PlayoffType,
 )
 from backend.common.helpers.event_helper import EventHelper
-from backend.common.helpers.match_helper import MatchHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.helpers.team_favorite_counts_helper import TeamFavoriteCountsHelper
 from backend.common.models.event import Event
@@ -38,8 +37,6 @@ W_TIME_DECAY: float = 0.25
 W_PERFORMANCE: float = 0.25
 
 NUM_SUGGESTIONS: int = 25
-MAX_UPCOMING_PER_EVENT: int = 3
-MAX_CANDIDATES: int = 250
 
 LEVEL_WEIGHTS: Dict[CompLevel, float] = {
     CompLevel.QM: 0.0,
@@ -62,19 +59,16 @@ DOUBLE_ELIM_ROUND_WEIGHTS: Dict[DoubleElimRound, float] = {
     DoubleElimRound.FINALS: 50.0,
 }
 
-# FUTURE covers matches that have not started yet. A champs match cycle is
-# ~7-10 minutes, so a 15 minute e-folding time keeps roughly the next two
-# matches per field hot.
+# A champs match cycle is ~7-10 minutes, so a 15 minute future e-folding time
+# keeps roughly the next two matches per field hot while allowing every timed,
+# unplayed match at a live event to participate in scoring and normalization.
 #
 # PAST covers a match whose time has gone by but which still has no score.
 # That is either a match on the field right now -- the most valuable thing we
 # can show -- or a dead schedule entry that will never be played. The short
-# PAST tau keeps the former hot while the latter fades, and the PAST horizon
-# drops anything that overdue from scoring at all.
+# PAST tau keeps the former hot while the latter fades.
 TIME_DECAY_TAU_FUTURE_S: int = 15 * 60
 TIME_DECAY_TAU_PAST_S: int = 5 * 60
-TIME_HORIZON_FUTURE_S: int = 3 * 60 * 60
-TIME_HORIZON_PAST_S: int = 30 * 60
 
 # Split of the performance component between predicted match magnitude and
 # predicted closeness; sum to 1.0 so `performance` stays in [0, 1]
@@ -104,7 +98,7 @@ class MatchSuggestionHelper:
         if events is None:
             events = [e for e in EventHelper.events_within_a_day() if e.now]
 
-        ranked = cls._rank(cls._candidate_matches(events, now), now)
+        ranked = cls._rank(cls._candidate_matches(events), now)
         return MatchSuggestions(
             updated_at=int(now.timestamp()),
             suggestions={s.match_key: s for s in ranked[:NUM_SUGGESTIONS]},
@@ -256,29 +250,23 @@ class MatchSuggestionHelper:
         ]
 
     @classmethod
-    def _candidate_matches(
-        cls, events: List[Event], now: datetime.datetime
-    ) -> List[Tuple[Event, Match]]:
+    def _candidate_matches(cls, events: List[Event]) -> List[Tuple[Event, Match]]:
         """
-        Unplayed, scheduled, near-term matches from the given events.
+        Every unplayed match with a known time from the given events.
         """
         for event in events:
             event.prep_matches()
 
         candidates: List[Tuple[Event, Match]] = []
         for event in events:
-            upcoming = MatchHelper.upcoming_matches(
-                event.matches, num=MAX_UPCOMING_PER_EVENT
+            candidates.extend(
+                (event, match)
+                for match in event.matches
+                if not match.has_been_played
+                and (match.predicted_time is not None or match.time is not None)
             )
-            for match in upcoming:
-                match_time = match.predicted_time or match.time
-                if match_time is None:
-                    continue
-                delta = (match_time - now).total_seconds()
-                if -TIME_HORIZON_PAST_S <= delta <= TIME_HORIZON_FUTURE_S:
-                    candidates.append((event, match))
 
-        return candidates[:MAX_CANDIDATES]
+        return candidates
 
     @staticmethod
     def _match_teams(match: Match) -> List[TeamKey]:

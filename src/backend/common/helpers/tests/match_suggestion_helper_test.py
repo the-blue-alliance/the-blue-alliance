@@ -10,7 +10,6 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.match_suggestion_helper import (
     MatchSuggestionHelper,
-    MAX_UPCOMING_PER_EVENT,
     NUM_SUGGESTIONS,
     W_FAVORITES,
     W_PERFORMANCE,
@@ -473,7 +472,9 @@ def test_skips_matches_with_no_time(ndb_stub, memcache_stub) -> None:
     assert result.suggestions == {}
 
 
-def test_skips_matches_beyond_the_future_horizon(ndb_stub, memcache_stub) -> None:
+def test_scores_distant_future_matches_with_low_time_decay(
+    ndb_stub, memcache_stub
+) -> None:
     event = make_event()
     seed_matches(
         event,
@@ -487,10 +488,13 @@ def test_skips_matches_beyond_the_future_horizon(ndb_stub, memcache_stub) -> Non
     )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert result.suggestions == {}
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert 0.0 < suggestion.components.time_decay < 0.001
 
 
-def test_skips_stale_late_matches(ndb_stub, memcache_stub) -> None:
+def test_scores_stale_unplayed_matches_with_low_time_decay(
+    ndb_stub, memcache_stub
+) -> None:
     event = make_event()
     seed_matches(
         event,
@@ -504,7 +508,8 @@ def test_skips_stale_late_matches(ndb_stub, memcache_stub) -> None:
     )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert result.suggestions == {}
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert 0.0 < suggestion.components.time_decay < 0.001
 
 
 def test_falls_back_to_scheduled_time(ndb_stub, memcache_stub) -> None:
@@ -518,7 +523,7 @@ def test_falls_back_to_scheduled_time(ndb_stub, memcache_stub) -> None:
     assert list(result.suggestions) == ["2026casj_qm1"]
 
 
-def test_respects_max_upcoming_per_event(ndb_stub, memcache_stub) -> None:
+def test_scores_all_unplayed_matches_per_event(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(
         event,
@@ -531,9 +536,16 @@ def test_respects_max_upcoming_per_event(ndb_stub, memcache_stub) -> None:
             for i in range(1, 8)
         ],
     )
+    seed_predictions(
+        event.key_name,
+        qual={f"2026casj_qm{i}": (50.0, 50.0, 0.5) for i in range(1, 7)}
+        | {"2026casj_qm7": (150.0, 150.0, 0.5)},
+    )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert len(result.suggestions) == MAX_UPCOMING_PER_EVENT
+    assert len(result.suggestions) == 7
+    assert result.suggestions["2026casj_qm1"].components.high_score == 0.0
+    assert result.suggestions["2026casj_qm7"].components.high_score == 1.0
 
 
 def test_truncates_to_num_suggestions(ndb_stub, memcache_stub) -> None:
@@ -721,7 +733,7 @@ def test_score_all_includes_played_and_unscheduled(ndb_stub, memcache_stub) -> N
     assert set(result.suggestions) == {"2026casj_qm1", "2026casj_qm2"}
 
 
-def test_score_all_ignores_the_time_horizon(ndb_stub, memcache_stub) -> None:
+def test_score_all_includes_matches_with_distant_times(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(
         event,
