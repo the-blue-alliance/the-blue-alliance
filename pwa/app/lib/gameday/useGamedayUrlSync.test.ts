@@ -13,7 +13,7 @@ import type { GamedaySearchParams } from '~/routes/gameday';
 function createEmptyUrlState(): GamedayUrlState {
   return {
     layoutId: null,
-    positionToWebcast: createEmptyPositionArray(),
+    positionToContent: createEmptyPositionArray(),
     chatSidebarVisible: true,
     currentChat: '',
   };
@@ -34,12 +34,12 @@ describe('hasUrlStateToRestore', () => {
   });
 
   test('returns true when any webcast position is set', () => {
-    const positionToWebcast = createEmptyPositionArray();
-    positionToWebcast[2] = 'event1-0';
+    const positionToContent = createEmptyPositionArray();
+    positionToContent[2] = 'event1-0';
 
     const state: GamedayUrlState = {
       ...createEmptyUrlState(),
-      positionToWebcast,
+      positionToContent,
     };
     expect(hasUrlStateToRestore(state)).toBe(true);
   });
@@ -61,13 +61,13 @@ describe('hasUrlStateToRestore', () => {
   });
 
   test('returns true when multiple values are set', () => {
-    const positionToWebcast = createEmptyPositionArray();
-    positionToWebcast[0] = 'event1-0';
-    positionToWebcast[1] = 'event2-0';
+    const positionToContent = createEmptyPositionArray();
+    positionToContent[0] = 'event1-0';
+    positionToContent[1] = 'event2-0';
 
     const state: GamedayUrlState = {
       layoutId: 3,
-      positionToWebcast,
+      positionToContent,
       chatSidebarVisible: false,
       currentChat: 'mychannel',
     };
@@ -81,8 +81,8 @@ describe('parseSearchParams', () => {
     const state = parseSearchParams(params);
 
     expect(state.layoutId).toBeNull();
-    expect(state.positionToWebcast).toHaveLength(MAX_VIEWS);
-    expect(state.positionToWebcast.every((p) => p === null)).toBe(true);
+    expect(state.positionToContent).toHaveLength(MAX_VIEWS);
+    expect(state.positionToContent.every((p) => p === null)).toBe(true);
     expect(state.chatSidebarVisible).toBe(true);
     expect(state.currentChat).toBe('');
   });
@@ -102,12 +102,20 @@ describe('parseSearchParams', () => {
     };
     const state = parseSearchParams(params);
 
-    expect(state.positionToWebcast[0]).toBe('event1-0');
-    expect(state.positionToWebcast[1]).toBeNull();
-    expect(state.positionToWebcast[2]).toBe('event2-0');
-    expect(state.positionToWebcast[3]).toBeNull();
-    expect(state.positionToWebcast[4]).toBeNull();
-    expect(state.positionToWebcast[5]).toBe('event3-1');
+    expect(state.positionToContent[0]).toBe('event1-0');
+    expect(state.positionToContent[1]).toBeNull();
+    expect(state.positionToContent[2]).toBe('event2-0');
+    expect(state.positionToContent[3]).toBeNull();
+    expect(state.positionToContent[4]).toBeNull();
+    expect(state.positionToContent[5]).toBe('event3-1');
+  });
+
+  test('parses a data panel from a view param', () => {
+    const state = parseSearchParams({
+      view_1: 'data-panel:match-recommendations',
+    });
+
+    expect(state.positionToContent[1]).toBe('data-panel:match-recommendations');
   });
 
   test('parses chat param as channel name', () => {
@@ -137,10 +145,10 @@ describe('parseSearchParams', () => {
     const state = parseSearchParams(params);
 
     expect(state.layoutId).toBe(4);
-    expect(state.positionToWebcast[0]).toBe('event1-0');
-    expect(state.positionToWebcast[1]).toBe('event2-0');
-    expect(state.positionToWebcast[2]).toBeNull();
-    expect(state.positionToWebcast[3]).toBe('event3-0');
+    expect(state.positionToContent[0]).toBe('event1-0');
+    expect(state.positionToContent[1]).toBe('event2-0');
+    expect(state.positionToContent[2]).toBeNull();
+    expect(state.positionToContent[3]).toBe('event3-0');
     expect(state.chatSidebarVisible).toBe(true);
     expect(state.currentChat).toBe('mychannel');
   });
@@ -165,19 +173,31 @@ describe('serializeToSearchParams', () => {
   });
 
   test('serializes webcast positions', () => {
-    const positionToWebcast = createEmptyPositionArray();
-    positionToWebcast[0] = 'event1-0';
-    positionToWebcast[2] = 'event2-0';
+    const positionToContent = createEmptyPositionArray();
+    positionToContent[0] = 'event1-0';
+    positionToContent[2] = 'event2-0';
 
     const state: GamedayUrlState = {
       ...createEmptyUrlState(),
-      positionToWebcast,
+      positionToContent,
     };
     const params = serializeToSearchParams(state);
 
     expect(params.view_0).toBe('event1-0');
     expect(params.view_1).toBeUndefined();
     expect(params.view_2).toBe('event2-0');
+  });
+
+  test('serializes a data panel position', () => {
+    const positionToContent = createEmptyPositionArray();
+    positionToContent[2] = 'data-panel:match-recommendations';
+
+    const params = serializeToSearchParams({
+      ...createEmptyUrlState(),
+      positionToContent,
+    });
+
+    expect(params.view_2).toBe('data-panel:match-recommendations');
   });
 
   test('serializes chat channel', () => {
@@ -225,14 +245,14 @@ describe('serializeToSearchParams', () => {
   });
 
   test('serializes all values together', () => {
-    const positionToWebcast = createEmptyPositionArray();
-    positionToWebcast[0] = 'event1-0';
-    positionToWebcast[1] = 'event2-0';
-    positionToWebcast[3] = 'event3-0';
+    const positionToContent = createEmptyPositionArray();
+    positionToContent[0] = 'event1-0';
+    positionToContent[1] = 'event2-0';
+    positionToContent[3] = 'event3-0';
 
     const state: GamedayUrlState = {
       layoutId: 4,
-      positionToWebcast,
+      positionToContent,
       chatSidebarVisible: true,
       currentChat: 'mychannel',
     };
@@ -301,13 +321,13 @@ describe('round-trip serialization', () => {
   });
 
   test('serialize -> parse preserves state', () => {
-    const positionToWebcast = createEmptyPositionArray();
-    positionToWebcast[0] = 'event1-0';
-    positionToWebcast[3] = 'event2-0';
+    const positionToContent = createEmptyPositionArray();
+    positionToContent[0] = 'event1-0';
+    positionToContent[3] = 'event2-0';
 
     const originalState: GamedayUrlState = {
       layoutId: 5,
-      positionToWebcast,
+      positionToContent,
       chatSidebarVisible: true,
       currentChat: 'testchannel',
     };
@@ -316,11 +336,11 @@ describe('round-trip serialization', () => {
     const parsedState = parseSearchParams(params);
 
     expect(parsedState.layoutId).toBe(originalState.layoutId);
-    expect(parsedState.positionToWebcast[0]).toBe(
-      originalState.positionToWebcast[0],
+    expect(parsedState.positionToContent[0]).toBe(
+      originalState.positionToContent[0],
     );
-    expect(parsedState.positionToWebcast[3]).toBe(
-      originalState.positionToWebcast[3],
+    expect(parsedState.positionToContent[3]).toBe(
+      originalState.positionToContent[3],
     );
     expect(parsedState.chatSidebarVisible).toBe(
       originalState.chatSidebarVisible,
