@@ -1,6 +1,6 @@
 import datetime
 import json
-from typing import Dict, List, NewType
+from typing import Dict, List, NewType, Optional
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -11,7 +11,10 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.queries.dict_converters.converter_base import ConverterBase
-from backend.common.queries.dict_converters.district_converter import DistrictConverter
+from backend.common.queries.dict_converters.district_converter import (
+    DistrictConverter,
+    DistrictDict,
+)
 
 EventDict = NewType("EventDict", Dict)
 
@@ -34,13 +37,34 @@ class EventConverter(ConverterBase):
 
     @classmethod
     def eventsConverter_v3(cls, events: List[Event]) -> List[EventDict]:
-        return list(map(cls.eventConverter_v3, events))
+        # Pre-fetch and convert unique districts to avoid N+1 lookups and redundant conversions
+        district_keys = {none_throws(e.district_key) for e in events if e.district_key}
+        districts = ndb.get_multi(district_keys)
+        district_map: Dict[ndb.Key, Optional[DistrictDict]] = {
+            district.key: DistrictConverter(district).convert(ApiMajorVersion.API_V3)
+            for district in districts
+            if district is not None
+        }
+        return [cls.eventConverter_v3(event, district_map) for event in events]
 
     @classmethod
-    def eventConverter_v3(cls, event: Event) -> EventDict:
-        district_future = (
-            none_throws(event.district_key).get_async() if event.district_key else None
-        )
+    def eventConverter_v3(
+        cls,
+        event: Event,
+        district_map: Optional[Dict[ndb.Key, Optional[DistrictDict]]] = None,
+    ) -> EventDict:
+        if district_map is not None:
+            district = (
+                district_map.get(event.district_key) if event.district_key else None
+            )
+        elif event.district_key:
+            district_future = none_throws(event.district_key).get_async()
+            district = DistrictConverter(district_future.get_result()).convert(
+                ApiMajorVersion.API_V3
+            )
+        else:
+            district = None
+
         event_dict = {
             "key": event.key.id(),
             "name": event.name,
@@ -59,13 +83,7 @@ class EventConverter(ConverterBase):
                 if event.playoff_type
                 else None
             ),
-            "district": (
-                DistrictConverter(district_future.get_result()).convert(
-                    ApiMajorVersion.API_V3
-                )
-                if district_future
-                else None
-            ),
+            "district": district,
             "division_keys": [
                 key.id() for key in event.divisions
             ],  # Datastore stub needs to support repeated properties 2020-06-16 @fangeugene
