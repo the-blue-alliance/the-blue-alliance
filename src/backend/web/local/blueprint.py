@@ -245,7 +245,7 @@ def get_fms_companion_db(event_key: str) -> Response:
 def match_suggestions(event_keys: str) -> Response:
     """
     Score every match at one or more comma-separated events, for validating the
-    suggestion components against real data.
+    suggestion scoring factors against real data.
 
     Unlike the cron feed this ignores the schedule, so it works on any event
     rather than only ones running right now. Time decay is therefore always 0.
