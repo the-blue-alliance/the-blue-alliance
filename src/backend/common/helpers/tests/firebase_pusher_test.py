@@ -639,7 +639,8 @@ def test_update_match_suggestions(
                     favorites=1.0,
                     significance=1.0,
                     time_decay=0.75,
-                    performance=0.5,
+                    high_score=0.5,
+                    close_score=0.5,
                 ),
             )
         },
@@ -674,7 +675,8 @@ def test_update_match_suggestions(
                     "f": 1.0,
                     "sig": 1.0,
                     "td": 0.75,
-                    "p": 0.5,
+                    "hs": 0.5,
+                    "cs": 0.5,
                 },
             }
         },

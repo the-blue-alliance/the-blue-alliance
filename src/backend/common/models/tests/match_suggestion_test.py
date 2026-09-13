@@ -28,7 +28,11 @@ def _suggestion() -> MatchSuggestion:
         rank=0,
         score=0.8125,
         components=MatchSuggestionComponents(
-            favorites=1.0, significance=0.4, time_decay=0.9, performance=0.75
+            favorites=1.0,
+            significance=0.4,
+            time_decay=0.9,
+            high_score=0.5,
+            close_score=1.0,
         ),
     )
 
@@ -50,6 +54,9 @@ def test_model_dump_is_json_serializable() -> None:
     # break the client
     assert isinstance(entry["cl"], str)
     assert entry["c"]["f"] == 1.0
+    assert entry["c"]["hs"] == 0.5
+    assert entry["c"]["cs"] == 1.0
+    assert "p" not in entry["c"]
 
 
 def test_model_dump_defaults_to_empty_suggestions() -> None:

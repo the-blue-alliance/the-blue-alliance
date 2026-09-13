@@ -29,9 +29,9 @@ class MatchSuggestionComponents(BaseModel):
     """
     The individual scoring factors behind a suggestion, each normalized to [0, 1].
 
-    `favorites` and `performance` are min-max normalized across the candidate pool
+    `favorites` and `high_score` are min-max normalized across the candidate pool
     of a single cron run, so they are only meaningful relative to their siblings in
-    that same run. `significance` and `time_decay` are absolute.
+    that same run. `significance`, `time_decay`, and `close_score` are absolute.
     """
 
     model_config = ConfigDict(populate_by_name=True)
@@ -39,7 +39,8 @@ class MatchSuggestionComponents(BaseModel):
     favorites: float = Field(alias="f")
     significance: float = Field(alias="sig")
     time_decay: float = Field(alias="td")
-    performance: float = Field(alias="p")
+    high_score: float = Field(alias="hs")
+    close_score: float = Field(alias="cs")
 
 
 class MatchSuggestion(BaseModel):

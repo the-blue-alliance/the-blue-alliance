@@ -35,7 +35,8 @@ from backend.common.models.match_suggestion import (
 W_FAVORITES: float = 0.25
 W_SIGNIFICANCE: float = 0.25
 W_TIME_DECAY: float = 0.25
-W_PERFORMANCE: float = 0.25
+W_HIGH_SCORE: float = 0.125
+W_CLOSE_SCORE: float = 0.125
 
 NUM_SUGGESTIONS: int = 25
 MAX_UPCOMING_PER_EVENT: int = 3
@@ -75,11 +76,6 @@ TIME_DECAY_TAU_FUTURE_S: int = 15 * 60
 TIME_DECAY_TAU_PAST_S: int = 5 * 60
 TIME_HORIZON_FUTURE_S: int = 3 * 60 * 60
 TIME_HORIZON_PAST_S: int = 30 * 60
-
-# Split of the performance component between predicted match magnitude and
-# predicted closeness; sum to 1.0 so `performance` stays in [0, 1]
-W_PERF_MAGNITUDE: float = 0.5
-W_PERF_CLOSENESS: float = 0.5
 
 DEGENERATE_NORMALIZED_VALUE: float = 0.5
 EPSILON: float = 1e-9
@@ -121,13 +117,13 @@ class MatchSuggestionHelper:
         schedule entirely.
 
         A validation tool, not used by the cron. Time decay is forced to 0 so
-        that favorites, significance and performance can be compared without a
-        scheduling term swamping them -- which also means `score` here tops out
-        at the sum of the other three weights rather than 1.0.
+        that favorites, significance, high score, and close score can be compared
+        without a scheduling term swamping them -- which also means `score` here
+        tops out at the sum of the other four weights rather than 1.0.
 
-        Performance and favorites are still min-max normalized across whatever
-        you pass in, so scoring two events together ranks them against each
-        other, while scoring them separately does not.
+        High score and favorites are still min-max normalized across whatever you
+        pass in, so scoring two events together ranks them against each other,
+        while scoring them separately does not.
         """
         now = now or datetime.datetime.now()
 
@@ -194,13 +190,12 @@ class MatchSuggestionHelper:
 
         favorites = cls._min_max_normalize(raw_favorites)
 
+        high_scores = [DEGENERATE_NORMALIZED_VALUE] * len(matches)
+        close_scores = [DEGENERATE_NORMALIZED_VALUE] * len(matches)
         magnitude_normalized = cls._min_max_normalize(raw_magnitude)
-        performance = [DEGENERATE_NORMALIZED_VALUE] * len(matches)
         for slot, i in enumerate(predicted_indices):
-            performance[i] = (
-                W_PERF_MAGNITUDE * magnitude_normalized[slot]
-                + W_PERF_CLOSENESS * closeness_by_index[i]
-            )
+            high_scores[i] = magnitude_normalized[slot]
+            close_scores[i] = closeness_by_index[i]
 
         scored: List[Tuple[float, Event, Match, MatchSuggestionComponents]] = []
         for i, (event, match) in enumerate(candidates):
@@ -212,13 +207,15 @@ class MatchSuggestionHelper:
                     if time_weighted
                     else 0.0
                 ),
-                performance=performance[i],
+                high_score=high_scores[i],
+                close_score=close_scores[i],
             )
             score = round(
                 W_FAVORITES * components.favorites
                 + W_SIGNIFICANCE * components.significance
                 + W_TIME_DECAY * components.time_decay
-                + W_PERFORMANCE * components.performance,
+                + W_HIGH_SCORE * components.high_score
+                + W_CLOSE_SCORE * components.close_score,
                 4,
             )
             scored.append((score, event, match, components))

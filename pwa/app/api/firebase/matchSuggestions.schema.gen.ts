@@ -119,14 +119,18 @@ export const matchSuggestionsSchema = {
     },
     MatchSuggestionComponents: {
       description:
-        'The individual scoring factors behind a suggestion, each normalized to [0, 1].\n\n`favorites` and `performance` are min-max normalized across the candidate pool\nof a single cron run, so they are only meaningful relative to their siblings in\nthat same run. `significance` and `time_decay` are absolute.',
+        'The individual scoring factors behind a suggestion, each normalized to [0, 1].\n\n`favorites` and `high_score` are min-max normalized across the candidate pool\nof a single cron run, so they are only meaningful relative to their siblings in\nthat same run. `significance`, `time_decay`, and `close_score` are absolute.',
       properties: {
+        cs: {
+          title: 'Cs',
+          type: 'number',
+        },
         f: {
           title: 'F',
           type: 'number',
         },
-        p: {
-          title: 'P',
+        hs: {
+          title: 'Hs',
           type: 'number',
         },
         sig: {
@@ -138,7 +142,7 @@ export const matchSuggestionsSchema = {
           type: 'number',
         },
       },
-      required: ['f', 'sig', 'td', 'p'],
+      required: ['f', 'sig', 'td', 'hs', 'cs'],
       title: 'MatchSuggestionComponents',
       type: 'object',
     },
