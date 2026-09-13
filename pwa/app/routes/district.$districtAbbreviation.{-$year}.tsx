@@ -67,6 +67,7 @@ import {
   parseParamsForYearElseDefault,
   publicCacheControlHeaders,
 } from '~/lib/utils';
+import { useHashTab } from '~/lib/useHashTab';
 
 export const Route = createFileRoute(
   '/district/$districtAbbreviation/{-$year}',
@@ -213,6 +214,10 @@ function DistrictPage() {
   } = Route.useLoaderData();
 
   const hasRankings = rankings !== null;
+  const tabs = useHashTab({
+    values: ['rankings', 'events', 'teams', 'champs'] as const,
+    defaultValue: hasRankings ? 'rankings' : 'events',
+  });
 
   const cmpQualification = advancementCutoffs?.cmp_qualification ?? {};
   const cmpDeclines = new Set(advancementCutoffs?.cmp_declines ?? []);
@@ -275,7 +280,9 @@ function DistrictPage() {
       </div>
 
       <AnimatedTabs
-        defaultValue={hasRankings ? 'rankings' : 'events'}
+        key={tabs.key}
+        defaultValue={tabs.defaultValue}
+        onValueChange={tabs.onValueChange}
         className="mt-6"
       >
         <TabsList
