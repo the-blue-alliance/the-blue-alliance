@@ -71,7 +71,7 @@
     "@testing-library/react": "16.3.3",
     "@iconify/json": "2.2.525",
     "@julr/vite-plugin-validate-env": "2.2.2",
-    "@playwright/test": "1.62.1",
+    "@playwright/test": "1.63.0",
     "@sentry/vite-plugin": "5.4.0",
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
