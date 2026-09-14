@@ -58,8 +58,9 @@ export function Banner({
         // Proportions of the printed FRC banner (36x60in, FIRST blue, white
         // Roboto). Type is sized in container-query units so the same
         // layout holds at any width a caller sets; every zone clips so
-        // long names can never spill into the next one.
-        `@container relative aspect-3/5 w-36 overflow-hidden bg-blue-banner
+        // long names can never spill into the next one. Sizes floor at
+        // ~11px at the default width so the smallest text stays readable.
+        `@container relative aspect-3/5 w-40 overflow-hidden bg-blue-banner
         text-center font-sans tracking-tight text-white uppercase`,
         className,
       )}
@@ -235,8 +236,8 @@ export function Banner({
           className={cn('line-clamp-2 leading-[1.05] font-black', {
             'text-[12cqw]': awardLength <= 8,
             'text-[10cqw]': 8 < awardLength && awardLength <= 13,
-            'text-[8cqw]': 13 < awardLength && awardLength <= 18,
-            'text-[6.5cqw]': awardLength > 18,
+            'text-[8.5cqw]': 13 < awardLength && awardLength <= 18,
+            'text-[7cqw]': awardLength > 18,
           })}
         >
           {formattedTitle}
@@ -248,7 +249,7 @@ export function Banner({
           className="absolute inset-x-[6%] top-[63%] flex h-[6.5%] items-center
             justify-center"
         >
-          <span className="text-[7cqw] leading-none font-bold">{year}</span>
+          <span className="text-[8cqw] leading-none font-bold">{year}</span>
         </div>
       )}
       {/* Region / event name (71-88%), up to three lines */}
@@ -259,8 +260,8 @@ export function Banner({
         <span
           className={cn('line-clamp-3 leading-[1.15] font-black', {
             'text-[8.5cqw]': eventName.length <= 24,
-            'text-[6.8cqw]': 24 < eventName.length && eventName.length <= 40,
-            'text-[5.6cqw]': eventName.length > 40,
+            'text-[7.5cqw]': 24 < eventName.length && eventName.length <= 40,
+            'text-[7cqw]': eventName.length > 40,
           })}
         >
           {eventName}
