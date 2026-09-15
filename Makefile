@@ -1,4 +1,4 @@
-.PHONY: test test-inline lint lint-bash typecheck sync freeze pwa pwa-generate-api benchmark-coldstart help
+.PHONY: test test-inline lint lint-bash typecheck sync freeze pwa-generate-api benchmark-coldstart help
 
 # Default target
 help:
@@ -14,7 +14,6 @@ help:
 	@echo "  make sync                       - Sync all dev dependencies via uv"
 	@echo "  make freeze                     - Generate src/requirements.txt from pyproject.toml"
 	@echo "  make pwa-generate-api           - Regenerate the PWA OpenAPI clients (in Docker)"
-	@echo "  make pwa ARGS='...'             - Run a PWA node command in Docker"
 	@echo "  make benchmark-coldstart        - Benchmark service startup and coldstart latency"
 	@echo ""
 	@echo "Examples:"
@@ -73,10 +72,6 @@ lint-bash:
 # Regenerate the PWA's OpenAPI clients in Docker
 pwa-generate-api:
 	docker compose --profile tools run --rm --build pwa-tools
-
-# Run any PWA node command in Docker
-pwa:
-	docker compose --profile tools run --rm --build pwa-tools $(ARGS)
 
 # Run pyre type checker
 typecheck:
