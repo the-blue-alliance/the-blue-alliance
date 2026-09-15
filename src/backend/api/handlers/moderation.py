@@ -4,6 +4,7 @@ import logging
 import re
 from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional
+from urllib.parse import unquote
 
 from flask import g, jsonify, make_response, request, Response
 from google.appengine.ext import ndb
@@ -156,6 +157,9 @@ def moderation_suggestion_list(suggestion_type: str) -> Response:
 @require_moderation_permission(SUGGESTION_PERMISSIONS)
 def moderation_suggestion_accept(suggestion_key: str) -> Response:
     """Accept a single pending suggestion, with optional type-specific overrides."""
+    # Clients percent-encode path params, so a key with slashes (Onshape CAD
+    # models) may arrive as %2F if the server doesn't decode it first
+    suggestion_key = unquote(suggestion_key)
     user: User = g.moderation_user
     overrides = request.get_json(silent=True) or {}
     if not isinstance(overrides, dict):
