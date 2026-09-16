@@ -1,3 +1,5 @@
+from unittest.mock import patch
+
 import pytest
 
 from backend.common.consts.auth_type import AuthType
@@ -94,3 +96,38 @@ def test_is_write_key() -> None:
     assert auth.is_write_key
     auth.auth_types_enum = [AuthType.ZEBRA_MOTIONWORKS]
     assert auth.is_write_key
+
+
+def test_generate_auth_id() -> None:
+    auth_id = ApiAuthAccess.generate_auth_id()
+    assert len(auth_id) == 16
+    assert all(c in ApiAuthAccess.TOKEN_ALPHABET for c in auth_id)
+
+
+def test_generate_read_key() -> None:
+    key = ApiAuthAccess.generate_read_key()
+    assert len(key) == 64
+    assert all(c in ApiAuthAccess.TOKEN_ALPHABET for c in key)
+
+
+def test_generate_secret() -> None:
+    secret = ApiAuthAccess.generate_secret()
+    assert len(secret) == 64
+    assert all(c in ApiAuthAccess.TOKEN_ALPHABET for c in secret)
+
+
+def test_generated_tokens_are_unique() -> None:
+    assert len({ApiAuthAccess.generate_secret() for _ in range(100)}) == 100
+    assert len({ApiAuthAccess.generate_auth_id() for _ in range(100)}) == 100
+
+
+def test_tokens_come_from_secrets_module() -> None:
+    # `random` is a Mersenne Twister whose state can be recovered from its
+    # output; bearer credentials must be drawn from `secrets` instead.
+    with patch(
+        "backend.common.models.api_auth_access.secrets.choice", return_value="x"
+    ) as mock_choice:
+        assert ApiAuthAccess.generate_auth_id() == "x" * 16
+        assert ApiAuthAccess.generate_secret() == "x" * 64
+        assert ApiAuthAccess.generate_read_key() == "x" * 64
+    assert mock_choice.call_count == 16 + 64 + 64

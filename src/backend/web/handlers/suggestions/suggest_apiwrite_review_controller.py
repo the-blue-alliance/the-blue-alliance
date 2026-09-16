@@ -1,5 +1,3 @@
-import random
-import string
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from typing import Any, Optional
@@ -50,12 +48,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBase[ApiWriteTargetModel]
         user = suggestion.author.get()
         event = none_throws(Event.get_by_id(event_key))
 
-        auth_id = "".join(
-            random.choice(
-                string.ascii_lowercase + string.ascii_uppercase + string.digits
-            )
-            for _ in range(16)
-        )
+        auth_id = ApiAuthAccess.generate_auth_id()
         auth_types = request.form.getlist("auth_types") or []
         expiration_offset = int(request.form.get("expiration_days", ""))
         if expiration_offset != -1:
@@ -71,12 +64,7 @@ class SuggestApiWriteReviewController(SuggestionsReviewBase[ApiWriteTargetModel]
             description="{} @ {}".format(
                 user.display_name, suggestion.contents["event_key"]
             ).encode("utf-8"),
-            secret="".join(
-                random.choice(
-                    string.ascii_lowercase + string.ascii_uppercase + string.digits
-                )
-                for _ in range(64)
-            ),
+            secret=ApiAuthAccess.generate_secret(),
             event_list=[ndb.Key(Event, event_key)],
             auth_types_enum=[AuthType(int(t)) for t in auth_types],
             owner=suggestion.author,
