@@ -8,6 +8,7 @@ import {
   eventSsrTtlSeconds,
   getCurrentWeekEvents,
   getEventDateString,
+  getEventNormalizedName,
   getEventWeekString,
   getPublicAgendaUrl,
   groupEventsByParent,
@@ -1171,5 +1172,71 @@ describe('eventCacheControlHeaders', () => {
       'CDN-Cache-Control': `max-age=${ttl}`,
     });
     vi.unstubAllEnvs();
+  });
+});
+
+describe('getEventNormalizedName', () => {
+  const base = {
+    year: 2026,
+    city: 'Houston',
+    name: 'Full Name',
+    short_name: null,
+  };
+
+  test('district championship division uses the short name plus the type', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.DISTRICT_CMP_DIVISION,
+        short_name: 'NEDC - Newsom',
+        name: 'New England FIRST District Championship - Newsom Division presented by GE Aerospace',
+      }),
+    ).toBe('NEDC - Newsom District Championship Division');
+  });
+
+  test('does not repeat a type suffix already in the short name', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.REGIONAL,
+        short_name: 'Silicon Valley Regional',
+      }),
+    ).toBe('Silicon Valley Regional');
+  });
+
+  test('championship finals are named by city from 2017', () => {
+    expect(
+      getEventNormalizedName({ ...base, event_type: EventType.CMP_FINALS }),
+    ).toBe('Houston Championship');
+    expect(
+      getEventNormalizedName({
+        ...base,
+        year: 2016,
+        event_type: EventType.CMP_FINALS,
+      }),
+    ).toBe('Championship');
+  });
+
+  test('offseason events use the bare short name', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.OFFSEASON,
+        short_name: 'Chezy Champs',
+      }),
+    ).toBe('Chezy Champs');
+  });
+
+  test('falls back to the full name without a short name, or for FoC', () => {
+    expect(
+      getEventNormalizedName({ ...base, event_type: EventType.DISTRICT }),
+    ).toBe('Full Name');
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.FOC,
+        short_name: 'FoC short',
+      }),
+    ).toBe('Full Name');
   });
 });

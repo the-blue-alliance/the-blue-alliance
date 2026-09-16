@@ -137,7 +137,6 @@ function HallOfFameTable({
                             title={getAwardName(year)}
                             description={eventKey}
                             year={year}
-                            className="h-48 w-28 text-xs"
                           />
                         </EventLink>
                       );
@@ -200,7 +199,6 @@ function WorldChampionsTable({
                             title="Winner"
                             description={eventKey}
                             year={year}
-                            className="h-48 w-28 text-xs"
                           />
                         </EventLink>
                       );
