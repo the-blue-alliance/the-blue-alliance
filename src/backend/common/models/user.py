@@ -1,5 +1,3 @@
-import random
-import string
 from typing import Any, cast, Dict, List, Optional, Union
 
 from google.appengine.ext import ndb
@@ -246,12 +244,7 @@ class User:
 
     def add_api_read_key(self, description: str) -> ApiAuthAccess:
         api_key = ApiAuthAccess(
-            id="".join(
-                random.choice(
-                    string.ascii_lowercase + string.ascii_uppercase + string.digits
-                )
-                for _ in range(64)
-            ),
+            id=ApiAuthAccess.generate_read_key(),
             owner=none_throws(self.account_key),
             auth_types_enum=[AuthType.READ_API],
             description=description,
