@@ -58,7 +58,7 @@ class TwitchGetAccessToken(DatafeedBase[Any, TwitchAccessToken]):
     @typed_tasklet
     def get_cached_token_async(
         cls,
-    ) -> Generator[Any, Any, TwitchAccessToken]:
+    ) -> Generator[Any, Any, Optional[TwitchAccessToken]]:
         """Get a Twitch access token, with automatic caching and refresh.
 
         Manages token lifecycle including cache checks, expiration checks,
@@ -82,6 +82,10 @@ class TwitchGetAccessToken(DatafeedBase[Any, TwitchAccessToken]):
         new_token = yield TwitchGetAccessToken(
             refresh_token=refresh_token
         ).fetch_async()
+
+        if new_token is None:
+            # Fetching a fresh token failed (e.g. Twitch auth outage)
+            return None
 
         # Cache the new token with expiration
         token_mc.expires(new_token["expires_in"])
