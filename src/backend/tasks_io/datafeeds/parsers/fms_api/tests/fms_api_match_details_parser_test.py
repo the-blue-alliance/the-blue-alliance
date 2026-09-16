@@ -1,5 +1,6 @@
 import json
 from datetime import datetime
+from typing import cast
 
 import pytest
 
@@ -7,6 +8,7 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.frc_api.frc_api import TScoreDetailReturn
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.event import Event
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
@@ -59,6 +61,68 @@ def setUp(ndb_stub):
         playoff_type=PlayoffType.BRACKET_8_TEAM,
     )
     event_2018week0.put()
+
+    event_2019test = Event(
+        id="2019test",
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        short_name="Test",
+        event_short="test",
+        year=2019,
+        end_date=datetime(2019, 3, 3),
+        official=True,
+        start_date=datetime(2019, 2, 28),
+        timezone_id="America/New_York",
+    )
+    event_2019test.put()
+
+
+def _make_2019_rocket_alliance(alliance: str, *, omit_key: str = "") -> dict:
+    """Build a minimal 2019 alliance score-detail dict with all 12 rocket
+    keys set to "PanelAndCargo", optionally omitting one of them."""
+    breakdown = {"alliance": alliance}
+    for side1 in ["Near", "Far"]:
+        for side2 in ["Left", "Right"]:
+            for level in ["low", "mid", "top"]:
+                key = "{}{}Rocket{}".format(level, side2, side1)
+                if key == omit_key:
+                    continue
+                breakdown[key] = "PanelAndCargo"
+    return breakdown
+
+
+def test_parse_2019_missing_rocket_key_does_not_raise() -> None:
+    # Regression test: a missing rocket key in the score breakdown used to
+    # raise a KeyError and abort parsing of the entire event. It should
+    # instead be treated as "rocket not completed".
+    response = {
+        "MatchScores": [
+            {
+                "matchLevel": "Qualification",
+                "matchNumber": 1,
+                "alliances": [
+                    _make_2019_rocket_alliance("Red", omit_key="lowLeftRocketNear"),
+                    _make_2019_rocket_alliance("Blue"),
+                ],
+            }
+        ]
+    }
+
+    matches = FMSAPIMatchDetailsParser(2019, "test").parse(
+        cast(TScoreDetailReturn, response)
+    )
+
+    assert isinstance(matches, dict)
+    assert len(matches) == 1
+
+    breakdown = matches["2019test_qm1"]
+    # Red is missing a key, so completedRocketNear must be False (not raise)
+    assert breakdown[AllianceColor.RED]["completedRocketNear"] is False
+    # Far side had all keys present for Red, so it should complete normally
+    assert breakdown[AllianceColor.RED]["completedRocketFar"] is True
+    # Blue had all keys present, so both sides should complete
+    assert breakdown[AllianceColor.BLUE]["completedRocketNear"] is True
+    assert breakdown[AllianceColor.BLUE]["completedRocketFar"] is True
 
 
 def test_parse_no_matches(test_data_importer) -> None:
