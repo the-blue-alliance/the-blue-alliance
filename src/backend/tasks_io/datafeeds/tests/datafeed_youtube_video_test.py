@@ -223,7 +223,7 @@ class TestYoutubeVideoDetailsDatafeed:
             datafeed = YoutubeVideoDetailsDatafeed(["video_456"])
             params = datafeed.url_params()
 
-            assert params["part"] == "snippet,liveStreamingDetails"
+            assert params["part"] == "snippet,contentDetails,liveStreamingDetails"
             assert params["id"] == "video_456"
 
     def test_datafeed_url_params_multiple(self) -> None:
@@ -232,7 +232,7 @@ class TestYoutubeVideoDetailsDatafeed:
             datafeed = YoutubeVideoDetailsDatafeed(["video_1", "video_2"])
             params = datafeed.url_params()
 
-            assert params["part"] == "snippet,liveStreamingDetails"
+            assert params["part"] == "snippet,contentDetails,liveStreamingDetails"
             assert params["id"] == "video_1,video_2"
 
     def test_datafeed_url_construction(self) -> None:
@@ -243,7 +243,7 @@ class TestYoutubeVideoDetailsDatafeed:
 
             assert "videos" in url
             assert "video_789" in url
-            assert "snippet,liveStreamingDetails" in url
+            assert "snippet,contentDetails,liveStreamingDetails" in url
 
     def test_datafeed_parser(self) -> None:
         """Test datafeed returns correct parser instance."""
