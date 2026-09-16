@@ -90,5 +90,22 @@ services:
       - './ops/lint_bash.sh "$@"'
       - --
 
+  # node_modules and the mise toolchain are volumes to keep the container's
+  # Linux installs off the host's bind mount
+  pwa-tools:
+    build:
+      context: ./ops/dev/pwa/
+      dockerfile: Dockerfile.pwa
+    profiles: ["tools"]
+    volumes:
+      - ./:/tba:delegated
+      - pwa-node-modules:/tba/pwa/node_modules
+      - pwa-pnpm-store:/pnpm/store
+      - pwa-mise:/mise
+    working_dir: /tba/pwa
+
 volumes:
   datastore-data:
+  pwa-node-modules:
+  pwa-pnpm-store:
+  pwa-mise:

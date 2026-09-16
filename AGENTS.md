@@ -170,7 +170,7 @@ make typecheck
 - **Add web page**: Create handler in `web/handlers/`, template in `web/templates/`, route in `web/main.py`
 - **Add async task**: Use `defer()` to enqueue, create handler in `tasks_io/` or `tasks_cpu/`
 - **Add configuration**: Use Sitevar (see docs/common/Sitevars.md)
-- **Update API/models**: Reflect changes in `src/backend/web/static/swagger/*.json` OpenAPI specs (api_v3.json, api_trusted_v1.json, client_v9.json), then regenerate PWA client by running `cd pwa && ./generate-api.sh`
+- **Update API/models**: Reflect changes in `src/backend/web/static/swagger/*.json` OpenAPI specs (api_v3.json, api_trusted_v1.json, client_v9.json), then regenerate PWA client by running `make pwa-generate-api` (runs `pwa/generate-api.sh` in Docker; use `cd pwa && ./generate-api.sh` if node/pnpm are installed locally)
 
 ## Tournament Structures
 
