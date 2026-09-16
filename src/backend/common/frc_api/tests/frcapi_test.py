@@ -388,3 +388,94 @@ def test_save_response_updated(
     f2 = cloud_storage_read(files[1])
     assert f2 is not None
     assert f2 == json.dumps(content2).encode()
+
+
+# --- response-archive deduplication -----------------------------------------
+#
+# `_maybe_save_response` only writes a new snapshot when the upstream content
+# actually changed. That comparison spans two type boundaries: urlfetch content
+# is bytes, while `StorageClient.read` returns str or bytes depending on which
+# client the environment selects. A `bytes == str` comparison is always False in
+# Python 3, which silently disabled the dedupe for all of 2025 (#6894) and wrote
+# ~300 GiB of byte-identical snapshots. These tests pin both sides.
+
+
+@pytest.fixture
+def saving_api() -> Any:
+    with patch.dict("os.environ", {"SAVE_FRC_API_RESPONSE": "true"}):
+        yield FRCAPI("test", save_response=True)
+
+
+@pytest.mark.parametrize(
+    "stored_content",
+    [
+        pytest.param(b'{"a": 1}', id="storage_returns_bytes"),
+        pytest.param('{"a": 1}', id="storage_returns_str"),
+    ],
+)
+def test_maybe_save_response_skips_write_when_unchanged(
+    saving_api: FRCAPI, stored_content: Any
+) -> None:
+    """Identical content must not produce a second snapshot.
+
+    Parameterized over both storage-client return types: the cloudstorage and
+    local clients read binary, GCloudStorageClient reads text.
+    """
+    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
+
+    with (
+        patch("backend.common.storage.get_files", return_value=["existing.json"]),
+        patch("backend.common.storage.read", return_value=stored_content),
+        patch("backend.common.storage.write") as mock_write,
+    ):
+        saving_api._maybe_save_response(url, b'{"a": 1}')
+
+    mock_write.assert_not_called()
+
+
+@pytest.mark.parametrize(
+    "outgoing_content",
+    [
+        pytest.param(b'{"a": 1}', id="content_is_bytes"),
+        pytest.param('{"a": 1}', id="content_is_str"),
+    ],
+)
+def test_maybe_save_response_skips_write_for_either_content_type(
+    saving_api: FRCAPI, outgoing_content: Any
+) -> None:
+    """The urlfetch side may also be str or bytes; neither should force a write."""
+    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
+
+    with (
+        patch("backend.common.storage.get_files", return_value=["existing.json"]),
+        patch("backend.common.storage.read", return_value=b'{"a": 1}'),
+        patch("backend.common.storage.write") as mock_write,
+    ):
+        saving_api._maybe_save_response(url, outgoing_content)
+
+    mock_write.assert_not_called()
+
+
+def test_maybe_save_response_writes_when_content_changed(saving_api: FRCAPI) -> None:
+    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
+
+    with (
+        patch("backend.common.storage.get_files", return_value=["existing.json"]),
+        patch("backend.common.storage.read", return_value=b'{"a": 1}'),
+        patch("backend.common.storage.write") as mock_write,
+    ):
+        saving_api._maybe_save_response(url, b'{"a": 2}')
+
+    mock_write.assert_called_once()
+
+
+def test_maybe_save_response_writes_when_no_prior_snapshot(saving_api: FRCAPI) -> None:
+    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
+
+    with (
+        patch("backend.common.storage.get_files", return_value=[]),
+        patch("backend.common.storage.write") as mock_write,
+    ):
+        saving_api._maybe_save_response(url, b'{"a": 1}')
+
+    mock_write.assert_called_once()
