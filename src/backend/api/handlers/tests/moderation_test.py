@@ -876,6 +876,42 @@ def test_accept_robot_cad(
     assert Media.get_by_id("grabcad_some-model") is not None
 
 
+@pytest.mark.parametrize("encode_slashes", [False, True])
+def test_accept_onshape_cad_with_slashes_in_key(
+    api_client: Client,
+    moderator,
+    author: Account,
+    taskqueue_stub,
+    encode_slashes: bool,
+) -> None:
+    # Onshape foreign keys are "<document>/w/<workspace>", so the suggestion
+    # key itself contains slashes and must survive the URL path
+    moderator([AccountPermission.REVIEW_DESIGNS])
+    foreign_key = "c875c6dd493f06b68a2b6358/w/472f4ddbf7f4d1748376be3b"
+    # The real key shape from Suggestion.render_media_key_name, slashes and all
+    suggestion_id = create_suggestion(
+        author,
+        "robot",
+        "frc3414",
+        {
+            "media_type_enum": MediaType.ONSHAPE,
+            "foreign_key": foreign_key,
+            "reference_type": "team",
+            "reference_key": "frc3414",
+            "year": 2024,
+            "details_json": json.dumps({"model_name": "2024 Robot Assembly"}),
+        },
+        suggestion_id=Suggestion.render_media_key_name(
+            2024, "team", "frc3414", "onshape", foreign_key
+        ),
+    )
+    assert "/w/" in suggestion_id
+    path_key = suggestion_id.replace("/", "%2F") if encode_slashes else suggestion_id
+    resp = api_client.post(f"{BASE_URL}/suggestions/{path_key}/accept")
+    assert resp.status_code == 200, resp.data
+    assert Media.get_by_id(f"onshape_{foreign_key}") is not None
+
+
 def test_accept_event_media(
     api_client: Client, moderator, author: Account, event: Event, taskqueue_stub
 ) -> None:
