@@ -306,9 +306,22 @@ def test_iter_keys_by_cache_key_prefix_paginates(ndb_stub) -> None:
         assert f"test_page_{i}:1:5" in keys
 
 
+def test_filtered_cache_key() -> None:
+    assert (
+        CachedQueryResult.filtered_cache_key("event_list_2024:0:6~dictv3.9", "simple")
+        == "event_list_2024:0:6~dictv3.9~simple"
+    )
+    assert (
+        CachedQueryResult.filtered_cache_key("event_list_2024:0:6~dictv3.9", "keys")
+        == "event_list_2024:0:6~dictv3.9~keys"
+    )
+
+
 def test_db_version_from_key_string() -> None:
     assert CachedQueryResult.db_version_from_key_string("abc:2:5") == 5
     assert CachedQueryResult.db_version_from_key_string("abc:2:5~dictv3.0") == 5
+    assert CachedQueryResult.db_version_from_key_string("abc:2:5~dictv3.0~simple") == 5
+    assert CachedQueryResult.db_version_from_key_string("abc:2:5~dictv3.0~keys") == 5
     assert CachedQueryResult.db_version_from_key_string("abc:2:not_an_int") is None
     assert CachedQueryResult.db_version_from_key_string("abc:2") is None
 
@@ -316,6 +329,10 @@ def test_db_version_from_key_string() -> None:
 def test_query_version_from_key_string() -> None:
     assert CachedQueryResult.query_version_from_key_string("abc:2:5") == 2
     assert CachedQueryResult.query_version_from_key_string("abc:2:5~dictv3.0") == 2
+    assert (
+        CachedQueryResult.query_version_from_key_string("abc:2:5~dictv3.0~simple") == 2
+    )
+    assert CachedQueryResult.query_version_from_key_string("abc:2:5~dictv3.0~keys") == 2
     assert CachedQueryResult.query_version_from_key_string("abc:not_an_int:5") is None
     assert CachedQueryResult.query_version_from_key_string("abc") is None
 

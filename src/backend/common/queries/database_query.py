@@ -7,7 +7,18 @@ import logging
 import pickle
 from contextlib import contextmanager
 from contextvars import ContextVar
-from typing import Any, Dict, Generator, Generic, List, Optional, Set, Type, Union
+from typing import (
+    Any,
+    Callable,
+    Dict,
+    Generator,
+    Generic,
+    List,
+    Optional,
+    Set,
+    Type,
+    Union,
+)
 
 import orjson
 from google.appengine.ext import ndb
@@ -140,6 +151,19 @@ class CachedDatabaseQuery(
         subvserion = none_throws(cls.DICT_CONVERTER).SUBVERSIONS[dict_version]
         return f"{cache_key}~dictv{dict_version}.{subvserion}"
 
+    def filtered_dict_cache_key(
+        self, dict_version: ApiMajorVersion, model_type: str
+    ) -> str:
+        return self._filtered_dict_cache_key(self.cache_key, dict_version, model_type)
+
+    @classmethod
+    def _filtered_dict_cache_key(
+        cls, cache_key: str, dict_version: ApiMajorVersion, model_type: str
+    ) -> str:
+        return CachedQueryResult.filtered_cache_key(
+            cls._dict_cache_key(cache_key, dict_version), model_type
+        )
+
     @classmethod
     def _compute_result_hash(cls, result: Any) -> str:
         with Span("query.compute_result_hash") as span:
@@ -177,10 +201,13 @@ class CachedDatabaseQuery(
         for cache_key in cache_keys:
             all_cache_keys.append(cache_key)
             if getattr(cls, "DICT_CONVERTER", None) is not None:
-                all_cache_keys += [
-                    cls._dict_cache_key(cache_key, valid_dict_version)
-                    for valid_dict_version in set(ApiMajorVersion)
-                ]
+                for valid_dict_version in set(ApiMajorVersion):
+                    dict_key = cls._dict_cache_key(cache_key, valid_dict_version)
+                    all_cache_keys.append(dict_key)
+                    for model_type in CachedQueryResult.FILTERED_MODEL_TYPES:
+                        all_cache_keys.append(
+                            CachedQueryResult.filtered_cache_key(dict_key, model_type)
+                        )
         logging.info("Deleting db query cache keys: {}".format(all_cache_keys))
         ndb.delete_multi(
             [ndb.Key(CachedQueryResult, cache_key) for cache_key in all_cache_keys]
@@ -375,29 +402,50 @@ class CachedDatabaseQuery(
             self._record_accessed_cache_key(cache_key, result)
             return result
 
-    def fetch_json(self, version: ApiMajorVersion) -> Optional[bytes]:
-        fut: TypedFuture[Optional[bytes]] = self.fetch_json_async(version)
+    def fetch_json(
+        self,
+        version: ApiMajorVersion,
+        model_type: Optional[str] = None,
+        filter_func: Optional[Callable] = None,
+    ) -> Optional[bytes]:
+        fut: TypedFuture[Optional[bytes]] = self.fetch_json_async(
+            version, model_type=model_type, filter_func=filter_func
+        )
         return fut.get_result()
 
     @ndb.tasklet
     def fetch_json_async(
-        self, version: ApiMajorVersion
+        self,
+        version: ApiMajorVersion,
+        model_type: Optional[str] = None,
+        filter_func: Optional[Callable] = None,
     ) -> Generator[Any, Any, Optional[bytes]]:
         with Span("{}.fetch_json_async".format(self.__class__.__name__)):
-            query_result = yield self._do_json_query(version, **self._query_args)
+            query_result = yield self._do_json_query(
+                version,
+                _model_type=model_type,
+                _filter_func=filter_func,
+                **self._query_args,
+            )
             return query_result
 
     @ndb.tasklet
     def _do_json_query(
-        self, _dict_version: ApiMajorVersion, *args, **kwargs
+        self,
+        _dict_version: ApiMajorVersion,
+        _model_type: Optional[str] = None,
+        _filter_func: Optional[Callable] = None,
+        *args,
+        **kwargs,
     ) -> Generator[Any, Any, Optional[bytes]]:
-        cache_key = (
-            self.dict_cache_key(_dict_version)
-            if self.DICT_CONVERTER is not None
-            else self.cache_key
-        )
+        if _model_type is not None:
+            cache_key = self.filtered_dict_cache_key(_dict_version, _model_type)
+        elif self.DICT_CONVERTER is not None:
+            cache_key = self.dict_cache_key(_dict_version)
+        else:
+            cache_key = self.cache_key
 
-        with Span("{}._do_json_query".format(self.__class__.__name__)):
+        with Span(f"{self.__class__.__name__}._do_json_query"):
             cached_query_result = None
             if self.DICT_CACHING_ENABLED:
                 with Span("query.cache_lookup") as span:
@@ -408,16 +456,35 @@ class CachedDatabaseQuery(
                     span.set_label("cache_hit", str(cached_query_result is not None))
 
             if cached_query_result is None:
-                with Span(f"{self.__class__.__name__}._query_async"):
-                    query_result = yield self._query_async(*args, **kwargs)
+                if _filter_func is not None and _model_type is not None:
+                    dict_cache_key = (
+                        self.dict_cache_key(_dict_version)
+                        if self.DICT_CONVERTER is not None
+                        else self.cache_key
+                    )
+                    converted_result = yield self._do_dict_query(
+                        _dict_version, *args, **kwargs
+                    )
+                    accessed_keys = accessed_query_cache_keys_ctx.get()
+                    if accessed_keys is not None:
+                        accessed_keys.pop(dict_cache_key, None)
+                    if converted_result is None:
+                        self._record_accessed_cache_key(cache_key, None)
+                        return None
+                    with Span("model_query_response.filter_properties") as span:
+                        span.set_label("model_type", _model_type)
+                        converted_result = _filter_func(converted_result, _model_type)
+                else:
+                    with Span(f"{self.__class__.__name__}._query_async"):
+                        query_result = yield self._query_async(*args, **kwargs)
 
-                converted_result = (
-                    none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
-                        query_result
-                    ).convert(_dict_version)
-                    if self.DICT_CONVERTER is not None
-                    else query_result
-                )
+                    converted_result = (
+                        none_throws(self.DICT_CONVERTER)(  # pyre-ignore[45]
+                            query_result
+                        ).convert(_dict_version)
+                        if self.DICT_CONVERTER is not None
+                        else query_result
+                    )
 
                 cqr = None
                 if self.DICT_CACHING_ENABLED and self.CACHE_WRITES_ENABLED:
