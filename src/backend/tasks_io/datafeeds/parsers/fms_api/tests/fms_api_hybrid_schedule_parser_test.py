@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 
+from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
@@ -85,6 +86,103 @@ def test_parse_qual(ndb_stub, test_data_importer) -> None:
         count, clean_matches = MatchHelper.organized_matches(matches)
         assert count == 88
         assert len(clean_matches[CompLevel.QM]) == 88
+
+
+def test_parse_qual_with_none_station(ndb_stub, test_data_importer) -> None:
+    """A team with station=None must not crash the sort (it's later skipped by the
+    `team_station is None: continue` guard). Regression test for a TypeError raised
+    when sorting a mix of None and str station values in Python 3."""
+    event = Event(
+        id="2016nyny",
+        name="NYC Regional",
+        event_type_enum=EventType.REGIONAL,
+        short_name="NYC",
+        event_short="nyny",
+        year=2016,
+        end_date=datetime(2016, 3, 27),
+        official=True,
+        start_date=datetime(2016, 3, 24),
+        timezone_id="America/New_York",
+    )
+    event.put()
+
+    response = {
+        "Schedule": [
+            {
+                "description": "Qualification 1 (A)",
+                "tournamentLevel": "Qualification",
+                "matchNumber": 1,
+                "startTime": "2016-03-12T09:00:00",
+                "actualStartTime": "2016-03-12T09:13:43.473",
+                "scoreRedFinal": 43,
+                "scoreRedFoul": 10,
+                "scoreRedAuto": 4,
+                "scoreBlueFinal": 0,
+                "scoreBlueFoul": 0,
+                "scoreBlueAuto": 0,
+                "Teams": [
+                    {
+                        "teamNumber": 3017,
+                        "station": "Red1",
+                        "surrogate": False,
+                        "dq": False,
+                    },
+                    {
+                        "teamNumber": 2601,
+                        "station": "Red2",
+                        "surrogate": False,
+                        "dq": False,
+                    },
+                    {
+                        "teamNumber": 5891,
+                        "station": "Red3",
+                        "surrogate": False,
+                        "dq": False,
+                    },
+                    {
+                        "teamNumber": 3053,
+                        "station": "Blue1",
+                        "surrogate": False,
+                        "dq": False,
+                    },
+                    {
+                        "teamNumber": 1884,
+                        "station": "Blue2",
+                        "surrogate": False,
+                        "dq": False,
+                    },
+                    {
+                        # Malformed/placeholder upstream row: station is None.
+                        # Must sort deterministically without comparing None to str,
+                        # and is skipped downstream by the `station is None` guard.
+                        "teamNumber": 4383,
+                        "station": None,
+                        "surrogate": False,
+                        "dq": True,
+                    },
+                ],
+            }
+        ]
+    }
+
+    # Round-trip through JSON, matching how the other tests in this file load
+    # fixtures (json.loads returns a loosely-typed Any, same as the real
+    # response coming off the wire).
+    response = json.loads(json.dumps(response))
+
+    # Should not raise TypeError: '<' not supported between instances of
+    # 'NoneType' and 'str'
+    matches, _ = FMSAPIHybridScheduleParser(2016, "nyny").parse(response)
+
+    assert isinstance(matches, list)
+    assert len(matches) == 1
+    match = matches[0]
+    assert match.alliances[AllianceColor.RED]["teams"] == [
+        "frc3017",
+        "frc2601",
+        "frc5891",
+    ]
+    assert match.alliances[AllianceColor.BLUE]["teams"] == ["frc3053", "frc1884"]
 
 
 def test_parse_playoff(ndb_stub, test_data_importer) -> None:
