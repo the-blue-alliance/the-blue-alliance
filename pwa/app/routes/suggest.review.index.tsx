@@ -1,14 +1,15 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
-import { type JSX, useState } from 'react';
-import { Temporal } from 'temporal-polyfill';
+import { type JSX } from 'react';
 
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
+import {
+  ReviewMediaTools,
+  ReviewOffseasonTools,
+} from '~/components/tba/moderation/reviewTools';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
 import { Card } from '~/components/ui/card';
-import { Input } from '~/components/ui/input';
 import { Spinner } from '~/components/ui/spinner';
 import { useModerationQueue } from '~/lib/hooks/useModeration';
 import { suggestionTypeOrderComparator } from '~/lib/moderationUtils';
@@ -16,42 +17,6 @@ import { suggestionTypeOrderComparator } from '~/lib/moderationUtils';
 export const Route = createFileRoute('/suggest/review/')({
   component: SuggestionReviewHome,
 });
-
-// Moderator tools that live on the main site, matching the web review home
-function ReviewMediaTools(): JSX.Element {
-  const [teamNumber, setTeamNumber] = useState('');
-  const year = Temporal.Now.plainDateISO().year;
-  const manageUrl = `https://www.thebluealliance.com/mod?team=${encodeURIComponent(teamNumber)}&year=${year}#frc${encodeURIComponent(teamNumber)}`;
-  return (
-    <div className="flex flex-col gap-2">
-      <h2 className="text-lg font-medium">Review Media Tools</h2>
-      <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          render={
-            <a href="https://www.thebluealliance.com/mod/webcasts">
-              Webcast Dashboard
-            </a>
-          }
-        />
-        <Input
-          className="w-44"
-          inputMode="numeric"
-          pattern="[0-9]+"
-          placeholder="Manage Team Media"
-          value={teamNumber}
-          onChange={(e) => setTeamNumber(e.target.value)}
-        />
-        <Button
-          variant="outline"
-          size="sm"
-          render={<a href={teamNumber ? manageUrl : undefined}>Go</a>}
-        />
-      </div>
-    </div>
-  );
-}
 
 function SuggestionReviewHome(): JSX.Element {
   const { isInitialLoading, user } = useAuth();
@@ -115,6 +80,9 @@ function SuggestionReviewHome(): JSX.Element {
         ))}
       </div>
       {types.includes(SuggestionType.MEDIA) && <ReviewMediaTools />}
+      {types.includes(SuggestionType.OFFSEASON_EVENT) && (
+        <ReviewOffseasonTools />
+      )}
     </div>
   );
 }
