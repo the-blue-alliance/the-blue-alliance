@@ -186,6 +186,12 @@ export const Route = createFileRoute('/event/$eventKey')({
         staleTime: eventStaleTime,
       })
       .catch(() => []);
+    const teamsQuery = queryClient
+      .ensureQueryData({
+        ...getEventTeamsOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
+      .catch(() => []);
 
     const event = await queryClient
       .ensureQueryData({
@@ -240,7 +246,7 @@ export const Route = createFileRoute('/event/$eventKey')({
         .catch(() => undefined);
     }
 
-    await Promise.all([matchesQuery, alliancesQuery]);
+    await Promise.all([matchesQuery, alliancesQuery, teamsQuery]);
 
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
