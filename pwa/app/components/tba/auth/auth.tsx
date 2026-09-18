@@ -17,7 +17,7 @@ import {
 import { flushSync } from 'react-dom';
 
 import { auth } from '~/firebase/firebaseConfig';
-import { shouldForceTokenRefresh } from '~/lib/authRefresh';
+import { createTokenRefresher, shouldRefreshToken } from '~/lib/authRefresh';
 import { createLogger } from '~/lib/utils';
 
 const authLogger = createLogger('auth');
@@ -53,25 +53,25 @@ export function AuthContextProvider({ children }: { children: ReactNode }) {
       authLogger.error({ error }, 'Error resolving sign-in redirect');
     });
 
-    const refreshToken = () => {
+    const refreshCurrentUserToken = createTokenRefresher(
+      () => activeAuth.currentUser,
+    );
+    const refreshTokenIfNeeded = () => {
       if (
-        !shouldForceTokenRefresh(
-          document.visibilityState,
-          !!activeAuth.currentUser,
-        )
+        !shouldRefreshToken(document.visibilityState, !!activeAuth.currentUser)
       )
         return;
-      activeAuth.currentUser?.getIdToken(true).catch((error: unknown) => {
+      refreshCurrentUserToken()?.catch((error: unknown) => {
         authLogger.error({ error }, 'Error refreshing ID token');
       });
     };
-    document.addEventListener('visibilitychange', refreshToken);
-    window.addEventListener('focus', refreshToken);
+    document.addEventListener('visibilitychange', refreshTokenIfNeeded);
+    window.addEventListener('focus', refreshTokenIfNeeded);
 
     return () => {
       unsubscribe();
-      document.removeEventListener('visibilitychange', refreshToken);
-      window.removeEventListener('focus', refreshToken);
+      document.removeEventListener('visibilitychange', refreshTokenIfNeeded);
+      window.removeEventListener('focus', refreshTokenIfNeeded);
     };
   }, []);
 
