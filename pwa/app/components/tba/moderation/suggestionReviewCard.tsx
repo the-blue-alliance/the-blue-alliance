@@ -9,6 +9,7 @@ import type {
   ModerationSuggestion,
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
+import { EventType } from '~/api/tba/read';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -42,11 +43,9 @@ interface SuggestionReviewCardProps {
 // Event types an accepted offseason-event suggestion can become. The API
 // defaults to OFFSEASON when the moderator doesn't choose, so the select
 // shows that default rather than leaving the field blank.
-export const OFFSEASON_EVENT_TYPE = 99;
-export const PRESEASON_EVENT_TYPE = 100;
 export const OFFSEASON_EVENT_TYPE_OPTIONS = [
-  { value: OFFSEASON_EVENT_TYPE, label: 'Offseason' },
-  { value: PRESEASON_EVENT_TYPE, label: 'Preseason' },
+  { value: EventType.OFFSEASON, label: 'Offseason' },
+  { value: EventType.PRESEASON, label: 'Preseason' },
 ] as const;
 
 // The write auth types moderators can grant for api_auth_access suggestions,
@@ -948,7 +947,7 @@ function OffseasonEventDetails({
             className="h-9 rounded-md border border-input bg-transparent px-3
               text-sm"
             aria-label="Event type"
-            value={overrides.event_type_enum ?? OFFSEASON_EVENT_TYPE}
+            value={overrides.event_type_enum ?? EventType.OFFSEASON}
             onChange={(e) =>
               onOverridesChange({
                 ...overrides,

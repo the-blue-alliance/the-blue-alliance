@@ -914,3 +914,64 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         self.assertEqual(entries[0].account, self.account.account_key)
         self.assertEqual(entries[0].endpoint, "team_admin.team_mod_review")
         self.assertEqual(entries[0].target_key, ndb.Key(Team, "frc1124"))
+
+    def test_review_media_permission_forced_team_hides_cad(self):
+        # A REVIEW_MEDIA holder using ?team=&year= may act on media but not
+        # CAD, so the dashboard must not offer CAD rows that would 403
+        self.account.has_permission.return_value = True
+        self.account.permissions = [AccountPermission.REVIEW_MEDIA]
+        media_id = self.createMediaSuggestion()
+        design_id = self.createDesignSuggestion()
+
+        response = self.web_client.get(f"/mod?team=1124&year={self.now.year}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(f"accept::{media_id}".encode(), response.data)
+        self.assertNotIn(f"accept::{design_id}".encode(), response.data)
+        self.assertNotIn(b"Robot CAD Suggestion", response.data)
+
+    def test_review_unapplied_outcome_is_shown_on_dashboard(self):
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+        # Someone else got there first
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        suggestion.review_state = SuggestionState.REVIEW_REJECTED
+        suggestion.put()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        location = urlparse(response.headers["Location"])
+        self.assertEqual(location.path, "/mod")
+        self.assertIn("review_error=", location.query)
+        self.assertIn("already_reviewed", location.query)
+
+        dashboard = self.web_client.get(response.headers["Location"])
+        self.assertIn(b'id="review-error"', dashboard.data)
+        self.assertIn(b"already_reviewed", dashboard.data)
+
+    def test_review_malformed_keys_are_bad_requests(self):
+        self.giveTeamAdminAccess()
+
+        for key in ("", "x" * 501):
+            response = self.web_client.post(
+                "/mod/review", data={"accept_reject-1": f"accept::{key}"}
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_review_audit_log_names_the_suggestion(self):
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+
+        self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"reject::{suggestion_id}"},
+        )
+
+        entries = AuditLogEntry.query().fetch()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].url_args, {"suggestion_key": suggestion_id})
+        self.assertEqual(entries[0].target_key, ndb.Key(Team, "frc1124"))

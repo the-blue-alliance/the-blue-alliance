@@ -8,6 +8,12 @@
 {% block content %}
 <div class="container">
   <h1>Team Admin Dashboard</h1>
+  {% if review_error %}
+  <div class="alert alert-danger" id="review-error">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>A suggestion could not be reviewed:</strong> {{ review_error }}
+  </div>
+  {% endif %}
   <h3>Hi, {{ user.display_name }}, you have administrative access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
   <ul>
     {% for team_link in existing_access %}

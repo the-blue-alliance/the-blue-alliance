@@ -1,8 +1,10 @@
+import logging
 from collections import defaultdict
 from datetime import datetime
-from typing import Any, Dict, List, Optional, Set
+from typing import Any, Dict, List, Optional
 
 from flask import abort, Blueprint, redirect, request, url_for
+from werkzeug.wrappers import Response
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -16,15 +18,21 @@ from backend.common.models.robot import Robot
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
-from backend.common.models.user import User
 from backend.common.queries.media_query import TeamSocialMediaQuery
-from backend.common.suggestions.suggestion_reviewer import SuggestionReviewer
+from backend.common.suggestions.suggestion_reviewer import (
+    SuggestionReviewer,
+    SuggestionReviewResult,
+    TEAM_ADMIN_REVIEWABLE_TYPES,
+)
 from backend.web.decorators import audit_post_mutation, require_login
 from backend.web.profiled_render import render_template
 
 blueprint = Blueprint("team_admin", __name__, url_prefix="/")
 
-ALLOWED_SUGGESTION_TYPES = ["media", "social-media", "robot"]
+# Suggestion types team admins may review for their own team, in display order
+ALLOWED_SUGGESTION_TYPES = sorted(t.value for t in TEAM_ADMIN_REVIEWABLE_TYPES)
+# Datastore key names are limited to 500 bytes; anything longer is not a key
+MAX_KEY_LENGTH = 500
 SUGGESTION_NAMES = {
     "media": "Media",
     "social-media": "Social Media",
@@ -129,9 +137,17 @@ def team_mod():
                     team_num = reference.id()[3:]
                     team_social_medias[int(team_num)].append(media)
 
+    # Only offer suggestions this user can actually act on: a REVIEW_MEDIA
+    # holder using ?team=&year= sees media but not CAD, which needs
+    # REVIEW_DESIGNS
+    delegated_team_keys = SuggestionReviewer.delegated_team_keys(user)
     suggestions_by_team = defaultdict(lambda: defaultdict(list))
     for suggestion in suggestions_future.get_result():
         if not suggestion.target_key:
+            continue
+        if not SuggestionReviewer.user_can_review_suggestion(
+            user, suggestion, delegated_team_keys
+        ):
             continue
         # Assume all the keys are team keys
         team_num = suggestion.target_key[3:]
@@ -152,6 +168,7 @@ def team_mod():
         "year_jump_current_year": (
             forced_year_int if has_valid_forced_team_year else None
         ),
+        "review_error": request.args.get("review_error"),
     }
 
     return render_template("team_admin_dashboard.html", template_values)
@@ -238,19 +255,9 @@ def team_mod_post():
         return redirect(url_for(".team_mod"))
 
 
-def _delegated_team_keys(user: User) -> Set[str]:
-    """Team keys (e.g. "frc254") the user currently holds TeamAdminAccess for."""
-    now = datetime.now()
-    access = TeamAdminAccess.query(
-        TeamAdminAccess.account == user.account_key,
-        TeamAdminAccess.expiration > now,
-    ).fetch()
-    return {f"frc{a.team_number}" for a in access}
-
-
 @blueprint.route("/mod/review", methods=["POST"])
 @require_login
-def team_mod_review():
+def team_mod_review() -> Response:
     """
     Accept/reject pending suggestions from the team admin dashboard. The form
     posts one accept_reject-<id> radio per suggestion (accept::<id> or
@@ -258,7 +265,6 @@ def team_mod_review():
     optional year-<id> overrides.
     """
     user = none_throws(current_user())
-    delegated_team_keys = _delegated_team_keys(user)
 
     accept_keys: List[str] = []
     reject_keys: List[str] = []
@@ -267,6 +273,8 @@ def team_mod_review():
         if len(split_value) != 2:
             continue
         verdict, key = split_value
+        if not key or len(key) > MAX_KEY_LENGTH:
+            abort(400)
         if verdict == "accept":
             accept_keys.append(key)
         elif verdict == "reject":
@@ -274,16 +282,19 @@ def team_mod_review():
 
     # Authorize everything up front so a single unauthorized suggestion in
     # the batch rejects the whole request instead of partially applying it
-    for key in accept_keys + reject_keys:
-        suggestion = Suggestion.get_by_id(key)
+    all_keys = accept_keys + reject_keys
+    suggestions = ndb.get_multi([ndb.Key(Suggestion, key) for key in all_keys])
+    delegated_team_keys = SuggestionReviewer.delegated_team_keys(user)
+    for suggestion in suggestions:
         if suggestion is None:
-            return abort(400)
+            abort(400)
         if not SuggestionReviewer.user_can_review_suggestion(
             user, suggestion, delegated_team_keys
         ):
-            return abort(403)
+            abort(403)
 
     preferred_keys = set(request.form.getlist("preferred_keys[]"))
+    outcomes = []
     for key in accept_keys:
         overrides: Dict[str, Any] = {
             # Team admins choose explicitly via the checkbox; the box is
@@ -294,24 +305,50 @@ def team_mod_review():
         year = request.form.get(f"year-{key}")
         if year:
             overrides["year"] = year
-        # Already-reviewed or invalid suggestions are skipped, as the retired
-        # review controllers did; the dashboard re-renders whatever is left
-        SuggestionReviewer.accept_suggestion(
-            key,
-            user,
-            overrides=overrides,
-            endpoint=request.endpoint or "",
-            delegated_team_keys=delegated_team_keys,
+        outcomes.append(
+            SuggestionReviewer.accept_suggestion(
+                key,
+                user,
+                overrides=overrides,
+                endpoint=request.endpoint or "",
+                delegated_team_keys=delegated_team_keys,
+            )
         )
 
     if reject_keys:
-        SuggestionReviewer.reject_suggestions(
-            reject_keys,
-            user,
-            endpoint=request.endpoint or "",
-            delegated_team_keys=delegated_team_keys,
+        outcomes.extend(
+            SuggestionReviewer.reject_suggestions(
+                reject_keys,
+                user,
+                endpoint=request.endpoint or "",
+                delegated_team_keys=delegated_team_keys,
+            )
         )
 
+    # Anything that was not applied (already reviewed by someone else, or an
+    # accept the reviewer could not complete) is shown on the dashboard
+    # instead of vanishing into a redirect
+    problems = [
+        o
+        for o in outcomes
+        if o.result
+        not in (SuggestionReviewResult.ACCEPTED, SuggestionReviewResult.REJECTED)
+    ]
+    if problems:
+        first = problems[0]
+        logging.warning(
+            f"/mod/review: {len(problems)} of {len(outcomes)} suggestions not "
+            f"applied; first: {first.suggestion_key} {first.result.value} "
+            f"{first.message or ''}"
+        )
+        return redirect(
+            url_for(
+                ".team_mod",
+                review_error=(
+                    f"{first.suggestion_key}: {first.message or first.result.value}"
+                ),
+            )
+        )
     return redirect(url_for(".team_mod"))
 
 

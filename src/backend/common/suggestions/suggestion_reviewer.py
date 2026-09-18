@@ -3,7 +3,17 @@ import enum
 import json
 import random
 import string
-from typing import AbstractSet, Any, Dict, FrozenSet, List, NamedTuple, Optional, Tuple
+from typing import (
+    AbstractSet,
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+)
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -26,6 +36,7 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
+from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.models.user import User
 from backend.common.models.webcast import Webcast
 from backend.common.suggestions.media_creator import MediaCreator
@@ -107,26 +118,41 @@ class SuggestionReviewer:
         return required in (user.permissions or [])
 
     @classmethod
+    def delegated_team_keys(cls, user: User) -> Set[str]:
+        """Team keys (e.g. "frc254") the user holds unexpired TeamAdminAccess for."""
+        access = TeamAdminAccess.query(
+            TeamAdminAccess.account == user.account_key,
+            TeamAdminAccess.expiration > datetime.datetime.now(),
+        ).fetch()
+        return {f"frc{a.team_number}" for a in access}
+
+    @classmethod
     def user_can_review_suggestion(
         cls,
         user: User,
         suggestion: Suggestion,
-        delegated_team_keys: AbstractSet[str] = frozenset(),
+        delegated_team_keys: Optional[AbstractSet[str]] = None,
     ) -> bool:
         """
         Whether the user may review this specific suggestion: either they hold
-        the site-wide permission for its type, or the suggestion targets one
-        of the teams in `delegated_team_keys` (e.g. "frc254") and is a type
-        that team admins are allowed to review for their own team.
+        the site-wide permission for its type, or they are a team admin for
+        the team it targets and it is a type team admins may review.
+
+        Team admin access is looked up when needed; callers checking many
+        suggestions can pass `delegated_team_keys` from delegated_team_keys()
+        to do that lookup once.
         """
         suggestion_type = SuggestionType(suggestion.target_model)
         if cls.user_can_review(user, suggestion_type):
             return True
-        return (
-            suggestion_type in TEAM_ADMIN_REVIEWABLE_TYPES
-            and suggestion.target_key is not None
-            and suggestion.target_key in delegated_team_keys
-        )
+        if (
+            suggestion_type not in TEAM_ADMIN_REVIEWABLE_TYPES
+            or not suggestion.target_key
+        ):
+            return False
+        if delegated_team_keys is None:
+            delegated_team_keys = cls.delegated_team_keys(user)
+        return suggestion.target_key in delegated_team_keys
 
     @classmethod
     def accept_suggestion(
@@ -135,7 +161,7 @@ class SuggestionReviewer:
         user: User,
         overrides: Optional[Dict[str, Any]] = None,
         endpoint: str = "",
-        delegated_team_keys: AbstractSet[str] = frozenset(),
+        delegated_team_keys: Optional[AbstractSet[str]] = None,
     ) -> ReviewOutcome:
         """Accept a single pending Suggestion, creating its target model."""
         suggestion = cls._get_suggestion(suggestion_key)
@@ -200,12 +226,15 @@ class SuggestionReviewer:
         suggestion_keys: List[str],
         user: User,
         endpoint: str = "",
-        delegated_team_keys: AbstractSet[str] = frozenset(),
+        delegated_team_keys: Optional[AbstractSet[str]] = None,
     ) -> List[ReviewOutcome]:
         """
         Reject a batch of pending Suggestions. Each rejection runs in its own
         transaction; rejects create/delete no domain entities.
         """
+        if delegated_team_keys is None and not user.is_admin:
+            # One lookup for the whole batch
+            delegated_team_keys = cls.delegated_team_keys(user)
         outcomes = []
         for suggestion_key in suggestion_keys:
             suggestion = cls._get_suggestion(suggestion_key)
@@ -422,9 +451,13 @@ class SuggestionReviewer:
         if Event.get_by_id(event_key):
             return None, f"Event {event_key} already exists"
 
-        first_code = overrides.get("first_code") or contents.get("first_code")
-        if first_code:
-            first_code = first_code.upper()
+        # Pasted codes arrive with stray whitespace; " iri " must match IRI
+        first_code = (
+            str(overrides.get("first_code") or contents.get("first_code") or "")
+            .strip()
+            .upper()
+            or None
+        )
         event_type_enum = EventType(
             int(overrides.get("event_type_enum", EventType.OFFSEASON))
         )
@@ -446,7 +479,7 @@ class SuggestionReviewer:
             website=overrides.get("website") or contents.get("website"),
             year=year,
             first_code=first_code,
-            official=(first_code is not None and first_code != ""),
+            official=first_code is not None,
         )
         EventManipulator.createOrUpdate(event)
         return event_key, None
@@ -543,7 +576,8 @@ class SuggestionReviewer:
             account=user.account_key,
             endpoint=endpoint,
             target_key=target_key,
-            url_args={},
+            # The target is the team/event; record which suggestion was acted on
+            url_args={"suggestion_key": str(none_throws(suggestion.key).id())},
             form_params={
                 str(k): [str(v)] for k, v in overrides.items() if v is not None
             },

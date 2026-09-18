@@ -1,3 +1,4 @@
+import datetime
 from typing import List
 from unittest.mock import Mock
 
@@ -12,6 +13,7 @@ from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
+from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.models.user import User
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
 from backend.common.suggestions.suggestion_reviewer import (
@@ -28,6 +30,17 @@ def _make_user(permissions: List[AccountPermission], is_admin: bool = False) -> 
     user.permissions = permissions
     user.account_key = account_key
     return user
+
+
+def _grant_team_admin(user: User, team_number: int, expired: bool = False) -> None:
+    TeamAdminAccess(
+        id=f"access_{team_number}",
+        team_number=team_number,
+        year=2026,
+        expiration=datetime.datetime.now()
+        + datetime.timedelta(days=-1 if expired else 1),
+        account=user.account_key,
+    ).put()
 
 
 def _pending_suggestion(target_model: str, target_key: str) -> Suggestion:
@@ -79,29 +92,50 @@ def test_no_permission_no_delegation_cannot_review(ndb_stub) -> None:
 
 def test_delegated_team_admin_can_review_own_team(ndb_stub) -> None:
     user = _make_user([])
+    _grant_team_admin(user, 254)
     for target_model in ("media", "social-media", "robot"):
         suggestion = _pending_suggestion(target_model, "frc254")
+        # Looked up from TeamAdminAccess when the caller passes nothing
         assert SuggestionReviewer.user_can_review_suggestion(
-            user, suggestion, delegated_team_keys={"frc254"}
+            user, suggestion
         ), target_model
+
+
+def test_delegated_team_keys_ignores_expired_access(ndb_stub) -> None:
+    user = _make_user([])
+    _grant_team_admin(user, 254, expired=True)
+    assert SuggestionReviewer.delegated_team_keys(user) == set()
+    suggestion = _pending_suggestion("media", "frc254")
+    assert not SuggestionReviewer.user_can_review_suggestion(user, suggestion)
+
+
+def test_precomputed_delegation_is_honored_without_a_lookup(ndb_stub) -> None:
+    user = _make_user([])
+    suggestion = _pending_suggestion("media", "frc254")
+    assert SuggestionReviewer.user_can_review_suggestion(
+        user, suggestion, delegated_team_keys={"frc254"}
+    )
+    assert not SuggestionReviewer.user_can_review_suggestion(
+        user, suggestion, delegated_team_keys=set()
+    )
 
 
 def test_delegated_team_admin_cannot_review_other_team(ndb_stub) -> None:
     user = _make_user([])
+    _grant_team_admin(user, 254)
     suggestion = _pending_suggestion("media", "frc1678")
-    assert not SuggestionReviewer.user_can_review_suggestion(
-        user, suggestion, delegated_team_keys={"frc254"}
-    )
+    assert not SuggestionReviewer.user_can_review_suggestion(user, suggestion)
 
 
 def test_delegated_team_admin_cannot_review_non_team_types(ndb_stub) -> None:
     # Even if a suggestion's target key happens to match, delegation only
     # covers the team-targeted suggestion types
     user = _make_user([])
+    _grant_team_admin(user, 254)
     for target_model in ("match", "event", "event_media", "offseason-event"):
         suggestion = _pending_suggestion(target_model, "frc254")
         assert not SuggestionReviewer.user_can_review_suggestion(
-            user, suggestion, delegated_team_keys={"frc254"}
+            user, suggestion
         ), target_model
 
 
@@ -109,14 +143,14 @@ def test_delegated_team_admin_cannot_review_suggestion_without_target(
     ndb_stub,
 ) -> None:
     user = _make_user([])
+    _grant_team_admin(user, 254)
     suggestion = _pending_suggestion("media", None)  # pyre-ignore[6]
-    assert not SuggestionReviewer.user_can_review_suggestion(
-        user, suggestion, delegated_team_keys={"frc254"}
-    )
+    assert not SuggestionReviewer.user_can_review_suggestion(user, suggestion)
 
 
 def test_accept_with_delegation(ndb_stub, taskqueue_stub) -> None:
     user = _make_user([])
+    _grant_team_admin(user, 1124)
     suggestion_id = _create_media_suggestion("frc1124")
 
     outcome = SuggestionReviewer.accept_suggestion(
@@ -124,7 +158,6 @@ def test_accept_with_delegation(ndb_stub, taskqueue_stub) -> None:
         user,
         overrides={"set_preferred": True},
         endpoint="team_admin.team_mod_review",
-        delegated_team_keys={"frc1124"},
     )
 
     assert outcome.result == SuggestionReviewResult.ACCEPTED
@@ -137,15 +170,16 @@ def test_accept_with_delegation(ndb_stub, taskqueue_stub) -> None:
     audit_entries = AuditLogEntry.query().fetch()
     assert len(audit_entries) == 1
     assert audit_entries[0].endpoint == "team_admin.team_mod_review"
+    # The target is the team; the entry must still say which suggestion
+    assert audit_entries[0].url_args == {"suggestion_key": suggestion_id}
 
 
 def test_accept_forbidden_for_other_team(ndb_stub, taskqueue_stub) -> None:
     user = _make_user([])
+    _grant_team_admin(user, 254)
     suggestion_id = _create_media_suggestion("frc1124")
 
-    outcome = SuggestionReviewer.accept_suggestion(
-        suggestion_id, user, delegated_team_keys={"frc254"}
-    )
+    outcome = SuggestionReviewer.accept_suggestion(suggestion_id, user)
 
     assert outcome.result == SuggestionReviewResult.FORBIDDEN
     suggestion = none_throws(Suggestion.get_by_id(suggestion_id))
@@ -155,26 +189,83 @@ def test_accept_forbidden_for_other_team(ndb_stub, taskqueue_stub) -> None:
 
 def test_reject_with_delegation(ndb_stub, taskqueue_stub) -> None:
     user = _make_user([])
+    _grant_team_admin(user, 1124)
     suggestion_id = _create_media_suggestion("frc1124")
 
-    outcomes = SuggestionReviewer.reject_suggestions(
-        [suggestion_id], user, delegated_team_keys={"frc1124"}
-    )
+    outcomes = SuggestionReviewer.reject_suggestions([suggestion_id], user)
 
     assert [o.result for o in outcomes] == [SuggestionReviewResult.REJECTED]
     suggestion = none_throws(Suggestion.get_by_id(suggestion_id))
     assert suggestion.review_state == SuggestionState.REVIEW_REJECTED
     assert Media.query().count() == 0
+    audit_entries = AuditLogEntry.query().fetch()
+    assert len(audit_entries) == 1
+    assert audit_entries[0].url_args == {"suggestion_key": suggestion_id}
 
 
 def test_reject_forbidden_for_other_team(ndb_stub, taskqueue_stub) -> None:
     user = _make_user([])
+    _grant_team_admin(user, 254)
     suggestion_id = _create_media_suggestion("frc1124")
 
-    outcomes = SuggestionReviewer.reject_suggestions(
-        [suggestion_id], user, delegated_team_keys={"frc254"}
-    )
+    outcomes = SuggestionReviewer.reject_suggestions([suggestion_id], user)
 
     assert [o.result for o in outcomes] == [SuggestionReviewResult.FORBIDDEN]
     suggestion = none_throws(Suggestion.get_by_id(suggestion_id))
     assert suggestion.review_state == SuggestionState.REVIEW_PENDING
+
+
+def test_offseason_first_code_is_stripped_and_uppercased(
+    ndb_stub, taskqueue_stub
+) -> None:
+    user = _make_user([AccountPermission.REVIEW_OFFSEASON_EVENTS])
+    suggestion = Suggestion(
+        id=77,
+        author=ndb.Key(Account, "author"),
+        target_model="offseason-event",
+        review_state=SuggestionState.REVIEW_PENDING,
+    )
+    suggestion.contents = {
+        "name": "Indiana Robotics Invitational",
+        "start_date": "2026-07-16",
+        "end_date": "2026-07-18",
+    }
+    suggestion.put()
+
+    outcome = SuggestionReviewer.accept_suggestion(
+        "77", user, overrides={"event_short": "iri", "first_code": " iri "}
+    )
+
+    assert outcome.result == SuggestionReviewResult.ACCEPTED
+    from backend.common.models.event import Event
+
+    event = none_throws(Event.get_by_id("2026iri"))
+    assert event.first_code == "IRI"
+    assert event.official is True
+
+
+def test_offseason_blank_first_code_is_unofficial(ndb_stub, taskqueue_stub) -> None:
+    user = _make_user([AccountPermission.REVIEW_OFFSEASON_EVENTS])
+    suggestion = Suggestion(
+        id=78,
+        author=ndb.Key(Account, "author"),
+        target_model="offseason-event",
+        review_state=SuggestionState.REVIEW_PENDING,
+    )
+    suggestion.contents = {
+        "name": "Local Offseason",
+        "start_date": "2026-07-16",
+        "end_date": "2026-07-18",
+    }
+    suggestion.put()
+
+    outcome = SuggestionReviewer.accept_suggestion(
+        "78", user, overrides={"event_short": "local", "first_code": "   "}
+    )
+
+    assert outcome.result == SuggestionReviewResult.ACCEPTED
+    from backend.common.models.event import Event
+
+    event = none_throws(Event.get_by_id("2026local"))
+    assert event.first_code is None
+    assert event.official is False
