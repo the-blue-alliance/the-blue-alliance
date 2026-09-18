@@ -269,3 +269,117 @@ def test_offseason_blank_first_code_is_unofficial(ndb_stub, taskqueue_stub) -> N
     event = none_throws(Event.get_by_id("2026local"))
     assert event.first_code is None
     assert event.official is False
+
+
+def test_offseason_cleared_first_code_makes_event_unofficial(
+    ndb_stub, taskqueue_stub
+) -> None:
+    # The suggester supplied a code; the reviewer cleared the field
+    user = _make_user([AccountPermission.REVIEW_OFFSEASON_EVENTS])
+    suggestion = Suggestion(
+        id=79,
+        author=ndb.Key(Account, "author"),
+        target_model="offseason-event",
+        review_state=SuggestionState.REVIEW_PENDING,
+    )
+    suggestion.contents = {
+        "name": "Not Actually Official",
+        "start_date": "2026-07-16",
+        "end_date": "2026-07-18",
+        "first_code": "IRI",
+    }
+    suggestion.put()
+
+    outcome = SuggestionReviewer.accept_suggestion(
+        "79", user, overrides={"event_short": "nao", "first_code": ""}
+    )
+
+    assert outcome.result == SuggestionReviewResult.ACCEPTED
+    from backend.common.models.event import Event
+
+    event = none_throws(Event.get_by_id("2026nao"))
+    assert event.first_code is None
+    assert event.official is False
+
+
+def test_offseason_untouched_first_code_keeps_suggested_code(
+    ndb_stub, taskqueue_stub
+) -> None:
+    user = _make_user([AccountPermission.REVIEW_OFFSEASON_EVENTS])
+    suggestion = Suggestion(
+        id=80,
+        author=ndb.Key(Account, "author"),
+        target_model="offseason-event",
+        review_state=SuggestionState.REVIEW_PENDING,
+    )
+    suggestion.contents = {
+        "name": "Indiana Robotics Invitational",
+        "start_date": "2026-07-16",
+        "end_date": "2026-07-18",
+        "first_code": "iri",
+    }
+    suggestion.put()
+
+    outcome = SuggestionReviewer.accept_suggestion(
+        "80", user, overrides={"event_short": "iri"}
+    )
+
+    assert outcome.result == SuggestionReviewResult.ACCEPTED
+    from backend.common.models.event import Event
+
+    event = none_throws(Event.get_by_id("2026iri"))
+    assert event.first_code == "IRI"
+    assert event.official is True
+
+
+def test_offseason_event_type_defaults_from_the_suggestion(
+    ndb_stub, taskqueue_stub
+) -> None:
+    from backend.common.consts.event_type import EventType
+    from backend.common.models.event import Event
+
+    user = _make_user([AccountPermission.REVIEW_OFFSEASON_EVENTS])
+    suggestion = Suggestion(
+        id=81,
+        author=ndb.Key(Account, "author"),
+        target_model="offseason-event",
+        review_state=SuggestionState.REVIEW_PENDING,
+    )
+    # A January event: the suggestion creator already marked it preseason
+    suggestion.contents = {
+        "name": "Week Zero",
+        "start_date": "2026-01-10",
+        "end_date": "2026-01-10",
+        "event_type": EventType.PRESEASON,
+    }
+    suggestion.put()
+
+    outcome = SuggestionReviewer.accept_suggestion(
+        "81", user, overrides={"event_short": "wz"}
+    )
+    assert outcome.result == SuggestionReviewResult.ACCEPTED
+    assert none_throws(Event.get_by_id("2026wz")).event_type_enum == EventType.PRESEASON
+
+    # An explicit override still wins
+    suggestion2 = Suggestion(
+        id=82,
+        author=ndb.Key(Account, "author"),
+        target_model="offseason-event",
+        review_state=SuggestionState.REVIEW_PENDING,
+    )
+    suggestion2.contents = {
+        "name": "Week Zero",
+        "start_date": "2026-01-10",
+        "end_date": "2026-01-10",
+        "event_type": EventType.PRESEASON,
+    }
+    suggestion2.put()
+    outcome = SuggestionReviewer.accept_suggestion(
+        "82",
+        user,
+        overrides={"event_short": "wz2", "event_type_enum": int(EventType.OFFSEASON)},
+    )
+    assert outcome.result == SuggestionReviewResult.ACCEPTED
+    assert (
+        none_throws(Event.get_by_id("2026wz2")).event_type_enum == EventType.OFFSEASON
+    )

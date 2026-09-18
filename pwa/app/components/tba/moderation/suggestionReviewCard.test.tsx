@@ -8,7 +8,10 @@ import type {
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import { EventType } from '~/api/tba/read';
-import { SuggestionReviewCard } from '~/components/tba/moderation/suggestionReviewCard';
+import {
+  SuggestionReviewCard,
+  suggestedEventType,
+} from '~/components/tba/moderation/suggestionReviewCard';
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -50,7 +53,26 @@ const OFFSEASON_SUGGESTION = {
 } as unknown as ModerationSuggestion;
 
 describe('SuggestionReviewCard offseason event', () => {
-  test('defaults the event type select to Offseason, matching the API', () => {
+  test('defaults the event type select to the type the suggestion carries', () => {
+    const preseason = {
+      ...OFFSEASON_SUGGESTION,
+      contents: { ...OFFSEASON_SUGGESTION.contents, event_type: 100 },
+    } as unknown as ModerationSuggestion;
+    render(
+      <SuggestionReviewCard
+        suggestion={preseason}
+        decision={undefined}
+        onDecisionChange={() => {}}
+        overrides={{}}
+        onOverridesChange={() => {}}
+      />,
+    );
+
+    const select = screen.getByLabelText('Event type') as HTMLSelectElement;
+    expect(Number(select.value)).toBe(EventType.PRESEASON);
+  });
+
+  test('defaults the event type select to Offseason when the suggestion has no type', () => {
     render(
       <SuggestionReviewCard
         suggestion={OFFSEASON_SUGGESTION}
@@ -103,5 +125,13 @@ describe('SuggestionReviewCard offseason event', () => {
 
     const select = screen.getByLabelText('Event type') as HTMLSelectElement;
     expect(Number(select.value)).toBe(EventType.PRESEASON);
+  });
+});
+
+describe('suggestedEventType', () => {
+  test('reads the preseason marker and falls back to offseason', () => {
+    expect(suggestedEventType('100')).toBe(EventType.PRESEASON);
+    expect(suggestedEventType('99')).toBe(EventType.OFFSEASON);
+    expect(suggestedEventType('')).toBe(EventType.OFFSEASON);
   });
 });

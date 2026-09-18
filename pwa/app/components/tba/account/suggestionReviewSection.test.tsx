@@ -42,17 +42,21 @@ describe('SuggestionReviewSection', () => {
     expect(container.innerHTML).toBe('');
   });
 
-  test('renders nothing while loading or when the request fails', () => {
+  test('renders nothing while loading', () => {
     mockQueue.mockReturnValue({
       data: undefined,
       error: null,
     } as unknown as ReturnType<typeof useModerationQueue>);
-    expect(render(<SuggestionReviewSection />).container.innerHTML).toBe('');
 
+    expect(render(<SuggestionReviewSection />).container.innerHTML).toBe('');
+  });
+
+  test('renders nothing when the request fails', () => {
     mockQueue.mockReturnValue({
       data: undefined,
       error: new Error('boom'),
     } as unknown as ReturnType<typeof useModerationQueue>);
+
     expect(render(<SuggestionReviewSection />).container.innerHTML).toBe('');
   });
 });

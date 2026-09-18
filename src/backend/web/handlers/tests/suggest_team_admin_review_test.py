@@ -956,7 +956,8 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
     def test_review_malformed_keys_are_bad_requests(self):
         self.giveTeamAdminAccess()
 
-        for key in ("", "x" * 501):
+        # Empty, too long in bytes, and too long only once UTF-8 encoded
+        for key in ("", "x" * 501, "\U0001f600" * 130):
             response = self.web_client.post(
                 "/mod/review", data={"accept_reject-1": f"accept::{key}"}
             )
@@ -975,3 +976,63 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         self.assertEqual(len(entries), 1)
         self.assertEqual(entries[0].url_args, {"suggestion_key": suggestion_id})
         self.assertEqual(entries[0].target_key, ndb.Key(Team, "frc1124"))
+
+    def test_review_returns_forced_team_viewer_to_their_view(self):
+        # A REVIEW_MEDIA holder with no TeamAdminAccess rows arrived via
+        # ?team=&year=; a bare /mod would bounce them to /mod/redeem
+        self.account.has_permission.return_value = True
+        self.account.permissions = [AccountPermission.REVIEW_MEDIA]
+        suggestion_id = self.createMediaSuggestion()
+
+        page = self.web_client.get(f"/mod?team=1124&year={self.now.year}")
+        self.assertIn(b'name="team" value="1124"', page.data)
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={
+                f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}",
+                "team": "1124",
+                "year": str(self.now.year),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        location = urlparse(response.headers["Location"])
+        self.assertEqual(location.path, "/mod")
+        self.assertIn("team=1124", location.query)
+        self.assertIn(f"year={self.now.year}", location.query)
+        dashboard = self.web_client.get(response.headers["Location"])
+        self.assertEqual(dashboard.status_code, 200)
+
+    def test_review_reports_every_unapplied_outcome(self):
+        self.giveTeamAdminAccess()
+        first_id = self.createMediaSuggestion()
+        Team(id="frc1124", team_number=1124).put()
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.account_key,
+            "http://imgur.com/second",
+            "frc1124",
+            str(self.now.year),
+        ).get_result()
+        self.assertEqual(status[0], "success")
+        second_id = [
+            k.id()
+            for k in Suggestion.query().fetch(keys_only=True)
+            if k.id() != first_id
+        ][0]
+        for suggestion_id in (first_id, second_id):
+            suggestion = Suggestion.get_by_id(suggestion_id)
+            suggestion.review_state = SuggestionState.REVIEW_REJECTED
+            suggestion.put()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={
+                f"accept_reject-{first_id}": f"accept::{first_id}",
+                f"accept_reject-{second_id}": f"reject::{second_id}",
+            },
+        )
+
+        location = urlparse(response.headers["Location"])
+        self.assertIn(first_id, location.query)
+        self.assertIn(second_id, location.query)

@@ -7,6 +7,7 @@ import {
   formatAuthorReputation,
   formatEventDateRange,
   groupSuggestionsByTargetKey,
+  isNotModeratorResponse,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
   socialProfileWarning,
@@ -322,5 +323,30 @@ describe('matchVideoDurationWarning', () => {
   test('no warning when duration is unknown', () => {
     expect(matchVideoDurationWarning(undefined, 'abc123')).toBeUndefined();
     expect(matchVideoDurationWarning(null, 'abc123')).toBeUndefined();
+  });
+});
+
+describe('isNotModeratorResponse', () => {
+  test('treats a permission 403 as "not a moderator"', () => {
+    expect(
+      isNotModeratorResponse(403, {
+        Error: 'Reviewing suggestions requires a review permission',
+      }),
+    ).toBe(true);
+    expect(isNotModeratorResponse(403, undefined)).toBe(true);
+  });
+
+  test('does not hide the unverified-email 403', () => {
+    expect(
+      isNotModeratorResponse(403, {
+        Error: 'Moderation requires a verified email on your sign-in provider.',
+      }),
+    ).toBe(false);
+  });
+
+  test('is false for any other status', () => {
+    expect(isNotModeratorResponse(401, { Error: 'x' })).toBe(false);
+    expect(isNotModeratorResponse(500, {})).toBe(false);
+    expect(isNotModeratorResponse(undefined, undefined)).toBe(false);
   });
 });

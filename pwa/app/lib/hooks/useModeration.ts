@@ -14,6 +14,7 @@ import type {
 } from '~/api/tba/moderation/types.gen';
 import { ReviewResult } from '~/api/tba/moderation/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
+import { isNotModeratorResponse } from '~/lib/moderationUtils';
 
 export interface ReviewDecisions {
   accepts: { key: string; overrides: AcceptRequest }[];
@@ -45,7 +46,7 @@ export function useModerationQueue() {
       if (response.data) {
         return response.data;
       }
-      if (response.response?.status === 403) {
+      if (isNotModeratorResponse(response.response?.status, response.error)) {
         return null;
       }
       throw response.error ?? new Error('Failed to load moderation queue');

@@ -40,13 +40,21 @@ interface SuggestionReviewCardProps {
   focused?: boolean;
 }
 
-// Event types an accepted offseason-event suggestion can become. The API
-// defaults to OFFSEASON when the moderator doesn't choose, so the select
-// shows that default rather than leaving the field blank.
+// Event types an accepted offseason-event suggestion can become. The
+// suggestion carries a type derived from its dates (Jan/Feb -> preseason);
+// the API uses that unless the moderator overrides it, so the select shows
+// the same default.
 export const OFFSEASON_EVENT_TYPE_OPTIONS = [
   { value: EventType.OFFSEASON, label: 'Offseason' },
   { value: EventType.PRESEASON, label: 'Preseason' },
 ] as const;
+
+export function suggestedEventType(contentsEventType: string): number {
+  const parsed = Number(contentsEventType);
+  return parsed === EventType.PRESEASON
+    ? EventType.PRESEASON
+    : EventType.OFFSEASON;
+}
 
 // The write auth types moderators can grant for api_auth_access suggestions,
 // mirroring AuthType / WRITE_TYPE_NAMES on the backend
@@ -947,7 +955,10 @@ function OffseasonEventDetails({
             className="h-9 rounded-md border border-input bg-transparent px-3
               text-sm"
             aria-label="Event type"
-            value={overrides.event_type_enum ?? EventType.OFFSEASON}
+            value={
+              overrides.event_type_enum ??
+              suggestedEventType(contentsString(suggestion, 'event_type'))
+            }
             onChange={(e) =>
               onOverridesChange({
                 ...overrides,

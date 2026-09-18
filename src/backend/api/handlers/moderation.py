@@ -167,8 +167,15 @@ def moderation_suggestion_accept(suggestion_key: str) -> Response:
             jsonify({"Error": "Request body must be a JSON object"}), 400
         )
 
+    # The API authorizes by AccountPermission only; team-admin delegation
+    # (/mod) is not offered here because the list/queue endpoints don't
+    # know about it either
     outcome = SuggestionReviewer.accept_suggestion(
-        suggestion_key, user, overrides=overrides, endpoint=request.endpoint or ""
+        suggestion_key,
+        user,
+        overrides=overrides,
+        endpoint=request.endpoint or "",
+        delegated_team_keys=frozenset(),
     )
     if outcome.result == SuggestionReviewResult.ACCEPTED:
         _send_apiwrite_review_alert(
@@ -209,7 +216,10 @@ def moderation_suggestions_reject() -> Response:
         )
 
     outcomes = SuggestionReviewer.reject_suggestions(
-        suggestion_keys, user, endpoint=request.endpoint or ""
+        suggestion_keys,
+        user,
+        endpoint=request.endpoint or "",
+        delegated_team_keys=frozenset(),
     )
     for outcome in outcomes:
         if outcome.result == SuggestionReviewResult.REJECTED:
