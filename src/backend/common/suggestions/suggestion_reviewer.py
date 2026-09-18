@@ -232,9 +232,6 @@ class SuggestionReviewer:
         Reject a batch of pending Suggestions. Each rejection runs in its own
         transaction; rejects create/delete no domain entities.
         """
-        if delegated_team_keys is None and not user.is_admin:
-            # One lookup for the whole batch
-            delegated_team_keys = cls.delegated_team_keys(user)
         outcomes = []
         for suggestion_key in suggestion_keys:
             suggestion = cls._get_suggestion(suggestion_key)
@@ -451,15 +448,23 @@ class SuggestionReviewer:
         if Event.get_by_id(event_key):
             return None, f"Event {event_key} already exists"
 
-        # Pasted codes arrive with stray whitespace; " iri " must match IRI
-        first_code = (
-            str(overrides.get("first_code") or contents.get("first_code") or "")
-            .strip()
-            .upper()
-            or None
+        # A reviewer who clears the field means "unofficial", so only fall
+        # back to the suggested code when they didn't touch it. Pasted codes
+        # arrive with stray whitespace; " iri " must match IRI.
+        raw_first_code = (
+            overrides["first_code"]
+            if "first_code" in overrides
+            else contents.get("first_code")
         )
+        first_code = str(raw_first_code or "").strip().upper() or None
+        # The suggestion already carries a type derived from its dates
+        # (January/February -> preseason); the reviewer may override it
         event_type_enum = EventType(
-            int(overrides.get("event_type_enum", EventType.OFFSEASON))
+            int(
+                overrides.get(
+                    "event_type_enum", contents.get("event_type", EventType.OFFSEASON)
+                )
+            )
         )
 
         event = Event(

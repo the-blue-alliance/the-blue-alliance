@@ -312,3 +312,18 @@ export function defaultSetPreferred(suggestion: {
  * deliberate exception, not the default.
  */
 export const DEFAULT_EXPIRATION_DAYS = 7;
+
+// The moderation API answers 403 both for "no review permissions" (the
+// normal case for most accounts, which is data, not an error) and for a
+// moderator whose sign-in email is unverified (which they need to fix).
+export function isNotModeratorResponse(
+  status: number | undefined,
+  error: unknown,
+): boolean {
+  if (status !== 403) return false;
+  const message =
+    typeof error === 'object' && error !== null && 'Error' in error
+      ? String((error as { Error: unknown }).Error)
+      : '';
+  return !message.toLowerCase().includes('verified email');
+}

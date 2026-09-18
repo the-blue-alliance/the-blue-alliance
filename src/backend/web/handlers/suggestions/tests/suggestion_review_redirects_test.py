@@ -58,7 +58,11 @@ def test_legacy_review_url_redirects_to_beta(
 
 def test_every_legacy_path_is_covered_by_a_test() -> None:
     # Keep the parametrized list above in sync with the blueprint
-    assert len(LEGACY_REVIEW_PATHS) == 9
+    covered = {
+        path
+        for path, _ in test_legacy_review_url_redirects_to_beta.pytestmark[0].args[1]
+    }
+    assert covered == set(LEGACY_REVIEW_PATHS)
 
 
 def test_legacy_review_url_redirects_locally_in_dev(web_client: Client) -> None:

@@ -2,10 +2,8 @@ import { fireEvent, render, screen } from '@testing-library/react';
 import { describe, expect, test } from 'vitest';
 
 import {
-  OFFSEASON_DASHBOARD_URL,
   ReviewMediaTools,
   ReviewOffseasonTools,
-  WEBCAST_DASHBOARD_URL,
   manageTeamMediaUrl,
 } from '~/components/tba/moderation/reviewTools';
 
@@ -14,8 +12,7 @@ describe('ReviewOffseasonTools', () => {
     render(<ReviewOffseasonTools />);
 
     const link = screen.getByRole('link', { name: 'Offseason Dashboard' });
-    expect(link.getAttribute('href')).toBe(OFFSEASON_DASHBOARD_URL);
-    expect(OFFSEASON_DASHBOARD_URL).toBe(
+    expect(link.getAttribute('href')).toBe(
       'https://www.thebluealliance.com/mod/offseasons',
     );
   });
@@ -26,8 +23,7 @@ describe('ReviewMediaTools', () => {
     render(<ReviewMediaTools />);
 
     const link = screen.getByRole('link', { name: 'Webcast Dashboard' });
-    expect(link.getAttribute('href')).toBe(WEBCAST_DASHBOARD_URL);
-    expect(WEBCAST_DASHBOARD_URL).toBe(
+    expect(link.getAttribute('href')).toBe(
       'https://www.thebluealliance.com/mod/webcasts',
     );
   });
@@ -35,18 +31,20 @@ describe('ReviewMediaTools', () => {
   test('Go has no destination until a team number is entered', () => {
     render(<ReviewMediaTools />);
 
-    const go = screen.getByText('Go');
-    expect(go.getAttribute('href')).toBeNull();
+    expect(screen.getByText('Go').getAttribute('href')).toBeNull();
+  });
+
+  test('Go links to the entered team on the main site', () => {
+    render(<ReviewMediaTools />);
 
     fireEvent.change(screen.getByLabelText('Manage Team Media'), {
       target: { value: '254' },
     });
 
-    const href = go.getAttribute('href') ?? '';
-    expect(
-      href.startsWith('https://www.thebluealliance.com/mod?team=254&year='),
-    ).toBe(true);
-    expect(href.endsWith('#frc254')).toBe(true);
+    const href = screen.getByText('Go').getAttribute('href') ?? '';
+    expect(href).toMatch(
+      /^https:\/\/www\.thebluealliance\.com\/mod\?team=254&year=\d{4}#frc254$/,
+    );
   });
 });
 

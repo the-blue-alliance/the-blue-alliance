@@ -60,6 +60,8 @@ def team_mod():
     existing_access = TeamAdminAccess.query(
         TeamAdminAccess.account == account, TeamAdminAccess.expiration > now
     ).fetch()
+    # Real delegations only; the forced team/year view below is not one
+    delegated_team_keys = {f"frc{a.team_number}" for a in existing_access}
 
     # If the current user is an admin, allow them to view this page for any
     # team/year combination
@@ -140,7 +142,6 @@ def team_mod():
     # Only offer suggestions this user can actually act on: a REVIEW_MEDIA
     # holder using ?team=&year= sees media but not CAD, which needs
     # REVIEW_DESIGNS
-    delegated_team_keys = SuggestionReviewer.delegated_team_keys(user)
     suggestions_by_team = defaultdict(lambda: defaultdict(list))
     for suggestion in suggestions_future.get_result():
         if not suggestion.target_key:
@@ -169,6 +170,11 @@ def team_mod():
             forced_year_int if has_valid_forced_team_year else None
         ),
         "review_error": request.args.get("review_error"),
+        # So /mod/review can bring a forced-team viewer back to the same view
+        "review_return_team": (
+            forced_team_number if has_valid_forced_team_year else None
+        ),
+        "review_return_year": forced_year_int if has_valid_forced_team_year else None,
     }
 
     return render_template("team_admin_dashboard.html", template_values)
@@ -273,7 +279,8 @@ def team_mod_review() -> Response:
         if len(split_value) != 2:
             continue
         verdict, key = split_value
-        if not key or len(key) > MAX_KEY_LENGTH:
+        # Datastore limits key names to 500 bytes, not code points
+        if not key or len(key.encode("utf-8")) > MAX_KEY_LENGTH:
             abort(400)
         if verdict == "accept":
             accept_keys.append(key)
@@ -284,7 +291,9 @@ def team_mod_review() -> Response:
     # the batch rejects the whole request instead of partially applying it
     all_keys = accept_keys + reject_keys
     suggestions = ndb.get_multi([ndb.Key(Suggestion, key) for key in all_keys])
-    delegated_team_keys = SuggestionReviewer.delegated_team_keys(user)
+    delegated_team_keys = (
+        set() if user.is_admin else SuggestionReviewer.delegated_team_keys(user)
+    )
     for suggestion in suggestions:
         if suggestion is None:
             abort(400)
@@ -334,22 +343,24 @@ def team_mod_review() -> Response:
         if o.result
         not in (SuggestionReviewResult.ACCEPTED, SuggestionReviewResult.REJECTED)
     ]
+    # A forced-team viewer (?team=&year=) has no TeamAdminAccess rows, so a
+    # bare /mod would bounce them to /mod/redeem; send them back to the view
+    # they came from
+    return_args: Dict[str, Any] = {}
+    team = request.form.get("team", "")
+    year = request.form.get("year", "")
+    if team.isdigit() and year.isdigit():
+        return_args = {"team": team, "year": year}
     if problems:
-        first = problems[0]
         logging.warning(
             f"/mod/review: {len(problems)} of {len(outcomes)} suggestions not "
-            f"applied; first: {first.suggestion_key} {first.result.value} "
-            f"{first.message or ''}"
+            "applied: "
+            + "; ".join(f"{p.suggestion_key} {p.result.value}" for p in problems)
         )
-        return redirect(
-            url_for(
-                ".team_mod",
-                review_error=(
-                    f"{first.suggestion_key}: {first.message or first.result.value}"
-                ),
-            )
+        return_args["review_error"] = "; ".join(
+            f"{p.suggestion_key}: {p.message or p.result.value}" for p in problems
         )
-    return redirect(url_for(".team_mod"))
+    return redirect(url_for(".team_mod", **return_args))
 
 
 def get_media_and_team_ref(media_key_name, team_number):
