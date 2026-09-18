@@ -39,6 +39,16 @@ interface SuggestionReviewCardProps {
   focused?: boolean;
 }
 
+// Event types an accepted offseason-event suggestion can become. The API
+// defaults to OFFSEASON when the moderator doesn't choose, so the select
+// shows that default rather than leaving the field blank.
+export const OFFSEASON_EVENT_TYPE = 99;
+export const PRESEASON_EVENT_TYPE = 100;
+export const OFFSEASON_EVENT_TYPE_OPTIONS = [
+  { value: OFFSEASON_EVENT_TYPE, label: 'Offseason' },
+  { value: PRESEASON_EVENT_TYPE, label: 'Preseason' },
+] as const;
+
 // The write auth types moderators can grant for api_auth_access suggestions,
 // mirroring AuthType / WRITE_TYPE_NAMES on the backend
 const WRITE_AUTH_TYPES: { type: number; name: string }[] = [
@@ -930,6 +940,29 @@ function OffseasonEventDetails({
           value={field('end_date', 'end_date')}
           onChange={setField('end_date')}
         />
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium text-muted-foreground">
+            Event type (Preseason: Jan-Feb, Offseason: Mar+)
+          </span>
+          <select
+            className="h-9 rounded-md border border-input bg-transparent px-3
+              text-sm"
+            aria-label="Event type"
+            value={overrides.event_type_enum ?? OFFSEASON_EVENT_TYPE}
+            onChange={(e) =>
+              onOverridesChange({
+                ...overrides,
+                event_type_enum: Number(e.target.value),
+              })
+            }
+          >
+            {OFFSEASON_EVENT_TYPE_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
         <LabeledInput
           label="Website"
           value={field('website', 'website')}

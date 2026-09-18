@@ -18,10 +18,7 @@ from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.models.user import User
 from backend.common.queries.media_query import TeamSocialMediaQuery
-from backend.common.suggestions.suggestion_reviewer import (
-    SuggestionReviewer,
-    SuggestionReviewResult,
-)
+from backend.common.suggestions.suggestion_reviewer import SuggestionReviewer
 from backend.web.decorators import audit_post_mutation, require_login
 from backend.web.profiled_render import render_template
 
@@ -297,25 +294,23 @@ def team_mod_review():
         year = request.form.get(f"year-{key}")
         if year:
             overrides["year"] = year
-        outcome = SuggestionReviewer.accept_suggestion(
+        # Already-reviewed or invalid suggestions are skipped, as the retired
+        # review controllers did; the dashboard re-renders whatever is left
+        SuggestionReviewer.accept_suggestion(
             key,
             user,
             overrides=overrides,
             endpoint=request.endpoint or "",
             delegated_team_keys=delegated_team_keys,
         )
-        if outcome.result == SuggestionReviewResult.FORBIDDEN:
-            return abort(403)
 
     if reject_keys:
-        outcomes = SuggestionReviewer.reject_suggestions(
+        SuggestionReviewer.reject_suggestions(
             reject_keys,
             user,
             endpoint=request.endpoint or "",
             delegated_team_keys=delegated_team_keys,
         )
-        if any(o.result == SuggestionReviewResult.FORBIDDEN for o in outcomes):
-            return abort(403)
 
     return redirect(url_for(".team_mod"))
 
