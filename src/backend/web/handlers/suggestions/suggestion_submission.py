@@ -26,6 +26,7 @@ from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
 )
+from backend.common.suggestions.suggestion_notifier import SuggestionNotifier
 from backend.web.decorators import enforce_login, require_login
 from backend.web.profiled_render import render_template
 
@@ -488,12 +489,8 @@ def submit_apiwrite() -> Response:
         auth_types=auth_types,
     )
 
-    """
-    # TODO support outgoing emails
     if status == SuggestionCreationStatus.SUCCESS:
-            subject, body = self._gen_notification_email(event_key, self.user_bundle)
-            OutgoingNotificationHelper.send_admin_alert_email(subject, body)
-    """
+        SuggestionNotifier.apiwrite_requested(none_throws(user.account_key), event_key)
 
     return redirect(url_for(".request_apiwrite", status=status.value))
 
@@ -571,7 +568,5 @@ def submit_offseason() -> Response:
             "suggestions/suggest_offseason_event.html", template_values
         )
     else:
-        # TODO support outgoing emails
-        # subject, body = self._gen_notification_email(event_name)
-        # OutgoingNotificationHelper.send_admin_alert_email(subject, body)
+        SuggestionNotifier.offseason_event_suggested(event_name)
         return redirect(url_for(".suggest_offseason", status=status.value))

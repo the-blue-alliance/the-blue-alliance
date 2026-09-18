@@ -23,6 +23,7 @@ import {
   formatEventDateRange,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  resolveUserMessage,
   socialProfileWarning,
 } from '~/lib/moderationUtils';
 
@@ -1119,14 +1120,12 @@ function ApiWriteDetails({
       </div>
       <label className="flex max-w-xl flex-col gap-1 text-sm">
         <span className="font-medium text-muted-foreground">
-          Message for the user (included in the admin alert email)
+          Message for the requester (emailed to them with the verdict)
         </span>
         <textarea
           className="min-h-20 rounded-md border border-input bg-transparent p-2
             text-sm"
-          value={
-            overrides.user_message ?? 'Thanks for helping make TBA better!'
-          }
+          value={resolveUserMessage(overrides)}
           onChange={(e) =>
             onOverridesChange({ ...overrides, user_message: e.target.value })
           }

@@ -1,5 +1,6 @@
 import { Temporal } from 'temporal-polyfill';
 
+import type { AcceptRequest } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 
 // Queue display order, carried over from the retired Jinja review home. Which
@@ -29,19 +30,28 @@ export function suggestionTypeOrderComparator(a: string, b: string): number {
  * targets first appear. Used to cluster webcast suggestions per event like
  * the web review page.
  */
+// Groups items by key, preserving first-seen order of both keys and items
+export function groupBy<T>(
+  items: T[],
+  keyOf: (item: T) => string,
+): Map<string, T[]> {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const key = keyOf(item);
+    const group = groups.get(key);
+    if (group) {
+      group.push(item);
+    } else {
+      groups.set(key, [item]);
+    }
+  }
+  return groups;
+}
+
 export function groupSuggestionsByTargetKey<
   T extends { target_key?: string | null },
 >(suggestions: T[]): { targetKey: string; suggestions: T[] }[] {
-  const groups = new Map<string, T[]>();
-  for (const suggestion of suggestions) {
-    const key = suggestion.target_key ?? '';
-    const group = groups.get(key);
-    if (group) {
-      group.push(suggestion);
-    } else {
-      groups.set(key, [suggestion]);
-    }
-  }
+  const groups = groupBy(suggestions, (s) => s.target_key ?? '');
   return [...groups.entries()].map(([targetKey, grouped]) => ({
     targetKey,
     suggestions: grouped,
@@ -326,4 +336,32 @@ export function isNotModeratorResponse(
       ? String((error as { Error: unknown }).Error)
       : '';
   return !message.toLowerCase().includes('verified email');
+}
+
+// Prefilled in the API key card's message box. The API sends exactly what the
+// client sends, so whatever the moderator sees is what the requester gets.
+export const DEFAULT_USER_MESSAGE = 'Thanks for helping make TBA better!';
+
+export function resolveUserMessage(
+  overrides: AcceptRequest | undefined,
+): string {
+  return overrides?.user_message ?? DEFAULT_USER_MESSAGE;
+}
+
+export interface RejectDecision {
+  key: string;
+  /** Emailed to api_auth_access requesters with the verdict. */
+  userMessage?: string;
+}
+
+// The reject endpoint takes one user_message per request, so rejects that
+// carry different messages go out as separate requests.
+export function groupRejectsByMessage(
+  rejects: RejectDecision[],
+): { keys: string[]; userMessage?: string }[] {
+  const groups = groupBy(rejects, (r) => r.userMessage?.trim() ?? '');
+  return Array.from(groups, ([userMessage, group]) => ({
+    keys: group.map((r) => r.key),
+    userMessage: userMessage || undefined,
+  }));
 }
