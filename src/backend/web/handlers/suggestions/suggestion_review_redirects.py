@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Callable, Dict, Optional
 
 from flask import Blueprint, redirect
 from werkzeug.wrappers import Response
@@ -29,7 +29,9 @@ LEGACY_REVIEW_PATHS: Dict[str, Optional[SuggestionType]] = {
 }
 
 
-def _make_redirect(suggestion_type: Optional[SuggestionType]):
+def _make_redirect(
+    suggestion_type: Optional[SuggestionType],
+) -> Callable[[], Response]:
     def view() -> Response:
         return redirect(PwaUrlHelper.suggestion_review_url(suggestion_type))
 

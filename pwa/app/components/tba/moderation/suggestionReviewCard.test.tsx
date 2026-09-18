@@ -7,11 +7,8 @@ import type {
   ModerationSuggestion,
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
-import {
-  OFFSEASON_EVENT_TYPE,
-  PRESEASON_EVENT_TYPE,
-  SuggestionReviewCard,
-} from '~/components/tba/moderation/suggestionReviewCard';
+import { EventType } from '~/api/tba/read';
+import { SuggestionReviewCard } from '~/components/tba/moderation/suggestionReviewCard';
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -65,7 +62,7 @@ describe('SuggestionReviewCard offseason event', () => {
     );
 
     const select = screen.getByLabelText('Event type') as HTMLSelectElement;
-    expect(Number(select.value)).toBe(OFFSEASON_EVENT_TYPE);
+    expect(Number(select.value)).toBe(EventType.OFFSEASON);
     expect(
       Array.from(select.options).map((option) => option.textContent),
     ).toEqual(['Offseason', 'Preseason']);
@@ -84,12 +81,12 @@ describe('SuggestionReviewCard offseason event', () => {
     );
 
     fireEvent.change(screen.getByLabelText('Event type'), {
-      target: { value: String(PRESEASON_EVENT_TYPE) },
+      target: { value: String(EventType.PRESEASON) },
     });
 
     expect(onOverridesChange).toHaveBeenCalledWith({
       event_short: 'cc',
-      event_type_enum: PRESEASON_EVENT_TYPE,
+      event_type_enum: EventType.PRESEASON,
     });
   });
 
@@ -99,12 +96,12 @@ describe('SuggestionReviewCard offseason event', () => {
         suggestion={OFFSEASON_SUGGESTION}
         decision={undefined}
         onDecisionChange={() => {}}
-        overrides={{ event_type_enum: PRESEASON_EVENT_TYPE }}
+        overrides={{ event_type_enum: EventType.PRESEASON }}
         onOverridesChange={() => {}}
       />,
     );
 
     const select = screen.getByLabelText('Event type') as HTMLSelectElement;
-    expect(Number(select.value)).toBe(PRESEASON_EVENT_TYPE);
+    expect(Number(select.value)).toBe(EventType.PRESEASON);
   });
 });

@@ -28,7 +28,7 @@ function SuggestionReviewHome(): JSX.Element {
   if (!user) {
     return <LoginPage />;
   }
-  if (error) {
+  if (error || data === null) {
     return (
       <div className="mx-auto mt-16 max-w-lg text-center">
         <h1 className="text-2xl font-semibold">Suggestion Review</h1>
