@@ -21,7 +21,7 @@ import { LAYOUT_DISPLAY_ORDER, getLayoutById } from '~/lib/gameday/layouts';
 
 export function GamedayToolbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { state, setLayout, toggleChatSidebar, resetWebcasts } = useGameday();
+  const { state, setLayout, toggleChatSidebar, resetContent } = useGameday();
 
   return (
     <>
@@ -157,12 +157,12 @@ export function GamedayToolbar() {
                 variant="destructive"
                 className="w-full gap-2"
                 onClick={() => {
-                  resetWebcasts();
+                  resetContent();
                   setDrawerOpen(false);
                 }}
               >
                 <RotateCcwIcon className="h-4 w-4" />
-                Reset All Webcasts
+                Reset All Content
               </Button>
             </section>
           </div>

@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router';
 import { useState } from 'react';
 
 import ArrowsLeftRightIcon from '~icons/lucide/arrow-left-right';
+import PanelsTopLeftIcon from '~icons/lucide/panels-top-left';
 import VideoIcon from '~icons/lucide/video';
 import XIcon from '~icons/lucide/x';
 
@@ -11,15 +12,15 @@ import { WebcastSelectorDialog } from '~/components/tba/gameday/WebcastSelectorD
 import { Button } from '~/components/ui/button';
 import { useGameday } from '~/lib/gameday/context';
 import { getNumViewsForLayout } from '~/lib/gameday/layouts';
-import type { WebcastWithMeta } from '~/lib/gameday/types';
+import type { GamedayContent } from '~/lib/gameday/types';
 
 export function VideoCell({
   position,
-  webcast,
+  content,
   gridArea,
 }: {
   position: number;
-  webcast: WebcastWithMeta | null;
+  content: GamedayContent | null;
   gridArea: string;
 }) {
   const [webcastDialogOpen, setWebcastDialogOpen] = useState(false);
@@ -27,9 +28,9 @@ export function VideoCell({
 
   const {
     state,
-    availableWebcasts,
-    removeWebcast,
-    addWebcastAtPosition,
+    availableContent,
+    removeContent,
+    addContentAtPosition,
     swapPositions,
   } = useGameday();
 
@@ -44,8 +45,8 @@ export function VideoCell({
     }
   };
 
-  const handleWebcastSelected = (webcastId: string) => {
-    addWebcastAtPosition(webcastId, position);
+  const handleContentSelected = (contentId: string) => {
+    addContentAtPosition(contentId, position);
     setWebcastDialogOpen(false);
   };
 
@@ -60,11 +61,15 @@ export function VideoCell({
         bg-neutral-950"
       style={{ gridArea }}
     >
-      {webcast ? (
+      {content ? (
         <>
-          {/* Video embed area */}
+          {/* Content area */}
           <div className="flex-1 overflow-hidden">
-            <WebcastEmbed webcast={webcast.webcast} />
+            {content.type === 'webcast' ? (
+              <WebcastEmbed webcast={content.webcast.webcast} />
+            ) : (
+              <content.component />
+            )}
           </div>
 
           {/* Toolbar */}
@@ -73,17 +78,17 @@ export function VideoCell({
               border-neutral-800 bg-neutral-900 px-2"
           >
             <span className="mr-auto truncate text-sm text-white">
-              {webcast.isSpecial ? (
-                webcast.name
+              {content.type === 'data-panel' || content.webcast.isSpecial ? (
+                content.name
               ) : (
                 <Link
                   to="/event/$eventKey"
                   params={{
-                    eventKey: webcast.id.split('-').slice(0, -1).join('-'),
+                    eventKey: content.id.split('-').slice(0, -1).join('-'),
                   }}
                   className="truncate text-sm text-white hover:underline"
                 >
-                  {webcast.name}
+                  {content.name}
                 </Link>
               )}
             </span>
@@ -105,9 +110,13 @@ export function VideoCell({
               className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800
                 hover:text-white"
               onClick={() => setWebcastDialogOpen(true)}
-              title="Change webcast"
+              title="Change content"
             >
-              <VideoIcon className="h-4 w-4" />
+              {content.type === 'webcast' ? (
+                <VideoIcon className="h-4 w-4" />
+              ) : (
+                <PanelsTopLeftIcon className="h-4 w-4" />
+              )}
             </Button>
 
             <Button
@@ -115,8 +124,8 @@ export function VideoCell({
               size="sm"
               className="h-7 w-7 p-0 text-neutral-300 hover:bg-neutral-800
                 hover:text-white"
-              onClick={() => removeWebcast(webcast.id)}
-              title="Remove webcast"
+              onClick={() => removeContent(content.id)}
+              title="Remove content"
             >
               <XIcon className="h-4 w-4" />
             </Button>
@@ -129,11 +138,11 @@ export function VideoCell({
             variant="secondary"
             className="cursor-pointer"
             onClick={() => setWebcastDialogOpen(true)}
-            disabled={availableWebcasts.length === 0}
+            disabled={availableContent.length === 0}
           >
-            {availableWebcasts.length > 0
-              ? 'Select a webcast'
-              : 'No webcasts available'}
+            {availableContent.length > 0
+              ? 'Select content'
+              : 'No content available'}
           </Button>
         </div>
       )}
@@ -142,7 +151,7 @@ export function VideoCell({
       <WebcastSelectorDialog
         open={webcastDialogOpen}
         onOpenChange={setWebcastDialogOpen}
-        onWebcastSelected={handleWebcastSelected}
+        onContentSelected={handleContentSelected}
       />
 
       <SwapPositionDialog
