@@ -3,7 +3,11 @@ import {
   init as sentryInit,
   tanstackRouterBrowserTracingIntegration,
 } from '@sentry/tanstackstart-react';
-import { ParsedLocation, createRouter } from '@tanstack/react-router';
+import {
+  type ErrorComponentProps,
+  type ParsedLocation,
+  createRouter,
+} from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
@@ -137,7 +141,7 @@ async function logPageView(pagePath: string, pageLocation: string) {
   });
 }
 
-function ErrorComponent({ error }: { error: Error }) {
+function ErrorComponent({ error }: ErrorComponentProps) {
   routerLogger.error(error, 'Router error');
 
   useEffect(() => {
@@ -149,7 +153,9 @@ function ErrorComponent({ error }: { error: Error }) {
     }
   }, [error]);
 
-  const stack = error.stack ?? error.message;
+  const normalizedError =
+    error instanceof Error ? error : new Error(String(error));
+  const stack = normalizedError.stack ?? normalizedError.message;
 
   const agentPrompt = [
     'I ran into the following error. Please find the root cause. ',
@@ -175,7 +181,7 @@ function ErrorComponent({ error }: { error: Error }) {
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>
       <h2 className="text-2xl">An error occurred.</h2>
-      {process.env.NODE_ENV !== 'production' && error.stack && (
+      {process.env.NODE_ENV !== 'production' && normalizedError.stack && (
         <>
           <div className="mt-4 flex gap-2">
             <Button
@@ -199,7 +205,7 @@ function ErrorComponent({ error }: { error: Error }) {
             className="mt-4 overflow-x-auto rounded bg-muted p-4 text-sm
               whitespace-pre-wrap"
           >
-            {error.stack}
+            {normalizedError.stack}
           </pre>
         </>
       )}
