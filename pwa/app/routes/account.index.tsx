@@ -8,6 +8,7 @@ import UserIcon from '~icons/lucide/user';
 
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
 import ApiKeysSection from '~/components/tba/account/apiKeys';
+import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
 import { Button } from '~/components/ui/button';
@@ -151,6 +152,8 @@ function Account() {
           </Button>
         </CardContent>
       </Card>
+
+      <SuggestionReviewSection />
 
       <ApiKeysSection />
     </div>
