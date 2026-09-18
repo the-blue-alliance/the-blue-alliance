@@ -248,9 +248,9 @@ def _send_apiwrite_review_alert(
     auth_id: Optional[str] = None,
 ) -> None:
     """
-    Admin alert for reviewed Trusted API key requests, carrying forward the
-    web review controller's (never-ported) admin email as a Slack alert on
-    the existing suggestion-nag channel. Only apiwrite suggestions alert.
+    Admin alert for reviewed Trusted API key requests, posted to the existing
+    suggestion-nag Slack channel. Only apiwrite suggestions alert. (The
+    original Python 2 review page emailed this instead; see #10723.)
     """
     suggestion = _get_suggestion_for_alert(suggestion_key)
     if suggestion is None or suggestion.target_model != "api_auth_access":

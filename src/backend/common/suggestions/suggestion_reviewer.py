@@ -3,7 +3,7 @@ import enum
 import json
 import random
 import string
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple
+from typing import AbstractSet, Any, Dict, FrozenSet, List, NamedTuple, Optional, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -30,9 +30,7 @@ from backend.common.models.user import User
 from backend.common.models.webcast import Webcast
 from backend.common.suggestions.media_creator import MediaCreator
 
-# The AccountPermission required to review each type of suggestion. This
-# mirrors the REQUIRED_PERMISSIONS on the web review controllers in
-# backend/web/handlers/suggestions/.
+# The AccountPermission required to review each type of suggestion.
 REQUIRED_REVIEW_PERMISSIONS: Dict[SuggestionType, AccountPermission] = {
     SuggestionType.EVENT: AccountPermission.REVIEW_MEDIA,
     SuggestionType.MATCH: AccountPermission.REVIEW_MEDIA,
@@ -44,10 +42,20 @@ REQUIRED_REVIEW_PERMISSIONS: Dict[SuggestionType, AccountPermission] = {
     SuggestionType.EVENT_MEDIA: AccountPermission.REVIEW_EVENT_MEDIA,
 }
 
+# Suggestion types that a team admin (someone holding a TeamAdminAccess for
+# the team, see /mod) may review for their own team without holding the
+# site-wide AccountPermission above.
+TEAM_ADMIN_REVIEWABLE_TYPES: FrozenSet[SuggestionType] = frozenset(
+    {
+        SuggestionType.MEDIA,
+        SuggestionType.SOCIAL_MEDIA,
+        SuggestionType.ROBOT,
+    }
+)
+
 # The NDB model kind name for the entity targeted by each suggestion type,
-# used when writing AuditLogEntry records. This mirrors _audit_target_kind on
-# the web review controllers. None means the target key is only known after
-# the model is created (offseason events).
+# used when writing AuditLogEntry records. None means the target key is only
+# known after the model is created (offseason events).
 AUDIT_TARGET_KINDS: Dict[SuggestionType, Optional[str]] = {
     SuggestionType.EVENT: "Event",
     SuggestionType.MATCH: "Match",
@@ -80,8 +88,8 @@ class ReviewOutcome(NamedTuple):
 class SuggestionReviewer:
     """
     Shared accept/reject logic for Suggestions, decoupled from any request
-    context so it can back both the web review controllers and the
-    moderation API.
+    context so it can back both the moderation API and the team admin
+    dashboard (/mod).
 
     Accepts run one at a time in an XG transaction with a REVIEW_PENDING
     re-check so that concurrent reviews of the same suggestion no-op safely.
@@ -92,10 +100,33 @@ class SuggestionReviewer:
 
     @classmethod
     def user_can_review(cls, user: User, suggestion_type: SuggestionType) -> bool:
+        """Whether the user holds the site-wide permission for a suggestion type."""
         if user.is_admin:
             return True
         required = REQUIRED_REVIEW_PERMISSIONS[suggestion_type]
         return required in (user.permissions or [])
+
+    @classmethod
+    def user_can_review_suggestion(
+        cls,
+        user: User,
+        suggestion: Suggestion,
+        delegated_team_keys: AbstractSet[str] = frozenset(),
+    ) -> bool:
+        """
+        Whether the user may review this specific suggestion: either they hold
+        the site-wide permission for its type, or the suggestion targets one
+        of the teams in `delegated_team_keys` (e.g. "frc254") and is a type
+        that team admins are allowed to review for their own team.
+        """
+        suggestion_type = SuggestionType(suggestion.target_model)
+        if cls.user_can_review(user, suggestion_type):
+            return True
+        return (
+            suggestion_type in TEAM_ADMIN_REVIEWABLE_TYPES
+            and suggestion.target_key is not None
+            and suggestion.target_key in delegated_team_keys
+        )
 
     @classmethod
     def accept_suggestion(
@@ -104,14 +135,14 @@ class SuggestionReviewer:
         user: User,
         overrides: Optional[Dict[str, Any]] = None,
         endpoint: str = "",
+        delegated_team_keys: AbstractSet[str] = frozenset(),
     ) -> ReviewOutcome:
         """Accept a single pending Suggestion, creating its target model."""
         suggestion = cls._get_suggestion(suggestion_key)
         if suggestion is None:
             return ReviewOutcome(SuggestionReviewResult.NOT_FOUND, suggestion_key)
 
-        suggestion_type = SuggestionType(suggestion.target_model)
-        if not cls.user_can_review(user, suggestion_type):
+        if not cls.user_can_review_suggestion(user, suggestion, delegated_team_keys):
             return ReviewOutcome(SuggestionReviewResult.FORBIDDEN, suggestion_key)
 
         return cls._accept_in_transaction(
@@ -169,6 +200,7 @@ class SuggestionReviewer:
         suggestion_keys: List[str],
         user: User,
         endpoint: str = "",
+        delegated_team_keys: AbstractSet[str] = frozenset(),
     ) -> List[ReviewOutcome]:
         """
         Reject a batch of pending Suggestions. Each rejection runs in its own
@@ -183,8 +215,9 @@ class SuggestionReviewer:
                 )
                 continue
 
-            suggestion_type = SuggestionType(suggestion.target_model)
-            if not cls.user_can_review(user, suggestion_type):
+            if not cls.user_can_review_suggestion(
+                user, suggestion, delegated_team_keys
+            ):
                 outcomes.append(
                     ReviewOutcome(SuggestionReviewResult.FORBIDDEN, suggestion_key)
                 )
@@ -223,8 +256,7 @@ class SuggestionReviewer:
         cls, suggestion: Suggestion, overrides: Dict[str, Any]
     ) -> Tuple[Optional[str], Optional[str]]:
         """
-        Create the domain entity for an accepted suggestion. Ported from the
-        create_target_model implementations on the web review controllers.
+        Create the domain entity for an accepted suggestion.
         Returns (created_target_key, error_message).
         """
         suggestion_type = SuggestionType(suggestion.target_model)

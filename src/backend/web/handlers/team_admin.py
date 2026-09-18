@@ -1,6 +1,6 @@
 from collections import defaultdict
 from datetime import datetime
-from typing import Optional
+from typing import Any, Dict, List, Optional, Set
 
 from flask import abort, Blueprint, redirect, request, url_for
 from google.appengine.ext import ndb
@@ -16,7 +16,12 @@ from backend.common.models.robot import Robot
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
+from backend.common.models.user import User
 from backend.common.queries.media_query import TeamSocialMediaQuery
+from backend.common.suggestions.suggestion_reviewer import (
+    SuggestionReviewer,
+    SuggestionReviewResult,
+)
 from backend.web.decorators import audit_post_mutation, require_login
 from backend.web.profiled_render import render_template
 
@@ -27,11 +32,6 @@ SUGGESTION_NAMES = {
     "media": "Media",
     "social-media": "Social Media",
     "robot": "Robot CAD",
-}
-SUGGESTION_REVIEW_URL = {
-    "media": "/suggest/team/media/review",
-    "social-media": "/suggest/team/social/review",
-    "robot": "/suggest/cad/review",
 }
 
 
@@ -148,7 +148,6 @@ def team_mod():
         "team_social_medias": team_social_medias,
         "suggestions_by_team": suggestions_by_team,
         "suggestion_names": SUGGESTION_NAMES,
-        "suggestion_review_urls": SUGGESTION_REVIEW_URL,
         "show_year_jump": has_global_review_permissions and has_valid_forced_team_year,
         "year_jump_team_number": (
             forced_team_number if has_valid_forced_team_year else None
@@ -240,6 +239,85 @@ def team_mod_post():
         )
     else:
         return redirect(url_for(".team_mod"))
+
+
+def _delegated_team_keys(user: User) -> Set[str]:
+    """Team keys (e.g. "frc254") the user currently holds TeamAdminAccess for."""
+    now = datetime.now()
+    access = TeamAdminAccess.query(
+        TeamAdminAccess.account == user.account_key,
+        TeamAdminAccess.expiration > now,
+    ).fetch()
+    return {f"frc{a.team_number}" for a in access}
+
+
+@blueprint.route("/mod/review", methods=["POST"])
+@require_login
+def team_mod_review():
+    """
+    Accept/reject pending suggestions from the team admin dashboard. The form
+    posts one accept_reject-<id> radio per suggestion (accept::<id> or
+    reject::<id>), optional preferred_keys[] entries (preferred::<id>) and
+    optional year-<id> overrides.
+    """
+    user = none_throws(current_user())
+    delegated_team_keys = _delegated_team_keys(user)
+
+    accept_keys: List[str] = []
+    reject_keys: List[str] = []
+    for value in request.form.values():
+        split_value = value.split("::")
+        if len(split_value) != 2:
+            continue
+        verdict, key = split_value
+        if verdict == "accept":
+            accept_keys.append(key)
+        elif verdict == "reject":
+            reject_keys.append(key)
+
+    # Authorize everything up front so a single unauthorized suggestion in
+    # the batch rejects the whole request instead of partially applying it
+    for key in accept_keys + reject_keys:
+        suggestion = Suggestion.get_by_id(key)
+        if suggestion is None:
+            return abort(400)
+        if not SuggestionReviewer.user_can_review_suggestion(
+            user, suggestion, delegated_team_keys
+        ):
+            return abort(403)
+
+    preferred_keys = set(request.form.getlist("preferred_keys[]"))
+    for key in accept_keys:
+        overrides: Dict[str, Any] = {
+            # Team admins choose explicitly via the checkbox; the box is
+            # pre-checked from the suggester's default_preferred request
+            "set_preferred": f"preferred::{key}"
+            in preferred_keys,
+        }
+        year = request.form.get(f"year-{key}")
+        if year:
+            overrides["year"] = year
+        outcome = SuggestionReviewer.accept_suggestion(
+            key,
+            user,
+            overrides=overrides,
+            endpoint=request.endpoint or "",
+            delegated_team_keys=delegated_team_keys,
+        )
+        if outcome.result == SuggestionReviewResult.FORBIDDEN:
+            return abort(403)
+
+    if reject_keys:
+        outcomes = SuggestionReviewer.reject_suggestions(
+            reject_keys,
+            user,
+            endpoint=request.endpoint or "",
+            delegated_team_keys=delegated_team_keys,
+        )
+        if any(o.result == SuggestionReviewResult.FORBIDDEN for o in outcomes):
+            return abort(403)
+
+    return redirect(url_for(".team_mod"))
 
 
 def get_media_and_team_ref(media_key_name, team_number):
