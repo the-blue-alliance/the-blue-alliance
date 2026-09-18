@@ -1,6 +1,6 @@
 import time
 from concurrent import futures
-from typing import Generator
+from typing import Callable, Generator, List, Sequence, Tuple
 
 import pytest
 from freezegun import api as freezegun_api
@@ -221,3 +221,89 @@ def test_data_importer(ndb_stub) -> JsonDataImporter:
 
 def clear_cached_queries() -> None:
     ndb.delete_multi(CachedQueryResult.query().fetch(keys_only=True))
+
+
+@pytest.fixture()
+def run_deferred_tasks(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> Callable[..., int]:
+    """
+    Runs every task currently in the task queue stub (deferred payloads), in
+    order, and returns how many ran. Tasks enqueued while running are picked
+    up too. Use it to exercise work that handlers hand off with defer_safe.
+    """
+    from backend.common.helpers.deferred import run_from_task
+
+    def _run(queue_names: Sequence[str] = ("default", "notifications")) -> int:
+        ran = 0
+        while True:
+            tasks = taskqueue_stub.get_filtered_tasks(queue_names=list(queue_names))
+            if not tasks:
+                return ran
+            # Snapshot then flush, so a task that enqueues more work is not
+            # re-run and the newly enqueued ones are picked up next loop
+            for queue_name in queue_names:
+                taskqueue_stub.FlushQueue(queue_name)
+            for task in tasks:
+                run_from_task(task)
+                ran += 1
+
+    return _run
+
+
+@pytest.fixture()
+def sent_result_emails(monkeypatch: pytest.MonkeyPatch) -> List[Tuple[str, str, str]]:
+    """Captures (to, subject, body) for every suggestion-result email."""
+    from backend.common.helpers.outgoing_notification_helper import (
+        OutgoingNotificationHelper,
+    )
+
+    sent: List[Tuple[str, str, str]] = []
+    monkeypatch.setattr(
+        OutgoingNotificationHelper,
+        "send_suggestion_result_email",
+        classmethod(
+            lambda cls, to, subject, email_body: sent.append((to, subject, email_body))
+        ),
+    )
+    return sent
+
+
+@pytest.fixture()
+def sent_admin_alerts(monkeypatch: pytest.MonkeyPatch) -> List[Tuple[str, str]]:
+    """Captures (subject, body) for every admin alert email."""
+    from backend.common.helpers.outgoing_notification_helper import (
+        OutgoingNotificationHelper,
+    )
+
+    sent: List[Tuple[str, str]] = []
+    monkeypatch.setattr(
+        OutgoingNotificationHelper,
+        "send_admin_alert_email",
+        classmethod(
+            lambda cls, subject, email_body: sent.append((subject, email_body))
+        ),
+    )
+    return sent
+
+
+@pytest.fixture()
+def sent_slack_alerts(monkeypatch: pytest.MonkeyPatch) -> List[Tuple[str, str]]:
+    """Captures (webhook_url, body) for every Slack alert, with a hook configured."""
+    from backend.common.helpers.outgoing_notification_helper import (
+        OutgoingNotificationHelper,
+    )
+    from backend.common.sitevars.slack_hook_urls import SlackHookUrls
+
+    sent: List[Tuple[str, str]] = []
+    monkeypatch.setattr(
+        SlackHookUrls, "url_for", staticmethod(lambda channel: "http://hook")
+    )
+    monkeypatch.setattr(
+        OutgoingNotificationHelper,
+        "send_slack_alert",
+        classmethod(
+            lambda cls, url, body, attachment_list=None: sent.append((url, body))
+        ),
+    )
+    return sent

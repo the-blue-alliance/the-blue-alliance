@@ -7,6 +7,8 @@ from backend.common.environment import Environment
 # src/dispatch.yaml). Locally it runs on the vite dev server.
 BETA_BASE_URL = "https://beta.thebluealliance.com"
 LOCAL_PWA_BASE_URL = "http://localhost:5173"
+# The Jinja site, for links in prod-only messages (emails, Slack)
+WWW_BASE_URL = "https://www.thebluealliance.com"
 
 
 class PwaUrlHelper:

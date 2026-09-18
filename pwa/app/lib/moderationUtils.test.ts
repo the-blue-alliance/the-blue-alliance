@@ -2,14 +2,17 @@ import { describe, expect, test } from 'vitest';
 
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 import {
+  DEFAULT_USER_MESSAGE,
   SUGGESTION_TYPE_ORDER,
   defaultSetPreferred,
   formatAuthorReputation,
   formatEventDateRange,
+  groupRejectsByMessage,
   groupSuggestionsByTargetKey,
   isNotModeratorResponse,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  resolveUserMessage,
   socialProfileWarning,
   suggestionTypeOrderComparator,
   summarizeReviewOutcomes,
@@ -348,5 +351,54 @@ describe('isNotModeratorResponse', () => {
     expect(isNotModeratorResponse(401, { Error: 'x' })).toBe(false);
     expect(isNotModeratorResponse(500, {})).toBe(false);
     expect(isNotModeratorResponse(undefined, undefined)).toBe(false);
+  });
+});
+
+describe('groupRejectsByMessage', () => {
+  test('batches rejects that share a trimmed message', () => {
+    const groups = groupRejectsByMessage([
+      { key: 'a', userMessage: 'Not this event' },
+      { key: 'c', userMessage: ' Not this event ' },
+    ]);
+
+    expect(groups).toEqual([
+      { keys: ['a', 'c'], userMessage: 'Not this event' },
+    ]);
+  });
+
+  test('sends rejects without a message as one group with no message', () => {
+    const groups = groupRejectsByMessage([
+      { key: 'b' },
+      { key: 'd', userMessage: '' },
+    ]);
+
+    expect(groups).toEqual([{ keys: ['b', 'd'], userMessage: undefined }]);
+  });
+
+  test('keeps distinct messages in separate requests, in first-seen order', () => {
+    const groups = groupRejectsByMessage([
+      { key: 'a', userMessage: 'first' },
+      { key: 'b', userMessage: 'second' },
+      { key: 'c', userMessage: 'first' },
+    ]);
+
+    expect(groups.map((g) => g.userMessage)).toEqual(['first', 'second']);
+    expect(groups[0].keys).toEqual(['a', 'c']);
+  });
+
+  test('returns nothing for no rejects', () => {
+    expect(groupRejectsByMessage([])).toEqual([]);
+  });
+});
+
+describe('resolveUserMessage', () => {
+  test('uses the default when the moderator left the box alone', () => {
+    expect(resolveUserMessage(undefined)).toBe(DEFAULT_USER_MESSAGE);
+    expect(resolveUserMessage({})).toBe(DEFAULT_USER_MESSAGE);
+  });
+
+  test('keeps what the moderator typed, including clearing it', () => {
+    expect(resolveUserMessage({ user_message: 'Enjoy!' })).toBe('Enjoy!');
+    expect(resolveUserMessage({ user_message: '' })).toBe('');
   });
 });

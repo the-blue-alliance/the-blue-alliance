@@ -154,3 +154,50 @@ def test_suggest_api_write(
         affiliation="Test Code",
         auth_types=[AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS],
     )
+
+
+def test_suggest_api_write_alerts_admins(
+    login_user,
+    ndb_stub,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_admin_alerts,
+    web_client: Client,
+) -> None:
+    resp = web_client.post(
+        "/request/apiwrite",
+        data={
+            "event_key": "2016necmp",
+            "role": "Test Code",
+            "auth_types": [int(AuthType.MATCH_VIDEO)],
+        },
+    )
+    assert resp.status_code == 302
+
+    # Delivered by the tasks service, not on the request path
+    assert sent_admin_alerts == []
+    assert run_deferred_tasks() == 1
+    subject, body = sent_admin_alerts[0]
+    assert subject == "Trusted API Key Request for 2016necmp"
+    assert "(test@tba.com) has made a request" in body
+    assert "https://www.thebluealliance.com/event/2016necmp" in body
+    assert "suggest/review/api_auth_access" in body
+
+
+def test_suggest_api_write_no_alert_on_failure(
+    login_user,
+    ndb_stub,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_admin_alerts,
+    web_client: Client,
+) -> None:
+    # No affiliation -> suggestion is not created
+    resp = web_client.post(
+        "/request/apiwrite",
+        data={"event_key": "2016necmp", "auth_types": [int(AuthType.MATCH_VIDEO)]},
+    )
+    assert resp.status_code == 302
+    assert Suggestion.query().count() == 0
+    assert run_deferred_tasks() == 0
+    assert sent_admin_alerts == []
