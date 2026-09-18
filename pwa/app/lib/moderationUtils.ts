@@ -2,10 +2,9 @@ import { Temporal } from 'temporal-polyfill';
 
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 
-// Queue display order, matching the web review home
-// (suggestions/pending_suggestion_rows_partial.html). Which types exist comes
-// from the API's SuggestionType enum; the order is a presentation choice made
-// here, and a test asserts the two stay in sync.
+// Queue display order, carried over from the retired Jinja review home. Which
+// types exist comes from the API's SuggestionType enum; the order is a
+// presentation choice made here, and a test asserts the two stay in sync.
 export const SUGGESTION_TYPE_ORDER: readonly SuggestionType[] = [
   SuggestionType.MATCH,
   SuggestionType.EVENT,
