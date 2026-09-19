@@ -142,7 +142,19 @@ def test_time_decay_falls_off_into_the_future(offset_s: int) -> None:
     assert 0.0 < further < nearer <= 1.0
 
 
-@pytest.mark.parametrize("offset_s", [60, 300, 900, 1800])
+@pytest.mark.parametrize("offset_s", [1, 60, 299, 300])
+def test_time_decay_stays_at_peak_while_match_is_likely_ongoing(
+    offset_s: int,
+) -> None:
+    assert (
+        MatchSuggestionHelper._time_decay(
+            NOW - datetime.timedelta(seconds=offset_s), NOW
+        )
+        == 1.0
+    )
+
+
+@pytest.mark.parametrize("offset_s", [301, 360, 900, 1800])
 def test_time_decay_falls_off_into_the_past(offset_s: int) -> None:
     nearer = MatchSuggestionHelper._time_decay(
         NOW - datetime.timedelta(seconds=offset_s - 60), NOW
@@ -552,6 +564,26 @@ def test_scores_stale_unplayed_matches_with_low_time_decay(
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
     suggestion = result.suggestions["2026casj_qm1"]
     assert 0.0 < suggestion.components.time_decay < 0.001
+
+
+def test_scores_unplayed_match_as_ongoing_during_grace_period(
+    ndb_stub, memcache_stub
+) -> None:
+    event = make_event()
+    seed_matches(
+        event,
+        [
+            make_match(
+                event,
+                match_number=1,
+                predicted_time=NOW - datetime.timedelta(minutes=5),
+            )
+        ],
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.components.time_decay == 1.0
 
 
 def test_falls_back_to_scheduled_time(ndb_stub, memcache_stub) -> None:

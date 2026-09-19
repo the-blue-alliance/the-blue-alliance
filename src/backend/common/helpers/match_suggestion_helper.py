@@ -67,10 +67,12 @@ DOUBLE_ELIM_ROUND_WEIGHTS: Dict[DoubleElimRound, float] = {
 #
 # PAST covers a match whose time has gone by but which still has no score.
 # That is either a match on the field right now -- the most valuable thing we
-# can show -- or a dead schedule entry that will never be played. The short
-# PAST tau keeps the former hot while the latter fades.
+# can show -- or a dead schedule entry that will never be played. Keep matches
+# fully hot for a short window while they are likely ongoing, then use the short
+# PAST tau to fade stale schedule entries.
 TIME_DECAY_TAU_FUTURE_S: int = 15 * 60
 TIME_DECAY_TAU_PAST_S: int = 5 * 60
+TIME_DECAY_ONGOING_GRACE_S: int = 5 * 60
 
 DEGENERATE_NORMALIZED_VALUE: float = 0.5
 EPSILON: float = 1e-9
@@ -340,7 +342,9 @@ class MatchSuggestionHelper:
         match_time: Optional[datetime.datetime], now: datetime.datetime
     ) -> float:
         """
-        Peaks at 1.0 when the match is starting and decays smoothly either side.
+        Peaks at 1.0 when the match is starting, stays there while an unscored
+        match is likely ongoing, and then decays smoothly. Future matches decay
+        toward the peak as they approach their start time.
 
         Deliberately absolute rather than pool-normalized: on a day where every
         candidate is 40 minutes out, normalizing would still hand one of them a
@@ -351,7 +355,9 @@ class MatchSuggestionHelper:
         delta = (match_time - now).total_seconds()
         if delta >= 0:
             return math.exp(-delta / TIME_DECAY_TAU_FUTURE_S)
-        return math.exp(delta / TIME_DECAY_TAU_PAST_S)
+        if delta >= -TIME_DECAY_ONGOING_GRACE_S:
+            return 1.0
+        return math.exp((delta + TIME_DECAY_ONGOING_GRACE_S) / TIME_DECAY_TAU_PAST_S)
 
     @classmethod
     def _significance(cls, event: Event, match: Match) -> float:
@@ -528,8 +534,13 @@ class MatchSuggestionHelper:
             return "none"
 
         delta = (match_time - now).total_seconds()
-        tau = "future" if delta >= 0 else "past"
-        return f"{source} delta={delta / 60:+.1f}m tau={tau}"
+        if delta >= 0:
+            phase = "future"
+        elif delta >= -TIME_DECAY_ONGOING_GRACE_S:
+            phase = "ongoing"
+        else:
+            phase = "past"
+        return f"{source} delta={delta / 60:+.1f}m phase={phase}"
 
     @classmethod
     def _elim_round_suffix(cls, event: Event, match: Match) -> str:
