@@ -54,22 +54,40 @@ export function formatMatchTime(
 
 function AllianceTeams({
   alliance,
+  predictedScore,
   teams,
   year,
 }: {
   alliance: 'red' | 'blue';
+  predictedScore: number | null | undefined;
   teams: number[];
   year: number;
 }) {
   return (
-    <TeamListSubgrid
-      allianceColor={alliance}
-      teamKeys={teams.map((team) => `frc${team}`)}
-      dq={[]}
-      surrogate={[]}
-      year={year}
-      className="col-span-3 rounded"
-    />
+    <div className="grid grid-cols-[minmax(0,1fr)_3rem] gap-1">
+      <TeamListSubgrid
+        allianceColor={alliance}
+        teamKeys={teams.map((team) => `frc${team}`)}
+        dq={[]}
+        surrogate={[]}
+        year={year}
+        className="rounded"
+      />
+      <div
+        className={`flex flex-col items-center justify-center rounded ${
+          alliance === 'red'
+            ? 'bg-alliance-red-loser'
+            : 'bg-alliance-blue-loser'
+          }`}
+      >
+        <span className="text-[9px] leading-none text-muted-foreground">
+          Pred.
+        </span>
+        <span className="font-mono text-sm font-medium text-foreground">
+          {predictedScore == null ? '—' : predictedScore.toFixed(0)}
+        </span>
+      </div>
+    </div>
   );
 }
 
@@ -117,11 +135,13 @@ function Recommendation({
       <div className="grid gap-1 sm:grid-cols-2">
         <AllianceTeams
           alliance="red"
+          predictedScore={suggestion.rs}
           teams={suggestion.rt}
           year={Number(suggestion.ek.slice(0, 4))}
         />
         <AllianceTeams
           alliance="blue"
+          predictedScore={suggestion.bs}
           teams={suggestion.bt}
           year={Number(suggestion.ek.slice(0, 4))}
         />

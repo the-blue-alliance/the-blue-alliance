@@ -32,9 +32,9 @@ from backend.common.models.match_suggestion import (
 )
 
 # Weights sum to 1.0, so the final score also lands in [0, 1]
-W_FAVORITES: float = 0.25
+W_FAVORITES: float = 0.20
 W_SIGNIFICANCE: float = 0.25
-W_TIME_DECAY: float = 0.25
+W_TIME_DECAY: float = 0.30
 W_HIGH_SCORE: float = 0.125
 W_CLOSE_SCORE: float = 0.125
 
