@@ -10,6 +10,7 @@ import DateIcon from '~icons/lucide/calendar-days';
 import MediaIcon from '~icons/lucide/camera';
 import StatbotIcon from '~icons/lucide/chart-spline';
 import ScoutingIcon from '~icons/lucide/clipboard-list';
+import Match13Icon from '~icons/lucide/cloud';
 import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
@@ -592,15 +593,26 @@ function EventPage() {
               </a>
             </DetailEntity>
           )}
-        <DetailEntity icon={<StatbotIcon />}>
-          <a
-            href={`https://www.statbotics.io/event/${event.key}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Statbotics
-          </a>
-        </DetailEntity>
+        <div className="flex items-center gap-4">
+          <DetailEntity icon={<StatbotIcon />}>
+            <a
+              href={`https://www.statbotics.io/event/${event.key}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Statbotics
+            </a>
+          </DetailEntity>
+          <DetailEntity icon={<Match13Icon />}>
+            <a
+              href={`https://www.match13.com/event/${event.key}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Match13
+            </a>
+          </DetailEntity>
+        </div>
         {event.webcasts.length > 0 &&
           getCurrentWeekEvents([event]).length > 0 && (
             <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>

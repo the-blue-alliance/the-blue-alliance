@@ -29,6 +29,7 @@ test.describe('/team/604/2024', () => {
   [
     ['FRC Events', 'https://frc-events.firstinspires.org/team/604'],
     ['Statbotics', 'https://www.statbotics.io/team/604'],
+    ['Match13', 'https://www.match13.com/team/604'],
   ].forEach(([name, href]) => {
     test(`links to the ${name} team page`, async ({ page }) => {
       await expect(page.getByRole('link', { name })).toHaveAttribute(
