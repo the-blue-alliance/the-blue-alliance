@@ -71,6 +71,11 @@ class MatchSuggestion(BaseModel):
     predicted_time: Optional[int] = Field(default=None, alias="pt")
     scheduled_time: Optional[int] = Field(default=None, alias="st")
 
+    # Predicted alliance scores. Predictions are not always available, and the
+    # Realtime Database drops these null children on write.
+    predicted_red_score: Optional[float] = Field(default=None, alias="rs")
+    predicted_blue_score: Optional[float] = Field(default=None, alias="bs")
+
     # 0-based; the stable ordering key for clients
     rank: int = Field(alias="r")
     score: float = Field(alias="sc")  # Weighted sum of `components`

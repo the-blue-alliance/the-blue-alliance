@@ -266,6 +266,16 @@ class MatchSuggestionHelper:
                     else None
                 ),
                 scheduled_time=(int(match.time.timestamp()) if match.time else None),
+                predicted_red_score=(
+                    predictions[match.key_name]["red"]["score"]
+                    if match.key_name in predictions
+                    else None
+                ),
+                predicted_blue_score=(
+                    predictions[match.key_name]["blue"]["score"]
+                    if match.key_name in predictions
+                    else None
+                ),
                 rank=rank,
                 score=score,
                 components=components,
