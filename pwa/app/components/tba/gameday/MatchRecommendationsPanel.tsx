@@ -132,7 +132,7 @@ function Recommendation({
           {formatMatchTime(suggestion.pt ?? suggestion.st, now, timeZone)}
         </span>
       </div>
-      <div className="grid gap-1 sm:grid-cols-2">
+      <div className="grid gap-1 lg:grid-cols-2">
         <AllianceTeams
           alliance="red"
           predictedScore={suggestion.rs}
