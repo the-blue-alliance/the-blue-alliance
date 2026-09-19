@@ -95,8 +95,8 @@ def seed_matches(event: Event, matches: List[Match]) -> Event:
 
 
 def test_scoring_weights() -> None:
-    assert W_HIGH_SCORE == 0.125
-    assert W_CLOSE_SCORE == 0.125
+    assert W_HIGH_SCORE == 0.10
+    assert W_CLOSE_SCORE == 0.10
     assert (
         W_FAVORITES + W_SIGNIFICANCE + W_TIME_DECAY + W_HIGH_SCORE + W_CLOSE_SCORE
         == 1.0
