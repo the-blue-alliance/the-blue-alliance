@@ -11,6 +11,18 @@ export const matchSuggestionsSchema = {
       description:
         'A single suggested match, with enough denormalized context to render it\nwithout any further TBA API calls.',
       properties: {
+        bs: {
+          anyOf: [
+            {
+              type: 'number',
+            },
+            {
+              type: 'null',
+            },
+          ],
+          default: null,
+          title: 'Bs',
+        },
         bt: {
           items: {
             type: 'integer',
@@ -71,6 +83,18 @@ export const matchSuggestionsSchema = {
         r: {
           title: 'R',
           type: 'integer',
+        },
+        rs: {
+          anyOf: [
+            {
+              type: 'number',
+            },
+            {
+              type: 'null',
+            },
+          ],
+          default: null,
+          title: 'Rs',
         },
         rt: {
           items: {

@@ -633,6 +633,8 @@ def test_update_match_suggestions(
                 blue_team_numbers=[118, 148, 971],
                 predicted_time=1777000200,
                 scheduled_time=1777000000,
+                predicted_red_score=135.5,
+                predicted_blue_score=128.25,
                 rank=0,
                 score=0.8125,
                 components=MatchSuggestionComponents(
@@ -669,6 +671,8 @@ def test_update_match_suggestions(
                 "bt": [118, 148, 971],
                 "pt": 1777000200,
                 "st": 1777000000,
+                "rs": 135.5,
+                "bs": 128.25,
                 "r": 0,
                 "sc": 0.8125,
                 "c": {

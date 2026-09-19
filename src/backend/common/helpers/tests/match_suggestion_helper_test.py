@@ -360,6 +360,20 @@ def test_high_score_favors_higher_scoring_predictions(ndb_stub, memcache_stub) -
     )
 
 
+def test_suggestion_includes_predicted_alliance_scores(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+    seed_predictions(
+        event.key_name,
+        qual={"2026casj_qm1": (123.5, 118.25, 0.6)},
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.predicted_red_score == 123.5
+    assert suggestion.predicted_blue_score == 118.25
+
+
 def test_scores_read_playoff_predictions(ndb_stub, memcache_stub) -> None:
     event = make_event("2026cmptx", EventType.CMP_FINALS)
     seed_matches(
@@ -390,6 +404,16 @@ def test_scores_are_neutral_without_event_details(ndb_stub, memcache_stub) -> No
     components = result.suggestions["2026casj_qm1"].components
     assert components.high_score == 0.5
     assert components.close_score == 0.5
+
+
+def test_suggestion_omits_scores_without_prediction(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.predicted_red_score is None
+    assert suggestion.predicted_blue_score is None
 
 
 def test_scores_are_neutral_when_predictions_is_none(ndb_stub, memcache_stub) -> None:
