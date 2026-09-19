@@ -57,14 +57,14 @@ export function VideoCell({
 
   return (
     <div
-      className="relative flex flex-col border border-neutral-700
-        bg-neutral-950"
+      className="relative flex min-h-0 min-w-0 flex-col overflow-hidden border
+        border-neutral-700 bg-neutral-950"
       style={{ gridArea }}
     >
       {content ? (
         <>
           {/* Content area */}
-          <div className="flex-1 overflow-hidden">
+          <div className="min-h-0 min-w-0 flex-1 overflow-hidden">
             {content.type === 'webcast' ? (
               <WebcastEmbed webcast={content.webcast.webcast} />
             ) : (
@@ -74,10 +74,10 @@ export function VideoCell({
 
           {/* Toolbar */}
           <div
-            className="flex h-10 shrink-0 items-center gap-1 border-t
+            className="flex h-10 min-w-0 shrink-0 items-center gap-1 border-t
               border-neutral-800 bg-neutral-900 px-2"
           >
-            <span className="mr-auto truncate text-sm text-white">
+            <span className="mr-auto min-w-0 truncate text-sm text-white">
               {content.type === 'data-panel' || content.webcast.isSpecial ? (
                 content.name
               ) : (
