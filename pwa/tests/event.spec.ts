@@ -113,6 +113,13 @@ test.describe('/event/2024mil', () => {
 
     await expect(page.locator('svg.recharts-surface')).toBeVisible();
   });
+
+  test('links to the Match13 event page', async ({ page }) => {
+    await expect(page.getByRole('link', { name: 'Match13' })).toHaveAttribute(
+      'href',
+      'https://www.match13.com/event/2024mil',
+    );
+  });
 });
 
 test('defers the animated tab indicator until a tab changes', async ({
