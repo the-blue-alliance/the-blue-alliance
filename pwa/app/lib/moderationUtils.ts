@@ -2,10 +2,9 @@ import { Temporal } from 'temporal-polyfill';
 
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 
-// Queue display order, matching the web review home
-// (suggestions/pending_suggestion_rows_partial.html). Which types exist comes
-// from the API's SuggestionType enum; the order is a presentation choice made
-// here, and a test asserts the two stay in sync.
+// Queue display order, carried over from the retired Jinja review home. Which
+// types exist comes from the API's SuggestionType enum; the order is a
+// presentation choice made here, and a test asserts the two stay in sync.
 export const SUGGESTION_TYPE_ORDER: readonly SuggestionType[] = [
   SuggestionType.MATCH,
   SuggestionType.EVENT,
@@ -313,3 +312,18 @@ export function defaultSetPreferred(suggestion: {
  * deliberate exception, not the default.
  */
 export const DEFAULT_EXPIRATION_DAYS = 7;
+
+// The moderation API answers 403 both for "no review permissions" (the
+// normal case for most accounts, which is data, not an error) and for a
+// moderator whose sign-in email is unverified (which they need to fix).
+export function isNotModeratorResponse(
+  status: number | undefined,
+  error: unknown,
+): boolean {
+  if (status !== 403) return false;
+  const message =
+    typeof error === 'object' && error !== null && 'Error' in error
+      ? String((error as { Error: unknown }).Error)
+      : '';
+  return !message.toLowerCase().includes('verified email');
+}

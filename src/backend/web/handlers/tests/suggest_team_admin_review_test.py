@@ -31,6 +31,19 @@ def test_login_redirect(web_client):
     assert urlparse(resp.headers["Location"]).path == "/account/login"
 
 
+def test_review_login_redirect(web_client):
+    resp = web_client.post("/mod/review", data={})
+
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/account/login"
+
+
+def test_review_get_not_allowed(login_user, web_client):
+    resp = web_client.get("/mod/review")
+
+    assert resp.status_code == 405
+
+
 def test_mod_admin_can_view_with_forced_team_year(login_admin, web_client):
     Team(
         id="frc1124",
@@ -444,13 +457,14 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         access.put()
 
         response = self.web_client.post(
-            "/suggest/team/media/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
                 )
             },
         )
+        self.assertEqual(response.status_code, 403)
 
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
@@ -468,17 +482,14 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         access.put()
 
         response = self.web_client.post(
-            "/suggest/team/media/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "reject::{}".format(
                     suggestion_id
                 )
             },
         )
-
-        access = access_key.get()
-        access.expiration += datetime.timedelta(days=-7)
-        access.put()
+        self.assertEqual(response.status_code, 403)
 
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
@@ -490,7 +501,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         suggestion_id = self.createMediaSuggestion()
 
         response = self.web_client.post(
-            "/suggest/team/media/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
@@ -516,7 +527,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
 
         suggestion_id = self.createMediaSuggestion()
         response = self.web_client.post(
-            "/suggest/team/media/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
@@ -543,7 +554,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
 
         suggestion_id = self.createMediaSuggestion()
         response = self.web_client.post(
-            "/suggest/team/media/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "reject::{}".format(
                     suggestion_id
@@ -571,14 +582,14 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         access.put()
 
         response = self.web_client.post(
-            "/suggest/team/social/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
                 ),
             },
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
@@ -596,14 +607,14 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         access.put()
 
         response = self.web_client.post(
-            "/suggest/team/social/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "reject::{}".format(
                     suggestion_id
                 ),
             },
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
@@ -614,7 +625,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
 
         suggestion_id = self.createSocialMediaSuggestion()
         response = self.web_client.post(
-            "/suggest/team/social/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
@@ -640,7 +651,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
 
         suggestion_id = self.createSocialMediaSuggestion()
         response = self.web_client.post(
-            "/suggest/team/social/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "reject::{}".format(
                     suggestion_id
@@ -668,14 +679,14 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         access.put()
 
         response = self.web_client.post(
-            "/suggest/cad/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
                 ),
             },
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
@@ -693,14 +704,14 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         access.put()
 
         response = self.web_client.post(
-            "/suggest/cad/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
                 ),
             },
         )
-        self.assertEqual(response.status_code, 401)
+        self.assertEqual(response.status_code, 403)
 
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
@@ -711,7 +722,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
 
         suggestion_id = self.createDesignSuggestion()
         response = self.web_client.post(
-            "/suggest/cad/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "accept::{}".format(
                     suggestion_id
@@ -737,7 +748,7 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
 
         suggestion_id = self.createDesignSuggestion()
         response = self.web_client.post(
-            "/suggest/cad/review",
+            "/mod/review",
             data={
                 "accept_reject-{}".format(suggestion_id): "reject::{}".format(
                     suggestion_id
@@ -754,3 +765,274 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         suggestion = Suggestion.get_by_id(suggestion_id)
         self.assertIsNotNone(suggestion)
         self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_REJECTED)
+
+    def test_review_redirects_to_mod_dashboard(self):
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(urlparse(response.headers["Location"]).path, "/mod")
+
+    def test_review_ignores_return_url(self):
+        # The retired review controllers redirected to a caller-supplied
+        # return_url (an open redirect); the new route always goes home
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={
+                f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}",
+                "return_url": "https://evil.example.com/",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        self.assertEqual(urlparse(response.headers["Location"]).path, "/mod")
+        self.assertNotIn("evil.example.com", response.headers["Location"])
+
+    def test_review_other_team_forbidden(self):
+        self.giveTeamAdminAccess()  # frc1124
+        Team(id="frc254", team_number=254).put()
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.account_key,
+            "http://imgur.com/other",
+            "frc254",
+            str(self.now.year),
+        ).get_result()
+        self.assertEqual(status[0], "success")
+        suggestion_id = Suggestion.query().fetch(keys_only=True)[0].id()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}"},
+        )
+
+        self.assertEqual(response.status_code, 403)
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+        self.assertEqual(len(Media.query().fetch()), 0)
+
+    def test_review_batch_with_one_forbidden_applies_nothing(self):
+        self.giveTeamAdminAccess()  # frc1124
+        own_id = self.createMediaSuggestion()
+        Team(id="frc254", team_number=254).put()
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.account_key,
+            "http://imgur.com/other",
+            "frc254",
+            str(self.now.year),
+        ).get_result()
+        self.assertEqual(status[0], "success")
+        other_id = [
+            k.id() for k in Suggestion.query().fetch(keys_only=True) if k.id() != own_id
+        ][0]
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={
+                f"accept_reject-{own_id}": f"accept::{own_id}",
+                f"accept_reject-{other_id}": f"reject::{other_id}",
+            },
+        )
+
+        self.assertEqual(response.status_code, 403)
+        for suggestion_id in (own_id, other_id):
+            suggestion = Suggestion.get_by_id(suggestion_id)
+            self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+        self.assertEqual(len(Media.query().fetch()), 0)
+
+    def test_review_unknown_suggestion_is_bad_request(self):
+        self.giveTeamAdminAccess()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={"accept_reject-nope": "accept::nope"},
+        )
+
+        self.assertEqual(response.status_code, 400)
+
+    def test_review_with_no_team_access_and_no_permission_forbidden(self):
+        suggestion_id = self.createMediaSuggestion()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"reject::{suggestion_id}"},
+        )
+
+        self.assertEqual(response.status_code, 403)
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+
+    def test_review_with_global_permission_needs_no_team_access(self):
+        self.account.permissions = [AccountPermission.REVIEW_MEDIA]
+        suggestion_id = self.createMediaSuggestion()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_ACCEPTED)
+        self.assertEqual(len(Media.query().fetch()), 1)
+
+    def test_accept_team_media_with_year_override(self):
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={
+                f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}",
+                f"year-{suggestion_id}": "2019",
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        medias = Media.query().fetch()
+        self.assertEqual(len(medias), 1)
+        self.assertEqual(medias[0].year, 2019)
+
+    def test_accept_team_media_writes_audit_log(self):
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+
+        self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}"},
+        )
+
+        entries = AuditLogEntry.query().fetch()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].account, self.account.account_key)
+        self.assertEqual(entries[0].endpoint, "team_admin.team_mod_review")
+        self.assertEqual(entries[0].target_key, ndb.Key(Team, "frc1124"))
+
+    def test_review_media_permission_forced_team_hides_cad(self):
+        # A REVIEW_MEDIA holder using ?team=&year= may act on media but not
+        # CAD, so the dashboard must not offer CAD rows that would 403
+        self.account.has_permission.return_value = True
+        self.account.permissions = [AccountPermission.REVIEW_MEDIA]
+        media_id = self.createMediaSuggestion()
+        design_id = self.createDesignSuggestion()
+
+        response = self.web_client.get(f"/mod?team=1124&year={self.now.year}")
+
+        self.assertEqual(response.status_code, 200)
+        self.assertIn(f"accept::{media_id}".encode(), response.data)
+        self.assertNotIn(f"accept::{design_id}".encode(), response.data)
+        self.assertNotIn(b"Robot CAD Suggestion", response.data)
+
+    def test_review_unapplied_outcome_is_shown_on_dashboard(self):
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+        # Someone else got there first
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        suggestion.review_state = SuggestionState.REVIEW_REJECTED
+        suggestion.put()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}"},
+        )
+
+        self.assertEqual(response.status_code, 302)
+        location = urlparse(response.headers["Location"])
+        self.assertEqual(location.path, "/mod")
+        self.assertIn("review_error=", location.query)
+        self.assertIn("already_reviewed", location.query)
+
+        dashboard = self.web_client.get(response.headers["Location"])
+        self.assertIn(b'id="review-error"', dashboard.data)
+        self.assertIn(b"already_reviewed", dashboard.data)
+
+    def test_review_malformed_keys_are_bad_requests(self):
+        self.giveTeamAdminAccess()
+
+        # Empty, too long in bytes, and too long only once UTF-8 encoded
+        for key in ("", "x" * 501, "\U0001f600" * 130):
+            response = self.web_client.post(
+                "/mod/review", data={"accept_reject-1": f"accept::{key}"}
+            )
+            self.assertEqual(response.status_code, 400)
+
+    def test_review_audit_log_names_the_suggestion(self):
+        self.giveTeamAdminAccess()
+        suggestion_id = self.createMediaSuggestion()
+
+        self.web_client.post(
+            "/mod/review",
+            data={f"accept_reject-{suggestion_id}": f"reject::{suggestion_id}"},
+        )
+
+        entries = AuditLogEntry.query().fetch()
+        self.assertEqual(len(entries), 1)
+        self.assertEqual(entries[0].url_args, {"suggestion_key": suggestion_id})
+        self.assertEqual(entries[0].target_key, ndb.Key(Team, "frc1124"))
+
+    def test_review_returns_forced_team_viewer_to_their_view(self):
+        # A REVIEW_MEDIA holder with no TeamAdminAccess rows arrived via
+        # ?team=&year=; a bare /mod would bounce them to /mod/redeem
+        self.account.has_permission.return_value = True
+        self.account.permissions = [AccountPermission.REVIEW_MEDIA]
+        suggestion_id = self.createMediaSuggestion()
+
+        page = self.web_client.get(f"/mod?team=1124&year={self.now.year}")
+        self.assertIn(b'name="team" value="1124"', page.data)
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={
+                f"accept_reject-{suggestion_id}": f"accept::{suggestion_id}",
+                "team": "1124",
+                "year": str(self.now.year),
+            },
+        )
+
+        self.assertEqual(response.status_code, 302)
+        location = urlparse(response.headers["Location"])
+        self.assertEqual(location.path, "/mod")
+        self.assertIn("team=1124", location.query)
+        self.assertIn(f"year={self.now.year}", location.query)
+        dashboard = self.web_client.get(response.headers["Location"])
+        self.assertEqual(dashboard.status_code, 200)
+
+    def test_review_reports_every_unapplied_outcome(self):
+        self.giveTeamAdminAccess()
+        first_id = self.createMediaSuggestion()
+        Team(id="frc1124", team_number=1124).put()
+        status = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.account_key,
+            "http://imgur.com/second",
+            "frc1124",
+            str(self.now.year),
+        ).get_result()
+        self.assertEqual(status[0], "success")
+        second_id = [
+            k.id()
+            for k in Suggestion.query().fetch(keys_only=True)
+            if k.id() != first_id
+        ][0]
+        for suggestion_id in (first_id, second_id):
+            suggestion = Suggestion.get_by_id(suggestion_id)
+            suggestion.review_state = SuggestionState.REVIEW_REJECTED
+            suggestion.put()
+
+        response = self.web_client.post(
+            "/mod/review",
+            data={
+                f"accept_reject-{first_id}": f"accept::{first_id}",
+                f"accept_reject-{second_id}": f"reject::{second_id}",
+            },
+        )
+
+        location = urlparse(response.headers["Location"])
+        self.assertIn(first_id, location.query)
+        self.assertIn(second_id, location.query)

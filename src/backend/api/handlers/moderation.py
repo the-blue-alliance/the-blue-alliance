@@ -167,8 +167,15 @@ def moderation_suggestion_accept(suggestion_key: str) -> Response:
             jsonify({"Error": "Request body must be a JSON object"}), 400
         )
 
+    # The API authorizes by AccountPermission only; team-admin delegation
+    # (/mod) is not offered here because the list/queue endpoints don't
+    # know about it either
     outcome = SuggestionReviewer.accept_suggestion(
-        suggestion_key, user, overrides=overrides, endpoint=request.endpoint or ""
+        suggestion_key,
+        user,
+        overrides=overrides,
+        endpoint=request.endpoint or "",
+        delegated_team_keys=frozenset(),
     )
     if outcome.result == SuggestionReviewResult.ACCEPTED:
         _send_apiwrite_review_alert(
@@ -209,7 +216,10 @@ def moderation_suggestions_reject() -> Response:
         )
 
     outcomes = SuggestionReviewer.reject_suggestions(
-        suggestion_keys, user, endpoint=request.endpoint or ""
+        suggestion_keys,
+        user,
+        endpoint=request.endpoint or "",
+        delegated_team_keys=frozenset(),
     )
     for outcome in outcomes:
         if outcome.result == SuggestionReviewResult.REJECTED:
@@ -248,9 +258,9 @@ def _send_apiwrite_review_alert(
     auth_id: Optional[str] = None,
 ) -> None:
     """
-    Admin alert for reviewed Trusted API key requests, carrying forward the
-    web review controller's (never-ported) admin email as a Slack alert on
-    the existing suggestion-nag channel. Only apiwrite suggestions alert.
+    Admin alert for reviewed Trusted API key requests, posted to the existing
+    suggestion-nag Slack channel. Only apiwrite suggestions alert. (The
+    original Python 2 review page emailed this instead; see #10723.)
     """
     suggestion = _get_suggestion_for_alert(suggestion_key)
     if suggestion is None or suggestion.target_model != "api_auth_access":
