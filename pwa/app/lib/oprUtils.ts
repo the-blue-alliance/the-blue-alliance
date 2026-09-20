@@ -34,6 +34,17 @@ export function getDefaultTotalComponentName(year: number): string {
   return 'totalPoints';
 }
 
+export function getDefaultCoprYAxisComponentName(
+  coprs: EventCoprs,
+  year: number,
+): string {
+  const autoComponentName = getDefaultAutoComponentName(year);
+
+  return autoComponentName in coprs
+    ? autoComponentName
+    : getDefaultTotalComponentName(year);
+}
+
 export interface CoprRow {
   teamKey: string;
   values: Record<string, number>;

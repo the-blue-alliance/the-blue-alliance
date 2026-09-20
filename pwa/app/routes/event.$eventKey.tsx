@@ -150,7 +150,7 @@ import {
 } from '~/lib/mediaUtils';
 import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
-  getDefaultAutoComponentName,
+  getDefaultCoprYAxisComponentName,
   getDefaultTeleopComponentName,
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
@@ -768,7 +768,10 @@ function EventPage() {
                     colors={colorsQuery.data ?? { teams: {} }}
                     coprs={coprsQuery.data}
                     defaultXCopr={getDefaultTeleopComponentName(event.year)}
-                    defaultYCopr={getDefaultAutoComponentName(event.year)}
+                    defaultYCopr={getDefaultCoprYAxisComponentName(
+                      coprsQuery.data,
+                      event.year,
+                    )}
                   />
                 </Suspense>
                 <ComponentOprsTable coprs={coprsQuery.data} year={event.year} />
