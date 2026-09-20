@@ -45,6 +45,15 @@ class MediaSuggestionMessage(TypedDict):
     details_json: str
 
 
+class EventMediaSuggestionMessage(TypedDict):
+    event_key: str
+    media_url: str
+
+
+class EventMediaSuggestionResponse(BaseResponse):
+    status: str
+
+
 class FavoriteMessage(TypedDict):
     model_key: str
     model_type: ModelType

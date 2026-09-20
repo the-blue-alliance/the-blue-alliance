@@ -160,6 +160,16 @@ test.describe('/event/2026necmp Media tab', () => {
     await page.getByRole('tab', { name: 'Media' }).click();
   });
 
+  test('shows the media count in the tab', async ({ page }) => {
+    await expect(page.getByRole('tab', { name: /^Media \d+$/ })).toBeVisible();
+  });
+
+  test('links to the event media suggestion form', async ({ page }) => {
+    await expect(
+      page.getByRole('link', { name: 'Add Event Media' }),
+    ).toHaveAttribute('href', '/suggest/event/media?event_key=2026necmp');
+  });
+
   test('shows the photo galleries heading', async ({ page }) => {
     await expect(
       page.getByRole('heading', { name: 'Photo Galleries' }),

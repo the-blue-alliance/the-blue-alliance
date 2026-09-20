@@ -62,6 +62,29 @@ export type MediaSuggestionMessage = {
   details_json: string;
 };
 
+export type EventMediaSuggestionMessage = {
+  /**
+   * The event receiving the suggested media
+   */
+  event_key: string;
+  /**
+   * The URL of the event media being suggested
+   */
+  media_url: string;
+};
+
+export type EventMediaSuggestionResponse = {
+  code: number;
+  message: string;
+  status:
+    | 'success'
+    | 'suggestion_exists'
+    | 'media_exists'
+    | 'bad_url'
+    | 'bad_event'
+    | 'unauthorized';
+};
+
 export type SubscriptionMessage = {
   device_key?: string;
   model_key: string;
@@ -156,6 +179,23 @@ export type SetModelPreferencesResponses = {
 
 export type SetModelPreferencesResponse =
   SetModelPreferencesResponses[keyof SetModelPreferencesResponses];
+
+export type SuggestEventMediaData = {
+  body: EventMediaSuggestionMessage;
+  path?: never;
+  query?: never;
+  url: '/event/media/suggest';
+};
+
+export type SuggestEventMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: EventMediaSuggestionResponse;
+};
+
+export type SuggestEventMediaResponse =
+  SuggestEventMediaResponses[keyof SuggestEventMediaResponses];
 
 export type SuggestTeamMediaData = {
   body: MediaSuggestionMessage;

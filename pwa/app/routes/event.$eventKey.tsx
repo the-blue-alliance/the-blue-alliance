@@ -700,6 +700,11 @@ function EventPage() {
             <InlineIcon>
               <MediaIcon />
               Media
+              <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
+                {eventMediaQuery.data
+                  ? eventMediaQuery.data.length + event.webcasts.length
+                  : '-'}
+              </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
           <AnimatedTabsTrigger value="scouting">
@@ -1387,7 +1392,16 @@ function MediaTab({
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Webcasts</h1>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold">Webcasts</h1>
+          <Button
+            render={
+              <Link to="/suggest/event/media" search={{ event_key: eventKey }}>
+                Add Event Media
+              </Link>
+            }
+          />
+        </div>
         {webcasts.length > 0 ? (
           <>
             {youtubeWebcasts.length > 0 && (
