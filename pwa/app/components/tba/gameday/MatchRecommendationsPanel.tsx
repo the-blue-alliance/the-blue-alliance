@@ -60,19 +60,32 @@ function AllianceTeams({
 }: {
   alliance: 'red' | 'blue';
   predictedScore: number | null | undefined;
-  teams: number[];
+  teams: number[] | null | undefined;
   year: number;
 }) {
   return (
     <div className="grid grid-cols-[minmax(0,1fr)_3rem] gap-1">
-      <TeamListSubgrid
-        allianceColor={alliance}
-        teamKeys={teams.map((team) => `frc${team}`)}
-        dq={[]}
-        surrogate={[]}
-        year={year}
-        className="rounded"
-      />
+      {teams && teams.length > 0 ? (
+        <TeamListSubgrid
+          allianceColor={alliance}
+          teamKeys={teams.map((team) => `frc${team}`)}
+          dq={[]}
+          surrogate={[]}
+          year={year}
+          className="rounded"
+        />
+      ) : (
+        <div
+          className={`flex items-center justify-center rounded text-sm
+            text-muted-foreground ${
+              alliance === 'red'
+                ? 'bg-alliance-red-loser'
+                : 'bg-alliance-blue-loser'
+            }`}
+        >
+          TBD
+        </div>
+      )}
       <div
         className={`flex flex-col items-center justify-center rounded ${
           alliance === 'red'

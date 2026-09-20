@@ -288,7 +288,8 @@ class MatchSuggestionHelper:
     @classmethod
     def _candidate_matches(cls, events: List[Event]) -> List[Tuple[Event, Match]]:
         """
-        Every unplayed match with a known time from the given events.
+        Every unplayed match with a known time and assigned alliances from the
+        given events.
         """
         for event in events:
             event.prep_matches()
@@ -300,6 +301,8 @@ class MatchSuggestionHelper:
                 for match in event.matches
                 if not match.has_been_played
                 and (match.predicted_time is not None or match.time is not None)
+                and match.alliances[AllianceColor.RED]["teams"]
+                and match.alliances[AllianceColor.BLUE]["teams"]
             )
 
         return candidates

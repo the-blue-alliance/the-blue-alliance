@@ -60,8 +60,8 @@ def make_match(
     predicted_time: Optional[datetime.datetime] = None,
     time: Optional[datetime.datetime] = None,
 ) -> Match:
-    red = red or ["frc1", "frc2", "frc3"]
-    blue = blue or ["frc4", "frc5", "frc6"]
+    red = red if red is not None else ["frc1", "frc2", "frc3"]
+    blue = blue if blue is not None else ["frc4", "frc5", "frc6"]
     score = 100 if played else -1
     return Match(
         id=Match.render_key_name(event.key_name, comp_level, set_number, match_number),
@@ -523,6 +523,40 @@ def test_skips_matches_with_no_time(ndb_stub, memcache_stub) -> None:
     seed_matches(event, [make_match(event, match_number=1)])
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    assert result.suggestions == {}
+
+
+@pytest.mark.parametrize(
+    "red,blue",
+    [
+        ([], ["frc4", "frc5", "frc6"]),
+        (["frc1", "frc2", "frc3"], []),
+        ([], []),
+    ],
+    ids=["red-unassigned", "blue-unassigned", "both-unassigned"],
+)
+def test_skips_matches_with_unassigned_alliances(
+    ndb_stub,
+    memcache_stub,
+    red: List[TeamKey],
+    blue: List[TeamKey],
+) -> None:
+    event = make_event()
+    seed_matches(
+        event,
+        [
+            make_match(
+                event,
+                match_number=1,
+                red=red,
+                blue=blue,
+                predicted_time=NOW + datetime.timedelta(minutes=10),
+            )
+        ],
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+
     assert result.suggestions == {}
 
 
