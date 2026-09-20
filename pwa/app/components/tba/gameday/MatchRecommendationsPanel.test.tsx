@@ -205,6 +205,27 @@ describe('MatchRecommendationsPanel', () => {
     );
   });
 
+  test('shows TBD when Firebase omits empty alliance team lists', () => {
+    useMatchSuggestionsMock.mockReturnValue({
+      data: {
+        updated_at: 1_776_959_400,
+        suggestions: {
+          match: {
+            ...makeSuggestion('2026cc_sf5m1'),
+            rt: undefined,
+            bt: undefined,
+          } as unknown as MatchSuggestion,
+        },
+      },
+      error: null,
+      isLoading: false,
+    });
+
+    render(<MatchRecommendationsPanel />);
+
+    expect(screen.getAllByText('TBD')).toHaveLength(2);
+  });
+
   test('shows an empty state when there are no recommendations', () => {
     useMatchSuggestionsMock.mockReturnValue({
       data: { updated_at: 1_776_959_400 },
