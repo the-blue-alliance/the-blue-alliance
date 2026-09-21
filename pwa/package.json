@@ -61,7 +61,7 @@
     "recharts": "3.10.1",
     "sonner": "2.0.8",
     "srvx": "1.0.4",
-    "temporal-polyfill": "1.0.4",
+    "temporal-polyfill": "1.0.5",
     "vaul": "1.1.2",
     "workbox-window": "7.4.1",
     "zod": "4.6.2"
