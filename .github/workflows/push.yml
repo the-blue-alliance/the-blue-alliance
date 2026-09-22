@@ -76,6 +76,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
+          flags: python
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-24.04
@@ -116,6 +117,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
+          flags: node
   pwa-lint:
     name: "[pwa] Format & Lint"
     runs-on: ubuntu-24.04
@@ -173,6 +175,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
+          flags: pwa
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-24.04

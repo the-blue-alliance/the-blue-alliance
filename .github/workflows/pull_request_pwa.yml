@@ -98,6 +98,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
+          flags: pwa
 
   pwa-build:
     name: "[pwa] Build"
