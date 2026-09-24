@@ -27,14 +27,16 @@ function TooltipTrigger({
 
 function TooltipContent({
   className,
+  viewportClassName,
   side,
   sideOffset = 0,
   align,
   alignOffset,
   children,
   ...props
-}: ComponentProps<typeof TooltipPrimitive.Popup> &
-  Pick<
+}: ComponentProps<typeof TooltipPrimitive.Popup> & {
+  viewportClassName?: string;
+} & Pick<
     ComponentProps<typeof TooltipPrimitive.Positioner>,
     'side' | 'sideOffset' | 'align' | 'alignOffset'
   >) {
@@ -66,11 +68,14 @@ function TooltipContent({
           {...props}
         >
           <div
-            className="relative z-10 max-h-60 overflow-x-hidden overflow-y-auto
-              px-3 py-1.5 text-center text-balance [&::-webkit-scrollbar]:w-2
+            className={cn(
+              `relative z-10 max-h-60 overflow-x-hidden overflow-y-auto px-3
+              py-1.5 text-center text-balance [&::-webkit-scrollbar]:w-2
               [&::-webkit-scrollbar-thumb]:rounded-full
               [&::-webkit-scrollbar-thumb]:bg-muted-foreground/30
-              [&::-webkit-scrollbar-track]:bg-transparent"
+              [&::-webkit-scrollbar-track]:bg-transparent`,
+              viewportClassName,
+            )}
           >
             {children}
           </div>

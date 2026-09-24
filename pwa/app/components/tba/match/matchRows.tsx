@@ -96,6 +96,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-before-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -132,6 +133,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-after-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -437,11 +439,13 @@ function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
 
 interface BreakRowProps extends React.HTMLAttributes<HTMLDivElement> {
   text: string;
+  size?: 'default' | 'small';
   playlists?: PlaylistEntry[];
 }
 export function BreakRow({
   className,
   text,
+  size = 'default',
   playlists,
   ...props
 }: BreakRowProps) {
@@ -451,8 +455,10 @@ export function BreakRow({
       {...props}
     >
       <div
-        className="relative flex h-8 w-full items-center justify-center text-sm
-          font-medium"
+        className={cn(
+          'relative flex w-full items-center justify-center font-medium',
+          size === 'small' ? 'h-5 text-xs' : 'h-8 text-sm',
+        )}
       >
         <span>{text}</span>
         {playlists && playlists.length > 0 && (

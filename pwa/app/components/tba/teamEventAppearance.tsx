@@ -15,6 +15,7 @@ import {
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import { AwardBanner } from '~/components/tba/banner';
 import DetailEntity from '~/components/tba/detailEntity';
+import EventRankTooltip from '~/components/tba/eventRankTooltip';
 import { EventLink, EventLocationLink, TeamLink } from '~/components/tba/links';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
@@ -47,6 +48,34 @@ function StatChip({
       {sub && <div className="mt-1 text-xs text-muted-foreground">{sub}</div>}
     </div>
   );
+}
+
+export function getTotalRankingPoints(
+  event: Event,
+  status: TeamEventStatus | null,
+): number | undefined {
+  const ranking = status?.qual?.ranking;
+  const rankingScore = ranking?.sort_orders?.[0];
+  const rankingScoreInfo = status?.qual?.sort_order_info?.[0];
+
+  if (
+    event.year < 2016 ||
+    rankingScoreInfo?.name !== 'Ranking Score' ||
+    rankingScore === undefined ||
+    rankingScore === null
+  ) {
+    return undefined;
+  }
+
+  if (rankingScoreInfo.precision === 0) {
+    return Math.round(rankingScore);
+  }
+
+  if (ranking?.matches_played === undefined) {
+    return undefined;
+  }
+
+  return Math.round(rankingScore * ranking.matches_played);
 }
 
 function Section({
@@ -97,8 +126,11 @@ export default function TeamEventAppearance({
   matches.sort(sortMatchComparator);
 
   return (
-    <div className="relative" id={event.key}>
-      <div className="flex flex-wrap gap-x-8">
+    <div className="relative min-[1550px]:grid" id={event.key}>
+      <div
+        className="flex flex-wrap gap-x-8 min-[1550px]:col-start-1
+          min-[1550px]:row-start-1"
+      >
         <div className="w-full md:w-[32%]">
           <h2 className="mb-1 text-2xl font-medium">
             <EventLink eventOrKey={event.key}>{event.name}</EventLink>
@@ -148,8 +180,9 @@ export default function TeamEventAppearance({
 
       {SEASON_EVENT_TYPES.has(event.event_type) && bannerAwards.length > 0 && (
         <div
-          className="absolute top-0 right-0 -mr-46 hidden min-[1550px]:flex
-            min-[1550px]:flex-col min-[1550px]:gap-2"
+          className="hidden min-[1550px]:col-start-1 min-[1550px]:row-start-1
+            min-[1550px]:flex min-[1550px]:translate-x-46 min-[1550px]:flex-col
+            min-[1550px]:gap-2 min-[1550px]:justify-self-end"
         >
           {bannerAwards.map((a) => (
             <AwardBanner key={a.award_type} award={a} event={event} />
@@ -160,7 +193,7 @@ export default function TeamEventAppearance({
   );
 }
 
-function TeamStatus({
+export function TeamStatus({
   event,
   status,
   team,
@@ -190,6 +223,7 @@ function TeamStatus({
   const hasRegionalPoolPoints =
     event.event_type === EventType.REGIONAL &&
     maybeRegionalPoolPoints?.points[team.key];
+  const rankingPoints = getTotalRankingPoints(event, status);
 
   const sections = [];
 
@@ -198,10 +232,11 @@ function TeamStatus({
     sections.push(
       <div key="stats" className="grid grid-cols-2 gap-2">
         {hasRank && status?.qual?.ranking?.rank && (
-          <StatChip
-            label="Rank"
-            value={status.qual.ranking.rank.toString()}
-            sub={`of ${status.qual.num_teams}`}
+          <EventRankTooltip
+            eventKey={event.key}
+            teamKey={team.key}
+            rank={status.qual.ranking.rank}
+            numTeams={status.qual.num_teams}
           />
         )}
         {hasRecord && status?.qual?.ranking?.record && (
@@ -217,6 +252,9 @@ function TeamStatus({
               status.qual.ranking.record.ties +
               (status.playoff?.record?.ties ?? 0)
             }`}
+            sub={
+              rankingPoints === undefined ? undefined : `${rankingPoints} RP`
+            }
           />
         )}
       </div>,
@@ -231,8 +269,15 @@ function TeamStatus({
           {maybeAlliances
             .find((a) => a.picks.includes(team.key))
             ?.picks.map((k) => (
-              <TeamLink key={k} teamOrKey={k} year={event.year}>
-                <Badge variant={'outline'}>{k.substring(3)}</Badge>
+              <TeamLink
+                key={k}
+                teamOrKey={k}
+                year={event.year}
+                aria-current={k === team.key ? 'page' : undefined}
+              >
+                <Badge variant={k === team.key ? 'secondary' : 'outline'}>
+                  {k.substring(3)}
+                </Badge>
               </TeamLink>
             ))}
         </div>

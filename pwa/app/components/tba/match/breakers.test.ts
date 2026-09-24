@@ -135,6 +135,7 @@ describe('END_OF_DAY_BREAKER', () => {
     ).toEqual({
       shouldBreak: false,
       text: 'End of Day',
+      size: 'small',
       whereToInsertBreak: 'after',
     });
   });
@@ -150,6 +151,7 @@ describe('END_OF_DAY_BREAKER', () => {
     ).toEqual({
       shouldBreak: true,
       text: 'End of Day',
+      size: 'small',
       whereToInsertBreak: 'after',
     });
   });
@@ -165,6 +167,7 @@ describe('END_OF_DAY_BREAKER', () => {
     ).toEqual({
       shouldBreak: true,
       text: 'End of Day',
+      size: 'small',
       whereToInsertBreak: 'after',
     });
   });
