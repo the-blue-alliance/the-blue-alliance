@@ -6,6 +6,7 @@ import { timestampsAreOnDifferentDays } from '~/lib/utils';
 export interface BreakerResult {
   shouldBreak: boolean;
   text?: string;
+  size?: 'default' | 'small';
   whereToInsertBreak?: 'before' | 'after';
 }
 
@@ -32,6 +33,7 @@ export const END_OF_DAY_BREAKER: ShouldInsertBreakCallback = ({
       event.timezone ?? 'UTC',
     ),
     text: 'End of Day',
+    size: 'small',
     whereToInsertBreak: 'after',
   };
 };

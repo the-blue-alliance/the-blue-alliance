@@ -125,9 +125,12 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
 - Do not assert mid-flow to check progress. Navigate and interact, then assert once at the end.
 - If you need assertions at three different points, write three tests.
 - No loops, conditionals, or try/catch in tests, except to assert an expected error.
-- Assert on what the user can see, not internal state or implementation details.
+- Test functionality, not appearance. Assert the user-visible meaning or state of the UI, not the specific styling used to communicate it.
+- For example, when an item should be highlighted, assert that it is identified as selected, active, current, or otherwise highlighted through an accessible or semantic contract. Do not assert the specific highlight color, Tailwind class, or other styling implementation.
+- Assert on what the user can perceive or do, not internal state or implementation details.
 - Prefer user-visible behavior and accessibility contracts in component tests: roles, accessible names, text, links, disabled state, and ARIA attributes.
-- Avoid coupling unit/component tests to Tailwind or CSS class names, DOM nesting, or private component structure; cover important visual styling with browser-level Playwright or screenshot tests.
+- Do not couple functional tests to colors, spacing, typography, Tailwind or CSS classes, DOM nesting, or private component structure.
+- Use browser-level screenshot or visual-regression tests only when appearance itself is the requirement under test.
 - Assert on the actual value, not whether a mock was called, unless the call itself is the behavior.
 - Do not assert on fields unrelated to the behavior under test.
 - Inline test data where it is used. Prefer literal values over computed ones.

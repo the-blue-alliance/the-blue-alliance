@@ -1,5 +1,27 @@
 import { expect, test } from '@playwright/test';
 
+[
+  ['history', '/team/604/history', 'History'],
+  ['stats', '/team/604/stats', 'Stats'],
+  ['specific year', '/team/604/2024', '2024'],
+].forEach(([pageName, path, currentYearLabel]) => {
+  test(`keeps the year selector the same size on the ${pageName} page`, async ({
+    page,
+  }) => {
+    await page.goto(path);
+    await page.locator('body[data-hydrated]').waitFor();
+
+    const boundingBox = await page
+      .getByRole('button', { name: currentYearLabel, exact: true })
+      .boundingBox();
+
+    expect({ width: boundingBox?.width, height: boundingBox?.height }).toEqual({
+      width: 180,
+      height: 40,
+    });
+  });
+});
+
 test.describe('/team/604/2024', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/team/604/2024');
@@ -128,6 +150,28 @@ test.describe('/team/604/2024', () => {
     ).toBeVisible();
   });
 
+  test('highlights the current team in its alliance', async ({ page }) => {
+    await expect(
+      page
+        .locator('section[id="2024casj"]')
+        .locator('a[aria-current="page"]')
+        .filter({ hasText: /^604$/ })
+        .locator('div'),
+    ).toHaveClass(/bg-secondary/);
+  });
+
+  test('does not mark an alliance partner as the current page', async ({
+    page,
+  }) => {
+    await expect(
+      page
+        .locator('section[id="2024casj"]')
+        .getByRole('heading', { name: 'Alliance 3' })
+        .locator('..')
+        .getByRole('link', { name: '3256', exact: true }),
+    ).not.toHaveAttribute('aria-current');
+  });
+
   test('watch-all-videos links point to YouTube playlists', async ({
     page,
   }) => {
@@ -210,6 +254,67 @@ test.describe('/team/2713/2024', () => {
     await expect(
       page.getByRole('link', { name: 'New England district' }),
     ).toHaveAttribute('href', '/district/ne/2024');
+  });
+});
+
+test.describe('/team/4946/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.setViewportSize({ width: 1600, height: 900 });
+    await page.goto('/team/4946/2026');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('keeps blue banners from adjacent event appearances separated', async ({
+    page,
+  }) => {
+    const bannersAreSeparated = await page
+      .locator('section:not(#team-info) [data-testid="award-banner"]')
+      .evaluateAll(
+        ([firstBanner, secondBanner]) =>
+          firstBanner.getBoundingClientRect().bottom <=
+          secondBanner.getBoundingClientRect().top,
+      );
+
+    expect(bannersAreSeparated).toBe(true);
+  });
+});
+
+test.describe('/team/6324/history', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/team/6324/history');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('alternates highlights between years', async ({ page }) => {
+    const highlightsAlternate = await page
+      .locator('tbody td[rowspan]')
+      .evaluateAll((yearCells) => {
+        const backgrounds = yearCells
+          .slice(0, 4)
+          .map((cell) => getComputedStyle(cell).backgroundColor);
+
+        return (
+          backgrounds.length === 4 &&
+          backgrounds[0] !== backgrounds[1] &&
+          backgrounds[0] === backgrounds[2] &&
+          backgrounds[1] === backgrounds[3]
+        );
+      });
+
+    expect(highlightsAlternate).toBe(true);
+  });
+
+  test('separates adjacent years', async ({ page }) => {
+    const yearDividersAreVisible = await page
+      .locator('tbody td[rowspan]')
+      .locator('..')
+      .evaluateAll((yearRows) =>
+        yearRows
+          .slice(1)
+          .every((row) => getComputedStyle(row).borderTopWidth !== '0px'),
+      );
+
+    expect(yearDividersAreVisible).toBe(true);
   });
 });
 
