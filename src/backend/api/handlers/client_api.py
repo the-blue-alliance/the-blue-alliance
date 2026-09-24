@@ -12,6 +12,8 @@ from backend.api.client_api_types import (
     ApiWriteKeyMessage,
     BaseResponse,
     DeleteApiReadKeyMessage,
+    EventMediaSuggestionMessage,
+    EventMediaSuggestionResponse,
     FavoriteCollection,
     FavoriteMessage,
     ListDevicesResponse,
@@ -39,6 +41,7 @@ from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
 from backend.common.models.subscription import Subscription
@@ -203,6 +206,57 @@ def suggest_team_media(request: MediaSuggestionMessage) -> BaseResponse:
         return BaseResponse(code=200, message="Suggestion added")
     else:
         return BaseResponse(code=304, message="Suggestion already exists")
+
+
+@client_api_method(EventMediaSuggestionMessage, EventMediaSuggestionResponse)
+def suggest_event_media(
+    request: EventMediaSuggestionMessage,
+) -> EventMediaSuggestionResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return EventMediaSuggestionResponse(
+            code=401,
+            message="Unauthorized to make suggestions",
+            status="unauthorized",
+        )
+
+    event_key = request["event_key"]
+    if not Event.validate_key_name(event_key) or Event.get_by_id(event_key) is None:
+        return EventMediaSuggestionResponse(
+            code=404,
+            message="Event not found",
+            status="bad_event",
+        )
+
+    status, _ = SuggestionCreator.createEventMediaSuggestion(
+        author_account_key=none_throws(current_user.account_key),
+        media_url=request["media_url"],
+        event_key=event_key,
+    ).get_result()
+
+    if status == SuggestionCreationStatus.SUCCESS:
+        return EventMediaSuggestionResponse(
+            code=200,
+            message="Suggestion added",
+            status="success",
+        )
+    if status == SuggestionCreationStatus.SUGGESTION_EXISTS:
+        return EventMediaSuggestionResponse(
+            code=304,
+            message="Suggestion is already pending review",
+            status="suggestion_exists",
+        )
+    if status == SuggestionCreationStatus.MEDIA_EXISTS:
+        return EventMediaSuggestionResponse(
+            code=304,
+            message="Media is already approved",
+            status="media_exists",
+        )
+    return EventMediaSuggestionResponse(
+        code=400,
+        message="Bad suggestion url",
+        status="bad_url",
+    )
 
 
 @client_api_method(VoidRequest, FavoriteCollection)

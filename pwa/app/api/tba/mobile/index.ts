@@ -8,6 +8,7 @@ export {
   listSubscriptions,
   type Options,
   setModelPreferences,
+  suggestEventMedia,
   suggestTeamMedia,
 } from './sdk.gen';
 export type {
@@ -23,6 +24,8 @@ export type {
   DeleteApiReadKeyData,
   DeleteApiReadKeyResponse,
   DeleteApiReadKeyResponses,
+  EventMediaSuggestionMessage,
+  EventMediaSuggestionResponse,
   FavoriteCollection,
   FavoriteMessage,
   ListApiKeysData,
@@ -42,6 +45,9 @@ export type {
   SetModelPreferencesResponses,
   SubscriptionCollection,
   SubscriptionMessage,
+  SuggestEventMediaData,
+  SuggestEventMediaResponse,
+  SuggestEventMediaResponses,
   SuggestTeamMediaData,
   SuggestTeamMediaResponse,
   SuggestTeamMediaResponses,
