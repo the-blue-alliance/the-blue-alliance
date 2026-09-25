@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import Any, Callable, cast, Dict, List, Optional, Set, TypeVar, Union
+from typing import Any, Callable, cast, Dict, List, Optional, TypeVar, Union
 
 from flask import abort, make_response, redirect, request, url_for
 from flask.typing import ResponseValue
@@ -70,26 +70,6 @@ def require_permission(
             if not user:
                 return redirect(url_for("account.login", next=request.url))
             if not user.is_admin and permission not in user.permissions:
-                return abort(401)
-            return f(*args, **kwargs)
-
-        return decorated_function
-
-    return decorator
-
-
-def require_any_permission(
-    permissions: Set[AccountPermission],
-) -> Callable[..., Callable[..., ResponseValue]]:
-    def decorator(f: Callable[..., ResponseValue]) -> Callable[..., ResponseValue]:
-        @wraps(f)
-        def decorated_function(*args, **kwargs):
-            user = current_user()
-            if not user:
-                return redirect(url_for("account.login", next=request.url))
-            if not user.is_admin and not permissions.intersection(
-                user.permissions or {}
-            ):
                 return abort(401)
             return f(*args, **kwargs)
 

@@ -1289,6 +1289,47 @@ def test_reject_apiwrite_sends_admin_alert(
     assert "Not this one" in body
 
 
+def test_api_does_not_honor_team_admin_delegation(
+    api_client: Client, moderator, author: Account, taskqueue_stub
+) -> None:
+    # A REVIEW_DESIGNS holder who is also a team admin for frc254 can accept
+    # frc254 media on /mod, but the API authorizes by permission only, so
+    # its read and write sides agree
+    from backend.common.models.team_admin_access import TeamAdminAccess
+
+    user = moderator([AccountPermission.REVIEW_DESIGNS])
+    TeamAdminAccess(
+        id="access_254",
+        team_number=254,
+        year=2016,
+        expiration=datetime.now() + timedelta(days=1),
+        account=user.account_key,
+    ).put()
+    suggestion_id = create_suggestion(
+        author,
+        "media",
+        "frc254",
+        {
+            "year": 2016,
+            "reference_type": "team",
+            "reference_key": "frc254",
+            "media_type_enum": int(MediaType.YOUTUBE_VIDEO),
+            "foreign_key": "abc123",
+            "details_json": "{}",
+            "private_details_json": None,
+            "is_social": False,
+        },
+    )
+
+    resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept", json={})
+    assert resp.status_code == 403
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/reject", json={"suggestion_keys": [suggestion_id]}
+    )
+    assert resp.status_code == 200
+    assert resp.json["results"][0]["result"] == "forbidden"
+
+
 # ---------------------------------------------------------------------------
 # Similar offseason event matching
 # ---------------------------------------------------------------------------

@@ -83,6 +83,12 @@ colorsClient.interceptors.error.use((error, response) => {
   return mapClientError(error, response);
 });
 
+// And for the moderation client, so a failed queue probe throws a real
+// ApiError (with status) rather than a bare object.
+moderationClient.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
+});
+
 // SSR-only network LRU under the API client. Client freshness is owned by
 // React Query staleTime — do not install a second TTL in the browser.
 if (typeof window === 'undefined') {

@@ -9,10 +9,12 @@ import {
 import type {
   AcceptRequest,
   AcceptResponse,
+  QueueResponse,
   SuggestionType,
 } from '~/api/tba/moderation/types.gen';
 import { ReviewResult } from '~/api/tba/moderation/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
+import { isNotModeratorResponse } from '~/lib/moderationUtils';
 
 export interface ReviewDecisions {
   accepts: { key: string; overrides: AcceptRequest }[];
@@ -27,18 +29,27 @@ export interface ReviewSubmissionResult {
   failed: { key: string; message: string }[];
 }
 
+/**
+ * The pending queue for the signed-in moderator, or `null` when the account
+ * has no review permissions. A 403 is the normal answer for most users (the
+ * account page asks for everyone), so it is data rather than a query error
+ * that would be reported.
+ */
 export function useModerationQueue() {
   const { user } = useAuth();
   return useQuery({
     queryKey: ['moderation', 'queue', user?.uid],
-    queryFn: async () => {
+    queryFn: async (): Promise<QueueResponse | null> => {
       if (!user) throw new Error('User not authenticated');
       const token = await user.getIdToken();
-      const response = await getModerationQueue({
-        auth: token,
-        throwOnError: true,
-      });
-      return response.data;
+      const response = await getModerationQueue({ auth: token });
+      if (response.data) {
+        return response.data;
+      }
+      if (isNotModeratorResponse(response.response?.status, response.error)) {
+        return null;
+      }
+      throw response.error ?? new Error('Failed to load moderation queue');
     },
     enabled: !!user,
     retry: false,
