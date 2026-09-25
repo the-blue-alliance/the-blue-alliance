@@ -23,6 +23,7 @@ import { Spinner } from '~/components/ui/spinner';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { getDistrictColorBorderClass } from '~/lib/districtUtils';
+import { useHashTab } from '~/lib/useHashTab';
 import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute(
@@ -741,6 +742,10 @@ function computeTeamupLeaderboard(
 }
 
 function DistrictInsightsPage() {
+  const tabs = useHashTab({
+    values: ['championships', 'events', 'awards'] as const,
+    defaultValue: 'championships',
+  });
   const { abbreviation } = Route.useLoaderData();
 
   const { data: history } = useSuspenseQuery(
@@ -839,7 +844,12 @@ function DistrictInsightsPage() {
       {isLoading ? (
         <Spinner className="mx-auto mt-16 size-8" />
       ) : (
-        <Tabs defaultValue="championships" className="mt-6">
+        <Tabs
+          key={tabs.key}
+          defaultValue={tabs.defaultValue}
+          onValueChange={(value) => tabs.onValueChange(String(value))}
+          className="mt-6"
+        >
           <TabsList
             className="flex h-auto flex-wrap items-center justify-evenly
               *:basis-1/2 lg:*:basis-1"

@@ -37,6 +37,7 @@ import {
   SUBSCRIPTION_TYPES,
   SUBSCRIPTION_TYPE_DISPLAY_NAMES,
 } from '~/lib/myTBAConstants';
+import { useHashTab } from '~/lib/useHashTab';
 import { MODEL_TYPE, pluralize } from '~/lib/utils';
 
 export const Route = createFileRoute('/account/mytba')({
@@ -44,6 +45,10 @@ export const Route = createFileRoute('/account/mytba')({
 });
 
 function MyTBA() {
+  const tabs = useHashTab({
+    values: ['teams', 'events'] as const,
+    defaultValue: 'teams',
+  });
   const { isInitialLoading, user } = useAuth();
 
   const { data: favorites } = useQuery({
@@ -112,7 +117,12 @@ function MyTBA() {
       <div className="py-4">
         <h1 className="text-2xl font-bold">myTBA</h1>
       </div>
-      <Tabs defaultValue="teams" className="mt-4">
+      <Tabs
+        key={tabs.key}
+        defaultValue={tabs.defaultValue}
+        onValueChange={(value) => tabs.onValueChange(String(value))}
+        className="mt-4"
+      >
         <TabsList>
           <TabsTrigger value="teams">My Teams</TabsTrigger>
           <TabsTrigger value="events">My Events</TabsTrigger>
