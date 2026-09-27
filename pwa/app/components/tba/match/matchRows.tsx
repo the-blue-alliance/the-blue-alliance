@@ -290,7 +290,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.red.score}
           allianceColor="red"
-          className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg
+          className="col-start-6 row-start-1 mt-0.5 max-xl:rounded-t-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
             xl:rounded-l-lg"
           winner={match.winning_alliance === AllianceColor.RED}
@@ -306,7 +306,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.blue.score}
           allianceColor="blue"
-          className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg
+          className="col-start-6 row-start-2 mb-0.5 max-xl:rounded-b-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
             xl:rounded-r-lg"
           winner={match.winning_alliance === AllianceColor.BLUE}
