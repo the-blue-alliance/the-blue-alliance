@@ -158,4 +158,34 @@ describe('EliminationBracket', () => {
       ),
     ).not.toBeNull();
   });
+
+  test('marks the series winner row as the winner', () => {
+    render(
+      <EliminationBracket
+        alliances={alliances}
+        matches={[match1RedWin]}
+        event={event}
+      />,
+    );
+
+    const row = screen
+      .getAllByRole('link', { name: '101' })[0]
+      .closest('[data-winner]');
+    expect(row?.getAttribute('data-winner')).toBe('true');
+  });
+
+  test('does not mark the series loser row as the winner', () => {
+    render(
+      <EliminationBracket
+        alliances={alliances}
+        matches={[match1RedWin]}
+        event={event}
+      />,
+    );
+
+    const row = screen
+      .getAllByRole('link', { name: '801' })[0]
+      .closest('[data-winner]');
+    expect(row?.getAttribute('data-winner')).toBe('false');
+  });
 });
