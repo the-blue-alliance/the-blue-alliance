@@ -7,7 +7,7 @@ import { getSearchRedirect } from '~/lib/search/searchRedirect';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 const searchSchema = z.object({
-  q: z.string().optional().default(''),
+  q: z.coerce.string().optional().default(''),
 });
 
 export const Route = createFileRoute('/search')({
