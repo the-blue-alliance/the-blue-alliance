@@ -88,7 +88,7 @@ export function matchTitleShort(
   return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.set_number} Match ${match.match_number}`;
 }
 
-function matchHasBeenPlayed(match: Match) {
+export function matchHasBeenPlayed(match: Match) {
   return match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
 }
 
