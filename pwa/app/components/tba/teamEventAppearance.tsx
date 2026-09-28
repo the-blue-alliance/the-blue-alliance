@@ -264,8 +264,17 @@ export function TeamStatus({
   // Alliance section
   if (hasAlliance) {
     sections.push(
-      <Section key="alliance" title={status.alliance?.name ?? 'Alliance'}>
-        <div className="flex flex-wrap gap-1">
+      <div
+        key="alliance"
+        className="flex flex-wrap items-center justify-between gap-2"
+      >
+        <h3
+          className="text-sm font-medium tracking-wide text-muted-foreground
+            uppercase"
+        >
+          {status.alliance?.name ?? 'Alliance'}
+        </h3>
+        <div className="flex flex-wrap justify-end gap-1">
           {maybeAlliances
             .find((a) => a.picks.includes(team.key))
             ?.picks.map((k) => (
@@ -281,7 +290,7 @@ export function TeamStatus({
               </TeamLink>
             ))}
         </div>
-      </Section>,
+      </div>,
     );
   }
 
