@@ -72,8 +72,7 @@ export default function BracketPlaceholderMatch({
       <PlaceholderRow
         side={sides.red}
         rowRef={redRowRef}
-        className="bg-alliance-red-loser
-          data-[highlight=true]:bg-alliance-red-accent"
+        className="bg-alliance-red-loser"
         alliances={alliances}
         event={event}
         hoveredAlliance={hoveredAlliance}
@@ -82,8 +81,7 @@ export default function BracketPlaceholderMatch({
       <PlaceholderRow
         side={sides.blue}
         rowRef={blueRowRef}
-        className="bg-alliance-blue-loser
-          data-[highlight=true]:bg-alliance-blue-accent"
+        className="bg-alliance-blue-loser"
         alliances={alliances}
         event={event}
         hoveredAlliance={hoveredAlliance}
@@ -117,8 +115,9 @@ function PlaceholderRow({
     <div
       ref={rowRef}
       className={cn(
-        `group flex min-h-7 items-center px-1 py-1 transition-colors
-        duration-200 data-[highlight=true]:text-white`,
+        `flex min-h-7 items-center px-1 py-1 transition-colors duration-200
+        data-[highlight=true]:ring-2 data-[highlight=true]:ring-foreground
+        data-[highlight=true]:ring-inset`,
         allianceNumber && 'cursor-pointer',
         className,
       )}
@@ -130,11 +129,7 @@ function PlaceholderRow({
     >
       {picks ? (
         picks.map((teamKey) => (
-          <span
-            key={teamKey}
-            className="w-12 text-center text-sm
-              group-data-[highlight=true]:text-white"
-          >
+          <span key={teamKey} className="w-12 text-center text-sm">
             <TeamLinkWithTooltip
               className="text-inherit"
               teamKey={teamKey}
