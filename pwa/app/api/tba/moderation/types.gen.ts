@@ -304,7 +304,7 @@ export type AcceptRequest = {
    */
   expiration_days?: number;
   /**
-   * api_auth_access: message for the requesting user, included in the admin alert email
+   * api_auth_access: message for the requester, emailed to them with the verdict and posted to the moderators' Slack channel
    */
   user_message?: string;
 };
@@ -331,7 +331,7 @@ export enum ReviewResult {
 export type RejectRequest = {
   suggestion_keys: Array<string>;
   /**
-   * Message for the suggesting user; included in the admin alert email for api_auth_access rejections
+   * api_auth_access: message for the requester, emailed to them with the rejection and posted to the moderators' Slack channel; ignored for other suggestion types
    */
   user_message?: string;
 };

@@ -14,11 +14,15 @@ import type {
 } from '~/api/tba/moderation/types.gen';
 import { ReviewResult } from '~/api/tba/moderation/types.gen';
 import { useAuth } from '~/components/tba/auth/auth';
-import { isNotModeratorResponse } from '~/lib/moderationUtils';
+import {
+  type RejectDecision,
+  groupRejectsByMessage,
+  isNotModeratorResponse,
+} from '~/lib/moderationUtils';
 
 export interface ReviewDecisions {
   accepts: { key: string; overrides: AcceptRequest }[];
-  rejects: string[];
+  rejects: RejectDecision[];
 }
 
 export interface ReviewSubmissionResult {
@@ -115,10 +119,10 @@ export function useReviewSubmission(suggestionType: SuggestionType) {
         }
       }
 
-      if (rejects.length > 0) {
+      for (const { keys, userMessage } of groupRejectsByMessage(rejects)) {
         const response = await rejectModerationSuggestions({
           auth: token,
-          body: { suggestion_keys: rejects },
+          body: { suggestion_keys: keys, user_message: userMessage },
         });
         for (const outcome of response.data?.results ?? []) {
           if (outcome.result === ReviewResult.REJECTED) {

@@ -18,9 +18,6 @@ from backend.common.consts.media_type import IMAGE_TYPES, MediaType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SuggestionType, TYPE_NAMES
 from backend.common.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafeed
-from backend.common.helpers.outgoing_notification_helper import (
-    OutgoingNotificationHelper,
-)
 from backend.common.helpers.smugmug_helper import (
     album_preview_images_many,
     SmugmugPreviewImage,
@@ -35,7 +32,6 @@ from backend.common.models.suggestion import Suggestion
 from backend.common.models.user import User
 from backend.common.queries.event_query import EventListQuery
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.common.sitevars.slack_hook_urls import SlackHookUrls
 from backend.common.suggestions.suggestion_reviewer import (
     REQUIRED_REVIEW_PERMISSIONS,
     SuggestionReviewer,
@@ -44,6 +40,14 @@ from backend.common.suggestions.suggestion_reviewer import (
 
 MAX_SUGGESTIONS_PER_PAGE = 100
 MAX_REJECT_BATCH = 500
+USER_MESSAGE_ERROR = "user_message must be a string"
+
+
+def _valid_user_message(user_message: Any) -> bool:
+    """user_message is optional, but when present it goes into an email to
+    a real person, so it must be a plain string."""
+    return user_message is None or isinstance(user_message, str)
+
 
 # HTTP status for each review outcome (accept/reject endpoints return the
 # outcome per suggestion; single-suggestion endpoints map it to the response
@@ -166,6 +170,8 @@ def moderation_suggestion_accept(suggestion_key: str) -> Response:
         return make_response(
             jsonify({"Error": "Request body must be a JSON object"}), 400
         )
+    if not _valid_user_message(overrides.get("user_message")):
+        return make_response(jsonify({"Error": USER_MESSAGE_ERROR}), 400)
 
     # The API authorizes by AccountPermission only; team-admin delegation
     # (/mod) is not offered here because the list/queue endpoints don't
@@ -177,14 +183,6 @@ def moderation_suggestion_accept(suggestion_key: str) -> Response:
         endpoint=request.endpoint or "",
         delegated_team_keys=frozenset(),
     )
-    if outcome.result == SuggestionReviewResult.ACCEPTED:
-        _send_apiwrite_review_alert(
-            suggestion_key,
-            user,
-            verdict="accepted",
-            user_message=overrides.get("user_message"),
-            auth_id=outcome.created_target_key,
-        )
     response: Dict[str, Any] = {
         "result": outcome.result.value,
         "suggestion_key": outcome.suggestion_key,
@@ -215,20 +213,17 @@ def moderation_suggestions_reject() -> Response:
             400,
         )
 
+    user_message = body.get("user_message")
+    if not _valid_user_message(user_message):
+        return make_response(jsonify({"Error": USER_MESSAGE_ERROR}), 400)
+
     outcomes = SuggestionReviewer.reject_suggestions(
         suggestion_keys,
         user,
         endpoint=request.endpoint or "",
         delegated_team_keys=frozenset(),
+        user_message=user_message,
     )
-    for outcome in outcomes:
-        if outcome.result == SuggestionReviewResult.REJECTED:
-            _send_apiwrite_review_alert(
-                outcome.suggestion_key,
-                user,
-                verdict="rejected",
-                user_message=body.get("user_message"),
-            )
     return jsonify(
         {
             "results": [
@@ -241,48 +236,6 @@ def moderation_suggestions_reject() -> Response:
             ]
         }
     )
-
-
-def _get_suggestion_for_alert(suggestion_key: str) -> Optional[Suggestion]:
-    try:
-        return Suggestion.get_by_id(int(suggestion_key))
-    except ValueError:
-        return Suggestion.get_by_id(suggestion_key)
-
-
-def _send_apiwrite_review_alert(
-    suggestion_key: str,
-    user: User,
-    verdict: str,
-    user_message: Optional[str],
-    auth_id: Optional[str] = None,
-) -> None:
-    """
-    Admin alert for reviewed Trusted API key requests, posted to the existing
-    suggestion-nag Slack channel. Only apiwrite suggestions alert. (The
-    original Python 2 review page emailed this instead; see #10723.)
-    """
-    suggestion = _get_suggestion_for_alert(suggestion_key)
-    if suggestion is None or suggestion.target_model != "api_auth_access":
-        return
-    channel_url = SlackHookUrls.url_for("suggestion-nag")
-    if not channel_url:
-        return
-
-    event_key = suggestion.contents.get("event_key")
-    # The default message mirrors the prefilled textarea on the review forms
-    message = user_message or "Thanks for helping make TBA better!"
-    body = (
-        f"*Trusted API Key Request for {event_key}*\n"
-        f"{user.display_name} ({user.email}) has {verdict} the request "
-        f"with the following message:\n{message}"
-    )
-    if auth_id:
-        body += (
-            "\n<https://www.thebluealliance.com/admin/api_auth/edit/"
-            f"{auth_id}|View the key>"
-        )
-    OutgoingNotificationHelper.send_slack_alert(channel_url, body)
 
 
 AUTHOR_REVIEW_COUNT_CACHE_SECONDS = 60 * 60

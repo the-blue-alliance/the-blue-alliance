@@ -18,9 +18,6 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
-from backend.common.helpers.outgoing_notification_helper import (
-    OutgoingNotificationHelper,
-)
 from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
@@ -31,7 +28,6 @@ from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
 from backend.common.models.user import User
-from backend.common.sitevars.slack_hook_urls import SlackHookUrls
 from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
@@ -1213,18 +1209,10 @@ def test_accept_apiwrite_sends_admin_alert(
     author: Account,
     event: Event,
     taskqueue_stub,
-    monkeypatch,
+    run_deferred_tasks,
+    sent_slack_alerts,
 ) -> None:
     moderator([AccountPermission.REVIEW_APIWRITE])
-    sent = []
-    monkeypatch.setattr(
-        SlackHookUrls, "url_for", staticmethod(lambda channel: "http://hook")
-    )
-    monkeypatch.setattr(
-        OutgoingNotificationHelper,
-        "send_slack_alert",
-        classmethod(lambda cls, url, body: sent.append((url, body))),
-    )
     suggestion_id = create_suggestion(
         author,
         "api_auth_access",
@@ -1242,8 +1230,11 @@ def test_accept_apiwrite_sends_admin_alert(
     )
     assert resp.status_code == 200
 
-    assert len(sent) == 1
-    url, body = sent[0]
+    # Notifications leave the request path; the tasks service delivers them
+    assert sent_slack_alerts == []
+    run_deferred_tasks()
+    assert len(sent_slack_alerts) == 1
+    url, body = sent_slack_alerts[0]
     assert url == "http://hook"
     assert "Trusted API Key Request for 2016necmp" in body
     assert "accepted" in body
@@ -1252,18 +1243,15 @@ def test_accept_apiwrite_sends_admin_alert(
 
 
 def test_reject_apiwrite_sends_admin_alert(
-    api_client: Client, moderator, author: Account, event: Event, monkeypatch
+    api_client: Client,
+    moderator,
+    author: Account,
+    event: Event,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_slack_alerts,
 ) -> None:
     moderator([AccountPermission.REVIEW_APIWRITE])
-    sent = []
-    monkeypatch.setattr(
-        SlackHookUrls, "url_for", staticmethod(lambda channel: "http://hook")
-    )
-    monkeypatch.setattr(
-        OutgoingNotificationHelper,
-        "send_slack_alert",
-        classmethod(lambda cls, url, body: sent.append((url, body))),
-    )
     suggestion_id = create_suggestion(
         author,
         "api_auth_access",
@@ -1281,8 +1269,9 @@ def test_reject_apiwrite_sends_admin_alert(
     )
     assert resp.status_code == 200
 
-    assert len(sent) == 1
-    url, body = sent[0]
+    run_deferred_tasks()
+    assert len(sent_slack_alerts) == 1
+    url, body = sent_slack_alerts[0]
     assert url == "http://hook"
     assert "Trusted API Key Request for 2016necmp" in body
     assert "rejected" in body
@@ -1328,6 +1317,112 @@ def test_api_does_not_honor_team_admin_delegation(
     )
     assert resp.status_code == 200
     assert resp.json["results"][0]["result"] == "forbidden"
+
+
+def test_accept_apiwrite_emails_requester(
+    api_client: Client,
+    moderator,
+    author: Account,
+    event: Event,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_result_emails,
+    sent_slack_alerts,
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    suggestion_id = create_suggestion(
+        author,
+        "api_auth_access",
+        "2016necmp",
+        {
+            "event_key": "2016necmp",
+            "affiliation": "Team 1124",
+            "auth_types": [int(AuthType.MATCH_VIDEO)],
+        },
+    )
+
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/{suggestion_id}/accept",
+        json={"user_message": "Enjoy the keys!"},
+    )
+    assert resp.status_code == 200
+
+    run_deferred_tasks()
+    assert len(sent_result_emails) == 1
+    to, _, body = sent_result_emails[0]
+    assert to == author.email
+    assert "Enjoy the keys!" in body
+
+
+def test_reject_apiwrite_emails_requester_with_message(
+    api_client: Client,
+    moderator,
+    author: Account,
+    event: Event,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_result_emails,
+    sent_slack_alerts,
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    suggestion_id = create_suggestion(
+        author,
+        "api_auth_access",
+        "2016necmp",
+        {
+            "event_key": "2016necmp",
+            "affiliation": "Team 1124",
+            "auth_types": [int(AuthType.MATCH_VIDEO)],
+        },
+    )
+
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/reject",
+        json={"suggestion_keys": [suggestion_id], "user_message": "Not this one"},
+    )
+    assert resp.status_code == 200
+
+    run_deferred_tasks()
+    assert len(sent_result_emails) == 1
+    to, _, body = sent_result_emails[0]
+    assert to == author.email
+    assert "Not this one" in body
+
+
+@pytest.mark.parametrize("bad_message", [123, True, ["a"], {"x": 1}])
+def test_user_message_must_be_a_string(
+    api_client: Client, moderator, author: Account, event: Event, bad_message
+) -> None:
+    # It is emailed verbatim to a real person, so never coerce it
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    suggestion_id = create_suggestion(
+        author,
+        "api_auth_access",
+        "2016necmp",
+        {
+            "event_key": "2016necmp",
+            "affiliation": "Team 1124",
+            "auth_types": [int(AuthType.MATCH_VIDEO)],
+        },
+    )
+
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/{suggestion_id}/accept",
+        json={"user_message": bad_message},
+    )
+    assert resp.status_code == 400
+    assert "user_message" in resp.json["Error"]
+
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/reject",
+        json={"suggestion_keys": [suggestion_id], "user_message": bad_message},
+    )
+    assert resp.status_code == 400
+    assert "user_message" in resp.json["Error"]
+
+    suggestion = Suggestion.get_by_id(int(suggestion_id))
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_PENDING
 
 
 # ---------------------------------------------------------------------------

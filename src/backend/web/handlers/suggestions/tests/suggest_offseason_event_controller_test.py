@@ -268,3 +268,50 @@ def test_suggest_event_with_mismatched_frc_events_link(
     assert "frc_events_link" in failures
 
     assert Suggestion.query().fetch() == []
+
+
+def test_suggest_event_alerts_admins(
+    login_user,
+    ndb_stub,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_admin_alerts,
+    web_client: Client,
+) -> None:
+    resp = web_client.post(
+        "/suggest/offseason",
+        data={
+            "name": "Test Event",
+            "start_date": "2012-04-04",
+            "end_date": "2012-04-06",
+            "website": "http://foo.com/bar",
+            "venue_name": "This is a Venue",
+            "venue_address": "123 Fake St",
+            "venue_city": "New York",
+            "venue_state": "NY",
+            "venue_country": "USA",
+        },
+    )
+    assert resp.status_code == 302
+
+    assert sent_admin_alerts == []
+    assert run_deferred_tasks() == 1
+    subject, body = sent_admin_alerts[0]
+    assert subject == "New Offseason Event Suggestion: Test Event"
+    assert "Test Event" in body
+    assert "suggest/review/offseason-event" in body
+
+
+def test_suggest_event_no_alert_on_validation_failure(
+    login_user,
+    ndb_stub,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_admin_alerts,
+    web_client: Client,
+) -> None:
+    resp = web_client.post("/suggest/offseason", data={"name": "Missing dates"})
+    assert resp.status_code == 200
+    assert Suggestion.query().count() == 0
+    assert run_deferred_tasks() == 0
+    assert sent_admin_alerts == []

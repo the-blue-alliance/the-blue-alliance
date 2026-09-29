@@ -16,6 +16,7 @@ from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.helpers.outgoing_notification_helper import CONTACT_EMAIL
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -410,7 +411,7 @@ class SuggestionCreator:
         # Make sure we have a dummy account to link these suggestions with
         account = Account.get_or_insert(
             "tba-bot-account",
-            email="contact@thebluealliance.com",
+            email=CONTACT_EMAIL,
             nickname="TBA-Bot",
             registered=True,
             permissions=[],
