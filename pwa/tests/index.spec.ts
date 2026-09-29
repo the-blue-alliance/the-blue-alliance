@@ -52,6 +52,10 @@ test('(mobile) navbar shows a toggle menu button instead of nav links', async ({
   ).not.toBeVisible();
 });
 
+test('(mobile) navbar search button is visible', async ({ page }) => {
+  await expect(page.getByRole('button', { name: 'Search' })).toBeVisible();
+});
+
 // This Week's Events
 // commented out while we figure out how to stub/mock properly
 
@@ -218,6 +222,28 @@ test('search trigger stays enabled while search_index is pending', async ({
   });
   await expect(searchButton).toBeEnabled();
   releaseSearchIndex();
+});
+
+test('(mobile) opening search focuses the input', async ({ page }) => {
+  await page.route('**/api/v3/search_index**', async (route) => {
+    await route.fulfill({
+      status: 200,
+      contentType: 'application/json',
+      body: JSON.stringify(MOCK_SEARCH_INDEX),
+    });
+  });
+
+  await page.goto('/');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  const searchButton = page.getByRole('button', { name: 'Search' });
+  await searchButton.click();
+
+  const dialog = page.getByRole('dialog');
+  await expect(dialog).toBeVisible();
+
+  const input = dialog.getByPlaceholder('Search teams and events...');
+  await expect(input).toBeFocused();
 });
 
 test.describe('Dark mode toggle', () => {
