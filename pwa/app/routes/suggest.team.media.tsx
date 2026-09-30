@@ -51,7 +51,8 @@ export const Route = createFileRoute('/suggest/team/media')({
 });
 
 type SubmitStatus =
-  'idle' | 'loading' | 'success' | 'exists' | 'bad_url' | 'error';
+  'idle' | 'loading' | 'success' | 'exists' | 'bad_url' | 'error'; // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SuggestTeamMedia(): JSX.Element {
   const { team_key, year } = Route.useSearch();
