@@ -410,6 +410,38 @@ describe('ScoreBreakdown2018 endgame', () => {
 describe('ScoreBreakdown2018 fouls', () => {
   // Both alliances get identical counts here: which alliance's counts belong
   // under which column is Bug #54, covered by its own failing-test PR.
+  // Wrong today: the "Fouls Received" row shows each alliance's OWN
+  // foulCount/techFoulCount (the fouls it committed).
+  // Correct: like 2016, 2017, 2019 and 2020, each alliance shows the fouls
+  // its opponent committed, because those are the points it received.
+  // 2018 Game & Season Manual (FIRST POWER UP), Section 4.4 Rule Violations,
+  // Table 4-3 Penalty Table (page 43, section revision V4): "FOUL: 5 points
+  // credited towards the opponent's total score", "TECH FOUL: 25 points
+  // credited towards the opponent's total score". Latest published manual
+  // (PDF last modified 2018-04-10, after all Team Updates):
+  // https://firstfrc.blob.core.windows.net/frc2018/Manual/2018FRCGameSeasonManual.pdf
+  test("Bug #54: shows the opponent's fouls as fouls received", () => {
+    render(
+      <ScoreBreakdown2018
+        scoreBreakdown={makeBreakdown(
+          { foulCount: 2, techFoulCount: 1 },
+          { foulCount: 4, techFoulCount: 0 },
+        )}
+        match={match}
+      />,
+    );
+
+    // Red received blue's 4 fouls; blue received red's 2 fouls and 1 tech foul.
+    expect(within(redCell('Fouls Received')).getByText('4 (+20)')).toBeTruthy();
+    expect(within(redCell('Fouls Received')).getByText('0 (+0)')).toBeTruthy();
+    expect(
+      within(blueCell('Fouls Received')).getByText('2 (+10)'),
+    ).toBeTruthy();
+    expect(
+      within(blueCell('Fouls Received')).getByText('1 (+25)'),
+    ).toBeTruthy();
+  });
+
   test('values fouls at 5 points each', () => {
     render(
       <ScoreBreakdown2018
