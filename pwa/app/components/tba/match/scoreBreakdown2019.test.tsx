@@ -355,8 +355,6 @@ describe('ScoreBreakdown2019 game pieces', () => {
 });
 
 describe('ScoreBreakdown2019 endgame', () => {
-  // HAB Level 2 and Level 3 point values are covered by the Bug #52
-  // failing-test PR.
   test.each([
     { value: EndgameRobot2019.HAB_LEVEL1, expected: '254HAB 1 (+3)' },
     { value: EndgameRobot2019.NONE, expected: '254None (+0)' },
@@ -372,12 +370,11 @@ describe('ScoreBreakdown2019 endgame', () => {
     expect(redCell('Robot 1 Endgame').textContent).toBe(expected);
   });
 
-  // Wrong today: ENDGAME_2019_POINTS is 3 / 3 / 6 for HAB levels 1 / 2 / 3,
-  // so the per-robot label shows (+3) for Level 2 and (+6) for Level 3.
-  // Correct: 3 / 6 / 12. 2019 Game & Season Manual (DESTINATION: DEEP SPACE),
-  // Section 5.3 Scoring, Table 5-1: "HAB Climb Bonus: Level 1 | 3",
-  // "Level 2 | 6", "Level 3 | 12". Latest published manual (PDF last
-  // modified 2019-04-09, after all Team Updates):
+  // Bug #52: HAB Level 2 and Level 3 were valued 3 and 6 instead of 6 and 12.
+  // 2019 Game Manual (DESTINATION: DEEP SPACE), Section 5.3 Scoring,
+  // Table 5-1 (page 38 of 129, Section 5 V8; PDF dated 2019-04-09, after
+  // the last Team Update): "HAB Climb Bonus: Level 1 | 3",
+  // "HAB Climb Bonus: Level 2 | 6", "HAB Climb Bonus: Level 3 | 12".
   // https://firstfrc.blob.core.windows.net/frc2019/Manual/2019FRCGameSeasonManual.pdf
   test.each([
     { value: EndgameRobot2019.HAB_LEVEL2, expected: '254HAB 2 (+6)' },
