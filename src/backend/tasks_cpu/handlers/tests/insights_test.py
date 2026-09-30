@@ -1,3 +1,5 @@
+import re
+
 import pytest
 from freezegun import freeze_time
 from google.appengine.ext import testbed
@@ -596,3 +598,38 @@ def test_do_insights_v2_delete_by_name_and_year(tasks_cpu_client: Client) -> Non
 
     remaining = InsightV2.query().fetch()
     assert [insight.year for insight in remaining] == [2026]
+
+
+def test_bug_15_year_insights_heading_names_year_and_kind(
+    tasks_cpu_client: Client,
+) -> None:
+    """Bug #15: the year_insights_do.html heading is always blank.
+
+    Today the template renders "Calculated the following Insights for
+    {{year}} {{kinds}}:" but do_year_insights passes `kind=` and no `year`,
+    so the page says "Calculated the following Insights for  :". Correct: the
+    heading names the year and the kind that were calculated.
+    """
+    resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/insights/matches/2023")
+    assert resp.status_code == 200
+    heading = re.search(rb"<h2>(.*?)</h2>", resp.data)
+    assert heading is not None
+    assert b"2023" in heading.group(1)
+    assert b"matches" in heading.group(1)
+
+
+def test_bug_15_district_insights_heading_names_year_and_district(
+    tasks_cpu_client: Client,
+) -> None:
+    """Bug #15: the heading is also blank for the per-district route.
+
+    do_district_insights_for_abbreviation renders the same template with
+    kind="districts/<year>/<abbrev>", which the template never reads. Correct:
+    the heading names the year and the district.
+    """
+    resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/insights/districts/2026/fim")
+    assert resp.status_code == 200
+    heading = re.search(rb"<h2>(.*?)</h2>", resp.data)
+    assert heading is not None
+    assert b"2026" in heading.group(1)
+    assert b"fim" in heading.group(1)
