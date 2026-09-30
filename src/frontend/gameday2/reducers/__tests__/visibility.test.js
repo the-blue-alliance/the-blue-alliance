@@ -125,4 +125,22 @@ describe("visibility reducer set actions", () => {
     });
     expect(opened.layoutDrawer).toBe(true);
   });
+
+  it("Bug #43: sets the layout drawer to the requested visibility instead of toggling", () => {
+    // Wrong today: setLayoutDrawerVisibility ignores `visible` and returns
+    // !state.layoutDrawer, so visible: false opens a closed drawer and
+    // visible: true closes an open one.
+    // Correct: layoutDrawer becomes exactly `visible`.
+    const stillClosed = visibility(defaultState, {
+      type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+      visible: false,
+    });
+    expect(stillClosed.layoutDrawer).toBe(false);
+    const open = Object.assign({}, defaultState, { layoutDrawer: true });
+    const stillOpen = visibility(open, {
+      type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+      visible: true,
+    });
+    expect(stillOpen.layoutDrawer).toBe(true);
+  });
 });
