@@ -341,3 +341,15 @@ def test_auto_win_conversion_counted(ndb_stub) -> None:
 
     rates = _rates(_scopes_of(insight, "overall")[0])
     assert rates["auto_win_conversion"] == [1, 2]
+
+
+def test_week_without_opportunities_is_omitted(ndb_stub) -> None:
+    _put_event("2024casj", start_date=_WEEK_1_START)
+    _put_match("2024casj", 1, 100, 80)
+
+    _put_event("2024caln", start_date=_WEEK_2_START)
+    _put_match("2024caln", 1, 60, 40, with_breakdown=False)
+
+    insight = compute_insights_for_year(2024, [GameStatsV2Calculator()])[0]
+
+    assert [w["label"] for w in _scopes_of(insight, "week")] == ["Week 1"]

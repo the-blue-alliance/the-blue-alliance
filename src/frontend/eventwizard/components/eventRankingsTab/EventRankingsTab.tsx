@@ -53,11 +53,6 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
       return;
     }
 
-    if (rankings.length === 0) {
-      alert("No rankings to upload");
-      return;
-    }
-
     setUploading(true);
     setStatusMessage("Uploading rankings...");
 
