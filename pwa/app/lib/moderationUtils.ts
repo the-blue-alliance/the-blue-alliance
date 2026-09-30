@@ -259,8 +259,11 @@ function matchTokens(compLevel: string, set: number, num: number): string[] {
         `final`,
         `finals`,
       ];
+    /* v8 ignore start -- unreachable: the only caller passes a comp level
+       captured by MATCH_KEY_PATTERN, which admits exactly the arms above. */
     default:
       return [];
+    /* v8 ignore stop */
   }
 }
 
