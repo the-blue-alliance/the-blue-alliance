@@ -118,18 +118,11 @@ describe("visibility reducer set actions", () => {
     ).toBe(true);
   });
 
-  // Pins current (buggy) behavior: SET_LAYOUT_DRAWER_VISIBILITY ignores
-  // `visible` and toggles the drawer instead.
-  it("toggles the layout drawer on SET_LAYOUT_DRAWER_VISIBILITY regardless of the requested value", () => {
+  it("opens the layout drawer on SET_LAYOUT_DRAWER_VISIBILITY visible: true", () => {
     const opened = visibility(defaultState, {
-      type: types.SET_LAYOUT_DRAWER_VISIBILITY,
-      visible: false,
-    });
-    expect(opened.layoutDrawer).toBe(true);
-    const closed = visibility(opened, {
       type: types.SET_LAYOUT_DRAWER_VISIBILITY,
       visible: true,
     });
-    expect(closed.layoutDrawer).toBe(false);
+    expect(opened.layoutDrawer).toBe(true);
   });
 });

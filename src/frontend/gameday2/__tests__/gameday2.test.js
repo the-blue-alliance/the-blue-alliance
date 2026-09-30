@@ -201,9 +201,6 @@ describe("gameday2 entry point", () => {
 
     await flushPromises();
     expect(mockStore.getState().favoriteTeams).toEqual(new Set(["frc254"]));
-    // Pins current (buggy) behavior: the later live_events update resets the
-    // default chat that was restored from the page on first load.
-    expect(mockStore.getState().chats.defaultChat).toBe("firstupdatesnow");
   });
 
   it("hides the chat sidebar when requested and ignores invalid layouts", async () => {

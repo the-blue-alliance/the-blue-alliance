@@ -23,10 +23,6 @@ describe("ZebraMotionWorksVisualizer", () => {
       "/images/2019_field.png"
     );
     expect(screen.queryByTestId("heatmap")).toBeNull();
-    // Pins current behavior: the heatmap button has an invalid type
-    // ("buttons"), which browsers treat as the default "submit".
-    expect(heatButton.getAttribute("type")).toBe("buttons");
-
     fireEvent.click(heatButton);
     expect(heatButton.className).toBe("btn btn-secondary active");
     expect(trajButton.className).toBe("btn btn-secondary");

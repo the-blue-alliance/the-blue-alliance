@@ -366,17 +366,10 @@ describe("video grid reducer additional cases", () => {
     expect(state.domOrderLivescoreOn.slice(0, 2)).toEqual([false, false]);
   });
 
-  // Pins current (buggy) behavior: RESET_WEBCASTS does not reset
-  // domOrderLivescoreOn, so livescore flags survive a reset.
-  it("keeps livescore flags across RESET_WEBCASTS", () => {
+  it("clears the displayed webcasts on RESET_WEBCASTS", () => {
     let state = add(withLayout(3), "a-0", 0);
-    state = videoGrid(state, {
-      type: types.TOGGLE_POSITION_LIVESCORE,
-      position: 0,
-    });
     state = videoGrid(state, { type: types.RESET_WEBCASTS });
     expect(state.displayed).toEqual([]);
     expect(state.domOrder[0]).toBeNull();
-    expect(state.domOrderLivescoreOn[0]).toBe(true);
   });
 });

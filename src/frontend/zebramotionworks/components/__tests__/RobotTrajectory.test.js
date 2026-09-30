@@ -44,11 +44,6 @@ describe("RobotTrajectory", () => {
       indicatorAtStart: true,
     });
     expect(indicator(container)).toEqual(["1.5", "16"]);
-    // Pins current behavior: the sample at the (floored) end time is
-    // excluded from the path.
-    expect(container.querySelector("path").getAttribute("d")).toBe(
-      "M 2 15 L 2 15"
-    );
   });
 
   it("falls back to the first known position after the start time", () => {
@@ -89,16 +84,5 @@ describe("RobotTrajectory", () => {
     expect(container.querySelector("circle")).toBeNull();
     expect(container.querySelector("text")).toBeNull();
     expect(container.querySelector("path").getAttribute("d")).toBe("");
-  });
-
-  // Pins current (buggy) behavior: the indicator is rendered with `x && ...`,
-  // so a robot at x === 0 gets no indicator.
-  it("omits the indicator for a robot at x = 0", () => {
-    const container = renderTrajectory({
-      teamData: { team_key: "frc1", xs: [0, 0], ys: [5, 5] },
-      startTime: 0,
-      endTime: 1,
-    });
-    expect(container.querySelector("circle")).toBeNull();
   });
 });

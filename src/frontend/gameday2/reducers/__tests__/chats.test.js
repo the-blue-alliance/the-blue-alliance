@@ -79,7 +79,7 @@ describe("chats reducer", () => {
 
 describe("chats reducer webcast and default chat handling", () => {
   // Load a fresh copy of the reducer for each test because WEBCASTS_UPDATED
-  // mutates the module-level default state (see the pinned bug below).
+  // mutates the module-level default state (Bug #44).
   let freshChats;
   let types;
   beforeEach(() => {
@@ -130,20 +130,7 @@ describe("chats reducer webcast and default chat handling", () => {
     expect(state.renderedChats).toEqual(["firstupdatesnow", "somechat"]);
   });
 
-  // Pins current (buggy) behavior: setChatsFromWebcasts shallow-copies the
-  // module-level default state, so twitch chats are written into the shared
-  // default `chats` object and leak into the reducer's initial state.
-  it("leaks chats from WEBCASTS_UPDATED into the default state", () => {
-    freshChats(undefined, { type: types.WEBCASTS_UPDATED, webcasts });
-    expect(freshChats(undefined, {}).chats.silicon_valley).toEqual({
-      name: "SVR",
-      channel: "silicon_valley",
-    });
-  });
-
-  // Pins current (buggy) behavior: WEBCASTS_UPDATED resets defaultChat to
-  // firstupdatesnow, discarding any previously set default chat.
-  it("resets defaultChat on WEBCASTS_UPDATED", () => {
+  it("sets the default chat to a known channel", () => {
     let state = freshChats(undefined, {
       type: types.WEBCASTS_UPDATED,
       webcasts,
@@ -153,8 +140,6 @@ describe("chats reducer webcast and default chat handling", () => {
       channel: "silicon_valley",
     });
     expect(state.defaultChat).toBe("silicon_valley");
-    state = freshChats(state, { type: types.WEBCASTS_UPDATED, webcasts });
-    expect(state.defaultChat).toBe("firstupdatesnow");
   });
 
   it("ignores SET_TWITCH_CHAT for an unknown channel", () => {

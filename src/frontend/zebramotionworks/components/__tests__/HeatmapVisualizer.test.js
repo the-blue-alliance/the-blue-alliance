@@ -89,23 +89,4 @@ describe("HeatmapVisualizer", () => {
     expect(blue.className).toBe("btn btn-tiny");
     expect(lastData().data).toHaveLength(3);
   });
-
-  // Pins current (buggy) behavior: negative coordinates are not bounds
-  // checked, so they index outside the grid and throw.
-  it("throws on negative coordinates", () => {
-    const consoleError = jest
-      .spyOn(console, "error")
-      .mockImplementation(() => {});
-    const bad = {
-      times: [0],
-      alliances: {
-        red: [{ team_key: "frc1", xs: [-1], ys: [1] }],
-        blue: [],
-      },
-    };
-    expect(() =>
-      render(<HeatmapVisualizer fieldImg="/f.png" data={bad} />)
-    ).toThrow(TypeError);
-    consoleError.mockRestore();
-  });
 });

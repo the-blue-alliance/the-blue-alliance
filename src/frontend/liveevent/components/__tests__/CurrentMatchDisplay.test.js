@@ -89,11 +89,6 @@ describe("CurrentMatchDisplay", () => {
       container.querySelector('.blueAlliance a[href="/team/1323/2018"]')
     ).not.toBeNull();
     expect(container.querySelectorAll(".booleanIndicator.red")).toHaveLength(4);
-    // Pins current behavior: falsy indicator values are interpolated into
-    // the class name (e.g. "booleanIndicator false").
-    expect(container.querySelectorAll(".booleanIndicator.false")).toHaveLength(
-      4
-    );
     const powerup = container.querySelector(".currentPowerup");
     expect(powerup.className).toBe("currentPowerup blue");
     expect(powerup.querySelector("img").getAttribute("src")).toBe(
