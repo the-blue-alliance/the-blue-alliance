@@ -1,3 +1,4 @@
+import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test } from 'vitest';
 
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
@@ -5,6 +6,7 @@ import {
   DEFAULT_USER_MESSAGE,
   SUGGESTION_TYPE_ORDER,
   defaultSetPreferred,
+  eventTiming,
   formatAuthorReputation,
   formatEventDateRange,
   groupRejectsByMessage,
@@ -159,6 +161,47 @@ describe('formatEventDateRange', () => {
   test('returns undefined when either date is missing', () => {
     expect(formatEventDateRange(null, '2016-03-27')).toBeUndefined();
     expect(formatEventDateRange('2016-03-24', undefined)).toBeUndefined();
+  });
+});
+
+describe('eventTiming', () => {
+  const today = Temporal.PlainDate.from('2026-09-29');
+
+  test('is undefined when either date is missing', () => {
+    expect(eventTiming(null, '2026-10-02', today)).toBeUndefined();
+    expect(eventTiming('2026-09-30', undefined, today)).toBeUndefined();
+  });
+
+  test('counts down to an upcoming event', () => {
+    expect(eventTiming('2026-10-02', '2026-10-04', today)).toEqual({
+      kind: 'upcoming',
+      label: 'Starts in 3 days',
+    });
+    expect(eventTiming('2026-09-30', '2026-10-02', today)).toEqual({
+      kind: 'upcoming',
+      label: 'Starts tomorrow',
+    });
+  });
+
+  test('is ongoing from the first day through the last day inclusive', () => {
+    expect(eventTiming('2026-09-29', '2026-10-01', today)?.kind).toBe(
+      'ongoing',
+    );
+    expect(eventTiming('2026-09-27', '2026-09-29', today)).toEqual({
+      kind: 'ongoing',
+      label: 'Happening now',
+    });
+  });
+
+  test('counts up from a finished event', () => {
+    expect(eventTiming('2026-09-26', '2026-09-28', today)).toEqual({
+      kind: 'past',
+      label: 'Ended yesterday',
+    });
+    expect(eventTiming('2025-09-26', '2025-09-28', today)).toEqual({
+      kind: 'past',
+      label: 'Ended 366 days ago',
+    });
   });
 });
 

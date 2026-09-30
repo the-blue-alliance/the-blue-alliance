@@ -1,5 +1,6 @@
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
+import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
 import type {
@@ -12,6 +13,7 @@ import {
   SuggestionReviewCard,
   suggestedEventType,
 } from '~/components/tba/moderation/suggestionReviewCard';
+import { formatEventDateRange } from '~/lib/moderationUtils';
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -51,6 +53,65 @@ const OFFSEASON_SUGGESTION = {
     website: 'https://cheesyarena.com',
   },
 } as unknown as ModerationSuggestion;
+
+// Relative to today so the timing badge is deterministic without faking
+// the clock, which the Temporal polyfill would not see anyway.
+const EVENT_START = Temporal.Now.plainDateISO().add({ days: 5 });
+const EVENT_END = EVENT_START.add({ days: 3 });
+
+const API_WRITE_SUGGESTION = {
+  key: 'apiwrite-1',
+  target_model: SuggestionType.API_AUTH_ACCESS,
+  contents: { event_key: '2026casj', affiliation: 'Team 254' },
+  event: {
+    type: 'event',
+    key: '2026casj',
+    name: 'Silicon Valley Regional',
+    year: 2026,
+    start_date: EVENT_START.toString(),
+    end_date: EVENT_END.toString(),
+  },
+  requested_auth_types: [{ type: 3, name: 'event matches' }],
+} as unknown as ModerationSuggestion;
+
+function renderCard(suggestion: ModerationSuggestion) {
+  return render(
+    <SuggestionReviewCard
+      suggestion={suggestion}
+      decision={undefined}
+      onDecisionChange={() => {}}
+      overrides={{}}
+      onOverridesChange={() => {}}
+    />,
+  );
+}
+
+describe('SuggestionReviewCard api write request', () => {
+  test('shows the event dates and how far off the event is', () => {
+    renderCard(API_WRITE_SUGGESTION);
+
+    expect(
+      screen.getByText(
+        `(${formatEventDateRange(EVENT_START.toString(), EVENT_END.toString())})`,
+      ),
+    ).toBeDefined();
+    expect(screen.getByText('Starts in 5 days')).toBeDefined();
+  });
+
+  test('omits the dates when the event has none', () => {
+    renderCard({
+      ...API_WRITE_SUGGESTION,
+      event: {
+        ...API_WRITE_SUGGESTION.event,
+        start_date: null,
+        end_date: null,
+      },
+    } as unknown as ModerationSuggestion);
+
+    expect(screen.queryByText(/Starts in|Happening now|Ended/)).toBeNull();
+    expect(screen.queryByText(/\(.* – .*\)/)).toBeNull();
+  });
+});
 
 describe('SuggestionReviewCard offseason event', () => {
   test('defaults the event type select to the type the suggestion carries', () => {
