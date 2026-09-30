@@ -171,7 +171,7 @@ Keep one-use case data next to the `.forEach`; extract it only when the same cas
 
 ## PR Screenshots
 
-**A before/after screenshot table in the PR description is a SHOULD for every PR that changes what a user sees.** One row per affected state, `Before` and `After` columns, under `## Screenshots`. The root `AGENTS.md` "Pull Requests" section has the full rule; this section is the PWA how-to.
+**A before/after screenshot table in the PR description is a SHOULD for every PR that changes what a user sees.** One row per affected state with `Before`, `After`, and `Diff` columns under `## Screenshots`; the diff is a pixel diff of the other two with its changed percentage noted. The root `AGENTS.md` "Pull Requests" section has the full rule; this section is the PWA how-to.
 
 ### Public routes: let CI capture them
 
@@ -193,9 +193,10 @@ CI renders public routes against the production API, so it cannot capture pages 
 
 1. Add a throwaway route, e.g. `app/routes/shot.tsx`, that renders the component with fixture props inside `<div id="shot">`. Do not commit it, and revert the regenerated `app/routeTree.gen.ts` afterwards.
 2. Start the dev server on a spare port: `pnpm dev --port 3123 --strictPort`.
-3. Capture the branch: `node scripts/screenshot-route.mjs http://localhost:3123/shot /tmp/after` writes `/tmp/after-light.png` and `/tmp/after-dark.png` of `#shot` with the navbar hidden. Pass a third argument to screenshot a different selector, e.g. `'[data-testid="suggestion-a"]'`.
+3. Capture the branch: `node scripts/screenshot-route.mjs http://localhost:3123/shot /tmp/after '#shot'` writes `/tmp/after-light.png` and `/tmp/after-dark.png` of that element with the navbar hidden. Any selector works, e.g. `'[data-testid="suggestion-a"]'`; omit it to capture the full page.
 4. Capture `main` the same way after `git checkout origin/main -- <changed source files>`, then `git checkout HEAD -- <those files>` to restore the branch.
-5. Copy the PNGs into a worktree of the `ci-screenshots` branch as `pr-<N>-<what>-{before,after}-{light,dark}.png`, commit, push, and reference them in the PR table as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`.
+5. Diff each pair from the repo root: `uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py /tmp/before-light.png /tmp/after-light.png /tmp/diff-light.png`. It prints the changed-pixel percentage; note it under the diff image in the table.
+6. Copy the PNGs into a worktree of the `ci-screenshots` branch as `pr-<N>-<what>-{before,after,diff}-{light,dark}.png`, commit, push, and reference them in the PR table as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`.
 
 If `pnpm install` leaves Playwright without a browser, run `npx playwright install chromium` once.
 
