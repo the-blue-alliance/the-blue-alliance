@@ -410,6 +410,7 @@ describe('ScoreBreakdown2018 endgame', () => {
 describe('ScoreBreakdown2018 fouls', () => {
   // Both alliances get identical counts here: which alliance's counts belong
   // under which column is Bug #54, covered by its own failing-test PR.
+
   // Wrong today: the "Fouls Received" row shows each alliance's OWN
   // foulCount/techFoulCount (the fouls it committed).
   // Correct: like 2016, 2017, 2019 and 2020, each alliance shows the fouls
