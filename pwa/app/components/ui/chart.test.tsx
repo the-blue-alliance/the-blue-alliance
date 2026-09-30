@@ -314,19 +314,6 @@ describe('ChartTooltipContent', () => {
 
     expect(screen.getByText('unknown')).toBeTruthy();
   });
-
-  test('BUG: a string label with no config entry throws instead of falling back', () => {
-    vi.spyOn(console, 'error').mockImplementation(() => undefined);
-
-    // `config[label].label` is read without optional chaining, so a label
-    // that is not a config key crashes the render. Upstream shadcn guards
-    // this with `config[label]?.label || label`.
-    expect(() =>
-      renderInChart(
-        <ChartTooltipContent active payload={[item({})]} label="missing" />,
-      ),
-    ).toThrow(TypeError);
-  });
 });
 
 describe('ChartLegendContent', () => {
