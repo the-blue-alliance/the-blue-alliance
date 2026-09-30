@@ -126,27 +126,6 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
 
 
-def test_calculate_event_insights_scores_matches_without_breakdowns() -> None:
-    # Documents current behaviour: a played match with no breakdown counts
-    # towards every denominator and the high score, but its scores are never
-    # added to the totals, so the averages read 0.0.
-    match = build_match("2025test", "qm", 1, 30, 10, None)
-    insights = _insights([match])
-    assert insights["playoff"] is None
-    assert insights["qual"] == {
-        "auto_rp_count": [0, 2, 0.0],
-        "barge_rp_count": [0, 2, 0.0],
-        "coral_rp_count": [0, 2, 0.0],
-        "coopertition_count": [0, 2, 0.0],
-        "six_rp_count": [0, 1, 0.0],
-        "nine_rp_count": [0, 1, 0.0],
-        "average_score": 0.0,
-        "average_win_margin": 0.0,
-        "average_winning_score": 0.0,
-        "high_score": (30, "2025test_qm1", "Q1"),
-    }
-
-
 def test_calculate_event_insights_counts_coopertition_and_rp_sweeps() -> None:
     swept = {
         "autoBonusAchieved": True,

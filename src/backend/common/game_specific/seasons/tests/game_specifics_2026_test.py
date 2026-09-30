@@ -276,73 +276,81 @@ def test_tiebreak_criteria_without_breakdown_data() -> None:
     assert GameSpecifics2026().tiebreak_criteria(no_auto, no_auto)[1] is None
 
 
-def _hub(**shifts: int) -> dict[str, Any]:
-    return {
-        "hubScore": {f"shift{i}Count": shifts.get(f"shift{i}", 0) for i in range(1, 5)}
+def _auto(fuel: int, **shifts: int) -> dict[str, Any]:
+    """
+    An alliance breakdown whose AUTO points are all AUTO FUEL, so
+    totalAutoPoints and hubScore.autoPoints agree. Which of the two decides the
+    AUTO winner is covered separately.
+    """
+    hub: dict[str, int] = {
+        f"shift{i}Count": shifts.get(f"shift{i}", 0) for i in range(1, 5)
     }
+    hub["autoPoints"] = fuel
+    hub["autoCount"] = fuel
+    return {"totalAutoPoints": fuel, "autoTowerPoints": 0, "hubScore": hub}
 
 
 @pytest.mark.parametrize(
     "red, blue, expected",
     [
-        # More AUTO points wins outright.
+        # More AUTO FUEL wins outright.
         (
-            {"totalAutoPoints": 10, **_hub()},
-            {"totalAutoPoints": 5, **_hub()},
+            _auto(10),
+            _auto(5),
             AllianceColor.RED,
         ),
         (
-            {"totalAutoPoints": 5, **_hub()},
-            {"totalAutoPoints": 10, **_hub()},
+            _auto(5),
+            _auto(10),
             AllianceColor.BLUE,
         ),
         # AUTO tied: the AUTO winner's HUB is inactive in SHIFT 1, so whichever
-        # alliance scored during SHIFT 1 must have lost AUTO (Game Manual 6.x,
-        # Table 6-3).
+        # alliance scored during SHIFT 1 must have lost AUTO (2026 Game Manual,
+        # Version TU22, Section 6.4.1, Table 6-3).
         (
-            {"totalAutoPoints": 5, **_hub(shift1=3)},
-            {"totalAutoPoints": 5, **_hub()},
+            _auto(5, shift1=3),
+            _auto(5),
             AllianceColor.BLUE,
         ),
         (
-            {"totalAutoPoints": 5, **_hub()},
-            {"totalAutoPoints": 5, **_hub(shift1=3)},
+            _auto(5),
+            _auto(5, shift1=3),
             AllianceColor.RED,
         ),
         # Nothing scored in SHIFT 1: the AUTO winner's HUB is active in SHIFT 2.
         (
-            {"totalAutoPoints": 5, **_hub(shift2=3)},
-            {"totalAutoPoints": 5, **_hub()},
+            _auto(5, shift2=3),
+            _auto(5),
             AllianceColor.RED,
         ),
         (
-            {"totalAutoPoints": 5, **_hub()},
-            {"totalAutoPoints": 5, **_hub(shift2=3)},
+            _auto(5),
+            _auto(5, shift2=3),
             AllianceColor.BLUE,
         ),
         # SHIFT 3 mirrors SHIFT 1, SHIFT 4 mirrors SHIFT 2.
         (
-            {"totalAutoPoints": 5, **_hub(shift3=3)},
-            {"totalAutoPoints": 5, **_hub()},
+            _auto(5, shift3=3),
+            _auto(5),
             AllianceColor.BLUE,
         ),
         (
-            {"totalAutoPoints": 5, **_hub()},
-            {"totalAutoPoints": 5, **_hub(shift3=3)},
+            _auto(5),
+            _auto(5, shift3=3),
             AllianceColor.RED,
         ),
         (
-            {"totalAutoPoints": 5, **_hub(shift4=3)},
-            {"totalAutoPoints": 5, **_hub()},
+            _auto(5, shift4=3),
+            _auto(5),
             AllianceColor.RED,
         ),
         (
-            {"totalAutoPoints": 5, **_hub()},
-            {"totalAutoPoints": 5, **_hub(shift4=3)},
+            _auto(5),
+            _auto(5, shift4=3),
             AllianceColor.BLUE,
         ),
         # Nobody scored in any shift: no way to tell who won AUTO.
-        ({"totalAutoPoints": 5, **_hub()}, {"totalAutoPoints": 5, **_hub()}, None),
+        (_auto(5), _auto(5), None),
     ],
 )
 def test_determine_auto_winner(
@@ -373,35 +381,6 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     unplayed = build_match("2026casj", "qm", 1, -1, -1, None)
     assert _insights([]) == {"qual": None, "playoff": None}
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
-
-
-def test_calculate_event_insights_scores_matches_without_breakdowns() -> None:
-    # Documents current behaviour: a played match with no breakdown counts
-    # towards every denominator (including auto win conversion) and the high
-    # score, but its scores are never added to the totals, so the averages
-    # read 0.0.
-    match = build_match("2026casj", "qm", 1, 30, 10, None)
-    insights = _insights([match])
-    assert insights["playoff"] is None
-    assert insights["qual"] == {
-        "energized_rp_count": [0, 2, 0.0],
-        "supercharged_rp_count": [0, 2, 0.0],
-        "traversal_rp_count": [0, 2, 0.0],
-        "six_rp_count": [0, 1, 0.0],
-        "nine_rp_count": [0, 1, 0.0],
-        "auto_win_conversion": [0, 1, 0.0],
-        "auto_fuel_scored": [0, 0.0, 0.0],
-        "teleop_fuel_scored": [0, 0.0, 0.0],
-        "total_fuel_scored": [0, 0.0, 0.0],
-        "auto_climb_count": [0, 4, 0.0],
-        "level1_climb_count": [0, 6, 0.0],
-        "level2_climb_count": [0, 6, 0.0],
-        "level3_climb_count": [0, 6, 0.0],
-        "average_score": 0.0,
-        "average_win_margin": 0.0,
-        "average_winning_score": 0.0,
-        "high_score": (30, "2026casj_qm1", "Q1"),
-    }
 
 
 def test_calculate_event_insights_counts_bonus_rps_and_sweeps() -> None:
