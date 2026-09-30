@@ -1,8 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
+import type { Team } from '~/api/tba/read';
 import {
   attemptToParseSchoolNameFromOldTeamName,
   attemptToParseSponsors,
+  sortTeamKeysComparator,
+  sortTeams,
+  sortTeamsComparator,
 } from '~/lib/teamUtils';
 
 describe('attemptToParseSponsors', () => {
@@ -278,5 +282,47 @@ describe('attemptToParseSchoolNameFromOldTeamName', () => {
     const schoolName = attemptToParseSchoolNameFromOldTeamName(teamName);
 
     expect(schoolName).toEqual('Public2 High School');
+  });
+});
+
+describe('attemptToParseSponsors edge cases', () => {
+  test('treats the last slash section as the school when it has no ampersand', () => {
+    expect(attemptToParseSponsors('Company 1/Company 2')).toEqual([
+      'Company 1',
+    ]);
+  });
+
+  test('falls back to the last ampersand when every ampersand looks embedded', () => {
+    expect(attemptToParseSponsors('Sponsor A/B&C High School')).toEqual([
+      'Sponsor A',
+      'B',
+    ]);
+  });
+});
+
+describe('sortTeams', () => {
+  test('orders teams by team number', () => {
+    const teams = [{ team_number: 1678 }, { team_number: 254 }] as Team[];
+
+    expect(sortTeams(teams).map((team) => team.team_number)).toEqual([
+      254, 1678,
+    ]);
+  });
+
+  test('the comparator sorts a lower team number first', () => {
+    expect(
+      sortTeamsComparator(
+        { team_number: 254 } as Team,
+        { team_number: 1678 } as Team,
+      ),
+    ).toBeLessThan(0);
+  });
+});
+
+describe('sortTeamKeysComparator', () => {
+  test('orders team keys numerically rather than lexically', () => {
+    expect(['frc1678', 'frc254', 'frc33'].sort(sortTeamKeysComparator)).toEqual(
+      ['frc33', 'frc254', 'frc1678'],
+    );
   });
 });

@@ -24,3 +24,34 @@ describe('createLogger', () => {
     expect(logger.isLevelEnabled('debug')).toBe(true);
   });
 });
+
+describe('createLogger production output', () => {
+  test('writes Google Cloud structured log lines', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const write = vi
+      .spyOn(process.stdout, 'write')
+      .mockImplementation(() => true);
+
+    createLogger('svc').warn({ requestId: 'abc' }, 'slow request');
+
+    expect(JSON.parse(String(write.mock.calls[0][0]))).toMatchObject({
+      severity: 'WARNING',
+      message: 'slow request',
+      'logging.googleapis.com/labels': { logger: 'svc', requestId: 'abc' },
+    });
+  });
+
+  test('labels every line with the logger name even without extra fields', () => {
+    vi.stubEnv('NODE_ENV', 'production');
+    const write = vi
+      .spyOn(process.stdout, 'write')
+      .mockImplementation(() => true);
+
+    createLogger('svc').info('hello');
+
+    expect(JSON.parse(String(write.mock.calls[0][0]))).toMatchObject({
+      severity: 'INFO',
+      'logging.googleapis.com/labels': { logger: 'svc' },
+    });
+  });
+});

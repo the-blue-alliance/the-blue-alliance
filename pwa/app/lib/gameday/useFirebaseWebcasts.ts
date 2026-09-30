@@ -78,7 +78,10 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   const { data: liveEventsData, isPending: liveEventsPending } =
     useQuery<Record<string, FirebaseLiveEvent> | null>({
       queryKey: [...FIREBASE_LIVE_EVENTS_QUERY_KEY],
+      // Never invoked: enabled is false and data arrives via setQueryData.
+      /* v8 ignore start */
       queryFn: () => null,
+      /* v8 ignore stop */
       enabled: false,
       staleTime: Infinity,
     });
@@ -86,7 +89,10 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   const { data: specialWebcastsData, isPending: specialWebcastsPending } =
     useQuery<Record<string, FirebaseSpecialWebcast> | null>({
       queryKey: [...FIREBASE_SPECIAL_WEBCASTS_QUERY_KEY],
+      // Never invoked: enabled is false and data arrives via setQueryData.
+      /* v8 ignore start */
       queryFn: () => null,
+      /* v8 ignore stop */
       enabled: false,
       staleTime: Infinity,
     });

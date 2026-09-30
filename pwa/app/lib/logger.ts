@@ -39,6 +39,9 @@ export function createLogger(name: string) {
       log(object) {
         // The log formatter receives custom fields (from both mixin and log call)
         // Transform them into Google Cloud Logging labels format
+        // The mixin below always contributes `logger`, so the object is
+        // never empty in practice; this guard is only a defensive fallback.
+        /* v8 ignore if */
         if (Object.keys(object).length === 0) {
           return {};
         }

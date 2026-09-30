@@ -58,7 +58,10 @@ export function useFirebaseMatchSuggestions(): UseFirebaseMatchSuggestionsResult
 
   const { data, isPending } = useQuery<MatchSuggestions | null>({
     queryKey: [...FIREBASE_MATCH_SUGGESTIONS_QUERY_KEY],
+    // Never invoked: enabled is false and data arrives via setQueryData.
+    /* v8 ignore start */
     queryFn: () => null,
+    /* v8 ignore stop */
     enabled: false,
     staleTime: Infinity,
   });
