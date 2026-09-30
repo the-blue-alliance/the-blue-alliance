@@ -1,3 +1,4 @@
+import pytest
 from google.appengine.ext import ndb
 
 from backend.common.models.regional_pool_team import RegionalPoolTeam
@@ -11,3 +12,28 @@ def test_key_name() -> None:
     assert pool_team.key_name == "2025_frc254"
     assert RegionalPoolTeam.render_key_name(2025, "frc254") == "2025_frc254"
     assert pool_team._affected_references == {"year": set()}
+
+
+@pytest.mark.parametrize(
+    "key, valid",
+    [
+        ("2025_frc254", True),
+        # Before the regional pool existed
+        ("2024_frc254", False),
+        ("2025_254", False),
+        ("2025_frc254_extra", False),
+        ("frc254", False),
+        # Non-numeric year
+        ("abcd_frc254", False),
+    ],
+)
+def test_bug_10841c_validate_key_name(key: str, valid: bool) -> None:
+    """
+    Bug #10841-c: RegionalPoolTeam.validate_key_name is declared a
+    @staticmethod but still takes `cls` as its first parameter, so calling it
+    like every other model's validate_key_name(key) binds the key to `cls`
+    and raises TypeError.
+
+    Correct: RegionalPoolTeam.validate_key_name(key) validates the key.
+    """
+    assert RegionalPoolTeam.validate_key_name(key) is valid  # pyre-ignore[20]
