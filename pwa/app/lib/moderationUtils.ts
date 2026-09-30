@@ -72,6 +72,42 @@ export function formatEventDateRange(
   return `${format(startDate)} – ${format(endDate)}`;
 }
 
+export type EventTiming = {
+  kind: 'upcoming' | 'ongoing' | 'past';
+  /** "Starts in 3 days", "Happening now", "Ended 12 days ago". */
+  label: string;
+};
+
+/**
+ * Where an event sits relative to today, so a reviewer can tell at a glance
+ * whether a key request is early, current, or after the fact. Undefined when
+ * the event has no dates. `today` is injectable for tests.
+ */
+export function eventTiming(
+  startDate: string | null | undefined,
+  endDate: string | null | undefined,
+  today: Temporal.PlainDate = Temporal.Now.plainDateISO(),
+): EventTiming | undefined {
+  if (!startDate || !endDate) return undefined;
+  const start = Temporal.PlainDate.from(startDate);
+  const end = Temporal.PlainDate.from(endDate);
+  if (Temporal.PlainDate.compare(today, start) < 0) {
+    const days = today.until(start).days;
+    return {
+      kind: 'upcoming',
+      label: days === 1 ? 'Starts tomorrow' : `Starts in ${days} days`,
+    };
+  }
+  if (Temporal.PlainDate.compare(today, end) > 0) {
+    const days = end.until(today).days;
+    return {
+      kind: 'past',
+      label: days === 1 ? 'Ended yesterday' : `Ended ${days} days ago`,
+    };
+  }
+  return { kind: 'ongoing', label: 'Happening now' };
+}
+
 /**
  * Sanity-checks a social media suggestion's foreign key for a given media
  * slug. Returns a human-readable warning when the value is not a plain

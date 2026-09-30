@@ -19,6 +19,7 @@ import { Input } from '~/components/ui/input';
 import {
   DEFAULT_EXPIRATION_DAYS,
   defaultSetPreferred,
+  eventTiming,
   formatAuthorReputation,
   formatEventDateRange,
   matchVideoDurationWarning,
@@ -1043,10 +1044,36 @@ function ApiWriteDetails({
       : selectedTypes.filter((t) => t !== type);
     onOverridesChange({ ...overrides, auth_types: next });
   };
+  // Keys are usually wanted for an event that is imminent or underway, so
+  // show when it is without the reviewer opening the event page.
+  const eventDates = formatEventDateRange(
+    suggestion.event?.start_date,
+    suggestion.event?.end_date,
+  );
+  const timing = eventTiming(
+    suggestion.event?.start_date,
+    suggestion.event?.end_date,
+  );
   return (
     <div className="flex flex-col gap-3">
       <FieldRow label="Event">
-        <ReferenceLink suggestion={suggestion} />
+        <span className="inline-flex flex-wrap items-center gap-2">
+          <ReferenceLink suggestion={suggestion} />
+          {eventDates && <span>({eventDates})</span>}
+          {timing && (
+            <Badge
+              variant={
+                timing.kind === 'ongoing'
+                  ? 'success'
+                  : timing.kind === 'upcoming'
+                    ? 'secondary'
+                    : 'outline'
+              }
+            >
+              {timing.label}
+            </Badge>
+          )}
+        </span>
       </FieldRow>
       <FieldRow label="User">
         {suggestion.author?.nickname ?? 'unknown'}
