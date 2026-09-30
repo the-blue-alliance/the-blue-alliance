@@ -195,6 +195,65 @@ def test_parse_2015_playoff(ndb_stub, test_data_importer) -> None:
         assert len(clean_matches[CompLevel.F]) == 3
 
 
+def test_parse_2015_playoff_repairs_null_team(ndb_stub, test_data_importer) -> None:
+    """
+    Bug #10840-f: in 2015 the FMS API sometimes returned a null team in a
+    played sf/f match. The parser should fill that match's alliances back in
+    from the previous level's playoff advancement.
+
+    Uses real 2015nyny data with 354 (sf1m1 Red1) nulled out. On TBA,
+    2015nyny_sf1m1 is 354/694/271 (51) vs 1660/743/4856 (19): the QF #2 and
+    #4 seeds, as QF_SF_MAP[1] expects.
+    """
+    Event(
+        id="2015nyny",
+        name="NYC Regional",
+        event_type_enum=EventType.REGIONAL,
+        short_name="NYC",
+        event_short="nyny",
+        year=2015,
+        end_date=datetime(2015, 3, 27),
+        official=True,
+        start_date=datetime(2015, 3, 24),
+        timezone_id="America/New_York",
+        playoff_type=PlayoffType.AVG_SCORE_8_TEAM,
+    ).put()
+    path = test_data_importer._get_path(
+        __file__, "data/2015nyny_hybrid_schedule_playoff.json"
+    )
+    with open(path, "r") as f:
+        data = json.loads(f.read())
+
+    sf1m1 = next(m for m in data["Schedule"] if m["matchNumber"] == 9)
+    assert sf1m1["description"] == "Semifinal 1"
+    red1 = next(t for t in sf1m1["Teams"] if t["station"] == "Red1")
+    assert red1["teamNumber"] == 354
+    red1["teamNumber"] = None
+
+    matches, _ = FMSAPIHybridScheduleParser(2015, "nyny").parse(data)
+
+    by_key = {m.key_name: m for m in matches}
+    assert len(matches) == 17
+    repaired = by_key["2015nyny_sf1m1"]
+    assert repaired.alliances[AllianceColor.RED]["teams"] == [
+        "frc354",
+        "frc694",
+        "frc271",
+    ]
+    assert repaired.alliances[AllianceColor.BLUE]["teams"] == [
+        "frc1660",
+        "frc743",
+        "frc4856",
+    ]
+    assert sorted(repaired.team_key_names) == sorted(
+        ["frc354", "frc694", "frc271", "frc1660", "frc743", "frc4856"]
+    )
+    for match in matches:
+        assert "frcNone" not in match.team_key_names
+        for color in [AllianceColor.RED, AllianceColor.BLUE]:
+            assert len(match.alliances[color]["teams"]) == 3, match.key_name
+
+
 def test_parse_2017micmp(ndb_stub, test_data_importer) -> None:
     # 2017micmp is a 4 team bracket that starts playoff match numbering at 1
     event = Event(
