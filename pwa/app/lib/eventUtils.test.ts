@@ -1406,6 +1406,18 @@ describe('event date windows without dates', () => {
   test('isEventActive is false without a start date', () => {
     expect(isEventActive(undated)).toBe(false);
   });
+
+  // Wrong today: isEventWithinDays only guards `=== null`, so an undefined
+  // start_date reaches Temporal.PlainDate.from and throws.
+  // Correct: return false, matching isEventActive's falsy guard.
+  test('Bug #51: isEventWithinDays is false when start_date is undefined', () => {
+    const missingStart = {
+      end_date: '2024-03-03',
+      timezone: 'UTC',
+    } as unknown as Event;
+
+    expect(isEventWithinDays(missingStart, 1, 1)).toBe(false);
+  });
 });
 
 describe('isEventWithinADay', () => {
