@@ -35,7 +35,8 @@ export const Route = createFileRoute('/hall-of-fame')({
     ],
   }),
   component: HallOfFamePage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function HallOfFamePage() {
   const { notables } = Route.useLoaderData();

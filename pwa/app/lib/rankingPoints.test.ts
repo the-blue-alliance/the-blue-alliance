@@ -1,17 +1,30 @@
 import { describe, expect, test } from 'vitest';
 
 import {
+  type MatchScoreBreakdown,
   type MatchScoreBreakdownAlliance,
   getBonusRankingPoints,
+  isScoreBreakdown2015,
+  isScoreBreakdown2015Alliance,
+  isScoreBreakdown2016,
   isScoreBreakdown2016Alliance,
+  isScoreBreakdown2017,
   isScoreBreakdown2017Alliance,
+  isScoreBreakdown2018,
   isScoreBreakdown2018Alliance,
+  isScoreBreakdown2019,
   isScoreBreakdown2019Alliance,
+  isScoreBreakdown2020,
   isScoreBreakdown2020Alliance,
+  isScoreBreakdown2022,
   isScoreBreakdown2022Alliance,
+  isScoreBreakdown2023,
   isScoreBreakdown2023Alliance,
+  isScoreBreakdown2024,
   isScoreBreakdown2024Alliance,
+  isScoreBreakdown2025,
   isScoreBreakdown2025Alliance,
+  isScoreBreakdown2026,
   isScoreBreakdown2026Alliance,
 } from '~/lib/rankingPoints';
 
@@ -260,4 +273,95 @@ describe('rankingPoints', () => {
       expect(getBonusRankingPoints(score_breakdown)).toEqual(expected);
     },
   );
+});
+
+describe('match score breakdown guards', () => {
+  const guards = [
+    {
+      year: 2015,
+      guard: isScoreBreakdown2015,
+      marker: 'container_count_level1',
+    },
+    {
+      year: 2016,
+      guard: isScoreBreakdown2016,
+      marker: 'teleopDefensesBreached',
+    },
+    {
+      year: 2017,
+      guard: isScoreBreakdown2017,
+      marker: 'kPaRankingPointAchieved',
+    },
+    {
+      year: 2018,
+      guard: isScoreBreakdown2018,
+      marker: 'autoQuestRankingPoint',
+    },
+    {
+      year: 2019,
+      guard: isScoreBreakdown2019,
+      marker: 'completeRocketRankingPoint',
+    },
+    {
+      year: 2020,
+      guard: isScoreBreakdown2020,
+      marker: 'shieldEnergizedRankingPoint',
+    },
+    {
+      year: 2022,
+      guard: isScoreBreakdown2022,
+      marker: 'cargoBonusRankingPoint',
+    },
+    {
+      year: 2023,
+      guard: isScoreBreakdown2023,
+      marker: 'sustainabilityBonusAchieved',
+    },
+    { year: 2024, guard: isScoreBreakdown2024, marker: 'melodyBonusAchieved' },
+    { year: 2025, guard: isScoreBreakdown2025, marker: 'coralBonusAchieved' },
+    { year: 2026, guard: isScoreBreakdown2026, marker: 'energizedAchieved' },
+  ];
+
+  function breakdownWith(field: string): MatchScoreBreakdown {
+    return {
+      red: { [field]: 0 },
+      blue: { [field]: 0 },
+    } as unknown as MatchScoreBreakdown;
+  }
+
+  test.each(guards)(
+    'isScoreBreakdown$year recognises a $year breakdown',
+    ({ guard, marker }) => {
+      expect(guard(breakdownWith(marker))).toBe(true);
+    },
+  );
+
+  test.each(guards)(
+    'isScoreBreakdown$year rejects a breakdown from another season',
+    ({ guard }) => {
+      expect(guard(breakdownWith('somethingElse'))).toBe(false);
+    },
+  );
+
+  test.each(guards)(
+    'isScoreBreakdown$year rejects a missing breakdown',
+    ({ guard }) => {
+      expect(guard(null)).toBe(false);
+    },
+  );
+
+  test.each([
+    [{ container_count_level1: 0 }, true],
+    [{}, false],
+  ])(
+    'isScoreBreakdown2015Alliance (%#)',
+    (score_breakdown: Partial<MatchScoreBreakdownAlliance>, expected) => {
+      // @ts-expect-error - score_breakdown can be a partial for testing
+      expect(isScoreBreakdown2015Alliance(score_breakdown)).toBe(expected);
+    },
+  );
+
+  test('getBonusRankingPoints has no bonus points for a 2015 alliance', () => {
+    expect(getBonusRankingPoints({ container_count_level1: 0 })).toEqual([]);
+  });
 });

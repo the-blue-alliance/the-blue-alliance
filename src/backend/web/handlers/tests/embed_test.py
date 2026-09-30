@@ -46,3 +46,24 @@ def test_avatar(web_client: Client):
     assert (
         resp.cache_control.max_age and float(resp.cache_control.max_age) == 24 * 60 * 60
     )
+
+
+def test_avatar_no_referrer(web_client: Client):
+    resp = web_client.get("/avatar/2024/frc604.png")
+    assert resp.status_code == 403
+
+
+def test_avatar_bad_team_key(web_client: Client):
+    resp = web_client.get(
+        "/avatar/2024/notateam.png",
+        headers={"Referer": "thebluealliance.com"},
+    )
+    assert resp.status_code == 404
+
+
+def test_avatar_bad_year(web_client: Client):
+    resp = web_client.get(
+        "/avatar/2017/frc604.png",
+        headers={"Referer": "thebluealliance.com"},
+    )
+    assert resp.status_code == 404

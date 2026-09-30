@@ -1,4 +1,5 @@
-import { describe, expect, test } from 'vitest';
+import { renderHook } from '@testing-library/react';
+import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { MAX_VIEWS } from '~/lib/gameday/layouts';
 import { createEmptyPositionArray } from '~/lib/gameday/reducer';
@@ -7,8 +8,19 @@ import {
   hasUrlStateToRestore,
   parseSearchParams,
   serializeToSearchParams,
+  useGamedayUrlSync,
 } from '~/lib/gameday/useGamedayUrlSync';
 import type { GamedaySearchParams } from '~/routes/gameday';
+
+const routerMocks = vi.hoisted(() => ({
+  useSearch: vi.fn<() => GamedaySearchParams>(),
+  navigate: vi.fn<() => Promise<void>>(),
+}));
+
+vi.mock('@tanstack/react-router', () => ({
+  useSearch: routerMocks.useSearch,
+  useNavigate: () => routerMocks.navigate,
+}));
 
 function createEmptyUrlState(): GamedayUrlState {
   return {
@@ -346,5 +358,50 @@ describe('round-trip serialization', () => {
       originalState.chatSidebarVisible,
     );
     expect(parsedState.currentChat).toBe(originalState.currentChat);
+  });
+});
+
+describe('useGamedayUrlSync', () => {
+  beforeEach(() => {
+    routerMocks.useSearch.mockReturnValue({ layout: 2 });
+  });
+
+  function renderSync(initialState: GamedayUrlState = createEmptyUrlState()) {
+    return renderHook((state: GamedayUrlState) => useGamedayUrlSync(state), {
+      initialProps: initialState,
+    });
+  }
+
+  test('parses the initial state from the url', () => {
+    const { result } = renderSync();
+
+    expect(result.current.initialUrlState.layoutId).toBe(2);
+  });
+
+  test('does not rewrite the url on mount', () => {
+    renderSync();
+
+    expect(routerMocks.navigate).not.toHaveBeenCalled();
+  });
+
+  test('replaces the url when the state changes', () => {
+    const { rerender } = renderSync();
+
+    rerender({ ...createEmptyUrlState(), layoutId: 3 });
+
+    expect(routerMocks.navigate).toHaveBeenCalledWith({
+      search: { layout: 3 },
+      replace: true,
+      resetScroll: false,
+    });
+  });
+
+  test('does not navigate again for an equivalent state', () => {
+    const { rerender } = renderSync();
+
+    rerender({ ...createEmptyUrlState(), layoutId: 3 });
+    rerender({ ...createEmptyUrlState(), layoutId: 3 });
+
+    expect(routerMocks.navigate).toHaveBeenCalledTimes(1);
   });
 });

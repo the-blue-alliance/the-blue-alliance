@@ -11,6 +11,7 @@ import {
 const loggerMocks = vi.hoisted(() => ({
   debug: vi.fn<(bindings: object, message: string) => void>(),
   warn: vi.fn<(bindings: object, message: string) => void>(),
+  error: vi.fn<(bindings: object, message: string) => void>(),
 }));
 
 vi.mock('@sentry/tanstackstart-react', () => ({
@@ -764,5 +765,78 @@ describe('Network Cache Middleware', () => {
       expect(body).toBe('recovered');
       expect(mockFetch).toHaveBeenCalledTimes(2);
     });
+  });
+});
+
+describe('Network Cache Middleware in-flight requests', () => {
+  let mockedNow: number;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    mockedNow = performance.now();
+    vi.spyOn(performance, 'now').mockImplementation(() => mockedNow);
+    vi.stubGlobal('window', undefined);
+    clearCache();
+  });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  });
+
+  function okResponse(body: string, maxAge: number): Response {
+    return new Response(body, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${maxAge}`,
+      },
+    });
+  }
+
+  it('collapses concurrent misses for one key into a single origin request', async () => {
+    let resolveOrigin: (response: Response) => void = () => undefined;
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolveOrigin = resolve;
+        }),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/inflight';
+
+    const first = cachedFetch(url);
+    const second = cachedFetch(url);
+    resolveOrigin(okResponse('v1', 60));
+    const bodies = await Promise.all([
+      first.then((r) => r.text()),
+      second.then((r) => r.text()),
+    ]);
+
+    expect(bodies).toEqual(['v1', 'v1']);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps serving the stale entry when background revalidation fails', async () => {
+    const mockFetch = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(okResponse('v1', 1))
+      .mockRejectedValueOnce(new Error('origin down'));
+    vi.stubGlobal('fetch', mockFetch);
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/swr-failure';
+    await cachedFetch(url);
+    mockedNow += 1100;
+    await vi.advanceTimersByTimeAsync(1100);
+
+    const stale = await (await cachedFetch(url)).text();
+    await vi.waitFor(() => expect(loggerMocks.error).toHaveBeenCalled());
+
+    expect(stale).toBe('v1');
+    expect(loggerMocks.error).toHaveBeenCalledWith(
+      expect.objectContaining({ url }),
+      'Request failed',
+    );
   });
 });
