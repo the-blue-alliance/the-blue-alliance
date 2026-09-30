@@ -293,6 +293,19 @@ describe('attemptToParseSponsors edge cases', () => {
   });
 });
 
+describe('attemptToParseSponsors embedded ampersands', () => {
+  // Wrong today: when every '&' in the final section looks embedded, the
+  // fallback splits on the last '&' and returns ['Sponsor A', 'B'], chopping
+  // "B&" off the school name.
+  // Correct: "B&C High School" is the school, so the only sponsor is
+  // 'Sponsor A'.
+  test('Bug #50: keeps an embedded-ampersand school name intact', () => {
+    expect(attemptToParseSponsors('Sponsor A/B&C High School')).toEqual([
+      'Sponsor A',
+    ]);
+  });
+});
+
 describe('sortTeams', () => {
   test('orders teams by team number', () => {
     const teams = [{ team_number: 1678 }, { team_number: 254 }] as Team[];
