@@ -3,7 +3,10 @@ import os
 from typing import List, Optional
 
 import pytest
+from google.appengine.ext import ndb
 
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.match_helper import MatchHelper
@@ -13,6 +16,8 @@ from backend.common.helpers.playoff_advancement_helper import (
 from backend.common.models.alliance import EventAlliance, EventAllianceBackup
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, TeamKey
+from backend.common.models.match import Match
+from backend.common.models.wlt import WLTRecord
 
 
 @pytest.fixture(autouse=True)
@@ -309,3 +314,77 @@ def test_double_elim_4(test_data_importer) -> None:
     ) as f:
         expected_advancement_apiv3 = json.load(f)
     assert json.loads(json.dumps(apiv3_response)) == expected_advancement_apiv3
+
+
+def _match(
+    year: int,
+    comp_level: CompLevel,
+    set_number: int,
+    red_score: int,
+    blue_score: int,
+) -> Match:
+    return Match(
+        id=f"{year}test_{comp_level}{set_number}m1",
+        event=ndb.Key(Event, f"{year}test"),
+        year=year,
+        comp_level=comp_level,
+        set_number=set_number,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": red_score},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": blue_score},
+            }
+        ),
+    )
+
+
+def test_round_robin_champ_points() -> None:
+    assert (
+        PlayoffAdvancementHelper.round_robin_champ_points_earned(
+            _match(2019, CompLevel.SF, 1, -1, -1), AllianceColor.RED
+        )
+        == 0
+    )
+    assert (
+        PlayoffAdvancementHelper.round_robin_champ_points_earned(
+            _match(2019, CompLevel.SF, 1, 10, 10), AllianceColor.RED
+        )
+        == 1
+    )
+
+
+def test_update_wlt_tie() -> None:
+    record = WLTRecord(wins=0, losses=0, ties=0)
+    PlayoffAdvancementHelper.update_wlt(
+        _match(2019, CompLevel.SF, 1, 10, 10), AllianceColor.RED, record
+    )
+    assert record == {"wins": 0, "losses": 0, "ties": 1}
+
+
+def test_unplayed_matches_are_skipped() -> None:
+    unplayed_qf = _match(2019, CompLevel.QF, 1, -1, -1)
+    unplayed_sf = _match(2019, CompLevel.SF, 1, -1, -1)
+    organized = MatchHelper.organized_matches([unplayed_qf, unplayed_sf])[1]
+
+    event = create_event("2019test", PlayoffType.BRACKET_8_TEAM)
+    bracket = PlayoffAdvancementHelper._generate_bracket(organized, event)
+    assert bracket[CompLevel.QF]["qf1"]["winning_alliance"] is None
+
+    advancement_2015 = PlayoffAdvancementHelper.generate_playoff_advancement_2015(
+        organized
+    )
+    assert advancement_2015[CompLevel.QF] == []
+
+    round_robin = PlayoffAdvancementHelper.generate_playoff_advancement_round_robin(
+        organized, 2019
+    )
+    assert round_robin["sf_complete"] is False
+
+    double_elim = PlayoffAdvancementHelper.generate_playoff_advancement_double_elim(
+        MatchHelper.organized_double_elim_matches(
+            MatchHelper.organized_matches([_match(2023, CompLevel.SF, 1, -1, -1)])[1],
+            2023,
+        )
+    )
+    assert all(not r.complete for r in double_elim["rounds"].values())

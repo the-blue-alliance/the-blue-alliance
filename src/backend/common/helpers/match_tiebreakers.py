@@ -26,7 +26,8 @@ class MatchTiebreakers(object):
         if AllianceColor.RED not in none_throws(
             match.score_breakdown
         ) or AllianceColor.BLUE not in none_throws(match.score_breakdown):
-            return ""
+            # Unreachable: Match.score_breakdown is None unless both are present
+            return ""  # pragma: no cover
 
         red_breakdown = none_throws(match.score_breakdown)[AllianceColor.RED]
         blue_breakdown = none_throws(match.score_breakdown)[AllianceColor.BLUE]

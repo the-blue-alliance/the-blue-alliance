@@ -160,7 +160,8 @@ class MyTBA:
     @property
     def attendance_stats_helper(self) -> AttendanceStatsHelper:
         event_teams = self.event_teams
-        if event_teams is None:
+        if event_teams is None:  # pragma: no cover
+            # Unreachable: event_teams always returns a list
             return AttendanceStatsHelper(
                 event_teams=[],
                 events=[],

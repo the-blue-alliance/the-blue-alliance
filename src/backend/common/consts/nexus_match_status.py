@@ -32,4 +32,7 @@ class NexusMatchStatus(enum.IntEnum):
             case self.ON_FIELD:
                 return "On field"
 
-        raise ValueError(f"Unknown value for NexusMatchStatus: {self}")
+        # Unreachable: every member is matched above
+        raise ValueError(  # pragma: no cover
+            f"Unknown value for NexusMatchStatus: {self}"
+        )

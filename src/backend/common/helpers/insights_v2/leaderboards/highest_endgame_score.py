@@ -44,7 +44,9 @@ class HighestEndgameScoreV2Calculator(MatchAllianceLeaderboardV2Calculator):
                 continue
 
             blue_endgame = get_endgame_points(blue_pts)
-            if blue_endgame is None:
+            if blue_endgame is None:  # pragma: no cover
+                # Unreachable: both alliances share a breakdown and year, so
+                # blue can only be None when red already was
                 continue
 
             if red_endgame >= blue_endgame:

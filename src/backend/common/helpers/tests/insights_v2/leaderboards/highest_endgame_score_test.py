@@ -2,6 +2,7 @@ from backend.common.helpers.insights_v2.leaderboards.highest_endgame_score impor
     HighestEndgameScoreV2Calculator,
 )
 from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.tests.insights_v2.fakes import fake_event, fake_match
 
 
 def test_highest_endgame_score_year(ndb_stub, test_data_importer) -> None:
@@ -73,3 +74,16 @@ def test_highest_endgame_score_rankings_descending(
 
     values = [r["value"] for r in insights[0].data["rankings"]]
     assert values == sorted(values, reverse=True)
+
+
+def test_highest_endgame_score_skips_unusable_matches() -> None:
+    calc = HighestEndgameScoreV2Calculator()
+    calc.on_event(
+        fake_event(
+            [
+                fake_match(-1, -1),  # Unplayed
+                fake_match(10, 5),  # No score breakdown
+            ]
+        )
+    )
+    assert calc.counts == {}

@@ -213,7 +213,8 @@ class YouTubeVideoHelper(object):
             first_item = parsed_data[0]
             resolved_channel_id = first_item.get("channel_id")
             resolved_channel_name = first_item.get("channel_name")
-            if not resolved_channel_id:
+            if not resolved_channel_id:  # pragma: no cover
+                # Unreachable: the parser drops items without a channel id
                 raise ndb.Return(None)
 
             raise ndb.Return(

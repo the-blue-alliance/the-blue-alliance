@@ -241,7 +241,8 @@ class LeaderboardV2Calculator(InsightV2Calculator):
                 )
 
         for district_abbrev, counts in sorted(district_counts.items()):
-            if not counts:
+            if not counts:  # pragma: no cover
+                # Unreachable: a district is only added along with a count
                 continue
             rankings = self._build_rankings(counts)
             if not rankings:

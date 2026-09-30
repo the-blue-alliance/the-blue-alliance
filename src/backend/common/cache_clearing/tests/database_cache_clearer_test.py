@@ -23,6 +23,7 @@ from backend.common.queries import (
     event_details_query,
     event_query,
     insight_query,
+    insight_v2_query,
     match_query,
     media_query,
     robot_query,
@@ -474,6 +475,36 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             district_query.DistrictAbbreviationQuery("chs").cache_key,
             district_query.DistrictAbbreviationQuery("fch").cache_key,
             event_query.DistrictEventsQuery("2019chs").cache_key,
+        }
+
+    def test_regionalpoolteam_updated(self) -> None:
+        affected_refs = {"year": {2025, 2026}}
+        cache_keys = {
+            q[0] for q in get_affected_queries.regionalpoolteam_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            team_query.RegionalTeamsQuery(2025).cache_key,
+            team_query.RegionalTeamsQuery(2026).cache_key,
+        }
+
+    def test_insight_v2_updated(self) -> None:
+        affected_refs = {
+            "year": {2024},
+            "category": {"leaderboards"},
+            "district_abbreviation": {"ne"},
+        }
+        cache_keys = {
+            q[0] for q in get_affected_queries.insight_v2_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            insight_v2_query.InsightV2YearQuery(2024).cache_key,
+            insight_v2_query.InsightV2YearCategoryQuery(2024, "leaderboards").cache_key,
+            insight_v2_query.InsightV2YearDistrictQuery(2024, "ne").cache_key,
+            insight_v2_query.InsightV2YearCategoryDistrictQuery(
+                2024, "leaderboards", "ne"
+            ).cache_key,
         }
 
     def test_insight_updated(self) -> None:
