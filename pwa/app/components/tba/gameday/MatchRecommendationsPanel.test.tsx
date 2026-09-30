@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { act, render, screen } from '@testing-library/react';
 import type { AnchorHTMLAttributes, PropsWithChildren } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
@@ -119,6 +119,15 @@ describe('formatMatchTime', () => {
     expect(formatMatchTime(timestamp / 1000, now, 'America/New_York')).toBe(
       'in 10 min · 12:00 PM',
     );
+  });
+
+  test('says now within a minute of the match', () => {
+    const now = Temporal.Instant.from('2026-04-23T15:59:31Z');
+    const timestamp = Temporal.Instant.from(
+      '2026-04-23T16:00:00Z',
+    ).epochMilliseconds;
+
+    expect(formatMatchTime(timestamp / 1000, now, 'UTC')).toBe('now · 4:00 PM');
   });
 
   test('shows a fallback when time is absent', () => {
@@ -252,5 +261,37 @@ describe('MatchRecommendationsPanel', () => {
     expect(
       screen.getByText('Unable to load match recommendations').textContent,
     ).toBe('Unable to load match recommendations');
+  });
+
+  test('shows a spinner while loading', () => {
+    useMatchSuggestionsMock.mockReturnValue({
+      data: undefined,
+      error: null,
+      isLoading: true,
+    });
+
+    render(<MatchRecommendationsPanel />);
+
+    expect(screen.getByText('Loading recommendations…')).toBeTruthy();
+  });
+
+  test('refreshes relative times every 30 seconds', () => {
+    vi.useFakeTimers();
+    try {
+      render(<MatchRecommendationsPanel />);
+      const before = screen.getByText(/ · /).textContent;
+
+      vi.mocked(Temporal.Now.instant).mockReturnValue(
+        Temporal.Instant.fromEpochMilliseconds(1_776_960_000_000),
+      );
+      act(() => {
+        vi.advanceTimersByTime(30_000);
+      });
+
+      expect(screen.getByText(/ · /).textContent).not.toBe(before);
+      expect(screen.getByText(/^now · /)).toBeTruthy();
+    } finally {
+      vi.useRealTimers();
+    }
   });
 });
