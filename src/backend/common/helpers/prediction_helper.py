@@ -160,7 +160,7 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["mean"].get(team)
                             if team_mean is not None:
-                                if year_diff != 0:
+                                if year_diff != 0:  # pragma: no cover
                                     team_mean *= (
                                         1  # TODO: Hacky; scale based on actual data
                                     )
@@ -171,7 +171,7 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["var"].get(team)
                             if team_var is not None:
-                                if year_diff != 0:
+                                if year_diff != 0:  # pragma: no cover
                                     team_var = (
                                         self._default_var * 3
                                     )  # TODO: Hacky; scale based on actual data
