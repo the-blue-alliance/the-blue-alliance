@@ -261,17 +261,20 @@ def do_overall_insights(kind: str) -> Response:
     return make_response("")
 
 
+def _insight_type_or_404(kind: str) -> InsightType:
+    try:
+        return InsightType(kind)
+    except ValueError:
+        logging.warning(f"Unknown insight kind {kind}")
+        abort(404)
+
+
 @blueprint.route("/backend-tasks-b2/enqueue/math/insights/<kind>/all")
 def enqueue_all_insights_of_kind(kind: str) -> Response:
     """
     Enqueues all insights (all valid years) of a given kind.
     """
-    try:
-        insight_type = InsightType(kind)
-    except ValueError:
-        logging.warning(f"Unknown insight kind {kind}")
-        abort(404)
-        return  # pragma: no cover  # no-op due to abort; only for type-hinting
+    insight_type = _insight_type_or_404(kind)
 
     for year in SeasonHelper.get_valid_years():
         taskqueue.add(
