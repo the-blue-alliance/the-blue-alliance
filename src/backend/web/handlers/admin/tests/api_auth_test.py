@@ -366,3 +366,34 @@ def test_api_auth_manage_unknown_type_is_404(
 ) -> None:
     resp = web_client.get("/admin/api_auth/manage/bogus")
     assert resp.status_code == 404
+
+
+def test_bug_5_api_auth_edit_updates_offseason_webcast_channels(
+    login_gae_admin, web_client: Client
+) -> None:
+    """Bug #5: editing an existing key never saves offseason_webcast_channels.
+
+    Today api_auth_edit_post only passes offseason_webcast_channels when
+    creating a new key; the update branch ignores the submitted
+    webcast_list_str, so the old channels stay. Correct: the channels become
+    the submitted list.
+    """
+    _store_write_auth(
+        "writekey",
+        auth_types=[AuthType.EVENT_MATCHES],
+        offseason_webcast_channels=["oldchan"],
+    )
+
+    resp = web_client.post(
+        "/admin/api_auth/edit/writekey",
+        data={
+            "description": "Updated",
+            "allow_edit_matches": "on",
+            "webcast_list_str": "newchan1,newchan2",
+        },
+    )
+    assert resp.status_code == 302
+
+    auth = ApiAuthAccess.get_by_id("writekey")
+    assert auth is not None
+    assert auth.offseason_webcast_channels == ["newchan1", "newchan2"]
