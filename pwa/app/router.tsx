@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
 
 import { Button } from '~/components/ui/button';
+import { getAnalyticsInstance } from '~/firebase/firebaseConfig';
 import { ApiError } from '~/lib/apiError';
 import { createQueryClient } from '~/lib/queryClient';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
@@ -137,10 +138,7 @@ export function getRouter() {
 // `firebase/analytics` and the gtag.js network request it triggers are loaded
 // lazily here so they stay out of the hydration critical path.
 async function logPageView(pagePath: string, pageLocation: string) {
-  const [{ logEvent }, { getAnalyticsInstance }] = await Promise.all([
-    import('firebase/analytics'),
-    import('~/firebase/firebaseConfig'),
-  ]);
+  const { logEvent } = await import('firebase/analytics');
 
   const analytics = await getAnalyticsInstance();
   if (analytics === null) {
