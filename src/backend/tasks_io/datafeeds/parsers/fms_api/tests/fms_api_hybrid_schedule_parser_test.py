@@ -608,10 +608,8 @@ def test_parse_team_with_null_station(ndb_stub) -> None:
     A team with a null station is counted in team_key_names but assigned to
     neither alliance.
 
-    Note: this only works when the match has a single team. With multiple
-    teams, the parser sorts by station and Python 3 raises TypeError when
-    comparing None to str, so a null station in a real six-team match would
-    crash the parser.
+    A null station alongside other teams is covered by bug #10840-e's
+    failing-test PR.
     """
     _put_event()
     matches, _ = _parse([_schedule_match(teams=[_team(254, None)])])

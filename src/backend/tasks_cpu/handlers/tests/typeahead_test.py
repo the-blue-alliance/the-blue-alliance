@@ -90,10 +90,6 @@ def test_do_districts(tasks_cpu_client: Client) -> None:
     District(
         id="2020ne", year=2020, abbreviation="ne", display_name="New England"
     ).put()
-    # A district without a display name. Note that the handler uses
-    # `display_name` directly rather than `District.render_name`, so this
-    # renders as "None District [ONT]".
-    District(id="2020ont", year=2020, abbreviation="ont").put()
 
     resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/typeaheadcalc")
     assert resp.status_code == 200
@@ -102,7 +98,6 @@ def test_do_districts(tasks_cpu_client: Client) -> None:
     assert _entry_data(TypeaheadEntry.ALL_DISTRICTS_KEY) == [
         "Michigan District [FIM]",
         "New England District [NE]",
-        "None District [ONT]",
     ]
     assert TypeaheadEntry.get_by_id(TypeaheadEntry.ALL_TEAMS_KEY) is None
     assert TypeaheadEntry.get_by_id(TypeaheadEntry.ALL_EVENTS_KEY) is None

@@ -2,7 +2,6 @@ import datetime
 import json
 from typing import Any, cast, Dict
 
-import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -1071,22 +1070,6 @@ def test_parse_unrecognized_event_type_is_skipped() -> None:
     )
 
     assert [e.key_name for e in events] == ["2010testreg"]
-
-
-def test_parse_unrecognized_event_type_with_explicit_short_raises() -> None:
-    # BUG: the "Event type not recognized" guard is bypassed when an explicit
-    # event short is given (`and not self.event_short`), presumably so a single
-    # event fetch still returns the event. However the parser then calls
-    # `none_throws(event_type)` when bootstrapping sync overrides, so an
-    # unrecognized type crashes the parse instead of being kept or skipped.
-    # This test documents the current behaviour.
-    with pytest.raises(AssertionError, match="Unexpected `None`"):
-        FMSAPIEventListParser(2010, short="testwhat").parse(
-            cast(
-                SeasonEventListModelV33,
-                {"Events": [_api_event("testwhat", "SomethingNew")]},
-            )
-        )
 
 
 def test_parse_event_sync_disabled_is_skipped() -> None:

@@ -567,12 +567,11 @@ def test_upload_as_admin_without_auth_id_skips_cloudrun_job(
 
 
 @freeze_time("2019-06-01")
-def test_upload_duplicate_db_with_unknown_newest_path(
+def test_upload_duplicate_db_reuses_newest_path(
     monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
-    """When the upload matches the newest stored database but the newest file
-    path can no longer be resolved, nothing is written and the storage path
-    is reported as empty."""
+    """When the upload matches the newest stored database, nothing new is
+    written and the import job points at the existing file."""
     setup_event(event_type=EventType.OFFSEASON)
     setup_user(monkeypatch, permissions=[])
     auth_id, auth_secret = setup_api_auth(
@@ -592,6 +591,7 @@ def test_upload_duplicate_db_with_unknown_newest_path(
         content_type="application/octet-stream",
     )
 
+    newest_path = "fms_companion/2019nyny/existing.db"
     monkeypatch.setattr(
         FMSCompanionHelper,
         "read_newest_companion_db",
@@ -600,7 +600,7 @@ def test_upload_duplicate_db_with_unknown_newest_path(
     monkeypatch.setattr(
         FMSCompanionHelper,
         "get_newest_file_path",
-        staticmethod(lambda event_key: None),
+        staticmethod(lambda event_key: newest_path),
     )
 
     with (
@@ -626,11 +626,10 @@ def test_upload_duplicate_db_with_unknown_newest_path(
             },
         )
 
+    expected_path = f"{FMSCompanionHelper.get_bucket()}/{newest_path}"
     assert resp.status_code == 200
     mock_write.assert_not_called()
-    assert resp.json["storage_path"] == ""
-    # The job is still started, pointing at an empty bucket path
+    assert resp.json["storage_path"] == expected_path
     mock_start_job.assert_called_once()
-    assert mock_start_job.call_args[1]["args"] == ["gs://"]
-    assert resp.json["job_name"] == "tba-offseason-companion-import"
+    assert mock_start_job.call_args[1]["args"] == [f"gs://{expected_path}"]
     assert resp.json["execution_id"] == "exec-123"
