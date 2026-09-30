@@ -72,6 +72,7 @@ describe("EventManualAlliances", () => {
 
     fireEvent.click(screen.getByRole("button", { name: "Upload Alliances to TBA" }));
     expect(onSubmit).toHaveBeenCalledTimes(1);
+    expect(onSubmit).toHaveBeenCalledWith("2025nysu");
   });
 
   it("disables inputs while uploading and styles the status message", () => {
