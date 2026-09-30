@@ -1072,6 +1072,20 @@ def test_parse_unrecognized_event_type_is_skipped() -> None:
     assert [e.key_name for e in events] == ["2010testreg"]
 
 
+def test_parse_unrecognized_event_type_with_explicit_short_is_skipped() -> None:
+    """Bug #10840-d: with an explicit `short=`, an unrecognized event type
+    should be skipped (with the same "not recognized" warning) just like it is
+    without `short=`, rather than crashing the parse on `none_throws`."""
+    events, _ = FMSAPIEventListParser(2010, short="testwhat").parse(
+        cast(
+            SeasonEventListModelV33,
+            {"Events": [_api_event("testwhat", "SomethingNew")]},
+        )
+    )
+
+    assert events == []
+
+
 def test_parse_event_sync_disabled_is_skipped() -> None:
     Event(
         id="2010testreg",
