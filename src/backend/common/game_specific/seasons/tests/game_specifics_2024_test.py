@@ -212,7 +212,7 @@ def test_bug_19_rp_sweep_requires_melody_and_ensemble() -> None:
     6 RP match).
 
     Correct: a 4 RP sweep is WIN (2 RP) + MELODY (1 RP) + ENSEMBLE (1 RP). The
-    2024 Game Manual, Section 6.5.6 Point Values, Table 6-2, p. 48 (Section 6
+    2024 Game Manual, Section 6.5.6 Point Values, Table 6-2, p. 49 (Section 6
     V10, manual dated 2024-04-09, current through Team Update 21) lists them
     as separate Ranking Points:
 
