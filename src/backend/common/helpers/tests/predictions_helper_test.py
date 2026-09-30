@@ -608,6 +608,51 @@ def test_contribution_calculator_extracts_stat(
         assert math.isclose(result["var"][team], 5**2)
 
 
+@pytest.mark.parametrize("num_matches", [1, 4])
+def test_bug_23_robot_on_stage_writes_the_current_match_row(num_matches: int) -> None:
+    """
+    Bug #23: the "robot_on_stage" extractor loops with `for i in range(1, 4)`,
+    which shadows calculate_before_match's match index `i`. After the loop
+    `i == 3`, so the extracted means are written to the rows for match 3
+    instead of the match being processed. With fewer than four matches that
+    is an IndexError.
+
+    Correct: counting ONSTAGE robots leaves the match index alone. Match 0's
+    rows get red 3 (all ONSTAGE) and blue 1 (only StageLeft); no other
+    match's rows are touched.
+    """
+    event = _make_event("2024test", datetime.datetime(2024, 3, 1))
+    on_stage = {
+        "endGameRobot1": "StageLeft",
+        "endGameRobot2": "StageRight",
+        "endGameRobot3": "CenterStage",
+    }
+    parked = {
+        "endGameRobot1": "Parked",
+        "endGameRobot2": "None",
+        "endGameRobot3": "StageLeft",
+    }
+    matches = [
+        _make_match(
+            "2024test",
+            n,
+            RED_TEAMS,
+            BLUE_TEAMS,
+            100,
+            60,
+            {"red": on_stage, "blue": parked},
+        )
+        for n in range(1, num_matches + 1)
+    ]
+    calculator = ContributionCalculator(event, matches, "robot_on_stage", 1, 1)
+
+    calculator.calculate_before_match(0)
+
+    assert calculator._mean_sums == [3, 1]
+    rows = [row[0] for row in calculator._Mmean]
+    assert rows == [3, 1] + [0] * (2 * (num_matches - 1))
+
+
 def test_contribution_calculator_unknown_stat() -> None:
     event = _make_event("2019test", datetime.datetime(2019, 3, 1))
     match = _make_match(
