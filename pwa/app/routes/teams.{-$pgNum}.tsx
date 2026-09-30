@@ -49,7 +49,8 @@ export const Route = createFileRoute('/teams/{-$pgNum}')({
     };
   },
   component: TeamsPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function TeamPageNumberToRange(pageNum: number): string {
   // Page number is 1-indexed

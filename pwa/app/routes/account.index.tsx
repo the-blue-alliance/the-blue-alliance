@@ -33,7 +33,8 @@ import { Spinner } from '~/components/ui/spinner';
 
 export const Route = createFileRoute('/account/')({
   component: Account,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Account() {
   const { isInitialLoading, user, logout } = useAuth();

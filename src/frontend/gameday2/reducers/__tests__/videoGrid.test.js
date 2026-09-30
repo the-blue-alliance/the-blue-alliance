@@ -292,3 +292,84 @@ describe("video grid recuder", () => {
     });
   }
 });
+
+describe("video grid reducer additional cases", () => {
+  const initial = videoGrid(undefined, {});
+  const withLayout = (layoutId) =>
+    videoGrid(initial, { type: types.SET_LAYOUT, layoutId });
+  const add = (state, webcastId, position) =>
+    videoGrid(state, {
+      type: types.ADD_WEBCAST_AT_POSITION,
+      webcastId,
+      position,
+    });
+
+  it("returns the same state for unknown actions", () => {
+    expect(videoGrid(initial, { type: "UNKNOWN" })).toBe(initial);
+  });
+
+  it("ignores negative positions", () => {
+    const state = withLayout(3);
+    expect(add(state, "a-0", -1)).toBe(state);
+  });
+
+  it("replaces the webcast at an occupied position", () => {
+    let state = add(withLayout(3), "a-0", 0);
+    state = add(state, "b-0", 0);
+    expect(state.displayed).toEqual(["b-0"]);
+    expect(state.domOrder[0]).toBe("b-0");
+    expect(state.positionMap[0]).toBe(0);
+  });
+
+  it("appends to displayed when the replaced webcast was not displayed", () => {
+    const state = Object.assign({}, add(withLayout(3), "a-0", 0), {
+      displayed: [],
+    });
+    expect(add(state, "b-0", 0).displayed).toEqual(["b-0"]);
+  });
+
+  it("pads a short dom order back to the maximum size when trimming", () => {
+    const state = Object.assign({}, withLayout(3), {
+      domOrder: [null],
+      domOrderLivescoreOn: [null],
+    });
+    const trimmed = videoGrid(state, { type: types.SET_LAYOUT, layoutId: 1 });
+    expect(trimmed.domOrder).toHaveLength(MAX_SUPPORTED_VIEWS);
+    expect(trimmed.domOrderLivescoreOn).toHaveLength(MAX_SUPPORTED_VIEWS);
+  });
+
+  it("swaps two positions", () => {
+    let state = add(withLayout(3), "a-0", 0);
+    state = add(state, "b-0", 1);
+    const swapped = videoGrid(state, {
+      type: types.SWAP_WEBCASTS,
+      firstPosition: 0,
+      secondPosition: 1,
+    });
+    expect(swapped.positionMap.slice(0, 2)).toEqual([1, 0]);
+    expect(swapped.domOrder).toEqual(state.domOrder);
+    expect(swapped.displayed).toEqual(state.displayed);
+  });
+
+  it("toggles livescore for the webcast at a position", () => {
+    let state = add(withLayout(3), "a-0", 0);
+    state = add(state, "b-0", 1);
+    state = videoGrid(state, {
+      type: types.TOGGLE_POSITION_LIVESCORE,
+      position: 1,
+    });
+    expect(state.domOrderLivescoreOn.slice(0, 2)).toEqual([false, true]);
+    state = videoGrid(state, {
+      type: types.TOGGLE_POSITION_LIVESCORE,
+      position: 1,
+    });
+    expect(state.domOrderLivescoreOn.slice(0, 2)).toEqual([false, false]);
+  });
+
+  it("clears the displayed webcasts on RESET_WEBCASTS", () => {
+    let state = add(withLayout(3), "a-0", 0);
+    state = videoGrid(state, { type: types.RESET_WEBCASTS });
+    expect(state.displayed).toEqual([]);
+    expect(state.domOrder[0]).toBeNull();
+  });
+});
