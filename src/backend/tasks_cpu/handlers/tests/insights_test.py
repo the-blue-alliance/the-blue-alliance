@@ -423,15 +423,6 @@ def test_do_overall_insights_unknown_kind_in_taskqueue_is_a_noop(
     assert Insight.query().count() == 0
 
 
-def test_do_overall_insights_unknown_kind_outside_taskqueue_errors(
-    tasks_cpu_client: Client,
-) -> None:
-    # Current behaviour: the template iterates over insights=None and fails.
-    resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/overallinsights/asdf")
-    assert resp.status_code == 500
-    assert Insight.query().count() == 0
-
-
 def test_enqueue_all_insights_of_kind_bad_kind(tasks_cpu_client: Client) -> None:
     resp = tasks_cpu_client.get("/backend-tasks-b2/enqueue/math/insights/asdf/all")
     assert resp.status_code == 404

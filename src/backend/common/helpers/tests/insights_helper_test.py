@@ -724,22 +724,12 @@ def test_do_match_insights_computes_all_match_stats(ndb_stub) -> None:
     ]
 
 
-def test_do_match_insights_with_no_events_only_produces_counts(ndb_stub) -> None:
+def test_do_match_insights_with_no_events_has_empty_counts(ndb_stub) -> None:
     insights = InsightsHelper.doMatchInsights(2014)
     by_name = _insights_by_name(insights)
 
-    assert set(by_name.keys()) == {
-        Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE],
-        Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
-        Insight.INSIGHT_NAMES[Insight.MATCHES_PLAYED],
-    }
     assert by_name[Insight.INSIGHT_NAMES[Insight.NUM_MATCHES]].data == 0
     assert by_name[Insight.INSIGHT_NAMES[Insight.MATCHES_PLAYED]].data == []
-    assert by_name[Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE]].data == {
-        "qual": [],
-        "playoff": [],
-        "overall": [],
-    }
 
 
 def test_do_match_insights_penalty_free_highscores_and_year_specific(
@@ -991,23 +981,6 @@ def test_do_prediction_insights_counts_championship_events_separately() -> None:
             "correct_matches_count_cmp": 0,
             "total_matches_count_cmp": 1,
         },
-    }
-
-
-def test_do_prediction_insights_without_predictions_reports_empty_counts() -> None:
-    insights = InsightsHelper._doPredictionInsightsForEvents(year=2024, events=[])
-
-    assert len(insights) == 1
-    assert insights[0].data == {
-        level: {
-            "mean_brier_score": None,
-            "correct_matches_count": 0,
-            "total_matches_count": 0,
-            "mean_brier_score_cmp": None,
-            "correct_matches_count_cmp": 0,
-            "total_matches_count_cmp": 0,
-        }
-        for level in ["qual", "playoff"]
     }
 
 

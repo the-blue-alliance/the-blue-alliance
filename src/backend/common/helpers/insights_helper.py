@@ -557,7 +557,7 @@ class InsightsHelper(object):
         if insight is not None:
             return [insight]
         else:
-            return []  # pragma: no cover  # highscore_matches is a dict, never == []
+            return []
 
     @classmethod
     def _calculateMatchesByTeam(
