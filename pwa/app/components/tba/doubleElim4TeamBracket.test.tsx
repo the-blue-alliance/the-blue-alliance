@@ -365,10 +365,8 @@ describe('DoubleElim4TeamBracket', () => {
   });
 
   test('falls back to match teams when they are in no alliance', () => {
-    // BUG: a row whose teams are in no alliance has a null alliance number,
-    // which compares equal to the "nothing hovered" state (null === null), so
-    // the row (and its card, once it wins) renders highlighted from the start.
-    // The mouse handlers are correctly inert; only the comparison is wrong.
+    // Whether these rows start highlighted is Bug #60, covered by its own
+    // failing-test PR; this test only checks they render and hover safely.
     const matches = [
       makeMatch(
         CompLevel.SF,
@@ -391,23 +389,13 @@ describe('DoubleElim4TeamBracket', () => {
 
     const match1 = group('Match 1');
     expect(match1.textContent).not.toContain('vs');
-    expect(rowIn('Match 1', '9001').getAttribute('data-highlight')).toBe(
-      'true',
-    );
-    expect(rowIn('Match 1', '9101').getAttribute('data-highlight')).toBe(
-      'true',
-    );
-    expect(match1.className).toContain('ring-alliance-red-accent');
+    expect(rowIn('Match 1', '9001')).toBeTruthy();
+    expect(rowIn('Match 1', '9101')).toBeTruthy();
 
+    // Hovering either row is inert and doesn't throw.
     fireEvent.mouseEnter(rowIn('Match 1', '9001'));
-    expect(rowIn('Match 1', '9001').getAttribute('data-highlight')).toBe(
-      'true',
-    );
     fireEvent.mouseLeave(rowIn('Match 1', '9001'));
     fireEvent.mouseEnter(rowIn('Match 1', '9101'));
-    expect(rowIn('Match 1', '9101').getAttribute('data-highlight')).toBe(
-      'true',
-    );
     fireEvent.mouseLeave(rowIn('Match 1', '9101'));
   });
 });

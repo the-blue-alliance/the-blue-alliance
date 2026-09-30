@@ -471,11 +471,9 @@ describe('TraditionalBracket', () => {
     expect(screen.getByRole('link', { name: '201' })).toBeTruthy();
   });
 
-  test('cannot hover an alliance that is missing from the alliance list', () => {
-    // BUG: a row whose teams are in no alliance has a null alliance number,
-    // which compares equal to the "nothing hovered" state (null === null), so
-    // the row (and its card, once it wins) renders highlighted from the start.
-    // The mouse handlers are correctly inert; only the comparison is wrong.
+  test('renders an alliance that is missing from the alliance list', () => {
+    // Whether these rows start highlighted is Bug #60, covered by its own
+    // failing-test PR; this test only checks they render and hover safely.
     const matches = [
       makeMatch(
         CompLevel.SF,
@@ -496,16 +494,13 @@ describe('TraditionalBracket', () => {
       />,
     );
 
-    expect(rowFor('9001').getAttribute('data-highlight')).toBe('true');
-    expect(rowFor('9101').getAttribute('data-highlight')).toBe('true');
-    expect(cardFor('9001').className).toContain('ring-alliance-red-accent');
+    expect(rowFor('9001')).toBeTruthy();
+    expect(rowFor('9101')).toBeTruthy();
 
-    // Hovering either row leaves the (already highlighted) state untouched.
+    // Hovering either row is inert and doesn't throw.
     fireEvent.mouseEnter(rowFor('9001'));
-    expect(rowFor('9001').getAttribute('data-highlight')).toBe('true');
     fireEvent.mouseLeave(rowFor('9001'));
     fireEvent.mouseEnter(rowFor('9101'));
-    expect(rowFor('9101').getAttribute('data-highlight')).toBe('true');
     fireEvent.mouseLeave(rowFor('9101'));
   });
 });
