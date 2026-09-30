@@ -7,6 +7,7 @@ import {
   nextSeriesLabel,
   resolveBracketSides,
   seriesOutcome,
+  sideAllianceNumber,
 } from '~/lib/doubleElimBracket';
 
 describe('resolveBracketSides', () => {
@@ -99,5 +100,44 @@ describe('nextSeriesLabel', () => {
     expect(
       nextSeriesLabel({ 'Match 5': [played], Finals: [played, unplayed] }),
     ).toBeUndefined();
+  });
+});
+
+describe('seriesOutcome for a red win', () => {
+  test('returns red as winner when red won', () => {
+    expect(
+      seriesOutcome({
+        redAllianceNumber: 1,
+        blueAllianceNumber: 8,
+        redWon: true,
+        blueWon: false,
+      }),
+    ).toEqual({ winner: 1, loser: 8 });
+  });
+});
+
+describe('nextSeriesLabel once the bracket is complete', () => {
+  const played = {
+    alliances: { red: { score: 100 }, blue: { score: 50 } },
+  } as unknown as Match;
+
+  test('has no next series when every series has been played', () => {
+    expect(
+      nextSeriesLabel({ 'Match 1': [played], 'Match 2': [played] }),
+    ).toBeUndefined();
+  });
+});
+
+describe('sideAllianceNumber', () => {
+  test('reads the alliance number of a seeded side', () => {
+    const sides = resolveBracketSides(DOUBLE_ELIM_8_SLOTS, {});
+
+    expect(sideAllianceNumber(sides['Match 2'].red)).toBe(4);
+  });
+
+  test('has no alliance number for a placeholder side', () => {
+    const sides = resolveBracketSides(DOUBLE_ELIM_8_SLOTS, {});
+
+    expect(sideAllianceNumber(sides['Match 13'].red)).toBeNull();
   });
 });
