@@ -42,10 +42,14 @@ class GameSpecifics2026(
     def determine_auto_winner(
         self, red: Dict[str, Any], blue: Dict[str, Any]
     ) -> Optional[AllianceColor]:
-        # Compare total auto points
-        if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
+        # Game Manual 6.4.1: "The ALLIANCE that scores the most FUEL during
+        # AUTO will have their HUB set to inactive for SHIFT 1". AUTO TOWER
+        # points do not count, so compare AUTO FUEL, not totalAutoPoints.
+        red_auto_fuel = red.get("hubScore").get("autoCount")
+        blue_auto_fuel = blue.get("hubScore").get("autoCount")
+        if red_auto_fuel > blue_auto_fuel:
             return AllianceColor.RED
-        if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
+        if blue_auto_fuel > red_auto_fuel:
             return AllianceColor.BLUE
 
         # Auto tied: compare shift 1

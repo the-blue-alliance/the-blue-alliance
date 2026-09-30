@@ -243,10 +243,10 @@ def test_success_rate_climbs_counted_per_robot() -> None:
 
 
 def test_success_rate_auto_win_conversion() -> None:
-    match = _build_match(100, 80, red={"totalAutoPoints": 10})
+    match = _build_match(100, 80, red={"hubScore": {"autoCount": 10}})
     assert _measure(match)["auto_win_conversion"] == (1, 1)
 
-    match = _build_match(80, 100, red={"totalAutoPoints": 10})
+    match = _build_match(80, 100, red={"hubScore": {"autoCount": 10}})
     assert _measure(match)["auto_win_conversion"] == (0, 1)
 
 
@@ -254,7 +254,7 @@ def test_success_rate_auto_win_conversion_needs_both_winners() -> None:
     match = _build_match(100, 80)
     assert _measure(match)["auto_win_conversion"] == (0, 0)
 
-    match = _build_match(80, 80, red={"totalAutoPoints": 10})
+    match = _build_match(80, 80, red={"hubScore": {"autoCount": 10}})
     assert _measure(match)["auto_win_conversion"] == (0, 0)
 
 
@@ -414,13 +414,13 @@ def test_calculate_event_insights_counts_bonus_rps_and_sweeps() -> None:
 def test_calculate_event_insights_auto_win_conversion() -> None:
     matches = [
         # AUTO winner goes on to win the match.
-        _build_match(30, 10, red={"totalAutoPoints": 10}, match_number=1),
-        _build_match(10, 30, blue={"totalAutoPoints": 10}, match_number=2),
+        _build_match(30, 10, red={"hubScore": {"autoCount": 10}}, match_number=1),
+        _build_match(10, 30, blue={"hubScore": {"autoCount": 10}}, match_number=2),
         # AUTO winner loses the match.
-        _build_match(30, 10, blue={"totalAutoPoints": 10}, match_number=3),
+        _build_match(30, 10, blue={"hubScore": {"autoCount": 10}}, match_number=3),
         # Undefined: AUTO tied with no shift scoring, or the match tied.
         _build_match(30, 10, match_number=4),
-        _build_match(20, 20, red={"totalAutoPoints": 10}, match_number=5),
+        _build_match(20, 20, red={"hubScore": {"autoCount": 10}}, match_number=5),
     ]
     qual = none_throws(_insights(matches)["qual"])
     assert qual["auto_win_conversion"] == [2, 3, 100.0 * 2 / 3]
@@ -475,13 +475,18 @@ def test_bug_22_auto_winner_decided_by_auto_fuel() -> None:
     AUTO TOWER points, so an alliance that climbed in AUTO can "win" AUTO
     while scoring less FUEL.
 
-    Correct: the AUTO result that sets SHIFT 1 HUB status is decided on FUEL
-    scored during AUTO only (hubScore.autoPoints; AUTO FUEL is 1 point each).
-    2026 Game Manual, Version TU22 (2026-05-07), Section 6.4.1 HUB Status and
-    Table 6-3 ("The ALLIANCE that scores the most FUEL during AUTO will have
-    their HUB set to inactive for SHIFT 1"):
+    Correct: the AUTO result that sets SHIFT 1 HUB status is decided on the
+    number of FUEL scored during AUTO (hubScore.autoCount); AUTO TOWER points
+    play no part. 2026 Game Manual, Version TU22 (2026-05-07), Section 6.4.1
+    HUB Status, p. 44 (sentence unchanged by any Team Update 00-22):
+
+        The ALLIANCE that scores the most FUEL during AUTO will have their HUB
+        set to inactive for SHIFT 1 while their opponent's HUB will be active
+        ... If both ALLIANCES score the same number of FUEL during AUTO, the
+        FMS will randomly select an ALLIANCE ...
+
     https://firstfrc.blob.core.windows.net/frc2026/Manual/2026GameManual.pdf
-    Judgment call: this assumes "AUTO winner" means the FMS SHIFT 1 decision.
+    "AUTO winner" here means the ALLIANCE whose HUB is inactive in SHIFT 1.
     """
     red = _auto(20)
     red["autoTowerPoints"] = 15
