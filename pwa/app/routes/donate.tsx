@@ -6,7 +6,8 @@ import { publicCacheControlHeaders } from '~/lib/utils';
 export const Route = createFileRoute('/donate')({
   headers: publicCacheControlHeaders(),
   component: Donate,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Donate(): React.JSX.Element {
   return (

@@ -92,7 +92,8 @@ interface MatchInfo {
   eventRankings?: EventRanking | null;
   eventPredictions?: EventPredictions | null;
   epaPercentileMap?: Map<string, number> | null;
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function epaStars(percentile: number | undefined): string {
   if (percentile == null) return '';
