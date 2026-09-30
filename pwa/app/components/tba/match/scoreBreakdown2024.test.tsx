@@ -188,8 +188,80 @@ describe('ScoreBreakdown2024', () => {
     ).toBeTruthy();
   });
 
-  // Robot endgame labels that depend on trap/microphone flags ("Spotlit")
-  // are Bug #57, covered by its own failing-test PR.
+  // Wrong today: EndgameRobotCell labels an onstage robot "Spotlit (+4)"
+  // when the TRAP at its stage position holds a note, and never reads the
+  // microphone flags.
+  // Correct: spotlit comes from a HIGH NOTE on the MICROPHONE above the robot
+  // (micCenterStage / micStageLeft / micStageRight); a trap note is a separate
+  // 5-point alliance score. 2024 Game Manual (CRESCENDO), Section 6.5.4
+  // SPOTLIGHTING (page 47, section revision V10): "ONSTAGE ROBOTS paired with
+  // (i.e. below) the MICROPHONE on which the HIGH NOTE was scored are awarded
+  // a greater number of points per Table 6-2"; Table 6-2 (page 48): ONSTAGE
+  // (not SPOTLIT) 3, ONSTAGE (SPOTLIT) 4, NOTE in TRAP 5. Latest published
+  // manual (PDF last modified 2024-04-09, after all Team Updates):
+  // https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
+  const noStageFlags = {
+    trapCenterStage: false,
+    trapStageLeft: false,
+    trapStageRight: false,
+    micCenterStage: false,
+    micStageLeft: false,
+    micStageRight: false,
+  };
+
+  test('Bug #57: a trap note alone does not make an onstage robot spotlit', () => {
+    renderBreakdown(
+      makeBreakdown(
+        {
+          endGameRobot1: EndGameRobot2024.CENTER_STAGE,
+          ...noStageFlags,
+          trapCenterStage: true,
+        },
+        { endGameRobot1: EndGameRobot2024.NONE, ...noStageFlags },
+      ),
+    );
+
+    expect(
+      screen.getByRole('row', {
+        name: '254 Onstage (+3) Robot 1 Endgame 148 None (+0)',
+      }),
+    ).toBeTruthy();
+  });
+
+  test.each([
+    {
+      position: 'center stage',
+      endgame: EndGameRobot2024.CENTER_STAGE,
+      mic: { micCenterStage: true },
+    },
+    {
+      position: 'stage left',
+      endgame: EndGameRobot2024.STAGE_LEFT,
+      mic: { micStageLeft: true },
+    },
+    {
+      position: 'stage right',
+      endgame: EndGameRobot2024.STAGE_RIGHT,
+      mic: { micStageRight: true },
+    },
+  ])(
+    'Bug #57: a high note on the microphone above an onstage robot at $position makes it spotlit',
+    ({ endgame, mic }) => {
+      renderBreakdown(
+        makeBreakdown(
+          { endGameRobot1: endgame, ...noStageFlags, ...mic },
+          { endGameRobot1: EndGameRobot2024.NONE, ...noStageFlags },
+        ),
+      );
+
+      expect(
+        screen.getByRole('row', {
+          name: '254 Spotlit (+4) Robot 1 Endgame 148 None (+0)',
+        }),
+      ).toBeTruthy();
+    },
+  );
+
   test.each([
     { name: '1114 Onstage (+3) Robot 2 Endgame 217 None (+0)' },
     { name: '2056 Parked (+1) Robot 3 Endgame 33 None (+0)' },
