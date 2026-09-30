@@ -80,13 +80,8 @@ def test_models_query_response_passthrough(app: Flask) -> None:
 
 def test_models_query_response_filtered(app: Flask) -> None:
     mock_query = MagicMock()
-    mock_query.fetch_dict.return_value = [
-        {"key": "2024casf", "name": "Event"},
-        {"key": "2024sj", "name": "Event 2"},
-    ]
-    filter_func = MagicMock(
-        side_effect=lambda models, mt: [{"key": m["key"]} for m in models]
-    )
+    mock_query.fetch_json.return_value = b'[{"key": "2024casf"}, {"key": "2024sj"}]'
+    filter_func = MagicMock()
 
     with app.app_context():
         resp = models_query_response(
@@ -95,8 +90,10 @@ def test_models_query_response_filtered(app: Flask) -> None:
             filter_func=filter_func,
         )
 
-        mock_query.fetch_dict.assert_called_once_with(ApiMajorVersion.API_V3)
-        mock_query.fetch_json.assert_not_called()
+        mock_query.fetch_json.assert_called_once_with(
+            ApiMajorVersion.API_V3, model_type="simple", filter_func=filter_func
+        )
+        mock_query.fetch_dict.assert_not_called()
         assert json.loads(resp.data) == [{"key": "2024casf"}, {"key": "2024sj"}]
 
 
@@ -137,18 +134,16 @@ def test_multi_models_query_response_passthrough(app: Flask) -> None:
 
 def test_multi_models_query_response_filtered(app: Flask) -> None:
     mock_fut1 = MagicMock()
-    mock_fut1.get_result.return_value = [{"key": "frc254", "name": "Team 254"}]
+    mock_fut1.get_result.return_value = b'[{"key": "frc254"}]'
     mock_fut2 = MagicMock()
-    mock_fut2.get_result.return_value = [{"key": "frc604", "name": "Team 604"}]
+    mock_fut2.get_result.return_value = b'[{"key": "frc604"}]'
 
     mock_q1 = MagicMock()
-    mock_q1.fetch_dict_async.return_value = mock_fut1
+    mock_q1.fetch_json_async.return_value = mock_fut1
     mock_q2 = MagicMock()
-    mock_q2.fetch_dict_async.return_value = mock_fut2
+    mock_q2.fetch_json_async.return_value = mock_fut2
 
-    filter_func = MagicMock(
-        side_effect=lambda models, mt: [{"key": m["key"]} for m in models]
-    )
+    filter_func = MagicMock()
 
     with app.app_context():
         resp = multi_models_query_response(
@@ -157,6 +152,11 @@ def test_multi_models_query_response_filtered(app: Flask) -> None:
             filter_func=filter_func,
         )
 
-        mock_q1.fetch_dict_async.assert_called_once_with(ApiMajorVersion.API_V3)
-        mock_q2.fetch_dict_async.assert_called_once_with(ApiMajorVersion.API_V3)
+        mock_q1.fetch_json_async.assert_called_once_with(
+            ApiMajorVersion.API_V3, model_type="simple", filter_func=filter_func
+        )
+        mock_q2.fetch_json_async.assert_called_once_with(
+            ApiMajorVersion.API_V3, model_type="simple", filter_func=filter_func
+        )
+        assert resp.content_type == "application/json"
         assert json.loads(resp.data) == [{"key": "frc254"}, {"key": "frc604"}]

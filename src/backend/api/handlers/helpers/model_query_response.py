@@ -49,20 +49,17 @@ def models_query_response(
 ) -> TypedFlaskResponse[Any]:
     """
     Handles a query for a collection of model entities.
-    If model_type is None, fetches pre-serialized JSON bytes directly.
-    If model_type is specified, fetches the dicts, filters properties, and serializes.
+    Fetches pre-serialized JSON bytes directly (with optional filtered caching).
     """
-    if model_type is None:
+    if model_type is not None:
+        raw_json = query.fetch_json(
+            ApiMajorVersion.API_V3,
+            model_type=str(model_type),
+            filter_func=filter_func,
+        )
+    else:
         raw_json = query.fetch_json(ApiMajorVersion.API_V3)
-        return profiled_jsonify(raw_json)
-
-    data = query.fetch_dict(ApiMajorVersion.API_V3)
-    if filter_func is not None and data is not None:
-        with Span("model_query_response.filter_properties") as span:
-            span.set_label("model_type", str(model_type))
-            span.set_label("item_count", str(len(data)))
-            data = filter_func(data, model_type)
-    return profiled_jsonify(data)
+    return profiled_jsonify(raw_json)
 
 
 def combine_json_arrays(chunks: Iterable[Optional[bytes]]) -> bytes:
@@ -98,24 +95,19 @@ def multi_models_query_response(
 ) -> TypedFlaskResponse[Any]:
     """
     Handles multiple queries for collections of model entities.
-    If model_type is None, fetches pre-serialized JSON bytes asynchronously and combines at the byte level.
-    If model_type is specified, fetches dicts asynchronously, combines them, filters properties, and serializes.
+    Fetches pre-serialized JSON bytes asynchronously (with optional filtered caching)
+    and combines at the byte level.
     """
-    if model_type is None:
+    if model_type is not None:
+        futures = [
+            q.fetch_json_async(
+                ApiMajorVersion.API_V3,
+                model_type=str(model_type),
+                filter_func=filter_func,
+            )
+            for q in queries
+        ]
+    else:
         futures = [q.fetch_json_async(ApiMajorVersion.API_V3) for q in queries]
-        payload = combine_json_arrays(f.get_result() for f in futures)
-        return profiled_jsonify(payload)
-
-    futures = [q.fetch_dict_async(ApiMajorVersion.API_V3) for q in queries]
-    items = []
-    for f in futures:
-        partial = f.get_result()
-        if partial:
-            items += partial
-
-    if filter_func is not None and items is not None:
-        with Span("model_query_response.filter_properties") as span:
-            span.set_label("model_type", str(model_type))
-            span.set_label("item_count", str(len(items)))
-            items = filter_func(items, model_type)
-    return profiled_jsonify(items)
+    payload = combine_json_arrays(f.get_result() for f in futures)
+    return profiled_jsonify(payload)
