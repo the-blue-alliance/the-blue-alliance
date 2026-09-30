@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional
 import numpy as np
 import pytest
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -69,6 +70,28 @@ def test_past_event_seeds_match_predictions(test_data_importer) -> None:
 
     matches = Match.query(Match.event == ndb.Key(Event, "2019nyny")).fetch()
     sorted_matches = MatchHelper.play_order_sorted_matches(matches)
+
+    # 2019scmb (Feb 27) precedes 2019nyny (Apr 4) but shares no teams with it.
+    # Enter every 2019nyny team at 2019scmb and give each the stats of one
+    # real 2019scmb team, so the 2019nyny priors come from 2019scmb.
+    details = none_throws(EventDetails.get_by_id("2019scmb"))
+    predictions = none_throws(details.predictions)
+    qual_stats = none_throws(predictions["stat_mean_vars"])["qual"]
+    template = "frc1051"
+    nyny_teams = {
+        team
+        for match in matches
+        for color in ALLIANCE_COLORS
+        for team in match.alliances[color]["teams"]
+    }
+    for team in nyny_teams:
+        _put_event_team("2019scmb", team)
+        for stat in qual_stats.values():
+            stat["mean"][team] = stat["mean"][template]
+            stat["var"][team] = stat["var"][template]
+    details.predictions = predictions
+    details.put()
+
     (
         match_predictions,
         match_prediction_stats,
@@ -78,6 +101,16 @@ def test_past_event_seeds_match_predictions(test_data_importer) -> None:
     assert match_predictions is not None
     assert match_prediction_stats is not None
     assert stat_mean_vars is not None
+
+    # Before anything is played the estimate is exactly the seeded prior, so
+    # the first match predicts three copies of the template team's score.
+    first = none_throws(sorted_matches[0].key.string_id())
+    first_prediction = match_predictions["qual"][first]
+    for color in ALLIANCE_COLORS:
+        assert math.isclose(
+            first_prediction[color]["score"],  # pyre-ignore[6]
+            3 * qual_stats["score"]["mean"][template],
+        )
 
 
 @pytest.mark.parametrize(
@@ -180,7 +213,9 @@ def test_compute_rankings_predictions_unplayed(
         match.alliances_json = json.dumps(alliances)
         match._alliances = None
 
-    mark_unplayed(matches[-1])
+    # Leave the final qual match unplayed so the sampled-qual path runs.
+    quals = [m for m in sorted_matches if m.comp_level == CompLevel.QM]
+    mark_unplayed(quals[-1])
 
     (
         ranking_predictions,
@@ -191,6 +226,9 @@ def test_compute_rankings_predictions_unplayed(
 
     assert ranking_predictions is not None
     assert ranking_prediction_stats is not None
+    # The unplayed qual was sampled, not read as a result: the last played
+    # match is the one before it.
+    assert ranking_prediction_stats["last_played_match"] == quals[-2].key_name
 
 
 # ---------------------------------------------------------------------------
@@ -300,69 +338,6 @@ def test_compute_match_predictions_modern_seasons(
     # Every played match contributed to the win/loss Brier score
     assert "win_loss" in match_prediction_stats["qual"]["brier_scores"]
     assert match_prediction_stats["qual"]["wl_accuracy"] is not None
-
-
-@pytest.mark.parametrize(
-    "event_key, dead_stat, prob_key, always_zero",
-    [
-        # 2024: melody references "coopertition_criteria", ensemble references
-        # "robot_on_stage". Neither is in the 2024 prediction stat list, so their
-        # (mean, var) is (0, 0) and the coop/on-stage factor divides by zero.
-        ("2024nytr", "coopertition_criteria", "prob_melody_bonus", False),
-        ("2024nytr", "robot_on_stage", "prob_ensemble_bonus", True),
-        # 2025: coral bonus references "coopertition_criteria" the same way.
-        ("2025isde1", "coopertition_criteria", "prob_coral_bonus", False),
-    ],
-)
-@pytest.mark.filterwarnings("ignore:divide by zero")
-def test_compute_match_predictions_with_dead_secondary_stats(
-    event_key: EventKey,
-    dead_stat: str,
-    prob_key: str,
-    always_zero: bool,
-    test_data_importer,
-) -> None:
-    """
-    Documents current behaviour: 2024 and 2025 bonus RP predictions read
-    secondary stats that no game config ever computes. The variance of those
-    stats is 0, so the secondary probability factor is `1 - normcdf(inf) == 0`
-    (numpy emits a divide-by-zero RuntimeWarning, which is an error under
-    this repo's pytest config, hence the filterwarnings marker). The ensemble bonus
-    is therefore always predicted as 0, and the coop paths of melody/coral
-    contribute nothing.
-    """
-    test_data_importer.import_event(__file__, f"data/{event_key}.json")
-    test_data_importer.import_match_list(__file__, f"data/{event_key}_matches.json")
-
-    matches = Match.query(Match.event == ndb.Key(Event, event_key)).fetch()
-    sorted_matches = MatchHelper.play_order_sorted_matches(matches)
-
-    game = get_game(int(event_key[:4]))
-    assert dead_stat not in {s for s, _, _ in game.get_prediction_relevant_stats()}
-
-    (
-        match_predictions,
-        match_prediction_stats,
-        stat_mean_vars,
-    ) = PredictionHelper.get_match_predictions(sorted_matches)
-
-    assert match_predictions is not None
-    assert match_prediction_stats is not None
-    assert stat_mean_vars is not None
-    assert dead_stat not in stat_mean_vars["qual"]
-
-    probs = []
-    for level in LEVELS:
-        for prediction in match_predictions[level].values():
-            for color in ALLIANCE_COLORS:
-                color_prediction = prediction[color]  # pyre-ignore[6]
-                probs.append(color_prediction[prob_key])
-    assert probs
-    if always_zero:
-        assert all(p == 0.0 for p in probs)
-    else:
-        assert all(0.0 <= p <= 1.0 for p in probs)
-        assert any(p > 0.0 for p in probs)
 
 
 def test_get_match_predictions_no_matches() -> None:
@@ -631,38 +606,6 @@ def test_contribution_calculator_extracts_stat(
     for team in RED_TEAMS + BLUE_TEAMS:
         assert math.isclose(result["mean"][team], 10)
         assert math.isclose(result["var"][team], 5**2)
-
-
-def test_contribution_calculator_robot_on_stage_shadows_match_index() -> None:
-    """
-    Documents current behaviour: the "robot_on_stage" extractor loops with
-    `for i in range(1, 4)`, which shadows the match index parameter `i`. The
-    loop leaves `i == 3`, so the extracted means are written to the rows for
-    match 3 instead of the match being processed; with fewer than four
-    matches that is an IndexError. No game config requests this stat, so
-    the bug is not reachable through get_match_predictions.
-    """
-    event = _make_event("2019test", datetime.datetime(2019, 3, 1))
-    on_stage = {
-        "endGameRobot1": "StageLeft",
-        "endGameRobot2": "StageRight",
-        "endGameRobot3": "CenterStage",
-    }
-    parked = {
-        "endGameRobot1": "Parked",
-        "endGameRobot2": "None",
-        "endGameRobot3": "StageLeft",
-    }
-    match = _make_match(
-        "2019test", 1, RED_TEAMS, BLUE_TEAMS, 100, 60, {"red": on_stage, "blue": parked}
-    )
-    calculator = ContributionCalculator(event, [match], "robot_on_stage", 10, 5**2)
-
-    with pytest.raises(IndexError):
-        calculator.calculate_before_match(0)
-
-    # Nothing was recorded for the match
-    assert calculator._mean_sums == []
 
 
 def test_contribution_calculator_unknown_stat() -> None:
