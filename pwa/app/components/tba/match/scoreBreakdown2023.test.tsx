@@ -246,17 +246,17 @@ describe('ScoreBreakdown2023', () => {
     ).toHaveLength(3);
   });
 
-  // Wrong today: each alliance's column shows its OWN foulCount /
-  // techFoulCount (the fouls it committed) as the fouls it received.
-  // Correct: show the opponent's counts, matching the 2022 breakdown and the
-  // old Jinja templates. (Judgment call: assumes the FRC API's foulCount is
-  // fouls committed by that alliance, as 2022 and Jinja already treat it.)
+  // Bug #56: each alliance's column showed its OWN foulCount / techFoulCount
+  // (the fouls it committed) as the fouls it received. It must show the
+  // opponent's counts, as the 2022 breakdown and the old Jinja templates do.
   // 2023 Game Manual (CHARGED UP), Section 6.5 Rule Violations, Table 6-3
-  // (page 48, section revision V4): "FOUL: a credit of 5 points towards the
-  // opponent's MATCH point total"; "TECH FOUL: a credit of 12 points toward
-  // the opponent's MATCH point total". Latest published manual (PDF last
-  // modified 2023-04-11, after all Team Updates):
+  // Rule violations (page 48 of 142, Section 6 V4; PDF dated 2023-04-11,
+  // after the last Team Update): "FOUL | a credit of 5 points towards the
+  // opponent's MATCH point total" / "TECH FOUL | a credit of 12 points
+  // toward the opponent's MATCH point total".
   // https://firstfrc.blob.core.windows.net/frc2023/Manual/2023FRCGameManual.pdf
+  // The FRC API's foulCount is fouls committed: in 2023cmptx_sf12m1 red's
+  // foulPoints 17 = blue's 1 foul x 5 + 1 tech foul x 12.
   test('Bug #56: shows each alliance the fouls its opponent committed', () => {
     // Red committed 2 fouls + 1 tech foul; blue committed 3 fouls.
     renderBreakdown(
@@ -273,8 +273,8 @@ describe('ScoreBreakdown2023', () => {
     ).toBeTruthy();
   });
 
-  // Both alliances get identical counts here: which alliance's counts belong
-  // under which column is Bug #56, covered by its own failing-test PR.
+  // Both alliances get identical counts here, so this checks point values
+  // only; which column gets whose counts is covered above.
   test('shows foul counts with derived points', () => {
     renderBreakdown(
       makeBreakdown(

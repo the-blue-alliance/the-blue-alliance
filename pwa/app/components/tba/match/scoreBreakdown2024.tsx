@@ -343,22 +343,24 @@ export default function ScoreBreakdown2024({
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Tech Fouls */}
+        {/* Fouls / Tech Fouls: foulCount/techFoulCount are the fouls an
+            alliance committed, which credit points to its opponent, so each
+            side shows the other's. */}
         <TableRow>
           <TableCell className="bg-alliance-red-loser">
-            {scoreBreakdown.red.foulCount} (+
-            {(scoreBreakdown.red.foulCount ?? 0) * 2}) /{' '}
-            {scoreBreakdown.red.techFoulCount} (+
-            {(scoreBreakdown.red.techFoulCount ?? 0) * 5})
+            {scoreBreakdown.blue.foulCount} (+
+            {(scoreBreakdown.blue.foulCount ?? 0) * 2}) /{' '}
+            {scoreBreakdown.blue.techFoulCount} (+
+            {(scoreBreakdown.blue.techFoulCount ?? 0) * 5})
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Fouls / Tech Fouls
           </TableCell>
           <TableCell className="bg-alliance-blue-loser">
-            {scoreBreakdown.blue.foulCount} (+
-            {(scoreBreakdown.blue.foulCount ?? 0) * 2}) /{' '}
-            {scoreBreakdown.blue.techFoulCount} (+
-            {(scoreBreakdown.blue.techFoulCount ?? 0) * 5})
+            {scoreBreakdown.red.foulCount} (+
+            {(scoreBreakdown.red.foulCount ?? 0) * 2}) /{' '}
+            {scoreBreakdown.red.techFoulCount} (+
+            {(scoreBreakdown.red.techFoulCount ?? 0) * 5})
           </TableCell>
         </TableRow>
 

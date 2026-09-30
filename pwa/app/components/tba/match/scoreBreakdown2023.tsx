@@ -340,13 +340,15 @@ export default function ScoreBreakdown2023({
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Tech Fouls */}
+        {/* Fouls / Tech Fouls: foulCount/techFoulCount are the fouls an
+            alliance committed, which credit points to its opponent, so each
+            side shows the other's. */}
         <TableRow>
           <TableCell className="bg-alliance-red-loser">
             <FoulDisplay
-              foulsReceived={scoreBreakdown.red.foulCount}
+              foulsReceived={scoreBreakdown.blue.foulCount}
               pointsPerFoul={POINTS_PER_FOUL[2023]}
-              techFoulsReceived={scoreBreakdown.red.techFoulCount}
+              techFoulsReceived={scoreBreakdown.blue.techFoulCount}
               pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
               techOrMajor="tech"
             />
@@ -356,9 +358,9 @@ export default function ScoreBreakdown2023({
           </TableCell>
           <TableCell className="bg-alliance-blue-loser">
             <FoulDisplay
-              foulsReceived={scoreBreakdown.blue.foulCount}
+              foulsReceived={scoreBreakdown.red.foulCount}
               pointsPerFoul={POINTS_PER_FOUL[2023]}
-              techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+              techFoulsReceived={scoreBreakdown.red.techFoulCount}
               pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
               techOrMajor="tech"
             />
