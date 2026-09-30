@@ -130,6 +130,16 @@ describe("chats reducer webcast and default chat handling", () => {
     expect(state.renderedChats).toEqual(["firstupdatesnow", "somechat"]);
   });
 
+  it("Bug #44: does not leak chats from WEBCASTS_UPDATED into the default state", () => {
+    // Wrong today: setChatsFromWebcasts shallow-copies the module-level
+    // default state, so twitch chats (e.g. silicon_valley) are written into
+    // the shared default `chats` object and leak into the initial state.
+    // Correct: the default state is unchanged by any action.
+    const pristine = JSON.parse(JSON.stringify(freshChats(undefined, {})));
+    freshChats(undefined, { type: types.WEBCASTS_UPDATED, webcasts });
+    expect(freshChats(undefined, {})).toEqual(pristine);
+  });
+
   it("sets the default chat to a known channel", () => {
     let state = freshChats(undefined, {
       type: types.WEBCASTS_UPDATED,
