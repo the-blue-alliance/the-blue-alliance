@@ -295,3 +295,12 @@ def test_parser_parse_missing_snippet() -> None:
 
     assert result["video1"]["status"] == WebcastStatus.OFFLINE
     assert "stream_title" not in result["video1"]
+
+
+def test_parser_skips_items_without_id() -> None:
+    parser = YoutubeStreamStatusBatchParser(["video1"])
+    result = parser.parse(
+        {"items": [{"id": "", "snippet": {"liveBroadcastContent": "live"}}]}
+    )
+    # The id-less item is skipped, so the requested video defaults to offline
+    assert result == {"video1": {"status": WebcastStatus.OFFLINE}}
