@@ -173,23 +173,9 @@ Keep one-use case data next to the `.forEach`; extract it only when the same cas
 
 **A before/after screenshot table in the PR description is a SHOULD for every PR that changes what a user sees.** One row per affected state with `Before`, `After`, and `Diff` columns under `## Screenshots`; the diff is a pixel diff of the other two with its changed percentage noted. The root `AGENTS.md` "Pull Requests" section has the full rule; this section is the PWA how-to.
 
-### Public routes: let CI capture them
+### Capturing
 
-PRs that touch `pwa/` files can get before/after screenshots posted as a comment. To request screenshots, add a `## Screenshot Pages` section to the PR description:
-
-```markdown
-## Screenshot Pages
-
-- /match/2024mil_f1m2
-- /team/254/2024 Team 254 Page
-- /gameday
-```
-
-Each line is `- /path` optionally followed by a display name. If no name is given, the path is used. If no pages are listed, the workflow skips screenshot capture.
-
-### Login-gated or data-dependent pages: capture locally
-
-CI renders public routes against the production API, so it cannot capture pages behind a login (`/account`, `/suggest/review/*`, `/mod/*`) or states that need particular data. Capture those yourself:
+CI does not capture screenshots. Capture them yourself, for public routes and for pages behind a login (`/account`, `/suggest/review/*`, `/mod/*`) alike. For a public route, point the script at the real route on the dev server and skip step 1:
 
 1. Add a throwaway route, e.g. `app/routes/shot.tsx`, that renders the component with fixture props inside `<div id="shot">`. Do not commit it, and revert the regenerated `app/routeTree.gen.ts` afterwards.
 2. Start the dev server on a spare port: `pnpm dev --port 3123 --strictPort`.
