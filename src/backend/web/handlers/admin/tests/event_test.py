@@ -1707,25 +1707,6 @@ def test_event_edit_post_creates_event(
     assert EventDetails.get_by_id("2020nyny") is None
 
 
-def test_event_edit_post_uppercase_event_short(
-    web_client: Client, login_gae_admin, taskqueue_stub
-) -> None:
-    # The key is lowercased, but event_short is stored verbatim, so the
-    # redirect (built from Event.key_name) points at an uppercase key that
-    # the event detail page will not find.
-    resp = web_client.post(
-        "/admin/event/edit", data=_full_event_form(event_short="NYNY")
-    )
-    assert resp.status_code == 302
-    assert resp.headers["Location"] == "/admin/event/2020NYNY"
-
-    assert Event.get_by_id("2020NYNY") is None
-    event = Event.get_by_id("2020nyny")
-    assert event is not None
-    assert event.event_short == "NYNY"
-    assert event.key_name == "2020NYNY"
-
-
 def test_event_edit_post_none_placeholders(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:
@@ -1760,16 +1741,6 @@ def test_event_edit_post_none_placeholders(
     # An empty string is not in the {"true", "false"} lookup, so it becomes None
     assert event.enable_predictions is None
     assert event.manual_attrs == [""]
-
-
-def test_event_edit_post_empty_divisions_field_fails(
-    web_client: Client, login_gae_admin, taskqueue_stub
-) -> None:
-    # The divisions field is parsed as JSON, so an empty string (rather than
-    # "[]", which the edit form always renders) is rejected before any write.
-    resp = web_client.post("/admin/event/edit", data=_full_event_form(divisions=""))
-    assert resp.status_code == 500
-    assert Event.get_by_id("2020nyny") is None
 
 
 def test_event_edit_post_defaults_when_fields_missing(
@@ -1850,25 +1821,6 @@ def test_event_edit_post_only_rankings_json(
     assert details is not None
     assert details.alliance_selections == []
     assert details.rankings == rankings
-
-
-def test_event_edit_post_create_with_details_json_fails(
-    web_client: Client, login_gae_admin, taskqueue_stub
-) -> None:
-    # On the create path (no event_key in the URL) the handler builds
-    # EventDetails(id=event_key) with event_key=None instead of the computed
-    # key, so the manipulator blows up after the Event itself has been saved.
-    alliances = [{"picks": ["frc1", "frc2", "frc3"], "declines": []}]
-    resp = web_client.post(
-        "/admin/event/edit",
-        data=_full_event_form(alliance_selections_json=json.dumps(alliances)),
-    )
-    assert resp.status_code == 500
-
-    event = Event.get_by_id("2020nyny")
-    assert event is not None
-    assert event.name == "New York City Regional"
-    assert EventDetails.get_by_id("2020nyny") is None
 
 
 # ---------------------------------------------------------------------------

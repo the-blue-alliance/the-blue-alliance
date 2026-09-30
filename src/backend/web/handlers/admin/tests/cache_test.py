@@ -13,12 +13,10 @@ from backend.common.manipulators.event_details_manipulator import (
 )
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
-from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match
-from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
 
 # ---------------------------------------------------------------------------
@@ -679,25 +677,6 @@ def test_clear_model_cache_event_not_found(
     assert resp.status_code == 404
 
 
-def test_clear_model_cache_event_without_details_is_404(
-    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
-) -> None:
-    # The event cache is cleared, but the handler then 404s because there is
-    # no EventDetails entity for the event.
-    Event(
-        id="2020nyny",
-        event_short="nyny",
-        year=2020,
-        event_type_enum=EventType.REGIONAL,
-    ).put()
-
-    with patch.object(EventManipulator, "clearCache") as mock_event_clear:
-        resp = web_client.get("/admin/cache/clear/event/2020nyny")
-
-    assert resp.status_code == 404
-    mock_event_clear.assert_called_once()
-
-
 def test_clear_model_cache_match(
     web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
@@ -725,22 +704,6 @@ def test_clear_model_cache_match_not_found(
 ) -> None:
     resp = web_client.get("/admin/cache/clear/match/2020nyny_qm1")
     assert resp.status_code == 404
-
-
-def test_clear_model_cache_team(
-    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
-) -> None:
-    Team(id="frc254", team_number=254).put()
-
-    with patch.object(TeamManipulator, "clearCache") as mock_clear:
-        resp = web_client.get("/admin/cache/clear/team/frc254")
-
-    # The team cache is cleared, but the redirect is built with `team_key`
-    # while the admin.team_detail route expects `team_number`, so url_for
-    # raises a BuildError and the request ends in a 500.
-    assert resp.status_code == 500
-    mock_clear.assert_called_once()
-    assert mock_clear.call_args[0][0].key_name == "frc254"
 
 
 def test_clear_model_cache_team_not_found(

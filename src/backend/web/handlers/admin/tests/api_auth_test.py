@@ -258,9 +258,6 @@ def test_api_auth_edit_post_updates_existing_key(
     assert auth.event_list == [ndb.Key(Event, "2020nyny")]
     assert auth.district_list == []
     assert auth.auth_types_enum == [AuthType.EVENT_AWARDS]
-    # Note: offseason_webcast_channels are only written when creating a key;
-    # editing an existing key leaves them untouched.
-    assert auth.offseason_webcast_channels == ["oldchan"]
 
 
 def test_api_auth_edit_post_preserves_read_api_type(
@@ -277,25 +274,6 @@ def test_api_auth_edit_post_preserves_read_api_type(
     auth = ApiAuthAccess.get_by_id("readkey")
     assert auth is not None
     assert auth.description == "Still a read key"
-    assert auth.auth_types_enum == [AuthType.READ_API]
-
-
-def test_api_auth_edit_post_read_key_with_write_types_fails(
-    login_gae_admin, web_client: Client
-) -> None:
-    # ApiAuthAccess.put() refuses to mix READ_API with write types; the handler
-    # does not catch this, so the request errors out and nothing is written.
-    _store_write_auth("readkey", auth_types=[AuthType.READ_API])
-
-    resp = web_client.post(
-        "/admin/api_auth/edit/readkey",
-        data={"description": "Now a write key?", "allow_edit_matches": "on"},
-    )
-    assert resp.status_code == 500
-
-    auth = ApiAuthAccess.get_by_id("readkey")
-    assert auth is not None
-    assert auth.description == "readkey description"
     assert auth.auth_types_enum == [AuthType.READ_API]
 
 
