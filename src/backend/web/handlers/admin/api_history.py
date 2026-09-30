@@ -179,20 +179,15 @@ def _get_storage_files(
                     timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
                 except (ValueError, AttributeError):
                     # Not ISO format, assume FMS format: name.timestamp
-                    parts = name_without_ext.split(".")
-                    if len(parts) >= 2:
-                        # FMS format: take everything after the first part
-                        raw_timestamp = ".".join(parts[1:])
-                        # Try to parse and format it
-                        try:
-                            dt = datetime.datetime.fromisoformat(raw_timestamp)
-                            timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
-                        except (ValueError, AttributeError):
-                            timestamp = raw_timestamp
-                    else:  # pragma: no cover
-                        # Unreachable: name_without_ext contains a ".", so
-                        # split(".") always yields at least two parts
-                        timestamp = name_without_ext
+                    # FMS format: take everything after the first "." (there
+                    # is always one, per the check above)
+                    raw_timestamp = name_without_ext.split(".", 1)[1]
+                    # Try to parse and format it
+                    try:
+                        dt = datetime.datetime.fromisoformat(raw_timestamp)
+                        timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
+                    except (ValueError, AttributeError):
+                        timestamp = raw_timestamp
             else:
                 # FRC API format: timestamp without extension
                 # Try to parse "2020-03-15 10:30:00" format
