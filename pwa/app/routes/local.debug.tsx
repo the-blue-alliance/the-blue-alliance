@@ -77,7 +77,8 @@ export const Route = createFileRoute('/local/debug')({
       ],
     };
   },
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function formatTimeRemaining(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
