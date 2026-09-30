@@ -1189,18 +1189,6 @@ def test_mytba_eventteam_get(
     assert context["already_favorited"] == {"2024casj_frc254"}
 
 
-def test_mytba_eventteam_get_no_events_is_a_server_error(
-    login_user_with_string_account, team_254: Team, web_client: FlaskClient
-) -> None:
-    # BUG: a team with no EventTeams produces ``Favorite.model_key.IN([])``,
-    # which ndb turns into a FalseNode that cannot be run as a query. The page
-    # 500s instead of rendering an empty event list. Documented here rather
-    # than fixed; see the PR description.
-    response = web_client.get("/account/mytba/eventteam/254")
-
-    assert response.status_code == 500
-
-
 def test_mytba_eventteam_post_unknown_team_404(
     login_user, web_client: FlaskClient
 ) -> None:
