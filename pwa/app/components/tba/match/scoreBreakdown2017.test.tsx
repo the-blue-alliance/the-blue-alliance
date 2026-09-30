@@ -176,6 +176,33 @@ describe('ScoreBreakdown2017 auto mobility', () => {
 
     expect(blueCell('Auto Mobility').textContent).toContain('(+10)');
   });
+
+  // Wrong today: the third Auto Mobility ConditionalCheckmark receives
+  // team_keys[2] === undefined and calls .substring on it, so the whole
+  // breakdown throws for a two-team alliance.
+  // Correct: the breakdown renders, showing the robots that exist.
+  test('Bug #55: renders for a two-team alliance', () => {
+    const twoTeamMatch: Match = {
+      ...match,
+      alliances: {
+        ...match.alliances,
+        red: { ...match.alliances.red, team_keys: ['frc254', 'frc1678'] },
+      },
+    };
+
+    render(
+      <ScoreBreakdown2017
+        scoreBreakdown={makeBreakdown({
+          robot1Auto: RobotAuto2017.MOBILITY,
+          robot2Auto: RobotAuto2017.MOBILITY,
+          autoMobilityPoints: 10,
+        })}
+        match={twoTeamMatch}
+      />,
+    );
+
+    expect(redCell('Auto Mobility').textContent).toContain('(+10)');
+  });
 });
 
 describe('ScoreBreakdown2017 point rows', () => {
