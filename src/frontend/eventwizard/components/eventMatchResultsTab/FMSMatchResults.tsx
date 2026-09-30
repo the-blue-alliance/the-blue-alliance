@@ -124,11 +124,6 @@ const FMSMatchResults: React.FC<FMSMatchResultsProps> = ({
   };
 
   const handleConfirm = async (): Promise<void> => {
-    if (matches.length === 0) {
-      setStatusMessage("No matches to submit");
-      return;
-    }
-
     setUploading(true);
     setShowConfirmDialog(false);
 

@@ -36,7 +36,9 @@ module.exports = [
               presets: [
                 "@babel/preset-env",
                 "@babel/preset-react",
-                "@babel/preset-typescript",
+                // Babel 8 keeps type-only imports unless told otherwise, which
+                // leaves webpack warning about missing exports for every type.
+                ["@babel/preset-typescript", { onlyRemoveTypeImports: false }],
               ],
             },
           },

@@ -112,3 +112,12 @@ def test_only_official_events_are_included(ndb_stub, test_data_importer):
         {"keys": ["2019nyny_f1m2", "2019nyny_qm57"], "value": 77},
         {"keys": ["2019nyny_qm15"], "value": 76},
     ]
+
+
+def test_overall_clean_scores_are_skipped(ndb_stub):
+    arguments = LeaderboardInsightArguments(events=[], year=0)
+    assert InsightsLeaderboardMatchHelper._highest_match_clean_score(arguments) is None
+    assert (
+        InsightsLeaderboardMatchHelper._highest_match_clean_combined_score(arguments)
+        is None
+    )
