@@ -147,3 +147,20 @@ def test_register_template_filters(empty_app: Flask) -> None:
     for filter, func in filters._filters.items():
         assert filter in empty_app.jinja_env.filters
         assert empty_app.jinja_env.filters[filter] == func
+
+
+def test_from_ms_timestamp() -> None:
+    assert filters.from_ms_timestamp(None) is None
+    assert filters.from_ms_timestamp(1_600_000_000_000) == datetime.fromtimestamp(
+        1_600_000_000
+    )
+
+
+def test_format_date_string() -> None:
+    assert filters.format_date_string("2024-03-15") == "Fri, Mar 15"
+    assert filters.format_date_string("2024-03-15", "%Y/%m/%d") == "2024/03/15"
+
+
+def test_get_item() -> None:
+    assert filters.get_item({"a": 1}, "a") == 1
+    assert filters.get_item({"a": 1}, "b") is None

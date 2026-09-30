@@ -445,3 +445,28 @@ describe('resolveUserMessage', () => {
     expect(resolveUserMessage({ user_message: '' })).toBe('');
   });
 });
+
+describe('socialProfileWarning for youtube urls', () => {
+  test('flags a channel url pasted instead of a handle', () => {
+    expect(
+      socialProfileWarning('youtube-channel', 'https://youtube.com/@frc254'),
+    ).toBe('Not a YouTube channel handle or ID');
+  });
+});
+
+describe('matchVideoTitleWarning for early playoff rounds', () => {
+  test('no warning for a spelled-out eighth final', () => {
+    expect(
+      matchVideoTitleWarning(
+        '2016necmp Octofinal 3 Match 1',
+        '2016necmp_ef3m1',
+      ),
+    ).toBeUndefined();
+  });
+
+  test('no warning for a spelled-out quarterfinal', () => {
+    expect(
+      matchVideoTitleWarning('2016necmp Quarterfinal 2', '2016necmp_qf2m1'),
+    ).toBeUndefined();
+  });
+});
