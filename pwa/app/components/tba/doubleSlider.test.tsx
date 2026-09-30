@@ -1,21 +1,21 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { fireEvent, render, screen } from "@testing-library/react";
+import { beforeEach, describe, expect, test, vi } from "vitest";
 
-import { DoubleSlider } from '~/components/tba/doubleSlider';
+import { DoubleSlider } from "~/components/tba/doubleSlider";
 
 function labels(container: HTMLElement) {
-  return Array.from(container.querySelectorAll('span.text-sm')).map(
+  return Array.from(container.querySelectorAll("span.text-sm")).map(
     (s) => s.textContent,
   );
 }
 
 beforeEach(() => {
   // React warns about the stray minStepsBetweenThumbs prop (see Bug #65).
-  vi.spyOn(console, 'error').mockImplementation(() => {});
+  vi.spyOn(console, "error").mockImplementation(() => {});
 });
 
-describe('DoubleSlider', () => {
-  test('defaults to the full range and reports thumb changes', () => {
+describe("DoubleSlider", () => {
+  test("defaults to the full range and reports thumb changes", () => {
     const onValueChange = vi.fn<(values: number[]) => void>();
     const { container } = render(
       <DoubleSlider
@@ -27,15 +27,15 @@ describe('DoubleSlider', () => {
         onValueChange={onValueChange}
       />,
     );
-    expect(labels(container)).toEqual(['2010', '2026']);
+    expect(labels(container)).toEqual(["2010", "2026"]);
 
-    const [low] = screen.getAllByRole('slider', { hidden: true });
-    fireEvent.keyDown(low, { key: 'ArrowRight' });
+    const [low] = screen.getAllByRole("slider", { hidden: true });
+    fireEvent.keyDown(low, { key: "ArrowRight" });
     expect(onValueChange).toHaveBeenCalledWith([2011, 2026]);
-    expect(labels(container)).toEqual(['2011', '2026']);
+    expect(labels(container)).toEqual(["2011", "2026"]);
   });
 
-  test('uses a provided value, formats labels, and works without a handler', () => {
+  test("uses a provided value, formats labels, and works without a handler", () => {
     const { container } = render(
       <DoubleSlider
         min={0}
@@ -46,9 +46,33 @@ describe('DoubleSlider', () => {
         formatLabel={(v) => `Y${v}`}
       />,
     );
-    expect(labels(container)).toEqual(['Y2', 'Y8']);
-    const [, high] = screen.getAllByRole('slider', { hidden: true });
-    fireEvent.keyDown(high, { key: 'ArrowLeft' });
-    expect(labels(container)).toEqual(['Y2', 'Y7']);
+    expect(labels(container)).toEqual(["Y2", "Y8"]);
+    const [, high] = screen.getAllByRole("slider", { hidden: true });
+    fireEvent.keyDown(high, { key: "ArrowLeft" });
+    expect(labels(container)).toEqual(["Y2", "Y7"]);
+  });
+
+  test("Bug #65: minStepsBetweenThumbs reaches Base UI instead of the DOM", () => {
+    // Wrong today: the Radix-era prop is spread onto Base UI's Slider.Root
+    // untouched (Base UI calls it `minStepsBetweenValues`), so it ends up as
+    // a stray `minstepsbetweenthumbs` DOM attribute, React warns about an
+    // unknown prop, and the thumbs are not kept apart.
+    // Correct: no stray attribute, and Base UI enforces the minimum gap.
+    const { container } = render(
+      <DoubleSlider
+        min={0}
+        max={10}
+        step={1}
+        minStepsBetweenThumbs={2}
+        value={[4, 6]}
+      />,
+    );
+    expect(
+      container.firstElementChild?.hasAttribute("minstepsbetweenthumbs"),
+    ).toBe(false);
+
+    const [, high] = screen.getAllByRole("slider", { hidden: true });
+    fireEvent.keyDown(high, { key: "ArrowLeft" });
+    expect(labels(container)).toEqual(["4", "6"]);
   });
 });
