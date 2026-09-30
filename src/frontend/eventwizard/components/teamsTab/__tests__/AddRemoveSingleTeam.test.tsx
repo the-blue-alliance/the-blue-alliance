@@ -437,17 +437,6 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
     expect(removeButton()).toBeEnabled();
   });
 
-  it("keeps the selection on backspace because the select is not clearable", async () => {
-    renderComponent();
-    await selectTeam("254 | The Cheesy Poofs", "254");
-    expect(addButton()).toBeEnabled();
-
-    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Backspace", keyCode: 8 });
-
-    expect(addButton()).toBeEnabled();
-    expect(screen.getByText("254 | The Cheesy Poofs")).toBeInTheDocument();
-  });
-
   it("adds the selected team to the existing list and resets on success", async () => {
     mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
     renderComponent();

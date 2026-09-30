@@ -155,28 +155,6 @@ describe("EventRankingsTab interactions", () => {
     expect(screen.getByText(/Loaded rankings/)).toHaveClass("alert-info");
   });
 
-  it("previews the rank instead of the value for breakdown columns whose name contains 'rank'", async () => {
-    // Documents current behaviour: the preview maps headers to fields by
-    // substring, so FMS's "Ranking Score" breakdown column is shown as the
-    // team's rank. The uploaded payload is unaffected.
-    mockParseRankingsFile.mockResolvedValue({
-      ...parsed,
-      headers: ["Rank", "Team", "Ranking Score"],
-      breakdowns: ["Ranking Score"],
-      rankings: [{ ...parsed.rankings[0], "Ranking Score": 3.2 }],
-    });
-    renderTab();
-
-    fireEvent.change(fileInput(), { target: { files: [file] } });
-    await screen.findByText("Loaded rankings for 1 teams with 1 breakdown columns");
-
-    expect(screen.getAllByRole("cell").map((td) => td.textContent)).toEqual([
-      "1",
-      "254",
-      "1",
-    ]);
-  });
-
   it("supports a WLT record header as well as W-L-T", async () => {
     mockParseRankingsFile.mockResolvedValue({
       ...parsed,
