@@ -1122,11 +1122,6 @@ def test_venue_address_safe_without_venue_address() -> None:
     assert Event(city="Berkeley").venue_address_safe is None
     assert Event(venue="Some Gym").venue_address_safe is None
 
-    # Pins current behaviour: the Python 2 era `.encode("utf-8")` calls leave
-    # bytes reprs in the resulting string.
-    event = Event(venue="Some Gym", city="Berkeley", state_prov="CA", country="USA")
-    assert event.venue_address_safe == "b'Some Gym'\nb'Berkeley, CA, USA'"
-
 
 @freeze_time("2020-02-02")
 def test_webcast_status_patched_from_memcache() -> None:

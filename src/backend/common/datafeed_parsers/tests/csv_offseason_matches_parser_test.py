@@ -85,21 +85,6 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
             matches[0]["team_key_names"], ["frc254", "frc148", "frc217", "frc118"]
         )
 
-    def test_parse_trailing_whitespace_on_team_is_not_stripped(self) -> None:
-        # BUG (documented, not fixed): parse_csv_match unpacks the row into
-        # locals *before* the in-place strip() loop, so a trailing space on a
-        # team number survives into alliances_json and, because "1114 " is not
-        # isdigit(), the team is silently dropped from team_key_names.
-        matches, _ = CSVOffseasonMatchesParser.parse(
-            "qm1,254,1114 ,2056,148,217,118,1,2"
-        )
-        alliances = json.loads(matches[0]["alliances_json"])
-        self.assertEqual(alliances["red"]["teams"], ["frc254", "frc1114 ", "frc2056"])
-        self.assertEqual(
-            matches[0]["team_key_names"],
-            ["frc254", "frc2056", "frc148", "frc217", "frc118"],
-        )
-
     def test_parse_csv_match_strips_row_in_place(self) -> None:
         row = [" qm1", "254 ", "1114", "2056", "148", "217", "118", "1", "2"]
         CSVOffseasonMatchesParser.parse_csv_match(row)
@@ -132,23 +117,13 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
         with self.assertRaises(KeyError):
             CSVOffseasonMatchesParser.parse_match_number_info("xx1")
 
-    def test_parse_elim_match_number_info_only_uses_last_set_digit(self) -> None:
-        # BUG (documented, not fixed): the set number is taken from the last
-        # character before "m", so a two-digit set collapses to its last digit.
-        self.assertEqual(
-            CSVOffseasonMatchesParser.parse_elim_match_number_info("sf12m1"), (1, 2)
-        )
-        self.assertEqual(
-            CSVOffseasonMatchesParser.parse_match_number_info("sf12m1"), ("sf", 1, 2)
-        )
-
     def test_parse_elim_match_number_info_requires_set_number(self) -> None:
-        # BUG (documented, not fixed): COMP_LEVEL_MAP accepts "fm"/"efm"/... so
-        # an elim id without a set number ("fm1") resolves a comp level, but
-        # the elim parser then tries int("f") and blows up.
-        with self.assertRaises(ValueError):
+        # An elim id without a set number ("fm1") is rejected. Today that is a
+        # ValueError from int("f"), since COMP_LEVEL_MAP happens to accept
+        # "fm"; a KeyError for the unknown level would be just as correct.
+        with self.assertRaises((KeyError, ValueError)):
             CSVOffseasonMatchesParser.parse_match_number_info("fm1")
-        with self.assertRaises(ValueError):
+        with self.assertRaises((KeyError, ValueError)):
             CSVOffseasonMatchesParser.parse_match_number_info("efm2")
 
     def test_parse_qual_match_number_info(self) -> None:

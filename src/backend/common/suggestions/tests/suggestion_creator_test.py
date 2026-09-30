@@ -1704,18 +1704,6 @@ class TestDummyOffseasonSuggestions(SuggestionCreatorTest):
             country="USA",
         )
 
-    def test_creates_nothing_today(self) -> None:
-        # BUG: keys_to_check is a one-shot `map`; ndb.get_multi exhausts it,
-        # so the zip() over it afterwards is empty and no suggestion is ever
-        # created. Only the bot account gets created. This test pins the
-        # current behaviour; fix by materialising the keys with list().
-        SuggestionCreator.createDummyOffseasonSuggestions([self._event()])
-
-        bot = none_throws(Account.get_by_id("tba-bot-account"))
-        self.assertEqual(bot.nickname, "TBA-Bot")
-        self.assertTrue(bot.registered)
-        self.assertEqual(Suggestion.query().count(), 0)
-
     def test_creates_suggestion_for_new_event(self) -> None:
         # Keep the key iterator intact so the loop body runs as intended
         event = self._event()

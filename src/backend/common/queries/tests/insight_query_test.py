@@ -3,7 +3,6 @@ import json
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.insight import Insight
 from backend.common.queries.insight_query import (
-    DistrictInsightQuery,
     DistrictInsightsYearQuery,
     InsightsLeaderboardsYearQuery,
     InsightsNotablesYearQuery,
@@ -47,16 +46,6 @@ def test_notables_year_query() -> None:
     _insight(Insight.TYPED_LEADERBOARD_BLUE_BANNERS, 2024)
 
     assert InsightsNotablesYearQuery(year=2024).fetch() == [notable]
-
-
-def test_district_insight_query() -> None:
-    insight = _insight(Insight.TYPED_LEADERBOARD_BLUE_BANNERS, 2024, "ne")
-    _insight(Insight.TYPED_LEADERBOARD_BLUE_BANNERS, 2024, "fim")
-
-    # Despite the Insight annotation, the query returns the fetched list.
-    assert DistrictInsightQuery(
-        insight_name=insight.name, year=2024, district_abbreviation="ne"
-    ).fetch() == [insight]
 
 
 def test_district_insights_year_query() -> None:

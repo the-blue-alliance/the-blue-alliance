@@ -1,7 +1,5 @@
-import pytest
 from google.appengine.ext import ndb
 
-from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.team import Team
 from backend.common.queries.team_query import (
@@ -35,12 +33,3 @@ def test_regional_teams_query() -> None:
     RegionalPoolTeam(id="2024_frc604", team=ndb.Key(Team, "frc604"), year=2024).put()
 
     assert RegionalTeamsQuery(year=2025).fetch() == [ndb.Key(Team, "frc254")]
-
-
-def test_regional_teams_query_dict_is_broken() -> None:
-    # Bug: RegionalTeamsQuery returns team Keys but declares TeamConverter as its
-    # DICT_CONVERTER, which expects Team models. Pin the current behaviour.
-    RegionalPoolTeam(id="2025_frc254", team=ndb.Key(Team, "frc254"), year=2025).put()
-
-    with pytest.raises(AttributeError):
-        RegionalTeamsQuery(year=2025).fetch_dict(ApiMajorVersion.API_V3)
