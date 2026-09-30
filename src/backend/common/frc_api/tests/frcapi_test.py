@@ -505,18 +505,67 @@ def test_merge_schedule_without_results() -> None:
 
 def test_bug_32_merge_match_capitalized_teams() -> None:
     """
-    Bug #32: when the schedule uses "Teams" (capitalised), _merge_match
-    detects teams_key == "Teams" but then looks up scheduled["teams"] while
-    merging the result's "Teams", raising KeyError.
-
-    Correct: the result's team fields merge into the matching scheduled team
-    under whichever key the schedule uses.
+    Bug #32: when the schedule used "Teams" (capitalised), _merge_match
+    detected teams_key == "Teams" but then read and wrote scheduled["teams"],
+    raising KeyError. Both sides are now normalized to "teams".
     """
     scheduled = {"Teams": [{"teamNumber": 254, "station": "Red1"}]}
     merged = FRCAPI._merge_match(
         scheduled, {"Teams": [{"teamNumber": 254, "dq": False}]}
     )
-    assert merged["Teams"] == [{"teamNumber": 254, "station": "Red1", "dq": False}]
+    assert merged["teams"] == [{"teamNumber": 254, "station": "Red1", "dq": False}]
+    assert "Teams" not in merged
+
+
+@pytest.mark.parametrize(
+    "schedule_key, result_key",
+    [("teams", "Teams"), ("Teams", "teams")],
+)
+def test_bug_32_merge_match_mixed_case_teams(
+    schedule_key: str, result_key: str
+) -> None:
+    """
+    Bug #32: the teams key was chosen from the schedule alone, so a result
+    using the other capitalisation was copied over as an unrelated field and
+    its dq/surrogate flags never reached the scheduled teams.
+    """
+    scheduled = {schedule_key: [{"teamNumber": 254, "station": "Red1"}]}
+    merged = FRCAPI._merge_match(
+        scheduled, {result_key: [{"teamNumber": 254, "surrogate": True}]}
+    )
+    assert merged["teams"] == [
+        {"teamNumber": 254, "station": "Red1", "surrogate": True}
+    ]
+    assert "Teams" not in merged
+
+
+def test_bug_32_merge_match_capitalized_placeholder_teams() -> None:
+    """
+    Bug #32: the {1, 2, 3} placeholder rewrite wrote scheduled["teams"] even
+    when the schedule used "Teams", leaving the original placeholders under
+    "Teams", which the match parser reads first.
+    """
+    scheduled = {
+        "Teams": [
+            {"teamNumber": 1, "station": "Red1"},
+            {"teamNumber": 2, "station": "Red2"},
+            {"teamNumber": 3, "station": "Red3"},
+        ]
+    }
+    merged = FRCAPI._merge_match(scheduled, {"scoreRedFinal": 10})
+    assert merged["teams"] == [
+        {"teamNumber": None, "station": "Red1"},
+        {"teamNumber": None, "station": "Red2"},
+        {"teamNumber": None, "station": "Red3"},
+    ]
+    assert "Teams" not in merged
+
+
+def test_merge_match_schedule_without_teams() -> None:
+    merged = FRCAPI._merge_match(
+        {"matchNumber": 1}, {"teams": [{"teamNumber": 254, "dq": False}]}
+    )
+    assert merged["teams"] == [{"teamNumber": 254, "dq": False}]
 
 
 def test_merge_match_placeholder_teams() -> None:
