@@ -437,6 +437,29 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
     expect(removeButton()).toBeEnabled();
   });
 
+  it("Bug #42: clears the selection with Backspace and Escape", async () => {
+    // Wrong today: the AsyncSelect is not clearable, so Backspace and Escape
+    // leave "254 | The Cheesy Poofs" selected and Add enabled.
+    // Correct: the single-team picker can be cleared from the keyboard
+    // (react-select needs isClearable, plus escapeClearsValue for Escape).
+    renderComponent();
+    await selectTeam("254 | The Cheesy Poofs", "254");
+    expect(addButton()).toBeEnabled();
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Backspace", keyCode: 8 });
+
+    expect(addButton()).toBeDisabled();
+    expect(screen.queryByText("254 | The Cheesy Poofs")).not.toBeInTheDocument();
+
+    await selectTeam("254 | The Cheesy Poofs", "254");
+    expect(addButton()).toBeEnabled();
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Escape", keyCode: 27 });
+
+    expect(addButton()).toBeDisabled();
+    expect(screen.queryByText("254 | The Cheesy Poofs")).not.toBeInTheDocument();
+  });
+
   it("adds the selected team to the existing list and resets on success", async () => {
     mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
     renderComponent();
