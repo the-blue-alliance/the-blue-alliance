@@ -172,3 +172,15 @@ def test_entries_sorted_by_team_number(ndb_stub) -> None:
 
     team_keys = [e["team_key"] for e in insights[0].data["entries"]]
     assert team_keys == ["frc321", "frc1114"]
+
+
+def test_chairmans_media_ignores_non_team_references(ndb_stub) -> None:
+    Media(
+        id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, "event_video"),
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        media_tag_enum=[MediaTag.CHAIRMANS_VIDEO],
+        references=[ndb.Key(Event, "2024cmptx")],
+        year=2024,
+        foreign_key="event_video",
+    ).put()
+    assert HallOfFameClubV2Calculator()._load_chairmans_media() == {}
