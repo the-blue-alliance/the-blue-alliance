@@ -915,3 +915,243 @@ def test_score_breakdown_2025_tba_fields() -> None:
                 actual_value = computed_score_breakdown[color][peroid][tba_key]
                 assert_string = f"{color}/{peroid}/{tba_key} expected {expected_value} got {actual_value}"
                 assert expected_value == actual_value, assert_string
+
+
+def test_verbose_name_display_name() -> None:
+    match = get_base_qual_match(display_name="Custom Match Name")
+    assert match.verbose_name == "Custom Match Name"
+
+
+def test_verbose_name_double_elim_4_team_unknown_set() -> None:
+    event = Event(
+        id="2024ct",
+        event_short="ct",
+        year=2024,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_4_TEAM,
+    )
+    event.put()
+    # set_number=99 is not part of the 4-team bracket
+    match = Match(
+        id="2024ct_sf99m1",
+        event=ndb.Key(Event, "2024ct"),
+        year=2024,
+        comp_level=CompLevel.SF,
+        set_number=99,
+        match_number=1,
+    )
+    assert match.verbose_name == "Playoff Match ?"
+
+
+def test_prediction_and_schedule_error_unset() -> None:
+    match = get_base_qual_match(actual_time=None, predicted_time=None, time=None)
+    assert match.prediction_error_str is None
+    assert match.schedule_error_str is None
+
+    only_actual = get_base_qual_match(actual_time=datetime(2019, 3, 1, 6, 0, 5))
+    assert only_actual.prediction_error_str is None
+    assert only_actual.schedule_error_str is None
+
+
+def test_winning_alliance_tie_einstein_round_robin() -> None:
+    Event(
+        id="2019cmptx",
+        year=2019,
+        event_short="cmptx",
+        event_type_enum=EventType.CMP_FINALS,
+        playoff_type=PlayoffType.ROUND_ROBIN_6_TEAM,
+    ).put()
+    alliances = {
+        AllianceColor.RED: MatchAlliance(teams=["frc1", "frc2", "frc3"], score=10),
+        AllianceColor.BLUE: MatchAlliance(teams=["frc4", "frc5", "frc6"], score=10),
+    }
+    match = Match(
+        id="2019cmptx_sf1m1",
+        event=ndb.Key(Event, "2019cmptx"),
+        year=2019,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(alliances),
+    )
+    # Round robin ties stand; no tiebreaker is applied
+    assert match.winning_alliance == ""
+    assert match.losing_alliance == ""
+
+
+def test_score_breakdown_2025_missing_reef_periods() -> None:
+    alliance_dict = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"], score=1, dqs=[], surrogates=[]
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=2, dqs=[], surrogates=[]
+        ),
+    }
+    score_breakdown = {
+        AllianceColor.RED: {
+            "autoReef": {
+                "botRow": {"nodeA": True, "nodeB": False},
+                "midRow": {"nodeA": True, "nodeB": True},
+                "topRow": {},
+            },
+        },
+        AllianceColor.BLUE: {},
+    }
+    match = Match(
+        id="2025miket_qm1",
+        year=2025,
+        alliances_json=json.dumps(alliance_dict),
+        score_breakdown_json=json.dumps(score_breakdown),
+    )
+    computed = none_throws(match.score_breakdown)
+    assert computed[AllianceColor.RED]["autoReef"]["tba_botRowCount"] == 1
+    assert computed[AllianceColor.RED]["autoReef"]["tba_midRowCount"] == 2
+    assert computed[AllianceColor.RED]["autoReef"]["tba_topRowCount"] == 0
+    assert "teleopReef" not in computed[AllianceColor.RED]
+    assert computed[AllianceColor.BLUE] == {}
+
+
+def _played_match(
+    key: str, year: int, red_score: int, blue_score: int, breakdown: dict
+) -> Match:
+    alliance_dict = {
+        AllianceColor.RED: MatchAlliance(
+            teams=["frc1", "frc2", "frc3"], score=red_score, dqs=[], surrogates=[]
+        ),
+        AllianceColor.BLUE: MatchAlliance(
+            teams=["frc4", "frc5", "frc6"], score=blue_score, dqs=[], surrogates=[]
+        ),
+    }
+    event_key, match_short = key.split("_")
+    level = "qm" if match_short.startswith("qm") else "sf"
+    return Match(
+        id=key,
+        event=ndb.Key(Event, event_key),
+        year=year,
+        comp_level=level,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(alliance_dict),
+        score_breakdown_json=json.dumps(breakdown),
+    )
+
+
+def test_score_breakdown_2016_rp() -> None:
+    match = _played_match(
+        "2016nyny_qm1",
+        2016,
+        10,
+        5,
+        {
+            "red": {"teleopDefensesBreached": True, "teleopTowerCaptured": True},
+            "blue": {},
+        },
+    )
+    breakdown = none_throws(match.score_breakdown)
+    assert breakdown[AllianceColor.RED]["tba_rpEarned"] == 4
+    assert breakdown[AllianceColor.BLUE]["tba_rpEarned"] == 0
+
+
+def test_score_breakdown_2017_rp_tie() -> None:
+    match = _played_match(
+        "2017nyny_qm1",
+        2017,
+        5,
+        5,
+        {
+            "red": {"kPaRankingPointAchieved": True, "rotorRankingPointAchieved": True},
+            "blue": {},
+        },
+    )
+    breakdown = none_throws(match.score_breakdown)
+    assert breakdown[AllianceColor.RED]["tba_rpEarned"] == 3
+    assert breakdown[AllianceColor.BLUE]["tba_rpEarned"] == 1
+
+
+def test_score_breakdown_2017_playoff_no_rp() -> None:
+    match = _played_match("2017nyny_sf1m1", 2017, 10, 5, {"red": {}, "blue": {}})
+    breakdown = none_throws(match.score_breakdown)
+    assert breakdown[AllianceColor.RED]["tba_rpEarned"] is None
+    assert breakdown[AllianceColor.BLUE]["tba_rpEarned"] is None
+
+
+def test_score_breakdown_2020_tba_fields() -> None:
+    match = _played_match(
+        "2020nyny_qm1",
+        2020,
+        10,
+        5,
+        {
+            "red": {
+                "shieldEnergizedRankingPoint": True,
+                "stage3Activated": False,
+                "endgameRobot1": "Hang",
+                "endgameRobot2": "Park",
+                "endgameRobot3": "Hang",
+            },
+            "blue": {
+                "shieldEnergizedRankingPoint": True,
+                "stage3Activated": True,
+            },
+        },
+    )
+    breakdown = none_throws(match.score_breakdown)
+    assert (
+        breakdown[AllianceColor.RED]["tba_shieldEnergizedRankingPointFromFoul"] is True
+    )
+    assert breakdown[AllianceColor.RED]["tba_numRobotsHanging"] == 2
+    assert (
+        breakdown[AllianceColor.BLUE]["tba_shieldEnergizedRankingPointFromFoul"]
+        is False
+    )
+    assert breakdown[AllianceColor.BLUE]["tba_numRobotsHanging"] == 0
+
+
+def test_verbose_name_double_elim_8_team_unknown_set() -> None:
+    Event(
+        id="2023ct",
+        event_short="ct",
+        year=2023,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+    ).put()
+    match = Match(
+        id="2023ct_qf1m1",
+        event=ndb.Key(Event, "2023ct"),
+        year=2023,
+        comp_level=CompLevel.QF,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.verbose_name == "Playoff Match ?"
+
+
+def test_verbose_name_best_of_three() -> None:
+    Event(
+        id="2019ct",
+        event_short="ct",
+        year=2019,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.BRACKET_8_TEAM,
+    ).put()
+    match = Match(
+        id="2019ct_sf2m3",
+        event=ndb.Key(Event, "2019ct"),
+        year=2019,
+        comp_level=CompLevel.SF,
+        set_number=2,
+        match_number=3,
+    )
+    assert match.verbose_name == "Semis 2 Match 3"
+
+
+def test_match_details_url() -> None:
+    match = Match(
+        id="2019ct_qm1",
+        event=ndb.Key(Event, "2019ct"),
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+    )
+    assert match.details_url == "/match/2019ct_qm1"

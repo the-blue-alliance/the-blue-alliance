@@ -87,3 +87,19 @@ def test_districtConverter_v3_advancement_works_for_old_and_new_district_names(
     assert converted_new["official_advancement_counts"] == AdvancementCounts(
         dcmp=49, cmp=14
     )
+
+
+def test_dictToModel_v3(ndb_context) -> None:
+    district = DistrictConverter.dictToModel_v3(
+        {
+            "key": "2025ne",
+            "year": 2025,
+            "abbreviation": "ne",
+            "display_name": "New England",
+        }
+    )
+
+    assert district.key.id() == "2025ne"
+    assert district.year == 2025
+    assert district.abbreviation == "ne"
+    assert district.display_name == "New England"
