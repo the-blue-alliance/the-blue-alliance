@@ -12,7 +12,16 @@
 <!--- Include details of your testing environment, and the tests you ran to -->
 <!--- see how your change affects other areas of the code, etc. -->
 
-## Screenshots (if appropriate):
+## Screenshots
+<!--- SHOULD for any change a user can see (PWA, templates, CSS, emails). -->
+<!--- One row per affected state; add dark-mode rows when the change touches colors. -->
+<!--- CI captures public PWA pages listed under "Screenshot Pages" below. Capture login-gated -->
+<!--- or data-dependent pages locally and publish them to the ci-screenshots branch (see AGENTS.md "Pull Requests"). -->
+<!--- If the change has no visible effect, replace the table with a sentence saying so. -->
+
+| | Before | After |
+|---|---|---|
+| <state> | | |
 
 ## Screenshot Pages
 <!--- For PRs that touch pwa/ files, list additional pages to screenshot. -->

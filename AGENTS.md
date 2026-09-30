@@ -50,6 +50,14 @@ ops/                    # Build, deploy, and dev scripts
 - Async work via `defer()` to task queues (see docs/common/Queues-and-defer.md)
 - **NEVER** modify data directly without manipulators
 - Configuration via `tba_dev_config.json` for local dev
+- **UI changes SHOULD ship with a before/after screenshot table in the PR description** (see [Pull Requests](#pull-requests))
+
+## Pull Requests
+- **Before/after screenshots are a SHOULD for any change a user can see.** That covers PWA routes and components, Jinja templates, CSS, and email templates. Put a Markdown table in the PR description under `## Screenshots` with a **Before** column and an **After** column, one row per affected state (for example empty vs. populated, upcoming vs. finished, light vs. dark mode). A PR without one is incomplete unless the change has no visible effect, and in that case say so in the description.
+- Put the table in the PR body, not in a trailing comment, so it stays with the description as the PR evolves. Update it when the UI changes after review.
+- **Public PWA pages**: list them under `## Screenshot Pages` in the PR description and CI posts screenshots as a comment (details in `pwa/AGENTS.md`). Still copy the relevant ones into the before/after table.
+- **Pages CI cannot reach** (behind a login, or needing specific data such as suggestion review, account, and admin pages): capture them locally. For PWA components, render the component with fixture data on a throwaway route and run `pwa/scripts/screenshot-route.mjs` against the dev server, once on `main` and once on the branch. For Jinja pages, render through the Flask test client with a logged-in fixture user. Then commit the PNGs to the `ci-screenshots` branch (`pr-<N>-<what>-{before,after}-*.png`) and reference them as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`. Never commit screenshots or throwaway routes to the feature branch.
+- Reviewers should ask for the table when a UI PR lacks it.
 
 ## Development Setup
 **Recommended**: Use docker compose for the local dev server, and `uv` for Python tooling (tests, linting).
