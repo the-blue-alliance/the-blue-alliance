@@ -255,7 +255,8 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     };
   },
   component: TeamPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function TeamPage(): React.JSX.Element {
   const { teamKey, year } = Route.useLoaderData();

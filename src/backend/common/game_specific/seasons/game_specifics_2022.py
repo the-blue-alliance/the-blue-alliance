@@ -221,11 +221,6 @@ class GameSpecifics2022(
         if not has_insights:
             return None
 
-        # Unreachable: has_insights is only set once a finished match was
-        # processed, so finished_matches is always positive here.
-        if finished_matches == 0:  # pragma: no cover
-            return {}
-
         opportunities_1x = 2 * finished_matches
         opportunities_3x = 6 * finished_matches
         event_insights = {
