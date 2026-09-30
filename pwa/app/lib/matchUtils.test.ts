@@ -9,6 +9,7 @@ import {
 } from '~/api/tba/read';
 import {
   formatMatchKeyName,
+  formatPredictedTime,
   getAllianceMatchResult,
   isValidMatchKey,
   parseMatchKey,
@@ -302,5 +303,18 @@ describe('formatMatchKeyName', () => {
   test('without the event, just the match title; unparseable keys pass through', () => {
     expect(formatMatchKeyName('2026arc_qm87')).toBe('Quals 87');
     expect(formatMatchKeyName('garbage')).toBe('garbage');
+  });
+});
+
+describe('formatPredictedTime', () => {
+  const at = (hour: number, minute: number) =>
+    new Date(2026, 2, 7, hour, minute).getTime() / 1000;
+
+  test.each([
+    [at(9, 30), 'Sat 9:30 AM'],
+    [at(14, 5), 'Sat 2:05 PM'],
+    [at(0, 0), 'Sat 12:00 AM'],
+  ])('formats %d as %s in the local time zone', (time, expected) => {
+    expect(formatPredictedTime(time)).toBe(expected);
   });
 });

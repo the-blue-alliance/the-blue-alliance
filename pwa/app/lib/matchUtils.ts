@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 import {
   AllianceColor,
   CompLevel,
@@ -389,4 +391,16 @@ export function formatMatchKeyName(
     event?.playoff_type ?? null,
   );
   return event ? `${getEventNormalizedName(event)} ${title}` : title;
+}
+
+/** A match's predicted start, e.g. "Sat 9:30 AM", in the viewer's time zone. */
+export function formatPredictedTime(predictedTime: number): string {
+  return Temporal.Instant.fromEpochMilliseconds(predictedTime * 1000)
+    .toZonedDateTimeISO(Temporal.Now.timeZoneId())
+    .toLocaleString('en-US', {
+      weekday: 'short',
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 }
