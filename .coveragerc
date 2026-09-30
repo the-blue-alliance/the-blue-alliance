@@ -4,6 +4,10 @@ relative_files = True
 # It is not ours to test; keep it out of the coverage denominator.
 omit =
     src/backend/common/storage/clients/cloudstorage/*
+    # Tests are not the code under test. Skipped live-API tests and unused
+    # helper branches in test files would otherwise count as "uncovered".
+    */tests/*
+    */conftest.py
 
 [report]
 ignore_errors = True
