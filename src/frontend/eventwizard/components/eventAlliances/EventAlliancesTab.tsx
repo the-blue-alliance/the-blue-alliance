@@ -65,13 +65,7 @@ const EventAlliancesTab: React.FC<EventAlliancesTabProps> = ({
     setAlliances(newAlliances);
   };
 
-  const handleManualSubmit = async (): Promise<void> => {
-    /* istanbul ignore if -- unreachable: the submit button is disabled without a selected event */
-    if (!selectedEvent) {
-      setStatusMessage("Please select an event first");
-      return;
-    }
-
+  const handleManualSubmit = async (eventKey: string): Promise<void> => {
     setUploading(true);
     setStatusMessage("Uploading alliances...");
 
@@ -104,7 +98,7 @@ const EventAlliancesTab: React.FC<EventAlliancesTabProps> = ({
 
     try {
       await makeTrustedRequest(
-        `/api/trusted/v1/event/${selectedEvent}/alliance_selections/update`,
+        `/api/trusted/v1/event/${eventKey}/alliance_selections/update`,
         JSON.stringify(requestBody)
       );
       setStatusMessage("Alliances uploaded successfully!");

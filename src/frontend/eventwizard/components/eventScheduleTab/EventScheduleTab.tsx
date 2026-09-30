@@ -125,12 +125,6 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    /* istanbul ignore if -- unreachable: the upload button only renders when there are matches */
-    if (matches.length === 0) {
-      alert("No matches to upload!");
-      return;
-    }
-
     setUploading(true);
     setStatusMessage("Uploading matches to TBA...");
 
