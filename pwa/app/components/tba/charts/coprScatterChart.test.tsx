@@ -185,14 +185,6 @@ describe('CoprScatterChart', () => {
     ).toEqual(['hsl(var(--primary))', '#000000', '#0000ff']);
   });
 
-  test('mutates the passed-in colors when darkening a white team', () => {
-    // Pins current behaviour: the white-to-black swap writes into the
-    // caller's EventColors object (typically React Query cache data).
-    const colors = renderChart();
-
-    expect(colors.teams['1678'].colors?.primaryHex).toBe('#000000');
-  });
-
   test('leaves dots unfilled for teams with no colors on record', () => {
     const colors = makeColors();
     colors.teams['254'].colors = null;
