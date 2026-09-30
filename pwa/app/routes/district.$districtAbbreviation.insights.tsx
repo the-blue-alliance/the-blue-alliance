@@ -501,7 +501,8 @@ interface PerAwardLeaderboard {
   name: string;
   rankings: LeaderboardInsight['data']['rankings'];
   contextTooltipMap: Record<string, ReactNode>;
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function computePerAwardLeaderboards(
   yearResults: Array<{
