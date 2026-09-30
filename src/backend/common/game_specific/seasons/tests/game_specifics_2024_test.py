@@ -12,10 +12,12 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.seasons.game_specifics_2024 import GameSpecifics2024
 from backend.common.game_specific.seasons.tests.conftest import (
+    build_match,
     HELPERS_TESTS,
     tiebreak_winner,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 
 
@@ -183,3 +185,60 @@ def test_success_rate_auto_win_conversion_needs_auto_points() -> None:
 
     match = _success_rate_match(100, 80, with_breakdown=False)
     assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+
+def test_tiebreak_criteria_without_breakdown_data() -> None:
+    empty = cast(ScoreDetailModelAlliance2024, {})
+    criteria = GameSpecifics2024().tiebreak_criteria(empty, empty)
+    assert criteria == [None] * 3
+    assert tiebreak_winner(criteria) == ""
+
+
+def _insights(matches: list[Match]) -> EventInsights:
+    return none_throws(GameSpecifics2024().calculate_event_insights(matches))
+
+
+def test_calculate_event_insights_without_finished_matches() -> None:
+    unplayed = build_match("2024test", "qm", 1, -1, -1, None)
+    assert _insights([]) == {"qual": None, "playoff": None}
+    assert _insights([unplayed]) == {"qual": None, "playoff": None}
+
+
+def test_calculate_event_insights_scores_matches_without_breakdowns() -> None:
+    # Documents current behaviour: a played match with no breakdown counts
+    # towards every denominator and the high score, but its scores are never
+    # added to the totals, so the averages read 0.0.
+    match = build_match("2024test", "qm", 1, 30, 10, None)
+    insights = _insights([match])
+    assert insights["playoff"] is None
+    assert insights["qual"] == {
+        "melody_rp_count": [0, 2, 0.0],
+        "ensemble_rp_count": [0, 2, 0.0],
+        "coopertition_count": [0, 2, 0.0],
+        "four_rp_count": [0, 1, 0.0],
+        "six_rp_count": [0, 1, 0.0],
+        "average_score": 0.0,
+        "average_win_margin": 0.0,
+        "average_winning_score": 0.0,
+        "high_score": (30, "2024test_qm1", "Q1"),
+    }
+
+
+def test_calculate_event_insights_rp_sweeps_only_check_melody() -> None:
+    # Documents current behaviour: the 4 RP / 6 RP sweep counters test
+    # melodyBonusAchieved twice and never consult ensembleBonusAchieved, so
+    # an alliance that only earned the Melody RP is counted as a full sweep.
+    melody_only = {
+        "melodyBonusAchieved": True,
+        "ensembleBonusAchieved": False,
+        "coopertitionCriteriaMet": True,
+    }
+    match = build_match(
+        "2024test", "qm", 1, 30, 10, {"red": melody_only, "blue": melody_only}
+    )
+    qual = none_throws(_insights([match])["qual"])
+    assert qual["melody_rp_count"] == [2, 2, 100.0]
+    assert qual["ensemble_rp_count"] == [0, 2, 0.0]
+    assert qual["coopertition_count"] == [2, 2, 100.0]
+    assert qual["four_rp_count"] == [1, 1, 100.0]
+    assert qual["six_rp_count"] == [1, 1, 100.0]
