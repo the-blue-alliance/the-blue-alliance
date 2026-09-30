@@ -5,7 +5,8 @@ import { publicCacheControlHeaders } from '~/lib/utils';
 export const Route = createFileRoute('/privacy')({
   headers: publicCacheControlHeaders(),
   component: Privacy,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Privacy(): React.JSX.Element {
   return (

@@ -85,7 +85,8 @@ export const Route = createFileRoute('/team/$teamNumber/stats')({
     };
   },
   component: TeamStatsPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function MatchStatsLoadingState({
   numLoaded,
