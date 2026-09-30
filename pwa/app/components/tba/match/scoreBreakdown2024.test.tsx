@@ -188,17 +188,18 @@ describe('ScoreBreakdown2024', () => {
     ).toBeTruthy();
   });
 
-  // Wrong today: EndgameRobotCell labels an onstage robot "Spotlit (+4)"
-  // when the TRAP at its stage position holds a note, and never reads the
-  // microphone flags.
-  // Correct: spotlit comes from a HIGH NOTE on the MICROPHONE above the robot
-  // (micCenterStage / micStageLeft / micStageRight); a trap note is a separate
-  // 5-point alliance score. 2024 Game Manual (CRESCENDO), Section 6.5.4
-  // SPOTLIGHTING (page 47, section revision V10): "ONSTAGE ROBOTS paired with
-  // (i.e. below) the MICROPHONE on which the HIGH NOTE was scored are awarded
-  // a greater number of points per Table 6-2"; Table 6-2 (page 48): ONSTAGE
-  // (not SPOTLIT) 3, ONSTAGE (SPOTLIT) 4, NOTE in TRAP 5. Latest published
-  // manual (PDF last modified 2024-04-09, after all Team Updates):
+  // Bug #57: EndgameRobotCell labelled an onstage robot "Spotlit (+4)" when
+  // the TRAP at its stage position held a note, and never read the
+  // microphone flags. Spotlit comes from a HIGH NOTE on the MICROPHONE above
+  // the robot (micCenterStage / micStageLeft / micStageRight); a trap note is
+  // a separate 5-point alliance score.
+  // 2024 Game Manual (CRESCENDO), Section 6.5.4 SPOTLIGHTING (pages 47-48 of
+  // 153, Section 6 V10; PDF dated 2024-04-09, after the last Team Update):
+  // "ALLIANCES may SPOTLIGHT ROBOTS by scoring a HIGH NOTE on a MICROPHONE.
+  // [...] Once a HIGH NOTE is scored on a MICROPHONE, ONSTAGE ROBOTS paired
+  // with (i.e. below) the MICROPHONE on which the HIGH NOTE was scored are
+  // awarded a greater number of points per Table 6-2." Table 6-2 (page 49):
+  // ONSTAGE (not SPOTLIT) 3, ONSTAGE (SPOTLIT) 4, NOTE in TRAP (max. 1/TRAP) 5.
   // https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
   const noStageFlags = {
     trapCenterStage: false,
