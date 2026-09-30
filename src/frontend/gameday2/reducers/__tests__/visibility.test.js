@@ -85,3 +85,51 @@ describe("visibility reducer", () => {
     expect(visibility(initialState, action)).toEqual(expectedState);
   });
 });
+
+describe("visibility reducer set actions", () => {
+  const defaultState = visibility(undefined, {});
+
+  it("returns the same state for unknown actions", () => {
+    expect(visibility(defaultState, { type: "UNKNOWN" })).toBe(defaultState);
+  });
+
+  it("sets the chat sidebar visibility and remembers it was visible", () => {
+    const hidden = visibility(
+      Object.assign({}, defaultState, { chatSidebarHasBeenVisible: false }),
+      { type: types.SET_CHAT_SIDEBAR_VISIBILITY, visible: false }
+    );
+    expect(hidden.chatSidebar).toBe(false);
+    expect(hidden.chatSidebarHasBeenVisible).toBe(false);
+
+    const shown = visibility(hidden, {
+      type: types.SET_CHAT_SIDEBAR_VISIBILITY,
+      visible: true,
+    });
+    expect(shown.chatSidebar).toBe(true);
+    expect(shown.chatSidebarHasBeenVisible).toBe(true);
+  });
+
+  it("sets the hashtag sidebar visibility", () => {
+    expect(
+      visibility(defaultState, {
+        type: types.SET_HASHTAG_SIDEBAR_VISIBILITY,
+        visible: true,
+      }).hashtagSidebar
+    ).toBe(true);
+  });
+
+  // Pins current (buggy) behavior: SET_LAYOUT_DRAWER_VISIBILITY ignores
+  // `visible` and toggles the drawer instead.
+  it("toggles the layout drawer on SET_LAYOUT_DRAWER_VISIBILITY regardless of the requested value", () => {
+    const opened = visibility(defaultState, {
+      type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+      visible: false,
+    });
+    expect(opened.layoutDrawer).toBe(true);
+    const closed = visibility(opened, {
+      type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+      visible: true,
+    });
+    expect(closed.layoutDrawer).toBe(false);
+  });
+});
