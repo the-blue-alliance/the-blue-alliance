@@ -141,7 +141,8 @@ function leaderboardEventYears(leaderboards: InsightV2Leaderboard[]): number[] {
     }
   }
   return [...years].sort((a, b) => a - b);
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function InsightsPage() {
   const { leaderboards, streaks, timeseries, successRates, year, eventYears } =

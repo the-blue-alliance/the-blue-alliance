@@ -341,3 +341,26 @@ describe("FMSAllianceImport", () => {
     });
   });
 });
+
+describe("FMSAllianceImport file input edge cases", () => {
+  beforeEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("clears the selection when the change event carries no file", () => {
+    const { container } = render(
+      <FMSAllianceImport
+        selectedEvent="2025nysu"
+        updateAlliances={jest.fn()}
+        makeTrustedRequest={jest.fn()}
+      />
+    );
+
+    fireEvent.change(container.querySelector('input[type="file"]')!, {
+      target: { files: [] },
+    });
+
+    expect(fmsAlliancesParser.parseFmsAlliancesFile).not.toHaveBeenCalled();
+    expect(screen.queryByText("Processing file...")).not.toBeInTheDocument();
+  });
+});
