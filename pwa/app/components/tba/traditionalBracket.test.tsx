@@ -471,6 +471,36 @@ describe('TraditionalBracket', () => {
     expect(screen.getByRole('link', { name: '201' })).toBeTruthy();
   });
 
+  // Wrong today: a row whose teams are in no alliance gets alliance number
+  // null, which equals the "nothing hovered" null (null === null), so the
+  // rows render highlighted, and the winner's card ringed, before any hover.
+  // Correct: nothing is highlighted until an alliance is hovered.
+  test('Bug #60: does not highlight rows for teams in no alliance before hover', () => {
+    const matches = [
+      makeMatch(
+        CompLevel.SF,
+        1,
+        1,
+        ['frc9001', 'frc9002', 'frc9003'],
+        ['frc9101', 'frc9102', 'frc9103'],
+        10,
+        5,
+      ),
+    ];
+
+    render(
+      <TraditionalBracket
+        alliances={alliances}
+        matches={matches}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(rowFor('9001').getAttribute('data-highlight')).toBe('false');
+    expect(rowFor('9101').getAttribute('data-highlight')).toBe('false');
+    expect(cardFor('9001').className).not.toContain('ring-alliance-red-accent');
+  });
+
   test('renders an alliance that is missing from the alliance list', () => {
     // Whether these rows start highlighted is Bug #60, covered by its own
     // failing-test PR; this test only checks they render and hover safely.
