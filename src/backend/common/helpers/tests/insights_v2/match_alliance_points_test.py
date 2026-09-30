@@ -212,6 +212,11 @@ class TestGetGamePieceCount:
         del bd["preMatchBay1"]
         assert get_game_piece_count(_pts(bd, year=2019)) is None
 
+    def test_2019_missing_rocket_field(self):
+        bd = _2019_breakdown()
+        del bd["topRightRocketFar"]
+        assert get_game_piece_count(_pts(bd, year=2019)) is None
+
     def test_2020_power_cells(self):
         bd = {
             "autoCellsBottom": 1,
@@ -250,3 +255,6 @@ class TestGetGamePieceCount:
 
     def test_2026_missing_hub_score(self):
         assert get_game_piece_count(_pts({"totalPoints": 10}, year=2026)) is None
+
+    def test_2026_missing_total_count(self):
+        assert get_game_piece_count(_pts({"hubScore": {}}, year=2026)) is None
