@@ -471,6 +471,33 @@ def test_get_cached_gcs_files_downloads_and_caches(
     )
 
 
+def test_bug_33_get_cached_gcs_files_same_paths_downloaded_or_cached(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    """
+    Bug #33: get_cached_gcs_files joins the (slash-terminated) directory and
+    file name with another "/" when it downloads from GCS, returning
+    "dir//file", but returns "dir/file" once the files are cached locally.
+
+    Correct: both calls return the same "dir/file" paths.
+    """
+    from backend.common.frc_api import frc_api as frc_api_module
+
+    monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
+    gcs_dir = "frc-api-response/v3.0/2020/root/"
+    contents = {f"{gcs_dir}2020-03-01 10:00:00.0.json": "text"}
+    with (
+        patch("backend.common.storage.get_files", return_value=list(contents)),
+        patch("backend.common.storage.read", side_effect=contents.get),
+    ):
+        downloaded = FRCAPI.get_cached_gcs_files(gcs_dir)
+    cached = FRCAPI.get_cached_gcs_files(gcs_dir)
+
+    expected = [f"{gcs_dir}2020-03-01 10_00_00.0.json"]
+    assert downloaded == expected
+    assert cached == expected
+
+
 def test_simulated_v2_schedule_uses_hybrid_endpoint() -> None:
     api = FRCAPI("zach", sim_time=datetime.datetime(2022, 3, 1), sim_api_version="v2.0")
     with patch.object(FRCAPI, "_get_api_response_from_gcs") as mock_gcs:
