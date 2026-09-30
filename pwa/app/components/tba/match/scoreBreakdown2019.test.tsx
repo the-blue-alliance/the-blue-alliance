@@ -372,6 +372,30 @@ describe('ScoreBreakdown2019 endgame', () => {
     expect(redCell('Robot 1 Endgame').textContent).toBe(expected);
   });
 
+  // Wrong today: ENDGAME_2019_POINTS is 3 / 3 / 6 for HAB levels 1 / 2 / 3,
+  // so the per-robot label shows (+3) for Level 2 and (+6) for Level 3.
+  // Correct: 3 / 6 / 12. 2019 Game & Season Manual (DESTINATION: DEEP SPACE),
+  // Section 5.3 Scoring, Table 5-1: "HAB Climb Bonus: Level 1 | 3",
+  // "Level 2 | 6", "Level 3 | 12". Latest published manual (PDF last
+  // modified 2019-04-09, after all Team Updates):
+  // https://firstfrc.blob.core.windows.net/frc2019/Manual/2019FRCGameSeasonManual.pdf
+  test.each([
+    { value: EndgameRobot2019.HAB_LEVEL2, expected: '254HAB 2 (+6)' },
+    { value: EndgameRobot2019.HAB_LEVEL3, expected: '254HAB 3 (+12)' },
+  ])(
+    'Bug #52: shows $value with its HAB climb points for robot 1',
+    ({ value, expected }) => {
+      render(
+        <ScoreBreakdown2019
+          scoreBreakdown={makeBreakdown({ endgameRobot1: value })}
+          match={match}
+        />,
+      );
+
+      expect(redCell('Robot 1 Endgame').textContent).toBe(expected);
+    },
+  );
+
   test('shows an unrecognised endgame value verbatim with zero points', () => {
     render(
       <ScoreBreakdown2019
