@@ -1,6 +1,6 @@
 import { describe, expect, test, vi } from 'vitest';
 
-import { createLogger } from '~/lib/logger';
+import { createLogger, formatGcpLogLabels } from '~/lib/logger';
 
 describe('createLogger', () => {
   test('defaults to info in production, so debug hot-path logs are not emitted', () => {
@@ -53,5 +53,17 @@ describe('createLogger production output', () => {
       severity: 'INFO',
       'logging.googleapis.com/labels': { logger: 'svc' },
     });
+  });
+});
+
+describe('formatGcpLogLabels', () => {
+  test('nests fields under the Cloud Logging labels key', () => {
+    expect(formatGcpLogLabels({ logger: 'svc', requestId: 'abc' })).toEqual({
+      'logging.googleapis.com/labels': { logger: 'svc', requestId: 'abc' },
+    });
+  });
+
+  test('emits no labels key for an empty object', () => {
+    expect(formatGcpLogLabels({})).toEqual({});
   });
 });
