@@ -34,7 +34,10 @@ export default function TeamMediaGallery({
         if (m.type === 'cd-thread') {
           return <CdThreadEmbed key={index} media={m} />;
         }
+        // getEmbedMedia only returns the three types handled above.
+        /* v8 ignore start -- @preserve */
         return null;
+        /* v8 ignore stop -- @preserve */
       })}
     </div>
   );
