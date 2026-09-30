@@ -52,3 +52,10 @@ def test_get_files_prefix():
     client.write(file_name, file_content)
     assert client.get_files("foo") == []
     assert client.get_files("some") == ["some_file.json"]
+
+
+def test_get_is_singleton(monkeypatch) -> None:
+    monkeypatch.setattr(InMemoryClient, "CLIENT", None)
+    client = InMemoryClient.get()
+    assert isinstance(client, InMemoryClient)
+    assert InMemoryClient.get() is client
