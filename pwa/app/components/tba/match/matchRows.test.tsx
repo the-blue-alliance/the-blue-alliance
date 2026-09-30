@@ -599,6 +599,38 @@ describe('SimpleMatchRow', () => {
     expect(screen.getByText(/^\w{3} \d{1,2}:\d{2} [AP]M$/)).toBeTruthy();
   });
 
+  // Wrong today: SimpleMatchRow formats predicted_time with
+  // Date#toLocaleTimeString, while MatchRow uses Temporal's
+  // ZonedDateTime#toLocaleString with the same options. Both use the viewer's
+  // time zone, but they disagree on the hour: SimpleMatchRow shows
+  // "Sat 09:30 AM" where MatchRow shows "Sat 9:30 AM".
+  // Correct: both rows format the same predicted time identically.
+  test('Bug #59: formats the predicted time the same way as MatchRow', () => {
+    // 9:30 AM in the test runner's own time zone, so the hour is a single
+    // digit wherever the tests run.
+    const predictedTime = new Date(2026, 2, 7, 9, 30).getTime() / 1000;
+    const timePattern = /^\w{3} \d{1,2}:\d{2} [AP]M$/;
+
+    const { unmount } = render(
+      <MatchRow
+        match={makeUnplayedMatch({ predicted_time: predictedTime })}
+        event={event}
+        year={2026}
+      />,
+    );
+    const matchRowTime = screen.getByText(timePattern).textContent;
+    unmount();
+
+    render(
+      <SimpleMatchRow
+        match={makeUnplayedMatch({ predicted_time: predictedTime })}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText(timePattern).textContent).toBe(matchRowTime);
+  });
+
   test('shows no time for an unplayed match without a prediction', () => {
     render(<SimpleMatchRow match={makeUnplayedMatch()} year={2026} />);
 
