@@ -66,3 +66,42 @@ describe("specialWebcastIds reducer", () => {
     expect(state.has("special_webcast-0")).toEqual(true);
   });
 });
+
+describe("webcastsById edge cases", () => {
+  it("returns the existing state for unrelated actions", () => {
+    const state = { a: 1 };
+    expect(webcastsById(state, { type: "UNKNOWN" })).toBe(state);
+    expect(specialWebcastIds(state, { type: "UNKNOWN" })).toBe(state);
+  });
+
+  it("handles a payload with no special webcasts or events", () => {
+    expect(
+      webcastsById(undefined, { type: SET_WEBCASTS_RAW, webcasts: {} })
+    ).toEqual({});
+    expect(
+      specialWebcastIds(undefined, { type: SET_WEBCASTS_RAW, webcasts: {} })
+    ).toEqual(new Set());
+  });
+
+  it("names multiple webcasts per event by index and falls back to the full name", () => {
+    const result = webcastsById(undefined, {
+      type: SET_WEBCASTS_RAW,
+      webcasts: {
+        ongoing_events_w_webcasts: [
+          {
+            key: "2024casj",
+            name: "Silicon Valley Regional",
+            webcasts: [
+              { type: "twitch", channel: "a" },
+              { type: "youtube", channel: "b" },
+            ],
+          },
+        ],
+      },
+    });
+    expect(Object.values(result).map((w) => w.name)).toEqual([
+      "Silicon Valley Regional 1",
+      "Silicon Valley Regional 2",
+    ]);
+  });
+});

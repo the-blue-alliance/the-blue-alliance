@@ -24,3 +24,17 @@ def test_key_name() -> None:
         year=2010,
     )
     assert et.key_name == "2010ct_frc177"
+
+
+def test_status_strings_no_status() -> None:
+    et = EventTeam(
+        id="2010ct_frc177",
+        event=ndb.Key(Event, "2010ct"),
+        team=ndb.Key(Team, "frc177"),
+        year=2010,
+    )
+    assert et.status_strings == {
+        "alliance": "--",
+        "playoff": "--",
+        "overall": "Team 177 is waiting for the event to begin.",
+    }
