@@ -246,6 +246,33 @@ describe('ScoreBreakdown2024', () => {
     ).toHaveLength(2);
   });
 
+  // Wrong today: each alliance's column shows its OWN foulCount /
+  // techFoulCount (the fouls it committed) as the fouls it received.
+  // Correct: show the opponent's counts, matching the 2022 breakdown and the
+  // old Jinja templates. (Judgment call: assumes the FRC API's foulCount is
+  // fouls committed by that alliance, as 2022 and Jinja already treat it.)
+  // 2024 Game Manual (CRESCENDO), Section 6.6 Violations, Table 6-3 Rule
+  // violations (page 49, section revision V10): "FOUL: a credit of 2 points
+  // towards the opponent's MATCH point total"; "TECH FOUL: a credit of 5
+  // points towards the opponent's MATCH point total". Latest published
+  // manual (PDF last modified 2024-04-09, after all Team Updates):
+  // https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
+  test('Bug #56: shows each alliance the fouls its opponent committed', () => {
+    // Red committed 3 fouls + 1 tech foul; blue's counts are unreported.
+    renderBreakdown(
+      makeBreakdown(
+        { foulCount: 3, techFoulCount: 1 },
+        { foulCount: undefined, techFoulCount: undefined },
+      ),
+    );
+
+    expect(
+      screen.getByRole('row', {
+        name: '(+0) / (+0) Fouls / Tech Fouls 3 (+6) / 1 (+5)',
+      }),
+    ).toBeTruthy();
+  });
+
   // Both alliances get identical counts in these two tests: which
   // alliance's counts belong under which column is Bug #56, covered by its
   // own failing-test PR.
