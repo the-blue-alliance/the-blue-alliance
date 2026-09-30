@@ -280,3 +280,17 @@ class MatchPostUpdateHooks:
             )
         except Exception:
             logging.exception(f"Error enqueuing event_matchstats for {event_key}")
+
+        # Enqueue task to advance season predictions (debounced with countdown=15)
+        try:
+            taskqueue.add(
+                url=f"/tasks/math/do/season_predictions_advance/{event.year}",
+                method="GET",
+                target="py3-tasks-cpu",
+                queue_name="season-predictions",
+                countdown=15,
+            )
+        except Exception:
+            logging.exception(
+                f"Error enqueuing season_predictions_advance for season {event.year}"
+            )

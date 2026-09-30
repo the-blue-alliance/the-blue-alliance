@@ -392,3 +392,17 @@ def insight_v2_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQ
                 )
 
     return _queries_to_cache_keys_and_queries(queries)
+
+
+def event_predictions_v2_updated(
+    affected_refs: TAffectedReferences,
+) -> List[TCacheKeyAndQuery]:
+    from backend.common.queries import event_predictions_v2_query
+
+    event_keys = _filter(affected_refs["key"])
+    queries: List[CachedDatabaseQuery] = []
+    for event_key in event_keys:
+        queries.append(
+            event_predictions_v2_query.EventPredictionsV2Query(event_key.id())
+        )
+    return _queries_to_cache_keys_and_queries(queries)

@@ -26,6 +26,7 @@ dependencies = [
     "pyre-extensions==0.0.32",
     "pytz==2026.3.post1",
     "requests==2.34.2",
+    "scipy>=1.14.0",
     "six==1.17.0",
     "typing-extensions==4.16.0",
     "tzlocal==5.4.4",

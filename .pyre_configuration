@@ -3,6 +3,9 @@
     "ops",
     "src"
   ],
+  "ignore_all_errors": [
+    "src/backend/common/helpers/sota_prediction"
+  ],
   "search_path": [
     "ops/pr_screenshots",
     "stubs",
@@ -33,6 +36,7 @@
     {"site-package": "six", "is_toplevel_module": true},
     {"site-package": "requests_mock"},
     {"site-package": "watchdog"},
-    {"site-package": "werkzeug"}
+    {"site-package": "werkzeug"},
+    {"site-package": "scipy"}
   ]
 }

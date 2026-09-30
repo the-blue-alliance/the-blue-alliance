@@ -805,3 +805,79 @@ def test_event_media_bad_key(ndb_stub, api_client: Client) -> None:
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 404
+
+
+def test_event_predictions_v2_not_found(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2024casj",
+        year=2024,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2024casj/predictions/v2",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 404
+
+
+def test_event_predictions_v2(ndb_stub, api_client: Client) -> None:
+    from backend.common.models.event_predictions_v2 import EventPredictionsV2
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2024casj",
+        year=2024,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    payload = {
+        "model_version": "hkf_ev_pcg_v1.0",
+        "as_of_match": "2024casj_qm1",
+        "last_updated": "2024-03-30T12:00:00Z",
+        "matches": {
+            "2024casj_qm2": {
+                "match_key": "2024casj_qm2",
+                "winning_alliance": "red",
+                "win_probability": 0.75,
+                "red_win_prob": 0.75,
+                "red": {"mean": 85.0, "sd": 12.0, "pmf": {85: 0.05}},
+                "blue": {"mean": 70.0, "sd": 10.0, "pmf": {70: 0.05}},
+                "ranking_points": None,
+            }
+        },
+        "team_ratings": {
+            "frc254": {
+                "shared_strength": 35.0,
+                "robot_strength": 40.0,
+                "win_rating": 1850.0,
+                "pcg_rating": 42.0,
+            }
+        },
+    }
+
+    EventPredictionsV2(
+        id="2024casj",
+        model_version="hkf_ev_pcg_v1.0",
+        as_of_match="2024casj_qm1",
+        predictions=payload,
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/event/2024casj/predictions/v2",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json["model_version"] == "hkf_ev_pcg_v1.0"
+    assert resp.json["as_of_match"] == "2024casj_qm1"
+    assert "2024casj_qm2" in resp.json["matches"]
+    assert "frc254" in resp.json["team_ratings"]

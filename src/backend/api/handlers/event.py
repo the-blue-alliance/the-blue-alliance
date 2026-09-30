@@ -44,6 +44,9 @@ from backend.common.queries.dict_converters.match_converter import MatchDict
 from backend.common.queries.dict_converters.media_converter import MediaDict
 from backend.common.queries.dict_converters.team_converter import TeamDict
 from backend.common.queries.event_details_query import EventDetailsQuery
+from backend.common.queries.event_predictions_v2_query import (
+    EventPredictionsV2Query,
+)
 from backend.common.queries.event_query import (
     EventListQuery,
     EventQuery,
@@ -308,3 +311,18 @@ def event_playoff_advancement(event_key: EventKey) -> TypedFlaskResponse[Any]:
         event, playoff_advancement, bracket_table
     )
     return profiled_jsonify(output)
+
+
+@api_authenticated
+@cached_public(query_string=False)
+@validate_etag
+@validate_keys
+def event_predictions_v2(event_key: EventKey) -> TypedFlaskResponse[Any]:
+    """
+    Returns SOTA match predictions and team ratings for an event (v2).
+    """
+    track_call_after_response("event/predictions/v2", event_key)
+    return model_query_response(
+        EventPredictionsV2Query(event_key=event_key),
+        abort_404_if_none=True,
+    )

@@ -1843,6 +1843,64 @@
         ]
       }
     },
+    "/event/{event_key}/predictions/v2": {
+      "get": {
+        "tags": [
+          "event"
+        ],
+        "summary": "Get SOTA match predictions and team ratings for an event (v2)",
+        "description": "Returns hierarchical Kalman filter (hkf_ev_pcg) probabilistic predictions, score distributions, and ranking point forecasts.",
+        "operationId": "getEventPredictionsV2",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Event_Predictions_V2"
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/event/{event_key}/rankings": {
       "get": {
         "tags": [
@@ -7652,6 +7710,39 @@
       "Event_Predictions": {
         "type": "object",
         "description": "JSON Object containing prediction information for the event. Contains year-specific information and is subject to change."
+      },
+      "Event_Predictions_V2": {
+        "type": "object",
+        "description": "JSON Object containing SOTA hierarchical Kalman filter prediction information and team ratings for the event.",
+        "properties": {
+          "model_version": {
+            "type": "string",
+            "description": "Model version identifier"
+          },
+          "as_of_match": {
+            "type": "string",
+            "nullable": true,
+            "description": "Match key after which these predictions were generated"
+          },
+          "last_updated": {
+            "type": "string",
+            "description": "ISO timestamp of last prediction calculation"
+          },
+          "matches": {
+            "type": "object",
+            "description": "Dictionary of match predictions keyed by match key"
+          },
+          "team_ratings": {
+            "type": "object",
+            "description": "Dictionary of team ratings keyed by team key"
+          }
+        },
+        "required": [
+          "model_version",
+          "last_updated",
+          "matches",
+          "team_ratings"
+        ]
       },
       "Event_Ranking": {
         "required": [
