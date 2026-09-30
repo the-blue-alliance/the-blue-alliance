@@ -154,3 +154,51 @@ def test_seed_blocked_in_prod(web_client: Client, login_gae_admin) -> None:
         environ_overrides=prod_environ,
     )
     assert resp.status_code == 404
+
+
+def test_seed_renames_existing_targets(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    Team(id="frc2", team_number=2, nickname="Old Name").put()
+    Event(
+        id="2020np",
+        year=2020,
+        event_short="np",
+        name="Old Event",
+        event_type_enum=0,
+    ).put()
+
+    resp = web_client.post(
+        "/admin/suggestions/seed",
+        data={"team_key": "frc2", "event_key": "2020np", "match_key": "2020np_qm1"},
+    )
+    assert resp.status_code == 200
+
+    team = Team.get_by_id("frc2")
+    assert team is not None
+    assert team.nickname == SEED_TEAM_NICKNAME
+    event = Event.get_by_id("2020np")
+    assert event is not None
+    assert event.name == SEED_EVENT_NAME
+
+
+def test_seed_skips_unavailable_targets(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    resp = web_client.post(
+        "/admin/suggestions/seed",
+        data={
+            "types": ["bogus", "event_media", "event", "match", "api_auth_access"],
+            "team_key": "frc3",
+            "event_key": "notanevent",
+            "match_key": "notanevent_qm1",
+            "grant_email": "nobody@example.com",
+        },
+    )
+    assert resp.status_code == 200
+    body = resp.data.decode()
+    assert "unknown type, skipped" in body
+    assert "skipped: event notanevent unavailable" in body
+    assert "skipped: match notanevent_qm1 unavailable" in body
+    assert "No account found for nobody@example.com" in body
+    assert Event.get_by_id("notanevent") is None
