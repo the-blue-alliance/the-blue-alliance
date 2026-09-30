@@ -23,12 +23,7 @@ class MatchTiebreakers(object):
         if match.comp_level not in ELIM_LEVELS or match.score_breakdown is None:
             return ""
 
-        if AllianceColor.RED not in none_throws(
-            match.score_breakdown
-        ) or AllianceColor.BLUE not in none_throws(match.score_breakdown):
-            # Unreachable: Match.score_breakdown is None unless both are present
-            return ""  # pragma: no cover
-
+        # Match.score_breakdown is None unless both red and blue are present
         red_breakdown = none_throws(match.score_breakdown)[AllianceColor.RED]
         blue_breakdown = none_throws(match.score_breakdown)[AllianceColor.BLUE]
 
