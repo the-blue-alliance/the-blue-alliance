@@ -23,8 +23,11 @@ vi.mock('~/components/tba/match/common', async (importOriginal) => ({
     condition: boolean;
     teamKey: string;
   }) => (
+    // Normalised so these rows don't depend on whether the component passes
+    // "frc254" or "254"; which one it should pass is Bug #58, covered by
+    // its own failing-test PR.
     <div>
-      {teamKey}={condition ? 'yes' : 'no'}
+      {teamKey.replace(/^frc/, '')}={condition ? 'yes' : 'no'}
     </div>
   ),
   ConditionalRpAchieved: ({ condition }: { condition: boolean }) => (
@@ -144,10 +147,7 @@ function renderBreakdown(scoreBreakdown = makeBreakdown()) {
 }
 
 describe('ScoreBreakdown2024', () => {
-  // BUG: the auto leave row hands ConditionalCheckmark an already-stripped
-  // team number ("254") even though the helper strips the "frc" prefix
-  // itself, so its tooltip ends up showing "" for 254 and "4" for 1114.
-  test('shows each robot auto leave result using the stripped team number', () => {
+  test('shows each robot auto leave result', () => {
     renderBreakdown();
 
     expect(
@@ -188,52 +188,8 @@ describe('ScoreBreakdown2024', () => {
     ).toBeTruthy();
   });
 
-  // BUG: a robot onstage at a stage position whose *trap* holds a note is
-  // labelled "Spotlit (+4)". Per the 2024 manual, a trap note is a separate
-  // 5-point alliance score (endGameNoteInTrapPoints) and spotlighting comes
-  // from the microphone flags (micCenterStage / micStageLeft / micStageRight),
-  // which this component never reads.
-  test.each([
-    {
-      position: 'center stage',
-      endgame: EndGameRobot2024.CENTER_STAGE,
-      trap: {
-        trapCenterStage: true,
-        trapStageLeft: false,
-        trapStageRight: false,
-      },
-    },
-    {
-      position: 'stage left',
-      endgame: EndGameRobot2024.STAGE_LEFT,
-      trap: {
-        trapCenterStage: false,
-        trapStageLeft: true,
-        trapStageRight: false,
-      },
-    },
-    {
-      position: 'stage right',
-      endgame: EndGameRobot2024.STAGE_RIGHT,
-      trap: {
-        trapCenterStage: false,
-        trapStageLeft: false,
-        trapStageRight: true,
-      },
-    },
-  ])(
-    'labels a robot onstage at $position as spotlit when that trap has a note',
-    ({ endgame, trap }) => {
-      renderBreakdown(makeBreakdown({ endGameRobot1: endgame, ...trap }));
-
-      expect(
-        screen.getByRole('row', {
-          name: '254 Spotlit (+4) Robot 1 Endgame 148 Spotlit (+4)',
-        }),
-      ).toBeTruthy();
-    },
-  );
-
+  // Robot endgame labels that depend on trap/microphone flags ("Spotlit")
+  // are Bug #57, covered by its own failing-test PR.
   test.each([
     { name: '1114 Onstage (+3) Robot 2 Endgame 217 None (+0)' },
     { name: '2056 Parked (+1) Robot 3 Endgame 33 None (+0)' },
@@ -241,23 +197,6 @@ describe('ScoreBreakdown2024', () => {
     renderBreakdown();
 
     expect(screen.getByRole('row', { name })).toBeTruthy();
-  });
-
-  test('shows a robot onstage at an untrapped position as onstage', () => {
-    renderBreakdown(
-      makeBreakdown({
-        endGameRobot1: EndGameRobot2024.STAGE_RIGHT,
-        trapCenterStage: true,
-        trapStageLeft: true,
-        trapStageRight: false,
-      }),
-    );
-
-    expect(
-      screen.getByRole('row', {
-        name: '254 Onstage (+3) Robot 1 Endgame 148 Spotlit (+4)',
-      }),
-    ).toBeTruthy();
   });
 
   test('treats missing trap flags as no trap note', () => {
@@ -307,12 +246,35 @@ describe('ScoreBreakdown2024', () => {
     ).toHaveLength(2);
   });
 
-  test('shows foul counts with points and blank counts when missing', () => {
-    renderBreakdown();
+  // Both alliances get identical counts in these two tests: which
+  // alliance's counts belong under which column is Bug #56, covered by its
+  // own failing-test PR.
+  test('shows foul counts with points', () => {
+    renderBreakdown(
+      makeBreakdown(
+        { foulCount: 3, techFoulCount: 1 },
+        { foulCount: 3, techFoulCount: 1 },
+      ),
+    );
 
     expect(
       screen.getByRole('row', {
-        name: '3 (+6) / 1 (+5) Fouls / Tech Fouls (+0) / (+0)',
+        name: '3 (+6) / 1 (+5) Fouls / Tech Fouls 3 (+6) / 1 (+5)',
+      }),
+    ).toBeTruthy();
+  });
+
+  test('shows blank foul counts when missing', () => {
+    renderBreakdown(
+      makeBreakdown(
+        { foulCount: undefined, techFoulCount: undefined },
+        { foulCount: undefined, techFoulCount: undefined },
+      ),
+    );
+
+    expect(
+      screen.getByRole('row', {
+        name: '(+0) / (+0) Fouls / Tech Fouls (+0) / (+0)',
       }),
     ).toBeTruthy();
   });

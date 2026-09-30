@@ -24,8 +24,11 @@ vi.mock('~/components/tba/match/common', async (importOriginal) => ({
     condition: boolean;
     teamKey: string;
   }) => (
+    // Normalised so these rows don't depend on whether the component passes
+    // "frc254" or "254"; which one it should pass is Bug #58, covered by
+    // its own failing-test PR.
     <div>
-      {teamKey}={condition ? 'yes' : 'no'}
+      {teamKey.replace(/^frc/, '')}={condition ? 'yes' : 'no'}
     </div>
   ),
   ConditionalRpAchieved: ({ condition }: { condition: boolean }) => (
@@ -149,11 +152,7 @@ function renderBreakdown(scoreBreakdown = makeBreakdown()) {
 }
 
 describe('ScoreBreakdown2023', () => {
-  // BUG: the mobility row hands ConditionalCheckmark an already-stripped team
-  // number ("254") even though the helper strips the "frc" prefix itself, so
-  // its tooltip ends up showing "" for 254 and "4" for 1114. Every other year
-  // passes the raw team key.
-  test('shows each robot mobility result using the stripped team number', () => {
+  test('shows each robot mobility result', () => {
     renderBreakdown();
 
     expect(
@@ -247,14 +246,19 @@ describe('ScoreBreakdown2023', () => {
     ).toHaveLength(3);
   });
 
-  // Unlike 2022, this year shows each alliance's own foul counts (and the
-  // points derived from them) in that alliance's column.
-  test('shows each alliance its own foul counts with derived points', () => {
-    renderBreakdown();
+  // Both alliances get identical counts here: which alliance's counts belong
+  // under which column is Bug #56, covered by its own failing-test PR.
+  test('shows foul counts with derived points', () => {
+    renderBreakdown(
+      makeBreakdown(
+        { foulCount: 2, techFoulCount: 1 },
+        { foulCount: 2, techFoulCount: 1 },
+      ),
+    );
 
     expect(
       screen.getByRole('row', {
-        name: /^Regular: ?2 \(\+10\) Tech: ?1 \(\+12\) Fouls \/ Tech Fouls Regular: ?3 \(\+15\) Tech: ?0 \(\+0\)$/,
+        name: /^Regular: ?2 \(\+10\) Tech: ?1 \(\+12\) Fouls \/ Tech Fouls Regular: ?2 \(\+10\) Tech: ?1 \(\+12\)$/,
       }),
     ).toBeTruthy();
   });
