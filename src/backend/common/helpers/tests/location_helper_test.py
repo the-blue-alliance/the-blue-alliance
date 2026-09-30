@@ -2266,3 +2266,16 @@ def test_get_timezone_id_missing_time_zone_id(
 
     assert LocationHelper.get_timezone_id(None, lat_lng=SAN_JOSE) is None
     assert "No timeZoneId for (37.3382, -121.8863)" in caplog.text
+
+
+def test_bug_9_get_similarity_matches_acronyms() -> None:
+    """Bug #9: acronym matching in get_similarity is dead code.
+
+    Today a_split/b_split are filter() iterators; sorted() exhausts them, so
+    the acronym comprehensions always produce "" and "lhs" vs
+    "Leland High School" scores about 0.29 (a Py2 -> Py3 regression: filter
+    used to return a list). Correct, per the docstring: acronym(a) is compared
+    with b (and a with acronym(b)), so both orders score 1.0.
+    """
+    assert LocationHelper.get_similarity("Leland High School", "lhs") == 1.0
+    assert LocationHelper.get_similarity("lhs", "Leland High School") == 1.0
