@@ -1086,3 +1086,54 @@ def test_do_overall_award_insights_with_nothing_stored_is_empty(ndb_stub) -> Non
 
 def test_do_overall_match_insights_with_nothing_stored_is_empty(ndb_stub) -> None:
     assert InsightsHelper.doOverallMatchInsights() == []
+
+
+def test_bug_18_overall_award_insights_skip_district_champs_and_einstein(
+    ndb_stub,
+) -> None:
+    """Bug #18: some all-time award insights include district-scoped data.
+
+    doOverallAwardInsights skips yearly insights that have a
+    district_abbreviation for REGIONAL_DISTRICT_WINNERS, BLUE_BANNERS,
+    RCA_WINNERS and SUCCESSFUL_ELIM_TEAMUPS, but not for WORLD_CHAMPIONS,
+    DIVISION_WINNERS (and so EINSTEIN_STREAK) or SUCCESSFUL_EINSTEIN_TEAMUPS.
+    Today a district-scoped copy of those insights is aggregated a second
+    time. Correct: district-scoped yearly insights are skipped for these too,
+    so adding them does not change the all-time results.
+    """
+    names = [
+        Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS],
+        Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS],
+        Insight.INSIGHT_NAMES[Insight.EINSTEIN_STREAK],
+        Insight.INSIGHT_NAMES[Insight.SUCCESSFUL_EINSTEIN_TEAMUPS],
+    ]
+
+    def store(district_abbreviation: Optional[str]) -> None:
+        for year in [2023, 2024]:
+            for name, data in [
+                (Insight.WORLD_CHAMPIONS, ["frc1", "frc2", "frc3"]),
+                (Insight.DIVISION_WINNERS, ["frc1", "frc2", "frc3"]),
+                (Insight.SUCCESSFUL_EINSTEIN_TEAMUPS, [["frc1", "frc2", "frc3"]]),
+            ]:
+                create_insight(
+                    data=data,
+                    name=Insight.INSIGHT_NAMES[name],
+                    year=year,
+                    district_abbreviation=district_abbreviation,
+                ).put()
+
+    def aggregate() -> Dict[str, Any]:
+        return {
+            i.name: i.data
+            for i in InsightsHelper.doOverallAwardInsights()
+            if i.name in names
+        }
+
+    store(None)
+    global_only = aggregate()
+    store("fim")
+    with_district = aggregate()
+
+    assert set(global_only.keys()) == set(names)
+    for name in names:
+        assert with_district[name] == global_only[name], name
