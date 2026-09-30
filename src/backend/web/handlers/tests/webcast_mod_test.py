@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timedelta
+from typing import Optional
 from unittest import mock
 from urllib.parse import parse_qs, urlparse
 
@@ -691,4 +692,537 @@ def test_offseason_delete_not_allowed_after_start(
     parsed = urlparse(response.headers["Location"])
     assert parsed.path == "/mod/offseasons"
     assert parse_qs(parsed.query)["status"] == ["delete_not_allowed"]
+    assert Event.get_by_id(event_key) is not None
+
+
+# ---------------------------------------------------------------------------
+# Helper functions
+# ---------------------------------------------------------------------------
+
+
+def test_parse_webcast_type_or_400_rejects_empty_and_unknown() -> None:
+    from backend.web.handlers.webcast_mod import _parse_webcast_type_or_400
+
+    with pytest.raises(ValueError, match="invalid_webcast_type"):
+        _parse_webcast_type_or_400(None)
+    with pytest.raises(ValueError, match="invalid_webcast_type"):
+        _parse_webcast_type_or_400("")
+    with pytest.raises(ValueError, match="invalid_webcast_type"):
+        _parse_webcast_type_or_400("not-a-real-type")
+
+    assert _parse_webcast_type_or_400("twitch") == WebcastType.TWITCH
+
+
+def test_parse_webcast_index_or_400_rejects_empty_and_non_numeric() -> None:
+    from backend.web.handlers.webcast_mod import _parse_webcast_index_or_400
+
+    with pytest.raises(ValueError, match="invalid_webcast_index"):
+        _parse_webcast_index_or_400(None)
+    with pytest.raises(ValueError, match="invalid_webcast_index"):
+        _parse_webcast_index_or_400("")
+    with pytest.raises(ValueError, match="invalid_webcast_index"):
+        _parse_webcast_index_or_400("one")
+
+    # Form indexes are 1-based; the helper converts to a 0-based list index
+    assert _parse_webcast_index_or_400("1") == 0
+    assert _parse_webcast_index_or_400("3") == 2
+
+
+def test_is_date_within_event_range() -> None:
+    from backend.web.handlers.webcast_mod import _is_date_within_event_range
+
+    event = Event(
+        id="2026casj",
+        year=2026,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2026, 3, 5),
+        end_date=datetime(2026, 3, 7),
+    )
+
+    assert _is_date_within_event_range(event, "2026-03-05") is True
+    assert _is_date_within_event_range(event, "2026-03-07") is True
+    assert _is_date_within_event_range(event, "2026-03-08") is False
+    assert _is_date_within_event_range(event, "not-a-date") is False
+
+    undated_event = Event(
+        id="2026nodate",
+        year=2026,
+        event_short="nodate",
+        event_type_enum=EventType.REGIONAL,
+    )
+    assert _is_date_within_event_range(undated_event, "2026-03-05") is False
+
+
+@pytest.mark.parametrize(
+    "raw, expected",
+    [
+        ("", None),
+        ("   ", None),
+        ("ohnew", "OHNEW"),
+        ("  OhNeW  ", "OHNEW"),
+        ("bad code", None),
+        ("https://frc-events.firstinspires.org/2026/OHNEW", "OHNEW"),
+        ("https://www.frc-events.firstinspires.org/2026/ohnew/qualifications", "OHNEW"),
+        # Wrong host
+        ("https://example.com/2026/OHNEW", None),
+        # Not enough path segments
+        ("https://frc-events.firstinspires.org/2026", None),
+        # Year in URL doesn't match the event's year
+        ("https://frc-events.firstinspires.org/2025/OHNEW", None),
+    ],
+)
+def test_parse_first_code(raw: str, expected: Optional[str]) -> None:
+    from backend.web.handlers.webcast_mod import _parse_first_code
+
+    assert _parse_first_code(raw, 2026) == expected
+
+
+def test_redirect_offseason_list_without_status() -> None:
+    from backend.web.handlers.webcast_mod import _redirect_offseason_list
+    from backend.web.main import app
+
+    with app.test_request_context("/"):
+        response = _redirect_offseason_list()
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parsed.query == ""
+
+
+# ---------------------------------------------------------------------------
+# 404s for unknown events
+# ---------------------------------------------------------------------------
+
+
+def test_webcast_detail_unknown_event_404(login_admin, web_client: Client) -> None:
+    response = web_client.get("/mod/webcast/2026doesnotexist")
+    assert response.status_code == 404
+
+
+def test_webcast_add_unknown_event_404(
+    login_user_with_permission, web_client: Client
+) -> None:
+    response = web_client.post(
+        "/mod/webcast/2026doesnotexist/add",
+        data={"webcast_url": "https://www.twitch.tv/frc0"},
+    )
+    assert response.status_code == 404
+
+
+# ---------------------------------------------------------------------------
+# Adding webcasts by channel (no URL)
+# ---------------------------------------------------------------------------
+
+
+def test_add_webcast_by_channel_with_file_and_date(
+    login_user_with_permission, web_client: Client, taskqueue_stub
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/add",
+        data={
+            "webcast_type": "livestream",
+            "webcast_channel": "chan123",
+            "webcast_file": "file456",
+            "webcast_date": "2026-03-28",
+        },
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == f"/mod/webcast/{event_key}"
+    assert parsed.fragment == "webcasts"
+    assert "status" not in parse_qs(parsed.query)
+
+    event = none_throws(Event.get_by_id(event_key))
+    assert (
+        Webcast(
+            type=WebcastType.LIVESTREAM,
+            channel="chan123",
+            file="file456",
+            date="2026-03-28",
+        )
+        in event.webcast
+    )
+
+
+def test_add_webcast_by_channel_missing_channel(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/add",
+        data={"webcast_type": "twitch"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == f"/mod/webcast/{event_key}"
+    assert parsed.fragment == "add-webcast"
+    assert parse_qs(parsed.query)["status"] == ["missing_webcast_channel"]
+
+
+def test_add_webcast_by_channel_invalid_type(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/add",
+        data={"webcast_type": "bogus", "webcast_channel": "chan"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["invalid_webcast_type"]
+
+    # Nothing was added
+    event = none_throws(Event.get_by_id(event_key))
+    assert len(event.webcast) == 2
+
+
+@mock.patch(
+    "backend.web.handlers.webcast_mod.YouTubeVideoHelper.get_scheduled_start_times"
+)
+def test_add_youtube_webcast_by_channel_form_date_overrides_scheduled_date(
+    mock_get_scheduled_start_times,
+    login_user_with_permission,
+    web_client: Client,
+    taskqueue_stub,
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    mock_get_scheduled_start_times.return_value.get_result.return_value = {
+        "vid999": "2026-01-01"
+    }
+
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/add",
+        data={
+            "webcast_type": "youtube",
+            "webcast_channel": "vid999",
+            "webcast_date": "2026-03-28",
+        },
+    )
+
+    assert response.status_code == 302
+    mock_get_scheduled_start_times.assert_called_once_with(["vid999"])
+    event = none_throws(Event.get_by_id(event_key))
+    assert Webcast(type=WebcastType.YOUTUBE, channel="vid999", date="2026-03-28") in (
+        event.webcast
+    )
+
+
+# ---------------------------------------------------------------------------
+# Removing webcasts
+# ---------------------------------------------------------------------------
+
+
+def test_remove_webcast_invalid_type_redirects_with_status(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/remove",
+        data={"index": "1", "type": "bogus", "channel": "frc0"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.fragment == "webcasts"
+    assert parse_qs(parsed.query)["status"] == ["invalid_webcast_type"]
+
+
+def test_remove_webcast_mismatch_redirects_with_status(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    # Index 2 is the twitch webcast, but we claim it's a youtube one
+    response = web_client.post(
+        f"/mod/webcast/{event_key}/remove",
+        data={"index": "2", "type": "youtube", "channel": "frc0"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["webcast_remove_mismatch"]
+
+    event = none_throws(Event.get_by_id(event_key))
+    assert len(event.webcast) == 2
+
+
+# ---------------------------------------------------------------------------
+# Updating a single webcast date
+# ---------------------------------------------------------------------------
+
+
+def _update_date(
+    web_client: Client, event_key: str, **overrides: str
+) -> tuple[int, dict[str, list[str]], str]:
+    data = {
+        "index": "1",
+        "type": "youtube",
+        "channel": "abc123",
+        "file": "",
+        "date": datetime.now().strftime("%Y-%m-%d"),
+    }
+    data.update(overrides)
+    response = web_client.post(f"/mod/webcast/{event_key}/update_date", data=data)
+    parsed = urlparse(response.headers.get("Location", ""))
+    return response.status_code, parse_qs(parsed.query), parsed.fragment
+
+
+def test_update_webcast_date_missing_channel(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    status_code, query, _ = _update_date(web_client, event_key, channel="")
+    assert status_code == 302
+    assert query["status"] == ["missing_webcast_channel"]
+
+
+def test_update_webcast_date_invalid_index(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    status_code, query, _ = _update_date(web_client, event_key, index="zero")
+    assert status_code == 302
+    assert query["status"] == ["invalid_webcast_index"]
+
+
+def test_update_webcast_date_missing_date(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    status_code, query, _ = _update_date(web_client, event_key, date="")
+    assert status_code == 302
+    assert query["status"] == ["missing_webcast_date"]
+
+
+def test_update_webcast_date_index_out_of_range(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    status_code, query, _ = _update_date(web_client, event_key, index="3")
+    assert status_code == 302
+    assert query["status"] == ["invalid_webcast_index"]
+
+
+def test_update_webcast_date_event_without_webcasts(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}cada"
+    status_code, query, _ = _update_date(web_client, event_key)
+    assert status_code == 302
+    assert query["status"] == ["invalid_webcast_index"]
+
+
+def test_update_webcast_date_type_mismatch(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    status_code, query, _ = _update_date(web_client, event_key, type="twitch")
+    assert status_code == 302
+    assert query["status"] == ["webcast_update_mismatch"]
+
+
+def test_update_webcast_date_file_mismatch(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    status_code, query, _ = _update_date(web_client, event_key, file="other")
+    assert status_code == 302
+    assert query["status"] == ["webcast_update_mismatch"]
+
+
+def test_update_webcast_date_changes_date(
+    login_user_with_permission, web_client: Client, taskqueue_stub
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    # The active event runs from yesterday to tomorrow; move the date to tomorrow
+    new_date = (datetime.now() + timedelta(days=1)).strftime("%Y-%m-%d")
+    status_code, query, fragment = _update_date(web_client, event_key, date=new_date)
+
+    assert status_code == 302
+    assert "status" not in query
+    assert fragment == "webcasts"
+
+    event = none_throws(Event.get_by_id(event_key))
+    youtube_webcasts = [w for w in event.webcast if w["type"] == "youtube"]
+    assert len(youtube_webcasts) == 1
+    assert youtube_webcasts[0]["date"] == new_date
+
+
+# ---------------------------------------------------------------------------
+# Updating all webcast dates from YouTube
+# ---------------------------------------------------------------------------
+
+
+def test_update_all_webcast_dates_no_webcasts(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}cada"
+    response = web_client.post(f"/mod/webcast/{event_key}/update_all_dates")
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["no_webcasts"]
+
+
+def test_update_all_webcast_dates_no_youtube_webcasts(
+    login_user_with_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}nyny"
+    response = web_client.post(f"/mod/webcast/{event_key}/update_all_dates")
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["no_youtube_webcasts"]
+
+
+@mock.patch(
+    "backend.web.handlers.webcast_mod.YouTubeVideoHelper.get_scheduled_start_times"
+)
+def test_update_all_webcast_dates_writes_changed_dates(
+    mock_get_scheduled_start_times,
+    login_user_with_permission,
+    web_client: Client,
+    taskqueue_stub,
+) -> None:
+    event_key = f"{datetime.now().year}casj"
+    now = datetime.now()
+    tomorrow = (now + timedelta(days=1)).strftime("%Y-%m-%d")
+    far_future = (now + timedelta(days=30)).strftime("%Y-%m-%d")
+
+    # Add more YouTube webcasts: one with no channel (skipped), one with no
+    # scheduled date (skipped), one whose date is outside the event (skipped)
+    event = none_throws(Event.get_by_id(event_key))
+    webcasts = event.webcast
+    webcasts.append(Webcast(type=WebcastType.YOUTUBE, channel=""))
+    webcasts.append(Webcast(type=WebcastType.YOUTUBE, channel="nodate"))
+    webcasts.append(Webcast(type=WebcastType.YOUTUBE, channel="outofrange"))
+    event.webcast_json = json.dumps(webcasts)
+    event.put()
+
+    mock_get_scheduled_start_times.return_value.get_result.return_value = {
+        "abc123": tomorrow,
+        "outofrange": far_future,
+    }
+
+    response = web_client.post(f"/mod/webcast/{event_key}/update_all_dates")
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert "status" not in parse_qs(parsed.query)
+    mock_get_scheduled_start_times.assert_called_once()
+    assert sorted(mock_get_scheduled_start_times.call_args[0][0]) == [
+        "abc123",
+        "nodate",
+        "outofrange",
+    ]
+
+    event = none_throws(Event.get_by_id(event_key))
+    by_channel = {w["channel"]: w for w in event.webcast}
+    assert by_channel["abc123"]["date"] == tomorrow
+    assert "date" not in by_channel["nodate"]
+    assert "date" not in by_channel["outofrange"]
+    assert "date" not in by_channel["frc0"]
+
+
+# ---------------------------------------------------------------------------
+# Offseason link / unlink / delete validation branches
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def malformed_offseason_event(ndb_stub) -> str:
+    # An event whose key doesn't pass Event.validate_key_name (uppercase
+    # letters are never valid) but which nonetheless exists in the datastore.
+    now = datetime.now()
+    event_key = f"{now.year}BADKEY"
+    Event(
+        id=event_key,
+        name="Malformed Key Offseason",
+        event_short="BADKEY",
+        year=now.year,
+        start_date=now + timedelta(days=10),
+        end_date=now + timedelta(days=11),
+        event_type_enum=EventType.OFFSEASON,
+        official=False,
+    ).put()
+    return event_key
+
+
+def test_offseason_link_invalid_event_key(
+    malformed_offseason_event: str,
+    login_user_with_offseason_permission,
+    web_client: Client,
+) -> None:
+    response = web_client.post(
+        f"/mod/offseason/{malformed_offseason_event}/link",
+        data={"first_code": "BADKEY"},
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parsed.path == "/mod/offseasons"
+    assert parse_qs(parsed.query)["status"] == ["invalid_event_key"]
+
+
+def test_offseason_link_non_offseason_event(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"  # a regional
+    response = web_client.post(
+        f"/mod/offseason/{event_key}/link", data={"first_code": "CASJ"}
+    )
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["invalid_event_type"]
+    assert none_throws(Event.get_by_id(event_key)).first_code is None
+
+
+def test_offseason_link_unknown_event_404(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    response = web_client.post(
+        f"/mod/offseason/{datetime.now().year}nope/link", data={"first_code": "NOPE"}
+    )
+    assert response.status_code == 404
+
+
+def test_offseason_unlink_invalid_event_key(
+    malformed_offseason_event: str,
+    login_user_with_offseason_permission,
+    web_client: Client,
+) -> None:
+    response = web_client.post(f"/mod/offseason/{malformed_offseason_event}/unlink")
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["invalid_event_key"]
+
+
+def test_offseason_unlink_non_offseason_event(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"  # a regional
+    response = web_client.post(f"/mod/offseason/{event_key}/unlink")
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["invalid_event_type"]
+    assert none_throws(Event.get_by_id(event_key)).official is True
+
+
+def test_offseason_delete_non_offseason_event(
+    login_user_with_offseason_permission, web_client: Client
+) -> None:
+    event_key = f"{datetime.now().year}casj"  # a regional
+    response = web_client.post(f"/mod/offseason/{event_key}/delete")
+
+    assert response.status_code == 302
+    parsed = urlparse(response.headers["Location"])
+    assert parse_qs(parsed.query)["status"] == ["invalid_event_type"]
     assert Event.get_by_id(event_key) is not None

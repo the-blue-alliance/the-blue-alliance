@@ -215,3 +215,44 @@ describe("AwardsTab", () => {
     expect(parsed[0].name_str).toBe("Keep Me");
   });
 });
+
+describe("AwardsTab save failures", () => {
+  beforeEach(() => {
+    global.fetch = jest.fn() as jest.Mock;
+    window.alert = jest.fn();
+  });
+
+  afterEach(() => {
+    jest.clearAllMocks();
+    delete (global as any).fetch;
+    delete (window as any).alert;
+  });
+
+  test("saveEdits alerts when the trusted request fails and re-enables the buttons", async () => {
+    (global.fetch as jest.Mock).mockResolvedValue({
+      ok: true,
+      json: () => Promise.resolve([]),
+    });
+    const makeTrustedRequest = jest.fn().mockRejectedValue(new Error("boom"));
+
+    render(
+      <AwardsTab selectedEvent="2020test" makeTrustedRequest={makeTrustedRequest} />
+    );
+    fireEvent.click(screen.getByRole("button", { name: "Fetch Awards" }));
+    await waitFor(() => {
+      expect(screen.getByRole("button", { name: "Save Edits" })).toBeEnabled();
+    });
+
+    fireEvent.click(screen.getByRole("button", { name: "Save Edits" }));
+
+    await waitFor(() => {
+      expect(window.alert).toHaveBeenCalledWith("There was an error: Error: boom");
+    });
+    expect(makeTrustedRequest).toHaveBeenCalledWith(
+      "/api/trusted/v1/event/2020test/awards/update",
+      "[]"
+    );
+    expect(screen.getByRole("button", { name: "Save Edits" })).toBeEnabled();
+    expect(screen.getByRole("button", { name: "Fetch Awards" })).toBeEnabled();
+  });
+});

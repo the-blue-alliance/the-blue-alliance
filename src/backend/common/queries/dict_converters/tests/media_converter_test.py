@@ -3,6 +3,7 @@ import json
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.media_type import MediaType
 from backend.common.models.media import Media
 from backend.common.queries.dict_converters.media_converter import MediaConverter
@@ -180,3 +181,87 @@ def test_mediaConverter_v3_smugmug_album(ndb_context) -> None:
     )
     assert result["direct_url"] == "https://photos.smugmug.com/L/cover-L.png"
     assert result["team_keys"] == []
+
+
+def test_mediaConverter_v3_instagram_image(ndb_context) -> None:
+    media = Media(
+        id="instagram-image_BUnZiriBYre",
+        media_type_enum=MediaType.INSTAGRAM_IMAGE,
+        foreign_key="BUnZiriBYre",
+        references=[ndb.Key("Team", "frc195")],
+    )
+    result = MediaConverter.mediaConverter_v3(media)
+    assert result["type"] == "instagram-image"
+    assert result["view_url"] == "https://www.instagram.com/p/BUnZiriBYre"
+    assert result["direct_url"] == "https://www.instagram.com/p/BUnZiriBYre"
+
+
+def test_mediaConverter_v3_onshape_non_string_model_created_is_none(
+    ndb_context,
+) -> None:
+    media = Media(
+        id="onshape_abc123",
+        media_type_enum=MediaType.ONSHAPE,
+        foreign_key="abc123",
+        details_json=json.dumps(
+            {
+                "model_name": "Robot",
+                "model_description": "",
+                "model_image": "https://cad.onshape.com/api/thumbnails/d/abc123/s/300x300",
+                "model_created": 1569370369,
+            }
+        ),
+        references=[ndb.Key("Team", "frc4")],
+    )
+    result = MediaConverter.mediaConverter_v3(media)
+    assert result["details"]["model_created"] is None
+
+
+def test_convert_list(ndb_context) -> None:
+    media = Media(
+        id="youtube_abc",
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        foreign_key="abc",
+        references=[ndb.Key("Team", "frc4")],
+    )
+    converted = MediaConverter([media]).convert(ApiMajorVersion.API_V3)
+    assert converted == [MediaConverter.mediaConverter_v3(media)]
+
+
+def test_dictToModel_v3_with_team(ndb_context) -> None:
+    media = MediaConverter.dictToModel_v3(
+        {
+            "type": "youtube",
+            "foreign_key": "abc",
+            "details": {"foo": "bar"},
+            "preferred": True,
+        },
+        2020,
+        "frc254",
+    )
+
+    assert media.key.id() == Media.render_key_name(MediaType.YOUTUBE_VIDEO, "abc")
+    assert media.media_type_enum == MediaType.YOUTUBE_VIDEO
+    assert media.foreign_key == "abc"
+    assert media.details == {"foo": "bar"}
+    assert media.references == [ndb.Key("Team", "frc254")]
+    assert media.preferred_references == [ndb.Key("Team", "frc254")]
+    assert media.year == 2020
+
+
+def test_dictToModel_v3_without_team(ndb_context) -> None:
+    media = MediaConverter.dictToModel_v3(
+        {
+            "type": "imgur",
+            "foreign_key": "xyz",
+            "details": {},
+            "preferred": True,
+        },
+        None,
+        None,
+    )
+
+    assert media.media_type_enum == MediaType.IMGUR
+    assert media.references == []
+    assert media.preferred_references == []
+    assert media.year is None

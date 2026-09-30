@@ -329,7 +329,8 @@ class FMSAPIHybridScheduleParser(
                         # Unreachable today: null teams are skipped when building
                         # team_key_names above, so "frcNone" never appears. Kept
                         # because that skip looks like a regression and this
-                        # repair is what a fix would re-enable.
+                        # repair is what a fix would re-enable. See Bug #10840-f
+                        # (PR #10930), whose test covers this block.
                         if "frcNone" in match.team_key_names:  # pragma: no cover
                             if level == "sf":
                                 red_seed, blue_seed = QF_SF_MAP[match.match_number]

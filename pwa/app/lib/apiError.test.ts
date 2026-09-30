@@ -28,3 +28,15 @@ describe('mapClientError', () => {
     expect(mapClientError(error, undefined)).toBe(error);
   });
 });
+
+describe('mapClientError without status text', () => {
+  test('falls back to the status code as the message', () => {
+    const error = mapClientError(
+      new Error('boom'),
+      new Response(null, { status: 404 }),
+    ) as ApiError;
+
+    expect(error.message).toBe('404');
+    expect(error.status).toBe(404);
+  });
+});

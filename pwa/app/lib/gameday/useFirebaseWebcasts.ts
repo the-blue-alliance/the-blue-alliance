@@ -3,6 +3,7 @@ import { onValue, ref } from 'firebase/database';
 import { useEffect, useMemo } from 'react';
 
 import { getDatabaseInstance } from '~/firebase/firebaseConfig';
+import { firebaseOnlyQueryFn } from '~/lib/gameday/firebaseQuery';
 import {
   type FirebaseLiveEvent,
   type FirebaseSpecialWebcast,
@@ -74,11 +75,11 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   // setQueryData is called for the first time (i.e. Firebase hasn't responded yet).
   // TanStack Query v5 requires a queryFn even when enabled: false. These queries
   // are never fetched — data is written exclusively via setQueryData in the
-  // Firebase subscription above. The queryFn placeholder satisfies the requirement.
+  // Firebase subscription above. firebaseOnlyQueryFn satisfies the requirement.
   const { data: liveEventsData, isPending: liveEventsPending } =
     useQuery<Record<string, FirebaseLiveEvent> | null>({
       queryKey: [...FIREBASE_LIVE_EVENTS_QUERY_KEY],
-      queryFn: () => null,
+      queryFn: firebaseOnlyQueryFn,
       enabled: false,
       staleTime: Infinity,
     });
@@ -86,7 +87,7 @@ export function useFirebaseWebcasts(): UseFirebaseWebcastsResult {
   const { data: specialWebcastsData, isPending: specialWebcastsPending } =
     useQuery<Record<string, FirebaseSpecialWebcast> | null>({
       queryKey: [...FIREBASE_SPECIAL_WEBCASTS_QUERY_KEY],
-      queryFn: () => null,
+      queryFn: firebaseOnlyQueryFn,
       enabled: false,
       staleTime: Infinity,
     });
