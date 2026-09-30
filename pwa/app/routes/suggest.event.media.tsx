@@ -53,7 +53,8 @@ export const Route = createFileRoute('/suggest/event/media')({
   component: SuggestEventMedia,
 });
 
-type SubmitStatus = 'idle' | EventMediaSuggestionResponse['status'] | 'error';
+type SubmitStatus = 'idle' | EventMediaSuggestionResponse['status'] | 'error'; // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SuggestEventMedia(): JSX.Element {
   const { event_key } = Route.useSearch();

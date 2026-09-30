@@ -534,3 +534,8 @@ def test_renamed_district_uses_latest_code(ndb_stub) -> None:
 
     district_insight = next(i for i in insights if i.district_abbreviation is not None)
     assert district_insight.district_abbreviation == "fma"
+
+
+def test_build_timeseries_data_without_matches() -> None:
+    data = HighScoreOverTimeV2Calculator()._build_timeseries_data()
+    assert data["series"] == []
