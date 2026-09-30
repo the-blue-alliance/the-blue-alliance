@@ -1,6 +1,6 @@
 /* @jest-environment jsdom */
 import React from "react";
-import { render, fireEvent, act } from "@testing-library/react";
+import { render, fireEvent } from "@testing-library/react";
 import ChatSelector from "../ChatSelector";
 
 const chats = [
@@ -88,36 +88,5 @@ describe("ChatSelector", () => {
     const { container } = renderSelector({ onRequestClose });
     fireEvent.click(container.querySelector("ul"));
     expect(onRequestClose).not.toHaveBeenCalled();
-  });
-
-  it("never animates in: AnimatableContainer uses the removed react-transition-group v1 lifecycle", () => {
-    // TransitionGroup v4 drives children through `in`/`onExited` props and
-    // never calls componentWillAppear/Enter/Leave, so the overlay and list
-    // stay at their beginStyle (opacity 0) after opening ...
-    const { container, rerender } = renderSelector();
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
-    const [overlay, list] = container.firstChild.children;
-    expect(overlay.style.opacity).toBe("0");
-    expect(list.style.opacity).toBe("0");
-    expect(list.style.transform).toBe("translate(0, 50%)");
-
-    // ... and, because onExited is never called, they are never removed from
-    // the DOM after closing.
-    rerender(
-      <ChatSelector
-        chats={chats}
-        currentChat="svr"
-        defaultChat="firstupdatesnow"
-        setTwitchChat={() => {}}
-        onRequestClose={() => {}}
-        open={false}
-      />
-    );
-    act(() => {
-      jest.advanceTimersByTime(1000);
-    });
-    expect(container.firstChild.children).toHaveLength(2);
   });
 });

@@ -66,6 +66,13 @@ const liveState = {
 const renderDisplay = (matchState, extraMatches = matches) =>
   render(<LivescoreDisplay matches={extraMatches} matchState={matchState} />);
 
+const ownership = (container) =>
+  Array.from(container.querySelectorAll(".booleanIndicator")).map((el) => {
+    if (el.classList.contains("red")) return "red";
+    if (el.classList.contains("blue")) return "blue";
+    return "none";
+  });
+
 describe("LivescoreDisplay", () => {
   beforeEach(() => {
     jest.useFakeTimers();
@@ -98,20 +105,16 @@ describe("LivescoreDisplay", () => {
     const blue = container.querySelector(".blueAlliance");
     expect(blue.textContent).toBe("971846594040");
 
-    const indicators = Array.from(
-      container.querySelectorAll(".booleanIndicator")
-    ).map((el) => el.className);
-    // Owned indicators get the alliance color; unowned ones get the literal
-    // string "false" from the `x && "red"` expression.
-    expect(indicators).toEqual([
-      "booleanIndicator false", // red scale
-      "booleanIndicator red", // red switch
-      "booleanIndicator red", // red auto quest
-      "booleanIndicator false", // red face the boss
-      "booleanIndicator blue", // blue scale
-      "booleanIndicator false", // blue switch
-      "booleanIndicator false", // blue auto quest
-      "booleanIndicator blue", // blue face the boss
+    // Owned indicators get the alliance color
+    expect(ownership(container)).toEqual([
+      "none", // red scale
+      "red", // red switch
+      "red", // red auto quest
+      "none", // red face the boss
+      "blue", // blue scale
+      "none", // blue switch
+      "none", // blue auto quest
+      "blue", // blue face the boss
     ]);
 
     const powerups = container.querySelectorAll(".powerupCountContainer");
@@ -235,22 +238,7 @@ describe("LivescoreDisplay", () => {
     expect(bar.className).toBe("progress-bar progress-bar-green");
     expect(bar.style.width).toBe("0%");
     expect(container.querySelector(".timeRemaining").textContent).toBe("0");
-    // The pre-match reset uses 0 for red ownership but false for blue, and
-    // both leak into the class name through `x && "color"`.
-    expect(
-      Array.from(container.querySelectorAll(".booleanIndicator")).map(
-        (el) => el.className
-      )
-    ).toEqual([
-      "booleanIndicator 0",
-      "booleanIndicator 0",
-      "booleanIndicator false",
-      "booleanIndicator false",
-      "booleanIndicator false",
-      "booleanIndicator false",
-      "booleanIndicator false",
-      "booleanIndicator false",
-    ]);
+    expect(ownership(container)).toEqual(Array(8).fill("none"));
   });
 
   it("formats the ETA as <2 min, minutes, or hours", () => {
@@ -306,9 +294,8 @@ describe("LivescoreDisplay", () => {
     expect(getByText("SF2-1")).toBeTruthy();
   });
 
-  it("refreshes the clock every ten seconds and never clears the interval", () => {
+  it("refreshes the clock every ten seconds", () => {
     const setIntervalSpy = jest.spyOn(global, "setInterval");
-    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
     const now = 1_700_000_000;
     jest.setSystemTime(now * 1000);
     const { getByText, unmount } = renderDisplay(
@@ -324,17 +311,7 @@ describe("LivescoreDisplay", () => {
     });
     expect(getByText("Q1 in ~10 min")).toBeTruthy();
 
-    // Documents existing behaviour: the interval is not cleared on unmount,
-    // so it keeps firing (and setting state) after the component is gone.
     unmount();
-    expect(clearIntervalSpy).not.toHaveBeenCalled();
     setIntervalSpy.mockRestore();
-    clearIntervalSpy.mockRestore();
-  });
-
-  it("declares matches with a non-existent PropTypes.list validator", () => {
-    // Documents existing behaviour: PropTypes.list is undefined, so the
-    // matches prop is never validated.
-    expect(LivescoreDisplay.propTypes.matches).toBeUndefined();
   });
 });

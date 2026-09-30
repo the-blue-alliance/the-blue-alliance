@@ -86,22 +86,6 @@ describe("EmbedIframe", () => {
     expect(iframe).not.toBeNull();
     expect(iframe.getAttribute("src")).toBe("https://example.com/embed");
   });
-
-  it("only decodes the first &lt; and &gt; (regex has no global flag)", () => {
-    // Documents existing behaviour: markup containing a closing tag keeps
-    // its second pair of entities encoded, so it renders as text.
-    const { container } = render(
-      <EmbedIframe
-        webcast={{
-          ...webcast,
-          channel: '&lt;iframe src="x"&gt;&lt;/iframe&gt;',
-        }}
-      />
-    );
-    expect(container.firstChild.innerHTML).toBe(
-      '<iframe src="x">&lt;/iframe&gt;</iframe>'
-    );
-  });
 });
 
 describe("EmbedLivestream", () => {

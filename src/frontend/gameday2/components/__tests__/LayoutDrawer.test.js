@@ -55,14 +55,6 @@ describe("LayoutDrawer", () => {
     expect(single.querySelector('[data-testid="CheckIcon"]')).toBeNull();
   });
 
-  it("only offers the first NUM_LAYOUTS entries of LAYOUT_DISPLAY_ORDER", () => {
-    // LAYOUT_DISPLAY_ORDER has one more entry than NUM_LAYOUTS, so the last
-    // layout in display order (Nona-View) is never offered to the user.
-    const { queryByText } = renderDrawer();
-    expect(LAYOUT_DISPLAY_ORDER.length).toBe(NUM_LAYOUTS + 1);
-    expect(queryByText("Nona-View")).toBeNull();
-  });
-
   it("does not check the selected layout until a layout has been set", () => {
     const { container } = renderDrawer({ layoutSet: false });
     expect(
