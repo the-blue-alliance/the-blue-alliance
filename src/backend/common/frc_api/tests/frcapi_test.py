@@ -503,6 +503,22 @@ def test_merge_schedule_without_results() -> None:
     }
 
 
+def test_bug_32_merge_match_capitalized_teams() -> None:
+    """
+    Bug #32: when the schedule uses "Teams" (capitalised), _merge_match
+    detects teams_key == "Teams" but then looks up scheduled["teams"] while
+    merging the result's "Teams", raising KeyError.
+
+    Correct: the result's team fields merge into the matching scheduled team
+    under whichever key the schedule uses.
+    """
+    scheduled = {"Teams": [{"teamNumber": 254, "station": "Red1"}]}
+    merged = FRCAPI._merge_match(
+        scheduled, {"Teams": [{"teamNumber": 254, "dq": False}]}
+    )
+    assert merged["Teams"] == [{"teamNumber": 254, "station": "Red1", "dq": False}]
+
+
 def test_merge_match_placeholder_teams() -> None:
     scheduled = {
         "teams": [
