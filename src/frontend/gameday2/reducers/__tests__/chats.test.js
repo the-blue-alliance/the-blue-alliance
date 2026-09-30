@@ -142,6 +142,23 @@ describe("chats reducer webcast and default chat handling", () => {
     expect(state.defaultChat).toBe("silicon_valley");
   });
 
+  it("Bug #45: keeps the page's default chat across WEBCASTS_UPDATED", () => {
+    // Wrong today: every WEBCASTS_UPDATED resets defaultChat to
+    // "firstupdatesnow", discarding the default set from the page's
+    // default_chat.
+    // Correct: defaultChat is preserved while that chat still exists.
+    let state = freshChats(undefined, {
+      type: types.WEBCASTS_UPDATED,
+      webcasts,
+    });
+    state = freshChats(state, {
+      type: types.SET_DEFAULT_TWITCH_CHAT,
+      channel: "silicon_valley",
+    });
+    state = freshChats(state, { type: types.WEBCASTS_UPDATED, webcasts });
+    expect(state.defaultChat).toBe("silicon_valley");
+  });
+
   it("ignores SET_TWITCH_CHAT for an unknown channel", () => {
     const state = freshChats(undefined, {});
     expect(
