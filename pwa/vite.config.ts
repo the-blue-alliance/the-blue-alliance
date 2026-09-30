@@ -54,6 +54,11 @@ export default defineConfig({
   plugins: [
     tanstackStart({
       srcDirectory: 'app',
+      router: {
+        // Vitest unit tests sit beside the route modules they cover; keep the
+        // route generator from treating them as routes.
+        routeFileIgnorePattern: '\\.test\\.tsx?$',
+      },
       prerender: {
         enabled: true,
         filter: ({ path }) => staticRoutes.includes(path),
