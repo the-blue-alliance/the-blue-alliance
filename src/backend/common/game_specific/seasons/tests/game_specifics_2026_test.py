@@ -479,9 +479,13 @@ def test_bug_21_auto_climb_counters_agree() -> None:
 
     Correct: a missing key is not a climb, and both use 4 opportunities per
     match, because only 2 ROBOTS per ALLIANCE may earn LEVEL 1 TOWER points in
-    AUTO. 2026 Game Manual, Version TU22 (2026-05-07), Section 6.5.2 ROBOT
-    Scoring Criteria and Section 6.5.3, Table 6-4 "Each ROBOT at LEVEL 1
-    (2 ROBOTS max in AUTO)":
+    AUTO. 2026 Game Manual, Version TU22 (2026-05-07), Section 6.5.3 Point
+    Values, Table 6-4, p. 47:
+
+        TOWER Each ROBOT at LEVEL 1 (2 ROBOTS max in AUTO) 15
+
+    and Section 6.5.2 ROBOT Scoring Criteria, p. 46: "A ROBOT may only earn
+    TOWER points for LEVEL 1 during AUTO."
     https://firstfrc.blob.core.windows.net/frc2026/Manual/2026GameManual.pdf
     """
     breakdown = json.loads(
@@ -497,3 +501,19 @@ def test_bug_21_auto_climb_counters_agree() -> None:
     qual = none_throws(_insights([match])["qual"])
     assert qual["auto_climb_count"] == [1, 4, 25.0]
     assert _measure(match)["auto_climb"] == (1, 4)
+
+
+def test_bug_21_auto_climbs_capped_at_two_per_alliance() -> None:
+    """
+    Table 6-4 (2026 Game Manual, TU22): "Each ROBOT at LEVEL 1 (2 ROBOTS max in
+    AUTO)", so a third AUTO climb in one ALLIANCE never counts.
+    """
+    match = _build_match(
+        30,
+        10,
+        red={f"autoTowerRobot{i}": "Level1" for i in (1, 2, 3)},
+        blue={"autoTowerRobot1": "Level1"},
+    )
+    qual = none_throws(_insights([match])["qual"])
+    assert qual["auto_climb_count"] == [3, 4, 75.0]
+    assert _measure(match)["auto_climb"] == (3, 4)
