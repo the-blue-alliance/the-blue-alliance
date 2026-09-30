@@ -202,3 +202,30 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     unplayed = build_match("2024test", "qm", 1, -1, -1, None)
     assert _insights([]) == {"qual": None, "playoff": None}
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
+
+
+def test_bug_19_rp_sweep_requires_melody_and_ensemble() -> None:
+    """
+    Bug #19: the 2024 four/six RP sweep counters test melodyBonusAchieved
+    twice and never read ensembleBonusAchieved, so a winner with only the
+    MELODY RP is counted as a 4 RP sweep (and two MELODY-only alliances as a
+    6 RP match).
+
+    Correct: a 4 RP sweep is WIN (2 RP) + MELODY (1 RP) + ENSEMBLE (1 RP), per
+    the 2024 Game Manual, Section 6.5.6 Point Values, Table 6-2 (Section 6 at
+    V10, manual of 2024-04-09):
+    https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
+    """
+    melody_only = {"melodyBonusAchieved": True, "ensembleBonusAchieved": False}
+    both = {"melodyBonusAchieved": True, "ensembleBonusAchieved": True}
+    matches = [
+        # Red wins with only the MELODY RP: 3 RP, not a sweep.
+        build_match(
+            "2024test", "qm", 1, 30, 10, {"red": melody_only, "blue": melody_only}
+        ),
+        # Red wins with both bonus RPs: a 4 RP sweep, but blue has no bonus RP.
+        build_match("2024test", "qm", 2, 30, 10, {"red": both, "blue": {}}),
+    ]
+    qual = none_throws(_insights(matches)["qual"])
+    assert qual["four_rp_count"] == [1, 2, 50.0]
+    assert qual["six_rp_count"] == [0, 2, 0.0]
