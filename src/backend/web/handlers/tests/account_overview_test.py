@@ -468,6 +468,9 @@ def test_has_review_permissions(
 
     if has_review_permissions:
         assert review_permissions_row
+        # The review UI moved to the PWA; the Jinja page no longer exists
+        link = review_permissions_row.find(id="review-pending-suggestions-link")
+        assert link["href"] == "https://beta.thebluealliance.com/suggest/review"
     else:
         assert review_permissions_row is None
 

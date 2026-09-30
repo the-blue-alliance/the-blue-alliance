@@ -9,6 +9,7 @@ import type {
   ModerationSuggestion,
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
+import { EventType } from '~/api/tba/read';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -22,6 +23,7 @@ import {
   formatEventDateRange,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  resolveUserMessage,
   socialProfileWarning,
 } from '~/lib/moderationUtils';
 
@@ -37,6 +39,22 @@ interface SuggestionReviewCardProps {
   hideEventContext?: boolean;
   /** Highlight this card as the keyboard-navigation target. */
   focused?: boolean;
+}
+
+// Event types an accepted offseason-event suggestion can become. The
+// suggestion carries a type derived from its dates (Jan/Feb -> preseason);
+// the API uses that unless the moderator overrides it, so the select shows
+// the same default.
+export const OFFSEASON_EVENT_TYPE_OPTIONS = [
+  { value: EventType.OFFSEASON, label: 'Offseason' },
+  { value: EventType.PRESEASON, label: 'Preseason' },
+] as const;
+
+export function suggestedEventType(contentsEventType: string): number {
+  const parsed = Number(contentsEventType);
+  return parsed === EventType.PRESEASON
+    ? EventType.PRESEASON
+    : EventType.OFFSEASON;
 }
 
 // The write auth types moderators can grant for api_auth_access suggestions,
@@ -930,6 +948,32 @@ function OffseasonEventDetails({
           value={field('end_date', 'end_date')}
           onChange={setField('end_date')}
         />
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium text-muted-foreground">
+            Event type (Preseason: Jan-Feb, Offseason: Mar+)
+          </span>
+          <select
+            className="h-9 rounded-md border border-input bg-transparent px-3
+              text-sm"
+            aria-label="Event type"
+            value={
+              overrides.event_type_enum ??
+              suggestedEventType(contentsString(suggestion, 'event_type'))
+            }
+            onChange={(e) =>
+              onOverridesChange({
+                ...overrides,
+                event_type_enum: Number(e.target.value),
+              })
+            }
+          >
+            {OFFSEASON_EVENT_TYPE_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
         <LabeledInput
           label="Website"
           value={field('website', 'website')}
@@ -1076,14 +1120,12 @@ function ApiWriteDetails({
       </div>
       <label className="flex max-w-xl flex-col gap-1 text-sm">
         <span className="font-medium text-muted-foreground">
-          Message for the user (included in the admin alert email)
+          Message for the requester (emailed to them with the verdict)
         </span>
         <textarea
           className="min-h-20 rounded-md border border-input bg-transparent p-2
             text-sm"
-          value={
-            overrides.user_message ?? 'Thanks for helping make TBA better!'
-          }
+          value={resolveUserMessage(overrides)}
           onChange={(e) =>
             onOverridesChange({ ...overrides, user_message: e.target.value })
           }

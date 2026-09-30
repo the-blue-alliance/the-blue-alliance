@@ -7,6 +7,16 @@ queue:
 - name: cache-clearing
   rate: 5/s
 
+# Outbound email/Slack for suggestions. Sends are retried with backoff so a
+# transient mail or webhook failure does not lose the notification.
+- name: notifications
+  rate: 10/s
+  retry_parameters:
+    task_retry_limit: 5
+    task_age_limit: 1d
+    min_backoff_seconds: 30
+    max_backoff_seconds: 600
+
 - name: api-track-call
   rate: 500/s
   retry_parameters:

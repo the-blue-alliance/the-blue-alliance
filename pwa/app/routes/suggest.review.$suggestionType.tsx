@@ -34,6 +34,7 @@ import {
   defaultSetPreferred,
   formatEventDateRange,
   groupSuggestionsByTargetKey,
+  resolveUserMessage,
   summarizeReviewOutcomes,
 } from '~/lib/moderationUtils';
 
@@ -256,17 +257,26 @@ function SuggestionReviewList(): JSX.Element {
         }
         // Likewise the expiration dropdown: always send what the moderator
         // saw, so the server default never decides a key's lifetime.
-        if (
-          suggestionType === SuggestionType.API_AUTH_ACCESS &&
-          acceptOverrides.expiration_days === undefined
-        ) {
-          acceptOverrides.expiration_days = DEFAULT_EXPIRATION_DAYS;
+        if (suggestionType === SuggestionType.API_AUTH_ACCESS) {
+          if (acceptOverrides.expiration_days === undefined) {
+            acceptOverrides.expiration_days = DEFAULT_EXPIRATION_DAYS;
+          }
+          // The message box shows a default; send what the moderator saw
+          acceptOverrides.user_message = resolveUserMessage(acceptOverrides);
         }
         return { key: s.key, overrides: acceptOverrides };
       });
     const rejects = suggestions
       .filter((s) => decisions[s.key] === 'reject')
-      .map((s) => s.key);
+      .map((s) => ({
+        key: s.key,
+        // Only API key requesters are told the verdict; send what the
+        // moderator saw in the message box, default included
+        userMessage:
+          suggestionType === SuggestionType.API_AUTH_ACCESS
+            ? resolveUserMessage(overrides[s.key])
+            : undefined,
+      }));
     submission.mutate(
       { accepts, rejects },
       {
