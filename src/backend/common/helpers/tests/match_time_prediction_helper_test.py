@@ -133,3 +133,77 @@ def test_nexus_prediction_ignored_when_no_matches_played_today(
     assert (
         time_diff < 60
     ), f"Predicted time {predicted} should be close to scheduled time {scheduled}, but diff is {time_diff} seconds"
+
+
+def _nyny_matches(test_data_importer) -> List[Match]:
+    matches = test_data_importer.parse_match_list(
+        __file__, "data/2019nyny_matches.json"
+    )
+    return MatchHelper.play_order_sorted_matches(matches)
+
+
+def test_nothing_to_predict_without_unplayed_matches(
+    test_data_importer, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    matches = _nyny_matches(test_data_importer)
+    before = [m.predicted_time for m in matches]
+
+    MatchTimePredictionHelper.predict_future_matches(
+        "2019nyny",
+        matches,
+        [],
+        none_throws(tz.gettz("America/New_York")),
+        False,
+        None,
+    )
+
+    assert [m.predicted_time for m in matches] == before
+
+
+def test_unplayed_match_without_a_scheduled_time_is_skipped(
+    test_data_importer, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    matches = _nyny_matches(test_data_importer)
+    [_mark_match_unplayed(m) for m in matches[2:]]
+    untimed = matches[3]
+    untimed.time = None
+
+    MatchTimePredictionHelper.predict_future_matches(
+        "2019nyny",
+        matches[:2],
+        matches[2:],
+        none_throws(tz.gettz("America/New_York")),
+        False,
+        None,
+    )
+
+    assert untimed.predicted_time is None
+    assert matches[2].predicted_time is not None
+    assert matches[4].predicted_time is not None
+
+
+def test_zero_average_cycle_time_shifts_the_schedule_instead_of_chaining(
+    test_data_importer,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    """A 0s average (e.g. FMS reporting identical start times) is falsy but not
+    None, so predictions fall back to scheduled time plus the first match's lag
+    rather than chaining off the previous prediction."""
+    matches = _nyny_matches(test_data_importer)
+    [_mark_match_unplayed(m) for m in matches[2:]]
+    monkeypatch.setattr(
+        MatchTimePredictionHelper,
+        "compute_average_cycle_time",
+        classmethod(lambda cls, played, next_match, timezone: 0.0),
+    )
+    timezone = none_throws(tz.gettz("America/New_York"))
+
+    MatchTimePredictionHelper.predict_future_matches(
+        "2019nyny", matches[:2], matches[2:], timezone, False, None
+    )
+
+    # Not live, so "now" is the epoch and the first-match lag clamps to zero:
+    # every same-day, same-level prediction is its scheduled time.
+    for match in matches[2:6]:
+        assert match.predicted_time == match.time
