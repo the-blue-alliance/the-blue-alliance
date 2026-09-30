@@ -619,6 +619,28 @@ def test_parse_team_with_null_station(ndb_stub) -> None:
     assert matches[0].alliances[AllianceColor.BLUE]["teams"] == []
 
 
+def test_parse_null_station_in_full_match(ndb_stub) -> None:
+    """
+    Bug #10840-e: a null station in a multi-team match should be handled the
+    same way as in a single-team match (counted in team_key_names, on neither
+    alliance), instead of crashing the station sort with a TypeError.
+    """
+    _put_event()
+    teams = _default_teams()
+    teams[2] = _team(3, None)
+    matches, _ = _parse([_schedule_match(teams=teams)])
+    assert len(matches) == 1
+    assert sorted(matches[0].team_key_names) == sorted(
+        ["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"]
+    )
+    assert matches[0].alliances[AllianceColor.RED]["teams"] == ["frc1", "frc2"]
+    assert matches[0].alliances[AllianceColor.BLUE]["teams"] == [
+        "frc4",
+        "frc5",
+        "frc6",
+    ]
+
+
 def test_parse_skips_match_without_start_time(ndb_stub) -> None:
     """Matches with no startTime are unneeded rubber matches and are skipped."""
     _put_event()
