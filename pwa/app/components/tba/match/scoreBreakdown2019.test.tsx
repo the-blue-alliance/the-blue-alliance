@@ -355,12 +355,9 @@ describe('ScoreBreakdown2019 game pieces', () => {
 });
 
 describe('ScoreBreakdown2019 endgame', () => {
-  // The 2019 game awarded 3 / 6 / 12 points for HAB levels 1 / 2 / 3, but the
-  // component's ENDGAME_2019_POINTS table has 3 / 3 / 6. These cases pin the
-  // values the component shows today, not the correct ones.
+  // HAB Level 2 and Level 3 point values are covered by the Bug #52
+  // failing-test PR.
   test.each([
-    { value: EndgameRobot2019.HAB_LEVEL3, expected: '254HAB 3 (+6)' },
-    { value: EndgameRobot2019.HAB_LEVEL2, expected: '254HAB 2 (+3)' },
     { value: EndgameRobot2019.HAB_LEVEL1, expected: '254HAB 1 (+3)' },
     { value: EndgameRobot2019.NONE, expected: '254None (+0)' },
     { value: EndgameRobot2019.UNKNOWN, expected: '254Unknown (+0)' },
@@ -409,14 +406,14 @@ describe('ScoreBreakdown2019 endgame', () => {
       <ScoreBreakdown2019
         scoreBreakdown={makeBreakdown(
           { endgameRobot3: EndgameRobot2019.NONE },
-          { endgameRobot3: EndgameRobot2019.HAB_LEVEL3 },
+          { endgameRobot3: EndgameRobot2019.HAB_LEVEL1 },
         )}
         match={match}
       />,
     );
 
     expect(redCell('Robot 3 Endgame').textContent).toBe('971None (+0)');
-    expect(blueCell('Robot 3 Endgame').textContent).toBe('118HAB 3 (+6)');
+    expect(blueCell('Robot 3 Endgame').textContent).toBe('118HAB 1 (+3)');
   });
 });
 

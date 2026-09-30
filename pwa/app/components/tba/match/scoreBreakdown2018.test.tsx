@@ -408,16 +408,14 @@ describe('ScoreBreakdown2018 endgame', () => {
 });
 
 describe('ScoreBreakdown2018 fouls', () => {
-  // Unlike the 2016, 2017, 2019 and 2020 breakdowns, which show the
-  // opponent's committed fouls under each alliance, the 2018 breakdown shows
-  // each alliance's own foulCount even though the row is labelled
-  // "Fouls Received". This test pins the current behaviour.
-  test("shows the alliance's own foul counts under it", () => {
+  // Both alliances get identical counts here: which alliance's counts belong
+  // under which column is Bug #54, covered by its own failing-test PR.
+  test('values fouls at 5 points each', () => {
     render(
       <ScoreBreakdown2018
         scoreBreakdown={makeBreakdown(
-          { foulCount: 2, techFoulCount: 1 },
-          { foulCount: 4, techFoulCount: 0 },
+          { foulCount: 2, techFoulCount: 0 },
+          { foulCount: 2, techFoulCount: 0 },
         )}
         match={match}
       />,
@@ -425,14 +423,17 @@ describe('ScoreBreakdown2018 fouls', () => {
 
     expect(within(redCell('Fouls Received')).getByText('2 (+10)')).toBeTruthy();
     expect(
-      within(blueCell('Fouls Received')).getByText('4 (+20)'),
+      within(blueCell('Fouls Received')).getByText('2 (+10)'),
     ).toBeTruthy();
   });
 
   test('values tech fouls at 25 points each', () => {
     render(
       <ScoreBreakdown2018
-        scoreBreakdown={makeBreakdown({ techFoulCount: 2 })}
+        scoreBreakdown={makeBreakdown(
+          { techFoulCount: 2 },
+          { techFoulCount: 2 },
+        )}
         match={match}
       />,
     );
@@ -474,23 +475,6 @@ describe('ScoreBreakdown2018 adjustments', () => {
         scoreBreakdown={makeBreakdown(
           { adjustPoints: undefined },
           { adjustPoints: undefined },
-        )}
-        match={match}
-      />,
-    );
-
-    expect(screen.queryByText('Adjustments')).toBeNull();
-  });
-
-  // The row is gated on both alliances having a non-zero adjustment, so an
-  // adjustment applied to only one alliance is never shown. This pins the
-  // current behaviour; the gate should almost certainly be "either".
-  test('hides the adjustments row when only one alliance was adjusted', () => {
-    render(
-      <ScoreBreakdown2018
-        scoreBreakdown={makeBreakdown(
-          { adjustPoints: 10 },
-          { adjustPoints: 0 },
         )}
         match={match}
       />,
