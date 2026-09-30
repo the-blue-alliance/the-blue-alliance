@@ -35,6 +35,18 @@ export default defineConfig({
     restoreMocks: true,
     unstubEnvs: true,
     unstubGlobals: true,
+    coverage: {
+      // Measure every source file, not only the ones a test happens to
+      // import, so untested modules show up as 0% instead of vanishing.
+      include: ['app/**/*.{ts,tsx}'],
+      exclude: [
+        'app/**/*.test.{ts,tsx}',
+        'app/**/*.d.ts',
+        // Generated: the OpenAPI client and the TanStack route tree.
+        'app/**/*.gen.ts',
+        'app/api/**',
+      ],
+    },
   },
   resolve: {
     tsconfigPaths: true,
