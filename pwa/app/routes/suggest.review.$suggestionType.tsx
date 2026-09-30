@@ -121,7 +121,8 @@ export const Route = createFileRoute('/suggest/review/$suggestionType')({
     },
   },
   component: SuggestionReviewList,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SuggestionReviewList(): JSX.Element {
   const { suggestionType } = Route.useParams();
