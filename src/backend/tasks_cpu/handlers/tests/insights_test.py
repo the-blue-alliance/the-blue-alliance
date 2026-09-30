@@ -596,3 +596,19 @@ def test_do_insights_v2_delete_by_name_and_year(tasks_cpu_client: Client) -> Non
 
     remaining = InsightV2.query().fetch()
     assert [insight.year for insight in remaining] == [2026]
+
+
+def test_bug_14_unknown_overall_insight_kind_outside_taskqueue_is_not_found(
+    tasks_cpu_client: Client,
+) -> None:
+    """Bug #14: an unknown overall-insight kind 500s outside the task queue.
+
+    Today do_overall_insights leaves insights=None for an unknown kind and
+    overall_insights_do.html does `{% for insight in insights %}`, raising
+    TypeError: 'NoneType' object is not iterable, so the request 500s.
+    Correct: an unknown kind is a client error (404, like the other insight
+    routes, or 400), never a 500, and nothing is written.
+    """
+    resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/overallinsights/asdf")
+    assert resp.status_code in (400, 404)
+    assert Insight.query().count() == 0
