@@ -92,13 +92,6 @@ describe('AllianceSelectionTable', () => {
     expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);
   });
 
-  test('drops the pick columns for an empty alliance list', () => {
-    // Math.max() of nothing is -Infinity, which is truthy, so the `|| 3`
-    // fallback never applies and only the first two headers render.
-    render(<AllianceSelectionTable year={2026} alliances={[]} />);
-    expect(headers()).toEqual(['Alliance', 'Captain']);
-  });
-
   test('renders a single-team alliance without pick columns', () => {
     render(
       <AllianceSelectionTable

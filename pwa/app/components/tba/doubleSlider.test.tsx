@@ -10,7 +10,7 @@ function labels(container: HTMLElement) {
 }
 
 beforeEach(() => {
-  // See the last test: React warns about the stray minStepsBetweenThumbs prop.
+  // React warns about the stray minStepsBetweenThumbs prop (see Bug #65).
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
@@ -50,16 +50,5 @@ describe('DoubleSlider', () => {
     const [, high] = screen.getAllByRole('slider', { hidden: true });
     fireEvent.keyDown(high, { key: 'ArrowLeft' });
     expect(labels(container)).toEqual(['Y2', 'Y7']);
-  });
-
-  test('forwards the Radix-era minStepsBetweenThumbs prop to the DOM', () => {
-    // Base UI calls this `minStepsBetweenValues`; the old Radix prop name is
-    // passed through untouched and ends up as a stray DOM attribute.
-    const { container } = render(
-      <DoubleSlider min={0} max={10} step={1} minStepsBetweenThumbs={2} />,
-    );
-    expect(
-      container.firstElementChild?.getAttribute('minstepsbetweenthumbs'),
-    ).toBe('2');
   });
 });

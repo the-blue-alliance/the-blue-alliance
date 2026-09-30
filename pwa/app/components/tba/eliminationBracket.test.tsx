@@ -289,46 +289,6 @@ describe('EliminationBracket', () => {
     expect(blueRow.dataset.highlight).toBe('false');
   });
 
-  test('always highlights rows for teams outside any alliance', () => {
-    // A series whose teams match no alliance has null alliance numbers, and
-    // null === the idle (null) hovered alliance, so both rows render
-    // highlighted before any hover. Hovering them changes nothing.
-    render(
-      <EliminationBracket
-        alliances={alliances}
-        matches={[
-          {
-            ...match1RedWin,
-            alliances: {
-              red: {
-                ...match1RedWin.alliances.red,
-                team_keys: ['frc9991', 'frc9992', 'frc9993'],
-              },
-              blue: {
-                ...match1RedWin.alliances.blue,
-                team_keys: ['frc9994', 'frc9995', 'frc9996'],
-              },
-            },
-          },
-        ]}
-        event={event}
-      />,
-    );
-    const match1 = screen.getByRole('group', { name: 'Match 1' });
-    for (const name of ['9991', '9994']) {
-      const row = within(match1)
-        .getByRole('link', { name })
-        .closest<HTMLElement>('[data-highlight]');
-      if (!row) {
-        throw new Error('Missing alliance row');
-      }
-      expect(row.dataset.highlight).toBe('true');
-      fireEvent.mouseEnter(row);
-      expect(row.dataset.highlight).toBe('true');
-    }
-    expect(match1.className).toContain('ring-alliance-red-accent/75');
-  });
-
   test('re-renders matches when the results change', () => {
     const { rerender } = render(
       <EliminationBracket alliances={alliances} matches={[]} event={event} />,

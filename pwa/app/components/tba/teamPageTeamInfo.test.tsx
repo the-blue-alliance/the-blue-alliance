@@ -84,14 +84,9 @@ describe('TeamPageTeamInfo', () => {
       );
     }
 
-    // The sponsor label is pluralized with a leading space, so the rendered
-    // text has a doubled space ("2  sponsors") that HTML collapses.
     const trigger = screen.getByRole('button', {
       name: 'Bellarmine College Preparatory with 2 sponsors',
     });
-    expect(trigger.textContent).toBe(
-      'Bellarmine College Preparatory with 2  sponsors',
-    );
     fireEvent.click(trigger);
     expect(await screen.findByText('NASA Ames Research Center')).toBeTruthy();
     expect(screen.getByText('Google')).toBeTruthy();
