@@ -325,9 +325,6 @@ class DistrictHelper:
             teams = teams.get_result()
 
         for team in teams:
-            if isinstance(teams, ndb.tasklets.Future):  # pragma: no cover
-                # Unreachable: a Future `teams` was already resolved above
-                team = team.get_result()
             bonus = cls._get_rookie_bonus(year, team.rookie_year)
 
             team_totals[team.key_name]["rookie_bonus"] = bonus
@@ -695,10 +692,6 @@ class DistrictHelper:
                                 )
                             done = True
                             break
-                        if done:
-                            # Unreachable: `done` is only set right before
-                            # breaking out of this loop
-                            break  # pragma: no cover
                     if done:
                         break
 
