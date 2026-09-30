@@ -144,7 +144,8 @@ def team_mod():
     # REVIEW_DESIGNS
     suggestions_by_team = defaultdict(lambda: defaultdict(list))
     for suggestion in suggestions_future.get_result():
-        if not suggestion.target_key:
+        if not suggestion.target_key:  # pragma: no cover
+            # Unreachable: the query filters on target_key IN team_keys
             continue
         if not SuggestionReviewer.user_can_review_suggestion(
             user, suggestion, delegated_team_keys

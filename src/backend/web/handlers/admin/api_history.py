@@ -189,7 +189,9 @@ def _get_storage_files(
                             timestamp = dt.strftime("%Y-%m-%d %I:%M:%S %p UTC")
                         except (ValueError, AttributeError):
                             timestamp = raw_timestamp
-                    else:
+                    else:  # pragma: no cover
+                        # Unreachable: name_without_ext contains a ".", so
+                        # split(".") always yields at least two parts
                         timestamp = name_without_ext
             else:
                 # FRC API format: timestamp without extension

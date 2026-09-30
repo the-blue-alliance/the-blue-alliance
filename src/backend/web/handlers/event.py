@@ -543,7 +543,7 @@ def event_pitmap(event_key: EventKey) -> Response:
         )
     except ValueError:
         abort(404)
-        raise RuntimeError("unreachable")
+        raise RuntimeError("unreachable")  # pragma: no cover
 
     response = make_cached_response(
         render_template("event_pitmap.svg", template_values),
