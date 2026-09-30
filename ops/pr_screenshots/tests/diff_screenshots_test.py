@@ -1,4 +1,3 @@
-import pytest
 from diff_screenshots import diff_images, HIGHLIGHT, main
 from PIL import Image
 

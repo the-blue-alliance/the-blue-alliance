@@ -27,7 +27,12 @@ try {
       viewport: { width: 1200, height: 1000 },
       colorScheme,
     });
-    await page.goto(url, { waitUntil: 'networkidle', timeout: 60_000 });
+    await page.goto(url, { waitUntil: 'load', timeout: 60_000 });
+    // Pages with long-polling or websockets (GameDay) never go idle; give
+    // them a bounded chance to settle and move on.
+    await page
+      .waitForLoadState('networkidle', { timeout: 10_000 })
+      .catch(() => {});
     // Let fonts and any entrance transitions settle.
     await page.waitForTimeout(800);
     const out = `${prefix}-${colorScheme}.png`;
