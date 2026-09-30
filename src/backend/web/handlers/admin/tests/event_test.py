@@ -2280,3 +2280,30 @@ def test_link_frc_api_post_not_found(web_client: Client, login_gae_admin) -> Non
         "/admin/event/link_frc_api/2020nyny", data={"frc_event_input": "NYNY"}
     )
     assert resp.status_code == 404
+
+
+def test_bug_2_create_event_with_details_json_saves_event_and_details(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """Bug #2: creating an event with alliance/rankings JSON 500s.
+
+    Today, on the create path (no event_key in the URL), event_edit_post
+    builds EventDetails(id=event_key) with the None URL argument instead of
+    the computed key, so the manipulator raises after the Event itself was
+    saved, leaving a half-written event. Correct: the request redirects to
+    the new event and both the Event and its EventDetails are saved.
+    """
+    alliances = [{"picks": ["frc1", "frc2", "frc3"], "declines": []}]
+    resp = web_client.post(
+        "/admin/event/edit",
+        data=_full_event_form(alliance_selections_json=json.dumps(alliances)),
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.name == "New York City Regional"
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == alliances
