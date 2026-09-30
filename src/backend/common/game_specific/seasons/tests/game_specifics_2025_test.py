@@ -11,10 +11,12 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2025
 from backend.common.game_specific.seasons.game_specifics_2025 import GameSpecifics2025
 from backend.common.game_specific.seasons.tests.conftest import (
+    build_match,
     HELPERS_TESTS,
     tiebreak_winner,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 
 
@@ -105,3 +107,54 @@ def test_prediction_ranking_fields() -> None:
     assert game.ranking_tiebreaker_breakdown_field() == "totalPoints"
     assert game.ranking_tiebreaker_prediction_field() == "score"
     assert game.ranking_win_points() == 3
+
+
+def test_tiebreak_criteria_without_breakdown_data() -> None:
+    empty = cast(ScoreDetailModelAlliance2025, {})
+    criteria = GameSpecifics2025().tiebreak_criteria(empty, empty)
+    assert criteria == [None] * 3
+    assert tiebreak_winner(criteria) == ""
+
+
+def _insights(matches: list[Match]) -> EventInsights:
+    return none_throws(GameSpecifics2025().calculate_event_insights(matches))
+
+
+def test_calculate_event_insights_without_finished_matches() -> None:
+    unplayed = build_match("2025test", "qm", 1, -1, -1, None)
+    assert _insights([]) == {"qual": None, "playoff": None}
+    assert _insights([unplayed]) == {"qual": None, "playoff": None}
+
+
+def test_calculate_event_insights_counts_coopertition_and_rp_sweeps() -> None:
+    swept = {
+        "autoBonusAchieved": True,
+        "bargeBonusAchieved": True,
+        "coralBonusAchieved": True,
+        "coopertitionCriteriaMet": True,
+    }
+    both_sweep = build_match("2025test", "qm", 1, 30, 10, {"red": swept, "blue": swept})
+    qual = none_throws(_insights([both_sweep])["qual"])
+    assert qual["auto_rp_count"] == [2, 2, 100.0]
+    assert qual["barge_rp_count"] == [2, 2, 100.0]
+    assert qual["coral_rp_count"] == [2, 2, 100.0]
+    assert qual["coopertition_count"] == [2, 2, 100.0]
+    assert qual["six_rp_count"] == [1, 1, 100.0]
+    assert qual["nine_rp_count"] == [1, 1, 100.0]
+
+    # Only the winner counts towards the 6 RP sweep, and 9 RP needs both.
+    loser_sweeps = build_match("2025test", "qm", 2, 30, 10, {"red": {}, "blue": swept})
+    qual = none_throws(_insights([loser_sweeps])["qual"])
+    assert qual["six_rp_count"] == [0, 1, 0.0]
+    assert qual["nine_rp_count"] == [0, 1, 0.0]
+
+    winner_sweeps = build_match("2025test", "qm", 3, 30, 10, {"red": swept, "blue": {}})
+    qual = none_throws(_insights([winner_sweeps])["qual"])
+    assert qual["six_rp_count"] == [1, 1, 100.0]
+    assert qual["nine_rp_count"] == [0, 1, 0.0]
+
+    # A tie has no winner, so neither sweep is awarded.
+    tie = build_match("2025test", "qm", 4, 20, 20, {"red": swept, "blue": swept})
+    qual = none_throws(_insights([tie])["qual"])
+    assert qual["six_rp_count"] == [0, 1, 0.0]
+    assert qual["nine_rp_count"] == [0, 1, 0.0]

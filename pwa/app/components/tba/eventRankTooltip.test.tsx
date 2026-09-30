@@ -189,4 +189,36 @@ describe('EventRankTooltip', () => {
       (await screen.findByRole('link', { name: '101' })).getAttribute('href'),
     ).toBe('/team/101/2026');
   });
+
+  test('uses whole-number ranking scores as total ranking points', async () => {
+    const rankings = makeRankings();
+    rankings.sort_order_info = [{ name: 'Ranking Score', precision: 0 }];
+    rankings.rankings = rankings.rankings.map((r) => ({
+      ...r,
+      sort_orders: [r.rank * 2.4],
+    }));
+    queryFnMock.mockResolvedValue(rankings);
+    renderTooltip();
+
+    fireEvent.mouseEnter(screen.getByTestId('tooltip'));
+
+    expect(
+      await screen.findByRole('row', { name: '3 103 7-2-0 7' }),
+    ).toBeTruthy();
+  });
+
+  test('shows a dash for teams without a ranking score', async () => {
+    const rankings = makeRankings();
+    rankings.rankings = rankings.rankings.map((r) =>
+      r.rank === 3 ? { ...r, sort_orders: [] } : r,
+    );
+    queryFnMock.mockResolvedValue(rankings);
+    renderTooltip();
+
+    fireEvent.mouseEnter(screen.getByTestId('tooltip'));
+
+    expect(
+      await screen.findByRole('row', { name: '3 103 7-2-0 —' }),
+    ).toBeTruthy();
+  });
 });
