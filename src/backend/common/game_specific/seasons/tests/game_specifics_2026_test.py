@@ -467,3 +467,24 @@ def test_calculate_event_insights_splits_quals_and_playoffs() -> None:
     insights = _insights([playoff])
     assert insights["qual"] is None
     assert none_throws(insights["playoff"])["high_score"] == (30, "2026casj_f1m1", "F1")
+
+
+def test_bug_22_auto_winner_decided_by_auto_fuel() -> None:
+    """
+    Bug #22: determine_auto_winner compares totalAutoPoints, which includes
+    AUTO TOWER points, so an alliance that climbed in AUTO can "win" AUTO
+    while scoring less FUEL.
+
+    Correct: the AUTO result that sets SHIFT 1 HUB status is decided on FUEL
+    scored during AUTO only (hubScore.autoPoints; AUTO FUEL is 1 point each).
+    2026 Game Manual, Version TU22 (2026-05-07), Section 6.4.1 HUB Status and
+    Table 6-3 ("The ALLIANCE that scores the most FUEL during AUTO will have
+    their HUB set to inactive for SHIFT 1"):
+    https://firstfrc.blob.core.windows.net/frc2026/Manual/2026GameManual.pdf
+    Judgment call: this assumes "AUTO winner" means the FMS SHIFT 1 decision.
+    """
+    red = _auto(20)
+    red["autoTowerPoints"] = 15
+    red["totalAutoPoints"] = 35
+    blue = _auto(25)
+    assert GameSpecifics2026().determine_auto_winner(red, blue) == AllianceColor.BLUE
