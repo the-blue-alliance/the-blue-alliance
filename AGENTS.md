@@ -60,6 +60,18 @@ ops/                    # Build, deploy, and dev scripts
 - **Pages CI cannot reach** (behind a login, or needing specific data such as suggestion review, account, and admin pages): capture them locally. For PWA components, render the component with fixture data on a throwaway route and run `pwa/scripts/screenshot-route.mjs` against the dev server, once on `main` and once on the branch, then diff the pair. The same script captures any local page, including Jinja pages on `http://localhost:8080`. For Jinja pages, render through the Flask test client with a logged-in fixture user. Then commit the PNGs to the `ci-screenshots` branch (`pr-<N>-<what>-{before,after,diff}-*.png`) and reference them as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`. Never commit screenshots or throwaway routes to the feature branch.
 - Reviewers should ask for the table when a UI PR lacks it.
 
+### Jinja pages that need a login or seeded data
+
+Account, admin, and suggestion-review pages are Jinja pages the dev server can only show after a login, so render them through the Flask test client instead and screenshot the saved HTML against the running dev server's CSS:
+
+1. Have the dev server up (`docker compose up`); it serves the CSS/JS at `http://localhost:8080`.
+2. Render the page with a **throwaway** pytest in `src/backend/web/handlers/tests/`. Use the fixtures the real tests use (`web_client`, `login_user`; set `login_user.permissions` and `login_user.has_permission.return_value = True` for gated pages), seed whatever models the page needs, `GET` it, and write `response.data` to a file after inserting `<base href="http://localhost:8080/">` right after `<head>`. Run it with `make test ARGS='src/backend/web/handlers/tests/<file> -q -s'`, then **delete the file**; it is a tool, not a test. Redact secrets the page renders (API keys, tokens) in the seed data.
+3. Screenshot: `cd pwa && node scripts/screenshot_html.mjs /tmp/after.html /tmp/after.png '[data-testid=...]'`. (The script lives in `pwa/` because Node resolves `@playwright/test` from the script's own directory, not from where you run it.) Pass a selector for an element inside the content you want; the script captures its surrounding content container. Do not target `div.container`, the navbar is one too.
+4. Get the **before** the same way after `git checkout origin/main -- <the templates and handlers you changed>`, then `git checkout HEAD -- <those files>` to restore the branch.
+5. Diff each pair (`uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py /tmp/before.png /tmp/after.png /tmp/diff.png`), publish all three to the `ci-screenshots` branch, and fill the Before | After | Diff table as described above.
+
+Look at every screenshot before posting it: an identical byte size across two supposedly different pages means the locator grabbed the wrong element.
+
 ## Development Setup
 **Recommended**: Use docker compose for the local dev server, and `uv` for Python tooling (tests, linting).
 
@@ -207,39 +219,6 @@ FRC data has several quirks that are important to understand when working with h
 - **Data completeness varies by era**: Event data may be fully populated, partially populated, or entirely missing. The further back in history, the less reliable the data. Rankings, alliances, match results, award data, and team lists may be partially or entirely absent on older events.
 - **Reliability by year**: Data becomes more reliable around 2010. Prior to 2006, data is uncommon.
 - **Elimination format**: FIRST implemented Double Elimination brackets starting in the 2023 season. Prior seasons used a single-elimination best-of-three bracket.
-
-## Screenshots for PRs
-
-Two paths, depending on what the page is.
-
-**PWA pages** are screenshotted by CI. List them in the PR template's "Screenshot Pages" section
-(`- /path Display Name`) and the bot posts them on the PR.
-
-**Web-service (Jinja) pages**, including anything behind a login that CI cannot reach — account,
-admin, and suggestion-review pages — are rendered locally through the Flask test client and
-screenshotted against the running dev server's CSS:
-
-1. Have the dev server up (`docker compose up`); it serves the CSS/JS at `http://localhost:8080`.
-2. Render the page with a **throwaway** pytest in `src/backend/web/handlers/tests/`. Use the
-   fixtures the real tests use (`web_client`, `login_user`; set `login_user.permissions` and
-   `login_user.has_permission.return_value = True` for gated pages), seed whatever models the page
-   needs, `GET` it, and write `response.data` to a file after inserting
-   `<base href="http://localhost:8080/">` right after `<head>`. Run it with
-   `make test ARGS='src/backend/web/handlers/tests/<file> -q -s'`, then **delete the file** — it
-   is a tool, not a test. Redact secrets the page renders (API keys, tokens) in the seed data.
-3. Screenshot: `cd pwa && node scripts/screenshot_html.mjs /tmp/page.html /tmp/page.png
-   '[data-testid=...]'`. (The script lives in `pwa/` because Node resolves `@playwright/test`
-   from the script's own directory, not from where you run it.) Pass a selector for an element inside the content you want;
-   the script captures its surrounding content container. Do not target `div.container` — the
-   navbar is one too.
-4. Publish. GitHub has no API for attaching images to comments, so the repo keeps screenshots on
-   the `ci-screenshots` branch (the CI bot uses it too). In a worktree of that branch, copy the
-   PNGs in as `pr-<PR number>-<slug>-<unix timestamp>.png`, commit
-   (`Add screenshots for PR #<N>`), push, and reference them in a PR comment as
-   `![alt](https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>)`.
-
-Look at every screenshot before posting it: an identical byte size across two supposedly different
-pages means the locator grabbed the wrong element.
 
 ## Notes
 - The PWA (Progressive Web App) is a separate project in `pwa/` with its own AGENTS.md
