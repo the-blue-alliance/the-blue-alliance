@@ -1,57 +1,113 @@
 #!/usr/bin/env python3
+"""Screenshot the dev server for a PR's Before | After | Diff comment.
+
+    python ops/pr_screenshots/capture_screenshots.py           # on the PR head
+    python ops/pr_screenshots/capture_screenshots.py --before  # on the PR base
+
+The head run writes the artifact; the base run adds `before_screenshots` to
+it. The comment workflow pairs them up by name and renders the diff.
+"""
 
 import base64
 import os
 import pickle
+import re
 import subprocess
+import sys
 import time
+from typing import Callable
 
-from artifact_data import ARTIFACT_FILENAME, ArtifactData
+from artifact_data import ARTIFACT_FILENAME, ArtifactData, Screenshot
 
 CAPTURE_URLS = [
     ("Homepage", "http://localhost:8080"),
     ("GameDay", "http://localhost:8080/gameday"),
 ]  # (name, url)
+
 GITHUB_REF = os.environ.get("GITHUB_REF", "")
 GITHUB_PULL_REQUEST_NUMBER = (
     int(GITHUB_REF.split("/")[2]) if "refs/pull/" in GITHUB_REF else None
 )
 
 
-def capture_screenshots(urls: list[tuple[str, str]]) -> list[tuple[str, str, str]]:
-    screenshots = []  # (name, filename, base64encode image)
+def screenshot_filename(pr: int | None, name: str, phase: str, timestamp: int) -> str:
+    """`pr-123-gameday-after-1790000000.png`; the phase lets the comment
+    workflow derive the diff's filename from the after's."""
+    slug = re.sub(r"[^a-z0-9]+", "-", name.lower()).strip("-")
+    return f"pr-{pr}-{slug}-{phase}-{timestamp}.png"
+
+
+def _capture_website(url: str) -> bytes:
+    return subprocess.check_output(
+        [
+            "capture-website",
+            url,
+            "--width",
+            "1920",
+            "--height",
+            "1080",
+            "--scale-factor",
+            "1",
+        ]
+    )
+
+
+def capture_screenshots(
+    urls: list[tuple[str, str]],
+    phase: str,
+    pr: int | None,
+    capture: Callable[[str], bytes] | None = None,
+    now: Callable[[], float] = time.time,
+) -> list[Screenshot]:
+    # Resolved at call time so tests can swap the real capture out.
+    capture = capture or _capture_website
+    screenshots: list[Screenshot] = []
     for name, url in urls:
-        print(f"Screenshotting {name}: {url}")
+        print(f"Screenshotting {name} ({phase}): {url}")
         try:
-            cmd = [
-                "capture-website",
-                url,
-                "--width",
-                "1920",
-                "--height",
-                "1080",
-                "--scale-factor",
-                "1",
-            ]
-            image_data = subprocess.check_output(cmd)
-            image = base64.b64encode(image_data).decode("utf-8")
-            filename = (
-                f"pr-{GITHUB_PULL_REQUEST_NUMBER}-{url}-{int(time.time())}.png".replace(
-                    "/", "-"
-                ).replace(" ", "")
-            )
-            screenshots.append((name, filename, image))
+            image = base64.b64encode(capture(url)).decode("utf-8")
         except subprocess.CalledProcessError as e:
             print(f"Error: {e}")
+            continue
+        screenshots.append(
+            (name, screenshot_filename(pr, name, phase, int(now())), image)
+        )
     return screenshots
 
 
-if __name__ == "__main__":
-    if os.environ.get("CI"):
-        screenshots = capture_screenshots(CAPTURE_URLS)
-        pickle.dump(
-            ArtifactData(screenshots=screenshots, pr=GITHUB_PULL_REQUEST_NUMBER),
-            open(ARTIFACT_FILENAME, "wb"),
+def with_before_screenshots(
+    artifact: ArtifactData, before: list[Screenshot]
+) -> ArtifactData:
+    """The base capture runs second and must not disturb what the head wrote."""
+    return ArtifactData(
+        pr=artifact["pr"],
+        screenshots=artifact["screenshots"],
+        before_screenshots=before,
+    )
+
+
+def main(argv: list[str]) -> int:
+    if not os.environ.get("CI"):
+        print("Only runnable in CI.")
+        return 0
+    if "--before" in argv:
+        with open(ARTIFACT_FILENAME, "rb") as f:
+            artifact = ArtifactData(pickle.load(f))
+        artifact = with_before_screenshots(
+            artifact,
+            capture_screenshots(CAPTURE_URLS, "before", GITHUB_PULL_REQUEST_NUMBER),
         )
     else:
-        print("Only runnable in CI.")
+        artifact = ArtifactData(
+            pr=GITHUB_PULL_REQUEST_NUMBER,
+            screenshots=capture_screenshots(
+                CAPTURE_URLS, "after", GITHUB_PULL_REQUEST_NUMBER
+            ),
+        )
+    with open(ARTIFACT_FILENAME, "wb") as f:
+        pickle.dump(artifact, f)
+    return 0
+
+
+if __name__ == "__main__":
+    sys.exit(main(sys.argv[1:]))

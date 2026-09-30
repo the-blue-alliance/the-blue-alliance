@@ -2,6 +2,7 @@
 """Render a pixel diff of two screenshots for a PR's Before | After | Diff table.
 
     uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py before.png after.png diff.png
+    uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py --dir before/ after/ diff/
 
 Pixels that differ are painted red on a faded grayscale copy of the "after" image, so
 unchanged areas stay legible for orientation. Screenshots of different sizes
@@ -10,6 +11,8 @@ padding counts as changed. Prints the changed-pixel percentage, which belongs
 in the table cell next to the image.
 """
 
+import json
+import os
 import sys
 from dataclasses import dataclass
 
@@ -73,17 +76,54 @@ def diff_images(before: Image.Image, after: Image.Image) -> DiffResult:
     )
 
 
-def main(argv: list[str]) -> int:
-    if len(argv) != 4:
-        print(__doc__, file=sys.stderr)
-        return 2
-    _, before_path, after_path, out_path = argv
+SUMMARY_FILENAME = "summary.json"
+
+
+def _diff_files(before_path: str, after_path: str, out_path: str) -> DiffResult:
     result = diff_images(Image.open(before_path), Image.open(after_path))
     result.image.save(out_path)
     print(
         f"{out_path}: {result.changed_pixels} of {result.total_pixels} pixels "
         f"changed ({result.changed_fraction:.2%})"
     )
+    return result
+
+
+def diff_directories(
+    before_dir: str, after_dir: str, out_dir: str
+) -> dict[str, dict[str, float]]:
+    """Diff every PNG in `after_dir` that has a same-named file in `before_dir`,
+    writing each diff to `out_dir` plus a `summary.json` of the counts keyed by
+    filename, which is what the comment scripts read."""
+    os.makedirs(out_dir, exist_ok=True)
+    summary: dict[str, dict[str, float]] = {}
+    for filename in sorted(os.listdir(after_dir)):
+        before_path = os.path.join(before_dir, filename)
+        if not filename.endswith(".png") or not os.path.exists(before_path):
+            continue
+        result = _diff_files(
+            before_path,
+            os.path.join(after_dir, filename),
+            os.path.join(out_dir, filename),
+        )
+        summary[filename] = {
+            "changed_pixels": result.changed_pixels,
+            "total_pixels": result.total_pixels,
+            "changed_fraction": result.changed_fraction,
+        }
+    with open(os.path.join(out_dir, SUMMARY_FILENAME), "w") as f:
+        json.dump(summary, f, indent=2)
+    return summary
+
+
+def main(argv: list[str]) -> int:
+    if len(argv) == 5 and argv[1] == "--dir":
+        diff_directories(*argv[2:])
+        return 0
+    if len(argv) != 4:
+        print(__doc__, file=sys.stderr)
+        return 2
+    _diff_files(*argv[1:])
     return 0
 
 

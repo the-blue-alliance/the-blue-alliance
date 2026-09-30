@@ -69,3 +69,43 @@ def test_main_rejects_wrong_arity(capsys) -> None:
     assert (
         "diff_screenshots.py before.png after.png diff.png" in capsys.readouterr().err
     )
+
+
+def test_diff_directories_diffs_matching_files_and_writes_a_summary(
+    tmp_path,
+) -> None:
+    import json
+
+    from diff_screenshots import diff_directories, SUMMARY_FILENAME
+
+    before, after, out = tmp_path / "before", tmp_path / "after", tmp_path / "diff"
+    before.mkdir()
+    after.mkdir()
+    _solid((4, 4)).save(before / "home.png")
+    changed = _solid((4, 4))
+    changed.putpixel((0, 0), (0, 0, 0, 255))
+    changed.save(after / "home.png")
+    _solid((4, 4)).save(after / "new-page.png")  # no before: skipped
+    (after / "notes.txt").write_text("ignored")
+
+    summary = diff_directories(str(before), str(after), str(out))
+
+    assert list(summary) == ["home.png"]
+    assert summary["home.png"]["changed_pixels"] == 1
+    assert summary["home.png"]["total_pixels"] == 16
+    assert Image.open(out / "home.png").getpixel((0, 0)) == HIGHLIGHT
+    assert not (out / "new-page.png").exists()
+    assert json.loads((out / SUMMARY_FILENAME).read_text()) == summary
+
+
+def test_main_dir_mode(tmp_path) -> None:
+    before, after, out = tmp_path / "b", tmp_path / "a", tmp_path / "d"
+    before.mkdir()
+    after.mkdir()
+    _solid((2, 2)).save(before / "p.png")
+    _solid((2, 2)).save(after / "p.png")
+
+    assert (
+        main(["diff_screenshots.py", "--dir", str(before), str(after), str(out)]) == 0
+    )
+    assert (out / "p.png").exists()

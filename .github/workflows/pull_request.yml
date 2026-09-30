@@ -300,6 +300,24 @@ jobs:
       - name: Capture screenshots
         if: steps.changes.outputs.web == 'true'
         run: python ./ops/pr_screenshots/capture_screenshots.py
+      # Same pages on the PR's base, so the comment can show Before | After | Diff.
+      # Restarting the stack on the base checkout is slower than hot-swapping
+      # files but is the only way to be sure Python, templates and the webpack
+      # bundle all reflect the base. Failure here degrades to an after-only
+      # comment rather than failing the job.
+      - name: Capture base screenshots
+        if: steps.changes.outputs.web == 'true'
+        continue-on-error: true
+        run: |
+          # The base checkout replaces these scripts too; run the PR's copies.
+          cp -r ./ops/pr_screenshots /tmp/pr_screenshots
+          cp ./ops/test_docker_startup.py /tmp/test_docker_startup.py
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml down
+          git fetch --depth=1 origin ${{ github.event.pull_request.base.sha }}
+          git checkout --force --detach ${{ github.event.pull_request.base.sha }}
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+          python /tmp/test_docker_startup.py
+          python /tmp/pr_screenshots/capture_screenshots.py --before
       - name: Upload screenshots artifact
         if: steps.changes.outputs.web == 'true'
         uses: actions/upload-artifact@v7

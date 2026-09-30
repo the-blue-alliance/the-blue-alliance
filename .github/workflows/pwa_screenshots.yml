@@ -141,6 +141,7 @@ jobs:
         run: |
           cp ops/pwa/take-screenshots.mjs /tmp/take-screenshots.mjs
           cp ops/pwa/generate-screenshot-comment.mjs /tmp/generate-screenshot-comment.mjs
+          cp ops/pr_screenshots/diff_screenshots.py /tmp/diff_screenshots.py
 
       - name: Checkout base branch
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
@@ -187,6 +188,20 @@ jobs:
           SCREENSHOT_DIR: ${{ github.workspace }}/screenshots-before
           PAGES: ${{ steps.pages.outputs.json }}
 
+      # --- Pixel-diff each before/after pair ---
+      - name: Set up Python for the pixel diff
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]' && steps.base-build.outcome == 'success'
+        uses: actions/setup-python@v7
+        with:
+          python-version: "3.13"
+
+      - name: Diff screenshots
+        if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]' && steps.base-build.outcome == 'success'
+        continue-on-error: true
+        run: |
+          pip install pillow
+          python /tmp/diff_screenshots.py --dir "${{ github.workspace }}/screenshots-before" "${{ github.workspace }}/screenshots-after" "${{ github.workspace }}/screenshots-diff"
+
       # --- Generate comment and post ---
       - name: Generate screenshot comment
         if: steps.check-key.outputs.skip != 'true' && steps.pages.outputs.json != '[]'
@@ -194,6 +209,7 @@ jobs:
         env:
           BEFORE_DIR: ${{ github.workspace }}/screenshots-before
           AFTER_DIR: ${{ github.workspace }}/screenshots-after
+          DIFF_DIR: ${{ github.workspace }}/screenshots-diff
           PR_NUMBER: ${{ github.event.pull_request.number }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GITHUB_REPOSITORY: ${{ github.repository }}

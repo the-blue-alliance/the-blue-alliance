@@ -1,12 +1,15 @@
 /**
  * PWA Screenshot Comment Generator
  *
- * Reads before/after screenshots, uploads them to the ci-screenshots branch
- * via the GitHub API, and generates a markdown PR comment comparing them.
+ * Reads before/after screenshots plus the pixel diffs that
+ * ops/pr_screenshots/diff_screenshots.py --dir wrote for them, uploads them
+ * to the ci-screenshots branch via the GitHub API, and generates a markdown
+ * PR comment with a Before | After | Diff table.
  *
  * Environment variables:
  *   BEFORE_DIR       - Directory with base branch screenshots (default: screenshots-before)
  *   AFTER_DIR        - Directory with PR branch screenshots (default: screenshots-after)
+ *   DIFF_DIR         - Directory with diff PNGs and summary.json (default: screenshots-diff)
  *   PR_NUMBER        - Pull request number (required)
  *   GITHUB_TOKEN     - GitHub token for API access (required)
  *   GITHUB_REPOSITORY - owner/repo (required)
@@ -18,6 +21,7 @@ import { join } from "path";
 
 const BEFORE_DIR = process.env.BEFORE_DIR || "screenshots-before";
 const AFTER_DIR = process.env.AFTER_DIR || "screenshots-after";
+const DIFF_DIR = process.env.DIFF_DIR || "screenshots-diff";
 const PR_NUMBER = process.env.PR_NUMBER;
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
 const GITHUB_REPOSITORY = process.env.GITHUB_REPOSITORY;
@@ -154,6 +158,11 @@ async function main() {
   const beforeFiles = hasBeforeDir
     ? readdirSync(BEFORE_DIR).filter((f) => f.endsWith(".png"))
     : [];
+  // Written by diff_screenshots.py --dir: { "<file>.png": { changed_pixels, total_pixels, changed_fraction } }
+  const summaryPath = join(DIFF_DIR, "summary.json");
+  const diffSummary = existsSync(summaryPath)
+    ? JSON.parse(readFileSync(summaryPath, "utf8"))
+    : {};
 
   const timestamp = Date.now();
   const changed = [];
@@ -168,25 +177,38 @@ async function main() {
     const afterUrl = await uploadImage(branchAfterPath, afterPath);
 
     let beforeUrl = null;
+    let diffUrl = null;
+    let changedFraction = null;
     let isChanged = true;
     if (beforeFiles.includes(filename)) {
       const beforePath = join(BEFORE_DIR, filename);
-      // Compare files byte-for-byte to detect visual changes
-      const beforeBuf = readFileSync(beforePath);
-      const afterBuf = readFileSync(afterPath);
-      isChanged = !beforeBuf.equals(afterBuf);
+      const summary = diffSummary[filename];
+      if (summary) {
+        // The pixel diff ignores sub-threshold anti-aliasing noise, so it is
+        // a better "did anything change" signal than byte equality.
+        isChanged = summary.changed_pixels > 0;
+        changedFraction = summary.changed_fraction;
+      } else {
+        // No diff for this page (the diff step failed or was skipped):
+        // fall back to comparing the files byte-for-byte.
+        isChanged = !readFileSync(beforePath).equals(readFileSync(afterPath));
+      }
 
-      // Only upload before screenshot if the page changed
+      // Only upload before/diff screenshots if the page changed
       if (isChanged) {
         const branchBeforePath = `pwa/pr-${PR_NUMBER}/${timestamp}/before/${filename}`;
         beforeUrl = await uploadImage(branchBeforePath, beforePath);
+        if (summary) {
+          const branchDiffPath = `pwa/pr-${PR_NUMBER}/${timestamp}/diff/${filename}`;
+          diffUrl = await uploadImage(branchDiffPath, join(DIFF_DIR, filename));
+        }
       }
       console.log(`  ${isChanged ? "CHANGED" : "unchanged"}`);
     } else {
       console.log(`  NEW (no base screenshot)`);
     }
 
-    const row = { name, beforeUrl, afterUrl, isChanged };
+    const row = { name, beforeUrl, afterUrl, diffUrl, changedFraction, isChanged };
     if (isChanged) {
       changed.push(row);
     } else {
@@ -204,12 +226,17 @@ async function main() {
   }
 
   // Show changed pages expanded
-  for (const { name, beforeUrl, afterUrl } of changed) {
+  for (const { name, beforeUrl, afterUrl, diffUrl, changedFraction } of changed) {
     if (!afterUrl) continue;
 
     message += `### ${name}\n\n`;
 
-    if (beforeUrl) {
+    if (beforeUrl && diffUrl) {
+      const percent = `${(changedFraction * 100).toFixed(2)}% of pixels changed`;
+      message += "| Before | After | Diff |\n";
+      message += "|--------|-------|------|\n";
+      message += `| ![Before](${beforeUrl}) | ![After](${afterUrl}) | ![Diff](${diffUrl})<br>${percent} |\n\n`;
+    } else if (beforeUrl) {
       message += "| Before | After |\n";
       message += "|--------|-------|\n";
       message += `| ![Before](${beforeUrl}) | ![After](${afterUrl}) |\n\n`;
