@@ -181,3 +181,39 @@ def test_is_etag_valid_failure_evicts_from_persisted_cache(memcache_stub) -> Non
         save_etag_dependencies("etag_heal", query_versions, path="/api/v3/team/frc254")
         is True
     )
+
+
+def test_get_incoming_etags_raw_header_fallback(app: Flask) -> None:
+    # Werkzeug's parsed `if_none_match` drops the special "*" tag, so the helper
+    # falls back to splitting the raw header.
+    with app.test_request_context(
+        "/api/v3/team/frc254",
+        headers={"If-None-Match": "*"},
+    ):
+        assert get_incoming_etags() == ["*"]
+
+
+def test_get_incoming_etags_raw_header_fallback_multiple(app: Flask) -> None:
+    with app.test_request_context(
+        "/api/v3/team/frc254",
+        headers={"If-None-Match": "*, , W/*"},
+    ):
+        assert get_incoming_etags() == ["*", "*"]
+
+
+def test_is_etag_valid_memcache_error(
+    memcache_stub, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    query_versions = {"q_k1": "ver1"}
+    save_etag_dependencies("etag_err", query_versions, path="/api/v3/team/frc254")
+    assert is_etag_valid("etag_err", path="/api/v3/team/frc254") is True
+
+    memcache = MemcacheClient.get()
+    monkeypatch.setattr(
+        memcache,
+        "get_multi",
+        MagicMock(side_effect=Exception("Memcache read failed")),
+    )
+
+    # A Memcache failure while checking query versions is treated as invalid
+    assert is_etag_valid("etag_err", path="/api/v3/team/frc254") is False

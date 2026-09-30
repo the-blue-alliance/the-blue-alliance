@@ -1,9 +1,14 @@
 import json
 from datetime import datetime
+from typing import Any, cast, Dict, List, Optional, Tuple
 
+import pytest
+
+from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
+from backend.common.frc_api.types import EventScheduleHybridModelV2
 from backend.common.helpers.match_helper import MatchHelper
 from backend.common.models.alliance import MatchAlliance
 from backend.common.models.event import Event
@@ -480,3 +485,215 @@ def test_is_blank_match_nested_dict_with_nonempty_list() -> None:
     }
     match = _make_sf_match(json.dumps(alliances), json.dumps(breakdown))
     assert FMSAPIHybridScheduleParser.is_blank_match(match) is False
+
+
+def _put_event(
+    event_key: str = "2016nyny",
+    year: int = 2016,
+    event_short: str = "nyny",
+    timezone_id: Optional[str] = "America/New_York",
+) -> Event:
+    event = Event(
+        id=event_key,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        short_name="Test",
+        event_short=event_short,
+        year=year,
+        end_date=datetime(year, 3, 27),
+        official=True,
+        start_date=datetime(year, 3, 24),
+        timezone_id=timezone_id,
+    )
+    event.put()
+    return event
+
+
+def _team(team_number: Optional[int], station: Optional[str]) -> Dict[str, Any]:
+    return {
+        "teamNumber": team_number,
+        "station": station,
+        "surrogate": False,
+        "dq": False,
+    }
+
+
+def _default_teams() -> List[Dict[str, Any]]:
+    return [
+        _team(1, "Red1"),
+        _team(2, "Red2"),
+        _team(3, "Red3"),
+        _team(4, "Blue1"),
+        _team(5, "Blue2"),
+        _team(6, "Blue3"),
+    ]
+
+
+def _schedule_match(
+    match_number: int = 1,
+    level: str = "Qualification",
+    start_time: Optional[str] = "2016-03-13T13:30:00",
+    actual_start_time: Optional[str] = None,
+    red_score: Optional[int] = 10,
+    blue_score: Optional[int] = 20,
+    teams: Optional[List[Dict[str, Any]]] = None,
+) -> Dict[str, Any]:
+    return {
+        "description": f"Match {match_number}",
+        "tournamentLevel": level,
+        "matchNumber": match_number,
+        "startTime": start_time,
+        "actualStartTime": actual_start_time,
+        "scoreRedFinal": red_score,
+        "scoreBlueFinal": blue_score,
+        "Teams": teams if teams is not None else _default_teams(),
+    }
+
+
+def _parse(schedule: List[Dict[str, Any]]) -> Tuple[List[Match], Dict[str, str]]:
+    return FMSAPIHybridScheduleParser(2016, "nyny").parse(
+        cast(EventScheduleHybridModelV2, {"Schedule": schedule})
+    )
+
+
+def test_parse_event_without_timezone_keeps_naive_time(ndb_stub) -> None:
+    """Without a timezone the parser logs a warning and uses the raw API time."""
+    _put_event(timezone_id=None)
+    matches, _ = _parse([_schedule_match(actual_start_time="2016-03-13T13:36:27.447")])
+    assert len(matches) == 1
+    assert matches[0].time == datetime(2016, 3, 13, 13, 30, 0)
+    assert matches[0].actual_time == datetime(2016, 3, 13, 13, 36, 27)
+
+
+def test_parse_2015_level_key(ndb_stub) -> None:
+    """2015-era responses use `level` instead of `tournamentLevel`."""
+    _put_event()
+    match = _schedule_match()
+    del match["tournamentLevel"]
+    match["level"] = "Qualification"
+    matches, _ = _parse([match])
+    assert len(matches) == 1
+    assert matches[0].comp_level == CompLevel.QM
+    assert matches[0].key_name == "2016nyny_qm1"
+
+
+def test_parse_skips_null_team_when_scores_present(ndb_stub) -> None:
+    """A null team in a scored match is dropped but the match is still parsed."""
+    _put_event()
+    teams = _default_teams()
+    teams[2] = _team(None, "Red3")
+    matches, _ = _parse([_schedule_match(teams=teams)])
+    assert len(matches) == 1
+    # Teams are sorted by station name, so Blue stations sort before Red.
+    assert matches[0].team_key_names == ["frc4", "frc5", "frc6", "frc1", "frc2"]
+    assert matches[0].alliances[AllianceColor.RED]["teams"] == ["frc1", "frc2"]
+    assert matches[0].alliances[AllianceColor.BLUE]["teams"] == [
+        "frc4",
+        "frc5",
+        "frc6",
+    ]
+
+
+def test_parse_skips_null_team_when_unscored(ndb_stub) -> None:
+    """A null team in an unscored match causes the whole match to be skipped."""
+    _put_event()
+    teams = _default_teams()
+    teams[0] = _team(None, "Red1")
+    matches, _ = _parse([_schedule_match(teams=teams, red_score=None, blue_score=None)])
+    assert matches == []
+
+
+def test_parse_team_with_null_station(ndb_stub) -> None:
+    """
+    A team with a null station is counted in team_key_names but assigned to
+    neither alliance.
+
+    Note: this only works when the match has a single team. With multiple
+    teams, the parser sorts by station and Python 3 raises TypeError when
+    comparing None to str, so a null station in a real six-team match would
+    crash the parser.
+    """
+    _put_event()
+    matches, _ = _parse([_schedule_match(teams=[_team(254, None)])])
+    assert len(matches) == 1
+    assert matches[0].team_key_names == ["frc254"]
+    assert matches[0].alliances[AllianceColor.RED]["teams"] == []
+    assert matches[0].alliances[AllianceColor.BLUE]["teams"] == []
+
+
+def test_parse_skips_match_without_start_time(ndb_stub) -> None:
+    """Matches with no startTime are unneeded rubber matches and are skipped."""
+    _put_event()
+    matches, _ = _parse(
+        [
+            _schedule_match(match_number=1, start_time=None),
+            _schedule_match(match_number=2),
+        ]
+    )
+    assert [m.key_name for m in matches] == ["2016nyny_qm2"]
+
+
+def test_parse_corrupt_existing_match_skips_tiebreak_logic(
+    ndb_stub, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    """An existing match with no alliances_json is ignored for tiebreak purposes."""
+    event = _put_event()
+    # alliances_json is a required property, so such a corrupt entity can only
+    # come from legacy data. Simulate it by returning an unsaved Match.
+    corrupt = Match(
+        id="2016nyny_qm1",
+        event=event.key,
+        year=2016,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+    )
+    monkeypatch.setattr(Match, "get_by_id", classmethod(lambda cls, _key: corrupt))
+
+    matches, remapped = _parse([_schedule_match()])
+    assert remapped == {}
+    assert len(matches) == 1
+    assert matches[0].key_name == "2016nyny_qm1"
+    assert matches[0].alliances[AllianceColor.RED]["score"] == 10
+    assert matches[0].alliances[AllianceColor.BLUE]["score"] == 20
+
+
+def test_parse_tied_match_with_too_few_matches_is_skipped(ndb_stub) -> None:
+    """
+    In a classic bracket a tiebreaker can only follow at least 3 matches in the
+    set. If a tie is detected earlier, the parser warns and drops the match.
+    """
+    event = _put_event()
+    played_at = datetime(2016, 3, 13, 18, 0, 0)
+    Match(
+        id="2016nyny_sf1m1",
+        event=event.key,
+        year=2016,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        actual_time=played_at,
+        alliances_json=json.dumps(
+            {
+                "red": MatchAlliance(teams=["frc1", "frc2", "frc3"], score=100),
+                "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=100),
+            }
+        ),
+    ).put()
+
+    # Match 13 is sf1m1 in an 8 team bracket. A different actual time means
+    # the API is describing a new (tiebreaker) match for the same slot.
+    matches, remapped = _parse(
+        [
+            _schedule_match(
+                match_number=13,
+                level="Playoff",
+                actual_start_time="2016-03-13T14:15:00.000",
+                red_score=50,
+                blue_score=60,
+            )
+        ]
+    )
+    assert matches == []
+    assert remapped == {}

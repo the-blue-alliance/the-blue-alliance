@@ -1,7 +1,8 @@
 import datetime
 import json
-from typing import cast
+from typing import Any, cast, Dict
 
+import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -1034,3 +1035,79 @@ def test_parse_offseason_preserves_first_api_code(test_data_importer):
 
     assert event.key_name == "2015iri"
     assert event.first_code == "synccode"
+
+
+def _api_event(code: str, event_type: str) -> Dict[str, Any]:
+    return {
+        "code": code,
+        "type": event_type,
+        "name": f"Test Event {code}",
+        "districtCode": None,
+        "address": "123 Main St",
+        "venue": "Test Venue",
+        "city": "Test City",
+        "stateprov": "MA",
+        "country": "USA",
+        "dateStart": "2010-04-15T00:00:00",
+        "dateEnd": "2010-04-17T23:59:59",
+        "website": None,
+        "webcasts": [],
+        "timezone": None,
+        "allianceCount": "EightAlliance",
+    }
+
+
+def test_parse_unrecognized_event_type_is_skipped() -> None:
+    events, _ = FMSAPIEventListParser(2010).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    _api_event("testreg", "Regional"),
+                    _api_event("testwhat", "SomethingNew"),
+                ]
+            },
+        )
+    )
+
+    assert [e.key_name for e in events] == ["2010testreg"]
+
+
+def test_parse_unrecognized_event_type_with_explicit_short_raises() -> None:
+    # BUG: the "Event type not recognized" guard is bypassed when an explicit
+    # event short is given (`and not self.event_short`), presumably so a single
+    # event fetch still returns the event. However the parser then calls
+    # `none_throws(event_type)` when bootstrapping sync overrides, so an
+    # unrecognized type crashes the parse instead of being kept or skipped.
+    # This test documents the current behaviour.
+    with pytest.raises(AssertionError, match="Unexpected `None`"):
+        FMSAPIEventListParser(2010, short="testwhat").parse(
+            cast(
+                SeasonEventListModelV33,
+                {"Events": [_api_event("testwhat", "SomethingNew")]},
+            )
+        )
+
+
+def test_parse_event_sync_disabled_is_skipped() -> None:
+    Event(
+        id="2010testreg",
+        year=2010,
+        event_short="testreg",
+        event_type_enum=EventType.REGIONAL,
+        sync_overrides={"event_sync_disable": True},
+    ).put()
+
+    events, _ = FMSAPIEventListParser(2010).parse(
+        cast(
+            SeasonEventListModelV33,
+            {
+                "Events": [
+                    _api_event("testreg", "Regional"),
+                    _api_event("testreg2", "Regional"),
+                ]
+            },
+        )
+    )
+
+    assert [e.key_name for e in events] == ["2010testreg2"]

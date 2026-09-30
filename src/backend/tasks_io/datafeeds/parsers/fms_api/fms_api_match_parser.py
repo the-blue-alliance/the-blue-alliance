@@ -190,7 +190,8 @@ class FMSAPIHybridScheduleParser(
                 )
                 if event_tz is not None:
                     time = time - event_tz.utcoffset(time)
-            else:
+            else:  # pragma: no cover
+                # Unreachable: a falsy startTime is skipped by the check above.
                 time = None
 
             actual_time_raw = (
@@ -330,7 +331,9 @@ class FMSAPIHybridScheduleParser(
                 )
                 if playoff_advancement[LAST_LEVEL[level]] != []:
                     for match in organized_matches[level]:
-                        if "frcNone" in match.team_key_names:
+                        # Unreachable: null teams are skipped when building
+                        # team_key_names above, so "frcNone" never appears.
+                        if "frcNone" in match.team_key_names:  # pragma: no cover
                             if level == "sf":
                                 red_seed, blue_seed = QF_SF_MAP[match.match_number]
                             else:
