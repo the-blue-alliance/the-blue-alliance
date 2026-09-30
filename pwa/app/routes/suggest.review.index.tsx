@@ -16,7 +16,8 @@ import { suggestionTypeOrderComparator } from '~/lib/moderationUtils';
 
 export const Route = createFileRoute('/suggest/review/')({
   component: SuggestionReviewHome,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SuggestionReviewHome(): JSX.Element {
   const { isInitialLoading, user } = useAuth();

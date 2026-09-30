@@ -6,7 +6,8 @@ import { publicCacheControlHeaders } from '~/lib/utils';
 export const Route = createFileRoute('/about')({
   headers: publicCacheControlHeaders(),
   component: About,
-});
+}); // v8 ignore start -- TanStack's dev-only HMR glue maps to this line
+// v8 ignore stop
 
 function About(): React.JSX.Element {
   return (

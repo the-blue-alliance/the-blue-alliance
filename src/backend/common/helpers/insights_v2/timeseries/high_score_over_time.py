@@ -194,11 +194,9 @@ class HighScoreOverTimeV2Calculator(TimeseriesV2Calculator):
             )
 
         for district_abbrev, matches in sorted(self._district_matches.items()):
+            # A district only holds matches with a score >= 0, and the first of
+            # those always sets a record, so its series is never empty
             data = self._build_from_matches(matches)
-            if not data["series"] or not any(s["points"] for s in data["series"]):
-                # Unreachable: districts only hold matches with a score >= 0,
-                # and the first of those always sets a record
-                continue  # pragma: no cover
             name = self.insight_name
             insights.append(
                 InsightV2(

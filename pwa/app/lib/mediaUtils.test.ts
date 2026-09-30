@@ -2,12 +2,16 @@ import { describe, expect, test } from 'vitest';
 
 import type { Media } from '~/api/tba/read';
 import {
+  getCadModelName,
+  getEmbedMedia,
   getEventVideos,
+  getImageMedia,
   getMediaImageUrl,
   getMediaLinkUrl,
   getMediaThumbSrcSet,
   getMediaThumbUrl,
   getSmugmugAlbums,
+  getTeamPreferredRobotPicMedium,
 } from '~/lib/mediaUtils';
 
 function imgurMedia(overrides: Partial<Media> = {}): Media {
@@ -226,5 +230,193 @@ describe('getEventVideos', () => {
       'abc',
       'def',
     ]);
+  });
+});
+
+function media(type: Media['type'], overrides: Partial<Media> = {}): Media {
+  return {
+    type,
+    foreign_key: 'key',
+    team_keys: ['frc254'],
+    preferred: false,
+    details: {},
+    ...overrides,
+  } as Media;
+}
+
+describe('getMediaImageUrl', () => {
+  test('cd-thread uses the thread image', () => {
+    expect(getMediaImageUrl(cdThreadMedia())).toBe(
+      'https://www.chiefdelphi.com/uploads/robot.jpg',
+    );
+  });
+
+  test('cd-thread without an image has no url', () => {
+    expect(
+      getMediaImageUrl(cdThreadMedia({ details: {} as Media['details'] })),
+    ).toBeUndefined();
+  });
+
+  test('other types use the direct url', () => {
+    expect(getMediaImageUrl(imgurMedia())).toBe(
+      'https://i.imgur.com/aB3d9Xk.jpg',
+    );
+  });
+
+  test('an empty direct url is treated as missing', () => {
+    expect(getMediaImageUrl(imgurMedia({ direct_url: '' }))).toBeUndefined();
+  });
+});
+
+describe('getMediaThumbUrl', () => {
+  test('imgur urls without an image extension are returned unchanged', () => {
+    const url = 'https://i.imgur.com/gallery/aB3d9Xk';
+
+    expect(getMediaThumbUrl(imgurMedia({ direct_url: url }))).toBe(url);
+  });
+});
+
+describe('getEmbedMedia', () => {
+  test('keeps only embeddable image media', () => {
+    const items = [
+      imgurMedia(),
+      media('instagram-image'),
+      cdThreadMedia(),
+      externalLinkMedia(),
+      youtubeMedia('abc'),
+    ];
+
+    expect(getEmbedMedia(items).map((m) => m.type)).toEqual([
+      'imgur',
+      'instagram-image',
+      'cd-thread',
+    ]);
+  });
+});
+
+describe('getMediaLinkUrl', () => {
+  test('imgur links to its view url', () => {
+    expect(getMediaLinkUrl(imgurMedia())).toBe('https://imgur.com/aB3d9Xk');
+  });
+
+  test('imgur builds a link from the key without a view url', () => {
+    expect(getMediaLinkUrl(imgurMedia({ view_url: undefined }))).toBe(
+      'https://imgur.com/aB3d9Xk',
+    );
+  });
+
+  test('instagram links to its view url', () => {
+    const item = media('instagram-image', {
+      view_url: 'https://www.instagram.com/p/xyz/',
+    });
+
+    expect(getMediaLinkUrl(item)).toBe('https://www.instagram.com/p/xyz/');
+  });
+
+  test('instagram builds a link from the key without a view url', () => {
+    expect(
+      getMediaLinkUrl(media('instagram-image', { foreign_key: 'xyz' })),
+    ).toBe('https://www.instagram.com/p/xyz/');
+  });
+
+  test('cdphotothread links to the chief delphi image', () => {
+    const item = media('cdphotothread', {
+      details: { image_partial: 'abc.jpg' } as Media['details'],
+    });
+
+    expect(getMediaLinkUrl(item)).toBe(
+      'https://www.chiefdelphi.com/media/img/abc.jpg',
+    );
+  });
+
+  test('cdphotothread without an image partial has no link', () => {
+    expect(getMediaLinkUrl(media('cdphotothread'))).toBeUndefined();
+  });
+
+  test('cd-thread links to the thread', () => {
+    expect(getMediaLinkUrl(cdThreadMedia())).toBe(
+      'https://www.chiefdelphi.com/t/12345',
+    );
+  });
+
+  test('grabcad links to the model', () => {
+    expect(getMediaLinkUrl(media('grabcad', { foreign_key: 'robot-1' }))).toBe(
+      'https://grabcad.com/library/robot-1',
+    );
+  });
+
+  test('onshape links to the document', () => {
+    expect(getMediaLinkUrl(media('onshape', { foreign_key: 'doc1' }))).toBe(
+      'https://cad.onshape.com/documents/doc1',
+    );
+  });
+
+  test('external links use the key as the url', () => {
+    expect(getMediaLinkUrl(externalLinkMedia())).toBe(
+      'https://example.com/robot.jpg',
+    );
+  });
+
+  test('video media has no link', () => {
+    expect(getMediaLinkUrl(youtubeMedia('abc'))).toBeUndefined();
+  });
+});
+
+describe('getCadModelName', () => {
+  test('uses the model name from grabcad details', () => {
+    const item = media('grabcad', {
+      details: { model_name: 'Swerve Module' } as Media['details'],
+    });
+
+    expect(getCadModelName(item)).toBe('Swerve Module');
+  });
+
+  test('falls back to a generic name without details', () => {
+    expect(getCadModelName(media('onshape'))).toBe('CAD Model');
+  });
+
+  test('non-CAD media gets the generic name', () => {
+    expect(getCadModelName(imgurMedia())).toBe('CAD Model');
+  });
+});
+
+describe('getImageMedia', () => {
+  test('keeps only image media', () => {
+    const items = [youtubeMedia('abc'), cdThreadMedia(), smugmugPhoto()];
+
+    expect(getImageMedia(items).map((m) => m.type)).toEqual(['cd-thread']);
+  });
+
+  test('puts preferred images first', () => {
+    const items = [
+      imgurMedia({ foreign_key: 'second', preferred: false }),
+      imgurMedia({ foreign_key: 'first', preferred: true }),
+      imgurMedia({ foreign_key: 'third', preferred: false }),
+    ];
+
+    expect(getImageMedia(items).map((m) => m.foreign_key)).toEqual([
+      'first',
+      'second',
+      'third',
+    ]);
+  });
+});
+
+describe('getTeamPreferredRobotPicMedium', () => {
+  test('returns the url of the preferred image', () => {
+    const items = [
+      imgurMedia({ preferred: false, direct_url: 'https://i.imgur.com/a.jpg' }),
+      imgurMedia({ preferred: true, direct_url: 'https://i.imgur.com/b.jpg' }),
+    ];
+
+    expect(getTeamPreferredRobotPicMedium(items)).toBe(
+      'https://i.imgur.com/b.jpg',
+    );
+  });
+
+  test('is undefined without a preferred image', () => {
+    expect(
+      getTeamPreferredRobotPicMedium([imgurMedia({ preferred: false })]),
+    ).toBeUndefined();
   });
 });

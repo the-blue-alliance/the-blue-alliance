@@ -22,17 +22,14 @@ class NexusMatchStatus(enum.IntEnum):
         raise ValueError(f"Unknown value for NexusMatchStatus: {name}")
 
     def to_string(self) -> str:
-        match self:
-            case self.QUEUING_SOON:
-                return "Queuing soon"
-            case self.NOW_QUEUING:
-                return "Now queuing"
-            case self.ON_DECK:
-                return "On deck"
-            case self.ON_FIELD:
-                return "On field"
+        return NEXUS_MATCH_STATUS_STRINGS[self]
 
-        # Unreachable: every member is matched above
-        raise ValueError(  # pragma: no cover
-            f"Unknown value for NexusMatchStatus: {self}"
-        )
+
+# Defined outside the enum body so it isn't treated as a member. Every member
+# must have an entry, which nexus_match_status_test checks.
+NEXUS_MATCH_STATUS_STRINGS: dict[NexusMatchStatus, str] = {
+    NexusMatchStatus.QUEUING_SOON: "Queuing soon",
+    NexusMatchStatus.NOW_QUEUING: "Now queuing",
+    NexusMatchStatus.ON_DECK: "On deck",
+    NexusMatchStatus.ON_FIELD: "On field",
+}
