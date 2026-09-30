@@ -1,5 +1,6 @@
 /* @jest-environment jsdom */
 import React from "react";
+import { format } from "util";
 import { render, fireEvent, act } from "@testing-library/react";
 import LayoutSelectionPanel from "../LayoutSelectionPanel";
 import {
@@ -49,6 +50,27 @@ beforeEach(() => {
 
 const getListContainer = (container) =>
   container.querySelector("h3").nextSibling;
+
+describe("Bug #35: LayoutSelectionPanel ListItem button prop", () => {
+  // Must run before any other test in this file: React only warns about a
+  // given unknown DOM attribute once per module registry.
+  it("Bug #35: does not pass MUI's removed `button` prop through to the DOM", () => {
+    // Wrong today: ListItem lost its `button` prop in MUI v7, so `button` is
+    // forwarded to the <li> and React warns about an unknown attribute.
+    // Correct: use ListItemButton (or drop the prop); no warning, no attribute.
+    const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      render(<LayoutSelectionPanel setLayout={() => {}} />);
+      expect(document.querySelector("[button]")).toBeNull();
+      const buttonWarnings = spy.mock.calls
+        .map((args) => format(...args))
+        .filter((msg) => msg.includes("`button`"));
+      expect(buttonWarnings).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
 
 describe("LayoutSelectionPanel", () => {
   it("lists every layout in display order with its icon", () => {

@@ -1,5 +1,6 @@
 /* @jest-environment jsdom */
 import React from "react";
+import { format } from "util";
 import { render, fireEvent } from "@testing-library/react";
 import { ThemeProvider, createTheme } from "@mui/material/styles";
 import LayoutDrawer from "../LayoutDrawer";
@@ -35,6 +36,27 @@ const renderDrawer = (props = {}) => {
   );
   return { ...utils, props: allProps };
 };
+
+describe("Bug #35: LayoutDrawer ListItem button prop", () => {
+  // Must run before any other test in this file: React only warns about a
+  // given unknown DOM attribute once per module registry.
+  it("Bug #35: does not pass MUI's removed `button` prop through to the DOM", () => {
+    // Wrong today: ListItem lost its `button` prop in MUI v7, so `button` is
+    // forwarded to the <li> and React warns about an unknown attribute.
+    // Correct: use ListItemButton (or drop the prop); no warning, no attribute.
+    const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      renderDrawer();
+      expect(document.querySelector("[button]")).toBeNull();
+      const buttonWarnings = spy.mock.calls
+        .map((args) => format(...args))
+        .filter((msg) => msg.includes("`button`"));
+      expect(buttonWarnings).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
 
 describe("LayoutDrawer", () => {
   it("lists the layouts in display order and checks the selected one", () => {
