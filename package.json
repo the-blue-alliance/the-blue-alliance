@@ -147,6 +147,11 @@
     ],
     "coverageDirectory": "./.node_coverage/",
     "collectCoverage": true,
+    "collectCoverageFrom": [
+      "src/frontend/**/*.{js,ts,tsx}",
+      "!src/frontend/**/__tests__/**",
+      "!src/frontend/**/*.test.{js,ts,tsx}"
+    ],
     "preset": "jest-puppeteer"
   }
 }
