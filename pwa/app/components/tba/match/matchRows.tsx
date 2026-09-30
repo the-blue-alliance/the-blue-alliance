@@ -24,7 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { formatPredictedTime, matchTitleShort } from '~/lib/matchUtils';
+import { formatMatchTime, matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
 
 interface PlaylistEntry {
@@ -269,7 +269,7 @@ export function MatchRow({
             xl:col-start-auto xl:row-span-1 xl:row-start-auto"
         >
           <span className="flex h-full items-center justify-center text-center">
-            {match.predicted_time && formatPredictedTime(match.predicted_time)}
+            {match.predicted_time && formatMatchTime(match.predicted_time)}
           </span>
         </div>
       )}
@@ -373,8 +373,7 @@ export function SimpleMatchRow({
               justify-center text-center"
           >
             <span>
-              {match.predicted_time &&
-                formatPredictedTime(match.predicted_time)}
+              {match.predicted_time && formatMatchTime(match.predicted_time)}
             </span>
           </div>
         )}

@@ -9,7 +9,7 @@ import {
 } from '~/api/tba/read';
 import {
   formatMatchKeyName,
-  formatPredictedTime,
+  formatMatchTime,
   getAllianceMatchResult,
   isValidMatchKey,
   parseMatchKey,
@@ -306,15 +306,30 @@ describe('formatMatchKeyName', () => {
   });
 });
 
-describe('formatPredictedTime', () => {
-  const at = (hour: number, minute: number) =>
-    new Date(2026, 2, 7, hour, minute).getTime() / 1000;
+describe('formatMatchTime', () => {
+  // 2026-03-07 is a Saturday; New York is on EST (UTC-5) until March 8.
+  const utc = (iso: string) => Date.parse(iso) / 1000;
+  const newYork = { timeZone: 'America/New_York' };
 
   test.each([
-    [at(9, 30), 'Sat 9:30 AM'],
-    [at(14, 5), 'Sat 2:05 PM'],
-    [at(0, 0), 'Sat 12:00 AM'],
-  ])('formats %d as %s in the local time zone', (time, expected) => {
-    expect(formatPredictedTime(time)).toBe(expected);
+    ['2026-03-07T14:30:00Z', 'Sat 9:30 AM'],
+    ['2026-03-07T19:05:00Z', 'Sat 2:05 PM'],
+    ['2026-03-07T05:00:00Z', 'Sat 12:00 AM'],
+  ])('formats %s in the given time zone as %s', (iso, expected) => {
+    expect(formatMatchTime(utc(iso), newYork)).toBe(expected);
+  });
+
+  test('omits the weekday when asked', () => {
+    expect(
+      formatMatchTime(utc('2026-03-07T14:30:00Z'), {
+        ...newYork,
+        weekday: false,
+      }),
+    ).toBe('9:30 AM');
+  });
+
+  test("defaults to the viewer's time zone", () => {
+    const nineThirty = new Date(2026, 2, 7, 9, 30).getTime() / 1000;
+    expect(formatMatchTime(nineThirty)).toBe('Sat 9:30 AM');
   });
 });
