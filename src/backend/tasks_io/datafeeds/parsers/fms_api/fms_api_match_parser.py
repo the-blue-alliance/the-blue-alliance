@@ -18,12 +18,24 @@ from backend.common.frc_api.types import (
     ScoreDetailModel2024,
 )
 from backend.common.helpers.match_helper import MatchHelper
+from backend.common.helpers.playoff_advancement_helper import PlayoffAdvancementHelper
 from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.keys import MatchKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.match_score_breakdown import MatchScoreBreakdown
 from backend.common.suggestions.media_parser import MediaParser
+
+QF_SF_MAP = {
+    1: (1, 3),  # in sf1, qf seeds 2 and 4 play. 0-indexed becomes 1, 3
+    2: (0, 2),
+    3: (1, 2),
+    4: (0, 3),
+    5: (2, 3),
+    6: (0, 1),
+}
+
+LAST_LEVEL = {CompLevel.SF: CompLevel.QF, CompLevel.F: CompLevel.SF}
 
 TIME_PATTERN = "%Y-%m-%dT%H:%M:%S"
 
@@ -303,16 +315,53 @@ class FMSAPIHybridScheduleParser(
             )
 
         if self.year == 2015:
-            # Return 2015 matches in organized order. (Null teams from 2015
-            # FMS API elim failures are dropped when building team_key_names
-            # above, so there is nothing to repair here.)
+            # Fix null teams in elims (due to FMS API failure, some info not complete)
+            # Should only happen for sf and f matches
             _, organized_matches = MatchHelper.organized_matches(parsed_matches)
-            parsed_matches = [
-                match
-                for key, level_matches in organized_matches.items()
-                if key != "num"
-                for match in level_matches
-            ]
+            for level in [CompLevel.SF, CompLevel.F]:
+                playoff_advancement = (
+                    PlayoffAdvancementHelper.generate_playoff_advancement_2015(
+                        organized_matches
+                    )
+                )
+                if playoff_advancement[LAST_LEVEL[level]] != []:
+                    for match in organized_matches[level]:
+                        # Unreachable today: null teams are skipped when building
+                        # team_key_names above, so "frcNone" never appears. Kept
+                        # because that skip looks like a regression and this
+                        # repair is what a fix would re-enable.
+                        if "frcNone" in match.team_key_names:  # pragma: no cover
+                            if level == "sf":
+                                red_seed, blue_seed = QF_SF_MAP[match.match_number]
+                            else:
+                                red_seed = 0
+                                blue_seed = 1
+                            red_teams = [
+                                "frc{}".format(t)
+                                for t in playoff_advancement[LAST_LEVEL[level]][
+                                    red_seed
+                                ][0]
+                            ]
+                            blue_teams = [
+                                "frc{}".format(t)
+                                for t in playoff_advancement[LAST_LEVEL[level]][
+                                    blue_seed
+                                ][0]
+                            ]
+
+                            alliances = match.alliances
+                            alliances[AllianceColor.RED]["teams"] = red_teams
+                            alliances[AllianceColor.BLUE]["teams"] = blue_teams
+                            match.alliances_json = json.dumps(alliances)
+                            match.team_key_names = red_teams + blue_teams
+
+            fixed_matches = []
+            for key, matches in organized_matches.items():
+                if key != "num":
+                    for match in matches:
+                        if "frcNone" not in match.team_key_names:
+                            fixed_matches.append(match)
+            parsed_matches = fixed_matches
 
         return parsed_matches, remapped_matches
 
