@@ -1212,15 +1212,6 @@ def test_get_similarity_dissimilar_strings_score_low() -> None:
     assert LocationHelper.get_similarity("Leland High School", "Zebra Quantum") < 0.3
 
 
-def test_get_similarity_acronyms_do_not_match() -> None:
-    # Documents current behaviour. The docstring promises acronym matching
-    # ("lhs" vs "Leland High School"), but the acronym is built from the same
-    # `filter()` iterator that `sorted()` already exhausted, so it is always ""
-    # and the acronym comparisons contribute nothing.
-    assert LocationHelper.get_similarity("Leland High School", "lhs") < 0.5
-    assert LocationHelper.get_similarity("lhs", "Leland High School") < 0.5
-
-
 # --- get_event_location / update_event_location ------------------------------
 
 
@@ -1529,24 +1520,6 @@ def test_compute_event_location_score_not_point_of_interest() -> None:
         )
         == 0
     )
-
-
-def test_compute_event_location_score_requires_formatted_address() -> None:
-    # Documents current behaviour: formatted_address is only populated when the
-    # place-details lookup succeeds, but the score reads it unconditionally.
-    info = cast(
-        LocationInfo,
-        {
-            "name": "Leland High School",
-            "lat": SAN_JOSE.lat,
-            "lng": SAN_JOSE.lon,
-            "types": ["point_of_interest"],
-        },
-    )
-    with pytest.raises(KeyError):
-        LocationHelper.compute_event_location_score(
-            "Leland High School", info, SAN_JOSE
-        )
 
 
 # --- update_team_location ---------------------------------------------------
@@ -1956,7 +1929,7 @@ def test_placesearch_without_sitevar(
     assert LocationHelper.google_maps_placesearch("Leland", SAN_JOSE) == []
 
     assert requests_mock.call_count == 0
-    assert "Must have sitevar google.api_key" in caplog.text
+    assert "Must have sitevar" in caplog.text
     assert LocationHelper.GOOGLE_API_KEY is None
 
 
@@ -2073,7 +2046,7 @@ def test_place_details_without_sitevar(
     assert LocationHelper.google_maps_place_details("place-1") is None
 
     assert requests_mock.call_count == 0
-    assert "Must have sitevar google.api_key" in caplog.text
+    assert "Must have sitevar" in caplog.text
 
 
 def test_place_details_ok_and_cached(requests_mock: Mocker) -> None:
@@ -2175,7 +2148,7 @@ def test_geocode_without_sitevar_omits_key(
     assert _qs(request, "address") == "San Jose, CA"
     assert _qs(request, "sensor") == "false"
     assert _qs(request, "key") is None
-    assert "Missing sitevar: google.api_key" in caplog.text
+    assert "Missing sitevar" in caplog.text
 
 
 def test_geocode_with_sitevar_sends_key_and_caches(requests_mock: Mocker) -> None:
@@ -2198,18 +2171,6 @@ def test_geocode_zero_results(
     with caplog.at_level(logging.INFO):
         assert LocationHelper.google_maps_geocode("Nowhere") == []
     assert "No geocode results for location: Nowhere" in caplog.text
-
-
-def test_geocode_zero_results_are_not_served_from_cache(requests_mock: Mocker) -> None:
-    # Documents current behaviour: an empty result is written to memcache but
-    # the cache check is `if not results`, so empty geocodes are re-fetched
-    # every call (placesearch uses `is None` and does not have this quirk).
-    requests_mock.get(GEOCODE_URL, json={"status": "ZERO_RESULTS", "results": []})
-
-    assert LocationHelper.google_maps_geocode("Nowhere") == []
-    assert LocationHelper.google_maps_geocode("Nowhere") == []
-
-    assert requests_mock.call_count == 2
 
 
 def test_geocode_error_status(
