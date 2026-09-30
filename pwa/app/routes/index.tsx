@@ -17,7 +17,8 @@ export const Route = createFileRoute('/')({
   },
   headers: publicCacheControlHeaders(),
   component: Home,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Home() {
   const { currentSeason, status } = Route.useRouteContext();
