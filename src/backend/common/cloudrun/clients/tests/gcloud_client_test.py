@@ -441,3 +441,29 @@ def test_get_job_status_correct_name_format():
         client.get_job_status(job_name, execution_id)
 
     mock_executions_client.get_execution.assert_called_once_with(name=expected_name)
+
+
+def test_get_job_status_unknown():
+    """More succeeded tasks than the task count is not a recognised state."""
+    execution = Execution(
+        succeeded_count=6,
+        failed_count=0,
+        cancelled_count=0,
+        task_count=5,
+    )
+    mock_executions_client = Mock(spec=ExecutionsClient)
+    mock_executions_client.get_execution.return_value = execution
+
+    with (
+        patch.object(JobsClient, "__init__", return_value=None),
+        patch.object(ExecutionsClient, "__init__", return_value=None),
+    ):
+        client = GCloudRunClient("test-project", "us-central1")
+        client.executions_client = mock_executions_client
+        status = client.get_job_status("test-job", "exec-unknown")
+
+    assert status == {
+        "state": "UNKNOWN",
+        "message": "Job status unknown",
+        "is_complete": True,
+    }
