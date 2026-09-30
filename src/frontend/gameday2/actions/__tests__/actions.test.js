@@ -140,3 +140,35 @@ describe("actions", () => {
     expect(actions.setTwitchChat(channel)).toEqual(expectedAction);
   });
 });
+
+describe("simple action creators", () => {
+  it.each([
+    ["setChatSidebarVisibility", types.SET_CHAT_SIDEBAR_VISIBILITY],
+    ["setHashtagSidebarVisibility", types.SET_HASHTAG_SIDEBAR_VISIBILITY],
+    ["setLayoutDrawerVisibility", types.SET_LAYOUT_DRAWER_VISIBILITY],
+  ])("%s creates a %s action", (creator, type) => {
+    expect(actions[creator](false)).toEqual({ type, visible: false });
+  });
+
+  it("should create an action to set the default twitch chat", () => {
+    expect(actions.setDefaultTwitchChat("tbagameday")).toEqual({
+      type: types.SET_DEFAULT_TWITCH_CHAT,
+      channel: "tbagameday",
+    });
+  });
+
+  it("should create an action to set favorite teams", () => {
+    const favoriteTeams = [{ model_key: "frc254" }];
+    expect(actions.setFavoriteTeams(favoriteTeams)).toEqual({
+      type: types.SET_FAVORITE_TEAMS,
+      favoriteTeams,
+    });
+  });
+
+  it("should create an action to toggle livescore at a position", () => {
+    expect(actions.togglePositionLivescore(2)).toEqual({
+      type: types.TOGGLE_POSITION_LIVESCORE,
+      position: 2,
+    });
+  });
+});
