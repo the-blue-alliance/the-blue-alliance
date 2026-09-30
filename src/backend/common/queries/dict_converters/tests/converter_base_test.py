@@ -111,3 +111,23 @@ def test_constructLocation_v3_location() -> None:
     assert converted["lng"] is None
     assert converted["gmaps_place_id"] is None
     assert converted["gmaps_url"] is None
+
+
+class PassthroughConverter(ConverterBase):
+    SUBVERSIONS = {
+        ApiMajorVersion.API_V3: 0,
+    }
+
+    @classmethod
+    def _convert_list(
+        cls, model_list: List[DummyModel], version: ApiMajorVersion
+    ) -> List[DummyDict]:
+        return super()._convert_list(model_list, version)
+
+
+def test_convert_base_default_convert_list() -> None:
+    # The abstract base implementation renders each model as an empty dict
+    converted = PassthroughConverter(
+        [DummyModel(int_prop=254), DummyModel(int_prop=604)]
+    ).convert(ApiMajorVersion.API_V3)
+    assert converted == [{}, {}]
