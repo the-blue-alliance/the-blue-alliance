@@ -557,7 +557,7 @@ class InsightsHelper(object):
         if insight is not None:
             return [insight]
         else:
-            return []
+            return []  # pragma: no cover  # highscore_matches is a dict, never == []
 
     @classmethod
     def _calculateMatchesByTeam(
@@ -749,7 +749,8 @@ class InsightsHelper(object):
             )
         if elim_score_distribution != {}:
             if binAmount is None:  # Use same binAmount from above if possible
-                binAmount = math.ceil(float(overall_highscore) / 20)
+                # Unreachable: elim scores are a subset of all scores
+                binAmount = math.ceil(float(overall_highscore) / 20)  # pragma: no cover
             totalCount = float(sum(elim_score_distribution.values()))
             elim_score_distribution_normalized = {}
             for score, amount in elim_score_distribution.items():
@@ -824,7 +825,10 @@ class InsightsHelper(object):
 
         if elim_winning_margin_distribution != {}:
             if binAmount is None:  # Use same binAmount from above if possible
-                binAmount = math.ceil(float(overall_high_margin) / 20)
+                # Unreachable: elim margins are a subset of all margins
+                binAmount = math.ceil(
+                    float(overall_high_margin) / 20
+                )  # pragma: no cover
             totalCount = float(sum(elim_winning_margin_distribution.values()))
             elim_winning_margin_distribution_normalized = {}
             for margin, amount in elim_winning_margin_distribution.items():

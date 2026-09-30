@@ -271,7 +271,7 @@ def enqueue_all_insights_of_kind(kind: str) -> Response:
     except ValueError:
         logging.warning(f"Unknown insight kind {kind}")
         abort(404)
-        return  # no-op due to abort; only for type-hinting on insight_type
+        return  # pragma: no cover  # no-op due to abort; only for type-hinting
 
     for year in SeasonHelper.get_valid_years():
         taskqueue.add(
