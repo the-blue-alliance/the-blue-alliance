@@ -458,6 +458,24 @@ describe('ScoreBreakdown2018 adjustments', () => {
     expect(blueCell('Adjustments').textContent).toBe('-5');
   });
 
+  // Wrong today: the row is gated on BOTH alliances having a non-zero
+  // adjustPoints, so an adjustment applied to only one alliance is hidden.
+  // Correct: show the row when either alliance was adjusted.
+  test('Bug #53: shows the adjustments row when only one alliance was adjusted', () => {
+    render(
+      <ScoreBreakdown2018
+        scoreBreakdown={makeBreakdown(
+          { adjustPoints: 10 },
+          { adjustPoints: 0 },
+        )}
+        match={match}
+      />,
+    );
+
+    expect(redCell('Adjustments').textContent).toBe('10');
+    expect(blueCell('Adjustments').textContent).toBe('0');
+  });
+
   test('hides the adjustments row when neither alliance was adjusted', () => {
     render(
       <ScoreBreakdown2018
