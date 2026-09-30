@@ -43,7 +43,8 @@ export const Route = createFileRoute('/webcasts')({
 interface EventGroup {
   label: string;
   events: Event[];
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function groupEventsByWeek(events: Event[]): EventGroup[] {
   const groups = new Map<string, EventGroup>();
