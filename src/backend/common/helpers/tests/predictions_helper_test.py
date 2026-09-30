@@ -340,6 +340,74 @@ def test_compute_match_predictions_modern_seasons(
     assert match_prediction_stats["qual"]["wl_accuracy"] is not None
 
 
+@pytest.mark.parametrize(
+    "event_key, secondary_stat, prob_key",
+    [
+        # 2024 MELODY: threshold drops with the Coopertition Bonus.
+        ("2024nytr", "coopertition_criteria", "prob_melody_bonus"),
+        # 2024 ENSEMBLE: needs at least 2 ONSTAGE ROBOTS.
+        ("2024nytr", "robot_on_stage", "prob_ensemble_bonus"),
+        # 2025 CORAL: threshold drops with the Coopertition Bonus.
+        ("2025isde1", "coopertition_criteria", "prob_coral_bonus"),
+    ],
+)
+def test_bug_24_bonus_predictions_compute_their_secondary_stats(
+    event_key: EventKey,
+    secondary_stat: str,
+    prob_key: str,
+    test_data_importer,
+) -> None:
+    """
+    Bug #24: the 2024/2025 bonus RP predictions in _predict_match read
+    secondary stats ("coopertition_criteria", "robot_on_stage") that are not
+    in those seasons' get_prediction_relevant_stats(), so they are never
+    computed. Their (mean, var) is (0, 0), the division by sqrt(0) emits a
+    numpy divide-by-zero RuntimeWarning, and the secondary factor is 0:
+    prob_ensemble_bonus is always 0 in 2024, and the Coopertition paths of
+    MELODY / CORAL contribute nothing.
+
+    Correct: every stat a prediction reads is computed, and an event where
+    alliances did earn the RP gets a non-zero probability.
+
+    Rules the secondary stats model:
+    - 2024 Game Manual (Section 6 at V10, manual of 2024-04-09),
+      Section 6.5.5 Coopertition Bonus and Section 6.5.6, Table 6-2: MELODY
+      threshold drops with the Coopertition Bonus; ENSEMBLE needs at least
+      10 STAGE points and at least 2 ONSTAGE ROBOTS.
+      https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
+    - 2025 Game Manual (Section 6 at V13, manual of 2025-04-08),
+      Section 6.5.3 Coopertition Bonus and Section 6.5.4, Table 6-2: with
+      Coopertition, the CORAL RP needs 7 CORAL on only 3 levels.
+      https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf
+    """
+    game = get_game(int(event_key[:4]))
+    assert secondary_stat in {s for s, _, _ in game.get_prediction_relevant_stats()}
+
+    test_data_importer.import_event(__file__, f"data/{event_key}.json")
+    test_data_importer.import_match_list(__file__, f"data/{event_key}_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, event_key)).fetch()
+    sorted_matches = MatchHelper.play_order_sorted_matches(matches)
+
+    (
+        match_predictions,
+        _match_prediction_stats,
+        stat_mean_vars,
+    ) = PredictionHelper.get_match_predictions(sorted_matches)
+
+    assert match_predictions is not None
+    assert stat_mean_vars is not None
+    assert secondary_stat in stat_mean_vars["qual"]
+    probs = [
+        prediction[color][prob_key]  # pyre-ignore[6]
+        for level in LEVELS
+        for prediction in match_predictions[level].values()
+        for color in ALLIANCE_COLORS
+    ]
+    assert probs
+    assert all(0.0 <= p <= 1.0 for p in probs)
+    assert any(p > 0.0 for p in probs)
+
+
 def test_get_match_predictions_no_matches() -> None:
     assert PredictionHelper.get_match_predictions([]) == (None, None, None)
 
