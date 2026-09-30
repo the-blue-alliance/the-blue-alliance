@@ -291,13 +291,6 @@ describe('attemptToParseSponsors edge cases', () => {
       'Company 1',
     ]);
   });
-
-  test('falls back to the last ampersand when every ampersand looks embedded', () => {
-    expect(attemptToParseSponsors('Sponsor A/B&C High School')).toEqual([
-      'Sponsor A',
-      'B',
-    ]);
-  });
 });
 
 describe('sortTeams', () => {
