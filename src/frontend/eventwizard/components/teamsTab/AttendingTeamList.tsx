@@ -28,14 +28,6 @@ const AttendingTeamList: React.FC<AttendingTeamListProps> = ({
   }, [hasFetchedTeams]);
 
   const handleUpdateAttendingTeams = async (): Promise<void> => {
-    if (!selectedEvent) {
-      // No valid event
-      showErrorMessage(
-        "Please select an event before fetching teams"
-      );
-      return;
-    }
-
     try {
       setButtonClass("btn-warning");
       const data: ApiTeam[] = await fetchTeams();
@@ -60,7 +52,7 @@ const AttendingTeamList: React.FC<AttendingTeamListProps> = ({
       <h4>Currently Attending Teams</h4>
       <button
         className={`btn ${buttonClass}`}
-        onClick={handleUpdateAttendingTeams}
+        onClick={selectedEvent ? handleUpdateAttendingTeams : undefined}
         disabled={!selectedEvent}
       >
         Fetch Teams

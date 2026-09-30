@@ -125,6 +125,10 @@ class ContributionCalculator:
 
         no_priors_team_list = team_list
 
+        # Only the current year is searched today. TODO: if this looks back
+        # further (year_diff != 0), scale prior-year stats based on actual
+        # data. The old placeholder kept means as-is (x1) and replaced
+        # variances with self._default_var * 3.
         for year_diff in range(1):
             team_events_futures = []
             for team in no_priors_team_list:
@@ -160,10 +164,6 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["mean"].get(team)
                             if team_mean is not None:
-                                if year_diff != 0:
-                                    team_mean *= (
-                                        1  # TODO: Hacky; scale based on actual data
-                                    )
                                 past_stats_mean[team].append(team_mean)
                                 no_past_mean = False
 
@@ -171,10 +171,6 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["var"].get(team)
                             if team_var is not None:
-                                if year_diff != 0:
-                                    team_var = (
-                                        self._default_var * 3
-                                    )  # TODO: Hacky; scale based on actual data
                                 past_stats_var[team].append(team_var)
                 if no_past_mean:
                     no_priors_team_list.append(team)

@@ -139,13 +139,10 @@ class EventDetails(CachedModel):
         sort_order_info = RANKING_SORT_ORDERS.get(game_year)
 
         extra_stats_info: List[RankingSortOrderInfo] = []
+        # has_extra_stats is never set for 2021 (no ranking matches), so 2021
+        # gets no extra stats.
         if has_extra_stats:
-            if game_year == 2021:
-                # Unreachable: the loop above `continue`s before setting
-                # has_extra_stats for 2021, which had no ranking matches
-                pass  # pragma: no cover
-
-            elif game_year >= 2017:
+            if game_year >= 2017:
                 extra_stats_info = [{"name": "Total Ranking Points", "precision": 0}]
             elif sort_order_info is not None:
                 extra_stats_info = [
