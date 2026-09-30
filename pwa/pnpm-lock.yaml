@@ -214,8 +214,8 @@ importers:
         specifier: 1.85.0
         version: 1.85.0(oxlint-tsgolint@7.0.2002)
       oxlint-tailwindcss:
-        specifier: 1.12.0
-        version: 1.12.0
+        specifier: 1.13.0
+        version: 1.13.0
       oxlint-tsgolint:
         specifier: 7.0.2002
         version: 7.0.2002
@@ -6109,8 +6109,8 @@ packages:
     resolution: {integrity: sha512-YO1/Ys3FIC/uBgyjexvGsITQUIXDGNmxJy6vqQbd8WY7JjzMD1+vCVh59lza9/P02/TRNaUXyU7Or2xwx/Kbdw==}
     engines: {node: ^20.19.0 || >=22.12.0}
 
-  oxlint-tailwindcss@1.12.0:
-    resolution: {integrity: sha512-dSeRi4mE+wHR7pdhF3G4A5ZBHgiLbyMORnyXLdbIi/JfwSjx65WxYddrpTuYDZzY8JqPaEYe+xTfj8v7b0xJhA==}
+  oxlint-tailwindcss@1.13.0:
+    resolution: {integrity: sha512-S6Dp9K1olUgPIAcQp3SQa+dZDJeZzoI9hE4Bp/fFYW43AMV0kPiDWpqm8JCXPHyHuMXvRWvdvS9J7KEQhTciBw==}
     engines: {node: '>=20'}
 
   oxlint-tsgolint@7.0.2002:
@@ -14486,7 +14486,7 @@ snapshots:
       '@oxc-transform-react/binding-win32-ia32-msvc': 0.151.0
       '@oxc-transform-react/binding-win32-x64-msvc': 0.151.0
 
-  oxlint-tailwindcss@1.12.0:
+  oxlint-tailwindcss@1.13.0:
     dependencies:
       '@tailwindcss/node': 4.3.3
       tailwindcss: 4.3.3
