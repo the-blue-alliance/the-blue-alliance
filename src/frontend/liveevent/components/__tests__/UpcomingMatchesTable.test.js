@@ -72,4 +72,16 @@ describe("UpcomingMatchesTable", () => {
     });
     expect(screen.getAllByText("<2 min")).toHaveLength(2);
   });
+
+  it("Bug #49b: clears its refresh interval on unmount", () => {
+    // Wrong today: componentDidMount starts a 10s setInterval that is never
+    // cleared, so it keeps calling setState after unmount.
+    // Correct: no timers remain once the table is unmounted.
+    const { unmount } = render(
+      <UpcomingMatchesTable year={2018} matches={[]} />
+    );
+    expect(jest.getTimerCount()).toBe(1);
+    unmount();
+    expect(jest.getTimerCount()).toBe(0);
+  });
 });

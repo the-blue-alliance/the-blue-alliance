@@ -151,4 +151,25 @@ describe("CurrentMatchDisplay", () => {
     expect(container.querySelectorAll(".powerCubeActive")).toHaveLength(0);
     expect(container.querySelectorAll(".booleanIndicator.red")).toHaveLength(0);
   });
+
+  it("Bug #49: never leaks false or 0 into the indicator class names", () => {
+    // Wrong today: class names are built with `${x && "red"}`, so unowned
+    // indicators get a "false" (or "0") class, e.g. "booleanIndicator false".
+    // Correct: unowned indicators are just "booleanIndicator".
+    [renderDisplay(liveState), renderDisplay(liveState, true)].forEach(
+      (container) => {
+        container.querySelectorAll(".booleanIndicator").forEach((el) => {
+          expect(Array.from(el.classList)).not.toContain("false");
+          expect(Array.from(el.classList)).not.toContain("0");
+        });
+      }
+    );
+  });
+
+  it("Bug #49d: validates forcePreMatch with a real PropTypes validator", () => {
+    // Wrong today: propTypes declares `forcePreMatch: PropTypes.boolean`,
+    // which does not exist, so the validator is undefined.
+    // Correct: PropTypes.bool.
+    expect(typeof CurrentMatchDisplay.propTypes.forcePreMatch).toBe("function");
+  });
 });

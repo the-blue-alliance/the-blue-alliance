@@ -5,6 +5,7 @@ import { act, render } from "@testing-library/react";
 import LiveEventPanel from "../LiveEventPanel";
 
 const mockListeners = {};
+const mockOff = jest.fn();
 jest.mock("../../firebaseapp", () => ({
   __esModule: true,
   default: {
@@ -13,6 +14,7 @@ jest.mock("../../firebaseapp", () => ({
         on: (event, cb) => {
           mockListeners[path] = cb;
         },
+        off: (...args) => mockOff(path, ...args),
       }),
     }),
   },
@@ -207,5 +209,28 @@ describe("LiveEventPanel", () => {
       container.querySelector('[data-testid="current-match"]').parentElement
         .className
     ).toBe(" text-center livePanelColumn");
+  });
+
+  it("Bug #49b: clears its refresh interval on unmount", () => {
+    // Wrong today: componentDidMount starts a 10s setInterval that is never
+    // cleared, so it keeps calling setState after unmount.
+    // Correct: no timers remain once the panel is unmounted.
+    const { unmount } = setUp();
+    expect(jest.getTimerCount()).toBe(1);
+    unmount();
+    expect(jest.getTimerCount()).toBe(0);
+  });
+
+  it("Bug #49c: detaches its Firebase listeners on unmount", () => {
+    // Wrong today: the /e/<event>/m and /le/<event> "value" listeners are
+    // never removed, so they keep calling setState after unmount.
+    // Correct: both refs are detached with off() on unmount.
+    mockOff.mockClear();
+    const { unmount } = setUp();
+    unmount();
+    const detached = mockOff.mock.calls.map(([path]) => path);
+    expect(detached).toEqual(
+      expect.arrayContaining(["/e/2018casj/m", "/le/2018casj"])
+    );
   });
 });
