@@ -441,16 +441,17 @@ export default function ScoreBreakdown2018({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls */}
+      {/* Fouls: foulCount/techFoulCount are the fouls an alliance committed,
+          which credit points to its opponent, so each side shows the other's. */}
       <ScoreBreakdownRow
         blueValue={scoreBreakdown.blue.foulPoints}
         redValue={scoreBreakdown.red.foulPoints}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
+            foulsReceived={scoreBreakdown.blue.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2018]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
+            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
             techOrMajor="tech"
           />
@@ -460,9 +461,9 @@ export default function ScoreBreakdown2018({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
+            foulsReceived={scoreBreakdown.red.foulCount}
             pointsPerFoul={POINTS_PER_FOUL[2018]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
+            techFoulsReceived={scoreBreakdown.red.techFoulCount}
             pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
             techOrMajor="tech"
           />

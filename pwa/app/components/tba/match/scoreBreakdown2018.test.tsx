@@ -408,19 +408,17 @@ describe('ScoreBreakdown2018 endgame', () => {
 });
 
 describe('ScoreBreakdown2018 fouls', () => {
-  // Both alliances get identical counts here: which alliance's counts belong
-  // under which column is Bug #54, covered by its own failing-test PR.
-
-  // Wrong today: the "Fouls Received" row shows each alliance's OWN
-  // foulCount/techFoulCount (the fouls it committed).
-  // Correct: like 2016, 2017, 2019 and 2020, each alliance shows the fouls
-  // its opponent committed, because those are the points it received.
+  // Bug #54: the "Fouls Received" row showed each alliance its OWN
+  // foulCount/techFoulCount, i.e. the fouls it committed. Each alliance must
+  // show its opponent's counts, because those are the points it received.
   // 2018 Game & Season Manual (FIRST POWER UP), Section 4.4 Rule Violations,
-  // Table 4-3 Penalty Table (page 43, section revision V4): "FOUL: 5 points
-  // credited towards the opponent's total score", "TECH FOUL: 25 points
-  // credited towards the opponent's total score". Latest published manual
-  // (PDF last modified 2018-04-10, after all Team Updates):
+  // Table 4-3 Penalty Table (page 43 of 133, Section 4 V4; PDF dated
+  // 2018-04-10, after the last Team Update): "FOUL | 5 points credited
+  // towards the opponent's total score." / "TECH FOUL | 25 points credited
+  // towards the opponent's total score."
   // https://firstfrc.blob.core.windows.net/frc2018/Manual/2018FRCGameSeasonManual.pdf
+  // The FRC API's foulCount is fouls committed: in 2018cmptx_sf1m13 red has
+  // foulCount 1 and foulPoints 10 = blue's foulCount 2 x 5.
   test("Bug #54: shows the opponent's fouls as fouls received", () => {
     render(
       <ScoreBreakdown2018
@@ -443,6 +441,8 @@ describe('ScoreBreakdown2018 fouls', () => {
     ).toBeTruthy();
   });
 
+  // Both alliances get identical counts in the next two tests, so they check
+  // point values only; which column gets whose counts is covered above.
   test('values fouls at 5 points each', () => {
     render(
       <ScoreBreakdown2018
