@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import unittest
-from typing import Any, cast, Dict, List, Optional
+from typing import Any, cast, Dict, get_type_hints, List, Optional
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
@@ -2266,3 +2266,16 @@ def test_get_timezone_id_missing_time_zone_id(
 
     assert LocationHelper.get_timezone_id(None, lat_lng=SAN_JOSE) is None
     assert "No timeZoneId for (37.3382, -121.8863)" in caplog.text
+
+
+def test_bug_12_location_info_annotations_match_stored_values() -> None:
+    """Bug #12: LocationInfo's annotations disagree with the stored values.
+
+    Today `types` is annotated `str` but holds the List[str] from the Maps
+    result, and `postal_code` is annotated `int` but holds the long_name
+    string (Location.postal_code is a StringProperty), so callers need cast().
+    Correct: types is List[str] and postal_code is str.
+    """
+    hints = get_type_hints(LocationInfo)
+    assert hints["types"] == List[str]
+    assert hints["postal_code"] is str
