@@ -12,6 +12,7 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.seasons.game_specifics_2026 import GameSpecifics2026
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_breakdownless_match_excluded,
     build_match,
     HELPERS_TESTS,
     tiebreak_winner,
@@ -467,3 +468,19 @@ def test_calculate_event_insights_splits_quals_and_playoffs() -> None:
     insights = _insights([playoff])
     assert insights["qual"] is None
     assert none_throws(insights["playoff"])["high_score"] == (30, "2026casj_f1m1", "F1")
+
+
+def test_bug_20_breakdownless_match_excluded_from_insights(
+    test_data_importer,
+) -> None:
+    """
+    Bug #20: a played match without a score breakdown skews the insights.
+    It is counted in finished_matches (every denominator), but the loop
+    skips it before its scores reach the totals, so it drags the averages
+    down.
+    Correct: exclude it from both numerator and denominator, so the insights
+    are identical to the event's insights without it.
+    """
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2026marea_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2026marea")).fetch()
+    assert_breakdownless_match_excluded(GameSpecifics2026(), matches)

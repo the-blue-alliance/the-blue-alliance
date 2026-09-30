@@ -15,6 +15,7 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2017
 from backend.common.game_specific.seasons.game_specifics_2017 import GameSpecifics2017
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_breakdownless_match_excluded,
     build_match,
     HELPERS_TESTS,
     put_event,
@@ -146,3 +147,18 @@ def test_calculate_event_insights_logs_failed_matches(
     ]
     assert failures
     assert all(record.levelno == level for record in failures)
+
+
+def test_bug_20_breakdownless_match_excluded_from_insights(
+    test_data_importer,
+) -> None:
+    """
+    Bug #20: a played match without a score breakdown skews the insights.
+    Its scores are added to the totals before the breakdown check, but
+    it is never counted in finished_matches, so it skews the averages.
+    Correct: exclude it from both numerator and denominator, so the insights
+    are identical to the event's insights without it.
+    """
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2017nyny_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2017nyny")).fetch()
+    assert_breakdownless_match_excluded(GameSpecifics2017(), matches)

@@ -7,7 +7,7 @@ from google.appengine.ext import ndb
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
-from backend.common.game_specific.base import TCriteria
+from backend.common.game_specific.base import SeasonGameConfig, TCriteria
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 
@@ -83,3 +83,21 @@ def build_match(
             None if score_breakdown is None else json.dumps(score_breakdown)
         ),
     )
+
+
+def assert_breakdownless_match_excluded(
+    config: SeasonGameConfig[Any], matches: List[Match]
+) -> None:
+    """
+    Bug #20: a played match without a score breakdown must be excluded from
+    both the numerators and the denominators of the event insights, so adding
+    one to an event must not change any figure. Its 1-0 score keeps it out of
+    the high score either way.
+    """
+    first = matches[0]
+    breakdownless = build_match(
+        first.event_key_name, first.comp_level, 999, 1, 0, None, 99
+    )
+    assert config.calculate_event_insights(
+        matches + [breakdownless]
+    ) == config.calculate_event_insights(matches)

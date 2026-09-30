@@ -11,6 +11,7 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2025
 from backend.common.game_specific.seasons.game_specifics_2025 import GameSpecifics2025
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_breakdownless_match_excluded,
     build_match,
     HELPERS_TESTS,
     tiebreak_winner,
@@ -158,3 +159,19 @@ def test_calculate_event_insights_counts_coopertition_and_rp_sweeps() -> None:
     qual = none_throws(_insights([tie])["qual"])
     assert qual["six_rp_count"] == [0, 1, 0.0]
     assert qual["nine_rp_count"] == [0, 1, 0.0]
+
+
+def test_bug_20_breakdownless_match_excluded_from_insights(
+    test_data_importer,
+) -> None:
+    """
+    Bug #20: a played match without a score breakdown skews the insights.
+    It is counted in finished_matches (every denominator), but the loop
+    skips it before its scores reach the totals, so it drags the averages
+    down.
+    Correct: exclude it from both numerator and denominator, so the insights
+    are identical to the event's insights without it.
+    """
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2025mndu_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2025mndu")).fetch()
+    assert_breakdownless_match_excluded(GameSpecifics2025(), matches)
