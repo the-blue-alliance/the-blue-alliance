@@ -124,6 +124,7 @@ const FMSMatchResults: React.FC<FMSMatchResultsProps> = ({
   };
 
   const handleConfirm = async (): Promise<void> => {
+    /* istanbul ignore if -- unreachable: the confirm dialog only renders when there are matches */
     if (matches.length === 0) {
       setStatusMessage("No matches to submit");
       return;

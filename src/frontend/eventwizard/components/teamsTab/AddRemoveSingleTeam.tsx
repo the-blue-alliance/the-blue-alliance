@@ -74,6 +74,7 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
   };
 
   const handleAddSingleTeam = (): void => {
+    /* istanbul ignore if -- unreachable: the Add button is disabled until teams are fetched */
     if (!hasFetchedTeams) {
       showErrorMessage(
         "Please fetch teams before modification to ensure up to date data"
@@ -83,6 +84,7 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
 
     const existingTeamKeys = currentTeams.map((team) => team.key);
     const keyIndex = existingTeamKeys.indexOf(selectedTeamKey);
+    /* istanbul ignore if -- unreachable: the Add button is disabled when the selected team is already attending */
     if (keyIndex >= 0) {
       showErrorMessage(
         `Team ${selectedTeamKey} is already attending ${selectedEvent}. Re-fetch the team list if you know this is wrong.`
@@ -108,6 +110,7 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
   };
 
   const handleRemoveSingleTeam = (): void => {
+    /* istanbul ignore if -- unreachable: the Remove button is disabled until teams are fetched */
     if (!hasFetchedTeams) {
       showErrorMessage(
         "Please fetch teams before modification to ensure up to date data"
@@ -117,6 +120,7 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
 
     const existingTeamKeys = currentTeams.map((team) => team.key);
     const keyIndex = existingTeamKeys.indexOf(selectedTeamKey);
+    /* istanbul ignore if -- unreachable: the Remove button is disabled when the selected team is not attending */
     if (keyIndex < 0) {
       showErrorMessage(
         `Team ${selectedTeamKey} is already not attending ${selectedEvent}. Re-fetch the team list if you know this is wrong.`

@@ -110,6 +110,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
   };
 
   const fetchMatches = async (): Promise<void> => {
+    /* istanbul ignore if -- unreachable: the fetch button is disabled without a selected event */
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;
@@ -173,11 +174,13 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
   };
 
   const fetchPlaylistVideos = async (): Promise<void> => {
+    /* istanbul ignore if -- unreachable: the Load Playlist button is disabled without a selected event */
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;
     }
 
+    /* istanbul ignore if -- unreachable: the Load Playlist button is disabled until matches are fetched */
     if (matches.length === 0) {
       setStatusMessage("Fetch matches before loading a playlist");
       return;
@@ -263,6 +266,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
   };
 
   const addAllVideos = async (): Promise<void> => {
+    /* istanbul ignore if -- unreachable: the Add All button is disabled without a selected event */
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;
@@ -271,6 +275,7 @@ const MatchVideosTab: React.FC<MatchVideosTabProps> = ({
     const payload = getPendingVideoAddPayload();
     const pendingEntries = Object.entries(payload);
 
+    /* istanbul ignore if -- unreachable: the Add All button is disabled when nothing is pending */
     if (pendingEntries.length === 0) {
       setStatusMessage("No new videos to add");
       return;

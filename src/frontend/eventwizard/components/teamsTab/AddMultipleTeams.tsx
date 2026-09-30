@@ -25,6 +25,7 @@ const AddMultipleTeams: React.FC<AddMultipleTeamsProps> = ({
   };
 
   const handleAddTeams = (): void => {
+    /* istanbul ignore if -- unreachable: the button is disabled without a selected event */
     if (!selectedEvent) {
       // No valid event
       showErrorMessage("Please select an event before adding teams");

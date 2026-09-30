@@ -53,6 +53,7 @@ function EventRankingsTab({ selectedEvent, makeTrustedRequest }: EventRankingsTa
       return;
     }
 
+    /* istanbul ignore if -- unreachable: the upload button only renders when there are rankings */
     if (rankings.length === 0) {
       alert("No rankings to upload");
       return;

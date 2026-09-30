@@ -66,6 +66,7 @@ const EventAlliancesTab: React.FC<EventAlliancesTabProps> = ({
   };
 
   const handleManualSubmit = async (): Promise<void> => {
+    /* istanbul ignore if -- unreachable: the submit button is disabled without a selected event */
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;

@@ -28,6 +28,7 @@ const AttendingTeamList: React.FC<AttendingTeamListProps> = ({
   }, [hasFetchedTeams]);
 
   const handleUpdateAttendingTeams = async (): Promise<void> => {
+    /* istanbul ignore if -- unreachable: the button is disabled without a selected event */
     if (!selectedEvent) {
       // No valid event
       showErrorMessage(

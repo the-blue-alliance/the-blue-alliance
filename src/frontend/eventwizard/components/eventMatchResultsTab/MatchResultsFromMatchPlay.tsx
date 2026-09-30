@@ -61,6 +61,7 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
   const [updatingMatches, setUpdatingMatches] = useState<Record<string, boolean>>({});
 
   const fetchMatches = async (): Promise<void> => {
+    /* istanbul ignore if -- unreachable: the fetch button is disabled without a selected event */
     if (!selectedEvent) {
       setStatusMessage("Please select an event first");
       return;
