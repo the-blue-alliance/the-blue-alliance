@@ -60,19 +60,13 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
   const [scores, setScores] = useState<Record<string, MatchScores>>({});
   const [updatingMatches, setUpdatingMatches] = useState<Record<string, boolean>>({});
 
-  const fetchMatches = async (): Promise<void> => {
-    /* istanbul ignore if -- unreachable: the fetch button is disabled without a selected event */
-    if (!selectedEvent) {
-      setStatusMessage("Please select an event first");
-      return;
-    }
-
+  const fetchMatches = async (eventKey: string): Promise<void> => {
     setLoading(true);
     setStatusMessage("Loading matches...");
 
     try {
       const response = await makeApiV3Request(
-        `/api/v3/event/${selectedEvent}/matches/simple`
+        `/api/v3/event/${eventKey}/matches/simple`
       );
       ensureRequestSuccess(response);
       const data = await response.json();
@@ -205,7 +199,7 @@ const MatchResultsFromMatchPlay: React.FC<MatchResultsFromMatchPlayProps> = ({
             <div className="panel-body">
               <button
                 className="btn btn-primary"
-                onClick={fetchMatches}
+                onClick={selectedEvent ? () => fetchMatches(selectedEvent) : undefined}
                 disabled={loading || !selectedEvent}
               >
                 {loading ? "Loading..." : "Fetch Matches"}
