@@ -1,4 +1,6 @@
+import datetime
 import json
+from unittest.mock import patch
 
 from bs4 import BeautifulSoup
 from werkzeug.test import Client
@@ -52,3 +54,30 @@ def test_team_number_link_omits_empty_tooltip(ndb_stub, web_client: Client) -> N
     assert team_link is not None
     assert "rel" not in team_link.attrs
     assert "title" not in team_link.attrs
+
+
+def test_team_threads_bad_year(web_client: Client) -> None:
+    response = web_client.get("/team-threads/1800")
+    assert response.status_code == 404
+
+
+def test_team_threads_skips_threads_without_team(ndb_stub, web_client: Client) -> None:
+    Media(
+        id="cd-thread-orphan",
+        media_type_enum=MediaType.CD_THREAD,
+        foreign_key="orphan",
+        year=2020,
+        references=[],
+        details_json=json.dumps({"thread_title": "Orphan thread"}),
+    ).put()
+
+    response = web_client.get("/team-threads/2020")
+    assert response.status_code == 200
+    assert b"Orphan thread" not in response.data
+
+
+def test_team_threads_canonical(ndb_stub, web_client: Client) -> None:
+    with patch("backend.web.handlers.team_threads.datetime") as mock_datetime:
+        mock_datetime.datetime.now.return_value = datetime.datetime(2020, 1, 1)
+        response = web_client.get("/team-threads")
+    assert response.status_code == 200
