@@ -64,3 +64,16 @@ def test_detail_insights_2026_with_legacy_year_specific_data(
     assert "Auto Win Conversion" in body
     assert "Fuel Statistics" in body
     assert "Tower Statistics" in body
+
+
+def test_overall_insights_multiple(web_client: Client) -> None:
+    for name in ["blue_banners", "ca_winner"]:
+        Insight(
+            id=Insight.render_key_name(0, name),
+            year=0,
+            name=name,
+            data_json=json.dumps({}),
+        ).put()
+
+    resp = web_client.get("/insights")
+    assert resp.status_code == 200

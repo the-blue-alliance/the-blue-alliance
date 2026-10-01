@@ -16,6 +16,7 @@ import SimpleMatchRowsWithBreaks, {
   MatchRow,
   SimpleMatchRow,
 } from '~/components/tba/match/matchRows';
+import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { TooltipProvider } from '~/components/ui/tooltip';
 
 vi.mock('@tanstack/react-router', () => ({
@@ -47,11 +48,10 @@ vi.mock('~/components/tba/teamTooltip', () => ({
   TeamLinkWithTooltip: ({
     teamKey,
     year,
+    disqualified: _disqualified,
+    surrogate: _surrogate,
     ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    teamKey: string;
-    year: number;
-  }) => (
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & TeamTooltipProps) => (
     <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
       {teamKey.substring(3)}
     </a>
