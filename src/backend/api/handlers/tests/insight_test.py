@@ -151,6 +151,11 @@ def test_insights_models_query_response_passthrough(
     monkeypatch.setattr(CachedDatabaseQuery, "fetch_json", spy_fetch_json)
     monkeypatch.setattr(CachedDatabaseQuery, "fetch_dict", spy_fetch_dict)
 
+    # Sanity check that the fetch_dict spy is wired up, so the
+    # `len(calls_fetch_dict) == 0` assertions below are meaningful
+    InsightsLeaderboardsYearQuery(year=2024).fetch_dict(ApiMajorVersion.API_V3)
+    assert calls_fetch_dict == [(InsightsLeaderboardsYearQuery, ApiMajorVersion.API_V3)]
+
     # 1. insights_leaderboards_year (fetch_json)
     calls_fetch_json.clear()
     calls_fetch_dict.clear()

@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/contact')({
@@ -80,23 +80,21 @@ function Contact(): React.JSX.Element {
         <h2>Everything else...</h2>
         <p>Feel free to reach out to us!</p>
         <div className="not-typeset flex flex-wrap gap-2">
-          <Button
-            render={<a href="mailto:contact@thebluealliance.com">Email Us!</a>}
-          />
-          <Button
-            render={
-              <a href="https://groups.google.com/forum/#!forum/thebluealliance-developers">
-                Join our Developer Mailing List!
-              </a>
-            }
-          />
-          <Button
-            render={
-              <a href="https://www.chiefdelphi.com/">
-                Ask Chief Delphi Fourms!
-              </a>
-            }
-          />
+          <a
+            href="mailto:contact@thebluealliance.com"
+            className={buttonVariants()}
+          >
+            Email Us!
+          </a>
+          <a
+            href="https://groups.google.com/forum/#!forum/thebluealliance-developers"
+            className={buttonVariants()}
+          >
+            Join our Developer Mailing List!
+          </a>
+          <a href="https://www.chiefdelphi.com/" className={buttonVariants()}>
+            Ask Chief Delphi Fourms!
+          </a>
         </div>
       </div>
     </div>

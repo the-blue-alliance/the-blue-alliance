@@ -23,9 +23,7 @@ vi.mock('~/components/tba/match/common', async (importOriginal) => ({
     condition: boolean;
     teamKey: string;
   }) => (
-    // Normalised so these rows don't depend on whether the component passes
-    // "frc254" or "254"; which one it should pass is Bug #58, covered by
-    // its own failing-test PR.
+    // Normalised so rows match whether the component passes "frc254" or "254".
     <div>
       {teamKey.replace(/^frc/, '')}={condition ? 'yes' : 'no'}
     </div>
@@ -188,8 +186,69 @@ describe('ScoreBreakdown2024', () => {
     ).toBeTruthy();
   });
 
-  // Robot endgame labels that depend on trap/microphone flags ("Spotlit")
-  // are Bug #57, covered by its own failing-test PR.
+  // Spotlit needs a HIGH NOTE on the MICROPHONE above the robot (2024 Manual 6.5.4).
+  const noStageFlags = {
+    trapCenterStage: false,
+    trapStageLeft: false,
+    trapStageRight: false,
+    micCenterStage: false,
+    micStageLeft: false,
+    micStageRight: false,
+  };
+
+  test('a trap note alone does not make an onstage robot spotlit', () => {
+    renderBreakdown(
+      makeBreakdown(
+        {
+          endGameRobot1: EndGameRobot2024.CENTER_STAGE,
+          ...noStageFlags,
+          trapCenterStage: true,
+        },
+        { endGameRobot1: EndGameRobot2024.NONE, ...noStageFlags },
+      ),
+    );
+
+    expect(
+      screen.getByRole('row', {
+        name: '254 Onstage (+3) Robot 1 Endgame 148 None (+0)',
+      }),
+    ).toBeTruthy();
+  });
+
+  test.each([
+    {
+      position: 'center stage',
+      endgame: EndGameRobot2024.CENTER_STAGE,
+      mic: { micCenterStage: true },
+    },
+    {
+      position: 'stage left',
+      endgame: EndGameRobot2024.STAGE_LEFT,
+      mic: { micStageLeft: true },
+    },
+    {
+      position: 'stage right',
+      endgame: EndGameRobot2024.STAGE_RIGHT,
+      mic: { micStageRight: true },
+    },
+  ])(
+    'a high note on the microphone above an onstage robot at $position makes it spotlit',
+    ({ endgame, mic }) => {
+      renderBreakdown(
+        makeBreakdown(
+          { endGameRobot1: endgame, ...noStageFlags, ...mic },
+          { endGameRobot1: EndGameRobot2024.NONE, ...noStageFlags },
+        ),
+      );
+
+      expect(
+        screen.getByRole('row', {
+          name: '254 Spotlit (+4) Robot 1 Endgame 148 None (+0)',
+        }),
+      ).toBeTruthy();
+    },
+  );
+
   test.each([
     { name: '1114 Onstage (+3) Robot 2 Endgame 217 None (+0)' },
     { name: '2056 Parked (+1) Robot 3 Endgame 33 None (+0)' },
@@ -246,9 +305,7 @@ describe('ScoreBreakdown2024', () => {
     ).toHaveLength(2);
   });
 
-  // Both alliances get identical counts in these two tests: which
-  // alliance's counts belong under which column is Bug #56, covered by its
-  // own failing-test PR.
+  // Both alliances get identical counts, so column placement is not checked.
   test('shows foul counts with points', () => {
     renderBreakdown(
       makeBreakdown(
