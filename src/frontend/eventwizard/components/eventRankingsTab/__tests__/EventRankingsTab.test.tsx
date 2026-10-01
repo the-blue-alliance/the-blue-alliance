@@ -155,13 +155,8 @@ describe("EventRankingsTab interactions", () => {
     expect(screen.getByText(/Loaded rankings/)).toHaveClass("alert-info");
   });
 
-  it("Bug #40: previews a 'Ranking Score' breakdown column's value, not the rank", async () => {
-    // Wrong today: the preview maps headers to fields by substring, so any
-    // header containing "rank" (e.g. FMS's "Ranking Score" breakdown) shows
-    // the team's rank (1) instead of its value (3.2). The uploaded payload is
-    // unaffected.
-    // Correct: only the "Rank" column shows the rank; breakdown columns show
-    // their own values.
+  it("previews a 'Ranking Score' breakdown column's value, not the rank", async () => {
+    // Only the preview is affected; the uploaded payload is correct.
     mockParseRankingsFile.mockResolvedValue({
       ...parsed,
       headers: ["Rank", "Team", "Ranking Score"],
