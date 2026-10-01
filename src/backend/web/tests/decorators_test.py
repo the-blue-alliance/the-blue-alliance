@@ -1,3 +1,4 @@
+from typing import Callable, cast
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
@@ -9,6 +10,8 @@ import backend.common.auth as backend_auth
 from backend.common.consts.account_permission import AccountPermission
 from backend.common.models.account import Account
 from backend.web.decorators import (
+    _serialize_url_args,
+    audit_post_mutation,
     enforce_login,
     require_admin,
     require_login,
@@ -252,3 +255,27 @@ def test_require_permission_admin(ndb_stub) -> None:
         decorated_func = require_permission(AccountPermission.REVIEW_MEDIA)(func)
         decorated_func(None, request)
     func.assert_called_with(None, request)
+
+
+def test_serialize_url_args_none() -> None:
+    assert _serialize_url_args(None) == {}
+
+
+def test_audit_post_mutation_with_kwargs_returns_decorator() -> None:
+    from backend.web.main import app
+
+    decorator = audit_post_mutation(target_key_getter=lambda: None)
+    decorated = decorator(lambda: "ok")
+    with app.test_request_context("/"):
+        assert decorated() == "ok"
+
+
+def test_audit_post_mutation_bare_decorator() -> None:
+    from backend.web.main import app
+
+    def view() -> str:
+        return "ok"
+
+    decorated = cast(Callable[[], str], audit_post_mutation(view))
+    with app.test_request_context("/"):
+        assert decorated() == "ok"

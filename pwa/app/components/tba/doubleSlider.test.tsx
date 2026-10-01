@@ -10,7 +10,7 @@ function labels(container: HTMLElement) {
 }
 
 beforeEach(() => {
-  // React warns about the stray minStepsBetweenThumbs prop (see Bug #65).
+  // React warns about the stray minStepsBetweenThumbs prop.
   vi.spyOn(console, 'error').mockImplementation(() => {});
 });
 
