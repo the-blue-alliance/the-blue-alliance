@@ -179,19 +179,15 @@ class FMSAPIHybridScheduleParser(
                 },
             }
 
-            if not match[
-                "startTime"
-            ]:  # no startTime means it's an unneeded rubber match
+            api_start_time = match["startTime"]
+            if not api_start_time:  # no startTime means it's an unneeded rubber match
                 continue
 
-            if api_start_time := match["startTime"]:
-                time = datetime.datetime.strptime(
-                    api_start_time.split(".")[0], TIME_PATTERN
-                )
-                if event_tz is not None:
-                    time = time - event_tz.utcoffset(time)
-            else:
-                time = None
+            time = datetime.datetime.strptime(
+                api_start_time.split(".")[0], TIME_PATTERN
+            )
+            if event_tz is not None:
+                time = time - event_tz.utcoffset(time)
 
             actual_time_raw = (
                 match["actualStartTime"] if "actualStartTime" in match else None
@@ -330,7 +326,12 @@ class FMSAPIHybridScheduleParser(
                 )
                 if playoff_advancement[LAST_LEVEL[level]] != []:
                     for match in organized_matches[level]:
-                        if "frcNone" in match.team_key_names:
+                        # Unreachable today: null teams are skipped when building
+                        # team_key_names above, so "frcNone" never appears. Kept
+                        # because that skip looks like a regression and this
+                        # repair is what a fix would re-enable. See Bug #10840-f
+                        # (PR #10930), whose test covers this block.
+                        if "frcNone" in match.team_key_names:  # pragma: no cover
                             if level == "sf":
                                 red_seed, blue_seed = QF_SF_MAP[match.match_number]
                             else:
