@@ -330,11 +330,8 @@ describe('ChartTooltipContent', () => {
     expect(screen.getByText('unknown')).toBeTruthy();
   });
 
-  test('Bug #61: a string label with no config entry falls back to the raw label', () => {
-    // Wrong today: `config[label].label` is read without optional chaining,
-    // so a label that is not a config key throws a TypeError during render.
-    // Correct: the tooltip renders and shows the raw label (upstream shadcn
-    // guards this with `config[label]?.label || label`).
+  test('a string label with no config entry falls back to the raw label', () => {
+    // Upstream shadcn reads `config[label]?.label || label`.
     renderInChart(
       <ChartTooltipContent active payload={[item({})]} label="missing" />,
     );
