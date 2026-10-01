@@ -1088,15 +1088,8 @@ def test_do_overall_match_insights_with_nothing_stored_is_empty(ndb_stub) -> Non
     assert InsightsHelper.doOverallMatchInsights() == []
 
 
-def test_bug_16_no_highscore_insight_without_matches(ndb_stub) -> None:
-    """Bug #16: the match high-score insight is emitted even when empty.
-
-    Today _calculateHighscoreMatches checks `highscore_matches != []`, but
-    highscore_matches is a dict, so the check is always true and a
-    MATCH_HIGHSCORE insight with empty qual/playoff/overall lists is emitted
-    for a year with no matches. Correct: no MATCH_HIGHSCORE insight is emitted
-    when there are no matches.
-    """
+def test_no_highscore_insight_without_matches(ndb_stub) -> None:
+    """A year with no matches emits no MATCH_HIGHSCORE insight."""
     insights = InsightsHelper.doMatchInsights(2014)
     by_name = _insights_by_name(insights)
 
