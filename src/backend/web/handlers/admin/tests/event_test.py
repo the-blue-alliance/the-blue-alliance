@@ -2285,7 +2285,7 @@ def test_link_frc_api_post_not_found(web_client: Client, login_gae_admin) -> Non
 def test_uppercase_event_short_redirects_to_lowercase_key(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:
-    """An uppercase event_short is stored lowercase and redirects to the lowercase key."""
+    """An uppercase event_short is stored and redirected to in lowercase."""
     resp = web_client.post(
         "/admin/event/edit", data=_full_event_form(event_short="NYNY")
     )
