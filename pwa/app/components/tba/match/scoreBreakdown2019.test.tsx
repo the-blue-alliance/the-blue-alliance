@@ -355,8 +355,6 @@ describe('ScoreBreakdown2019 game pieces', () => {
 });
 
 describe('ScoreBreakdown2019 endgame', () => {
-  // HAB Level 2 and Level 3 point values are covered by the Bug #52
-  // failing-test PR.
   test.each([
     { value: EndgameRobot2019.HAB_LEVEL1, expected: '254HAB 1 (+3)' },
     { value: EndgameRobot2019.NONE, expected: '254None (+0)' },
