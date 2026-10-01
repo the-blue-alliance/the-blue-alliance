@@ -63,16 +63,9 @@ async function hoverFirstCheckmark(row: HTMLElement): Promise<HTMLElement> {
   });
 }
 
-// These render the real ConditionalCheckmark (the per-year test files mock
-// it), because the bug is only visible in its tooltip.
-//
-// Wrong today: the 2023 Mobility and 2024 Auto Leave rows pass
-// team_keys[i].substring(3) ("254") to ConditionalCheckmark, which strips
-// the "frc" prefix again, so the tooltip for frc254 is "".
-// Correct: pass the raw team key so the tooltip reads "254", as every other
-// year does.
+// Renders the real ConditionalCheckmark, which the per-year test files mock.
 describe('ConditionalCheckmark team tooltips', () => {
-  test('Bug #58: 2023 mobility tooltip shows the team number', async () => {
+  test('2023 mobility tooltip shows the team number', async () => {
     const alliance = { mobilityRobot1: MobilityRobot2023.YES };
     render(
       <ScoreBreakdown2023
@@ -90,7 +83,7 @@ describe('ConditionalCheckmark team tooltips', () => {
     expect(tip.textContent).toBe('254');
   });
 
-  test('Bug #58: 2024 auto leave tooltip shows the team number', async () => {
+  test('2024 auto leave tooltip shows the team number', async () => {
     const alliance = { autoLineRobot1: AutoLineRobot2024.YES };
     render(
       <ScoreBreakdown2024
