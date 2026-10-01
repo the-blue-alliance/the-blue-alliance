@@ -1,4 +1,29 @@
+# Coverage is uploaded from three independent test suites. Each is tagged with
+# a flag so that a PR which only runs one suite (CI path-filters the others)
+# carries forward the base commit's coverage for the suites it didn't run,
+# instead of reporting a bogus project-wide drop.
+flags:
+  python:
+    carryforward: true
+    paths:
+      - src/backend/
+  node:
+    carryforward: true
+    paths:
+      - src/frontend/
+  pwa:
+    carryforward: true
+    paths:
+      - pwa/
+
 coverage:
   status:
     project: no
     patch: no
+
+comment:
+  # Only comment when the PR itself adds lines that no test exercises.
+  # A PR whose changed lines are fully covered gets no comment (and no email).
+  require_changes: "uncovered_patch"
+  hide_project_coverage: true
+  layout: "condensed_header, condensed_files, condensed_footer"

@@ -125,11 +125,6 @@ const EventScheduleTab: React.FC<EventScheduleTabProps> = ({
   };
 
   const handleSubmit = async (): Promise<void> => {
-    if (matches.length === 0) {
-      alert("No matches to upload!");
-      return;
-    }
-
     setUploading(true);
     setStatusMessage("Uploading matches to TBA...");
 

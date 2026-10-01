@@ -14,6 +14,7 @@ import {
   tableFeatures,
   useTable,
 } from '@tanstack/react-table';
+import { cn } from 'cn';
 import { useState } from 'react';
 
 import ColumnsIcon from '~icons/lucide/columns-3';
@@ -33,7 +34,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { cn } from '~/lib/utils';
 
 // The built-in sort functions have to be registered here, otherwise a column's
 // default `sortFn: 'auto'` cannot resolve one.
@@ -93,6 +93,7 @@ interface DataTableProps<TData extends RowData> {
   columns: TbaColumnDef<TData>[];
   data: TData[];
   initialSorting?: SortingState;
+  enableSortingRemoval?: boolean;
   columnVisibility?: ColumnVisibilityState;
   equalColumnWidths?: boolean;
 }
@@ -101,6 +102,7 @@ export function DataTable<TData extends RowData>({
   columns,
   data,
   initialSorting,
+  enableSortingRemoval = true,
   columnVisibility,
   equalColumnWidths,
   conditionalRowStyling,
@@ -112,6 +114,7 @@ export function DataTable<TData extends RowData>({
     features: tbaTableFeatures,
     data,
     columns,
+    enableSortingRemoval,
     onSortingChange: setSorting,
     state: { sorting, columnVisibility: columnVisibility ?? {} },
   });

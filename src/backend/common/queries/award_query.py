@@ -85,6 +85,47 @@ class TeamEventAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
         return awards
 
 
+class EventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "event_type_awards_{event_type}_{award_type}"
+    DICT_CONVERTER = AwardConverter
+
+    def __init__(self, event_type: EventType, award_type: AwardType) -> None:
+        super().__init__(event_type=event_type, award_type=award_type)
+
+    @typed_tasklet
+    def _query_async(
+        self, event_type: EventType, award_type: AwardType
+    ) -> Generator[Any, Any, List[Award]]:
+        awards = yield Award.query(
+            Award.event_type_enum == event_type,
+            Award.award_type_enum == award_type,
+        ).fetch_async()
+        return awards
+
+
+class YearEventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "year_event_type_awards_{year}_{event_type}_{award_type}"
+    DICT_CONVERTER = AwardConverter
+
+    def __init__(
+        self, year: Year, event_type: EventType, award_type: AwardType
+    ) -> None:
+        super().__init__(year=year, event_type=event_type, award_type=award_type)
+
+    @typed_tasklet
+    def _query_async(
+        self, year: Year, event_type: EventType, award_type: AwardType
+    ) -> Generator[Any, Any, List[Award]]:
+        awards = yield Award.query(
+            Award.year == year,
+            Award.event_type_enum == event_type,
+            Award.award_type_enum == award_type,
+        ).fetch_async()
+        return awards
+
+
 class TeamEventTypeAwardsQuery(CachedDatabaseQuery[List[Award], List[AwardDict]]):
     CACHE_VERSION = 0
     CACHE_KEY_FORMAT = (

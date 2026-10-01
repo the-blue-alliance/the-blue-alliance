@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import AsyncSelect from "react-select/async";
 import { ApiTeam } from "../../constants/ApiTeam";
+import { editSingleTeam } from "../../utils/singleTeamEdit";
 
 interface TeamOption {
   value: string;
@@ -73,29 +74,15 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
     }
   };
 
-  const handleAddSingleTeam = (): void => {
-    if (!hasFetchedTeams) {
-      showErrorMessage(
-        "Please fetch teams before modification to ensure up to date data"
-      );
-      return;
-    }
-
-    const existingTeamKeys = currentTeams.map((team) => team.key);
-    const keyIndex = existingTeamKeys.indexOf(selectedTeamKey);
-    if (keyIndex >= 0) {
-      showErrorMessage(
-        `Team ${selectedTeamKey} is already attending ${selectedEvent}. Re-fetch the team list if you know this is wrong.`
-      );
-      return;
-    }
-
-    existingTeamKeys.push(selectedTeamKey);
-    setAddButtonClass("btn-warning");
+  const submitTeamList = (
+    teamKeys: string[],
+    setButtonClass: (buttonClass: string) => void
+  ): void => {
+    setButtonClass("btn-warning");
     updateTeamList(
-      existingTeamKeys,
+      teamKeys,
       () => {
-        setAddButtonClass("btn-success");
+        setButtonClass("btn-success");
         setSelectedTeam(null);
         setSelectedTeamKey("");
         hasFetchedTeams = false;
@@ -107,39 +94,28 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
     );
   };
 
-  const handleRemoveSingleTeam = (): void => {
-    if (!hasFetchedTeams) {
-      showErrorMessage(
-        "Please fetch teams before modification to ensure up to date data"
-      );
-      return;
-    }
-
-    const existingTeamKeys = currentTeams.map((team) => team.key);
-    const keyIndex = existingTeamKeys.indexOf(selectedTeamKey);
-    if (keyIndex < 0) {
-      showErrorMessage(
-        `Team ${selectedTeamKey} is already not attending ${selectedEvent}. Re-fetch the team list if you know this is wrong.`
-      );
-      return;
-    }
-
-    existingTeamKeys.splice(keyIndex, 1);
-    setRemoveButtonClass("btn-warning");
-    updateTeamList(
-      existingTeamKeys,
-      () => {
-        setRemoveButtonClass("btn-success");
-        setSelectedTeam(null);
-        setSelectedTeamKey("");
-        hasFetchedTeams = false;
-        if (clearTeams) {
-          clearTeams();
-        }
-      },
-      (error: string) => showErrorMessage(`${error}`)
-    );
+  const editRequest = {
+    eventKey: selectedEvent,
+    teamKey: selectedTeamKey,
+    currentTeamKeys: currentTeams.map((team) => team.key),
+    hasFetchedTeams,
   };
+
+  const handleAddSingleTeam = (): void =>
+    editSingleTeam(
+      "add",
+      editRequest,
+      (teamKeys) => submitTeamList(teamKeys, setAddButtonClass),
+      showErrorMessage
+    );
+
+  const handleRemoveSingleTeam = (): void =>
+    editSingleTeam(
+      "remove",
+      editRequest,
+      (teamKeys) => submitTeamList(teamKeys, setRemoveButtonClass),
+      showErrorMessage
+    );
 
   const isTeamAttending = (selectedTeam !== null && currentTeams.some(team => team.key === selectedTeam.value));
 
@@ -161,6 +137,8 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
         defaultOptions={teamOptions}
         onChange={handleTeamSelectionChanged}
         isDisabled={!selectedEvent || !hasFetchedTeams}
+        isClearable
+        escapeClearsValue
       />
       <button
         className={`btn ${addButtonClass}`}

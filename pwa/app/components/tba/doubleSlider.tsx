@@ -1,7 +1,6 @@
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
+import { cn } from 'cn';
 import { useState } from 'react';
-
-import { cn } from '~/lib/utils';
 
 type SliderProps = {
   className?: string;

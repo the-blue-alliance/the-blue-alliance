@@ -1,7 +1,7 @@
+import { cn } from 'cn';
 import { useState } from 'react';
 
 import { MediaAvatar } from '~/api/tba/read';
-import { cn } from '~/lib/utils';
 
 const RED_ACCENT = 'bg-alliance-red-accent';
 const BLUE_ACCENT = 'bg-alliance-blue-accent';

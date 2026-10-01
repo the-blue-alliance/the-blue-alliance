@@ -43,7 +43,8 @@ class EventRemapTeamsHelper:
         # Remap rankings
         if event.rankings:
             cls.remapteams_rankings2(event.rankings, event.remap_teams)
-        EventDetailsManipulator.createOrUpdate(event.details)
+        if event.details:
+            EventDetailsManipulator.createOrUpdate(event.details)
 
         # Remap awards
         cls.remapteams_awards(event.awards, event.remap_teams)

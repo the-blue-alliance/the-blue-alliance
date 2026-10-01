@@ -1,0 +1,1512 @@
+[
+  {
+    "address": "Alpena High School\n3303 S 3rd Avenue\nAlpena, MI 49707\nUSA",
+    "city": "Alpena",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-07",
+    "event_code": "mialp",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mialp",
+    "first_event_id": "33161",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mialp",
+    "lat": null,
+    "lng": null,
+    "location_name": "Alpena High School",
+    "name": "FIM District Alpena Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49707",
+    "remap_teams": null,
+    "short_name": "Alpena",
+    "start_date": "2018-04-05",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "461548",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 5,
+    "year": 2018
+  },
+  {
+    "address": "Belleville High School\n501 W Columbia Avenue\nBelleville, MI 48111\nUSA",
+    "city": "Belleville",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-24",
+    "event_code": "mibel",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mibel",
+    "first_event_id": "27989",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mibel",
+    "lat": null,
+    "lng": null,
+    "location_name": "Belleville High School",
+    "name": "FIM District Belleville Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48111",
+    "remap_teams": null,
+    "short_name": "Belleville",
+    "start_date": "2018-03-22",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "461548",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2018
+  },
+  {
+    "address": "Center Line High School\n26300 Arsenal\nCenter Line, MI 48015\nUSA",
+    "city": "Center Line",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-10",
+    "event_code": "micen",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "micen",
+    "first_event_id": "27943",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018micen",
+    "lat": null,
+    "lng": null,
+    "location_name": "Center Line High School",
+    "name": "FIM District Center Line Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48015",
+    "remap_teams": null,
+    "short_name": "Center Line",
+    "start_date": "2018-03-08",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219331",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 1,
+    "year": 2018
+  },
+  {
+    "address": "Saginaw Valley State University\nRyder Center\n7400 Bay Road\nUniversity Center, MI 48710\nUSA",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [
+      "2018micmp1",
+      "2018micmp2",
+      "2018micmp3",
+      "2018micmp4"
+    ],
+    "end_date": "2018-04-14",
+    "event_code": "micmp",
+    "event_type": 2,
+    "event_type_string": "District Championship",
+    "first_event_code": "micmp",
+    "first_event_id": "27869",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018micmp",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "Michigan State Championship",
+    "parent_event_key": null,
+    "playoff_type": 2,
+    "playoff_type_string": "Elimination Bracket (4 Alliances)",
+    "postal_code": "48710",
+    "remap_teams": null,
+    "short_name": "Michigan",
+    "start_date": "2018-04-14",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "219328",
+        "file": "66716",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 6,
+    "year": 2018
+  },
+  {
+    "address": "7400 Bay Rd, Saginaw, MI 48604, USA",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-14",
+    "event_code": "micmp1",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp1",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018micmp1",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "Michigan State Championship - DTE Energy Foundation Division",
+    "parent_event_key": "2018micmp",
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "48604",
+    "remap_teams": null,
+    "short_name": "MSC - DTE Energy Foundation",
+    "start_date": "2018-04-11",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "461548",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 6,
+    "year": 2018
+  },
+  {
+    "address": "7400 Bay Rd, Saginaw, MI 48604, USA",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-14",
+    "event_code": "micmp2",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp2",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018micmp2",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "Michigan State Championship - Consumers Energy Division",
+    "parent_event_key": "2018micmp",
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "48604",
+    "remap_teams": null,
+    "short_name": "MSC - Consumers Energy",
+    "start_date": "2018-04-11",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 6,
+    "year": 2018
+  },
+  {
+    "address": "7400 Bay Rd, Saginaw, MI 48604, USA",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-14",
+    "event_code": "micmp3",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp3",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018micmp3",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "Michigan State Championship - Ford Division",
+    "parent_event_key": "2018micmp",
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "48604",
+    "remap_teams": null,
+    "short_name": "MSC - Ford",
+    "start_date": "2018-04-11",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219331",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 6,
+    "year": 2018
+  },
+  {
+    "address": "7400 Bay Rd, Saginaw, MI 48604, USA",
+    "city": "University Center",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-14",
+    "event_code": "micmp4",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "micmp4",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018micmp4",
+    "lat": null,
+    "lng": null,
+    "location_name": "Saginaw Valley State University",
+    "name": "Michigan State Championship - Dow Division",
+    "parent_event_key": "2018micmp",
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "48604",
+    "remap_teams": null,
+    "short_name": "MSC - Dow",
+    "start_date": "2018-04-11",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219330",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 6,
+    "year": 2018
+  },
+  {
+    "address": "Escanaba High School\n500 S. Lincoln Road\nEscanaba, MI 49829\nUSA",
+    "city": "Escanaba",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-17",
+    "event_code": "miesc",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miesc",
+    "first_event_id": "28031",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018miesc",
+    "lat": null,
+    "lng": null,
+    "location_name": "Escanaba High School",
+    "name": "FIM District Escanaba Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49829",
+    "remap_teams": null,
+    "short_name": "Escanaba",
+    "start_date": "2018-03-15",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2018
+  },
+  {
+    "address": "Forest Hills High School\n5901 Hall Street SE\nGrand Rapids, MI 49546\nUSA",
+    "city": "Grand Rapids",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-07",
+    "event_code": "mifor",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mifor",
+    "first_event_id": "35198",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mifor",
+    "lat": null,
+    "lng": null,
+    "location_name": "Forest Hills High School",
+    "name": "FIM District Forest Hills Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49546",
+    "remap_teams": null,
+    "short_name": "Forest Hills",
+    "start_date": "2018-04-05",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219330",
+        "type": "dacast"
+      },
+      {
+        "channel": "fimrestream1",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 5,
+    "year": 2018
+  },
+  {
+    "address": "Gaylord High School\n90 Livingston Blvd\nGaylord, MI 49735\nUSA",
+    "city": "Gaylord",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-17",
+    "event_code": "migay",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "migay",
+    "first_event_id": "28143",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018migay",
+    "lat": null,
+    "lng": null,
+    "location_name": "Gaylord High School",
+    "name": "FIM District Gaylord Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49735",
+    "remap_teams": null,
+    "short_name": "Gaylord",
+    "start_date": "2018-03-15",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219330",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2018
+  },
+  {
+    "address": "Carlson High School\n30550 W Jefferson Avenue\nGibraltar, MI 48173\nUSA",
+    "city": "Gibraltar",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-03",
+    "event_code": "migib",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "migib",
+    "first_event_id": "33147",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018migib",
+    "lat": null,
+    "lng": null,
+    "location_name": "Carlson High School",
+    "name": "FIM District Gibraltar Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48173",
+    "remap_teams": null,
+    "short_name": "Gibraltar",
+    "start_date": "2018-03-01",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2018
+  },
+  {
+    "address": "Gull Lake High School\n7753 N. 34th Street\nRichland, MI 49083\nUSA",
+    "city": "Richland",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-17",
+    "event_code": "migul",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "migul",
+    "first_event_id": "28105",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018migul",
+    "lat": null,
+    "lng": null,
+    "location_name": "Gull Lake High School",
+    "name": "FIM District Gull Lake Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49083",
+    "remap_teams": null,
+    "short_name": "Gull Lake",
+    "start_date": "2018-03-15",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219328",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org/",
+    "week": 2,
+    "year": 2018
+  },
+  {
+    "address": "Kettering University\nRecreation Center\n1700 University Avenue\nFlint, MI 48504\nUSA",
+    "city": "Flint",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-10",
+    "event_code": "mike2",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mike2",
+    "first_event_id": "28081",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mike2",
+    "lat": null,
+    "lng": null,
+    "location_name": "Kettering University",
+    "name": "FIM District Kettering University Event #2",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "48504",
+    "remap_teams": null,
+    "short_name": "Kettering University #2",
+    "start_date": "2018-03-08",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219328",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 1,
+    "year": 2018
+  },
+  {
+    "address": "East Kentwood High School\n6230 Kalamazoo Avenue SE\nKentwood, MI 49508\nUSA",
+    "city": "Kentwood",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-31",
+    "event_code": "miken",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miken",
+    "first_event_id": "28051",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018miken",
+    "lat": null,
+    "lng": null,
+    "location_name": "East Kentwood High School",
+    "name": "FIM District East Kentwood Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "49508",
+    "remap_teams": null,
+    "short_name": "East Kentwood",
+    "start_date": "2018-03-29",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2018
+  },
+  {
+    "address": "Kettering University\nRecreation Center\n1700 University Avenue\nFlint, MI 48504\nUSA",
+    "city": "Flint",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-03",
+    "event_code": "miket",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miket",
+    "first_event_id": "27941",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018miket",
+    "lat": null,
+    "lng": null,
+    "location_name": "Kettering University",
+    "name": "FIM District Kettering University Event #1",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48504",
+    "remap_teams": null,
+    "short_name": "Kettering University #1",
+    "start_date": "2018-03-01",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219330",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2018
+  },
+  {
+    "address": "Lakeview High School\n15060 Helmer Rd S\nBattle Creek, MI 49015\nUSA",
+    "city": "Battle Creek",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-07",
+    "event_code": "milak",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "milak",
+    "first_event_id": "28083",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018milak",
+    "lat": null,
+    "lng": null,
+    "location_name": "Lakeview High School",
+    "name": "FIM District Lakeview Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49015",
+    "remap_teams": null,
+    "short_name": "Lakeview",
+    "start_date": "2018-04-05",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219331",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 5,
+    "year": 2018
+  },
+  {
+    "address": "Mason High School\n1001 S. Barns Street\nMason, MI 48854\nUSA",
+    "city": "Mason",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-24",
+    "event_code": "milan",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "milan",
+    "first_event_id": "28037",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018milan",
+    "lat": null,
+    "lng": null,
+    "location_name": "Mason High School",
+    "name": "FIM District Lansing Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48854",
+    "remap_teams": null,
+    "short_name": "Lansing",
+    "start_date": "2018-03-22",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219330",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2018
+  },
+  {
+    "address": "Lincoln High School\n7425 Willis Road\nYpsilanti, MI 48197\nUSA",
+    "city": "Ypsilanti",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-17",
+    "event_code": "milin",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "milin",
+    "first_event_id": "33177",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018milin",
+    "lat": null,
+    "lng": null,
+    "location_name": "Lincoln High School",
+    "name": "FIM District Lincoln Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48197",
+    "remap_teams": null,
+    "short_name": "Lincoln",
+    "start_date": "2018-03-15",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219331",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2018
+  },
+  {
+    "address": "Churchill High School\n8900 Newburgh Road\nLivonia, MI 48150\nUSA",
+    "city": "Livonia",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-31",
+    "event_code": "miliv",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miliv",
+    "first_event_id": "27963",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018miliv",
+    "lat": null,
+    "lng": null,
+    "location_name": "Churchill High School",
+    "name": "FIM District Livonia Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "48150",
+    "remap_teams": null,
+    "short_name": "Livonia",
+    "start_date": "2018-03-29",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "461548",
+        "type": "livestream"
+      },
+      {
+        "channel": "66716",
+        "file": "461548",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2018
+  },
+  {
+    "address": "Lake Superior State University\n650 W. Easterday Avenue\nSault Ste. Marie, MI 49783\nUSA",
+    "city": "Sault Ste. Marie",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-07",
+    "event_code": "milsu",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "milsu",
+    "first_event_id": "28085",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018milsu",
+    "lat": null,
+    "lng": null,
+    "location_name": "Lake Superior State University",
+    "name": "FIM District Lake Superior State University Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49783",
+    "remap_teams": null,
+    "short_name": "Lake Superior State University",
+    "start_date": "2018-04-05",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 5,
+    "year": 2018
+  },
+  {
+    "address": "Marysville High School\n555 E. Huron Blvd.\nMarysville, MI 48040\nUSA",
+    "city": "Marysville",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-04-07",
+    "event_code": "mimar",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimar",
+    "first_event_id": "27997",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mimar",
+    "lat": null,
+    "lng": null,
+    "location_name": "Marysville High School",
+    "name": "FIM District Marysville Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48040",
+    "remap_teams": null,
+    "short_name": "Marysville",
+    "start_date": "2018-04-05",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219328",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 5,
+    "year": 2018
+  },
+  {
+    "address": "H.H. Dow High School\n3901 N. Saginaw Road\nMidland, MI 48640\nUSA",
+    "city": "Midland",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-24",
+    "event_code": "mimid",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimid",
+    "first_event_id": "28033",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mimid",
+    "lat": null,
+    "lng": null,
+    "location_name": "H.H. Dow High School",
+    "name": "FIM District Midland Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48640",
+    "remap_teams": null,
+    "short_name": "Midland",
+    "start_date": "2018-03-22",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      },
+      {
+        "channel": "first_glbr",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2018
+  },
+  {
+    "address": "Milford High School\n2380 S Milford Road\nMilford, MI 48357\nUSA",
+    "city": "Milford",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-17",
+    "event_code": "mimil",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mimil",
+    "first_event_id": "33149",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mimil",
+    "lat": null,
+    "lng": null,
+    "location_name": "Milford High School",
+    "name": "FIM District Milford Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48357",
+    "remap_teams": null,
+    "short_name": "Milford",
+    "start_date": "2018-03-15",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "461548",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 2,
+    "year": 2018
+  },
+  {
+    "address": "Shepherd High School\n100 E Hall Street\nShepherd, MI 48883\nUSA",
+    "city": "Shepherd",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-31",
+    "event_code": "mishe",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mishe",
+    "first_event_id": "28141",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mishe",
+    "lat": null,
+    "lng": null,
+    "location_name": "Shepherd High School",
+    "name": "FIM District Shepherd Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48883",
+    "remap_teams": null,
+    "short_name": "Shepherd",
+    "start_date": "2018-03-29",
+    "state_prov": "MI",
+    "timezone": "America/Detroit",
+    "webcasts": [
+      {
+        "channel": "first_glbr",
+        "type": "twitch"
+      },
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2018
+  },
+  {
+    "address": "St. Joseph High School\n2521 Stadium Drive\nSt. Joseph, MI 49085\nUSA",
+    "city": "St. Joseph",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-10",
+    "event_code": "misjo",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "misjo",
+    "first_event_id": "27961",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018misjo",
+    "lat": null,
+    "lng": null,
+    "location_name": "St. Joseph High School",
+    "name": "FIM District St. Joseph Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49085",
+    "remap_teams": null,
+    "short_name": "St. Joseph",
+    "start_date": "2018-03-08",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219330",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 1,
+    "year": 2018
+  },
+  {
+    "address": "Southfield High School\n24675 Lahser Road\nSouthfield, MI 48033\nUSA",
+    "city": "Southfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-03",
+    "event_code": "misou",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "misou",
+    "first_event_id": "27881",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018misou",
+    "lat": null,
+    "lng": null,
+    "location_name": "Southfield High School",
+    "name": "FIM District Southfield Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48033",
+    "remap_teams": null,
+    "short_name": "Southfield",
+    "start_date": "2018-03-01",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219331",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2018
+  },
+  {
+    "address": "Troy Athens High School\n4333 John R Road\nTroy, MI 48085\nUSA",
+    "city": "Troy",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-31",
+    "event_code": "mitry",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mitry",
+    "first_event_id": "27945",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mitry",
+    "lat": null,
+    "lng": null,
+    "location_name": "Troy Athens High School",
+    "name": "FIM District Troy Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "48085",
+    "remap_teams": null,
+    "short_name": "Troy",
+    "start_date": "2018-03-29",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219331",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 4,
+    "year": 2018
+  },
+  {
+    "address": "Traverse City Central High School\n1150 Miliken Drive\nTraverse City, MI 49686\nUSA",
+    "city": "Traverse City",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-03",
+    "event_code": "mitvc",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mitvc",
+    "first_event_id": "27939",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018mitvc",
+    "lat": null,
+    "lng": null,
+    "location_name": "Traverse City Central High School",
+    "name": "FIM District Traverse City Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49686",
+    "remap_teams": null,
+    "short_name": "Traverse City",
+    "start_date": "2018-03-01",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219328",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 0,
+    "year": 2018
+  },
+  {
+    "address": "Waterford Mott High School\n1151 Scott Lake Road\nWaterford, MI 48328\nUSA",
+    "city": "Waterford",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-10",
+    "event_code": "miwat",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miwat",
+    "first_event_id": "28035",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018miwat",
+    "lat": null,
+    "lng": null,
+    "location_name": "Waterford Mott High School",
+    "name": "FIM District Waterford Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "48328",
+    "remap_teams": null,
+    "short_name": "Waterford",
+    "start_date": "2018-03-08",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219332",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 1,
+    "year": 2018
+  },
+  {
+    "address": "Grand Valley State University\nField House\n10915 S Campus Drive\nAllendale, MI 49401\nUSA",
+    "city": "Allendale",
+    "country": "USA",
+    "district": {
+      "abbreviation": "fim",
+      "display_name": "FIRST in Michigan",
+      "key": "2018fim",
+      "official_advancement_counts": {
+        "cmp": 89,
+        "dcmp": 160
+      },
+      "year": 2018
+    },
+    "division_keys": [],
+    "end_date": "2018-03-24",
+    "event_code": "miwmi",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "miwmi",
+    "first_event_id": "27921",
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2018miwmi",
+    "lat": null,
+    "lng": null,
+    "location_name": "Grand Valley State University",
+    "name": "FIM District West Michigan Event",
+    "parent_event_key": null,
+    "playoff_type": null,
+    "playoff_type_string": null,
+    "postal_code": "49401",
+    "remap_teams": null,
+    "short_name": "West Michigan",
+    "start_date": "2018-03-22",
+    "state_prov": "MI",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "66716",
+        "file": "219331",
+        "type": "dacast"
+      }
+    ],
+    "website": "http://www.firstinmichigan.org",
+    "week": 3,
+    "year": 2018
+  }
+]

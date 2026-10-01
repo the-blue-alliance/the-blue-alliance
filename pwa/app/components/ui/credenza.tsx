@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import { type ComponentProps, createContext, useContext } from 'react';
 
 import {
@@ -21,7 +22,6 @@ import {
   DrawerTrigger,
 } from '~/components/ui/drawer';
 import { useMediaQuery } from '~/lib/hooks';
-import { cn } from '~/lib/utils';
 
 interface BaseProps {
   children: React.ReactNode;

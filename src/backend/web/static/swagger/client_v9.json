@@ -121,6 +121,51 @@
           }
         }
       },
+      "EventMediaSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "event_key",
+          "media_url"
+        ],
+        "properties": {
+          "event_key": {
+            "type": "string",
+            "description": "The event receiving the suggested media"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "The URL of the event media being suggested"
+          }
+        }
+      },
+      "EventMediaSuggestionResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "suggestion_exists",
+              "media_exists",
+              "bad_url",
+              "bad_event",
+              "unauthorized"
+            ]
+          }
+        }
+      },
       "SubscriptionMessage": {
         "type": "object",
         "required": [
@@ -340,6 +385,39 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/event/media/suggest": {
+      "post": {
+        "summary": "Suggest event media",
+        "operationId": "suggestEventMedia",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventMediaSuggestionMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventMediaSuggestionResponse"
                 }
               }
             }
