@@ -614,11 +614,7 @@ def test_parse_team_with_null_station(ndb_stub) -> None:
 
 
 def test_parse_null_station_in_full_match(ndb_stub) -> None:
-    """
-    Bug #10840-e: a null station in a multi-team match should be handled the
-    same way as in a single-team match (counted in team_key_names, on neither
-    alliance), instead of crashing the station sort with a TypeError.
-    """
+    """A null-station team in a full match is listed but on neither alliance."""
     _put_event()
     teams = _default_teams()
     teams[2] = _team(3, None)
