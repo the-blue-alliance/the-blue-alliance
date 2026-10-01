@@ -305,3 +305,71 @@ def test_submit_succeeds(mock_bootstrap, local_client: Client) -> None:
 
     query = parse_qs(url.query)
     assert query == {"status": ["success"], "url": ["/test"]}
+
+
+def test_link_nexus_demo_invalid_event_key(local_client: Client) -> None:
+    resp = local_client.post(
+        "/local/bootstrap/link_nexus_demo",
+        data={"test_event_key": "notakey", "nexus_demo_event_id": "demo"},
+    )
+    assert resp.status_code == 302
+    assert "status=bad_key" in resp.headers["Location"]
+
+
+def test_link_nexus_demo_missing_event(local_client: Client) -> None:
+    resp = local_client.post(
+        "/local/bootstrap/link_nexus_demo",
+        data={"test_event_key": "2026nope", "nexus_demo_event_id": "demo"},
+    )
+    assert resp.status_code == 302
+    assert "status=bad_key" in resp.headers["Location"]
+
+
+def test_link_nexus_demo_missing_demo_id(local_client: Client) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.OFFSEASON,
+    ).put()
+    resp = local_client.post(
+        "/local/bootstrap/link_nexus_demo",
+        data={"test_event_key": "2026test", "nexus_demo_event_id": ""},
+    )
+    assert resp.status_code == 302
+    assert "status=bad_key" in resp.headers["Location"]
+
+
+def test_bootstrap_nexus_invalid_key(local_client: Client) -> None:
+    resp = local_client.get("/local/bootstrap/nexus/notakey")
+    assert resp.status_code == 404
+
+
+def test_bootstrap_nexus_missing_event(local_client: Client) -> None:
+    resp = local_client.get("/local/bootstrap/nexus/2026nope")
+    assert resp.status_code == 404
+
+
+def test_bootstrap_nexus_pads_short_alliances(local_client: Client) -> None:
+    event = Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.OFFSEASON,
+        nexus_code="demoevent",
+    )
+    event.put()
+    Match(
+        id="2026test_qm1",
+        event=event.key,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        alliances_json='{"blue":{"teams":["frc111"],"score":0},"red":{"teams":["frc444","frc555"],"score":0}}',
+        team_key_names=["frc111", "frc444", "frc555"],
+        year=2026,
+    ).put()
+
+    resp = local_client.get("/local/bootstrap/nexus/2026test")
+    assert resp.status_code == 200
+    assert "Qualification,1,111,,,444,555," in resp.get_data(as_text=True)

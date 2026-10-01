@@ -408,8 +408,7 @@ describe('ScoreBreakdown2018 endgame', () => {
 });
 
 describe('ScoreBreakdown2018 fouls', () => {
-  // Both alliances get identical counts here: which alliance's counts belong
-  // under which column is Bug #54, covered by its own failing-test PR.
+  // Both alliances get identical counts, so column placement is not checked.
   test('values fouls at 5 points each', () => {
     render(
       <ScoreBreakdown2018
