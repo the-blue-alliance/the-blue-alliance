@@ -185,3 +185,8 @@ def test_user_permissions_list(web_client: Client, login_gae_admin) -> None:
 
     resp = web_client.get("/admin/users/permissions")
     assert resp.status_code == 200
+
+
+def test_user_edit_post_doesnt_exist(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post("/admin/user/edit/asdf", data={"display_name": "x"})
+    assert resp.status_code == 404
