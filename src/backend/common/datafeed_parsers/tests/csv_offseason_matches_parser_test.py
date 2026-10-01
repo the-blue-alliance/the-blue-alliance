@@ -118,7 +118,7 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
             CSVOffseasonMatchesParser.parse_match_number_info("xx1")
 
     def test_parse_elim_match_number_info_two_digit_set(self) -> None:
-        """"sf12m1" is set 12, match 1."""
+        """The elim id "sf12m1" is set 12, match 1."""
         self.assertEqual(
             CSVOffseasonMatchesParser.parse_elim_match_number_info("sf12m1"), (1, 12)
         )
