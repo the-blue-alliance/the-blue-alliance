@@ -2268,17 +2268,10 @@ def test_get_timezone_id_missing_time_zone_id(
     assert "No timeZoneId for (37.3382, -121.8863)" in caplog.text
 
 
-def test_bug_13_missing_key_warnings_name_google_secrets(
+def test_missing_key_warnings_name_google_secrets(
     requests_mock: Mocker, caplog: pytest.LogCaptureFixture
 ) -> None:
-    """Bug #13: the missing-key warnings name the wrong sitevar.
-
-    Today the placesearch / place details warnings say "Must have sitevar
-    google.api_key" and the geocode / timezone warnings say "Missing sitevar:
-    google.api_key", but the code reads the api_key field of the
-    google.secrets sitevar; there is no google.api_key sitevar. Correct: every
-    warning names google.secrets.
-    """
+    """Every missing-key warning names the google.secrets sitevar."""
     _mock_geocode(requests_mock, {"San Jose, CA": [_geocode_result()]})
     requests_mock.get(TIMEZONE_URL, json={"timeZoneId": "America/Los_Angeles"})
 
