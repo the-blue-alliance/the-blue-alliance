@@ -221,11 +221,8 @@ describe("WebcastSelectionDialog", () => {
     ]);
   });
 
-  it("Bug #39: divides a BlueZone-only special section from event webcasts", () => {
-    // Wrong today: the Special/Event divider is only inserted when there are
-    // non-BlueZone specials, so a BlueZone-only special section abuts
-    // "Event Webcasts" with no divider.
-    // Correct: any non-empty special section is divided from event webcasts.
+  it("divides a BlueZone-only special section from event webcasts", () => {
+    // The divider must not depend on there being non-BlueZone specials.
     renderDialog({ webcasts: ["bluezone-0", "2026casj-0"] });
     expect(listText()).toEqual([
       "Special Webcasts",
