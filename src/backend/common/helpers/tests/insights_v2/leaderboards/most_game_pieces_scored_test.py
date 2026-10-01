@@ -4,6 +4,7 @@ from backend.common.helpers.insights_v2.leaderboards.most_game_pieces_scored imp
     MostGamePiecesScoredV2Calculator,
 )
 from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.tests.insights_v2.fakes import fake_event, fake_match
 
 # (year, event_key, expected display_name, expected top value, possible top match keys)
 # Top values/keys computed directly from the fixture data; several years have
@@ -112,3 +113,23 @@ def test_most_game_pieces_scored_skips_unsupported_year(
     insights = compute_insights_for_year(2018, [MostGamePiecesScoredV2Calculator()])
 
     assert insights == []
+
+
+def test_most_game_pieces_scored_skips_unusable_matches() -> None:
+    calc = MostGamePiecesScoredV2Calculator()
+    calc.on_event(
+        fake_event(
+            [
+                fake_match(-1, -1, year=2026),  # Unplayed
+                # Red counted, blue is missing its fuel count
+                fake_match(
+                    10,
+                    5,
+                    red_breakdown={"hubScore": {"totalCount": 4}},
+                    blue_breakdown={"hubScore": {}},
+                    year=2026,
+                ),
+            ]
+        )
+    )
+    assert calc.counts == {}
