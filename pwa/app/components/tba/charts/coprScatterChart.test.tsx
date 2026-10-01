@@ -239,10 +239,8 @@ describe('CoprScatterChart', () => {
     ).toEqual(['hsl(var(--primary))', '#000000', '#0000ff']);
   });
 
-  test('Bug #67: does not mutate the passed-in colors when darkening a white team', () => {
-    // Wrong today: the white-to-black swap writes '#000000' into the
-    // caller's EventColors object (typically React Query cache data).
-    // Correct: the chart draws the dot black but leaves its input unchanged.
+  test('does not mutate the passed-in colors when darkening a white team', () => {
+    // The passed-in colors are typically React Query cache data.
     const colors = renderChart();
 
     expect(colors).toEqual(makeColors());
