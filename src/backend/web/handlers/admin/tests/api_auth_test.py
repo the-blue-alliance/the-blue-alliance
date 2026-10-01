@@ -368,16 +368,10 @@ def test_api_auth_manage_unknown_type_is_404(
     assert resp.status_code == 404
 
 
-def test_bug_6_api_auth_edit_read_key_with_write_flag_rejected_gracefully(
+def test_api_auth_edit_read_key_with_write_flag_rejected_gracefully(
     login_gae_admin, web_client: Client
 ) -> None:
-    """Bug #6: adding a write flag to a READ_API key 500s.
-
-    Today ApiAuthAccess.put() raises because READ_API cannot be mixed with
-    write types, and api_auth_edit_post does not catch it, so the request
-    ends in a 500. Correct: reject the edit gracefully (a 400 or a redirect
-    back, never a 500) and leave the stored key unchanged.
-    """
+    """Adding a write flag to a READ_API key is rejected without a 500."""
     _store_write_auth("readkey", auth_types=[AuthType.READ_API])
 
     resp = web_client.post(
