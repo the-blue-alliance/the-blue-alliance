@@ -37,6 +37,26 @@ export function ComponentOprsTable({
 
   const columns: TbaColumnDef<CoprRow>[] = [
     {
+      id: 'rank',
+      header: () => <span className="block text-center">#</span>,
+      enableSorting: false,
+      enableHiding: false,
+      cell: ({ row, table }) => {
+        const sortedRows = table.getRowModel().rows;
+        const index = sortedRows.findIndex(
+          (sortedRow) => sortedRow.id === row.id,
+        );
+        const isAscending = table
+          .getAllLeafColumns()
+          .some(
+            (column) =>
+              column.getSortIndex() === 0 && column.getIsSorted() === 'asc',
+          );
+
+        return isAscending ? sortedRows.length - index : index + 1;
+      },
+    },
+    {
       id: 'team',
       header: 'Team',
       accessorFn: (row) => row.teamKey,
@@ -75,6 +95,7 @@ export function ComponentOprsTable({
         <DataTable
           columns={columns}
           data={rows}
+          enableSortingRemoval={false}
           equalColumnWidths
           columnVisibility={columnVisibility}
           initialSorting={
