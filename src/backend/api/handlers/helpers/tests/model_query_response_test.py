@@ -160,3 +160,34 @@ def test_multi_models_query_response_filtered(app: Flask) -> None:
         mock_q1.fetch_dict_async.assert_called_once_with(ApiMajorVersion.API_V3)
         mock_q2.fetch_dict_async.assert_called_once_with(ApiMajorVersion.API_V3)
         assert json.loads(resp.data) == [{"key": "frc254"}, {"key": "frc604"}]
+
+
+def test_model_query_response_dict_404(app: Flask) -> None:
+    mock_query = MagicMock()
+    mock_query.fetch_dict.return_value = None
+
+    with app.app_context():
+        with pytest.raises(NotFound):
+            model_query_response(mock_query, model_type=ModelType("simple"))
+
+        mock_query.fetch_dict.assert_called_once_with(ApiMajorVersion.API_V3)
+        mock_query.fetch_json.assert_not_called()
+
+
+def test_model_query_response_dict_none_without_404(app: Flask) -> None:
+    mock_query = MagicMock()
+    mock_query.fetch_dict.return_value = None
+    filter_func = MagicMock()
+
+    with app.app_context():
+        resp = model_query_response(
+            mock_query,
+            model_type=ModelType("simple"),
+            filter_func=filter_func,
+            abort_404_if_none=False,
+        )
+
+        assert resp.content_type == "application/json"
+        assert json.loads(resp.data) is None
+        # The filter is never applied to a missing model
+        filter_func.assert_not_called()
