@@ -102,7 +102,7 @@ import {
 } from '~/components/ui/animated-tabs';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -1398,13 +1398,13 @@ function MediaTab({
       <div className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h1 className="text-2xl font-bold">Webcasts</h1>
-          <Button
-            render={
-              <Link to="/suggest/event/media" search={{ event_key: eventKey }}>
-                Add Event Media
-              </Link>
-            }
-          />
+          <Link
+            to="/suggest/event/media"
+            search={{ event_key: eventKey }}
+            className={buttonVariants()}
+          >
+            Add Event Media
+          </Link>
         </div>
         {webcasts.length > 0 ? (
           <>
@@ -1428,16 +1428,12 @@ function MediaTab({
             )}
           </>
         ) : (
-          <Button
-            variant="secondary"
-            render={
-              <a
-                href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
-              >
-                Add Webcast
-              </a>
-            }
-          />
+          <a
+            href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
+            className={buttonVariants({ variant: 'secondary' })}
+          >
+            Add Webcast
+          </a>
         )}
       </div>
 
