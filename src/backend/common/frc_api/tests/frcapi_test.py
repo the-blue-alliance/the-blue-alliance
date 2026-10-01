@@ -471,16 +471,10 @@ def test_get_cached_gcs_files_downloads_and_caches(
     )
 
 
-def test_bug_33_get_cached_gcs_files_same_paths_downloaded_or_cached(
+def test_get_cached_gcs_files_same_paths_downloaded_or_cached(
     monkeypatch: pytest.MonkeyPatch, tmp_path
 ) -> None:
-    """
-    Bug #33: get_cached_gcs_files joins the (slash-terminated) directory and
-    file name with another "/" when it downloads from GCS, returning
-    "dir//file", but returns "dir/file" once the files are cached locally.
-
-    Correct: both calls return the same "dir/file" paths.
-    """
+    """Downloaded and cached GCS files have the same dir/file paths."""
     from backend.common.frc_api import frc_api as frc_api_module
 
     monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
