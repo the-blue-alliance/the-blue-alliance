@@ -503,12 +503,8 @@ def test_merge_schedule_without_results() -> None:
     }
 
 
-def test_bug_32_merge_match_capitalized_teams() -> None:
-    """
-    Bug #32: when the schedule used "Teams" (capitalised), _merge_match
-    detected teams_key == "Teams" but then read and wrote scheduled["teams"],
-    raising KeyError. Both sides are now normalized to "teams".
-    """
+def test_merge_match_normalizes_capitalized_teams() -> None:
+    """A "Teams" key on both sides is merged and normalized to "teams"."""
     scheduled = {"Teams": [{"teamNumber": 254, "station": "Red1"}]}
     merged = FRCAPI._merge_match(
         scheduled, {"Teams": [{"teamNumber": 254, "dq": False}]}
@@ -521,14 +517,10 @@ def test_bug_32_merge_match_capitalized_teams() -> None:
     "schedule_key, result_key",
     [("teams", "Teams"), ("Teams", "teams")],
 )
-def test_bug_32_merge_match_mixed_case_teams(
+def test_merge_match_merges_mixed_case_teams(
     schedule_key: str, result_key: str
 ) -> None:
-    """
-    Bug #32: the teams key was chosen from the schedule alone, so a result
-    using the other capitalisation was copied over as an unrelated field and
-    its dq/surrogate flags never reached the scheduled teams.
-    """
+    """Result team flags reach the scheduled teams whatever the key capitalisation."""
     scheduled = {schedule_key: [{"teamNumber": 254, "station": "Red1"}]}
     merged = FRCAPI._merge_match(
         scheduled, {result_key: [{"teamNumber": 254, "surrogate": True}]}
@@ -539,12 +531,8 @@ def test_bug_32_merge_match_mixed_case_teams(
     assert "Teams" not in merged
 
 
-def test_bug_32_merge_match_capitalized_placeholder_teams() -> None:
-    """
-    Bug #32: the {1, 2, 3} placeholder rewrite wrote scheduled["teams"] even
-    when the schedule used "Teams", leaving the original placeholders under
-    "Teams", which the match parser reads first.
-    """
+def test_merge_match_clears_capitalized_placeholder_teams() -> None:
+    """The {1, 2, 3} placeholder teams are cleared when the schedule uses "Teams"."""
     scheduled = {
         "Teams": [
             {"teamNumber": 1, "station": "Red1"},

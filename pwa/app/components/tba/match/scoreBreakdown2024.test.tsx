@@ -23,9 +23,7 @@ vi.mock('~/components/tba/match/common', async (importOriginal) => ({
     condition: boolean;
     teamKey: string;
   }) => (
-    // Normalised so these rows don't depend on whether the component passes
-    // "frc254" or "254"; which one it should pass is Bug #58, covered by
-    // its own failing-test PR.
+    // Normalised so rows match whether the component passes "frc254" or "254".
     <div>
       {teamKey.replace(/^frc/, '')}={condition ? 'yes' : 'no'}
     </div>
@@ -188,19 +186,7 @@ describe('ScoreBreakdown2024', () => {
     ).toBeTruthy();
   });
 
-  // Bug #57: EndgameRobotCell labelled an onstage robot "Spotlit (+4)" when
-  // the TRAP at its stage position held a note, and never read the
-  // microphone flags. Spotlit comes from a HIGH NOTE on the MICROPHONE above
-  // the robot (micCenterStage / micStageLeft / micStageRight); a trap note is
-  // a separate 5-point alliance score.
-  // 2024 Game Manual (CRESCENDO), Section 6.5.4 SPOTLIGHTING (pages 47-48 of
-  // 153, Section 6 V10; PDF dated 2024-04-09, after the last Team Update):
-  // "ALLIANCES may SPOTLIGHT ROBOTS by scoring a HIGH NOTE on a MICROPHONE.
-  // [...] Once a HIGH NOTE is scored on a MICROPHONE, ONSTAGE ROBOTS paired
-  // with (i.e. below) the MICROPHONE on which the HIGH NOTE was scored are
-  // awarded a greater number of points per Table 6-2." Table 6-2 (page 49):
-  // ONSTAGE (not SPOTLIT) 3, ONSTAGE (SPOTLIT) 4, NOTE in TRAP (max. 1/TRAP) 5.
-  // https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
+  // Spotlit needs a HIGH NOTE on the MICROPHONE above the robot (2024 Manual 6.5.4).
   const noStageFlags = {
     trapCenterStage: false,
     trapStageLeft: false,
@@ -210,7 +196,7 @@ describe('ScoreBreakdown2024', () => {
     micStageRight: false,
   };
 
-  test('Bug #57: a trap note alone does not make an onstage robot spotlit', () => {
+  test('a trap note alone does not make an onstage robot spotlit', () => {
     renderBreakdown(
       makeBreakdown(
         {
@@ -246,7 +232,7 @@ describe('ScoreBreakdown2024', () => {
       mic: { micStageRight: true },
     },
   ])(
-    'Bug #57: a high note on the microphone above an onstage robot at $position makes it spotlit',
+    'a high note on the microphone above an onstage robot at $position makes it spotlit',
     ({ endgame, mic }) => {
       renderBreakdown(
         makeBreakdown(
@@ -319,9 +305,7 @@ describe('ScoreBreakdown2024', () => {
     ).toHaveLength(2);
   });
 
-  // Both alliances get identical counts in these two tests: which
-  // alliance's counts belong under which column is Bug #56, covered by its
-  // own failing-test PR.
+  // Both alliances get identical counts, so column placement is not checked.
   test('shows foul counts with points', () => {
     renderBreakdown(
       makeBreakdown(
