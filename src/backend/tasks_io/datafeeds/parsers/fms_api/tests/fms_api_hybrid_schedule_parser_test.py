@@ -663,13 +663,7 @@ def test_parse_skips_null_team_when_unscored(ndb_stub) -> None:
 
 
 def test_parse_team_with_null_station(ndb_stub) -> None:
-    """
-    A team with a null station is counted in team_key_names but assigned to
-    neither alliance.
-
-    A null station alongside other teams is covered by bug #10840-e's
-    failing-test PR.
-    """
+    """A team with a null station is in team_key_names but on neither alliance."""
     _put_event()
     matches, _ = _parse([_schedule_match(teams=[_team(254, None)])])
     assert len(matches) == 1

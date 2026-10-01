@@ -8,7 +8,7 @@ import type {
   ApiReadKeyMessage,
   ApiWriteKeyMessage,
 } from '~/api/tba/mobile/types.gen';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -116,10 +116,12 @@ export default function ApiKeysSection() {
               Keys for writing event data. Granted on request.
             </CardDescription>
           </div>
-          <Button
-            size="sm"
-            render={<a href={REQUEST_APIWRITE_URL}>Request Write Key</a>}
-          />
+          <a
+            href={REQUEST_APIWRITE_URL}
+            className={buttonVariants({ size: 'sm' })}
+          >
+            Request Write Key
+          </a>
         </CardHeader>
         <CardContent>
           {isLoading ? (
