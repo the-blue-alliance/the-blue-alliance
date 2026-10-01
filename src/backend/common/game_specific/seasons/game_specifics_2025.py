@@ -265,6 +265,7 @@ class GameSpecifics2025(
             PredictionStatConfig("auto_coral_scored", 0, 2**2),
             PredictionStatConfig("coral_scored", 0, 10**2),
             PredictionStatConfig("barge_points", 0, 10**2),
+            PredictionStatConfig("coopertition_criteria", 0, 1),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:

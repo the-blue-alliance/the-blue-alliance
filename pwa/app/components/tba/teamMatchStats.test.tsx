@@ -25,6 +25,13 @@ vi.mock('~/components/tba/links', () => ({
   ),
 }));
 
+vi.mock('recharts', async (importOriginal) => ({
+  ...(await importOriginal<typeof import('recharts')>()),
+  ResponsiveContainer: ({ children }: { children: ReactNode }) => (
+    <div>{children}</div>
+  ),
+}));
+
 const TEAM = 'frc254';
 
 function makeMatch({
