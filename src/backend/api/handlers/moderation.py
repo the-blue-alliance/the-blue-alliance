@@ -12,7 +12,6 @@ from pyre_extensions import none_throws
 from backend.api.handlers.decorators import require_moderation_permission
 from backend.common.consts.account_permission import SUGGESTION_PERMISSIONS
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
-from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import IMAGE_TYPES, MediaType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SuggestionType, TYPE_NAMES
