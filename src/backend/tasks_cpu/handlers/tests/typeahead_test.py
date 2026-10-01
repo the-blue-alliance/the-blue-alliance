@@ -106,8 +106,7 @@ def test_do_districts(tasks_cpu_client: Client) -> None:
 def test_do_districts_without_display_name_uses_render_name(
     tasks_cpu_client: Client,
 ) -> None:
-    """Bug #10840-c: a district with no display name should be labelled with
-    `District.render_name` (its abbreviation), not "None"."""
+    """A district with no display name is labelled by its render_name, not None."""
     District(id="2020ont", year=2020, abbreviation="ont").put()
 
     resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/typeaheadcalc")
