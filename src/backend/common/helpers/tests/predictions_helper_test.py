@@ -351,40 +351,13 @@ def test_compute_match_predictions_modern_seasons(
         ("2025isde1", "coopertition_criteria", "prob_coral_bonus"),
     ],
 )
-def test_bug_24_bonus_predictions_compute_their_secondary_stats(
+def test_bonus_predictions_compute_their_secondary_stats(
     event_key: EventKey,
     secondary_stat: str,
     prob_key: str,
     test_data_importer,
 ) -> None:
-    """
-    Bug #24: the 2024/2025 bonus RP predictions in _predict_match read
-    secondary stats ("coopertition_criteria", "robot_on_stage") that are not
-    in those seasons' get_prediction_relevant_stats(), so they are never
-    computed. Their (mean, var) is (0, 0), the division by sqrt(0) emits a
-    numpy divide-by-zero RuntimeWarning, and the secondary factor is 0:
-    prob_ensemble_bonus is always 0 in 2024, and the Coopertition paths of
-    MELODY / CORAL contribute nothing.
-
-    Correct: every stat a prediction reads is computed, and an event where
-    alliances did earn the RP gets a non-zero probability.
-
-    Rules the secondary stats model (latest manuals, verbatim):
-    - 2024 Game Manual (manual dated 2024-04-09, Section 6 V10, current
-      through Team Update 21), Section 6.5.6, Table 6-2, p. 49:
-        "ENSEMBLE At least 10 STAGE points and at least 2 ONSTAGE ROBOTS*"
-      and Section 6.5.5 Coopertition Bonus, p. 48: "If both ALLIANCES use a
-      NOTE scored in their AMP to engage in Coopertition (by pressing their
-      Coopertition button) within the first 45 seconds of TELEOP ... all teams
-      earn a Coopertition Bonus, and the threshold for the MELODY decreases".
-      https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
-    - 2025 Game Manual (manual dated 2025-04-08, Section 6 V13, current
-      through Team Update 21), Section 6.5.3 Coopertition Bonus, p. 49: "In
-      Qualification MATCHES, if at least 2 ALGAE are scored in each
-      ALLIANCE'S PROCESSOR, all teams earn 1 Coopertition Point, and the
-      threshold for the CORAL RP decreases as described in Table 6-2."
-      https://firstfrc.blob.core.windows.net/frc2025/Manual/2025GameManual.pdf
-    """
+    """Every stat a bonus RP prediction reads is computed (2024 Manual 6.5.6)."""
     game = get_game(int(event_key[:4]))
     assert secondary_stat in {s for s, _, _ in game.get_prediction_relevant_stats()}
 
@@ -423,15 +396,10 @@ def test_bug_24_bonus_predictions_compute_their_secondary_stats(
         (0.0, 1.0, 0.0, 0.1),
     ],
 )
-def test_bug_24_coopertition_bonus_needs_both_alliances(
+def test_coopertition_bonus_needs_both_alliances(
     red_mean: float, blue_mean: float, low: float, high: float
 ) -> None:
-    """
-    2024 Game Manual 6.5.5: "If both ALLIANCES use a NOTE scored in their AMP
-    to engage in Coopertition ... all teams earn a Coopertition Bonus".
-    2025 Game Manual 6.5.3: "if at least 2 ALGAE are scored in each
-    ALLIANCE'S PROCESSOR, all teams earn 1 Coopertition Point".
-    """
+    """Coopertition needs both alliances (2024 Manual 6.5.5, 2025 Manual 6.5.3)."""
     mean_vars = {
         "red": {"coopertition_criteria": {"mean": red_mean, "var": 0.01}},
         "blue": {"coopertition_criteria": {"mean": blue_mean, "var": 0.01}},
