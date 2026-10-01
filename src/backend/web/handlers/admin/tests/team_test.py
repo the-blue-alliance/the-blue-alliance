@@ -265,16 +265,10 @@ def test_team_website_update_ignores_blocklisted_url(
     assert team.website == "https://www.thebluealliance.com"
 
 
-def test_bug_8_team_detail_media_years_sorted_newest_first(
+def test_team_detail_media_years_sorted_newest_first(
     web_client: Client, login_gae_admin
 ) -> None:
-    """Bug #8: team_detail does not actually sort media years.
-
-    Today the sort key is `lambda m: 0 if media.year is None else media.year`,
-    which closes over the leftover loop variable `media` instead of using `m`,
-    so every year gets the same key and the years stay in query order.
-    Correct: team_media_years is sorted newest first, e.g. [2019, 2018].
-    """
+    """Admin team_detail lists media years newest first."""
     helpers.preseed_team(1124)
     team_key = ndb.Key(Team, "frc1124")
     # Keys chosen so the query returns the older year first.
