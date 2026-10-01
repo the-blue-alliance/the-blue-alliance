@@ -138,6 +138,10 @@ Type-aware rules are enabled via `oxlint-tsgolint`.
 #### Isolation
 
 - Each test runs alone, in any order, with no shared mutable state.
+- Tests must not depend on the real clock, the machine's time zone, or its locale. CI runs in UTC and dev machines do not, so a test that passes locally can fail on CI, or fail only at certain times of day.
+- Pin the current time and the local zone by stubbing the APIs the code reads, for example `vi.spyOn(Temporal.Now, 'instant').mockReturnValue(...)` and `vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue(...)`, then restore them in `afterEach`. Fake timers do not move the native `Temporal`.
+- Use fixed, literal dates and assert literal expected strings. Do not build targets from `Temporal.Now` or format the expected value with the same API the code uses.
+- Pick a stubbed zone whose calendar date differs from the event's zone, so the test proves the code uses the zone it should.
 - Use `beforeEach` for shared navigation and setup when every test in a
   `describe` block starts from the same route and state. Keep
   behavior-specific setup inside each test.

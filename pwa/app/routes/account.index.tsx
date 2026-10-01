@@ -11,7 +11,7 @@ import ApiKeysSection from '~/components/tba/account/apiKeys';
 import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -148,9 +148,9 @@ function Account() {
               <div className="text-sm text-muted-foreground">Subscriptions</div>
             </div>
           </div>
-          <Button size="sm" render={<Link to="/account/mytba" />}>
+          <Link to="/account/mytba" className={buttonVariants({ size: 'sm' })}>
             Manage myTBA
-          </Button>
+          </Link>
         </CardContent>
       </Card>
 
