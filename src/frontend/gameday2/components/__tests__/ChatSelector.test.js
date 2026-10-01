@@ -1,6 +1,7 @@
 /* @jest-environment jsdom */
 import React from "react";
 import { render, fireEvent } from "@testing-library/react";
+import { format } from "util";
 import ChatSelector from "../ChatSelector";
 
 const chats = [
@@ -21,6 +22,24 @@ const renderSelector = (props = {}) =>
       {...props}
     />
   );
+
+describe("ChatSelector ListItem button prop", () => {
+  // Runs first: React warns about a given unknown DOM attribute only once per module registry.
+  it("does not pass MUI's removed `button` prop through to the DOM", () => {
+    // MUI v7 ListItem has no `button` prop; React warns if it reaches the DOM.
+    const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const { container } = renderSelector();
+      expect(container.querySelector("[button]")).toBeNull();
+      const buttonWarnings = spy.mock.calls
+        .map((args) => format(...args))
+        .filter((msg) => msg.includes("`button`"));
+      expect(buttonWarnings).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
 
 describe("ChatSelector", () => {
   beforeEach(() => {
