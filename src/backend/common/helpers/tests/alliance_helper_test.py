@@ -1,9 +1,15 @@
 import unittest
+from types import SimpleNamespace
+from typing import cast
 
 import pytest
 from pyre_extensions import none_throws
 
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.alliance_helper import AllianceHelper
+from backend.common.models.alliance import PlayoffAllianceStatus, PlayoffOutcome
 from backend.common.models.event import Event
 from backend.tests.json_data_importer import JsonDataImporter  # noqa
 
@@ -110,4 +116,73 @@ class Test2023njflaAllianceHelper(unittest.TestCase):
                 "competed in the playoffs as the <b>1st Pick</b> of <b>Alliance 4</b>",
                 "were eliminated in the <b>Semifinals</b>",
             ],
+        )
+
+
+def test_alliance_size_legacy_year() -> None:
+    assert (
+        AllianceHelper.get_known_alliance_size(EventType.REGIONAL, 2010)
+        == AllianceHelper.UNKNOWN_ALLIANCE_SIZE
+    )
+
+
+def test_ordinal_pick_teens() -> None:
+    assert AllianceHelper.get_ordinal_pick_from_number(11) == "11th Pick"
+    assert AllianceHelper.get_ordinal_pick_from_number(22) == "22nd Pick"
+
+
+def test_alliance_details_backup_and_missing_team() -> None:
+    event = cast(
+        Event,
+        SimpleNamespace(
+            event_type_enum=EventType.REGIONAL,
+            year=2019,
+            alliance_selections=[
+                {
+                    "picks": ["frc1", "frc2", "frc3"],
+                    "backup": {"in": "frc4", "out": "frc3"},
+                    "name": "Alliance 1",
+                }
+            ],
+        ),
+    )
+    alliance = none_throws(event.alliance_selections)[0]
+    assert AllianceHelper.get_alliance_details_and_pick_name(event, "frc4") == (
+        alliance,
+        "Backup",
+        3,
+    )
+    assert AllianceHelper.get_alliance_details_and_pick_name(event, "frc5") == (
+        None,
+        None,
+        3,
+    )
+
+
+def _status(status: PlayoffOutcome, level: CompLevel) -> PlayoffAllianceStatus:
+    return PlayoffAllianceStatus(
+        level=level,
+        status=status,
+        record=None,
+        current_level_record={"wins": 1, "losses": 1, "ties": 0},
+        playoff_type=PlayoffType.BRACKET_8_TEAM,
+    )
+
+
+def test_playoff_status_string_plural_playing() -> None:
+    assert AllianceHelper.generate_playoff_status_string(
+        _status(PlayoffOutcome.PLAYING, CompLevel.SF), None, None, plural=True
+    ) == ["are <b>1-1-0</b> in the <b>Semifinals</b>"]
+
+
+def test_playoff_status_string_won_level() -> None:
+    assert AllianceHelper.generate_playoff_status_string(
+        _status(PlayoffOutcome.WON, CompLevel.SF), None, None
+    ) == ["<b>won the Semifinals</b>"]
+
+
+def test_playoff_status_string_unknown_status() -> None:
+    with pytest.raises(Exception, match="Unknown playoff status"):
+        AllianceHelper.generate_playoff_status_string(
+            _status(cast(PlayoffOutcome, "bogus"), CompLevel.SF), None, None
         )
