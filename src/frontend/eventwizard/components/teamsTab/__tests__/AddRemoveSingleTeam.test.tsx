@@ -437,13 +437,8 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
     expect(removeButton()).toBeEnabled();
   });
 
-  it("Bug #41: requires a re-fetch after a successful add, even without clearTeams", async () => {
-    // Wrong today: the success callback does `hasFetchedTeams = false`, which
-    // only reassigns the destructured prop, so the component itself never
-    // resets. Without a parent clearTeams, it keeps allowing edits against a
-    // stale team list and never shows the "fetch the current team list" note.
-    // Correct: after a successful add the component itself requires a
-    // re-fetch (note shown, picker disabled) until the parent reloads teams.
+  it("requires a re-fetch after a successful add, even without clearTeams", async () => {
+    // Without clearTeams, the component must reset hasFetchedTeams itself.
     mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
     renderComponent({ clearTeams: undefined });
     await selectTeam("254 | The Cheesy Poofs", "254");
@@ -457,8 +452,7 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
     expect(screen.getByRole("combobox")).toBeDisabled();
   });
 
-  it("Bug #41: requires a re-fetch after a successful remove, even without clearTeams", async () => {
-    // Wrong today / correct: as above, for the Remove path.
+  it("requires a re-fetch after a successful remove, even without clearTeams", async () => {
     mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
     renderComponent({ clearTeams: undefined });
     await selectTeam("1678 | Citrus Circuits", "1678");
