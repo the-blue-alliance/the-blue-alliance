@@ -83,6 +83,17 @@ describe("LayoutSelectionPanel", () => {
     });
   });
 
+  it("offers every layout in LAYOUT_DISPLAY_ORDER, including Nona-View", () => {
+    // Nona-View (layout 8) is the last entry in LAYOUT_DISPLAY_ORDER.
+    const { container, queryByText } = render(
+      <LayoutSelectionPanel setLayout={() => {}} />
+    );
+    expect(container.querySelectorAll("ul > li")).toHaveLength(
+      LAYOUT_DISPLAY_ORDER.length
+    );
+    expect(queryByText("Nona-View")).not.toBeNull();
+  });
+
   it("selects a layout when its item is clicked", () => {
     const setLayout = jest.fn();
     const { getByText } = render(

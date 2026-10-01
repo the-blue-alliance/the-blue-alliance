@@ -74,6 +74,18 @@ describe("LayoutDrawer", () => {
     expect(single.querySelector('[data-testid="CheckIcon"]')).toBeNull();
   });
 
+  it("offers every layout in LAYOUT_DISPLAY_ORDER, including Nona-View", () => {
+    // Nona-View (layout 8) is the last entry in LAYOUT_DISPLAY_ORDER.
+    const { queryByText, container } = renderDrawer();
+    const layoutList =
+      container.ownerDocument.querySelectorAll(".MuiList-root")[0];
+    const items = layoutList.querySelectorAll(
+      ":scope > li.MuiListItem-container"
+    );
+    expect(items).toHaveLength(LAYOUT_DISPLAY_ORDER.length);
+    expect(queryByText("Nona-View")).not.toBeNull();
+  });
+
   it("does not check the selected layout until a layout has been set", () => {
     const { container } = renderDrawer({ layoutSet: false });
     expect(
