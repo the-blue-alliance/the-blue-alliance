@@ -24,9 +24,7 @@ vi.mock('~/components/tba/match/common', async (importOriginal) => ({
     condition: boolean;
     teamKey: string;
   }) => (
-    // Normalised so these rows don't depend on whether the component passes
-    // "frc254" or "254"; which one it should pass is Bug #58, covered by
-    // its own failing-test PR.
+    // Normalised so rows match whether the component passes "frc254" or "254".
     <div>
       {teamKey.replace(/^frc/, '')}={condition ? 'yes' : 'no'}
     </div>
@@ -246,8 +244,7 @@ describe('ScoreBreakdown2023', () => {
     ).toHaveLength(3);
   });
 
-  // Both alliances get identical counts here: which alliance's counts belong
-  // under which column is Bug #56, covered by its own failing-test PR.
+  // Both alliances get identical counts, so column placement is not checked.
   test('shows foul counts with derived points', () => {
     renderBreakdown(
       makeBreakdown(
