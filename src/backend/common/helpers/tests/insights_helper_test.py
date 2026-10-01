@@ -1088,14 +1088,8 @@ def test_do_overall_match_insights_with_nothing_stored_is_empty(ndb_stub) -> Non
     assert InsightsHelper.doOverallMatchInsights() == []
 
 
-def test_bug_17_no_prediction_insight_without_predictions() -> None:
-    """Bug #17: a zero-count MATCH_PREDICTIONS insight is emitted anyway.
-
-    Today _doPredictionInsightsForEvents sets `data = None` when no event had
-    predictions, but the next line overwrites it with defaultdict(dict), so
-    an insight with all-zero counts and None Brier scores is emitted.
-    Correct: with no predictions, no insight is emitted.
-    """
+def test_no_prediction_insight_without_predictions() -> None:
+    """With no predictions, no MATCH_PREDICTIONS insight is emitted."""
     insights = InsightsHelper._doPredictionInsightsForEvents(year=2024, events=[])
 
     assert insights == []
