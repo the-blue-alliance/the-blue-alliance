@@ -129,6 +129,13 @@ describe("chats reducer webcast and default chat handling", () => {
     expect(state.renderedChats).toEqual(["firstupdatesnow", "somechat"]);
   });
 
+  it("does not leak chats from WEBCASTS_UPDATED into the default state", () => {
+    // Twitch chats must not be written into the module-level default state.
+    const pristine = JSON.parse(JSON.stringify(freshChats(undefined, {})));
+    freshChats(undefined, { type: types.WEBCASTS_UPDATED, webcasts });
+    expect(freshChats(undefined, {})).toEqual(pristine);
+  });
+
   it("sets the default chat to a known channel", () => {
     let state = freshChats(undefined, {
       type: types.WEBCASTS_UPDATED,
