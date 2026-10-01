@@ -721,16 +721,10 @@ def test_clear_model_cache_unknown_type_redirects_home(
     assert resp.headers["Location"] == "/admin/"
 
 
-def test_bug_4_clear_event_cache_without_details_redirects_to_event_page(
+def test_clear_event_cache_without_details_redirects_to_event_page(
     web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
-    """Bug #4: clearing an event's cache 404s when it has no EventDetails.
-
-    Today the event cache is cleared, then the handler aborts 404 because
-    there is no EventDetails entity (common for events without results yet).
-    Correct: clear the event cache, skip the missing details, and redirect to
-    /admin/event/2020nyny.
-    """
+    """An event without EventDetails still has its cache cleared and redirects."""
     Event(
         id="2020nyny",
         event_short="nyny",
