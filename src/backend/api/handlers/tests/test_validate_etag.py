@@ -1106,3 +1106,126 @@ def test_validate_etag_short_circuits_across_json_and_dict_endpoints(
         )
         assert resp4.status_code == 304
         assert mock_mqr.called is False
+
+
+def test_validate_etag_skips_empty_incoming_etags(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = none_throws(resp1.headers.get("ETag"))
+
+    # Empty entries in the incoming ETag list are skipped rather than looked up
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.get_incoming_etags",
+        lambda: ["", none_throws(normalize_etag(etag))],
+    )
+    mock_is_etag_valid = MagicMock(return_value=False)
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.is_etag_valid", mock_is_etag_valid
+    )
+
+    # Track handler execution via track_call_after_response
+    from backend.api.handlers.team import track_call_after_response
+
+    mock_track_call = MagicMock(side_effect=track_call_after_response)
+    monkeypatch.setattr(
+        "backend.api.handlers.team.track_call_after_response", mock_track_call
+    )
+
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    # Flask's own conditional response handling may still produce a 304, but
+    # the fast path did not short-circuit: the handler ran
+    assert resp2.status_code in (200, 304)
+    mock_track_call.assert_called()
+    mock_is_etag_valid.assert_called_once_with(
+        normalize_etag(etag), path="/api/v3/team/frc254"
+    )
+
+
+def test_validate_etag_fast_path_exception_falls_through(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = none_throws(resp1.headers.get("ETag"))
+
+    # An unexpected error while validating the incoming ETag must not break the
+    # request; the handler runs and a full response is returned.
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.is_etag_valid",
+        MagicMock(side_effect=RuntimeError("boom")),
+    )
+
+    # Track handler execution via track_call_after_response
+    from backend.api.handlers.team import track_call_after_response
+
+    mock_track_call = MagicMock(side_effect=track_call_after_response)
+    monkeypatch.setattr(
+        "backend.api.handlers.team.track_call_after_response", mock_track_call
+    )
+
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    # Flask's own conditional response handling may still produce a 304, but
+    # the fast path did not short-circuit: the handler ran
+    assert resp2.status_code in (200, 304)
+    mock_track_call.assert_called()
+
+
+def test_validate_etag_save_dependencies_exception_is_swallowed(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    mock_save = MagicMock(side_effect=RuntimeError("boom"))
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.save_etag_dependencies", mock_save
+    )
+
+    # An error while persisting ETag dependencies must not break the response
+    resp = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.json["key"] == "frc254"
+    assert resp.headers.get("ETag") is not None
+    mock_save.assert_called_once()
+    # Nothing was recorded, so the ETag can't be validated on a later request
+    assert (
+        etag_deps_persisted_cache.get(
+            ("/api/v3/team/frc254", none_throws(normalize_etag(resp.headers["ETag"])))
+        )
+        is None
+    )

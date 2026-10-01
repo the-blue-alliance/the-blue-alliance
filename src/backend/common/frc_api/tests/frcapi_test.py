@@ -530,6 +530,59 @@ def test_merge_schedule_without_results() -> None:
     }
 
 
+def test_merge_match_normalizes_capitalized_teams() -> None:
+    """A "Teams" key on both sides is merged and normalized to "teams"."""
+    scheduled = {"Teams": [{"teamNumber": 254, "station": "Red1"}]}
+    merged = FRCAPI._merge_match(
+        scheduled, {"Teams": [{"teamNumber": 254, "dq": False}]}
+    )
+    assert merged["teams"] == [{"teamNumber": 254, "station": "Red1", "dq": False}]
+    assert "Teams" not in merged
+
+
+@pytest.mark.parametrize(
+    "schedule_key, result_key",
+    [("teams", "Teams"), ("Teams", "teams")],
+)
+def test_merge_match_merges_mixed_case_teams(
+    schedule_key: str, result_key: str
+) -> None:
+    """Result team flags reach the scheduled teams whatever the key capitalisation."""
+    scheduled = {schedule_key: [{"teamNumber": 254, "station": "Red1"}]}
+    merged = FRCAPI._merge_match(
+        scheduled, {result_key: [{"teamNumber": 254, "surrogate": True}]}
+    )
+    assert merged["teams"] == [
+        {"teamNumber": 254, "station": "Red1", "surrogate": True}
+    ]
+    assert "Teams" not in merged
+
+
+def test_merge_match_clears_capitalized_placeholder_teams() -> None:
+    """The {1, 2, 3} placeholder teams are cleared when the schedule uses "Teams"."""
+    scheduled = {
+        "Teams": [
+            {"teamNumber": 1, "station": "Red1"},
+            {"teamNumber": 2, "station": "Red2"},
+            {"teamNumber": 3, "station": "Red3"},
+        ]
+    }
+    merged = FRCAPI._merge_match(scheduled, {"scoreRedFinal": 10})
+    assert merged["teams"] == [
+        {"teamNumber": None, "station": "Red1"},
+        {"teamNumber": None, "station": "Red2"},
+        {"teamNumber": None, "station": "Red3"},
+    ]
+    assert "Teams" not in merged
+
+
+def test_merge_match_schedule_without_teams() -> None:
+    merged = FRCAPI._merge_match(
+        {"matchNumber": 1}, {"teams": [{"teamNumber": 254, "dq": False}]}
+    )
+    assert merged["teams"] == [{"teamNumber": 254, "dq": False}]
+
+
 def test_merge_match_placeholder_teams() -> None:
     scheduled = {
         "teams": [
