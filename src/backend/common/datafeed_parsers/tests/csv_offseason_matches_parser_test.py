@@ -117,14 +117,8 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
         with self.assertRaises(KeyError):
             CSVOffseasonMatchesParser.parse_match_number_info("xx1")
 
-    def test_bug_10841b_parse_elim_match_number_info_two_digit_set(self) -> None:
-        """
-        Bug #10841-b: the elim set number is taken from the single character
-        before "m", so a two-digit set ("sf12m1") collapses to its last digit
-        (set 2).
-
-        Correct: "sf12m1" is set 12, match 1.
-        """
+    def test_parse_elim_match_number_info_two_digit_set(self) -> None:
+        """"sf12m1" is set 12, match 1."""
         self.assertEqual(
             CSVOffseasonMatchesParser.parse_elim_match_number_info("sf12m1"), (1, 12)
         )
