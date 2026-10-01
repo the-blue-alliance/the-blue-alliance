@@ -1088,19 +1088,10 @@ def test_do_overall_match_insights_with_nothing_stored_is_empty(ndb_stub) -> Non
     assert InsightsHelper.doOverallMatchInsights() == []
 
 
-def test_bug_18_overall_award_insights_skip_district_champs_and_einstein(
+def test_overall_award_insights_skip_district_champs_and_einstein(
     ndb_stub,
 ) -> None:
-    """Bug #18: some all-time award insights include district-scoped data.
-
-    doOverallAwardInsights skips yearly insights that have a
-    district_abbreviation for REGIONAL_DISTRICT_WINNERS, BLUE_BANNERS,
-    RCA_WINNERS and SUCCESSFUL_ELIM_TEAMUPS, but not for WORLD_CHAMPIONS,
-    DIVISION_WINNERS (and so EINSTEIN_STREAK) or SUCCESSFUL_EINSTEIN_TEAMUPS.
-    Today a district-scoped copy of those insights is aggregated a second
-    time. Correct: district-scoped yearly insights are skipped for these too,
-    so adding them does not change the all-time results.
-    """
+    """District-scoped champs, division and Einstein insights don't change all-time totals."""
     names = [
         Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS],
         Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS],
