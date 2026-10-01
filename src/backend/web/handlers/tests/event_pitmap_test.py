@@ -2,6 +2,7 @@ import json
 import os
 import re
 from datetime import datetime
+from unittest.mock import patch
 
 from freezegun import freeze_time
 from werkzeug.test import Client
@@ -283,3 +284,14 @@ def test_event_pitmap_400_when_teams_param_contains_invalid_team_key(
 
     resp = web_client.get("/event/2026nyny/pitmap?teams=3015")
     assert resp.status_code == 400
+
+
+def test_event_pitmap_404_when_pitmap_invalid(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
+    NexusEventDetails(id="2020nyny", pitmap_json={}).put()
+
+    with patch.object(
+        NexusEventDetailsSVGHelper, "template_values", side_effect=ValueError
+    ):
+        resp = web_client.get("/event/2020nyny/pitmap")
+    assert resp.status_code == 404

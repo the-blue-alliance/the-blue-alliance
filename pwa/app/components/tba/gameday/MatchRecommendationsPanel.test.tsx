@@ -9,6 +9,7 @@ import {
   formatMatchTime,
   sortMatchSuggestions,
 } from '~/components/tba/gameday/MatchRecommendationsPanel';
+import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import type { UseFirebaseMatchSuggestionsResult } from '~/lib/gameday/useFirebaseMatchSuggestions';
 
 const { useMatchSuggestionsMock } = vi.hoisted(() => ({
@@ -51,8 +52,10 @@ vi.mock('~/components/tba/links', () => ({
 vi.mock('~/components/tba/teamTooltip', () => ({
   TeamLinkWithTooltip: ({
     teamKey,
+    disqualified: _disqualified,
+    surrogate: _surrogate,
     ...props
-  }: { teamKey: string } & AnchorHTMLAttributes<HTMLAnchorElement>) => (
+  }: TeamTooltipProps & AnchorHTMLAttributes<HTMLAnchorElement>) => (
     <a href={`/team/${teamKey.slice(3)}`} {...props}>
       {teamKey.slice(3)}
     </a>

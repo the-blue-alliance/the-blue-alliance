@@ -2,6 +2,7 @@ import unittest
 from datetime import datetime
 
 import pytest
+from pyre_extensions import none_throws
 
 from backend.common.consts.notification_type import NotificationType
 from backend.common.models.notifications.event_schedule import (
@@ -88,6 +89,23 @@ class TestEventScheduleNotification(unittest.TestCase):
         assert (
             self.notification.fcm_notification.body
             == "The Present Test Event match schedule has been updated. The next match starts at 8:30 EST."
+        )
+
+    def test_fcm_notification_time_bad_timezone(self) -> None:
+        for team_number in range(7):
+            Team(id="frc%s" % team_number, team_number=team_number).put()
+        event = EventTestCreator.create_present_event()
+        notification = EventScheduleNotification(event)
+        next_match = none_throws(notification.next_match)
+
+        # An unknown timezone falls back to the raw UTC time
+        event.timezone_id = "Not/AZone"
+        next_match.time = datetime(2017, 11, 28, 13, 30, 59)
+
+        fcm_notification = none_throws(notification.fcm_notification)
+        assert (
+            fcm_notification.body
+            == "The Present Test Event match schedule has been updated. The next match starts at 13:30."
         )
 
     def test_fcm_notification_short_name(self):
