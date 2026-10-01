@@ -25,12 +25,6 @@ const AddMultipleTeams: React.FC<AddMultipleTeamsProps> = ({
   };
 
   const handleAddTeams = (): void => {
-    if (!selectedEvent) {
-      // No valid event
-      showErrorMessage("Please select an event before adding teams");
-      return;
-    }
-
     const teams: string[] = [];
     const teamInput = inputTeams.split("\n");
     for (let i = 0; inputTeams && i < teamInput.length; i++) {
@@ -69,7 +63,7 @@ const AddMultipleTeams: React.FC<AddMultipleTeamsProps> = ({
       />
       <button
         className={`btn ${buttonClass}`}
-        onClick={handleAddTeams}
+        onClick={selectedEvent ? handleAddTeams : undefined}
         disabled={!selectedEvent}
       >
         Overwrite Teams

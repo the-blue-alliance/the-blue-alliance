@@ -60,7 +60,7 @@ export function ScoreBreakdownRow({
       })}
     >
       {Children.map(children, (child) => {
-        if (isValidElement(child)) {
+        if (isValidElement(child) && child.type === ScoreBreakdownLabelCell) {
           return cloneElement(
             child as ReactElement<{
               redWon?: boolean;
