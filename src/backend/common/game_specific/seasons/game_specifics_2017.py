@@ -267,9 +267,6 @@ class GameSpecifics2017(
         if not has_insights:
             return None
 
-        if finished_matches == 0:
-            return {}
-
         opportunities_1x = 2 * finished_matches  # once per alliance
         opportunities_3x = 6 * finished_matches  # 3x per alliance
         event_insights = {
