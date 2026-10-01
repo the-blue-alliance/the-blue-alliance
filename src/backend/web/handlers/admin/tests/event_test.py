@@ -2282,16 +2282,10 @@ def test_link_frc_api_post_not_found(web_client: Client, login_gae_admin) -> Non
     assert resp.status_code == 404
 
 
-def test_bug_7_empty_divisions_field_means_no_divisions(
+def test_empty_divisions_field_means_no_divisions(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:
-    """Bug #7: an empty divisions field 500s.
-
-    Today event_edit_post calls json.loads("") on the divisions field, which
-    raises, so the request 500s and nothing is saved. Correct: an empty field
-    is treated as "no divisions", the event is saved, and the handler
-    redirects to the event page.
-    """
+    """An empty divisions field saves the event with no divisions."""
     resp = web_client.post("/admin/event/edit", data=_full_event_form(divisions=""))
     assert resp.status_code == 302
     event = Event.get_by_id("2020nyny")
