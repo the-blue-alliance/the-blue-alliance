@@ -1,11 +1,16 @@
+import datetime
 import json
 from collections.abc import Generator
 
 import pytest
 from flask.testing import FlaskClient
+from google.appengine.ext import ndb
 from werkzeug.test import Client
 
+from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
+from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.typeahead_entry import TypeaheadEntry
 
@@ -194,3 +199,67 @@ def test_account_info_csrf_token_from_another_session_is_rejected(
     )
     assert resp.status_code == 400
     assert Favorite.query(ancestor=login_user.account_key).fetch() == []
+
+
+def test_apiwrite_events_not_logged_in(web_client: Client) -> None:
+    resp = web_client.get("/_/account/apiwrite_events")
+    assert resp.status_code == 401
+
+
+def test_apiwrite_events(login_user, web_client: Client) -> None:
+    Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        name="New York City Regional",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    Event(
+        id="2020ctha",
+        year=2020,
+        event_short="ctha",
+        name="Hartford",
+        event_type_enum=EventType.DISTRICT,
+    ).put()
+    ApiAuthAccess(
+        id="active",
+        owner=login_user.account_key,
+        event_list=[ndb.Key(Event, "2020nyny")],
+    ).put()
+    ApiAuthAccess(
+        id="expired",
+        owner=login_user.account_key,
+        event_list=[ndb.Key(Event, "2020ctha")],
+        expiration=datetime.datetime(2000, 1, 1),
+    ).put()
+
+    resp = web_client.get("/_/account/apiwrite_events")
+    assert resp.status_code == 200
+    assert resp.json == [
+        {"value": "2020nyny", "label": "2020 New York City Regional"},
+    ]
+
+
+def test_remap_teams_no_event(web_client: Client) -> None:
+    resp = web_client.get("/_/remap_teams/2020nyny")
+    assert resp.status_code == 200
+    assert resp.json is None
+
+
+def test_remap_teams(web_client: Client) -> None:
+    Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+        remap_teams={"frc9000": "frc254B"},
+    ).put()
+    resp = web_client.get("/_/remap_teams/2020nyny")
+    assert resp.status_code == 200
+    assert resp.json == {"frc9000": "frc254B"}
+
+
+def test_playoff_types(web_client: Client) -> None:
+    resp = web_client.get("/_/playoff_types")
+    assert resp.status_code == 200
+    assert {"value": 0, "label": "Elimination Bracket (8 Alliances)"} in resp.json

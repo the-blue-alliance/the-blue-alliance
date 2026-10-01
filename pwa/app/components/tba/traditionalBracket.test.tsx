@@ -472,8 +472,7 @@ describe('TraditionalBracket', () => {
   });
 
   test('renders an alliance that is missing from the alliance list', () => {
-    // Whether these rows start highlighted is Bug #60, covered by its own
-    // failing-test PR; this test only checks they render and hover safely.
+    // This test only checks that rows render and hover safely.
     const matches = [
       makeMatch(
         CompLevel.SF,

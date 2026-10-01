@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import cast, Dict, List
+from unittest.mock import patch
 
 from google.appengine.ext import ndb
 from requests_mock.mocker import Mocker as RequestsMocker
@@ -16,6 +17,7 @@ from backend.common.helpers.deferred import run_from_task
 from backend.common.models.alliance import EventAlliance, MatchAlliance
 from backend.common.models.award import Award
 from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_predictions import EventPredictions
@@ -600,3 +602,160 @@ def test_bootstrap_event_with_district(
 
     stored_event = Event.get_by_id("2020nyny")
     assert event == remove_auto_add_properties(stored_event)
+
+
+def test_fetch_helpers_build_endpoints() -> None:
+    with patch.object(
+        LocalDataBootstrap, "fetch_endpoint", return_value={}
+    ) as mock_fetch:
+        LocalDataBootstrap.fetch_event("2020nyny", "key")
+        LocalDataBootstrap.fetch_event_detail("2020nyny", "teams", "key")
+        LocalDataBootstrap.fetch_district_history("ne", "key")
+        LocalDataBootstrap.fetch_district_events("2020ne", "key")
+        LocalDataBootstrap.fetch_district_rankings("2020ne", "key")
+        LocalDataBootstrap.fetch_district_teams("2020ne", "key")
+
+    assert [c.args[0] for c in mock_fetch.call_args_list] == [
+        "event/2020nyny",
+        "event/2020nyny/teams",
+        "district/ne/history",
+        "district/2020ne/events",
+        "district/2020ne/rankings",
+        "district/2020ne/teams",
+    ]
+
+
+def test_store_empty_lists(ndb_context) -> None:
+    district = District(id="2020ne", year=2020, abbreviation="ne")
+    assert LocalDataBootstrap.store_district_teams([], district) == []
+    assert LocalDataBootstrap.store_team_medias([], 2020, "frc254") == []
+    assert LocalDataBootstrap.store_match_zebra(cast(Dict, None)) is None
+
+
+def test_update_events(ndb_context) -> None:
+    with patch.object(LocalDataBootstrap, "update_event") as mock_update:
+        LocalDataBootstrap.update_events(["2020nyny", "2020ctha"], "key")
+    assert [c.args for c in mock_update.call_args_list] == [
+        ("2020nyny", "key"),
+        ("2020ctha", "key"),
+    ]
+
+
+def test_update_event_with_pit_locations_and_district_points(
+    ndb_context, taskqueue_stub
+) -> None:
+    event = make_event("2020nyny")
+    team = make_team(254)
+    district_points = {
+        "points": {
+            "frc254": {
+                "qual_points": 1,
+                "elim_points": 0,
+                "alliance_points": 0,
+                "award_points": 0,
+                "total": 1,
+            }
+        },
+        "tiebreakers": {},
+    }
+    bundle = {
+        "event": EventConverter(event).convert(ApiMajorVersion.API_V3),
+        "teams": TeamConverter([team]).convert(ApiMajorVersion.API_V3),
+        "teams_statuses": {"frc254": {"pit_location": "A1"}, "frc1": None},
+        "matches": [],
+        "rankings": None,
+        "alliances": None,
+        "awards": [],
+        "predictions": None,
+        "district_points": district_points,
+    }
+    with patch.object(LocalDataBootstrap, "_fetch_event_bundle", return_value=bundle):
+        LocalDataBootstrap.update_event("2020nyny", "key")
+
+    event_team = EventTeam.get_by_id("2020nyny_frc254")
+    assert event_team is not None
+    assert event_team.pit_location == {"location": "A1"}
+
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.district_points == district_points
+
+
+def test_bootstrap_year_with_districts(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    mock_events_url(requests_mock, 2020, [])
+    district_data = {
+        "key": "2020ne",
+        "year": 2020,
+        "abbreviation": "ne",
+        "display_name": "New England",
+    }
+    mock_districts_url(requests_mock, 2020, [district_data])
+
+    resp = LocalDataBootstrap.bootstrap_key("2020", "test_apiv3")
+    assert resp == "/events/2020"
+
+    # The district is deferred for its own update
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+
+
+def test_bootstrap_district_abbreviation(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    district_data = {
+        "key": "2020ne",
+        "year": 2020,
+        "abbreviation": "ne",
+        "display_name": "New England",
+    }
+    team = make_team(254)
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/ne/history",
+        json=[district_data],
+    )
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/2020ne/teams",
+        json=TeamConverter([team]).convert(ApiMajorVersion.API_V3),
+    )
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/2020ne/events",
+        json=[{"key": "2020nyny"}],
+    )
+    rankings = [
+        {
+            "rank": 1,
+            "team_key": "frc254",
+            "point_total": 10,
+            "rookie_bonus": 0,
+            "event_points": [],
+        }
+    ]
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/2020ne/rankings",
+        json=rankings,
+    )
+
+    resp = LocalDataBootstrap.bootstrap_key("ne", "test_apiv3")
+    assert resp == "/events/ne"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    run_from_task(tasks[0])
+
+    # update_district defers an update for each of the district's events
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="default")) == 2
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    assert district.display_name == "New England"
+    assert district.rankings == rankings
+
+    district_team = DistrictTeam.get_by_id("2020ne_frc254")
+    assert district_team is not None
+    assert district_team.year == 2020

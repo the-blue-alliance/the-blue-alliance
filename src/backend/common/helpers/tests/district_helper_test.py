@@ -2,17 +2,26 @@ import json
 from typing import cast
 
 import pytest
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.district_helper import (
     DistrictHelper,
     DistrictRankingTeamTotal,
     DistrictRankingTiebreakers,
     TeamAtEventDistrictPoints,
 )
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.models.alliance import EventAlliance
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.keys import Year
+from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
@@ -326,3 +335,78 @@ def test_hq_adjustments(setup_full_event) -> None:
         adjustments=5,
         tiebreakers=DistrictRankingTiebreakers(*[30, 30, 16, 16, 19]),
     )
+
+
+def _unplayed_match(comp_level: CompLevel, set_number: int = 1) -> Match:
+    return Match(
+        id=f"2015test_{comp_level}{set_number}m1",
+        event=ndb.Key(Event, "2015test"),
+        year=2015,
+        comp_level=comp_level,
+        set_number=set_number,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+            }
+        ),
+    )
+
+
+def _empty_points() -> EventDistrictPoints:
+    return EventDistrictPoints(points={}, tiebreakers={})
+
+
+def test_event_level_rookie_bonus_skips_missing_team(ndb_context) -> None:
+    event = Event(id="2023test", year=2023)
+    assert DistrictHelper._get_event_level_rookie_bonus_points(event, {"frc9999"}) == {}
+
+
+def test_alliance_number_not_found() -> None:
+    assert (
+        DistrictHelper._get_alliance_number_from_teams(
+            [EventAlliance(picks=["frc1", "frc2", "frc3"])],
+            ["frc4", "frc5", "frc6"],
+        )
+        is None
+    )
+
+
+def test_elim_match_points_double_elim_4_team_unplayed() -> None:
+    points = _empty_points()
+    DistrictHelper._calc_elim_match_points(
+        points, [_unplayed_match(CompLevel.SF)], [], PlayoffType.DOUBLE_ELIM_4_TEAM, 1
+    )
+    assert points["points"] == {}
+
+
+def test_elim_match_points_2015_skips_unplayed() -> None:
+    points = _empty_points()
+    _, organized = MatchHelper.organized_matches(
+        [_unplayed_match(CompLevel.QF), _unplayed_match(CompLevel.F)]
+    )
+    DistrictHelper._calc_elim_match_points_2015(points, organized, 1)
+    assert points["points"] == {}
+
+
+def test_wlt_based_match_points_skips_unplayed() -> None:
+    points = _empty_points()
+    DistrictHelper._calc_wlt_based_match_points(
+        points, [_unplayed_match(CompLevel.QM)], 1
+    )
+    assert points["points"] == {}
+
+
+def test_alliance_selections_to_points_error_is_logged(ndb_context) -> None:
+    event = Event(
+        id="2019test",
+        year=2019,
+        event_type_enum=EventType.DISTRICT,
+        district_key=ndb.Key(District, "2019ne"),
+    )
+    # A malformed alliance (too few picks) errors partway through
+    points = DistrictHelper._alliance_selections_to_points(
+        event, 1, [EventAlliance(picks=["frc1", "frc2"])]
+    )
+    assert points == {"frc1": 16, "frc2": 16}

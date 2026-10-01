@@ -1,8 +1,10 @@
 import json
-from datetime import datetime
+from datetime import datetime, timedelta
 from typing import Optional
+from unittest import mock
 
 import pytest
+import pytz
 from freezegun import freeze_time
 from google.appengine.ext import ndb
 
@@ -10,6 +12,7 @@ from backend.common.consts.award_type import AwardType
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
@@ -783,3 +786,395 @@ def test_disable_sync_by_mask() -> None:
         assert (
             event.is_sync_enabled(sync_type) == expected
         ), f"Sync should be {expected} for {sync_type} when official"
+
+
+def test_time_as_utc_retries_out_of_nonexistent_time(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # pytz only raises for a DST gap when asked to disambiguate; simulate that
+    # and make sure we fall back to the offset an hour later.
+    tz = mock.Mock()
+    tz.utcoffset.side_effect = [pytz.NonExistentTimeError(), timedelta(hours=-4)]
+    monkeypatch.setattr(pytz, "timezone", lambda _: tz)
+
+    e = Event(timezone_id="America/New_York")
+    gap_time = datetime(2020, 3, 8, 2, 30)
+    assert e.time_as_utc(gap_time) == datetime(2020, 3, 8, 6, 30)
+    assert tz.utcoffset.call_args_list == [
+        mock.call(gap_time),
+        mock.call(gap_time + timedelta(hours=1)),
+    ]
+
+
+def test_local_time_retries_out_of_ambiguous_time(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    tz = mock.Mock()
+    tz.utcoffset.side_effect = [pytz.AmbiguousTimeError(), timedelta(hours=-5)]
+    monkeypatch.setattr(pytz, "timezone", lambda _: tz)
+
+    e = Event(timezone_id="America/New_York")
+    with freeze_time("2020-11-01 01:30"):
+        assert e.local_time() == datetime(2020, 10, 31, 20, 30)
+    assert tz.utcoffset.call_args_list == [
+        mock.call(datetime(2020, 11, 1, 1, 30)),
+        mock.call(datetime(2020, 11, 1, 2, 30)),
+    ]
+
+
+def test_week_before_2018_starts_on_wednesday() -> None:
+    # 2017-03-01 is a Wednesday, so it is the season start as-is (a Monday
+    # based season would have snapped to 2017-02-27)
+    e = Event(
+        id="2017test",
+        year=2017,
+        event_type_enum=EventType.REGIONAL,
+        official=True,
+        start_date=datetime(2017, 3, 1),
+        event_short="test",
+    )
+    e.put()
+
+    assert e.week == 0
+
+    from backend.common.context_cache import context_cache
+
+    assert context_cache.get("2017_season_start") == datetime(2017, 3, 1, 0, 0)
+
+    later = Event(
+        id="2017later",
+        year=2017,
+        event_type_enum=EventType.REGIONAL,
+        official=True,
+        start_date=datetime(2017, 3, 10),
+        event_short="later",
+    )
+    assert later.week == 1
+
+
+def _webcast_status_event() -> Event:
+    return Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        start_date=datetime(2020, 2, 1),
+        end_date=datetime(2020, 2, 3),
+        webcast_json=json.dumps(
+            [
+                {"type": "twitch", "channel": "one"},
+                {"type": "twitch", "channel": "two"},
+            ]
+        ),
+    )
+
+
+@freeze_time("2020-02-02")
+def test_webcast_status_offline() -> None:
+    event = _webcast_status_event()
+    assert event.webcast_status == "offline"
+
+
+@freeze_time("2020-02-02")
+def test_webcast_status_unknown() -> None:
+    event = _webcast_status_event()
+    event.webcast[0]["status"] = WebcastStatus.UNKNOWN
+    assert event.webcast_status == "unknown"
+
+
+@freeze_time("2020-02-02")
+def test_webcast_status_online_wins() -> None:
+    event = _webcast_status_event()
+    event.webcast[0]["status"] = WebcastStatus.UNKNOWN
+    event.webcast[1]["status"] = WebcastStatus.ONLINE
+    assert event.webcast_status == "online"
+
+
+@freeze_time("2020-02-02")
+def test_webcast_status_skips_missing_webcasts() -> None:
+    event = _webcast_status_event()
+    with (
+        mock.patch.object(Event, "_patch_webcast_online_status", return_value=None),
+        mock.patch.object(
+            Event,
+            "current_webcasts",
+            new_callable=mock.PropertyMock,
+            return_value=[
+                None,
+                {"type": "twitch", "channel": "two", "status": "online"},
+            ],
+        ),
+    ):
+        assert event.webcast_status == "online"
+
+
+def test_division_keys_json() -> None:
+    event = Event(
+        id="2019cmptx",
+        divisions=[ndb.Key(Event, "2019carv"), ndb.Key(Event, "2019gal")],
+    )
+    assert event.division_keys_json == '["2019carv", "2019gal"]'
+    assert Event(id="2019nyny").division_keys_json == "[]"
+
+
+def test_urls() -> None:
+    event = Event(id="2019nyny", year=2019, event_short="nyny", facebook_eid="12345")
+    assert event.facebook_event_url == "http://www.facebook.com/event.php?eid=12345"
+    assert event.details_url == "/event/2019nyny"
+
+
+def test_gameday_url() -> None:
+    no_webcast = Event(id="2019nyny", year=2019, event_short="nyny")
+    assert no_webcast.gameday_url is None
+
+    with_webcast = Event(
+        id="2019nyny",
+        year=2019,
+        event_short="nyny",
+        webcast_json=json.dumps([{"type": "twitch", "channel": "one"}]),
+    )
+    assert with_webcast.gameday_url == "/gameday/2019nyny"
+
+
+@pytest.mark.parametrize(
+    "event_type, expected",
+    [
+        (EventType.OFFSEASON, None),
+        (EventType.PRESEASON, None),
+        (
+            EventType.CMP_DIVISION,
+            "https://www.firstinspires.org/hubfs/web/event/2019/cmp/frc/public-schedule.pdf",
+        ),
+        (
+            EventType.CMP_FINALS,
+            "https://www.firstinspires.org/hubfs/web/event/2019/cmp/frc/public-schedule.pdf",
+        ),
+        (
+            EventType.REGIONAL,
+            "https://info.firstinspires.org/hubfs/web/event/frc/2019/2019_NYNY_Agenda.pdf",
+        ),
+        (
+            EventType.DISTRICT,
+            "https://info.firstinspires.org/hubfs/web/event/frc/2019/2019_NYNY_Agenda.pdf",
+        ),
+    ],
+)
+def test_public_agenda_url(event_type: EventType, expected: Optional[str]) -> None:
+    event = Event(
+        id="2019nyny", year=2019, event_short="nyny", event_type_enum=event_type
+    )
+    assert event.public_agenda_url == expected
+
+
+def test_hashtag() -> None:
+    event = Event(id="2019nyny", year=2019, event_short="nyny")
+    assert event.hashtag == "frcnyny"
+    event.custom_hashtag = "NYCRegional"
+    assert event.hashtag == "NYCRegional"
+
+
+def test_display_name() -> None:
+    event = Event(id="2019nyny", name="New York City Regional")
+    assert event.display_name == "New York City Regional"
+    event.short_name = "New York City"
+    assert event.display_name == "New York City"
+
+
+@pytest.mark.parametrize(
+    "year, expected",
+    [(2016, "Championship"), (2017, "Houston Championship")],
+)
+def test_normalized_name_cmp_finals(year: int, expected: str) -> None:
+    event = Event(
+        id=f"{year}cmptx",
+        year=year,
+        event_short="cmptx",
+        city="Houston",
+        name="FIRST Championship - Einstein",
+        event_type_enum=EventType.CMP_FINALS,
+    )
+    assert event.normalized_name == expected
+
+
+def test_normalized_name_offseason_short_name() -> None:
+    event = Event(
+        id="2019iri",
+        year=2019,
+        event_short="iri",
+        name="Indiana Robotics Invitational",
+        short_name="IRI",
+        event_type_enum=EventType.OFFSEASON,
+    )
+    assert event.normalized_name == "IRI"
+
+
+def test_alliance_teams_no_alliances() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.alliance_teams == []
+
+
+def test_details_passthrough_properties_without_details() -> None:
+    event = Event(
+        id="2019ct", year=2019, event_short="ct", event_type_enum=EventType.REGIONAL
+    )
+    assert event.regional_champs_pool_points is None
+    assert event.playoff_advancement is None
+    assert event.playoff_bracket is None
+    assert event.matchstats is None
+    assert event.coprs is None
+
+
+def test_details_passthrough_properties_with_details() -> None:
+    EventDetails(
+        id="2019ct",
+        regional_champs_pool_points={"points": {}, "tiebreakers": {}},
+        matchstats={"oprs": {"254": 10.0}},
+        coprs={"Total Points": {"254": 10.0}},
+        playoff_advancement={"advancement": {"sf": []}, "bracket": {"sf": {}}},
+    ).put()
+    event = Event(
+        id="2019ct", year=2019, event_short="ct", event_type_enum=EventType.REGIONAL
+    )
+    assert event.regional_champs_pool_points == {"points": {}, "tiebreakers": {}}
+    assert event.playoff_advancement == {"sf": []}
+    assert event.playoff_bracket == {"sf": {}}
+    assert event.matchstats == {"oprs": {"254": 10.0}}
+    assert event.coprs == {"Total Points": {"254": 10.0}}
+
+    district_event = Event(
+        id="2019ct", year=2019, event_short="ct", event_type_enum=EventType.DISTRICT
+    )
+    assert district_event.regional_champs_pool_points is None
+
+
+def test_playoff_advancement_empty() -> None:
+    EventDetails(id="2019ct").put()
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.playoff_advancement is None
+    assert event.playoff_bracket is None
+
+
+def test_clear_futures() -> None:
+    event = Event(id="2019ct", year=2019, event_short="ct")
+    assert event.matches == []
+    assert event.awards == []
+    assert event.teams == []
+    event.clear_matches()
+    event.clear_awards()
+    event.clear_teams()
+    assert event._matches_future is None
+    assert event._awards_future is None
+    assert event._teams_future is None
+
+
+@pytest.mark.parametrize(
+    "mock_time, divisions, expected",
+    [
+        ("2020-02-02", [], True),
+        ("2020-01-26", [], False),
+        ("2020-01-26", [ndb.Key(Event, "2020div1")], True),
+        ("2020-01-20", [ndb.Key(Event, "2020div1")], False),
+    ],
+)
+def test_should_use_short_cache(
+    mock_time: str, divisions: list[ndb.Key], expected: bool
+) -> None:
+    event = Event(
+        start_date=datetime(2020, 2, 1),
+        end_date=datetime(2020, 2, 3),
+        divisions=divisions,
+    )
+    with freeze_time(mock_time):
+        assert event.should_use_short_cache is expected
+
+
+def test_should_use_short_cache_parent_event() -> None:
+    event = Event(
+        start_date=datetime(2020, 2, 1),
+        end_date=datetime(2020, 2, 3),
+        parent_event=ndb.Key(Event, "2020cmp"),
+    )
+    with freeze_time("2020-01-26"):
+        assert event.should_use_short_cache is True
+
+
+def test_week_no_season_start() -> None:
+    # No hardcoded start date for 1992 and no events in the datastore
+    e = Event(
+        id="1992test",
+        year=1992,
+        event_type_enum=EventType.REGIONAL,
+        official=True,
+        start_date=datetime(1992, 3, 1),
+        event_short="test",
+    )
+    assert e.week is None
+
+
+def test_venue_or_venue_from_address_without_venue() -> None:
+    event = Event(venue_address="Some Gym\r\n1 Main St")
+    assert event.venue_or_venue_from_address == "Some Gym"
+
+    # No venue and no address: the AttributeError is swallowed
+    assert Event().venue_or_venue_from_address is None
+
+
+def test_venue_address_safe_without_venue_address() -> None:
+    assert Event(city="Berkeley").venue_address_safe is None
+    assert Event(venue="Some Gym").venue_address_safe is None
+
+
+@freeze_time("2020-02-02")
+def test_webcast_status_patched_from_memcache() -> None:
+    from backend.common.memcache_models.webcast_online_status_memcache import (
+        WebcastOnlineStatusMemcache,
+    )
+
+    event = _webcast_status_event()
+    WebcastOnlineStatusMemcache(event.webcast[0]).put(
+        {
+            "type": WebcastType.TWITCH,
+            "channel": "one",
+            "status": WebcastStatus.ONLINE,
+            "stream_title": "Qualifications",
+            "viewer_count": 100,
+            "scheduled_start_time_utc": "2020-02-02T12:00:00Z",
+        }
+    )
+
+    assert event.webcast_status == "online"
+    assert event.webcast[0]["stream_title"] == "Qualifications"
+    assert event.webcast[0]["viewer_count"] == 100
+    assert event.webcast[0]["scheduled_start_time_utc"] == "2020-02-02T12:00:00Z"
+
+
+@freeze_time("2020-02-02")
+def test_webcast_status_patched_from_memcache_partial() -> None:
+    from backend.common.memcache_models.webcast_online_status_memcache import (
+        WebcastOnlineStatusMemcache,
+    )
+
+    event = _webcast_status_event()
+    WebcastOnlineStatusMemcache(event.webcast[1]).put(
+        {"type": WebcastType.TWITCH, "channel": "two"}
+    )
+
+    assert event.webcast_status == "offline"
+    assert "status" not in event.webcast[1]
+
+
+def test_render_key_name() -> None:
+    assert Event.render_key_name(2019, "NYNY") == "2019nyny"
+
+
+@pytest.mark.parametrize(
+    "nexus_code, expected",
+    [
+        ("2026demo0755", "2026demo0755"),
+        ("demo0755", "demo0755"),
+        ("DEMO0755", "DEMO0755"),
+        ("test", "2026test"),
+    ],
+)
+def test_nexus_code_for_api(nexus_code: str, expected: str) -> None:
+    event = Event(year=2026, event_short="test", nexus_code=nexus_code)
+    assert event.nexus_code_for_api == expected

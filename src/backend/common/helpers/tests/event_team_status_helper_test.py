@@ -1,4 +1,6 @@
+import json
 import unittest
+from typing import cast, Optional
 
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
@@ -9,11 +11,13 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.playoff_type import DoubleElimRound, PlayoffType
 from backend.common.helpers.event_team_status_helper import EventTeamStatusHelper
-from backend.common.models.alliance import PlayoffOutcome
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.models.alliance import PlayoffAllianceStatus, PlayoffOutcome
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team_status import (
     EventTeamLevelStatus,
+    EventTeamStatus,
 )
 from backend.common.models.match import Match
 from backend.common.tests.event_simulator import EventSimulator
@@ -1839,3 +1843,155 @@ class Test2023njflaEventTeamStatusHelper(unittest.TestCase):
             ),
             "Team 555 had a record of <b>3-9-0</b> in quals.",
         )
+
+
+def _playoff_status(
+    status: PlayoffOutcome, level: CompLevel = CompLevel.SF, **kwargs
+) -> PlayoffAllianceStatus:
+    return cast(
+        PlayoffAllianceStatus,
+        {
+            "level": level,
+            "status": status,
+            "record": None,
+            "current_level_record": None,
+            "playoff_type": PlayoffType.BRACKET_8_TEAM,
+            **kwargs,
+        },
+    )
+
+
+def _status(playoff: Optional[PlayoffAllianceStatus] = None, qual=None):
+    return cast(
+        EventTeamStatus,
+        {
+            "qual": qual,
+            "alliance": None,
+            "playoff": playoff,
+            "last_match_key": None,
+            "next_match_key": None,
+        },
+    )
+
+
+def test_playoff_status_string_playing() -> None:
+    status = _status(
+        _playoff_status(
+            PlayoffOutcome.PLAYING,
+            current_level_record={"wins": 1, "losses": 0, "ties": 0},
+        )
+    )
+    assert (
+        EventTeamStatusHelper.generate_team_at_event_playoff_status_string(
+            "frc254", status
+        )
+        == "Currently <b>1-0-0</b> in the <b>Semifinals</b>"
+    )
+
+
+def test_playoff_status_string_won_level_with_average() -> None:
+    status = _status(_playoff_status(PlayoffOutcome.WON, playoff_average=123.45))
+    assert (
+        EventTeamStatusHelper.generate_team_at_event_playoff_status_string(
+            "frc254", status
+        )
+        == "<b>Won the Semifinals</b> with a playoff average of <b>123.5</b>"
+    )
+
+
+def test_playoff_status_string_unknown_status() -> None:
+    status = _status(_playoff_status(cast(PlayoffOutcome, "bogus")))
+    with pytest.raises(Exception, match="Unknown playoff status"):
+        EventTeamStatusHelper.generate_team_at_event_playoff_status_string(
+            "frc254", status
+        )
+
+
+def test_status_string_without_team() -> None:
+    assert (
+        EventTeamStatusHelper.generate_team_at_event_status_string(
+            "frc254", _status(), include_team=False
+        )
+        == "is waiting for the event to begin."
+    )
+
+
+def test_status_string_verbose_record_without_team_at_event() -> None:
+    event = Event(id="2020nyny", name="New York City Regional", year=2020)
+    qual = {
+        "status": EventTeamLevelStatus.COMPLETED,
+        "num_teams": 40,
+        "ranking": {
+            "rank": 3,
+            "matches_played": 3,
+            "dq": 0,
+            "record": {"wins": 1, "losses": 1, "ties": 1},
+            "qual_average": None,
+            "sort_orders": None,
+            "team_key": "frc254",
+        },
+        "sort_order_info": None,
+    }
+    result = EventTeamStatusHelper.generate_team_at_event_status_string(
+        "frc254",
+        _status(qual=qual),
+        event=event,
+        include_team=False,
+        verbose=True,
+    )
+    assert result == (
+        "was <b>Rank 3 of 40</b> with a record of <b>1 win, 1 loss, and 1 tie</b>"
+        " in quals at the New York City Regional."
+    )
+
+
+def test_build_playoff_info_double_elim_other_types() -> None:
+    assert (
+        EventTeamStatusHelper._build_playoff_info_double_elim(
+            {"frc254"}, {}, 2023, PlayoffType.BRACKET_8_TEAM
+        )
+        is None
+    )
+    assert (
+        EventTeamStatusHelper._build_playoff_info_double_elim(
+            {"frc254"},
+            MatchHelper.organized_matches([])[1],
+            2023,
+            PlayoffType.DOUBLE_ELIM_4_TEAM,
+        )
+        is None
+    )
+
+
+def test_build_playoff_info_round_robin_no_finals() -> None:
+    assert (
+        EventTeamStatusHelper._build_playoff_info_round_robin(
+            {"frc254"}, {}, 2019, PlayoffType.ROUND_ROBIN_6_TEAM, None
+        )
+        is None
+    )
+
+
+def test_build_playoff_info_bracket_tie() -> None:
+    match = Match(
+        id="2019nyny_sf1m1",
+        event=ndb.Key(Event, "2019nyny"),
+        year=2019,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": ["frc254", "frc1", "frc2"], "score": 50},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+            }
+        ),
+    )
+    status = EventTeamStatusHelper._build_playoff_info_bracket(
+        {"frc254", "frc1", "frc2"},
+        MatchHelper.organized_matches([match])[1],
+        2019,
+        PlayoffType.BRACKET_8_TEAM,
+    )
+    assert status is not None
+    assert status["record"] == {"wins": 0, "losses": 0, "ties": 1}
