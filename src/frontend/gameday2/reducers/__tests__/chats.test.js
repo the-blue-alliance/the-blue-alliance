@@ -141,11 +141,8 @@ describe("chats reducer webcast and default chat handling", () => {
     expect(state.defaultChat).toBe("silicon_valley");
   });
 
-  it("Bug #45: keeps the page's default chat across WEBCASTS_UPDATED", () => {
-    // Wrong today: every WEBCASTS_UPDATED resets defaultChat to
-    // "firstupdatesnow", discarding the default set from the page's
-    // default_chat.
-    // Correct: defaultChat is preserved while that chat still exists.
+  it("keeps the page's default chat across WEBCASTS_UPDATED", () => {
+    // defaultChat is preserved while that chat still exists.
     let state = freshChats(undefined, {
       type: types.WEBCASTS_UPDATED,
       webcasts,

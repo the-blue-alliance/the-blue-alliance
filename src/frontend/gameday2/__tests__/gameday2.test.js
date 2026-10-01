@@ -203,11 +203,8 @@ describe("gameday2 entry point", () => {
     expect(mockStore.getState().favoriteTeams).toEqual(new Set(["frc254"]));
   });
 
-  it("Bug #45: keeps the page's default chat across later live_events updates", () => {
-    // Wrong today: every live_events update dispatches WEBCASTS_UPDATED,
-    // which resets chats.defaultChat to "firstupdatesnow", so the page's
-    // default_chat ("svr") is lost after the second update.
-    // Correct: defaultChat stays "svr".
+  it("keeps the page's default chat across later live_events updates", () => {
+    // Each live_events update dispatches WEBCASTS_UPDATED.
     setUpPage({ hash: "#chat=nyc", defaultChat: "svr" });
     loadGameday();
     mockListeners.live_events({ val: () => liveEvents });
