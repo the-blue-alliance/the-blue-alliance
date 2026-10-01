@@ -36,15 +36,8 @@ def test_regional_teams_query() -> None:
     assert RegionalTeamsQuery(year=2025).fetch() == [ndb.Key(Team, "frc254")]
 
 
-def test_bug_29_regional_teams_query_fetch_dict() -> None:
-    """
-    Bug #29: RegionalTeamsQuery returns team Keys, but its DICT_CONVERTER is
-    TeamConverter, which expects Team models, so fetch_dict always raises
-    AttributeError.
-
-    Correct: fetch_dict returns the declared dict type, List[str] of team
-    keys.
-    """
+def test_regional_teams_query_fetch_dict() -> None:
+    """fetch_dict returns the regional pool's team keys as strings."""
     RegionalPoolTeam(id="2025_frc254", team=ndb.Key(Team, "frc254"), year=2025).put()
 
     assert RegionalTeamsQuery(year=2025).fetch_dict(ApiMajorVersion.API_V3) == [
