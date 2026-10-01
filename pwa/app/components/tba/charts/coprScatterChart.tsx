@@ -16,10 +16,17 @@ import {
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
 
+import HelpCircleIcon from '~icons/lucide/help-circle';
+
 import { EventColors, TeamWithColor } from '~/api/colors';
 import { EventCoprs } from '~/api/tba/read';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { ChartContainer } from '~/components/ui/chart';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '~/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -139,8 +146,41 @@ export default function CoprScatterChart({
     <Card>
       <CardHeader className="p-4 sm:p-6">
         <div className="flex justify-between">
-          <div>
+          <div className="flex items-center gap-2">
             <CardTitle>Component OPRs</CardTitle>
+            <Popover>
+              <PopoverTrigger
+                aria-label="How to submit team colors"
+                openOnHover={isDesktop}
+                className="rounded-sm text-muted-foreground
+                  hover:text-foreground focus-visible:outline-2
+                  focus-visible:outline-ring"
+              >
+                <HelpCircleIcon className="size-4" aria-hidden="true" />
+              </PopoverTrigger>
+              <PopoverContent align="start" className="text-sm">
+                Team colors in this chart come from{' '}
+                <a
+                  href="https://frc-colors.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  frc-colors
+                </a>
+                . To add or update your team’s colors, submit your team number
+                and primary and secondary hex colors on{' '}
+                <a
+                  href="https://frc-colors.com/submit-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  frc-colors
+                </a>
+                .
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </CardHeader>
