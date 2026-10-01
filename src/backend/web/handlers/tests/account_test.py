@@ -1189,20 +1189,13 @@ def test_mytba_eventteam_get(
     assert context["already_favorited"] == {"2024casj_frc254"}
 
 
-def test_bug_26_mytba_eventteam_get_no_events_renders_empty_list(
+def test_mytba_eventteam_get_no_events_renders_empty_list(
     login_user_with_string_account,
     team_254: Team,
     captured_templates: List[CapturedTemplate],
     web_client: FlaskClient,
 ) -> None:
-    """
-    Bug #26: for a team with no EventTeams the handler builds
-    ``Favorite.model_key.IN([])``, which ndb turns into a FalseNode that
-    cannot run as a query (``BadQueryError: Cannot convert FalseNode to
-    predicate``), so the page 500s.
-
-    Correct: the page renders with an empty event list and no favorites.
-    """
+    """A team with no events renders an empty event list and no favorites."""
     response = web_client.get("/account/mytba/eventteam/254")
 
     assert response.status_code == 200
