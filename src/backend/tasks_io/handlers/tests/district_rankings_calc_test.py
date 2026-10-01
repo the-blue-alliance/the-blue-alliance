@@ -409,3 +409,29 @@ def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> No
     district = District.get_by_id("2020ne")
     assert district is not None
     assert district.rankings[0]["adjustments"] == 5
+
+
+@mock.patch.object(DistrictHelper, "calculate_rankings")
+def test_calc_2022_includes_other_bonus(
+    calc_mock: mock.Mock, tasks_client: Client
+) -> None:
+    District(id="2022ne", year=2022, abbreviation="ne").put()
+    calc_mock.return_value = {
+        "frc254": DistrictRankingTeamTotal(
+            event_points=[],
+            point_total=7,
+            tiebreakers=[],
+            match_scores=[],
+            rookie_bonus=0,
+            single_event_bonus=0,
+            other_bonus=7,
+            adjustments=0,
+        )
+    }
+
+    resp = tasks_client.get("/tasks/math/do/district_rankings_calc/2022ne")
+    assert resp.status_code == 200
+
+    district = District.get_by_id("2022ne")
+    assert district is not None
+    assert district.rankings[0]["other_bonus"] == 7

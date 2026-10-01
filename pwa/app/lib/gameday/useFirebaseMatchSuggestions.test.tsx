@@ -113,3 +113,39 @@ describe('useFirebaseMatchSuggestions', () => {
     expect(firebaseMocks.unsubscribe).toHaveBeenCalledOnce();
   });
 });
+
+describe('useFirebaseMatchSuggestions when Firebase is unreachable', () => {
+  test('exposes the connection error', async () => {
+    firebaseMocks.getDatabaseInstance.mockRejectedValue(new Error('no db'));
+
+    const { result } = renderHook(() => useFirebaseMatchSuggestions(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.error?.message).toBe('no db'));
+  });
+
+  test('wraps a non-Error rejection in a generic connection error', async () => {
+    firebaseMocks.getDatabaseInstance.mockRejectedValue('nope');
+
+    const { result } = renderHook(() => useFirebaseMatchSuggestions(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() =>
+      expect(result.current.error?.message).toBe(
+        'Unable to connect to Firebase',
+      ),
+    );
+  });
+
+  test('is no longer loading once the connection has failed', async () => {
+    firebaseMocks.getDatabaseInstance.mockRejectedValue(new Error('no db'));
+
+    const { result } = renderHook(() => useFirebaseMatchSuggestions(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() => expect(result.current.isLoading).toBe(false));
+  });
+});

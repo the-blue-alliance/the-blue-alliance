@@ -238,3 +238,21 @@ def test_send_verification_different_user(login_user: User, web_client: Client):
     updated_webhook = client_key.get()
     assert updated_webhook.verified is False
     assert updated_webhook.verification_code == "abc"
+
+
+def test_delete_webhook_no_client_id(login_user: User, web_client: Client):
+    response = web_client.post("/webhooks/delete", data={})
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/account"
+
+
+def test_verify_webhook_not_found(login_user: User, web_client: Client):
+    response = web_client.post("/webhooks/verify/12345", data={"code": "abc"})
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/account"
+
+
+def test_send_verification_no_client_id(login_user: User, web_client: Client):
+    response = web_client.post("/webhooks/send_verification", data={})
+    assert response.status_code == 302
+    assert response.headers["Location"] == "/account"

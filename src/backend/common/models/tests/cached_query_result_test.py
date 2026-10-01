@@ -499,3 +499,37 @@ def test_get_json_bytes_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
     json_bytes = c.get_json_bytes()
     assert dumps_called is True
     assert json_bytes == b'{"hello":"world"}'
+
+
+def test_purge_query_class_global_version_skips_integer_ids(
+    ndb_stub, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    current_v = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    db_version = current_v - 2
+
+    old_key = f"dummy_purge_query_a:1:{db_version}"
+    CachedQueryResult(id=old_key, result=None).put()
+    # Integer ids sort before every string id in Datastore, so the prefix
+    # range query never returns one; feed one in directly to exercise the guard.
+    int_key = CachedQueryResult(id=12345, result=None).put()
+
+    def fake_iter(
+        cls, cache_key_prefix: str, page_size: int
+    ) -> Generator[ndb.Key, None, None]:
+        yield int_key
+        yield ndb.Key(CachedQueryResult, old_key)
+
+    monkeypatch.setattr(
+        CachedQueryResult, "iter_keys_by_cache_key_prefix", classmethod(fake_iter)
+    )
+
+    deleted = CachedQueryResult.purge_query_class_global_version(
+        _DummyCachedQueryForPurge,
+        db_version=db_version,
+        page_size=10,
+        delete_batch_size=10,
+    )
+
+    assert deleted == 1
+    assert CachedQueryResult.get_by_id(old_key) is None
+    assert int_key.get() is not None
