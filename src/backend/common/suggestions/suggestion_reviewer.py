@@ -3,7 +3,17 @@ import enum
 import json
 import random
 import string
-from typing import Any, Dict, List, NamedTuple, Optional, Tuple
+from typing import (
+    AbstractSet,
+    Any,
+    Dict,
+    FrozenSet,
+    List,
+    NamedTuple,
+    Optional,
+    Set,
+    Tuple,
+)
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -26,13 +36,13 @@ from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
+from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.models.user import User
 from backend.common.models.webcast import Webcast
 from backend.common.suggestions.media_creator import MediaCreator
+from backend.common.suggestions.suggestion_notifier import SuggestionNotifier
 
-# The AccountPermission required to review each type of suggestion. This
-# mirrors the REQUIRED_PERMISSIONS on the web review controllers in
-# backend/web/handlers/suggestions/.
+# The AccountPermission required to review each type of suggestion.
 REQUIRED_REVIEW_PERMISSIONS: Dict[SuggestionType, AccountPermission] = {
     SuggestionType.EVENT: AccountPermission.REVIEW_MEDIA,
     SuggestionType.MATCH: AccountPermission.REVIEW_MEDIA,
@@ -44,10 +54,20 @@ REQUIRED_REVIEW_PERMISSIONS: Dict[SuggestionType, AccountPermission] = {
     SuggestionType.EVENT_MEDIA: AccountPermission.REVIEW_EVENT_MEDIA,
 }
 
+# Suggestion types that a team admin (someone holding a TeamAdminAccess for
+# the team, see /mod) may review for their own team without holding the
+# site-wide AccountPermission above.
+TEAM_ADMIN_REVIEWABLE_TYPES: FrozenSet[SuggestionType] = frozenset(
+    {
+        SuggestionType.MEDIA,
+        SuggestionType.SOCIAL_MEDIA,
+        SuggestionType.ROBOT,
+    }
+)
+
 # The NDB model kind name for the entity targeted by each suggestion type,
-# used when writing AuditLogEntry records. This mirrors _audit_target_kind on
-# the web review controllers. None means the target key is only known after
-# the model is created (offseason events).
+# used when writing AuditLogEntry records. None means the target key is only
+# known after the model is created (offseason events).
 AUDIT_TARGET_KINDS: Dict[SuggestionType, Optional[str]] = {
     SuggestionType.EVENT: "Event",
     SuggestionType.MATCH: "Match",
@@ -80,8 +100,8 @@ class ReviewOutcome(NamedTuple):
 class SuggestionReviewer:
     """
     Shared accept/reject logic for Suggestions, decoupled from any request
-    context so it can back both the web review controllers and the
-    moderation API.
+    context so it can back both the moderation API and the team admin
+    dashboard (/mod).
 
     Accepts run one at a time in an XG transaction with a REVIEW_PENDING
     re-check so that concurrent reviews of the same suggestion no-op safely.
@@ -92,10 +112,48 @@ class SuggestionReviewer:
 
     @classmethod
     def user_can_review(cls, user: User, suggestion_type: SuggestionType) -> bool:
+        """Whether the user holds the site-wide permission for a suggestion type."""
         if user.is_admin:
             return True
         required = REQUIRED_REVIEW_PERMISSIONS[suggestion_type]
         return required in (user.permissions or [])
+
+    @classmethod
+    def delegated_team_keys(cls, user: User) -> Set[str]:
+        """Team keys (e.g. "frc254") the user holds unexpired TeamAdminAccess for."""
+        access = TeamAdminAccess.query(
+            TeamAdminAccess.account == user.account_key,
+            TeamAdminAccess.expiration > datetime.datetime.now(),
+        ).fetch()
+        return {f"frc{a.team_number}" for a in access}
+
+    @classmethod
+    def user_can_review_suggestion(
+        cls,
+        user: User,
+        suggestion: Suggestion,
+        delegated_team_keys: Optional[AbstractSet[str]] = None,
+    ) -> bool:
+        """
+        Whether the user may review this specific suggestion: either they hold
+        the site-wide permission for its type, or they are a team admin for
+        the team it targets and it is a type team admins may review.
+
+        Team admin access is looked up when needed; callers checking many
+        suggestions can pass `delegated_team_keys` from delegated_team_keys()
+        to do that lookup once.
+        """
+        suggestion_type = SuggestionType(suggestion.target_model)
+        if cls.user_can_review(user, suggestion_type):
+            return True
+        if (
+            suggestion_type not in TEAM_ADMIN_REVIEWABLE_TYPES
+            or not suggestion.target_key
+        ):
+            return False
+        if delegated_team_keys is None:
+            delegated_team_keys = cls.delegated_team_keys(user)
+        return suggestion.target_key in delegated_team_keys
 
     @classmethod
     def accept_suggestion(
@@ -104,19 +162,53 @@ class SuggestionReviewer:
         user: User,
         overrides: Optional[Dict[str, Any]] = None,
         endpoint: str = "",
+        delegated_team_keys: Optional[AbstractSet[str]] = None,
     ) -> ReviewOutcome:
         """Accept a single pending Suggestion, creating its target model."""
         suggestion = cls._get_suggestion(suggestion_key)
         if suggestion is None:
             return ReviewOutcome(SuggestionReviewResult.NOT_FOUND, suggestion_key)
 
-        suggestion_type = SuggestionType(suggestion.target_model)
-        if not cls.user_can_review(user, suggestion_type):
+        if not cls.user_can_review_suggestion(user, suggestion, delegated_team_keys):
             return ReviewOutcome(SuggestionReviewResult.FORBIDDEN, suggestion_key)
 
-        return cls._accept_in_transaction(
-            none_throws(suggestion.key), user, overrides or {}, endpoint
+        overrides = overrides or {}
+        outcome = cls._accept_in_transaction(
+            none_throws(suggestion.key), user, overrides, endpoint
         )
+        cls._notify_reviewed(suggestion, outcome, overrides.get("user_message"))
+        return outcome
+
+    @classmethod
+    def _notify_reviewed(
+        cls,
+        suggestion: Suggestion,
+        outcome: ReviewOutcome,
+        user_message: Optional[str],
+    ) -> None:
+        """
+        Enqueue whatever the suggester and moderators should hear about this
+        review. Runs after the transaction commits so a notification can
+        never roll back (or be rolled back by) the review itself.
+        """
+        suggestion_type = SuggestionType(suggestion.target_model)
+        if suggestion_type == SuggestionType.API_AUTH_ACCESS and outcome.result in (
+            SuggestionReviewResult.ACCEPTED,
+            SuggestionReviewResult.REJECTED,
+        ):
+            SuggestionNotifier.apiwrite_reviewed(
+                outcome.suggestion_key,
+                accepted=outcome.result == SuggestionReviewResult.ACCEPTED,
+                user_message=user_message,
+                auth_id=outcome.created_target_key,
+            )
+        elif (
+            suggestion_type == SuggestionType.OFFSEASON_EVENT
+            and outcome.result == SuggestionReviewResult.ACCEPTED
+        ):
+            SuggestionNotifier.offseason_event_accepted(
+                outcome.suggestion_key, none_throws(outcome.created_target_key)
+            )
 
     @classmethod
     @ndb.transactional(xg=True)
@@ -169,10 +261,14 @@ class SuggestionReviewer:
         suggestion_keys: List[str],
         user: User,
         endpoint: str = "",
+        delegated_team_keys: Optional[AbstractSet[str]] = None,
+        user_message: Optional[str] = None,
     ) -> List[ReviewOutcome]:
         """
         Reject a batch of pending Suggestions. Each rejection runs in its own
-        transaction; rejects create/delete no domain entities.
+        transaction; rejects create/delete no domain entities. `user_message`
+        is audited and passed along to suggesters who get told about the
+        outcome (API key requests).
         """
         outcomes = []
         for suggestion_key in suggestion_keys:
@@ -183,22 +279,38 @@ class SuggestionReviewer:
                 )
                 continue
 
-            suggestion_type = SuggestionType(suggestion.target_model)
-            if not cls.user_can_review(user, suggestion_type):
+            if not cls.user_can_review_suggestion(
+                user, suggestion, delegated_team_keys
+            ):
                 outcomes.append(
                     ReviewOutcome(SuggestionReviewResult.FORBIDDEN, suggestion_key)
                 )
                 continue
 
-            outcomes.append(
-                cls._reject_in_transaction(none_throws(suggestion.key), user, endpoint)
+            # Only API key requesters are told anything, so only their audit
+            # entries record a message
+            tells_requester = (
+                SuggestionType(suggestion.target_model)
+                == SuggestionType.API_AUTH_ACCESS
             )
+            outcome = cls._reject_in_transaction(
+                none_throws(suggestion.key),
+                user,
+                endpoint,
+                user_message if tells_requester else None,
+            )
+            outcomes.append(outcome)
+            cls._notify_reviewed(suggestion, outcome, user_message)
         return outcomes
 
     @classmethod
     @ndb.transactional(xg=True)
     def _reject_in_transaction(
-        cls, suggestion_ndb_key: ndb.Key, user: User, endpoint: str
+        cls,
+        suggestion_ndb_key: ndb.Key,
+        user: User,
+        endpoint: str,
+        user_message: Optional[str] = None,
     ) -> ReviewOutcome:
         suggestion: Optional[Suggestion] = suggestion_ndb_key.get()
         suggestion_key = str(suggestion_ndb_key.id())
@@ -215,7 +327,10 @@ class SuggestionReviewer:
         suggestion.reviewed_at = datetime.datetime.now()
         suggestion.put()
 
-        cls._write_audit_log(suggestion, user, endpoint, {}, None)
+        # The message is what the requester gets told, so it belongs in the
+        # audit trail just as accept overrides do
+        form_params = {"user_message": user_message} if user_message else {}
+        cls._write_audit_log(suggestion, user, endpoint, form_params, None)
         return ReviewOutcome(SuggestionReviewResult.REJECTED, suggestion_key)
 
     @classmethod
@@ -223,8 +338,7 @@ class SuggestionReviewer:
         cls, suggestion: Suggestion, overrides: Dict[str, Any]
     ) -> Tuple[Optional[str], Optional[str]]:
         """
-        Create the domain entity for an accepted suggestion. Ported from the
-        create_target_model implementations on the web review controllers.
+        Create the domain entity for an accepted suggestion.
         Returns (created_target_key, error_message).
         """
         suggestion_type = SuggestionType(suggestion.target_model)
@@ -390,11 +504,23 @@ class SuggestionReviewer:
         if Event.get_by_id(event_key):
             return None, f"Event {event_key} already exists"
 
-        first_code = overrides.get("first_code") or contents.get("first_code")
-        if first_code:
-            first_code = first_code.upper()
+        # A reviewer who clears the field means "unofficial", so only fall
+        # back to the suggested code when they didn't touch it. Pasted codes
+        # arrive with stray whitespace; " iri " must match IRI.
+        raw_first_code = (
+            overrides["first_code"]
+            if "first_code" in overrides
+            else contents.get("first_code")
+        )
+        first_code = str(raw_first_code or "").strip().upper() or None
+        # The suggestion already carries a type derived from its dates
+        # (January/February -> preseason); the reviewer may override it
         event_type_enum = EventType(
-            int(overrides.get("event_type_enum", EventType.OFFSEASON))
+            int(
+                overrides.get(
+                    "event_type_enum", contents.get("event_type", EventType.OFFSEASON)
+                )
+            )
         )
 
         event = Event(
@@ -414,7 +540,7 @@ class SuggestionReviewer:
             website=overrides.get("website") or contents.get("website"),
             year=year,
             first_code=first_code,
-            official=(first_code is not None and first_code != ""),
+            official=first_code is not None,
         )
         EventManipulator.createOrUpdate(event)
         return event_key, None
@@ -482,12 +608,7 @@ class SuggestionReviewer:
 
     @classmethod
     def _get_suggestion(cls, suggestion_key: str) -> Optional[Suggestion]:
-        suggestion = Suggestion.get_by_id(suggestion_key)
-        if suggestion is None and suggestion_key.isdigit():
-            # Some suggestion types (offseason events, apiwrite) have
-            # auto-allocated integer IDs
-            suggestion = Suggestion.get_by_id(int(suggestion_key))
-        return suggestion
+        return Suggestion.get_by_key_string(suggestion_key)
 
     @classmethod
     def _write_audit_log(
@@ -511,7 +632,8 @@ class SuggestionReviewer:
             account=user.account_key,
             endpoint=endpoint,
             target_key=target_key,
-            url_args={},
+            # The target is the team/event; record which suggestion was acted on
+            url_args={"suggestion_key": str(none_throws(suggestion.key).id())},
             form_params={
                 str(k): [str(v)] for k, v in overrides.items() if v is not None
             },

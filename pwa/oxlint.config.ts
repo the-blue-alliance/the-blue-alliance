@@ -62,6 +62,14 @@ export default defineConfig({
       },
     },
     {
+      // Standalone scripts are outside the `~/` alias, so relative sibling
+      // imports are the only option.
+      files: ['scripts/**/*.{ts,mjs}'],
+      rules: {
+        'no-relative-import-paths/no-relative-import-paths': 'off',
+      },
+    },
+    {
       files: ALL_TS_FILES,
       jsPlugins: ['oxlint-tailwindcss'],
       rules: {

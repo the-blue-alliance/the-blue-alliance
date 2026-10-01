@@ -42,6 +42,7 @@ export {
   type RejectResponse,
   ReviewResult,
   type SimilarEvent,
+  type SmugmugPreviewImage,
   type SuggestionAuthor,
   type SuggestionListResponse,
   type SuggestionReference,

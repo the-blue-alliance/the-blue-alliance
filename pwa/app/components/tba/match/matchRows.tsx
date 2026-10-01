@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { Temporal } from 'temporal-polyfill';
 
 import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
@@ -26,7 +27,6 @@ import {
 } from '~/components/ui/tooltip';
 import { matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
-import { cn } from '~/lib/utils';
 
 interface PlaylistEntry {
   url: string;
@@ -96,6 +96,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-before-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -132,6 +133,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-after-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -288,7 +290,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.red.score}
           allianceColor="red"
-          className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg
+          className="col-start-6 row-start-1 mt-0.5 max-xl:rounded-t-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
             xl:rounded-l-lg"
           winner={match.winning_alliance === AllianceColor.RED}
@@ -304,7 +306,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.blue.score}
           allianceColor="blue"
-          className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg
+          className="col-start-6 row-start-2 mb-0.5 max-xl:rounded-b-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
             xl:rounded-r-lg"
           winner={match.winning_alliance === AllianceColor.BLUE}
@@ -437,11 +439,13 @@ function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
 
 interface BreakRowProps extends React.HTMLAttributes<HTMLDivElement> {
   text: string;
+  size?: 'default' | 'small';
   playlists?: PlaylistEntry[];
 }
 export function BreakRow({
   className,
   text,
+  size = 'default',
   playlists,
   ...props
 }: BreakRowProps) {
@@ -451,8 +455,10 @@ export function BreakRow({
       {...props}
     >
       <div
-        className="relative flex h-8 w-full items-center justify-center text-sm
-          font-medium"
+        className={cn(
+          'relative flex w-full items-center justify-center font-medium',
+          size === 'small' ? 'h-5 text-xs' : 'h-8 text-sm',
+        )}
       >
         <span>{text}</span>
         {playlists && playlists.length > 0 && (

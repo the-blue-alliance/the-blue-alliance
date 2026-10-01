@@ -10,6 +10,7 @@ from backend.api.handlers.client_api import (
     list_subscriptions,
     ping_mobile_client,
     register_mobile_client,
+    suggest_event_media,
     suggest_team_media,
     unregister_mobile_client,
     update_model_preferences,
@@ -52,6 +53,11 @@ client_api.add_url_rule(
     "/subscriptions/list",
     methods=["POST"],
     view_func=list_subscriptions,
+)
+client_api.add_url_rule(
+    "/event/media/suggest",
+    methods=["POST"],
+    view_func=suggest_event_media,
 )
 client_api.add_url_rule(
     "/team/media/suggest",

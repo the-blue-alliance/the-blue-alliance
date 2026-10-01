@@ -81,12 +81,18 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleErrors,
   GetEventMatchesSimpleResponses,
+  GetEventMediaData,
+  GetEventMediaErrors,
+  GetEventMediaResponses,
   GetEventNexusInfoData,
   GetEventNexusInfoErrors,
   GetEventNexusInfoResponses,
   GetEventOprsData,
   GetEventOprsErrors,
   GetEventOprsResponses,
+  GetEventPlayoffAdvancementData,
+  GetEventPlayoffAdvancementErrors,
+  GetEventPlayoffAdvancementResponses,
   GetEventPredictionsData,
   GetEventPredictionsErrors,
   GetEventPredictionsResponses,
@@ -337,6 +343,9 @@ import {
   zGetEventMatchesSimpleHeaders,
   zGetEventMatchesSimplePath,
   zGetEventMatchesSimpleResponse,
+  zGetEventMediaHeaders,
+  zGetEventMediaPath,
+  zGetEventMediaResponse,
   zGetEventNexusInfoHeaders,
   zGetEventNexusInfoPath,
   zGetEventNexusInfoResponse,
@@ -344,6 +353,9 @@ import {
   zGetEventOprsPath,
   zGetEventOprsResponse,
   zGetEventPath,
+  zGetEventPlayoffAdvancementHeaders,
+  zGetEventPlayoffAdvancementPath,
+  zGetEventPlayoffAdvancementResponse,
   zGetEventPredictionsHeaders,
   zGetEventPredictionsPath,
   zGetEventPredictionsResponse,
@@ -1274,6 +1286,33 @@ export const getEventMatchTimeseries = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.
+ */
+export const getEventMedia = <ThrowOnError extends boolean = false>(
+  options: Options<GetEventMediaData, ThrowOnError>,
+): RequestResult<GetEventMediaResponses, GetEventMediaErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetEventMediaResponses,
+    GetEventMediaErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventMediaHeaders.optional(),
+          path: zGetEventMediaPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventMediaResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/media',
+    ...options,
+  });
+
+/**
  * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
  */
 export const getEventNexusInfo = <ThrowOnError extends boolean = false>(
@@ -1328,6 +1367,39 @@ export const getEventOprs = <ThrowOnError extends boolean = false>(
       await zGetEventOprsResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/oprs',
+    ...options,
+  });
+
+/**
+ * Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.
+ */
+export const getEventPlayoffAdvancement = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetEventPlayoffAdvancementData, ThrowOnError>,
+): RequestResult<
+  GetEventPlayoffAdvancementResponses,
+  GetEventPlayoffAdvancementErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventPlayoffAdvancementResponses,
+    GetEventPlayoffAdvancementErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventPlayoffAdvancementHeaders.optional(),
+          path: zGetEventPlayoffAdvancementPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPlayoffAdvancementResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/playoff_advancement',
     ...options,
   });
 

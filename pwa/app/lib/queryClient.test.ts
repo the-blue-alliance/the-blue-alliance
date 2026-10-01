@@ -10,11 +10,19 @@ import {
   staleTimeForYear,
 } from '~/lib/queryClient';
 
+const loggerMocks = vi.hoisted(() => ({
+  error: vi.fn<(bindings: object, message: string) => void>(),
+}));
+
 vi.mock('@sentry/tanstackstart-react', () => ({
   captureException: vi.fn<typeof Sentry.captureException>(),
 }));
 
-describe.concurrent('createQueryClient', () => {
+vi.mock('~/lib/logger', () => ({
+  createLogger: () => loggerMocks,
+}));
+
+describe('createQueryClient', () => {
   test('defaults staleTime to STALE_TIME.DEFAULT', () => {
     const queryClient = createQueryClient();
     expect(queryClient.getDefaultOptions().queries?.staleTime).toEqual(
@@ -100,6 +108,53 @@ describe.concurrent('createQueryClient', () => {
     );
   });
 
+  test.each([
+    {
+      name: '500 API errors',
+      error: new ApiError('server error', 500),
+      queryKey: ['test-log-error-500'],
+    },
+    {
+      name: 'network errors',
+      error: new Error('network error'),
+      queryKey: ['test-log-error-network'],
+    },
+  ])('onError logs $name', async ({ error, queryKey }) => {
+    const queryClient = createQueryClient();
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey,
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow(error.message);
+
+    expect(loggerMocks.error).toHaveBeenCalledWith(
+      { err: error, queryKey },
+      'Query failed',
+    );
+  });
+
+  test('onError does not log 404 ApiErrors', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('not found', 404);
+    const queryKey = ['test-log-error-404'];
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey,
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('not found');
+
+    expect(loggerMocks.error).not.toHaveBeenCalledWith(
+      { err: error, queryKey },
+      'Query failed',
+    );
+  });
+
   test('freshly hydrated data is not stale under the default staleTime', () => {
     // Simulates the SSR -> hydration flow: a loader warms the cache on the
     // server, the cache is dehydrated into the payload, and a fresh
@@ -122,7 +177,7 @@ describe.concurrent('createQueryClient', () => {
   });
 });
 
-describe.concurrent('staleTimeForYear', () => {
+describe('staleTimeForYear', () => {
   const currentYear = Temporal.Now.plainDateISO().year;
 
   test('returns HISTORICAL for a past year', () => {

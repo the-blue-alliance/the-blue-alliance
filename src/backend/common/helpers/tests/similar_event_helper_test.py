@@ -4,6 +4,7 @@ import pytest
 
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.similar_event_helper import (
+    location_similarity,
     MAX_SIMILAR_EVENTS,
     name_similarity,
     SimilarEventHelper,
@@ -332,3 +333,10 @@ def test_matches_an_existing_event_by_its_short_name() -> None:
         name="Chezy Champs",
     )
     assert SimilarEventHelper.similar_events(candidate, [unrelated, formal]) == [formal]
+
+
+def test_location_similarity_same_venue() -> None:
+    a = Event(country="USA", state_prov="NY", city="New York", venue="Javits Center")
+    b = Event(country="USA", state_prov="NY", city="new york", venue="JAVITS CENTER")
+    c = Event(country="USA", state_prov="NY", city="New York", venue="Elsewhere")
+    assert location_similarity(a, b) > location_similarity(a, c)

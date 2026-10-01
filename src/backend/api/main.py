@@ -6,6 +6,7 @@ from backend.api.apiv3_main import api_v3
 from backend.api.client_api_main import client_api
 from backend.api.eventwizard_api_main import eventwizard_api
 from backend.api.handlers.error import handle_404
+from backend.api.handlers.warmup import warmup
 from backend.api.moderation_api_main import moderation_api
 from backend.api.trusted_api_main import trusted_api
 from backend.common.flask_cache import configure_flask_cache
@@ -34,7 +35,7 @@ install_middleware(app, configure_secret_key=True, include_appspot_redirect=True
 install_url_converters(app)
 configure_flask_cache(app)
 
-app.json.compact = False  # pyre-ignore[16]
+app.json.compact = True  # pyre-ignore[16]
 app.url_map.converters["simple_model_type"] = SimpleModelTypeConverter
 app.url_map.converters["model_type"] = ModelTypeConverter
 app.url_map.converters["event_detail_type"] = EventDetailTypeConverter
@@ -46,3 +47,5 @@ app.register_blueprint(trusted_api)
 app.register_blueprint(client_api)
 app.register_blueprint(moderation_api)
 app.register_error_handler(404, handle_404)
+
+app.add_url_rule("/_ah/warmup", view_func=warmup)

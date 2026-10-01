@@ -28,8 +28,10 @@ import {
   getEventMatches,
   getEventMatchesKeys,
   getEventMatchesSimple,
+  getEventMedia,
   getEventNexusInfo,
   getEventOprs,
+  getEventPlayoffAdvancement,
   getEventPredictions,
   getEventRankings,
   getEventSimple,
@@ -162,12 +164,18 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleError,
   GetEventMatchesSimpleResponse,
+  GetEventMediaData,
+  GetEventMediaError,
+  GetEventMediaResponse,
   GetEventNexusInfoData,
   GetEventNexusInfoError,
   GetEventNexusInfoResponse,
   GetEventOprsData,
   GetEventOprsError,
   GetEventOprsResponse,
+  GetEventPlayoffAdvancementData,
+  GetEventPlayoffAdvancementError,
+  GetEventPlayoffAdvancementResponse,
   GetEventPredictionsData,
   GetEventPredictionsError,
   GetEventPredictionsResponse,
@@ -1051,6 +1059,31 @@ export const getEventMatchTimeseriesOptions = (
     queryKey: getEventMatchTimeseriesQueryKey(options),
   });
 
+export const getEventMediaQueryKey = (options: Options<GetEventMediaData>) =>
+  createQueryKey('getEventMedia', options);
+
+/**
+ * Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.
+ */
+export const getEventMediaOptions = (options: Options<GetEventMediaData>) =>
+  queryOptions<
+    GetEventMediaResponse,
+    GetEventMediaError,
+    GetEventMediaResponse,
+    ReturnType<typeof getEventMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMediaQueryKey(options),
+  });
+
 export const getEventNexusInfoQueryKey = (
   options: Options<GetEventNexusInfoData>,
 ) => createQueryKey('getEventNexusInfo', options);
@@ -1102,6 +1135,34 @@ export const getEventOprsOptions = (options: Options<GetEventOprsData>) =>
       return data;
     },
     queryKey: getEventOprsQueryKey(options),
+  });
+
+export const getEventPlayoffAdvancementQueryKey = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) => createQueryKey('getEventPlayoffAdvancement', options);
+
+/**
+ * Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.
+ */
+export const getEventPlayoffAdvancementOptions = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) =>
+  queryOptions<
+    GetEventPlayoffAdvancementResponse,
+    GetEventPlayoffAdvancementError,
+    GetEventPlayoffAdvancementResponse,
+    ReturnType<typeof getEventPlayoffAdvancementQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPlayoffAdvancement({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPlayoffAdvancementQueryKey(options),
   });
 
 export const getEventPredictionsQueryKey = (

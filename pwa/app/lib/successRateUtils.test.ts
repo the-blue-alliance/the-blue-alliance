@@ -1,8 +1,12 @@
 import { describe, expect, test } from 'vitest';
 
-import { formatSuccessRate, otherMatchLevel } from '~/lib/successRateUtils';
+import {
+  formatAverageStatValue,
+  formatSuccessRate,
+  otherMatchLevel,
+} from '~/lib/successRateUtils';
 
-describe.concurrent('formatSuccessRate', () => {
+describe('formatSuccessRate', () => {
   test('formats a rate to two decimal places', () => {
     expect(formatSuccessRate({ count: 17512, opportunities: 30352 })).toEqual(
       '57.70%',
@@ -23,9 +27,15 @@ describe.concurrent('formatSuccessRate', () => {
   });
 });
 
-describe.concurrent('otherMatchLevel', () => {
+describe('otherMatchLevel', () => {
   test('swaps between the two match levels', () => {
     expect(otherMatchLevel('qual')).toEqual('playoff');
     expect(otherMatchLevel('playoff')).toEqual('qual');
+  });
+});
+
+describe('formatAverageStatValue', () => {
+  test('rounds an average to one decimal place', () => {
+    expect(formatAverageStatValue(12.345)).toEqual('12.3');
   });
 });

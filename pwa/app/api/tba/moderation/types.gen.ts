@@ -84,6 +84,18 @@ export type CandidateMedia = {
   view_image_url?: string;
   image_direct_url?: string;
   social_profile_url?: string;
+  /**
+   * Album or photo title, when the provider supplied one (SmugMug)
+   */
+  title?: string;
+  /**
+   * Number of photos in the album (SmugMug albums)
+   */
+  image_count?: number;
+  /**
+   * The first few photos of the album, for previewing its contents (SmugMug albums)
+   */
+  preview_images?: Array<SmugmugPreviewImage>;
 };
 
 /**
@@ -292,7 +304,7 @@ export type AcceptRequest = {
    */
   expiration_days?: number;
   /**
-   * api_auth_access: message for the requesting user, included in the admin alert email
+   * api_auth_access: message for the requester, emailed to them with the verdict and posted to the moderators' Slack channel
    */
   user_message?: string;
 };
@@ -319,7 +331,7 @@ export enum ReviewResult {
 export type RejectRequest = {
   suggestion_keys: Array<string>;
   /**
-   * Message for the suggesting user; included in the admin alert email for api_auth_access rejections
+   * api_auth_access: message for the requester, emailed to them with the rejection and posted to the moderators' Slack channel; ignored for other suggestion types
    */
   user_message?: string;
 };
@@ -330,6 +342,18 @@ export type RejectResponse = {
 
 export type ErrorResponse = {
   Error?: string;
+};
+
+export type SmugmugPreviewImage = {
+  thumbnail_url?: string;
+  /**
+   * Small-size rendition, suitable for a preview grid
+   */
+  image_url?: string;
+  /**
+   * The photo's page on SmugMug
+   */
+  web_uri?: string;
 };
 
 export type GetModerationQueueData = {

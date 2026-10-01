@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-unsafe-argument */
 /* eslint-disable @typescript-eslint/no-unsafe-member-access */
 /* eslint-disable @typescript-eslint/no-unsafe-assignment */
+import { cn } from 'cn';
 import {
   type CSSProperties,
   type ComponentProps,
@@ -16,8 +17,6 @@ import type {
   NameType,
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
-
-import { cn } from '~/lib/utils';
 
 // Format: { THEME_NAME: CSS_SELECTOR }
 const THEMES = { light: '', dark: '.dark' } as const;

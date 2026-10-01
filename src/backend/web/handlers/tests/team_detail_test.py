@@ -1,14 +1,31 @@
 import json
+from typing import Generator
 
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
+from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
+from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.webcast_status import WebcastStatus
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
+from backend.common.models.alliance import MatchAlliance
+from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
+from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
+from backend.common.models.event_team import EventTeam
+from backend.common.models.event_team_pit_location import EventTeamPitLocation
+from backend.common.models.match import Match
+from backend.common.models.media import Media
+from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
 
@@ -216,3 +233,272 @@ def test_schema_org_sports_team_full_data(web_client: Client, setup_full_team) -
     assert sports_team_schema["location"]["address"]["addressLocality"] == "Greenville"
     assert sports_team_schema["location"]["address"]["addressRegion"] == "Texas"
     assert sports_team_schema["location"]["address"]["addressCountry"] == "USA"
+
+
+def test_favorite_button_has_no_csrf_token(web_client: Client, ndb_stub) -> None:
+    # The team page is served by a `@cached_public` handler, whose cache is
+    # keyed on path + query string with no user component, so a per-session
+    # CSRF token rendered into the body would be handed to every subsequent
+    # visitor and their favorite POSTs would be rejected with a 400.
+    # tba_favorites.js fetches a token from /_/account/info instead.
+    # See https://github.com/the-blue-alliance/the-blue-alliance/issues/10495
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    button = soup.find("button", {"class": "tba-fab-team"})
+    assert button is not None
+    assert button["data-team"] == "frc254"
+    assert "data-csrf-token" not in button.attrs
+    assert b"csrf" not in resp.data.lower()
+
+
+@ndb.synctasklet
+def preseed_smugmug_photo(team_number: int, year: int) -> Generator:
+    yield Media(
+        id="smugmug-photo_xxrbgK6",
+        media_type_enum=MediaType.SMUGMUG_PHOTO,
+        foreign_key="xxrbgK6",
+        year=year,
+        details_json=json.dumps(
+            {
+                "title": "Robot on the field",
+                "caption": "",
+                "web_uri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+                "image_url": "https://photos.smugmug.com/L/x-L.jpg",
+                "image_url_med": "https://photos.smugmug.com/M/x-M.jpg",
+                "image_url_sm": "https://photos.smugmug.com/S/x-S.jpg",
+            }
+        ),
+        references=[ndb.Key(Team, f"frc{team_number}")],
+    ).put_async()
+
+
+def test_smugmug_photo_in_gallery(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    preseed_smugmug_photo(254, 2020)
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    thumbnail = soup.find(
+        "a", class_="gallery", href="https://photos.smugmug.com/L/x-L.jpg"
+    )
+    assert thumbnail is not None
+    assert "https://photos.smugmug.com/M/x-M.jpg" in thumbnail.find("span")["style"]
+
+    caption = soup.find(
+        "a",
+        href="https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+    )
+    assert caption is not None
+    assert caption.text == "Robot on the field"
+
+
+@ndb.synctasklet
+def preseed_smugmug_album(team_number: int, year: int) -> Generator:
+    yield Media(
+        id="smugmug-album_4RWMLM",
+        media_type_enum=MediaType.SMUGMUG_ALBUM,
+        foreign_key="4RWMLM",
+        year=year,
+        details_json=json.dumps(
+            {
+                "title": "2026 FIRST Championship - BAE Systems",
+                "web_uri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE",
+                "image_count": 81,
+                "cover_url": "https://photos.smugmug.com/L/cover-L.png",
+                "cover_url_med": "https://photos.smugmug.com/M/cover-M.png",
+                "cover_url_sm": "https://photos.smugmug.com/S/cover-S.png",
+            }
+        ),
+        references=[ndb.Key(Team, f"frc{team_number}")],
+    ).put_async()
+
+
+def test_smugmug_album_in_photo_galleries(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    preseed_smugmug_album(254, 2020)
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+
+    assert soup.find(id="photo-galleries") is not None
+
+    links = soup.find_all(
+        "a", href="https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
+    )
+    assert len(links) == 2
+
+    cover, caption = links
+    assert "https://photos.smugmug.com/M/cover-M.png" in cover.find("span")["style"]
+    assert caption.text == "2026 FIRST Championship - BAE Systems"
+    assert "81 photos" in caption.parent.text
+
+    # An album alone must not fall through to the empty-media message
+    assert "No photos or videos for team" not in resp.get_data(as_text=True)
+
+
+def test_no_smugmug_album(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find(id="photo-galleries") is None
+
+
+def _put_played_qual_match(event_key: str, team_key: str) -> None:
+    Match(
+        id=f"{event_key}_qm1",
+        year=int(event_key[:4]),
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, event_key),
+        team_key_names=[team_key, "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(
+                    teams=[team_key, "frc2", "frc3"], score=50
+                ),
+                AllianceColor.BLUE: MatchAlliance(
+                    teams=["frc4", "frc5", "frc6"], score=40
+                ),
+            }
+        ),
+    ).put()
+
+
+def test_team_2015_averages_and_rank(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2015test")
+    _put_played_qual_match("2015test", "frc254")
+    EventDetails(
+        id="2015test",
+        rankings2=[
+            {
+                "rank": 3,
+                "team_key": "frc1",
+                "record": None,
+                "qual_average": None,
+                "matches_played": 1,
+                "dq": 0,
+                "sort_orders": [],
+            },
+            {
+                "rank": 7,
+                "team_key": "frc254",
+                "record": None,
+                "qual_average": None,
+                "matches_played": 1,
+                "dq": 0,
+                "sort_orders": [],
+            },
+        ],
+    ).put()
+
+    resp = web_client.get("/team/254/2015")
+    assert resp.status_code == 200
+
+
+def test_team_district_points(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    District(
+        id="2020ne",
+        year=2020,
+        abbreviation="ne",
+        display_name="New England",
+        rankings=[
+            {
+                "rank": 1,
+                "team_key": "frc254",
+                "point_total": 50,
+                "rookie_bonus": 0,
+                "event_points": [
+                    {
+                        "event_key": "2020test",
+                        "district_cmp": False,
+                        "qual_points": 20,
+                        "elim_points": 10,
+                        "alliance_points": 15,
+                        "award_points": 5,
+                        "total": 50,
+                    }
+                ],
+            }
+        ],
+    ).put()
+    DistrictTeam(
+        id="2020ne_frc254",
+        year=2020,
+        district_key=ndb.Key(District, "2020ne"),
+        team=ndb.Key(Team, "frc254"),
+    ).put()
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    assert helpers.get_team_info(resp.data).district == "New England District"
+
+
+def test_team_regional_champs_pool_points(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2025test")
+    RegionalChampsPool(
+        id=RegionalChampsPool.render_key_name(2025),
+        year=2025,
+        rankings=[
+            {
+                "rank": 1,
+                "team_key": "frc254",
+                "point_total": 50,
+                "rookie_bonus": 0,
+                "single_event_bonus": 0,
+                "event_points": [
+                    {
+                        "event_key": "2025test",
+                        "district_cmp": False,
+                        "qual_points": 20,
+                        "elim_points": 10,
+                        "alliance_points": 15,
+                        "award_points": 5,
+                        "total": 50,
+                    }
+                ],
+            }
+        ],
+    ).put()
+
+    resp = web_client.get("/team/254/2025")
+    assert resp.status_code == 200
+
+
+@freeze_time("2020-03-03")
+def test_team_current_event_pit_location(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    event_team = none_throws(EventTeam.get_by_id("2020test_frc254"))
+    event_team.pit_location = EventTeamPitLocation(location="A12")
+    event_team.put()
+
+    resp = web_client.get("/team/254/history")
+    assert resp.status_code == 200
+    assert b"A12" in resp.data
+
+
+def test_team_alliance_status(web_client: Client, setup_full_event) -> None:
+    setup_full_event("2019ctwat")
+    helpers.preseed_team(176)
+
+    resp = web_client.get("/team/176/2019")
+    assert resp.status_code == 200
+    event_info = helpers.get_team_event_participation(resp.data, "2019ctwat")
+    assert event_info is not None

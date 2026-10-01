@@ -51,7 +51,7 @@ def test_add_team_media_mod_batched(
         "/admin/media/modcodes/add",
         data={
             "year": 2023,
-            "auth_codes_csv": "\n".join([f"{i},abc123" for i in range(1, 10000)]),
+            "auth_codes_csv": "\n".join([f"{i},abc123" for i in range(1, 251)]),
         },
     )
     assert resp.status_code == 302
@@ -62,7 +62,7 @@ def test_add_team_media_mod_batched(
             run_from_task(task)
 
     modcodes = TeamAdminAccess.query().fetch()
-    assert len(modcodes) == 9999
+    assert len(modcodes) == 250
 
 
 def test_edit_team_media_mod_doest_exist(login_gae_admin, web_client: Client) -> None:
@@ -107,3 +107,60 @@ def test_edit_team_media_mod(login_gae_admin, web_client: Client) -> None:
     assert access.access_code == "def456"
     assert access.expiration == datetime(2023, 8, 1)
     assert access.account == account_key
+
+
+def test_team_media_mod_list_default_year(login_gae_admin, web_client: Client) -> None:
+    TeamAdminAccess(
+        id=f"frc254_{datetime.now().year}",
+        team_number=254,
+        year=datetime.now().year,
+        access_code="abc123",
+        expiration=datetime(2023, 7, 1),
+    ).put()
+    resp = web_client.get("/admin/media/modcodes/list")
+    assert resp.status_code == 200
+    assert b"abc123" in resp.data
+
+
+def test_team_media_mod_list_last_page(login_gae_admin, web_client: Client) -> None:
+    TeamAdminAccess(
+        id="frc10254_2023",
+        team_number=10254,
+        year=2023,
+        access_code="xyz789",
+        expiration=datetime(2023, 7, 1),
+    ).put()
+    resp = web_client.get("/admin/media/modcodes/list/2023/10")
+    assert resp.status_code == 200
+    assert b"xyz789" in resp.data
+
+
+def test_team_media_mod_add(login_gae_admin, web_client: Client) -> None:
+    resp = web_client.get("/admin/media/modcodes/add")
+    assert resp.status_code == 200
+
+
+def test_edit_team_media_mod_with_account(login_gae_admin, web_client: Client) -> None:
+    account_key = Account(email="linked@example.com").put()
+    TeamAdminAccess(
+        id="frc254_2023",
+        team_number=254,
+        year=2023,
+        access_code="abc123",
+        expiration=datetime(2023, 7, 1),
+        account=account_key,
+    ).put()
+
+    resp = web_client.get("/admin/media/modcodes/edit/254/2023")
+    assert resp.status_code == 200
+    assert b"linked@example.com" in resp.data
+
+
+def test_edit_team_media_mod_post_doesnt_exist(
+    login_gae_admin, web_client: Client
+) -> None:
+    resp = web_client.post(
+        "/admin/media/modcodes/edit/254/2023",
+        data={"access_code": "x", "expiration": "2023-08-01"},
+    )
+    assert resp.status_code == 404

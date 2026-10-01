@@ -865,6 +865,8 @@ export const zMediaBase = z.object({
     'avatar',
     'onshape',
     'cd-thread',
+    'smugmug-photo',
+    'smugmug-album',
   ]),
   foreign_key: z.string(),
   preferred: z.boolean().optional(),
@@ -903,7 +905,7 @@ export const zMediaGrabCad = zMediaBase.and(
     type: z.literal('grabcad').optional(),
     details: z
       .object({
-        model_created: z.iso.datetime({ offset: true }),
+        model_created: z.iso.datetime({ offset: true }).nullable(),
         model_description: z.string().nullable(),
         model_image: z.url(),
         model_name: z.string(),
@@ -938,10 +940,42 @@ export const zMediaOnshape = zMediaBase.and(
     type: z.literal('onshape').optional(),
     details: z
       .object({
-        model_created: z.iso.datetime({ offset: true }),
+        model_created: z.iso.datetime({ offset: true }).nullable(),
         model_description: z.string().nullable(),
         model_image: z.url(),
         model_name: z.string(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaSmugmugAlbum = zMediaBase.and(
+  z.object({
+    type: z.literal('smugmug-album').optional(),
+    details: z
+      .object({
+        cover_url: z.url(),
+        cover_url_med: z.url(),
+        cover_url_sm: z.url(),
+        image_count: z.int(),
+        title: z.string(),
+        web_uri: z.url(),
+      })
+      .optional(),
+  }),
+);
+
+export const zMediaSmugmugPhoto = zMediaBase.and(
+  z.object({
+    type: z.literal('smugmug-photo').optional(),
+    details: z
+      .object({
+        caption: z.string(),
+        image_url: z.url(),
+        image_url_med: z.url(),
+        image_url_sm: z.url(),
+        title: z.string(),
+        web_uri: z.url(),
       })
       .optional(),
   }),
@@ -1031,6 +1065,16 @@ export const zMedia = z.union([
       type: z.literal('onshape'),
     })
     .and(zMediaOnshape),
+  z
+    .object({
+      type: z.literal('smugmug-album'),
+    })
+    .and(zMediaSmugmugAlbum),
+  z
+    .object({
+      type: z.literal('smugmug-photo'),
+    })
+    .and(zMediaSmugmugPhoto),
 ]);
 
 export const zMobilityRobot2023 = z.enum(['No', 'Yes']);
@@ -1932,6 +1976,15 @@ export const zMatch = z.object({
 });
 
 /**
+ * Describes one entry in an advancement level's `sort_orders` or `extra_stats` arrays.
+ */
+export const zPlayoffAdvancementSortOrderInfo = z.object({
+  name: z.string(),
+  type: z.enum(['int', 'bool']),
+  precision: z.int(),
+});
+
+/**
  * A Win-Loss-Tie record for a team, or an alliance.
  */
 export const zWltRecord = z.object({
@@ -2068,6 +2121,32 @@ export const zTeamEventStatus = z.object({
   next_match_key: z.string().nullish(),
   last_match_key: z.string().nullish(),
   pit_location: z.string().nullish(),
+});
+
+/**
+ * One alliance's standing within a playoff advancement level.
+ */
+export const zPlayoffAdvancementAllianceRank = z.object({
+  team_keys: z.array(z.string()),
+  alliance_name: z.string(),
+  alliance_color: z.string().nullish(),
+  rank: z.int().nullish(),
+  record: zWltRecord.nullish(),
+  matches_played: z.int(),
+  sort_orders: z.array(z.number()),
+  extra_stats: z.array(z.number()),
+});
+
+/**
+ * A single level of computed playoff advancement for an event.
+ */
+export const zPlayoffAdvancement = z.object({
+  level: z.string(),
+  level_name: z.string(),
+  type: z.string(),
+  rankings: z.array(zPlayoffAdvancementAllianceRank).nullish(),
+  sort_order_info: z.array(zPlayoffAdvancementSortOrderInfo),
+  extra_stats_info: z.array(zPlayoffAdvancementSortOrderInfo),
 });
 
 /**
@@ -2532,6 +2611,19 @@ export const zGetEventMatchTimeseriesPath = z.object({
  */
 export const zGetEventMatchTimeseriesResponse = z.array(z.string());
 
+export const zGetEventMediaHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventMediaPath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventMediaResponse = z.array(zMedia);
+
 export const zGetEventNexusInfoHeaders = z.object({
   'If-None-Match': z.string().optional(),
 });
@@ -2557,6 +2649,19 @@ export const zGetEventOprsPath = z.object({
  * Successful response
  */
 export const zGetEventOprsResponse = zEventOprs.nullable();
+
+export const zGetEventPlayoffAdvancementHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventPlayoffAdvancementPath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventPlayoffAdvancementResponse = z.array(zPlayoffAdvancement);
 
 export const zGetEventPredictionsHeaders = z.object({
   'If-None-Match': z.string().optional(),

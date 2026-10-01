@@ -3,9 +3,6 @@ import enum
 import logging
 import time
 
-import firebase_admin
-from firebase_admin.exceptions import FirebaseError
-
 from backend.common.consts.client_type import ClientType, FCM_CLIENTS
 from backend.common.consts.notification_type import (
     ENABLED_EVENT_NOTIFICATIONS,
@@ -67,7 +64,15 @@ class _NotificationMode(enum.Flag):
     ALL = FCM | WEBHOOK  # pyre-ignore[8]
 
 
+_firebase_app_instance = None
+
+
 def _firebase_app():
+    global _firebase_app_instance
+    if _firebase_app_instance is not None:
+        return _firebase_app_instance
+
+    import firebase_admin
     from firebase_admin import credentials
 
     try:
@@ -75,12 +80,10 @@ def _firebase_app():
     except Exception:
         creds = None
     try:
-        return firebase_admin.get_app("tbans")
+        _firebase_app_instance = firebase_admin.get_app("tbans")
     except ValueError:
-        return firebase_admin.initialize_app(creds, name="tbans")
-
-
-firebase_app = _firebase_app()
+        _firebase_app_instance = firebase_admin.initialize_app(creds, name="tbans")
+    return _firebase_app_instance
 
 
 class TBANSHelper:
@@ -525,7 +528,7 @@ class TBANSHelper:
             notification = PingNotification()
 
             fcm_request = FCMRequest(
-                firebase_app,
+                _firebase_app(),
                 notification,
                 tokens=[client.messaging_id],
             )
@@ -888,7 +891,7 @@ class TBANSHelper:
             for i in range(0, len(clients), MAXIMUM_TOKENS)
         ]:
             fcm_request = FCMRequest(
-                firebase_app,
+                _firebase_app(),
                 notification,
                 tokens=[client.messaging_id for client in subclients],
             )
@@ -991,11 +994,15 @@ class TBANSHelper:
 
     # Returns a list of debug strings for a FirebaseError
     @classmethod
-    def _debug_string(cls, exception: FirebaseError) -> str:
-        debug_strings = [exception.code, str(exception)]
-        if exception.http_response:
-            debug_strings.append(str(exception.http_response.json()))
-        return " / ".join(debug_strings)
+    def _debug_string(cls, exception: Exception) -> str:
+        from firebase_admin.exceptions import FirebaseError
+
+        if isinstance(exception, FirebaseError):
+            debug_strings = [exception.code, str(exception)]
+            if exception.http_response:
+                debug_strings.append(str(exception.http_response.json()))
+            return " / ".join(debug_strings)
+        return str(exception)
 
     @classmethod
     def _notifications_enabled(cls) -> bool:

@@ -158,7 +158,7 @@ async function signInToPwa(page, context) {
   await shot(page, 'pwa-after-signin');
 }
 
-async function reviewType(page, type, index) {
+async function reviewType(page, type) {
   console.log(`STAGE: review ${type}`);
   await page.goto(`${PWA_URL}/suggest/review/${type}`);
   await page.waitForLoadState('networkidle');
@@ -256,8 +256,8 @@ async function main() {
       await shot(pwaPage, 'pwa-review-dashboard');
     }
     if (run('review')) {
-      for (let i = 0; i < TYPES.length; i++) {
-        summary.push(await reviewType(pwaPage, TYPES[i], i));
+      for (const type of TYPES) {
+        summary.push(await reviewType(pwaPage, type));
       }
       await pwaPage.goto(`${PWA_URL}/suggest/review`);
       await pwaPage.waitForLoadState('networkidle');

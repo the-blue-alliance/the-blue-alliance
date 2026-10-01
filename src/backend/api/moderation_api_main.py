@@ -29,7 +29,10 @@ moderation_api.add_url_rule(
     view_func=moderation_suggestion_list,
 )
 moderation_api.add_url_rule(
-    "/suggestions/<suggestion_key>/accept",
+    # Suggestion keys embed the media foreign key, which for Onshape CAD
+    # models contains slashes (.../w/...); the default converter stops at a
+    # slash and the request 404s before CORS headers are added
+    "/suggestions/<path:suggestion_key>/accept",
     methods=["POST"],
     view_func=moderation_suggestion_accept,
 )

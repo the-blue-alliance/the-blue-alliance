@@ -1,6 +1,5 @@
-from typing import Dict, List, Set
+from typing import Any, Dict, List, Set
 
-from firebase_admin import db as firebase_db
 from pyre_extensions import none_throws
 
 from backend.common.consts.nexus_match_status import NexusMatchStatus
@@ -29,7 +28,9 @@ class FirebasePusher:
     DB_URL = "https://{project}.firebaseio.com/"
 
     @classmethod
-    def _get_reference(cls, key: str) -> firebase_db.Reference:
+    def _get_reference(cls, key: str) -> Any:
+        from firebase_admin import db as firebase_db
+
         url = cls.DB_URL.format(project=Environment.project())
         return firebase_db.reference(key, app=get_firebase_app(), url=url)
 

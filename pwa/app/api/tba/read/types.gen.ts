@@ -2683,7 +2683,13 @@ export type Media =
     } & MediaNoDetails)
   | ({
       type: 'onshape';
-    } & MediaOnshape);
+    } & MediaOnshape)
+  | ({
+      type: 'smugmug-album';
+    } & MediaSmugmugAlbum)
+  | ({
+      type: 'smugmug-photo';
+    } & MediaSmugmugPhoto);
 
 export type MediaAvatar = MediaBase & MediaAvatarExtras;
 
@@ -2714,7 +2720,9 @@ export type MediaBase = {
     | 'external-link'
     | 'avatar'
     | 'onshape'
-    | 'cd-thread';
+    | 'cd-thread'
+    | 'smugmug-photo'
+    | 'smugmug-album';
   /**
    * The key used to identify this media on the media site.
    */
@@ -2755,7 +2763,7 @@ export type MediaCdThread = MediaBase & {
 export type MediaGrabCad = MediaBase & {
   type?: 'grabcad';
   details?: {
-    model_created: string;
+    model_created: string | null;
     model_description: string | null;
     model_image: string;
     model_name: string;
@@ -2781,10 +2789,34 @@ export type MediaNoDetails = MediaBase & {
 export type MediaOnshape = MediaBase & {
   type?: 'onshape';
   details?: {
-    model_created: string;
+    model_created: string | null;
     model_description: string | null;
     model_image: string;
     model_name: string;
+  };
+};
+
+export type MediaSmugmugAlbum = MediaBase & {
+  type?: 'smugmug-album';
+  details?: {
+    cover_url: string;
+    cover_url_med: string;
+    cover_url_sm: string;
+    image_count: number;
+    title: string;
+    web_uri: string;
+  };
+};
+
+export type MediaSmugmugPhoto = MediaBase & {
+  type?: 'smugmug-photo';
+  details?: {
+    caption: string;
+    image_url: string;
+    image_url_med: string;
+    image_url_sm: string;
+    title: string;
+    web_uri: string;
   };
 };
 
@@ -3631,6 +3663,92 @@ export enum TowerFace2016 {
   SCALED = 'Scaled',
   UNKNOWN = 'Unknown',
 }
+
+/**
+ * Describes one entry in an advancement level's `sort_orders` or `extra_stats` arrays.
+ */
+export type PlayoffAdvancementSortOrderInfo = {
+  /**
+   * Human-readable name of the sort order or extra stat.
+   */
+  name: string;
+  /**
+   * Data type of the corresponding value.
+   */
+  type: 'int' | 'bool';
+  /**
+   * Number of decimal places to display for the value.
+   */
+  precision: number;
+};
+
+/**
+ * One alliance's standing within a playoff advancement level.
+ */
+export type PlayoffAdvancementAllianceRank = {
+  /**
+   * Team keys (eg `frc254`) making up the alliance.
+   */
+  team_keys: Array<string>;
+  /**
+   * Name of the alliance (eg `Turing`, `Alliance 1`).
+   */
+  alliance_name: string;
+  /**
+   * For bracket levels, `red` or `blue`. Absent for round robin standings.
+   */
+  alliance_color?: string | null;
+  /**
+   * 1-indexed rank within the advancement level. Absent for bracket levels.
+   */
+  rank?: number | null;
+  /**
+   * Win-loss-tie record for the alliance at this level.
+   */
+  record?: WltRecord | null;
+  /**
+   * Number of matches the alliance played at this level.
+   */
+  matches_played: number;
+  /**
+   * Values used to rank alliances, described by the level's `sort_order_info`. For round robin: Champ Points followed by per-year tiebreakers.
+   */
+  sort_orders: Array<number>;
+  /**
+   * Additional per-alliance values, described by the level's `extra_stats_info`. For round robin: `1` if the alliance advances to the finals, else `0`.
+   */
+  extra_stats: Array<number>;
+};
+
+/**
+ * A single level of computed playoff advancement for an event.
+ */
+export type PlayoffAdvancement = {
+  /**
+   * Machine-readable level identifier (eg `sf`, `f1`).
+   */
+  level: string;
+  /**
+   * Human-readable level name (eg `Round Robin Semifinals`, `Finals`).
+   */
+  level_name: string;
+  /**
+   * Advancement level type (eg `round_robin`, `best_of_3`, `double_elim`, `average_score`).
+   */
+  type: string;
+  /**
+   * Ranked alliances for this level.
+   */
+  rankings?: Array<PlayoffAdvancementAllianceRank> | null;
+  /**
+   * Describes each element of every ranking's `sort_orders` array, in order.
+   */
+  sort_order_info: Array<PlayoffAdvancementSortOrderInfo>;
+  /**
+   * Describes each element of every ranking's `extra_stats` array, in order.
+   */
+  extra_stats_info: Array<PlayoffAdvancementSortOrderInfo>;
+};
 
 /**
  * A Win-Loss-Tie record for a team, or an alliance.
@@ -4933,6 +5051,52 @@ export type GetEventMatchTimeseriesResponses = {
 export type GetEventMatchTimeseriesResponse =
   GetEventMatchTimeseriesResponses[keyof GetEventMatchTimeseriesResponses];
 
+export type GetEventMediaData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/media';
+};
+
+export type GetEventMediaErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventMediaError = GetEventMediaErrors[keyof GetEventMediaErrors];
+
+export type GetEventMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Media>;
+};
+
+export type GetEventMediaResponse =
+  GetEventMediaResponses[keyof GetEventMediaResponses];
+
 export type GetEventNexusInfoData = {
   body?: never;
   headers?: {
@@ -5025,6 +5189,53 @@ export type GetEventOprsResponses = {
 
 export type GetEventOprsResponse =
   GetEventOprsResponses[keyof GetEventOprsResponses];
+
+export type GetEventPlayoffAdvancementData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/playoff_advancement';
+};
+
+export type GetEventPlayoffAdvancementErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPlayoffAdvancementError =
+  GetEventPlayoffAdvancementErrors[keyof GetEventPlayoffAdvancementErrors];
+
+export type GetEventPlayoffAdvancementResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<PlayoffAdvancement>;
+};
+
+export type GetEventPlayoffAdvancementResponse =
+  GetEventPlayoffAdvancementResponses[keyof GetEventPlayoffAdvancementResponses];
 
 export type GetEventPredictionsData = {
   body?: never;

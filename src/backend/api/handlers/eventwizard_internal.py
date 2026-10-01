@@ -3,7 +3,6 @@ from io import BytesIO
 from pathlib import Path
 
 from flask import make_response, request, Response
-from openpyxl import load_workbook
 from pyre_extensions import none_throws
 
 from backend.api.handlers.decorators import require_write_auth, validate_keys
@@ -28,6 +27,8 @@ def add_fms_report_archive(event_key: EventKey, report_type: str) -> Response:
     file_contents: bytes = form_data.read()
 
     try:
+        from openpyxl import load_workbook
+
         workbook = load_workbook(filename=BytesIO(file_contents))
         mtime = workbook.properties.modified
     except Exception:

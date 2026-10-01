@@ -1,9 +1,8 @@
 import { useRender } from '@base-ui/react/use-render';
+import { cn } from 'cn';
 
 import ChevronRightIcon from '~icons/lucide/chevron-right';
 import MoreHorizontalIcon from '~icons/lucide/more-horizontal';
-
-import { cn } from '~/lib/utils';
 
 function Breadcrumb({ ...props }: React.ComponentProps<'nav'>) {
   return <nav aria-label="breadcrumb" data-slot="breadcrumb" {...props} />;
@@ -55,8 +54,6 @@ function BreadcrumbPage({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
       data-slot="breadcrumb-page"
-      role="link"
-      aria-disabled="true"
       aria-current="page"
       className={cn('font-normal text-foreground', className)}
       {...props}
