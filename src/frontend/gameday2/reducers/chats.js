@@ -61,6 +61,10 @@ const setChatsFromWebcasts = (webcasts, state) => {
     }
   });
 
+  if (newState.chats[state.defaultChat] !== undefined) {
+    newState.defaultChat = state.defaultChat;
+  }
+
   return newState;
 };
 
