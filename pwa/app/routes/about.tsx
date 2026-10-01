@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/about')({
@@ -38,24 +38,20 @@ function About(): React.JSX.Element {
             You can support The Blue Alliance or reach us with the following:
           </p>
           <div className="not-typeset flex flex-wrap gap-2">
-            <Button
-              size="sm"
-              render={
-                <a
-                  href="https://github.com/the-blue-alliance"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Contribute on GitHub
-                </a>
-              }
-            />
-            <Button size="sm" render={<Link to="/donate" />}>
+            <a
+              href="https://github.com/the-blue-alliance"
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({ size: 'sm' })}
+            >
+              Contribute on GitHub
+            </a>
+            <Link to="/donate" className={buttonVariants({ size: 'sm' })}>
               Donate with PayPal
-            </Button>
-            <Button size="sm" render={<Link to="/contact" />}>
+            </Link>
+            <Link to="/contact" className={buttonVariants({ size: 'sm' })}>
               Contact Us
-            </Button>
+            </Link>
           </div>
         </section>
 
@@ -84,18 +80,14 @@ function About(): React.JSX.Element {
             appreciation for STEM within the local community.
           </p>
           <div className="not-typeset">
-            <Button
-              size="sm"
-              render={
-                <a
-                  href="http://www.firstinspires.org"
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  Join the movement
-                </a>
-              }
-            />
+            <a
+              href="http://www.firstinspires.org"
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({ size: 'sm' })}
+            >
+              Join the movement
+            </a>
           </div>
         </section>
 

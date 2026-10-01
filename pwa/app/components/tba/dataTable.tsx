@@ -93,6 +93,7 @@ interface DataTableProps<TData extends RowData> {
   columns: TbaColumnDef<TData>[];
   data: TData[];
   initialSorting?: SortingState;
+  enableSortingRemoval?: boolean;
   columnVisibility?: ColumnVisibilityState;
   equalColumnWidths?: boolean;
 }
@@ -101,6 +102,7 @@ export function DataTable<TData extends RowData>({
   columns,
   data,
   initialSorting,
+  enableSortingRemoval = true,
   columnVisibility,
   equalColumnWidths,
   conditionalRowStyling,
@@ -112,6 +114,7 @@ export function DataTable<TData extends RowData>({
     features: tbaTableFeatures,
     data,
     columns,
+    enableSortingRemoval,
     onSortingChange: setSorting,
     state: { sorting, columnVisibility: columnVisibility ?? {} },
   });
