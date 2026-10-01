@@ -19,11 +19,8 @@ describe("LampIcon", () => {
     expect(svg.getAttribute("viewBox")).toBe("0 0 240 240");
   });
 
-  it("Bug #68: applies the default 48x48 size when none is given", () => {
-    // Wrong today: LampIcon declares defaultProps of 48x48, but React 19 no
-    // longer applies defaultProps to function components, so the svg has no
-    // width or height at all.
-    // Correct: the default size is applied (e.g. via default parameters).
+  it("applies the default 48x48 size when none is given", () => {
+    // React 19 ignores defaultProps on function components.
     const { container } = render(<LampIcon />);
     const svg = container.querySelector("svg");
     expect(svg.getAttribute("width")).toBe("48");
