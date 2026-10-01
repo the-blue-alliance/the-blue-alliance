@@ -107,7 +107,6 @@ describe('ScoreBreakdown2015', () => {
     { label: 'Container Points', field: 'container_points' as const },
     { label: 'Litter Points', field: 'litter_points' as const },
     { label: 'Total Teleop', field: 'teleop_points' as const },
-    { label: 'Foul Points', field: 'foul_points' as const },
     { label: 'Total Score', field: 'total_points' as const },
   ])('shows each alliance value for $label', ({ label, field }) => {
     render(
@@ -141,7 +140,6 @@ describe('ScoreBreakdown2015', () => {
     { label: 'Container Points', field: 'container_points' as const },
     { label: 'Litter Points', field: 'litter_points' as const },
     { label: 'Total Teleop', field: 'teleop_points' as const },
-    { label: 'Foul Points', field: 'foul_points' as const },
     { label: 'Total Score', field: 'total_points' as const },
   ])(
     'shows no arrow when $label is missing on both sides',
@@ -163,6 +161,63 @@ describe('ScoreBreakdown2015', () => {
   test('renders one row per breakdown line', () => {
     render(<ScoreBreakdown2015 scoreBreakdown={makeBreakdown()} />);
 
-    expect(screen.getAllByRole('row')).toHaveLength(11);
+    expect(screen.getAllByRole('row')).toHaveLength(12);
+  });
+});
+
+describe('ScoreBreakdown2015 fouls', () => {
+  // Fouls from 2015hop_qm49; 2015 Game Manual (2015-04-07) section 3.1.3 deducts them from the offender.
+  function renderFouls() {
+    render(
+      <ScoreBreakdown2015
+        scoreBreakdown={makeBreakdown(
+          { foul_count: 1, foul_points: 6, total_points: 88 },
+          { foul_count: 3, foul_points: 18, total_points: 78 },
+        )}
+      />,
+    );
+  }
+
+  test('shows the fouls each alliance committed', () => {
+    renderFouls();
+
+    expect(rowCells('Fouls Committed')).toEqual(['1', 'Fouls Committed', '3']);
+  });
+
+  test("shows each alliance's foul points as a deduction from its own score", () => {
+    renderFouls();
+
+    expect(rowCells('Foul Points Deducted')).toEqual([
+      '−6',
+      'Foul Points Deducted',
+      '−18',
+    ]);
+  });
+
+  test('shows zero fouls when the counts are missing', () => {
+    render(
+      <ScoreBreakdown2015
+        scoreBreakdown={makeBreakdown(
+          { foul_count: undefined, foul_points: undefined },
+          { foul_count: undefined, foul_points: undefined },
+        )}
+      />,
+    );
+
+    expect(rowCells('Fouls Committed')).toEqual(['0', 'Fouls Committed', '0']);
+    expect(rowCells('Foul Points Deducted')).toEqual([
+      '0',
+      'Foul Points Deducted',
+      '0',
+    ]);
+  });
+
+  test('does not mark either alliance as leading on fouls', () => {
+    renderFouls();
+
+    for (const label of ['Fouls Committed', 'Foul Points Deducted']) {
+      const row = screen.getByText(label).closest('tr');
+      expect(within(row as HTMLElement).queryByRole('img')).toBeNull();
+    }
   });
 });

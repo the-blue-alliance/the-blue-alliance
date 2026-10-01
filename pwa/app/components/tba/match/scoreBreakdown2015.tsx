@@ -12,6 +12,10 @@ import {
   AUTO_TOTE_SET_2015_POINTS,
 } from '~/lib/pointValues';
 
+function fmtDeduction(points: number | null | undefined): string {
+  return points ? `−${points}` : '0';
+}
+
 export default function ScoreBreakdown2015({
   scoreBreakdown,
 }: {
@@ -181,19 +185,29 @@ export default function ScoreBreakdown2015({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Foul Points */}
-      <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.foul_points ?? 0}
-        redValue={scoreBreakdown.red.foul_points ?? 0}
-      >
+      {/* Fouls committed by each alliance */}
+      <ScoreBreakdownRow>
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.foul_points}
+          {scoreBreakdown.red.foul_count ?? 0}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Foul Points
+          Fouls Committed
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.foul_points}
+          {scoreBreakdown.blue.foul_count ?? 0}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* In 2015 fouls were deducted from the committing alliance's own score */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {fmtDeduction(scoreBreakdown.red.foul_points)}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Foul Points Deducted
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {fmtDeduction(scoreBreakdown.blue.foul_points)}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
