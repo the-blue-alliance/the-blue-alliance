@@ -204,24 +204,8 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
 
 
-def test_bug_19_rp_sweep_requires_melody_and_ensemble() -> None:
-    """
-    Bug #19: the 2024 four/six RP sweep counters test melodyBonusAchieved
-    twice and never read ensembleBonusAchieved, so a winner with only the
-    MELODY RP is counted as a 4 RP sweep (and two MELODY-only alliances as a
-    6 RP match).
-
-    Correct: a 4 RP sweep is WIN (2 RP) + MELODY (1 RP) + ENSEMBLE (1 RP). The
-    2024 Game Manual, Section 6.5.6 Point Values, Table 6-2, p. 49 (Section 6
-    V10, manual dated 2024-04-09, current through Team Update 21) lists them
-    as separate Ranking Points:
-
-        MELODY ... 1
-        ENSEMBLE At least 10 STAGE points and at least 2 ONSTAGE ROBOTS* 1
-        Win completing a MATCH with more MATCH points than your opponent 2
-
-    https://firstfrc.blob.core.windows.net/frc2024/Manual/2024GameManual.pdf
-    """
+def test_rp_sweep_requires_melody_and_ensemble() -> None:
+    """A 4 RP sweep is WIN + MELODY + ENSEMBLE (2024 manual, Table 6-2)."""
     melody_only = {"melodyBonusAchieved": True, "ensembleBonusAchieved": False}
     both = {"melodyBonusAchieved": True, "ensembleBonusAchieved": True}
     matches = [
