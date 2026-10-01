@@ -364,11 +364,8 @@ describe('DoubleElim4TeamBracket', () => {
     expect(group('Match 2').textContent).toContain('Arc vs Cur');
   });
 
-  // Wrong today: a row whose teams are in no alliance gets alliance number
-  // null, which equals the "nothing hovered" null (null === null), so the
-  // rows render highlighted, and the winner's card ringed, before any hover.
-  // Correct: nothing is highlighted until an alliance is hovered.
-  test('Bug #60: does not highlight rows for teams in no alliance before hover', () => {
+  // Teams in no alliance have a null alliance number.
+  test('does not highlight rows for teams in no alliance before hover', () => {
     const matches = [
       makeMatch(
         CompLevel.SF,
