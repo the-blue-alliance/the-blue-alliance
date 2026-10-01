@@ -723,16 +723,10 @@ def test_clear_model_cache_unknown_type_redirects_home(
     assert resp.headers["Location"] == "/admin/"
 
 
-def test_bug_1_clear_team_cache_redirects_to_team_page(
+def test_clear_team_cache_redirects_to_team_page(
     web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
-    """Bug #1: clearing a team's cache 500s.
-
-    Today the redirect is built with url_for("admin.team_detail",
-    team_key=...) but the route is /admin/team/<int:team_number>, so url_for
-    raises BuildError and the request 500s (after the cache was cleared).
-    Correct: clear the cache and redirect to /admin/team/254.
-    """
+    """Clearing a team's cache redirects to its admin page."""
     Team(id="frc254", team_number=254).put()
 
     with patch.object(TeamManipulator, "clearCache") as mock_clear:
