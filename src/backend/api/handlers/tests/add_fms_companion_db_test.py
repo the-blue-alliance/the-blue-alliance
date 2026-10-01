@@ -639,10 +639,7 @@ def test_upload_duplicate_db_reuses_newest_path(
 def test_upload_duplicate_db_with_unknown_newest_path_does_not_start_job(
     monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
-    """Bug #10840-a: when the upload matches the newest stored database but
-    that database's path can't be resolved, there is no file to import, so
-    the Cloud Run import job must not be started with an empty "gs://" path.
-    """
+    """A duplicate upload whose stored path is unknown starts no import job."""
     setup_event(event_type=EventType.OFFSEASON)
     setup_user(monkeypatch, permissions=[])
     auth_id, auth_secret = setup_api_auth(
