@@ -141,6 +141,8 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
         defaultOptions={teamOptions}
         onChange={handleTeamSelectionChanged}
         isDisabled={!selectedEvent || !hasFetchedTeams}
+        isClearable
+        escapeClearsValue
       />
       <button
         className={`btn ${addButtonClass}`}
