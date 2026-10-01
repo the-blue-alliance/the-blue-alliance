@@ -10,6 +10,7 @@ from backend.common.helpers.insights_v2.registry import compute_insights_for_yea
 from backend.common.helpers.insights_v2.timeseries.cumulative_matches_by_day import (
     CumulativeMatchesByDayV2Calculator,
 )
+from backend.common.helpers.tests.insights_v2.fakes import fake_event, fake_match
 from backend.common.models.event import Event
 from backend.common.models.insight_v2 import InsightCategory
 from backend.common.models.match import Match
@@ -142,3 +143,48 @@ def test_no_played_matches_produces_no_insight(ndb_stub) -> None:
     insights = compute_insights_for_year(2024, [_calc()])
 
     assert insights == []
+
+
+def _timed_match(
+    time: Optional[datetime.datetime], comp_level: CompLevel = CompLevel.QM
+):
+    match = fake_match(10, 5, comp_level=comp_level)
+    match.post_result_time = None
+    match.actual_time = None
+    match.time = time
+    return match
+
+
+def test_implausible_and_missing_timestamps() -> None:
+    calc = CumulativeMatchesByDayV2Calculator()
+    event_start = datetime.datetime(2024, 3, 1)
+
+    # An implausibly old timestamp falls back to the event start date
+    calc.on_event(
+        fake_event(
+            [_timed_match(datetime.datetime(1970, 1, 1))],
+            year=2024,
+            start_date=event_start,
+            end_date=None,
+        )
+    )
+    # No usable time at all (playoff match, event has no end date)
+    calc.on_event(
+        fake_event(
+            [_timed_match(None, CompLevel.F)],
+            year=2024,
+            start_date=event_start,
+            end_date=None,
+        )
+    )
+    # A timestamp outside the event's year is ignored
+    calc.on_event(
+        fake_event(
+            [_timed_match(datetime.datetime(2023, 12, 31))],
+            year=2024,
+            start_date=event_start,
+            end_date=None,
+        )
+    )
+
+    assert dict(calc._day_counts) == {event_start.date(): 1}
