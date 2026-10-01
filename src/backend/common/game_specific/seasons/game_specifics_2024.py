@@ -257,6 +257,8 @@ class GameSpecifics2024(
             PredictionStatConfig("score", 0, 20**2),
             PredictionStatConfig("note_scored", 0, 10**2),
             PredictionStatConfig("stage_points", 0, 10**2),
+            PredictionStatConfig("coopertition_criteria", 0, 1),
+            PredictionStatConfig("robot_on_stage", 0, 1),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:
