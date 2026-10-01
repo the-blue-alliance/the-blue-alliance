@@ -2268,17 +2268,10 @@ def test_get_timezone_id_missing_time_zone_id(
     assert "No timeZoneId for (37.3382, -121.8863)" in caplog.text
 
 
-def test_bug_11_geocode_zero_results_are_served_from_cache(
+def test_geocode_zero_results_are_served_from_cache(
     requests_mock: Mocker,
 ) -> None:
-    """Bug #11: an empty geocode result is cached but never served.
-
-    Today google_maps_geocode writes [] to memcache for ZERO_RESULTS, but the
-    cache check is `if not results`, so an empty cached value counts as a miss
-    and every call re-fetches (2 requests for 2 calls). Correct: the second
-    call is served from cache (1 request), as google_maps_placesearch already
-    does with its `is None` check.
-    """
+    """A cached empty geocode result is served without another request."""
     requests_mock.get(GEOCODE_URL, json={"status": "ZERO_RESULTS", "results": []})
 
     assert LocationHelper.google_maps_geocode("Nowhere") == []
