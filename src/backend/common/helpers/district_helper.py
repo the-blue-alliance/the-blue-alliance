@@ -325,8 +325,6 @@ class DistrictHelper:
             teams = teams.get_result()
 
         for team in teams:
-            if isinstance(teams, ndb.tasklets.Future):
-                team = team.get_result()
             bonus = cls._get_rookie_bonus(year, team.rookie_year)
 
             team_totals[team.key_name]["rookie_bonus"] = bonus
@@ -693,8 +691,6 @@ class DistrictHelper:
                                     * POINTS_MULTIPLIER
                                 )
                             done = True
-                            break
-                        if done:
                             break
                     if done:
                         break

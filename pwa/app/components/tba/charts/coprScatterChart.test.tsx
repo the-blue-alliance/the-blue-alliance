@@ -1,4 +1,4 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { createEvent, fireEvent, render, screen } from '@testing-library/react';
 import {
   type ReactElement,
   type ReactNode,
@@ -137,6 +137,60 @@ describe('CoprScatterChart', () => {
   beforeEach(() => {
     captured.isDesktop = true;
   });
+
+  test('explains how to submit team colors on desktop hover', async () => {
+    renderChart();
+
+    const trigger = screen.getByRole('button', {
+      name: 'How to submit team colors',
+    });
+    const pointerEnter = createEvent.pointerOver(trigger);
+    Object.defineProperty(pointerEnter, 'pointerType', { value: 'mouse' });
+    fireEvent(trigger, pointerEnter);
+    fireEvent.mouseEnter(trigger);
+    fireEvent.mouseMove(trigger);
+
+    expect(
+      await screen.findByText(
+        /submit your team number and primary and secondary hex colors/,
+      ),
+    ).toBeTruthy();
+  });
+
+  test('explains how to submit team colors on mobile tap', async () => {
+    captured.isDesktop = false;
+    renderChart();
+
+    fireEvent.click(
+      screen.getByRole('button', { name: 'How to submit team colors' }),
+    );
+
+    expect(
+      await screen.findByText(
+        /submit your team number and primary and secondary hex colors/,
+      ),
+    ).toBeTruthy();
+  });
+
+  test.each([
+    ['homepage', 0, 'https://frc-colors.com'],
+    ['submission form', 1, 'https://frc-colors.com/submit-colors'],
+  ])(
+    'links to the frc-colors %s when help is opened',
+    async (_name, index, href) => {
+      renderChart();
+
+      fireEvent.click(
+        screen.getByRole('button', { name: 'How to submit team colors' }),
+      );
+
+      expect(
+        (await screen.findAllByRole('link', { name: 'frc-colors' }))[
+          index
+        ].getAttribute('href'),
+      ).toBe(href);
+    },
+  );
 
   test('labels the axes with human-readable COPR names', () => {
     renderChart();

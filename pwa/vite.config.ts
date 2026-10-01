@@ -107,12 +107,17 @@ export default defineConfig({
   build: {
     outDir: 'build',
     sourcemap: true,
+    chunkSizeWarningLimit: 1700,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (!id.includes('/node_modules/')) return;
 
           if (id.includes('/temporal-polyfill/')) return 'temporal-polyfill';
+
+          // Base UI primitives + their floating-ui dep — spread across 36 chunks
+          if (id.includes('/@base-ui/react/') || id.includes('/@floating-ui/'))
+            return 'vendor-baseui';
 
           // React core — already eager on every page, one stable long-cache chunk
           if (
@@ -124,10 +129,6 @@ export default defineConfig({
 
           // TanStack router/query/store — eager, spread across ~10 chunks today
           if (id.includes('/@tanstack/')) return 'vendor-tanstack';
-
-          // Base UI primitives + their floating-ui dep — spread across 36 chunks
-          if (id.includes('/@base-ui/react/') || id.includes('/@floating-ui/'))
-            return 'vendor-baseui';
         },
       },
     },
