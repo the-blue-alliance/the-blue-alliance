@@ -124,3 +124,26 @@ def test_request_no_stream(api_mock: mock.Mock) -> None:
         status=WebcastStatus.OFFLINE,
     )
     assert result == expected
+
+
+def test_headers_and_url() -> None:
+    w = Webcast(
+        type=WebcastType.TWITCH,
+        channel="abc123",
+    )
+    t = TwitchAccessToken(
+        access_token="t",
+        expires_in=14124,
+        refresh_token="xyz",
+        scope=[],
+        token_type="bearer",
+        expires_at=14124,
+        client_id="zzz",
+    )
+
+    df = TwitchWebcastStatus(t, w)
+    assert df.headers() == {
+        "Authorization": "Bearer t",
+        "Client-ID": "zzz",
+    }
+    assert df.url() == "https://api.twitch.tv/helix/streams?user_login=abc123"

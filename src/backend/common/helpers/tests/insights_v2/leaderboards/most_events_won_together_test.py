@@ -198,3 +198,10 @@ def test_event_list_context_sorted_by_start_date(ndb_stub) -> None:
     ranking = insights[0].data["rankings"][0]
     # txcmp (March) should precede nytr (April) despite being later alphabetically
     assert ranking["contexts"][0]["event_keys"] == ["2022txcmp", "2022nytr"]
+
+
+def test_most_events_won_together_team_keys() -> None:
+    calc = MostEventsWonTogetherV2Calculator()
+    calc._increment("frc1|frc2")
+    calc._increment("frc2|frc3")
+    assert calc.team_keys == {"frc1", "frc2", "frc3"}
