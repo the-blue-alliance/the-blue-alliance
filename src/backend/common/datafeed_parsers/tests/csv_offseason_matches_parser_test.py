@@ -85,15 +85,8 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
             matches[0]["team_key_names"], ["frc254", "frc148", "frc217", "frc118"]
         )
 
-    def test_bug_10841a_parse_strips_whitespace_from_team_numbers(self) -> None:
-        """
-        Bug #10841-a: parse_csv_match unpacks the row into locals before its
-        in-place strip() loop, so a trailing space on a team number survives
-        into alliances_json ("frc1114 "), and because "1114 " is not
-        isdigit(), the team is silently dropped from team_key_names.
-
-        Correct: team numbers are stripped before use.
-        """
+    def test_parse_strips_whitespace_from_team_numbers(self) -> None:
+        """Whitespace around a team number is stripped before use."""
         matches, _ = CSVOffseasonMatchesParser.parse(
             "qm1,254,1114 ,2056,148,217,118,1,2"
         )
