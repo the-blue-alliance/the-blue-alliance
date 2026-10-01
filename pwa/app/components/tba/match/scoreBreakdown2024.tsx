@@ -11,6 +11,7 @@ import InlineIcon from '~/components/tba/inlineIcon';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
@@ -343,22 +344,35 @@ export default function ScoreBreakdown2024({
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Tech Fouls */}
+        {/* Fouls committed by each alliance */}
         <TableRow>
           <TableCell className="bg-alliance-red-loser">
-            {scoreBreakdown.red.foulCount} (+
-            {(scoreBreakdown.red.foulCount ?? 0) * 2}) /{' '}
-            {scoreBreakdown.red.techFoulCount} (+
-            {(scoreBreakdown.red.techFoulCount ?? 0) * 5})
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.red.foulCount,
+              techFouls: scoreBreakdown.red.techFoulCount,
+            })}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Fouls / Tech Fouls
+            Fouls / Tech Fouls Committed
           </TableCell>
           <TableCell className="bg-alliance-blue-loser">
-            {scoreBreakdown.blue.foulCount} (+
-            {(scoreBreakdown.blue.foulCount ?? 0) * 2}) /{' '}
-            {scoreBreakdown.blue.techFoulCount} (+
-            {(scoreBreakdown.blue.techFoulCount ?? 0) * 5})
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.blue.foulCount,
+              techFouls: scoreBreakdown.blue.techFoulCount,
+            })}
+          </TableCell>
+        </TableRow>
+
+        {/* Foul Points: points each alliance received from the other's fouls */}
+        <TableRow>
+          <TableCell className="bg-alliance-red-winner">
+            {scoreBreakdown.red.foulPoints}
+          </TableCell>
+          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
+            Foul Points Received
+          </TableCell>
+          <TableCell className="bg-alliance-blue-winner">
+            {scoreBreakdown.blue.foulPoints}
           </TableCell>
         </TableRow>
 

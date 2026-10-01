@@ -6,6 +6,7 @@ import {
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
@@ -401,27 +402,32 @@ export default function ScoreBreakdown2025({
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Major Fouls */}
+        {/* Fouls committed by each alliance */}
         <TableRow>
           <TableCell className="bg-alliance-red-loser" colSpan={2}>
-            {scoreBreakdown.red.foulCount} / {scoreBreakdown.red.techFoulCount}
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.red.foulCount,
+              techFouls: scoreBreakdown.red.techFoulCount,
+            })}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Fouls / Major Fouls
+            Fouls / Major Fouls Committed
           </TableCell>
           <TableCell className="bg-alliance-blue-loser" colSpan={2}>
-            {scoreBreakdown.blue.foulCount} /{' '}
-            {scoreBreakdown.blue.techFoulCount}
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.blue.foulCount,
+              techFouls: scoreBreakdown.blue.techFoulCount,
+            })}
           </TableCell>
         </TableRow>
 
-        {/* Foul Points */}
+        {/* Foul Points: points each alliance received from the other's fouls */}
         <TableRow>
           <TableCell className="bg-alliance-red-winner" colSpan={2}>
             {scoreBreakdown.red.foulPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
-            Foul Points
+            Foul Points Received
           </TableCell>
           <TableCell className="bg-alliance-blue-winner" colSpan={2}>
             {scoreBreakdown.blue.foulPoints}
