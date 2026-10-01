@@ -236,7 +236,7 @@ def test_success_rate_climbs_counted_per_robot() -> None:
         blue={"autoTowerRobot1": "Level2", "endGameTowerRobot1": "Level1"},
     )
     rates = _measure(match)
-    # Bug #21: at most 2 ROBOTS per ALLIANCE can climb in AUTO, so 4 per match.
+    # At most 2 robots per alliance can climb in AUTO, so 4 per match.
     assert rates["auto_climb"] == (3, 4)
     assert rates["level1_climb"] == (2, 6)
     assert rates["level2_climb"] == (1, 6)
@@ -470,24 +470,8 @@ def test_calculate_event_insights_splits_quals_and_playoffs() -> None:
     assert none_throws(insights["playoff"])["high_score"] == (30, "2026casj_f1m1", "F1")
 
 
-def test_bug_21_auto_climb_counters_agree() -> None:
-    """
-    Bug #21: the two 2026 AUTO climb counters disagree. The insights helper
-    counts autoTowerRobotN != "None", so a missing key counts as a climb, over
-    4 opportunities per match; the auto_climb success-rate counter excludes
-    missing keys but uses 6 opportunities per match.
-
-    Correct: a missing key is not a climb, and both use 4 opportunities per
-    match, because only 2 ROBOTS per ALLIANCE may earn LEVEL 1 TOWER points in
-    AUTO. 2026 Game Manual, Version TU22 (2026-05-07), Section 6.5.3 Point
-    Values, Table 6-4, p. 47:
-
-        TOWER Each ROBOT at LEVEL 1 (2 ROBOTS max in AUTO) 15
-
-    and Section 6.5.2 ROBOT Scoring Criteria, p. 46: "A ROBOT may only earn
-    TOWER points for LEVEL 1 during AUTO."
-    https://firstfrc.blob.core.windows.net/frc2026/Manual/2026GameManual.pdf
-    """
+def test_auto_climb_counters_agree() -> None:
+    """A missing AUTO climb key is not a climb; both counters use 4 per match."""
     breakdown = json.loads(
         none_throws(
             _build_match(30, 10, red={"autoTowerRobot1": "Level1"}).score_breakdown_json
@@ -503,11 +487,8 @@ def test_bug_21_auto_climb_counters_agree() -> None:
     assert _measure(match)["auto_climb"] == (1, 4)
 
 
-def test_bug_21_auto_climbs_capped_at_two_per_alliance() -> None:
-    """
-    Table 6-4 (2026 Game Manual, TU22): "Each ROBOT at LEVEL 1 (2 ROBOTS max in
-    AUTO)", so a third AUTO climb in one ALLIANCE never counts.
-    """
+def test_auto_climbs_capped_at_two_per_alliance() -> None:
+    """At most 2 AUTO climbs count per alliance (2026 manual, Table 6-4)."""
     match = _build_match(
         30,
         10,
