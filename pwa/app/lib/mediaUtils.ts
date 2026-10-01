@@ -8,12 +8,25 @@ export const IMAGE_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
   'external-link',
 ]);
 
-/** Media types that represent embeddable images (shown in the media gallery). */
-export const EMBED_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
+const EMBED_MEDIA_TYPE_LIST = [
   'imgur',
   'instagram-image',
   'cd-thread',
-]);
+] as const;
+
+/** Media types that represent embeddable images (shown in the media gallery). */
+export const EMBED_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set(
+  EMBED_MEDIA_TYPE_LIST,
+);
+
+/** A media item of one of the embeddable types in `EMBED_MEDIA_TYPES`. */
+export type EmbedMedia = Media & {
+  type: (typeof EMBED_MEDIA_TYPE_LIST)[number];
+};
+
+function isEmbedMedia(media: Media): media is EmbedMedia {
+  return EMBED_MEDIA_TYPES.has(media.type);
+}
 
 /** Media types that represent CAD models. */
 export const CAD_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
@@ -73,9 +86,9 @@ export function getMediaThumbSrcSet(media: Media): string | undefined {
   return `${medium} 1x, ${large} 2x`;
 }
 
-/** Returns all embeddable image media (imgur + instagram-image). */
-export function getEmbedMedia(media: Media[]): Media[] {
-  return media.filter((m) => EMBED_MEDIA_TYPES.has(m.type));
+/** Returns all embeddable image media (imgur, instagram-image, cd-thread). */
+export function getEmbedMedia(media: Media[]): EmbedMedia[] {
+  return media.filter(isEmbedMedia);
 }
 
 /** Returns the link URL for a media item (where clicking should navigate). */
