@@ -187,7 +187,11 @@ describe('getRouter', () => {
     expect(mocks.tracingIntegration).toHaveBeenCalledWith(router);
     expect(mocks.sentryInit).toHaveBeenCalledWith(
       expect.objectContaining({
-        sendDefaultPii: false,
+        dataCollection: expect.objectContaining({
+          userInfo: false,
+          cookies: false,
+          httpBodies: [],
+        }),
         integrations: [{ name: 'tracing' }],
         enabled: false,
       }),
