@@ -1704,14 +1704,8 @@ class TestDummyOffseasonSuggestions(SuggestionCreatorTest):
             country="USA",
         )
 
-    def test_bug_28_creates_suggestion_without_patching(self) -> None:
-        """
-        Bug #28: keys_to_check is a one-shot `map`, and ndb.get_multi uses it
-        up, so the zip() over it afterwards is empty and no suggestion is ever
-        created. Only the bot account gets created.
-
-        Correct: an offseason event with no existing suggestion gets one.
-        """
+    def test_creates_suggestion_without_patching(self) -> None:
+        """An offseason event with no existing suggestion gets one."""
         SuggestionCreator.createDummyOffseasonSuggestions([self._event()])
 
         self.assertEqual(Suggestion.query().count(), 1)
