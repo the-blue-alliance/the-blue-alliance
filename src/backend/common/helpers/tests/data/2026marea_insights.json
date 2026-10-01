@@ -1,0 +1,152 @@
+{
+  "qual": {
+    "energized_rp_count": [
+      95,
+      152,
+      62.5
+    ],
+    "supercharged_rp_count": [
+      2,
+      152,
+      1.3157894736842106
+    ],
+    "traversal_rp_count": [
+      0,
+      152,
+      0.0
+    ],
+    "six_rp_count": [
+      0,
+      76,
+      0.0
+    ],
+    "nine_rp_count": [
+      0,
+      76,
+      0.0
+    ],
+    "auto_win_conversion": [
+      61,
+      76,
+      80.26315789473684
+    ],
+    "auto_fuel_scored": [
+      4004,
+      26.342105263157894,
+      8.780701754385966
+    ],
+    "teleop_fuel_scored": [
+      17221,
+      113.29605263157895,
+      37.76535087719298
+    ],
+    "total_fuel_scored": [
+      21225,
+      139.63815789473685,
+      46.546052631578945
+    ],
+    "auto_climb_count": [
+      1,
+      304,
+      0.32894736842105265
+    ],
+    "level1_climb_count": [
+      11,
+      456,
+      2.412280701754386
+    ],
+    "level2_climb_count": [
+      0,
+      456,
+      0.0
+    ],
+    "level3_climb_count": [
+      0,
+      456,
+      0.0
+    ],
+    "average_score": 149.93421052631578,
+    "average_win_margin": 98.26315789473684,
+    "average_winning_score": 199.06578947368422,
+    "high_score": [
+      436,
+      "2026marea_qm44",
+      "Q44"
+    ]
+  },
+  "playoff": {
+    "energized_rp_count": [
+      0,
+      30,
+      0.0
+    ],
+    "supercharged_rp_count": [
+      0,
+      30,
+      0.0
+    ],
+    "traversal_rp_count": [
+      0,
+      30,
+      0.0
+    ],
+    "six_rp_count": [
+      0,
+      15,
+      0.0
+    ],
+    "nine_rp_count": [
+      0,
+      15,
+      0.0
+    ],
+    "auto_win_conversion": [
+      12,
+      15,
+      80.0
+    ],
+    "auto_fuel_scored": [
+      1470,
+      49.0,
+      16.333333333333332
+    ],
+    "teleop_fuel_scored": [
+      4885,
+      162.83333333333334,
+      54.27777777777778
+    ],
+    "total_fuel_scored": [
+      6355,
+      211.83333333333334,
+      70.61111111111111
+    ],
+    "auto_climb_count": [
+      1,
+      60,
+      1.6666666666666667
+    ],
+    "level1_climb_count": [
+      1,
+      90,
+      1.1111111111111112
+    ],
+    "level2_climb_count": [
+      0,
+      90,
+      0.0
+    ],
+    "level3_climb_count": [
+      0,
+      90,
+      0.0
+    ],
+    "average_score": 224.5,
+    "average_win_margin": 121.13333333333334,
+    "average_winning_score": 285.06666666666666,
+    "high_score": [
+      464,
+      "2026marea_sf1m1",
+      "SF1-1"
+    ]
+  }
+}
