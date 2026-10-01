@@ -408,36 +408,31 @@ describe('ScoreBreakdown2018 endgame', () => {
 });
 
 describe('ScoreBreakdown2018 fouls', () => {
-  // Both alliances get identical counts, so column placement is not checked.
-  test('values fouls at 5 points each', () => {
+  // Counts and foul points from 2018cmptx_sf1m6; each alliance's foulPoints come from the other's fouls.
+  function renderFouls() {
     render(
       <ScoreBreakdown2018
         scoreBreakdown={makeBreakdown(
-          { foulCount: 2, techFoulCount: 0 },
-          { foulCount: 2, techFoulCount: 0 },
+          { foulCount: 0, techFoulCount: 4, foulPoints: 30 },
+          { foulCount: 1, techFoulCount: 1, foulPoints: 100 },
         )}
         match={match}
       />,
     );
+  }
 
-    expect(within(redCell('Fouls Received')).getByText('2 (+10)')).toBeTruthy();
-    expect(
-      within(blueCell('Fouls Received')).getByText('2 (+10)'),
-    ).toBeTruthy();
+  test('shows the fouls and tech fouls each alliance committed', () => {
+    renderFouls();
+
+    expect(redCell('Fouls / Tech Fouls Committed').textContent).toBe('0 / 4');
+    expect(blueCell('Fouls / Tech Fouls Committed').textContent).toBe('1 / 1');
   });
 
-  test('values tech fouls at 25 points each', () => {
-    render(
-      <ScoreBreakdown2018
-        scoreBreakdown={makeBreakdown(
-          { techFoulCount: 2 },
-          { techFoulCount: 2 },
-        )}
-        match={match}
-      />,
-    );
+  test('shows the foul points each alliance received', () => {
+    renderFouls();
 
-    expect(within(redCell('Fouls Received')).getByText('2 (+50)')).toBeTruthy();
+    expect(redCell('Foul Points Received').textContent).toBe('30');
+    expect(blueCell('Foul Points Received').textContent).toBe('100');
   });
 });
 
