@@ -315,10 +315,8 @@ describe("LivescoreDisplay", () => {
     setIntervalSpy.mockRestore();
   });
 
-  it("Bug #36: clears its refresh interval on unmount", () => {
-    // Wrong today: componentDidMount starts a 10s setInterval that is never
-    // cleared, so it keeps calling setState after the component is gone.
-    // Correct: componentWillUnmount clears the interval it started.
+  it("clears its refresh interval on unmount", () => {
+    // componentDidMount starts a 10s refresh interval.
     const setIntervalSpy = jest.spyOn(global, "setInterval");
     const clearIntervalSpy = jest.spyOn(global, "clearInterval");
     try {
@@ -336,18 +334,13 @@ describe("LivescoreDisplay", () => {
     }
   });
 
-  it("Bug #36: validates the matches prop with a real PropTypes validator", () => {
-    // Wrong today: propTypes declares `matches: PropTypes.list`, which does
-    // not exist, so the validator is undefined and the prop is unchecked.
-    // Correct: a real validator such as PropTypes.array / arrayOf(...).
+  it("validates the matches prop with a real PropTypes validator", () => {
+    // PropTypes has no `list` validator.
     expect(typeof LivescoreDisplay.propTypes.matches).toBe("function");
   });
 
-  it("Bug #36: never leaks false or 0 into the indicator class names", () => {
-    // Wrong today: class names are built with `${x && "red"}`, so unowned
-    // indicators render as "booleanIndicator false", and after the pre-match
-    // reset (0 for red switch/scale) as "booleanIndicator 0".
-    // Correct: unowned indicators are just "booleanIndicator".
+  it("never leaks false or 0 into the indicator class names", () => {
+    // Covers live state and the pre-match reset, which sets red switch/scale to 0.
     const now = 1_700_000_000;
     jest.setSystemTime(now * 1000);
     const live = renderDisplay(liveState);
