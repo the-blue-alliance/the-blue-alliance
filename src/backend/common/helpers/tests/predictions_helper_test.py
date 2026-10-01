@@ -685,18 +685,8 @@ def test_contribution_calculator_extracts_stat(
 
 
 @pytest.mark.parametrize("num_matches", [1, 4])
-def test_bug_23_robot_on_stage_writes_the_current_match_row(num_matches: int) -> None:
-    """
-    Bug #23: the "robot_on_stage" extractor loops with `for i in range(1, 4)`,
-    which shadows calculate_before_match's match index `i`. After the loop
-    `i == 3`, so the extracted means are written to the rows for match 3
-    instead of the match being processed. With fewer than four matches that
-    is an IndexError.
-
-    Correct: counting ONSTAGE robots leaves the match index alone. Match 0's
-    rows get red 3 (all ONSTAGE) and blue 1 (only StageLeft); no other
-    match's rows are touched.
-    """
+def test_robot_on_stage_writes_the_current_match_row(num_matches: int) -> None:
+    """Counting ONSTAGE robots writes only the current match's rows."""
     event = _make_event("2024test", datetime.datetime(2024, 3, 1))
     on_stage = {
         "endGameRobot1": "StageLeft",
