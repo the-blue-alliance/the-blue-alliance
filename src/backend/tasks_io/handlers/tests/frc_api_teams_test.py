@@ -10,6 +10,7 @@ from backend.common.futures import InstantFuture
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.media import Media
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
@@ -411,3 +412,64 @@ def test_fetch_team_avatar_no_output_in_taskqueue(
 
     # Make sure we write models
     assert Media.get_by_id("avatar_media") is not None
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_creates_regional_pool_team(
+    api_mock, tasks_client: Client
+) -> None:
+    # A team with no district membership in a regional-pool year (2025+) is
+    # eligible for Championship via the regional pool, so a RegionalPoolTeam
+    # row is written alongside the Team.
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc254", team_number=254),
+            None,
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
+    assert resp.status_code == 200
+
+    assert Team.get_by_id("frc254") is not None
+    regional_pool_team = RegionalPoolTeam.get_by_id(
+        RegionalPoolTeam.render_key_name(2026, "frc254")
+    )
+    assert regional_pool_team is not None
+    assert regional_pool_team.year == 2026
+    assert regional_pool_team.team == ndb.Key(Team, "frc254")
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_district_team_removes_regional_pool_team(
+    api_mock, tasks_client: Client
+) -> None:
+    # If FIRST now reports the team as a district team, any stale
+    # RegionalPoolTeam for that year is deleted.
+    RegionalPoolTeam(
+        id=RegionalPoolTeam.render_key_name(2026, "frc254"),
+        year=2026,
+        team=ndb.Key(Team, "frc254"),
+    ).put()
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc254", team_number=254),
+            DistrictTeam(
+                id="2026fim_frc254",
+                team=ndb.Key(Team, "frc254"),
+                year=2026,
+                district_key=ndb.Key(District, "2026fim"),
+            ),
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
+    assert resp.status_code == 200
+
+    assert DistrictTeam.get_by_id("2026fim_frc254") is not None
+    assert (
+        RegionalPoolTeam.get_by_id(RegionalPoolTeam.render_key_name(2026, "frc254"))
+        is None
+    )
