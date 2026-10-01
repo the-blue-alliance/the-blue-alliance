@@ -61,7 +61,7 @@ def test_detail_insights_2026_with_legacy_year_specific_data(
     assert resp.status_code == 200
 
     body = resp.get_data(as_text=True)
-    assert "Auto Win Conversion" in body
+    assert "Auto FUEL Win Conversion" in body
     assert "Fuel Statistics" in body
     assert "Tower Statistics" in body
 

@@ -503,7 +503,9 @@ class AbstractModernGameConfig(
 
             return (1 if auto_winner == match_winner else 0, 1)
 
-        return SuccessRateCounter("auto_win_conversion", "Auto Win Conversion", measure)
+        return SuccessRateCounter(
+            "auto_win_conversion", self.AUTO_WIN_CONVERSION_LABEL, measure
+        )
 
     def success_rate_counters(self) -> Sequence[SuccessRateCounter]:
         """
@@ -546,6 +548,9 @@ class AbstractModernGameConfig(
     @property
     @abstractmethod
     def SCORE_BREAKDOWN_MODEL(self) -> type[TScoreBreakdown]: ...
+
+    # Display name of the auto_win_conversion success-rate counter.
+    AUTO_WIN_CONVERSION_LABEL: ClassVar[str] = "Auto Win Conversion"
 
     # Keys injected at parse-time that are not part of the FRC API TypedDict
     # (e.g. TBA-synthesised fields or match-level values copied per-alliance).

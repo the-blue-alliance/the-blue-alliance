@@ -172,7 +172,7 @@ def test_success_rate_counter_names_and_labels() -> None:
         ("rp_3", "Traversal RP"),
         ("max_alliance_rp", "6 RP"),
         ("max_match_rp", "9 RP"),
-        ("auto_win_conversion", "Auto Win Conversion"),
+        ("auto_win_conversion", "Auto FUEL Win Conversion"),
         ("auto_climb", "Auto Climb"),
         ("level1_climb", "Level 1 Climb"),
         ("level2_climb", "Level 2 Climb"),
@@ -469,27 +469,15 @@ def test_calculate_event_insights_splits_quals_and_playoffs() -> None:
     assert none_throws(insights["playoff"])["high_score"] == (30, "2026casj_f1m1", "F1")
 
 
-def test_bug_22_auto_winner_decided_by_auto_fuel() -> None:
-    """
-    Bug #22: determine_auto_winner compares totalAutoPoints, which includes
-    AUTO TOWER points, so an alliance that climbed in AUTO can "win" AUTO
-    while scoring less FUEL.
-
-    Correct: the AUTO result that sets SHIFT 1 HUB status is decided on the
-    number of FUEL scored during AUTO (hubScore.autoCount); AUTO TOWER points
-    play no part. 2026 Game Manual, Version TU22 (2026-05-07), Section 6.4.1
-    HUB Status, p. 44 (sentence unchanged by any Team Update 00-22):
-
-        The ALLIANCE that scores the most FUEL during AUTO will have their HUB
-        set to inactive for SHIFT 1 while their opponent's HUB will be active
-        ... If both ALLIANCES score the same number of FUEL during AUTO, the
-        FMS will randomly select an ALLIANCE ...
-
-    https://firstfrc.blob.core.windows.net/frc2026/Manual/2026GameManual.pdf
-    "AUTO winner" here means the ALLIANCE whose HUB is inactive in SHIFT 1.
-    """
+def test_auto_winner_decided_by_auto_fuel() -> None:
+    """Most AUTO FUEL wins AUTO; AUTO TOWER points do not (2026 manual 6.4.1)."""
     red = _auto(20)
     red["autoTowerPoints"] = 15
     red["totalAutoPoints"] = 35
     blue = _auto(25)
     assert GameSpecifics2026().determine_auto_winner(red, blue) == AllianceColor.BLUE
+
+
+def test_auto_win_conversion_labelled_auto_fuel() -> None:
+    counters = {c.name: c for c in GameSpecifics2026().success_rate_counters()}
+    assert counters["auto_win_conversion"].label == "Auto FUEL Win Conversion"

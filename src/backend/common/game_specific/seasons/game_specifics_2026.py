@@ -38,13 +38,12 @@ class GameSpecifics2026(
         "Supercharged",
         "Traversal",
     )
+    AUTO_WIN_CONVERSION_LABEL = "Auto FUEL Win Conversion"
 
     def determine_auto_winner(
         self, red: Dict[str, Any], blue: Dict[str, Any]
     ) -> Optional[AllianceColor]:
-        # Game Manual 6.4.1: "The ALLIANCE that scores the most FUEL during
-        # AUTO will have their HUB set to inactive for SHIFT 1". AUTO TOWER
-        # points do not count, so compare AUTO FUEL, not totalAutoPoints.
+        # Most AUTO FUEL wins AUTO; TOWER points do not count (2026 manual 6.4.1).
         red_auto_fuel = red.get("hubScore").get("autoCount")
         blue_auto_fuel = blue.get("hubScore").get("autoCount")
         if red_auto_fuel > blue_auto_fuel:
