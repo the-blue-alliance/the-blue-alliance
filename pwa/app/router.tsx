@@ -15,6 +15,7 @@ import { toast } from 'sonner';
 import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
 
 import { Button } from '~/components/ui/button';
+import { getAnalyticsInstance } from '~/firebase/firebaseConfig';
 import { ApiError } from '~/lib/apiError';
 import { createQueryClient } from '~/lib/queryClient';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
@@ -89,9 +90,22 @@ export function getRouter() {
   if (!router.isServer) {
     sentryInit({
       dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-      sendDefaultPii: false,
-      enableLogs: true,
-      enableMetrics: true,
+      dataCollection: {
+        userInfo: false,
+        cookies: false,
+        httpHeaders: {
+          request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+          response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        },
+        httpBodies: [],
+        urlQueryParams: {
+          deny: ['forwarded', '-ip', 'remote-', 'via', '-user'],
+        },
+        genAI: { inputs: false, outputs: false },
+        databaseQueryData: false,
+        queues: false,
+        graphQL: { document: false, variables: false },
+      },
       tracesSampleRate: 0.1,
 
       integrations: [tanstackRouterBrowserTracingIntegration(router)],
@@ -124,10 +138,7 @@ export function getRouter() {
 // `firebase/analytics` and the gtag.js network request it triggers are loaded
 // lazily here so they stay out of the hydration critical path.
 async function logPageView(pagePath: string, pageLocation: string) {
-  const [{ logEvent }, { getAnalyticsInstance }] = await Promise.all([
-    import('firebase/analytics'),
-    import('~/firebase/firebaseConfig'),
-  ]);
+  const { logEvent } = await import('firebase/analytics');
 
   const analytics = await getAnalyticsInstance();
   if (analytics === null) {
