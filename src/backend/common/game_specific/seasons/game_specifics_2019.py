@@ -252,12 +252,9 @@ class GameSpecifics2019(
                             elif NFSide == "Far" and LRSide == "Left":
                                 alLRSide = "Right" if isRed else "Left"
                                 alNFSide = "Far" if isRed else "Near"
-                            elif NFSide == "Far" and LRSide == "Right":
+                            else:  # NFSide == "Far" and LRSide == "Right"
                                 alLRSide = "Right" if isRed else "Left"
                                 alNFSide = "Near" if isRed else "Far"
-                            else:
-                                alLRSide = ""
-                                alNFSide = ""
 
                             rocket_hatch_panel_count[
                                 "low{}{}".format(alLRSide, alNFSide)
@@ -319,9 +316,6 @@ class GameSpecifics2019(
 
         if not has_insights:
             return None
-
-        if finished_matches == 0:
-            return {}
 
         opportunities_1x = 2 * finished_matches  # once per alliance
         opportunities_3x = 6 * finished_matches  # 3x per alliance

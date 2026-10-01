@@ -1,13 +1,22 @@
+import datetime
 import json
 import os
-from typing import Dict
+from typing import Dict, Optional
 
 import pytest
+from google.appengine.ext import ndb
 
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
 from backend.common.helpers.matchstats_helper import MatchstatsHelper
+from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
 from backend.common.models.event_matchstats import EventComponentOPRs
+from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import TeamKey
+from backend.common.models.match import Match
 from backend.common.models.stats import EventMatchStats, StatType
+from backend.common.models.team import Team
 
 
 @pytest.fixture(autouse=True)
@@ -128,3 +137,86 @@ def test_compute_coprs_with_b_teams(test_data_importer) -> None:
 
     coprs = MatchstatsHelper.calculate_coprs(matches, 2019)
     assert_coprs_keys_equal(coprs, expected_coprs)
+
+
+def _playoff_match(score_breakdown: bool) -> Match:
+    return Match(
+        id="2014nyny_sf1m1",
+        event=ndb.Key(Event, "2014nyny"),
+        year=2014,
+        comp_level=CompLevel.SF,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": 10},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 5},
+            }
+        ),
+        score_breakdown_json=(
+            json.dumps({"red": {"totalPoints": 10}, "blue": {"totalPoints": 5}})
+            if score_breakdown
+            else None
+        ),
+    )
+
+
+def test_compute_matchstats_playoffs_only() -> None:
+    assert MatchstatsHelper.calculate_matchstats([_playoff_match(False)], 2014) == {}
+
+
+def test_compute_coprs_playoffs_only() -> None:
+    assert MatchstatsHelper.calculate_coprs([_playoff_match(True)], 2014) == {}
+
+
+def test_get_last_event_stats(memcache_stub) -> None:
+    def put_event(
+        event_key: str,
+        start: datetime.datetime,
+        event_type: EventType = EventType.REGIONAL,
+        official: bool = True,
+        oprs: Optional[Dict[str, float]] = None,
+    ) -> None:
+        Event(
+            id=event_key,
+            year=2020,
+            event_short=event_key[4:],
+            event_type_enum=event_type,
+            official=official,
+            start_date=start,
+            end_date=start + datetime.timedelta(days=2),
+        ).put()
+        EventTeam(
+            id=f"{event_key}_frc254",
+            event=ndb.Key(Event, event_key),
+            team=ndb.Key(Team, "frc254"),
+            year=2020,
+        ).put()
+        if oprs is not None:
+            EventDetails(id=event_key, matchstats={StatType.OPR: oprs}).put()
+
+    put_event("2020nyny", datetime.datetime(2020, 3, 20))
+    put_event("2020ctha", datetime.datetime(2020, 3, 1), oprs={"254": 10.0})
+    put_event("2020miket", datetime.datetime(2020, 3, 8), oprs={"254": 20.0})
+    put_event("2020mitry", datetime.datetime(2020, 3, 5), oprs={"254": 15.0})
+    put_event(
+        "2020cmptx",
+        datetime.datetime(2020, 3, 10),
+        event_type=EventType.CMP_FINALS,
+        oprs={"254": 99.0},
+    )
+    put_event(
+        "2020offs",
+        datetime.datetime(2020, 3, 12),
+        event_type=EventType.OFFSEASON,
+        official=False,
+        oprs={"254": 99.0},
+    )
+
+    event_key = ndb.Key(Event, "2020nyny")
+    stats = MatchstatsHelper.get_last_event_stats(["254", "1124"], event_key)
+    assert stats == {StatType.OPR: {"254": 20.0}}
+
+    # The second call reuses the cached stats for 254
+    stats = MatchstatsHelper.get_last_event_stats(["254"], event_key)
+    assert stats == {StatType.OPR: {"254": 20.0}}
