@@ -1123,14 +1123,8 @@ def test_venue_address_safe_without_venue_address() -> None:
     assert Event(venue="Some Gym").venue_address_safe is None
 
 
-def test_bug_31_venue_address_safe_is_plain_text() -> None:
-    """
-    Bug #31: with no venue_address, Event.venue_address_safe formats the
-    results of Python 2 era `.encode("utf-8")` calls, so the string contains
-    bytes reprs: "b'Some Gym'\\nb'Berkeley, CA, USA'".
-
-    Correct: plain text, "Some Gym\\nBerkeley, CA, USA".
-    """
+def test_venue_address_safe_is_plain_text() -> None:
+    """Without a venue_address, venue_address_safe is plain text, not bytes reprs."""
     event = Event(venue="Some Gym", city="Berkeley", state_prov="CA", country="USA")
     assert event.venue_address_safe == "Some Gym\nBerkeley, CA, USA"
 
