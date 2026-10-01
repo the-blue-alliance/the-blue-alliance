@@ -1653,3 +1653,225 @@ def test_find_event_webcasts_match_by_description_event_code(
     add_webcast_mock.assert_called_once()
     call_args = add_webcast_mock.call_args
     assert call_args[0][0].key_name == "2026fim1"
+
+
+@freeze_time("2026-03-15 16:00:00")
+@mock.patch.object(FirebasePusher, "update_live_events")
+@mock.patch.object(LiveEventHelper, "get_live_events_with_current_webcasts")
+@mock.patch.object(EventHelper, "week_events")
+def test_update_live_events_enqueues_using_event_timezone(
+    week_events_mock: mock.Mock,
+    live_events_mock: mock.Mock,
+    firebase_mock: mock.Mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    """An event with a timezone converts match times to local time before comparing dates."""
+    set_district_webcast_channels(
+        "fim",
+        [
+            WebcastChannel(
+                type=WebcastType.YOUTUBE,
+                channel="FIRST in Michigan",
+                channel_id="UCjX4WSaAFPgM2PYr-6P",
+            )
+        ],
+    )
+
+    event = Event(
+        id="2026fim1",
+        year=2026,
+        event_short="fim1",
+        event_type_enum=EventType.DISTRICT,
+        start_date=datetime.datetime(2026, 3, 14),
+        end_date=datetime.datetime(2026, 3, 16),
+        district_key=ndb.Key(District, "2026fim"),
+        timezone_id="America/Detroit",
+    )
+    event.put()
+
+    # 03:00 UTC on 03-16 is 23:00 local on 03-15, so this match counts as "today"
+    Match(
+        id="2026fim1_qm1",
+        year=2026,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        event=ndb.Key(Event, "2026fim1"),
+        time=datetime.datetime(2026, 3, 16, 3, 0),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=[], score=-1),
+                AllianceColor.BLUE: MatchAlliance(teams=[], score=-1),
+            }
+        ),
+    ).put()
+
+    week_events_mock.return_value = [event]
+    live_events_mock.return_value = ({}, [])
+
+    resp = tasks_client.get("/tasks/do/update_live_events")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    assert tasks[0].url == "/tasks/do/find_event_webcasts/2026fim"
+
+
+@mock.patch.object(EventTeamStatusHelper, "generate_team_at_event_status")
+def test_do_eventteam_status_no_output_in_taskqueue(
+    status_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2020test",
+        year=2020,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    EventTeam(
+        id="2020test_frc254",
+        year=2020,
+        event=ndb.Key(Event, "2020test"),
+        team=ndb.Key(Team, "frc254"),
+    ).put()
+    status = EventTeamStatus(
+        qual=None,
+        playoff=None,
+        alliance=None,
+        last_match_key=None,
+        next_match_key=None,
+    )
+    status_mock.return_value = status
+
+    resp = tasks_client.get(
+        "/tasks/math/do/event_team_status/2020test",
+        headers={"X-Appengine-Taskname": "test"},
+    )
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+    et = EventTeam.get_by_id("2020test_frc254")
+    assert et is not None
+    assert et.status == status
+
+
+def test_enqueue_playoff_advancement_year_no_output_in_taskqueue(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    Event(
+        id="2020test",
+        year=2020,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    resp = tasks_client.get(
+        "/tasks/math/enqueue/playoff_advancement_update/2020",
+        headers={"X-Appengine-Taskname": "test"},
+    )
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    assert tasks[0].url == "/tasks/math/do/playoff_advancement_update/2020test"
+
+
+def test_enqueue_playoff_advancement_event_not_found(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    # Note: test_enqueue_playoff_advancement_no_event above hits the /do/ route,
+    # so this is the first test to exercise the /enqueue/<event_key> 404 branch.
+    resp = tasks_client.get("/tasks/math/enqueue/playoff_advancement_update/asdf")
+    assert resp.status_code == 404
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+def test_update_event_webcast_status_not_found(tasks_client: Client) -> None:
+    resp = tasks_client.get("/tasks/do/update_webcast_online_status/2026test")
+    assert resp.status_code == 404
+
+
+def test_update_firebase_event_not_found(tasks_client: Client) -> None:
+    resp = tasks_client.get("/tasks/do/update_firebase_event/2026test")
+    assert resp.status_code == 404
+
+
+@mock.patch.object(FirebasePusher, "update_live_event")
+def test_update_firebase_event(
+    update_live_event_mock: mock.Mock, tasks_client: Client
+) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = tasks_client.get("/tasks/do/update_firebase_event/2026test")
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+    update_live_event_mock.assert_called_once()
+    assert update_live_event_mock.call_args[0][0].key_name == "2026test"
+
+
+def test_update_firebase_matches_not_found(tasks_client: Client) -> None:
+    resp = tasks_client.get("/tasks/do/update_firebase_matches/2026test")
+    assert resp.status_code == 404
+
+
+@mock.patch.object(FirebasePusher, "update_match")
+def test_update_firebase_matches(
+    update_match_mock: mock.Mock, tasks_client: Client
+) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    for match_number in (1, 2):
+        Match(
+            id=f"2026test_qm{match_number}",
+            year=2026,
+            comp_level=CompLevel.QM,
+            set_number=1,
+            match_number=match_number,
+            event=ndb.Key(Event, "2026test"),
+            alliances_json=json.dumps(
+                {
+                    AllianceColor.RED: MatchAlliance(teams=[], score=-1),
+                    AllianceColor.BLUE: MatchAlliance(teams=[], score=-1),
+                }
+            ),
+        ).put()
+
+    resp = tasks_client.get("/tasks/do/update_firebase_matches/2026test")
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+    assert update_match_mock.call_count == 2
+    pushed_keys = {c[0][0].key_name for c in update_match_mock.call_args_list}
+    assert pushed_keys == {"2026test_qm1", "2026test_qm2"}
+    for c in update_match_mock.call_args_list:
+        assert c.kwargs == {"updated_attrs": set()}
+
+
+@mock.patch.object(FirebasePusher, "update_match")
+def test_update_firebase_matches_no_matches(
+    update_match_mock: mock.Mock, tasks_client: Client
+) -> None:
+    Event(
+        id="2026test",
+        year=2026,
+        event_short="test",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    resp = tasks_client.get("/tasks/do/update_firebase_matches/2026test")
+    assert resp.status_code == 200
+    assert resp.data == b""
+    update_match_mock.assert_not_called()
