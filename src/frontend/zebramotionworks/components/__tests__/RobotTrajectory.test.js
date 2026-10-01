@@ -46,10 +46,8 @@ describe("RobotTrajectory", () => {
     expect(indicator(container)).toEqual(["1.5", "16"]);
   });
 
-  it("Bug #49: includes the sample at the (floored) end time in the path", () => {
-    // Wrong today: generatePath loops `i < endTimeFloor`, so the last sample
-    // is dropped and the path for 1.5..3 is "M 2 15 L 2 15".
-    // Correct: every sample from ceil(start) through floor(end) is drawn.
+  it("includes the sample at the (floored) end time in the path", () => {
+    // Every sample from ceil(start) through floor(end) is drawn.
     const container = renderTrajectory({
       teamData,
       startTime: 1.5,

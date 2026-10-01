@@ -211,20 +211,16 @@ describe("LiveEventPanel", () => {
     ).toBe(" text-center livePanelColumn");
   });
 
-  it("Bug #49b: clears its refresh interval on unmount", () => {
-    // Wrong today: componentDidMount starts a 10s setInterval that is never
-    // cleared, so it keeps calling setState after unmount.
-    // Correct: no timers remain once the panel is unmounted.
+  it("clears its refresh interval on unmount", () => {
+    // componentDidMount starts a 10s refresh interval.
     const { unmount } = setUp();
     expect(jest.getTimerCount()).toBe(1);
     unmount();
     expect(jest.getTimerCount()).toBe(0);
   });
 
-  it("Bug #49c: detaches its Firebase listeners on unmount", () => {
-    // Wrong today: the /e/<event>/m and /le/<event> "value" listeners are
-    // never removed, so they keep calling setState after unmount.
-    // Correct: both refs are detached with off() on unmount.
+  it("detaches its Firebase listeners on unmount", () => {
+    // Both the /e/<event>/m and /le/<event> "value" listeners are removed.
     mockOff.mockClear();
     const { unmount } = setUp();
     unmount();

@@ -152,10 +152,8 @@ describe("CurrentMatchDisplay", () => {
     expect(container.querySelectorAll(".booleanIndicator.red")).toHaveLength(0);
   });
 
-  it("Bug #49: never leaks false or 0 into the indicator class names", () => {
-    // Wrong today: class names are built with `${x && "red"}`, so unowned
-    // indicators get a "false" (or "0") class, e.g. "booleanIndicator false".
-    // Correct: unowned indicators are just "booleanIndicator".
+  it("never leaks false or 0 into the indicator class names", () => {
+    // Unowned indicators have only the booleanIndicator class.
     [renderDisplay(liveState), renderDisplay(liveState, true)].forEach(
       (container) => {
         container.querySelectorAll(".booleanIndicator").forEach((el) => {
@@ -166,10 +164,8 @@ describe("CurrentMatchDisplay", () => {
     );
   });
 
-  it("Bug #49d: validates forcePreMatch with a real PropTypes validator", () => {
-    // Wrong today: propTypes declares `forcePreMatch: PropTypes.boolean`,
-    // which does not exist, so the validator is undefined.
-    // Correct: PropTypes.bool.
+  it("validates forcePreMatch with a real PropTypes validator", () => {
+    // PropTypes has no `boolean` validator; the real one is PropTypes.bool.
     expect(typeof CurrentMatchDisplay.propTypes.forcePreMatch).toBe("function");
   });
 });
