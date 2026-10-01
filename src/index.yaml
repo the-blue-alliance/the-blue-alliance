@@ -128,6 +128,11 @@ indexes:
     properties:
       - name: event
       - name: comp_level
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: comp_level
       - name: match_number
       - name: set_number
 
@@ -156,6 +161,18 @@ indexes:
       - name: team_key_names
       - name: set_number
       - name: match_number
+
+  - kind: Match
+    properties:
+      - name: event
+      - name: team_key_names
+      - name: comp_level
+
+  - kind: Match
+    properties:
+      - name: team_key_names
+      - name: year
+      - name: comp_level
 
   - kind: Subscription
     properties:

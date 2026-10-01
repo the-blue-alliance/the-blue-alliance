@@ -368,6 +368,21 @@ describe('sortMatchComparator', () => {
     expect(keys).toEqual(['2024test_qm9', '2024test_sf2m1', '2024test_f1m1']);
   });
 
+  test('orders practice matches before qualification matches', () => {
+    const matches = [
+      makeMatch({ key: '2024test_qm1', match_number: 1 }),
+      makeMatch({
+        key: '2024test_pm2',
+        comp_level: CompLevel.PM,
+        match_number: 2,
+      }),
+    ];
+
+    const keys = matches.sort(sortMatchComparator).map((m) => m.key);
+
+    expect(keys).toEqual(['2024test_pm2', '2024test_qm1']);
+  });
+
   test('orders by set number then match number within a level', () => {
     const matches = [
       makeMatch({
