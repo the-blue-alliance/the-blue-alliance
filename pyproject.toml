@@ -24,7 +24,7 @@ dependencies = [
     "orjson==3.12.0",
     "pydantic==2.13.5",
     "pyre-extensions==0.0.32",
-    "pytz==2026.3.post1",
+    "pytz==2026.4",
     "requests==2.34.2",
     "six==1.17.0",
     "typing-extensions==4.16.0",
