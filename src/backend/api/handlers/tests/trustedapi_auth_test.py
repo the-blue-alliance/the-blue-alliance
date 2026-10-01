@@ -1246,10 +1246,7 @@ def test_empty_request_body_does_not_log_to_storage(
 def test_file_upload_unknown_report_type_is_rejected(
     monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
-    """
-    A trusted-key upload to an unknown FMS report type is rejected and nothing
-    is stored. Which client error it gets is covered by bug #10840-b.
-    """
+    """An upload to an unknown FMS report type is rejected and nothing is stored."""
     setup_event(event_type=EventType.OFFSEASON)
     setup_user(monkeypatch, permissions=[])
     auth_id, auth_secret = setup_api_auth(
