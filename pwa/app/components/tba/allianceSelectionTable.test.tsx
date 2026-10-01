@@ -92,11 +92,7 @@ describe('AllianceSelectionTable', () => {
     expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);
   });
 
-  test('Bug #64: an empty alliance list falls back to the default three team columns', () => {
-    // Wrong today: Math.max() of nothing is -Infinity, which is truthy, so
-    // the `|| 3` fallback never applies and only Alliance and Captain render.
-    // Correct: the fallback applies, giving the same Captain, Pick 1, Pick 2
-    // columns as a list whose alliances have no picks.
+  test('an empty alliance list falls back to the default three team columns', () => {
     render(<AllianceSelectionTable year={2026} alliances={[]} />);
     expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);
   });
