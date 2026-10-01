@@ -1,7 +1,7 @@
 import { type JSX, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import { Input } from '~/components/ui/input';
 
 // Moderator dashboards that still live on the Jinja site. The retired Jinja
@@ -23,11 +23,12 @@ export function ReviewMediaTools(): JSX.Element {
     <div className="flex flex-col gap-2">
       <h2 className="text-lg font-medium">Review Media Tools</h2>
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          render={<a href={WEBCAST_DASHBOARD_URL}>Webcast Dashboard</a>}
-        />
+        <a
+          href={WEBCAST_DASHBOARD_URL}
+          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+        >
+          Webcast Dashboard
+        </a>
         <Input
           className="w-44"
           inputMode="numeric"
@@ -37,19 +38,12 @@ export function ReviewMediaTools(): JSX.Element {
           value={teamNumber}
           onChange={(e) => setTeamNumber(e.target.value)}
         />
-        <Button
-          variant="outline"
-          size="sm"
-          render={
-            <a
-              href={
-                teamNumber ? manageTeamMediaUrl(teamNumber, year) : undefined
-              }
-            >
-              Go
-            </a>
-          }
-        />
+        <a
+          href={teamNumber ? manageTeamMediaUrl(teamNumber, year) : undefined}
+          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+        >
+          Go
+        </a>
       </div>
     </div>
   );
@@ -60,11 +54,12 @@ export function ReviewOffseasonTools(): JSX.Element {
     <div className="flex flex-col gap-2">
       <h2 className="text-lg font-medium">Review Offseason Tools</h2>
       <div className="flex flex-wrap items-center gap-2">
-        <Button
-          variant="outline"
-          size="sm"
-          render={<a href={OFFSEASON_DASHBOARD_URL}>Offseason Dashboard</a>}
-        />
+        <a
+          href={OFFSEASON_DASHBOARD_URL}
+          className={buttonVariants({ variant: 'outline', size: 'sm' })}
+        >
+          Offseason Dashboard
+        </a>
       </div>
     </div>
   );

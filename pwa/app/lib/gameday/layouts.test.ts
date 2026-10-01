@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
-import { Layout, getBestLayoutForCount } from '~/lib/gameday/layouts';
+import {
+  Layout,
+  getBestLayoutForCount,
+  getLayoutById,
+  getNumViewsForLayout,
+} from '~/lib/gameday/layouts';
 
 describe('getBestLayoutForCount', () => {
   test('returns single view for 0 or 1 webcasts', () => {
@@ -36,5 +41,25 @@ describe('getBestLayoutForCount', () => {
   test('returns nona-view for 9+ webcasts', () => {
     expect(getBestLayoutForCount(9)).toBe(Layout.NONA_VIEW);
     expect(getBestLayoutForCount(100)).toBe(Layout.NONA_VIEW);
+  });
+});
+
+describe('getLayoutById', () => {
+  test('has no layout without an id', () => {
+    expect(getLayoutById(null)).toBeUndefined();
+  });
+
+  test('looks up a layout by its index', () => {
+    expect(getLayoutById(Layout.VERTICAL_SPLIT)?.name).toBe('Vertical Split');
+  });
+});
+
+describe('getNumViewsForLayout', () => {
+  test('reports the views of a known layout', () => {
+    expect(getNumViewsForLayout(Layout.VERTICAL_SPLIT)).toBe(2);
+  });
+
+  test('falls back to a single view for an unknown layout', () => {
+    expect(getNumViewsForLayout(99)).toBe(1);
   });
 });
