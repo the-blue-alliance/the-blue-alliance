@@ -1292,12 +1292,7 @@ def test_file_upload_unknown_report_type_is_rejected(
 def test_file_upload_unknown_report_type_is_client_error_not_auth_error(
     monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
-    """
-    Bug #10840-b: an unknown FMS report type is a bad request, not an auth
-    failure. A correctly signed upload to `fms_reports/<unknown>` should get a
-    400 or 404 naming the problem, not a 401 saying no required auth types
-    could be determined.
-    """
+    """A signed upload of an unknown report type gets a 400 or 404, not a 401."""
     setup_event(event_type=EventType.OFFSEASON)
     setup_user(monkeypatch, permissions=[])
     auth_id, auth_secret = setup_api_auth(
