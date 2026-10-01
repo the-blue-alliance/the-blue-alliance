@@ -87,11 +87,8 @@ describe("EmbedIframe", () => {
     expect(iframe.getAttribute("src")).toBe("https://example.com/embed");
   });
 
-  it("Bug #38: decodes every &lt; and &gt; in the embed markup", () => {
-    // Wrong today: .replace is called without the global flag, so only the
-    // first &lt; and &gt; are decoded and the closing tag renders as text:
-    // '<iframe src="x">&lt;/iframe&gt;</iframe>'.
-    // Correct: all entities are decoded, giving a single empty iframe.
+  it("decodes every &lt; and &gt; in the embed markup", () => {
+    // Every entity must be decoded, not just the first match.
     const { container } = render(
       <EmbedIframe
         webcast={{
