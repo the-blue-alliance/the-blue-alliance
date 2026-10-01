@@ -2,7 +2,7 @@ import { Link } from '@tanstack/react-router';
 import type { JSX } from 'react';
 
 import type { QueueResponse } from '~/api/tba/moderation/types.gen';
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -46,9 +46,9 @@ export function SuggestionReviewCard({
             Pending suggestions you can review
           </div>
         </div>
-        <Button size="sm" render={<Link to="/suggest/review" />}>
+        <Link to="/suggest/review" className={buttonVariants({ size: 'sm' })}>
           Review Pending Suggestions
-        </Button>
+        </Link>
       </CardContent>
     </Card>
   );
