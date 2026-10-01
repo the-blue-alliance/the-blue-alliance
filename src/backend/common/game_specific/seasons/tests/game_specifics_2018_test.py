@@ -1,14 +1,24 @@
 from __future__ import annotations
 
 import json
+import logging
+
+from typing import cast
 
 import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
+from backend.common.consts.event_type import EventType
 from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
+from backend.common.frc_api.types import ScoreDetailModelAlliance2018
 from backend.common.game_specific.seasons.game_specifics_2018 import GameSpecifics2018
-from backend.common.game_specific.seasons.tests.conftest import HELPERS_TESTS
+from backend.common.game_specific.seasons.tests.conftest import (
+    build_match,
+    HELPERS_TESTS,
+    put_event,
+    tiebreak_winner,
+)
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 
@@ -68,3 +78,46 @@ def test_round_robin_tiebreaker_names() -> None:
         "Park/Climb Points",
         "Auto Points",
     ]
+
+
+def test_tiebreak_criteria_has_no_criteria() -> None:
+    # 2018 playoff ties were not broken by score breakdown fields.
+    empty = cast(ScoreDetailModelAlliance2018, {})
+    assert GameSpecifics2018().tiebreak_criteria(empty, empty) == []
+    assert tiebreak_winner([]) == ""
+
+
+# A played match whose breakdown lacks every scoring field FIRST publishes.
+_BROKEN_BREAKDOWN = {"red": {}, "blue": {}}
+
+
+def test_calculate_event_insights_ignores_unplayed_and_breakdownless_matches() -> None:
+    matches = [
+        build_match("2018test", "qm", 1, -1, -1, None),
+        build_match("2018test", "qm", 2, 30, 10, None),
+    ]
+    assert GameSpecifics2018().calculate_event_insights(matches) == {
+        "qual": None,
+        "playoff": None,
+    }
+
+
+@pytest.mark.parametrize(
+    "event_type, level",
+    [(EventType.REGIONAL, logging.WARNING), (EventType.OFFSEASON, logging.INFO)],
+)
+def test_calculate_event_insights_logs_failed_matches(
+    event_type: EventType, level: int, caplog: pytest.LogCaptureFixture
+) -> None:
+    put_event("2018test", event_type)
+    broken = build_match("2018test", "qm", 1, 30, 10, _BROKEN_BREAKDOWN)
+    with caplog.at_level(logging.INFO):
+        insights = GameSpecifics2018().calculate_event_insights([broken])
+    assert insights == {"qual": None, "playoff": None}
+    failures = [
+        record
+        for record in caplog.records
+        if record.getMessage().startswith("Event insights failed for 2018test_qm1")
+    ]
+    assert failures
+    assert all(record.levelno == level for record in failures)

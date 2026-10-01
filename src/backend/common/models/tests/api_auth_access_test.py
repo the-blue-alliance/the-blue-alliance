@@ -1,7 +1,11 @@
 import pytest
+from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.webcast_type import WebcastType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.district import District
+from backend.common.models.event import Event
 
 
 def test_read_type_put() -> None:
@@ -94,3 +98,29 @@ def test_is_write_key() -> None:
     assert auth.is_write_key
     auth.auth_types_enum = [AuthType.ZEBRA_MOTIONWORKS]
     assert auth.is_write_key
+
+
+def test_list_strs() -> None:
+    auth = ApiAuthAccess(
+        auth_types_enum=[AuthType.EVENT_INFO],
+        event_list=[ndb.Key(Event, "2020nyny"), ndb.Key(Event, "2020casj")],
+        district_list=[ndb.Key(District, "2020ne"), ndb.Key(District, "2020fim")],
+        offseason_webcast_channels=["twitch:tba", "youtube:abc"],
+    )
+    assert auth.event_list_str == "2020nyny,2020casj"
+    assert auth.district_list_str == "2020ne,2020fim"
+    assert auth.webcast_list_str == "twitch:tba,youtube:abc"
+
+
+def test_list_strs_empty() -> None:
+    auth = ApiAuthAccess(auth_types_enum=[AuthType.EVENT_INFO])
+    assert auth.event_list_str == ""
+    assert auth.district_list_str == ""
+    assert auth.webcast_list_str == ""
+
+
+def test_webcast_key() -> None:
+    assert (
+        ApiAuthAccess.webcast_key({"type": WebcastType.TWITCH, "channel": "abc"})
+        == "twitch:abc"
+    )

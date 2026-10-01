@@ -52,3 +52,11 @@ describe('createTokenRefresher', () => {
     expect(getIdToken).toHaveBeenCalledTimes(2);
   });
 });
+
+describe('createTokenRefresher without a user', () => {
+  it('has nothing to refresh when no user is signed in', () => {
+    const refresh = createTokenRefresher(() => null);
+
+    expect(refresh()).toBeNull();
+  });
+});
