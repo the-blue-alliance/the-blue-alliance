@@ -1091,7 +1091,7 @@ def test_do_overall_match_insights_with_nothing_stored_is_empty(ndb_stub) -> Non
 def test_overall_award_insights_skip_district_champs_and_einstein(
     ndb_stub,
 ) -> None:
-    """District-scoped champs, division and Einstein insights don't change all-time totals."""
+    """District-scoped champs and Einstein insights don't change all-time totals."""
     names = [
         Insight.INSIGHT_NAMES[Insight.WORLD_CHAMPIONS],
         Insight.INSIGHT_NAMES[Insight.DIVISION_WINNERS],
