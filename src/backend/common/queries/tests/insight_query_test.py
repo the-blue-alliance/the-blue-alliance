@@ -73,16 +73,8 @@ def _matches_declared_type(value: object, declared: object) -> bool:
     return isinstance(value, origin)
 
 
-def test_bug_30_district_insight_query_returns_its_declared_type() -> None:
-    """
-    Bug #30: DistrictInsightQuery is declared
-    CachedDatabaseQuery[Insight, InsightDict] (and its _query_async as
-    returning Insight), but it returns the fetched list of Insights.
-    api/handlers/district.py consumes it.
-
-    Correct: what the query returns matches its declared result type, either
-    by returning one Insight or by declaring List[Insight].
-    """
+def test_district_insight_query_returns_its_declared_type() -> None:
+    """What DistrictInsightQuery returns matches its declared result type."""
     insight = _insight(Insight.TYPED_LEADERBOARD_BLUE_BANNERS, 2024, "ne")
     _insight(Insight.TYPED_LEADERBOARD_BLUE_BANNERS, 2024, "fim")
 
