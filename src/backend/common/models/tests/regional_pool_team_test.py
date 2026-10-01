@@ -27,13 +27,6 @@ def test_key_name() -> None:
         ("abcd_frc254", False),
     ],
 )
-def test_bug_10841c_validate_key_name(key: str, valid: bool) -> None:
-    """
-    Bug #10841-c: RegionalPoolTeam.validate_key_name is declared a
-    @staticmethod but still takes `cls` as its first parameter, so calling it
-    like every other model's validate_key_name(key) binds the key to `cls`
-    and raises TypeError.
-
-    Correct: RegionalPoolTeam.validate_key_name(key) validates the key.
-    """
+def test_validate_key_name(key: str, valid: bool) -> None:
+    """RegionalPoolTeam.validate_key_name(key) accepts only YEAR_frcNUMBER keys from 2025."""
     assert RegionalPoolTeam.validate_key_name(key) is valid  # pyre-ignore[20]
