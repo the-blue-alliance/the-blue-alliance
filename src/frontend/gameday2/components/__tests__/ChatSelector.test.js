@@ -90,15 +90,8 @@ describe("ChatSelector", () => {
     expect(onRequestClose).not.toHaveBeenCalled();
   });
 
-  it("Bug #34: animates the overlay in to its endStyle and removes it after closing", () => {
-    // Wrong today: AnimatableContainer implements the removed
-    // react-transition-group v1 lifecycle (componentWillAppear/Enter/Leave).
-    // TransitionGroup v4 drives children through `in`/`onExited` props
-    // instead, so the overlay and list stay at their beginStyle (opacity 0)
-    // after opening and, because onExited is never called, are never removed
-    // after closing.
-    // Correct: once shown they reach endStyle, and after closing (and the
-    // exit transition) they leave the DOM.
+  it("animates the overlay in to its endStyle and removes it after closing", () => {
+    // The overlay must follow react-transition-group v4's `in`/`onExited` lifecycle.
     const { container, rerender } = renderSelector();
     act(() => {
       jest.advanceTimersByTime(1000);
