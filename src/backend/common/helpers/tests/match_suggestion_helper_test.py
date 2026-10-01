@@ -17,6 +17,7 @@ from backend.common.helpers.match_suggestion_helper import (
     W_SIGNIFICANCE,
     W_TIME_DECAY,
 )
+from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import TeamKey
@@ -952,3 +953,25 @@ def test_score_all_normalizes_across_the_events_passed(ndb_stub, memcache_stub) 
     components = alone.suggestions["2026cmptx_qm1"].components
     assert components.high_score == 0.5
     assert components.close_score == 1.0
+
+
+def test_double_elim_round_legacy_bracket() -> None:
+    event = make_event("2023cmptx", EventType.CMP_DIVISION)
+    event.playoff_type = PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM
+    match = make_match(event, comp_level=CompLevel.SF, set_number=1)
+    assert MatchSuggestionHelper._double_elim_round(
+        event, match
+    ) == PlayoffTypeHelper.get_double_elim_round_pre_2023(CompLevel.SF, 1)
+
+
+def test_time_decay_detail_no_time() -> None:
+    event = make_event("2026cmptx", EventType.CMP_DIVISION)
+    match = make_match(event, comp_level=CompLevel.QM, set_number=1)
+    match.time = None
+    match.predicted_time = None
+    assert (
+        MatchSuggestionHelper._time_decay_detail(
+            match, datetime.datetime(2026, 4, 1), True
+        )
+        == "none"
+    )

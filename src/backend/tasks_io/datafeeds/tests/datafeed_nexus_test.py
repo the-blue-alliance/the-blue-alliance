@@ -440,3 +440,83 @@ def test_fetch_malformed_response_records_sync_status_failure(
     status = EventSyncStatusMemcache("2019casj").get()
     assert status is not None
     assert status["tasks.get.nexus_event_queue_status"]["num_consecutive_failures"] == 1
+
+
+@mock.patch.object(_DatafeedNexus, "_fetch")
+def test_fetch_none_result_records_sync_status_failure(
+    fetch_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    # A non-200 response makes the base datafeed return None without raising;
+    # that still counts as a sync failure for the event.
+    response = URLFetchResult.mock_for_content(
+        "https://frc.nexus/api/v1/",
+        500,
+        "",
+    )
+    fetch_mock.return_value = InstantFuture(response)
+
+    with mock.patch.object(
+        DummyDatafeedNexus,
+        "_request_endpoint",
+        return_value="tasks.get.nexus_pit_locations",
+    ):
+        cache = EventSyncStatusMemcache("2019casj")
+        cache.record_success("tasks.get.nexus_pit_locations")
+        result = DummyDatafeedNexus().fetch_async().get_result()
+
+    assert result is None
+    status = EventSyncStatusMemcache("2019casj").get()
+    assert status is not None
+    assert status["tasks.get.nexus_pit_locations"]["num_consecutive_failures"] == 1
+
+
+class DummyDatafeedNexusNoEvent(_DatafeedNexus[PitAddresses, Any]):
+    """A datafeed that does not override the default event_key()."""
+
+    def endpoint(self) -> str:
+        return "/"
+
+    def parser(self) -> ParserBase[PitAddresses, Any]:
+        class DummyParser(ParserBase[PitAddresses, Any]):
+            def parse(self, response: PitAddresses) -> Any:
+                return response
+
+        return DummyParser()
+
+
+def test_default_event_key_is_none(ndb_stub, nexus_api_secrets) -> None:
+    assert DummyDatafeedNexusNoEvent().event_key() is None
+
+
+@mock.patch.object(_DatafeedNexus, "_fetch")
+def test_fetch_without_event_key_does_not_record_sync_status(
+    fetch_mock: mock.Mock, ndb_stub, nexus_api_secrets
+) -> None:
+    response = URLFetchResult.mock_for_content(
+        "https://frc.nexus/api/v1/",
+        200,
+        json.dumps({"ok": True}),
+    )
+    fetch_mock.return_value = InstantFuture(response)
+
+    with mock.patch.object(
+        DummyDatafeedNexusNoEvent,
+        "_request_endpoint",
+        return_value="tasks.get.nexus_pit_locations",
+    ):
+        result = DummyDatafeedNexusNoEvent().fetch_async().get_result()
+
+    assert result == {"ok": True}
+    assert EventSyncStatusMemcache("2019casj").get() is None
+
+
+def test_request_endpoint_outside_request(ndb_stub, nexus_api_secrets) -> None:
+    assert DummyDatafeedNexus()._request_endpoint() is None
+
+
+def test_request_endpoint_inside_request(ndb_stub, nexus_api_secrets) -> None:
+    from backend.tasks_io.main import app
+
+    df = DummyDatafeedNexus()
+    with app.test_request_context("/backend-tasks/get/team_details/frc254"):
+        assert df._request_endpoint() == "frc_api.team_details"

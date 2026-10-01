@@ -87,3 +87,9 @@ def test_concurrent_access_deadlock_free() -> None:
             f.result()  # will raise if deadlock or exception occurred
 
     assert len(cache) <= 50
+
+
+def test_properties() -> None:
+    cache: InstanceCache[str, str] = InstanceCache(ttl_seconds=12.5, max_size=7)
+    assert cache.ttl_seconds == 12.5
+    assert cache.max_size == 7
