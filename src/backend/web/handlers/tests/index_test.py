@@ -446,18 +446,10 @@ def test_avatar_list_sorts_by_team_and_caches_shards(
     ]
 
 
-def test_bug_27_avatar_list_cached_order_matches_fresh_order(
+def test_avatar_list_cached_order_matches_fresh_order(
     ndb_stub, captured_templates: List[CapturedTemplate], web_client: Client
 ) -> None:
-    """
-    Bug #27: the fresh /avatars/<year> path sorts avatars by team number and
-    writes them to 20 memcache shards, but the cached path reassembles the
-    shards with sorted(shards.items()), i.e. in lexicographic key order
-    ("..._1", "..._10", ..., "..._19", "..._2", ...). Once more than 10 shards
-    are populated (every real season), the cached page is scrambled.
-
-    Correct: the cached page lists avatars in the same order as the fresh one.
-    """
+    """The cached avatar page lists avatars in the same order as the fresh one."""
     team_numbers = list(range(1, 26))
     for team_number in team_numbers:
         _put_avatar(2024, team_number)
@@ -467,8 +459,7 @@ def test_bug_27_avatar_list_cached_order_matches_fresh_order(
     fresh_order = [a.references[0].id() for a in captured_templates[0][1]["avatars"]]
     assert fresh_order == [f"frc{n}" for n in team_numbers]
 
-    # A different query string bypasses the response cache, so this request
-    # is assembled from the memcache shards.
+    # A new query string skips the response cache, so this reads the shards.
     resp = web_client.get("/avatars/2024?fresh=1")
     assert resp.status_code == 200
     cached_order = [a.references[0].id() for a in captured_templates[1][1]["avatars"]]
