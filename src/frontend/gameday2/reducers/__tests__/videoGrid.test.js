@@ -373,10 +373,8 @@ describe("video grid reducer additional cases", () => {
     expect(state.domOrder[0]).toBeNull();
   });
 
-  it("Bug #46: resets the livescore flags on RESET_WEBCASTS", () => {
-    // Wrong today: RESET_WEBCASTS resets displayed/domOrder/positionMap but
-    // not domOrderLivescoreOn, so domOrderLivescoreOn[0] is still true.
-    // Correct: livescore flags return to their defaults too.
+  it("resets the livescore flags on RESET_WEBCASTS", () => {
+    // domOrderLivescoreOn resets along with displayed, domOrder and positionMap.
     let state = add(withLayout(3), "a-0", 0);
     state = videoGrid(state, {
       type: types.TOGGLE_POSITION_LIVESCORE,
