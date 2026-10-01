@@ -5,6 +5,7 @@ from unittest.mock import patch
 from flask import Flask
 from google.appengine.ext import ndb
 
+from backend.common import profiler
 from backend.common.middleware import install_middleware
 from backend.common.profiler import send_traces, Span, trace_context
 
@@ -405,3 +406,60 @@ def test_span_exit_without_request() -> None:
     trace_context.request = None
     with Span("no_request_span"):
         pass
+
+
+def test_send_traces_swallows_errors() -> None:
+    app = setup_app()
+
+    @app.route("/")
+    def route():
+        with Span("test_span"):
+            pass
+        return "Hi!"
+
+    with (
+        patch(
+            "backend.common.profiler._make_tracing_call",
+            side_effect=Exception("boom"),
+        ) as mock_call,
+        app.test_client() as client,
+    ):
+        client.get("/", headers={"X-Cloud-Trace-Context": "TRACE_ID/SPAN_ID;o=1"})
+        send_traces()
+
+    mock_call.assert_called_once()
+
+
+def test_make_tracing_call_no_project() -> None:
+    with (
+        patch.object(profiler, "PROJECT_ID", None),
+        patch("googleapiclient.discovery.build") as mock_build,
+    ):
+        profiler._make_tracing_call({"traces": []})
+    mock_build.assert_not_called()
+
+
+def test_make_tracing_call() -> None:
+    with (
+        patch.object(profiler, "PROJECT_ID", "test-project"),
+        patch("googleapiclient.discovery.build") as mock_build,
+        patch(
+            "oauth2client.client.GoogleCredentials.get_application_default"
+        ) as mock_creds,
+    ):
+        profiler._make_tracing_call({"traces": []})
+
+    mock_build.assert_called_once_with(
+        "cloudtrace", "v1", credentials=mock_creds.return_value, cache_discovery=False
+    )
+    patch_traces = mock_build.return_value.projects.return_value.patchTraces
+    patch_traces.assert_called_once_with(projectId="test-project", body={"traces": []})
+    patch_traces.return_value.execute.assert_called_once()
+
+
+def test_span_exit_in_different_context() -> None:
+    trace_context.request = None
+    span = Span("cross_context")
+    contextvars.copy_context().run(span.__enter__)
+    # Resetting a token from another context raises ValueError, which is ignored
+    span.__exit__(None, None, None)

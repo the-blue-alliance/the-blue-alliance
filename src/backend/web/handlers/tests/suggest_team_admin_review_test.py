@@ -1036,3 +1036,70 @@ class TestSuggestTeamAdminReview(unittest.TestCase):
         location = urlparse(response.headers["Location"])
         self.assertIn(first_id, location.query)
         self.assertIn(second_id, location.query)
+
+    def test_dashboard_shows_social_media(self):
+        self.giveTeamAdminAccess()
+
+        team_reference = Media.create_reference("team", "frc1124")
+        suggestion_id = self.createSocialMediaSuggestion()
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        MediaCreator.create_media_model(suggestion, team_reference).put()
+
+        resp = self.web_client.get("/mod")
+        assert resp.status_code == 200
+        assert b"frc1124" in resp.data
+
+    def test_mod_post_missing_team_number(self):
+        self.giveTeamAdminAccess()
+        resp = self.web_client.post("/mod", data={"action": "set_team_info"})
+        assert resp.status_code == 400
+
+    def test_mod_post_unknown_team(self):
+        self.giveTeamAdminAccess()
+        resp = self.web_client.post(
+            "/mod", data={"team_number": 9999, "action": "set_team_info"}
+        )
+        assert resp.status_code == 400
+
+    def test_mod_post_unknown_action(self):
+        self.giveTeamAdminAccess()
+        resp = self.web_client.post(
+            "/mod", data={"team_number": 1124, "action": "bogus"}
+        )
+        assert resp.status_code == 400
+
+    def test_mod_post_unknown_media(self):
+        self.giveTeamAdminAccess()
+        resp = self.web_client.post(
+            "/mod",
+            data={
+                "team_number": 1124,
+                "action": "remove_media_reference",
+                "media_key_name": "nonexistent",
+            },
+        )
+        assert resp.status_code == 400
+
+    def test_remove_preferred_media_reference(self):
+        self.giveTeamAdminAccess()
+
+        team_reference = Media.create_reference("team", "frc1124")
+        suggestion_id = self.createMediaSuggestion()
+        suggestion = Suggestion.get_by_id(suggestion_id)
+        media = MediaCreator.create_media_model(suggestion, team_reference)
+        media.preferred_references = [team_reference]
+        media_key = media.put()
+
+        resp = self.web_client.post(
+            "/mod",
+            data={
+                "team_number": 1124,
+                "action": "remove_media_reference",
+                "media_key_name": media_key.id(),
+            },
+        )
+        assert resp.status_code == 302
+
+        media = media_key.get()
+        assert team_reference not in media.references
+        assert team_reference not in media.preferred_references

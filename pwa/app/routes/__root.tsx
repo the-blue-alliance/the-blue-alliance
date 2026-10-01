@@ -3,6 +3,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   HeadContent,
   Outlet,
+  ScriptOnce,
   Scripts,
   createRootRouteWithContext,
   useLocation,
@@ -210,23 +211,21 @@ function RootComponent() {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          // This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded.
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  var isDark = theme === 'dark' || 
-                    (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded. */}
+        <ScriptOnce>
+          {`
+            (function() {
+              try {
+                var theme = localStorage.getItem('theme');
+                var isDark = theme === 'dark' ||
+                  (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
+                if (isDark) {
+                  document.documentElement.classList.add('dark');
+                }
+              } catch (e) {}
+            })()
+          `}
+        </ScriptOnce>
         <HeadContent />
       </head>
       <body>

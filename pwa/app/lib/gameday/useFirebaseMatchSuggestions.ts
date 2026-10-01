@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 
 import type { MatchSuggestions } from '~/api/firebase';
 import { getDatabaseInstance } from '~/firebase/firebaseConfig';
+import { firebaseOnlyQueryFn } from '~/lib/gameday/firebaseQuery';
 
 export const FIREBASE_MATCH_SUGGESTIONS_QUERY_KEY = [
   'firebase',
@@ -58,7 +59,7 @@ export function useFirebaseMatchSuggestions(): UseFirebaseMatchSuggestionsResult
 
   const { data, isPending } = useQuery<MatchSuggestions | null>({
     queryKey: [...FIREBASE_MATCH_SUGGESTIONS_QUERY_KEY],
-    queryFn: () => null,
+    queryFn: firebaseOnlyQueryFn,
     enabled: false,
     staleTime: Infinity,
   });

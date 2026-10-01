@@ -1,13 +1,18 @@
-from typing import Dict, List
+from typing import cast, Dict, List
 
 from google.appengine.ext import ndb
 
 from backend.common.helpers.insights_v2.leaderboards.calculator import (
+    build_leaderboard_event_list_rankings,
     build_leaderboard_match_alliance_rankings,
+    build_leaderboard_pair_event_list_rankings,
     build_leaderboard_pair_rankings,
     build_leaderboard_rankings,
     LEADERBOARD_MAX_KEYS_PER_RANKING,
     LeaderboardV2Calculator,
+)
+from backend.common.helpers.insights_v2.leaderboards.highest_auto_score import (
+    HighestAutoScoreV2Calculator,
 )
 from backend.common.helpers.insights_v2.names import InsightV2NameEntry, InsightV2Names
 from backend.common.helpers.insights_v2.registry import _build_team_district_map
@@ -223,3 +228,53 @@ def test_district_uses_most_recent_district_team(ndb_stub) -> None:
     ).put()
 
     assert _build_team_district_map() == {"frc1": "ne"}
+
+
+def test_event_list_rankings_filters() -> None:
+    team_events = {
+        "frc1": ["2024a", "2024b"],
+        "frc2": ["2024a"],  # Below min_count
+        "frc3": [],
+        **{
+            f"frc{i}": ["2024a", "2024b", "2024c"]
+            for i in range(100, 101 + LEADERBOARD_MAX_KEYS_PER_RANKING)
+        },  # Too many keys at this value
+    }
+    result = build_leaderboard_event_list_rankings(team_events, min_count=2)
+    assert [r["keys"] for r in result] == [["frc1"]]
+
+
+def test_pair_event_list_rankings_filters_and_default_sort() -> None:
+    pair_events = {
+        "frc1|frc2": ["2024b", "2024a"],
+        "frc3|frc4": ["2024a"],  # Below min_count
+        "frc5|frc6": [],
+        **{
+            f"frc{i}|frc{i + 1}": ["2024a", "2024b", "2024c"]
+            for i in range(100, 101 + LEADERBOARD_MAX_KEYS_PER_RANKING)
+        },  # Too many keys at this value
+    }
+    result = build_leaderboard_pair_event_list_rankings(pair_events, min_count=2)
+    assert len(result) == 1
+    assert result[0]["keys"] == [["frc1", "frc2"]]
+    # Events default to alphabetical order
+    assert cast(dict, result[0])["contexts"] == [{"event_keys": ["2024a", "2024b"]}]
+
+
+def test_district_without_rankings_is_skipped(ndb_stub) -> None:
+    calc = _StubLeaderboard()
+    calc._increment("frc1", 5)
+    calc._increment("frc2", 1)  # Below min_count
+
+    insights = calc.make_insights(2024, {"frc2": "ne"})
+
+    assert [i.district_abbreviation for i in insights] == [None]
+
+
+def test_match_alliance_insight_without_rankings(ndb_stub) -> None:
+    calc = HighestAutoScoreV2Calculator()
+    for i in range(LEADERBOARD_MAX_KEYS_PER_RANKING + 1):
+        calc._record_match(match_key=f"2024miket_qm{i}", score=10, alliance=[])
+
+    # Every match ties, which is too many keys for a single ranking
+    assert calc.make_insights(2024, {}) == []
