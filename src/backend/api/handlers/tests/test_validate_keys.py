@@ -285,3 +285,60 @@ def test_validate_keys_hot_path_bypasses_negative_cache(
         )
         assert resp2.status_code == 200
         mock_get.assert_not_called()
+
+
+def test_validate_keys_resolved_key_positive_cache_hit(ndb_stub) -> None:
+    Event(
+        id="2020arc",
+        year=2020,
+        event_short="arc",
+        event_type_enum=EventType.CMP_DIVISION,
+    ).put()
+
+    @validate_keys
+    def handler(event_key: str):
+        return "success"
+
+    # Warm the positive cache for the canonical key only
+    assert handler(event_key="2020arc") == "success"
+    assert key_exists_cache.get(("Event", "2020arc")) is True
+    assert key_exists_cache.get(("Event", "2020archimedes")) is None
+
+    # The aliased key is served from the canonical key's cache entry without
+    # hitting the datastore, and gets its own cache entry
+    mock_get = MagicMock(side_effect=Event.get_by_id_async)
+    with patch.object(Event, "get_by_id_async", mock_get):
+        assert handler(event_key="2020archimedes") == "success"
+    mock_get.assert_not_called()
+    assert key_exists_cache.get(("Event", "2020archimedes")) is True
+
+
+def test_validate_keys_resolved_key_negative_cache_hit(ndb_stub) -> None:
+    Event(
+        id="2020arc",
+        year=2020,
+        event_short="arc",
+        event_type_enum=EventType.CMP_DIVISION,
+    ).put()
+
+    @validate_keys
+    def handler(event_key: str):
+        return "success"
+
+    assert handler(event_key="2020arc") == "success"
+
+    # Warm the negative cache for the canonical key only (2019arc doesn't exist)
+    err_resp, status = handler(event_key="2019arc")
+    assert status == 404
+    assert key_does_not_exist_cache.get(("Event", "2019arc")) is True
+    assert key_does_not_exist_cache.get(("Event", "2019archimedes")) is None
+
+    # The aliased key is rejected from the canonical key's negative cache entry
+    # without hitting the datastore, and gets its own negative cache entry
+    mock_get = MagicMock(side_effect=Event.get_by_id_async)
+    with patch.object(Event, "get_by_id_async", mock_get):
+        err_resp, status = handler(event_key="2019archimedes")
+    assert status == 404
+    assert err_resp == {"Error": "event key: 2019archimedes does not exist"}
+    mock_get.assert_not_called()
+    assert key_does_not_exist_cache.get(("Event", "2019archimedes")) is True

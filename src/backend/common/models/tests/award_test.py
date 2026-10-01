@@ -266,3 +266,22 @@ def test_recipient_list_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
     monkeypatch.setattr("backend.common.models.award.orjson.loads", mock_loads)
     assert a.recipient_list == recipients
     assert loads_called is True
+
+
+def test_recipient_dict_groups_awardees_by_team() -> None:
+    a = Award(
+        id="2010ct_3",
+        year=2010,
+        award_type_enum=AwardType.DEANS_LIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2010ct"),
+        name_str="Dean's List",
+        recipient_json_list=[
+            json.dumps({"team_number": 254, "awardee": "Alice"}),
+            json.dumps({"team_number": 254, "awardee": "Bob"}),
+            json.dumps({"team_number": None, "awardee": "Carol"}),
+        ],
+    )
+    assert a.recipient_dict == {254: ["Alice", "Bob"], None: ["Carol"]}
+    # Cached after the first access
+    assert a.recipient_dict is a.recipient_dict
