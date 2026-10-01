@@ -286,11 +286,7 @@ describe('useReviewSubmission', () => {
     });
   });
 
-  test('Bug #62: rejects whose request fails outright are reported as failed', async () => {
-    // Wrong today: when the reject call returns no `data` (for example a
-    // 500), its keys land in none of rejected/alreadyReviewed/failed, so the
-    // moderator is never told the reject didn't happen.
-    // Correct: those keys appear in `failed`, as failed accepts do.
+  test('rejects whose request fails outright are reported as failed', async () => {
     mocks.rejectModerationSuggestions.mockResolvedValue({
       error: { Error: 'Internal Server Error' },
       response: { status: 500 },
