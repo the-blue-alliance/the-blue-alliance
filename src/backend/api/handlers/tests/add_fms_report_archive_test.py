@@ -425,3 +425,21 @@ def test_upload_not_authenticated(ndb_stub, api_client: Client) -> None:
 
     assert resp.status_code == 401
     assert "Error" in resp.json
+
+
+@freeze_time("2019-06-01")
+def test_upload_missing_file_as_admin(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """Admins skip the trusted-API file check, so the handler itself must
+    reject a request with no report file."""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[], is_admin=True)
+
+    resp = api_client.post(
+        "/api/_eventwizard/event/2019nyny/fms_reports/qual_rankings",
+        data={},
+    )
+
+    assert resp.status_code == 400
+    assert resp.json == {"Error": "Missing report file"}
