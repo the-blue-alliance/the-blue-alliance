@@ -77,8 +77,8 @@ function findSeparatorAmpersand(section: string): number {
     pos += 1; // skip past '&'
   }
 
-  // Fallback: all '&' look embedded — use the last one.
-  return section.lastIndexOf('&');
+  // All '&' look embedded (like "B&C High School"), so there is no separator.
+  return -1;
 }
 
 // This is used on teams that have a null school_name field, for example 1717.
