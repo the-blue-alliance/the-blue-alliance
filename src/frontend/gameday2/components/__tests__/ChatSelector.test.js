@@ -1,6 +1,6 @@
 /* @jest-environment jsdom */
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act } from "@testing-library/react";
 import { format } from "util";
 import ChatSelector from "../ChatSelector";
 
@@ -107,5 +107,32 @@ describe("ChatSelector", () => {
     const { container } = renderSelector({ onRequestClose });
     fireEvent.click(container.querySelector("ul"));
     expect(onRequestClose).not.toHaveBeenCalled();
+  });
+
+  it("animates the overlay in to its endStyle and removes it after closing", () => {
+    // The overlay must follow react-transition-group v4's `in`/`onExited` lifecycle.
+    const { container, rerender } = renderSelector();
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    const [overlay, list] = container.firstChild.children;
+    expect(overlay.style.opacity).toBe("1");
+    expect(list.style.opacity).toBe("1");
+    expect(list.style.transform).toBe("translate(0, 0)");
+
+    rerender(
+      <ChatSelector
+        chats={chats}
+        currentChat="svr"
+        defaultChat="firstupdatesnow"
+        setTwitchChat={() => {}}
+        onRequestClose={() => {}}
+        open={false}
+      />
+    );
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(container.firstChild.children).toHaveLength(0);
   });
 });
