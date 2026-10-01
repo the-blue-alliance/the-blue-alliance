@@ -63,3 +63,69 @@ def test_no_details_returns_empty() -> None:
 
     assert teams == []
     assert more is False
+
+
+def test_details_without_summary_or_unmatched_summary_are_skipped() -> None:
+    html = b"""
+    <details><p>no summary here</p></details>
+    <details><summary>Some unrelated section</summary></details>
+    <details><summary>2020 - Team 1114</summary></details>
+    """
+    teams, more = ResourceLibraryParser().parse(html)
+
+    assert more is False
+    assert [(t["year"], t["team_number"]) for t in teams] == [(2020, 1114)]
+
+
+def test_iframe_without_src_is_skipped() -> None:
+    html = b"""
+    <details>
+      <summary>2020 - Team 1114</summary>
+      <iframe></iframe>
+      <iframe data-src="https://www.youtube.com/embed/9oBL8s2Y7tA"></iframe>
+    </details>
+    """
+    teams, _ = ResourceLibraryParser().parse(html)
+
+    assert teams[0]["video"] == "9oBL8s2Y7tA"
+
+
+def test_links_without_href_are_skipped() -> None:
+    html = b"""
+    <details>
+      <summary>2020 - Team 1114</summary>
+      <a>Essay</a>
+      <a href="https://www.firstinspires.org/essay.pdf">Essay</a>
+    </details>
+    """
+    teams, _ = ResourceLibraryParser().parse(html)
+
+    assert teams[0]["essay"] == "https://www.firstinspires.org/essay.pdf"
+
+
+def test_relative_essay_link_is_made_absolute() -> None:
+    html = b"""
+    <details>
+      <summary>2020 - Team 1114</summary>
+      <a href="/hubfs/essays/2020/1114.pdf">Essay</a>
+    </details>
+    """
+    teams, _ = ResourceLibraryParser().parse(html)
+
+    assert (
+        teams[0]["essay"] == "https://www.firstinspires.org/hubfs/essays/2020/1114.pdf"
+    )
+
+
+def test_video_link_used_when_no_iframe() -> None:
+    html = b"""
+    <details>
+      <summary>2020 - Team 1114</summary>
+      <a href="https://www.youtube.com/watch?v=9oBL8s2Y7tA">Video</a>
+      <a href="https://www.youtube.com/watch?v=TIFLhevHf7k">Presentation</a>
+    </details>
+    """
+    teams, _ = ResourceLibraryParser().parse(html)
+
+    assert teams[0]["video"] == "9oBL8s2Y7tA"
+    assert teams[0]["presentation"] == "TIFLhevHf7k"

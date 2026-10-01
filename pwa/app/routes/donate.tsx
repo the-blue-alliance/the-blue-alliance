@@ -1,6 +1,6 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/donate')({
@@ -46,13 +46,12 @@ function Donate(): React.JSX.Element {
             <Link to="/thanks">thank all of our sponsors</Link> whose generous
             support has made it possible to keep the site running.
           </p>
-          <Button
-            render={
-              <a href="https://www.paypal.com/donate/?hosted_button_id=RNFK8Y7FU9VX8">
-                Donate on PayPal!
-              </a>
-            }
-          />
+          <a
+            href="https://www.paypal.com/donate/?hosted_button_id=RNFK8Y7FU9VX8"
+            className={buttonVariants()}
+          >
+            Donate on PayPal!
+          </a>
         </div>
       </div>
     </>
