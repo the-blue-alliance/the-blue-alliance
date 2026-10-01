@@ -1160,7 +1160,7 @@ describe('SuggestionReviewCard offseason event fields', () => {
       suggestionOf({
         ...OFFSEASON_SUGGESTION,
         similar_events: [{ key: '2026cc', name: 'Chezy Champs' }],
-        similar_events_last_year: [{ name: 'Old Champs' }],
+        similar_events_last_year: [{ key: '2025cc', name: 'Old Champs' }],
       }),
     );
 

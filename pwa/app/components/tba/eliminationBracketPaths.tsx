@@ -32,7 +32,7 @@ export interface SeriesResult {
 export type WinnerLink = { from: string; to: string };
 
 export type PlayoffMatchHandle = {
-  card: HTMLDivElement | null;
+  card: HTMLElement | null;
   redRow: HTMLDivElement | null;
   blueRow: HTMLDivElement | null;
   redAlliance: number | null;
