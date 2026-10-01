@@ -1,7 +1,7 @@
 import json
 import logging
 from typing import Any, Dict, Optional
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from werkzeug.test import create_environ
 
@@ -759,3 +759,32 @@ def test_integration_prod_logging_with_trace_header(app) -> None:
     if hasattr(trace_context, "request"):
         del trace_context.request
     logger.handlers.clear()
+
+
+def test_configure_logging_patches_thread_delete() -> None:
+    """The patched Thread._delete swallows the KeyError Cloud Logging can cause."""
+    import threading
+
+    original_delete = Mock(side_effect=KeyError("thread"))
+    with (
+        patch.object(threading.Thread, "_delete", original_delete),
+        patch("backend.common.logging.Environment.is_prod", return_value=False),
+    ):
+        configure_logging()
+        threading.Thread._delete(Mock())  # pyre-ignore[16]
+
+    original_delete.assert_called_once()
+
+
+def test_configure_logging_ndb_log_level() -> None:
+    ndb_logger = logging.getLogger("google.appengine.ext.ndb.test_logger")
+    ndb_logger.setLevel(logging.INFO)
+    with (
+        patch("backend.common.logging.Environment.is_prod", return_value=False),
+        patch(
+            "backend.common.logging.Environment.ndb_log_level", return_value="warning"
+        ),
+    ):
+        configure_logging()
+
+    assert ndb_logger.level == logging.WARNING
