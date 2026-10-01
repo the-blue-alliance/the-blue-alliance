@@ -196,15 +196,7 @@ def test_parse_2015_playoff(ndb_stub, test_data_importer) -> None:
 
 
 def test_parse_2015_playoff_repairs_null_team(ndb_stub, test_data_importer) -> None:
-    """
-    Bug #10840-f: in 2015 the FMS API sometimes returned a null team in a
-    played sf/f match. The parser should fill that match's alliances back in
-    from the previous level's playoff advancement.
-
-    Uses real 2015nyny data with 354 (sf1m1 Red1) nulled out. On TBA,
-    2015nyny_sf1m1 is 354/694/271 (51) vs 1660/743/4856 (19): the QF #2 and
-    #4 seeds, as QF_SF_MAP[1] expects.
-    """
+    """A null team in a 2015 playoff match is refilled from playoff advancement."""
     Event(
         id="2015nyny",
         name="NYC Regional",
@@ -224,6 +216,7 @@ def test_parse_2015_playoff_repairs_null_team(ndb_stub, test_data_importer) -> N
     with open(path, "r") as f:
         data = json.loads(f.read())
 
+    # 2015nyny_sf1m1 is 354/694/271 vs 1660/743/4856, the QF #2 and #4 seeds.
     sf1m1 = next(m for m in data["Schedule"] if m["matchNumber"] == 9)
     assert sf1m1["description"] == "Semifinal 1"
     red1 = next(t for t in sf1m1["Teams"] if t["station"] == "Red1")
