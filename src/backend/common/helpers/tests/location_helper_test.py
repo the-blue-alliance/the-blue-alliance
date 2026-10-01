@@ -2268,14 +2268,8 @@ def test_get_timezone_id_missing_time_zone_id(
     assert "No timeZoneId for (37.3382, -121.8863)" in caplog.text
 
 
-def test_bug_12_location_info_annotations_match_stored_values() -> None:
-    """Bug #12: LocationInfo's annotations disagree with the stored values.
-
-    Today `types` is annotated `str` but holds the List[str] from the Maps
-    result, and `postal_code` is annotated `int` but holds the long_name
-    string (Location.postal_code is a StringProperty), so callers need cast().
-    Correct: types is List[str] and postal_code is str.
-    """
+def test_location_info_annotations_match_stored_values() -> None:
+    """LocationInfo annotates types as List[str] and postal_code as str."""
     hints = get_type_hints(LocationInfo)
     assert hints["types"] == List[str]
     assert hints["postal_code"] is str
