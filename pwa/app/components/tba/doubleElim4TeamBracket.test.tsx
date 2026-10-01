@@ -365,8 +365,7 @@ describe('DoubleElim4TeamBracket', () => {
   });
 
   test('falls back to match teams when they are in no alliance', () => {
-    // Whether these rows start highlighted is Bug #60, covered by its own
-    // failing-test PR; this test only checks they render and hover safely.
+    // This test only checks that rows render and hover safely.
     const matches = [
       makeMatch(
         CompLevel.SF,

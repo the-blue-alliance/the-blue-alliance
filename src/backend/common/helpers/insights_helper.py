@@ -726,9 +726,10 @@ class InsightsHelper(object):
                         elim_score_distribution[blueScore] += 1
 
         insights = []
-        binAmount = None
+        # Elim scores are a subset of all scores, so both distributions share
+        # one bin size.
+        binAmount = math.ceil(float(overall_highscore) / 20)
         if score_distribution != {}:
-            binAmount = math.ceil(float(overall_highscore) / 20)
             totalCount = float(sum(score_distribution.values()))
             score_distribution_normalized = {}
             for score, amount in score_distribution.items():
@@ -748,8 +749,6 @@ class InsightsHelper(object):
                 )
             )
         if elim_score_distribution != {}:
-            if binAmount is None:  # Use same binAmount from above if possible
-                binAmount = math.ceil(float(overall_highscore) / 20)
             totalCount = float(sum(elim_score_distribution.values()))
             elim_score_distribution_normalized = {}
             for score, amount in elim_score_distribution.items():
@@ -799,9 +798,10 @@ class InsightsHelper(object):
                         elim_winning_margin_distribution[winning_margin] += 1
 
         insights = []
-        binAmount = None
+        # Elim margins are a subset of all margins, so both distributions share
+        # one bin size.
+        binAmount = math.ceil(float(overall_high_margin) / 20)
         if winning_margin_distribution != {}:
-            binAmount = math.ceil(float(overall_high_margin) / 20)
             totalCount = float(sum(winning_margin_distribution.values()))
             winning_margin_distribution_normalized = {}
             for margin, amount in winning_margin_distribution.items():
@@ -823,8 +823,6 @@ class InsightsHelper(object):
             )
 
         if elim_winning_margin_distribution != {}:
-            if binAmount is None:  # Use same binAmount from above if possible
-                binAmount = math.ceil(float(overall_high_margin) / 20)
             totalCount = float(sum(elim_winning_margin_distribution.values()))
             elim_winning_margin_distribution_normalized = {}
             for margin, amount in elim_winning_margin_distribution.items():
