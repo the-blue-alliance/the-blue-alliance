@@ -91,7 +91,7 @@ const _BracketMatch = forwardRef<
   },
   ref,
 ): JSX.Element | null {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLFieldSetElement>(null);
   const redRowRef = useRef<HTMLDivElement>(null);
   const blueRowRef = useRef<HTMLDivElement>(null);
   const result = getSeriesResult(matches);
@@ -127,9 +127,8 @@ const _BracketMatch = forwardRef<
   const isHighlighted = isRedHighlighted || isBlueHighlighted;
 
   return (
-    <div
+    <fieldset
       ref={cardRef}
-      role="group"
       aria-label={matchLabel}
       className={cn(
         `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200
@@ -308,7 +307,7 @@ const _BracketMatch = forwardRef<
           </div>
         </div>
       </div>
-    </div>
+    </fieldset>
   );
 });
 
