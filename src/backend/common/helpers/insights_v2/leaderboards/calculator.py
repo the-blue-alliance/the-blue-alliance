@@ -241,8 +241,6 @@ class LeaderboardV2Calculator(InsightV2Calculator):
                 )
 
         for district_abbrev, counts in sorted(district_counts.items()):
-            if not counts:
-                continue
             rankings = self._build_rankings(counts)
             if not rankings:
                 continue

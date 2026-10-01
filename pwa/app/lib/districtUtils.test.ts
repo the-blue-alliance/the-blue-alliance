@@ -19,3 +19,9 @@ describe('getDistrictColorBorderClass', () => {
     expect(getDistrictColorBorderClass('unknown')).toBe('');
   });
 });
+
+describe('getDistrictColorBorderClass without a district', () => {
+  test('returns no class when the abbreviation is missing', () => {
+    expect(getDistrictColorBorderClass(undefined)).toBe('');
+  });
+});

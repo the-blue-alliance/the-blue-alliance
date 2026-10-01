@@ -1,14 +1,17 @@
 import datetime
 import json
 
+import pytest
 from google.appengine.ext import ndb
 
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.helpers.insights_v2.names import InsightV2Names
 from backend.common.helpers.insights_v2.registry import compute_insights_for_year
 from backend.common.helpers.insights_v2.timeseries.average_win_margin_by_week import (
     AverageWinMarginByWeekV2Calculator,
 )
+from backend.common.helpers.tests.insights_v2.fakes import fake_event, fake_match
 from backend.common.models.event import Event
 from backend.common.models.insight_v2 import InsightCategory
 from backend.common.models.match import Match
@@ -207,3 +210,28 @@ def test_key_name(ndb_stub) -> None:
     assert len(insights) == 1
     assert insights[0].key_name == "2022_v2_timeseries_match_average_margins_by_week"
     assert insights[0].display_name == "Average Win Margin By Week"
+
+
+def test_average_win_margin_by_week_calculator_edge_cases() -> None:
+    calc = AverageWinMarginByWeekV2Calculator()
+    assert calc.insight_name == InsightV2Names.AVERAGE_WIN_MARGIN_BY_WEEK
+    with pytest.raises(NotImplementedError):
+        calc._build_timeseries_data()
+
+    # Events without a week (that aren't championship events) are ignored
+    calc.on_event(
+        fake_event([fake_match(10, 5)], week=None, event_type_enum=EventType.OFFSEASON)
+    )
+    assert calc._cmp_count == 0
+    assert calc._week_counts == {}
+
+    # Championship playoff matches count towards the elim-only series too
+    calc.on_event(
+        fake_event(
+            [fake_match(10, 5, comp_level=CompLevel.SF)],
+            week=None,
+            event_type_enum=EventType.CMP_DIVISION,
+        )
+    )
+    assert calc._cmp_count == 1
+    assert calc._elim_cmp_count == 1
