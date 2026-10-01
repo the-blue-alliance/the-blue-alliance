@@ -23,13 +23,10 @@ const renderSelector = (props = {}) =>
     />
   );
 
-describe("Bug #35: ChatSelector ListItem button prop", () => {
-  // Must run before any other test in this file: React only warns about a
-  // given unknown DOM attribute once per module registry.
-  it("Bug #35: does not pass MUI's removed `button` prop through to the DOM", () => {
-    // Wrong today: ListItem lost its `button` prop in MUI v7, so `button` is
-    // forwarded to the <li> and React warns about an unknown attribute.
-    // Correct: use ListItemButton (or drop the prop); no warning, no attribute.
+describe("ChatSelector ListItem button prop", () => {
+  // Runs first: React warns about a given unknown DOM attribute only once per module registry.
+  it("does not pass MUI's removed `button` prop through to the DOM", () => {
+    // MUI v7 ListItem has no `button` prop; React warns if it reaches the DOM.
     const spy = jest.spyOn(console, "error").mockImplementation(() => {});
     try {
       const { container } = renderSelector();
