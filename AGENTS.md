@@ -60,6 +60,18 @@ ops/                    # Build, deploy, and dev scripts
 - Reviewers should ask for the table when a UI PR lacks it.
 - **Screenshots are for reviewers; tests are what prove production still works.** A screenshot shows what changed, never that nothing broke. Every change still needs tests that would fail if it broke production: unit tests beside the code, Playwright route specs for PWA routes, and the Ops Fullstack Test (`ops/test_ops.sh`), which boots the whole stack in CI.
 
+### Jinja pages that need a login or seeded data
+
+Account, admin, and suggestion-review pages are Jinja pages the dev server can only show after a login, so render them through the Flask test client instead and screenshot the saved HTML against the running dev server's CSS:
+
+1. Have the dev server up (`docker compose up`); it serves the CSS/JS at `http://localhost:8080`.
+2. Render the page with a **throwaway** pytest in `src/backend/web/handlers/tests/`. Use the fixtures the real tests use (`web_client`, `login_user`; set `login_user.permissions` and `login_user.has_permission.return_value = True` for gated pages), seed whatever models the page needs, `GET` it, and write `response.data` to a file after inserting `<base href="http://localhost:8080/">` right after `<head>`. Run it with `make test ARGS='src/backend/web/handlers/tests/<file> -q -s'`, then **delete the file**; it is a tool, not a test. Redact secrets the page renders (API keys, tokens) in the seed data.
+3. Screenshot: `cd pwa && node scripts/screenshot_html.mjs /tmp/after.html /tmp/after.png '[data-testid=...]'`. (The script lives in `pwa/` because Node resolves `@playwright/test` from the script's own directory, not from where you run it.) Pass a selector for an element inside the content you want; the script captures its surrounding content container. Do not target `div.container`, the navbar is one too.
+4. Get the **before** the same way after `git checkout origin/main -- <the templates and handlers you changed>`, then `git checkout HEAD -- <those files>` to restore the branch.
+5. Diff each pair (`uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py /tmp/before.png /tmp/after.png /tmp/diff.png`), publish all three to the `ci-screenshots` branch, and fill the Before | After | Diff table as described above.
+
+Look at every screenshot before posting it: an identical byte size across two supposedly different pages means the locator grabbed the wrong element.
+
 ## Development Setup
 **Recommended**: Use docker compose for the local dev server, and `uv` for Python tooling (tests, linting).
 
