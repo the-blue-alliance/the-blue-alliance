@@ -5,8 +5,7 @@ import {
   ConditionalBadge,
   ConditionalCheckmark,
   ConditionalRpAchieved,
-  FoulDisplay,
-  fmtFouls,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 
 vi.mock('~icons/mdi/check', () => ({
@@ -111,84 +110,14 @@ describe('ConditionalBadge', () => {
   });
 });
 
-describe('fmtFouls', () => {
-  test('multiplies the foul count by the points per foul', () => {
-    expect(fmtFouls({ foulCount: 3, pointsPerFoul: 5 })).toBe('3 (+15)');
+describe('fmtFoulsCommitted', () => {
+  test('shows plain fouls and tech fouls committed', () => {
+    expect(fmtFoulsCommitted({ fouls: 3, techFouls: 1 })).toBe('3 / 1');
   });
 
-  test('treats a missing foul count as zero', () => {
-    expect(fmtFouls({ foulCount: undefined, pointsPerFoul: 5 })).toBe('0 (+0)');
-  });
-});
-
-describe('FoulDisplay', () => {
-  test('shows regular foul count and points', () => {
-    render(
-      <FoulDisplay
-        foulsReceived={2}
-        pointsPerFoul={5}
-        techFoulsReceived={1}
-        pointsPerTechFoul={25}
-        techOrMajor="tech"
-      />,
+  test('treats missing counts as zero', () => {
+    expect(fmtFoulsCommitted({ fouls: undefined, techFouls: undefined })).toBe(
+      '0 / 0',
     );
-
-    expect(screen.getByText('2 (+10)')).toBeTruthy();
-  });
-
-  test('labels the second line Tech for tech fouls', () => {
-    render(
-      <FoulDisplay
-        foulsReceived={2}
-        pointsPerFoul={5}
-        techFoulsReceived={1}
-        pointsPerTechFoul={25}
-        techOrMajor="tech"
-      />,
-    );
-
-    expect(screen.getByText('Tech:')).toBeTruthy();
-  });
-
-  test('labels the second line Major for major fouls', () => {
-    render(
-      <FoulDisplay
-        foulsReceived={2}
-        pointsPerFoul={2}
-        techFoulsReceived={1}
-        pointsPerTechFoul={6}
-        techOrMajor="major"
-      />,
-    );
-
-    expect(screen.getByText('Major:')).toBeTruthy();
-  });
-
-  test('shows tech foul count and points', () => {
-    render(
-      <FoulDisplay
-        foulsReceived={2}
-        pointsPerFoul={5}
-        techFoulsReceived={1}
-        pointsPerTechFoul={25}
-        techOrMajor="tech"
-      />,
-    );
-
-    expect(screen.getByText('1 (+25)')).toBeTruthy();
-  });
-
-  test('shows zero fouls when counts are missing', () => {
-    render(
-      <FoulDisplay
-        foulsReceived={undefined}
-        pointsPerFoul={5}
-        techFoulsReceived={undefined}
-        pointsPerTechFoul={25}
-        techOrMajor="tech"
-      />,
-    );
-
-    expect(screen.getAllByText('0 (+0)')).toHaveLength(2);
   });
 });
