@@ -2268,16 +2268,8 @@ def test_get_timezone_id_missing_time_zone_id(
     assert "No timeZoneId for (37.3382, -121.8863)" in caplog.text
 
 
-def test_bug_10_compute_event_location_score_without_formatted_address() -> None:
-    """Bug #10: compute_event_location_score raises KeyError.
-
-    Today formatted_address is only set when the place-details lookup
-    succeeds, but the score reads location_info["formatted_address"]
-    unconditionally for any point_of_interest result, so a failed details
-    lookup raises KeyError up through get_event_location_info and
-    update_event_location. Correct: no exception; the score falls back to the
-    name similarity (an exact name match scores 1.0).
-    """
+def test_compute_event_location_score_without_formatted_address() -> None:
+    """Without a formatted_address the score falls back to name similarity."""
     info = cast(
         LocationInfo,
         {
