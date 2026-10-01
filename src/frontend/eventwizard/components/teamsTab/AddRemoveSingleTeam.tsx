@@ -24,7 +24,7 @@ interface AddRemoveSingleTeamProps {
 const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
   selectedEvent,
   updateTeamList,
-  hasFetchedTeams,
+  hasFetchedTeams: teamsFetched,
   currentTeams,
   clearTeams,
   showErrorMessage,
@@ -34,6 +34,10 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
   const [selectedTeamKey, setSelectedTeamKey] = useState("");
   const [addButtonClass, setAddButtonClass] = useState("btn-primary");
   const [removeButtonClass, setRemoveButtonClass] = useState("btn-primary");
+  // The team list is stale after an edit until the parent fetches it again.
+  const [isStale, setIsStale] = useState(false);
+  useEffect(() => setIsStale(false), [currentTeams]);
+  const hasFetchedTeams = teamsFetched && !isStale;
 
   useEffect(() => {
     // Load team typeahead data
@@ -53,11 +57,11 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
   }, []);
 
   useEffect(() => {
-    if (!hasFetchedTeams) {
+    if (!teamsFetched) {
       setAddButtonClass("btn-primary");
       setRemoveButtonClass("btn-primary");
     }
-  }, [hasFetchedTeams]);
+  }, [teamsFetched]);
 
   const loadTeams = async (search: string): Promise<TeamOption[]> => {
     return teamOptions.filter((team) =>
@@ -85,7 +89,7 @@ const AddRemoveSingleTeam: React.FC<AddRemoveSingleTeamProps> = ({
         setButtonClass("btn-success");
         setSelectedTeam(null);
         setSelectedTeamKey("");
-        hasFetchedTeams = false;
+        setIsStale(true);
         if (clearTeams) {
           clearTeams();
         }

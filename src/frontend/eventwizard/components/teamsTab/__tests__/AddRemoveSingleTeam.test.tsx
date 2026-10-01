@@ -449,7 +449,7 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
     expect(
       screen.getByText(/Please fetch the current team list/)
     ).toBeInTheDocument();
-    expect(screen.getByRole("combobox")).toBeDisabled();
+    expect(screen.getByRole("combobox", { hidden: true })).toBeDisabled();
   });
 
   it("requires a re-fetch after a successful remove, even without clearTeams", async () => {
@@ -463,7 +463,7 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
     expect(
       screen.getByText(/Please fetch the current team list/)
     ).toBeInTheDocument();
-    expect(screen.getByRole("combobox")).toBeDisabled();
+    expect(screen.getByRole("combobox", { hidden: true })).toBeDisabled();
   });
 
   it("adds the selected team to the existing list and resets on success", async () => {
@@ -538,10 +538,20 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
 
   it("tolerates a missing clearTeams callback on add and remove", async () => {
     mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
-    renderComponent({ clearTeams: undefined });
+    const { rerender } = renderComponent({ clearTeams: undefined });
 
     await selectTeam("254 | The Cheesy Poofs", "254");
     fireEvent.click(addButton());
+    // Re-fetching delivers a new team list, which allows another edit.
+    rerender(
+      <AddRemoveSingleTeam
+        selectedEvent="2024nytr"
+        updateTeamList={mockUpdateTeamList}
+        hasFetchedTeams={true}
+        currentTeams={[...attending]}
+        showErrorMessage={mockShowErrorMessage}
+      />
+    );
     await selectTeam("1678 | Citrus Circuits", "1678");
     fireEvent.click(removeButton());
 
