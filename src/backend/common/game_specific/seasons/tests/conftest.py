@@ -88,12 +88,7 @@ def build_match(
 def assert_breakdownless_match_excluded(
     config: SeasonGameConfig[Any], matches: List[Match]
 ) -> None:
-    """
-    Bug #20: a played match without a score breakdown must be excluded from
-    both the numerators and the denominators of the event insights, so adding
-    one to an event must not change any figure. Its 1-0 score keeps it out of
-    the high score either way.
-    """
+    """Adding a played match without a breakdown must not change any insight."""
     first = matches[0]
     breakdownless = build_match(
         first.event_key_name, first.comp_level, 999, 1, 0, None, 99

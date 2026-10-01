@@ -205,17 +205,10 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
 
 
-def test_bug_20_breakdownless_match_excluded_from_insights(
+def test_breakdownless_match_excluded_from_insights(
     test_data_importer,
 ) -> None:
-    """
-    Bug #20: a played match without a score breakdown skews the insights.
-    It is counted in finished_matches (every denominator), but the loop
-    skips it before its scores reach the totals, so it drags the averages
-    down.
-    Correct: exclude it from both numerator and denominator, so the insights
-    are identical to the event's insights without it.
-    """
+    """A played match without a score breakdown leaves every insight unchanged."""
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2024nytr_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2024nytr")).fetch()
     assert_breakdownless_match_excluded(GameSpecifics2024(), matches)
