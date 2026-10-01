@@ -289,11 +289,8 @@ describe('EliminationBracket', () => {
     expect(blueRow.dataset.highlight).toBe('false');
   });
 
-  test('Bug #63: rows for teams outside any alliance are not highlighted until hovered', () => {
-    // Wrong today: a series whose teams match no alliance gets null alliance
-    // numbers, and null === the idle (null) hovered alliance, so both rows
-    // and the card render highlighted before any hover.
-    // Correct: nothing is highlighted while no alliance is hovered.
+  test('rows for teams outside any alliance are not highlighted until hovered', () => {
+    // A series whose teams match no alliance has null alliance numbers.
     render(
       <EliminationBracket
         alliances={alliances}
