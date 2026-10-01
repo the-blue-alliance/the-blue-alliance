@@ -355,8 +355,6 @@ describe('ScoreBreakdown2019 game pieces', () => {
 });
 
 describe('ScoreBreakdown2019 endgame', () => {
-  // HAB Level 2 and Level 3 point values are covered by the Bug #52
-  // failing-test PR.
   test.each([
     { value: EndgameRobot2019.HAB_LEVEL1, expected: '254HAB 1 (+3)' },
     { value: EndgameRobot2019.NONE, expected: '254None (+0)' },
@@ -371,6 +369,29 @@ describe('ScoreBreakdown2019 endgame', () => {
 
     expect(redCell('Robot 1 Endgame').textContent).toBe(expected);
   });
+
+  // Bug #52: HAB Level 2 and Level 3 were valued 3 and 6 instead of 6 and 12.
+  // 2019 Game Manual (DESTINATION: DEEP SPACE), Section 5.3 Scoring,
+  // Table 5-1 (page 38 of 129, Section 5 V8; PDF dated 2019-04-09, after
+  // the last Team Update): "HAB Climb Bonus: Level 1 | 3",
+  // "HAB Climb Bonus: Level 2 | 6", "HAB Climb Bonus: Level 3 | 12".
+  // https://firstfrc.blob.core.windows.net/frc2019/Manual/2019FRCGameSeasonManual.pdf
+  test.each([
+    { value: EndgameRobot2019.HAB_LEVEL2, expected: '254HAB 2 (+6)' },
+    { value: EndgameRobot2019.HAB_LEVEL3, expected: '254HAB 3 (+12)' },
+  ])(
+    'Bug #52: shows $value with its HAB climb points for robot 1',
+    ({ value, expected }) => {
+      render(
+        <ScoreBreakdown2019
+          scoreBreakdown={makeBreakdown({ endgameRobot1: value })}
+          match={match}
+        />,
+      );
+
+      expect(redCell('Robot 1 Endgame').textContent).toBe(expected);
+    },
+  );
 
   test('shows an unrecognised endgame value verbatim with zero points', () => {
     render(

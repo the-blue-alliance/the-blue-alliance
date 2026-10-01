@@ -23,7 +23,7 @@ interface BracketPlaceholderMatchProps {
   hoveredAlliance: number | null;
   setHoveredAlliance: Dispatch<SetStateAction<number | null>>;
   getAllianceDisplayName: (allianceNumber: number) => string;
-  cardRef: RefObject<HTMLDivElement | null>;
+  cardRef: RefObject<HTMLFieldSetElement | null>;
   redRowRef: RefObject<HTMLDivElement | null>;
   blueRowRef: RefObject<HTMLDivElement | null>;
   isNext: boolean;
@@ -48,9 +48,8 @@ export default function BracketPlaceholderMatch({
     allianceNumber ? getAllianceDisplayName(allianceNumber) : 'TBD';
 
   return (
-    <div
+    <fieldset
       ref={cardRef}
-      role="group"
       aria-label={matchLabel}
       className="mb-2 min-w-45 overflow-hidden rounded-md border border-dashed
         border-neutral-300 bg-background dark:border-neutral-600"
@@ -87,7 +86,7 @@ export default function BracketPlaceholderMatch({
         hoveredAlliance={hoveredAlliance}
         setHoveredAlliance={setHoveredAlliance}
       />
-    </div>
+    </fieldset>
   );
 }
 
