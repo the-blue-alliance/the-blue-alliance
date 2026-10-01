@@ -2282,17 +2282,10 @@ def test_link_frc_api_post_not_found(web_client: Client, login_gae_admin) -> Non
     assert resp.status_code == 404
 
 
-def test_bug_3_uppercase_event_short_redirects_to_lowercase_key(
+def test_uppercase_event_short_redirects_to_lowercase_key(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:
-    """Bug #3: an uppercase event_short produces a mismatched redirect.
-
-    Today event_edit_post lowercases the datastore key but stores event_short
-    verbatim, so Event.key_name (and the redirect built from it) is 2020NYNY
-    while the entity is 2020nyny, and the redirect lands on a missing page.
-    Correct: event_short is normalised to lowercase, key_name matches the
-    stored key, and the redirect goes to /admin/event/2020nyny.
-    """
+    """An uppercase event_short is stored lowercase and redirects to the lowercase key."""
     resp = web_client.post(
         "/admin/event/edit", data=_full_event_form(event_short="NYNY")
     )
