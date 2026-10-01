@@ -22,11 +22,13 @@ from backend.common.memcache import MemcacheClient
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.audit_log_entry import AuditLogEntry
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.suggestion_dict import SuggestionDict
+from backend.common.models.team import Team
 from backend.common.models.user import User
 from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
@@ -531,6 +533,332 @@ def test_list_team_media_suggestions_includes_reference_and_preferred(
     assert suggestion["max_preferred"] == Media.MAX_PREFERRED
 
 
+def test_list_match_video_metadata_survives_youtube_failure(
+    api_client: Client,
+    moderator,
+    author: Account,
+    event: Event,
+    match: Match,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    # Video title/duration are assistive only: a YouTube API failure must not
+    # fail the queue, the metadata is simply left out
+    from backend.api.handlers import moderation
+    from backend.common.sitevars.google_api_secret import GoogleApiSecret
+
+    moderator([AccountPermission.REVIEW_MEDIA])
+    create_match_video_suggestion(author)
+
+    monkeypatch.setattr(GoogleApiSecret, "secret_key", staticmethod(lambda: "key"))
+
+    def boom(self) -> None:
+        raise RuntimeError("quota exceeded")
+
+    monkeypatch.setattr(moderation.YoutubeVideoDetailsDatafeed, "fetch_async", boom)
+    monkeypatch.setattr(
+        moderation.YoutubeVideoDetailsDatafeed, "__init__", lambda self, ids: None
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/match")
+    assert resp.status_code == 200
+    suggestion = resp.json["suggestions"][0]
+    assert suggestion["event"]["key"] == "2016necmp"
+    assert "video_title" not in suggestion
+    assert "video_duration_seconds" not in suggestion
+
+
+def test_list_webcast_suggestions_official_webcast_unit(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    # Events in a district that uses an official webcast unit are flagged so
+    # reviewers can spot stream rips
+    moderator([AccountPermission.REVIEW_MEDIA])
+    District(
+        id="2016ne",
+        year=2016,
+        abbreviation="ne",
+        uses_official_webcast_unit=True,
+    ).put()
+    event.district_key = ndb.Key(District, "2016ne")
+    event.put()
+    create_suggestion(
+        author,
+        "event",
+        "2016necmp",
+        {"webcast_url": "https://twitch.tv/other_channel"},
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/event")
+    assert resp.status_code == 200
+    suggestion = resp.json["suggestions"][0]
+    assert suggestion["uses_official_webcast_unit"] is True
+    assert suggestion["existing_webcasts"] == []
+
+
+def test_list_webcast_suggestions_district_without_webcast_unit(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_MEDIA])
+    District(id="2016ne", year=2016, abbreviation="ne").put()
+    event.district_key = ndb.Key(District, "2016ne")
+    event.put()
+    create_suggestion(
+        author,
+        "event",
+        "2016necmp",
+        {"webcast_url": "https://twitch.tv/other_channel"},
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/event")
+    assert resp.status_code == 200
+    assert resp.json["suggestions"][0]["uses_official_webcast_unit"] is False
+
+
+def test_list_webcast_suggestions_missing_district(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_MEDIA])
+    event.district_key = ndb.Key(District, "2016zz")
+    event.put()
+    create_suggestion(
+        author,
+        "event",
+        "2016necmp",
+        {"webcast_url": "https://twitch.tv/other_channel"},
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/event")
+    assert resp.status_code == 200
+    assert resp.json["suggestions"][0]["uses_official_webcast_unit"] is False
+
+
+def test_list_team_media_suggestions_serializes_team_reference(
+    api_client: Client, moderator, author: Account
+) -> None:
+    moderator([AccountPermission.REVIEW_MEDIA])
+    Team(id="frc1124", team_number=1124, nickname="UberBots").put()
+    create_suggestion(
+        author,
+        "media",
+        "frc1124",
+        {
+            "media_type_enum": MediaType.IMGUR,
+            "foreign_key": "abc123",
+            "reference_type": "team",
+            "reference_key": "frc1124",
+            "year": 2016,
+        },
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/media")
+    assert resp.status_code == 200
+    assert resp.json["suggestions"][0]["reference"] == {
+        "type": "team",
+        "key": "frc1124",
+        "team_number": 1124,
+        "nickname": "UberBots",
+    }
+
+
+def test_list_media_suggestions_ignores_malformed_details_json(
+    api_client: Client, moderator, author: Account
+) -> None:
+    moderator([AccountPermission.REVIEW_MEDIA])
+    create_suggestion(
+        author,
+        "media",
+        "frc1124",
+        {
+            "media_type_enum": MediaType.IMGUR,
+            "foreign_key": "abc123",
+            "reference_type": "team",
+            "reference_key": "frc1124",
+            "year": 2016,
+            "details_json": "{not json",
+        },
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/media")
+    assert resp.status_code == 200
+    suggestion = resp.json["suggestions"][0]
+    assert "details" not in suggestion
+    assert suggestion["candidate_media"]["slug_name"] == "imgur"
+
+
+def test_list_social_media_suggestions_includes_profile_url(
+    api_client: Client, moderator, author: Account
+) -> None:
+    moderator([AccountPermission.REVIEW_MEDIA])
+    create_suggestion(
+        author,
+        "social-media",
+        "frc1124",
+        {
+            "media_type_enum": MediaType.GITHUB_PROFILE,
+            "foreign_key": "uberasaurus",
+            "reference_type": "team",
+            "reference_key": "frc1124",
+            "is_social": True,
+        },
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/social-media")
+    assert resp.status_code == 200
+    suggestion = resp.json["suggestions"][0]
+    assert suggestion["reference"] is None
+    assert "existing_preferred" not in suggestion
+    media = suggestion["candidate_media"]
+    assert media["slug_name"] == "github-profile"
+    assert media["social_profile_url"] == "https://github.com/uberasaurus"
+
+
+def test_list_offseason_event_suggestions_includes_similar_events(
+    api_client: Client, moderator, author: Account
+) -> None:
+    moderator([AccountPermission.REVIEW_OFFSEASON_EVENTS])
+    _offseason_event("2016cc", "Chezy Champs").put()
+    _offseason_event("2015cc", "Chezy Champs").put()
+    _offseason_event("2016rr", "Ranger Rumble").put()
+    # A same-year official event with a matching name is not a candidate
+    Event(
+        id="2016ccof",
+        name="Chezy Champs",
+        event_short="ccof",
+        event_type_enum=EventType.REGIONAL,
+        year=2016,
+    ).put()
+    create_suggestion(
+        author,
+        "offseason-event",
+        None,
+        {
+            "name": "Chezy Champs 2016",
+            "start_date": "2016-10-01",
+            "end_date": "2016-10-02",
+        },
+    )
+    create_suggestion(
+        author,
+        "offseason-event",
+        None,
+        {
+            "name": "",
+            "start_date": "2016-10-01",
+            "end_date": "2016-10-02",
+        },
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/offseason-event")
+    assert resp.status_code == 200
+    by_name = {s["contents"]["name"]: s for s in resp.json["suggestions"]}
+    assert by_name["Chezy Champs 2016"]["similar_events"] == [
+        {"key": "2016cc", "name": "Chezy Champs"}
+    ]
+    assert by_name["Chezy Champs 2016"]["similar_events_last_year"] == [
+        {"key": "2015cc", "name": "Chezy Champs"}
+    ]
+    assert by_name[""]["similar_events"] == []
+    assert by_name[""]["similar_events_last_year"] == []
+
+
+def test_list_apiwrite_suggestions_includes_event_and_existing_keys(
+    api_client: Client, moderator, author: Account, event: Event
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    other_owner = Account(
+        id="other_uid", email="other@tba.com", nickname="Other", registered=True
+    )
+    other_owner.put()
+    ApiAuthAccess(
+        id="existing_owned",
+        auth_types_enum=[AuthType.MATCH_VIDEO, AuthType.EVENT_DATA],
+        event_list=[ndb.Key(Event, "2016necmp")],
+        owner=other_owner.key,
+    ).put()
+    ApiAuthAccess(
+        id="existing_unowned",
+        auth_types_enum=[AuthType.EVENT_TEAMS],
+        event_list=[ndb.Key(Event, "2016necmp")],
+    ).put()
+    # A key whose owner Account no longer exists
+    ApiAuthAccess(
+        id="existing_orphaned",
+        auth_types_enum=[AuthType.EVENT_INFO],
+        event_list=[ndb.Key(Event, "2016necmp")],
+        owner=ndb.Key(Account, "deleted_uid"),
+    ).put()
+    # A key for another event must not show up
+    ApiAuthAccess(
+        id="other_event",
+        auth_types_enum=[AuthType.MATCH_VIDEO],
+        event_list=[ndb.Key(Event, "2016other")],
+    ).put()
+    create_suggestion(
+        author,
+        "api_auth_access",
+        "2016necmp",
+        {
+            "event_key": "2016necmp",
+            "affiliation": "Team 1124",
+            # EVENT_DATA is deprecated and has no name, so it is filtered out
+            "auth_types": [
+                int(AuthType.MATCH_VIDEO),
+                int(AuthType.EVENT_TEAMS),
+                int(AuthType.EVENT_DATA),
+            ],
+        },
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
+    assert resp.status_code == 200
+    suggestion = resp.json["suggestions"][0]
+    assert suggestion["event"]["key"] == "2016necmp"
+    assert suggestion["event"]["type"] == "event"
+    assert suggestion["requested_auth_types"] == [
+        {"type": int(AuthType.MATCH_VIDEO), "name": "match video"},
+        {"type": int(AuthType.EVENT_TEAMS), "name": "event teams"},
+    ]
+    existing = sorted(
+        suggestion["existing_auth"], key=lambda a: a["auth_types"][0]["type"]
+    )
+    assert existing == [
+        {
+            "owner_email": "other@tba.com",
+            "auth_types": [{"type": int(AuthType.MATCH_VIDEO), "name": "match video"}],
+        },
+        {
+            "owner_email": None,
+            "auth_types": [{"type": int(AuthType.EVENT_TEAMS), "name": "event teams"}],
+        },
+        {
+            "owner_email": None,
+            "auth_types": [{"type": int(AuthType.EVENT_INFO), "name": "event info"}],
+        },
+    ]
+
+
+def test_list_apiwrite_suggestions_missing_event(
+    api_client: Client, moderator, author: Account
+) -> None:
+    moderator([AccountPermission.REVIEW_APIWRITE])
+    create_suggestion(
+        author,
+        "api_auth_access",
+        "2016gone",
+        {
+            "event_key": "2016gone",
+            "affiliation": "Team 1124",
+            "auth_types": [int(AuthType.MATCH_VIDEO)],
+        },
+    )
+
+    resp = api_client.get(f"{BASE_URL}/suggestions/api_auth_access")
+    assert resp.status_code == 200
+    suggestion = resp.json["suggestions"][0]
+    assert suggestion["event"] is None
+    assert suggestion["existing_auth"] == []
+
+
 # ---------------------------------------------------------------------------
 # Accept: match video
 # ---------------------------------------------------------------------------
@@ -641,6 +969,23 @@ def test_accept_twice_conflicts(
     resp = api_client.post(f"{BASE_URL}/suggestions/{suggestion_id}/accept")
     assert resp.status_code == 409
     assert resp.json["result"] == "already_reviewed"
+
+
+def test_accept_rejects_non_object_body(
+    api_client: Client, moderator, author: Account, event: Event, match: Match
+) -> None:
+    moderator([AccountPermission.REVIEW_MEDIA])
+    suggestion_id = create_match_video_suggestion(author)
+
+    resp = api_client.post(
+        f"{BASE_URL}/suggestions/{suggestion_id}/accept", json=["not", "a", "dict"]
+    )
+    assert resp.status_code == 400
+    assert resp.json == {"Error": "Request body must be a JSON object"}
+
+    suggestion = Suggestion.get_by_id(suggestion_id)
+    assert suggestion is not None
+    assert suggestion.review_state == SuggestionState.REVIEW_PENDING
 
 
 def test_accept_not_found(api_client: Client, moderator) -> None:
@@ -1479,6 +1824,31 @@ def test_find_similar_events_strongest_first_and_capped(ndb_stub) -> None:
     results = _find_similar_events("Chezy Champs", events)
     assert len(results) == 5
     assert results[0] == {"key": "2016cc", "name": "Chezy Champs"}
+
+
+def test_find_similar_events_empty_name(ndb_stub) -> None:
+    events = [_offseason_event("2016cc", "Chezy Champs")]
+    assert _find_similar_events("", events) == []
+    # Punctuation-only names normalize to nothing
+    assert _find_similar_events("!!! ???", events) == []
+
+
+def test_find_similar_events_skips_unnamed_and_unnormalizable_events(
+    ndb_stub,
+) -> None:
+    events = [
+        Event(
+            id="2016noname",
+            event_short="noname",
+            event_type_enum=EventType.OFFSEASON,
+            year=2016,
+        ),
+        _offseason_event("2016punct", "***", "---"),
+        _offseason_event("2016cc", "Chezy Champs"),
+    ]
+    assert _find_similar_events("Chezy Champs", events) == [
+        {"key": "2016cc", "name": "Chezy Champs"}
+    ]
 
 
 def test_suggested_event_year(ndb_stub) -> None:

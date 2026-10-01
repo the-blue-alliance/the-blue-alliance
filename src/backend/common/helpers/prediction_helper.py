@@ -2,6 +2,7 @@ import copy
 import math
 from collections import defaultdict
 from typing import (
+    Any,
     cast,
     Dict,
     List,
@@ -400,10 +401,17 @@ class ContributionCalculator:
                             count += 1
                     means[color] = count
                 elif self._stat == "coopertition_criteria":
-                    count = 0
-                    if score_breakdown[color]["coopertitionCriteriaMet"]:
-                        count = 1
-                    means[color] = count
+                    # This ALLIANCE's half of the Coopertition Bonus, which
+                    # needs both ALLIANCES to meet it.
+                    if "wallAlgaeCount" in score_breakdown[color]:
+                        # 2025 Game Manual 6.5.3: "at least 2 ALGAE are scored
+                        # in each ALLIANCE'S PROCESSOR"
+                        met = score_breakdown[color]["wallAlgaeCount"] >= 2
+                    else:
+                        # 2024: FMS sets this when the ALLIANCE uses a NOTE for
+                        # Coopertition within the first 45 seconds of TELEOP
+                        met = score_breakdown[color]["coopertitionCriteriaMet"]
+                    means[color] = 1 if met else 0
                 elif self._stat == "auto_coral_scored":
                     means[color] = score_breakdown[color]["autoCoralCount"]
                 elif self._stat == "coral_scored":
@@ -494,6 +502,23 @@ class PredictionHelper:
     @classmethod
     def _normcdf(cls, x: float) -> float:
         return (1.0 + math.erf(x / np.sqrt(2.0))) / 2.0
+
+    @classmethod
+    def _prob_coopertition_bonus(cls, mean_vars: Dict[str, Any]) -> float:
+        """
+        Probability that both ALLIANCES meet the Coopertition criteria, from
+        each ALLIANCE's 0/1 "coopertition_criteria" stat (thresholded at 0.5).
+        2024 Game Manual 6.5.5: "If both ALLIANCES use a NOTE scored in their
+        AMP to engage in Coopertition ... all teams earn a Coopertition Bonus".
+        2025 Game Manual 6.5.3: "if at least 2 ALGAE are scored in each
+        ALLIANCE'S PROCESSOR, all teams earn 1 Coopertition Point".
+        """
+        prob = 1.0
+        for color in ALLIANCE_COLORS:
+            mean_var = mean_vars[color]["coopertition_criteria"]
+            mu = mean_var["mean"] - 0.5
+            prob *= 1 - cls._normcdf(-mu / np.sqrt(mean_var["var"]))
+        return prob
 
     @classmethod
     def _predict_match(
@@ -708,17 +733,16 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
-                    prob2 = 1 - cls._normcdf(
-                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
-                    )
+                    prob_coop = cls._prob_coopertition_bonus(mean_vars)
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
                     prob3 = 1 - cls._normcdf(
                         -mu3 / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    prediction[color]["prob_melody_bonus"] = prob + prob2 * prob3
+                    prediction[color]["prob_melody_bonus"] = (
+                        prob_coop * prob3 + (1 - prob_coop) * prob
+                    )
                 if stat == "stage_points":
                     required_points = 10
 
@@ -750,17 +774,16 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
-                    prob2 = 1 - cls._normcdf(
-                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
-                    )
+                    prob_coop = cls._prob_coopertition_bonus(mean_vars)
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
                     prob3 = 1 - cls._normcdf(
                         -mu3 / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    prediction[color]["prob_coral_bonus"] = prob + prob2 * prob3
+                    prediction[color]["prob_coral_bonus"] = (
+                        prob_coop * prob3 + (1 - prob_coop) * prob
+                    )
                 if stat == "barge_points":
                     required_points = 14
 
