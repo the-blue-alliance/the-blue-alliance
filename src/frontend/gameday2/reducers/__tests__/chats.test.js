@@ -78,8 +78,7 @@ describe("chats reducer", () => {
 });
 
 describe("chats reducer webcast and default chat handling", () => {
-  // Load a fresh copy of the reducer for each test because WEBCASTS_UPDATED
-  // mutates the module-level default state (Bug #44).
+  // WEBCASTS_UPDATED mutates module-level default state, so reload per test.
   let freshChats;
   let types;
   beforeEach(() => {

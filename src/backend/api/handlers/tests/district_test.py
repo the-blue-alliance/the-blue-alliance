@@ -854,3 +854,132 @@ def test_district_models_query_response_passthrough(
     assert len(calls_fetch_json) == 0
     assert len(calls_fetch_dict) == 1
     assert calls_fetch_dict[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3)
+
+
+@pytest.mark.parametrize("endpoint", ["rankings", "advancement"])
+def test_district_endpoint_404_when_district_deleted_after_key_cache_warm(
+    endpoint: str, ndb_stub, api_client: Client
+) -> None:
+    # validate_keys remembers that a district key exists for a short TTL. If
+    # the District is deleted inside that window, the decorator still lets the
+    # request through and the handler itself must return the 404.
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    District(
+        id="2024ne",
+        year=2024,
+        abbreviation="ne",
+    ).put()
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    # Warm the key-exists cache through an endpoint that doesn't use
+    # DistrictQuery, so the district lookup below actually hits the datastore.
+    resp = api_client.get("/api/v3/district/2024ne/events", headers=headers)
+    assert resp.status_code == 200
+
+    ndb.Key(District, "2024ne").delete()
+
+    resp = api_client.get(f"/api/v3/district/2024ne/{endpoint}", headers=headers)
+    assert resp.status_code == 404
+
+
+def test_dcmp_history(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    for year in (2023, 2024):
+        District(
+            id=f"{year}ne",
+            year=year,
+            abbreviation="ne",
+            display_name="New England",
+        ).put()
+    Team(id="frc2713", team_number=2713).put()
+
+    # A DCMP, a DCMP division, and a plain district event (which must be
+    # excluded) in 2024; a DCMP in 2023.
+    Event(
+        id="2024necmp",
+        year=2024,
+        event_short="necmp",
+        district_key=ndb.Key(District, "2024ne"),
+        event_type_enum=EventType.DISTRICT_CMP,
+    ).put()
+    Event(
+        id="2024necmp1",
+        year=2024,
+        event_short="necmp1",
+        district_key=ndb.Key(District, "2024ne"),
+        event_type_enum=EventType.DISTRICT_CMP_DIVISION,
+    ).put()
+    Event(
+        id="2024nhgrs",
+        year=2024,
+        event_short="nhgrs",
+        district_key=ndb.Key(District, "2024ne"),
+        event_type_enum=EventType.DISTRICT,
+    ).put()
+    Event(
+        id="2023necmp",
+        year=2023,
+        event_short="necmp",
+        district_key=ndb.Key(District, "2023ne"),
+        event_type_enum=EventType.DISTRICT_CMP,
+    ).put()
+    Award(
+        id="2024necmp_1",
+        name_str="Winner",
+        event=ndb.Key(Event, "2024necmp"),
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.DISTRICT_CMP,
+        year=2024,
+        team_list=[ndb.Key(Team, "frc2713")],
+    ).put()
+    Award(
+        id="2024nhgrs_1",
+        name_str="Winner",
+        event=ndb.Key(Event, "2024nhgrs"),
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.DISTRICT,
+        year=2024,
+        team_list=[ndb.Key(Team, "frc2713")],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/ne/dcmp_history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    by_key = {entry["event"]["key"]: entry for entry in resp.json}
+    assert set(by_key.keys()) == {"2023necmp", "2024necmp", "2024necmp1"}
+    assert by_key["2024necmp"]["event"]["event_type"] == EventType.DISTRICT_CMP
+    assert by_key["2024necmp1"]["event"]["event_type"] == (
+        EventType.DISTRICT_CMP_DIVISION
+    )
+    assert by_key["2024necmp"]["awards"] == [
+        {
+            "award_type": AwardType.WINNER,
+            "event_key": "2024necmp",
+            "name": "Winner",
+            "recipient_list": [],
+            "year": 2024,
+        }
+    ]
+    assert by_key["2024necmp1"]["awards"] == []
+    assert by_key["2023necmp"]["awards"] == []
+
+
+def test_dcmp_history_unknown_abbreviation(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    resp = api_client.get(
+        "/api/v3/district/zz/dcmp_history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == []

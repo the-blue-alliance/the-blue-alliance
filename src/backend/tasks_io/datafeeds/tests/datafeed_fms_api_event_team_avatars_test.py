@@ -81,3 +81,24 @@ def test_get_event_teams_cmp() -> None:
 
     mock_api.assert_called_once_with(2014, "galileo", 1)
     mock_parse.assert_called_once_with(response.json())
+
+
+def test_get_event_team_avatars_fetch_failed_stops_paging() -> None:
+    response = URLFetchResult.mock_for_content(
+        "https://frc-api.firstinspires.org/v3.0/2020/avatars?eventCode=MIKET&page=1",
+        500,
+        "",
+    )
+
+    df = DatafeedFMSAPI()
+    with (
+        patch.object(
+            FRCAPI, "event_team_avatars", return_value=InstantFuture(response)
+        ) as mock_api,
+        patch.object(FMSAPITeamAvatarParser, "parse") as mock_parse,
+    ):
+        assert df.get_event_team_avatars("2020miket").get_result() == ([], set())
+
+    # A failed page ends pagination without requesting further pages
+    mock_api.assert_called_once_with(2020, "miket", 1)
+    mock_parse.assert_not_called()
