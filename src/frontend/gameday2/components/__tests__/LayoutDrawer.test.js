@@ -55,10 +55,8 @@ describe("LayoutDrawer", () => {
     expect(single.querySelector('[data-testid="CheckIcon"]')).toBeNull();
   });
 
-  it("Bug #37: offers every layout in LAYOUT_DISPLAY_ORDER, including Nona-View", () => {
-    // Wrong today: NUM_LAYOUTS is 12 but 13 layouts are defined, so the last
-    // display-order entry (layout 8, Nona-View) is never offered.
-    // Correct: every layout in LAYOUT_DISPLAY_ORDER is listed.
+  it("offers every layout in LAYOUT_DISPLAY_ORDER, including Nona-View", () => {
+    // Nona-View (layout 8) is the last entry in LAYOUT_DISPLAY_ORDER.
     const { queryByText, container } = renderDrawer();
     const layoutList =
       container.ownerDocument.querySelectorAll(".MuiList-root")[0];
