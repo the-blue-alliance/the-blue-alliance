@@ -543,18 +543,17 @@ def event_pitmap(event_key: EventKey) -> Response:
         )
     except ValueError:
         abort(404)
-        raise RuntimeError("unreachable")
-
-    response = make_cached_response(
-        render_template("event_pitmap.svg", template_values),
-        ttl=(
-            timedelta(seconds=61)
-            if event.should_use_short_cache
-            else timedelta(hours=6)
-        ),
-    )
-    response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
-    return response
+    else:
+        response = make_cached_response(
+            render_template("event_pitmap.svg", template_values),
+            ttl=(
+                timedelta(seconds=61)
+                if event.should_use_short_cache
+                else timedelta(hours=6)
+            ),
+        )
+        response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
+        return response
 
 
 @cached_public

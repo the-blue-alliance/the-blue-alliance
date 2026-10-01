@@ -12,10 +12,12 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.seasons.game_specifics_2024 import GameSpecifics2024
 from backend.common.game_specific.seasons.tests.conftest import (
+    build_match,
     HELPERS_TESTS,
     tiebreak_winner,
 )
 from backend.common.models.event import Event
+from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 
 
@@ -183,3 +185,20 @@ def test_success_rate_auto_win_conversion_needs_auto_points() -> None:
 
     match = _success_rate_match(100, 80, with_breakdown=False)
     assert _measure(match)["auto_win_conversion"] == (0, 0)
+
+
+def test_tiebreak_criteria_without_breakdown_data() -> None:
+    empty = cast(ScoreDetailModelAlliance2024, {})
+    criteria = GameSpecifics2024().tiebreak_criteria(empty, empty)
+    assert criteria == [None] * 3
+    assert tiebreak_winner(criteria) == ""
+
+
+def _insights(matches: list[Match]) -> EventInsights:
+    return none_throws(GameSpecifics2024().calculate_event_insights(matches))
+
+
+def test_calculate_event_insights_without_finished_matches() -> None:
+    unplayed = build_match("2024test", "qm", 1, -1, -1, None)
+    assert _insights([]) == {"qual": None, "playoff": None}
+    assert _insights([unplayed]) == {"qual": None, "playoff": None}

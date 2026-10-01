@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { type AnchorHTMLAttributes, type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -187,5 +187,121 @@ describe('EliminationBracket', () => {
       .getAllByRole('link', { name: '801' })[0]
       .closest('[data-winner]');
     expect(row?.getAttribute('data-winner')).toBe('false');
+  });
+
+  test('renders nothing without alliances', () => {
+    const { container } = render(
+      <EliminationBracket alliances={[]} matches={[]} event={event} />,
+    );
+    expect(container.innerHTML).toBe('');
+  });
+
+  test('leaves unknown alliance numbers unnamed', () => {
+    render(
+      <EliminationBracket
+        alliances={alliances.slice(0, 4)}
+        matches={[]}
+        event={event}
+      />,
+    );
+    // Match 1 is alliance 1 vs 8, and there is no alliance 8.
+    const match1 = screen.getByRole('group', { name: 'Match 1' });
+    expect(match1.textContent).toContain('(#1 vs )');
+  });
+
+  test('names Einstein alliances after their divisions', () => {
+    render(
+      <EliminationBracket
+        alliances={alliances.map((a, i) => ({
+          ...a,
+          name: i === 0 ? 'Archimedes' : i === 7 ? 'Newton' : undefined,
+        }))}
+        matches={[match1RedWin]}
+        event={{ ...event, event_type: EventType.CMP_FINALS }}
+      />,
+    );
+    const match1 = screen.getByRole('group', { name: 'Match 1' });
+    expect(match1.textContent).toContain('(Arc vs New)');
+  });
+
+  test('hides alliance members who sat out a later-round series', () => {
+    const fourTeamAlliances = alliances.map((a, i) => ({
+      ...a,
+      picks: [...a.picks, `frc${i + 1}04`],
+    }));
+    const match7: Match = {
+      ...match1RedWin,
+      key: '2026test_sf7m1',
+      set_number: 7,
+      alliances: {
+        red: { ...match1RedWin.alliances.red },
+        blue: {
+          ...match1RedWin.alliances.blue,
+          team_keys: ['frc201', 'frc202', 'frc203'],
+        },
+      },
+    };
+    render(
+      <EliminationBracket
+        alliances={fourTeamAlliances}
+        matches={[match1RedWin, match7]}
+        event={event}
+      />,
+    );
+    const match1 = screen.getByRole('group', { name: 'Match 1' });
+    const match7Group = screen.getByRole('group', { name: 'Match 7' });
+    // Round 1 shows the full alliance; later rounds only who played.
+    expect(within(match1).getByRole('link', { name: '104' })).toBeTruthy();
+    expect(within(match7Group).queryByRole('link', { name: '104' })).toBeNull();
+    expect(within(match7Group).queryByRole('link', { name: '204' })).toBeNull();
+    expect(within(match7Group).getByRole('link', { name: '201' })).toBeTruthy();
+  });
+
+  test('highlights an alliance across matches on hover', () => {
+    render(
+      <EliminationBracket
+        alliances={alliances}
+        matches={[match1RedWin]}
+        event={event}
+      />,
+    );
+    const match1 = screen.getByRole('group', { name: 'Match 1' });
+    const redRow = within(match1)
+      .getByRole('link', { name: '101' })
+      .closest<HTMLElement>('[data-highlight]');
+    const blueRow = within(match1)
+      .getByRole('link', { name: '801' })
+      .closest<HTMLElement>('[data-highlight]');
+    if (!redRow || !blueRow) {
+      throw new Error('Missing alliance rows');
+    }
+
+    fireEvent.mouseEnter(redRow);
+    expect(redRow.dataset.highlight).toBe('true');
+    expect(within(match1).getByText('#1').className).toContain('bg-red-100');
+    fireEvent.mouseLeave(redRow);
+    expect(redRow.dataset.highlight).toBe('false');
+
+    fireEvent.mouseEnter(blueRow);
+    expect(blueRow.dataset.highlight).toBe('true');
+    expect(within(match1).getByText('#8').className).toContain('bg-blue-100');
+    fireEvent.mouseLeave(blueRow);
+    expect(blueRow.dataset.highlight).toBe('false');
+  });
+
+  test('re-renders matches when the results change', () => {
+    const { rerender } = render(
+      <EliminationBracket alliances={alliances} matches={[]} event={event} />,
+    );
+    expect(screen.getByText('Winner of Match 1')).toBeTruthy();
+
+    rerender(
+      <EliminationBracket
+        alliances={alliances}
+        matches={[match1RedWin]}
+        event={event}
+      />,
+    );
+    expect(screen.getAllByRole('link', { name: '101' })).toHaveLength(2);
   });
 });
