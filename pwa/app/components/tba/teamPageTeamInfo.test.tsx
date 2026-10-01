@@ -106,10 +106,8 @@ describe('TeamPageTeamInfo', () => {
     expect(screen.queryByText(/sponsor/)).toBeNull();
   });
 
-  test('Bug #66: the sponsor label has a single space before "sponsors"', () => {
-    // Wrong today: the label is pluralized with a leading space, so the text
-    // reads "with 2  sponsors" (double space, hidden by HTML whitespace
-    // collapsing). Correct: "with 2 sponsors".
+  test('the sponsor label has a single space before "sponsors"', () => {
+    // HTML collapses a double space when rendered, so this checks textContent.
     render(
       <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,
     );
