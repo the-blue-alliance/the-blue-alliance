@@ -90,11 +90,8 @@ describe("HeatmapVisualizer", () => {
     expect(lastData().data).toHaveLength(3);
   });
 
-  it("Bug #48: ignores negative coordinates instead of throwing", () => {
-    // Wrong today: only the upper bounds are checked, so x = -1 indexes
-    // grid[-10] (undefined) and render throws a TypeError.
-    // Correct (choosing "ignored" over "clamped"): out-of-bounds samples,
-    // including negative ones, are skipped and in-bounds samples still plot.
+  it("ignores negative coordinates instead of throwing", () => {
+    // Out-of-bounds samples, negative ones included, are skipped rather than clamped.
     const consoleError = jest
       .spyOn(console, "error")
       .mockImplementation(() => {});
