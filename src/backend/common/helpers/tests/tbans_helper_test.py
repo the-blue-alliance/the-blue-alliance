@@ -35,6 +35,7 @@ from backend.common.helpers.tbans_helper import (
 from backend.common.models.account import Account
 from backend.common.models.award import Award
 from backend.common.models.district import District
+from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match
 from backend.common.models.mobile_client import MobileClient
@@ -2123,3 +2124,177 @@ class TestTBANSHelper(unittest.TestCase):
             mock_send.assert_called_once_with(
                 ["user_id_1"], notification, _NotificationMode.ALL
             )
+
+    def _put_match_with_missing_team(self) -> Match:
+        match = Match(
+            id=f"{self.event.key_name}_qm9",
+            event=self.event.key,
+            comp_level="qm",
+            set_number=1,
+            match_number=9,
+            team_key_names=["frc7332", "frc9999"],
+            alliances_json=json.dumps(
+                {
+                    "red": {"teams": ["frc7332"], "score": 25},
+                    "blue": {"teams": ["frc9999"], "score": 17},
+                }
+            ),
+            year=2020,
+        )
+        match.put()
+        return match
+
+    def test_alliance_selection_team_lookup_errors(self):
+        EventDetails(
+            id=self.event.key_name,
+            alliance_selections=[{"declines": [], "picks": ["frc7332"]}],
+        ).put()
+
+        # Errors looking up a team skip that team, in either loop
+        with (
+            patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send,
+            patch.object(Team, "get_by_id", side_effect=Exception("boom")),
+        ):
+            TBANSHelper.alliance_selection(self.event.key_name)
+        assert mock_send.call_count == 1  # Event subscribers only
+
+        with (
+            patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send,
+            patch.object(Team, "get_by_id", side_effect=[self.team, Exception("boom")]),
+        ):
+            TBANSHelper.alliance_selection(self.event.key_name)
+        assert mock_send.call_count == 1
+
+    def test_awards_missing_team_and_lookup_error(self):
+        Award(
+            id=Award.render_key_name(self.event.key_name, AwardType.WINNER),
+            year=2020,
+            award_type_enum=AwardType.WINNER,
+            event_type_enum=EventType.REGIONAL,
+            event=self.event.key,
+            name_str="Winner",
+            team_list=[ndb.Key(Team, "frc7332"), ndb.Key(Team, "frc9999")],
+            recipient_json_list=[
+                json.dumps({"team_number": 7332, "awardee": None}),
+                json.dumps({"team_number": 9999, "awardee": None}),
+            ],
+        ).put()
+
+        with (
+            patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send,
+            patch.object(Team, "get_by_id", side_effect=Exception("boom")),
+        ):
+            TBANSHelper.awards(self.event.key_name, {"frc7332"})
+        # Only the Event subscribers; frc9999 doesn't exist, frc7332 errored
+        assert mock_send.call_count == 1
+
+    def test_match_score_missing_team_and_lookup_error(self):
+        match = self._put_match_with_missing_team()
+        with (
+            patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send,
+            patch.object(Team, "get_by_id", side_effect=Exception("boom")),
+            patch.object(TBANSHelper, "schedule_upcoming_match"),
+        ):
+            TBANSHelper.match_score(match.key_name)
+        # Event and Match subscribers only
+        assert mock_send.call_count == 2
+
+    def test_match_score_event_without_matches(self):
+        with (
+            patch.object(TBANSHelper, "_batch_send_subscriptions"),
+            patch(
+                "backend.common.models.event.Event.matches",
+                new_callable=mock.PropertyMock,
+                return_value=[],
+            ),
+            patch.object(TBANSHelper, "schedule_upcoming_match") as mock_schedule,
+        ):
+            TBANSHelper.match_score(self.match.key_name)
+        mock_schedule.assert_not_called()
+
+    def test_match_upcoming_missing_team_and_lookup_error(self):
+        match = self._put_match_with_missing_team()
+        with (
+            patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send,
+            patch.object(Team, "get_by_id", side_effect=Exception("boom")),
+        ):
+            TBANSHelper.match_upcoming(match.key_name)
+        # Event and Match subscribers only
+        assert mock_send.call_count == 2
+
+    def test_match_video_missing_team_and_lookup_error(self):
+        match = self._put_match_with_missing_team()
+        with (
+            patch.object(TBANSHelper, "_batch_send_subscriptions") as mock_send,
+            patch.object(Team, "get_by_id", side_effect=Exception("boom")),
+        ):
+            TBANSHelper.match_video(match.key_name)
+        # Event and Match subscribers only
+        assert mock_send.call_count == 2
+
+    def test_ping_client_unsupported_type(self):
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="token",
+            client_type=ClientType.OS_ANDROID,
+        )
+        with pytest.raises(Exception, match="Unsupported FCM client type"):
+            TBANSHelper._ping_client(client)
+
+    def test_schedule_upcoming_matches_no_matches(self):
+        Event(
+            id="2020zzz",
+            year=2020,
+            event_short="zzz",
+            event_type_enum=EventType.OFFSEASON,
+        ).put()
+        with patch.object(TBANSHelper, "schedule_upcoming_match") as mock_schedule:
+            TBANSHelper.schedule_upcoming_matches("2020zzz")
+        mock_schedule.assert_not_called()
+
+    def test_schedule_upcoming_matches_all_played(self):
+        with (
+            patch(
+                "backend.common.helpers.match_helper.MatchHelper.upcoming_matches",
+                return_value=[],
+            ),
+            patch.object(TBANSHelper, "schedule_upcoming_match") as mock_schedule,
+        ):
+            TBANSHelper.schedule_upcoming_matches(self.event.key_name)
+        mock_schedule.assert_not_called()
+
+    def test_create_test_notification_missing_entities(self):
+        for notification_type in [
+            NotificationType.ALLIANCE_SELECTION,
+            NotificationType.LEVEL_STARTING,
+            NotificationType.MATCH_SCORE,
+            NotificationType.UPCOMING_MATCH,
+            NotificationType.MATCH_VIDEO,
+            NotificationType.SCHEDULE_UPDATED,
+        ]:
+            assert (
+                TBANSHelper._create_test_notification(
+                    notification_type,
+                    event_key="2020missing",
+                    match_key="2020missing_qm1",
+                )
+                is None
+            )
+
+    def test_send_fcm_backoff_exhausted(self):
+        client = MobileClient(
+            parent=ndb.Key(Account, "user_id"),
+            user_id="user_id",
+            messaging_id="token",
+            client_type=ClientType.OS_IOS,
+        )
+        with (
+            patch.object(TBANSHelper, "_notifications_enabled", return_value=True),
+            patch.object(FCMRequest, "send") as mock_send,
+        ):
+            TBANSHelper._send_fcm([client], MockNotification(), backoff_iteration=6)
+        mock_send.assert_not_called()
+
+    def test_debug_string_generic_exception(self):
+        assert TBANSHelper._debug_string(ValueError("oops")) == "oops"

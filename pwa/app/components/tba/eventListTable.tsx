@@ -5,7 +5,7 @@ import MdiVideo from '~icons/mdi/video';
 
 import { Event } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Table,
   TableBody,
@@ -104,30 +104,24 @@ export default function EventListTable({ events }: { events: Event[] }) {
                 )}
               </TableCell>
               <TableCell>
-                {event.webcasts.length > 0 && (
-                  <Button
-                    render={
-                      isOnline || withinADay ? (
-                        <a
-                          href={`/gameday/${event.key}`}
-                          target="_blank"
-                          rel="noreferrer"
-                          className="hover:no-underline"
-                        >
-                          {watchButtonContent}
-                        </a>
-                      ) : undefined
-                    }
-                    variant={isOnline ? 'success' : 'secondary'}
-                    disabled={!isOnline && !withinADay}
-                    className={cn({
-                      'pointer-events-none opacity-50':
-                        !isOnline && !withinADay,
-                    })}
-                  >
-                    {watchButtonContent}
-                  </Button>
-                )}
+                {event.webcasts.length > 0 &&
+                  (isOnline || withinADay ? (
+                    <a
+                      href={`/gameday/${event.key}`}
+                      target="_blank"
+                      rel="noreferrer"
+                      className={buttonVariants({
+                        variant: isOnline ? 'success' : 'secondary',
+                        className: 'hover:no-underline',
+                      })}
+                    >
+                      {watchButtonContent}
+                    </a>
+                  ) : (
+                    <Button variant="secondary" disabled>
+                      {watchButtonContent}
+                    </Button>
+                  ))}
               </TableCell>
               <TableCell>{getEventDateString(event, 'short')}</TableCell>
             </TableRow>

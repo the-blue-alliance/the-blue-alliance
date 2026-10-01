@@ -19,9 +19,11 @@ import {
 import { Badge } from '~/components/ui/badge';
 import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
+// HAB Climb Bonus per robot. 2019 Game Manual, Section 5.3 Scoring,
+// Table 5-1 (page 38, Section 5 V8): Level 1 = 3, Level 2 = 6, Level 3 = 12.
 const ENDGAME_2019_POINTS: Record<string, number> = {
-  HabLevel3: 6,
-  HabLevel2: 3,
+  HabLevel3: 12,
+  HabLevel2: 6,
   HabLevel1: 3,
   None: 0,
   Unknown: 0,

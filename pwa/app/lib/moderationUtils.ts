@@ -208,7 +208,14 @@ export function formatAuthorReputation(author: {
   return `${accepted} accepted · ${rejected} rejected`;
 }
 
-const MATCH_KEY_PATTERN = /^(qm|ef|qf|sf|f)(\d+)(?:m(\d+))?$/;
+const MATCH_KEY_COMP_LEVELS = ['qm', 'ef', 'qf', 'sf', 'f'] as const;
+type MatchKeyCompLevel = (typeof MATCH_KEY_COMP_LEVELS)[number];
+
+// Built from MATCH_KEY_COMP_LEVELS, so its first capture group is always a
+// MatchKeyCompLevel.
+const MATCH_KEY_PATTERN = new RegExp(
+  `^(${MATCH_KEY_COMP_LEVELS.join('|')})(\\d+)(?:m(\\d+))?$`,
+);
 
 /** Normalize for fuzzy title comparison: lowercase, punctuation → spaces. */
 function normalizeTitle(value: string): string {
@@ -219,7 +226,11 @@ function normalizeTitle(value: string): string {
 }
 
 /** Tokens a video title might use to refer to a match, per comp level. */
-function matchTokens(compLevel: string, set: number, num: number): string[] {
+function matchTokens(
+  compLevel: MatchKeyCompLevel,
+  set: number,
+  num: number,
+): string[] {
   switch (compLevel) {
     case 'qm':
       return [
@@ -259,8 +270,6 @@ function matchTokens(compLevel: string, set: number, num: number): string[] {
         `final`,
         `finals`,
       ];
-    default:
-      return [];
   }
 }
 
@@ -290,7 +299,11 @@ export function matchVideoTitleWarning(
   const parsed = MATCH_KEY_PATTERN.exec(matchPart.toLowerCase());
   if (!parsed) return undefined;
   const [, compLevel, setStr, numStr] = parsed;
-  const tokens = matchTokens(compLevel, Number(setStr), Number(numStr ?? '1'));
+  const tokens = matchTokens(
+    compLevel as MatchKeyCompLevel,
+    Number(setStr),
+    Number(numStr ?? '1'),
+  );
   const mentionsMatch = tokens.some((token) =>
     token.includes(' ') ? title.includes(` ${token} `) : title.includes(token),
   );

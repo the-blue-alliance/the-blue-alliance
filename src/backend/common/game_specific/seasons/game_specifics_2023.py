@@ -246,9 +246,6 @@ class GameSpecifics2023(
         if not has_insights:
             return None
 
-        if finished_matches == 0:
-            return {}
-
         opportunities_1x = 2 * finished_matches
         opportunities_3x = 6 * finished_matches
         event_insights = {
