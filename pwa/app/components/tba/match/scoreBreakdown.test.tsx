@@ -184,13 +184,30 @@ describe('ScoreBreakdownRow', () => {
       <table>
         <tbody>
           <ScoreBreakdownRow redValue={1} blueValue={0}>
-            {'plain text child'}
+            <td>plain cell</td>
           </ScoreBreakdownRow>
         </tbody>
       </table>,
     );
 
-    expect(screen.getByRole('row').textContent).toBe('plain text child');
+    expect(screen.getByRole('row').textContent).toBe('plain cell');
+  });
+
+  test('gives win flags only to the label cell', () => {
+    function PropsProbe(props: Record<string, unknown>) {
+      return <td>{Object.keys(props).sort().join(',')}</td>;
+    }
+    render(
+      <table>
+        <tbody>
+          <ScoreBreakdownRow redValue={1} blueValue={0}>
+            <PropsProbe color="red" />
+          </ScoreBreakdownRow>
+        </tbody>
+      </table>,
+    );
+
+    expect(screen.getByRole('cell').textContent).toBe('color');
   });
 });
 
