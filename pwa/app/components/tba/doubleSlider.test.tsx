@@ -52,12 +52,8 @@ describe('DoubleSlider', () => {
     expect(labels(container)).toEqual(['Y2', 'Y7']);
   });
 
-  test('Bug #65: minStepsBetweenThumbs reaches Base UI instead of the DOM', () => {
-    // Wrong today: the Radix-era prop is spread onto Base UI's Slider.Root
-    // untouched (Base UI calls it `minStepsBetweenValues`), so it ends up as
-    // a stray `minstepsbetweenthumbs` DOM attribute, React warns about an
-    // unknown prop, and the thumbs are not kept apart.
-    // Correct: no stray attribute, and Base UI enforces the minimum gap.
+  test('minStepsBetweenThumbs reaches Base UI instead of the DOM', () => {
+    // Base UI names this prop minStepsBetweenValues.
     const { container } = render(
       <DoubleSlider
         min={0}
