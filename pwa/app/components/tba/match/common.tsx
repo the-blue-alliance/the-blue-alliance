@@ -42,7 +42,7 @@ export function ConditionalBadge({
   alignIcon,
 }: {
   condition: boolean;
-  teamKey: string;
+  teamKey?: string;
   alignIcon: 'left' | 'right';
 }) {
   return (
@@ -51,7 +51,7 @@ export function ConditionalBadge({
       className="flex items-center justify-center gap-1"
     >
       {alignIcon === 'left' && (condition ? <MdiCheck /> : <MdiClose />)}
-      {teamKey.substring(3)}
+      {teamKey?.substring(3)}
       {alignIcon === 'right' && (condition ? <MdiCheck /> : <MdiClose />)}
     </Badge>
   );

@@ -108,6 +108,12 @@ describe('ConditionalBadge', () => {
 
     expect(screen.getAllByRole('img')).toHaveLength(1);
   });
+
+  test('renders without a team key', () => {
+    render(<ConditionalBadge condition={true} alignIcon="left" />);
+
+    expect(screen.getAllByRole('img')).toHaveLength(1);
+  });
 });
 
 describe('fmtFoulsCommitted', () => {
