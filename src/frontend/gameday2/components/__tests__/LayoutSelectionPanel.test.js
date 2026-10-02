@@ -1,5 +1,6 @@
 /* @jest-environment jsdom */
 import React from "react";
+import { format } from "util";
 import { render, fireEvent, act } from "@testing-library/react";
 import LayoutSelectionPanel from "../LayoutSelectionPanel";
 import {
@@ -50,6 +51,24 @@ beforeEach(() => {
 const getListContainer = (container) =>
   container.querySelector("h3").nextSibling;
 
+describe("LayoutSelectionPanel ListItem button prop", () => {
+  // Runs first: React warns about a given unknown DOM attribute only once per module registry.
+  it("does not pass MUI's removed `button` prop through to the DOM", () => {
+    // MUI v7 ListItem has no `button` prop; React warns if it reaches the DOM.
+    const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      render(<LayoutSelectionPanel setLayout={() => {}} />);
+      expect(document.querySelector("[button]")).toBeNull();
+      const buttonWarnings = spy.mock.calls
+        .map((args) => format(...args))
+        .filter((msg) => msg.includes("`button`"));
+      expect(buttonWarnings).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
+
 describe("LayoutSelectionPanel", () => {
   it("lists every layout in display order with its icon", () => {
     const { container, getByText } = render(
@@ -62,6 +81,17 @@ describe("LayoutSelectionPanel", () => {
       expect(item.textContent).toBe(NAME_FOR_LAYOUT[LAYOUT_DISPLAY_ORDER[i]]);
       expect(item.querySelector("svg path")).not.toBeNull();
     });
+  });
+
+  it("offers every layout in LAYOUT_DISPLAY_ORDER, including Nona-View", () => {
+    // Nona-View (layout 8) is the last entry in LAYOUT_DISPLAY_ORDER.
+    const { container, queryByText } = render(
+      <LayoutSelectionPanel setLayout={() => {}} />
+    );
+    expect(container.querySelectorAll("ul > li")).toHaveLength(
+      LAYOUT_DISPLAY_ORDER.length
+    );
+    expect(queryByText("Nona-View")).not.toBeNull();
   });
 
   it("selects a layout when its item is clicked", () => {

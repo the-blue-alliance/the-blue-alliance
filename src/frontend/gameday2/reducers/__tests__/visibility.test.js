@@ -125,4 +125,19 @@ describe("visibility reducer set actions", () => {
     });
     expect(opened.layoutDrawer).toBe(true);
   });
+
+  it("sets the layout drawer to the requested visibility", () => {
+    // visible: false keeps a closed drawer closed; visible: true keeps an open one open.
+    const stillClosed = visibility(defaultState, {
+      type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+      visible: false,
+    });
+    expect(stillClosed.layoutDrawer).toBe(false);
+    const open = Object.assign({}, defaultState, { layoutDrawer: true });
+    const stillOpen = visibility(open, {
+      type: types.SET_LAYOUT_DRAWER_VISIBILITY,
+      visible: true,
+    });
+    expect(stillOpen.layoutDrawer).toBe(true);
+  });
 });
