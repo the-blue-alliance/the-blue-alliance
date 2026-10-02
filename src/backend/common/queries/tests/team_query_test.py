@@ -1,3 +1,4 @@
+import pytest
 from google.appengine.ext import ndb
 
 from backend.common.consts.api_version import ApiMajorVersion
@@ -36,10 +37,6 @@ def test_regional_teams_query() -> None:
     assert RegionalTeamsQuery(year=2025).fetch() == [ndb.Key(Team, "frc254")]
 
 
-def test_regional_teams_query_fetch_dict() -> None:
-    """fetch_dict returns the regional pool's team keys as strings."""
-    RegionalPoolTeam(id="2025_frc254", team=ndb.Key(Team, "frc254"), year=2025).put()
-
-    assert RegionalTeamsQuery(year=2025).fetch_dict(ApiMajorVersion.API_V3) == [
-        "frc254"
-    ]
+def test_regional_teams_query_has_no_dict_form() -> None:
+    with pytest.raises(AssertionError, match="Unexpected `None`"):
+        RegionalTeamsQuery(year=2025).fetch_dict(ApiMajorVersion.API_V3)

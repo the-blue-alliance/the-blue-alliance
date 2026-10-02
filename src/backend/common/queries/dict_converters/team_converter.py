@@ -1,7 +1,5 @@
 from typing import cast, Dict, List, NewType
 
-from google.appengine.ext import ndb
-
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.team import Team
 from backend.common.protocols.locatable import Locatable
@@ -59,15 +57,3 @@ class TeamConverter(ConverterBase):
         team.country = data["country"]
         team.school_name = data["school_name"]
         return team
-
-
-class TeamKeyConverter(ConverterBase):
-    SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 0,
-    }
-
-    @classmethod
-    def _convert_list(
-        cls, model_list: List[ndb.Key], version: ApiMajorVersion
-    ) -> List[str]:
-        return [str(key.id()) for key in model_list]

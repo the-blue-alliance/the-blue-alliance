@@ -13,7 +13,6 @@ from backend.common.queries.database_query import CachedDatabaseQuery
 from backend.common.queries.dict_converters.team_converter import (
     TeamConverter,
     TeamDict,
-    TeamKeyConverter,
 )
 from backend.common.tasklets import typed_tasklet
 
@@ -100,10 +99,10 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
-class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], List[str]]):
+class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], None]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "regional_teams_{year}"
-    DICT_CONVERTER = TeamKeyConverter
+    DICT_CONVERTER = None
 
     def __init__(self, year: Year) -> None:
         super().__init__(year=year)
