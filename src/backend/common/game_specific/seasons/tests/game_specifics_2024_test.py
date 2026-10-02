@@ -212,3 +212,20 @@ def test_breakdownless_match_excluded_from_insights(
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2024nytr_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2024nytr")).fetch()
     assert_breakdownless_match_excluded(GameSpecifics2024(), matches)
+
+
+def test_rp_sweep_requires_melody_and_ensemble() -> None:
+    """A 4 RP sweep is WIN + MELODY + ENSEMBLE (2024 manual, Table 6-2)."""
+    melody_only = {"melodyBonusAchieved": True, "ensembleBonusAchieved": False}
+    both = {"melodyBonusAchieved": True, "ensembleBonusAchieved": True}
+    matches = [
+        # Red wins with only the MELODY RP: 3 RP, not a sweep.
+        build_match(
+            "2024test", "qm", 1, 30, 10, {"red": melody_only, "blue": melody_only}
+        ),
+        # Red wins with both bonus RPs: a 4 RP sweep, but blue has no bonus RP.
+        build_match("2024test", "qm", 2, 30, 10, {"red": both, "blue": {}}),
+    ]
+    qual = none_throws(_insights(matches)["qual"])
+    assert qual["four_rp_count"] == [1, 2, 50.0]
+    assert qual["six_rp_count"] == [0, 2, 0.0]

@@ -155,6 +155,26 @@ describe("EventRankingsTab interactions", () => {
     expect(screen.getByText(/Loaded rankings/)).toHaveClass("alert-info");
   });
 
+  it("previews a 'Ranking Score' breakdown column's value, not the rank", async () => {
+    // Only the preview is affected; the uploaded payload is correct.
+    mockParseRankingsFile.mockResolvedValue({
+      ...parsed,
+      headers: ["Rank", "Team", "Ranking Score"],
+      breakdowns: ["Ranking Score"],
+      rankings: [{ ...parsed.rankings[0], "Ranking Score": 3.2 }],
+    });
+    renderTab();
+
+    fireEvent.change(fileInput(), { target: { files: [file] } });
+    await screen.findByText("Loaded rankings for 1 teams with 1 breakdown columns");
+
+    expect(screen.getAllByRole("cell").map((td) => td.textContent)).toEqual([
+      "1",
+      "254",
+      "3.2",
+    ]);
+  });
+
   it("supports a WLT record header as well as W-L-T", async () => {
     mockParseRankingsFile.mockResolvedValue({
       ...parsed,

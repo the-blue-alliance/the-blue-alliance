@@ -237,7 +237,8 @@ def test_success_rate_climbs_counted_per_robot() -> None:
         blue={"autoTowerRobot1": "Level2", "endGameTowerRobot1": "Level1"},
     )
     rates = _measure(match)
-    assert rates["auto_climb"] == (3, 6)
+    # At most 2 robots per alliance can climb in AUTO, so 4 per match.
+    assert rates["auto_climb"] == (3, 4)
     assert rates["level1_climb"] == (2, 6)
     assert rates["level2_climb"] == (1, 6)
     assert rates["level3_climb"] == (1, 6)
@@ -477,3 +478,33 @@ def test_breakdownless_match_excluded_from_insights(
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2026marea_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2026marea")).fetch()
     assert_breakdownless_match_excluded(GameSpecifics2026(), matches)
+
+
+def test_auto_climb_counters_agree() -> None:
+    """A missing AUTO climb key is not a climb; both counters use 4 per match."""
+    breakdown = json.loads(
+        none_throws(
+            _build_match(30, 10, red={"autoTowerRobot1": "Level1"}).score_breakdown_json
+        )
+    )
+    for color, robots in (("red", (2, 3)), ("blue", (1, 2, 3))):
+        for i in robots:
+            del breakdown[color][f"autoTowerRobot{i}"]
+    match = build_match("2026casj", "qm", 1, 30, 10, breakdown)
+
+    qual = none_throws(_insights([match])["qual"])
+    assert qual["auto_climb_count"] == [1, 4, 25.0]
+    assert _measure(match)["auto_climb"] == (1, 4)
+
+
+def test_auto_climbs_capped_at_two_per_alliance() -> None:
+    """At most 2 AUTO climbs count per alliance (2026 manual, Table 6-4)."""
+    match = _build_match(
+        30,
+        10,
+        red={f"autoTowerRobot{i}": "Level1" for i in (1, 2, 3)},
+        blue={"autoTowerRobot1": "Level1"},
+    )
+    qual = none_throws(_insights([match])["qual"])
+    assert qual["auto_climb_count"] == [3, 4, 75.0]
+    assert _measure(match)["auto_climb"] == (3, 4)
