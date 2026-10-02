@@ -2266,3 +2266,23 @@ def test_get_timezone_id_missing_time_zone_id(
 
     assert LocationHelper.get_timezone_id(None, lat_lng=SAN_JOSE) is None
     assert "No timeZoneId for (37.3382, -121.8863)" in caplog.text
+
+
+def test_missing_key_warnings_name_google_secrets(
+    requests_mock: Mocker, caplog: pytest.LogCaptureFixture
+) -> None:
+    """Every missing-key warning names the google.secrets sitevar."""
+    _mock_geocode(requests_mock, {"San Jose, CA": [_geocode_result()]})
+    requests_mock.get(TIMEZONE_URL, json={"timeZoneId": "America/Los_Angeles"})
+
+    with caplog.at_level(logging.WARNING):
+        assert LocationHelper.google_maps_placesearch("Leland", SAN_JOSE) == []
+        assert LocationHelper.google_maps_place_details("place-1") is None
+        LocationHelper.get_timezone_id("San Jose, CA")
+
+    warnings = [r.getMessage() for r in caplog.records if "sitevar" in r.getMessage()]
+    # nearbysearch, place details, geocode, timezone
+    assert len(warnings) == 4
+    for message in warnings:
+        assert "google.secrets" in message
+        assert "google.api_key" not in message
