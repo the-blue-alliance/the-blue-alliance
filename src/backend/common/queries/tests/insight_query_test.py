@@ -1,8 +1,11 @@
 import json
+import typing
+from typing import Any, cast
 
 from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.models.insight import Insight
 from backend.common.queries.insight_query import (
+    DistrictInsightQuery,
     DistrictInsightsYearQuery,
     InsightsLeaderboardsYearQuery,
     InsightsNotablesYearQuery,
@@ -56,3 +59,32 @@ def test_district_insights_year_query() -> None:
 
     result = DistrictInsightsYearQuery(district_abbreviation="ne", year=2024).fetch()
     assert sorted(i.key_name for i in result) == sorted([a.key_name, b.key_name])
+
+
+def _matches_declared_type(value: object, declared: object) -> bool:
+    origin = typing.get_origin(declared)
+    if origin is None:
+        return isinstance(value, cast(type, declared))
+    if origin is list:
+        (item_type,) = typing.get_args(declared)
+        return isinstance(value, list) and all(
+            _matches_declared_type(v, item_type) for v in value
+        )
+    return isinstance(value, origin)
+
+
+def test_district_insight_query_returns_its_declared_type() -> None:
+    """What DistrictInsightQuery returns matches its declared result type."""
+    insight = _insight(Insight.TYPED_LEADERBOARD_BLUE_BANNERS, 2024, "ne")
+    _insight(Insight.TYPED_LEADERBOARD_BLUE_BANNERS, 2024, "fim")
+
+    (base,) = cast(Any, DistrictInsightQuery).__orig_bases__
+    declared_result_type = typing.get_args(base)[0]
+    result = DistrictInsightQuery(
+        insight_name=insight.name, year=2024, district_abbreviation="ne"
+    ).fetch()
+
+    declared_name = getattr(declared_result_type, "__name__", declared_result_type)
+    assert _matches_declared_type(
+        result, declared_result_type
+    ), f"returned {type(result).__name__}, declared {declared_name}"
