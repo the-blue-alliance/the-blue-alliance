@@ -1088,6 +1088,13 @@ def test_do_overall_match_insights_with_nothing_stored_is_empty(ndb_stub) -> Non
     assert InsightsHelper.doOverallMatchInsights() == []
 
 
+def test_no_prediction_insight_without_predictions() -> None:
+    """With no predictions, no MATCH_PREDICTIONS insight is emitted."""
+    insights = InsightsHelper._doPredictionInsightsForEvents(year=2024, events=[])
+
+    assert insights == []
+
+
 def test_no_highscore_insight_without_matches(ndb_stub) -> None:
     """A year with no matches emits no MATCH_HIGHSCORE insight."""
     insights = InsightsHelper.doMatchInsights(2014)

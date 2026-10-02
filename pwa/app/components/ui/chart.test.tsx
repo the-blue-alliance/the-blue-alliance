@@ -329,6 +329,15 @@ describe('ChartTooltipContent', () => {
 
     expect(screen.getByText('unknown')).toBeTruthy();
   });
+
+  test('a string label with no config entry falls back to the raw label', () => {
+    // Upstream shadcn reads `config[label]?.label || label`.
+    renderInChart(
+      <ChartTooltipContent active payload={[item({})]} label="missing" />,
+    );
+
+    expect(screen.getByText('missing')).toBeTruthy();
+  });
 });
 
 describe('ChartLegendContent', () => {
