@@ -13,10 +13,10 @@
 <!--- see how your change affects other areas of the code, etc. -->
 
 ## Screenshots
-<!--- SHOULD for any change a user can see (PWA, templates, CSS, emails). -->
+<!--- SHOULD for any change a user can see (PWA, templates, CSS, emails), including bug fixes (e.g. an error page that now renders, a tooltip that now shows). -->
 <!--- One row per affected state; add dark-mode rows when the change touches colors. -->
 <!--- Diff = pixel diff of Before and After: ops/pr_screenshots/diff_screenshots.py before.png after.png diff.png (note its % under the image). -->
-<!--- Capture them yourself (CI does not) and publish them to the ci-screenshots branch; see AGENTS.md "Pull Requests". -->
+<!--- Capture them yourself (CI does not). Drag the images into this description, or (maintainers/agents) publish them to the ci-screenshots branch; see AGENTS.md "Pull Requests". -->
 <!--- If the change has no visible effect, replace the table with a sentence saying so. -->
 
 | | Before | After | Diff |
