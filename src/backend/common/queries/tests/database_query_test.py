@@ -1,15 +1,35 @@
+import hashlib
+import json
 import logging
-from typing import Any, Generator, Iterable, List, TypedDict
-from unittest.mock import patch
+import pickle
+from typing import Any, Generator, Iterable, List, Optional, TypedDict
+from unittest.mock import MagicMock, patch
 
+import orjson
+import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.consts.api_version import ApiMajorVersion
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.memcache import MemcacheClient
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.cached_query_result import CachedQueryResult
-from backend.common.queries.database_query import CachedDatabaseQuery, DatabaseQuery
+from backend.common.models.district import District
+from backend.common.models.event import Event
+from backend.common.models.match import Match
+from backend.common.models.team import Team
+from backend.common.queries.database_query import (
+    CachedDatabaseQuery,
+    DatabaseQuery,
+    track_accessed_query_cache_keys,
+)
 from backend.common.queries.dict_converters.converter_base import ConverterBase
+from backend.common.queries.district_query import DistrictQuery
+from backend.common.queries.event_query import EventQuery
+from backend.common.queries.match_query import MatchQuery
+from backend.common.queries.team_query import TeamQuery
 
 
 class DummyModel(ndb.Model):
@@ -52,6 +72,15 @@ class DummyModelPointQuery(DatabaseQuery[DummyModel, DummyDict]):
         return model
 
 
+class DummyModelPointQueryNoConverter(DatabaseQuery[DummyModel, None]):
+    DICT_CONVERTER = None
+
+    @ndb.tasklet
+    def _query_async(self, model_key: str) -> Generator[Any, Any, DummyModel]:
+        model: DummyModel = yield DummyModel.get_by_id_async(model_key)
+        return model
+
+
 class DummyModelRangeQuery(DatabaseQuery[List[DummyModel], List[DummyDict]]):
     DICT_CONVERTER = DummyConverter
 
@@ -76,6 +105,34 @@ class CachedDummyModelRangeQuery(
             DummyModel.int_prop >= min, DummyModel.int_prop <= max
         ).fetch_async()
         return list(models)
+
+
+class CachedDummyModelPointQuery(
+    CachedDatabaseQuery[Optional[DummyModel], Optional[DummyDict]]
+):
+    CACHE_KEY_FORMAT = "test_point_query_{model_key}"
+    DICT_CONVERTER = DummyConverter
+    CACHE_WRITES_ENABLED = True
+
+    @ndb.tasklet
+    def _query_async(self, model_key: str) -> Generator[Any, Any, Optional[DummyModel]]:
+        model = yield DummyModel.get_by_id_async(model_key)
+        return model
+
+
+class CachedDummyModelPointQueryNoDictCache(
+    CachedDatabaseQuery[Optional[DummyModel], Optional[DummyDict]]
+):
+    CACHE_KEY_FORMAT = "test_point_query_no_dict_cache_{model_key}"
+    DICT_CONVERTER = DummyConverter
+    MODEL_CACHING_ENABLED = False
+    DICT_CACHING_ENABLED = False
+    CACHE_WRITES_ENABLED = True
+
+    @ndb.tasklet
+    def _query_async(self, model_key: str) -> Generator[Any, Any, Optional[DummyModel]]:
+        model = yield DummyModel.get_by_id_async(model_key)
+        return model
 
 
 class CachedDummyModelWithRequiredPropQuery(
@@ -337,3 +394,441 @@ def test_cached_query_corrupt_cache_treated_as_miss(caplog, monkeypatch) -> None
     # Should have refetched valid data from datastore
     assert len(result) == 3
     assert all(model.required_prop is not None for model in result)
+
+
+def test_cached_query_fetch_json() -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+
+    # Cache miss
+    json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert isinstance(json_bytes, bytes)
+    parsed = json.loads(json_bytes)
+    assert len(parsed) == 3
+    assert parsed[0] == {"int_val": 0}
+
+    # Verify cache was populated
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    cached_entity = CachedQueryResult.get_by_id(cache_key)
+    assert cached_entity is not None
+    assert cached_entity.get_json_bytes() is not None
+
+    # Cache hit should return the same raw JSON bytes
+    hit_json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert hit_json_bytes == json_bytes
+
+
+def test_cached_query_fetch_json_negative_cache() -> None:
+    query = CachedDummyModelPointQuery(model_key="nonexistent")
+
+    # Cache miss on non-existent entity
+    json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert json_bytes is None
+
+    # Verify cache was populated with negative result (result_dict=None)
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    cached_entity = CachedQueryResult.get_by_id(cache_key)
+    assert cached_entity is not None
+    assert cached_entity.result_dict is None
+
+    # Cache hit should also return None without querying datastore
+    hit_json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+    assert hit_json_bytes is None
+
+
+def test_cached_query_fetch_dict_uses_orjson(monkeypatch) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 5)])
+    assert len(keys) == 5
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+
+    # Miss: populates cache
+    result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+
+    # Hit: should decode via orjson.loads
+    called = []
+    real_loads = orjson.loads
+
+    def mock_loads(b):
+        called.append(b)
+        return real_loads(b)
+
+    monkeypatch.setattr(orjson, "loads", mock_loads)
+    hit_result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(called) == 1
+    assert hit_result == result
+
+
+def test_cached_query_fetch_dict_fallback_on_orjson_error(caplog, monkeypatch) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    assert len(keys) == 3
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+
+    # Populate cache
+    result = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert len(result) == 3
+
+    # Hit with orjson.loads failure: should fall back to cached_query_result.result_dict with warning
+    def fail_loads(_b):
+        raise orjson.JSONDecodeError("mock decode failure", "doc", 0)
+
+    monkeypatch.setattr(orjson, "loads", fail_loads)
+    with caplog.at_level(logging.WARNING):
+        fallback_result = query.fetch_dict(ApiMajorVersion.API_V3)
+
+    assert fallback_result == result
+    assert "falling back to result_dict" in caplog.text
+
+
+def test_cached_query_fetch_dict_pre_inflated_bypasses_orjson(monkeypatch) -> None:
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    pre_inflated = CachedQueryResult(id=cache_key, result_dict=[{"int_val": 1}])
+    pre_inflated.put()
+
+    # Access result_dict to ensure it is inflated in memory
+    assert pre_inflated.result_dict == [{"int_val": 1}]
+
+    mock_loads = MagicMock(wraps=orjson.loads)
+
+    monkeypatch.setattr(orjson, "loads", mock_loads)
+    with patch.object(
+        CachedQueryResult, "get_by_id_async", return_value=ndb.Future()
+    ) as mock_get:
+        mock_get.return_value.set_result(pre_inflated)
+        result = query.fetch_dict(ApiMajorVersion.API_V3)
+
+    assert result == [{"int_val": 1}]
+    mock_loads.assert_not_called()
+
+
+def _cached_result_without_raw_bytes(
+    query: CachedDummyModelRangeQuery,
+) -> CachedQueryResult:
+    """A stored cache hit for `query` whose result_dict is populated.
+
+    Tests pair this with `get_json_bytes` patched to return None: with a real
+    entity the raw bytes are always recoverable whenever result_dict is set, so
+    the "re-serialize result_dict" fallback in _do_json_query is only reachable
+    when the raw-bytes shortcut declines to serve the hit.
+    """
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    cached = CachedQueryResult(id=cache_key, result_dict=[{"int_val": 1}])
+    cached.put()
+    assert cached.result_dict == [{"int_val": 1}]
+    return cached
+
+
+def test_cached_query_fetch_json_without_raw_bytes_serializes_result_dict() -> None:
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    _cached_result_without_raw_bytes(query)
+
+    with patch.object(CachedQueryResult, "get_json_bytes", return_value=None):
+        with track_accessed_query_cache_keys() as accessed_keys:
+            json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+
+    assert json_bytes == orjson.dumps([{"int_val": 1}])
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    assert accessed_keys == {
+        cache_key: hashlib.md5(none_throws(json_bytes)).hexdigest()
+    }
+
+
+def test_cached_query_fetch_json_without_raw_bytes_fallback_on_orjson_error(
+    caplog, monkeypatch
+) -> None:
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    _cached_result_without_raw_bytes(query)
+
+    def fail_dumps(_obj: Any) -> bytes:
+        raise TypeError("mock encode failure")
+
+    monkeypatch.setattr(orjson, "dumps", fail_dumps)
+    with patch.object(CachedQueryResult, "get_json_bytes", return_value=None):
+        with caplog.at_level(logging.WARNING):
+            json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+
+    assert json_bytes == b'[{"int_val":1}]'
+    assert "falling back to json.dumps" in caplog.text
+    assert query.dict_cache_key(ApiMajorVersion.API_V3) in caplog.text
+
+
+def test_cached_query_fetch_json_put_exception_logs_cache_key(caplog) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    assert len(keys) == 3
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    with caplog.at_level(logging.WARNING):
+        with patch.object(
+            CachedQueryResult, "put_async", side_effect=Exception("too large")
+        ):
+            json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+
+    # The write failure is logged, and the response is still served by
+    # serializing the freshly converted result.
+    assert "CachedQueryResult.put_async() failed" in caplog.text
+    assert query.dict_cache_key(ApiMajorVersion.API_V3) in caplog.text
+    assert json.loads(none_throws(json_bytes)) == [
+        {"int_val": 0},
+        {"int_val": 1},
+        {"int_val": 2},
+    ]
+    assert (
+        CachedQueryResult.get_by_id(query.dict_cache_key(ApiMajorVersion.API_V3))
+        is None
+    )
+
+
+def test_cached_query_fetch_json_miss_fallback_on_orjson_error(
+    caplog, monkeypatch
+) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    assert len(keys) == 3
+
+    def fail_dumps(_obj: Any) -> bytes:
+        raise TypeError("mock encode failure")
+
+    monkeypatch.setattr(orjson, "dumps", fail_dumps)
+    # No dict caching, so there is no CachedQueryResult to hand back raw
+    # bytes and the converted result has to be serialized directly.
+    query = CachedDummyModelPointQueryNoDictCache(model_key="1")
+    with caplog.at_level(logging.WARNING):
+        json_bytes = query.fetch_json(ApiMajorVersion.API_V3)
+
+    assert json_bytes == b'{"int_val":1}'
+    assert "falling back to json.dumps" in caplog.text
+    assert query.dict_cache_key(ApiMajorVersion.API_V3) in caplog.text
+
+
+def test_fetch_dict_without_converter_raises() -> None:
+    DummyModel(id="1", int_prop=1).put()
+
+    query = DummyModelPointQueryNoConverter(model_key="1")
+    assert query.fetch() == DummyModel.get_by_id("1")
+
+    with pytest.raises(
+        Exception,
+        match="DummyModelPointQueryNoConverter does not provide a Dict converter!",
+    ):
+        query.fetch_dict(ApiMajorVersion.API_V3)
+
+
+def test_compute_result_hash_by_result_type() -> None:
+    assert CachedDatabaseQuery._compute_result_hash(None) == "none"
+    assert (
+        CachedDatabaseQuery._compute_result_hash(b"raw")
+        == hashlib.md5(b"raw").hexdigest()
+    )
+    assert (
+        CachedDatabaseQuery._compute_result_hash(bytearray(b"raw"))
+        == hashlib.md5(b"raw").hexdigest()
+    )
+    # Strings are hashed as their UTF-8 bytes, not JSON-encoded
+    assert (
+        CachedDatabaseQuery._compute_result_hash("r\u00e9sult\u00e9")
+        == hashlib.md5("r\u00e9sult\u00e9".encode("utf-8")).hexdigest()
+    )
+    assert (
+        CachedDatabaseQuery._compute_result_hash({"a": 1})
+        == hashlib.md5(orjson.dumps({"a": 1})).hexdigest()
+    )
+    # Non-JSON-serializable results fall back to pickle
+    model = DummyModel(id="1", int_prop=1)
+    assert (
+        CachedDatabaseQuery._compute_result_hash(model)
+        == hashlib.md5(pickle.dumps(model, protocol=4)).hexdigest()
+    )
+
+
+def test_delete_cache_multi_memcache_failure_is_logged(caplog) -> None:
+    keys = ndb.put_multi([DummyModel(id=f"{i}", int_prop=i) for i in range(0, 3)])
+    assert len(keys) == 3
+
+    query = CachedDummyModelRangeQuery(min=0, max=2)
+    assert len(query.fetch()) == 3
+    assert CachedQueryResult.get_by_id(query.cache_key) is not None
+
+    with caplog.at_level(logging.WARNING):
+        with patch.object(MemcacheClient, "get", side_effect=Exception("down")):
+            CachedDummyModelRangeQuery.delete_cache_multi({query.cache_key})
+
+    # The datastore entry is gone even though the memcache cleanup failed
+    assert CachedQueryResult.get_by_id(query.cache_key) is None
+    assert "Failed to delete Memcache query version keys: down" in caplog.text
+
+
+def test_dict_caching_disabled_fetch_dict_exists() -> None:
+    m = DummyModel(id="test_disabled", int_prop=42)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_disabled")
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert result_dict == {"int_val": 42}
+
+    # Verify nothing was written to CachedQueryResult
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    assert CachedQueryResult.get_by_id(cache_key) is None
+
+
+def test_dict_caching_disabled_fetch_dict_not_exists() -> None:
+    query = CachedDummyModelPointQueryNoDictCache(model_key="nonexistent")
+    result_dict = query.fetch_dict(ApiMajorVersion.API_V3)
+    assert result_dict is None
+
+
+def test_dict_caching_disabled_fetch_json_exists() -> None:
+    m = DummyModel(id="test_disabled_json", int_prop=99)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_disabled_json")
+    result_json = query.fetch_json(ApiMajorVersion.API_V3)
+    assert result_json is not None
+    assert isinstance(result_json, bytes)
+    assert orjson.loads(result_json) == {"int_val": 99}
+
+    # Verify nothing was written to CachedQueryResult
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+    assert CachedQueryResult.get_by_id(cache_key) is None
+
+
+def test_dict_caching_disabled_fetch_json_not_exists() -> None:
+    query = CachedDummyModelPointQueryNoDictCache(model_key="nonexistent")
+    result_json = query.fetch_json(ApiMajorVersion.API_V3)
+    assert result_json is None
+
+
+def test_dict_caching_disabled_bypasses_cached_query_result_lookup() -> None:
+    m = DummyModel(id="test_bypass", int_prop=1)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_bypass")
+    with patch.object(
+        CachedQueryResult, "get_by_id_async", return_value=ndb.Future()
+    ) as mock_get:
+        dict_result = query.fetch_dict(ApiMajorVersion.API_V3)
+        json_result = query.fetch_json(ApiMajorVersion.API_V3)
+        mock_get.assert_not_called()
+
+    assert dict_result == {"int_val": 1}
+    assert json_result is not None
+    assert orjson.loads(json_result) == {"int_val": 1}
+
+
+def test_dict_caching_disabled_records_accessed_cache_key() -> None:
+    m = DummyModel(id="test_etag_track", int_prop=7)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_etag_track")
+    expected_cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as accessed_keys_dict:
+        query.fetch_dict(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as accessed_keys_json:
+        query.fetch_json(ApiMajorVersion.API_V3)
+
+    assert expected_cache_key in accessed_keys_dict
+    assert expected_cache_key in accessed_keys_json
+    assert (
+        accessed_keys_dict[expected_cache_key] == accessed_keys_json[expected_cache_key]
+    )
+    assert len(accessed_keys_json[expected_cache_key]) == 32
+
+
+def test_dict_caching_disabled_single_serialization() -> None:
+    m = DummyModel(id="test_single_ser", int_prop=42)
+    m.put()
+
+    query = CachedDummyModelPointQueryNoDictCache(model_key="test_single_ser")
+    expected_cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    with patch(
+        "backend.common.queries.database_query.orjson.dumps", wraps=orjson.dumps
+    ) as mock_dumps:
+        with track_accessed_query_cache_keys() as accessed_keys:
+            result_json = query.fetch_json(ApiMajorVersion.API_V3)
+
+        # Verify orjson.dumps was called exactly once during the entire fetch_json execution
+        assert mock_dumps.call_count == 1
+
+    assert result_json is not None
+    assert orjson.loads(result_json) == {"int_val": 42}
+    assert expected_cache_key in accessed_keys
+    expected_hash = hashlib.md5(result_json).hexdigest()
+    assert accessed_keys[expected_cache_key] == expected_hash
+
+
+def test_production_point_queries_single_serialization() -> None:
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+    Event(
+        id="2024casf",
+        year=2024,
+        event_type_enum=EventType.REGIONAL,
+        event_short="casf",
+    ).put()
+    Match(
+        id="2024casf_qm1",
+        event=ndb.Key(Event, "2024casf"),
+        year=2024,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": [], "score": 0, "surrogates": [], "dqs": []},
+                "blue": {"teams": [], "score": 0, "surrogates": [], "dqs": []},
+            }
+        ),
+    ).put()
+    District(id="2024fim", year=2024, abbreviation="fim").put()
+
+    queries = [
+        TeamQuery(team_key="frc254"),
+        EventQuery(event_key="2024casf"),
+        MatchQuery(match_key="2024casf_qm1"),
+        DistrictQuery(district_key="2024fim"),
+    ]
+
+    for query in queries:
+        assert not query.DICT_CACHING_ENABLED
+        cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+        with patch(
+            "backend.common.queries.database_query.orjson.dumps", wraps=orjson.dumps
+        ) as mock_dumps:
+            with track_accessed_query_cache_keys() as accessed_keys:
+                res = query.fetch_json(ApiMajorVersion.API_V3)
+            assert mock_dumps.call_count == 1
+
+        assert res is not None
+        assert cache_key in accessed_keys
+        assert accessed_keys[cache_key] == hashlib.md5(res).hexdigest()
+
+
+def test_cached_dict_query_not_exists() -> None:
+    query = CachedDummyModelPointQuery(model_key="nonexistent")
+    assert query.fetch_dict(ApiMajorVersion.API_V3) is None
+    assert query.fetch_dict(ApiMajorVersion.API_V3) is None
+
+
+def test_get_query_class_by_name() -> None:
+    assert (
+        CachedDatabaseQuery.get_query_class_by_name("CachedDummyModelPointQuery")
+        is CachedDummyModelPointQuery
+    )
+    assert CachedDatabaseQuery.get_query_class_by_name("NotARealQuery") is None
+
+
+def test_validate_db_version_for_deletion() -> None:
+    current = CachedDatabaseQuery.DATABASE_QUERY_VERSION
+    CachedDatabaseQuery.validate_db_version_for_deletion(current - 2)
+
+    with pytest.raises(ValueError, match="must be a positive integer"):
+        CachedDatabaseQuery.validate_db_version_for_deletion(0)
+    with pytest.raises(ValueError, match="must be less than"):
+        CachedDatabaseQuery.validate_db_version_for_deletion(current - 1)

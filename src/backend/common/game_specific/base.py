@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import (
+    Any,
     Callable,
     ClassVar,
     Dict,
@@ -51,6 +52,18 @@ class SuccessRateCounter(NamedTuple):
     name: str
     label: str
     measure: Callable[[Match], Tuple[int, int]]
+
+
+_AUTO_POINTS_KEYS = ("autoPoints", "totalAutoPoints")
+
+
+def _auto_points(breakdown: Dict[str, Any]) -> Optional[int]:
+    """Alliance AUTO points, or None when the breakdown does not record them."""
+    for key in _AUTO_POINTS_KEYS:
+        value = breakdown.get(key)
+        if value is not None:
+            return int(value)
+    return None
 
 
 def _bonus_rp_success_rate_counter(
@@ -456,7 +469,48 @@ class AbstractModernGameConfig(
     def ranking_win_points(self) -> int:
         return 2
 
+    def determine_auto_winner(
+        self, red: Dict[str, Any], blue: Dict[str, Any]
+    ) -> Optional[AllianceColor]:
+        """
+        Which alliance won AUTO, or None when AUTO was tied or the breakdown
+        does not record auto points. Seasons whose game defines its own AUTO
+        tiebreakers override this.
+        """
+        red_auto = _auto_points(red)
+        blue_auto = _auto_points(blue)
+        if red_auto is None or blue_auto is None or red_auto == blue_auto:
+            return None
+        return AllianceColor.RED if red_auto > blue_auto else AllianceColor.BLUE
+
+    def _auto_win_conversion_counter(self) -> SuccessRateCounter:
+        """
+        How often the alliance that won AUTO went on to win the match. Matches
+        where either AUTO or the match itself was tied offer no opportunity.
+        """
+
+        def measure(match: Match) -> Tuple[int, int]:
+            breakdown = match.score_breakdown
+            if breakdown is None:
+                return (0, 0)
+
+            auto_winner = self.determine_auto_winner(
+                breakdown[AllianceColor.RED], breakdown[AllianceColor.BLUE]
+            )
+            match_winner = match.winning_alliance
+            if auto_winner is None or match_winner == "":
+                return (0, 0)
+
+            return (1 if auto_winner == match_winner else 0, 1)
+
+        return SuccessRateCounter("auto_win_conversion", "Auto Win Conversion", measure)
+
     def success_rate_counters(self) -> Sequence[SuccessRateCounter]:
+        """
+        The bonus-RP counters every modern season shares, plus auto win
+        conversion. A season declaring no bonus RPs (2021, the remote
+        practice-only season) tracks nothing at all.
+        """
         fields = list(self.ranking_bonus_rp_breakdown_fields())
         if not fields:
             return []
@@ -486,6 +540,7 @@ class AbstractModernGameConfig(
                 both_alliances=True,
             )
         )
+        counters.append(self._auto_win_conversion_counter())
         return counters
 
     @property

@@ -3,26 +3,28 @@ name = "the-blue-alliance"
 version = "0.1.0"
 requires-python = ">=3.13"
 dependencies = [
-    "appengine-python-standard==2.0.1",
+    "appengine-python-standard==3.0.2",
     "beautifulsoup4==4.15.0",
-    "firebase-admin==7.4.0",
+    "firebase-admin==7.7.0",
     "Flask==3.1.3",
     "Flask-Caching==2.3.1",
     "Flask-Cors==6.0.2",
     "Flask-WTF==1.2.2",
-    "google-api-core==2.34.0",
-    "google-api-python-client==2.199.0",
-    "google-cloud-logging==3.16.2",
+    "google-api-core==2.38.0",
+    "google-api-python-client==2.200.0",
+    "google-cloud-logging==3.16.3",
     "google-cloud-run==0.16.1",
-    "grpcio==1.83.0",
+    "grpcio==1.84.0",
     "gunicorn==26.2.0",
     "Jinja2==3.1.6",
     "MarkupSafe==3.0.3",
-    "numpy==2.5.2",
+    "numpy==2.5.3",
     "oauth2client==4.1.3",
     "openpyxl==3.1.5",
+    "orjson==3.12.0",
+    "pydantic==2.13.5",
     "pyre-extensions==0.0.32",
-    "pytz==2026.3.post1",
+    "pytz==2026.4",
     "requests==2.34.2",
     "six==1.17.0",
     "typing-extensions==4.16.0",
@@ -37,6 +39,7 @@ test = [
     "pytest-custom_exit_code",
     "pytest-split",
     "pytest-testmon",
+    "pytest-xdist>=3.8.0",
     "requests-mock==1.12.1",
 ]
 ci = [
@@ -45,7 +48,7 @@ ci = [
 ]
 lint = [
     "black==26.5.1",
-    "flake8==7.3.0",
+    "flake8==7.4.1",
     "flake8-import-order",
     "flake8-tidy-imports",
 ]

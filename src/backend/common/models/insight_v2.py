@@ -8,17 +8,20 @@ from backend.common.models.keys import DistrictAbbreviation
 LeaderboardKeyType = Literal["team", "event", "match", "team_pair", "alliance"]
 LeaderboardContextType = Literal["event_list", "match_alliance", "none"]
 
-TimeseriesXType = Literal["week", "year", "event"]
+TimeseriesXType = Literal["week", "year", "event", "date"]
 TimeseriesPointContextType = Literal["none", "match_record"]
 
-SuccessRateScopeType = Literal["overall", "week", "event"]
+GameStatsScopeType = Literal["overall", "week", "event"]
+
+ClubContextType = Literal["hall_of_fame", "none"]
 
 
 class InsightCategory:
     LEADERBOARD = "leaderboard"
     STREAK = "streak"
     TIMESERIES = "timeseries"
-    SUCCESS_RATE = "success_rate"
+    GAME_STATS = "game_stats"
+    CLUBS = "clubs"
 
 
 class InsightV2(CachedModel):
@@ -166,21 +169,55 @@ class TimeseriesData(TypedDict):
     point_context_type: TimeseriesPointContextType
 
 
-class SuccessRate(TypedDict):
+class GameStat(TypedDict):
     name: str
     label: str
     count: int
     opportunities: int
 
 
-class SuccessRateScope(TypedDict):
-    scope_type: SuccessRateScopeType
+class AverageStat(TypedDict):
+    name: str
+    label: str
+    value: float
+
+
+class GameStatsScope(TypedDict):
+    scope_type: GameStatsScopeType
     label: str
     key: Optional[str]
     week: Optional[int]
-    qual: List[SuccessRate]
-    playoff: List[SuccessRate]
+    qual: List[GameStat]
+    playoff: List[GameStat]
+    qual_averages: List[AverageStat]
+    playoff_averages: List[AverageStat]
 
 
-class SuccessRateData(TypedDict):
-    scopes: List[SuccessRateScope]
+class GameStatsData(TypedDict):
+    scopes: List[GameStatsScope]
+
+
+class HallOfFameClubContext(TypedDict):
+    year: int  # induction year (year of event_added_key)
+    video: Optional[str]  # Chairman's video URL, or None
+    presentation: Optional[str]  # Chairman's presentation URL, or None
+    essay: Optional[str]  # Chairman's essay URL, or None
+
+
+class ClubEntryV2(TypedDict):
+    team_key: str
+    event_added_key: str  # event where the team first qualified for the club
+
+
+class ClubEntryWithHallOfFame(TypedDict):
+    team_key: str
+    event_added_key: str
+    extra_context: HallOfFameClubContext
+
+
+ClubEntry = ClubEntryV2 | ClubEntryWithHallOfFame
+
+
+class ClubsData(TypedDict):
+    entries: List[ClubEntry]
+    context_type: ClubContextType

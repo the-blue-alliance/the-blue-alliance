@@ -1,6 +1,7 @@
 import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { type JSX, useState } from 'react';
 import { Temporal } from 'temporal-polyfill';
 
@@ -19,14 +20,13 @@ import {
   getEventOprs,
   getEventPredictions,
   getEventRankings,
-  getEventsByYear,
   getInsightsNotablesYear,
-  getStatus,
   getTeamEventsStatusesByYear,
 } from '~/api/tba/read';
 import {
   getDistrictRankingsOptions,
   getEventOptions,
+  getEventsByYearOptions,
   getTeamAwardsByYearOptions,
   getTeamDistrictsOptions,
   getTeamEventsByYearOptions,
@@ -42,27 +42,18 @@ import {
   getCurrentWeekEvents,
 } from '~/lib/eventUtils';
 import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
-import { cn, publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
+import { publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
 
 export const Route = createFileRoute('/match_suggestion')({
-  loader: async () => {
-    const status = await getStatus();
+  loader: async ({ context: { queryClient, currentSeason } }) => {
+    const events = await queryClient.ensureQueryData(
+      getEventsByYearOptions({ path: { year: currentSeason } }),
+    );
 
-    if (status.data === undefined) {
-      throw new Error('Failed to load status');
-    }
-
-    const year = status.data.current_season;
-    const events = await getEventsByYear({ path: { year } });
-
-    if (events.data === undefined) {
-      throw new Error('Failed to load events');
-    }
-
-    const filteredEvents = getCurrentWeekEvents(events.data);
-
+    // Filtered here rather than in the component because getCurrentWeekEvents
+    // reads the ambient timezone, which differs between server and browser.
     return {
-      events: filteredEvents,
+      events: getCurrentWeekEvents(events),
     };
   },
   headers: publicCacheControlHeaders(),
@@ -101,7 +92,8 @@ interface MatchInfo {
   eventRankings?: EventRanking | null;
   eventPredictions?: EventPredictions | null;
   epaPercentileMap?: Map<string, number> | null;
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function epaStars(percentile: number | undefined): string {
   if (percentile == null) return '';

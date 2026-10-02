@@ -1,6 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
@@ -20,14 +21,16 @@ export default class WebcastSelectionDialogItem extends React.Component {
 
   render() {
     return (
-      <ListItem button onClick={() => this.handleClick()}>
-        {this.props.leftIcon && (
-          <ListItemIcon>{this.props.leftIcon}</ListItemIcon>
-        )}
-        <ListItemText
-          primary={this.props.webcast.name}
-          secondary={this.props.secondaryText}
-        />
+      <ListItem disablePadding>
+        <ListItemButton onClick={() => this.handleClick()}>
+          {this.props.leftIcon && (
+            <ListItemIcon>{this.props.leftIcon}</ListItemIcon>
+          )}
+          <ListItemText
+            primary={this.props.webcast.name}
+            secondary={this.props.secondaryText}
+          />
+        </ListItemButton>
         {this.props.rightIcon && (
           <ListItemSecondaryAction>
             {this.props.rightIcon}

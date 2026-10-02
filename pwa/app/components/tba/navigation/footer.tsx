@@ -1,11 +1,12 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
 import { Temporal } from 'temporal-polyfill';
 
 import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
+import { useIsHydrated } from '~/lib/hooks';
 
 type InternalLink = {
   icon?: React.ComponentType<React.SVGProps<SVGSVGElement>>;
@@ -59,11 +60,11 @@ function formatRenderTime(): string {
 }
 
 export const Footer = () => {
-  const [renderTime, setRenderTime] = useState<string | null>(null);
-
-  useEffect(() => {
-    setRenderTime(formatRenderTime());
-  }, []);
+  const hydrated = useIsHydrated();
+  const renderTime = useMemo(
+    () => (hydrated ? formatRenderTime() : null),
+    [hydrated],
+  );
 
   return (
     <footer
@@ -126,7 +127,9 @@ export const Footer = () => {
               <img
                 src={andymarkLogo}
                 alt="AndyMark"
-                className="ml-2 inline h-4"
+                width={450}
+                height={81}
+                className="ml-2 inline h-4 w-auto"
               />
             </a>
           </span>

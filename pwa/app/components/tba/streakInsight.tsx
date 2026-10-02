@@ -1,3 +1,5 @@
+import { cn } from 'cn';
+
 import MaterialSymbolsLocalFireDepartment from '~icons/material-symbols/local-fire-department';
 
 import { type InsightV2Streak } from '~/api/tba/read';
@@ -17,7 +19,6 @@ import {
   rankRowClassName,
   rankTextClassName,
 } from '~/lib/insightUtils';
-import { cn } from '~/lib/utils';
 
 export function StreakInsight({
   streak,

@@ -662,3 +662,30 @@ def test_mytba() -> None:
     mytba = user.myTBA
     assert mytba is not None
     assert mytba.models == [f, s]
+
+
+def test_has_permission_none() -> None:
+    user = User(session_claims={})
+    assert user._account is None
+    assert user.has_permission(AccountPermission.REVIEW_MEDIA) is False
+
+
+def test_has_permission() -> None:
+    email = "zach@thebluealliance.com"
+    account = Account(
+        id="account", email=email, permissions=[AccountPermission.REVIEW_MEDIA]
+    )
+    account.put()
+
+    user = User(session_claims={"email": email})
+    assert user._account is not None
+    assert user.has_permission(AccountPermission.REVIEW_MEDIA) is True
+    assert user.has_permission(AccountPermission.REVIEW_EVENT_MEDIA) is False
+
+
+@pytest.mark.parametrize(
+    "claims, expected",
+    [({}, False), ({"email_verified": False}, False), ({"email_verified": True}, True)],
+)
+def test_email_verified(claims: dict, expected: bool) -> None:
+    assert User(session_claims=claims).email_verified is expected

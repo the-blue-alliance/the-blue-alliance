@@ -1,6 +1,7 @@
 import datetime
 import json
 from typing import Dict, Optional
+from unittest.mock import patch
 
 import pytest
 import requests
@@ -11,6 +12,7 @@ from freezegun import freeze_time
 from google.appengine.ext import ndb, testbed
 from pyre_extensions import none_throws
 
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.deferred import run_from_task
@@ -25,6 +27,11 @@ from backend.common.models.event_queue_status import (
     NexusMatchTiming,
 )
 from backend.common.models.match import Match
+from backend.common.models.match_suggestion import (
+    MatchSuggestion,
+    MatchSuggestionComponents,
+    MatchSuggestions,
+)
 from backend.common.models.webcast import Webcast
 from backend.common.sitevars.gameday_special_webcasts import (
     ContentType as TSpecialWebcasts,
@@ -606,3 +613,154 @@ def test_update_match_queue_status_not_found(
 
     with pytest.raises(firebase_exceptions.NotFoundError):
         FirebasePusher._get_reference("e/2018ct/m/qm1").get()
+
+
+def test_update_match_suggestions(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    suggestions = MatchSuggestions(
+        updated_at=1777000000,
+        suggestions={
+            "2026cmptx_f1m1": MatchSuggestion(
+                match_key="2026cmptx_f1m1",
+                event_key="2026cmptx",
+                event_name="Einstein Field",
+                event_short_name="Einstein",
+                comp_level=CompLevel.F,
+                set_number=1,
+                match_number=1,
+                display_name="F1",
+                red_team_numbers=[254, 1114, 2056],
+                blue_team_numbers=[118, 148, 971],
+                predicted_time=1777000200,
+                scheduled_time=1777000000,
+                predicted_red_score=135.5,
+                predicted_blue_score=128.25,
+                rank=0,
+                score=0.8125,
+                components=MatchSuggestionComponents(
+                    favorites=1.0,
+                    significance=1.0,
+                    time_decay=0.75,
+                    high_score=0.5,
+                    close_score=0.5,
+                ),
+            )
+        },
+    )
+
+    FirebasePusher.update_match_suggestions(suggestions)
+    drain_deferred(taskqueue_stub)
+
+    # Reading back a dict rather than a JSON string is the guard against
+    # double-encoding the payload before handing it to the SDK
+    # Per-suggestion keys are published terse (billed per byte); root keys stay
+    # readable since they appear once per document
+    assert FirebasePusher._get_reference("match_suggestions").get() == {
+        "updated_at": 1777000000,
+        "suggestions": {
+            "2026cmptx_f1m1": {
+                "mk": "2026cmptx_f1m1",
+                "ek": "2026cmptx",
+                "en": "Einstein Field",
+                "esn": "Einstein",
+                "cl": "f",
+                "sn": 1,
+                "mn": 1,
+                "dn": "F1",
+                "rt": [254, 1114, 2056],
+                "bt": [118, 148, 971],
+                "pt": 1777000200,
+                "st": 1777000000,
+                "rs": 135.5,
+                "bs": 128.25,
+                "r": 0,
+                "sc": 0.8125,
+                "c": {
+                    "f": 1.0,
+                    "sig": 1.0,
+                    "td": 0.75,
+                    "hs": 0.5,
+                    "cs": 0.5,
+                },
+            }
+        },
+    }
+
+
+def test_update_match_suggestions_empty(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    FirebasePusher.update_match_suggestions(MatchSuggestions(updated_at=1777000000))
+    drain_deferred(taskqueue_stub)
+
+    # NB: the real Realtime Database drops empty children, so `suggestions` would
+    # be absent rather than `{}` in production. Clients must treat a missing node
+    # as an empty feed.
+    assert FirebasePusher._get_reference("match_suggestions").get() == {
+        "updated_at": 1777000000,
+        "suggestions": {},
+    }
+
+
+def test_update_match_queue_status_unchanged(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    match = Match(
+        id="2018ct_qm1",
+        alliances_json="""{"blue": {"score": 57, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": 74, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="qm",
+        event=ndb.Key(Event, "2018ct"),
+        year=2018,
+        set_number=1,
+        match_number=1,
+    )
+    nexus_status = EventQueueStatus(
+        data_as_of_ms=0,
+        now_queueing=None,
+        matches={
+            "2018ct_qm1": NexusMatch(
+                label="Quals 1",
+                status=NexusMatchStatus.ON_DECK,
+                played=False,
+                times=NexusMatchTiming(
+                    estimated_queue_time_ms=None,
+                    estimated_start_time_ms=None,
+                ),
+            ),
+        },
+    )
+
+    FirebasePusher.update_match_queue_status(match, nexus_status)
+
+    # The same status again doesn't push another update
+    with patch("backend.common.helpers.firebase_pusher.defer_safe") as mock_defer:
+        FirebasePusher.update_match_queue_status(match, nexus_status)
+    mock_defer.assert_not_called()
+
+
+def test_update_single_live_event(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    e = Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime.datetime(2020, 4, 1),
+        end_date=datetime.datetime(2020, 4, 1),
+        name="Test Event",
+        short_name="Test",
+    )
+
+    FirebasePusher.update_live_event(e)
+    drain_deferred(taskqueue_stub)
+
+    assert FirebasePusher._get_reference("live_events").get() == {
+        "2020nyny": {
+            "key": "2020nyny",
+            "name": "Test Event",
+            "short_name": "Test",
+            "webcasts": [],
+        }
+    }

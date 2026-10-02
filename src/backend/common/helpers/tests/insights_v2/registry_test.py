@@ -193,8 +193,44 @@ def test_average_by_week_calculators_not_instantiated_for_all_time(
     "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
     return_value=[],
 )
-@patch("backend.common.helpers.insights_v2.registry.SuccessRateV2Calculator")
-def test_success_rate_instantiated_for_specific_year(mock_calc, mock_compute) -> None:
+@patch("backend.common.helpers.insights_v2.registry.NumMatchesByYearV2Calculator")
+def test_num_matches_by_year_only_for_all_time(mock_calc, mock_compute) -> None:
+    make_all_insights(0)
+    mock_calc.assert_called_once_with()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.NumMatchesByYearV2Calculator")
+def test_num_matches_by_year_not_for_specific_year(mock_calc, mock_compute) -> None:
+    make_all_insights(2024)
+    mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.CumulativeMatchesByDayV2Calculator")
+def test_cumulative_matches_by_day_for_specific_year_only(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(2024)
+    mock_calc.assert_called_once_with()
+
+    mock_calc.reset_mock()
+    make_all_insights(0)
+    mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.GameStatsV2Calculator")
+def test_game_stats_instantiated_for_specific_year(mock_calc, mock_compute) -> None:
     make_all_insights(2026)
     mock_calc.assert_called_once_with()
 
@@ -203,7 +239,55 @@ def test_success_rate_instantiated_for_specific_year(mock_calc, mock_compute) ->
     "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
     return_value=[],
 )
-@patch("backend.common.helpers.insights_v2.registry.SuccessRateV2Calculator")
-def test_success_rate_not_instantiated_for_all_time(mock_calc, mock_compute) -> None:
+@patch("backend.common.helpers.insights_v2.registry.GameStatsV2Calculator")
+def test_game_stats_not_instantiated_for_all_time(mock_calc, mock_compute) -> None:
     make_all_insights(0)
+    mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.HallOfFameClubV2Calculator")
+def test_hall_of_fame_club_only_for_all_time(mock_calc, mock_compute) -> None:
+    make_all_insights(0)
+    mock_calc.assert_called_once_with()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch("backend.common.helpers.insights_v2.registry.HallOfFameClubV2Calculator")
+def test_hall_of_fame_club_not_for_specific_year(mock_calc, mock_compute) -> None:
+    make_all_insights(2024)
+    mock_calc.assert_not_called()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.WorldChampionshipWinnersClubV2Calculator"
+)
+def test_world_championship_winners_club_only_for_all_time(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(0)
+    mock_calc.assert_called_once_with()
+
+
+@patch(
+    "backend.common.helpers.insights_v2.registry.compute_insights_for_year",
+    return_value=[],
+)
+@patch(
+    "backend.common.helpers.insights_v2.registry.WorldChampionshipWinnersClubV2Calculator"
+)
+def test_world_championship_winners_club_not_for_specific_year(
+    mock_calc, mock_compute
+) -> None:
+    make_all_insights(2024)
     mock_calc.assert_not_called()

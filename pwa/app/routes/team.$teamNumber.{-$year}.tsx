@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/tanstackstart-react';
+import { metrics } from '@sentry/tanstackstart-react';
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   Link,
@@ -95,7 +95,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     const teamKey = `frc${params.teamNumber}`;
     const year = parseParamsForYearElseDefault(currentSeason, params);
 
-    Sentry.metrics.count('team.page.view', 1, {
+    metrics.count('team.page.view', 1, {
       attributes: { team_number: params.teamNumber, year },
     });
 
@@ -186,7 +186,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
     const endTime = Temporal.Now.instant().epochMilliseconds;
     const duration = endTime - startTime;
-    Sentry.metrics.distribution('team.page.loader.duration', duration, {
+    metrics.distribution('team.page.loader.duration', duration, {
       attributes: { team_number: params.teamNumber, year },
     });
 
@@ -255,7 +255,8 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     };
   },
   component: TeamPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function TeamPage(): React.JSX.Element {
   const { teamKey, year } = Route.useLoaderData();
@@ -416,7 +417,7 @@ function TeamPage(): React.JSX.Element {
       <TableOfContents tocItems={tocItems} inView={inView}>
         <YearSelector
           currentLabel={String(year)}
-          triggerClassName="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          triggerClassName="w-[180px]"
           options={[
             {
               label: 'History',

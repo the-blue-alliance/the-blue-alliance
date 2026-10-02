@@ -94,10 +94,11 @@ jobs:
         run: pnpm --dir pwa test
 
       - name: Upload coverage to Codecov
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
+          flags: pwa
 
   pwa-build:
     name: "[pwa] Build"

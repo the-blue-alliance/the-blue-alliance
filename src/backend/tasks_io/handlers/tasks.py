@@ -67,7 +67,8 @@ def remap_teams(event_key: EventKey) -> str:
         EventRemapTeamsHelper.remapteams_rankings2(
             event.details.rankings2, event.remap_teams
         )
-    EventDetailsManipulator.createOrUpdate(event.details)
+    if event.details:
+        EventDetailsManipulator.createOrUpdate(event.details)
 
     # Remap awards
     EventRemapTeamsHelper.remapteams_awards(event.awards, event.remap_teams)

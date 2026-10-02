@@ -3,16 +3,19 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   HeadContent,
   Outlet,
+  ScriptOnce,
   Scripts,
   createRootRouteWithContext,
   useLocation,
 } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { Suspense, lazy, useEffect } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
 import { client as colorsClient } from '~/api/colors/client.gen';
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
+import { client as moderationClient } from '~/api/tba/moderation/client.gen';
 import {
   getSearchIndexOptions,
   getStatusOptions,
@@ -35,8 +38,8 @@ import {
 } from '~/lib/dataSource';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { STALE_TIME } from '~/lib/queryClient';
-import { ThemeProvider } from '~/lib/theme';
-import { cn, createLogger } from '~/lib/utils';
+import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
+import { createLogger } from '~/lib/utils';
 import appCss from '~/style/tailwind.css?url';
 
 const logger = createLogger('root');
@@ -70,7 +73,7 @@ client.interceptors.request.use((request) => {
       : import.meta.env.VITE_TBA_API_READ_KEY,
   );
 
-  logger.info(
+  logger.debug(
     {
       method: request.method,
       url: request.url,
@@ -90,6 +93,12 @@ client.interceptors.error.use((error, response) => {
 // Same ApiError mapping for the colors client — consumers rely on 404s being
 // skipped and 4xx not being retried (see queryClient.ts).
 colorsClient.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
+});
+
+// And for the moderation client, so a failed queue probe throws a real
+// ApiError (with status) rather than a bare object.
+moderationClient.interceptors.error.use((error, response) => {
   return mapClientError(error, response);
 });
 
@@ -114,6 +123,13 @@ if (isLocalDataSource()) {
 if (import.meta.env.VITE_TBA_MOBILE_API_BASE_URL) {
   mobileClient.setConfig({
     baseUrl: import.meta.env.VITE_TBA_MOBILE_API_BASE_URL,
+  });
+}
+
+// Point moderation API client at local backend when configured
+if (import.meta.env.VITE_TBA_MODERATION_API_BASE_URL) {
+  moderationClient.setConfig({
+    baseUrl: import.meta.env.VITE_TBA_MODERATION_API_BASE_URL,
   });
 }
 
@@ -214,23 +230,8 @@ function RootComponent() {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          // This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded.
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  var isDark = theme === 'dark' || 
-                    (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded. */}
+        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
         <HeadContent />
       </head>
       <body>
@@ -276,4 +277,5 @@ function RootComponent() {
       </body>
     </html>
   );
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop

@@ -1,4 +1,8 @@
-import { useSuspenseQuery } from '@tanstack/react-query';
+import {
+  useMutation,
+  useQueryClient,
+  useSuspenseQuery,
+} from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { type JSX, useState } from 'react';
 import { z } from 'zod';
@@ -47,7 +51,8 @@ export const Route = createFileRoute('/suggest/team/media')({
 });
 
 type SubmitStatus =
-  'idle' | 'loading' | 'success' | 'exists' | 'bad_url' | 'error';
+  'idle' | 'loading' | 'success' | 'exists' | 'bad_url' | 'error'; // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SuggestTeamMedia(): JSX.Element {
   const { team_key, year } = Route.useSearch();
@@ -55,6 +60,7 @@ function SuggestTeamMedia(): JSX.Element {
   const [mediaUrl, setMediaUrl] = useState('');
   const [status, setStatus] = useState<SubmitStatus>('idle');
   const [loginOpen, setLoginOpen] = useState(false);
+  const queryClient = useQueryClient();
 
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key } }),
@@ -63,14 +69,9 @@ function SuggestTeamMedia(): JSX.Element {
     getTeamMediaByYearOptions({ path: { team_key, year } }),
   );
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!user) {
-      setLoginOpen(true);
-      return;
-    }
-    setStatus('loading');
-    try {
+  const { mutate: submitMedia, isPending } = useMutation({
+    mutationFn: async (url: string) => {
+      if (!user) throw new Error('User not authenticated');
       const token = await user.getIdToken();
       const { data } = await suggestTeamMedia({
         auth: token,
@@ -78,14 +79,23 @@ function SuggestTeamMedia(): JSX.Element {
           reference_type: 'team',
           reference_key: team_key,
           year,
-          media_url: mediaUrl,
+          media_url: url,
           details_json: '',
         },
       });
-      const code = Number(data?.code);
+      // client_api_method always returns HTTP 200; logical failures are in the
+      // body `code` (e.g. 304 already submitted, 400 unsupported URL).
+      return Number(data?.code);
+    },
+    onSuccess: (code) => {
       if (code === 200) {
         setStatus('success');
         setMediaUrl('');
+        void queryClient.invalidateQueries({
+          queryKey: getTeamMediaByYearOptions({
+            path: { team_key, year },
+          }).queryKey,
+        });
       } else if (code === 304) {
         setStatus('exists');
       } else if (code === 400) {
@@ -93,9 +103,20 @@ function SuggestTeamMedia(): JSX.Element {
       } else {
         setStatus('error');
       }
-    } catch {
+    },
+    onError: () => {
       setStatus('error');
+    },
+  });
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!user) {
+      setLoginOpen(true);
+      return;
     }
+    setStatus('loading');
+    submitMedia(mediaUrl);
   };
 
   return (
@@ -217,7 +238,7 @@ function SuggestTeamMedia(): JSX.Element {
         )}
         <form
           onSubmit={(e) => {
-            void handleSubmit(e);
+            handleSubmit(e);
           }}
           className="flex gap-2"
         >
@@ -229,8 +250,8 @@ function SuggestTeamMedia(): JSX.Element {
             required
             className="flex-1"
           />
-          <Button type="submit" disabled={status === 'loading'}>
-            {status === 'loading' ? 'Submitting\u2026' : 'Add Media'}
+          <Button type="submit" disabled={isPending}>
+            {isPending ? 'Submitting\u2026' : 'Add Media'}
           </Button>
         </form>
       </div>

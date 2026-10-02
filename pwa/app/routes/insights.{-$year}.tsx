@@ -1,21 +1,28 @@
+import { useSuspenseQueries } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
 import {
+  type Event,
+  type InsightV2GameStats,
   type InsightV2Leaderboard,
   type InsightV2Streak,
-  type InsightV2SuccessRate,
   type InsightV2Timeseries,
-  getInsightsV2Year,
 } from '~/api/tba/read';
+import {
+  getEventsByYearOptions,
+  getInsightsV2YearOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { Leaderboard } from '~/components/tba/leaderboard';
 import { StreakInsight } from '~/components/tba/streakInsight';
 import { SuccessRateInsight } from '~/components/tba/successRateInsight';
 import { TimeseriesInsight } from '~/components/tba/timeseriesInsight';
 import { YearSelector } from '~/components/tba/yearSelector';
+import { parseMatchKey } from '~/lib/matchUtils';
+import { STALE_TIME, staleTimeForYear } from '~/lib/queryClient';
 import { publicCacheControlHeaders, useValidYears } from '~/lib/utils';
 
 export const Route = createFileRoute('/insights/{-$year}')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     let numericYear = -1;
     if (params.year === undefined || params.year === '') {
       numericYear = 0;
@@ -30,24 +37,22 @@ export const Route = createFileRoute('/insights/{-$year}')({
       throw notFound();
     }
 
-    const insights = await getInsightsV2Year({
-      path: { year: numericYear },
+    const insights = await queryClient.ensureQueryData({
+      ...getInsightsV2YearOptions({ path: { year: numericYear } }),
+      staleTime:
+        numericYear === 0 ? STALE_TIME.DEFAULT : staleTimeForYear(numericYear),
     });
 
-    if (insights.data === undefined) {
-      throw new Error('Failed to load insights');
-    }
-
-    if (insights.data.length === 0) {
+    if (insights.length === 0) {
       throw notFound();
     }
 
     const leaderboards: InsightV2Leaderboard[] = [];
     const streaks: InsightV2Streak[] = [];
     const timeseries: InsightV2Timeseries[] = [];
-    const successRates: InsightV2SuccessRate[] = [];
+    const successRates: InsightV2GameStats[] = [];
 
-    for (const insight of insights.data) {
+    for (const insight of insights) {
       switch (insight.category) {
         case 'leaderboard':
           leaderboards.push(insight);
@@ -58,14 +63,26 @@ export const Route = createFileRoute('/insights/{-$year}')({
         case 'timeseries':
           timeseries.push(insight);
           break;
-        case 'success_rate':
+        case 'game_stats':
           successRates.push(insight);
           break;
       }
     }
 
+    // Event and match leaderboards render names, not keys, which needs the
+    // events behind those keys. Overall (year 0) boards can span seasons.
+    const eventYears = leaderboardEventYears(leaderboards);
+    await Promise.all(
+      eventYears.map((eventYear) =>
+        queryClient.ensureQueryData({
+          ...getEventsByYearOptions({ path: { year: eventYear } }),
+          staleTime: staleTimeForYear(eventYear),
+        }),
+      ),
+    );
     return {
       year: numericYear,
+      eventYears,
       leaderboards,
       streaks,
       timeseries,
@@ -101,13 +118,52 @@ export const Route = createFileRoute('/insights/{-$year}')({
   component: InsightsPage,
 });
 
+/** Seasons whose events are referenced by event or match keys in the boards. */
+function leaderboardEventYears(leaderboards: InsightV2Leaderboard[]): number[] {
+  const years = new Set<number>();
+  for (const board of leaderboards) {
+    const keyType = board.data.key_type;
+    if (keyType !== 'event' && keyType !== 'match') {
+      continue;
+    }
+    for (const ranking of board.data.rankings) {
+      for (const key of ranking.keys) {
+        if (typeof key !== 'string') {
+          continue;
+        }
+        const eventKey =
+          keyType === 'match' ? parseMatchKey(key)?.eventKey : key;
+        const year = Number(eventKey?.slice(0, 4));
+        if (year > 0) {
+          years.add(year);
+        }
+      }
+    }
+  }
+  return [...years].sort((a, b) => a - b);
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
+
 function InsightsPage() {
-  const { leaderboards, streaks, timeseries, successRates, year } =
+  const { leaderboards, streaks, timeseries, successRates, year, eventYears } =
     Route.useLoaderData();
+  const eventQueries = useSuspenseQueries({
+    queries: eventYears.map((eventYear) => ({
+      ...getEventsByYearOptions({ path: { year: eventYear } }),
+      staleTime: staleTimeForYear(eventYear),
+    })),
+  });
+  const eventsByKey = new Map<string, Event>();
+  for (const query of eventQueries) {
+    for (const event of query.data) {
+      eventsByKey.set(event.key, event);
+    }
+  }
 
   return (
     <div>
       <SingleYearInsights
+        eventsByKey={eventsByKey}
         leaderboards={leaderboards}
         streaks={streaks}
         timeseries={timeseries}
@@ -132,16 +188,18 @@ function SectionHeading({ children }: { children: string }) {
 
 function SingleYearInsights({
   year,
+  eventsByKey,
   leaderboards,
   streaks,
   timeseries,
   successRates,
 }: {
   year: number;
+  eventsByKey: ReadonlyMap<string, Event>;
   leaderboards: InsightV2Leaderboard[];
   streaks: InsightV2Streak[];
   timeseries: InsightV2Timeseries[];
-  successRates: InsightV2SuccessRate[];
+  successRates: InsightV2GameStats[];
 }) {
   const validYears = useValidYears();
 
@@ -204,6 +262,7 @@ function SingleYearInsights({
                 displayName={l.display_name}
                 key={l.name}
                 year={year}
+                eventsByKey={eventsByKey}
               />
             ))}
           </div>

@@ -51,7 +51,7 @@ export function ChatSidebar() {
             src={chatSrc}
             title="Twitch chat"
             className="h-full w-full"
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals"
           />
         ) : (
           <div

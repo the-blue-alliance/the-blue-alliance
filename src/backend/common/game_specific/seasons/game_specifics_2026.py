@@ -19,41 +19,6 @@ from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
-def _determine_auto_winner(red, blue) -> Optional[AllianceColor]:
-    # Compare total auto points
-    if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
-        return AllianceColor.RED
-    if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
-        return AllianceColor.BLUE
-
-    # Auto tied: compare shift 1
-    if red.get("hubScore").get("shift1Count") > 0:
-        return AllianceColor.BLUE
-    if blue.get("hubScore").get("shift1Count") > 0:
-        return AllianceColor.RED
-
-    # No scoring in shift 1: compare shift 2
-    if red.get("hubScore").get("shift2Count") > 0:
-        return AllianceColor.RED
-    if blue.get("hubScore").get("shift2Count") > 0:
-        return AllianceColor.BLUE
-
-    # No scoring in shift 2: compare shift 3
-    if red.get("hubScore").get("shift3Count") > 0:
-        return AllianceColor.BLUE
-    if blue.get("hubScore").get("shift3Count") > 0:
-        return AllianceColor.RED
-
-    # No scoring in shift 3: compare shift 4
-    if red.get("hubScore").get("shift4Count") > 0:
-        return AllianceColor.RED
-    if blue.get("hubScore").get("shift4Count") > 0:
-        return AllianceColor.BLUE
-
-    # Fully tied
-    return None
-
-
 class GameSpecifics2026(
     TripleWinTotalPointsScoreBonusRpGameConfig[ScoreDetailModelAlliance2026]
 ):
@@ -73,6 +38,42 @@ class GameSpecifics2026(
         "Supercharged",
         "Traversal",
     )
+
+    def determine_auto_winner(
+        self, red: Dict[str, Any], blue: Dict[str, Any]
+    ) -> Optional[AllianceColor]:
+        # Compare total auto points
+        if red.get("totalAutoPoints") > blue.get("totalAutoPoints"):
+            return AllianceColor.RED
+        if blue.get("totalAutoPoints") > red.get("totalAutoPoints"):
+            return AllianceColor.BLUE
+
+        # Auto tied: compare shift 1
+        if red.get("hubScore").get("shift1Count") > 0:
+            return AllianceColor.BLUE
+        if blue.get("hubScore").get("shift1Count") > 0:
+            return AllianceColor.RED
+
+        # No scoring in shift 1: compare shift 2
+        if red.get("hubScore").get("shift2Count") > 0:
+            return AllianceColor.RED
+        if blue.get("hubScore").get("shift2Count") > 0:
+            return AllianceColor.BLUE
+
+        # No scoring in shift 2: compare shift 3
+        if red.get("hubScore").get("shift3Count") > 0:
+            return AllianceColor.BLUE
+        if blue.get("hubScore").get("shift3Count") > 0:
+            return AllianceColor.RED
+
+        # No scoring in shift 3: compare shift 4
+        if red.get("hubScore").get("shift4Count") > 0:
+            return AllianceColor.RED
+        if blue.get("hubScore").get("shift4Count") > 0:
+            return AllianceColor.BLUE
+
+        # Fully tied
+        return None
 
     def tiebreak_criteria(
         self, red: ScoreDetailModelAlliance2026, blue: ScoreDetailModelAlliance2026
@@ -202,7 +203,7 @@ class GameSpecifics2026(
                 if red_all_rp and blue_all_rp:
                     nine_rp_count += 1
 
-            auto_winner = _determine_auto_winner(red_sb, blue_sb)
+            auto_winner = self.determine_auto_winner(red_sb, blue_sb)
 
             if (auto_winner is None) or (red_score == blue_score):
                 undefined_auto_conversion_matches += 1
@@ -211,11 +212,7 @@ class GameSpecifics2026(
             elif (auto_winner == AllianceColor.BLUE) and (blue_score > red_score):
                 auto_win_conversion += 1
 
-            for i in range(3):
-                if red_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
-                    auto_climb_count += 1
-                if blue_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
-                    auto_climb_count += 1
+            auto_climb_count += _count_auto_climb(match)[0]
 
             auto_fuel_scored += red_sb.get("hubScore").get("autoCount")
             auto_fuel_scored += blue_sb.get("hubScore").get("autoCount")
@@ -341,9 +338,6 @@ class GameSpecifics2026(
             SuccessRateCounter(
                 "level3_climb", "Level 3 Climb", _tower_level_counter("Level3")
             ),
-            SuccessRateCounter(
-                "auto_win_conversion", "Auto Win Conversion", _count_auto_win_conversion
-            ),
         ]
 
     def get_manual_coprs(self) -> Dict[str, StatAccessor]:
@@ -415,12 +409,23 @@ def _robot_tower_states(
     ]
 
 
+# 2026 Game Manual, Table 6-4: "Each ROBOT at LEVEL 1 (2 ROBOTS max in AUTO)".
+MAX_AUTO_CLIMBS_PER_ALLIANCE = 2
+
+
 def _count_auto_climb(match: Match) -> Tuple[int, int]:
     breakdown = match.score_breakdown
     if breakdown is None:
         return (0, 0)
-    states = _robot_tower_states(breakdown, "autoTowerRobot")
-    return (sum(1 for state in states if state not in (None, "None")), len(states))
+    climbs = 0
+    for color in ALLIANCE_COLORS:
+        alliance_climbs = sum(
+            1
+            for i in range(3)
+            if breakdown[color].get(f"autoTowerRobot{i + 1}") not in (None, "None")
+        )
+        climbs += min(alliance_climbs, MAX_AUTO_CLIMBS_PER_ALLIANCE)
+    return (climbs, MAX_AUTO_CLIMBS_PER_ALLIANCE * len(ALLIANCE_COLORS))
 
 
 def _tower_level_counter(level: str) -> Callable[[Match], Tuple[int, int]]:
@@ -432,22 +437,3 @@ def _tower_level_counter(level: str) -> Callable[[Match], Tuple[int, int]]:
         return (sum(1 for state in states if state == level), len(states))
 
     return measure
-
-
-def _count_auto_win_conversion(match: Match) -> Tuple[int, int]:
-    """
-    How often the alliance that won AUTO went on to win the match. Matches
-    where either AUTO or the match itself was tied offer no opportunity.
-    """
-    breakdown = match.score_breakdown
-    if breakdown is None:
-        return (0, 0)
-
-    auto_winner = _determine_auto_winner(
-        breakdown[AllianceColor.RED], breakdown[AllianceColor.BLUE]
-    )
-    match_winner = match.winning_alliance
-    if auto_winner is None or match_winner == "":
-        return (0, 0)
-
-    return (1 if auto_winner == match_winner else 0, 1)

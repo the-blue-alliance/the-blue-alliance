@@ -10,6 +10,24 @@ const PINO_TO_GCP_SEVERITY: Record<string, string> = {
   60: 'CRITICAL', // fatal
 };
 
+/**
+ * pino `formatters.log`: moves custom fields (from both the mixin and the log
+ * call) under Google Cloud Logging's labels key. The mixin in `createLogger`
+ * always contributes `logger`, so in practice the object is never empty; an
+ * empty object yields no labels key rather than an empty one.
+ */
+export function formatGcpLogLabels(
+  object: Record<string, unknown>,
+): Record<string, unknown> {
+  if (Object.keys(object).length === 0) {
+    return {};
+  }
+
+  return {
+    'logging.googleapis.com/labels': object,
+  };
+}
+
 export function createLogger(name: string) {
   const isDev = process.env.NODE_ENV !== 'production';
 
@@ -25,7 +43,8 @@ export function createLogger(name: string) {
   // See: https://cloud.google.com/run/docs/logging#writing-structured-logs
   return pino({
     name,
-    level: 'info',
+    // Hot-path diagnostics log at debug; set LOG_LEVEL=debug to see them.
+    level: process.env.LOG_LEVEL ?? 'info',
     // Use 'message' instead of 'msg' for Google Cloud Logging compatibility
     messageKey: 'message',
     // Omit default base fields (pid, hostname) - not needed for Cloud Logging
@@ -35,17 +54,7 @@ export function createLogger(name: string) {
       level(label, number) {
         return { severity: PINO_TO_GCP_SEVERITY[number] || 'INFO' };
       },
-      log(object) {
-        // The log formatter receives custom fields (from both mixin and log call)
-        // Transform them into Google Cloud Logging labels format
-        if (Object.keys(object).length === 0) {
-          return {};
-        }
-
-        return {
-          'logging.googleapis.com/labels': object,
-        };
-      },
+      log: formatGcpLogLabels,
     },
     // Add logger name to every log entry (will be picked up by log formatter)
     mixin() {

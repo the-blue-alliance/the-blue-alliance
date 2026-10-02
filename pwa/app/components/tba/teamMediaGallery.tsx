@@ -4,8 +4,8 @@ import { InstagramEmbed } from 'react-social-media-embed';
 import { Media } from '~/api/tba/read';
 import {
   getEmbedMedia,
-  getMediaImageUrl,
   getMediaLinkUrl,
+  getMediaThumbUrl,
 } from '~/lib/mediaUtils';
 
 export default function TeamMediaGallery({
@@ -24,17 +24,15 @@ export default function TeamMediaGallery({
       className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3"
       data-testid="team-media-gallery"
     >
-      {embedMedia.map((m, index) => {
-        if (m.type === 'imgur') {
-          return <ImgurEmbed key={index} media={m} />;
+      {embedMedia.map((m, index): React.JSX.Element => {
+        switch (m.type) {
+          case 'imgur':
+            return <ImgurEmbed key={index} media={m} />;
+          case 'instagram-image':
+            return <InstagramImageEmbed key={index} media={m} />;
+          case 'cd-thread':
+            return <CdThreadEmbed key={index} media={m} />;
         }
-        if (m.type === 'instagram-image') {
-          return <InstagramImageEmbed key={index} media={m} />;
-        }
-        if (m.type === 'cd-thread') {
-          return <CdThreadEmbed key={index} media={m} />;
-        }
-        return null;
       })}
     </div>
   );
@@ -45,7 +43,7 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
   const [failed, setFailed] = useState(false);
   const [visible, setVisible] = useState(false);
   const imgRef = useRef<HTMLImageElement>(null);
-  const thumbnailUrl = getMediaImageUrl(media);
+  const thumbnailUrl = getMediaThumbUrl(media);
 
   useEffect(() => {
     const img = imgRef.current;

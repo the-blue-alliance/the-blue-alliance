@@ -1,8 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
-import { type ClassValue, clsx } from 'clsx';
 import { Fragment, type ReactNode } from 'react';
-import { twMerge } from 'tailwind-merge';
 import { Temporal } from 'temporal-polyfill';
 
 import { WltRecord } from '~/api/tba/read';
@@ -32,10 +30,6 @@ export const MODEL_TYPE = {
   AWARD: 6,
   MEDIA: 7,
 } as const;
-
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
 
 export function removeNonNumeric(str: string): string {
   return str.replace(/\D/g, '');
@@ -327,15 +321,18 @@ export function doThrowNotFound(): never {
 
 // TODO: Increase the default max age once we are confident things work.
 // The end goal is for this to be relatively large, since the client will re-fetch data on load.
-export function publicCacheControlHeaders(maxAge: number = 61) {
-  return (): Record<string, string> => {
-    const isProd = process.env.NODE_ENV === 'production';
-    if (!isProd) {
-      return {};
-    }
-    return {
-      'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
-      'CDN-Cache-Control': `max-age=${maxAge}`, // Cloudflare-specific
-    };
+export function buildPublicCacheControlHeaders(
+  maxAge: number = 61,
+): Record<string, string> {
+  if (process.env.NODE_ENV !== 'production') {
+    return {};
+  }
+  return {
+    'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
+    'CDN-Cache-Control': `max-age=${maxAge}`, // Cloudflare-specific
   };
+}
+
+export function publicCacheControlHeaders(maxAge: number = 61) {
+  return (): Record<string, string> => buildPublicCacheControlHeaders(maxAge);
 }
