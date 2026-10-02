@@ -247,6 +247,52 @@ def test_parse_2015_playoff_repairs_null_team(ndb_stub, test_data_importer) -> N
             assert len(match.alliances[color]["teams"]) == 3, match.key_name
 
 
+def test_parse_2015_playoff_repairs_null_team_in_finals(
+    ndb_stub, test_data_importer
+) -> None:
+    """A null team in a 2015 final is refilled from semifinal advancement."""
+    Event(
+        id="2015nyny",
+        name="NYC Regional",
+        event_type_enum=EventType.REGIONAL,
+        short_name="NYC",
+        event_short="nyny",
+        year=2015,
+        end_date=datetime(2015, 3, 27),
+        official=True,
+        start_date=datetime(2015, 3, 24),
+        timezone_id="America/New_York",
+        playoff_type=PlayoffType.AVG_SCORE_8_TEAM,
+    ).put()
+    path = test_data_importer._get_path(
+        __file__, "data/2015nyny_hybrid_schedule_playoff.json"
+    )
+    with open(path, "r") as f:
+        data = json.loads(f.read())
+
+    # 2015nyny_f1m1 is 2344/1884/1796 vs 354/694/271, the SF #1 and #2 seeds.
+    f1m1 = next(m for m in data["Schedule"] if m["matchNumber"] == 15)
+    blue3 = next(t for t in f1m1["Teams"] if t["station"] == "Blue3")
+    assert blue3["teamNumber"] == 271
+    blue3["teamNumber"] = None
+
+    matches, _ = FMSAPIHybridScheduleParser(2015, "nyny").parse(data)
+
+    by_key = {m.key_name: m for m in matches}
+    assert len(matches) == 17
+    repaired = by_key["2015nyny_f1m1"]
+    assert repaired.alliances[AllianceColor.RED]["teams"] == [
+        "frc2344",
+        "frc1884",
+        "frc1796",
+    ]
+    assert repaired.alliances[AllianceColor.BLUE]["teams"] == [
+        "frc354",
+        "frc694",
+        "frc271",
+    ]
+
+
 def test_parse_2017micmp(ndb_stub, test_data_importer) -> None:
     # 2017micmp is a 4 team bracket that starts playoff match numbering at 1
     event = Event(

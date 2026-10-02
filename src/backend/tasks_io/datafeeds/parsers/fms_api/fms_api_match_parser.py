@@ -1,7 +1,7 @@
 import datetime
 import json
 import logging
-from typing import Any, cast, Dict, List, Tuple
+from typing import Any, cast, Dict, List, Set, Tuple
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -111,6 +111,7 @@ class FMSAPIHybridScheduleParser(
         )
 
         parsed_matches: List[Match] = []
+        null_team_matches: Set[MatchKey] = set()
         remapped_matches: Dict[MatchKey, MatchKey] = (
             {}
         )  # If a key changes due to a tiebreaker
@@ -313,22 +314,28 @@ class FMSAPIHybridScheduleParser(
                     youtube_videos=youtube_videos,
                 )
             )
+            if null_team:
+                null_team_matches.add(key_name)
 
-        if self.year == 2015:
+        if self.year == 2015 and null_team_matches:
             # Fix null teams in elims (due to FMS API failure, some info not complete)
-            # Should only happen for sf and f matches
+            # Should only happen for sf and f matches. Rebuild them from the previous
+            # level's average-score advancement (2015 Game Manual rev 2015-04-07, 5.4.3).
             _, organized_matches = MatchHelper.organized_matches(parsed_matches)
             for level in [CompLevel.SF, CompLevel.F]:
+                complete_matches = {
+                    lvl: [m for m in ms if m.key_name not in null_team_matches]
+                    for lvl, ms in organized_matches.items()
+                }
                 playoff_advancement = (
                     PlayoffAdvancementHelper.generate_playoff_advancement_2015(
-                        organized_matches
+                        complete_matches
                     )
                 )
                 if playoff_advancement[LAST_LEVEL[level]] != []:
                     for match in organized_matches[level]:
-                        # Unreachable: null teams are skipped in team_key_names.
-                        if "frcNone" in match.team_key_names:  # pragma: no cover
-                            if level == "sf":
+                        if match.key_name in null_team_matches:
+                            if level == CompLevel.SF:
                                 red_seed, blue_seed = QF_SF_MAP[match.match_number]
                             else:
                                 red_seed = 0
@@ -351,14 +358,7 @@ class FMSAPIHybridScheduleParser(
                             alliances[AllianceColor.BLUE]["teams"] = blue_teams
                             match.alliances_json = json.dumps(alliances)
                             match.team_key_names = red_teams + blue_teams
-
-            fixed_matches = []
-            for key, matches in organized_matches.items():
-                if key != "num":
-                    for match in matches:
-                        if "frcNone" not in match.team_key_names:
-                            fixed_matches.append(match)
-            parsed_matches = fixed_matches
+                            null_team_matches.discard(match.key_name)
 
         return parsed_matches, remapped_matches
 
