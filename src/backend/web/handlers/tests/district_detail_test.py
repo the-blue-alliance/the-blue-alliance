@@ -410,3 +410,50 @@ def test_district_insights_multiple(ndb_stub, web_client: Client) -> None:
 
     resp = web_client.get("/district/fim/insights/2024")
     assert resp.status_code == 200
+
+
+def test_render_district_without_display_name_uses_render_name(
+    ndb_stub, web_client: Client
+) -> None:
+    District(id="2020ne", year=2020, abbreviation="ne").put()
+    District(id="2020fim", year=2020, abbreviation="fim").put()
+
+    resp = web_client.get("/events/ne/2020")
+    assert resp.status_code == 200
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert "".join(soup.find(id="district-name").contents) == "2020 NE District"
+    district_dropdown = soup.find(id="valid-districts")
+    assert [y.string for y in district_dropdown.contents if y != "\n"] == [
+        "All Events",
+        "Regional Events",
+        "FIM",
+    ]
+
+
+def test_regional_detail_district_without_display_name_uses_render_name(
+    ndb_stub, web_client: Client
+) -> None:
+    District(id="2020ne", year=2020, abbreviation="ne").put()
+    Event(
+        id="2020nyny",
+        year=2020,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime.datetime(2020, 3, 1),
+        end_date=datetime.datetime(2020, 3, 3),
+    ).put()
+
+    resp = web_client.get("/events/regional/2020")
+    assert resp.status_code == 200
+    assert 'href="/events/ne/2020">NE</a>' in resp.get_data(as_text=True)
+
+
+def test_district_insights_without_display_name_uses_render_name(
+    ndb_stub, web_client: Client
+) -> None:
+    District(id="2024fim", year=2024, abbreviation="fim").put()
+
+    resp = web_client.get("/district/fim/insights")
+    assert resp.status_code == 200
+    assert "2024 FIM District Insights" in resp.get_data(as_text=True)

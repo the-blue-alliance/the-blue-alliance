@@ -2297,3 +2297,14 @@ def test_uppercase_event_short_redirects_to_lowercase_key(
     assert event is not None
     assert event.event_short == "nyny"
     assert event.key_name == "2020nyny"
+
+
+def test_empty_divisions_field_means_no_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """An empty divisions field saves the event with no divisions."""
+    resp = web_client.post("/admin/event/edit", data=_full_event_form(divisions=""))
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.divisions == []

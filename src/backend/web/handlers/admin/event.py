@@ -288,7 +288,7 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
     district_key = request.form.get("event_district_key", None)
     parent_key = request.form.get("parent_event", None)
 
-    division_key_names = json.loads(request.form.get("divisions", "[]"))
+    division_key_names = json.loads(request.form.get("divisions") or "[]")
     division_keys = (
         [ndb.Key(Event, key) for key in division_key_names]
         if division_key_names
