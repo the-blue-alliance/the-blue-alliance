@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useState } from 'react';
 
 import ChevronUpIcon from '~icons/lucide/chevron-up';
 import MessageSquareIcon from '~icons/lucide/message-square';
@@ -17,7 +17,6 @@ const SIDEBAR_WIDTH = 300;
 export function ChatSidebar() {
   const { state, setCurrentChat } = useGameday();
   const [selectorOpen, setSelectorOpen] = useState(false);
-  const contentRef = useRef<HTMLDivElement>(null);
 
   if (!state.chatSidebarVisible) return null;
 
@@ -52,7 +51,7 @@ export function ChatSidebar() {
             src={chatSrc}
             title="Twitch chat"
             className="h-full w-full"
-            sandbox="allow-scripts allow-same-origin allow-popups"
+            sandbox="allow-storage-access-by-user-activation allow-scripts allow-same-origin allow-popups allow-popups-to-escape-sandbox allow-modals"
           />
         ) : (
           <div
@@ -70,8 +69,8 @@ export function ChatSidebar() {
       <button
         onClick={() => setSelectorOpen(true)}
         className="flex h-9 shrink-0 cursor-pointer items-center justify-between
-          border-t border-neutral-800 bg-primary px-3 text-white
-          transition-colors hover:bg-primary/90"
+          border-t border-neutral-800 bg-brand px-3 text-white transition-colors
+          hover:bg-brand/90"
       >
         <span className="truncate text-sm font-medium">
           {currentChatInfo?.name ?? 'Select a chat'}
@@ -81,11 +80,7 @@ export function ChatSidebar() {
 
       {/* Chat selector dialog */}
       <Dialog open={selectorOpen} onOpenChange={setSelectorOpen}>
-        <DialogContent
-          ref={contentRef}
-          initialFocus={contentRef}
-          className="max-w-sm p-0"
-        >
+        <DialogContent focusContentOnOpen className="max-w-sm p-0">
           <DialogHeader className="border-b px-4 py-3">
             <DialogTitle>Select a chat</DialogTitle>
           </DialogHeader>

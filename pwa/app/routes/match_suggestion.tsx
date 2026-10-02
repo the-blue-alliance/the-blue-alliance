@@ -1,8 +1,8 @@
 import { Progress as ProgressPrimitive } from '@base-ui/react/progress';
 import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { type JSX, useState } from 'react';
-import { Temporal } from 'temporal-polyfill';
 
 import MedalIcon from '~icons/lucide/medal';
 import TrophyIcon from '~icons/lucide/trophy';
@@ -19,14 +19,13 @@ import {
   getEventOprs,
   getEventPredictions,
   getEventRankings,
-  getEventsByYear,
   getInsightsNotablesYear,
-  getStatus,
   getTeamEventsStatusesByYear,
 } from '~/api/tba/read';
 import {
   getDistrictRankingsOptions,
   getEventOptions,
+  getEventsByYearOptions,
   getTeamAwardsByYearOptions,
   getTeamDistrictsOptions,
   getTeamEventsByYearOptions,
@@ -41,28 +40,23 @@ import {
   EVENT_FALLBACK_TIMEZONE,
   getCurrentWeekEvents,
 } from '~/lib/eventUtils';
-import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
-import { cn, publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
+import {
+  formatMatchTime,
+  matchTitleShort,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
+import { publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
 
 export const Route = createFileRoute('/match_suggestion')({
-  loader: async () => {
-    const status = await getStatus();
+  loader: async ({ context: { queryClient, currentSeason } }) => {
+    const events = await queryClient.ensureQueryData(
+      getEventsByYearOptions({ path: { year: currentSeason } }),
+    );
 
-    if (status.data === undefined) {
-      throw new Error('Failed to load status');
-    }
-
-    const year = status.data.current_season;
-    const events = await getEventsByYear({ path: { year } });
-
-    if (events.data === undefined) {
-      throw new Error('Failed to load events');
-    }
-
-    const filteredEvents = getCurrentWeekEvents(events.data);
-
+    // Filtered here rather than in the component because getCurrentWeekEvents
+    // reads the ambient timezone, which differs between server and browser.
     return {
-      events: filteredEvents,
+      events: getCurrentWeekEvents(events),
     };
   },
   headers: publicCacheControlHeaders(),
@@ -101,7 +95,8 @@ interface MatchInfo {
   eventRankings?: EventRanking | null;
   eventPredictions?: EventPredictions | null;
   epaPercentileMap?: Map<string, number> | null;
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function epaStars(percentile: number | undefined): string {
   if (percentile == null) return '';
@@ -167,7 +162,7 @@ function TeamDetails({
     getTeamEventsByYearOptions({ path: { team_key: teamKey, year: 2026 } }),
   );
   const eventOprsQuery = useQuery({
-    queryKey: ['eventOprs', teamKey, 2026],
+    queryKey: ['eventOprs', teamKey, 2026, teamEventsByYearQuery.data],
     enabled: !!teamEventsByYearQuery.data,
     queryFn: async () => {
       const results = await Promise.all(
@@ -539,16 +534,9 @@ function MatchSuggestionRow({
         <td className="border">
           {match.predicted_time && (
             <span>
-              {Temporal.Instant.fromEpochMilliseconds(
-                match.predicted_time * 1000,
-              )
-                .toZonedDateTimeISO(event.timezone ?? EVENT_FALLBACK_TIMEZONE)
-                .toLocaleString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  weekday: 'short',
-                  hour12: true,
-                })}
+              {formatMatchTime(match.predicted_time, {
+                timeZone: event.timezone ?? EVENT_FALLBACK_TIMEZONE,
+              })}
             </span>
           )}
         </td>
@@ -796,7 +784,7 @@ function MatchSuggestion(): JSX.Element {
         2.5%
       </div>
       <h2 className="text-2xl font-medium">Current Matches</h2>
-      <table className="w-[100%]">
+      <table className="w-full">
         <thead>
           <tr>
             <th className="border">Event</th>
@@ -823,7 +811,7 @@ function MatchSuggestion(): JSX.Element {
         </tbody>
       </table>
       <h2 className="text-2xl font-medium">Upcoming Matches</h2>
-      <table className="w-[100%]">
+      <table className="w-full">
         <thead>
           <tr>
             <th className="border">Event</th>

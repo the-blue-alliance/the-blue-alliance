@@ -25,6 +25,7 @@ class TeamQuery(CachedDatabaseQuery[Optional[Team], Optional[TeamDict]]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "team_{team_key}"
     MODEL_CACHING_ENABLED = False  # No need to cache a point query
+    DICT_CACHING_ENABLED = False  # No need to cache a point query dict
     DICT_CONVERTER = TeamConverter
 
     def __init__(self, team_key: TeamKey) -> None:
@@ -98,10 +99,10 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
-class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], List[str]]):
+class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], None]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "regional_teams_{year}"
-    DICT_CONVERTER = TeamConverter
+    DICT_CONVERTER = None
 
     def __init__(self, year: Year) -> None:
         super().__init__(year=year)

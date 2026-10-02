@@ -22,6 +22,10 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
     SCORE_BREAKDOWN_MODEL = ScoreDetailModelAlliance2016
     BONUS_RP_BREAKDOWN_FIELDS = ("teleopDefensesBreached", "teleopTowerCaptured")
     BONUS_RP_PREDICTION_FIELDS = ("prob_breach", "prob_capture")
+    BONUS_RP_LABELS = (
+        "Breach",
+        "Capture",
+    )
 
     def finals_can_be_tiebroken(self) -> bool:
         return True
@@ -223,9 +227,6 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
 
         if not has_insights:
             return None
-
-        if finished_matches == 0:
-            return {}
 
         opportunities_1x = 2 * finished_matches  # once per alliance
         opportunities_3x = 6 * finished_matches  # 3x per alliance

@@ -2,6 +2,7 @@ import copy
 import math
 from collections import defaultdict
 from typing import (
+    Any,
     cast,
     Dict,
     List,
@@ -125,6 +126,10 @@ class ContributionCalculator:
 
         no_priors_team_list = team_list
 
+        # Only the current year is searched today. TODO: if this looks back
+        # further (year_diff != 0), scale prior-year stats based on actual
+        # data. The old placeholder kept means as-is (x1) and replaced
+        # variances with self._default_var * 3.
         for year_diff in range(1):
             team_events_futures = []
             for team in no_priors_team_list:
@@ -160,10 +165,6 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["mean"].get(team)
                             if team_mean is not None:
-                                if year_diff != 0:
-                                    team_mean *= (
-                                        1  # TODO: Hacky; scale based on actual data
-                                    )
                                 past_stats_mean[team].append(team_mean)
                                 no_past_mean = False
 
@@ -171,10 +172,6 @@ class ContributionCalculator:
                                 "qual"
                             ][self._stat]["var"].get(team)
                             if team_var is not None:
-                                if year_diff != 0:
-                                    team_var = (
-                                        self._default_var * 3
-                                    )  # TODO: Hacky; scale based on actual data
                                 past_stats_var[team].append(team_var)
                 if no_past_mean:
                     no_priors_team_list.append(team)
@@ -392,22 +389,29 @@ class ContributionCalculator:
                     means[color] = count
                 elif self._stat == "robot_on_stage":
                     count = 0
-                    for i in range(1, 4):
+                    for robot in range(1, 4):
                         if (
-                            score_breakdown[color]["endGameRobot{}".format(i)]
+                            score_breakdown[color]["endGameRobot{}".format(robot)]
                             == "StageLeft"
-                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            or score_breakdown[color]["endGameRobot{}".format(robot)]
                             == "StageRight"
-                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            or score_breakdown[color]["endGameRobot{}".format(robot)]
                             == "CenterStage"
                         ):
                             count += 1
                     means[color] = count
                 elif self._stat == "coopertition_criteria":
-                    count = 0
-                    if score_breakdown[color]["coopertitionCriteriaMet"]:
-                        count = 1
-                    means[color] = count
+                    # This ALLIANCE's half of the Coopertition Bonus, which
+                    # needs both ALLIANCES to meet it.
+                    if "wallAlgaeCount" in score_breakdown[color]:
+                        # 2025 Game Manual 6.5.3: "at least 2 ALGAE are scored
+                        # in each ALLIANCE'S PROCESSOR"
+                        met = score_breakdown[color]["wallAlgaeCount"] >= 2
+                    else:
+                        # 2024: FMS sets this when the ALLIANCE uses a NOTE for
+                        # Coopertition within the first 45 seconds of TELEOP
+                        met = score_breakdown[color]["coopertitionCriteriaMet"]
+                    means[color] = 1 if met else 0
                 elif self._stat == "auto_coral_scored":
                     means[color] = score_breakdown[color]["autoCoralCount"]
                 elif self._stat == "coral_scored":
@@ -498,6 +502,23 @@ class PredictionHelper:
     @classmethod
     def _normcdf(cls, x: float) -> float:
         return (1.0 + math.erf(x / np.sqrt(2.0))) / 2.0
+
+    @classmethod
+    def _prob_coopertition_bonus(cls, mean_vars: Dict[str, Any]) -> float:
+        """
+        Probability that both ALLIANCES meet the Coopertition criteria, from
+        each ALLIANCE's 0/1 "coopertition_criteria" stat (thresholded at 0.5).
+        2024 Game Manual 6.5.5: "If both ALLIANCES use a NOTE scored in their
+        AMP to engage in Coopertition ... all teams earn a Coopertition Bonus".
+        2025 Game Manual 6.5.3: "if at least 2 ALGAE are scored in each
+        ALLIANCE'S PROCESSOR, all teams earn 1 Coopertition Point".
+        """
+        prob = 1.0
+        for color in ALLIANCE_COLORS:
+            mean_var = mean_vars[color]["coopertition_criteria"]
+            mu = mean_var["mean"] - 0.5
+            prob *= 1 - cls._normcdf(-mu / np.sqrt(mean_var["var"]))
+        return prob
 
     @classmethod
     def _predict_match(
@@ -712,17 +733,16 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
-                    prob2 = 1 - cls._normcdf(
-                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
-                    )
+                    prob_coop = cls._prob_coopertition_bonus(mean_vars)
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
                     prob3 = 1 - cls._normcdf(
                         -mu3 / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    prediction[color]["prob_melody_bonus"] = prob + prob2 * prob3
+                    prediction[color]["prob_melody_bonus"] = (
+                        prob_coop * prob3 + (1 - prob_coop) * prob
+                    )
                 if stat == "stage_points":
                     required_points = 10
 
@@ -754,17 +774,16 @@ class PredictionHelper:
                         -mu / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    mu2 = mean_vars[color]["coopertition_criteria"]["mean"] - 1
-                    prob2 = 1 - cls._normcdf(
-                        -mu2 / np.sqrt(mean_vars[color]["coopertition_criteria"]["var"])
-                    )
+                    prob_coop = cls._prob_coopertition_bonus(mean_vars)
 
                     mu3 = mean_vars[color][stat]["mean"] - 15
                     prob3 = 1 - cls._normcdf(
                         -mu3 / np.sqrt(mean_vars[color][stat]["var"])
                     )
 
-                    prediction[color]["prob_coral_bonus"] = prob + prob2 * prob3
+                    prediction[color]["prob_coral_bonus"] = (
+                        prob_coop * prob3 + (1 - prob_coop) * prob
+                    )
                 if stat == "barge_points":
                     required_points = 14
 

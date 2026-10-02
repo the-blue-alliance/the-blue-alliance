@@ -288,7 +288,7 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
     district_key = request.form.get("event_district_key", None)
     parent_key = request.form.get("parent_event", None)
 
-    division_key_names = json.loads(request.form.get("divisions", "[]"))
+    division_key_names = json.loads(request.form.get("divisions") or "[]")
     division_keys = (
         [ndb.Key(Event, key) for key in division_key_names]
         if division_key_names
@@ -301,9 +301,8 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         else WebsiteHelper.format_url(request.form.get("website"))
     )
 
-    key = str(request.form.get("year")) + str.lower(
-        str(request.form.get("event_short"))
-    )
+    event_short = str(request.form.get("event_short")).lower()
+    key = str(request.form.get("year")) + event_short
     if event_key is not None and event_key != key:
         abort(400)
 
@@ -315,7 +314,7 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
     event = Event(
         id=key,
         end_date=end_date,
-        event_short=request.form.get("event_short"),
+        event_short=event_short,
         first_code=first_code if first_code and first_code != "None" else None,
         event_type_enum=int(request.form.get("event_type", EventType.UNLABLED)),
         district_key=(
@@ -362,7 +361,7 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         "rankings_json"
     ):
         event_details = EventDetails(
-            id=event_key,
+            id=key,
             alliance_selections=json.loads(
                 request.form.get("alliance_selections_json", "[]")
             ),

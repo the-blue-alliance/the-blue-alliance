@@ -241,8 +241,6 @@ class LeaderboardV2Calculator(InsightV2Calculator):
                 )
 
         for district_abbrev, counts in sorted(district_counts.items()):
-            if not counts:
-                continue
             rankings = self._build_rankings(counts)
             if not rankings:
                 continue
@@ -351,6 +349,11 @@ class MatchAllianceLeaderboardV2Calculator(LeaderboardV2Calculator):
     def min_count(self) -> int:
         return 1
 
+    def display_name_for(self, year: Year) -> str:
+        # Override to vary the display name by year (e.g. a shared "game pieces"
+        # calculator that shows a game-specific label per season).
+        return self.insight_name.display_name
+
     def _record_match(self, match_key: str, score: int, alliance: List[str]) -> None:
         self.counts[match_key] = score
         self._match_contexts[match_key] = MatchAllianceContext(
@@ -382,7 +385,7 @@ class MatchAllianceLeaderboardV2Calculator(LeaderboardV2Calculator):
                     year, InsightCategory.LEADERBOARD, self.insight_name.name
                 ),
                 name=self.insight_name.name,
-                display_name=self.insight_name.display_name,
+                display_name=self.display_name_for(year),
                 year=year,
                 category=InsightCategory.LEADERBOARD,
                 data_json=data,

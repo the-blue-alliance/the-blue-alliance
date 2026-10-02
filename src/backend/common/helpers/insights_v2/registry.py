@@ -7,6 +7,15 @@ from google.appengine.ext import ndb
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.insights_v2.base import InsightV2Calculator
+from backend.common.helpers.insights_v2.clubs.hall_of_fame import (
+    HallOfFameClubV2Calculator,
+)
+from backend.common.helpers.insights_v2.clubs.world_championship_winners import (
+    WorldChampionshipWinnersClubV2Calculator,
+)
+from backend.common.helpers.insights_v2.game_stats.calculator import (
+    GameStatsV2Calculator,
+)
 from backend.common.helpers.insights_v2.leaderboards.blue_banners import (
     BlueBannersV2Calculator,
 )
@@ -37,9 +46,6 @@ from backend.common.helpers.insights_v2.leaderboards.most_cmp_finals_appearances
 from backend.common.helpers.insights_v2.leaderboards.most_cmp_wins import (
     MostCmpWinsV2Calculator,
 )
-from backend.common.helpers.insights_v2.leaderboards.most_coral_scored import (
-    MostCoralScored2025V2Calculator,
-)
 from backend.common.helpers.insights_v2.leaderboards.most_district_cmp_wins import (
     MostDistrictCmpWinsV2Calculator,
 )
@@ -55,8 +61,8 @@ from backend.common.helpers.insights_v2.leaderboards.most_events_won import (
 from backend.common.helpers.insights_v2.leaderboards.most_events_won_together import (
     MostEventsWonTogetherV2Calculator,
 )
-from backend.common.helpers.insights_v2.leaderboards.most_fuel_scored import (
-    MostFuelScored2026V2Calculator,
+from backend.common.helpers.insights_v2.leaderboards.most_game_pieces_scored import (
+    MostGamePiecesScoredV2Calculator,
 )
 from backend.common.helpers.insights_v2.leaderboards.most_impact_award_wins import (
     MostImpactAwardWinsV2Calculator,
@@ -82,8 +88,20 @@ from backend.common.helpers.insights_v2.streaks.undefeated_streak import (
 from backend.common.helpers.insights_v2.streaks.win_streak import (
     LongestWinStreakV2Calculator,
 )
+from backend.common.helpers.insights_v2.timeseries.average_match_score_by_week import (
+    AverageMatchScoreByWeekV2Calculator,
+)
+from backend.common.helpers.insights_v2.timeseries.average_win_margin_by_week import (
+    AverageWinMarginByWeekV2Calculator,
+)
+from backend.common.helpers.insights_v2.timeseries.cumulative_matches_by_day import (
+    CumulativeMatchesByDayV2Calculator,
+)
 from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
     HighScoreOverTimeV2Calculator,
+)
+from backend.common.helpers.insights_v2.timeseries.num_matches_by_year import (
+    NumMatchesByYearV2Calculator,
 )
 from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.insight_v2 import InsightV2
@@ -168,20 +186,25 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             LongestEinsteinStreakV2Calculator(),
             LongestUndefeatedStreakV2Calculator(),
             LongestWinStreakV2Calculator(),
+            NumMatchesByYearV2Calculator(),
+            HallOfFameClubV2Calculator(),
+            WorldChampionshipWinnersClubV2Calculator(),
         ]
     else:
         calculators += [
             HighScoreOverTimeV2Calculator(),
+            CumulativeMatchesByDayV2Calculator(),
+            AverageMatchScoreByWeekV2Calculator(),
+            AverageWinMarginByWeekV2Calculator(),
             HighestMatchCleanScoreV2Calculator(),
             HighestMatchCleanCombinedScoreV2Calculator(),
             HighestLosingScoreV2Calculator(),
             HighestAutoScoreV2Calculator(),
             HighestTeleopScoreV2Calculator(),
+            GameStatsV2Calculator(),
         ]
         if year not in {2017, 2018, 2023, 2025}:
             calculators.append(HighestEndgameScoreV2Calculator())
-        if year == 2025:
-            calculators.append(MostCoralScored2025V2Calculator())
-        if year == 2026:
-            calculators.append(MostFuelScored2026V2Calculator())
+        if year in {2016, 2017, 2019, 2020, 2022, 2023, 2024, 2025, 2026}:
+            calculators.append(MostGamePiecesScoredV2Calculator())
     return compute_insights_for_year(year, calculators)

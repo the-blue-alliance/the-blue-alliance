@@ -211,7 +211,7 @@ class Event(CachedModel):
         # keys must be model properties
         self._affected_references = {"key": set(), "year": set(), "district_key": set()}
         self._awards_future: Optional[TypedFuture[List[Award]]] = None
-        self._details_future: Optional[TypedFuture[EventDetails]] = None
+        self._details_future: Optional[TypedFuture[Optional[EventDetails]]] = None
         self._location = None
         self._city_state_country = None
         self._matches_future: Optional[TypedFuture[List[Match]]] = None
@@ -260,13 +260,17 @@ class Event(CachedModel):
             self.prep_awards()
         return none_throws(self._awards_future).get_result()
 
-    def prep_details(self) -> TypedFuture[EventDetails]:
+    def prep_details(self) -> TypedFuture[Optional[EventDetails]]:
         if self._details_future is None:
-            self._details_future = ndb.Key(EventDetails, self.key.id()).get_async()
+            from backend.common.queries.event_details_query import EventDetailsQuery
+
+            self._details_future = EventDetailsQuery(
+                event_key=none_throws(self.key.string_id())
+            ).fetch_async()
         return self._details_future
 
     @property
-    def details(self) -> EventDetails:
+    def details(self) -> Optional[EventDetails]:
         if self._details_future is None:
             self.prep_details()
         if not none_throws(self._details_future).done():
@@ -317,6 +321,9 @@ class Event(CachedModel):
 
     def clear_teams(self) -> None:
         self._teams_future = None
+
+    def clear_details(self) -> None:
+        self._details_future = None
 
     def prep_matches(self) -> TypedFuture[List[Match]]:
         if self._matches_future is None:
@@ -451,7 +458,7 @@ class Event(CachedModel):
         ):
             return None
 
-        if self._week:
+        if self._week is not None:
             return self._week
 
         # Cache week_start for the same context
@@ -460,18 +467,23 @@ class Event(CachedModel):
         cache_key = "{}_season_start".format(self.year)
         season_start = context_cache.get(cache_key)
         if season_start is None:
-            e = (
-                Event.query(
-                    Event.year == self.year,
-                    Event.event_type_enum.IN(event_type.NON_CMP_EVENT_TYPES),
-                    Event.start_date != None,  # noqa: E711
-                )
-                .order(Event.start_date)
-                .fetch(1, projection=[Event.start_date])
-            )
-            if e:
-                first_start_date = e[0].start_date
+            from backend.common.helpers.season_helper import SeasonHelper
 
+            first_start_date = SeasonHelper.get_first_event_start_date(self.year)
+            if first_start_date is None:
+                e = (
+                    Event.query(
+                        Event.year == self.year,
+                        Event.event_type_enum.IN(event_type.NON_CMP_EVENT_TYPES),
+                        Event.start_date != None,  # noqa: E711
+                    )
+                    .order(Event.start_date)
+                    .fetch(1, projection=[Event.start_date])
+                )
+                if e:
+                    first_start_date = e[0].start_date
+
+            if first_start_date:
                 days_diff = 0
                 # Before 2018, event weeks start on Wednesdays
                 if self.year < 2018:
@@ -612,8 +624,8 @@ class Event(CachedModel):
                 self._venue_address_safe = None
             else:
                 self._venue_address_safe = "{}\n{}".format(
-                    none_throws(self.venue).encode("utf-8"),
-                    none_throws(self.location).encode("utf-8"),
+                    none_throws(self.venue),
+                    none_throws(self.location),
                 )
         else:
             self._venue_address_safe = self.venue_address.replace("\r\n", "\n")
@@ -857,9 +869,14 @@ class Event(CachedModel):
             if self.event_type_enum == EventType.OFFSEASON:
                 return self.short_name
             else:
+                type_suffix = event_type.SHORT_TYPE_NAMES[
+                    EventType(self.event_type_enum)
+                ]
+                if self.short_name.strip().endswith(type_suffix):
+                    return self.short_name
                 return "{} {}".format(
                     self.short_name,
-                    event_type.SHORT_TYPE_NAMES[EventType(self.event_type_enum)],
+                    type_suffix,
                 )
         else:
             return self.name

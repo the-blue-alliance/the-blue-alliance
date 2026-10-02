@@ -1,0 +1,20 @@
+# trixie for the glibc the upstream mise binary is built against
+FROM debian:trixie-slim
+
+# libatomic1 is needed by mise's standalone pnpm binary
+RUN apt-get update && apt-get install -y --no-install-recommends \
+    ca-certificates \
+    libatomic1 \
+    && rm -rf /var/lib/apt/lists/*
+
+COPY --from=jdxcode/mise:latest /usr/local/bin/mise /usr/local/bin/mise
+ENV MISE_DATA_DIR=/mise
+# mise otherwise prompts to trust the bind-mounted pwa/mise.toml
+ENV MISE_TRUSTED_CONFIG_PATHS=/tba
+
+ENV PNPM_STORE_DIR=/pnpm/store
+
+WORKDIR /tba/pwa
+
+ENTRYPOINT ["/tba/ops/dev/pwa/entrypoint.sh"]
+CMD ["./generate-api.sh"]

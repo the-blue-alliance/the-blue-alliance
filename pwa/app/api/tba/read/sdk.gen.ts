@@ -81,9 +81,18 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleErrors,
   GetEventMatchesSimpleResponses,
+  GetEventMediaData,
+  GetEventMediaErrors,
+  GetEventMediaResponses,
+  GetEventNexusInfoData,
+  GetEventNexusInfoErrors,
+  GetEventNexusInfoResponses,
   GetEventOprsData,
   GetEventOprsErrors,
   GetEventOprsResponses,
+  GetEventPlayoffAdvancementData,
+  GetEventPlayoffAdvancementErrors,
+  GetEventPlayoffAdvancementResponses,
   GetEventPredictionsData,
   GetEventPredictionsErrors,
   GetEventPredictionsResponses,
@@ -334,10 +343,19 @@ import {
   zGetEventMatchesSimpleHeaders,
   zGetEventMatchesSimplePath,
   zGetEventMatchesSimpleResponse,
+  zGetEventMediaHeaders,
+  zGetEventMediaPath,
+  zGetEventMediaResponse,
+  zGetEventNexusInfoHeaders,
+  zGetEventNexusInfoPath,
+  zGetEventNexusInfoResponse,
   zGetEventOprsHeaders,
   zGetEventOprsPath,
   zGetEventOprsResponse,
   zGetEventPath,
+  zGetEventPlayoffAdvancementHeaders,
+  zGetEventPlayoffAdvancementPath,
+  zGetEventPlayoffAdvancementResponse,
   zGetEventPredictionsHeaders,
   zGetEventPredictionsPath,
   zGetEventPredictionsResponse,
@@ -628,7 +646,7 @@ export const getDistrictInsights = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Gets a list of advancement information per team in a district.
+ * Gets per-team advancement information and the advancement cutoffs for a district.
  */
 export const getDistrictAdvancement = <ThrowOnError extends boolean = false>(
   options: Options<GetDistrictAdvancementData, ThrowOnError>,
@@ -1268,6 +1286,64 @@ export const getEventMatchTimeseries = <ThrowOnError extends boolean = false>(
   });
 
 /**
+ * Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.
+ */
+export const getEventMedia = <ThrowOnError extends boolean = false>(
+  options: Options<GetEventMediaData, ThrowOnError>,
+): RequestResult<GetEventMediaResponses, GetEventMediaErrors, ThrowOnError> =>
+  (options.client ?? client).get<
+    GetEventMediaResponses,
+    GetEventMediaErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventMediaHeaders.optional(),
+          path: zGetEventMediaPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventMediaResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/media',
+    ...options,
+  });
+
+/**
+ * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
+ */
+export const getEventNexusInfo = <ThrowOnError extends boolean = false>(
+  options: Options<GetEventNexusInfoData, ThrowOnError>,
+): RequestResult<
+  GetEventNexusInfoResponses,
+  GetEventNexusInfoErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventNexusInfoResponses,
+    GetEventNexusInfoErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventNexusInfoHeaders.optional(),
+          path: zGetEventNexusInfoPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventNexusInfoResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/nexus_info',
+    ...options,
+  });
+
+/**
  * Gets a set of Event OPRs (including OPR, DPR, and CCWM) for the given Event.
  */
 export const getEventOprs = <ThrowOnError extends boolean = false>(
@@ -1291,6 +1367,39 @@ export const getEventOprs = <ThrowOnError extends boolean = false>(
       await zGetEventOprsResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/oprs',
+    ...options,
+  });
+
+/**
+ * Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.
+ */
+export const getEventPlayoffAdvancement = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetEventPlayoffAdvancementData, ThrowOnError>,
+): RequestResult<
+  GetEventPlayoffAdvancementResponses,
+  GetEventPlayoffAdvancementErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventPlayoffAdvancementResponses,
+    GetEventPlayoffAdvancementErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventPlayoffAdvancementHeaders.optional(),
+          path: zGetEventPlayoffAdvancementPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPlayoffAdvancementResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/playoff_advancement',
     ...options,
   });
 
@@ -1756,7 +1865,7 @@ export const getInsightsV2Year = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategory = <ThrowOnError extends boolean = false>(
   options: Options<GetInsightsV2YearCategoryData, ThrowOnError>,
@@ -1818,7 +1927,7 @@ export const getInsightsV2YearDistrict = <ThrowOnError extends boolean = false>(
   });
 
 /**
- * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryDistrict = <
   ThrowOnError extends boolean = false,

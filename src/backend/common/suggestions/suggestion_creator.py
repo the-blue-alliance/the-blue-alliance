@@ -7,11 +7,16 @@ from google.appengine.ext import ndb
 
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
-from backend.common.consts.media_type import MediaType, ROBOT_TYPES, SLUG_NAMES
+from backend.common.consts.media_type import (
+    EVENT_MEDIA_TYPES,
+    ROBOT_TYPES,
+    SLUG_NAMES,
+)
 from backend.common.consts.string_enum import StrEnum
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.helpers.event_webcast_adder import EventWebcastAdder
+from backend.common.helpers.outgoing_notification_helper import CONTACT_EMAIL
 from backend.common.helpers.webcast_helper import WebcastParser
 from backend.common.helpers.website_helper import WebsiteHelper
 from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
@@ -128,7 +133,7 @@ class SuggestionCreator:
 
         media_dict = yield MediaParser.partial_media_dict_from_url(media_url)
         if media_dict is not None:
-            if media_dict["media_type_enum"] != MediaType.YOUTUBE_VIDEO:
+            if media_dict["media_type_enum"] not in EVENT_MEDIA_TYPES:
                 return SuggestionCreationStatus.BAD_URL, None
 
             existing_media = Media.get_by_id(
@@ -394,19 +399,17 @@ class SuggestionCreator:
         Create an offseason suggestion from a made up bot.
         Used to link offseasons with official data sync
         """
-        keys_to_check = map(
-            lambda event: ndb.Key(
-                Suggestion, "offseason_with_data_{}".format(event.key_name)
-            ),
-            events_to_suggest,
-        )
+        keys_to_check = [
+            ndb.Key(Suggestion, "offseason_with_data_{}".format(event.key_name))
+            for event in events_to_suggest
+        ]
         keys_found = ndb.get_multi(keys_to_check)
         logging.info("Fetched {} suggestion keys from ndb".format(len(keys_found)))
 
         # Make sure we have a dummy account to link these suggestions with
         account = Account.get_or_insert(
             "tba-bot-account",
-            email="contact@thebluealliance.com",
+            email=CONTACT_EMAIL,
             nickname="TBA-Bot",
             registered=True,
             permissions=[],

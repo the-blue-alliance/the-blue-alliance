@@ -1,19 +1,29 @@
 import json
 from datetime import datetime
+from typing import Dict
 from unittest.mock import patch
 
 import bs4
 from freezegun import freeze_time
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.memcache_models.event_sync_status_memcache import (
     EventSyncStatusMemcache,
 )
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_team import EventTeam
+from backend.common.models.location import Location
+from backend.common.models.match import Match
 from backend.common.models.nexus_event_details import NexusEventDetails
+from backend.common.models.team import Team
 from backend.web.handlers.tests import helpers
 
 
@@ -1335,3 +1345,986 @@ def test_link_frc_api_post_invalid_code_redirects_with_error(
     assert event is not None
     assert event.official is False
     assert event.first_code is None
+
+
+# ---------------------------------------------------------------------------
+# Helpers for the tests below
+# ---------------------------------------------------------------------------
+
+
+def _store_match(
+    event_key: str, comp_level: CompLevel, match_number: int, played: bool
+) -> Match:
+    score = 10 if played else -1
+    match = Match(
+        id=f"{event_key}_{comp_level}{'' if comp_level == CompLevel.QM else '1m'}{match_number}",
+        event=ndb.Key(Event, event_key),
+        year=int(event_key[:4]),
+        comp_level=comp_level,
+        set_number=1,
+        match_number=match_number,
+        team_key_names=["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                "red": {"score": score, "teams": ["frc1", "frc2", "frc3"]},
+                "blue": {"score": score, "teams": ["frc4", "frc5", "frc6"]},
+            }
+        ),
+    )
+    match.put()
+    return match
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/<event_key>  (GET) - match stats
+# ---------------------------------------------------------------------------
+
+
+def test_event_detail_match_stats_skip_empty_levels(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_event("2020nyny")
+    _store_match("2020nyny", CompLevel.QM, 1, played=True)
+    _store_match("2020nyny", CompLevel.QM, 2, played=False)
+
+    resp = web_client.get("/admin/event/2020nyny")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    heading = soup.find("h2", string="Match Stats")
+    assert heading is not None
+    stats_table = heading.find_next("table")
+    assert stats_table is not None
+    rows = stats_table.find_all("tr")
+    # Header + one row for qualification matches only
+    assert len(rows) == 2
+    cells = [c.get_text(strip=True) for c in rows[1].find_all("td")]
+    assert cells[0].startswith("Qualification")
+    assert cells[1:4] == ["2", "1", "1"]
+
+
+def test_event_detail_district_points_sorted(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2025ctwat",
+        event_short="ctwat",
+        year=2025,
+        name="Test District Event",
+        event_type_enum=EventType.DISTRICT,
+        district_key=ndb.Key(District, "2025ne"),
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 5),
+    ).put()
+    EventDetails(
+        id="2025ctwat",
+        district_points={
+            "points": {
+                "frc1": {
+                    "qual_points": 3,
+                    "elim_points": 4,
+                    "alliance_points": 5,
+                    "award_points": 6,
+                    "total": 18,
+                },
+                "frc2": {
+                    "qual_points": 10,
+                    "elim_points": 10,
+                    "alliance_points": 10,
+                    "award_points": 0,
+                    "total": 30,
+                },
+            },
+            "tiebreakers": {
+                "frc1": {"qual_wins": 0, "highest_match_scores": []},
+                "frc2": {"qual_wins": 0, "highest_match_scores": []},
+            },
+        },
+    ).put()
+
+    resp = web_client.get("/admin/event/2025ctwat")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    heading = soup.find("h2", string="District Points")
+    assert heading is not None
+    table = heading.find_next("table")
+    assert table is not None
+    rows = table.find_all("tr")[1:]
+    teams = [row.find("a").get_text(strip=True) for row in rows]
+    # Sorted by total points descending
+    assert teams == ["2", "1"]
+    totals = [row.find_all("td")[-1].get_text(strip=True) for row in rows]
+    assert totals == ["30", "18"]
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/<event_key>/edit  (GET)
+# ---------------------------------------------------------------------------
+
+
+def test_event_edit_get_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/event/2020nyny/edit")
+    assert resp.status_code == 404
+
+
+def test_event_edit_get(web_client: Client, login_gae_admin) -> None:
+    helpers.preseed_event("2020nyny")
+    EventDetails(
+        id="2020nyny",
+        alliance_selections=[{"picks": ["frc1", "frc2", "frc3"], "declines": []}],
+        rankings=[["Rank", "Team"], [1, "1"]],
+    ).put()
+
+    resp = web_client.get("/admin/event/2020nyny/edit")
+    assert resp.status_code == 200
+    content = resp.data.decode("utf-8")
+    assert 'name="event_short" value="nyny"' in content
+    assert "frc1" in content
+    assert "sync_disabled::EVENT_ALLIANCES" in content
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/create
+# ---------------------------------------------------------------------------
+
+
+def test_event_create_get(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/event/create")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    form = soup.find("form", method="post")
+    assert form is not None
+    assert form["action"].startswith("/admin/event/edit")
+    assert form.find("input", attrs={"name": "event_short"}) is not None
+    assert form.find("select", attrs={"name": "event_type"}) is not None
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/<event_key>/delete
+# ---------------------------------------------------------------------------
+
+
+def test_event_delete_get_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/event/2020nyny/delete")
+    assert resp.status_code == 404
+
+
+def test_event_delete_get(web_client: Client, login_gae_admin) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.get("/admin/event/2020nyny/delete")
+    assert resp.status_code == 200
+    assert b"Delete 2020nyny?" in resp.data
+
+
+def test_event_delete_post_not_found(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    resp = web_client.post("/admin/event/2020nyny/delete")
+    assert resp.status_code == 404
+
+
+def test_event_delete_post_removes_event_matches_and_eventteams(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    helpers.preseed_event("2020casj")
+    _store_match("2020nyny", CompLevel.QM, 1, played=True)
+    _store_match("2020casj", CompLevel.QM, 1, played=True)
+    EventTeam(
+        id="2020nyny_frc1",
+        event=ndb.Key(Event, "2020nyny"),
+        team=ndb.Key(Team, "frc1"),
+        year=2020,
+    ).put()
+    EventTeam(
+        id="2020casj_frc1",
+        event=ndb.Key(Event, "2020casj"),
+        team=ndb.Key(Team, "frc1"),
+        year=2020,
+    ).put()
+
+    resp = web_client.post("/admin/event/2020nyny/delete")
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/events"
+
+    assert Event.get_by_id("2020nyny") is None
+    assert Match.get_by_id("2020nyny_qm1") is None
+    assert EventTeam.get_by_id("2020nyny_frc1") is None
+    # Other events are untouched
+    assert Event.get_by_id("2020casj") is not None
+    assert Match.get_by_id("2020casj_qm1") is not None
+    assert EventTeam.get_by_id("2020casj_frc1") is not None
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/delete_matches/<event_key>/<comp_level>/<to_delete>
+# ---------------------------------------------------------------------------
+
+
+def test_event_delete_matches_invalid_key(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/event/delete_matches/asdf/qm/all")
+    assert resp.status_code == 404
+
+
+def test_event_delete_matches_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.get("/admin/event/delete_matches/2020nyny/qm/all")
+    assert resp.status_code == 404
+
+
+def test_event_delete_matches_bad_comp_level(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.get("/admin/event/delete_matches/2020nyny/bogus/all")
+    assert resp.status_code == 400
+
+
+def test_event_delete_matches_all(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    _store_match("2020nyny", CompLevel.QM, 1, played=True)
+    _store_match("2020nyny", CompLevel.QM, 2, played=False)
+    _store_match("2020nyny", CompLevel.SF, 1, played=False)
+
+    resp = web_client.get("/admin/event/delete_matches/2020nyny/qm/all")
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    assert Match.get_by_id("2020nyny_qm1") is None
+    assert Match.get_by_id("2020nyny_qm2") is None
+    assert Match.get_by_id("2020nyny_sf1m1") is not None
+
+
+def test_event_delete_matches_unplayed(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    _store_match("2020nyny", CompLevel.QM, 1, played=True)
+    _store_match("2020nyny", CompLevel.QM, 2, played=False)
+
+    resp = web_client.get("/admin/event/delete_matches/2020nyny/qm/unplayed")
+    assert resp.status_code == 302
+
+    assert Match.get_by_id("2020nyny_qm1") is not None
+    assert Match.get_by_id("2020nyny_qm2") is None
+
+
+def test_event_delete_matches_unknown_selector_is_noop(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    _store_match("2020nyny", CompLevel.QM, 1, played=True)
+
+    resp = web_client.get("/admin/event/delete_matches/2020nyny/qm/bogus")
+    assert resp.status_code == 302
+    assert Match.get_by_id("2020nyny_qm1") is not None
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/edit and /admin/event/<event_key>/edit  (POST)
+# ---------------------------------------------------------------------------
+
+
+def _full_event_form(**overrides) -> Dict[str, str]:
+    form = {
+        "year": "2020",
+        "event_short": "nyny",
+        "name": "New York City Regional",
+        "short_name": "NYC",
+        "start_date": "2020-03-05",
+        "end_date": "2020-03-08",
+        "first_code": "  nyny  ",
+        "event_type": str(int(EventType.REGIONAL)),
+        "event_district_key": "2020ne",
+        "playoff_type": str(int(PlayoffType.DOUBLE_ELIM_8_TEAM)),
+        "venue": "Armory",
+        "venue_address": "1 Main St",
+        "city": "New York",
+        "state_prov": "NY",
+        "postalcode": "10001",
+        "country": "USA",
+        "website": "example.com/nyny",
+        "first_eid": "12345",
+        "official": "True",
+        "enable_predictions": "true",
+        "facebook_eid": "fb123",
+        "custom_hashtag": "frcnyny",
+        "webcast_json": json.dumps([{"type": "twitch", "channel": "nyny"}]),
+        "parent_event": "2020cmp",
+        "divisions": json.dumps(["2020cmptx", "2020cmpmo"]),
+        "manual_attrs_csv": "name, website",
+        "sync_disabled::EVENT_ALLIANCES": "on",
+        "sync_disabled::EVENT_AWARDS": "on",
+    }
+    form.update(overrides)
+    return form
+
+
+def test_event_edit_post_creates_event(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    resp = web_client.post("/admin/event/edit", data=_full_event_form())
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.event_short == "nyny"
+    assert event.name == "New York City Regional"
+    assert event.short_name == "NYC"
+    assert event.start_date == datetime(2020, 3, 5)
+    assert event.end_date == datetime(2020, 3, 8)
+    assert event.first_code == "nyny"
+    assert event.event_type_enum == EventType.REGIONAL
+    assert event.district_key == ndb.Key(District, "2020ne")
+    assert event.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM
+    assert event.venue == "Armory"
+    assert event.venue_address == "1 Main St"
+    assert event.city == "New York"
+    assert event.state_prov == "NY"
+    assert event.postalcode == "10001"
+    assert event.country == "USA"
+    assert event.website == "http://example.com/nyny"
+    assert event.first_eid == "12345"
+    assert event.year == 2020
+    assert event.official is True
+    assert event.enable_predictions is True
+    assert event.facebook_eid == "fb123"
+    assert event.custom_hashtag == "frcnyny"
+    assert event.webcast == [{"type": "twitch", "channel": "nyny"}]
+    assert event.parent_event == ndb.Key(Event, "2020cmp")
+    assert event.divisions == [
+        ndb.Key(Event, "2020cmptx"),
+        ndb.Key(Event, "2020cmpmo"),
+    ]
+    assert event.manual_attrs == ["name", "website"]
+    assert event.disable_sync_flags == int(
+        EventSyncType.EVENT_ALLIANCES | EventSyncType.EVENT_AWARDS
+    )
+    assert not event.is_sync_enabled(EventSyncType.EVENT_ALLIANCES)
+    assert event.is_sync_enabled(EventSyncType.EVENT_RANKINGS)
+    assert EventDetails.get_by_id("2020nyny") is None
+
+
+def test_event_edit_post_none_placeholders(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    # The edit form renders "None" for unset fields; these must round-trip to None
+    resp = web_client.post(
+        "/admin/event/edit",
+        data=_full_event_form(
+            start_date="",
+            end_date="",
+            first_code="None",
+            event_district_key="None",
+            parent_event="None",
+            divisions="[]",
+            website="None",
+            official="false",
+            enable_predictions="",
+            manual_attrs_csv="",
+        ),
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.start_date is None
+    assert event.end_date is None
+    assert event.first_code is None
+    assert event.district_key is None
+    assert event.parent_event is None
+    assert event.divisions == []
+    assert event.website == "None"
+    assert event.official is False
+    # An empty string is not in the {"true", "false"} lookup, so it becomes None
+    assert event.enable_predictions is None
+    assert event.manual_attrs == [""]
+
+
+def test_event_edit_post_defaults_when_fields_missing(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    resp = web_client.post(
+        "/admin/event/edit",
+        data={"year": "2020", "event_short": "nyny"},
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.event_type_enum == EventType.UNLABLED
+    assert event.playoff_type == PlayoffType.BRACKET_8_TEAM
+    assert event.official is False
+    assert event.enable_predictions is False
+    assert event.website is None
+    assert event.disable_sync_flags == 0
+
+
+def test_event_edit_post_mismatched_key(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.post(
+        "/admin/event/2020nyny/edit",
+        data=_full_event_form(event_short="casj"),
+    )
+    assert resp.status_code == 400
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.name == "Test Event"
+
+
+def test_event_edit_post_updates_existing_event_and_details(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    alliances = [{"picks": ["frc1", "frc2", "frc3"], "declines": []}]
+    rankings = [["Rank", "Team"], [1, "1"]]
+
+    resp = web_client.post(
+        "/admin/event/2020nyny/edit",
+        data=_full_event_form(
+            alliance_selections_json=json.dumps(alliances),
+            rankings_json=json.dumps(rankings),
+        ),
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.name == "New York City Regional"
+    assert event.event_type_enum == EventType.REGIONAL
+
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == alliances
+    assert details.rankings == rankings
+
+
+def test_event_edit_post_only_rankings_json(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    rankings = [["Rank", "Team"], [1, "1"]]
+
+    resp = web_client.post(
+        "/admin/event/2020nyny/edit",
+        data=_full_event_form(rankings_json=json.dumps(rankings)),
+    )
+    assert resp.status_code == 302
+
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == []
+    assert details.rankings == rankings
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/<event_key>  (POST)
+# ---------------------------------------------------------------------------
+
+
+def test_event_detail_post_invalid_key(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post("/admin/event/asdf", data={"first_code": "x"})
+    assert resp.status_code == 404
+
+
+def test_event_detail_post_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post("/admin/event/2020nyny", data={"first_code": "x"})
+    assert resp.status_code == 404
+
+
+def test_event_detail_post_sync_override_flags_set_and_cleared(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+
+    resp = web_client.post(
+        "/admin/event/2020nyny",
+        data={
+            "event_sync_disable": "on",
+            "set_start_day_to_last": "on",
+            "skip_eventteams": "on",
+        },
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.sync_overrides == {
+        "event_sync_disable": True,
+        "set_start_day_to_last": True,
+        "skip_eventteams": True,
+    }
+
+    # The detail page reflects the flags as checked
+    resp = web_client.get("/admin/event/2020nyny")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    for name in ("event_sync_disable", "set_start_day_to_last", "skip_eventteams"):
+        checkbox = soup.find("input", attrs={"name": name})
+        assert checkbox is not None
+        assert checkbox.has_attr("checked")
+
+    # Submitting the form without the flags clears them
+    resp = web_client.post("/admin/event/2020nyny", data={})
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.sync_overrides == {}
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/remap_teams/<event_key>
+# ---------------------------------------------------------------------------
+
+
+def test_event_remap_teams_not_found(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    resp = web_client.post(
+        "/admin/event/remap_teams/2020nyny",
+        data={"remap_teams": json.dumps({"1": "1B"})},
+    )
+    assert resp.status_code == 404
+
+
+def test_event_remap_teams(web_client: Client, login_gae_admin, taskqueue_stub) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.post(
+        "/admin/event/remap_teams/2020nyny",
+        data={"remap_teams": json.dumps({"1": "1B", "9999": "254"})},
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.remap_teams == {"frc1": "frc1B", "frc9999": "frc254"}
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert [t.url for t in tasks] == ["/tasks/do/remap_teams/2020nyny"]
+
+
+def test_event_remap_teams_empty_clears_mapping(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    event.remap_teams = {"frc1": "frc1B"}
+    event.put()
+
+    resp = web_client.post("/admin/event/remap_teams/2020nyny", data={})
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.remap_teams == {}
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/update_location/<event_key>
+# ---------------------------------------------------------------------------
+
+
+def test_event_update_location_get_not_found(
+    web_client: Client, login_gae_admin
+) -> None:
+    resp = web_client.get("/admin/event/update_location/2020nyny")
+    assert resp.status_code == 404
+
+
+def test_event_update_location_get_without_location(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    # Events without any city/state/country have nothing to geocode
+    helpers.preseed_event("2020nyny")
+    resp = web_client.get("/admin/event/update_location/2020nyny")
+    assert resp.status_code == 200
+    assert resp.data == b"New location: None"
+
+
+def test_event_update_location_get(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        city="New York",
+        state_prov="NY",
+        country="USA",
+        normalized_location=Location(name="Stale"),
+    ).put()
+
+    with patch(
+        "backend.web.handlers.admin.event.LocationHelper.get_event_location",
+        return_value=Location(name="Armory", city="New York", place_id="abc"),
+    ) as mock_get_location:
+        resp = web_client.get("/admin/event/update_location/2020nyny")
+
+    assert resp.status_code == 200
+    assert b"Armory" in resp.data
+    mock_get_location.assert_called_once()
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    location = none_throws(event.normalized_location)
+    assert location.name == "Armory"
+    assert location.place_id == "abc"
+
+
+def test_event_update_location_post_not_found(
+    web_client: Client, login_gae_admin
+) -> None:
+    resp = web_client.post(
+        "/admin/event/update_location/2020nyny", data={"place_id": "abc"}
+    )
+    assert resp.status_code == 404
+
+
+def test_event_update_location_post_missing_place_id(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.post("/admin/event/update_location/2020nyny", data={})
+    assert resp.status_code == 400
+
+
+def test_event_update_location_post(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+
+    location_info = {
+        "place_id": "abc",
+        "lat": 40.7,
+        "lng": -74.0,
+        "name": "Armory",
+        "types": [],
+        "city": "New York",
+        "state_prov": "New York",
+        "state_prov_short": "NY",
+        "country": "United States",
+        "country_short": "US",
+    }
+    with patch(
+        "backend.web.handlers.admin.event.LocationHelper.construct_location_info",
+        return_value=location_info,
+    ) as mock_construct:
+        resp = web_client.post(
+            "/admin/event/update_location/2020nyny", data={"place_id": "abc"}
+        )
+
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+    mock_construct.assert_called_once()
+    assert mock_construct.call_args[0][0]["place_id"] == "abc"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    location = none_throws(event.normalized_location)
+    assert location.name == "Armory"
+    assert location.place_id == "abc"
+    assert location.city == "New York"
+    assert location.state_prov_short == "NY"
+    assert location.lat_lng == ndb.GeoPt(40.7, -74.0)
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/add_webcast/<event_key> and /admin/event/remove_webcast/<event_key>
+# ---------------------------------------------------------------------------
+
+
+def test_add_webcast_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post(
+        "/admin/event/add_webcast/2020nyny",
+        data={"webcast_url": "https://www.twitch.tv/firstinspires"},
+    )
+    assert resp.status_code == 404
+
+
+def test_add_webcast_via_manual_fields_with_file_and_date(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.post(
+        "/admin/event/add_webcast/2020nyny",
+        data={
+            "webcast_url": "",
+            "webcast_type": "youtube",
+            "webcast_channel": "abc123defgh",
+            "webcast_file": "somefile",
+            "webcast_date": "2020-03-01",
+        },
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny#webcasts"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert {
+        "type": "youtube",
+        "channel": "abc123defgh",
+        "file": "somefile",
+        "date": "2020-03-01",
+    } in event.webcast
+
+
+def test_remove_webcast_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post(
+        "/admin/event/remove_webcast/2020nyny",
+        data={"type": "twitch", "channel": "robosportsnetwork", "index": "1"},
+    )
+    assert resp.status_code == 404
+
+
+def test_remove_webcast(web_client: Client, login_gae_admin, taskqueue_stub) -> None:
+    helpers.preseed_event("2020nyny")
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert [w["channel"] for w in event.webcast] == [
+        "firstinspires",
+        "robosportsnetwork",
+    ]
+
+    resp = web_client.post(
+        "/admin/event/remove_webcast/2020nyny",
+        data={"type": "twitch", "channel": "robosportsnetwork", "index": "2"},
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny#webcasts"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.webcast == [{"type": "twitch", "channel": "firstinspires"}]
+
+
+def test_remove_webcast_with_file(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        event_type_enum=EventType.OFFSEASON,
+        webcast_json=json.dumps(
+            [
+                {"type": "youtube", "channel": "abc123defgh", "file": "day1"},
+                {"type": "twitch", "channel": "firstinspires"},
+            ]
+        ),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/remove_webcast/2020nyny",
+        data={
+            "type": "youtube",
+            "channel": "abc123defgh",
+            "file": "day1",
+            "index": "2",
+        },
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.webcast == [{"type": "twitch", "channel": "firstinspires"}]
+
+
+def test_remove_webcast_mismatch_is_noop(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    helpers.preseed_event("2020nyny")
+
+    resp = web_client.post(
+        "/admin/event/remove_webcast/2020nyny",
+        data={"type": "twitch", "channel": "someoneelse", "index": "1"},
+    )
+    assert resp.status_code == 302
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert len(event.webcast) == 2
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/update_webcast_date/<event_key>
+# ---------------------------------------------------------------------------
+
+
+def test_update_webcast_date_index_out_of_range(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        event_type_enum=EventType.OFFSEASON,
+        webcast_json=json.dumps([{"type": "youtube", "channel": "abc123defgh"}]),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/update_webcast_date/2020nyny",
+        data={"type": "youtube", "channel": "abc123defgh", "index": "2"},
+    )
+    assert resp.status_code == 400
+
+
+def test_update_webcast_date_channel_mismatch(
+    web_client: Client, login_gae_admin
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        event_type_enum=EventType.OFFSEASON,
+        webcast_json=json.dumps([{"type": "youtube", "channel": "abc123defgh"}]),
+    ).put()
+
+    resp = web_client.post(
+        "/admin/event/update_webcast_date/2020nyny",
+        data={"type": "youtube", "channel": "otherchannel", "index": "1"},
+    )
+    assert resp.status_code == 400
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/update_all_webcast_dates/<event_key>
+# ---------------------------------------------------------------------------
+
+
+def test_update_all_webcast_dates_not_found(
+    web_client: Client, login_gae_admin
+) -> None:
+    resp = web_client.post("/admin/event/update_all_webcast_dates/2020nyny")
+    assert resp.status_code == 404
+
+
+def test_update_all_webcast_dates_no_youtube_webcasts(
+    web_client: Client, login_gae_admin
+) -> None:
+    helpers.preseed_event("2020nyny")
+
+    with patch(
+        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_scheduled_start_times"
+    ) as mock_get_dates:
+        resp = web_client.post("/admin/event/update_all_webcast_dates/2020nyny")
+
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny#webcasts"
+    mock_get_dates.assert_not_called()
+
+
+def test_update_all_webcast_dates_skips_non_youtube_and_unchanged(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        event_type_enum=EventType.OFFSEASON,
+        webcast_json=json.dumps(
+            [
+                {"type": "twitch", "channel": "firstinspires"},
+                {"type": "youtube", "channel": "abc123defgh", "date": "2020-03-01"},
+                {"type": "youtube", "channel": ""},
+                {"type": "youtube", "channel": "nodate12345"},
+            ]
+        ),
+    ).put()
+
+    with patch(
+        "backend.web.handlers.admin.event.YouTubeVideoHelper.get_scheduled_start_times"
+    ) as mock_get_dates:
+        mock_future = ndb.Future()
+        mock_future.set_result({"abc123defgh": "2020-03-01"})
+        mock_get_dates.return_value = mock_future
+
+        resp = web_client.post("/admin/event/update_all_webcast_dates/2020nyny")
+
+    assert resp.status_code == 302
+    mock_get_dates.assert_called_once_with(["abc123defgh", "", "nodate12345"])
+
+    # Nothing changed, so the event was not rewritten
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert len(event.webcast) == 4
+    youtube = [w for w in event.webcast if w["type"] == "youtube"]
+    assert [w.get("date") for w in youtube] == ["2020-03-01", None, None]
+
+
+# ---------------------------------------------------------------------------
+# /admin/event/link_frc_api/<event_key>
+# ---------------------------------------------------------------------------
+
+
+def test_link_frc_api_post_invalid_key(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post(
+        "/admin/event/link_frc_api/asdf", data={"frc_event_input": "NYNY"}
+    )
+    assert resp.status_code == 404
+
+
+def test_link_frc_api_post_not_found(web_client: Client, login_gae_admin) -> None:
+    resp = web_client.post(
+        "/admin/event/link_frc_api/2020nyny", data={"frc_event_input": "NYNY"}
+    )
+    assert resp.status_code == 404
+
+
+def test_uppercase_event_short_redirects_to_lowercase_key(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """An uppercase event_short is stored and redirected to in lowercase."""
+    resp = web_client.post(
+        "/admin/event/edit", data=_full_event_form(event_short="NYNY")
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    assert Event.get_by_id("2020NYNY") is None
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.event_short == "nyny"
+    assert event.key_name == "2020nyny"
+
+
+def test_create_event_with_details_json_saves_event_and_details(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """Creating an event with details JSON saves the Event and its EventDetails."""
+    alliances = [{"picks": ["frc1", "frc2", "frc3"], "declines": []}]
+    resp = web_client.post(
+        "/admin/event/edit",
+        data=_full_event_form(alliance_selections_json=json.dumps(alliances)),
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.name == "New York City Regional"
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == alliances
+
+
+def test_empty_divisions_field_means_no_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """An empty divisions field saves the event with no divisions."""
+    resp = web_client.post("/admin/event/edit", data=_full_event_form(divisions=""))
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.divisions == []

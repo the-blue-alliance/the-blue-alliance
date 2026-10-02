@@ -1,7 +1,6 @@
 import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
+import { cn } from 'cn';
 import { type ComponentProps } from 'react';
-
-import { cn } from '~/lib/utils';
 
 function Popover({ ...props }: ComponentProps<typeof PopoverPrimitive.Root>) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
@@ -54,10 +53,4 @@ function PopoverContent({
   );
 }
 
-function PopoverAnchor({ ...props }: ComponentProps<'div'>) {
-  // Base UI has no Popover.Anchor part (Positioner takes an `anchor` prop
-  // instead); kept as an inert passthrough since no consumer uses it.
-  return <div data-slot="popover-anchor" {...props} />;
-}
-
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
+export { Popover, PopoverTrigger, PopoverContent };

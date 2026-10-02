@@ -15,13 +15,16 @@ import lamp from '~/images/tba/tba-lamp.svg';
 import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 
 export function Navbar() {
-  const [selected, setSelected] = useState<string>('');
+  // Base UI derives the menu's open state from `value != null`, so the
+  // closed state must be null — an empty string counts as "open" and keeps
+  // the popup permanently mounted (Radix used '' as its closed sentinel).
+  const [selected, setSelected] = useState<string | null>(null);
   const router = useRouter();
   const { pathname } = useLocation();
 
   useEffect(() => {
     const unsubscribe = router.subscribe('onBeforeNavigate', () => {
-      setSelected('');
+      setSelected(null);
     });
     return () => unsubscribe();
   }, [router, setSelected]);
@@ -31,7 +34,16 @@ export function Navbar() {
       <GlobalLoadingProgress />
       <NavigationMenu
         value={selected}
-        onValueChange={(value) => setSelected((value as string) ?? '')}
+        onValueChange={(value, eventDetails) => {
+          // Base UI opens NavigationMenu triggers on hover (~50ms delay)
+          // with no opt-out prop. The only trigger here is the mobile
+          // hamburger, which should be click-only, so ignore hover-driven
+          // changes (the menu is controlled, so dropping them is enough).
+          if (eventDetails.reason === 'trigger-hover') {
+            return;
+          }
+          setSelected((value as string | null) ?? null);
+        }}
         render={
           <header className="sticky top-0 z-50 h-14 w-full bg-brand shadow-md" />
         }

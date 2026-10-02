@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import { type ComponentProps, createContext, useContext } from 'react';
 
 import {
@@ -21,7 +22,6 @@ import {
   DrawerTrigger,
 } from '~/components/ui/drawer';
 import { useMediaQuery } from '~/lib/hooks';
-import { cn } from '~/lib/utils';
 
 interface BaseProps {
   children: React.ReactNode;
@@ -114,16 +114,41 @@ const CredenzaClose = ({
 const CredenzaContent = ({
   className,
   children,
+  focusContentOnOpen,
   ...props
 }: Omit<ComponentProps<typeof DialogContent>, 'className' | 'style'> &
   CredenzaProps) => {
   const isDesktop = useContext(CredenzaIsDesktopContext);
-  const CredenzaContent = isDesktop ? DialogContent : DrawerContent;
+
+  if (isDesktop) {
+    return (
+      <DialogContent
+        className={className}
+        focusContentOnOpen={focusContentOnOpen}
+        {...props}
+      >
+        {children}
+      </DialogContent>
+    );
+  }
 
   return (
-    <CredenzaContent className={className} {...props}>
+    <DrawerContent
+      className={className}
+      // vaul's Content is Radix-based; translate focusContentOnOpen to the
+      // equivalent Radix escape hatch so mobile matches the desktop dialog
+      onOpenAutoFocus={
+        focusContentOnOpen
+          ? (e) => {
+              e.preventDefault();
+              (e.currentTarget as HTMLElement | null)?.focus();
+            }
+          : undefined
+      }
+      {...props}
+    >
       {children}
-    </CredenzaContent>
+    </DrawerContent>
   );
 };
 

@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import List
 from unittest.mock import Mock, patch
 from urllib.parse import parse_qsl, quote, urlparse
@@ -5,17 +6,30 @@ from urllib.parse import parse_qsl, quote, urlparse
 import pytest
 from _pytest.monkeypatch import MonkeyPatch
 from flask.testing import FlaskClient
+from google.appengine.ext import ndb
 
 import backend
 from backend.common import auth
 from backend.common.auth import SESSION_COOKIE_LIFETIME
 from backend.common.consts.client_type import ClientType
+from backend.common.consts.event_type import EventType
 from backend.common.consts.model_type import ModelType
+from backend.common.consts.notification_type import (
+    ENABLED_EVENT_NOTIFICATIONS,
+    ENABLED_TEAM_NOTIFICATIONS,
+    NotificationType,
+)
 from backend.common.helpers.account_deletion import AccountDeletionHelper
 from backend.common.helpers.mytba import AttendanceStatsHelper
+from backend.common.helpers.mytba_helper import MyTBAHelper
 from backend.common.helpers.tbans_helper import TBANSHelper
 from backend.common.models.account import Account
+from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
+from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
+from backend.common.models.subscription import Subscription
+from backend.common.models.team import Team
 from backend.web.handlers.conftest import CapturedTemplate
 from backend.web.handlers.tests.helpers import get_page_title
 
@@ -753,3 +767,508 @@ def test_delete_post_firebase_user_not_found(
     assert response.status_code == 302
     parsed_response = urlparse(response.headers["Location"])
     assert parsed_response.path == "/"
+
+
+def test_register_register_no_display_name_with_matching_account(
+    login_user, web_client: FlaskClient
+) -> None:
+    login_user.is_registered = False
+    login_user.uid = "abc"
+
+    with patch.object(login_user, "register") as mock_register:
+        response = web_client.post(
+            "/account/register", data={"account_id": login_user.uid}
+        )
+
+    mock_register.assert_not_called()
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/"
+
+
+def test_login_rewrites_auth_emulator_host_for_browser(
+    captured_templates: List[CapturedTemplate], web_client: FlaskClient
+) -> None:
+    # The backend sees the Docker-internal hostname, but the browser needs
+    # localhost with the same port.
+    with patch.object(
+        backend.web.handlers.account.Environment,
+        "auth_emulator_host",
+        return_value="firebase:9099",
+    ):
+        response = web_client.get("/account/login")
+
+    assert response.status_code == 200
+    assert len(captured_templates) == 1
+    template, context = captured_templates[0]
+    assert template.name == "account_login_required.html"
+    assert context["auth_emulator_host"] == "localhost:9099"
+
+
+# ---------------------------------------------------------------------------
+# myTBA team / event / eventteam preference pages
+# ---------------------------------------------------------------------------
+
+
+@pytest.fixture
+def login_user_with_string_account(login_user):
+    # Production Account keys are Firebase uid strings. The mytba_*_post
+    # handlers pass ``account_key.id()`` straight into ``Favorite.user_id``
+    # (a StringProperty), so the account must have a string id here.
+    account_key = Account(id="uid-abc", email="test@tba.com", registered=True).put()
+    login_user.account_key = account_key
+    login_user.uid = account_key.id()
+    return login_user
+
+
+@pytest.fixture
+def team_254(ndb_stub) -> Team:
+    team = Team(id="frc254", team_number=254, nickname="The Cheesy Poofs")
+    team.put()
+    return team
+
+
+def _make_event(event_key: str) -> Event:
+    year = int(event_key[:4])
+    event = Event(
+        id=event_key,
+        year=year,
+        event_short=event_key[4:],
+        name=f"Event {event_key}",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(year, 3, 1),
+        end_date=datetime(year, 3, 3),
+    )
+    event.put()
+    return event
+
+
+def _favorites(account_key: ndb.Key, model_type: ModelType) -> List[Favorite]:
+    return Favorite.query(
+        Favorite.model_type == model_type, ancestor=account_key
+    ).fetch()
+
+
+def _subscriptions(account_key: ndb.Key, model_type: ModelType) -> List[Subscription]:
+    return Subscription.query(
+        Subscription.model_type == model_type, ancestor=account_key
+    ).fetch()
+
+
+def test_mytba_team_get_unknown_team_404(login_user, web_client: FlaskClient) -> None:
+    response = web_client.get("/account/mytba/team/254")
+    assert response.status_code == 404
+
+
+def test_mytba_team_get_defaults_to_favorite(
+    login_user,
+    team_254: Team,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    response = web_client.get("/account/mytba/team/254")
+
+    assert response.status_code == 200
+    template, context = captured_templates[0]
+    assert template.name == "mytba_team.html"
+    assert context["team"].key == team_254.key
+    # No existing favorite or subscription -> new entries default to favorite
+    assert context["is_favorite"] is True
+    assert context["subscription"] is None
+    assert {en for en, _ in context["enabled_notifications"]} == set(
+        ENABLED_TEAM_NOTIFICATIONS
+    )
+
+
+def test_mytba_team_get_subscription_only(
+    login_user_with_string_account,
+    team_254: Team,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    account_key = login_user_with_string_account.account_key
+    MyTBAHelper.add_subscription(
+        Subscription(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.TEAM,
+            model_key="frc254",
+            notification_types=[NotificationType.MATCH_SCORE],
+        )
+    )
+
+    response = web_client.get("/account/mytba/team/254")
+
+    assert response.status_code == 200
+    context = captured_templates[0][1]
+    # An existing subscription without a favorite means "not a favorite"
+    assert context["is_favorite"] is False
+    assert context["subscription"].notification_types == [NotificationType.MATCH_SCORE]
+
+
+def test_mytba_team_get_existing_favorite(
+    login_user_with_string_account,
+    team_254: Team,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    account_key = login_user_with_string_account.account_key
+    MyTBAHelper.add_favorite(
+        Favorite(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.TEAM,
+            model_key="frc254",
+        )
+    )
+
+    response = web_client.get("/account/mytba/team/254")
+
+    assert response.status_code == 200
+    context = captured_templates[0][1]
+    assert context["is_favorite"] is True
+    assert context["subscription"] is None
+
+
+def test_mytba_team_post_adds_favorite_and_subscription(
+    login_user_with_string_account, web_client: FlaskClient
+) -> None:
+    account_key = login_user_with_string_account.account_key
+
+    response = web_client.post(
+        "/account/mytba/team/254",
+        data={
+            "favorite": "on",
+            "notification_types": [
+                str(int(NotificationType.UPCOMING_MATCH)),
+                str(int(NotificationType.MATCH_SCORE)),
+            ],
+        },
+    )
+
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account/mytba"
+    assert dict(parse_qsl(parsed_response.query)) == {"status": "team_updated"}
+    assert parsed_response.fragment == "my-teams"
+
+    favorites = _favorites(account_key, ModelType.TEAM)
+    assert [f.model_key for f in favorites] == ["frc254"]
+    assert favorites[0].user_id == "uid-abc"
+
+    subscriptions = _subscriptions(account_key, ModelType.TEAM)
+    assert [s.model_key for s in subscriptions] == ["frc254"]
+    assert sorted(subscriptions[0].notification_types) == [
+        NotificationType.UPCOMING_MATCH,
+        NotificationType.MATCH_SCORE,
+    ]
+
+
+def test_mytba_team_post_removes_favorite_and_subscription(
+    login_user_with_string_account, web_client: FlaskClient
+) -> None:
+    account_key = login_user_with_string_account.account_key
+    MyTBAHelper.add_favorite(
+        Favorite(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.TEAM,
+            model_key="frc254",
+        )
+    )
+    MyTBAHelper.add_subscription(
+        Subscription(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.TEAM,
+            model_key="frc254",
+            notification_types=[NotificationType.AWARDS],
+        )
+    )
+
+    # Unchecking the favorite box and all notification boxes clears both
+    response = web_client.post("/account/mytba/team/254", data={})
+
+    assert response.status_code == 302
+    assert _favorites(account_key, ModelType.TEAM) == []
+    assert _subscriptions(account_key, ModelType.TEAM) == []
+
+
+def test_mytba_team_post_honors_safe_next(
+    login_user_with_string_account, web_client: FlaskClient
+) -> None:
+    response = web_client.post(
+        "/account/mytba/team/254?next=/team/254", data={"favorite": "on"}
+    )
+
+    assert response.status_code == 302
+    assert urlparse(response.headers["Location"]).path == "/team/254"
+
+
+def test_mytba_event_get_unknown_event_404(login_user, web_client: FlaskClient) -> None:
+    response = web_client.get("/account/mytba/event/2024casj")
+    assert response.status_code == 404
+
+
+@pytest.mark.parametrize("event_key", ["abcd*", "1000*", "*"])
+def test_mytba_event_get_bad_wildcard_404(
+    login_user, event_key: str, web_client: FlaskClient
+) -> None:
+    response = web_client.get(f"/account/mytba/event/{event_key}")
+    assert response.status_code == 404
+
+
+def test_mytba_event_get_wildcard(
+    login_user,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    year = datetime.now().year
+    response = web_client.get(f"/account/mytba/event/{year}*")
+
+    assert response.status_code == 200
+    template, context = captured_templates[0]
+    assert template.name == "mytba_event.html"
+    assert context["is_wildcard"] is True
+    assert context["event"].name == f"ALL {year} EVENTS"
+    assert context["event"].year == year
+    assert context["is_favorite"] is True
+    assert context["subscription"] is None
+    assert {en for en, _ in context["enabled_notifications"]} == set(
+        ENABLED_EVENT_NOTIFICATIONS
+    )
+
+
+def test_mytba_event_get_existing_event_with_subscription(
+    login_user_with_string_account,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    event = _make_event("2024casj")
+    account_key = login_user_with_string_account.account_key
+    MyTBAHelper.add_subscription(
+        Subscription(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.EVENT,
+            model_key="2024casj",
+            notification_types=[NotificationType.AWARDS],
+        )
+    )
+
+    response = web_client.get("/account/mytba/event/2024casj")
+
+    assert response.status_code == 200
+    context = captured_templates[0][1]
+    assert context["event"].key == event.key
+    assert context["is_wildcard"] is False
+    assert context["is_favorite"] is False
+    assert context["subscription"].notification_types == [NotificationType.AWARDS]
+
+
+def test_mytba_event_get_existing_event_with_favorite(
+    login_user_with_string_account,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    _make_event("2024casj")
+    account_key = login_user_with_string_account.account_key
+    MyTBAHelper.add_favorite(
+        Favorite(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.EVENT,
+            model_key="2024casj",
+        )
+    )
+
+    response = web_client.get("/account/mytba/event/2024casj")
+
+    assert response.status_code == 200
+    context = captured_templates[0][1]
+    assert context["is_favorite"] is True
+
+
+def test_mytba_event_post_adds_favorite_and_subscription(
+    login_user_with_string_account, web_client: FlaskClient
+) -> None:
+    account_key = login_user_with_string_account.account_key
+
+    response = web_client.post(
+        "/account/mytba/event/2024casj",
+        data={
+            "favorite": "on",
+            "notification_types": [str(int(NotificationType.ALLIANCE_SELECTION))],
+        },
+    )
+
+    assert response.status_code == 302
+    parsed_response = urlparse(response.headers["Location"])
+    assert parsed_response.path == "/account/mytba"
+    assert dict(parse_qsl(parsed_response.query)) == {"status": "event_updated"}
+    assert parsed_response.fragment == "my-events"
+
+    favorites = _favorites(account_key, ModelType.EVENT)
+    assert [f.model_key for f in favorites] == ["2024casj"]
+
+    subscriptions = _subscriptions(account_key, ModelType.EVENT)
+    assert [s.model_key for s in subscriptions] == ["2024casj"]
+    assert subscriptions[0].notification_types == [NotificationType.ALLIANCE_SELECTION]
+
+
+def test_mytba_event_post_removes_favorite_and_subscription(
+    login_user_with_string_account, web_client: FlaskClient
+) -> None:
+    account_key = login_user_with_string_account.account_key
+    MyTBAHelper.add_favorite(
+        Favorite(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.EVENT,
+            model_key="2024casj",
+        )
+    )
+    MyTBAHelper.add_subscription(
+        Subscription(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.EVENT,
+            model_key="2024casj",
+            notification_types=[NotificationType.AWARDS],
+        )
+    )
+
+    response = web_client.post("/account/mytba/event/2024casj", data={})
+
+    assert response.status_code == 302
+    assert _favorites(account_key, ModelType.EVENT) == []
+    assert _subscriptions(account_key, ModelType.EVENT) == []
+
+
+def test_mytba_eventteam_get_unknown_team_404(
+    login_user, web_client: FlaskClient
+) -> None:
+    response = web_client.get("/account/mytba/eventteam/254")
+    assert response.status_code == 404
+
+
+def test_mytba_eventteam_get(
+    login_user_with_string_account,
+    team_254: Team,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    account_key = login_user_with_string_account.account_key
+    for event_key in ["2024casj", "2024cada"]:
+        _make_event(event_key)
+        EventTeam(
+            id=f"{event_key}_frc254",
+            event=ndb.Key(Event, event_key),
+            team=team_254.key,
+            year=2024,
+        ).put()
+    MyTBAHelper.add_favorite(
+        Favorite(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.EVENT_TEAM,
+            model_key="2024casj_frc254",
+        )
+    )
+
+    response = web_client.get("/account/mytba/eventteam/254")
+
+    assert response.status_code == 200
+    template, context = captured_templates[0]
+    assert template.name == "mytba_eventteam.html"
+    assert context["team"].key == team_254.key
+    assert sorted(e.key_name for e in context["team_events"]) == [
+        "2024cada",
+        "2024casj",
+    ]
+    assert context["already_favorited"] == {"2024casj_frc254"}
+
+
+def test_mytba_eventteam_get_no_events_renders_empty_list(
+    login_user_with_string_account,
+    team_254: Team,
+    captured_templates: List[CapturedTemplate],
+    web_client: FlaskClient,
+) -> None:
+    """A team with no events renders an empty event list and no favorites."""
+    response = web_client.get("/account/mytba/eventteam/254")
+
+    assert response.status_code == 200
+    template, context = captured_templates[0]
+    assert template.name == "mytba_eventteam.html"
+    assert context["team"].key == team_254.key
+    assert list(context["team_events"]) == []
+    assert context["already_favorited"] == set()
+
+
+def test_mytba_eventteam_post_unknown_team_404(
+    login_user, web_client: FlaskClient
+) -> None:
+    response = web_client.post(
+        "/account/mytba/eventteam/254", data={"favorite_events": ["2024casj"]}
+    )
+    assert response.status_code == 404
+
+
+def test_mytba_eventteam_post_replaces_favorites(
+    login_user_with_string_account, team_254: Team, web_client: FlaskClient
+) -> None:
+    account_key = login_user_with_string_account.account_key
+    for event_key in ["2024casj", "2024cada"]:
+        _make_event(event_key)
+        EventTeam(
+            id=f"{event_key}_frc254",
+            event=ndb.Key(Event, event_key),
+            team=team_254.key,
+            year=2024,
+        ).put()
+    MyTBAHelper.add_favorite(
+        Favorite(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.EVENT_TEAM,
+            model_key="2024casj_frc254",
+        )
+    )
+
+    # Uncheck casj, check cada
+    response = web_client.post(
+        "/account/mytba/eventteam/254", data={"favorite_events": ["2024cada"]}
+    )
+
+    assert response.status_code == 302
+    assert urlparse(response.headers["Location"]).path == "/account/mytba"
+
+    favorites = _favorites(account_key, ModelType.EVENT_TEAM)
+    assert [f.model_key for f in favorites] == ["2024cada_frc254"]
+
+
+def test_mytba_eventteam_post_clears_all_favorites(
+    login_user_with_string_account, team_254: Team, web_client: FlaskClient
+) -> None:
+    account_key = login_user_with_string_account.account_key
+    _make_event("2024casj")
+    EventTeam(
+        id="2024casj_frc254",
+        event=ndb.Key(Event, "2024casj"),
+        team=team_254.key,
+        year=2024,
+    ).put()
+    MyTBAHelper.add_favorite(
+        Favorite(
+            parent=account_key,
+            user_id=account_key.id(),
+            model_type=ModelType.EVENT_TEAM,
+            model_key="2024casj_frc254",
+        )
+    )
+
+    response = web_client.post("/account/mytba/eventteam/254", data={})
+
+    assert response.status_code == 302
+    assert _favorites(account_key, ModelType.EVENT_TEAM) == []

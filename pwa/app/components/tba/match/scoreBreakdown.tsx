@@ -1,4 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 import {
   Children,
   type ComponentPropsWithoutRef,
@@ -12,7 +13,6 @@ import MdiArrowLeft from '~icons/mdi/arrow-left';
 import MdiArrowRight from '~icons/mdi/arrow-right';
 
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { cn } from '~/lib/utils';
 
 export function ScoreBreakdownTable({
   children,
@@ -40,8 +40,8 @@ export function ScoreBreakdownTable({
 
 export function ScoreBreakdownRow({
   children,
-  blueValue = undefined,
-  redValue = undefined,
+  blueValue,
+  redValue,
 }: {
   children: ReactNode;
   blueValue?: number;
@@ -60,7 +60,7 @@ export function ScoreBreakdownRow({
       })}
     >
       {Children.map(children, (child) => {
-        if (isValidElement(child)) {
+        if (isValidElement(child) && child.type === ScoreBreakdownLabelCell) {
           return cloneElement(
             child as ReactElement<{
               redWon?: boolean;

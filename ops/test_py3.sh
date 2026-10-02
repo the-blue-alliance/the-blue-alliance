@@ -51,7 +51,11 @@ run_inline_tests() {
         return 0
     fi
 
-    pytest "${test_targets[@]}" "${pytest_args[@]}"
+    if [[ ! " ${pytest_args[*]} " =~ " -n" ]]; then
+        pytest -n 0 "${test_targets[@]}" "${pytest_args[@]}"
+    else
+        pytest "${test_targets[@]}" "${pytest_args[@]}"
+    fi
 }
 
 if [ "${1:-}" == "--inline" ]; then
@@ -63,7 +67,7 @@ elif [ "${1:-}" == "--relevant" ]; then
 elif [ "$#" -ge 1 ]; then
     pytest "$@"
 else
-    if python -c "import pytest_cov" 2>/dev/null; then
+    if [ -n "${CI:-}" ] || [ "${COVERAGE:-}" = "1" ]; then
         pytest src --cov-report=xml --cov=src
     else
         pytest src

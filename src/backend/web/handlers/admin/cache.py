@@ -248,9 +248,8 @@ def clear_model_cache(model_type: str, model_key: str) -> Response:
             EventManipulator.clearCache(event)
 
             event_details = EventDetails.get_by_id(model_key)
-            if not event_details:
-                abort(404)
-            EventDetailsManipulator.clearCache(event_details)
+            if event_details:
+                EventDetailsManipulator.clearCache(event_details)
             return redirect(url_for("admin.event_detail", event_key=model_key))
         case "match":
             match = Match.get_by_id(model_key)
@@ -263,6 +262,6 @@ def clear_model_cache(model_type: str, model_key: str) -> Response:
             if not team:
                 abort(404)
             TeamManipulator.clearCache(team)
-            return redirect(url_for("admin.team_detail", team_key=model_key))
+            return redirect(url_for("admin.team_detail", team_number=team.team_number))
 
     return redirect(url_for("admin.admin_home"))

@@ -1,6 +1,6 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { useRouter, useSearch } from '@tanstack/react-router';
-import { Suspense, useRef } from 'react';
+import { Suspense, useState } from 'react';
 
 import { PlayoffType } from '~/api/tba/read';
 import {
@@ -25,9 +25,9 @@ export function MatchModal() {
   const isOpen = !!matchKey && isValidMatchKey(matchKey);
 
   // Keep track of last valid matchKey to show during close animation
-  const lastMatchKeyRef = useRef<string | null>(null);
-  if (isOpen && matchKey) {
-    lastMatchKeyRef.current = matchKey;
+  const [lastMatchKey, setLastMatchKey] = useState<string | null>(null);
+  if (isOpen && matchKey && matchKey !== lastMatchKey) {
+    setLastMatchKey(matchKey);
   }
 
   const handleOpenChange = (open: boolean) => {
@@ -46,11 +46,12 @@ export function MatchModal() {
   };
 
   // Use current matchKey if open, otherwise use last valid one during close animation
-  const displayMatchKey = isOpen ? matchKey : lastMatchKeyRef.current;
+  const displayMatchKey = isOpen ? matchKey : lastMatchKey;
 
   return (
     <Credenza open={isOpen} onOpenChange={handleOpenChange}>
-      <CredenzaContent className="max-w-5xl sm:max-w-5xl">
+      {/* Focus the content area and not the first element */}
+      <CredenzaContent className="max-w-5xl sm:max-w-5xl" focusContentOnOpen>
         {displayMatchKey && (
           <Suspense fallback={<MatchModalSpinner />}>
             <MatchModalContent matchKey={displayMatchKey} />

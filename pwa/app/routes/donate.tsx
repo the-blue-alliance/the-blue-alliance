@@ -1,12 +1,13 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/donate')({
   headers: publicCacheControlHeaders(),
   component: Donate,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Donate(): React.JSX.Element {
   return (
@@ -45,14 +46,12 @@ function Donate(): React.JSX.Element {
             <Link to="/thanks">thank all of our sponsors</Link> whose generous
             support has made it possible to keep the site running.
           </p>
-          <Button
-            render={
-              // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from Button's own children, merged onto this element by Base UI's render prop
-              <a href="https://www.paypal.com/donate/?hosted_button_id=RNFK8Y7FU9VX8" />
-            }
+          <a
+            href="https://www.paypal.com/donate/?hosted_button_id=RNFK8Y7FU9VX8"
+            className={buttonVariants()}
           >
             Donate on PayPal!
-          </Button>
+          </a>
         </div>
       </div>
     </>

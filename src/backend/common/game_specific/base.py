@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from abc import ABC, abstractmethod
 from typing import (
+    Any,
     Callable,
     ClassVar,
     Dict,
@@ -17,7 +18,7 @@ from typing import (
     TypeVar,
 )
 
-from backend.common.consts.alliance_color import AllianceColor
+from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.models.event_insights import EventInsights
 from backend.common.models.match import Match
 from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
@@ -39,6 +40,68 @@ class PredictionStatConfig(NamedTuple):
     stat_name: str
     prior_mean: int
     prior_variance: int
+
+
+class SuccessRateCounter(NamedTuple):
+    """
+    One row of the v2 success_rate insight. ``measure`` returns the
+    (successes, opportunities) a single played match contributes, and returns
+    (0, 0) for matches whose data cannot support the stat.
+    """
+
+    name: str
+    label: str
+    measure: Callable[[Match], Tuple[int, int]]
+
+
+_AUTO_POINTS_KEYS = ("autoPoints", "totalAutoPoints")
+
+
+def _auto_points(breakdown: Dict[str, Any]) -> Optional[int]:
+    """Alliance AUTO points, or None when the breakdown does not record them."""
+    for key in _AUTO_POINTS_KEYS:
+        value = breakdown.get(key)
+        if value is not None:
+            return int(value)
+    return None
+
+
+def _bonus_rp_success_rate_counter(
+    index: int, field: str, label: Optional[str]
+) -> SuccessRateCounter:
+    def measure(match: Match) -> Tuple[int, int]:
+        breakdown = match.score_breakdown
+        if breakdown is None:
+            return (0, 0)
+        hits = sum(1 for color in ALLIANCE_COLORS if breakdown[color].get(field))
+        return (hits, 2)
+
+    return SuccessRateCounter(
+        f"rp_{index + 1}", f"{label} RP" if label else f"RP {index + 1}", measure
+    )
+
+
+def _rp_sweep_success_rate_counter(
+    name: str, total_rp: int, fields: List[str], both_alliances: bool
+) -> SuccessRateCounter:
+    """
+    Counts matches that awarded the maximum ranking points possible - either to
+    the winning alliance alone (both_alliances=False) or across both alliances
+    (both_alliances=True), which also requires the loser to sweep every bonus RP.
+    """
+
+    def measure(match: Match) -> Tuple[int, int]:
+        breakdown = match.score_breakdown
+        if breakdown is None:
+            return (0, 0)
+        winner = match.winning_alliance
+        if winner == "":
+            return (0, 1)
+        colors = ALLIANCE_COLORS if both_alliances else [winner]
+        swept = all(breakdown[color].get(field) for color in colors for field in fields)
+        return (1 if swept else 0, 1)
+
+    return SuccessRateCounter(name, f"{total_rp} RP", measure)
 
 
 class SeasonGameConfig(ABC, Generic[TScoreBreakdown]):
@@ -82,6 +145,19 @@ class SeasonGameConfig(ABC, Generic[TScoreBreakdown]):
         """Returns computed insights for the event, or None if not supported."""
         raise NotImplementedError()
 
+    def success_rate_counters(self) -> Sequence[SuccessRateCounter]:
+        """
+        Returns the count/opportunities objectives tracked by the v2
+        success_rate insight for this season.
+
+        Concrete (not abstract) with a default of "none": a season that tracks
+        nothing produces no success_rate insight, so no year gating is needed
+        in the insights registry. Modern seasons inherit the bonus-RP counters
+        from AbstractModernGameConfig and override this to append their own
+        game-specific objectives.
+        """
+        return []
+
     # ── Component OPRs ─────────────────────────────────────────────────────────
 
     @abstractmethod
@@ -119,6 +195,14 @@ class SeasonGameConfig(ABC, Generic[TScoreBreakdown]):
         earned by an alliance in a played quals match.
         """
         raise NotImplementedError()
+
+    def ranking_bonus_rp_labels(self) -> Sequence[str]:
+        """
+        Returns display names for this season's bonus ranking points, parallel
+        to ranking_bonus_rp_breakdown_fields(). Empty when the season does not
+        name them, in which case callers fall back to positional labels.
+        """
+        return []
 
     @abstractmethod
     def ranking_bonus_rp_prediction_fields(self) -> Sequence[str]:
@@ -289,9 +373,13 @@ class NoBonusRankingPointsMixin:
 class FixedBonusRankingPointsMixin(Generic[TRpBreakdownField, TRpPredictionField]):
     BONUS_RP_BREAKDOWN_FIELDS: Tuple[TRpBreakdownField, ...] = ()
     BONUS_RP_PREDICTION_FIELDS: Tuple[TRpPredictionField, ...] = ()
+    BONUS_RP_LABELS: Tuple[str, ...] = ()
 
     def ranking_bonus_rp_breakdown_fields(self) -> Sequence[str]:
         return list(self.BONUS_RP_BREAKDOWN_FIELDS)
+
+    def ranking_bonus_rp_labels(self) -> Sequence[str]:
+        return list(self.BONUS_RP_LABELS)
 
     def ranking_bonus_rp_prediction_fields(self) -> Sequence[str]:
         return list(self.BONUS_RP_PREDICTION_FIELDS)
@@ -380,6 +468,80 @@ class AbstractModernGameConfig(
 
     def ranking_win_points(self) -> int:
         return 2
+
+    def determine_auto_winner(
+        self, red: Dict[str, Any], blue: Dict[str, Any]
+    ) -> Optional[AllianceColor]:
+        """
+        Which alliance won AUTO, or None when AUTO was tied or the breakdown
+        does not record auto points. Seasons whose game defines its own AUTO
+        tiebreakers override this.
+        """
+        red_auto = _auto_points(red)
+        blue_auto = _auto_points(blue)
+        if red_auto is None or blue_auto is None or red_auto == blue_auto:
+            return None
+        return AllianceColor.RED if red_auto > blue_auto else AllianceColor.BLUE
+
+    def _auto_win_conversion_counter(self) -> SuccessRateCounter:
+        """
+        How often the alliance that won AUTO went on to win the match. Matches
+        where either AUTO or the match itself was tied offer no opportunity.
+        """
+
+        def measure(match: Match) -> Tuple[int, int]:
+            breakdown = match.score_breakdown
+            if breakdown is None:
+                return (0, 0)
+
+            auto_winner = self.determine_auto_winner(
+                breakdown[AllianceColor.RED], breakdown[AllianceColor.BLUE]
+            )
+            match_winner = match.winning_alliance
+            if auto_winner is None or match_winner == "":
+                return (0, 0)
+
+            return (1 if auto_winner == match_winner else 0, 1)
+
+        return SuccessRateCounter("auto_win_conversion", "Auto Win Conversion", measure)
+
+    def success_rate_counters(self) -> Sequence[SuccessRateCounter]:
+        """
+        The bonus-RP counters every modern season shares, plus auto win
+        conversion. A season declaring no bonus RPs (2021, the remote
+        practice-only season) tracks nothing at all.
+        """
+        fields = list(self.ranking_bonus_rp_breakdown_fields())
+        if not fields:
+            return []
+
+        labels = list(self.ranking_bonus_rp_labels())
+        win_points = self.ranking_win_points()
+
+        counters = [
+            _bonus_rp_success_rate_counter(
+                index, field, labels[index] if index < len(labels) else None
+            )
+            for index, field in enumerate(fields)
+        ]
+        counters.append(
+            _rp_sweep_success_rate_counter(
+                "max_alliance_rp",
+                win_points + len(fields),
+                fields,
+                both_alliances=False,
+            )
+        )
+        counters.append(
+            _rp_sweep_success_rate_counter(
+                "max_match_rp",
+                win_points + 2 * len(fields),
+                fields,
+                both_alliances=True,
+            )
+        )
+        counters.append(self._auto_win_conversion_counter())
+        return counters
 
     @property
     @abstractmethod

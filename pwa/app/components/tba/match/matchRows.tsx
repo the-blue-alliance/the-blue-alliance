@@ -1,5 +1,5 @@
 import { Link } from '@tanstack/react-router';
-import { Temporal } from 'temporal-polyfill';
+import { cn } from 'cn';
 
 import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
 import PlayArrowIcon from '~icons/ic/baseline-play-arrow';
@@ -24,9 +24,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { matchTitleShort } from '~/lib/matchUtils';
+import { formatMatchTime, matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
-import { cn } from '~/lib/utils';
 
 interface PlaylistEntry {
   url: string;
@@ -96,6 +95,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-before-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -132,6 +132,7 @@ export default function SimpleMatchRowsWithBreaks({
           <BreakRow
             key={`break-after-${i}-${bi}`}
             text={result.text ?? 'Break'}
+            size={result.size}
             playlists={isFirst ? playlistUrls : undefined}
           />,
         );
@@ -268,17 +269,7 @@ export function MatchRow({
             xl:col-start-auto xl:row-span-1 xl:row-start-auto"
         >
           <span className="flex h-full items-center justify-center text-center">
-            {match.predicted_time &&
-              Temporal.Instant.fromEpochMilliseconds(
-                match.predicted_time * 1000,
-              )
-                .toZonedDateTimeISO(Temporal.Now.timeZoneId())
-                .toLocaleString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  weekday: 'short',
-                  hour12: true,
-                })}
+            {match.predicted_time && formatMatchTime(match.predicted_time)}
           </span>
         </div>
       )}
@@ -288,7 +279,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.red.score}
           allianceColor="red"
-          className="col-start-6 row-start-1 mt-0.5 max-lg:rounded-t-lg
+          className="col-start-6 row-start-1 mt-0.5 max-xl:rounded-t-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
             xl:rounded-l-lg"
           winner={match.winning_alliance === AllianceColor.RED}
@@ -304,7 +295,7 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.blue.score}
           allianceColor="blue"
-          className="col-start-6 row-start-2 mb-0.5 max-lg:rounded-b-lg
+          className="col-start-6 row-start-2 mb-0.5 max-xl:rounded-b-lg
             xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
             xl:rounded-r-lg"
           winner={match.winning_alliance === AllianceColor.BLUE}
@@ -382,16 +373,7 @@ export function SimpleMatchRow({
               justify-center text-center"
           >
             <span>
-              {match.predicted_time &&
-                new Date(match.predicted_time * 1000).toLocaleTimeString(
-                  'en-US',
-                  {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    weekday: 'short',
-                    hour12: true,
-                  },
-                )}
+              {match.predicted_time && formatMatchTime(match.predicted_time)}
             </span>
           </div>
         )}
@@ -431,16 +413,19 @@ function maybeGetFirstMatchVideoURL(match: Match): string | undefined {
     return undefined;
   }
 
-  return `https://www.youtube.com/watch?v=${match.videos[0].key}`;
+  // Video key may contain start time query param (e.g., "?t=123"); convert "?" to "&" for watch?v= URL structure
+  return `https://www.youtube.com/watch?v=${match.videos[0].key.replace('?', '&')}`;
 }
 
 interface BreakRowProps extends React.HTMLAttributes<HTMLDivElement> {
   text: string;
+  size?: 'default' | 'small';
   playlists?: PlaylistEntry[];
 }
 export function BreakRow({
   className,
   text,
+  size = 'default',
   playlists,
   ...props
 }: BreakRowProps) {
@@ -450,8 +435,10 @@ export function BreakRow({
       {...props}
     >
       <div
-        className="relative flex h-8 w-full items-center justify-center text-sm
-          font-medium"
+        className={cn(
+          'relative flex w-full items-center justify-center font-medium',
+          size === 'small' ? 'h-5 text-xs' : 'h-8 text-sm',
+        )}
       >
         <span>{text}</span>
         {playlists && playlists.length > 0 && (
@@ -483,18 +470,17 @@ export function BreakRow({
                     <DropdownMenuItem
                       key={url}
                       render={
-                        // eslint-disable-next-line jsx-a11y/anchor-has-content -- content comes from DropdownMenuItem's own children, merged onto this element by Base UI's render prop
                         <a
                           href={url}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="flex cursor-pointer items-center gap-2"
-                        />
+                        >
+                          <YoutubeIcon className="size-3.5" />
+                          {label}
+                        </a>
                       }
-                    >
-                      <YoutubeIcon className="size-3.5" />
-                      {label}
-                    </DropdownMenuItem>
+                    />
                   ))}
                 </DropdownMenuContent>
               </DropdownMenu>

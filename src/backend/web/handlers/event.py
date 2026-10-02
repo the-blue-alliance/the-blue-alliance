@@ -101,7 +101,7 @@ def event_list(year: Optional[Year] = None) -> Response:
 
     districts = []  # a tuple of (district abbrev, district name)
     for district in districts_future.get_result():
-        districts.append((district.abbreviation, district.display_name))
+        districts.append((district.abbreviation, district.render_name))
     districts = sorted(districts, key=lambda d: d[1])
 
     # Special case to display a list of regionals
@@ -438,7 +438,7 @@ def event_detail(event_key: EventKey) -> Response:
     template_values = {
         "event": event,
         "event_down": False,  # status_sitevar and event_key in status_sitevar.contents,
-        "district_name": district.display_name if district else None,
+        "district_name": district.render_name if district else None,
         "district_abbrev": district.abbreviation if district else None,
         "is_regional_cmp_eligible": is_regional_cmp_pool_eligible,
         "matches": matches,
@@ -543,18 +543,17 @@ def event_pitmap(event_key: EventKey) -> Response:
         )
     except ValueError:
         abort(404)
-        raise RuntimeError("unreachable")
-
-    response = make_cached_response(
-        render_template("event_pitmap.svg", template_values),
-        ttl=(
-            timedelta(seconds=61)
-            if event.should_use_short_cache
-            else timedelta(hours=6)
-        ),
-    )
-    response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
-    return response
+    else:
+        response = make_cached_response(
+            render_template("event_pitmap.svg", template_values),
+            ttl=(
+                timedelta(seconds=61)
+                if event.should_use_short_cache
+                else timedelta(hours=6)
+            ),
+        )
+        response.headers["content-type"] = "image/svg+xml; charset=UTF-8"
+        return response
 
 
 @cached_public
