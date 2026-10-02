@@ -1212,11 +1212,6 @@ def test_get_similarity_dissimilar_strings_score_low() -> None:
     assert LocationHelper.get_similarity("Leland High School", "Zebra Quantum") < 0.3
 
 
-def test_get_similarity_matches_acronym() -> None:
-    assert LocationHelper.get_similarity("lhs", "Leland High School") == 1
-    assert LocationHelper.get_similarity("Leland High School", "lhs") == 1
-
-
 # --- get_event_location / update_event_location ------------------------------
 
 

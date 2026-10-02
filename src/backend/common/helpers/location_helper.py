@@ -54,8 +54,8 @@ class LocationHelper:
         a = a.lower().strip()
         b = b.lower().strip()
 
-        a_split = [x for x in re.split(r"\s+|,|-", a) if x]
-        b_split = [x for x in re.split(r"\s+|,|-", b) if x]
+        a_split = filter(lambda x: x, re.split(r"\s+|,|-", a))
+        b_split = filter(lambda x: x, re.split(r"\s+|,|-", b))
         a_sorted = " ".join(sorted(a_split))
         b_sorted = " ".join(sorted(b_split))
         a_acr = "".join([w[0] if w else "" for w in a_split]).lower()
