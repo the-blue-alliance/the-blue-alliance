@@ -1,0 +1,17 @@
+name: Label pull requests
+
+# pull_request_target runs from the base branch, so it can label PRs from forks.
+# Safe here: the labeler only reads the list of changed files and never checks
+# out or runs PR code.
+on:
+  pull_request_target:
+    types: [opened, synchronize, reopened]
+
+jobs:
+  label:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      pull-requests: write
+    steps:
+      - uses: actions/labeler@v7

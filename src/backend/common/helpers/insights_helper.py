@@ -247,7 +247,7 @@ class InsightsHelper(object):
                                 brier_scores_cmp[level].append(bs["win_loss"])
 
         if not has_insights:
-            data = None
+            return []
 
         data = defaultdict(dict)
         for level in ["qual", "playoff"]:
@@ -550,7 +550,7 @@ class InsightsHelper(object):
                         highscore[comp_level] = maxScore
 
         insight = None
-        if highscore_matches != []:
+        if highscore_matches["overall"]:
             insight = create_insight(
                 highscore_matches, Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE], year
             )

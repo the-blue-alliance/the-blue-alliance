@@ -471,6 +471,33 @@ describe('TraditionalBracket', () => {
     expect(screen.getByRole('link', { name: '201' })).toBeTruthy();
   });
 
+  // Teams in no alliance have a null alliance number.
+  test('does not highlight rows for teams in no alliance before hover', () => {
+    const matches = [
+      makeMatch(
+        CompLevel.SF,
+        1,
+        1,
+        ['frc9001', 'frc9002', 'frc9003'],
+        ['frc9101', 'frc9102', 'frc9103'],
+        10,
+        5,
+      ),
+    ];
+
+    render(
+      <TraditionalBracket
+        alliances={alliances}
+        matches={matches}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(rowFor('9001').getAttribute('data-highlight')).toBe('false');
+    expect(rowFor('9101').getAttribute('data-highlight')).toBe('false');
+    expect(cardFor('9001').className).not.toContain('ring-alliance-red-accent');
+  });
+
   test('renders an alliance that is missing from the alliance list', () => {
     // This test only checks that rows render and hover safely.
     const matches = [
