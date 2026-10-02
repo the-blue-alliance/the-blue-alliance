@@ -388,7 +388,7 @@ export function isEventWithinDays(
   negativeDaysBefore: number,
   positiveDaysAfter: number,
 ): boolean {
-  if (event.start_date === null || event.end_date === null) {
+  if (!event.start_date || !event.end_date) {
     return false;
   }
   // Use the event's own timezone so that "midnight" refers to the event's
