@@ -201,7 +201,9 @@ class LocationHelper:
             score = pow(
                 max(
                     cls.get_similarity(query_name, location_info["name"]),
-                    cls.get_similarity(query_name, location_info["formatted_address"]),
+                    cls.get_similarity(
+                        query_name, location_info.get("formatted_address", "")
+                    ),
                 ),
                 1.0 / 3,
             )
