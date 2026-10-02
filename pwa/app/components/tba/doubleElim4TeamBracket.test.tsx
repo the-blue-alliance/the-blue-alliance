@@ -364,6 +364,39 @@ describe('DoubleElim4TeamBracket', () => {
     expect(group('Match 2').textContent).toContain('Arc vs Cur');
   });
 
+  // Teams in no alliance have a null alliance number.
+  test('does not highlight rows for teams in no alliance before hover', () => {
+    const matches = [
+      makeMatch(
+        CompLevel.SF,
+        1,
+        1,
+        ['frc9001', 'frc9002', 'frc9003'],
+        ['frc9101', 'frc9102', 'frc9103'],
+        10,
+        5,
+      ),
+    ];
+
+    render(
+      <DoubleElim4TeamBracket
+        alliances={alliances}
+        matches={matches}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(rowIn('Match 1', '9001').getAttribute('data-highlight')).toBe(
+      'false',
+    );
+    expect(rowIn('Match 1', '9101').getAttribute('data-highlight')).toBe(
+      'false',
+    );
+    expect(group('Match 1').className).not.toContain(
+      'ring-alliance-red-accent',
+    );
+  });
+
   test('falls back to match teams when they are in no alliance', () => {
     // This test only checks that rows render and hover safely.
     const matches = [

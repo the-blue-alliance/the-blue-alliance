@@ -85,6 +85,18 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
             matches[0]["team_key_names"], ["frc254", "frc148", "frc217", "frc118"]
         )
 
+    def test_parse_strips_whitespace_from_team_numbers(self) -> None:
+        """Whitespace around a team number is stripped before use."""
+        matches, _ = CSVOffseasonMatchesParser.parse(
+            "qm1,254,1114 ,2056,148,217,118,1,2"
+        )
+        alliances = json.loads(matches[0]["alliances_json"])
+        self.assertEqual(alliances["red"]["teams"], ["frc254", "frc1114", "frc2056"])
+        self.assertEqual(
+            matches[0]["team_key_names"],
+            ["frc254", "frc1114", "frc2056", "frc148", "frc217", "frc118"],
+        )
+
     def test_parse_csv_match_strips_row_in_place(self) -> None:
         row = [" qm1", "254 ", "1114", "2056", "148", "217", "118", "1", "2"]
         CSVOffseasonMatchesParser.parse_csv_match(row)
@@ -116,6 +128,15 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
     def test_parse_match_number_info_unknown_level(self) -> None:
         with self.assertRaises(KeyError):
             CSVOffseasonMatchesParser.parse_match_number_info("xx1")
+
+    def test_parse_elim_match_number_info_two_digit_set(self) -> None:
+        """The elim id "sf12m1" is set 12, match 1."""
+        self.assertEqual(
+            CSVOffseasonMatchesParser.parse_elim_match_number_info("sf12m1"), (1, 12)
+        )
+        self.assertEqual(
+            CSVOffseasonMatchesParser.parse_match_number_info("sf12m1"), ("sf", 1, 12)
+        )
 
     def test_parse_elim_match_number_info_requires_set_number(self) -> None:
         # An elim id without a set number ("fm1") is rejected. Today that is a
