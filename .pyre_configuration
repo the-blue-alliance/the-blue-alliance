@@ -23,6 +23,7 @@
     {"site-package": "openpyxl"},
     {"site-package": "orjson"},
     {"site-package": "packaging"},
+    {"site-package": "PIL"},
     {"site-package": "annotated_types"},
     {"site-package": "pydantic"},
     {"site-package": "pydantic_core"},
