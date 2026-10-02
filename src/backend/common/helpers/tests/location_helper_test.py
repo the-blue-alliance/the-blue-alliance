@@ -2311,3 +2311,20 @@ def test_geocode_zero_results_are_served_from_cache(
     assert LocationHelper.google_maps_geocode("Nowhere") == []
 
     assert requests_mock.call_count == 1
+
+
+def test_compute_event_location_score_without_formatted_address() -> None:
+    """Without a formatted_address the score falls back to name similarity."""
+    info = cast(
+        LocationInfo,
+        {
+            "name": "Leland High School",
+            "lat": SAN_JOSE.lat,
+            "lng": SAN_JOSE.lon,
+            "types": ["point_of_interest"],
+        },
+    )
+    score = LocationHelper.compute_event_location_score(
+        "Leland High School", info, SAN_JOSE
+    )
+    assert score == pytest.approx(1.0)  # pyre-ignore[16]
