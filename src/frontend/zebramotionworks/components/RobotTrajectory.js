@@ -74,7 +74,7 @@ class RobotTrajectory extends React.PureComponent {
           stroke={color}
           strokeWidth={0.2}
         />
-        {x && (
+        {Number.isFinite(x) && (
           <circle
             cx={x}
             cy={27 - y}
@@ -84,7 +84,7 @@ class RobotTrajectory extends React.PureComponent {
             strokeWidth={0.2}
           />
         )}
-        {x && (
+        {Number.isFinite(x) && (
           <text
             x={x}
             y={27 - y}

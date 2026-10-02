@@ -305,23 +305,26 @@ describe('ScoreBreakdown2024', () => {
     ).toHaveLength(2);
   });
 
-  // Both alliances get identical counts, so column placement is not checked.
-  test('shows foul counts with points', () => {
+  // Counts and foul points from 2024cmptx_sf5m1; each alliance's foulPoints come from the other's fouls.
+  test('shows the fouls each alliance committed and the foul points it received', () => {
     renderBreakdown(
       makeBreakdown(
-        { foulCount: 3, techFoulCount: 1 },
-        { foulCount: 3, techFoulCount: 1 },
+        { foulCount: 1, techFoulCount: 0, foulPoints: 10 },
+        { foulCount: 0, techFoulCount: 2, foulPoints: 2 },
       ),
     );
 
     expect(
       screen.getByRole('row', {
-        name: '3 (+6) / 1 (+5) Fouls / Tech Fouls 3 (+6) / 1 (+5)',
+        name: '1 / 0 Fouls / Tech Fouls Committed 0 / 2',
       }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('row', { name: '10 Foul Points Received 2' }),
     ).toBeTruthy();
   });
 
-  test('shows blank foul counts when missing', () => {
+  test('shows zero foul counts when missing', () => {
     renderBreakdown(
       makeBreakdown(
         { foulCount: undefined, techFoulCount: undefined },
@@ -331,7 +334,7 @@ describe('ScoreBreakdown2024', () => {
 
     expect(
       screen.getByRole('row', {
-        name: '(+0) / (+0) Fouls / Tech Fouls (+0) / (+0)',
+        name: '0 / 0 Fouls / Tech Fouls Committed 0 / 0',
       }),
     ).toBeTruthy();
   });

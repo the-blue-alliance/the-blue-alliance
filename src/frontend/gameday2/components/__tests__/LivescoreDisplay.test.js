@@ -314,4 +314,46 @@ describe("LivescoreDisplay", () => {
     unmount();
     setIntervalSpy.mockRestore();
   });
+
+  it("clears its refresh interval on unmount", () => {
+    // componentDidMount starts a 10s refresh interval.
+    const setIntervalSpy = jest.spyOn(global, "setInterval");
+    const clearIntervalSpy = jest.spyOn(global, "clearInterval");
+    try {
+      const { unmount } = renderDisplay(liveState);
+      const call = setIntervalSpy.mock.calls.findIndex(
+        ([, ms]) => ms === 10000
+      );
+      expect(call).not.toBe(-1);
+      const intervalId = setIntervalSpy.mock.results[call].value;
+      unmount();
+      expect(clearIntervalSpy).toHaveBeenCalledWith(intervalId);
+    } finally {
+      setIntervalSpy.mockRestore();
+      clearIntervalSpy.mockRestore();
+    }
+  });
+
+  it("validates the matches prop with a real PropTypes validator", () => {
+    // PropTypes has no `list` validator.
+    expect(typeof LivescoreDisplay.propTypes.matches).toBe("function");
+  });
+
+  it("never leaks false or 0 into the indicator class names", () => {
+    // Covers live state and the pre-match reset, which sets red switch/scale to 0.
+    const now = 1_700_000_000;
+    jest.setSystemTime(now * 1000);
+    const live = renderDisplay(liveState);
+    const reset = renderDisplay({ ...liveState, mk: "qm2", m: "post_match" }, [
+      makeMatch("qm1", { r: 100, b: 50 }),
+      makeMatch("qm2", { r: 80, b: 90 }),
+      makeMatch("qm3", { pt: now + 600 }),
+    ]);
+    [live.container, reset.container].forEach((container) => {
+      container.querySelectorAll(".booleanIndicator").forEach((el) => {
+        expect(Array.from(el.classList)).not.toContain("false");
+        expect(Array.from(el.classList)).not.toContain("0");
+      });
+    });
+  });
 });
