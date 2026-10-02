@@ -624,8 +624,8 @@ class Event(CachedModel):
                 self._venue_address_safe = None
             else:
                 self._venue_address_safe = "{}\n{}".format(
-                    none_throws(self.venue).encode("utf-8"),
-                    none_throws(self.location).encode("utf-8"),
+                    none_throws(self.venue),
+                    none_throws(self.location),
                 )
         else:
             self._venue_address_safe = self.venue_address.replace("\r\n", "\n")
