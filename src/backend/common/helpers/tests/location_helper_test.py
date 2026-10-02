@@ -2299,3 +2299,15 @@ def test_get_similarity_matches_acronyms() -> None:
     """A name and its acronym are fully similar, in either order."""
     assert LocationHelper.get_similarity("Leland High School", "lhs") == 1.0
     assert LocationHelper.get_similarity("lhs", "Leland High School") == 1.0
+
+
+def test_geocode_zero_results_are_served_from_cache(
+    requests_mock: Mocker,
+) -> None:
+    """A cached empty geocode result is served without another request."""
+    requests_mock.get(GEOCODE_URL, json={"status": "ZERO_RESULTS", "results": []})
+
+    assert LocationHelper.google_maps_geocode("Nowhere") == []
+    assert LocationHelper.google_maps_geocode("Nowhere") == []
+
+    assert requests_mock.call_count == 1
