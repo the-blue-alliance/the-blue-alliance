@@ -40,19 +40,19 @@ export default function ScoreBreakdown2024({
               condition={
                 scoreBreakdown.red.autoLineRobot1 === AutoLineRobot2024.YES
               }
-              teamKey={match.alliances.red.team_keys[0].substring(3)}
+              teamKey={match.alliances.red.team_keys[0]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.red.autoLineRobot2 === AutoLineRobot2024.YES
               }
-              teamKey={match.alliances.red.team_keys[1].substring(3)}
+              teamKey={match.alliances.red.team_keys[1]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.red.autoLineRobot3 === AutoLineRobot2024.YES
               }
-              teamKey={match.alliances.red.team_keys[2].substring(3)}
+              teamKey={match.alliances.red.team_keys[2]}
             />
             (+{scoreBreakdown.red.autoLeavePoints})
           </TableCell>
@@ -66,19 +66,19 @@ export default function ScoreBreakdown2024({
               condition={
                 scoreBreakdown.blue.autoLineRobot1 === AutoLineRobot2024.YES
               }
-              teamKey={match.alliances.blue.team_keys[0].substring(3)}
+              teamKey={match.alliances.blue.team_keys[0]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.blue.autoLineRobot2 === AutoLineRobot2024.YES
               }
-              teamKey={match.alliances.blue.team_keys[1].substring(3)}
+              teamKey={match.alliances.blue.team_keys[1]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.blue.autoLineRobot3 === AutoLineRobot2024.YES
               }
-              teamKey={match.alliances.blue.team_keys[2].substring(3)}
+              teamKey={match.alliances.blue.team_keys[2]}
             />
             (+{scoreBreakdown.blue.autoLeavePoints})
           </TableCell>

@@ -143,8 +143,10 @@ const _PlayoffMatch = forwardRef<
     );
   }
 
-  const isRedHighlighted = hoveredAlliance === result.redAllianceNumber;
-  const isBlueHighlighted = hoveredAlliance === result.blueAllianceNumber;
+  const isRedHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.redAllianceNumber;
+  const isBlueHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.blueAllianceNumber;
   const isHighlighted = isRedHighlighted || isBlueHighlighted;
 
   return (
