@@ -2295,6 +2295,12 @@ def test_location_info_annotations_match_stored_values() -> None:
     assert hints["postal_code"] is str
 
 
+def test_get_similarity_matches_acronyms() -> None:
+    """A name and its acronym are fully similar, in either order."""
+    assert LocationHelper.get_similarity("Leland High School", "lhs") == 1.0
+    assert LocationHelper.get_similarity("lhs", "Leland High School") == 1.0
+
+
 def test_geocode_zero_results_are_served_from_cache(
     requests_mock: Mocker,
 ) -> None:
