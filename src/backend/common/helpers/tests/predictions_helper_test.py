@@ -684,6 +684,41 @@ def test_contribution_calculator_extracts_stat(
         assert math.isclose(result["var"][team], 5**2)
 
 
+@pytest.mark.parametrize("num_matches", [1, 4])
+def test_robot_on_stage_writes_the_current_match_row(num_matches: int) -> None:
+    """Counting ONSTAGE robots writes only the current match's rows."""
+    event = _make_event("2024test", datetime.datetime(2024, 3, 1))
+    on_stage = {
+        "endGameRobot1": "StageLeft",
+        "endGameRobot2": "StageRight",
+        "endGameRobot3": "CenterStage",
+    }
+    parked = {
+        "endGameRobot1": "Parked",
+        "endGameRobot2": "None",
+        "endGameRobot3": "StageLeft",
+    }
+    matches = [
+        _make_match(
+            "2024test",
+            n,
+            RED_TEAMS,
+            BLUE_TEAMS,
+            100,
+            60,
+            {"red": on_stage, "blue": parked},
+        )
+        for n in range(1, num_matches + 1)
+    ]
+    calculator = ContributionCalculator(event, matches, "robot_on_stage", 1, 1)
+
+    calculator.calculate_before_match(0)
+
+    assert calculator._mean_sums == [3, 1]
+    rows = [row[0] for row in calculator._Mmean]
+    assert rows == [3, 1] + [0] * (2 * (num_matches - 1))
+
+
 def test_contribution_calculator_unknown_stat() -> None:
     event = _make_event("2019test", datetime.datetime(2019, 3, 1))
     match = _make_match(

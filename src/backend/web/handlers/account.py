@@ -524,13 +524,18 @@ def mytba_eventteam_get(team_number: TeamNumber) -> str:
 
     team_events = TeamEventsQuery(none_throws(team.key.string_id())).fetch()
 
-    favorites = Favorite.query(
-        Favorite.model_type == ModelType.EVENT_TEAM,
-        Favorite.model_key.IN(  # pyre-ignore[16]
-            [f"{event.key.string_id()}_{team.key.string_id()}" for event in team_events]
-        ),
-        ancestor=none_throws(user.account_key),
-    ).fetch(1000)
+    eventteam_keys = [
+        f"{event.key.string_id()}_{team.key.string_id()}" for event in team_events
+    ]
+    favorites = (
+        Favorite.query(
+            Favorite.model_type == ModelType.EVENT_TEAM,
+            Favorite.model_key.IN(eventteam_keys),  # pyre-ignore[16]
+            ancestor=none_throws(user.account_key),
+        ).fetch(1000)
+        if eventteam_keys
+        else []
+    )
 
     already_favorited = set()
     if favorites:

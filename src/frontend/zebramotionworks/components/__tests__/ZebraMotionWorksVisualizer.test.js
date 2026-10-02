@@ -35,4 +35,10 @@ describe("ZebraMotionWorksVisualizer", () => {
     expect(screen.getByTestId("trajectory")).toBeTruthy();
     expect(screen.queryByTestId("heatmap")).toBeNull();
   });
+
+  it("gives the Heatmap button a valid type", () => {
+    // type="buttons" is invalid, so browsers would treat it as submit.
+    render(<ZebraMotionWorksVisualizer data={{}} year={2019} />);
+    expect(screen.getByText("Heatmap").getAttribute("type")).toBe("button");
+  });
 });

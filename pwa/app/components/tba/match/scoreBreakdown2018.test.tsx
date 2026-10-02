@@ -452,6 +452,21 @@ describe('ScoreBreakdown2018 adjustments', () => {
     expect(blueCell('Adjustments').textContent).toBe('-5');
   });
 
+  test('shows the adjustments row when only one alliance was adjusted', () => {
+    render(
+      <ScoreBreakdown2018
+        scoreBreakdown={makeBreakdown(
+          { adjustPoints: 10 },
+          { adjustPoints: 0 },
+        )}
+        match={match}
+      />,
+    );
+
+    expect(redCell('Adjustments').textContent).toBe('10');
+    expect(blueCell('Adjustments').textContent).toBe('0');
+  });
+
   test('hides the adjustments row when neither alliance was adjusted', () => {
     render(
       <ScoreBreakdown2018

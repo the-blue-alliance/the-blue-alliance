@@ -2280,3 +2280,51 @@ def test_link_frc_api_post_not_found(web_client: Client, login_gae_admin) -> Non
         "/admin/event/link_frc_api/2020nyny", data={"frc_event_input": "NYNY"}
     )
     assert resp.status_code == 404
+
+
+def test_uppercase_event_short_redirects_to_lowercase_key(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """An uppercase event_short is stored and redirected to in lowercase."""
+    resp = web_client.post(
+        "/admin/event/edit", data=_full_event_form(event_short="NYNY")
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    assert Event.get_by_id("2020NYNY") is None
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.event_short == "nyny"
+    assert event.key_name == "2020nyny"
+
+
+def test_create_event_with_details_json_saves_event_and_details(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """Creating an event with details JSON saves the Event and its EventDetails."""
+    alliances = [{"picks": ["frc1", "frc2", "frc3"], "declines": []}]
+    resp = web_client.post(
+        "/admin/event/edit",
+        data=_full_event_form(alliance_selections_json=json.dumps(alliances)),
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.name == "New York City Regional"
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.alliance_selections == alliances
+
+
+def test_empty_divisions_field_means_no_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """An empty divisions field saves the event with no divisions."""
+    resp = web_client.post("/admin/event/edit", data=_full_event_form(divisions=""))
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.divisions == []

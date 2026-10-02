@@ -151,4 +151,21 @@ describe("CurrentMatchDisplay", () => {
     expect(container.querySelectorAll(".powerCubeActive")).toHaveLength(0);
     expect(container.querySelectorAll(".booleanIndicator.red")).toHaveLength(0);
   });
+
+  it("never leaks false or 0 into the indicator class names", () => {
+    // Unowned indicators have only the booleanIndicator class.
+    [renderDisplay(liveState), renderDisplay(liveState, true)].forEach(
+      (container) => {
+        container.querySelectorAll(".booleanIndicator").forEach((el) => {
+          expect(Array.from(el.classList)).not.toContain("false");
+          expect(Array.from(el.classList)).not.toContain("0");
+        });
+      }
+    );
+  });
+
+  it("validates forcePreMatch with a real PropTypes validator", () => {
+    // PropTypes has no `boolean` validator; the real one is PropTypes.bool.
+    expect(typeof CurrentMatchDisplay.propTypes.forcePreMatch).toBe("function");
+  });
 });

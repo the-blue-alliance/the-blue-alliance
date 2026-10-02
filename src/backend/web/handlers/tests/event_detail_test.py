@@ -4,6 +4,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -667,3 +668,17 @@ def test_event_agenda(ndb_stub, web_client: Client) -> None:
         resp.headers["Location"]
         == "https://info.firstinspires.org/hubfs/web/event/frc/2020/2020_NYNY_Agenda.pdf"
     )
+
+
+def test_render_event_district_without_display_name(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+    District(id="2020ne", year=2020, abbreviation="ne").put()
+    event = none_throws(Event.get_by_id("2020nyny"))
+    event.district_key = ndb.Key(District, "2020ne")
+    event.put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert '<a href="/events/ne/2020">NE District</a>' in resp.get_data(as_text=True)
