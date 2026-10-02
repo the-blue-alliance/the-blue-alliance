@@ -1,5 +1,5 @@
 import { Temporal } from 'temporal-polyfill';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { Event, EventType } from '~/api/tba/read';
 import {
@@ -1392,19 +1392,49 @@ describe('getDivisionShortform', () => {
   });
 });
 
-describe('event date windows without dates', () => {
-  const undated = {
+describe('events with only one date', () => {
+  const onlyEnd = {
     start_date: null,
     end_date: '2024-03-03',
     timezone: 'UTC',
   } as unknown as Event;
+  const onlyStart = {
+    start_date: '2024-03-03',
+    timezone: 'UTC',
+  } as unknown as Event;
+  const undated = {
+    start_date: null,
+    end_date: null,
+    timezone: 'UTC',
+  } as unknown as Event;
 
-  test('isEventWithinDays is false without a start date', () => {
-    expect(isEventWithinDays(undated, 1, 1)).toBe(false);
+  afterEach(() => {
+    vi.useRealTimers();
   });
 
-  test('isEventActive is false without a start date', () => {
+  test.each([
+    ['only an end date', onlyEnd],
+    ['only a start date', onlyStart],
+  ])('an event with %s is a one-day event on that date', (_, event) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-03-03T12:00:00Z'));
+    expect(isEventActive(event)).toBe(true);
+    expect(hasEventEnded(event)).toBe(true);
+
+    vi.setSystemTime(new Date('2024-03-04T12:00:00Z'));
+    expect(isEventActive(event)).toBe(false);
+    expect(isEventWithinDays(event, 0, 1)).toBe(true);
+
+    vi.setSystemTime(new Date('2024-03-02T12:00:00Z'));
+    expect(isEventActive(event)).toBe(false);
+    expect(hasEventEnded(event)).toBe(false);
+  });
+
+  test('an event with no dates is never active or ended', () => {
     expect(isEventActive(undated)).toBe(false);
+    expect(isEventWithinDays(undated, 365, 365)).toBe(false);
+    expect(hasEventEnded(undated)).toBe(false);
+    expect(getCurrentWeekEvents([undated])).toEqual([]);
   });
 });
 
