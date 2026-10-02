@@ -1,9 +1,7 @@
 import React from "react";
 import PropTypes from "prop-types";
 
-const LampIcon = (props) => {
-  const { width, height } = props;
-
+const LampIcon = ({ width = 48, height = 48 }) => {
   return (
     <svg
       xmlns="http://www.w3.org/2000/svg"
@@ -94,11 +92,6 @@ const LampIcon = (props) => {
 LampIcon.propTypes = {
   width: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
   height: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-};
-
-LampIcon.defaultProps = {
-  width: 48,
-  height: 48,
 };
 
 export default LampIcon;
