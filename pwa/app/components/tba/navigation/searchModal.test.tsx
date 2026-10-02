@@ -211,16 +211,26 @@ describe('SearchModal', () => {
     expect(await screen.findByText('No results found.')).toBeTruthy();
   });
 
-  test('lists teams first for a team query and navigates to the team', async () => {
+  test('lists teams and events in one list without section headings', async () => {
+    await openAndType('Silicon Valley');
+
+    await screen.findByText('2026 Silicon Valley Regional [casj]');
+
+    expect(screen.queryByText(/^(Teams|Events)$/)).toBeNull();
+  });
+
+  test('navigates to the team year page for a team number and year', async () => {
+    await openAndType('254 2025');
+
+    fireEvent.click(await screen.findByText('254 - The Cheesy Poofs (2025)'));
+
+    expect(useNavigateMock).toHaveBeenCalledWith({ to: '/team/254/2025' });
+  });
+
+  test('navigates to the team for a team query', async () => {
     await openAndType('254');
 
-    const team = await screen.findByText('254 - The Cheesy Poofs');
-    const headings = screen
-      .getAllByText(/^(Teams|Events)$/)
-      .map((heading) => heading.textContent);
-    expect(headings[0]).toBe('Teams');
-
-    fireEvent.click(team);
+    fireEvent.click(await screen.findByText('254 - The Cheesy Poofs'));
 
     expect(useNavigateMock).toHaveBeenCalledWith({ to: '/team/254' });
     await waitFor(() =>
@@ -230,14 +240,12 @@ describe('SearchModal', () => {
     );
   });
 
-  test('lists events first for an event query and navigates to the event', async () => {
+  test('navigates to the event for an event query', async () => {
     await openAndType('Silicon Valley');
 
-    const event = await screen.findByText(/Silicon Valley Regional/);
-    expect(event.textContent).toBe('2026 Silicon Valley Regional [casj]');
-    expect(screen.queryByText('Teams')).toBeNull();
-
-    fireEvent.click(event);
+    fireEvent.click(
+      await screen.findByText('2026 Silicon Valley Regional [casj]'),
+    );
 
     expect(useNavigateMock).toHaveBeenCalledWith({ to: '/event/2026casj' });
   });

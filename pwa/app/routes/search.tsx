@@ -62,6 +62,10 @@ function SearchRoute() {
             Team nicknames (e.g., &quot;Cheesy Poofs&quot;,
             &quot;Quixilver&quot;)
           </li>
+          <li>
+            Team number and year (e.g., &quot;254 2024&quot;,
+            &quot;604/2025&quot;)
+          </li>
           <li>Event keys (e.g., &quot;2024casj&quot;, &quot;2024mil&quot;)</li>
           <li>Event names (e.g., &quot;Silicon Valley Regional&quot;)</li>
         </ul>
