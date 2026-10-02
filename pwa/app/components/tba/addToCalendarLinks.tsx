@@ -9,6 +9,7 @@ import { Event } from '~/api/tba/read';
 import {
   DropdownMenu,
   DropdownMenuContent,
+  DropdownMenuGroup,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuSeparator,
@@ -34,40 +35,48 @@ export default function AddToCalendarLinks({
         <MoreHorizontalIcon className="size-4" />
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
-        <DropdownMenuLabel>Add to Calendar</DropdownMenuLabel>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem asChild>
-          <a
-            href={google(calEvent)}
-            target="_blank"
-            rel="noreferrer"
-            className="cursor-pointer gap-2"
-          >
-            <GoogleCalendarIcon className="size-4" />
-            Google Calendar
-          </a>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <a
-            href={ics(calEvent)}
-            download={`${event.key}.ics`}
-            className="cursor-pointer gap-2"
-          >
-            <AppleIcon className="size-4 dark:invert" />
-            Apple Calendar
-          </a>
-        </DropdownMenuItem>
-        <DropdownMenuItem asChild>
-          <a
-            href={outlook(calEvent)}
-            target="_blank"
-            rel="noreferrer"
-            className="cursor-pointer gap-2"
-          >
-            <OutlookIcon className="size-4" />
-            Outlook
-          </a>
-        </DropdownMenuItem>
+        <DropdownMenuGroup>
+          <DropdownMenuLabel>Add to Calendar</DropdownMenuLabel>
+          <DropdownMenuSeparator />
+          <DropdownMenuItem
+            render={
+              <a
+                href={google(calEvent)}
+                target="_blank"
+                rel="noreferrer"
+                className="cursor-pointer gap-2"
+              >
+                <GoogleCalendarIcon className="size-4" />
+                Google Calendar
+              </a>
+            }
+          />
+          <DropdownMenuItem
+            render={
+              <a
+                href={ics(calEvent)}
+                download={`${event.key}.ics`}
+                className="cursor-pointer gap-2"
+              >
+                <AppleIcon className="size-4 dark:invert" />
+                Apple Calendar
+              </a>
+            }
+          />
+          <DropdownMenuItem
+            render={
+              <a
+                href={outlook(calEvent)}
+                target="_blank"
+                rel="noreferrer"
+                className="cursor-pointer gap-2"
+              >
+                <OutlookIcon className="size-4" />
+                Outlook
+              </a>
+            }
+          />
+        </DropdownMenuGroup>
       </DropdownMenuContent>
     </DropdownMenu>
   );

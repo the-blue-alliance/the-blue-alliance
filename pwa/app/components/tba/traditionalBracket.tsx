@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import {
   type Dispatch,
   type JSX,
@@ -34,7 +35,6 @@ import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import { Card, CardHeader, CardTitle } from '~/components/ui/card';
 import { getDivisionShortform } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-import { cn } from '~/lib/utils';
 
 const _BracketMatchCard = forwardRef<
   PlayoffMatchHandle,
@@ -74,8 +74,10 @@ const _BracketMatchCard = forwardRef<
 
   if (!result) return null;
 
-  const isRedHighlighted = hoveredAlliance === result.redAllianceNumber;
-  const isBlueHighlighted = hoveredAlliance === result.blueAllianceNumber;
+  const isRedHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.redAllianceNumber;
+  const isBlueHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.blueAllianceNumber;
   const isHighlighted = isRedHighlighted || isBlueHighlighted;
 
   return (
@@ -140,11 +142,13 @@ const _BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
+        className={`flex cursor-pointer items-center justify-between
           bg-alliance-red-loser px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-red-accent
-          data-[highlight=true]:text-white`}
+          data-[highlight=true]:ring-2 data-[highlight=true]:ring-foreground
+          data-[highlight=true]:ring-inset
+          data-[winner=true]:bg-alliance-red-winner`}
         data-highlight={isRedHighlighted}
+        data-winner={result.redWon}
         ref={redRowRef}
         onMouseEnter={() =>
           result.redAllianceNumber &&
@@ -161,8 +165,7 @@ const _BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm
-                    group-data-[highlight=true]:text-white`,
+                    'w-12 text-center text-sm',
                     result.redWon && 'font-bold',
                   )}
                 >
@@ -176,7 +179,10 @@ const _BracketMatchCard = forwardRef<
             })}
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1 self-stretch border-l
+            border-current/20 pl-1"
+        >
           <div className="flex min-w-0 gap-1">
             {result.redResults.map((r, i) => (
               <span
@@ -193,11 +199,13 @@ const _BracketMatchCard = forwardRef<
         </div>
       </div>
       <div
-        className={`group flex cursor-pointer items-center justify-between
+        className={`flex cursor-pointer items-center justify-between
           bg-alliance-blue-loser px-1 py-1 transition-colors duration-200
-          data-[highlight=true]:bg-alliance-blue-accent
-          data-[highlight=true]:text-white`}
+          data-[highlight=true]:ring-2 data-[highlight=true]:ring-foreground
+          data-[highlight=true]:ring-inset
+          data-[winner=true]:bg-alliance-blue-winner`}
         data-highlight={isBlueHighlighted}
+        data-winner={result.blueWon}
         ref={blueRowRef}
         onMouseEnter={() =>
           result.blueAllianceNumber &&
@@ -214,8 +222,7 @@ const _BracketMatchCard = forwardRef<
                 <span
                   key={team}
                   className={cn(
-                    `w-12 text-center text-sm
-                    group-data-[highlight=true]:text-white`,
+                    'w-12 text-center text-sm',
                     result.blueWon && 'font-bold',
                   )}
                 >
@@ -229,13 +236,16 @@ const _BracketMatchCard = forwardRef<
             })}
           </div>
         </div>
-        <div className="flex items-center gap-1">
+        <div
+          className="flex items-center gap-1 self-stretch border-l
+            border-current/20 pl-1"
+        >
           <div className="flex min-w-0 gap-1">
             {result.blueResults.map((r, i) => (
               <span
                 key={i}
                 className={cn(
-                  'w-8 flex-shrink-0 text-center text-sm',
+                  'w-8 shrink-0 text-center text-sm',
                   r.won && 'font-bold',
                 )}
               >

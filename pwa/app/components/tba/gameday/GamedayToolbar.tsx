@@ -21,13 +21,13 @@ import { LAYOUT_DISPLAY_ORDER, getLayoutById } from '~/lib/gameday/layouts';
 
 export function GamedayToolbar() {
   const [drawerOpen, setDrawerOpen] = useState(false);
-  const { state, setLayout, toggleChatSidebar, resetWebcasts } = useGameday();
+  const { state, setLayout, toggleChatSidebar, resetContent } = useGameday();
 
   return (
     <>
       <header
         className="flex h-10 shrink-0 items-center gap-2 border-b
-          border-slate-700 bg-primary px-4"
+          border-slate-700 bg-brand px-4"
       >
         {/* TBA branding */}
         <a
@@ -69,7 +69,7 @@ export function GamedayToolbar() {
       <Drawer open={drawerOpen} onOpenChange={setDrawerOpen} direction="right">
         <DrawerContent
           className="fixed inset-y-0 right-0 left-auto mt-0 h-full w-80
-            rounded-t-none rounded-l-[10px] sm:w-96"
+            rounded-l-[10px] sm:w-96"
           showHandle={false}
         >
           <DrawerHeader>
@@ -157,12 +157,12 @@ export function GamedayToolbar() {
                 variant="destructive"
                 className="w-full gap-2"
                 onClick={() => {
-                  resetWebcasts();
+                  resetContent();
                   setDrawerOpen(false);
                 }}
               >
                 <RotateCcwIcon className="h-4 w-4" />
-                Reset All Webcasts
+                Reset All Content
               </Button>
             </section>
           </div>

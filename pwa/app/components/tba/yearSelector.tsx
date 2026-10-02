@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 
 import CheckIcon from '~icons/lucide/check';
 import ChevronDownIcon from '~icons/lucide/chevron-down';
@@ -9,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { cn } from '~/lib/utils';
 
 export interface YearSelectorOption {
   label: string;
@@ -47,25 +47,28 @@ export function YearSelector({
       </DropdownMenuTrigger>
       <DropdownMenuContent
         className={cn(
-          'max-h-[30vh] w-(--radix-dropdown-menu-trigger-width) overflow-y-auto',
+          'max-h-[30vh] w-(--anchor-width) overflow-y-auto',
           contentClassName,
         )}
       >
         {options.map((option) => (
-          <DropdownMenuItem key={option.to} asChild>
-            <Link
-              to={option.to}
-              className="flex cursor-pointer items-center gap-2 text-foreground
-                no-underline"
-            >
-              <CheckIcon
-                className={cn(
-                  'size-4 shrink-0',
-                  !option.isCurrent && 'invisible',
-                )}
+          <DropdownMenuItem
+            key={option.to}
+            render={
+              <Link
+                to={option.to}
+                className="flex cursor-pointer items-center gap-2
+                  text-foreground no-underline"
               />
-              {option.label}
-            </Link>
+            }
+          >
+            <CheckIcon
+              className={cn(
+                'size-4 shrink-0',
+                !option.isCurrent && 'invisible',
+              )}
+            />
+            {option.label}
           </DropdownMenuItem>
         ))}
       </DropdownMenuContent>

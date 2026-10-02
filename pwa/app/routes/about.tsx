@@ -1,18 +1,20 @@
 import { Link, createFileRoute } from '@tanstack/react-router';
 
-import { Button } from '~/components/ui/button';
+import { buttonVariants } from '~/components/ui/button';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/about')({
   headers: publicCacheControlHeaders(),
   component: About,
-});
+}); // v8 ignore start -- TanStack's dev-only HMR glue maps to this line
+// v8 ignore stop
 
 function About(): React.JSX.Element {
   return (
     <div className="container max-w-4xl py-8">
-      <h1 className="text-3xl font-medium">About Us</h1>
-      <div className="[&_p]:mb-2">
+      <div className="typeset">
+        <h1>About Us</h1>
+
         <section className="border-b py-6">
           <p>
             Founded in the fall of 2006, The Blue Alliance began as a website
@@ -35,30 +37,29 @@ function About(): React.JSX.Element {
           <p>
             You can support The Blue Alliance or reach us with the following:
           </p>
-          <div className="flex flex-wrap gap-2">
-            <Button size="sm" asChild>
-              <a
-                href="https://github.com/the-blue-alliance"
-                target="_blank"
-                rel="noreferrer"
-              >
-                Contribute on GitHub
-              </a>
-            </Button>
-            <Button size="sm" asChild>
-              <Link to="/donate">Donate with PayPal</Link>
-            </Button>
-            <Button size="sm" asChild>
-              <Link to="/contact">Contact Us</Link>
-            </Button>
+          <div className="not-typeset flex flex-wrap gap-2">
+            <a
+              href="https://github.com/the-blue-alliance"
+              target="_blank"
+              rel="noreferrer"
+              className={buttonVariants({ size: 'sm' })}
+            >
+              Contribute on GitHub
+            </a>
+            <Link to="/donate" className={buttonVariants({ size: 'sm' })}>
+              Donate with PayPal
+            </Link>
+            <Link to="/contact" className={buttonVariants({ size: 'sm' })}>
+              Contact Us
+            </Link>
           </div>
         </section>
 
         <section className="border-b py-6">
-          <h3 className="mb-2 text-2xl font-medium">
+          <h2>
             About <em>FIRST</em>
             <sup>®</sup>
-          </h3>
+          </h2>
           <p>
             <em>FIRST</em>
             <sup>®</sup> is the world&apos;s leading youth-serving nonprofit
@@ -78,37 +79,38 @@ function About(): React.JSX.Element {
             their goals, create a team identity, and advance respect and
             appreciation for STEM within the local community.
           </p>
-          <Button size="sm" asChild>
+          <div className="not-typeset">
             <a
               href="http://www.firstinspires.org"
               target="_blank"
               rel="noreferrer"
+              className={buttonVariants({ size: 'sm' })}
             >
               Join the movement
             </a>
-          </Button>
+          </div>
         </section>
 
         <section className="py-6">
-          <h3 className="mb-2 text-2xl font-medium">Other community sites</h3>
+          <h2>Other community sites</h2>
           <p>
             Here are some other amazing resources that the <em>FIRST</em>{' '}
             community has to offer.
           </p>
-          <ul className="list-inside">
-            <li className="list-disc">
+          <ul>
+            <li>
               <a href="https://www.chiefdelphi.com/" title="Chief Delphi">
                 Chief Delphi
               </a>{' '}
               - The go-to fourm for FRC discussion
             </li>
-            <li className="list-disc">
+            <li>
               <a href="https://frc.link/" title="FRC Links">
                 FRC Links
               </a>{' '}
               - Easy access to specific FRC team and event pages
             </li>
-            <li className="list-disc">
+            <li>
               <a href="https://www.statbotics.io/" title="Statbotics">
                 Statbotics
               </a>{' '}

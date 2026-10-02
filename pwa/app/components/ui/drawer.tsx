@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import {
   type ComponentProps,
   type ComponentPropsWithoutRef,
@@ -6,8 +7,6 @@ import {
   forwardRef,
 } from 'react';
 import { Drawer as DrawerPrimitive } from 'vaul';
-
-import { cn } from '~/lib/utils';
 
 const Drawer = ({
   shouldScaleBackground = true,

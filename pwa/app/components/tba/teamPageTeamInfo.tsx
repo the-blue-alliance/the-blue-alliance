@@ -3,6 +3,7 @@ import type { ReactNode } from 'react';
 import SponsorsIcon from '~icons/lucide/anchor';
 import SourceIcon from '~icons/lucide/badge-check';
 import StatbotIcon from '~icons/lucide/chart-spline';
+import Match13Icon from '~icons/lucide/cloud';
 import DistrictIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import RookieIcon from '~icons/lucide/sprout';
@@ -72,7 +73,7 @@ export default function TeamPageTeamInfo({
           )}
 
           {sponsors.length > 0 ? (
-            <Accordion type="single" collapsible>
+            <Accordion>
               <AccordionItem value="item-1" className="border-0">
                 <AccordionTrigger
                   className="justify-normal p-0 text-left font-normal"
@@ -80,7 +81,7 @@ export default function TeamPageTeamInfo({
                   <DetailEntity icon={<SponsorsIcon />}>
                     {schoolName}
                     {sponsors.length > 0 &&
-                      ` with ${pluralize(sponsors.length, ' sponsor', ' sponsors')}`}
+                      ` with ${pluralize(sponsors.length, 'sponsor', 'sponsors')}`}
                   </DetailEntity>
                 </AccordionTrigger>
                 <AccordionContent className="pb-0">
@@ -113,15 +114,26 @@ export default function TeamPageTeamInfo({
               FRC Events
             </a>
           </DetailEntity>
-          <DetailEntity icon={<StatbotIcon />}>
-            <a
-              href={`https://www.statbotics.io/team/${team.team_number}`}
-              target="_blank"
-              rel="noreferrer"
-            >
-              Statbotics
-            </a>
-          </DetailEntity>
+          <div className="flex items-center gap-4">
+            <DetailEntity icon={<StatbotIcon />}>
+              <a
+                href={`https://www.statbotics.io/team/${team.team_number}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Statbotics
+              </a>
+            </DetailEntity>
+            <DetailEntity icon={<Match13Icon />}>
+              <a
+                href={`https://www.match13.com/team/${team.team_number}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Match13
+              </a>
+            </DetailEntity>
+          </div>
         </div>
       </div>
 

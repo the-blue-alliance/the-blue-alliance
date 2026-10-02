@@ -9,16 +9,19 @@ import { getLayoutById } from '~/lib/gameday/layouts';
 
 function SwapPositionPreviewCell({
   gridArea,
+  position,
   enabled,
   onClick,
 }: {
   gridArea: string;
+  position: number;
   enabled: boolean;
   onClick: () => void;
 }) {
   return (
     <button
       type="button"
+      aria-label={`Swap with position ${position + 1}`}
       style={{ gridArea }}
       className={
         'm-1 rounded transition-colors ' +
@@ -52,6 +55,7 @@ export function SwapPositionDialog({
     <SwapPositionPreviewCell
       key={i}
       gridArea={area}
+      position={i}
       enabled={i !== currentPosition}
       onClick={() => onPositionSelected(i)}
     />
@@ -59,14 +63,7 @@ export function SwapPositionDialog({
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        // Auto focus on the content area and not first element
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
-          (e.currentTarget as HTMLElement)?.focus();
-        }}
-        className="max-w-md p-0"
-      >
+      <DialogContent focusContentOnOpen className="max-w-md p-0">
         <DialogHeader className="border-b px-4 py-3">
           <DialogTitle>Select a position to swap with</DialogTitle>
         </DialogHeader>

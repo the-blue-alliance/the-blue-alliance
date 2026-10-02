@@ -1,7 +1,8 @@
 import {
   type AuthProvider,
   type User,
-  onAuthStateChanged,
+  getRedirectResult,
+  onIdTokenChanged,
   signInWithPopup,
   signOut,
 } from 'firebase/auth';
@@ -16,6 +17,10 @@ import {
 import { flushSync } from 'react-dom';
 
 import { auth } from '~/firebase/firebaseConfig';
+import { createTokenRefresher, shouldRefreshToken } from '~/lib/authRefresh';
+import { createLogger } from '~/lib/utils';
+
+const authLogger = createLogger('auth');
 
 export type AuthContextType = {
   isInitialLoading: boolean;
@@ -28,20 +33,46 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthContextProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(auth?.currentUser ?? null);
-  // Start with false to match server render; set true after hydration while waiting for auth
-  const [isInitialLoading, setIsInitialLoading] = useState(false);
+  // Start loading so the initial render shows a loader instead of the signed-out
+  // UI while Firebase asynchronously restores the persisted session. The server
+  // renders this same loading state, so there is no hydration mismatch.
+  const [isInitialLoading, setIsInitialLoading] = useState(true);
 
   useEffect(() => {
     if (!auth) return;
-    // Set loading after hydration to avoid server/client mismatch
-    setIsInitialLoading(true);
-    const unsubscribe = onAuthStateChanged(auth, (user) => {
+    const activeAuth = auth;
+
+    const unsubscribe = onIdTokenChanged(activeAuth, (user) => {
       flushSync(() => {
         setUser(user);
         setIsInitialLoading(false);
       });
     });
-    return () => unsubscribe();
+
+    getRedirectResult(activeAuth).catch((error: unknown) => {
+      authLogger.error({ error }, 'Error resolving sign-in redirect');
+    });
+
+    const refreshCurrentUserToken = createTokenRefresher(
+      () => activeAuth.currentUser,
+    );
+    const refreshTokenIfNeeded = () => {
+      if (
+        !shouldRefreshToken(document.visibilityState, !!activeAuth.currentUser)
+      )
+        return;
+      refreshCurrentUserToken()?.catch((error: unknown) => {
+        authLogger.error({ error }, 'Error refreshing ID token');
+      });
+    };
+    document.addEventListener('visibilitychange', refreshTokenIfNeeded);
+    window.addEventListener('focus', refreshTokenIfNeeded);
+
+    return () => {
+      unsubscribe();
+      document.removeEventListener('visibilitychange', refreshTokenIfNeeded);
+      window.removeEventListener('focus', refreshTokenIfNeeded);
+    };
   }, []);
 
   const logout = useCallback(async () => {

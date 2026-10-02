@@ -149,29 +149,31 @@ def test_parse_team_with_no_district_no_robot(test_data_importer, ndb_stub):
 
 @pytest.mark.parametrize(
     "website, expected_website",
-    zip(
-        [
-            None,
-            "",
-            "www.firstinspires.org",
-            "website.com",
-            "www.website.com",
-            "http://website.com",
-            "https://website.com",
-            "ftp://website.com",
-            "http://blacklist.com/",
-        ],
-        [
-            None,
-            None,
-            None,
-            "http://website.com",
-            "http://www.website.com",
-            "http://website.com",
-            "https://website.com",
-            None,
-            "",
-        ],
+    list(
+        zip(
+            [
+                None,
+                "",
+                "www.firstinspires.org",
+                "website.com",
+                "www.website.com",
+                "http://website.com",
+                "https://website.com",
+                "ftp://website.com",
+                "http://blacklist.com/",
+            ],
+            [
+                None,
+                None,
+                None,
+                "http://website.com",
+                "http://www.website.com",
+                "http://website.com",
+                "https://website.com",
+                None,
+                "",
+            ],
+        )
     ),
 )
 def test_parse_team_websites(website, expected_website, test_data_importer, ndb_stub):

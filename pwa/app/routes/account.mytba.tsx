@@ -22,6 +22,7 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
+import { Spinner } from '~/components/ui/spinner';
 import {
   Table,
   TableBody,
@@ -53,6 +54,9 @@ function MyTBA() {
       const response = await listFavorites({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -66,13 +70,20 @@ function MyTBA() {
       const response = await listSubscriptions({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load subscriptions');
+      }
       return response.data;
     },
     enabled: !!user,
   });
 
   if (isInitialLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -128,7 +139,8 @@ function MyTBA() {
 interface ModelListProps {
   favorites: FavoriteMessage[];
   subscriptions: SubscriptionMessage[];
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function buildCombinedItems(
   favorites: FavoriteMessage[],

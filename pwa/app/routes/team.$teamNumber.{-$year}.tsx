@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/tanstackstart-react';
+import { metrics } from '@sentry/tanstackstart-react';
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   Link,
@@ -76,6 +76,7 @@ import {
   getTeamsUnpenalizedHighScore,
 } from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import {
   MODEL_TYPE,
   addRecords,
@@ -89,12 +90,12 @@ import {
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
-  loader: async ({ params, context: { queryClient } }) => {
+  loader: async ({ params, context: { queryClient, currentSeason } }) => {
     const startTime = Temporal.Now.instant().epochMilliseconds;
     const teamKey = `frc${params.teamNumber}`;
-    const year = await parseParamsForYearElseDefault(queryClient, params);
+    const year = parseParamsForYearElseDefault(currentSeason, params);
 
-    Sentry.metrics.count('team.page.view', 1, {
+    metrics.count('team.page.view', 1, {
       attributes: { team_number: params.teamNumber, year },
     });
 
@@ -102,11 +103,14 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       throw notFound();
     }
 
+    const yearStaleTime = staleTimeForYear(year);
+
     // spawn these now, we don't need to await them yet though
     const teamMediaQuery = queryClient
-      .ensureQueryData(
-        getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamSocialsQuery = queryClient
       .ensureQueryData(
@@ -114,26 +118,30 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       )
       .catch(() => ({}));
     const teamMatchesQuery = queryClient
-      .ensureQueryData(
-        getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamStatusesQuery = queryClient
-      .ensureQueryData(
-        getTeamEventsStatusesByYearOptions({
+      .ensureQueryData({
+        ...getTeamEventsStatusesByYearOptions({
           path: { team_key: teamKey, year },
         }),
-      )
+        staleTime: yearStaleTime,
+      })
       .catch(() => ({}));
     const teamAwardsQuery = queryClient
-      .ensureQueryData(
-        getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamEventsQuery = queryClient
-      .ensureQueryData(
-        getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
-      )
+      .ensureQueryData({
+        ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
+        staleTime: yearStaleTime,
+      })
       .catch(() => []);
     const teamDistrictsQuery = queryClient
       .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
@@ -148,10 +156,14 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         .ensureQueryData(
           getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
         )
-        .catch((): number[] => []),
+        // Distinguish "fetch failed" from "team genuinely has no years" —
+        // coercing a failure to [] would make the check below always redirect
+        // or 404, even though the failure was already reported (see
+        // ~/lib/queryClient.ts's onError) and has nothing to do with the year.
+        .catch((): number[] | null => null),
     ]);
 
-    if (!yearsParticipated.includes(year)) {
+    if (yearsParticipated !== null && !yearsParticipated.includes(year)) {
       if (params.year === undefined) {
         throw redirect({
           to: '/team/$teamNumber/history',
@@ -174,7 +186,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
     const endTime = Temporal.Now.instant().epochMilliseconds;
     const duration = endTime - startTime;
-    Sentry.metrics.distribution('team.page.loader.duration', duration, {
+    metrics.distribution('team.page.loader.duration', duration, {
       attributes: { team_number: params.teamNumber, year },
     });
 
@@ -243,38 +255,55 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     };
   },
   component: TeamPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function TeamPage(): React.JSX.Element {
   const { teamKey, year } = Route.useLoaderData();
+  const yearStaleTime = staleTimeForYear(year);
 
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key: teamKey } }),
   );
-  const { data: media } = useSuspenseQuery(
-    getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: socials } = useSuspenseQuery(
+  const mediaQuery = useQuery({
+    ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
+  const socialsQuery = useQuery(
     getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
   );
-  const { data: yearsParticipated } = useSuspenseQuery(
+  const socials = socialsQuery.data ?? [];
+  const yearsParticipatedQuery = useQuery(
     getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
   );
-  const { data: events } = useSuspenseQuery(
-    getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: matches } = useSuspenseQuery(
-    getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: statuses } = useSuspenseQuery(
-    getTeamEventsStatusesByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: awards } = useSuspenseQuery(
-    getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
-  );
-  const { data: districts } = useSuspenseQuery(
+  const yearsParticipated = yearsParticipatedQuery.data ?? [];
+  const eventsQuery = useQuery({
+    ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const events = useMemo(() => eventsQuery.data ?? [], [eventsQuery.data]);
+  const matchesQuery = useQuery({
+    ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const matches = matchesQuery.data ?? [];
+  const statusesQuery = useQuery({
+    ...getTeamEventsStatusesByYearOptions({
+      path: { team_key: teamKey, year },
+    }),
+    staleTime: yearStaleTime,
+  });
+  const statuses = statusesQuery.data ?? {};
+  const awardsQuery = useQuery({
+    ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
+    staleTime: yearStaleTime,
+  });
+  const awards = awardsQuery.data ?? [];
+  const districtsQuery = useQuery(
     getTeamDistrictsOptions({ path: { team_key: teamKey } }),
   );
+  const districts = districtsQuery.data ?? [];
 
   const currentDistrict = districts.find((d) => d.year === year);
 
@@ -282,6 +311,7 @@ function TeamPage(): React.JSX.Element {
     ...getDistrictRankingsOptions({
       path: { district_key: currentDistrict?.key ?? '' },
     }),
+    staleTime: yearStaleTime,
     enabled: !!currentDistrict,
   });
 
@@ -291,6 +321,7 @@ function TeamPage(): React.JSX.Element {
 
   const { data: regionalRankings } = useQuery({
     ...getRegionalRankingsOptions({ path: { year } }),
+    staleTime: yearStaleTime,
     enabled: !currentDistrict,
   });
 
@@ -304,6 +335,7 @@ function TeamPage(): React.JSX.Element {
 
   const { data: regionalAdvancement } = useQuery({
     ...getRegionalAdvancementOptions({ path: { year } }),
+    staleTime: yearStaleTime,
     enabled: hasRegionalEvents,
   });
 
@@ -319,6 +351,7 @@ function TeamPage(): React.JSX.Element {
   const eventDistrictPtsQueries = useQueries({
     queries: sortedEvents.map((e) => ({
       ...getEventDistrictPointsOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
       enabled: DISTRICT_EVENT_TYPES.has(e.event_type),
     })),
     combine: (results) =>
@@ -332,6 +365,7 @@ function TeamPage(): React.JSX.Element {
   const regionalPoolPtsQueries = useQueries({
     queries: sortedEvents.map((e) => ({
       ...getRegionalChampsPoolPointsOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
       enabled: e.event_type === EventType.REGIONAL,
     })),
     combine: (results) =>
@@ -343,9 +377,10 @@ function TeamPage(): React.JSX.Element {
       ),
   });
   const eventAlliancesQueries = useQueries({
-    queries: sortedEvents.map((e) =>
-      getEventAlliancesOptions({ path: { event_key: e.key } }),
-    ),
+    queries: sortedEvents.map((e) => ({
+      ...getEventAlliancesOptions({ path: { event_key: e.key } }),
+      staleTime: yearStaleTime,
+    })),
     combine: (results) =>
       Object.fromEntries(
         results.map((result, index) => [
@@ -382,7 +417,7 @@ function TeamPage(): React.JSX.Element {
       <TableOfContents tocItems={tocItems} inView={inView}>
         <YearSelector
           currentLabel={String(year)}
-          triggerClassName="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          triggerClassName="w-[180px]"
           options={[
             {
               label: 'History',
@@ -754,10 +789,15 @@ function RecordCell({
     <TableCell className="text-center">
       <TooltipProvider>
         <Tooltip>
-          <TooltipTrigger asChild>
-            <div className="cursor-pointer" data-testid={`${dataTestId}_cell`}>
-              {stringifyRecord(record)}
-            </div>
+          <TooltipTrigger
+            render={
+              <div
+                className="cursor-pointer"
+                data-testid={`${dataTestId}_cell`}
+              />
+            }
+          >
+            {stringifyRecord(record)}
           </TooltipTrigger>
           <TooltipContent side="top" data-testid={`${dataTestId}_tooltip`}>
             {(winrateFromRecord(record) * 100).toFixed(0)}% winrate
