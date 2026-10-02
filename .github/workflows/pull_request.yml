@@ -265,7 +265,6 @@ jobs:
         if: steps.changes.outputs.web == 'true'
         run: |
           npm ci
-          npm install -g capture-website-cli
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
@@ -297,12 +296,3 @@ jobs:
       - name: Test Ops Fullstack
         if: steps.changes.outputs.web == 'true'
         run: ./ops/test_ops.sh
-      - name: Capture screenshots
-        if: steps.changes.outputs.web == 'true'
-        run: python ./ops/pr_screenshots/capture_screenshots.py
-      - name: Upload screenshots artifact
-        if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: ci_screenshots
-          path: ci_screenshots.pickle

@@ -311,6 +311,30 @@ def test_name_similarity_of_only_generic_names() -> None:
     assert name_similarity("Robotics Competition", "Beach Blitz") < SIMILARITY_THRESHOLD
 
 
+def test_matches_an_existing_event_by_its_short_name() -> None:
+    """The formal listing and the name people use for an event can differ
+    completely; a returning event is usually suggested under the latter."""
+    candidate = Event(
+        name="Beach Blitz", year=2026, event_type_enum=EventType.OFFSEASON
+    )
+    formal = Event(
+        id="2025bb",
+        event_short="bb",
+        year=2025,
+        event_type_enum=EventType.OFFSEASON,
+        name="Southern California Robotics Invitational",
+        short_name="Beach Blitz",
+    )
+    unrelated = Event(
+        id="2025cc",
+        event_short="cc",
+        year=2025,
+        event_type_enum=EventType.OFFSEASON,
+        name="Chezy Champs",
+    )
+    assert SimilarEventHelper.similar_events(candidate, [unrelated, formal]) == [formal]
+
+
 def test_location_similarity_same_venue() -> None:
     a = Event(country="USA", state_prov="NY", city="New York", venue="Javits Center")
     b = Event(country="USA", state_prov="NY", city="new york", venue="JAVITS CENTER")
