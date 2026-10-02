@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useMemo, useState } from 'react';
 import {
   Cell,
   DefaultTooltipContentProps,
@@ -16,10 +16,17 @@ import {
   ValueType,
 } from 'recharts/types/component/DefaultTooltipContent';
 
+import HelpCircleIcon from '~icons/lucide/help-circle';
+
 import { EventColors, TeamWithColor } from '~/api/colors';
 import { EventCoprs } from '~/api/tba/read';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { ChartContainer } from '~/components/ui/chart';
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '~/components/ui/popover';
 import {
   Select,
   SelectContent,
@@ -95,7 +102,7 @@ function getNonWhiteTeamColor(
   };
 
   if (color.colors?.primaryHex === '#ffffff') {
-    color.colors.primaryHex = '#000000';
+    return { ...color, colors: { ...color.colors, primaryHex: '#000000' } };
   }
 
   return color;
@@ -114,7 +121,6 @@ export default function CoprScatterChart({
 }) {
   const [selectedXCopr, setSelectedXCopr] = useState(defaultXCopr);
   const [selectedYCopr, setSelectedYCopr] = useState(defaultYCopr);
-  const [data, setData] = useState<Datapoint[]>([]);
   const isDesktop = useMediaQuery('(min-width: 640px)');
 
   // Base UI's Select.Value renders the raw value unless the items are
@@ -124,24 +130,57 @@ export default function CoprScatterChart({
     label: camelCaseToHumanReadable(k),
   }));
 
-  useEffect(() => {
-    const data: Datapoint[] = Object.keys(coprs[selectedXCopr])
-      .map((tk) => ({
-        teamKey: tk,
-        valueX: coprs[selectedXCopr][tk],
-        valueY: coprs[selectedYCopr][tk],
-      }))
-      .sort((a, b) => a.valueX - b.valueX);
-
-    setData(data);
-  }, [selectedXCopr, selectedYCopr, coprs]);
+  const data: Datapoint[] = useMemo(
+    () =>
+      Object.keys(coprs[selectedXCopr])
+        .map((tk) => ({
+          teamKey: tk,
+          valueX: coprs[selectedXCopr][tk],
+          valueY: coprs[selectedYCopr][tk],
+        }))
+        .sort((a, b) => a.valueX - b.valueX),
+    [selectedXCopr, selectedYCopr, coprs],
+  );
 
   return (
     <Card>
       <CardHeader className="p-4 sm:p-6">
         <div className="flex justify-between">
-          <div>
+          <div className="flex items-center gap-2">
             <CardTitle>Component OPRs</CardTitle>
+            <Popover>
+              <PopoverTrigger
+                aria-label="How to submit team colors"
+                openOnHover={isDesktop}
+                className="rounded-sm text-muted-foreground
+                  hover:text-foreground focus-visible:outline-2
+                  focus-visible:outline-ring"
+              >
+                <HelpCircleIcon className="size-4" aria-hidden="true" />
+              </PopoverTrigger>
+              <PopoverContent align="start" className="text-sm">
+                Team colors in this chart come from{' '}
+                <a
+                  href="https://frc-colors.com"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  frc-colors
+                </a>
+                . To add or update your team’s colors, submit your team number
+                and primary and secondary hex colors on{' '}
+                <a
+                  href="https://frc-colors.com/submit-colors"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-primary underline"
+                >
+                  frc-colors
+                </a>
+                .
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       </CardHeader>

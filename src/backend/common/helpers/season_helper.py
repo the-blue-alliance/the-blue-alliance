@@ -1,5 +1,5 @@
 from datetime import datetime, timedelta
-from typing import Optional, Sequence
+from typing import Dict, Optional, Sequence
 
 from pytz import timezone, UTC
 
@@ -16,6 +16,50 @@ class SeasonHelper(object):
     MIN_YEAR: Year = 1992
     MIN_DISTRICT_YEAR: Year = 2009
     MIN_REGIONAL_CMP_POOL_YEAR: Year = 2025
+
+    # Prior to 1995, FIRST only held a single Championship event per season and
+    # no regional or district events existed. Because event weeks are only defined
+    # for non-Championship events (NON_CMP_EVENT_TYPES), regular season competition
+    # weeks begin with the 1995 season.
+    FIRST_EVENT_START_DATES: Dict[Year, datetime] = {
+        1995: datetime(1995, 2, 25),
+        1996: datetime(1996, 3, 28),
+        1997: datetime(1997, 3, 6),
+        1998: datetime(1998, 3, 5),
+        1999: datetime(1999, 2, 25),
+        2000: datetime(2000, 3, 9),
+        2001: datetime(2001, 3, 1),
+        2002: datetime(2002, 3, 7),
+        2003: datetime(2003, 3, 6),
+        2004: datetime(2004, 3, 4),
+        2005: datetime(2005, 3, 3),
+        2006: datetime(2006, 3, 2),
+        2007: datetime(2007, 3, 1),
+        2008: datetime(2008, 2, 28),
+        2009: datetime(2009, 2, 26),
+        2010: datetime(2010, 3, 4),
+        2011: datetime(2011, 3, 3),
+        2012: datetime(2012, 3, 1),
+        2013: datetime(2013, 2, 28),
+        2014: datetime(2014, 2, 27),
+        2015: datetime(2015, 2, 25),
+        2016: datetime(2016, 2, 24),
+        2017: datetime(2017, 3, 1),
+        2018: datetime(2018, 2, 28),
+        2019: datetime(2019, 2, 27),
+        2020: datetime(2020, 2, 23),
+        2021: datetime(2021, 3, 1),
+        2022: datetime(2022, 3, 2),
+        2023: datetime(2023, 2, 26),
+        2024: datetime(2024, 2, 24),
+        2025: datetime(2025, 2, 23),
+        2026: datetime(2026, 3, 3),
+        2027: datetime(2027, 3, 3),
+    }
+
+    @classmethod
+    def get_first_event_start_date(cls, year: Year) -> Optional[datetime]:
+        return cls.FIRST_EVENT_START_DATES.get(year)
 
     @staticmethod
     def get_max_year() -> Year:

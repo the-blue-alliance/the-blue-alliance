@@ -1,0 +1,668 @@
+[
+  {
+    "address": "55 Forest St",
+    "city": "Hartford",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-04-10",
+    "event_code": "cthar",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "cthar",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022cthar",
+    "lat": null,
+    "lng": null,
+    "location_name": "Hartford Public High School",
+    "name": "NE District Hartford Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": null,
+    "remap_teams": null,
+    "short_name": "Hartford",
+    "start_date": "2022-04-08",
+    "state_prov": "CT",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_green",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_yellow",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 5,
+    "year": 2022
+  },
+  {
+    "address": "460 Buck Hill Road",
+    "city": "Waterbury",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-03-13",
+    "event_code": "ctwat",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "ctwat",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022ctwat",
+    "lat": null,
+    "lng": null,
+    "location_name": "Wilby High School",
+    "name": "NE District Waterbury Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "06704",
+    "remap_teams": null,
+    "short_name": "Waterbury",
+    "start_date": "2022-03-11",
+    "state_prov": "CT",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 1,
+    "year": 2022
+  },
+  {
+    "address": "101 School Street",
+    "city": "Revere",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-03-27",
+    "event_code": "mabos",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mabos",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022mabos",
+    "lat": null,
+    "lng": null,
+    "location_name": "Revere High School",
+    "name": "NE District Greater Boston Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "02151",
+    "remap_teams": null,
+    "short_name": "Greater Boston",
+    "start_date": "2022-03-25",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_orange",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 3,
+    "year": 2022
+  },
+  {
+    "address": "64 Holden Street",
+    "city": "Shrewsbury",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-03-27",
+    "event_code": "macma",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "macma",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022macma",
+    "lat": null,
+    "lng": null,
+    "location_name": "Shrewsbury High School",
+    "name": "NE District Central Mass Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "01545",
+    "remap_teams": null,
+    "short_name": "Central Mass",
+    "start_date": "2022-03-25",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_green",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 3,
+    "year": 2022
+  },
+  {
+    "address": "62 Oakland Road",
+    "city": "Reading",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-03-20",
+    "event_code": "marea",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "marea",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022marea",
+    "lat": null,
+    "lng": null,
+    "location_name": "Reading Memorial High School",
+    "name": "NE District North Shore Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "01867",
+    "remap_teams": null,
+    "short_name": "North Shore",
+    "start_date": "2022-03-18",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_orange",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 2,
+    "year": 2022
+  },
+  {
+    "address": "1215 Wilbraham Road",
+    "city": "Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-03-20",
+    "event_code": "mawne",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mawne",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022mawne",
+    "lat": null,
+    "lng": null,
+    "location_name": "Western New England University",
+    "name": "NE District Western NE Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "01119",
+    "remap_teams": null,
+    "short_name": "Western NE",
+    "start_date": "2022-03-18",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_green",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 2,
+    "year": 2022
+  },
+  {
+    "address": "100 Institute Road",
+    "city": "Worcester",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-04-10",
+    "event_code": "mawor",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "mawor",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022mawor",
+    "lat": null,
+    "lng": null,
+    "location_name": "Worcester Polytechnic Institute",
+    "name": "NE District WPI Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "01609",
+    "remap_teams": null,
+    "short_name": "WPI",
+    "start_date": "2022-04-08",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_orange",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 5,
+    "year": 2022
+  },
+  {
+    "address": "180 W River Road",
+    "city": "Waterville",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-03-13",
+    "event_code": "melew",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "melew",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022melew",
+    "lat": null,
+    "lng": null,
+    "location_name": "Thomas College",
+    "name": "NE District Pine Tree Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "04901",
+    "remap_teams": null,
+    "short_name": "Pine Tree",
+    "start_date": "2022-03-11",
+    "state_prov": "ME",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 1,
+    "year": 2022
+  },
+  {
+    "address": "1305 Memorial Ave",
+    "city": "West Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [
+      "2022necmp1",
+      "2022necmp2"
+    ],
+    "end_date": "2022-04-16",
+    "event_code": "necmp",
+    "event_type": 2,
+    "event_type_string": "District Championship",
+    "first_event_code": "necmp",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022necmp",
+    "lat": null,
+    "lng": null,
+    "location_name": "Eastern States Exposition",
+    "name": "New England FIRST District Championship",
+    "parent_event_key": null,
+    "playoff_type": 9,
+    "playoff_type_string": "Elimination Bracket (2 Alliances)",
+    "postal_code": "01089",
+    "remap_teams": null,
+    "short_name": "New England FIRST",
+    "start_date": "2022-04-16",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_green",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_orange",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 6,
+    "year": 2022
+  },
+  {
+    "address": "1305 Memorial Ave",
+    "city": "West Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-04-16",
+    "event_code": "necmp1",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "necmp1",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022necmp1",
+    "lat": null,
+    "lng": null,
+    "location_name": "Eastern States Exposition",
+    "name": "New England FIRST District Championship - Calcium Division",
+    "parent_event_key": "2022necmp",
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "01089",
+    "remap_teams": null,
+    "short_name": "NEFDC - Calcium",
+    "start_date": "2022-04-13",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_green",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 6,
+    "year": 2022
+  },
+  {
+    "address": "1305 Memorial Ave",
+    "city": "West Springfield",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-04-16",
+    "event_code": "necmp2",
+    "event_type": 5,
+    "event_type_string": "District Championship Division",
+    "first_event_code": "necmp2",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022necmp2",
+    "lat": null,
+    "lng": null,
+    "location_name": "Eastern States Exposition",
+    "name": "New England FIRST District Championship - Titanium Division",
+    "parent_event_key": "2022necmp",
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "01089",
+    "remap_teams": null,
+    "short_name": "NEFDC - Titanium",
+    "start_date": "2022-04-13",
+    "state_prov": "MA",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 6,
+    "year": 2022
+  },
+  {
+    "address": "44 Geremonty Drive",
+    "city": "Salem",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-03-05",
+    "event_code": "nhgrs",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "nhgrs",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022nhgrs",
+    "lat": null,
+    "lng": null,
+    "location_name": "Salem High School",
+    "name": "NE District Granite State Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "03079",
+    "remap_teams": null,
+    "short_name": "Granite State",
+    "start_date": "2022-03-03",
+    "state_prov": "NH",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_red",
+        "type": "twitch"
+      }
+    ],
+    "website": "http://www.nefirst.org/",
+    "week": 0,
+    "year": 2022
+  },
+  {
+    "address": "121 Technology Dr",
+    "city": "Durham",
+    "country": "USA",
+    "district": {
+      "abbreviation": "ne",
+      "display_name": "New England",
+      "key": "2022ne",
+      "official_advancement_counts": {
+        "cmp": 25,
+        "dcmp": 80
+      },
+      "year": 2022
+    },
+    "division_keys": [],
+    "end_date": "2022-04-02",
+    "event_code": "nhsea",
+    "event_type": 1,
+    "event_type_string": "District",
+    "first_event_code": "nhsea",
+    "first_event_id": null,
+    "gmaps_place_id": null,
+    "gmaps_url": null,
+    "key": "2022nhsea",
+    "lat": null,
+    "lng": null,
+    "location_name": "RJ Kelly",
+    "name": "NE District Pease ANG Event",
+    "parent_event_key": null,
+    "playoff_type": 0,
+    "playoff_type_string": null,
+    "postal_code": "03801",
+    "remap_teams": null,
+    "short_name": "Pease ANG",
+    "start_date": "2022-03-31",
+    "state_prov": "NH",
+    "timezone": "America/New_York",
+    "webcasts": [
+      {
+        "channel": "nefirst_orange",
+        "type": "twitch"
+      },
+      {
+        "channel": "nefirst_blue",
+        "type": "twitch"
+      }
+    ],
+    "website": "https://nefirst.org/",
+    "week": 4,
+    "year": 2022
+  }
+]

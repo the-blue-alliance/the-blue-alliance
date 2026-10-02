@@ -7,6 +7,12 @@ from google.appengine.ext import ndb
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.insights_v2.base import InsightV2Calculator
+from backend.common.helpers.insights_v2.clubs.hall_of_fame import (
+    HallOfFameClubV2Calculator,
+)
+from backend.common.helpers.insights_v2.clubs.world_championship_winners import (
+    WorldChampionshipWinnersClubV2Calculator,
+)
 from backend.common.helpers.insights_v2.game_stats.calculator import (
     GameStatsV2Calculator,
 )
@@ -87,6 +93,9 @@ from backend.common.helpers.insights_v2.timeseries.average_match_score_by_week i
 )
 from backend.common.helpers.insights_v2.timeseries.average_win_margin_by_week import (
     AverageWinMarginByWeekV2Calculator,
+)
+from backend.common.helpers.insights_v2.timeseries.cumulative_matches_by_day import (
+    CumulativeMatchesByDayV2Calculator,
 )
 from backend.common.helpers.insights_v2.timeseries.high_score_over_time import (
     HighScoreOverTimeV2Calculator,
@@ -178,10 +187,13 @@ def make_all_insights(year: Year) -> List[InsightV2]:
             LongestUndefeatedStreakV2Calculator(),
             LongestWinStreakV2Calculator(),
             NumMatchesByYearV2Calculator(),
+            HallOfFameClubV2Calculator(),
+            WorldChampionshipWinnersClubV2Calculator(),
         ]
     else:
         calculators += [
             HighScoreOverTimeV2Calculator(),
+            CumulativeMatchesByDayV2Calculator(),
             AverageMatchScoreByWeekV2Calculator(),
             AverageWinMarginByWeekV2Calculator(),
             HighestMatchCleanScoreV2Calculator(),

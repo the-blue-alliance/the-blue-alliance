@@ -59,7 +59,7 @@ updates:
         - "@vitest/coverage-v8"
         - "@julr/vite-plugin-validate-env"
         - "@vitejs/plugin-react"
-        - "babel-plugin-react-compiler"
+        - "oxc-transform-react"
     linting:
       patterns:
         - "oxlint"
@@ -82,6 +82,7 @@ updates:
         - "tailwindcss"
         - "tailwind-merge"
         - "tw-animate-css"
+        - "cn"
     icons:
       patterns:
         - "@iconify/json"
@@ -102,6 +103,7 @@ updates:
     testing:
       patterns:
         - "@playwright/test"
+        - "lighthouse"
     logging:
       patterns:
         - "pino"

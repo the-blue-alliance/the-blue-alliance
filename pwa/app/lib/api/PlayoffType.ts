@@ -8,6 +8,10 @@ export const TRADITIONAL_BRACKET_TYPES = new Set<PlayoffType | null>([
   PlayoffType.BRACKET_2_TEAM,
 ]);
 
+export const ROUND_ROBIN_TYPES = new Set<PlayoffType | null>([
+  PlayoffType.ROUND_ROBIN_6_TEAM,
+]);
+
 export const DOUBLE_ELIM_ROUND_MAPPING = new Map<number, number>([
   [1, 1],
   [2, 1],

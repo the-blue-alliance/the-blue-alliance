@@ -1,4 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 import { type HTMLAttributes, type JSX } from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
@@ -14,7 +15,6 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { cn } from '~/lib/utils';
 
 const rowVariants = cva('text-center', {
   variants: {
@@ -64,7 +64,7 @@ export default function AllianceSelectionTable(props: {
   year: number;
 }) {
   const allianceSize =
-    Math.max(...props.alliances.map((a) => a.picks.length)) || 3;
+    Math.max(0, ...props.alliances.map((a) => a.picks.length)) || 3;
 
   return (
     <>

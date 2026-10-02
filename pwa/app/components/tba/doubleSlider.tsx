@@ -1,7 +1,6 @@
 import { Slider as SliderPrimitive } from '@base-ui/react/slider';
+import { cn } from 'cn';
 import { useState } from 'react';
-
-import { cn } from '~/lib/utils';
 
 type SliderProps = {
   className?: string;
@@ -18,6 +17,7 @@ function DoubleSlider({
   className,
   min,
   max,
+  minStepsBetweenThumbs,
   step,
   formatLabel,
   value,
@@ -39,6 +39,7 @@ function DoubleSlider({
       min={min}
       max={max}
       step={step}
+      minStepsBetweenValues={minStepsBetweenThumbs}
       value={localValues}
       onValueChange={handleValueChange}
       thumbAlignment="edge"

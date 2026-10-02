@@ -216,14 +216,22 @@
     <div class="col-md-10 col-md-offset-1">
       <table id="api-write-keys" class="table table-striped">
         <tr>
-          <th>Event</th>
+          <th>
+            <a id="api-write-keys-sort"
+               href="{{ url_for('account.overview', api_write_keys_sort=api_write_keys_next_sort) }}"
+               class="api-write-keys-sort"
+               title="Sort by event ({{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first)"
+               aria-label="Sort write API keys by event, {{ 'oldest' if api_write_keys_next_sort == 'asc' else 'newest' }} first">
+              Event{% if api_write_keys_sort_explicit %} <span class="glyphicon glyphicon-triangle-{{ 'top' if api_write_keys_sort_direction == 'asc' else 'bottom' }}" aria-hidden="true"></span>{% endif %}
+            </a>
+          </th>
           <th>Permissions</th>
           <th>Expires</th>
           <th>Auth ID</th>
           <th>Auth Secret</th>
         </tr>
         <tbody>
-          {% for key in user.api_write_keys %}
+          {% for key in api_write_keys %}
             <tr class="api-write-key">
               <td>
               {% for event in key.event_list %}
@@ -274,7 +282,7 @@
           </tr>
         </tbody>
       </table>
-      <p><a class="btn btn-primary" href="/suggest/review"><span class="glyphicon glyphicon-ok"></span> Review Pending Suggestions</a></p>
+      <p><a class="btn btn-primary" id="review-pending-suggestions-link" href="{{ pwa_suggestion_review_url }}"><span class="glyphicon glyphicon-ok"></span> Review Pending Suggestions</a></p>
     </div>
   </div>
   <hr>

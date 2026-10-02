@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react';
@@ -17,7 +18,6 @@ import ArrowLeftIcon from '~icons/lucide/arrow-left';
 import ArrowRightIcon from '~icons/lucide/arrow-right';
 
 import { Button } from '~/components/ui/button';
-import { cn } from '~/lib/utils';
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -121,6 +121,7 @@ const Carousel = forwardRef<
         return;
       }
 
+      // eslint-disable-next-line react/set-state-in-effect -- syncing initial scroll state from the embla API
       onSelect(api);
       api.on('reInit', onSelect);
       api.on('select', onSelect);
