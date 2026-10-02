@@ -29,4 +29,4 @@ def test_key_name() -> None:
 )
 def test_validate_key_name(key: str, valid: bool) -> None:
     """validate_key_name(key) accepts only YEAR_frcNUMBER keys from 2025 on."""
-    assert RegionalPoolTeam.validate_key_name(key) is valid  # pyre-ignore[20]
+    assert RegionalPoolTeam.validate_key_name(key) is valid
