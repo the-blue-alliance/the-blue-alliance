@@ -33,17 +33,14 @@ $(document).ready(function(){
   var hash = window.location.hash;
   hash && $('ul.nav a[href="' + hash + '"]').tab('show');
 
-  $('.nav-tabs a, .nav-pills a').not(".nav-pills#suggestion-review-list a").click(function (e) {
+  $('.nav-tabs a, .nav-pills a').click(function (e) {
     e.preventDefault();
     window.location.hash = this.hash;
   });
 
-	// Fancybox
-	$(".fancybox").fancybox();
-
   // Tooltips
   $('body').tooltip({
-      selector: '[rel=tooltip]'
+      selector: '[rel~=tooltip]'
   });
 
 	// Fitvids
@@ -109,6 +106,39 @@ $(document).ready(function(){
   month[9] = "Oct";
   month[10] = "Nov";
   month[11] = "Dec";
+
+  var localTimeFormatter = null;
+  if (window.Intl && Intl.DateTimeFormat) {
+    localTimeFormatter = new Intl.DateTimeFormat(undefined, {
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+  }
+
+  function formatLocalTime(time) {
+    if (localTimeFormatter) {
+      return localTimeFormatter.format(time);
+    }
+    return time.toLocaleTimeString([], {
+      hour: 'numeric',
+      minute: '2-digit'
+    });
+  }
+
+  $('.tba-webcast-offline-tooltip').each(function () {
+    var scheduledStartUtc = $(this).attr('data-scheduled-start-utc');
+    if (!scheduledStartUtc) {
+      return;
+    }
+
+    var time = new Date(scheduledStartUtc);  // Converts UTC to local time
+    if (!isNaN(time)) {
+      var tooltipText = 'scheduled to start at ' + formatLocalTime(time);
+      $(this).attr('title', tooltipText);
+      $(this).attr('data-original-title', tooltipText);
+    }
+  });
+
   $('.tba-verbose-date-utc').each(function () {  // Like "Mar. 13, 2016"
     var time = new Date($(this).attr('datetime'));  // Converts UTC to local time
     if (!isNaN(time)) {

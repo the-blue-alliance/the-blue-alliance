@@ -3,9 +3,9 @@
   "info": {
     "title": "The Blue Alliance API v3",
     "description": "# Overview \n\n Information and statistics about FIRST Robotics Competition teams and events. \n\n# Authentication \n\nAll endpoints require an Auth Key to be passed in the header `X-TBA-Auth-Key`. If you do not have an auth key yet, you can obtain one from your [Account Page](/account).",
-    "version": "3.12.0",
+    "version": "3.26.0",
     "x-version-info": "Versions of the API follow the format X.Y.Z, with X being a major version, Y denoting the minor version, and Z the point release. Changes to the spec or API that result in a major version change will significantly impact implementations. Changes to the minor version indicate paths and/or fields in existing models may be added, and any breaking changes will be confined to paths or models listed as in-development in the prior minor version. Changes to the point release indicate no format or structure changes to the paths or models, but updated or clarified documentation. Note that changes to paths and models refer to the actual result from the API, not the documentation.",
-    "x-changes": "3.12.0: Add 2026 score breakdowns. 3.11.0: Deprecate Event.lat, Event.lng, Event.gmaps_place_id, Event.gmaps_url. Event models will no longer be geocoded. Moving forward, these fields will return null. Eventually these fields will be removed. Event.address will now return FRC-API address, and Event.location_name will return FRC-API venue. 3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
+    "x-changes": "3.26.0: Add the /event/{event_key}/playoff_advancement endpoint, returning computed playoff advancement for an event. For round robin (6-alliance) playoffs it returns a Round Robin Semifinals standings level, ranking alliances by Champ Points and per-year score-breakdown tiebreakers and flagging which alliances advance to the finals, followed by a finals bracket level. Adds the Playoff_Advancement, Playoff_Advancement_Alliance_Rank, and Playoff_Advancement_Sort_Order_Info schemas. 3.25.0: Add the /event/{event_key}/media endpoint, returning media attached to an event itself (SmugMug photo galleries and event YouTube videos), as opposed to /event/{event_key}/team_media which returns media belonging to the event's teams. Populates `direct_url`/`direct_url` derived sizes for `smugmug-album` media (previously empty strings) with the album cover image. 3.24.0: Add the `smugmug-photo` and `smugmug-album` media types, for SmugMug photos and galleries. A `smugmug-photo` may be attached to a team; a `smugmug-album` may be attached to a team or an event, but not both. A `smugmug-album`'s details carry `cover_url`/`cover_url_med`/`cover_url_sm` for the album's cover image. Adds the Media_SmugmugPhoto and Media_SmugmugAlbum schemas. 3.23.0: Add `cmp_qualification` to District_Advancement_Cutoffs on /district/{district_key}/advancement, a mapping of team key to CmpQualificationMethod. This is the same data already projected onto each entry in `teams`, surfaced under `cutoffs` as well because it is computed by TBA from rankings, events and awards rather than sourced from the per-team advancement feed, and so is available even when `teams` is empty. 3.22.1: Fix /district/{district_key}/advancement returning `teams: null` for a district whose advancement has been fetched but is empty; it now returns an empty object, and `null` is reserved for advancement that has never been fetched. 3.22.0: Adds CMP/DCMP qualification cutoffs and methods. 3.21.0: Add the `date` value to the InsightV2 timeseries `x_type` enum. When `x_type` is `date`, each data point's `x` is a Unix timestamp (seconds) at UTC midnight of that day. Adds the `cumulative_matches_by_day` timeseries insight (per-year, `x_type` `date`), tracking the running cumulative count of played matches over the course of a season. 3.20.0: Add the `clubs` InsightV2 category, returning cumulative all-time memberships of teams that reached a milestone. Each member has an `event_added_key` (where the team first qualified) and an optional club-specific `extra_context`. The first club is `hall_of_fame` - teams that won the Impact/Chairman's Award at Championship finals, with `extra_context` carrying the Chairman's video, presentation, and essay links. Adds InsightV2_Clubs, InsightV2_Clubs_Extras, InsightV2ClubsData, InsightV2ClubEntry, and InsightV2HallOfFameContext schemas, and adds `clubs` to the InsightV2 category path parameter enum. 3.19.0: Add `kickoff_datetime` to API_Status, an ISO 8601 UTC datetime for the upcoming season's FRC Kickoff. 3.18.0: Rename the InsightV2 `success_rate` category to `game_stats`, and add `qual_averages`/`playoff_averages` to each InsightV2GameStatsScope - non-binary average statistics (e.g. average score, average win margin) for a season overall, per competition week, and per event, alongside the existing count/opportunities statistics. Renames InsightV2_SuccessRate, InsightV2_SuccessRate_Extras, InsightV2SuccessRateData, InsightV2SuccessRateScope, and InsightV2SuccessRateEntry to InsightV2_GameStats, InsightV2_GameStats_Extras, InsightV2GameStatsData, InsightV2GameStatsScope, and InsightV2GameStat respectively, and adds the InsightV2AverageStat schema. 3.17.1: Add success_rate to the InsightV2 category path parameter enum, so /insights/{year}/{category} and its district variant document the category the API already serves. 3.17.0: Add the `success_rate` InsightV2 category, returning count/opportunities statistics (bonus ranking points and game-specific objectives) for a season overall, per competition week, and per event. Adds InsightV2_SuccessRate, InsightV2SuccessRateData, InsightV2SuccessRateScope, and InsightV2SuccessRate schemas. 3.16.0: Add /event/{event_key}/nexus_info endpoint, returning cached live match-queuing info sourced from Nexus (https://frc.nexus/) for an event, or null if unavailable. Adds Nexus_Event_Info, Nexus_Now_Queueing, Nexus_Match_Info, and Nexus_Match_Timing schemas. 3.15.0: Add InsightV2 endpoints and schemas. Introduces /insights/{year}, /insights/{year}/{category}, /insights/{year}/district/{district_abbreviation}, and /insights/{year}/{category}/district/{district_abbreviation} routes returning typed InsightV2 objects with leaderboard, streak, and timeseries categories. Use year=0 for all-time insights. 3.14.0: Introduce named string enum schemas (AllianceColor, WebcastStatus). Webcast.status now references the WebcastStatus schema. AllianceColor includes red, blue, and empty string for no winner or tie; Match.winning_alliance references AllianceColor. Wire values are unchanged; clients regenerated against the spec get correctly-named enum members. 3.13.0: Introduce named integer enum schemas (AwardType, EventType, PlayoffType) using OpenAPI 3.1.1's annotated-enumeration pattern (`oneOf` of `const` branches with per-branch titles). The `award_type`, `event_type`, and `playoff_type` fields now reference these schemas. Integer values on the wire are unchanged; clients regenerated against the spec get value constraints, and Swagger UI renders the value->name mapping inline. 3.12.2: Renames District `highest_qual_scores` tiebreaker to `highest_match_scores` to more accurately reflect district rankings. 3.12.1: Add pit_location to Team_Event_Status. 3.12.0: Add 2026 score breakdowns. 3.11.0: Deprecate Event.lat, Event.lng, Event.gmaps_place_id, Event.gmaps_url. Event models will no longer be geocoded. Moving forward, these fields will return null. Eventually these fields will be removed. Event.address will now return FRC-API address, and Event.location_name will return FRC-API venue. 3.10.1: Add remap_teams to event. 3.10.0: Upgrade to Openapi v3.1.1. 3.9.16: Marked Event.timezone as nullable, renamed District_List to District. 3.9.15: Add onshape to media type. 3.9.14: Adds max_team_page to Status. 3.9.13: Fixes missing 2023 endgame enum. 3.9.12: Updates 2025 match breakdown penalties to be correct for 2025. 3.9.11: Adds tba_botRowCount, tba_midRowCount, and tba_topRowCount to 2025 match breakdown autoReef and teleopReef. 3.9.10: Add 2025 score breakdowns. 3.9.9: Fix nullable fields within Team_Event_Status. 3.9.8: Add district awards endpoint. Add nullable to district rankings. 3.9.7: Add district history endpoint. 3.9.6: Added History endpoint; added NotablesInsight endpoint. 3.9.5: Properly documented that event.district may be null. 3.9.4: Properly documented that a Status may be null (future events). 3.9.3: Proper nullable event rankings/oprs/coprs 3.9.2: Add event/key/team_media endpoint; add team_keys to media objects. 3.9.1: Mark WLT_Record as nullable. 3.8.2-3.9.0: Fixed undefined vs nullable fields. Adds 2024 score breakdown. Links score breakdown types to score_breakdown field. Adds leaderboard insights endpoint and type. 3.8.1-3.8.2: Replace `If-Modified-Since` with `If-None-Match` and `Last-Modified` with `ETag`. 3.8.0-3.8.1: Added Webcast date field. 3.7.0-3.8.0: Added 2020 Match Breakdown. 3.6.0-3.7.0: Added Zebra MotionWorks endpoints and models. 3.5.2-3.6.0: Added `school_name` to the Team model. 3.5.1-3.5.2: Removed `key` from the Media object, set `foreign_key` as a required property. 3.5-3.5.1: Fixed api clients crashing when requesting simple matches resulting in ties. 3.04.1 - 3.5: Updated the spec to follow OpenAPI standards. 3.04.0 - 3.04.1: Team motto will now return null. 3.03.1 - 3.04.0: Add direct_url and view_url to the Media model. 3.03.0 - 3.03.1: Fix model of /team/{team_key}/robots to match API, add min and max for year and add min for page_num. 3.02.1 - 3.03.0: Added Timeseries models and endpoints. 3.02.0 - 3.02.1: Fixed the model for `/team/{team_key}/districts` to match return from API. 3.1.0 - 3.02.0: Added `tba_gameData` to score breakdown and a leading zero to the minor version number to allow for easier sorting later. 3.0.5 - 3.1.0: Version bump for 2018 added fields and endpoints. Models Updated: `Team_Event_Status`, `Media`, 2018 Score Breakdowns. Endpoints Added: `/team/{team_key}/events/{year}/statuses`, `/event/{event_key}/teams/statuses` 3.0.4 - 3.0.5: Minor spelling fixes. Remove 2016 fields from `Match_Score_Breakdown_2017_Alliance` model. Fix `first_event_id` in `Event` model to correct type. Update `Media`.`type` enum. --- 3.0.3 - 3.0.4: Correct syntax in `Team_Event_Status_playoff` object, include descriptions in `Event_District_Points` and fix the path in `Team_Event_Status_playoff.properties.record` in order to more closely match Swagger spec. Fix syntax of `Match.video` to be correct and accurately reflect what is returned by the API. --- 3.0.2 - 3.0.3: `extra_stats` and `extra_stats_info` added to `Event_Ranking` model. Corrected match video property claiming to use the `Media` model, which it doesn't. Added `first_event_code` to the `Event` model. Added `/team/{team_key}/media/tag/{media_tag}` and year endpoints. Added `dq_team_keys` to `Match_alliance` model.  --- 3.0.1 - 3.0.2: `Team_Event_Status` and `Event_Ranking` model documentation changed to reflect actual API return. Changes involved W-L-T and ranking properties. --- 3.0.0 - 3.0.1: Descriptions updated to clarify some terms and improve grammar. The `district` property on the `Event` object now points to the `District_List` model, which was identical. `Required` fields on fully documented models now represent fields that may not be `null`. `District_Ranking` model documented."
   },
   "servers": [
     {
@@ -237,7 +237,7 @@
           "district",
           "team"
         ],
-        "description": "Gets a list of advancement information per team in a district.",
+        "description": "Gets per-team advancement information and the advancement cutoffs for a district.",
         "operationId": "getDistrictAdvancement",
         "parameters": [
           {
@@ -267,14 +267,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
-                  "description": "A mapping of team key to District_Advancement",
-                  "additionalProperties": {
-                    "$ref": "#/components/schemas/District_Advancement"
-                  }
+                  "$ref": "#/components/schemas/District_Advancement_Response"
                 }
               }
             }
@@ -947,10 +940,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_District_Points",
-                  "type": [
-                    "null",
-                    "object"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_District_Points"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 }
               }
@@ -1131,11 +1127,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
-                  "$ref": "#/components/schemas/Event_COPRs"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_COPRs"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             }
@@ -1193,10 +1192,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_District_Points",
-                  "type": [
-                    "null",
-                    "object"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_District_Points"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 }
               }
@@ -1254,10 +1256,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_Insights",
-                  "type": [
-                    "null",
-                    "object"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Insights"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 }
               }
@@ -1526,6 +1531,130 @@
         ]
       }
     },
+    "/event/{event_key}/media": {
+      "get": {
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.",
+        "operationId": "getEventMedia",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Media"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/nexus_info": {
+      "get": {
+        "tags": [
+          "event"
+        ],
+        "description": "Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.",
+        "operationId": "getEventNexusInfo",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Nexus_Event_Info"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
     "/event/{event_key}/oprs": {
       "get": {
         "tags": [
@@ -1561,11 +1690,74 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
-                  "$ref": "#/components/schemas/Event_OPRs"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_OPRs"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/event/{event_key}/playoff_advancement": {
+      "get": {
+        "tags": [
+          "event"
+        ],
+        "description": "Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.",
+        "operationId": "getEventPlayoffAdvancement",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/event_key"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Playoff_Advancement"
+                  }
                 }
               }
             }
@@ -1622,10 +1814,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_Predictions",
-                  "type": [
-                    "null",
-                    "object"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Predictions"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 }
               }
@@ -1683,10 +1878,13 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Event_Ranking",
-                  "type": [
-                    "null",
-                    "object"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_Ranking"
+                    },
+                    {
+                      "type": "null"
+                    }
                   ]
                 }
               }
@@ -1744,11 +1942,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
-                  "$ref": "#/components/schemas/Event_District_Points"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Event_District_Points"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             }
@@ -2109,10 +2310,13 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "$ref": "#/components/schemas/Team_Event_Status",
-                    "type": [
-                      "null",
-                      "object"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/Team_Event_Status"
+                      },
+                      {
+                        "type": "null"
+                      }
                     ]
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
@@ -2416,6 +2620,258 @@
                   "type": "array",
                   "items": {
                     "$ref": "#/components/schemas/NotablesInsight"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year across all categories. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights.",
+        "operationId": "getInsightsV2Year",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}/{category}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.",
+        "operationId": "getInsightsV2YearCategory",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          },
+          {
+            "$ref": "#/components/parameters/insight_v2_category"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}/district/{district_abbreviation}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year scoped to a specific district, across all categories. Use year=0 for all-time insights.",
+        "operationId": "getInsightsV2YearDistrict",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          },
+          {
+            "$ref": "#/components/parameters/district_abbreviation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "$ref": "#/components/responses/NotModified"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        },
+        "security": [
+          {
+            "apiKey": []
+          }
+        ]
+      }
+    },
+    "/insights/{year}/{category}/district/{district_abbreviation}": {
+      "get": {
+        "tags": [
+          "insight"
+        ],
+        "description": "Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.",
+        "operationId": "getInsightsV2YearCategoryDistrict",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/If-None-Match"
+          },
+          {
+            "$ref": "#/components/parameters/year"
+          },
+          {
+            "$ref": "#/components/parameters/insight_v2_category"
+          },
+          {
+            "$ref": "#/components/parameters/district_abbreviation"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "headers": {
+              "Cache-Control": {
+                "description": "The `Cache-Control` header, in particular the `max-age` value, contains the number of seconds the result should be considered valid for. During this time subsequent calls should return from the local cache directly.",
+                "schema": {
+                  "type": "string"
+                }
+              },
+              "ETag": {
+                "description": "Specifies the version of the most recent response. Used by clients in the `If-None-Match` request header.",
+                "schema": {
+                  "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/InsightV2"
                   }
                 }
               }
@@ -3380,7 +3836,7 @@
                 "schema": {
                   "type": "array",
                   "items": {
-                    "$ref": "#/components/schemas/Match"
+                    "$ref": "#/components/schemas/Match_Simple"
                   }
                 }
               }
@@ -3442,11 +3898,14 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "type": [
-                    "null",
-                    "object"
-                  ],
-                  "$ref": "#/components/schemas/Team_Event_Status"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/Team_Event_Status"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 }
               }
             }
@@ -3886,11 +4345,14 @@
                 "schema": {
                   "type": "object",
                   "additionalProperties": {
-                    "type": [
-                      "null",
-                      "object"
-                    ],
-                    "$ref": "#/components/schemas/Team_Event_Status"
+                    "oneOf": [
+                      {
+                        "$ref": "#/components/schemas/Team_Event_Status"
+                      },
+                      {
+                        "type": "null"
+                      }
+                    ]
                   },
                   "description": "A key-value pair of `Team_Event_Status` objects with the event key as the key."
                 }
@@ -5006,6 +5468,10 @@
           "max_team_page": {
             "type": "integer",
             "description": "Maximum team page number for valid queries."
+          },
+          "kickoff_datetime": {
+            "type": "string",
+            "description": "ISO 8601 datetime (UTC) of FRC Kickoff for the upcoming season."
           }
         }
       },
@@ -5025,6 +5491,21 @@
             "description": "Internal use - Latest application version available."
           }
         }
+      },
+      "AllianceColor": {
+        "title": "AllianceColor",
+        "description": "The color of an alliance, or an empty string when there is no winning alliance (e.g. tie or no result). See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/alliance_color.py for red/blue definitions.",
+        "type": "string",
+        "enum": [
+          "red",
+          "blue",
+          ""
+        ],
+        "x-enum-varnames": [
+          "RED",
+          "BLUE",
+          "NO_ALLIANCE"
+        ]
       },
       "AutoChargeStationRobot_2023": {
         "type": "string",
@@ -5062,8 +5543,7 @@
             "description": "The name of the award as provided by FIRST. May vary for the same award type."
           },
           "award_type": {
-            "type": "integer",
-            "description": "Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py#L8"
+            "$ref": "#/components/schemas/AwardType"
           },
           "event_key": {
             "type": "string",
@@ -5132,12 +5612,301 @@
         ],
         "description": "The competition level the match was played at."
       },
+      "AwardType": {
+        "title": "AwardType",
+        "description": "Type of award given. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/award_type.py for full definitions.",
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          8,
+          9,
+          10,
+          11,
+          12,
+          13,
+          14,
+          15,
+          16,
+          17,
+          18,
+          19,
+          20,
+          21,
+          22,
+          23,
+          24,
+          25,
+          26,
+          27,
+          28,
+          29,
+          30,
+          31,
+          32,
+          33,
+          34,
+          35,
+          36,
+          37,
+          38,
+          39,
+          40,
+          41,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          48,
+          49,
+          50,
+          51,
+          52,
+          53,
+          54,
+          55,
+          56,
+          57,
+          58,
+          59,
+          60,
+          61,
+          62,
+          63,
+          64,
+          65,
+          66,
+          67,
+          68,
+          69,
+          70,
+          71,
+          72,
+          73,
+          74,
+          75,
+          76,
+          77,
+          78,
+          79,
+          80,
+          81,
+          82,
+          83
+        ],
+        "x-enum-varnames": [
+          "CHAIRMANS",
+          "WINNER",
+          "FINALIST",
+          "WOODIE_FLOWERS",
+          "DEANS_LIST",
+          "VOLUNTEER",
+          "FOUNDERS",
+          "BART_KAMEN_MEMORIAL",
+          "MAKE_IT_LOUD",
+          "ENGINEERING_INSPIRATION",
+          "ROOKIE_ALL_STAR",
+          "GRACIOUS_PROFESSIONALISM",
+          "COOPERTITION",
+          "JUDGES",
+          "HIGHEST_ROOKIE_SEED",
+          "ROOKIE_INSPIRATION",
+          "INDUSTRIAL_DESIGN",
+          "QUALITY",
+          "SAFETY",
+          "SPORTSMANSHIP",
+          "CREATIVITY",
+          "ENGINEERING_EXCELLENCE",
+          "ENTREPRENEURSHIP",
+          "EXCELLENCE_IN_DESIGN",
+          "EXCELLENCE_IN_DESIGN_CAD",
+          "EXCELLENCE_IN_DESIGN_ANIMATION",
+          "DRIVING_TOMORROWS_TECHNOLOGY",
+          "IMAGERY",
+          "MEDIA_AND_TECHNOLOGY",
+          "INNOVATION_IN_CONTROL",
+          "SPIRIT",
+          "WEBSITE",
+          "VISUALIZATION",
+          "AUTODESK_INVENTOR",
+          "FUTURE_INNOVATOR",
+          "RECOGNITION_OF_EXTRAORDINARY_SERVICE",
+          "OUTSTANDING_CART",
+          "WSU_AIM_HIGHER",
+          "LEADERSHIP_IN_CONTROL",
+          "NUM_1_SEED",
+          "INCREDIBLE_PLAY",
+          "PEOPLES_CHOICE_ANIMATION",
+          "VISUALIZATION_RISING_STAR",
+          "BEST_OFFENSIVE_ROUND",
+          "BEST_PLAY_OF_THE_DAY",
+          "FEATHERWEIGHT_IN_THE_FINALS",
+          "MOST_PHOTOGENIC",
+          "OUTSTANDING_DEFENSE",
+          "POWER_TO_SIMPLIFY",
+          "AGAINST_ALL_ODDS",
+          "RISING_STAR",
+          "CHAIRMANS_HONORABLE_MENTION",
+          "CONTENT_COMMUNICATION_HONORABLE_MENTION",
+          "TECHNICAL_EXECUTION_HONORABLE_MENTION",
+          "REALIZATION",
+          "REALIZATION_HONORABLE_MENTION",
+          "DESIGN_YOUR_FUTURE",
+          "DESIGN_YOUR_FUTURE_HONORABLE_MENTION",
+          "SPECIAL_RECOGNITION_CHARACTER_ANIMATION",
+          "HIGH_SCORE",
+          "TEACHER_PIONEER",
+          "BEST_CRAFTSMANSHIP",
+          "BEST_DEFENSIVE_MATCH",
+          "PLAY_OF_THE_DAY",
+          "PROGRAMMING",
+          "PROFESSIONALISM",
+          "GOLDEN_CORNDOG",
+          "MOST_IMPROVED_TEAM",
+          "WILDCARD",
+          "CHAIRMANS_FINALIST",
+          "OTHER",
+          "AUTONOMOUS",
+          "INNOVATION_CHALLENGE_SEMI_FINALIST",
+          "ROOKIE_GAME_CHANGER",
+          "SKILLS_COMPETITION_WINNER",
+          "SKILLS_COMPETITION_FINALIST",
+          "ROOKIE_DESIGN",
+          "ENGINEERING_DESIGN",
+          "DESIGNERS",
+          "CONCEPT",
+          "GAME_DESIGN_CHALLENGE_WINNER",
+          "GAME_DESIGN_CHALLENGE_FINALIST",
+          "SUSTAINABILITY",
+          "RISING_ALL_STAR"
+        ]
+      },
+      "EventType": {
+        "title": "EventType",
+        "description": "Event Type. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py for definitions.",
+        "type": "integer",
+        "enum": [
+          0,
+          1,
+          2,
+          3,
+          4,
+          5,
+          6,
+          7,
+          99,
+          100,
+          -1
+        ],
+        "x-enum-varnames": [
+          "REGIONAL",
+          "DISTRICT",
+          "DISTRICT_CMP",
+          "CMP_DIVISION",
+          "CMP_FINALS",
+          "DISTRICT_CMP_DIVISION",
+          "FOC",
+          "REMOTE",
+          "OFFSEASON",
+          "PRESEASON",
+          "UNLABLED"
+        ]
+      },
+      "PlayoffType": {
+        "title": "PlayoffType",
+        "description": "Playoff bracket format. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py for definitions.",
+        "type": "integer",
+        "enum": [
+          1,
+          0,
+          2,
+          9,
+          3,
+          4,
+          5,
+          10,
+          11,
+          6,
+          7,
+          8
+        ],
+        "x-enum-varnames": [
+          "BRACKET_16_TEAM",
+          "BRACKET_8_TEAM",
+          "BRACKET_4_TEAM",
+          "BRACKET_2_TEAM",
+          "AVG_SCORE_8_TEAM",
+          "ROUND_ROBIN_6_TEAM",
+          "LEGACY_DOUBLE_ELIM_8_TEAM",
+          "DOUBLE_ELIM_8_TEAM",
+          "DOUBLE_ELIM_4_TEAM",
+          "BO5_FINALS",
+          "BO3_FINALS",
+          "CUSTOM"
+        ]
+      },
+      "CmpQualificationMethod": {
+        "title": "CmpQualificationMethod",
+        "description": "How a team earned its invitation to the FIRST Championship. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/cmp_qualification.py for full definitions.",
+        "type": "string",
+        "enum": [
+          "district_points",
+          "waitlist",
+          "original_and_sustaining",
+          "hall_of_fame",
+          "prior_year_cmp_winner",
+          "prior_year_cmp_impact",
+          "prior_year_cmp_engineering_inspiration",
+          "regional_winner",
+          "regional_impact",
+          "regional_engineering_inspiration",
+          "regional_wildcard",
+          "late_regional_winner",
+          "late_regional_impact",
+          "late_regional_engineering_inspiration",
+          "late_regional_wildcard",
+          "dcmp_winner",
+          "dcmp_impact",
+          "dcmp_engineering_inspiration",
+          "dcmp_rookie_all_star"
+        ],
+        "x-enum-varnames": [
+          "DISTRICT_POINTS",
+          "WAITLIST",
+          "ORIGINAL_AND_SUSTAINING",
+          "HALL_OF_FAME",
+          "PRIOR_YEAR_CMP_WINNER",
+          "PRIOR_YEAR_CMP_IMPACT",
+          "PRIOR_YEAR_CMP_ENGINEERING_INSPIRATION",
+          "REGIONAL_WINNER",
+          "REGIONAL_IMPACT",
+          "REGIONAL_ENGINEERING_INSPIRATION",
+          "REGIONAL_WILDCARD",
+          "LATE_REGIONAL_WINNER",
+          "LATE_REGIONAL_IMPACT",
+          "LATE_REGIONAL_ENGINEERING_INSPIRATION",
+          "LATE_REGIONAL_WILDCARD",
+          "DCMP_WINNER",
+          "DCMP_IMPACT",
+          "DCMP_ENGINEERING_INSPIRATION",
+          "DCMP_ROOKIE_ALL_STAR"
+        ]
+      },
       "District": {
         "required": [
           "abbreviation",
           "display_name",
           "key",
-          "year"
+          "year",
+          "official_advancement_counts"
         ],
         "type": "object",
         "properties": {
@@ -5156,6 +5925,24 @@
           "year": {
             "type": "integer",
             "description": "Year this district participated."
+          },
+          "official_advancement_counts": {
+            "type": "object",
+            "description": "The number of teams advancing to DCMP and CMP from this district, as specified in the FIRST manual.",
+            "required": [
+              "dcmp",
+              "cmp"
+            ],
+            "properties": {
+              "dcmp": {
+                "type": "integer",
+                "description": "Number of teams advancing to the District Championship."
+              },
+              "cmp": {
+                "type": "integer",
+                "description": "Number of teams advancing to the Championship."
+              }
+            }
           }
         }
       },
@@ -5218,9 +6005,103 @@
           "cmp": {
             "type": "boolean",
             "description": "Whether or not the team qualified for the FIRST Championship"
+          },
+          "cmp_qualification": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/CmpQualificationMethod"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "How the team qualified for the FIRST Championship, or `null` if the team did not qualify."
           }
         },
         "description": "Advancement status of a team in a district."
+      },
+      "District_Advancement_Cutoffs": {
+        "required": [
+          "cmp_declines",
+          "cmp_effective",
+          "cmp_original",
+          "cmp_qualification",
+          "dcmp_declines",
+          "dcmp_effective",
+          "dcmp_original"
+        ],
+        "type": "object",
+        "properties": {
+          "dcmp_original": {
+            "type": "integer",
+            "description": "The rank at which the District Championship cutoff would have fallen before any declines were applied."
+          },
+          "dcmp_effective": {
+            "type": "integer",
+            "description": "The rank at which the District Championship cutoff actually fell, after declines were backfilled."
+          },
+          "dcmp_declines": {
+            "type": "array",
+            "description": "TBA team keys for teams that declined their District Championship invitation.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cmp_original": {
+            "type": "integer",
+            "description": "The rank at which the FIRST Championship cutoff would have fallen before any declines were applied."
+          },
+          "cmp_effective": {
+            "type": "integer",
+            "description": "The rank at which the FIRST Championship cutoff actually fell, after declines were backfilled."
+          },
+          "cmp_declines": {
+            "type": "array",
+            "description": "TBA team keys for teams that declined their FIRST Championship invitation.",
+            "items": {
+              "type": "string"
+            }
+          },
+          "cmp_qualification": {
+            "type": "object",
+            "description": "A mapping of team key to how that team earned its FIRST Championship invitation. Populated independently of the per-team advancement data, so it is present even when `teams` is empty.",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/CmpQualificationMethod"
+            }
+          }
+        },
+        "description": "Where the District Championship and FIRST Championship advancement cutoffs fell for a district, and how each qualifying team earned its Championship invitation."
+      },
+      "District_Advancement_Response": {
+        "required": [
+          "cutoffs",
+          "teams"
+        ],
+        "type": "object",
+        "properties": {
+          "teams": {
+            "type": [
+              "null",
+              "object"
+            ],
+            "description": "A mapping of team key to District_Advancement. An empty object means advancement has been fetched but no teams are listed yet; `null` means it has never been fetched for this district.",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/District_Advancement"
+            }
+          },
+          "cutoffs": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/District_Advancement_Cutoffs"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Where the advancement cutoffs fell for the district, or `null` if they have not been calculated yet."
+          }
+        },
+        "description": "Per-team advancement status and the advancement cutoffs for a district."
       },
       "District_Insight": {
         "type": "object",
@@ -5494,11 +6375,14 @@
                 "description": "Average match score during playoffs. Year specific. May be null."
               },
               "playoff_type": {
-                "type": [
-                  "number",
-                  "null"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/PlayoffType"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ],
-                "format": "int64",
                 "description": "Playoff type, may be null."
               },
               "level": {
@@ -5506,20 +6390,26 @@
                 "description": "Match level, qm/ef/qf/sf/f."
               },
               "record": {
-                "type": [
-                  "object",
-                  "null"
-                ],
-                "$ref": "#/components/schemas/WLT_Record",
-                "description": "W-L-T record for the alliance, may be null."
+                "description": "W-L-T record for the alliance, may be null.",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/WLT_Record"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "current_level_record": {
-                "type": [
-                  "object",
-                  "null"
-                ],
-                "$ref": "#/components/schemas/WLT_Record",
-                "description": "W-L-T record for the alliance at the current level, may be null."
+                "description": "W-L-T record for the alliance at the current level, may be null.",
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/WLT_Record"
+                  },
+                  {
+                    "type": "null"
+                  }
+                ]
               },
               "status": {
                 "type": "string",
@@ -5755,14 +6645,16 @@
             "description": "Event short code, as provided by FIRST."
           },
           "event_type": {
-            "type": "integer",
-            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8"
+            "$ref": "#/components/schemas/EventType"
           },
           "district": {
-            "$ref": "#/components/schemas/District",
-            "type": [
-              "null",
-              "object"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/District"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "city": {
@@ -5919,11 +6811,15 @@
             "description": "The TBA Event key that represents the event's parent. Used to link back to the event from a division event. It is also the inverse relation of `divison_keys`."
           },
           "playoff_type": {
-            "type": [
-              "integer",
-              "null"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlayoffType"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "description": "Playoff Type, as defined under `PlayoffType`: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/playoff_type.py#L37, or null."
+            "description": "Playoff Type, or null."
           },
           "playoff_type_string": {
             "type": [
@@ -6003,7 +6899,7 @@
             "additionalProperties": {
               "type": "object",
               "properties": {
-                "highest_qual_scores": {
+                "highest_match_scores": {
                   "type": "array",
                   "items": {
                     "type": "integer"
@@ -6787,7 +7683,7 @@
                 },
                 "qual_average": {
                   "type": [
-                    "integer",
+                    "number",
                     "null"
                   ],
                   "description": "The average match score during qualifications. Year specific. May be null if not relevant for a given year."
@@ -6808,11 +7704,14 @@
                   "description": "Additional year-specific information. See parent `sort_order_info` for details."
                 },
                 "record": {
-                  "type": [
-                    "object",
-                    "null"
-                  ],
-                  "$ref": "#/components/schemas/WLT_Record"
+                  "oneOf": [
+                    {
+                      "$ref": "#/components/schemas/WLT_Record"
+                    },
+                    {
+                      "type": "null"
+                    }
+                  ]
                 },
                 "rank": {
                   "type": "integer",
@@ -6905,14 +7804,16 @@
             "description": "Event short code, as provided by FIRST."
           },
           "event_type": {
-            "type": "integer",
-            "description": "Event Type, as defined here: https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/event_type.py#L8"
+            "$ref": "#/components/schemas/EventType"
           },
           "district": {
-            "$ref": "#/components/schemas/District",
-            "type": [
-              "null",
-              "object"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/District"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "city": {
@@ -7098,12 +7999,11 @@
             "description": "A list of alliances, the teams on the alliances, and their score."
           },
           "winning_alliance": {
-            "type": "string",
             "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
-            "enum": [
-              "red",
-              "blue",
-              ""
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AllianceColor"
+              }
             ]
           },
           "event_key": {
@@ -7143,10 +8043,6 @@
             "format": "int64"
           },
           "score_breakdown": {
-            "type": [
-              "object",
-              "null"
-            ],
             "oneOf": [
               {
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2015"
@@ -7177,6 +8073,12 @@
               },
               {
                 "$ref": "#/components/schemas/Match_Score_Breakdown_2025"
+              },
+              {
+                "$ref": "#/components/schemas/Match_Score_Breakdown_2026"
+              },
+              {
+                "type": "null"
               }
             ],
             "description": "Score breakdown for auto, teleop, etc. points. Varies from year to year. May be null."
@@ -7748,7 +8650,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "techFoulCount": {
             "type": "integer"
@@ -8007,7 +8909,7 @@
             "$ref": "#/components/schemas/EndgameRobot_2019"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "sandStormBonusPoints": {
             "type": "integer"
@@ -8185,7 +9087,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "totalPoints": {
             "type": "integer"
@@ -8327,7 +9229,7 @@
           },
           "rp": {
             "type": [
-              "integer",
+              "number",
               "null"
             ]
           },
@@ -8588,7 +9490,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "totalPoints": {
             "type": "integer"
@@ -8733,7 +9635,7 @@
             "type": "boolean"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "techFoulCount": {
             "type": "integer"
@@ -8933,7 +9835,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "techFoulCount": {
             "type": "integer"
@@ -9079,7 +9981,7 @@
             "type": "integer"
           },
           "rp": {
-            "type": "integer"
+            "type": "number"
           },
           "superchargedAchieved": {
             "type": "boolean"
@@ -9148,12 +10050,11 @@
             "description": "A list of alliances, the teams on the alliances, and their score."
           },
           "winning_alliance": {
-            "type": "string",
             "description": "The color (red/blue) of the winning alliance. Will contain an empty string in the event of no winner, or a tie.",
-            "enum": [
-              "red",
-              "blue",
-              ""
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AllianceColor"
+              }
             ]
           },
           "event_key": {
@@ -9354,12 +10255,93 @@
         }
       },
       "Media": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/Media_Avatar"
+          },
+          {
+            "$ref": "#/components/schemas/Media_CdPhotoThread"
+          },
+          {
+            "$ref": "#/components/schemas/Media_CdThread"
+          },
+          {
+            "$ref": "#/components/schemas/Media_GrabCad"
+          },
+          {
+            "$ref": "#/components/schemas/Media_NoDetails"
+          },
+          {
+            "$ref": "#/components/schemas/Media_Onshape"
+          },
+          {
+            "$ref": "#/components/schemas/Media_SmugmugAlbum"
+          },
+          {
+            "$ref": "#/components/schemas/Media_SmugmugPhoto"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "type",
+          "mapping": {
+            "avatar": "#/components/schemas/Media_Avatar",
+            "cdphotothread": "#/components/schemas/Media_CdPhotoThread",
+            "cd-thread": "#/components/schemas/Media_CdThread",
+            "grabcad": "#/components/schemas/Media_GrabCad",
+            "youtube": "#/components/schemas/Media_NoDetails",
+            "imgur": "#/components/schemas/Media_NoDetails",
+            "facebook-profile": "#/components/schemas/Media_NoDetails",
+            "youtube-channel": "#/components/schemas/Media_NoDetails",
+            "twitter-profile": "#/components/schemas/Media_NoDetails",
+            "github-profile": "#/components/schemas/Media_NoDetails",
+            "instagram-profile": "#/components/schemas/Media_NoDetails",
+            "periscope-profile": "#/components/schemas/Media_NoDetails",
+            "gitlab-profile": "#/components/schemas/Media_NoDetails",
+            "instagram-image": "#/components/schemas/Media_NoDetails",
+            "external-link": "#/components/schemas/Media_NoDetails",
+            "onshape": "#/components/schemas/Media_Onshape",
+            "smugmug-album": "#/components/schemas/Media_SmugmugAlbum",
+            "smugmug-photo": "#/components/schemas/Media_SmugmugPhoto"
+          }
+        },
+        "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA."
+      },
+      "Media_Avatar": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "$ref": "#/components/schemas/Media_Avatar_Extras"
+          }
+        ]
+      },
+      "Media_Avatar_Extras": {
+        "type": "object",
+        "properties": {
+          "type": {
+            "const": "avatar"
+          },
+          "details": {
+            "type": "object",
+            "required": [
+              "base64Image"
+            ],
+            "properties": {
+              "base64Image": {
+                "type": "string"
+              }
+            }
+          }
+        }
+      },
+      "Media_Base": {
+        "type": "object",
         "required": [
           "type",
           "foreign_key",
           "team_keys"
         ],
-        "type": "object",
         "properties": {
           "type": {
             "type": "string",
@@ -9380,164 +10362,14 @@
               "external-link",
               "avatar",
               "onshape",
-              "cd-thread"
+              "cd-thread",
+              "smugmug-photo",
+              "smugmug-album"
             ]
           },
           "foreign_key": {
             "type": "string",
             "description": "The key used to identify this media on the media site."
-          },
-          "details": {
-            "type": "object",
-            "description": "If required, a JSON dict of additional media information.",
-            "oneOf": [
-              {
-                "type": "object",
-                "properties": {},
-                "additionalProperties": false
-              },
-              {
-                "properties": {
-                  "base64Image": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "base64Image"
-                ],
-                "type": "object"
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "author_id": {
-                    "type": "integer"
-                  },
-                  "author_name": {
-                    "type": "string"
-                  },
-                  "author_url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "height": {
-                    "type": [
-                      "integer",
-                      "null"
-                    ]
-                  },
-                  "html": {
-                    "type": "string"
-                  },
-                  "media_id": {
-                    "type": "string"
-                  },
-                  "provider_name": {
-                    "type": "string"
-                  },
-                  "provider_url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "thumbnail_height": {
-                    "type": "integer"
-                  },
-                  "thumbnail_url": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "thumbnail_width": {
-                    "type": "integer"
-                  },
-                  "title": {
-                    "type": "string"
-                  },
-                  "type": {
-                    "type": "string"
-                  },
-                  "version": {
-                    "type": "string"
-                  },
-                  "width": {
-                    "type": "integer"
-                  }
-                },
-                "required": [
-                  "author_id",
-                  "author_name",
-                  "author_url",
-                  "height",
-                  "html",
-                  "media_id",
-                  "provider_name",
-                  "provider_url",
-                  "thumbnail_height",
-                  "thumbnail_url",
-                  "thumbnail_width",
-                  "title",
-                  "type",
-                  "version",
-                  "width"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "model_created": {
-                    "type": "string",
-                    "format": "date-time"
-                  },
-                  "model_description": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  },
-                  "model_image": {
-                    "type": "string",
-                    "format": "uri"
-                  },
-                  "model_name": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "model_created",
-                  "model_description",
-                  "model_image",
-                  "model_name"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "image_partial": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "image_partial"
-                ]
-              },
-              {
-                "type": "object",
-                "properties": {
-                  "thread_title": {
-                    "type": "string"
-                  },
-                  "image_url": {
-                    "type": [
-                      "string",
-                      "null"
-                    ]
-                  }
-                },
-                "required": [
-                  "thread_title",
-                  "image_url"
-                ]
-              }
-            ]
           },
           "preferred": {
             "type": "boolean",
@@ -9559,14 +10391,412 @@
             "type": "string",
             "description": "The URL that leads to the full web page for the media, if one exists."
           }
-        },
-        "description": "The `Media` object contains a reference for most any media associated with a team or event on TBA."
+        }
+      },
+      "Media_CdPhotoThread": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "cdphotothread"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "image_partial"
+                ],
+                "properties": {
+                  "image_partial": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_CdThread": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "cd-thread"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "thread_title",
+                  "image_url"
+                ],
+                "properties": {
+                  "thread_title": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_GrabCad": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "grabcad"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "model_created",
+                  "model_description",
+                  "model_image",
+                  "model_name"
+                ],
+                "properties": {
+                  "model_created": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "model_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "model_image": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "model_name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_NoDetails": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "type": "string",
+                "enum": [
+                  "youtube",
+                  "imgur",
+                  "facebook-profile",
+                  "youtube-channel",
+                  "twitter-profile",
+                  "github-profile",
+                  "instagram-profile",
+                  "periscope-profile",
+                  "gitlab-profile",
+                  "instagram-image",
+                  "external-link"
+                ]
+              },
+              "details": {
+                "type": "object",
+                "properties": {},
+                "additionalProperties": false
+              }
+            }
+          }
+        ]
+      },
+      "Media_Onshape": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "onshape"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "model_created",
+                  "model_description",
+                  "model_image",
+                  "model_name"
+                ],
+                "properties": {
+                  "model_created": {
+                    "type": [
+                      "string",
+                      "null"
+                    ],
+                    "format": "date-time"
+                  },
+                  "model_description": {
+                    "type": [
+                      "string",
+                      "null"
+                    ]
+                  },
+                  "model_image": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "model_name": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_SmugmugAlbum": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "smugmug-album"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "cover_url",
+                  "cover_url_med",
+                  "cover_url_sm",
+                  "image_count",
+                  "title",
+                  "web_uri"
+                ],
+                "properties": {
+                  "cover_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cover_url_med": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "cover_url_sm": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "image_count": {
+                    "type": "integer"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "web_uri": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        ]
+      },
+      "Media_SmugmugPhoto": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/Media_Base"
+          },
+          {
+            "type": "object",
+            "properties": {
+              "type": {
+                "const": "smugmug-photo"
+              },
+              "details": {
+                "type": "object",
+                "required": [
+                  "caption",
+                  "image_url",
+                  "image_url_med",
+                  "image_url_sm",
+                  "title",
+                  "web_uri"
+                ],
+                "properties": {
+                  "caption": {
+                    "type": "string"
+                  },
+                  "image_url": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "image_url_med": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "image_url_sm": {
+                    "type": "string",
+                    "format": "uri"
+                  },
+                  "title": {
+                    "type": "string"
+                  },
+                  "web_uri": {
+                    "type": "string",
+                    "format": "uri"
+                  }
+                }
+              }
+            }
+          }
+        ]
       },
       "MobilityRobot_2023": {
         "type": "string",
         "enum": [
           "No",
           "Yes"
+        ]
+      },
+      "Nexus_Match_Timing": {
+        "type": "object",
+        "description": "Estimated timing for a match, as reported by Nexus.",
+        "properties": {
+          "estimated_queue_time_ms": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Estimated Unix timestamp (in milliseconds) of when the match will be queued, or null if unknown."
+          },
+          "estimated_start_time_ms": {
+            "oneOf": [
+              {
+                "type": "integer"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Estimated Unix timestamp (in milliseconds) of when the match will start, or null if unknown."
+          }
+        },
+        "required": [
+          "estimated_queue_time_ms",
+          "estimated_start_time_ms"
+        ]
+      },
+      "Nexus_Match_Info": {
+        "type": "object",
+        "description": "Live match-queuing info for a single match, as reported by Nexus.",
+        "properties": {
+          "label": {
+            "type": "string",
+            "description": "The match label as reported by Nexus, e.g. `Qualification 5`."
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "Queuing soon",
+              "Now queuing",
+              "On deck",
+              "On field"
+            ],
+            "description": "The current queuing status of the match."
+          },
+          "played": {
+            "type": "boolean",
+            "description": "Whether the match has been played."
+          },
+          "times": {
+            "$ref": "#/components/schemas/Nexus_Match_Timing"
+          }
+        },
+        "required": [
+          "label",
+          "status",
+          "played",
+          "times"
+        ]
+      },
+      "Nexus_Now_Queueing": {
+        "type": "object",
+        "description": "The match currently being queued, as reported by Nexus.",
+        "properties": {
+          "match_key": {
+            "type": "string",
+            "description": "TBA match key for the match currently being queued."
+          },
+          "match_name": {
+            "type": "string",
+            "description": "The match name as reported by Nexus, e.g. `Qualification 5`."
+          }
+        },
+        "required": [
+          "match_key",
+          "match_name"
+        ]
+      },
+      "Nexus_Event_Info": {
+        "type": "object",
+        "description": "Live match-queuing info for an event, sourced from Nexus (https://frc.nexus/) and cached by TBA.",
+        "properties": {
+          "data_as_of_ms": {
+            "type": "integer",
+            "description": "Unix timestamp (in milliseconds) of when this data was last fetched from Nexus."
+          },
+          "now_queueing": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Nexus_Now_Queueing"
+              },
+              {
+                "type": "null"
+              }
+            ]
+          },
+          "matches": {
+            "type": "object",
+            "description": "Map of TBA match key to live queuing info for that match.",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/Nexus_Match_Info"
+            }
+          }
+        },
+        "required": [
+          "data_as_of_ms",
+          "now_queueing",
+          "matches"
         ]
       },
       "NotablesInsight": {
@@ -9614,6 +10844,688 @@
           "name",
           "year"
         ]
+      },
+      "InsightV2": {
+        "oneOf": [
+          {
+            "$ref": "#/components/schemas/InsightV2_Leaderboard"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Streak"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Timeseries"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_GameStats"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Clubs"
+          }
+        ],
+        "discriminator": {
+          "propertyName": "category",
+          "mapping": {
+            "leaderboard": "#/components/schemas/InsightV2_Leaderboard",
+            "streak": "#/components/schemas/InsightV2_Streak",
+            "timeseries": "#/components/schemas/InsightV2_Timeseries",
+            "game_stats": "#/components/schemas/InsightV2_GameStats",
+            "clubs": "#/components/schemas/InsightV2_Clubs"
+          }
+        },
+        "description": "A typed insight object. Use `category` to discriminate between leaderboard, streak, timeseries, game stats, and clubs shapes."
+      },
+      "InsightV2_Base": {
+        "type": "object",
+        "required": [
+          "name",
+          "display_name",
+          "year",
+          "category",
+          "district_abbreviation"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Programmatic name of the insight, e.g. `blue_banners`."
+          },
+          "display_name": {
+            "type": "string",
+            "description": "Human-readable name of the insight, e.g. `Total Blue Banners`."
+          },
+          "year": {
+            "type": "integer",
+            "description": "Year the insight was measured in. Use 0 for all-time insights."
+          },
+          "category": {
+            "type": "string",
+            "enum": [
+              "leaderboard",
+              "streak",
+              "timeseries",
+              "game_stats",
+              "clubs"
+            ],
+            "description": "Insight category. Discriminates the shape of `data`."
+          },
+          "district_abbreviation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "District abbreviation if the insight is district-scoped, otherwise null."
+          }
+        }
+      },
+      "InsightV2_Leaderboard": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Leaderboard_Extras"
+          }
+        ]
+      },
+      "InsightV2_Leaderboard_Extras": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "category": {
+            "const": "leaderboard"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2LeaderboardData"
+          }
+        }
+      },
+      "InsightV2_Streak": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Streak_Extras"
+          }
+        ]
+      },
+      "InsightV2_Streak_Extras": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "category": {
+            "const": "streak"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2StreakData"
+          }
+        }
+      },
+      "InsightV2_Timeseries": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Timeseries_Extras"
+          }
+        ]
+      },
+      "InsightV2_Timeseries_Extras": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "category": {
+            "const": "timeseries"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2TimeseriesData"
+          }
+        }
+      },
+      "InsightV2_GameStats": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_GameStats_Extras"
+          }
+        ]
+      },
+      "InsightV2_GameStats_Extras": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "category": {
+            "const": "game_stats"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2GameStatsData"
+          }
+        }
+      },
+      "InsightV2_Clubs": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/InsightV2_Base"
+          },
+          {
+            "$ref": "#/components/schemas/InsightV2_Clubs_Extras"
+          }
+        ]
+      },
+      "InsightV2_Clubs_Extras": {
+        "type": "object",
+        "required": [
+          "data"
+        ],
+        "properties": {
+          "category": {
+            "const": "clubs"
+          },
+          "data": {
+            "$ref": "#/components/schemas/InsightV2ClubsData"
+          }
+        }
+      },
+      "InsightV2ClubsData": {
+        "type": "object",
+        "description": "Data for a clubs-category InsightV2. A cumulative all-time membership of teams that reached a milestone.",
+        "required": [
+          "entries",
+          "context_type"
+        ],
+        "properties": {
+          "entries": {
+            "type": "array",
+            "description": "Club members, sorted ascending by team number.",
+            "items": {
+              "$ref": "#/components/schemas/InsightV2ClubEntry"
+            }
+          },
+          "context_type": {
+            "type": "string",
+            "enum": [
+              "hall_of_fame",
+              "none"
+            ],
+            "description": "Discriminates the shape of each entry's `extra_context`. `none` means entries have no `extra_context`."
+          }
+        }
+      },
+      "InsightV2ClubEntry": {
+        "type": "object",
+        "description": "A single club member.",
+        "required": [
+          "team_key",
+          "event_added_key"
+        ],
+        "properties": {
+          "team_key": {
+            "type": "string",
+            "description": "Team key of the club member, e.g. `frc254`."
+          },
+          "event_added_key": {
+            "type": "string",
+            "description": "Key of the event where the team first qualified for the club."
+          },
+          "extra_context": {
+            "$ref": "#/components/schemas/InsightV2HallOfFameContext",
+            "description": "Club-specific extra material for this member. Present when the club's `context_type` is `hall_of_fame`."
+          }
+        }
+      },
+      "InsightV2HallOfFameContext": {
+        "type": "object",
+        "description": "Chairman's Award material for a Hall of Fame team, scraped from the FIRST resource library.",
+        "required": [
+          "year",
+          "video",
+          "presentation",
+          "essay"
+        ],
+        "properties": {
+          "year": {
+            "type": "integer",
+            "description": "Year the team was inducted (year of `event_added_key`)."
+          },
+          "video": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "URL of the team's Chairman's video, or null."
+          },
+          "presentation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "URL of the team's Chairman's presentation, or null."
+          },
+          "essay": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "URL of the team's Chairman's essay, or null."
+          }
+        }
+      },
+      "InsightV2LeaderboardData": {
+        "type": "object",
+        "description": "Data for a leaderboard-category InsightV2. Rankings of teams, events, or matches by a numeric value.",
+        "required": [
+          "rankings",
+          "key_type",
+          "context_type"
+        ],
+        "properties": {
+          "key_type": {
+            "type": "string",
+            "enum": [
+              "team",
+              "event",
+              "match",
+              "team_pair",
+              "alliance"
+            ],
+            "description": "What kind of keys appear in the rankings."
+          },
+          "context_type": {
+            "type": "string",
+            "enum": [
+              "event_list",
+              "none",
+              "match_alliance"
+            ],
+            "description": "Whether rankings include per-entry context."
+          },
+          "rankings": {
+            "type": "array",
+            "description": "Ranked entries, ordered from highest to lowest value.",
+            "items": {
+              "type": "object",
+              "required": [
+                "keys",
+                "value"
+              ],
+              "properties": {
+                "keys": {
+                  "description": "Team/event/match keys sharing this rank. For team_pair, a list of two-element lists.",
+                  "oneOf": [
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "string"
+                      }
+                    },
+                    {
+                      "type": "array",
+                      "items": {
+                        "type": "array",
+                        "items": {
+                          "type": "string"
+                        }
+                      }
+                    }
+                  ]
+                },
+                "value": {
+                  "type": "number",
+                  "description": "The numeric value for this rank."
+                },
+                "contexts": {
+                  "type": "array",
+                  "description": "Present when context_type is event_list or match_alliance. Parallel to keys. For event_list, each entry lists event_keys. For match_alliance, each entry has match_key and alliance (team keys).",
+                  "items": {
+                    "oneOf": [
+                      {
+                        "type": "object",
+                        "description": "event_list context",
+                        "properties": {
+                          "event_keys": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      },
+                      {
+                        "type": "object",
+                        "description": "match_alliance context",
+                        "required": [
+                          "match_key",
+                          "alliance"
+                        ],
+                        "properties": {
+                          "match_key": {
+                            "type": "string"
+                          },
+                          "alliance": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            }
+                          }
+                        }
+                      }
+                    ]
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "InsightV2StreakData": {
+        "type": "object",
+        "description": "Data for a streak-category InsightV2. Records of consecutive achievement by teams.",
+        "required": [
+          "entries"
+        ],
+        "properties": {
+          "entries": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "key",
+                "key_type",
+                "streak_length",
+                "start",
+                "end",
+                "is_active"
+              ],
+              "properties": {
+                "key": {
+                  "type": "string",
+                  "description": "Team or entity key."
+                },
+                "key_type": {
+                  "type": "string",
+                  "enum": [
+                    "team",
+                    "event",
+                    "match",
+                    "team_pair"
+                  ]
+                },
+                "streak_length": {
+                  "type": "integer",
+                  "description": "Length of the streak."
+                },
+                "start": {
+                  "type": "string",
+                  "description": "Event key or year string where the streak began."
+                },
+                "end": {
+                  "type": "string",
+                  "description": "Event key or year string where the streak ended (or is ongoing)."
+                },
+                "is_active": {
+                  "type": "boolean",
+                  "description": "Whether this streak is still ongoing."
+                }
+              }
+            }
+          }
+        }
+      },
+      "InsightV2TimeseriesData": {
+        "type": "object",
+        "description": "Data for a timeseries-category InsightV2. One or more named series of (x, y) data points over time.",
+        "required": [
+          "series",
+          "x_type",
+          "x_label",
+          "y_label",
+          "point_context_type"
+        ],
+        "properties": {
+          "x_type": {
+            "type": "string",
+            "enum": [
+              "week",
+              "year",
+              "event",
+              "date"
+            ],
+            "description": "What the x-axis represents. For `date`, each point's `x` is a Unix timestamp (seconds) at UTC midnight of that day."
+          },
+          "x_label": {
+            "type": "string",
+            "description": "Human-readable label for the x-axis."
+          },
+          "y_label": {
+            "type": "string",
+            "description": "Human-readable label for the y-axis."
+          },
+          "point_context_type": {
+            "type": "string",
+            "enum": [
+              "none",
+              "match_record"
+            ],
+            "description": "Whether data points include additional context."
+          },
+          "series": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": [
+                "label",
+                "points"
+              ],
+              "properties": {
+                "label": {
+                  "type": "string",
+                  "description": "Human-readable series name."
+                },
+                "points": {
+                  "type": "array",
+                  "items": {
+                    "type": "object",
+                    "required": [
+                      "x",
+                      "y"
+                    ],
+                    "properties": {
+                      "x": {
+                        "description": "X-axis value (week string, year integer, event key, or Unix timestamp in seconds when x_type is date).",
+                        "oneOf": [
+                          {
+                            "type": "string"
+                          },
+                          {
+                            "type": "integer"
+                          },
+                          {
+                            "type": "number"
+                          }
+                        ]
+                      },
+                      "y": {
+                        "type": "number",
+                        "description": "Y-axis value."
+                      },
+                      "context": {
+                        "type": "object",
+                        "description": "Present when point_context_type is match_record.",
+                        "properties": {
+                          "match_key": {
+                            "type": "string"
+                          },
+                          "alliance": {
+                            "type": "array",
+                            "items": {
+                              "type": "string"
+                            },
+                            "description": "Team keys on the record-setting alliance."
+                          },
+                          "post_result_time": {
+                            "type": "integer",
+                            "description": "Unix timestamp when the record was set."
+                          },
+                          "is_current": {
+                            "type": "boolean",
+                            "description": "Whether this is still the current world record."
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "InsightV2GameStatsData": {
+        "type": "object",
+        "description": "Count/opportunities and average-value statistics for a year, broken out by scope: the season overall, each competition week, and each event.",
+        "required": [
+          "scopes"
+        ],
+        "properties": {
+          "scopes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/InsightV2GameStatsScope"
+            }
+          }
+        }
+      },
+      "InsightV2GameStatsScope": {
+        "type": "object",
+        "required": [
+          "scope_type",
+          "label",
+          "key",
+          "week",
+          "qual",
+          "playoff",
+          "qual_averages",
+          "playoff_averages"
+        ],
+        "properties": {
+          "scope_type": {
+            "type": "string",
+            "enum": [
+              "overall",
+              "week",
+              "event"
+            ],
+            "description": "What slice of the season this scope covers."
+          },
+          "label": {
+            "type": "string",
+            "description": "Display name of the scope, e.g. `Overall`, `Week 3`, or an event's short name."
+          },
+          "key": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Event key when `scope_type` is `event`, otherwise null."
+          },
+          "week": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "Zero-indexed competition week, or null for the overall and championship scopes."
+          },
+          "qual": {
+            "type": "array",
+            "description": "Count/opportunities statistics over qualification matches in this scope.",
+            "items": {
+              "$ref": "#/components/schemas/InsightV2GameStat"
+            }
+          },
+          "playoff": {
+            "type": "array",
+            "description": "Count/opportunities statistics over playoff matches in this scope.",
+            "items": {
+              "$ref": "#/components/schemas/InsightV2GameStat"
+            }
+          },
+          "qual_averages": {
+            "type": "array",
+            "description": "Average-value statistics over qualification matches in this scope.",
+            "items": {
+              "$ref": "#/components/schemas/InsightV2AverageStat"
+            }
+          },
+          "playoff_averages": {
+            "type": "array",
+            "description": "Average-value statistics over playoff matches in this scope.",
+            "items": {
+              "$ref": "#/components/schemas/InsightV2AverageStat"
+            }
+          }
+        }
+      },
+      "InsightV2GameStat": {
+        "type": "object",
+        "description": "How many times an objective was achieved, out of how many chances there were to achieve it.",
+        "required": [
+          "name",
+          "label",
+          "count",
+          "opportunities"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Programmatic name of the statistic, e.g. `rp_1` or `auto_climb`."
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable name of the statistic, e.g. `Energized RP`."
+          },
+          "count": {
+            "type": "integer",
+            "description": "Times the objective was achieved."
+          },
+          "opportunities": {
+            "type": "integer",
+            "description": "Chances there were to achieve the objective."
+          }
+        }
+      },
+      "InsightV2AverageStat": {
+        "type": "object",
+        "description": "The average value of a numeric match statistic, e.g. average score or average win margin.",
+        "required": [
+          "name",
+          "label",
+          "value"
+        ],
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Programmatic name of the statistic, e.g. `average_score`."
+          },
+          "label": {
+            "type": "string",
+            "description": "Human-readable name of the statistic, e.g. `Average Score`."
+          },
+          "value": {
+            "type": "number",
+            "description": "The average value of the statistic over matches in this scope."
+          }
+        }
       },
       "Position_2016": {
         "type": "string",
@@ -10035,24 +11947,33 @@
         "type": "object",
         "properties": {
           "qual": {
-            "$ref": "#/components/schemas/Team_Event_Status_rank",
-            "type": [
-              "null",
-              "object"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Team_Event_Status_rank"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "alliance": {
-            "$ref": "#/components/schemas/Team_Event_Status_alliance",
-            "type": [
-              "null",
-              "object"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Team_Event_Status_alliance"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "playoff": {
-            "$ref": "#/components/schemas/Team_Event_Status_playoff",
-            "type": [
-              "null",
-              "object"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/Team_Event_Status_playoff"
+              },
+              {
+                "type": "null"
+              }
             ]
           },
           "alliance_status_str": {
@@ -10080,6 +12001,13 @@
               "null"
             ],
             "description": "TBA match key for the last match the team played in at this event, or null."
+          },
+          "pit_location": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "The pit location for the team at this event, or null if not available."
           }
         }
       },
@@ -10137,18 +12065,24 @@
             "$ref": "#/components/schemas/Comp_Level"
           },
           "current_level_record": {
-            "type": [
-              "null",
-              "object"
-            ],
-            "$ref": "#/components/schemas/WLT_Record"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WLT_Record"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "record": {
-            "type": [
-              "null",
-              "object"
-            ],
-            "$ref": "#/components/schemas/WLT_Record"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WLT_Record"
+              },
+              {
+                "type": "null"
+              }
+            ]
           },
           "status": {
             "type": "string",
@@ -10207,10 +12141,13 @@
                 }
               },
               "record": {
-                "$ref": "#/components/schemas/WLT_Record",
-                "type": [
-                  "null",
-                  "object"
+                "oneOf": [
+                  {
+                    "$ref": "#/components/schemas/WLT_Record"
+                  },
+                  {
+                    "type": "null"
+                  }
                 ]
               },
               "rank": {
@@ -10353,6 +12290,149 @@
           "Unknown"
         ]
       },
+      "Playoff_Advancement_Sort_Order_Info": {
+        "required": [
+          "name",
+          "type",
+          "precision"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string",
+            "description": "Human-readable name of the sort order or extra stat."
+          },
+          "type": {
+            "type": "string",
+            "enum": [
+              "int",
+              "bool"
+            ],
+            "description": "Data type of the corresponding value."
+          },
+          "precision": {
+            "type": "integer",
+            "description": "Number of decimal places to display for the value."
+          }
+        },
+        "description": "Describes one entry in an advancement level's `sort_orders` or `extra_stats` arrays."
+      },
+      "Playoff_Advancement_Alliance_Rank": {
+        "required": [
+          "team_keys",
+          "alliance_name",
+          "matches_played",
+          "sort_orders",
+          "extra_stats"
+        ],
+        "type": "object",
+        "properties": {
+          "team_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Team keys (eg `frc254`) making up the alliance."
+          },
+          "alliance_name": {
+            "type": "string",
+            "description": "Name of the alliance (eg `Turing`, `Alliance 1`)."
+          },
+          "alliance_color": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "For bracket levels, `red` or `blue`. Absent for round robin standings."
+          },
+          "rank": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "description": "1-indexed rank within the advancement level. Absent for bracket levels."
+          },
+          "record": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WLT_Record"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Win-loss-tie record for the alliance at this level."
+          },
+          "matches_played": {
+            "type": "integer",
+            "description": "Number of matches the alliance played at this level."
+          },
+          "sort_orders": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "Values used to rank alliances, described by the level's `sort_order_info`. For round robin: Champ Points followed by per-year tiebreakers."
+          },
+          "extra_stats": {
+            "type": "array",
+            "items": {
+              "type": "number"
+            },
+            "description": "Additional per-alliance values, described by the level's `extra_stats_info`. For round robin: `1` if the alliance advances to the finals, else `0`."
+          }
+        },
+        "description": "One alliance's standing within a playoff advancement level."
+      },
+      "Playoff_Advancement": {
+        "required": [
+          "level",
+          "level_name",
+          "type",
+          "sort_order_info",
+          "extra_stats_info"
+        ],
+        "type": "object",
+        "properties": {
+          "level": {
+            "type": "string",
+            "description": "Machine-readable level identifier (eg `sf`, `f1`)."
+          },
+          "level_name": {
+            "type": "string",
+            "description": "Human-readable level name (eg `Round Robin Semifinals`, `Finals`)."
+          },
+          "type": {
+            "type": "string",
+            "description": "Advancement level type (eg `round_robin`, `best_of_3`, `double_elim`, `average_score`)."
+          },
+          "rankings": {
+            "type": [
+              "array",
+              "null"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/Playoff_Advancement_Alliance_Rank"
+            },
+            "description": "Ranked alliances for this level."
+          },
+          "sort_order_info": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Playoff_Advancement_Sort_Order_Info"
+            },
+            "description": "Describes each element of every ranking's `sort_orders` array, in order."
+          },
+          "extra_stats_info": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Playoff_Advancement_Sort_Order_Info"
+            },
+            "description": "Describes each element of every ranking's `extra_stats` array, in order."
+          }
+        },
+        "description": "A single level of computed playoff advancement for an event."
+      },
       "WLT_Record": {
         "required": [
           "losses",
@@ -10375,6 +12455,21 @@
           }
         },
         "description": "A Win-Loss-Tie record for a team, or an alliance."
+      },
+      "WebcastStatus": {
+        "title": "WebcastStatus",
+        "description": "Online status of a webcast. See https://github.com/the-blue-alliance/the-blue-alliance/blob/main/src/backend/common/consts/webcast_status.py for full definitions.",
+        "type": "string",
+        "enum": [
+          "unknown",
+          "online",
+          "offline"
+        ],
+        "x-enum-varnames": [
+          "UNKNOWN",
+          "ONLINE",
+          "OFFLINE"
+        ]
       },
       "Webcast": {
         "required": [
@@ -10420,16 +12515,15 @@
             "description": "File identification as may be required for some types. May be null."
           },
           "status": {
-            "type": [
-              "string",
-              "null"
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/WebcastStatus"
+              },
+              {
+                "type": "null"
+              }
             ],
-            "description": "The online status of the webcast, fetched from the streaming provider's API. May be null if not available.",
-            "enum": [
-              "unknown",
-              "online",
-              "offline"
-            ]
+            "description": "The online status of the webcast, fetched from the streaming provider's API. May be null if not available."
           },
           "stream_title": {
             "type": [
@@ -10634,6 +12728,22 @@
         "required": true,
         "schema": {
           "type": "string"
+        }
+      },
+      "insight_v2_category": {
+        "name": "category",
+        "in": "path",
+        "description": "InsightV2 category. One of: leaderboard, streak, timeseries, game_stats, clubs.",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "enum": [
+            "leaderboard",
+            "streak",
+            "timeseries",
+            "game_stats",
+            "clubs"
+          ]
         }
       },
       "year": {

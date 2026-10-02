@@ -1,11 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
-import { Mail, User } from 'lucide-react';
+import { deleteUser, updateProfile } from 'firebase/auth';
+import { useState } from 'react';
+
+import MailIcon from '~icons/lucide/mail';
+import UserIcon from '~icons/lucide/user';
 
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
+import ApiKeysSection from '~/components/tba/account/apiKeys';
+import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -13,10 +19,22 @@ import {
   CardHeader,
   CardTitle,
 } from '~/components/ui/card';
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '~/components/ui/dialog';
+import { Input } from '~/components/ui/input';
+import { Spinner } from '~/components/ui/spinner';
 
 export const Route = createFileRoute('/account/')({
   component: Account,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Account() {
   const { isInitialLoading, user, logout } = useAuth();
@@ -29,6 +47,9 @@ function Account() {
       const response = await listFavorites({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -42,13 +63,20 @@ function Account() {
       const response = await listSubscriptions({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load subscriptions');
+      }
       return response.data;
     },
     enabled: !!user,
   });
 
   if (isInitialLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -72,24 +100,27 @@ function Account() {
           <div className="flex items-center gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-foreground">
-                <User className="h-4 w-4 text-muted-foreground" />
+                <UserIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{user.displayName}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
+                <MailIcon className="h-4 w-4" />
                 <span className="text-sm">{user.email}</span>
               </div>
             </div>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <a href="#todo">
-              <Button size="sm">Edit Profile</Button>
-            </a>
-            <a href="#todo">
-              <Button size="sm" variant="destructive">
-                Delete Account
-              </Button>
-            </a>
+            <EditProfileDialog
+              displayName={user.displayName ?? ''}
+              onSave={async (newDisplayName) => {
+                await updateProfile(user, { displayName: newDisplayName });
+              }}
+            />
+            <DeleteAccountDialog
+              onConfirm={async () => {
+                await deleteUser(user);
+              }}
+            />
           </div>
         </CardContent>
       </Card>
@@ -117,11 +148,162 @@ function Account() {
               <div className="text-sm text-muted-foreground">Subscriptions</div>
             </div>
           </div>
-          <Button size="sm" asChild>
-            <Link to="/account/mytba">Manage myTBA</Link>
-          </Button>
+          <Link to="/account/mytba" className={buttonVariants({ size: 'sm' })}>
+            Manage myTBA
+          </Link>
         </CardContent>
       </Card>
+
+      <SuggestionReviewSection />
+
+      <ApiKeysSection />
     </div>
+  );
+}
+
+function EditProfileDialog({
+  displayName,
+  onSave,
+}: {
+  displayName: string;
+  onSave: (newDisplayName: string) => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [name, setName] = useState(displayName);
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSave = async () => {
+    if (!name.trim()) {
+      setError('Display name cannot be empty.');
+      return;
+    }
+    setSaving(true);
+    setError(null);
+    try {
+      await onSave(name.trim());
+      setOpen(false);
+    } catch {
+      setError('Failed to update profile. Please try again.');
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (isOpen) {
+          setName(displayName);
+          setError(null);
+        }
+      }}
+    >
+      <DialogTrigger render={<Button size="sm" />}>Edit Profile</DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Edit Profile</DialogTitle>
+          <DialogDescription>Update your display name.</DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <span className="text-sm font-medium">Display Name</span>
+            <Input
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="Enter your display name"
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button onClick={() => void handleSave()} disabled={saving}>
+            {saving ? 'Saving...' : 'Save'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
+  );
+}
+
+function DeleteAccountDialog({
+  onConfirm,
+}: {
+  onConfirm: () => Promise<void>;
+}) {
+  const [open, setOpen] = useState(false);
+  const [confirmText, setConfirmText] = useState('');
+  const [deleting, setDeleting] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDelete = async () => {
+    setDeleting(true);
+    setError(null);
+    try {
+      await onConfirm();
+      setOpen(false);
+    } catch {
+      setError(
+        'Failed to delete account. You may need to sign in again before deleting.',
+      );
+    } finally {
+      setDeleting(false);
+    }
+  };
+
+  return (
+    <Dialog
+      open={open}
+      onOpenChange={(isOpen) => {
+        setOpen(isOpen);
+        if (isOpen) {
+          setConfirmText('');
+          setError(null);
+        }
+      }}
+    >
+      <DialogTrigger render={<Button size="sm" variant="destructive" />}>
+        Delete Account
+      </DialogTrigger>
+      <DialogContent>
+        <DialogHeader>
+          <DialogTitle>Delete Account</DialogTitle>
+          <DialogDescription>
+            This action is permanent and cannot be undone. All your data,
+            favorites, and subscriptions will be deleted.
+          </DialogDescription>
+        </DialogHeader>
+        <div className="space-y-4 py-4">
+          <div className="space-y-2">
+            <span className="text-sm font-medium">
+              Type <strong>DELETE</strong> to confirm
+            </span>
+            <Input
+              value={confirmText}
+              onChange={(e) => setConfirmText(e.target.value)}
+              placeholder="DELETE"
+            />
+          </div>
+          {error && <p className="text-sm text-destructive">{error}</p>}
+        </div>
+        <DialogFooter>
+          <Button variant="outline" onClick={() => setOpen(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="destructive"
+            onClick={() => void handleDelete()}
+            disabled={confirmText !== 'DELETE' || deleting}
+          >
+            {deleting ? 'Deleting...' : 'Delete Account'}
+          </Button>
+        </DialogFooter>
+      </DialogContent>
+    </Dialog>
   );
 }

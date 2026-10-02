@@ -1,6 +1,66 @@
-import { Event } from '~/api/tba/read/types.gen';
-import { EventType } from '~/lib/api/EventType';
-import { convertMsToDays } from '~/lib/utils';
+import { CalendarEvent } from 'calendar-link';
+import { Temporal } from 'temporal-polyfill';
+
+import { Event, EventType } from '~/api/tba/read';
+import { CMP_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { buildPublicCacheControlHeaders, slugify } from '~/lib/utils';
+
+/** IANA timezone used when an event has no timezone field. */
+export const EVENT_FALLBACK_TIMEZONE = 'America/New_York';
+/** Hour (0–23) when events start each day in the event's local timezone. */
+export const EVENT_START_HOUR = 8;
+/** Hour (0–23) when events end each day in the event's local timezone. */
+export const EVENT_END_HOUR = 18;
+
+const EVENT_START_TIME = Temporal.PlainTime.from({ hour: EVENT_START_HOUR });
+const EVENT_END_TIME = Temporal.PlainTime.from({ hour: EVENT_END_HOUR });
+
+// Defaults to EVENT_FALLBACK_TIMEZONE, but may want to introduce some semi-intelligent guessing in the future.
+function getEventTz(event: Event): string {
+  return event.timezone ?? EVENT_FALLBACK_TIMEZONE;
+}
+
+/** Returns the instants when the event opens (8am start_date) and closes (6pm end_date). */
+function getEventActiveWindow(event: Event): {
+  start: Temporal.Instant;
+  end: Temporal.Instant;
+} {
+  const tz = getEventTz(event);
+  return {
+    start: Temporal.PlainDate.from(event.start_date)
+      .toZonedDateTime({ timeZone: tz, plainTime: EVENT_START_TIME })
+      .toInstant(),
+    end: Temporal.PlainDate.from(event.end_date)
+      .toZonedDateTime({ timeZone: tz, plainTime: EVENT_END_TIME })
+      .toInstant(),
+  };
+}
+
+export function toCalendarEvent(event: Event): CalendarEvent {
+  const locationParts = [
+    event.location_name,
+    event.city,
+    event.state_prov,
+    event.country,
+  ].filter(Boolean);
+
+  return {
+    title: `${event.name} ${event.year}`,
+    start: Temporal.PlainDate.from(event.start_date)
+      .toZonedDateTime('UTC')
+      .toInstant()
+      .toString(),
+    end: Temporal.PlainDate.from(event.end_date)
+      .add({ days: 1 })
+      .toZonedDateTime('UTC')
+      .toInstant()
+      .toString(),
+    allDay: true,
+    description: `https://www.thebluealliance.com/event/${event.key}`,
+    location: locationParts.join(', '),
+    url: `https://www.thebluealliance.com/event/${event.key}`,
+  };
+}
 
 export function isValidEventKey(key: string) {
   return /^[1-9]\d{3}(\d{2})?[a-z]+[0-9]{0,3}$/.test(key);
@@ -8,22 +68,17 @@ export function isValidEventKey(key: string) {
 
 export function sortEventsComparator(a: Event, b: Event) {
   // First sort by date
-  const start_date_a = new Date(a.start_date);
-  const start_date_b = new Date(b.start_date);
-  const end_date_a = new Date(a.end_date);
-  const end_date_b = new Date(b.end_date);
-  if (start_date_a < start_date_b) {
-    return -1;
-  }
-  if (start_date_a > start_date_b) {
-    return 1;
-  }
-  if (end_date_a < end_date_b) {
-    return -1;
-  }
-  if (end_date_a > end_date_b) {
-    return 1;
-  }
+  const startCompare = Temporal.PlainDate.compare(
+    Temporal.PlainDate.from(a.start_date),
+    Temporal.PlainDate.from(b.start_date),
+  );
+  if (startCompare !== 0) return startCompare;
+
+  const endCompare = Temporal.PlainDate.compare(
+    Temporal.PlainDate.from(a.end_date),
+    Temporal.PlainDate.from(b.end_date),
+  );
+  if (endCompare !== 0) return endCompare;
 
   // If one of the events is DCMP finals or CMP finals, put it last
   // e.g.: [2024necmp1, 2024necmp2, 2024necmp]
@@ -50,28 +105,22 @@ export function sortEventsComparator(a: Event, b: Event) {
   return 0;
 }
 
-/** Returns a Date object at midnight in the user's timezone on the specified YYYY-MM-DD. */
-function getLocalMidnightOnDate(yyyymmdd: string) {
-  const date = new Date(yyyymmdd + 'T00:00:00Z');
-  return new Date(date.getUTCFullYear(), date.getUTCMonth(), date.getUTCDate());
-}
-
 export function getEventDateString(event: Event, month: 'long' | 'short') {
-  // Local dates are needed since the toLocaleDateString depends on the user's local timezone.
-  const startDate = getLocalMidnightOnDate(event.start_date);
-  const endDate = getLocalMidnightOnDate(event.end_date);
+  // PlainDate has no time or timezone component, so formatting is locale-only.
+  const startDate = Temporal.PlainDate.from(event.start_date);
+  const endDate = Temporal.PlainDate.from(event.end_date);
 
-  const endDateString = endDate.toLocaleDateString('default', {
+  const endDateString = endDate.toLocaleString('default', {
     month: month,
     day: 'numeric',
     year: 'numeric',
   });
 
-  if (startDate.getTime() === endDate.getTime()) {
+  if (Temporal.PlainDate.compare(startDate, endDate) === 0) {
     return endDateString;
   }
 
-  const startDateString = startDate.toLocaleDateString('default', {
+  const startDateString = startDate.toLocaleString('default', {
     month: month,
     day: 'numeric',
   });
@@ -107,31 +156,199 @@ export function getEventWeekString(event: Event) {
   }
 }
 
-export function getCurrentWeekEvents(events: Event[]) {
-  const now = new Date();
-  const filteredEvents = [];
+export interface EventGroup {
+  groupName: string;
+  slug: string;
+  events: Event[];
+  isOfficial: boolean;
+}
 
-  const diffFromWeekStart = now.getDay();
-  const closestStartMonday = new Date(now).setDate(
-    now.getDate() - diffFromWeekStart,
-  );
-
-  for (const event of events) {
-    const startDateMs = new Date(event.start_date).getTime();
-
-    const timeOffsetDays = Math.floor(
-      convertMsToDays(startDateMs - closestStartMonday),
+function earliestStartDate(group: EventGroup): Temporal.PlainDate {
+  return group.events
+    .map((event) => Temporal.PlainDate.from(event.start_date))
+    .reduce((min, date) =>
+      Temporal.PlainDate.compare(date, min) < 0 ? date : min,
     );
+}
 
-    if (timeOffsetDays >= 0 && timeOffsetDays < 7) {
+/**
+ * Groups events into the labeled sections shown on the events list page.
+ * Official sections are ordered by earliest event start date, not week
+ * number, so Championship stays chronological even when district weeks are
+ * delayed past it (e.g. the 2026 Israel districts in weeks 17–19).
+ */
+export function groupEventsBySections(events: Event[]): EventGroup[] {
+  const eventsByWeek = new Map<string, EventGroup>();
+  const eventsByChampionship = new Map<string, EventGroup>();
+  const unofficialEventsByMonth = new Map<string, EventGroup>();
+  const FOCEvents: EventGroup = {
+    groupName: 'FIRST Festival of Champions',
+    slug: 'foc',
+    events: [],
+    isOfficial: true,
+  };
+  events.forEach((event) => {
+    // Events by week
+    const weekStr = getEventWeekString(event);
+    if (weekStr != null) {
+      const weekGroup = eventsByWeek.get(weekStr);
+      if (weekGroup) {
+        weekGroup.events.push(event);
+      } else {
+        eventsByWeek.set(weekStr, {
+          groupName: weekStr,
+          slug: slugify(weekStr),
+          events: [event],
+          isOfficial: true,
+        });
+      }
+    }
+
+    // Events by Championship
+    if (CMP_EVENT_TYPES.has(event.event_type)) {
+      const groupName =
+        event.year >= 2017 && event.year <= 2020
+          ? `FIRST Championship - ${event.city}`
+          : 'FIRST Championship';
+      const championshipGroup = eventsByChampionship.get(groupName);
+      if (championshipGroup) {
+        championshipGroup.events.push(event);
+      } else {
+        eventsByChampionship.set(groupName, {
+          groupName,
+          slug: slugify(groupName),
+          events: [event],
+          isOfficial: true,
+        });
+      }
+    }
+
+    // FOC
+    if (event.event_type === EventType.FOC) {
+      FOCEvents.events.push(event);
+    }
+
+    // Group unofficial events by month
+    if (
+      event.event_type == EventType.PRESEASON ||
+      event.event_type == EventType.OFFSEASON
+    ) {
+      const monthName = Temporal.PlainDate.from(
+        event.start_date,
+      ).toLocaleString('default', { month: 'long' });
+      const offseasonGroup = unofficialEventsByMonth.get(monthName);
+      if (offseasonGroup) {
+        offseasonGroup.events.push(event);
+      } else {
+        unofficialEventsByMonth.set(monthName, {
+          groupName: monthName,
+          slug: slugify(monthName),
+          events: [event],
+          isOfficial: false,
+        });
+      }
+    }
+  });
+
+  const officialGroups = Array.from(eventsByWeek.values()).concat(
+    Array.from(eventsByChampionship.values()),
+  );
+  if (FOCEvents.events.length > 0) {
+    officialGroups.push(FOCEvents);
+  }
+  officialGroups.sort((a, b) =>
+    Temporal.PlainDate.compare(earliestStartDate(a), earliestStartDate(b)),
+  );
+  return officialGroups.concat(Array.from(unofficialEventsByMonth.values()));
+}
+
+// Minimum overlap (in seconds) between an event's active window and the
+// user's week before the event is considered "this week". 6 hours ensures that
+// an event ending Sunday evening in a western timezone doesn't bleed into the
+// next week on a UTC server, while still catching events that start or end
+// partway through the week.
+const MIN_WEEK_OVERLAP_SECONDS = 6 * 60 * 60;
+
+export function getCurrentWeekEvents(events: Event[]) {
+  // Build the user's week window as Instants so we can compare against the
+  // event's active window (8am–6pm in the event's timezone) correctly even
+  // when the two timezones are far apart.
+  const userTz = Temporal.Now.timeZoneId();
+  const today = Temporal.Now.plainDateISO(userTz);
+  // ISO day-of-week: 1 = Monday … 7 = Sunday
+  const monday = today.subtract({ days: today.dayOfWeek - 1 });
+  const weekStart = monday.toZonedDateTime(userTz).toInstant();
+  // Exclusive upper bound: next Monday at 00:00 in the user's timezone.
+  const weekEnd = monday.add({ days: 7 }).toZonedDateTime(userTz).toInstant();
+
+  const filteredEvents = [];
+  for (const event of events) {
+    const { start: eventStart, end: eventEnd } = getEventActiveWindow(event);
+    // Compute how much of the event's active window falls inside this week.
+    const overlapStart =
+      Temporal.Instant.compare(eventStart, weekStart) > 0
+        ? eventStart
+        : weekStart;
+    const overlapEnd =
+      Temporal.Instant.compare(eventEnd, weekEnd) < 0 ? eventEnd : weekEnd;
+    const overlapSeconds = overlapEnd.since(overlapStart).total('seconds');
+    if (overlapSeconds >= MIN_WEEK_OVERLAP_SECONDS) {
       filteredEvents.push(event);
     }
   }
   return sortEvents(filteredEvents);
 }
 
+/**
+ * Returns true on any calendar day the event is scheduled, from midnight on
+ * start_date through midnight at the end of end_date (event's timezone).
+ * The window is intentionally wide so the Watch Now button is active even if
+ * the event runs early or late.
+ */
+export function isEventActive(event: Event): boolean {
+  if (!event.start_date || !event.end_date) return false;
+  return isEventWithinDays(event, 0, 0);
+}
+
 export function sortEvents(events: Event[]) {
   return events.sort((a, b) => sortEventsComparator(a, b));
+}
+
+/**
+ * Returns events ordered so that each parent event is immediately followed by
+ * its division events (from division_keys). Each group is sorted by its
+ * earliest start_date so a group whose divisions start earlier sorts before a
+ * later standalone event. Divisions within a group are sorted by event key.
+ */
+export function groupEventsByParent(events: Event[]): Event[] {
+  const eventMap = new Map(events.map((e) => [e.key, e]));
+  const divisionKeys = new Set(events.flatMap((e) => e.division_keys));
+
+  const groups: Array<{ parent: Event; divisions: Event[] }> = [];
+  for (const event of events) {
+    if (divisionKeys.has(event.key)) continue;
+    const divisions = event.division_keys
+      .map((key) => eventMap.get(key))
+      .filter((e): e is Event => e !== undefined)
+      .sort((a, b) => a.key.localeCompare(b.key));
+    groups.push({ parent: event, divisions });
+  }
+
+  groups.sort((a, b) => {
+    const aMin = [a.parent, ...a.divisions].reduce(
+      (min, e) => (e.start_date < min ? e.start_date : min),
+      a.parent.start_date,
+    );
+    const bMin = [b.parent, ...b.divisions].reduce(
+      (min, e) => (e.start_date < min ? e.start_date : min),
+      b.parent.start_date,
+    );
+    if (aMin < bMin) return -1;
+    if (aMin > bMin) return 1;
+    return sortEventsComparator(a.parent, b.parent);
+  });
+
+  return groups.flatMap(({ parent, divisions }) => [parent, ...divisions]);
 }
 
 // Common division names and their shortforms for Einstein events
@@ -174,15 +391,166 @@ export function isEventWithinDays(
   if (event.start_date === null || event.end_date === null) {
     return false;
   }
-  const DAY_IN_MS = 24 * 60 * 60 * 1000;
-  const startDate = getLocalMidnightOnDate(event.start_date);
-  const endDate = getLocalMidnightOnDate(event.end_date);
-  const now = new Date();
-  const windowStart = startDate.getTime() - negativeDaysBefore * DAY_IN_MS;
-  const windowEnd = endDate.getTime() + positiveDaysAfter * 2 * DAY_IN_MS;
-  return now.getTime() >= windowStart && now.getTime() <= windowEnd;
+  // Use the event's own timezone so that "midnight" refers to the event's
+  // local midnight, not the user's. Falls back to EVENT_FALLBACK_TIMEZONE.
+  const eventTimeZone = getEventTz(event);
+  const startDate = Temporal.PlainDate.from(event.start_date);
+  const endDate = Temporal.PlainDate.from(event.end_date);
+
+  // Window opens negativeDaysBefore days before midnight of start_date in the
+  // event's timezone.
+  const windowStart = startDate
+    .subtract({ days: negativeDaysBefore })
+    .toZonedDateTime(eventTimeZone)
+    .toInstant();
+
+  // endDate is the last calendar day. +1 moves to the next midnight (end of
+  // the last day), then positiveDaysAfter extends further.
+  const windowEnd = endDate
+    .add({ days: 1 + positiveDaysAfter })
+    .toZonedDateTime(eventTimeZone)
+    .toInstant();
+
+  const now = Temporal.Now.instant();
+  return (
+    Temporal.Instant.compare(now, windowStart) >= 0 &&
+    Temporal.Instant.compare(now, windowEnd) <= 0
+  );
 }
 
 export function isEventWithinADay(event: Event): boolean {
   return isEventWithinDays(event, -1, 1);
+}
+
+/**
+ * Returns true if the event's last day (end_date) is today or in the past.
+ * "Today" is evaluated in both the event's timezone and the user's timezone —
+ * the condition is met when end_date has been reached in either.
+ */
+/**
+ * Returns the public agenda PDF URL for a season event, or null if not
+ * applicable (offseason, preseason, or unlabeled events have no agenda).
+ */
+export function getPublicAgendaUrl(event: Event): string | null {
+  if (!SEASON_EVENT_TYPES.has(event.event_type)) {
+    return null;
+  }
+
+  if (CMP_EVENT_TYPES.has(event.event_type)) {
+    return `https://www.firstinspires.org/hubfs/web/event/${event.year}/cmp/frc/public-schedule.pdf`;
+  }
+
+  const eventCode =
+    event.event_type === EventType.DISTRICT_CMP_DIVISION &&
+    event.parent_event_key
+      ? event.parent_event_key.substring(4)
+      : event.event_code;
+
+  return `https://info.firstinspires.org/hubfs/web/event/frc/${event.year}/${event.year}_${eventCode.toUpperCase()}_Agenda.pdf`;
+}
+
+/**
+ * Strips the parent event name prefix from a division name, along with any
+ * leading separator characters (spaces, dashes, en-dashes, em-dashes).
+ * e.g. "FIRST Championship - Newton Division" with parent "FIRST Championship"
+ * → "Newton Division"
+ */
+export function stripParentPrefix(
+  name: string,
+  parentName: string | undefined,
+): string {
+  if (parentName && name.startsWith(parentName)) {
+    return name.slice(parentName.length).replace(/^[\s–—-]+/, '');
+  }
+  return name;
+}
+
+export function hasEventEnded(event: Event): boolean {
+  if (!event.end_date) return false;
+  const endDate = Temporal.PlainDate.from(event.end_date);
+  const eventTz = getEventTz(event);
+  const todayInEventTz = Temporal.Now.plainDateISO(eventTz);
+  if (Temporal.PlainDate.compare(endDate, todayInEventTz) <= 0) return true;
+  const userTz = Temporal.Now.timeZoneId();
+  const todayInUserTz = Temporal.Now.plainDateISO(userTz);
+  return Temporal.PlainDate.compare(endDate, todayInUserTz) <= 0;
+}
+
+export const EVENT_SSR_TTL_SECONDS = {
+  PAST_SEASON: 24 * 60 * 60,
+  STABLE: 60 * 60,
+  LIVE: 60,
+} as const;
+
+const SSR_STABLE_AFTER_END = Temporal.Duration.from({ hours: 24 * 7 });
+const SSR_STABLE_BEFORE_START = Temporal.Duration.from({ hours: 24 * 3 });
+
+export function eventSsrTtlSeconds(event: Event): number {
+  if (event.year < Temporal.Now.plainDateISO().year) {
+    return EVENT_SSR_TTL_SECONDS.PAST_SEASON;
+  }
+
+  if (!event.start_date || !event.end_date) {
+    return EVENT_SSR_TTL_SECONDS.LIVE;
+  }
+
+  const now = Temporal.Now.instant();
+  const { start, end } = getEventActiveWindow(event);
+  const endedLongAgo =
+    Temporal.Instant.compare(now, end.add(SSR_STABLE_AFTER_END)) > 0;
+  const startsFarOut =
+    Temporal.Instant.compare(start.subtract(SSR_STABLE_BEFORE_START), now) > 0;
+
+  return endedLongAgo || startsFarOut
+    ? EVENT_SSR_TTL_SECONDS.STABLE
+    : EVENT_SSR_TTL_SECONDS.LIVE;
+}
+
+export function eventCacheControlHeaders(
+  event: Event | undefined,
+): Record<string, string> {
+  return buildPublicCacheControlHeaders(
+    event ? eventSsrTtlSeconds(event) : EVENT_SSR_TTL_SECONDS.LIVE,
+  );
+}
+
+// Mirrors SHORT_TYPE_NAMES in backend/common/consts/event_type.py
+const SHORT_TYPE_NAMES: Partial<Record<EventType, string>> = {
+  [EventType.REGIONAL]: 'Regional',
+  [EventType.DISTRICT]: 'District',
+  [EventType.DISTRICT_CMP_DIVISION]: 'District Championship Division',
+  [EventType.DISTRICT_CMP]: 'District Championship',
+  [EventType.CMP_DIVISION]: 'Division',
+  [EventType.CMP_FINALS]: 'Championship',
+  [EventType.FOC]: 'FoC',
+  [EventType.OFFSEASON]: 'Offseason',
+  [EventType.PRESEASON]: 'Preseason',
+  [EventType.REMOTE]: 'Remote',
+  [EventType.UNLABLED]: '--',
+};
+
+/**
+ * The short, banner-friendly event name the Jinja site uses (Event.normalized_name):
+ * "NEDC - Newsom District Championship Division" rather than
+ * "New England FIRST District Championship - Newsom Division presented by GE Aerospace".
+ */
+export function getEventNormalizedName(
+  event: Pick<Event, 'event_type' | 'year' | 'city' | 'short_name' | 'name'>,
+): string {
+  if (event.event_type === EventType.CMP_FINALS) {
+    return event.year >= 2017 && event.city
+      ? `${event.city} Championship`
+      : 'Championship';
+  }
+  if (event.short_name && event.event_type !== EventType.FOC) {
+    if (event.event_type === EventType.OFFSEASON) {
+      return event.short_name;
+    }
+    const suffix = SHORT_TYPE_NAMES[event.event_type];
+    if (!suffix || event.short_name.trim().endsWith(suffix)) {
+      return event.short_name;
+    }
+    return `${event.short_name} ${suffix}`;
+  }
+  return event.name;
 }

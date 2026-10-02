@@ -142,6 +142,15 @@ class User:
     def is_admin(self) -> bool:
         return self._session_claims.get("admin", False)
 
+    @property
+    def email_verified(self) -> bool:
+        """
+        Whether the identity provider has verified the token's email claim.
+        Accounts are linked to tokens by email, so anything granting
+        privileges based on that link must require a verified email.
+        """
+        return bool(self._session_claims.get("email_verified", False))
+
     def register(self, display_name: str) -> None:
         if self._account is None:
             return
@@ -205,6 +214,11 @@ class User:
         if self._account is None:
             return False
         return True if none_throws(self._account).permissions else False
+
+    def has_permission(self, permission: AccountPermission) -> bool:
+        if self._account is None:
+            return False
+        return permission in none_throws(self._account).permissions
 
     @property
     def api_keys(self) -> List[ApiAuthAccess]:

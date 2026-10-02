@@ -1,0 +1,830 @@
+{
+  "2018fim": {
+    "dcmp_engineering_inspiration": [
+      "frc548"
+    ],
+    "dcmp_impact": [
+      "frc2137",
+      "frc2604",
+      "frc2834",
+      "frc3641",
+      "frc4776"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc7160",
+      "frc7226"
+    ],
+    "dcmp_winner": [
+      "frc2586",
+      "frc3098",
+      "frc4003"
+    ],
+    "district_points": [
+      "frc33",
+      "frc51",
+      "frc70",
+      "frc74",
+      "frc85",
+      "frc141",
+      "frc217",
+      "frc245",
+      "frc314",
+      "frc494",
+      "frc503",
+      "frc573",
+      "frc857",
+      "frc910",
+      "frc1025",
+      "frc1189",
+      "frc1322",
+      "frc1506",
+      "frc1684",
+      "frc1711",
+      "frc1718",
+      "frc1918",
+      "frc2054",
+      "frc2075",
+      "frc2337",
+      "frc2474",
+      "frc2771",
+      "frc2832",
+      "frc3357",
+      "frc3452",
+      "frc3534",
+      "frc3536",
+      "frc3538",
+      "frc3539",
+      "frc3542",
+      "frc3572",
+      "frc3604",
+      "frc3618",
+      "frc3620",
+      "frc3656",
+      "frc3667",
+      "frc3707",
+      "frc3767",
+      "frc4004",
+      "frc4130",
+      "frc4237",
+      "frc4384",
+      "frc4391",
+      "frc4392",
+      "frc4405",
+      "frc4855",
+      "frc4967",
+      "frc5050",
+      "frc5114",
+      "frc5205",
+      "frc5216",
+      "frc5234",
+      "frc5436",
+      "frc5460",
+      "frc5505",
+      "frc5517",
+      "frc5561",
+      "frc5603",
+      "frc5674",
+      "frc5675",
+      "frc5712",
+      "frc5907",
+      "frc5980",
+      "frc6077",
+      "frc6090",
+      "frc6121",
+      "frc6193",
+      "frc6548",
+      "frc6618",
+      "frc6753",
+      "frc7250"
+    ],
+    "hall_of_fame": [
+      "frc27",
+      "frc67"
+    ],
+    "late_regional_winner": [
+      "frc469"
+    ],
+    "prior_year_cmp_engineering_inspiration": [
+      "frc1023"
+    ],
+    "prior_year_cmp_winner": [
+      "frc862",
+      "frc2767"
+    ],
+    "regional_winner": [
+      "frc244",
+      "frc302",
+      "frc4362"
+    ],
+    "waitlist": [
+      "frc247",
+      "frc894",
+      "frc1076",
+      "frc2620",
+      "frc3175",
+      "frc3535",
+      "frc3546",
+      "frc3770",
+      "frc4327",
+      "frc4680",
+      "frc4810",
+      "frc4811",
+      "frc5090",
+      "frc5531",
+      "frc5567",
+      "frc7225"
+    ]
+  },
+  "2019ne": {
+    "dcmp_engineering_inspiration": [
+      "frc1729",
+      "frc6328"
+    ],
+    "dcmp_impact": [
+      "frc3654",
+      "frc5422"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc7462"
+    ],
+    "dcmp_winner": [
+      "frc125",
+      "frc558",
+      "frc2168"
+    ],
+    "district_points": [
+      "frc69",
+      "frc78",
+      "frc88",
+      "frc95",
+      "frc133",
+      "frc172",
+      "frc173",
+      "frc176",
+      "frc177",
+      "frc230",
+      "frc237",
+      "frc238",
+      "frc319",
+      "frc509",
+      "frc1058",
+      "frc1073",
+      "frc1153",
+      "frc1519",
+      "frc1768",
+      "frc1922",
+      "frc2370",
+      "frc3146",
+      "frc3467",
+      "frc3555",
+      "frc4041",
+      "frc4311",
+      "frc4761",
+      "frc4909",
+      "frc5687",
+      "frc7127",
+      "frc7416"
+    ],
+    "hall_of_fame": [
+      "frc23",
+      "frc175",
+      "frc236"
+    ],
+    "original_and_sustaining": [
+      "frc126",
+      "frc151",
+      "frc157",
+      "frc190"
+    ],
+    "regional_winner": [
+      "frc195"
+    ]
+  },
+  "2022fin": {
+    "dcmp_engineering_inspiration": [
+      "frc234",
+      "frc1555"
+    ],
+    "dcmp_impact": [
+      "frc1741"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc8742"
+    ],
+    "dcmp_winner": [
+      "frc829",
+      "frc4926",
+      "frc7617"
+    ],
+    "district_points": [
+      "frc7457"
+    ],
+    "regional_winner": [
+      "frc5484"
+    ]
+  },
+  "2022ne": {
+    "dcmp_engineering_inspiration": [
+      "frc78",
+      "frc2370"
+    ],
+    "dcmp_impact": [
+      "frc3654",
+      "frc5422",
+      "frc6328"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc8709"
+    ],
+    "dcmp_winner": [
+      "frc176",
+      "frc238",
+      "frc5846"
+    ],
+    "district_points": [
+      "frc58",
+      "frc88",
+      "frc95",
+      "frc125",
+      "frc126",
+      "frc131",
+      "frc133",
+      "frc155",
+      "frc166",
+      "frc172",
+      "frc175",
+      "frc177",
+      "frc195",
+      "frc228",
+      "frc230",
+      "frc237",
+      "frc319",
+      "frc467",
+      "frc509",
+      "frc558",
+      "frc663",
+      "frc716",
+      "frc1027",
+      "frc1071",
+      "frc1073",
+      "frc1100",
+      "frc1153",
+      "frc1699",
+      "frc1740",
+      "frc1757",
+      "frc1768",
+      "frc1922",
+      "frc2067",
+      "frc2168",
+      "frc2262",
+      "frc2342",
+      "frc2648",
+      "frc2713",
+      "frc2877",
+      "frc3146",
+      "frc3182",
+      "frc3205",
+      "frc3461",
+      "frc3467",
+      "frc4048",
+      "frc4564",
+      "frc4905",
+      "frc4909",
+      "frc5112",
+      "frc5563",
+      "frc5687",
+      "frc5735",
+      "frc5813",
+      "frc6153",
+      "frc6329",
+      "frc6933",
+      "frc7153",
+      "frc7407",
+      "frc8046",
+      "frc8085",
+      "frc8544",
+      "frc8708",
+      "frc8724",
+      "frc8889"
+    ]
+  },
+  "2024ne": {
+    "dcmp_engineering_inspiration": [
+      "frc509",
+      "frc2079"
+    ],
+    "dcmp_impact": [
+      "frc1071",
+      "frc2370",
+      "frc3654"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc9644"
+    ],
+    "dcmp_winner": [
+      "frc195",
+      "frc5112",
+      "frc8013"
+    ],
+    "district_points": [
+      "frc58",
+      "frc78",
+      "frc88",
+      "frc125",
+      "frc131",
+      "frc133",
+      "frc175",
+      "frc176",
+      "frc177",
+      "frc1058",
+      "frc1153",
+      "frc1699",
+      "frc1729",
+      "frc1768",
+      "frc2067",
+      "frc3464",
+      "frc3467",
+      "frc4909",
+      "frc5687",
+      "frc5813",
+      "frc6328",
+      "frc6329",
+      "frc7407",
+      "frc8085"
+    ],
+    "waitlist": [
+      "frc157",
+      "frc190",
+      "frc2713",
+      "frc2877"
+    ]
+  },
+  "2025fim": {
+    "dcmp_engineering_inspiration": [
+      "frc9312"
+    ],
+    "dcmp_impact": [
+      "frc201",
+      "frc1502",
+      "frc3604",
+      "frc3620"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc10656",
+      "frc10690"
+    ],
+    "dcmp_winner": [
+      "frc67",
+      "frc2767",
+      "frc5843"
+    ],
+    "district_points": [
+      "frc33",
+      "frc51",
+      "frc70",
+      "frc217",
+      "frc226",
+      "frc245",
+      "frc302",
+      "frc469",
+      "frc494",
+      "frc548",
+      "frc858",
+      "frc862",
+      "frc910",
+      "frc1023",
+      "frc1025",
+      "frc1076",
+      "frc1189",
+      "frc1498",
+      "frc1506",
+      "frc1684",
+      "frc1701",
+      "frc1718",
+      "frc1918",
+      "frc2054",
+      "frc2075",
+      "frc2137",
+      "frc2145",
+      "frc2337",
+      "frc2586",
+      "frc2832",
+      "frc2851",
+      "frc2960",
+      "frc3175",
+      "frc3322",
+      "frc3414",
+      "frc3536",
+      "frc3538",
+      "frc3546",
+      "frc3572",
+      "frc3655",
+      "frc3656",
+      "frc3668",
+      "frc3767",
+      "frc4237",
+      "frc4381",
+      "frc4391",
+      "frc4398",
+      "frc4422",
+      "frc4680",
+      "frc4776",
+      "frc4967",
+      "frc5114",
+      "frc5166",
+      "frc5193",
+      "frc5216",
+      "frc5352",
+      "frc5460",
+      "frc5505",
+      "frc5530",
+      "frc5535",
+      "frc5660",
+      "frc5675",
+      "frc5712",
+      "frc5907",
+      "frc6002",
+      "frc6548",
+      "frc6615",
+      "frc7056",
+      "frc7166",
+      "frc7174",
+      "frc7197",
+      "frc7211",
+      "frc7769",
+      "frc7790",
+      "frc8608",
+      "frc9245",
+      "frc10589"
+    ],
+    "hall_of_fame": [
+      "frc503",
+      "frc2834"
+    ],
+    "regional_winner": [
+      "frc27",
+      "frc3539"
+    ],
+    "waitlist": [
+      "frc1481"
+    ]
+  },
+  "2025fit": {
+    "dcmp_engineering_inspiration": [
+      "frc1296"
+    ],
+    "dcmp_impact": [
+      "frc4192",
+      "frc8573"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc10032",
+      "frc10518"
+    ],
+    "dcmp_winner": [
+      "frc3005",
+      "frc6357",
+      "frc6800"
+    ],
+    "district_points": [
+      "frc148",
+      "frc324",
+      "frc418",
+      "frc624",
+      "frc1477",
+      "frc2468",
+      "frc2714",
+      "frc2881",
+      "frc3035",
+      "frc3310",
+      "frc3847",
+      "frc5411",
+      "frc5572",
+      "frc6369",
+      "frc8177",
+      "frc8749",
+      "frc9105",
+      "frc9140",
+      "frc10014"
+    ],
+    "regional_winner": [
+      "frc118"
+    ]
+  },
+  "2025ne": {
+    "dcmp_engineering_inspiration": [
+      "frc4905",
+      "frc5112"
+    ],
+    "dcmp_impact": [
+      "frc125",
+      "frc195",
+      "frc1071"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc10063"
+    ],
+    "dcmp_winner": [
+      "frc839",
+      "frc6324",
+      "frc7407"
+    ],
+    "district_points": [
+      "frc58",
+      "frc78",
+      "frc88",
+      "frc95",
+      "frc131",
+      "frc133",
+      "frc138",
+      "frc166",
+      "frc176",
+      "frc190",
+      "frc230",
+      "frc467",
+      "frc1073",
+      "frc1100",
+      "frc1153",
+      "frc1699",
+      "frc1768",
+      "frc2342",
+      "frc2370",
+      "frc2648",
+      "frc2877",
+      "frc3182",
+      "frc3467",
+      "frc4909",
+      "frc5142",
+      "frc5687",
+      "frc5813",
+      "frc6328",
+      "frc6329",
+      "frc7153",
+      "frc8013",
+      "frc8085",
+      "frc8708",
+      "frc9443",
+      "frc9644"
+    ]
+  },
+  "2026fim": {
+    "dcmp_engineering_inspiration": [
+      "frc5712"
+    ],
+    "dcmp_impact": [
+      "frc245",
+      "frc3604",
+      "frc3620",
+      "frc5577"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc11387",
+      "frc11493"
+    ],
+    "dcmp_winner": [
+      "frc27",
+      "frc3668",
+      "frc7769"
+    ],
+    "district_points": [
+      "frc33",
+      "frc51",
+      "frc67",
+      "frc68",
+      "frc70",
+      "frc85",
+      "frc123",
+      "frc201",
+      "frc226",
+      "frc302",
+      "frc469",
+      "frc494",
+      "frc548",
+      "frc573",
+      "frc818",
+      "frc862",
+      "frc910",
+      "frc1023",
+      "frc1076",
+      "frc1188",
+      "frc1189",
+      "frc1481",
+      "frc1498",
+      "frc1502",
+      "frc1506",
+      "frc1684",
+      "frc1701",
+      "frc1918",
+      "frc2054",
+      "frc2075",
+      "frc2137",
+      "frc2337",
+      "frc2586",
+      "frc2611",
+      "frc2619",
+      "frc2767",
+      "frc2851",
+      "frc2960",
+      "frc3175",
+      "frc3357",
+      "frc3414",
+      "frc3536",
+      "frc3538",
+      "frc3539",
+      "frc3572",
+      "frc3603",
+      "frc3641",
+      "frc3656",
+      "frc3707",
+      "frc3767",
+      "frc3770",
+      "frc3875",
+      "frc4237",
+      "frc4362",
+      "frc4391",
+      "frc4398",
+      "frc4779",
+      "frc4967",
+      "frc5066",
+      "frc5086",
+      "frc5114",
+      "frc5166",
+      "frc5193",
+      "frc5216",
+      "frc5460",
+      "frc5462",
+      "frc5534",
+      "frc5535",
+      "frc5660",
+      "frc5675",
+      "frc5843",
+      "frc5907",
+      "frc6002",
+      "frc6090",
+      "frc6121",
+      "frc6152",
+      "frc6528",
+      "frc6615",
+      "frc7056",
+      "frc7160",
+      "frc7166",
+      "frc7197",
+      "frc7220",
+      "frc7250",
+      "frc7598",
+      "frc8280",
+      "frc8352",
+      "frc8373",
+      "frc8517",
+      "frc8608",
+      "frc8612",
+      "frc8873",
+      "frc9210",
+      "frc9215",
+      "frc9245",
+      "frc9312",
+      "frc9572",
+      "frc9757",
+      "frc9771",
+      "frc10349",
+      "frc10633"
+    ],
+    "hall_of_fame": [
+      "frc503",
+      "frc2834"
+    ]
+  },
+  "2026fit": {
+    "dcmp_engineering_inspiration": [
+      "frc5414"
+    ],
+    "dcmp_impact": [
+      "frc118",
+      "frc1477"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc11178",
+      "frc11242"
+    ],
+    "dcmp_winner": [
+      "frc6369",
+      "frc9128",
+      "frc9140"
+    ],
+    "district_points": [
+      "frc148",
+      "frc624",
+      "frc1296",
+      "frc2468",
+      "frc2582",
+      "frc2583",
+      "frc2848",
+      "frc2881",
+      "frc3005",
+      "frc3035",
+      "frc3847",
+      "frc4206",
+      "frc5572",
+      "frc5829",
+      "frc6773",
+      "frc6800",
+      "frc8749",
+      "frc8858",
+      "frc10014",
+      "frc10340"
+    ]
+  },
+  "2026ne": {
+    "dcmp_engineering_inspiration": [
+      "frc178",
+      "frc999"
+    ],
+    "dcmp_impact": [
+      "frc131",
+      "frc195",
+      "frc4905",
+      "frc6328"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc11269"
+    ],
+    "dcmp_winner": [
+      "frc1768",
+      "frc5687",
+      "frc8724",
+      "frc9644"
+    ],
+    "district_points": [
+      "frc88",
+      "frc95",
+      "frc125",
+      "frc133",
+      "frc166",
+      "frc176",
+      "frc190",
+      "frc236",
+      "frc238",
+      "frc571",
+      "frc1058",
+      "frc1073",
+      "frc1153",
+      "frc1699",
+      "frc1922",
+      "frc2067",
+      "frc2370",
+      "frc2713",
+      "frc2877",
+      "frc3467",
+      "frc4909",
+      "frc5000",
+      "frc5813",
+      "frc6201",
+      "frc6324",
+      "frc6329",
+      "frc7407",
+      "frc8046",
+      "frc10254"
+    ]
+  },
+  "2026ont": {
+    "dcmp_engineering_inspiration": [
+      "frc1360"
+    ],
+    "dcmp_impact": [
+      "frc772",
+      "frc6865"
+    ],
+    "dcmp_rookie_all_star": [
+      "frc11270"
+    ],
+    "dcmp_winner": [
+      "frc1114",
+      "frc2056",
+      "frc7712"
+    ],
+    "district_points": [
+      "frc188",
+      "frc610",
+      "frc1241",
+      "frc1325",
+      "frc2200",
+      "frc2702",
+      "frc3161",
+      "frc3683",
+      "frc4039",
+      "frc4069",
+      "frc4476",
+      "frc4678",
+      "frc4907",
+      "frc4946",
+      "frc5406",
+      "frc7520",
+      "frc7558",
+      "frc8884",
+      "frc9098",
+      "frc9785",
+      "frc10015",
+      "frc10554"
+    ]
+  }
+}

@@ -22,18 +22,29 @@ const TeamLink = forwardRef<
       year?: number;
     } & AnchorHTMLAttributes<HTMLAnchorElement>
   >
->(({ teamOrKey, year, ...props }, ref) => {
+>(({ teamOrKey, year, className, ...props }, ref) => {
   const teamNumber: string =
     typeof teamOrKey === 'string'
       ? removeNonNumeric(teamOrKey)
       : teamOrKey.team_number.toString();
 
-  const yearSuffix = year === 0 ? 'history' : year?.toString();
+  if (year === 0) {
+    return (
+      <Link
+        to="/team/$teamNumber/history"
+        params={{ teamNumber }}
+        className={className ?? 'text-foreground hover:underline'}
+        {...props}
+        ref={ref}
+      />
+    );
+  }
 
   return (
     <Link
       to="/team/$teamNumber/{-$year}"
-      params={{ teamNumber, year: yearSuffix }}
+      params={{ teamNumber, year: year?.toString() }}
+      className={className ?? 'text-foreground hover:underline'}
       {...props}
       ref={ref}
     />
@@ -171,4 +182,59 @@ const MatchLink = forwardRef<
 });
 MatchLink.displayName = 'MatchLink';
 
-export { EventLink, EventLocationLink, TeamLocationLink, MatchLink, TeamLink };
+const PitLocationLink = ({
+  teamNumber,
+  year,
+  firstEventCode,
+  pitLocation,
+}: {
+  teamNumber: number;
+  year: number;
+  firstEventCode: string;
+  pitLocation: string;
+}) => {
+  return (
+    <a
+      href={`https://frc.nexus/en/event/${year}${firstEventCode}/team/${teamNumber}/map`}
+      target="_blank"
+      rel="noopener noreferrer"
+      className="text-blue-600 underline dark:text-blue-400"
+    >
+      {pitLocation}
+    </a>
+  );
+};
+PitLocationLink.displayName = 'PitLocationLink';
+
+const DistrictLink = forwardRef<
+  HTMLAnchorElement,
+  PropsWithChildren<
+    {
+      districtAbbreviation: string;
+      year?: number;
+    } & AnchorHTMLAttributes<HTMLAnchorElement>
+  >
+>(({ districtAbbreviation, year, ...props }, ref) => {
+  return (
+    <Link
+      to="/district/$districtAbbreviation/{-$year}"
+      params={{
+        districtAbbreviation,
+        year: year?.toString(),
+      }}
+      {...props}
+      ref={ref}
+    />
+  );
+});
+DistrictLink.displayName = 'DistrictLink';
+
+export {
+  DistrictLink,
+  EventLink,
+  EventLocationLink,
+  MatchLink,
+  PitLocationLink,
+  TeamLink,
+  TeamLocationLink,
+};

@@ -1,5 +1,8 @@
+import base64
 import datetime
 import json
+import logging
+import os
 import random
 from typing import List
 
@@ -10,16 +13,24 @@ from werkzeug import Response
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
+from backend.common.consts.suggestion_type import SuggestionType
+from backend.common.helpers.pwa_url_helper import PwaUrlHelper
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.manipulators.team_manipulator import TeamManipulator
+from backend.common.models.account import Account
 from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
+from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.team import Team
+from backend.common.suggestions.suggestion_creator import (
+    SuggestionCreationStatus,
+    SuggestionCreator,
+)
 
 NUM_COMPLETED = 15
 NUM_SCHEDULED = 8
@@ -102,12 +113,20 @@ def seed_test_event() -> Response:
         matches.append(match)
 
     # Scheduled matches (qm16 - qm23)
+    # Q21, Q22, Q23 get predicted times that drift from schedule by 2, 5,
+    # and 10 minutes respectively, to test "(est.)" display in the app.
+    predicted_time_offsets = {21: 2, 22: 5, 23: 10}  # match_number -> minutes
     scheduled_start = now + datetime.timedelta(minutes=10)
     for i in range(NUM_COMPLETED + 1, NUM_COMPLETED + NUM_SCHEDULED + 1):
         red_teams, blue_teams = _teams_for_match(teams, i)
         match_time = scheduled_start + datetime.timedelta(
             minutes=(i - NUM_COMPLETED - 1) * MATCH_SPACING_MINUTES
         )
+        predicted_time = None
+        if i in predicted_time_offsets:
+            predicted_time = match_time + datetime.timedelta(
+                minutes=predicted_time_offsets[i]
+            )
         match = Match(
             id=Match.render_key_name(event_key, CompLevel.QM, 1, i),
             event=ndb.Key(Event, event_key),
@@ -133,6 +152,7 @@ def seed_test_event() -> Response:
                 }
             ),
             time=match_time,
+            predicted_time=predicted_time,
         )
         matches.append(match)
 
@@ -171,14 +191,16 @@ def seed_test_event() -> Response:
 
     # Create EventTeam records
     team_numbers = {t.team_number for t in teams}
+    rows = "ABCDEFG"
     event_teams = [
         EventTeam(
             id=f"{event_key}_frc{num}",
             event=ndb.Key(Event, event_key),
             team=ndb.Key(Team, f"frc{num}"),
             year=year,
+            pit_location=EventTeamPitLocation(location=f"{rows[i // 6]}{(i % 6) + 1}"),
         )
-        for num in team_numbers
+        for i, num in enumerate(sorted(team_numbers))
     ]
     EventTeamManipulator.createOrUpdate(event_teams)
 
@@ -223,7 +245,26 @@ def seed_test_team() -> Response:
     TeamManipulator.createOrUpdate(team)
 
     team_ref = Media.create_reference("team", "frc2")
+    avatar_foreign_key = f"avatar_{year}_frc2"
+
+    # Load avatar image from test_data/reindeer_avatar.png
+    avatar_path = os.path.join(
+        os.path.dirname(__file__), "test_data", "reindeer_avatar.png"
+    )
+    avatar_b64 = ""
+    if os.path.exists(avatar_path):
+        with open(avatar_path, "rb") as f:
+            avatar_b64 = base64.b64encode(f.read()).decode("ascii")
+
     media_list = [
+        Media(
+            id=Media.render_key_name(MediaType.AVATAR, avatar_foreign_key),
+            media_type_enum=MediaType.AVATAR,
+            foreign_key=avatar_foreign_key,
+            year=year,
+            references=[team_ref],
+            details_json=json.dumps({"base64Image": avatar_b64}),
+        ),
         Media(
             id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, "dQw4w9WgXcQ"),
             media_type_enum=MediaType.YOUTUBE_VIDEO,
@@ -249,20 +290,84 @@ def seed_test_team() -> Response:
             id=Media.render_key_name(MediaType.YOUTUBE_CHANNEL, "bobcatrobotics"),
             media_type_enum=MediaType.YOUTUBE_CHANNEL,
             foreign_key="bobcatrobotics",
-            year=year,
             references=[team_ref],
         ),
         Media(
             id=Media.render_key_name(MediaType.INSTAGRAM_PROFILE, "bobcatrobotics"),
             media_type_enum=MediaType.INSTAGRAM_PROFILE,
             foreign_key="bobcatrobotics",
-            year=year,
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.FACEBOOK_PROFILE, "thebluealliance"),
+            media_type_enum=MediaType.FACEBOOK_PROFILE,
+            foreign_key="thebluealliance",
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.TWITTER_PROFILE, "thebluealliance"),
+            media_type_enum=MediaType.TWITTER_PROFILE,
+            foreign_key="thebluealliance",
+            references=[team_ref],
+        ),
+        Media(
+            id=Media.render_key_name(MediaType.GITHUB_PROFILE, "the-blue-alliance"),
+            media_type_enum=MediaType.GITHUB_PROFILE,
+            foreign_key="the-blue-alliance",
             references=[team_ref],
         ),
     ]
     MediaManipulator.createOrUpdate(media_list)
 
     return redirect("/team/2")
+
+
+def seed_media_suggestions() -> Response:
+    now = datetime.datetime.now()
+    year = str(now.year)
+
+    # Create/reuse a dev account as the suggestion author
+    account = Account.get_or_insert(
+        "dev-suggestion-author",
+        email="dev@thebluealliance.com",
+        nickname="Dev User",
+        registered=True,
+    )
+
+    # Ensure team frc2 exists
+    team = Team.get_by_id("frc2")
+    if not team:
+        team = Team(
+            id="frc2",
+            team_number=2,
+            nickname="The Reindeer",
+        )
+        TeamManipulator.createOrUpdate(team)
+
+    # Real media from production TBA teams.
+    # Use keys distinct from seed_test_team to avoid media_exists conflicts.
+    media_urls = [
+        "https://www.youtube.com/watch?v=gUJUAoHRq8I",  # frc1678 2025 reveal
+        "https://imgur.com/MZ3lWM4",  # frc254 2025 robot photo
+        "https://www.instagram.com/p/C4bhT7FsmAW/",  # frc254 2024 robot photo
+    ]
+
+    created = 0
+    for url in media_urls:
+        status, _ = SuggestionCreator.createTeamMediaSuggestion(
+            account.key,
+            url,
+            "frc2",
+            year,
+        ).get_result()
+        if status == SuggestionCreationStatus.SUCCESS:
+            created += 1
+        else:
+            logging.info(f"Suggestion not created for {url}: {status}")
+
+    logging.info(f"Created {created}/{len(media_urls)} media suggestions")
+    # Review them in the local PWA dev server; never bounce local dev to prod
+    return redirect(PwaUrlHelper.suggestion_review_url(SuggestionType.MEDIA))
 
 
 def _teams_for_match(teams: List[Team], match_number: int) -> tuple:

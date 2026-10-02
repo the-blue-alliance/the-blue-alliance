@@ -6,6 +6,9 @@ from werkzeug.test import Client
 
 from backend.common.consts.event_type import EventType
 from backend.common.helpers.district_helper import DistrictHelper
+from backend.common.manipulators.event_details_manipulator import (
+    EventDetailsManipulator,
+)
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
@@ -142,6 +145,80 @@ def test_enqueue_skips_regionals_2025(
         assert task_resp.status_code == 200
 
 
+def test_enqueue_for_district_invalid_key(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/district/asdf")
+    assert resp.status_code == 400
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+def test_enqueue_for_district_not_found(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/district/2025chs")
+    assert resp.status_code == 404
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 0
+
+
+def test_enqueue_for_district(
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    District(
+        id="2025chs",
+        year=2025,
+        abbreviation="chs",
+    ).put()
+    Event(
+        id="2025chsevent",
+        year=2025,
+        event_short="chsevent",
+        event_type_enum=EventType.DISTRICT,
+        district_key=ndb.Key(District, "2025chs"),
+    ).put()
+    Event(
+        id="2025chsoffseason",
+        year=2025,
+        event_short="chsoffseason",
+        event_type_enum=EventType.OFFSEASON,
+        district_key=ndb.Key(District, "2025chs"),
+    ).put()
+    resp = tasks_client.get("/tasks/math/enqueue/district_points_calc/district/2025chs")
+    assert resp.status_code == 200
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    task_urls = {t.url for t in tasks}
+    assert task_urls == {
+        "/tasks/math/do/district_points_calc/2025chsevent",
+    }
+
+
+def test_enqueue_for_district_no_output_in_taskqueue(
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+    ndb_stub,
+) -> None:
+    District(
+        id="2025chs",
+        year=2025,
+        abbreviation="chs",
+    ).put()
+    resp = tasks_client.get(
+        "/tasks/math/enqueue/district_points_calc/district/2025chs",
+        headers={
+            "X-Appengine-Taskname": "test",
+        },
+    )
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+
 def test_calc_no_event(
     tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
 ) -> None:
@@ -182,6 +259,31 @@ def test_calc_skips_offseason_override(tasks_client: Client) -> None:
 
 
 @mock.patch.object(DistrictHelper, "calculate_event_points")
+@mock.patch.object(EventDetailsManipulator, "createOrUpdate")
+def test_calc_disables_event_details_post_update_hook(
+    create_or_update_mock: mock.Mock,
+    calc_mock: mock.Mock,
+    tasks_client: Client,
+) -> None:
+    Event(
+        id="2020test",
+        year=2020,
+        event_short="event",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    points = EventDistrictPoints(points={}, tiebreakers={})
+    calc_mock.return_value = points
+
+    resp = tasks_client.get(
+        "/tasks/math/do/district_points_calc/2020test?allow-offseason=true"
+    )
+
+    assert resp.status_code == 200
+    create_or_update_mock.assert_called_once()
+    assert create_or_update_mock.call_args.kwargs["run_post_update_hook"] is False
+
+
+@mock.patch.object(DistrictHelper, "calculate_event_points")
 def test_calc_regional_pre_2025(
     calc_mock: mock.Mock,
     tasks_client: Client,
@@ -208,7 +310,7 @@ def test_calc_regional_pre_2025(
         tiebreakers={
             "frc254": TeamAtEventDistrictPointTiebreakers(
                 qual_wins=0,
-                highest_qual_scores=[],
+                highest_match_scores=[],
             )
         },
     )

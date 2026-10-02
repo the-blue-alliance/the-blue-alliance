@@ -1,3 +1,5 @@
+import datetime
+
 from backend.common.consts.webcast_type import WebcastType
 from backend.common.sitevars.gameday_special_webcasts import (
     GamedaySpecialWebcasts,
@@ -127,3 +129,81 @@ def test_remove_alias_doesnt_exist() -> None:
 def test_set_default_chat() -> None:
     GamedaySpecialWebcasts.set_default_chat("tbagameday2")
     assert GamedaySpecialWebcasts.default_chat() == "tbagameday2"
+
+
+def test_webcasts_no_date_filter() -> None:
+    webcast = TSpecialWebcast(
+        type=WebcastType.TWITCH,
+        channel="tbagameday",
+        name="TBA Gameday",
+        key_name="tbagameday",
+    )
+    GamedaySpecialWebcasts.add_special_webcast(webcast)
+
+    special_webcasts = GamedaySpecialWebcasts.webcasts()
+    assert special_webcasts == [webcast]
+
+
+def test_webcasts_date_matches_today() -> None:
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    webcast = TSpecialWebcast(
+        type=WebcastType.TWITCH,
+        channel="tbagameday",
+        name="TBA Gameday",
+        key_name="tbagameday",
+        date=today,
+    )
+    GamedaySpecialWebcasts.add_special_webcast(webcast)
+
+    special_webcasts = GamedaySpecialWebcasts.webcasts()
+    assert special_webcasts == [webcast]
+
+
+def test_webcasts_date_different_from_today() -> None:
+    yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime(
+        "%Y-%m-%d"
+    )
+    webcast = TSpecialWebcast(
+        type=WebcastType.TWITCH,
+        channel="tbagameday",
+        name="TBA Gameday",
+        key_name="tbagameday",
+        date=yesterday,
+    )
+    GamedaySpecialWebcasts.add_special_webcast(webcast)
+
+    special_webcasts = GamedaySpecialWebcasts.webcasts()
+    assert special_webcasts == []
+
+
+def test_webcasts_mixed_dates() -> None:
+    today = datetime.date.today().strftime("%Y-%m-%d")
+    yesterday = (datetime.date.today() - datetime.timedelta(days=1)).strftime(
+        "%Y-%m-%d"
+    )
+    webcast_today = TSpecialWebcast(
+        type=WebcastType.TWITCH,
+        channel="tbagameday",
+        name="TBA Gameday Today",
+        key_name="tbagameday_today",
+        date=today,
+    )
+    webcast_yesterday = TSpecialWebcast(
+        type=WebcastType.TWITCH,
+        channel="tbagameday2",
+        name="TBA Gameday Yesterday",
+        key_name="tbagameday_yesterday",
+        date=yesterday,
+    )
+    webcast_no_date = TSpecialWebcast(
+        type=WebcastType.TWITCH,
+        channel="tbagameday3",
+        name="TBA Gameday No Date",
+        key_name="tbagameday_no_date",
+    )
+    GamedaySpecialWebcasts.add_special_webcast(webcast_today)
+    GamedaySpecialWebcasts.add_special_webcast(webcast_yesterday)
+    GamedaySpecialWebcasts.add_special_webcast(webcast_no_date)
+
+    special_webcasts = GamedaySpecialWebcasts.webcasts()
+    assert special_webcasts == [webcast_today, webcast_no_date]

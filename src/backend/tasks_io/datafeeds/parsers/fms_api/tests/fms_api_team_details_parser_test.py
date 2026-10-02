@@ -5,7 +5,7 @@ import pytest
 from google.appengine.ext import ndb
 
 from backend.common.models.district import District
-from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
     FMSAPITeamDetailsParser,
 )
@@ -149,29 +149,31 @@ def test_parse_team_with_no_district_no_robot(test_data_importer, ndb_stub):
 
 @pytest.mark.parametrize(
     "website, expected_website",
-    zip(
-        [
-            None,
-            "",
-            "www.firstinspires.org",
-            "website.com",
-            "www.website.com",
-            "http://website.com",
-            "https://website.com",
-            "ftp://website.com",
-            "http://blacklist.com/",
-        ],
-        [
-            None,
-            None,
-            None,
-            "http://website.com",
-            "http://www.website.com",
-            "http://website.com",
-            "https://website.com",
-            None,
-            "",
-        ],
+    list(
+        zip(
+            [
+                None,
+                "",
+                "www.firstinspires.org",
+                "website.com",
+                "www.website.com",
+                "http://website.com",
+                "https://website.com",
+                "ftp://website.com",
+                "http://blacklist.com/",
+            ],
+            [
+                None,
+                None,
+                None,
+                "http://website.com",
+                "http://www.website.com",
+                "http://website.com",
+                "https://website.com",
+                None,
+                "",
+            ],
+        )
     ),
 )
 def test_parse_team_websites(website, expected_website, test_data_importer, ndb_stub):
@@ -186,7 +188,7 @@ def test_parse_team_websites(website, expected_website, test_data_importer, ndb_
         return False
 
     with patch.object(
-        WebsiteBlacklist, "is_blacklisted", side_effect=blacklist_side_effect
+        WebsiteBlocklist, "is_blacklisted", side_effect=blacklist_side_effect
     ):
         team_details, more_results = FMSAPITeamDetailsParser(2015).parse(data)
 

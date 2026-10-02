@@ -64,4 +64,10 @@ def test_get_files():
     with patch.object(storage, "_client_for_env", return_value=client):
         storage.get_files(path)
 
-    client.get_files.assert_called_with(path)
+    client.get_files.assert_called_with(path, recursive=False)
+
+
+def test_client_for_env_requires_project(monkeypatch: MonkeyPatch) -> None:
+    monkeypatch.delenv("GOOGLE_CLOUD_PROJECT", raising=False)
+    with pytest.raises(ValueError, match="GOOGLE_CLOUD_PROJECT"):
+        storage.read("some_file.json")

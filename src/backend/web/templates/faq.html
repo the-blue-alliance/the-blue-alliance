@@ -1,0 +1,103 @@
+{% extends "base.html" %}
+
+{% block title %}Frequently Asked Questions - The Blue Alliance{% endblock %}
+
+{% block meta_description %}The Blue Alliance Frequently Asked Questions{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="row">
+    <div class="col-sm-3 col-lg-2">
+      <div class="tba-sidenav-affixed">
+        <h1 class="visible-xs end_header">Frequently Asked Questions</h1>
+
+        <div class="tba-sidebar">
+          <ul class="nav tba-sidenav">
+              <li><a class="smooth-scroll" href="#data-sources">Data Sources</a></li>
+              <li><a class="smooth-scroll" href="#data-freshness">Data Freshness</a></li>
+              <li><a class="smooth-scroll" href="#data-accuracy">Data Accuracy</a></li>
+              <li><a class="smooth-scroll" href="#team-data">Team Data</a></li>
+              <li><a class="smooth-scroll" href="#event-data">Event Data</a></li>
+              <li><a class="smooth-scroll" href="#feature-requests">Feature Requests</a></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="col-xs-12 col-sm-9 col-lg-10">
+      <h1 class="hidden-xs end_header">Frequently Asked Questions</h1>
+      <p>This page provides answers to some of the most Frequently Asked Questions about TBA.</p>
+
+      <h2 id="data-sources">Data Sources</h2>
+        <p>TBA sources its data from a number of sources depending on many factors.</p>
+        <div class="row">
+            <div class="col-xs-6 col-sm-5 col-lg-6">
+                <h3>Data from Official Sources</h3>
+                <p>TBA gathers a great deal of information from official sources published by <i>FIRST</i>. This includes
+                    information about teams, events, match results, awards, as well as many match videos. Generally,
+                    official sources are available and used for more recent seasons.</p>
+                <p>Teams themselves can access and update some team-related data on TBA by using the
+                    <a href="/mod">Team Admin Dashboard</a>.</p>
+            </div>
+            <div class="col-xs-6 col-sm-4 col-lg-6">
+                <h3>Crowdsourced Data</h3>
+                <p>TBA also gathers a great deal of information from crowdsourced sources. This includes information
+                    such as robot pictures, reveal videos, robot CAD files, and social media links. Additionally, some
+                    match videos recorded by partners or teams themselves are included.</p>
+                <p>Users will see links on various pages throughout TBA to suggest additional information, videos, or
+                    images.</p>
+                <p>Finally, a great deal of historical information available on TBA is not available from official
+                    sources and is instead crowdsourced from the community.</p>
+            </div>
+        </div>
+
+      <h2 id="data-freshness">Data Freshness</h2>
+      <p>TBA strives to have the most up-to-date data available. For data provided by <i>FIRST</i>, TBA will make every
+          effort to ensure that data is accurate and up to date, while maintaining an economically viable service to
+          the community. Two key parts of that process are the refresh-rate and caching of data.</p>
+      <p>TBA regularly updates current-season data, while providing frequent updates to events-in-progress and
+          less frequent updates to other events. Events in progress will often update within minutes, if not faster,
+          while events that have concluded or not begun may take 24 hours, or longer, to update.</p>
+      <p>Please note that offseason or unofficial events may require manual updates from the event organizer.</p>
+      <p>Aside from the data refresh rate, TBA uses an aggressive caching system to provide our service at scale. As a
+          result, data may be provided from one of our caches and appear stale temporarily. This is normal and expected
+          behavior. You can check this by looking at the bottom of the page for the date and time each page was
+          generated. Also refer to our <a href="/apidocs">API reference</a> for more information on API response
+          caching.</p>
+      <p>If you notice out of data, please <a href="/contact">contact us</a> to help us keep TBA up to date.</p>
+
+
+      <h2 id="data-accuracy">Data Accuracy</h2>
+      <p>TBA strives to have the most up-to-date and accurate data available. For data provided by <i>FIRST</i>,
+          TBA will make every effort to ensure that data is accurate and up to date. If <i>FIRST</i>-provided data
+          is incorrect, we encourage the affected team to contact <i>FIRST</i> directly to correct the information.</p>
+      <p>For crowdsourced data, please <a href="/contact">Contact Us</a> with any data issues.</p>
+
+
+      <h2 id="team-data">Updating Team Data</h2>
+      <p>Teams seeking to update their team data shown on TBA must contact <i>FIRST</i> to update any of the following:
+          Team name, location (city, state, country), sponsor information, or avatar. Images, team videos, and social
+          media links can be updated or removed using the <a href="/mod">Team Admin Dashboard</a> and any user can
+          suggest new videos or links from the team page, subject to moderation.</p>
+
+
+      <h2 id="event-data">Updating Event Data</h2>
+      <p>If you wish to add to, or correct, historical event information not currently provided by <i>FIRST</i>, you can
+          <a href="/contact">contact us</a> providing a description of the change you wish made and any supporting
+          documentation. For offseason or unofficial events that are not using FMS Sync, please contact the event
+          organizer and ask them to reach out to us. For events with data provided by <i>FIRST</i>, please contact
+          <i>FIRST</i> directly to correct the information.</p>
+        <p>In the rare case where event information has been changed after the conclusion of the event, TBA may retain
+          older or incorrect information for some time. If several days have passed, please <a href="/contact">contact us</a>
+          to request that the information be updated.</p>
+
+
+      <h2 id="feature-requests">Feature Requests</h2>
+      <p>The Blue Alliance welcomes feature requests from the community. If you have an idea for a new feature or
+          improvement, please open an issue on our <a href="https://github.com/the-blue-alliance">GitHub page</a> with
+          your suggestion. We value your input and will consider all valid feature requests for future development.</p>
+      <p>The Blue Alliance is a community-driven Open Source Project. We welcome contributions from the community to help
+          improve the platform and make it more useful for everyone.</p>
+    </div>
+  </div>
+</div>
+{% endblock %}

@@ -6,6 +6,7 @@ from werkzeug.wrappers import Request, Response
 from werkzeug.wsgi import ClosingIterator
 
 from backend.common.environment import Environment
+from backend.common.logging import logging_context
 from backend.common.profiler import send_traces, Span, trace_context
 from backend.common.run_after_response import execute_callbacks, response_context
 
@@ -24,7 +25,10 @@ class AppspotRedirectMiddleware:
         request = Request(environ)
         host = request.host.lower()
 
-        if host in ("tbatv-prod-hrd.appspot.com", "www.tbatv-prod-hrd.appspot.com"):
+        if not request.path.startswith("/_ah/") and host in (
+            "tbatv-prod-hrd.appspot.com",
+            "www.tbatv-prod-hrd.appspot.com",
+        ):
             redirect_url = f"https://www.thebluealliance.com{request.full_path}"
 
             # Create a 301 (permanent) redirect response
@@ -36,7 +40,7 @@ class AppspotRedirectMiddleware:
 
 class TraceRequestMiddleware:
     """
-    A middleware that gives trace_context access to the request
+    A middleware that gives trace_context and logging_context access to the request
     """
 
     app: Callable[[Any, Any], Any]
@@ -45,7 +49,12 @@ class TraceRequestMiddleware:
         self.app = app
 
     def __call__(self, environ: Any, start_response: Any):
-        trace_context.request = Request(environ)
+        request = Request(environ)
+        trace_context.request = request
+        # Initialize logging_context with the request and an empty logging_context dict
+        logging_context.request = request
+        if not hasattr(logging_context.request, "logging_context"):
+            logging_context.request.logging_context = {}
         return self.app(environ, start_response)
 
 
@@ -62,12 +71,26 @@ class AfterResponseMiddleware:
     @ndb.toplevel
     def __call__(self, environ: Any, start_response: Any):
         response_context.request = Request(environ)
-        return ClosingIterator(self.app(environ, start_response), self._run_after)
+        try:
+            app_iter = self.app(environ, start_response)
+        except Exception:
+            self._cleanup()
+            send_traces()
+            raise
+        return ClosingIterator(app_iter, self._run_after)
 
-    def _run_after(self):
-        with Span("Running AfterResponseMiddleware"):
-            execute_callbacks()
-        send_traces()
+    @ndb.toplevel
+    def _run_after(self) -> None:
+        try:
+            with Span("Running AfterResponseMiddleware"):
+                execute_callbacks()
+            send_traces()
+        finally:
+            self._cleanup()
+
+    def _cleanup(self) -> None:
+        if hasattr(response_context, "request"):
+            del response_context.request
 
 
 def install_middleware(

@@ -4,6 +4,10 @@ import tempfile
 from pathlib import Path
 from typing import Optional
 
+# The GCP project the real site runs in; every other App Engine deploy is a
+# contributor's own
+PROD_PROJECT_ID = "tbatv-prod-hrd"
+
 
 @enum.unique
 class EnvironmentMode(enum.Enum):
@@ -34,6 +38,15 @@ class Environment:
     def is_prod() -> bool:
         env = os.environ.get("GAE_ENV")
         return env is not None and env.startswith("standard")
+
+    @classmethod
+    def is_prod_project(cls) -> bool:
+        """
+        Running on App Engine *in the production project*, as opposed to a
+        contributor's own GAE project. Gate side effects that reach real
+        people (email) on this rather than is_prod().
+        """
+        return cls.is_prod() and cls.project() == PROD_PROJECT_ID
 
     @staticmethod
     def service() -> Optional[str]:
@@ -86,3 +99,66 @@ class Environment:
         if Environment.is_prod():
             return True
         return bool(os.environ.get("SAVE_FRC_API_RESPONSE", False))
+
+    _commit_info: Optional[tuple[Optional[str], Optional[str]]] = None
+
+    @classmethod
+    def commit_info(cls) -> tuple[Optional[str], Optional[str]]:
+        """Returns (sha, shortlog) for the running code."""
+        if cls._commit_info is not None:
+            return cls._commit_info
+
+        # Try baked COMMIT file (production deploys)
+        # Format: "<sha> <shortlog>"
+        commit_file = Path(__file__).resolve().parents[3] / "COMMIT"
+        try:
+            line = commit_file.read_text().strip()
+            if line:
+                parts = line.split(" ", 1)
+                sha = parts[0]
+                shortlog = parts[1] if len(parts) > 1 else None
+                cls._commit_info = (sha, shortlog)
+                return cls._commit_info
+        except OSError:
+            pass
+
+        # Fall back to reading .git/HEAD directly (dev server)
+        # The repo is mounted into the container but git isn't installed
+        sha = cls._read_git_head()
+        if sha:
+            cls._commit_info = (sha, None)
+            return cls._commit_info
+
+        cls._commit_info = (None, None)
+        return cls._commit_info
+
+    @classmethod
+    def _read_git_head(cls) -> Optional[str]:
+        git_dir = Path(__file__).resolve().parents[4] / ".git"
+        try:
+            head = (git_dir / "HEAD").read_text().strip()
+        except OSError:
+            return None
+
+        if not head.startswith("ref: "):
+            return head  # detached HEAD, already a SHA
+
+        ref = head[5:]
+        # Try loose ref file first
+        try:
+            return (git_dir / ref).read_text().strip()
+        except OSError:
+            pass
+
+        # Fall back to packed-refs
+        try:
+            for packed_line in (git_dir / "packed-refs").read_text().splitlines():
+                if packed_line.startswith("#"):
+                    continue
+                parts = packed_line.split()
+                if len(parts) == 2 and parts[1] == ref:
+                    return parts[0]
+        except OSError:
+            pass
+
+        return None

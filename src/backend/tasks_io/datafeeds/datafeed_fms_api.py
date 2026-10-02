@@ -3,10 +3,16 @@ import json
 import logging
 from typing import Any, Dict, Generator, List, Optional, Set, Tuple
 
+from flask import has_request_context, request
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
+from backend.common.datafeeds.parsers.parser_base import (
+    ParserBase,
+    TParsedResponse,
+    TParserInput,
+)
 from backend.common.frc_api import FRCAPI
 from backend.common.frc_api.frc_api import TScoreDetailReturn
 from backend.common.frc_api.types import (
@@ -16,10 +22,15 @@ from backend.common.frc_api.types import (
     DistrictRankingListModelV2,
     EventRankingListModelV2,
     EventScheduleHybridModelV2,
+    RegionalRankingTeamDetailListModelV31,
     SeasonDistrictListModelV2,
     SeasonEventListModelV31,
+    SeasonEventListModelV33,
     SeasonTeamListModelV2,
     TeamAvatarListingsModelV2,
+)
+from backend.common.memcache_models.event_sync_status_memcache import (
+    EventSyncStatusMemcache,
 )
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
@@ -32,6 +43,7 @@ from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import DistrictKey, EventKey, TeamKey, Year
 from backend.common.models.match import Match
 from backend.common.models.media import Media
+from backend.common.models.regional_pool_advancement import RegionalPoolAdvancement
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.common.profiler import Span
@@ -61,6 +73,10 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_match_parser import (
     FMSAPIHybridScheduleParser,
     FMSAPIMatchDetailsParser,
 )
+from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_regional_rankings_parser import (
+    FMSAPIRegionalRankingsParser,
+    TParsedRegionalAdvancement,
+)
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_root_parser import (
     FMSAPIRootParser,
     RootInfo,
@@ -70,11 +86,6 @@ from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_avatar_parser impor
 )
 from backend.tasks_io.datafeeds.parsers.fms_api.fms_api_team_details_parser import (
     FMSAPITeamDetailsParser,
-)
-from backend.tasks_io.datafeeds.parsers.parser_base import (
-    ParserBase,
-    TParsedResponse,
-    TParserInput,
 )
 
 
@@ -159,9 +170,9 @@ class DatafeedFMSAPI:
     def get_event_list(
         self, year: Year
     ) -> Generator[Any, Any, Tuple[List[Event], List[District]]]:
-        event_list_response: TypedURLFetchResult[SeasonEventListModelV31] = (
-            yield self.api.event_list(year)
-        )
+        event_list_response: TypedURLFetchResult[
+            SeasonEventListModelV31 | SeasonEventListModelV33
+        ] = (yield self.api.event_list(year))
         result = self._parse(event_list_response, FMSAPIEventListParser(year))
         return result or ([], [])
 
@@ -175,12 +186,13 @@ class DatafeedFMSAPI:
 
         event = Event.get_by_id(event_key)
         api_event_short = self._get_event_short(year, event_short, event)
-        event_info_response: TypedURLFetchResult[SeasonEventListModelV31] = (
-            yield self.api.event_info(year, api_event_short)
-        )
+        event_info_response: TypedURLFetchResult[
+            SeasonEventListModelV31 | SeasonEventListModelV33
+        ] = (yield self.api.event_info(year, api_event_short))
         result = self._parse(
             event_info_response,
             FMSAPIEventListParser(year, short=event_short),
+            event_key=event_key,
         )
         return result or ([], [])
 
@@ -206,7 +218,7 @@ class DatafeedFMSAPI:
             page_response: TypedURLFetchResult[SeasonTeamListModelV2] = (
                 yield self.api.event_teams(year, event_code, page)
             )
-            result = self._parse(page_response, parser)
+            result = self._parse(page_response, parser, event_key=event_key)
             if result is None:
                 break
 
@@ -220,6 +232,10 @@ class DatafeedFMSAPI:
     @typed_tasklet
     def get_awards(self, event: Event) -> Generator[Any, Any, List[Award]]:
         awards: List[Award] = []
+        # key_name requires both year and event_short to be set
+        event_key_name: Optional[EventKey] = (
+            event.key_name if event.year and event.event_short else None
+        )
 
         # 8 subdivisions from 2015-2021 have awards listed under 4 divisions
         if (
@@ -246,6 +262,7 @@ class DatafeedFMSAPI:
                 self._parse(
                     api_awards_response,
                     FMSAPIAwardsParser(event, valid_team_nums),
+                    event_key=event_key_name,
                 )
                 or []
             )
@@ -258,14 +275,21 @@ class DatafeedFMSAPI:
                 ),
             )
         )
-        awards += self._parse(api_awards_response, FMSAPIAwardsParser(event)) or []
+        awards += (
+            self._parse(
+                api_awards_response,
+                FMSAPIAwardsParser(event),
+                event_key=event_key_name,
+            )
+            or []
+        )
 
         return awards
 
     @typed_tasklet
     def get_event_alliances(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, List[EventAlliance]]:
+    ) -> Generator[Any, Any, Optional[List[EventAlliance]]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -274,13 +298,14 @@ class DatafeedFMSAPI:
         api_response: TypedURLFetchResult[AllianceListModelV2] = (
             yield self.api.alliances(year, api_event_short)
         )
-        alliances = self._parse(api_response, FMSAPIEventAlliancesParser()) or []
-        return alliances
+        return self._parse(
+            api_response, FMSAPIEventAlliancesParser(), event_key=event_key
+        )
 
     @typed_tasklet
     def get_event_rankings(
         self, event_key: EventKey
-    ) -> Generator[Any, Any, List[EventRanking]]:
+    ) -> Generator[Any, Any, Optional[List[EventRanking]]]:
         year = int(event_key[:4])
         event_short = event_key[4:]
 
@@ -289,8 +314,9 @@ class DatafeedFMSAPI:
         api_response: TypedURLFetchResult[EventRankingListModelV2] = (
             yield self.api.rankings(year, api_event_short)
         )
-        result = self._parse(api_response, FMSAPIEventRankingsParser(year))
-        return result or []
+        return self._parse(
+            api_response, FMSAPIEventRankingsParser(year), event_key=event_key
+        )
 
     @typed_tasklet
     def get_event_matches(
@@ -344,8 +370,16 @@ class DatafeedFMSAPI:
             playoff_scores_result,
         ) = yield (qual_fetches + playoff_fetches)
 
-        qual_matches_merged = self._parse(qual_hybrid_schedule_result, hs_parser)
-        playoff_matches_merged = self._parse(playoff_hybrid_schedule_result, hs_parser)
+        qual_matches_merged = self._parse(
+            qual_hybrid_schedule_result,
+            hs_parser,
+            event_key=event_key,
+        )
+        playoff_matches_merged = self._parse(
+            playoff_hybrid_schedule_result,
+            hs_parser,
+            event_key=event_key,
+        )
 
         # Organize matches by key
         matches_by_key = {}
@@ -360,8 +394,12 @@ class DatafeedFMSAPI:
             remapped_playoff_matches = playoff_matches_merged[1]
 
         # Add details to matches based on key
-        qual_details = self._parse(qual_scores_result, detail_parser) or {}
-        playoff_details = self._parse(playoff_scores_result, detail_parser) or {}
+        qual_details = (
+            self._parse(qual_scores_result, detail_parser, event_key=event_key) or {}
+        )
+        playoff_details = (
+            self._parse(playoff_scores_result, detail_parser, event_key=event_key) or {}
+        )
         for match_key, match_details in {**qual_details, **playoff_details}.items():
             # Deal with remapped playoff matches, defaulting to the original match key
             match_key = remapped_playoff_matches.get(match_key, match_key)
@@ -397,7 +435,7 @@ class DatafeedFMSAPI:
             avatar_result: TypedURLFetchResult[TeamAvatarListingsModelV2] = (
                 yield self.api.event_team_avatars(year, api_event_short, page)
             )
-            result = self._parse(avatar_result, parser)
+            result = self._parse(avatar_result, parser, event_key=event_key)
             if result is None:
                 break
 
@@ -450,6 +488,35 @@ class DatafeedFMSAPI:
             adjustments=adjustments,
         )
 
+    @typed_tasklet
+    def get_regional_rankings(
+        self, year: Year
+    ) -> Generator[Any, Any, TParsedRegionalAdvancement]:
+        advancement: RegionalPoolAdvancement = {}
+        adjustments: Dict[TeamKey, int] = {}
+
+        more_pages = True
+        page = 1
+
+        parser = FMSAPIRegionalRankingsParser()
+        while more_pages:
+            api_result: TypedURLFetchResult[RegionalRankingTeamDetailListModelV31] = (
+                yield self.api.regional_rankings(year, page)
+            )
+            result = self._parse(api_result, parser)
+            if not result:
+                break
+
+            advancement_page, more_pages = result
+            advancement.update(advancement_page.advancement)
+            adjustments.update(advancement_page.adjustments)
+            page = page + 1
+
+        return TParsedRegionalAdvancement(
+            advancement=advancement,
+            adjustments=adjustments,
+        )
+
     @classmethod
     def _get_event_short(
         self, year: int, event_short: str, event: Optional[Event]
@@ -462,9 +529,13 @@ class DatafeedFMSAPI:
         self,
         response: TypedURLFetchResult[TParserInput],
         parser: ParserBase[TParserInput, TParsedResponse],
+        event_key: Optional[EventKey] = None,
     ) -> Optional[TParsedResponse]:
         if response.status_code == 200:
             ApiStatusFMSApiDown.set_down(False)
+
+            if event_key and response.url:
+                self._record_sync_status_success(event_key)
 
             with Span(f"datafeed_fmsapi_parser:{type(parser).__name__}"):
                 resp_body = response.json()
@@ -472,14 +543,32 @@ class DatafeedFMSAPI:
                     return None
                 return parser.parse(resp_body)
 
-        elif response.status_code // 100 == 5:
-            # 5XX error - something is wrong with the server
+        elif response.status_code // 100 == 5 or response.status_code == 408:
+            # 5XX error or 408 - something is wrong with the server or request timed out
             ApiStatusFMSApiDown.set_down(True)
+
+        if event_key and response.url:
+            self._record_sync_status_failure(event_key)
 
         logging.warning(
             f"Fetch for {response.url} failed; Error code {response.status_code}; {response.content}"
         )
         return None
+
+    def _request_endpoint(self) -> Optional[str]:
+        if not has_request_context():
+            return None
+        return request.endpoint
+
+    def _record_sync_status_success(self, event_key: EventKey) -> None:
+        endpoint = self._request_endpoint()
+        if endpoint:
+            EventSyncStatusMemcache(event_key).record_success(endpoint)
+
+    def _record_sync_status_failure(self, event_key: EventKey) -> None:
+        endpoint = self._request_endpoint()
+        if endpoint:
+            EventSyncStatusMemcache(event_key).record_failure(endpoint)
 
     @ndb.tasklet
     def _stub_fetch_hybrid_schedule(self):

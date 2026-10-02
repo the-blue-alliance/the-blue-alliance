@@ -1,6 +1,6 @@
 from typing import List, Optional
 
-from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
+from backend.common.game_specific.registry import get_game
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_ranking import EventRanking
 from backend.common.models.event_team_status import WLTRecord
@@ -9,10 +9,6 @@ from backend.common.models.ranking_sort_order_info import RankingSortOrderInfo
 
 
 class RankingsHelper:
-    NO_RECORD_YEARS = {2010, 2015, 2021}
-
-    QUAL_AVERAGE_YEARS = {2015}
-
     @classmethod
     def build_ranking(
         cls,
@@ -27,15 +23,16 @@ class RankingsHelper:
         dq: int,
         sort_orders: List[float],
     ) -> EventRanking:
+        game = get_game(year)
         record: Optional[WLTRecord] = None
-        if year not in cls.NO_RECORD_YEARS:
+        if game.record_in_rankings():
             record = {
                 "wins": int(wins),
                 "losses": int(losses),
                 "ties": int(ties),
             }
 
-        if year not in cls.QUAL_AVERAGE_YEARS:
+        if not game.qual_average_in_rankings():
             qual_average = None
 
         sort_orders_sanitized = []
@@ -59,4 +56,4 @@ class RankingsHelper:
     def get_sort_order_info(
         cls, event_details: EventDetails
     ) -> Optional[List[RankingSortOrderInfo]]:
-        return SORT_ORDER_INFO.get(event_details.game_year)
+        return get_game(event_details.game_year).ranking_sort_order_info()

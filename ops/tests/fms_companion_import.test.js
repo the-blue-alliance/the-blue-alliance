@@ -8,7 +8,7 @@ const { execSync } = require("child_process");
 const crypto = require("crypto");
 const FormData = require("form-data");
 
-jest.setTimeout(60000);
+jest.setTimeout(120000);
 
 describe("FMS Companion Import", () => {
   let eventKey = null;
@@ -132,7 +132,7 @@ describe("FMS Companion Import", () => {
       if (error.stderr) console.error("stderr:", error.stderr);
       throw error;
     }
-  });
+  }, 180000); // 3 min — container execution + data processing
 
   it("should have matches written", async () => {
     expect(eventKey).not.toBeNull();

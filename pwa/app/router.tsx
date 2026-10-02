@@ -1,9 +1,23 @@
-import * as Sentry from '@sentry/tanstackstart-react';
-import { QueryClient } from '@tanstack/react-query';
-import { createRouter } from '@tanstack/react-router';
+import {
+  captureException,
+  init as sentryInit,
+  tanstackRouterBrowserTracingIntegration,
+} from '@sentry/tanstackstart-react';
+import {
+  type ErrorComponentProps,
+  type ParsedLocation,
+  createRouter,
+} from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { useEffect } from 'react';
+import { toast } from 'sonner';
 
+import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
+
+import { Button } from '~/components/ui/button';
+import { getAnalyticsInstance } from '~/firebase/firebaseConfig';
+import { ApiError } from '~/lib/apiError';
+import { createQueryClient } from '~/lib/queryClient';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
 import { createLogger } from '~/lib/utils';
 import { routeTree } from '~/routeTree.gen';
@@ -12,12 +26,12 @@ const queryCacheLogger = createLogger('queryCache');
 const routerLogger = createLogger('router');
 
 export function getRouter() {
-  const queryClient = new QueryClient();
+  const queryClient = createQueryClient();
   queryClient.getQueryCache().subscribe((event) => {
     // Only log "added" events (new queries) and "updated" events when query completes successfully
     // This reduces noise from intermediate state transitions (loading states)
     if (event.type === 'added') {
-      queryCacheLogger.info(
+      queryCacheLogger.debug(
         {
           type: event.type,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -33,7 +47,7 @@ export function getRouter() {
       event.query.state.data !== undefined
     ) {
       // Only log successful updates with data (not loading states)
-      queryCacheLogger.info(
+      queryCacheLogger.debug(
         {
           type: event.type,
           // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
@@ -51,9 +65,19 @@ export function getRouter() {
     context: {
       queryClient,
     },
+    // Preload on hover/touch so browse-heavy navigations (event → team → match)
+    // feel instant. defaultPreloadStaleTime: 0 means Router always invokes
+    // loaders on preload and lets React Query's staleTime own freshness —
+    // see https://tanstack.com/router/latest/docs/framework/react/guide/preloading
+    defaultPreload: 'intent',
+    defaultPreloadStaleTime: 0,
     scrollRestoration: ({ location }) => {
       return location.pathname !== '/apidocs/v3';
     },
+    // Scalar updates window.location.hash as you scroll through API docs; without
+    // this, TanStack Router's hashScrollIntoView causes the page to snap/jump.
+    // TableOfContents uses e.preventDefault() so it's unaffected by this setting.
+    defaultHashScrollIntoView: false,
     caseSensitive: true,
     defaultErrorComponent: ErrorComponent,
     defaultNotFoundComponent: NotFoundComponent,
@@ -64,39 +88,138 @@ export function getRouter() {
   });
 
   if (!router.isServer) {
-    Sentry.init({
+    sentryInit({
       dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-      sendDefaultPii: false,
-      enableLogs: true,
-      enableMetrics: true,
-      tracesSampleRate: 1,
-      replaysSessionSampleRate: 0.1,
-      replaysOnErrorSampleRate: 1,
-      profilesSampleRate: 1,
+      dataCollection: {
+        userInfo: false,
+        cookies: false,
+        httpHeaders: {
+          request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+          response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        },
+        httpBodies: [],
+        urlQueryParams: {
+          deny: ['forwarded', '-ip', 'remote-', 'via', '-user'],
+        },
+        genAI: { inputs: false, outputs: false },
+        databaseQueryData: false,
+        queues: false,
+        graphQL: { document: false, variables: false },
+      },
+      tracesSampleRate: 0.1,
 
-      integrations: [
-        // eslint-disable-next-line import/namespace
-        Sentry.tanstackRouterBrowserTracingIntegration(router),
-      ],
+      integrations: [tanstackRouterBrowserTracingIntegration(router)],
       enabled: process.env.NODE_ENV === 'production',
     });
     void registerServiceWorker();
+
+    router.subscribe(
+      'onResolved',
+      ({ toLocation }: { toLocation: ParsedLocation }) => {
+        void logPageView(toLocation.pathname, toLocation.href);
+      },
+    );
+
+    // onResolved doesn't fire for the initial hydration, so log it manually.
+    // Defer to idle so Firebase Analytics (gtag.js) stays off the hydration
+    // critical path.
+    const logInitialPageView = () =>
+      void logPageView(window.location.pathname, window.location.href);
+    if ('requestIdleCallback' in window) {
+      window.requestIdleCallback(logInitialPageView);
+    } else {
+      setTimeout(logInitialPageView, 1);
+    }
   }
 
   return router;
 }
 
-function ErrorComponent({ error }: { error: Error }) {
+// `firebase/analytics` and the gtag.js network request it triggers are loaded
+// lazily here so they stay out of the hydration critical path.
+async function logPageView(pagePath: string, pageLocation: string) {
+  const { logEvent } = await import('firebase/analytics');
+
+  const analytics = await getAnalyticsInstance();
+  if (analytics === null) {
+    return;
+  }
+
+  logEvent(analytics, 'page_view', {
+    page_path: pagePath,
+    page_location: pageLocation,
+    client_platform: 'pwa', // GA4 custom dimension
+  });
+}
+
+function ErrorComponent({ error }: ErrorComponentProps) {
   routerLogger.error(error, 'Router error');
 
   useEffect(() => {
-    Sentry.captureException(error);
+    // ApiErrors that bubble up here already went through the QueryCache's
+    // onError handler (see ~/lib/queryClient.ts), which reports them to
+    // Sentry — avoid double-reporting the same failure.
+    if (!(error instanceof ApiError)) {
+      captureException(error);
+    }
   }, [error]);
+
+  const normalizedError =
+    error instanceof Error ? error : new Error(String(error));
+  const stack = normalizedError.stack ?? normalizedError.message;
+
+  const agentPrompt = [
+    'I ran into the following error. Please find the root cause. ',
+    '',
+    `URL: ${window.location.href}`,
+    '',
+    'Stack trace:',
+    '```',
+    stack,
+    '```',
+  ].join('\n');
+
+  const copyToClipboard = async (text: string, label: string) => {
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success(`Copied ${label} to clipboard!`);
+    } catch {
+      toast.error('Failed to copy to clipboard.');
+    }
+  };
 
   return (
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>
       <h2 className="text-2xl">An error occurred.</h2>
+      {process.env.NODE_ENV !== 'production' && normalizedError.stack && (
+        <>
+          <div className="mt-4 flex gap-2">
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void copyToClipboard(stack, 'stack trace')}
+            >
+              <ClipboardCopyIcon />
+              Copy stack trace
+            </Button>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={() => void copyToClipboard(agentPrompt, 'agent prompt')}
+            >
+              <ClipboardCopyIcon />
+              Copy with agent prompt
+            </Button>
+          </div>
+          <pre
+            className="mt-4 overflow-x-auto rounded bg-muted p-4 text-sm
+              whitespace-pre-wrap"
+          >
+            {normalizedError.stack}
+          </pre>
+        </>
+      )}
     </div>
   );
 }

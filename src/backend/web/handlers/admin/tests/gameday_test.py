@@ -40,6 +40,36 @@ def test_add_special_webcast(web_client: Client, login_gae_admin, ndb_stub) -> N
     ]
 
 
+def test_add_special_webcast_with_date(
+    web_client: Client, login_gae_admin, ndb_stub
+) -> None:
+    resp = web_client.post(
+        "/admin/gameday",
+        data={
+            "action": "add",
+            "item": "webcast",
+            "webcast_type": "twitch",
+            "webcast_channel": "tbagameday",
+            "webcast_name": "TBA Gameday",
+            "webcast_urlkey": "gameday",
+            "webcast_date": "2023-04-01",
+        },
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/gameday"
+
+    sv_value = GamedaySpecialWebcasts.get()
+    assert sv_value["webcasts"] == [
+        TSpecialWebcast(
+            type=WebcastType.TWITCH,
+            channel="tbagameday",
+            name="TBA Gameday",
+            key_name="gameday",
+            date="2023-04-01",
+        )
+    ]
+
+
 def test_remove_special_webcast(web_client: Client, login_gae_admin, ndb_stub) -> None:
     GamedaySpecialWebcasts.add_special_webcast(
         TSpecialWebcast(

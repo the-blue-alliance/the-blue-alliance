@@ -1,9 +1,11 @@
 version: 2
 updates:
-- package-ecosystem: pip
+- package-ecosystem: uv
   directory: "/"
   schedule:
     interval: daily
+  cooldown:
+    default-days: 7
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: pyre-check
@@ -13,6 +15,8 @@ updates:
   directory: "/"
   schedule:
     interval: daily
+  cooldown:
+    default-days: 7
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: swagger-ui
@@ -30,6 +34,8 @@ updates:
   directory: "/pwa"
   schedule:
     interval: daily
+  cooldown:
+    default-days: 7
   open-pull-requests-limit: 10
   ignore:
   - dependency-name: "@types/node"
@@ -45,9 +51,6 @@ updates:
       patterns:
         - "embla-carousel-autoplay"
         - "embla-carousel-react"
-    radix-ui:
-      patterns:
-        - "@radix-ui/*"
     vite:
       patterns:
         - "vite"
@@ -56,26 +59,20 @@ updates:
         - "@vitest/coverage-v8"
         - "@julr/vite-plugin-validate-env"
         - "@vitejs/plugin-react"
-        - "babel-plugin-react-compiler"
+        - "oxc-transform-react"
     linting:
       patterns:
-        - "@eslint/*"
-        - "eslint"
-        - "eslint-config-prettier"
-        - "eslint-import-resolver-typescript"
-        - "eslint-plugin-import"
-        - "eslint-plugin-jsx-a11y"
+        - "oxlint"
+        - "oxlint-tsgolint"
+        - "@oxlint/*"
         - "eslint-plugin-no-relative-import-paths"
-        - "eslint-plugin-react"
-        - "eslint-plugin-react-hooks"
-        - "globals"
-        - "typescript-eslint"
-        - "@typescript-eslint/*"
         - "prettier"
         - "prettier-plugin-classnames"
         - "prettier-plugin-merge"
         - "prettier-plugin-tailwindcss"
         - "@trivago/prettier-plugin-sort-imports"
+        - "@tanstack/eslint-plugin-query"
+        - "@tanstack/eslint-plugin-router"
     sentry:
       patterns:
         - "@sentry/*"
@@ -85,11 +82,13 @@ updates:
         - "tailwindcss"
         - "tailwind-merge"
         - "tw-animate-css"
+        - "cn"
     icons:
       patterns:
         - "@iconify/json"
-        - "lucide-react"
         - "unplugin-icons"
+        - "@svgr/core"
+        - "@svgr/plugin-jsx"
     react:
       patterns:
         - "react"
@@ -104,6 +103,7 @@ updates:
     testing:
       patterns:
         - "@playwright/test"
+        - "lighthouse"
     logging:
       patterns:
         - "pino"

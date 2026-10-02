@@ -1,5 +1,8 @@
+import json
 import unittest
+from datetime import datetime
 from typing import cast
+from unittest.mock import patch
 
 import pytest
 from google.appengine.ext import ndb
@@ -9,14 +12,19 @@ from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.consts.media_type import MediaType
 from backend.common.consts.suggestion_state import SuggestionState
+from backend.common.consts.webcast_type import WebcastType
+from backend.common.futures import InstantFuture
 from backend.common.models.account import Account
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.team import Team
+from backend.common.models.webcast import WebcastChannel
 from backend.common.suggestions.media_parser import MediaParser
 from backend.common.suggestions.suggestion_creator import SuggestionCreator
+from backend.common.urlfetch import URLFetchResult
 
 
 @pytest.mark.usefixtures("ndb_context")
@@ -274,6 +282,51 @@ class TestEventMediaSuggestionCreator(SuggestionCreatorTest):
         status, _ = SuggestionCreator.createEventMediaSuggestion(
             self.account.key, "http://foobar.com/ruRAxDm", "2016nyny"
         ).get_result()
+        self.assertEqual(status, "bad_url")
+
+    def _patch_smugmug(self, response):
+        return patch.object(
+            MediaParser,
+            "_parse_smugmug",
+            return_value=InstantFuture(response),
+        )
+
+    def test_create_album_suggestion(self) -> None:
+        album_dict = {
+            "media_type_enum": MediaType.SMUGMUG_ALBUM,
+            "is_social": False,
+            "foreign_key": "4RWMLM",
+            "site_name": "SmugMug Album",
+        }
+        url = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
+        with self._patch_smugmug(album_dict):
+            status, _ = SuggestionCreator.createEventMediaSuggestion(
+                self.account.key, url, "2016nyny"
+            ).get_result()
+        self.assertEqual(status, "success")
+
+        suggestion = Suggestion.get_by_id(
+            Suggestion.render_media_key_name(
+                2016, "event", "2016nyny", "smugmug-album", "4RWMLM"
+            )
+        )
+        self.assertIsNotNone(suggestion)
+        self.assertEqual(suggestion.target_model, "event_media")
+        self.assertEqual(suggestion.contents["reference_type"], "event")
+        self.assertEqual(suggestion.contents["reference_key"], "2016nyny")
+
+    def test_create_photo_suggestion_rejected(self) -> None:
+        photo_dict = {
+            "media_type_enum": MediaType.SMUGMUG_PHOTO,
+            "is_social": False,
+            "foreign_key": "xxrbgK6",
+            "site_name": "SmugMug Photo",
+        }
+        url = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6/A"
+        with self._patch_smugmug(photo_dict):
+            status, _ = SuggestionCreator.createEventMediaSuggestion(
+                self.account.key, url, "2016nyny"
+            ).get_result()
         self.assertEqual(status, "bad_url")
 
 
@@ -662,7 +715,7 @@ class TestApiWriteSuggestionCreator(SuggestionCreatorTest):
 class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
     def test_bad_event(self) -> None:
         status = SuggestionCreator.createEventWebcastSuggestion(
-            self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
+            self.account.key, "http://twitch.tv/frcgamesense", "", "2016doesnotexist"
         ).get_result()
         self.assertEqual(status, "bad_event")
 
@@ -875,6 +928,498 @@ class TestSuggestEventWebcastCreator(SuggestionCreatorTest):
         self.assertIsNotNone(suggestion.contents.get("webcast_dict"))
         self.assertEqual(suggestion.contents.get("webcast_date"), "2017-02-28")
 
+    def test_youtube_webcast_autofill_date(self) -> None:
+        event = Event(
+            id="2016test",
+            name="Test Event",
+            event_short="Test Event",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        )
+        event.put()
+
+        api_resp = {
+            "items": [
+                {
+                    "id": "abc123",
+                    "liveStreamingDetails": {
+                        "scheduledStartTime": "2016-03-15T18:00:00Z",
+                    },
+                }
+            ]
+        }
+        mock_urlfetch_result = URLFetchResult.mock_for_content(
+            "https://www.googleapis.com/youtube/v3/videos",
+            200,
+            json.dumps(api_resp),
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
+
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch",
+                return_value=mock_future,
+            ):
+                status = SuggestionCreator.createEventWebcastSuggestion(
+                    self.account.key,
+                    "https://www.youtube.com/watch?v=abc123",
+                    "",
+                    "2016test",
+                ).get_result()
+
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertIsNotNone(suggestion.contents.get("webcast_dict"))
+        self.assertEqual(suggestion.contents.get("webcast_date"), "2016-03-15")
+        self.assertEqual(suggestion.contents.get("stream_title"), "")
+        self.assertIsNone(suggestion.contents.get("stream_description"))
+        self.assertEqual(
+            suggestion.contents.get("stream_scheduled_start_time"), "2016-03-15"
+        )
+
+    def test_youtube_webcast_no_autofill_when_date_provided(self) -> None:
+        event = Event(
+            id="2016test",
+            name="Test Event",
+            event_short="Test Event",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        )
+        event.put()
+
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=abc123",
+            "2016-04-01",
+            "2016test",
+        ).get_result()
+
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertEqual(suggestion.contents.get("webcast_date"), "2016-04-01")
+
+    def test_youtube_webcast_autofill_date_api_failure(self) -> None:
+        event = Event(
+            id="2016test",
+            name="Test Event",
+            event_short="Test Event",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        )
+        event.put()
+
+        mock_urlfetch_result = URLFetchResult.mock_for_content(
+            "https://www.googleapis.com/youtube/v3/videos",
+            200,
+            '{"items": []}',
+        )
+        mock_future = InstantFuture(mock_urlfetch_result)
+
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch",
+                return_value=mock_future,
+            ):
+                status = SuggestionCreator.createEventWebcastSuggestion(
+                    self.account.key,
+                    "https://www.youtube.com/watch?v=abc123",
+                    "",
+                    "2016test",
+                ).get_result()
+
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertIsNotNone(suggestion.contents.get("webcast_dict"))
+        self.assertIsNone(suggestion.contents.get("webcast_date"))
+
+    def _make_district_event_with_youtube_channel(
+        self,
+        channel_id: str = "UCfirstinmichigan",
+        event_short_name: str = "Troy",
+    ) -> Event:
+        """Helper to create a district and event with a configured YouTube channel."""
+        from datetime import datetime as _dt
+
+        District(
+            id="2016fim",
+            year=2016,
+            abbreviation="fim",
+            webcast_channels=[
+                WebcastChannel(
+                    type=WebcastType.YOUTUBE,
+                    channel="firstinmichigan",
+                    channel_id=channel_id,
+                )
+            ],
+        ).put()
+        event = Event(
+            id="2016fim1",
+            name="FIM District Troy Event",
+            event_short="fim1",
+            short_name=event_short_name,
+            year=2016,
+            event_type_enum=EventType.DISTRICT,
+            district_key=ndb.Key(District, "2016fim"),
+            start_date=_dt(2016, 3, 14),
+            end_date=_dt(2016, 3, 16),
+        )
+        event.put()
+        return event
+
+    def _make_youtube_api_response(
+        self,
+        video_id: str = "abc123",
+        channel_id: str = "UCfirstinmichigan",
+        title: str = "Troy District Event - Qualifications",
+        description: str = "FIM1 District Event",
+        scheduled_start_time: str = "2016-03-15T18:00:00Z",
+    ) -> str:
+        """Helper to build a YouTube API JSON response for video details."""
+        item: dict = {
+            "id": video_id,
+            "snippet": {
+                "title": title,
+                "description": description,
+                "channelId": channel_id,
+            },
+        }
+        if scheduled_start_time:
+            item["liveStreamingDetails"] = {
+                "scheduledStartTime": scheduled_start_time,
+            }
+        return json.dumps({"items": [item]})
+
+    def test_youtube_webcast_auto_approve_from_district_channel(self) -> None:
+        """Auto-approve when video is from a known district channel and title matches event."""
+        self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCfirstinmichigan",
+            title="Troy District Event - Qualifications",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_called_once()
+        # Verify the API date was used (event spans 2016-03-14 to 2016-03-16)
+        webcast_arg = mock_add_webcast.call_args[0][1]
+        self.assertEqual(webcast_arg.get("date"), "2016-03-15")
+        # No pending suggestion should be created
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 0)
+
+    def test_youtube_webcast_auto_approve_with_explicit_date(self) -> None:
+        """Auto-approve uses YouTube API date (not user-provided) when within event dates."""
+        self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCfirstinmichigan",
+            title="Troy District Event - Qualifications",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "2016-04-01",  # user-provided date overridden by API date
+                        "2016fim1",
+                    ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_called_once()
+        # Verify the webcast passed to add_webcast uses the API date "2016-03-15"
+        webcast_arg = mock_add_webcast.call_args[0][1]
+        self.assertEqual(webcast_arg.get("date"), "2016-03-15")
+
+    def test_youtube_webcast_no_auto_approve_date_outside_event_range(self) -> None:
+        """No auto-approval when stream's scheduled date is outside the event's date range."""
+        self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        # Scheduled start time is far outside the event's 2016-03-14 to 2016-03-16 range
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCfirstinmichigan",
+            title="Troy District Event - Qualifications",
+            scheduled_start_time="2016-05-01T18:00:00Z",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        # Should fall through to normal suggestion (not auto-approved)
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+
+    def test_youtube_webcast_no_auto_approve_different_channel(self) -> None:
+        """No auto-approval when video channel does not match the district channel."""
+        self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCsomeotherchannel",  # Different channel
+            title="Troy District Event - Qualifications",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+
+    def test_youtube_webcast_no_auto_approve_event_title_no_match(self) -> None:
+        """No auto-approval when stream title/description do not match the event."""
+        self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCfirstinmichigan",
+            title="Completely Unrelated Stream",  # Title doesn't mention event
+            description="No relevant info",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+
+    def test_youtube_webcast_no_auto_approve_no_district(self) -> None:
+        """No auto-approval when event has no district configured."""
+        event = Event(
+            id="2016test",
+            name="Test Offseason Event",
+            event_short="test",
+            short_name="Test",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        )
+        event.put()
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCsomechannel",
+            title="Test Offseason Event",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016test",
+                    ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+
+    def test_youtube_webcast_no_auto_approve_district_no_youtube_channels(
+        self,
+    ) -> None:
+        """No auto-approval when district has no YouTube channels configured."""
+        District(
+            id="2016fim",
+            year=2016,
+            abbreviation="fim",
+            webcast_channels=[],  # No YouTube channels
+        ).put()
+        event = Event(
+            id="2016fim1",
+            name="FIM District Troy Event",
+            event_short="fim1",
+            short_name="Troy",
+            year=2016,
+            event_type_enum=EventType.DISTRICT,
+            district_key=ndb.Key(District, "2016fim"),
+        )
+        event.put()
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCsomechannel",
+            title="Troy District Event - Qualifications",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+
+    def test_youtube_webcast_auto_approve_skips_duplicate(self) -> None:
+        """Auto-approve skips add_webcast if webcast with same type/channel/date already exists."""
+        event = self._make_district_event_with_youtube_channel(
+            channel_id="UCfirstinmichigan", event_short_name="Troy"
+        )
+        # Pre-populate the event with the same webcast
+        import json as _json
+
+        event.webcast_json = _json.dumps(
+            [{"type": "youtube", "channel": "abc123", "date": "2016-03-15"}]
+        )
+        event.put()
+        api_resp = self._make_youtube_api_response(
+            channel_id="UCfirstinmichigan",
+            title="Troy District Event - Qualifications",
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_for_content(
+                "https://www.googleapis.com/youtube/v3/videos", 200, api_resp
+            )
+        )
+        with patch(
+            "backend.common.datafeeds.datafeed_youtube.GoogleApiSecret.secret_key",
+            return_value="test_key",
+        ):
+            with patch(
+                "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+            ):
+                with patch(
+                    "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+                ) as mock_add_webcast:
+                    status = SuggestionCreator.createEventWebcastSuggestion(
+                        self.account.key,
+                        "https://www.youtube.com/watch?v=abc123",
+                        "",
+                        "2016fim1",
+                    ).get_result()
+
+        # Still returns SUCCESS but does not call add_webcast for the duplicate
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+
 
 class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):
     def setUp(self) -> None:
@@ -970,3 +1515,265 @@ class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):
             self.account.key, "", "2016test_f1m1"
         )
         self.assertEqual(status, "bad_url")
+
+
+class TestTeamMediaSuggestionCreatorTargets(SuggestionCreatorTest):
+    def test_social_url_rejected_for_media_suggestion(self) -> None:
+        # A social profile URL submitted through the (non-social) media form
+        status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key, "https://github.com/frc1124", "frc1124", "2016"
+        ).get_result()
+        self.assertEqual(status, "bad_url")
+        self.assertIsNone(suggestion)
+        self.assertEqual(Suggestion.query().count(), 0)
+
+    def test_event_key_targets_event_media(self) -> None:
+        # The team media creator also backs event media when handed an event key
+        status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key, "http://imgur.com/ruRAxDm", "2016casj", "2016"
+        ).get_result()
+        self.assertEqual(status, "success")
+        suggestion = none_throws(suggestion)
+        self.assertEqual(suggestion.target_model, "event_media")
+        self.assertEqual(suggestion.target_key, "2016casj")
+        self.assertEqual(suggestion.contents["reference_type"], "event")
+        self.assertEqual(suggestion.contents["reference_key"], "2016casj")
+
+    def test_private_details_are_kept(self) -> None:
+        status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "http://imgur.com/ruRAxDm",
+            "frc1124",
+            "2016",
+            private_details_json=json.dumps({"secret": "shh"}),
+        ).get_result()
+        self.assertEqual(status, "success")
+        suggestion = none_throws(suggestion)
+        self.assertEqual(
+            suggestion.contents["private_details_json"], json.dumps({"secret": "shh"})
+        )
+
+    def test_cad_url_targets_robot(self) -> None:
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(
+                "https://cad.onshape.com/api/documents/5481081f48161555332968ff",
+                200,
+                json.dumps({"name": "Robot", "description": "", "createdAt": ""}),
+            )
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ):
+            status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+                self.account.key,
+                "https://cad.onshape.com/documents/5481081f48161555332968ff/w/a466cec29af372ec09c44333/e/abc123",
+                "frc1124",
+                "2016",
+            ).get_result()
+        self.assertEqual(status, "success")
+        self.assertEqual(none_throws(suggestion).target_model, "robot")
+
+
+class TestEventMediaSuggestionCreatorPrivateDetails(SuggestionCreatorTest):
+    def test_private_details_are_kept(self) -> None:
+        status, suggestion = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=H-54KMwMKY0",
+            "2016nyny",
+            private_details_json=json.dumps({"secret": "shh"}),
+        ).get_result()
+        self.assertEqual(status, "success")
+        suggestion = none_throws(suggestion)
+        self.assertEqual(
+            suggestion.contents["private_details_json"], json.dumps({"secret": "shh"})
+        )
+
+
+class TestSuggestEventWebcastCreatorEdgeCases(SuggestionCreatorTest):
+    def setUp(self) -> None:
+        super().setUp()
+        Event(
+            id="2016test",
+            name="Test Event",
+            event_short="test",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        ).put()
+
+    def test_unformattable_url(self) -> None:
+        # Non-ASCII URLs can't be cleaned up, so nothing is suggested
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key, "http://twitch.tv/frcgamesénse", "", "2016test"
+        ).get_result()
+        self.assertEqual(status, "bad_url")
+        self.assertEqual(Suggestion.query().count(), 0)
+
+    def test_webcast_parser_failure_is_treated_as_unknown_url(self) -> None:
+        with patch(
+            "backend.common.suggestions.suggestion_creator.WebcastParser.webcast_dict_from_url",
+            side_effect=RuntimeError("upstream down"),
+        ):
+            status = SuggestionCreator.createEventWebcastSuggestion(
+                self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
+            ).get_result()
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+        suggestion = cast(Suggestion, suggestions[0])
+        # Saved as an obscure webcast for a human to sort out
+        self.assertIsNone(suggestion.contents.get("webcast_dict"))
+        self.assertEqual(
+            suggestion.contents.get("webcast_url"), "http://twitch.tv/frcgamesense"
+        )
+
+
+class TestSuggestEventWebcastCreatorAutoApproveDates(SuggestionCreatorTest):
+    def test_unparseable_api_date_does_not_auto_approve(self) -> None:
+        # The YouTube parser normalises dates to YYYY-MM-DD; anything else
+        # from the helper is ignored rather than trusted
+        District(
+            id="2016fim",
+            year=2016,
+            abbreviation="fim",
+            webcast_channels=[
+                WebcastChannel(
+                    type=WebcastType.YOUTUBE,
+                    channel="firstinmichigan",
+                    channel_id="UCfirstinmichigan",
+                )
+            ],
+        ).put()
+        Event(
+            id="2016fim1",
+            name="FIM District Troy Event",
+            event_short="fim1",
+            short_name="Troy",
+            year=2016,
+            event_type_enum=EventType.DISTRICT,
+            district_key=ndb.Key(District, "2016fim"),
+            start_date=datetime(2016, 3, 14),
+            end_date=datetime(2016, 3, 16),
+        ).put()
+        video_details = {
+            "abc123": {
+                "title": "Troy District Event - Qualifications",
+                "description": "FIM1 District Event",
+                "channel_id": "UCfirstinmichigan",
+                "scheduled_start_time": "2016-03-15T18:00:00Z",
+            }
+        }
+        with patch(
+            "backend.common.suggestions.suggestion_creator.YouTubeVideoHelper.get_video_details_batch",
+            return_value=InstantFuture(video_details),
+        ):
+            with patch(
+                "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+            ) as mock_add_webcast:
+                status = SuggestionCreator.createEventWebcastSuggestion(
+                    self.account.key,
+                    "https://www.youtube.com/watch?v=abc123",
+                    "",
+                    "2016fim1",
+                ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertEqual(
+            suggestion.contents.get("webcast_date"), "2016-03-15T18:00:00Z"
+        )
+
+
+class TestDummyOffseasonSuggestions(SuggestionCreatorTest):
+    def _event(self, event_short: str = "test") -> Event:
+        return Event(
+            id=f"2016{event_short}",
+            name="Test Event",
+            event_short=event_short,
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+            start_date=datetime(2016, 8, 1),
+            end_date=datetime(2016, 8, 2),
+            website="http://example.com",
+            venue="Venue",
+            venue_address="1 Main St",
+            city="City",
+            state_prov="ST",
+            country="USA",
+        )
+
+    def test_creates_suggestion_for_new_event(self) -> None:
+        # Keep the key iterator intact so the loop body runs as intended
+        event = self._event()
+        with patch(
+            "backend.common.suggestions.suggestion_creator.ndb.get_multi",
+            return_value=[None],
+        ):
+            SuggestionCreator.createDummyOffseasonSuggestions([event])
+
+        suggestion = none_throws(Suggestion.get_by_id("offseason_with_data_2016test"))
+        bot = none_throws(Account.get_by_id("tba-bot-account"))
+        self.assertEqual(suggestion.author, bot.key)
+        self.assertEqual(suggestion.target_model, "offseason-event")
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+        self.assertEqual(suggestion.contents["name"], "Test Event")
+        self.assertEqual(suggestion.contents["start_date"], "2016-08-01")
+        self.assertEqual(suggestion.contents["end_date"], "2016-08-02")
+        self.assertEqual(suggestion.contents["first_code"], "TEST")
+        self.assertEqual(suggestion.contents["venue_name"], "Venue")
+        self.assertEqual(suggestion.contents["address"], "1 Main St")
+        self.assertEqual(suggestion.contents["city"], "City")
+        self.assertEqual(suggestion.contents["state"], "ST")
+        self.assertEqual(suggestion.contents["country"], "USA")
+
+    def test_skips_events_with_existing_suggestion(self) -> None:
+        event = self._event()
+        existing = Suggestion(
+            id="offseason_with_data_2016test",
+            author=self.account.key,
+            target_model="offseason-event",
+        )
+        existing.contents = {"name": "Already here"}
+        existing.put()
+
+        with patch(
+            "backend.common.suggestions.suggestion_creator.ndb.get_multi",
+            return_value=[existing],
+        ):
+            with patch.object(
+                SuggestionCreator, "createOffseasonEventSuggestion"
+            ) as mock_create:
+                SuggestionCreator.createDummyOffseasonSuggestions([event])
+
+        mock_create.assert_not_called()
+        self.assertEqual(Suggestion.query().count(), 1)
+
+    def test_logs_creation_failure(self) -> None:
+        event = self._event()
+        with patch(
+            "backend.common.suggestions.suggestion_creator.ndb.get_multi",
+            return_value=[None],
+        ):
+            with patch.object(
+                SuggestionCreator,
+                "createOffseasonEventSuggestion",
+                return_value=("validation_failure", {"name": "Missing event name"}),
+            ):
+                with self.assertLogs(level="WARNING") as logs:
+                    SuggestionCreator.createDummyOffseasonSuggestions([event])
+
+        self.assertTrue(
+            any("Failed to create suggestion" in line for line in logs.output)
+        )
+        self.assertEqual(Suggestion.query().count(), 0)
+
+
+class TestApiWriteSuggestionCreatorNoEventKey(SuggestionCreatorTest):
+    def test_empty_event_key(self) -> None:
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key, "", "Event Organizer", [1, 2, 3]
+        )
+        self.assertEqual(status, "bad_event")
+        self.assertEqual(Suggestion.query().count(), 0)

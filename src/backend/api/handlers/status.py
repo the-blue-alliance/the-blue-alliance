@@ -1,12 +1,15 @@
+from datetime import datetime
 from typing import cast
 
-from flask import Response
-
 from backend.api.handlers.decorators import api_authenticated
-from backend.api.handlers.helpers.profiled_jsonify import profiled_jsonify
+from backend.api.handlers.helpers.profiled_jsonify import (
+    profiled_jsonify,
+    TypedFlaskResponse,
+)
 from backend.api.handlers.helpers.track_call import track_call_after_response
 from backend.common.consts.teams import TEAM_PAGE_SIZE
 from backend.common.decorators import cached_public
+from backend.common.helpers.season_helper import SeasonHelper
 from backend.common.models.sitevar import Sitevar
 from backend.common.models.team import Team
 from backend.common.sitevars.apistatus import ApiStatus
@@ -14,8 +17,8 @@ from backend.common.sitevars.apistatus_fmsapi_down import ApiStatusFMSApiDown
 
 
 @api_authenticated
-@cached_public
-def status() -> Response:
+@cached_public(query_string=False)
+def status() -> TypedFlaskResponse[dict]:
     track_call_after_response("status", "status")
 
     # TODO: Remove Sitevar usage for Sitevar classes
@@ -35,5 +38,10 @@ def status() -> Response:
     max_team_page = int(max_team_num / TEAM_PAGE_SIZE)
 
     status["max_team_page"] = max_team_page
+
+    kickoff_year = SeasonHelper.effective_season_year(datetime.now())
+    status["kickoff_datetime"] = SeasonHelper.kickoff_datetime_utc(
+        kickoff_year
+    ).isoformat()
 
     return profiled_jsonify(status)

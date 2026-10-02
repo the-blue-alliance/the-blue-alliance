@@ -5,10 +5,14 @@ from typing import List, Optional
 from flask import abort, Blueprint, make_response, render_template, request, url_for
 from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
+from markupsafe import escape
 from werkzeug.wrappers import Response
 
 from backend.common.consts.event_type import EventType, SEASON_EVENT_TYPES
 from backend.common.futures import InstantFuture, TypedFuture
+from backend.common.helpers.district_advancement_helper import (
+    DistrictAdvancementHelper,
+)
 from backend.common.helpers.district_helper import DistrictHelper
 from backend.common.helpers.event_helper import EventHelper
 from backend.common.helpers.event_insights_helper import EventInsightsHelper
@@ -109,6 +113,40 @@ def enqueue_event_district_points_calc(year: Optional[Year]) -> Response:
     return make_response("")
 
 
+@blueprint.route("/tasks/math/enqueue/district_points_calc/district/<district_key>")
+def enqueue_district_points_calc_for_district(district_key: DistrictKey) -> Response:
+    """
+    Enqueues calculation of district points for all events in a single district.
+    Each per-event task auto-enqueues district_rankings_calc on completion.
+    """
+    if not District.validate_key_name(district_key):
+        return make_response(f"{escape(district_key)} is not a valid district key", 400)
+
+    district = District.get_by_id(district_key)
+    if not district:
+        return make_response(f"District {escape(district_key)} not found", 404)
+
+    events = DistrictEventsQuery(district_key).fetch()
+    event_keys = [
+        event.key_name
+        for event in events
+        if event.event_type_enum in SEASON_EVENT_TYPES
+    ]
+    for event_key in event_keys:
+        taskqueue.add(
+            url=url_for("math.event_district_points_calc", event_key=event_key),
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="default",
+        )
+
+    if (
+        "X-Appengine-Taskname" not in request.headers
+    ):  # Only write out if not in taskqueue
+        return make_response(f"Enqueued for {escape(district_key)}: {event_keys}")
+    return make_response("")
+
+
 @blueprint.route("/tasks/math/do/district_points_calc/<event_key>")
 def event_district_points_calc(event_key: EventKey) -> Response:
     """
@@ -128,7 +166,7 @@ def event_district_points_calc(event_key: EventKey) -> Response:
 
     district_points = DistrictHelper.calculate_event_points(event)
     event_details = EventDetails(id=event_key, district_points=district_points)
-    EventDetailsManipulator.createOrUpdate(event_details)
+    EventDetailsManipulator.createOrUpdate(event_details, run_post_update_hook=False)
 
     # Enqueue task to update rankings
     if event.district_key:
@@ -175,7 +213,7 @@ def regional_event_champs_pool_points_calc(event_key: EventKey) -> Response:
     event_details = EventDetails(
         id=event_key, regional_champs_pool_points=regional_pool_points
     )
-    EventDetailsManipulator.createOrUpdate(event_details)
+    EventDetailsManipulator.createOrUpdate(event_details, run_post_update_hook=False)
 
     taskqueue.add(
         url=url_for("math.regional_champs_pool_rankings_calc", year=event.year),
@@ -209,7 +247,7 @@ def enqueue_district_rankings_calc(year: Optional[Year]) -> Response:
         # This will hit the FRC API for adjustment points, and then
         # call back into district_rankings_calc below
         taskqueue.add(
-            url=url_for("frc_api.district_rankings", district_key=district_key),
+            url=url_for("frc_api.district_adjustments", district_key=district_key),
             method="GET",
             target="py3-tasks-io",
             queue_name="default",
@@ -276,6 +314,9 @@ def district_rankings_calc(district_key: DistrictKey) -> Response:
 
     if rankings:
         district.rankings = rankings
+        cutoffs = DistrictAdvancementHelper.calculate_for_district(district, events)
+        if cutoffs:
+            district.advancement_cutoffs = cutoffs
         DistrictManipulator.createOrUpdate(district)
 
     if (
@@ -399,7 +440,7 @@ def event_matchstats_calc(event_key: EventKey) -> Response:
 
     predictions_dict = None
     if (
-        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2025}
+        event.year in {2016, 2017, 2018, 2019, 2020, 2022, 2023, 2024, 2025, 2026}
         and event.event_type_enum in SEASON_EVENT_TYPES
     ) or event.enable_predictions:
         sorted_matches = MatchHelper.play_order_sorted_matches(event.matches)

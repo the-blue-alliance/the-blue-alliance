@@ -3,7 +3,6 @@ from io import BytesIO
 from pathlib import Path
 
 from flask import make_response, request, Response
-from openpyxl import load_workbook
 from pyre_extensions import none_throws
 
 from backend.api.handlers.decorators import require_write_auth, validate_keys
@@ -13,6 +12,7 @@ from backend.common.cloudrun import get_job_status, start_job
 from backend.common.consts.auth_type import AuthType
 from backend.common.helpers.fms_companion_helper import FMSCompanionHelper
 from backend.common.helpers.fms_report_helper import FMSReportHelper
+from backend.common.helpers.youtube_video_helper import YouTubeVideoHelper
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.keys import EventKey
 
@@ -27,6 +27,8 @@ def add_fms_report_archive(event_key: EventKey, report_type: str) -> Response:
     file_contents: bytes = form_data.read()
 
     try:
+        from openpyxl import load_workbook
+
         workbook = load_workbook(filename=BytesIO(file_contents))
         mtime = workbook.properties.modified
     except Exception:
@@ -78,11 +80,14 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
     newest_db_contents = FMSCompanionHelper.read_newest_companion_db(event_key)
     if newest_db_contents == file_contents:
         newest_file_path = FMSCompanionHelper.get_newest_file_path(event_key)
-        storage_path = (
-            f"{FMSCompanionHelper.get_bucket()}/{newest_file_path}"
-            if newest_file_path
-            else ""
-        )
+        if not newest_file_path:
+            return make_response(
+                profiled_jsonify(
+                    {"Error": "Unable to locate stored FMS Companion database"}
+                ),
+                500,
+            )
+        storage_path = f"{FMSCompanionHelper.get_bucket()}/{newest_file_path}"
     else:
         filename = Path(form_data.filename or "fms_companion.db")
 
@@ -130,6 +135,22 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
             **job_params,
         }
     )
+
+
+@require_write_auth({AuthType.MATCH_VIDEO})
+@validate_keys
+def get_playlist_videos(event_key: EventKey, playlist_id: str) -> Response:
+    try:
+        playlist_videos = YouTubeVideoHelper.videos_in_playlist(
+            playlist_id
+        ).get_result()
+        return profiled_jsonify(playlist_videos)
+    except Exception as e:
+        logging.exception("Failed to fetch YouTube playlist videos")
+        return make_response(
+            profiled_jsonify({"Error": f"Failed to fetch playlist videos: {str(e)}"}),
+            500,
+        )
 
 
 @require_write_auth({AuthType.EVENT_TEAMS})

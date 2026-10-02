@@ -139,6 +139,12 @@ def match_short(match_key: MatchKey) -> str:
     return match_id.replace("m", "-").upper()
 
 
+def format_date_string(date_str: str, formatstr: str = "%a, %b %d") -> str:
+    """Parses a YYYY-MM-DD string and formats it."""
+    dt = datetime.strptime(date_str, "%Y-%m-%d")
+    return strftime(dt, formatstr)
+
+
 def sort_by(values, prop):
     return sorted(values, key=lambda item: getattr(item, prop))
 
@@ -168,6 +174,7 @@ _filters = {
     "get_item": get_item,
     "pprint_json": pprint_json,
     "from_ms_timestamp": from_ms_timestamp,
+    "format_date_string": format_date_string,
 }
 
 

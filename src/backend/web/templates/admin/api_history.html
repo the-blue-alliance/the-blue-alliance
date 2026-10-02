@@ -24,6 +24,7 @@
       <li class="active"><a href="#frc-api" data-toggle="tab">FRC API</a></li>
       <li><a href="#fms-reports" data-toggle="tab">FMS Reports</a></li>
       <li><a href="#companion-db" data-toggle="tab">Companion DB</a></li>
+      <li><a href="#trusted-api" data-toggle="tab">Trusted API</a></li>
     </ul>
   </div>
 </div>
@@ -164,6 +165,17 @@
       "FMS Companion Database",
       companion_db_data,
       "Database files from the FMS Companion application"
+    ) }}
+
+  </div>
+
+  <!-- Trusted API Tab -->
+  <div class="tab-pane" id="trusted-api">
+    
+    {{ render_api_section(
+      "Trusted API Request Logs",
+      trusted_api_data,
+      "Logged requests to the Trusted API for this event"
     ) }}
 
   </div>

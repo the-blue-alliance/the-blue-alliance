@@ -79,3 +79,23 @@ class DistrictInsightQuery(CachedDatabaseQuery[Insight, InsightDict]):
         ).fetch_async()
 
         return insight
+
+
+class DistrictInsightsYearQuery(CachedDatabaseQuery[List[Insight], List[InsightDict]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "district_insights_{district_abbreviation}_{year}"
+    DICT_CONVERTER = InsightConverter
+
+    def __init__(self, district_abbreviation: DistrictAbbreviation, year: Year) -> None:
+        super().__init__(district_abbreviation=district_abbreviation, year=year)
+
+    @typed_tasklet
+    def _query_async(
+        self, district_abbreviation: DistrictAbbreviation, year: Year
+    ) -> Generator[Any, Any, List[Insight]]:
+        insights = yield Insight.query(
+            Insight.year == year,
+            Insight.district_abbreviation == district_abbreviation,
+        ).fetch_async()
+
+        return insights

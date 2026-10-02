@@ -24,5 +24,5 @@ EOF
     esac
 done
 
-python ./ops/build/do_compress.py
+uv run ./ops/build/do_compress.py
 npm run build

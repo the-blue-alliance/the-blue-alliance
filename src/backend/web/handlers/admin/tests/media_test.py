@@ -1,6 +1,7 @@
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
+from backend.common.consts.media_type import MediaType
 from backend.common.models.media import Media
 from backend.common.suggestions.media_parser import MediaParser
 
@@ -60,6 +61,37 @@ def test_delete_reference(
     assert media.preferred_references == []
 
 
+def test_delete_reference_key_with_slash(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    media_reference = Media.create_reference("team", "frc1124")
+    # YouTube channel keys can contain slashes (e.g. channel/UCxxx)
+    foreign_key = "channel/UCxxx"
+    media = Media(
+        id=Media.render_key_name(MediaType.YOUTUBE_CHANNEL, foreign_key),
+        foreign_key=foreign_key,
+        media_type_enum=MediaType.YOUTUBE_CHANNEL,
+        year=2010,
+        references=[media_reference],
+    )
+    media.put()
+
+    resp = web_client.post(
+        f"/admin/media/delete_reference/{media.key_name}",
+        data={
+            "reference_type": "team",
+            "reference_key_name": "frc1124",
+            "originating_url": "/admin/team/1124",
+        },
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/team/1124"
+
+    media = Media.get_by_id(media.key_name)
+    assert media is not None
+    assert media.references == []
+
+
 def test_make_preferred_no_media(
     web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
 ) -> None:
@@ -107,6 +139,36 @@ def test_make_preferred(
     media = Media.get_by_id(media.key_name)
     assert media is not None
     assert media.references == [media_reference]
+    assert media.preferred_references == [media_reference]
+
+
+def test_make_preferred_key_with_slash(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    media_reference = Media.create_reference("team", "frc1124")
+    foreign_key = "channel/UCxxx"
+    media = Media(
+        id=Media.render_key_name(MediaType.YOUTUBE_CHANNEL, foreign_key),
+        foreign_key=foreign_key,
+        media_type_enum=MediaType.YOUTUBE_CHANNEL,
+        year=2010,
+        references=[media_reference],
+    )
+    media.put()
+
+    resp = web_client.post(
+        f"/admin/media/make_preferred/{media.key_name}",
+        data={
+            "reference_type": "team",
+            "reference_key_name": "frc1124",
+            "originating_url": "/admin/team/1124",
+        },
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/team/1124"
+
+    media = Media.get_by_id(media.key_name)
+    assert media is not None
     assert media.preferred_references == [media_reference]
 
 
@@ -158,6 +220,37 @@ def test_remove_preferred(
     media = Media.get_by_id(media.key_name)
     assert media is not None
     assert media.references == [media_reference]
+    assert media.preferred_references == []
+
+
+def test_remove_preferred_key_with_slash(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    media_reference = Media.create_reference("team", "frc1124")
+    foreign_key = "channel/UCxxx"
+    media = Media(
+        id=Media.render_key_name(MediaType.YOUTUBE_CHANNEL, foreign_key),
+        foreign_key=foreign_key,
+        media_type_enum=MediaType.YOUTUBE_CHANNEL,
+        year=2010,
+        references=[media_reference],
+        preferred_references=[media_reference],
+    )
+    media.put()
+
+    resp = web_client.post(
+        f"/admin/media/remove_preferred/{media.key_name}",
+        data={
+            "reference_type": "team",
+            "reference_key_name": "frc1124",
+            "originating_url": "/admin/team/1124",
+        },
+    )
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/team/1124"
+
+    media = Media.get_by_id(media.key_name)
+    assert media is not None
     assert media.preferred_references == []
 
 

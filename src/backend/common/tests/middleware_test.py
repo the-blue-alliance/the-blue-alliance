@@ -1,4 +1,4 @@
-from typing import cast
+from typing import Any, cast
 from unittest.mock import Mock, patch
 from wsgiref.types import WSGIApplication
 
@@ -10,6 +10,7 @@ from werkzeug.wrappers import Request
 
 from backend.common import middleware
 from backend.common.environment import Environment
+from backend.common.logging import logging_context
 from backend.common.middleware import (
     _set_secret_key,
     AfterResponseMiddleware,
@@ -18,7 +19,7 @@ from backend.common.middleware import (
     TraceRequestMiddleware,
 )
 from backend.common.profiler import trace_context
-from backend.common.run_after_response import run_after_response
+from backend.common.run_after_response import response_context, run_after_response
 
 
 def test_AppspotRedirectMiddleware_init(app: Flask) -> None:
@@ -118,6 +119,24 @@ def test_AppspotRedirectMiddleware_no_redirect_localhost(app: Flask) -> None:
     assert location_header is None
 
 
+def test_AppspotRedirectMiddleware_no_redirect_ah_path(app: Flask) -> None:
+    middleware = cast(WSGIApplication, AppspotRedirectMiddleware(app))
+
+    @app.route("/_ah/warmup")
+    def warmup_handler():
+        return "warmup ok"
+
+    # Test no redirect for /_ah/ paths on appspot host
+    environ = create_environ(
+        path="/_ah/warmup", base_url="https://tbatv-prod-hrd.appspot.com"
+    )
+    _, status, headers = run_wsgi_app(middleware, environ, buffered=True)
+
+    assert status == "200 OK"
+    location_header = next((v for k, v in headers if k == "Location"), None)
+    assert location_header is None
+
+
 def test_TraceRequestMiddleware_init(app: Flask) -> None:
     middleware = TraceRequestMiddleware(app)
     assert middleware.app is app
@@ -133,6 +152,9 @@ def test_TraceRequestMiddleware_callable(app: Flask) -> None:
     middleware(environ, start_response)
 
     assert isinstance(trace_context.request, Request)
+    assert isinstance(logging_context.request, Request)
+    assert hasattr(logging_context.request, "logging_context")
+    assert isinstance(logging_context.request.logging_context, dict)
 
 
 def test_AfterResponseMiddleware_init(app: Flask) -> None:
@@ -182,6 +204,95 @@ def test_AfterResponseMiddleware_callable(app: Flask) -> None:
     run_wsgi_app(middleware, environ, buffered=True)
     callback1.assert_called_once()
     callback2.assert_called_once()
+    assert not hasattr(response_context, "request")
+
+
+def test_AfterResponseMiddleware_exception_in_app() -> None:
+    failing_app = Mock(side_effect=RuntimeError("WSGI error"))
+    middleware_app = cast(WSGIApplication, AfterResponseMiddleware(failing_app))
+
+    environ = create_environ(path="/error", base_url="http://localhost")
+    with patch("backend.common.middleware.send_traces") as mock_send_traces:
+        with pytest.raises(RuntimeError, match="WSGI error"):
+            run_wsgi_app(middleware_app, environ, buffered=True)
+
+        mock_send_traces.assert_called_once()
+        assert not hasattr(response_context, "request")
+
+
+def test_AfterResponseMiddleware_cleans_up_on_flask_500(app: Flask) -> None:
+    middleware_app = cast(WSGIApplication, AfterResponseMiddleware(app))
+
+    @app.route("/flask_error")
+    def test_handler_error():
+        raise RuntimeError("Flask view crashed")
+
+    environ = create_environ(path="/flask_error", base_url="http://localhost")
+    _, status, _ = run_wsgi_app(middleware_app, environ, buffered=True)
+
+    assert status == "500 INTERNAL SERVER ERROR"
+    assert not hasattr(response_context, "request")
+
+
+def test_AfterResponseMiddleware_toplevel_awaits_async(app: Flask, ndb_stub) -> None:
+    from google.appengine.ext import ndb
+
+    middleware_app = cast(WSGIApplication, AfterResponseMiddleware(app))
+    tasklet_finished = False
+
+    @ndb.tasklet
+    def async_work():
+        nonlocal tasklet_finished
+        tasklet_finished = True
+
+    def callback():
+        async_work()
+
+    @app.route("/async")
+    def test_handler_async():
+        run_after_response(callback)
+        return "OK"
+
+    environ = create_environ(path="/async", base_url="http://localhost")
+    run_wsgi_app(middleware_app, environ, buffered=True)
+
+    assert tasklet_finished is True
+    assert not hasattr(response_context, "request")
+
+
+def test_AfterResponseMiddleware_ndb_context_access(app: Flask, ndb_stub) -> None:
+    from google.appengine.ext import ndb
+
+    middleware_app = cast(WSGIApplication, AfterResponseMiddleware(app))
+    contexts: dict[str, Any] = {}
+
+    class TestModel(ndb.Model):
+        val = ndb.StringProperty()
+
+    @app.route("/ndb_test")
+    def test_handler():
+        contexts["handler"] = ndb.get_context()
+        TestModel(id="test_key", val="initial").put()
+
+        @run_after_response
+        def callback():
+            contexts["callback"] = ndb.get_context()
+            entity = TestModel.get_by_id("test_key")
+            contexts["read_val"] = entity.val if entity else None
+            TestModel(id="test_key2", val="after_response").put()
+
+        return "OK"
+
+    environ = create_environ(path="/ndb_test", base_url="http://localhost")
+    run_wsgi_app(middleware_app, environ, buffered=True)
+
+    assert contexts["callback"] is not None
+    assert contexts["handler"] is not None
+    assert contexts["callback"] is not contexts["handler"]
+    assert contexts["read_val"] == "initial"
+    saved_entity = TestModel.get_by_id("test_key2")
+    assert saved_entity is not None
+    assert saved_entity.val == "after_response"
 
 
 @patch.object(middleware, "_set_secret_key")

@@ -7,9 +7,10 @@ from backend.common.queries.dict_converters.converter_base import ConverterBase
 DistrictDict = NewType("DistrictDict", Dict)
 
 
+# If you change this dict, make sure to bump the subversion of the Event converter
 class DistrictConverter(ConverterBase):
     SUBVERSIONS = {  # Increment every time a change to the dict is made
-        ApiMajorVersion.API_V3: 2,
+        ApiMajorVersion.API_V3: 3,
     }
 
     @classmethod
@@ -33,6 +34,7 @@ class DistrictConverter(ConverterBase):
                 "year": district.year,
                 "abbreviation": district.abbreviation,
                 "display_name": district.display_name,
+                "official_advancement_counts": district.official_advancement_counts,
             }
         )
 

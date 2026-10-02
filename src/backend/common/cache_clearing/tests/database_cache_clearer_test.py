@@ -23,6 +23,7 @@ from backend.common.queries import (
     event_details_query,
     event_query,
     insight_query,
+    insight_v2_query,
     match_query,
     media_query,
     robot_query,
@@ -395,6 +396,7 @@ class TestDatabaseCacheClearer(unittest.TestCase):
         }
 
         assert cache_keys == {
+            district_query.AllDistrictTeamsQuery().cache_key,
             team_query.DistrictTeamsQuery("2015fim").cache_key,
             team_query.DistrictTeamsQuery("2015mar").cache_key,
             district_query.TeamDistrictsQuery("frc254").cache_key,
@@ -416,9 +418,11 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             district_query.DistrictsInYearQuery(2016).cache_key,
             district_query.DistrictHistoryQuery("ne").cache_key,
             district_query.DistrictHistoryQuery("chs").cache_key,
+            district_query.DistrictHistoryQuery("fch").cache_key,
             district_query.DistrictQuery("2016ne").cache_key,
             district_query.DistrictAbbreviationQuery("ne").cache_key,
             district_query.DistrictAbbreviationQuery("chs").cache_key,
+            district_query.DistrictAbbreviationQuery("fch").cache_key,
             district_query.TeamDistrictsQuery("frc604").cache_key,
             # Necessary because APIv3 Event models include the District model
             event_query.EventQuery("2016necmp").cache_key,
@@ -450,6 +454,57 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             district_query.DistrictAbbreviationQuery("mar").cache_key,
             district_query.DistrictAbbreviationQuery("fma").cache_key,
             event_query.DistrictEventsQuery("2019mar").cache_key,
+        }
+
+    def test_renamed_chs_district_updated(self) -> None:
+        affected_refs = {
+            "key": {ndb.Key(District, "2019chs")},
+            "year": {2019},
+            "abbreviation": {"chs"},
+        }
+        cache_keys = {
+            q[0] for q in get_affected_queries.district_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            district_query.DistrictsInYearQuery(2019).cache_key,
+            district_query.DistrictHistoryQuery("chs").cache_key,
+            district_query.DistrictHistoryQuery("fch").cache_key,
+            district_query.DistrictQuery("2019chs").cache_key,
+            district_query.DistrictQuery("2019fch").cache_key,
+            district_query.DistrictAbbreviationQuery("chs").cache_key,
+            district_query.DistrictAbbreviationQuery("fch").cache_key,
+            event_query.DistrictEventsQuery("2019chs").cache_key,
+        }
+
+    def test_regionalpoolteam_updated(self) -> None:
+        affected_refs = {"year": {2025, 2026}}
+        cache_keys = {
+            q[0] for q in get_affected_queries.regionalpoolteam_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            team_query.RegionalTeamsQuery(2025).cache_key,
+            team_query.RegionalTeamsQuery(2026).cache_key,
+        }
+
+    def test_insight_v2_updated(self) -> None:
+        affected_refs = {
+            "year": {2024},
+            "category": {"leaderboards"},
+            "district_abbreviation": {"ne"},
+        }
+        cache_keys = {
+            q[0] for q in get_affected_queries.insight_v2_updated(affected_refs)
+        }
+
+        assert cache_keys == {
+            insight_v2_query.InsightV2YearQuery(2024).cache_key,
+            insight_v2_query.InsightV2YearCategoryQuery(2024, "leaderboards").cache_key,
+            insight_v2_query.InsightV2YearDistrictQuery(2024, "ne").cache_key,
+            insight_v2_query.InsightV2YearCategoryDistrictQuery(
+                2024, "leaderboards", "ne"
+            ).cache_key,
         }
 
     def test_insight_updated(self) -> None:

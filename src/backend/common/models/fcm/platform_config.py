@@ -1,11 +1,14 @@
 from __future__ import annotations
 
-from typing import Optional
+from typing import Optional, TYPE_CHECKING
 
 from pyre_extensions import none_throws
 
 from backend.common.consts.fcm.platform_priority import PlatformPriority
 from backend.common.consts.fcm.platform_type import PlatformType
+
+if TYPE_CHECKING:
+    from firebase_admin.messaging import AndroidConfig, APNSConfig, WebpushConfig
 
 
 class PlatformConfig:
@@ -42,60 +45,49 @@ class PlatformConfig:
             self.collapse_key, self.priority
         )
 
-    def platform_config(self, platform_type: PlatformType) -> PlatformConfig:
-        """Return a platform-specific configuration object for a platform_type, given the platform payload.
-
-        Args:
-            platform_type (PlatformType): Type for the platform config.
-
-        Returns:
-            object: Either a AndroidConfig, ApnsConfig, or WebpushConfig depending on the platform_type.
-        """
-        from backend.common.consts.fcm.platform_type import PlatformType
-
-        # Validate that platform_type is supported
-        PlatformType.validate(platform_type)
-
+    def android_config(self) -> AndroidConfig:
+        """Return the AndroidConfig for this platform payload."""
         from firebase_admin import messaging
 
-        if platform_type == PlatformType.ANDROID:
-            priority = None
-            if self.priority is not None:
-                priority = PlatformPriority.platform_priority(
-                    platform_type, none_throws(self.priority)
-                )
-
-            return messaging.AndroidConfig(
-                collapse_key=self.collapse_key, priority=priority
+        priority = None
+        if self.priority is not None:
+            priority = PlatformPriority.platform_priority(
+                PlatformType.ANDROID, none_throws(self.priority)
             )
-        else:
-            headers = {}
 
-            if self.collapse_key:
-                headers[PlatformType.collapse_key_key(platform_type)] = (
-                    self.collapse_key
-                )
+        return messaging.AndroidConfig(
+            collapse_key=self.collapse_key, priority=priority
+        )
 
-            priority = None
-            if self.priority is not None:
-                priority = PlatformPriority.platform_priority(
+    def apns_config(self) -> APNSConfig:
+        """Return the APNSConfig for this platform payload."""
+        from firebase_admin import messaging
+
+        return messaging.APNSConfig(
+            headers=self._headers(PlatformType.APNS),
+            # Create an empty `payload` as a workaround for an FCM bug
+            # https://github.com/the-blue-alliance/the-blue-alliance/pull/2557#discussion_r310365295
+            payload=messaging.APNSPayload(aps=messaging.Aps()),
+        )
+
+    def webpush_config(self) -> WebpushConfig:
+        """Return the WebpushConfig for this platform payload."""
+        from firebase_admin import messaging
+
+        return messaging.WebpushConfig(headers=self._headers(PlatformType.WEBPUSH))
+
+    def _headers(self, platform_type: PlatformType) -> Optional[dict[str, str]]:
+        """Collapse key and priority as headers, or None if neither is set."""
+        headers = {}
+
+        if self.collapse_key:
+            headers[PlatformType.collapse_key_key(platform_type)] = self.collapse_key
+
+        if self.priority is not None:
+            headers[PlatformType.priority_key(platform_type)] = (
+                PlatformPriority.platform_priority(
                     platform_type, none_throws(self.priority)
                 )
-                headers[PlatformType.priority_key(platform_type)] = priority
+            )
 
-            # Null out headers if they're empty
-            headers = headers if headers else None
-
-            if platform_type == PlatformType.APNS:
-                # Create an empty `payload` as a workaround for an FCM bug
-                # https://github.com/the-blue-alliance/the-blue-alliance/pull/2557#discussion_r310365295
-                payload = messaging.APNSPayload(aps=messaging.Aps())
-                return messaging.APNSConfig(headers=headers, payload=payload)
-            elif platform_type == PlatformType.WEBPUSH:
-                return messaging.WebpushConfig(headers=headers)
-            else:
-                raise TypeError(
-                    "Unsupported PlatformPayload platform_type: {}".format(
-                        platform_type
-                    )
-                )
+        return headers or None

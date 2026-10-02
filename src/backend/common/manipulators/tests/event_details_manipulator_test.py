@@ -3,6 +3,7 @@ from typing import Optional
 from unittest.mock import patch
 
 import pytest
+from google.appengine.api import taskqueue
 from google.appengine.ext import testbed
 from pyre_extensions import none_throws
 
@@ -193,6 +194,35 @@ class TestEventDetailsManipulator(unittest.TestCase):
         task = tasks[0]
         assert task.name == "2011ct_alliance_selection"
 
+    def test_postUpdateHook_notifications_emptyAllianceSelections(self):
+        import datetime
+
+        # Setup our event to be "now"
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        self.old_event_details.put()
+        new_event_details_no_alliances = EventDetails(
+            id="2011ct",
+            alliance_selections=[],
+            matchstats={},
+        )
+        EventDetailsManipulator.createOrUpdate(new_event_details_no_alliances)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        for task in tasks:
+            with patch.object(
+                TBANSHelper, "alliance_selection"
+            ) as mock_alliance_selection:
+                run_from_task(task)
+
+        # alliance_selections is empty - skip notification
+        mock_alliance_selection.assert_not_called()
+
     def test_postUpdateHook_notifications_notWithinADay(self):
         self.old_event_details.put()
         EventDetailsManipulator.createOrUpdate(self.new_event_details)
@@ -210,3 +240,54 @@ class TestEventDetailsManipulator(unittest.TestCase):
 
         # Event is not configured to be within a day - skip it
         mock_alliance_selection.assert_not_called()
+
+    def test_postUpdateHook_calcs_taskqueueThrows(self) -> None:
+        """Every stats task enqueue failure is logged and swallowed, so one
+        failing queue never prevents the rest of the hook from running."""
+        EventDetailsManipulator.createOrUpdate(self.old_event_details2025)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+        with patch.object(taskqueue, "add", side_effect=Exception) as mock_add:
+            for task in tasks:
+                run_from_task(task)
+
+        # district points, event team status, regional champs pool points
+        assert mock_add.call_count == 3
+        assert (
+            none_throws(self.taskqueue_stub).get_filtered_tasks(queue_names="default")
+            == []
+        )
+
+    def test_postUpdateHook_notifications_deferThrows(self) -> None:
+        """A failure enqueuing the alliance_selection notification is swallowed."""
+        import datetime
+
+        self.event.start_date = datetime.datetime.now()
+        self.event.end_date = self.event.start_date + datetime.timedelta(days=1)
+
+        self.old_event_details.put()
+        EventDetailsManipulator.createOrUpdate(self.new_event_details)
+
+        tasks = none_throws(self.taskqueue_stub).get_filtered_tasks(
+            queue_names="post-update-hooks"
+        )
+        assert len(tasks) == 1
+
+        with patch(
+            "backend.common.manipulators.event_details_manipulator.defer_safe",
+            side_effect=Exception,
+        ) as mock_defer:
+            for task in tasks:
+                run_from_task(task)
+
+        mock_defer.assert_called_once()
+        assert mock_defer.call_args[0][0] == TBANSHelper.alliance_selection
+        assert (
+            none_throws(self.taskqueue_stub).get_filtered_tasks(
+                queue_names="push-notifications"
+            )
+            == []
+        )

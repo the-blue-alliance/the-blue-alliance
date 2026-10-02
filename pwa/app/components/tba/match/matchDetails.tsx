@@ -1,45 +1,90 @@
-import { useState } from 'react';
+import { Suspense, lazy, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Event, Match } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
-import { ScoreBreakdown2015 } from '~/components/tba/match/scoreBreakdown2015';
-import ScoreBreakdown2018 from '~/components/tba/match/scoreBreakdown2018';
-import ScoreBreakdown2023 from '~/components/tba/match/scoreBreakdown2023';
-import ScoreBreakdown2024 from '~/components/tba/match/scoreBreakdown2024';
-import ScoreBreakdown2025 from '~/components/tba/match/scoreBreakdown2025';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
 import {
   isScoreBreakdown2015,
+  isScoreBreakdown2016,
+  isScoreBreakdown2017,
   isScoreBreakdown2018,
+  isScoreBreakdown2019,
+  isScoreBreakdown2020,
+  isScoreBreakdown2022,
   isScoreBreakdown2023,
   isScoreBreakdown2024,
   isScoreBreakdown2025,
+  isScoreBreakdown2026,
 } from '~/lib/rankingPoints';
 
-function formatMatchDate(timestamp: number, timezone: string): string {
-  const date = new Date(timestamp * 1000);
+// Lazy-loaded so a match's chunk only pulls in the single year's breakdown
+// component it actually renders, instead of all 11 years' worth of UI. This
+// matters because MatchDetails is reachable from MatchModal, which mounts on
+// every page.
+const ScoreBreakdown2015 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2015'),
+);
+const ScoreBreakdown2016 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2016'),
+);
+const ScoreBreakdown2017 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2017'),
+);
+const ScoreBreakdown2018 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2018'),
+);
+const ScoreBreakdown2019 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2019'),
+);
+const ScoreBreakdown2020 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2020'),
+);
+const ScoreBreakdown2022 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2022'),
+);
+const ScoreBreakdown2023 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2023'),
+);
+const ScoreBreakdown2024 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2024'),
+);
+const ScoreBreakdown2025 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2025'),
+);
+const ScoreBreakdown2026 = lazy(
+  () => import('~/components/tba/match/scoreBreakdown2026'),
+);
+const ScoreByShift2026 = lazy(
+  () => import('~/components/tba/match/scoreByShift2026'),
+);
 
-  return date.toLocaleString('en-US', {
-    timeZone: timezone,
-    weekday: 'short',
-    month: 'short',
-    day: 'numeric',
-  });
+function ScoreBreakdownSkeleton() {
+  return <div className="h-32 w-full animate-pulse rounded-lg bg-muted/50" />;
+}
+
+function formatMatchDate(timestamp: number, timezone: string): string {
+  return Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
+    .toZonedDateTimeISO(timezone)
+    .toLocaleString('en-US', {
+      weekday: 'short',
+      month: 'short',
+      day: 'numeric',
+    });
 }
 
 function formatMatchTime(
   timestamp: number,
   timezone: string,
 ): React.JSX.Element {
-  const date = new Date(timestamp * 1000);
-
-  const time = date.toLocaleString('en-US', {
-    timeZone: timezone,
-    hour: '2-digit',
-    minute: '2-digit',
-    hour12: true,
-  });
+  const time = Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
+    .toZonedDateTimeISO(timezone)
+    .toLocaleString('en-US', {
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    });
 
   return <span className="font-bold">{time}</span>;
 }
@@ -94,6 +139,21 @@ export default function MatchDetails({
 
   let sbDiv = null;
 
+  if (isScoreBreakdown2026(match.score_breakdown)) {
+    sbDiv = (
+      <>
+        <ScoreBreakdown2026
+          scoreBreakdown={match.score_breakdown}
+          match={match}
+        />
+        <ScoreByShift2026
+          scoreBreakdown={match.score_breakdown}
+          match={match}
+        />
+      </>
+    );
+  }
+
   if (isScoreBreakdown2025(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2025
@@ -121,9 +181,54 @@ export default function MatchDetails({
     );
   }
 
+  if (isScoreBreakdown2022(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2022
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2020(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2020
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2019(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2019
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
   if (isScoreBreakdown2018(match.score_breakdown)) {
     sbDiv = (
       <ScoreBreakdown2018
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2017(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2017
+        scoreBreakdown={match.score_breakdown}
+        match={match}
+      />
+    );
+  }
+
+  if (isScoreBreakdown2016(match.score_breakdown)) {
+    sbDiv = (
+      <ScoreBreakdown2016
         scoreBreakdown={match.score_breakdown}
         match={match}
       />
@@ -139,7 +244,9 @@ export default function MatchDetails({
       <div className="order-2 w-full md:order-1 md:w-lg">
         <div className="flex flex-col gap-2">
           <SimpleMatchRow match={match} year={event.year} />
-          {sbDiv}
+          {sbDiv && (
+            <Suspense fallback={<ScoreBreakdownSkeleton />}>{sbDiv}</Suspense>
+          )}
           <div className="flex flex-col gap-2 rounded-lg border bg-muted/50 p-3">
             <div className="flex items-center justify-between">
               <h3 className="text-sm font-semibold">Match Times</h3>
@@ -204,6 +311,7 @@ export default function MatchDetails({
               key={v.key}
               videoId={v.key}
               title={`${event.name} ${match.match_number} ${v.key}`}
+              deferUntilIdle
             />
           ))}
       </div>

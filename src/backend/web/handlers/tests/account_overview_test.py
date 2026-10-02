@@ -1,6 +1,6 @@
 import datetime
 from random import randint
-from typing import List
+from typing import List, Optional
 from unittest.mock import ANY, Mock, patch
 from urllib.parse import parse_qsl, urlparse
 
@@ -468,6 +468,9 @@ def test_has_review_permissions(
 
     if has_review_permissions:
         assert review_permissions_row
+        # The review UI moved to the PWA; the Jinja page no longer exists
+        link = review_permissions_row.find(id="review-pending-suggestions-link")
+        assert link["href"] == "https://beta.thebluealliance.com/suggest/review"
     else:
         assert review_permissions_row is None
 
@@ -608,6 +611,95 @@ def test_api_write_keys(
         assert len(api_write) == 0
 
 
+@pytest.mark.parametrize(
+    "path, expected_key_ids, expected_next_href, expected_caret",
+    [
+        # Default: newest events first, plain header (no caret until the user sorts).
+        (
+            "/account",
+            ["key-2026", "key-2025", "key-multiple-events", "key-no-event"],
+            "/account?api_write_keys_sort=asc",
+            None,
+        ),
+        # An invalid value falls back to the default, still with no caret.
+        (
+            "/account?api_write_keys_sort=sideways",
+            ["key-2026", "key-2025", "key-multiple-events", "key-no-event"],
+            "/account?api_write_keys_sort=asc",
+            None,
+        ),
+        # Explicit ascending: oldest first, caret points up, next click flips it.
+        (
+            "/account?api_write_keys_sort=asc",
+            ["key-multiple-events", "key-2025", "key-2026", "key-no-event"],
+            "/account?api_write_keys_sort=desc",
+            "glyphicon-triangle-top",
+        ),
+        # Explicit descending: same order as the default, but the caret shows.
+        (
+            "/account?api_write_keys_sort=desc",
+            ["key-2026", "key-2025", "key-multiple-events", "key-no-event"],
+            "/account?api_write_keys_sort=asc",
+            "glyphicon-triangle-bottom",
+        ),
+    ],
+)
+def test_api_write_keys_sorted_by_event_key(
+    login_user,
+    web_client: FlaskClient,
+    path: str,
+    expected_key_ids: List[str],
+    expected_next_href: str,
+    expected_caret: Optional[str],
+) -> None:
+    def api_write_key(key_id: str, event_ids: List[str]) -> Mock:
+        events = []
+        for event_id in event_ids:
+            event = Mock()
+            event.configure_mock(**{"id.return_value": event_id})
+            events.append(event)
+
+        key = Mock(event_list=events, auth_types_enum=[])
+        key.expiration = None
+        key.secret = "secret"
+        key.key.configure_mock(**{"id.return_value": key_id})
+        return key
+
+    login_user.api_write_keys = [
+        api_write_key("key-2026", ["2026nmrc"]),
+        api_write_key("key-no-event", []),
+        api_write_key("key-multiple-events", ["2025mrcmp", "2024nmrc"]),
+        api_write_key("key-2025", ["2025nmrc"]),
+    ]
+
+    response = web_client.get(path)
+
+    assert response.status_code == 200
+    soup = bs4.BeautifulSoup(response.data, "html.parser")
+    api_write_rows = soup.find_all("tr", attrs={"class": "api-write-key"})
+    assert [
+        row.find_all("td")[3].text.strip() for row in api_write_rows
+    ] == expected_key_ids
+
+    # The "Event" header is the control: one link that flips the direction.
+    header_link = soup.find(id="api-write-keys-sort")
+    assert header_link is not None
+    assert header_link.get("href") == expected_next_href
+    assert header_link.text.strip().startswith("Event")
+
+    # Keys without an event always trail the list, whatever the direction.
+    assert expected_key_ids[-1] == "key-no-event"
+
+    # The caret only appears once the user has actively sorted, and it points
+    # in the direction of the current order.
+    carets = header_link.find_all("span", class_="glyphicon")
+    if expected_caret is None:
+        assert carets == []
+    else:
+        assert len(carets) == 1
+        assert expected_caret in carets[0].get("class")
+
+
 def test_auth_write_type_names(
     login_user,
     captured_templates: List[CapturedTemplate],
@@ -669,6 +761,6 @@ def test_overview_api_write_add_button(
         "div", attrs={"class": "row"}, id="api-write-keys-row"
     )
     api_write_key_row_button = api_write_key_row.find(
-        "a", attrs={"href": "request/apiwrite", "class": "btn btn-success pull-right"}
+        "a", attrs={"href": "/request/apiwrite", "class": "btn btn-success pull-right"}
     )
     assert api_write_key_row_button.text == " Request Tokens"

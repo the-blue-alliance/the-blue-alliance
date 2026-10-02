@@ -8,7 +8,7 @@ from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
-from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 from backend.tasks_io.datafeeds.parsers.parser_paginated import ParserPaginated
 
 
@@ -39,7 +39,7 @@ class FMSAPITeamDetailsParser(
             # Fix issue where FIRST's API returns dummy website for all teams
             elif "www.firstinspires.org" in team_website:
                 website = None
-            elif WebsiteBlacklist.is_blacklisted(team_website):
+            elif WebsiteBlocklist.is_blacklisted(team_website):
                 website = ""
             else:
                 website = WebsiteHelper.format_url(team_website)

@@ -1,4 +1,10 @@
 <div class="row">
+    {% if alliance_selections is none %}
+    <div class="alert alert-block alert-danger">
+        <h4>Failed to fetch alliances for {{event_name}}</h4>
+        <p>The FRC API returned an error.</p>
+    </div>
+    {% else %}
     <div class="alert alert-block alert-success">
         <h4>Got Alliances for {{event_name}}</h4>
     </div>
@@ -12,4 +18,5 @@
         </tr>
     {% endfor %}
     </table>
+    {% endif %}
 </div>

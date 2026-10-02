@@ -5,7 +5,7 @@ import json
 import random
 import string
 from typing import List, Optional, Tuple
-from unittest.mock import Mock
+from unittest.mock import Mock, patch
 
 import pytest
 from freezegun import freeze_time
@@ -30,6 +30,7 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
 from backend.common.models.webcast import Webcast
+from backend.common.sitevars.trusted_api import TrustedApiConfig
 
 
 @pytest.fixture(autouse=True)
@@ -977,3 +978,388 @@ def test_file_upload_succeeds_with_correct_permission(
 
     assert resp.status_code == 200
     assert "Success" in resp.json
+
+
+@freeze_time("2019-06-01")
+def test_error_message_with_all_official_events_and_event_keys(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    Test that error message includes "all current-season official events" when
+    all_official_events is True and event_list is not empty
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=False)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other",
+        auth_types=[AuthType.EVENT_TEAMS],
+        all_official_events=True,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401
+    assert "Error" in resp.json
+    assert (
+        resp.json["Error"]
+        == "Only allowed to edit events: all current-season official events, 2019other"
+    )
+
+
+@freeze_time("2019-06-01")
+def test_error_message_with_all_official_events_only(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    Test that error message includes only "all current-season official events" when
+    all_official_events is True and event_list is empty
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=False)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        None,
+        auth_types=[AuthType.EVENT_TEAMS],
+        all_official_events=True,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401
+    assert "Error" in resp.json
+    assert (
+        resp.json["Error"]
+        == "Only allowed to edit events: all current-season official events"
+    )
+
+
+@freeze_time("2019-06-01")
+def test_error_message_without_all_official_events(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    Test that error message does not include "all current-season official events" when
+    all_official_events is False
+    """
+    setup_event(event_type=EventType.OFFSEASON, official=False)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other",
+        auth_types=[AuthType.EVENT_TEAMS],
+        all_official_events=False,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401
+    assert "Error" in resp.json
+    assert resp.json["Error"] == "Only allowed to edit events: 2019other"
+
+
+@freeze_time("2019-06-01")
+def test_successful_request_logs_to_storage(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """Test that successful requests are logged to cloud storage"""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, is_admin=True)
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+    )
+
+    request_data = json.dumps([])
+    request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+
+    with patch("backend.common.helpers.trusted_api_logger.storage_write") as mock_write:
+        with api_client.application.test_request_context():  # pyre-ignore[16]
+            resp = api_client.post(
+                request_path,
+                headers={
+                    "X-TBA-Auth-Id": auth_id,
+                    "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                        auth_secret, request_path, request_data
+                    ),
+                },
+                data=request_data,
+            )
+
+    assert resp.status_code == 200
+    # Verify storage_write was called
+    mock_write.assert_called_once()
+
+    # Verify the call arguments
+    call_args = mock_write.call_args
+    storage_path = call_args[0][0]
+    content = call_args[0][1]
+    bucket = call_args[1]["bucket"]
+    metadata = call_args[1]["metadata"]
+
+    # Check storage path structure
+    assert storage_path.startswith("api/trusted/v1/event/2019nyny/team_list/update/")
+    assert storage_path.endswith(".json")
+
+    # Check bucket name
+    assert bucket.endswith("-trustedapi-requests")
+
+    # Check content
+    assert content == request_data.encode()
+
+    # Check metadata
+    assert metadata["X-TBA-Auth-Id"] == auth_id
+    assert metadata["method"] == "POST"
+    assert metadata["status_code"] == "200"
+
+
+@freeze_time("2019-06-01")
+def test_failed_request_does_not_log_to_storage(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """Test that failed requests are not logged to cloud storage"""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019other",  # Different event, should fail auth
+        auth_types=[AuthType.EVENT_TEAMS],
+    )
+
+    request_data = json.dumps([])
+    request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+
+    with patch("backend.common.helpers.trusted_api_logger.storage_write") as mock_write:
+        with api_client.application.test_request_context():  # pyre-ignore[16]
+            resp = api_client.post(
+                request_path,
+                headers={
+                    "X-TBA-Auth-Id": auth_id,
+                    "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                        auth_secret, request_path, request_data
+                    ),
+                },
+                data=request_data,
+            )
+
+    assert resp.status_code == 401
+    # Verify storage_write was NOT called for failed request
+    mock_write.assert_not_called()
+
+
+@freeze_time("2019-06-01")
+def test_get_request_does_not_log_to_storage(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """Test that GET requests are not logged to cloud storage"""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, is_admin=True)
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_INFO],
+    )
+
+    request_path = "/api/trusted/v1/event/2019nyny/info"
+
+    with patch("backend.common.helpers.trusted_api_logger.storage_write") as mock_write:
+        with api_client.application.test_request_context():  # pyre-ignore[16]
+            resp = api_client.get(
+                request_path,
+                headers={
+                    "X-TBA-Auth-Id": auth_id,
+                    "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                        auth_secret, request_path, ""
+                    ),
+                },
+            )
+
+    assert resp.status_code == 200
+    # Verify storage_write was NOT called for GET request
+    mock_write.assert_not_called()
+
+
+@freeze_time("2019-06-01")
+def test_empty_request_body_does_not_log_to_storage(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """Test that requests with empty body are not logged to cloud storage"""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, is_admin=True)
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+    )
+
+    request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+
+    with patch("backend.common.helpers.trusted_api_logger.storage_write") as mock_write:
+        with api_client.application.test_request_context():  # pyre-ignore[16]
+            _resp = api_client.post(  # noqa: F841
+                request_path,
+                headers={
+                    "X-TBA-Auth-Id": auth_id,
+                    "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                        auth_secret, request_path, ""
+                    ),
+                },
+                data="",
+            )
+
+    # Request might succeed or fail, but either way empty body should not log
+    # Verify storage_write was NOT called for empty request body
+    mock_write.assert_not_called()
+
+
+@freeze_time("2019-06-01")
+def test_file_upload_unknown_report_type_is_rejected(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """An upload to an unknown FMS report type is rejected and nothing is stored."""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_RANKINGS],
+        expiration=None,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        file_content = create_excel_file()
+        file_digest = hashlib.sha256(file_content).hexdigest()
+
+        request_path = "/api/_eventwizard/event/2019nyny/fms_reports/not_a_report"
+
+        file_storage = FileStorage(
+            stream=io.BytesIO(file_content),
+            filename="test.xlsx",
+            content_type="application/vnd.ms-excel",
+        )
+
+        with patch(
+            "backend.common.helpers.fms_report_helper.storage_write"
+        ) as mock_write:
+            resp = api_client.post(
+                request_path,
+                headers={
+                    "X-TBA-Auth-Id": auth_id,
+                    "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                        auth_secret, request_path, file_digest
+                    ),
+                },
+                data={
+                    "reportFile": file_storage,
+                    "fileDigest": file_digest,
+                },
+            )
+
+    assert 400 <= resp.status_code < 500
+    mock_write.assert_not_called()
+
+
+@freeze_time("2019-06-01")
+def test_file_upload_unknown_report_type_is_client_error_not_auth_error(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """A signed upload of an unknown report type gets a 400 or 404, not a 401."""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_RANKINGS],
+        expiration=None,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        file_content = create_excel_file()
+        file_digest = hashlib.sha256(file_content).hexdigest()
+
+        request_path = "/api/_eventwizard/event/2019nyny/fms_reports/not_a_report"
+
+        file_storage = FileStorage(
+            stream=io.BytesIO(file_content),
+            filename="test.xlsx",
+            content_type="application/vnd.ms-excel",
+        )
+
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, file_digest
+                ),
+            },
+            data={
+                "reportFile": file_storage,
+                "fileDigest": file_digest,
+            },
+        )
+
+    assert resp.status_code in (400, 404), resp.json
+    assert "no required auth types" not in resp.json["Error"]
+
+
+def test_explicit_auth_trusted_api_disabled(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """
+    An otherwise valid auth is rejected when TBA admins have disabled
+    that write type via the TrustedApiConfig sitevar
+    """
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=None,
+    )
+    TrustedApiConfig.put({str(AuthType.EVENT_TEAMS): False})
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        request_data = json.dumps([])
+        request_path = "/api/trusted/v1/event/2019nyny/team_list/update"
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, request_data
+                ),
+            },
+            data=request_data,
+        )
+
+    assert resp.status_code == 401
+    assert "temporarily disabled" in resp.json["Error"]

@@ -1,15 +1,15 @@
-import { DialogProps } from '@radix-ui/react-dialog';
 import { useQuery } from '@tanstack/react-query';
 import { ClientOnly, useNavigate } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import SearchIcon from '~icons/lucide/search';
 
-import { SearchIndex } from '~/api/tba/read';
 import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { Button } from '~/components/ui/button';
 import {
   Command,
+  CommandEmpty,
   CommandGroup,
   CommandInput,
   CommandItem,
@@ -24,13 +24,19 @@ import {
 } from '~/components/ui/dialog';
 import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
-import FuzzysortFilterer from '~/lib/search/fuzzysortFilterer';
-import { cn } from '~/lib/utils';
+import { STALE_TIME } from '~/lib/queryClient';
+import FuzzysortFilterer, {
+  FilteredSearchIndex,
+} from '~/lib/search/fuzzysortFilterer';
 
-export function SearchModal({ ...props }: DialogProps) {
+export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
-  const searchIndexQuery = useQuery(getSearchIndexOptions({}));
+  const inputRef = useRef<HTMLInputElement>(null);
+  const searchIndexQuery = useQuery({
+    ...getSearchIndexOptions({}),
+    staleTime: STALE_TIME.SEARCH_INDEX,
+  });
   const filterer = useMemo(() => new FuzzysortFilterer(), []);
   const navigate = useNavigate();
   const isMacintosh =
@@ -38,7 +44,7 @@ export function SearchModal({ ...props }: DialogProps) {
       ? navigator.userAgent.includes('Macintosh')
       : false;
 
-  const searchResults: SearchIndex | null = useMemo(() => {
+  const searchResults: FilteredSearchIndex | null = useMemo(() => {
     if (!searchIndexQuery.data) {
       return null;
     }
@@ -67,35 +73,42 @@ export function SearchModal({ ...props }: DialogProps) {
     };
   }, []);
 
+  const isIndexPending = searchIndexQuery.isPending && !searchIndexQuery.data;
+  const hasNoResults =
+    searchResults !== null &&
+    searchResults.teams.length === 0 &&
+    searchResults.events.length === 0;
+
   return (
     <Dialog open={open} onOpenChange={setOpen}>
-      <DialogTrigger asChild>
-        <Button
-          variant="secondary"
-          className={cn(
-            `bg-surface relative h-9 w-full justify-start rounded-lg bg-white
-            pl-4 font-normal text-muted-foreground shadow-none hover:bg-white
-            max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
-          )}
-          onClick={() => setOpen(true)}
-          {...props}
-        >
-          <span className="hidden xl:inline-flex">
-            Search teams and events...
-          </span>
-          <span className="inline-flex xl:hidden">Search...</span>
-          <ClientOnly>
-            <div className="absolute top-2 right-1.5 hidden gap-1 sm:flex">
-              <KbdGroup>
-                <Kbd>{isMacintosh ? '⌘' : 'Ctrl'}</Kbd>
-                <Kbd>K</Kbd>
-              </KbdGroup>
-            </div>
-          </ClientOnly>
-        </Button>
+      <DialogTrigger
+        render={
+          <Button
+            variant="secondary"
+            className={cn(
+              `relative h-9 w-full justify-start rounded-lg bg-white pl-4
+              font-normal text-muted-foreground shadow-none hover:bg-white
+              max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
+            )}
+          />
+        }
+      >
+        <span className="hidden xl:inline-flex">
+          Search teams and events...
+        </span>
+        <span className="inline-flex xl:hidden">Search...</span>
+        <ClientOnly>
+          <div className="absolute top-2 right-1.5 hidden gap-1 sm:flex">
+            <KbdGroup>
+              <Kbd>{isMacintosh ? '⌘' : 'Ctrl'}</Kbd>
+              <Kbd>K</Kbd>
+            </KbdGroup>
+          </div>
+        </ClientOnly>
       </DialogTrigger>
 
       <DialogTrigger
+        aria-label="Search"
         className="z-30 cursor-pointer rounded-full p-2 text-white
           transition-colors duration-200 hover:bg-black/20 lg:hidden"
       >
@@ -103,6 +116,7 @@ export function SearchModal({ ...props }: DialogProps) {
       </DialogTrigger>
 
       <DialogContent
+        initialFocus={inputRef}
         showCloseButton={false}
         className="top-[10%] translate-y-0 rounded-2xl border-none
           bg-clip-padding p-2 shadow-2xl dark:bg-neutral-900"
@@ -123,12 +137,13 @@ export function SearchModal({ ...props }: DialogProps) {
         >
           <div className="relative">
             <CommandInput
+              ref={inputRef}
               placeholder="Search teams and events..."
               value={query}
               onValueChange={setQuery}
               className="h-20 text-base"
             />
-            {searchIndexQuery.isLoading && (
+            {isIndexPending && (
               <div
                 className="pointer-events-none absolute top-1/2 right-3 z-10
                   flex -translate-y-1/2 items-center justify-center"
@@ -138,49 +153,80 @@ export function SearchModal({ ...props }: DialogProps) {
             )}
           </div>
           <CommandList className="no-scrollbar scroll-pt-2 scroll-pb-1.5">
-            {searchResults?.teams && searchResults.teams.length > 0 && (
-              <CommandGroup
-                heading="Teams"
-                className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                  **:[[cmdk-group-heading]]:p-3!
-                  **:[[cmdk-group-heading]]:pb-1!"
+            {isIndexPending && (
+              <div
+                data-testid="search-index-loading"
+                className="py-6 text-center text-sm text-muted-foreground"
               >
-                {searchResults.teams.map((team) => (
-                  <SearchItem
-                    key={team.key}
-                    value={team.key}
-                    onSelect={() => {
-                      void navigate({ to: `/team/${team.key.substring(3)}` });
-                      setOpen(false);
-                    }}
-                  >
-                    {team.key.substring(3)} - {team.nickname}
-                  </SearchItem>
-                ))}
-              </CommandGroup>
+                Loading teams and events…
+              </div>
             )}
-            {searchResults?.events && searchResults.events.length > 0 && (
-              <CommandGroup
-                heading="Events"
-                className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                  **:[[cmdk-group-heading]]:p-3!
-                  **:[[cmdk-group-heading]]:pb-1!"
+            {searchIndexQuery.isError && !searchIndexQuery.data && (
+              <div
+                data-testid="search-index-error"
+                className="py-6 text-center text-sm text-muted-foreground"
               >
-                {searchResults.events.map((event) => (
-                  <SearchItem
-                    key={event.key}
-                    value={event.key}
-                    onSelect={() => {
-                      void navigate({ to: `/event/${event.key}` });
-                      setOpen(false);
-                    }}
-                  >
-                    {event.key.substring(0, 4)} {event.name} [
-                    {event.key.substring(4)}]
-                  </SearchItem>
-                ))}
-              </CommandGroup>
+                Failed to load search data. Try again later.
+              </div>
             )}
+            {searchResults && (
+              <>
+                {[
+                  searchResults.teamsFirst ? 'teams' : 'events',
+                  searchResults.teamsFirst ? 'events' : 'teams',
+                ].map((group) =>
+                  group === 'teams'
+                    ? searchResults.teams.length > 0 && (
+                        <CommandGroup
+                          key="teams"
+                          heading="Teams"
+                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
+                            **:[[cmdk-group-heading]]:p-3!
+                            **:[[cmdk-group-heading]]:pb-1!"
+                        >
+                          {searchResults.teams.map((team) => (
+                            <SearchItem
+                              key={team.key}
+                              value={team.key}
+                              onSelect={() => {
+                                void navigate({
+                                  to: `/team/${team.key.substring(3)}`,
+                                });
+                                setOpen(false);
+                              }}
+                            >
+                              {team.key.substring(3)} - {team.nickname}
+                            </SearchItem>
+                          ))}
+                        </CommandGroup>
+                      )
+                    : searchResults.events.length > 0 && (
+                        <CommandGroup
+                          key="events"
+                          heading="Events"
+                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
+                            **:[[cmdk-group-heading]]:p-3!
+                            **:[[cmdk-group-heading]]:pb-1!"
+                        >
+                          {searchResults.events.map((event) => (
+                            <SearchItem
+                              key={event.key}
+                              value={event.key}
+                              onSelect={() => {
+                                void navigate({ to: `/event/${event.key}` });
+                                setOpen(false);
+                              }}
+                            >
+                              {event.key.substring(0, 4)} {event.name} [
+                              {event.key.substring(4)}]
+                            </SearchItem>
+                          ))}
+                        </CommandGroup>
+                      ),
+                )}
+              </>
+            )}
+            {hasNoResults && <CommandEmpty>No results found.</CommandEmpty>}
           </CommandList>
         </Command>
       </DialogContent>

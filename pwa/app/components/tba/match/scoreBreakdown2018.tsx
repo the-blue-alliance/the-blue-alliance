@@ -1,5 +1,8 @@
-import { Match, MatchScoreBreakdown2018 } from '~/api/tba/read';
-import { ConditionalBadge, FoulDisplay } from '~/components/tba/match/common';
+import { AutoRobot2018, Match, MatchScoreBreakdown2018 } from '~/api/tba/read';
+import {
+  ConditionalBadge,
+  fmtFoulsCommitted,
+} from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
   ScoreBreakdownLabelCell,
@@ -7,11 +10,7 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-import {
-  ENDGAME_2018_POINTS,
-  POINTS_PER_FOUL,
-  POINTS_PER_TECH_FOUL,
-} from '~/lib/pointValues';
+import { ENDGAME_2018_POINTS } from '~/lib/pointValues';
 
 export default function ScoreBreakdown2018({
   scoreBreakdown,
@@ -31,17 +30,23 @@ export default function ScoreBreakdown2018({
           <div className="flex flex-row items-center gap-1">
             <div className="flex flex-col items-start justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoRobot1 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.red.autoRobot1 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.red.team_keys[0]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoRobot2 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.red.autoRobot2 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.red.team_keys[1]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoRobot3 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.red.autoRobot3 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.red.team_keys[2]}
                 alignIcon="left"
               />
@@ -59,17 +64,23 @@ export default function ScoreBreakdown2018({
             </div>
             <div className="flex flex-col items-end justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoRobot1 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.blue.autoRobot1 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.blue.team_keys[0]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoRobot2 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.blue.autoRobot2 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.blue.team_keys[1]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoRobot3 === 'AutoRun'}
+                condition={
+                  scoreBreakdown.blue.autoRobot3 === AutoRobot2018.AUTO_RUN
+                }
                 teamKey={match.alliances.blue.team_keys[2]}
                 alignIcon="right"
               />
@@ -429,31 +440,38 @@ export default function ScoreBreakdown2018({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls */}
-      <ScoreBreakdownRow
-        blueValue={scoreBreakdown.blue.foulPoints}
-        redValue={scoreBreakdown.red.foulPoints}
-      >
+      {/* Fouls committed by each alliance */}
+      <ScoreBreakdownRow>
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2018]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
-            techOrMajor="tech"
-          />
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.foulCount,
+            techFouls: scoreBreakdown.red.techFoulCount,
+          })}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls Received
+          Fouls / Tech Fouls Committed
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2018]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2018]}
-            techOrMajor="tech"
-          />
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.foulCount,
+            techFouls: scoreBreakdown.blue.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Foul Points: points each alliance received from the other's fouls */}
+      <ScoreBreakdownRow
+        redValue={scoreBreakdown.red.foulPoints}
+        blueValue={scoreBreakdown.blue.foulPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.foulPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Foul Points Received
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.foulPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 

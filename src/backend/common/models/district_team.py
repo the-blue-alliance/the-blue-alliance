@@ -1,10 +1,16 @@
-from typing import Set
+from typing import Optional, Set
 
 from google.appengine.ext import ndb
 
 from backend.common.models.cached_model import CachedModel
 from backend.common.models.district import District
-from backend.common.models.keys import DistrictKey, DistrictTeamKey, TeamKey, Year
+from backend.common.models.keys import (
+    DistrictKey,
+    DistrictTeamKey,
+    EventKey,
+    TeamKey,
+    Year,
+)
 from backend.common.models.team import Team
 
 
@@ -17,12 +23,16 @@ class DistrictTeam(CachedModel):
     team = ndb.KeyProperty(kind=Team)
     year: Year = ndb.IntegerProperty()
     district_key = ndb.KeyProperty(kind=District)
+    # The event key of the team's "home" DCMP (only used in districts with
+    # multiple DCMPs, currently only California)
+    home_dcmp_event_key: Optional[EventKey] = ndb.StringProperty(indexed=False)
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
 
     _mutable_attrs: Set[str] = {
         "district_key",  # for migrations
+        "home_dcmp_event_key",
     }
 
     def __init__(self, *args, **kw):

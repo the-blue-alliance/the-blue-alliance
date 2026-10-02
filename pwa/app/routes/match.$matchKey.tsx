@@ -1,32 +1,47 @@
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
+import { Temporal } from 'temporal-polyfill';
 
-import { getEvent, getMatch } from '~/api/tba/read';
+import { PlayoffType } from '~/api/tba/read';
+import {
+  getEventOptions,
+  getMatchOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink } from '~/components/tba/links';
 import MatchDetails from '~/components/tba/match/matchDetails';
-import { PlayoffType } from '~/lib/api/PlayoffType';
 import { isValidMatchKey, matchTitleShort } from '~/lib/matchUtils';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { staleTimeForYear } from '~/lib/queryClient';
+import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/match/$matchKey')({
-  loader: async ({ params }) => {
+  loader: async ({ params, context: { queryClient } }) => {
     if (!isValidMatchKey(params.matchKey)) {
       throw notFound();
     }
 
     const eventKey = params.matchKey.split('_')[0];
+    const eventStaleTime = staleTimeForYear(Number(eventKey.slice(0, 4)));
 
     const [event, match] = await Promise.all([
-      getEvent({ path: { event_key: eventKey } }),
-      getMatch({ path: { match_key: params.matchKey } }),
+      queryClient
+        .ensureQueryData({
+          ...getEventOptions({ path: { event_key: eventKey } }),
+          staleTime: eventStaleTime,
+        })
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData({
+          ...getMatchOptions({ path: { match_key: params.matchKey } }),
+          staleTime: eventStaleTime,
+        })
+        .catch(doThrowNotFound),
     ]);
 
-    if (event.data === undefined || match.data === undefined) {
-      throw notFound();
-    }
-
     return {
-      event: event.data,
-      match: match.data,
+      eventKey,
+      matchKey: params.matchKey,
+      event,
+      match,
     };
   },
   headers: publicCacheControlHeaders(),
@@ -43,23 +58,99 @@ export const Route = createFileRoute('/match/$matchKey')({
       };
     }
 
+    const { event, match } = loaderData;
+    const playoffType = event.playoff_type ?? PlayoffType.CUSTOM;
+    const title = matchTitleShort(match, playoffType);
+
+    const videos = match.videos
+      .filter((v) => v.type === 'youtube')
+      .map((v) => ({
+        '@type': 'VideoObject' as const,
+        name: `${title} - ${event.name} ${event.year}`,
+        url: `https://www.youtube.com/watch?v=${v.key}`,
+        thumbnailUrl: `https://img.youtube.com/vi/${v.key}/hqdefault.jpg`,
+      }));
+
+    const jsonLd = {
+      '@context': 'https://schema.org',
+      '@type': 'SportsEvent',
+      name: `${title} - ${event.name} ${event.year}`,
+      description: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition`,
+      url: `https://www.thebluealliance.com/match/${match.key}`,
+      ...(match.actual_time && {
+        startDate: Temporal.Instant.fromEpochMilliseconds(
+          match.actual_time * 1000,
+        ).toString(),
+      }),
+      location: {
+        '@type': 'Place',
+        name: event.location_name ?? event.name,
+        address: {
+          '@type': 'PostalAddress',
+          addressLocality: event.city,
+          addressRegion: event.state_prov,
+          addressCountry: event.country,
+        },
+      },
+      ...(videos.length > 0 && {
+        subjectOf: videos.length === 1 ? videos[0] : videos,
+      }),
+      competitor: [
+        {
+          '@type': 'SportsTeam',
+          name: 'Red Alliance',
+          member: match.alliances.red.team_keys.map((key) => ({
+            '@type': 'SportsTeam',
+            name: `Team ${key.substring(3)}`,
+            url: `https://www.thebluealliance.com/team/${key.substring(3)}`,
+          })),
+        },
+        {
+          '@type': 'SportsTeam',
+          name: 'Blue Alliance',
+          member: match.alliances.blue.team_keys.map((key) => ({
+            '@type': 'SportsTeam',
+            name: `Team ${key.substring(3)}`,
+            url: `https://www.thebluealliance.com/team/${key.substring(3)}`,
+          })),
+        },
+      ],
+    };
+
     return {
       meta: [
         {
-          title: `${matchTitleShort(loaderData.match, loaderData.event.playoff_type ?? PlayoffType.CUSTOM)} - ${loaderData.event.name} (${loaderData.event.year}) - The Blue Alliance`,
+          title: `${title} - ${event.name} (${event.year}) - The Blue Alliance`,
         },
         {
           name: 'description',
-          content: `${matchTitleShort(loaderData.match, loaderData.event.playoff_type ?? PlayoffType.CUSTOM)} at the ${loaderData.event.year} ${loaderData.event.name} FIRST Robotics Competition in ${loaderData.event.city}, ${loaderData.event.state_prov}, ${loaderData.event.country}`,
+          content: `${title} at the ${event.year} ${event.name} FIRST Robotics Competition in ${event.city}, ${event.state_prov}, ${event.country}`,
+        },
+      ],
+      scripts: [
+        {
+          type: 'application/ld+json',
+          children: JSON.stringify(jsonLd),
         },
       ],
     };
   },
   component: MatchPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function MatchPage() {
-  const { event, match } = Route.useLoaderData();
+  const { eventKey, matchKey } = Route.useLoaderData();
+  const eventStaleTime = staleTimeForYear(Number(eventKey.slice(0, 4)));
+
+  const { data: event } = useSuspenseQuery({
+    ...getEventOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+  });
+  const { data: match } = useSuspenseQuery({
+    ...getMatchOptions({ path: { match_key: matchKey } }),
+    staleTime: eventStaleTime,
+  });
 
   return (
     <div>

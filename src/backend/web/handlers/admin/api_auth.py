@@ -9,6 +9,7 @@ from google.appengine.ext import ndb
 from werkzeug.wrappers import Response
 
 from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
+from backend.common.environment import Environment
 from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.district import District
@@ -17,6 +18,7 @@ from backend.web.profiled_render import render_template
 
 
 def api_auth_add() -> Response:
+    event_key = request.args.get("event_key", "")
     template_values = {
         "auth_id": "".join(
             random.choice(
@@ -24,6 +26,7 @@ def api_auth_add() -> Response:
             )
             for _ in range(16)
         ),
+        "event_key": event_key,
     }
 
     return render_template("admin/api_add_auth.html", template_values)
@@ -201,6 +204,7 @@ def api_auth_manage(key_type: Optional[str]) -> Response:
         "key_type": key_type,
         "include_expired": include_expired,
         "auths": auths,
+        "gcp_project_id": Environment.project(),
     }
 
     return render_template("admin/api_manage_auth.html", template_values)

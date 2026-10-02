@@ -1,0 +1,49 @@
+name: Feature Request
+description: Request a new feature on The Blue Alliance.
+labels: ["Enhancement"]
+type: Feature
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for taking the time to request this feature on The Blue Alliance!
+        Provide a general summary of the feature in the Title above.
+  - type: checkboxes
+    id: searched
+    attributes:
+      label: Is there an existing issue or feature request for this?
+      description: Please search to see if an issue already exists for this feature request.
+      options:
+        - label: I have searched the existing issues
+          required: true
+  - type: textarea
+    id: summary
+    attributes:
+      label: "Summary"
+      description: Provide a brief explanation of the feature
+      placeholder: Describe in a few lines your feature request
+    validations:
+      required: true
+  - type: textarea
+    id: basic_example
+    attributes:
+      label: "Basic Example"
+      description: Indicate here some basic examples of your feature.
+      placeholder: A few specific words about your feature request.
+    validations:
+      required: true
+  - type: textarea
+    id: context
+    attributes:
+      label: Context
+      description: How has this missing feature affected you? What are you trying to accomplish?
+    validations:
+      required: false
+  - type: textarea
+    id: drawbacks
+    attributes:
+      label: "Drawbacks"
+      description: What are the drawbacks/impacts of your feature request ?
+      placeholder: Identify the drawbacks and impacts while being neutral on your feature request
+    validations:
+      required: false

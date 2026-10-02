@@ -1,11 +1,11 @@
 import datetime
 
 from flask import abort, jsonify, make_response, request, Response
+from flask_wtf.csrf import generate_csrf
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
 from backend.common.auth import current_user
-from backend.common.consts.client_type import ClientType
 from backend.common.consts.model_type import ModelType
 from backend.common.consts.playoff_type import TYPE_NAMES as PLAYOFF_TYPE_NAMES
 from backend.common.decorators import cached_public
@@ -14,7 +14,6 @@ from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.keys import EventKey
-from backend.common.models.mobile_client import MobileClient
 from backend.common.models.typeahead_entry import TypeaheadEntry
 from backend.web.decorators import enforce_login
 
@@ -124,43 +123,24 @@ def account_favorites_delete_handler() -> Response:
 
 
 def account_info_handler() -> Response:
+    """
+    Returns information about the current session, including a CSRF token for
+    use with the other /_/account/ endpoints.
+
+    A CSRF token is per-session, so it must never be rendered into a page served
+    by `cached_public` - that cache is keyed on path + query string with no user
+    component, so every visitor would be handed the token belonging to whoever
+    warmed the cache. Client-side code needing a token should fetch it from here
+    instead.
+    """
     user = current_user()
-    return jsonify(
+    response = jsonify(
         {
             "logged_in": (user is not None),
             "user_id": str(user.uid) if user else None,
+            "csrf_token": generate_csrf(),
         }
     )
-
-
-@enforce_login
-def account_register_fcm_token() -> Response:
-    user = none_throws(current_user())
-    user_id = str(user.uid)
-    fcm_token = request.form.get("fcm_token")
-    uuid = request.form.get("uuid")
-    display_name = request.form.get("display_name")
-    client_type = ClientType.WEB
-
-    query = MobileClient.query(
-        MobileClient.user_id == user_id,
-        MobileClient.device_uuid == uuid,
-        MobileClient.client_type == client_type,
-    )
-    if query.count() == 0:
-        # Record doesn't exist yet, so add it
-        MobileClient(
-            parent=none_throws(user.account_key),
-            user_id=user_id,
-            messaging_id=fcm_token,
-            client_type=client_type,
-            device_uuid=uuid,
-            display_name=display_name,
-        ).put()
-    else:
-        client = query.fetch(1)[0]
-        client.messaging_id = fcm_token
-        client.display_name = display_name
-        client.put()
-
-    return jsonify({})
+    # Session-specific, so it must not be stored by any shared cache
+    response.headers["Cache-Control"] = "no-store, private"
+    return response

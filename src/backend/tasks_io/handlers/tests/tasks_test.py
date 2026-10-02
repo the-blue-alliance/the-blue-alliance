@@ -1,4 +1,5 @@
 import datetime
+import json
 import urllib.parse
 from unittest.mock import patch
 
@@ -7,11 +8,19 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
+from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.auth_type import AuthType
+from backend.common.consts.award_type import AwardType
+from backend.common.consts.comp_level import CompLevel
+from backend.common.models.alliance import EventAlliance, MatchAlliance
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.award import Award
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
+from backend.common.models.event_ranking import EventRanking
+from backend.common.models.match import Match
 from backend.common.models.team import Team
-from backend.common.sitevars.website_blacklist import WebsiteBlacklist
+from backend.common.sitevars.website_blocklist import WebsiteBlocklist
 
 
 def test_blacklist_website_invalid_key(tasks_client: Client):
@@ -36,7 +45,7 @@ def test_blacklist_website_team(tasks_client: Client):
 
     assert team.website == website
 
-    with patch.object(WebsiteBlacklist, "blacklist") as mock_blacklist:
+    with patch.object(WebsiteBlocklist, "blacklist") as mock_blacklist:
         resp = tasks_client.get("/backend-tasks/do/team_blacklist_website/frc7332")
 
     assert resp.status_code == 302
@@ -111,3 +120,119 @@ def test_archive_api_keys_ignores_existing_expiration(tasks_client: Client) -> N
     key = ApiAuthAccess.get_by_id("test_auth_key")
     assert key is not None
     assert key.expiration == initial_expiration
+
+
+@freeze_time("2025-01-01")
+def test_archive_api_keys_no_output_in_taskqueue(tasks_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.MATCH_VIDEO],
+        event_list=[ndb.Key(Event, "2024test")],
+    ).put()
+
+    resp = tasks_client.get(
+        "/tasks/do/archive_api_keys", headers={"X-Appengine-Taskname": "test"}
+    )
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+    key = ApiAuthAccess.get_by_id("test_auth_key")
+    assert key is not None
+    assert key.expiration == datetime.datetime(year=2025, month=1, day=1)
+
+
+def test_remap_teams_no_event(tasks_client: Client) -> None:
+    resp = tasks_client.get("/tasks/do/remap_teams/2024test")
+    assert resp.status_code == 404
+
+
+def test_remap_teams_nothing_to_remap(tasks_client: Client) -> None:
+    Event(id="2024test", year=2024, event_short="test", event_type_enum=0).put()
+    resp = tasks_client.get("/tasks/do/remap_teams/2024test")
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+
+def _put_remap_event(with_details: bool) -> Event:
+    event = Event(
+        id="2024test",
+        year=2024,
+        event_short="test",
+        event_type_enum=0,
+        remap_teams={"frc9999": "frc254"},
+    )
+    event.put()
+    Match(
+        id="2024test_qm1",
+        event=event.key,
+        year=2024,
+        comp_level=CompLevel.QM,
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc9999", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                "red": MatchAlliance(teams=["frc9999", "frc2", "frc3"], score=10),
+                "blue": MatchAlliance(teams=["frc4", "frc5", "frc6"], score=20),
+            }
+        ),
+    ).put()
+    Award(
+        id="2024test_1",
+        name_str="Winner",
+        award_type_enum=AwardType.WINNER,
+        year=2024,
+        event=event.key,
+        event_type_enum=0,
+        team_list=[ndb.Key(Team, "frc9999")],
+        recipient_json_list=[json.dumps({"team_number": 9999, "awardee": None})],
+    ).put()
+    if with_details:
+        EventDetails(
+            id="2024test",
+            alliance_selections=[EventAlliance(picks=["frc9999", "frc2", "frc3"])],
+            rankings2=[
+                EventRanking(
+                    rank=1,
+                    team_key="frc9999",
+                    record=None,
+                    qual_average=None,
+                    matches_played=1,
+                    dq=0,
+                    sort_orders=[],
+                )
+            ],
+        ).put()
+    return event
+
+
+def test_remap_teams(tasks_client: Client) -> None:
+    _put_remap_event(with_details=True)
+
+    resp = tasks_client.get("/tasks/do/remap_teams/2024test")
+    assert resp.status_code == 200
+    assert resp.data == b""
+
+    match = none_throws(Match.get_by_id("2024test_qm1"))
+    assert match.alliances[AllianceColor.RED]["teams"] == ["frc254", "frc2", "frc3"]
+    assert match.team_key_names == ["frc254", "frc2", "frc3", "frc4", "frc5", "frc6"]
+
+    details = none_throws(EventDetails.get_by_id("2024test"))
+    assert details.alliance_selections[0]["picks"] == ["frc254", "frc2", "frc3"]
+    assert details.rankings2[0]["team_key"] == "frc254"
+
+    award = none_throws(Award.get_by_id("2024test_1"))
+    assert award.team_list == [ndb.Key(Team, "frc254")]
+
+
+def test_remap_teams_without_details(tasks_client: Client) -> None:
+    _put_remap_event(with_details=False)
+
+    resp = tasks_client.get("/tasks/do/remap_teams/2024test")
+    assert resp.status_code == 200
+
+    match = none_throws(Match.get_by_id("2024test_qm1"))
+    assert match.alliances[AllianceColor.RED]["teams"] == ["frc254", "frc2", "frc3"]
+    assert EventDetails.get_by_id("2024test") is None
+    award = none_throws(Award.get_by_id("2024test_1"))
+    assert award.team_list == [ndb.Key(Team, "frc254")]

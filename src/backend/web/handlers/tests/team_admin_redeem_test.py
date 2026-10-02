@@ -7,6 +7,7 @@ from google.appengine.ext import ndb
 from werkzeug.test import Client
 
 from backend.common.models.account import Account
+from backend.common.models.audit_log_entry import AuditLogEntry
 from backend.common.models.team import Team
 from backend.common.models.team_admin_access import TeamAdminAccess
 from backend.common.models.user import User
@@ -22,15 +23,19 @@ def store_team(ndb_stub):
     team.put()
 
 
-def add_team_admin_access(account, team_number=1124, year=None, access_code="abc123"):
+def add_team_admin_access(
+    account, team_number=1124, year=None, access_code="abc123", expiration=None
+):
     if not year:
         year = datetime.datetime.now().year
+    if expiration is None:
+        expiration = datetime.datetime.now() + datetime.timedelta(days=1)
     access = TeamAdminAccess(
         id="test_access_{}".format(year),
         access_code=access_code,
         team_number=team_number,
         year=year,
-        expiration=datetime.datetime.now() + datetime.timedelta(days=1),
+        expiration=expiration,
         account=account,
     )
     return access.put()
@@ -100,6 +105,20 @@ def test_redeem_code(login_user: User, web_client: Client, captured_templates):
     access = access_key.get()
     assert login_user.account_key == access.account
 
+    entries = AuditLogEntry.query().fetch()
+    assert len(entries) == 1
+    entry = entries[0]
+    assert entry.account == login_user.account_key
+    assert entry.endpoint == "team_admin.team_admin_redeem_post"
+    assert entry.target_key is not None
+    assert entry.target_key.kind() == "Team"
+    assert entry.target_key.id() == "frc1124"
+    assert entry.url_args == {}
+    assert entry.form_params == {
+        "team_number": ["1124"],
+        "auth_code": ["abc123"],
+    }
+
 
 def test_redeem_code_with_whitespace(
     login_user: User, web_client: Client, captured_templates
@@ -126,6 +145,41 @@ def test_redeem_used_code(login_user: User, web_client: Client, captured_templat
     )
 
     assert_template_status(captured_templates, "code_used")
+
+
+def test_redeem_page_hides_expired_access(
+    login_user: User, web_client: Client, captured_templates
+):
+    add_team_admin_access(
+        account=login_user.account_key,
+        year=datetime.datetime.now().year - 1,
+        access_code="abc123_old",
+        expiration=datetime.datetime.now() - datetime.timedelta(days=1),
+    )
+
+    resp = web_client.get("/mod/redeem")
+    assert resp.status_code == 200
+
+    context = captured_templates[0][1]
+    assert list(context["existing_access"]) == []
+
+
+def test_mod_dashboard_does_not_loop_with_only_expired_access(
+    login_user: User, web_client: Client
+):
+    add_team_admin_access(
+        account=login_user.account_key,
+        year=datetime.datetime.now().year - 1,
+        access_code="abc123_old",
+        expiration=datetime.datetime.now() - datetime.timedelta(days=1),
+    )
+
+    resp = web_client.get("/mod")
+    assert resp.status_code == 302
+    assert urlparse(resp.headers["Location"]).path == "/mod/redeem"
+
+    resp = web_client.get("/mod/redeem")
+    assert resp.status_code == 200
 
 
 def test_redeem_code_after_redeeming_last_year(

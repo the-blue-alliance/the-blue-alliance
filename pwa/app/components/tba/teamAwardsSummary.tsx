@@ -1,4 +1,6 @@
-import { Award, Event } from '~/api/tba/read';
+import { cn } from 'cn';
+
+import { Award, AwardType, Event } from '~/api/tba/read';
 import { EventLink } from '~/components/tba/links';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { Checkbox } from '~/components/ui/checkbox';
@@ -8,8 +10,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { AwardType, BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
-import { cn, pluralize } from '~/lib/utils';
+import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
+import { pluralize } from '~/lib/utils';
 
 interface TeamAwardsSummaryProps {
   awards: Award[];
@@ -300,7 +302,7 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
 
                         return (
                           <Tooltip key={item.key}>
-                            <TooltipTrigger asChild>{content}</TooltipTrigger>
+                            <TooltipTrigger render={content} />
                             <TooltipContent
                               side="top"
                               align="start"

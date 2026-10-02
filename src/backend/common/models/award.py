@@ -1,6 +1,7 @@
 import json
 from typing import cast, Dict, List, Optional
 
+import orjson
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -94,6 +95,12 @@ class Award(CachedModel):
     @property
     def normalized_name(self) -> str:
         if (
+            self.year >= 2026
+            and self.award_type_enum in award_type.NORMALIZED_NAMES_2026
+        ):
+            return award_type.NORMALIZED_NAMES_2026[self.award_type_enum]
+
+        if (
             self.year >= 2023
             and self.award_type_enum in award_type.NORMALIZED_NAMES_2023
         ):
@@ -135,7 +142,7 @@ class Award(CachedModel):
         if self._recipient_list is None:
             recipient_list = []
             for recipient_json in self.recipient_json_list:
-                recipient_list.append(json.loads(recipient_json))
+                recipient_list.append(orjson.loads(recipient_json))
             self._recipient_list = recipient_list
         return none_throws(self._recipient_list)
 

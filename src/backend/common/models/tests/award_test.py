@@ -1,6 +1,8 @@
 import json
 from datetime import datetime
+from typing import Any
 
+import orjson
 import pytest
 from google.appengine.api import datastore_errors
 from google.appengine.ext import ndb
@@ -156,6 +158,54 @@ def test_normalized_name() -> None:
     assert a3.normalized_name == "Woodie Flowers Award"
 
 
+def test_normalized_name_chairmans_impact() -> None:
+    # Before 2023, should be Chairman's Award
+    a1 = Award(
+        id="2022ct_0",
+        year=2022,
+        award_type_enum=AwardType.CHAIRMANS,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2022ct"),
+        name_str="Regional Chairman's Award",
+    )
+    assert a1.normalized_name == "Chairman's Award"
+
+    # 2023 and later, should be FIRST Impact Award
+    a2 = Award(
+        id="2023ct_0",
+        year=2023,
+        award_type_enum=AwardType.CHAIRMANS,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2023ct"),
+        name_str="Regional FIRST Impact Award",
+    )
+    assert a2.normalized_name == "FIRST Impact Award"
+
+
+def test_normalized_name_deans_list_leadership() -> None:
+    # Before 2026, should be Dean's List (falls through to name_str)
+    a1 = Award(
+        id="2025ct_4",
+        year=2025,
+        award_type_enum=AwardType.DEANS_LIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2025ct"),
+        name_str="FIRST Dean's List Finalist Award",
+    )
+    assert a1.normalized_name == "FIRST Dean's List Finalist Award"
+
+    # 2026 and later, should be FIRST Leadership Award
+    a2 = Award(
+        id="2026ct_4",
+        year=2026,
+        award_type_enum=AwardType.DEANS_LIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2026ct"),
+        name_str="FIRST Leadership Award",
+    )
+    assert a2.normalized_name == "FIRST Leadership Award"
+
+
 def test_recipients_team() -> None:
     recipients = [AwardRecipient(awardee=None, team_number=176)]
     a1 = Award(
@@ -192,3 +242,46 @@ def test_recipients_individual() -> None:
     recipient_dict = a1.recipient_dict
     assert None in recipient_dict
     assert recipient_dict[None] == ["Woodie Flowers"]
+
+
+def test_recipient_list_uses_orjson(monkeypatch: pytest.MonkeyPatch) -> None:
+    recipients = [AwardRecipient(awardee="Woodie Flowers", team_number=None)]
+    a = Award(
+        id="2010ct_3",
+        year=2010,
+        award_type_enum=AwardType.WOODIE_FLOWERS,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2010ct"),
+        name_str="WFFA",
+        recipient_json_list=[json.dumps(r) for r in recipients],
+    )
+    loads_called = False
+    real_loads = orjson.loads
+
+    def mock_loads(val: Any) -> Any:
+        nonlocal loads_called
+        loads_called = True
+        return real_loads(val)
+
+    monkeypatch.setattr("backend.common.models.award.orjson.loads", mock_loads)
+    assert a.recipient_list == recipients
+    assert loads_called is True
+
+
+def test_recipient_dict_groups_awardees_by_team() -> None:
+    a = Award(
+        id="2010ct_3",
+        year=2010,
+        award_type_enum=AwardType.DEANS_LIST,
+        event_type_enum=EventType.REGIONAL,
+        event=ndb.Key(Event, "2010ct"),
+        name_str="Dean's List",
+        recipient_json_list=[
+            json.dumps({"team_number": 254, "awardee": "Alice"}),
+            json.dumps({"team_number": 254, "awardee": "Bob"}),
+            json.dumps({"team_number": None, "awardee": "Carol"}),
+        ],
+    )
+    assert a.recipient_dict == {254: ["Alice", "Bob"], None: ["Carol"]}
+    # Cached after the first access
+    assert a.recipient_dict is a.recipient_dict

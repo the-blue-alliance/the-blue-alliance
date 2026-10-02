@@ -1,16 +1,19 @@
-import { QueryClient, useSuspenseQuery } from '@tanstack/react-query';
+import { useSuspenseQuery } from '@tanstack/react-query';
 import { notFound } from '@tanstack/react-router';
-import { type ClassValue, clsx } from 'clsx';
-import pino from 'pino';
 import { Fragment, type ReactNode } from 'react';
-import { twMerge } from 'tailwind-merge';
+import { Temporal } from 'temporal-polyfill';
 
 import { WltRecord } from '~/api/tba/read';
 import { getStatusOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { RequestResult } from '~/api/tba/read/client';
+import { ApiError } from '~/lib/apiError';
+import { STALE_TIME } from '~/lib/queryClient';
 
 export function useValidYears() {
-  const { data: status } = useSuspenseQuery(getStatusOptions({}));
+  const { data: status } = useSuspenseQuery({
+    ...getStatusOptions({}),
+    staleTime: STALE_TIME.STATUS,
+  });
   return Array.from(
     { length: status.max_season - 1992 + 1 },
     (_, i) => status.max_season - i,
@@ -28,10 +31,6 @@ export const MODEL_TYPE = {
   MEDIA: 7,
 } as const;
 
-export function cn(...inputs: ClassValue[]) {
-  return twMerge(clsx(inputs));
-}
-
 export function removeNonNumeric(str: string): string {
   return str.replace(/\D/g, '');
 }
@@ -44,15 +43,14 @@ export function slugify(str: string): string {
     .replace(/-+$/, '');
 }
 
-export async function parseParamsForYearElseDefault(
-  queryClient: QueryClient,
+export function parseParamsForYearElseDefault(
+  currentSeason: number,
   params: {
     year?: string | undefined;
   },
-): Promise<number | undefined> {
+): number | undefined {
   if (params.year === undefined) {
-    const status = await queryClient.ensureQueryData(getStatusOptions({}));
-    return status.current_season;
+    return currentSeason;
   }
 
   const year = Number(params.year);
@@ -85,20 +83,14 @@ export function timestampsAreOnDifferentDays(
   timestamp2: number,
   timezone: string | null,
 ): boolean {
-  const date1 = new Date(timestamp1 * 1000);
-  const date2 = new Date(timestamp2 * 1000);
-
-  const formatter = new Intl.DateTimeFormat('en-US', {
-    timeZone: timezone ?? 'UTC',
-    year: 'numeric',
-    month: '2-digit',
-    day: '2-digit',
-  });
-
-  const formattedDate1 = formatter.format(date1);
-  const formattedDate2 = formatter.format(date2);
-
-  return formattedDate1 !== formattedDate2;
+  const tz = timezone ?? 'UTC';
+  const date1 = Temporal.Instant.fromEpochMilliseconds(timestamp1 * 1000)
+    .toZonedDateTimeISO(tz)
+    .toPlainDate();
+  const date2 = Temporal.Instant.fromEpochMilliseconds(timestamp2 * 1000)
+    .toZonedDateTimeISO(tz)
+    .toPlainDate();
+  return Temporal.PlainDate.compare(date1, date2) !== 0;
 }
 
 export function zip<T extends unknown[]>(...arrays: (T | undefined)[]): T[] {
@@ -143,6 +135,10 @@ export function addRecords(record1: WltRecord, record2: WltRecord): WltRecord {
     losses: record1.losses + record2.losses,
     ties: record1.ties + record2.ties,
   };
+}
+
+export function hasAnyMatches(record: WltRecord): boolean {
+  return record.wins + record.losses + record.ties > 0;
 }
 
 export function winrateFromRecord(record: WltRecord): number {
@@ -280,7 +276,12 @@ export async function queryFromAPI<T>(
     return Promise.resolve(resp.data as T);
   }
 
-  return Promise.reject(new Error(resp.response.status.toString()));
+  return Promise.reject(
+    new ApiError(
+      resp.response?.statusText || String(resp.response?.status ?? 0),
+      resp.response?.status ?? 0,
+    ),
+  );
 }
 
 // https://web.archive.org/web/20250409124545/https://www.evanmiller.org/how-not-to-sort-by-average-rating.html
@@ -312,17 +313,7 @@ export function hoursToMilliseconds(hours: number): number {
   return minutesToMilliseconds(hours * 60);
 }
 
-export function createLogger(name: string) {
-  const transport =
-    process.env.NODE_ENV !== 'production'
-      ? { transport: { target: 'pino-pretty' } }
-      : {};
-
-  return pino({
-    name,
-    ...transport,
-  });
-}
+export { createLogger } from '~/lib/logger';
 
 export function doThrowNotFound(): never {
   throw notFound();
@@ -330,15 +321,18 @@ export function doThrowNotFound(): never {
 
 // TODO: Increase the default max age once we are confident things work.
 // The end goal is for this to be relatively large, since the client will re-fetch data on load.
-export function publicCacheControlHeaders(maxAge: number = 61) {
-  return (): Record<string, string> => {
-    const isProd = process.env.NODE_ENV === 'production';
-    if (!isProd) {
-      return {};
-    }
-    return {
-      'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
-      'CDN-Cache-Control': `max-age=${maxAge}`, // Cloudflare-specific
-    };
+export function buildPublicCacheControlHeaders(
+  maxAge: number = 61,
+): Record<string, string> {
+  if (process.env.NODE_ENV !== 'production') {
+    return {};
+  }
+  return {
+    'Cache-Control': `public, max-age=${maxAge}, stale-while-revalidate=${maxAge * 2}`,
+    'CDN-Cache-Control': `max-age=${maxAge}`, // Cloudflare-specific
   };
+}
+
+export function publicCacheControlHeaders(maxAge: number = 61) {
+  return (): Record<string, string> => buildPublicCacheControlHeaders(maxAge);
 }

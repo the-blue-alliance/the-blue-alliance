@@ -1,7 +1,7 @@
 import json
+from unittest.mock import MagicMock, patch
 
 import pytest
-from pyre_extensions import none_throws
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -46,66 +46,26 @@ def test_match_not_played() -> None:
     assert MatchTiebreakers.tiebreak_winner(m) == ""
 
 
-def test_2016_tiebreakers(test_data_importer) -> None:
-    test_data_importer.import_match(__file__, "data/2016cmp_f1m3.json")
-    match: Match = none_throws(Match.get_by_id("2016cmp_f1m3"))
-    assert match.winning_alliance == AllianceColor.RED
+def _sf_match(score_breakdown: dict) -> Match:
+    return Match(
+        comp_level=CompLevel.SF,
+        year=2014,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=["frc1"], score=10),
+                AllianceColor.BLUE: MatchAlliance(teams=["frc4"], score=10),
+            }
+        ),
+        score_breakdown_json=json.dumps(score_breakdown),
+    )
 
 
-def test_2017_tiebreakers(test_data_importer) -> None:
-    test_data_importer.import_match(__file__, "data/2017dal_qf3m2.json")
-    match: Match = none_throws(Match.get_by_id("2017dal_qf3m2"))
-    assert match.winning_alliance == AllianceColor.RED
-
-
-def test_2019_tiebreakers(test_data_importer) -> None:
-    test_data_importer.import_match(__file__, "data/2019hiho_qf4m1.json")
-    match: Match = none_throws(Match.get_by_id("2019hiho_qf4m1"))
-    assert match.winning_alliance == AllianceColor.RED
-
-
-def test_2020_tiebreakers(test_data_importer) -> None:
-    test_data_importer.import_match(__file__, "data/2020mndu2_sf2m2.json")
-    match: Match = none_throws(Match.get_by_id("2020mndu2_sf2m2"))
-    assert match.winning_alliance == AllianceColor.BLUE
-
-
-def test_2022_tiebreakers(test_data_importer) -> None:
-    test_data_importer.import_match(__file__, "data/2022wasam_qf2m2.json")
-    match: Match = none_throws(Match.get_by_id("2022wasam_qf2m2"))
-    assert match.winning_alliance == AllianceColor.BLUE
-
-
-def test_2023_tiebreakers(test_data_importer) -> None:
-    test_data_importer.import_match(__file__, "data/2023cmptx_sf12m1.json")
-    match: Match = none_throws(Match.get_by_id("2023cmptx_sf12m1"))
-    assert match.winning_alliance == AllianceColor.RED
-
-
-def test_2024_tiebreakers(test_data_importer) -> None:
-    # broken by tech fouls
-    test_data_importer.import_match(__file__, "data/2024miket_sf13m1.json")
-    match: Match = none_throws(Match.get_by_id("2024miket_sf13m1"))
-    assert match.winning_alliance == AllianceColor.RED
-
-    # broken by auto points
-    test_data_importer.import_match(__file__, "data/2024isde1_sf12m1.json")
-    match: Match = none_throws(Match.get_by_id("2024isde1_sf12m1"))
-    assert match.winning_alliance == AllianceColor.RED
-
-    # finals match - no tiebreakers
-    test_data_importer.import_match(__file__, "data/2024isde1_f1m2.json")
-    match: Match = none_throws(Match.get_by_id("2024isde1_f1m2"))
-    assert match.winning_alliance == ""
-
-
-def test_2025_tiebreakers(test_data_importer) -> None:
-    # Broken by tech fouls
-    test_data_importer.import_match(__file__, "data/2025nhsal_sf7m1.json")
-    match: Match = none_throws(Match.get_by_id("2025nhsal_sf7m1"))
-    assert match.winning_alliance == AllianceColor.BLUE
-
-    # Broken by auto points
-    test_data_importer.import_match(__file__, "data/2025vagle_sf8m1.json")
-    match: Match = none_throws(Match.get_by_id("2025vagle_sf8m1"))
-    assert match.winning_alliance == AllianceColor.BLUE
+def test_undecidable_tiebreaker() -> None:
+    m = _sf_match({AllianceColor.RED: {}, AllianceColor.BLUE: {}})
+    game = MagicMock()
+    game.finals_can_be_tiebroken.return_value = True
+    game.tiebreak_criteria.return_value = [None, (2, 1)]
+    with patch("backend.common.helpers.match_tiebreakers.get_game", return_value=game):
+        assert MatchTiebreakers.tiebreak_winner(m) == ""

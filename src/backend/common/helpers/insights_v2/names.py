@@ -1,0 +1,99 @@
+from typing import NamedTuple
+
+
+class InsightV2NameEntry(NamedTuple):
+    name: str
+    display_name: str
+
+
+class InsightV2Names:
+    # Leaderboards
+    BLUE_BANNERS = InsightV2NameEntry("blue_banners", "Total Blue Banners")
+    MOST_MATCHES_PLAYED = InsightV2NameEntry(
+        "most_matches_played", "Most Matches Played"
+    )
+    MOST_MATCHES_PLAYED_TOGETHER = InsightV2NameEntry(
+        "most_matches_played_together", "Most Matches Played Together"
+    )
+    MOST_DIVISION_FINALS_APPEARANCES = InsightV2NameEntry(
+        "most_division_finals_appearances", "Most Division Finals Appearances"
+    )
+    MOST_DIVISION_WINS = InsightV2NameEntry("most_division_wins", "Most Division Wins")
+    MOST_CMP_FINALS_APPEARANCES = InsightV2NameEntry(
+        "most_cmp_finals_appearances", "Most World Championship Finals Appearances"
+    )
+    MOST_CMP_WINS = InsightV2NameEntry("most_cmp_wins", "Most World Championship Wins")
+    MOST_EVENTS_WON = InsightV2NameEntry("most_events_won", "Most Events Won")
+    MOST_EVENTS_WON_TOGETHER = InsightV2NameEntry(
+        "most_events_won_together", "Most Events Won Together"
+    )
+    MOST_IMPACT_AWARD_WINS = InsightV2NameEntry(
+        "most_impact_award_wins", "Most Impact Award Wins"
+    )
+    MOST_AWARDS_WON = InsightV2NameEntry("most_awards_won", "Most Awards Won")
+    MOST_DISTRICT_CMP_WINS = InsightV2NameEntry(
+        "most_district_cmp_wins", "Most District Championship Wins"
+    )
+    MOST_WFFA_WINS = InsightV2NameEntry("most_wffa_wins", "Most WFFAs")
+    HIGHEST_MATCH_CLEAN_SCORE = InsightV2NameEntry(
+        "highest_match_clean_score", "Highest Clean Score"
+    )
+    HIGHEST_MATCH_CLEAN_COMBINED_SCORE = InsightV2NameEntry(
+        "highest_match_clean_combined_score", "Highest Combined Clean Score"
+    )
+    HIGHEST_LOSING_SCORE = InsightV2NameEntry(
+        "highest_losing_score", "Highest Losing Score"
+    )
+    HIGHEST_AUTO_SCORE = InsightV2NameEntry("highest_auto_score", "Highest Auto Score")
+    HIGHEST_TELEOP_SCORE = InsightV2NameEntry(
+        "highest_teleop_score", "Highest Teleop Score"
+    )
+    HIGHEST_ENDGAME_SCORE = InsightV2NameEntry(
+        "highest_endgame_score", "Highest Endgame Score"
+    )
+
+    # Streaks
+    QUALIFYING_EVENT_WIN_STREAK = InsightV2NameEntry(
+        "qualifying_event_win_streak", "Longest Qualifying Event Win Streak"
+    )
+    EINSTEIN_WIN_STREAK = InsightV2NameEntry(
+        "einstein_streak", "Longest Einstein Streak"
+    )
+    UNDEFEATED_STREAK = InsightV2NameEntry(
+        "undefeated_streak", "Longest Undefeated Season Start"
+    )
+    WIN_STREAK = InsightV2NameEntry("win_streak", "Longest Win Streak")
+
+    MOST_GAME_PIECES_SCORED = InsightV2NameEntry(
+        "most_game_pieces_scored", "Most Game Pieces Scored"
+    )
+
+    # Timeseries
+    HIGH_SCORE_OVER_TIME = InsightV2NameEntry(
+        "high_score_over_time", "High Score Over Time"
+    )
+    AVERAGE_MATCH_SCORE_BY_WEEK = InsightV2NameEntry(
+        "match_averages_by_week", "Average Match Score By Week"
+    )
+    AVERAGE_ELIM_MATCH_SCORE_BY_WEEK = InsightV2NameEntry(
+        "elim_match_averages_by_week", "Average Elim Match Score By Week"
+    )
+    AVERAGE_WIN_MARGIN_BY_WEEK = InsightV2NameEntry(
+        "match_average_margins_by_week", "Average Win Margin By Week"
+    )
+    AVERAGE_ELIM_WIN_MARGIN_BY_WEEK = InsightV2NameEntry(
+        "elim_match_average_margins_by_week", "Average Elim Win Margin By Week"
+    )
+    NUM_MATCHES_BY_YEAR = InsightV2NameEntry("num_matches_by_year", "Matches over Time")
+    CUMULATIVE_MATCHES_BY_DAY = InsightV2NameEntry(
+        "cumulative_matches_by_day", "Matches over Time"
+    )
+
+    # Game Stats
+    GAME_STATS = InsightV2NameEntry("game_stats", "Game Stats")
+
+    # Clubs
+    HALL_OF_FAME = InsightV2NameEntry("hall_of_fame", "Hall of Fame")
+    WORLD_CHAMPIONSHIP_WINNERS = InsightV2NameEntry(
+        "world_championship_winners", "World Championship Winners"
+    )

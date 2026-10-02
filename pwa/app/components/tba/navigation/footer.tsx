@@ -1,11 +1,14 @@
 import { Link, LinkOptions } from '@tanstack/react-router';
-import { MoonIcon, SunIcon } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
+import { Temporal } from 'temporal-polyfill';
 
-import GithubIcon from '~icons/logos/github-icon';
+import MoonIcon from '~icons/lucide/moon';
+import SunIcon from '~icons/lucide/sun';
+import GithubIcon from '~icons/simple-icons/github';
 
 import andymarkLogo from '~/images/images/andymark-logo.png';
+import { useIsHydrated } from '~/lib/hooks';
 import { useTheme } from '~/lib/theme';
 
 type InternalLink = {
@@ -40,7 +43,7 @@ const links: NavigationLink[] = [
   { label: 'Privacy Policy', to: '/privacy' },
 ];
 
-// Commit hash is string-replaced, so we need to ignore eslint and typescript errors.
+// Commit hash is string-replaced at build time, so we need to ignore eslint and typescript errors.
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-expect-error
 const commitHash = __COMMIT_HASH__ as string;
@@ -49,18 +52,15 @@ const themes = [['light', SunIcon] as const, ['dark', MoonIcon] as const];
 
 function ThemeToggle() {
   const { setTheme, resolvedTheme } = useTheme();
-  const [mounted, setMounted] = useState<boolean>(false);
+  const mounted = useIsHydrated();
   const value = mounted ? resolvedTheme : null;
-
-  useEffect(() => {
-    setMounted(true);
-  }, []);
 
   return (
     <button
       className="group inline-flex cursor-pointer items-center rounded-full
         border p-1"
       aria-label="Toggle Theme"
+      data-mounted={mounted}
       onClick={() => setTheme(value === 'light' ? 'dark' : 'light')}
     >
       {themes.map(([key, Icon]) => {
@@ -81,8 +81,11 @@ function ThemeToggle() {
   );
 }
 
-export const Footer = () => {
-  const renderTime = new Date().toLocaleString('en-US', {
+// Computed client-side (rather than in the root loader) so the timestamp
+// doesn't make the root loader non-deterministic — a stale value baked into
+// every cached SSR response and a hydration-mismatch hazard.
+function formatRenderTime(): string {
+  return Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
     month: 'short',
     day: 'numeric',
     year: 'numeric',
@@ -90,6 +93,14 @@ export const Footer = () => {
     minute: 'numeric',
     hour12: true,
   });
+}
+
+export const Footer = () => {
+  const hydrated = useIsHydrated();
+  const renderTime = useMemo(
+    () => (hydrated ? formatRenderTime() : null),
+    [hydrated],
+  );
 
   return (
     <footer
@@ -153,13 +164,24 @@ export const Footer = () => {
               <img
                 src={andymarkLogo}
                 alt="AndyMark"
-                className="ml-2 inline h-4"
+                width={450}
+                height={81}
+                className="ml-2 inline h-4 w-auto"
               />
             </a>
           </span>
 
           <p className="text-xs text-neutral-600 dark:text-neutral-400">
-            Generated on {renderTime}. Commit:{' '}
+            Data provided by the{' '}
+            <a
+              href="https://frc-events.firstinspires.org/services/API"
+              target="_blank"
+              rel="noreferrer noopener"
+              className="hover:underline"
+            >
+              <i>FIRST</i>® Events API
+            </a>
+            {renderTime && <>. Generated on {renderTime}</>}. Commit:{' '}
             <a
               href={`https://github.com/the-blue-alliance/the-blue-alliance/commit/${commitHash}`}
               target="_blank"

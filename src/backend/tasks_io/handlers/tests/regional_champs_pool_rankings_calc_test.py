@@ -47,7 +47,7 @@ def test_calc(calc_mock: mock.Mock, tasks_client: Client) -> None:
             ],
             point_total=10,
             tiebreakers=[],
-            qual_scores=[],
+            match_scores=[],
             rookie_bonus=0,
             single_event_bonus=0,
             other_bonus=0,
@@ -114,7 +114,7 @@ def test_calc_doesnt_write_out_in_taskqueue(
             ],
             point_total=10,
             tiebreakers=[],
-            qual_scores=[],
+            match_scores=[],
             rookie_bonus=0,
             single_event_bonus=0,
             other_bonus=0,
@@ -189,7 +189,7 @@ def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> No
             ],
             point_total=15,
             tiebreakers=[],
-            qual_scores=[],
+            match_scores=[],
             rookie_bonus=0,
             single_event_bonus=0,
             other_bonus=0,
@@ -213,3 +213,8 @@ def test_calc_with_adjustments(calc_mock: mock.Mock, tasks_client: Client) -> No
     )
     assert regional_pool is not None
     assert regional_pool.rankings[0]["adjustments"] == 5
+
+
+def test_calc_bad_year(tasks_client: Client) -> None:
+    resp = tasks_client.get("/tasks/math/do/regional_champs_pool_rankings_calc/2020")
+    assert resp.status_code == 404

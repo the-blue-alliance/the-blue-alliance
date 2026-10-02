@@ -25,23 +25,6 @@ def _create_test_event(event_key: str, event_type: EventType = EventType.REGIONA
     e.put()
 
 
-@pytest.mark.parametrize("year", RankingsHelper.NO_RECORD_YEARS)
-def test_build_ranking_no_record(year: int) -> None:
-    ranking = RankingsHelper.build_ranking(
-        year,
-        1,  # rank
-        "frc7332",  # team_key
-        1,  # wins
-        2,  # losses
-        3,  # ties
-        None,  # qual_average
-        1,  # matches_played
-        2,  # dq
-        [],  # sort_orders
-    )
-    assert ranking["record"] is None
-
-
 def test_build_ranking_record() -> None:
     ranking = RankingsHelper.build_ranking(
         2020,
@@ -56,24 +39,6 @@ def test_build_ranking_record() -> None:
         [],  # sort_orders
     )
     assert ranking["record"] == {"losses": 2, "ties": 3, "wins": 1}
-
-
-@pytest.mark.parametrize("year", RankingsHelper.QUAL_AVERAGE_YEARS)
-def test_build_ranking_qual_average(year: int) -> None:
-    qual_average = 39.18
-    ranking = RankingsHelper.build_ranking(
-        year,
-        1,  # rank
-        "frc7332",  # team_key
-        1,  # wins
-        2,  # losses
-        3,  # ties
-        qual_average,  # qual_average
-        1,  # matches_played
-        2,  # dq
-        [],  # sort_orders
-    )
-    assert ranking["qual_average"] == qual_average
 
 
 def test_build_ranking_no_qual_average() -> None:
