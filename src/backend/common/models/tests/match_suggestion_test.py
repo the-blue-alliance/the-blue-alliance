@@ -25,6 +25,8 @@ def _suggestion() -> MatchSuggestion:
         blue_team_numbers=[118, 148, 971],
         predicted_time=1777000000,
         scheduled_time=1776999000,
+        predicted_red_score=123.5,
+        predicted_blue_score=118.25,
         rank=0,
         score=0.8125,
         components=MatchSuggestionComponents(
@@ -57,6 +59,8 @@ def test_model_dump_is_json_serializable() -> None:
     assert entry["c"]["hs"] == 0.5
     assert entry["c"]["cs"] == 1.0
     assert "p" not in entry["c"]
+    assert entry["rs"] == 123.5
+    assert entry["bs"] == 118.25
 
 
 def test_model_dump_defaults_to_empty_suggestions() -> None:
@@ -74,6 +78,15 @@ def test_optional_times_dump_as_none() -> None:
     dumped = unscheduled.model_dump(mode="json", by_alias=True)
     assert dumped["pt"] is None
     assert dumped["st"] is None
+
+
+def test_optional_predicted_scores_dump_as_none() -> None:
+    unpredicted = _suggestion().model_copy(
+        update={"predicted_red_score": None, "predicted_blue_score": None}
+    )
+    dumped = unpredicted.model_dump(mode="json", by_alias=True)
+    assert dumped["rs"] is None
+    assert dumped["bs"] is None
 
 
 def test_json_schema_generates() -> None:

@@ -164,3 +164,14 @@ def test_delete_api_read_key_not_found(
     resp = make_clientapi_request(api_client, "/api_keys/read/delete", req)
     assert resp["code"] == 404
     mock.delete_api_key.assert_not_called()
+
+
+def test_list_api_keys_empty_request_body(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    # A request with no body is decoded as a VoidRequest
+    resp = api_client.post("/clientapi/tbaClient/v9/api_keys/list")
+    assert resp.status_code == 200
+    assert resp.json == ApiKeysResponse(
+        code=200, message="", read_keys=[], write_keys=[]
+    )

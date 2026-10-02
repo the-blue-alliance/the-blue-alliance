@@ -113,6 +113,13 @@ test.describe('/event/2024mil', () => {
 
     await expect(page.locator('svg.recharts-surface')).toBeVisible();
   });
+
+  test('links to the Match13 event page', async ({ page }) => {
+    await expect(page.getByRole('link', { name: 'Match13' })).toHaveAttribute(
+      'href',
+      'https://www.match13.com/event/2024mil',
+    );
+  });
 });
 
 test('defers the animated tab indicator until a tab changes', async ({
@@ -151,6 +158,16 @@ test.describe('/event/2026necmp Media tab', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/event/2026necmp');
     await page.getByRole('tab', { name: 'Media' }).click();
+  });
+
+  test('shows the media count in the tab', async ({ page }) => {
+    await expect(page.getByRole('tab', { name: /^Media \d+$/ })).toBeVisible();
+  });
+
+  test('links to the event media suggestion form', async ({ page }) => {
+    await expect(
+      page.getByRole('link', { name: 'Add Event Media' }),
+    ).toHaveAttribute('href', '/suggest/event/media?event_key=2026necmp');
   });
 
   test('shows the photo galleries heading', async ({ page }) => {

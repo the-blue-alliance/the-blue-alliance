@@ -83,10 +83,6 @@ def api_authenticated(func):
                 # Add to trace span for visibility in Cloud Trace
                 span.set_label("api_auth_key", auth_key)
                 span.set_label("auth_owner_id", str(auth_owner_id))
-                # Log API key usage for visibility in GCP Console
-                logging.info(
-                    f"API request authenticated with key: {auth_key[:16]}... (owner: {auth_owner_id})"
-                )
             else:
                 from backend.common.auth import current_user
 
@@ -121,7 +117,12 @@ def require_write_auth(auth_types: set[AuthType] | None, file_param: str | None 
                     try:
                         FMSReportType(fms_report_type)
                     except ValueError:
-                        fms_report_type = None
+                        return make_response(
+                            jsonify(
+                                {"Error": f"Unknown FMS report type {fms_report_type}"}
+                            ),
+                            400,
+                        )
 
                 # This will abort the request on failure
                 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper

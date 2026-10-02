@@ -1,5 +1,6 @@
 import json
 import unittest
+from datetime import datetime
 from typing import cast
 from unittest.mock import patch
 
@@ -1514,3 +1515,275 @@ class TestSuggestMatchVideoYouTube(SuggestionCreatorTest):
             self.account.key, "", "2016test_f1m1"
         )
         self.assertEqual(status, "bad_url")
+
+
+class TestTeamMediaSuggestionCreatorTargets(SuggestionCreatorTest):
+    def test_social_url_rejected_for_media_suggestion(self) -> None:
+        # A social profile URL submitted through the (non-social) media form
+        status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key, "https://github.com/frc1124", "frc1124", "2016"
+        ).get_result()
+        self.assertEqual(status, "bad_url")
+        self.assertIsNone(suggestion)
+        self.assertEqual(Suggestion.query().count(), 0)
+
+    def test_event_key_targets_event_media(self) -> None:
+        # The team media creator also backs event media when handed an event key
+        status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key, "http://imgur.com/ruRAxDm", "2016casj", "2016"
+        ).get_result()
+        self.assertEqual(status, "success")
+        suggestion = none_throws(suggestion)
+        self.assertEqual(suggestion.target_model, "event_media")
+        self.assertEqual(suggestion.target_key, "2016casj")
+        self.assertEqual(suggestion.contents["reference_type"], "event")
+        self.assertEqual(suggestion.contents["reference_key"], "2016casj")
+
+    def test_private_details_are_kept(self) -> None:
+        status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+            self.account.key,
+            "http://imgur.com/ruRAxDm",
+            "frc1124",
+            "2016",
+            private_details_json=json.dumps({"secret": "shh"}),
+        ).get_result()
+        self.assertEqual(status, "success")
+        suggestion = none_throws(suggestion)
+        self.assertEqual(
+            suggestion.contents["private_details_json"], json.dumps({"secret": "shh"})
+        )
+
+    def test_cad_url_targets_robot(self) -> None:
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(
+                "https://cad.onshape.com/api/documents/5481081f48161555332968ff",
+                200,
+                json.dumps({"name": "Robot", "description": "", "createdAt": ""}),
+            )
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ):
+            status, suggestion = SuggestionCreator.createTeamMediaSuggestion(
+                self.account.key,
+                "https://cad.onshape.com/documents/5481081f48161555332968ff/w/a466cec29af372ec09c44333/e/abc123",
+                "frc1124",
+                "2016",
+            ).get_result()
+        self.assertEqual(status, "success")
+        self.assertEqual(none_throws(suggestion).target_model, "robot")
+
+
+class TestEventMediaSuggestionCreatorPrivateDetails(SuggestionCreatorTest):
+    def test_private_details_are_kept(self) -> None:
+        status, suggestion = SuggestionCreator.createEventMediaSuggestion(
+            self.account.key,
+            "https://www.youtube.com/watch?v=H-54KMwMKY0",
+            "2016nyny",
+            private_details_json=json.dumps({"secret": "shh"}),
+        ).get_result()
+        self.assertEqual(status, "success")
+        suggestion = none_throws(suggestion)
+        self.assertEqual(
+            suggestion.contents["private_details_json"], json.dumps({"secret": "shh"})
+        )
+
+
+class TestSuggestEventWebcastCreatorEdgeCases(SuggestionCreatorTest):
+    def setUp(self) -> None:
+        super().setUp()
+        Event(
+            id="2016test",
+            name="Test Event",
+            event_short="test",
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+        ).put()
+
+    def test_unformattable_url(self) -> None:
+        # Non-ASCII URLs can't be cleaned up, so nothing is suggested
+        status = SuggestionCreator.createEventWebcastSuggestion(
+            self.account.key, "http://twitch.tv/frcgamesénse", "", "2016test"
+        ).get_result()
+        self.assertEqual(status, "bad_url")
+        self.assertEqual(Suggestion.query().count(), 0)
+
+    def test_webcast_parser_failure_is_treated_as_unknown_url(self) -> None:
+        with patch(
+            "backend.common.suggestions.suggestion_creator.WebcastParser.webcast_dict_from_url",
+            side_effect=RuntimeError("upstream down"),
+        ):
+            status = SuggestionCreator.createEventWebcastSuggestion(
+                self.account.key, "http://twitch.tv/frcgamesense", "", "2016test"
+            ).get_result()
+        self.assertEqual(status, "success")
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+        suggestion = cast(Suggestion, suggestions[0])
+        # Saved as an obscure webcast for a human to sort out
+        self.assertIsNone(suggestion.contents.get("webcast_dict"))
+        self.assertEqual(
+            suggestion.contents.get("webcast_url"), "http://twitch.tv/frcgamesense"
+        )
+
+
+class TestSuggestEventWebcastCreatorAutoApproveDates(SuggestionCreatorTest):
+    def test_unparseable_api_date_does_not_auto_approve(self) -> None:
+        # The YouTube parser normalises dates to YYYY-MM-DD; anything else
+        # from the helper is ignored rather than trusted
+        District(
+            id="2016fim",
+            year=2016,
+            abbreviation="fim",
+            webcast_channels=[
+                WebcastChannel(
+                    type=WebcastType.YOUTUBE,
+                    channel="firstinmichigan",
+                    channel_id="UCfirstinmichigan",
+                )
+            ],
+        ).put()
+        Event(
+            id="2016fim1",
+            name="FIM District Troy Event",
+            event_short="fim1",
+            short_name="Troy",
+            year=2016,
+            event_type_enum=EventType.DISTRICT,
+            district_key=ndb.Key(District, "2016fim"),
+            start_date=datetime(2016, 3, 14),
+            end_date=datetime(2016, 3, 16),
+        ).put()
+        video_details = {
+            "abc123": {
+                "title": "Troy District Event - Qualifications",
+                "description": "FIM1 District Event",
+                "channel_id": "UCfirstinmichigan",
+                "scheduled_start_time": "2016-03-15T18:00:00Z",
+            }
+        }
+        with patch(
+            "backend.common.suggestions.suggestion_creator.YouTubeVideoHelper.get_video_details_batch",
+            return_value=InstantFuture(video_details),
+        ):
+            with patch(
+                "backend.common.suggestions.suggestion_creator.EventWebcastAdder.add_webcast"
+            ) as mock_add_webcast:
+                status = SuggestionCreator.createEventWebcastSuggestion(
+                    self.account.key,
+                    "https://www.youtube.com/watch?v=abc123",
+                    "",
+                    "2016fim1",
+                ).get_result()
+
+        self.assertEqual(status, "success")
+        mock_add_webcast.assert_not_called()
+        suggestions = Suggestion.query().fetch()
+        self.assertEqual(len(suggestions), 1)
+        suggestion = cast(Suggestion, suggestions[0])
+        self.assertEqual(
+            suggestion.contents.get("webcast_date"), "2016-03-15T18:00:00Z"
+        )
+
+
+class TestDummyOffseasonSuggestions(SuggestionCreatorTest):
+    def _event(self, event_short: str = "test") -> Event:
+        return Event(
+            id=f"2016{event_short}",
+            name="Test Event",
+            event_short=event_short,
+            year=2016,
+            event_type_enum=EventType.OFFSEASON,
+            start_date=datetime(2016, 8, 1),
+            end_date=datetime(2016, 8, 2),
+            website="http://example.com",
+            venue="Venue",
+            venue_address="1 Main St",
+            city="City",
+            state_prov="ST",
+            country="USA",
+        )
+
+    def test_creates_suggestion_without_patching(self) -> None:
+        """An offseason event with no existing suggestion gets one."""
+        SuggestionCreator.createDummyOffseasonSuggestions([self._event()])
+
+        self.assertEqual(Suggestion.query().count(), 1)
+        suggestion = none_throws(Suggestion.get_by_id("offseason_with_data_2016test"))
+        self.assertEqual(suggestion.target_model, "offseason-event")
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+        self.assertEqual(suggestion.contents["first_code"], "TEST")
+
+    def test_creates_suggestion_for_new_event(self) -> None:
+        # Keep the key iterator intact so the loop body runs as intended
+        event = self._event()
+        with patch(
+            "backend.common.suggestions.suggestion_creator.ndb.get_multi",
+            return_value=[None],
+        ):
+            SuggestionCreator.createDummyOffseasonSuggestions([event])
+
+        suggestion = none_throws(Suggestion.get_by_id("offseason_with_data_2016test"))
+        bot = none_throws(Account.get_by_id("tba-bot-account"))
+        self.assertEqual(suggestion.author, bot.key)
+        self.assertEqual(suggestion.target_model, "offseason-event")
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+        self.assertEqual(suggestion.contents["name"], "Test Event")
+        self.assertEqual(suggestion.contents["start_date"], "2016-08-01")
+        self.assertEqual(suggestion.contents["end_date"], "2016-08-02")
+        self.assertEqual(suggestion.contents["first_code"], "TEST")
+        self.assertEqual(suggestion.contents["venue_name"], "Venue")
+        self.assertEqual(suggestion.contents["address"], "1 Main St")
+        self.assertEqual(suggestion.contents["city"], "City")
+        self.assertEqual(suggestion.contents["state"], "ST")
+        self.assertEqual(suggestion.contents["country"], "USA")
+
+    def test_skips_events_with_existing_suggestion(self) -> None:
+        event = self._event()
+        existing = Suggestion(
+            id="offseason_with_data_2016test",
+            author=self.account.key,
+            target_model="offseason-event",
+        )
+        existing.contents = {"name": "Already here"}
+        existing.put()
+
+        with patch(
+            "backend.common.suggestions.suggestion_creator.ndb.get_multi",
+            return_value=[existing],
+        ):
+            with patch.object(
+                SuggestionCreator, "createOffseasonEventSuggestion"
+            ) as mock_create:
+                SuggestionCreator.createDummyOffseasonSuggestions([event])
+
+        mock_create.assert_not_called()
+        self.assertEqual(Suggestion.query().count(), 1)
+
+    def test_logs_creation_failure(self) -> None:
+        event = self._event()
+        with patch(
+            "backend.common.suggestions.suggestion_creator.ndb.get_multi",
+            return_value=[None],
+        ):
+            with patch.object(
+                SuggestionCreator,
+                "createOffseasonEventSuggestion",
+                return_value=("validation_failure", {"name": "Missing event name"}),
+            ):
+                with self.assertLogs(level="WARNING") as logs:
+                    SuggestionCreator.createDummyOffseasonSuggestions([event])
+
+        self.assertTrue(
+            any("Failed to create suggestion" in line for line in logs.output)
+        )
+        self.assertEqual(Suggestion.query().count(), 0)
+
+
+class TestApiWriteSuggestionCreatorNoEventKey(SuggestionCreatorTest):
+    def test_empty_event_key(self) -> None:
+        status = SuggestionCreator.createApiWriteSuggestion(
+            self.account.key, "", "Event Organizer", [1, 2, 3]
+        )
+        self.assertEqual(status, "bad_event")
+        self.assertEqual(Suggestion.query().count(), 0)

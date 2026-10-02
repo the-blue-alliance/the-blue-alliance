@@ -72,10 +72,11 @@ jobs:
           uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
+          flags: python
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-24.04
@@ -112,10 +113,11 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
+          flags: node
   pwa-lint:
     name: "[pwa] Format & Lint"
     runs-on: ubuntu-24.04
@@ -169,10 +171,11 @@ jobs:
         run: pnpm --dir pwa test
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
+          flags: pwa
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-24.04

@@ -17,6 +17,7 @@ from backend.common.helpers.match_suggestion_helper import (
     W_SIGNIFICANCE,
     W_TIME_DECAY,
 )
+from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import TeamKey
@@ -60,8 +61,8 @@ def make_match(
     predicted_time: Optional[datetime.datetime] = None,
     time: Optional[datetime.datetime] = None,
 ) -> Match:
-    red = red or ["frc1", "frc2", "frc3"]
-    blue = blue or ["frc4", "frc5", "frc6"]
+    red = red if red is not None else ["frc1", "frc2", "frc3"]
+    blue = blue if blue is not None else ["frc4", "frc5", "frc6"]
     score = 100 if played else -1
     return Match(
         id=Match.render_key_name(event.key_name, comp_level, set_number, match_number),
@@ -95,8 +96,8 @@ def seed_matches(event: Event, matches: List[Match]) -> Event:
 
 
 def test_scoring_weights() -> None:
-    assert W_HIGH_SCORE == 0.125
-    assert W_CLOSE_SCORE == 0.125
+    assert W_HIGH_SCORE == 0.10
+    assert W_CLOSE_SCORE == 0.10
     assert (
         W_FAVORITES + W_SIGNIFICANCE + W_TIME_DECAY + W_HIGH_SCORE + W_CLOSE_SCORE
         == 1.0
@@ -142,7 +143,19 @@ def test_time_decay_falls_off_into_the_future(offset_s: int) -> None:
     assert 0.0 < further < nearer <= 1.0
 
 
-@pytest.mark.parametrize("offset_s", [60, 300, 900, 1800])
+@pytest.mark.parametrize("offset_s", [1, 60, 299, 300])
+def test_time_decay_stays_at_peak_while_match_is_likely_ongoing(
+    offset_s: int,
+) -> None:
+    assert (
+        MatchSuggestionHelper._time_decay(
+            NOW - datetime.timedelta(seconds=offset_s), NOW
+        )
+        == 1.0
+    )
+
+
+@pytest.mark.parametrize("offset_s", [301, 360, 900, 1800])
 def test_time_decay_falls_off_into_the_past(offset_s: int) -> None:
     nearer = MatchSuggestionHelper._time_decay(
         NOW - datetime.timedelta(seconds=offset_s - 60), NOW
@@ -360,6 +373,20 @@ def test_high_score_favors_higher_scoring_predictions(ndb_stub, memcache_stub) -
     )
 
 
+def test_suggestion_includes_predicted_alliance_scores(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+    seed_predictions(
+        event.key_name,
+        qual={"2026casj_qm1": (123.5, 118.25, 0.6)},
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.predicted_red_score == 123.5
+    assert suggestion.predicted_blue_score == 118.25
+
+
 def test_scores_read_playoff_predictions(ndb_stub, memcache_stub) -> None:
     event = make_event("2026cmptx", EventType.CMP_FINALS)
     seed_matches(
@@ -390,6 +417,16 @@ def test_scores_are_neutral_without_event_details(ndb_stub, memcache_stub) -> No
     components = result.suggestions["2026casj_qm1"].components
     assert components.high_score == 0.5
     assert components.close_score == 0.5
+
+
+def test_suggestion_omits_scores_without_prediction(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.predicted_red_score is None
+    assert suggestion.predicted_blue_score is None
 
 
 def test_scores_are_neutral_when_predictions_is_none(ndb_stub, memcache_stub) -> None:
@@ -490,6 +527,40 @@ def test_skips_matches_with_no_time(ndb_stub, memcache_stub) -> None:
     assert result.suggestions == {}
 
 
+@pytest.mark.parametrize(
+    "red,blue",
+    [
+        ([], ["frc4", "frc5", "frc6"]),
+        (["frc1", "frc2", "frc3"], []),
+        ([], []),
+    ],
+    ids=["red-unassigned", "blue-unassigned", "both-unassigned"],
+)
+def test_skips_matches_with_unassigned_alliances(
+    ndb_stub,
+    memcache_stub,
+    red: List[TeamKey],
+    blue: List[TeamKey],
+) -> None:
+    event = make_event()
+    seed_matches(
+        event,
+        [
+            make_match(
+                event,
+                match_number=1,
+                red=red,
+                blue=blue,
+                predicted_time=NOW + datetime.timedelta(minutes=10),
+            )
+        ],
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+
+    assert result.suggestions == {}
+
+
 def test_scores_distant_future_matches_with_low_time_decay(
     ndb_stub, memcache_stub
 ) -> None:
@@ -528,6 +599,26 @@ def test_scores_stale_unplayed_matches_with_low_time_decay(
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
     suggestion = result.suggestions["2026casj_qm1"]
     assert 0.0 < suggestion.components.time_decay < 0.001
+
+
+def test_scores_unplayed_match_as_ongoing_during_grace_period(
+    ndb_stub, memcache_stub
+) -> None:
+    event = make_event()
+    seed_matches(
+        event,
+        [
+            make_match(
+                event,
+                match_number=1,
+                predicted_time=NOW - datetime.timedelta(minutes=5),
+            )
+        ],
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.components.time_decay == 1.0
 
 
 def test_falls_back_to_scheduled_time(ndb_stub, memcache_stub) -> None:
@@ -862,3 +953,25 @@ def test_score_all_normalizes_across_the_events_passed(ndb_stub, memcache_stub) 
     components = alone.suggestions["2026cmptx_qm1"].components
     assert components.high_score == 0.5
     assert components.close_score == 1.0
+
+
+def test_double_elim_round_legacy_bracket() -> None:
+    event = make_event("2023cmptx", EventType.CMP_DIVISION)
+    event.playoff_type = PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM
+    match = make_match(event, comp_level=CompLevel.SF, set_number=1)
+    assert MatchSuggestionHelper._double_elim_round(
+        event, match
+    ) == PlayoffTypeHelper.get_double_elim_round_pre_2023(CompLevel.SF, 1)
+
+
+def test_time_decay_detail_no_time() -> None:
+    event = make_event("2026cmptx", EventType.CMP_DIVISION)
+    match = make_match(event, comp_level=CompLevel.QM, set_number=1)
+    match.time = None
+    match.predicted_time = None
+    assert (
+        MatchSuggestionHelper._time_decay_detail(
+            match, datetime.datetime(2026, 4, 1), True
+        )
+        == "none"
+    )

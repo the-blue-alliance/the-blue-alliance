@@ -10,6 +10,7 @@ import DateIcon from '~icons/lucide/calendar-days';
 import MediaIcon from '~icons/lucide/camera';
 import StatbotIcon from '~icons/lucide/chart-spline';
 import ScoutingIcon from '~icons/lucide/clipboard-list';
+import Match13Icon from '~icons/lucide/cloud';
 import GlobeIcon from '~icons/lucide/globe';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
@@ -101,7 +102,7 @@ import {
 } from '~/components/ui/animated-tabs';
 import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -149,7 +150,7 @@ import {
 } from '~/lib/mediaUtils';
 import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
-  getDefaultAutoComponentName,
+  getDefaultCoprYAxisComponentName,
   getDefaultTeleopComponentName,
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
@@ -184,6 +185,12 @@ export const Route = createFileRoute('/event/$eventKey')({
     const alliancesQuery = queryClient
       .ensureQueryData({
         ...getEventAlliancesOptions({ path: { event_key: params.eventKey } }),
+        staleTime: eventStaleTime,
+      })
+      .catch(() => []);
+    const teamsQuery = queryClient
+      .ensureQueryData({
+        ...getEventTeamsOptions({ path: { event_key: params.eventKey } }),
         staleTime: eventStaleTime,
       })
       .catch(() => []);
@@ -241,7 +248,7 @@ export const Route = createFileRoute('/event/$eventKey')({
         .catch(() => undefined);
     }
 
-    await Promise.all([matchesQuery, alliancesQuery]);
+    await Promise.all([matchesQuery, alliancesQuery, teamsQuery]);
 
     // event needs to be returned so we can access it in meta
     return { eventKey: params.eventKey, event };
@@ -314,7 +321,8 @@ export const Route = createFileRoute('/event/$eventKey')({
     };
   },
   component: EventPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 const EVENT_TAB_VALUES = [
   'results',
@@ -609,15 +617,26 @@ function EventPage() {
               </a>
             </DetailEntity>
           )}
-        <DetailEntity icon={<StatbotIcon />}>
-          <a
-            href={`https://www.statbotics.io/event/${event.key}`}
-            target="_blank"
-            rel="noreferrer"
-          >
-            Statbotics
-          </a>
-        </DetailEntity>
+        <div className="flex items-center gap-4">
+          <DetailEntity icon={<StatbotIcon />}>
+            <a
+              href={`https://www.statbotics.io/event/${event.key}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Statbotics
+            </a>
+          </DetailEntity>
+          <DetailEntity icon={<Match13Icon />}>
+            <a
+              href={`https://www.match13.com/event/${event.key}`}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Match13
+            </a>
+          </DetailEntity>
+        </div>
         {event.webcasts.length > 0 &&
           getCurrentWeekEvents([event]).length > 0 && (
             <DetailEntity className="font-medium" icon={<LiveWebcastIcon />}>
@@ -707,6 +726,11 @@ function EventPage() {
             <InlineIcon>
               <MediaIcon />
               Media
+              <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
+                {eventMediaQuery.data
+                  ? eventMediaQuery.data.length + event.webcasts.length
+                  : '-'}
+              </Badge>
             </InlineIcon>
           </AnimatedTabsTrigger>
           <AnimatedTabsTrigger value="scouting">
@@ -775,7 +799,10 @@ function EventPage() {
                     colors={colorsQuery.data ?? { teams: {} }}
                     coprs={coprsQuery.data}
                     defaultXCopr={getDefaultTeleopComponentName(event.year)}
-                    defaultYCopr={getDefaultAutoComponentName(event.year)}
+                    defaultYCopr={getDefaultCoprYAxisComponentName(
+                      coprsQuery.data,
+                      event.year,
+                    )}
                   />
                 </Suspense>
                 <ComponentOprsTable coprs={coprsQuery.data} year={event.year} />
@@ -1394,7 +1421,16 @@ function MediaTab({
   return (
     <div className="space-y-8">
       <div className="space-y-4">
-        <h1 className="text-2xl font-bold">Webcasts</h1>
+        <div className="flex items-center justify-between gap-4">
+          <h1 className="text-2xl font-bold">Webcasts</h1>
+          <Link
+            to="/suggest/event/media"
+            search={{ event_key: eventKey }}
+            className={buttonVariants()}
+          >
+            Add Event Media
+          </Link>
+        </div>
         {webcasts.length > 0 ? (
           <>
             {youtubeWebcasts.length > 0 && (
@@ -1417,16 +1453,12 @@ function MediaTab({
             )}
           </>
         ) : (
-          <Button
-            variant="secondary"
-            render={
-              <a
-                href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
-              >
-                Add Webcast
-              </a>
-            }
-          />
+          <a
+            href={`https://www.thebluealliance.com/suggest/event/webcast?event_key=${eventKey}`}
+            className={buttonVariants({ variant: 'secondary' })}
+          >
+            Add Webcast
+          </a>
         )}
       </div>
 

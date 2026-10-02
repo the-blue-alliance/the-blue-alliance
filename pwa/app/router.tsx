@@ -3,7 +3,11 @@ import {
   init as sentryInit,
   tanstackRouterBrowserTracingIntegration,
 } from '@sentry/tanstackstart-react';
-import { ParsedLocation, createRouter } from '@tanstack/react-router';
+import {
+  type ErrorComponentProps,
+  type ParsedLocation,
+  createRouter,
+} from '@tanstack/react-router';
 import { setupRouterSsrQueryIntegration } from '@tanstack/react-router-ssr-query';
 import { useEffect } from 'react';
 import { toast } from 'sonner';
@@ -11,6 +15,7 @@ import { toast } from 'sonner';
 import ClipboardCopyIcon from '~icons/lucide/clipboard-copy';
 
 import { Button } from '~/components/ui/button';
+import { getAnalyticsInstance } from '~/firebase/firebaseConfig';
 import { ApiError } from '~/lib/apiError';
 import { createQueryClient } from '~/lib/queryClient';
 import registerServiceWorker from '~/lib/serviceWorkerRegistration';
@@ -85,9 +90,22 @@ export function getRouter() {
   if (!router.isServer) {
     sentryInit({
       dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-      sendDefaultPii: false,
-      enableLogs: true,
-      enableMetrics: true,
+      dataCollection: {
+        userInfo: false,
+        cookies: false,
+        httpHeaders: {
+          request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+          response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+        },
+        httpBodies: [],
+        urlQueryParams: {
+          deny: ['forwarded', '-ip', 'remote-', 'via', '-user'],
+        },
+        genAI: { inputs: false, outputs: false },
+        databaseQueryData: false,
+        queues: false,
+        graphQL: { document: false, variables: false },
+      },
       tracesSampleRate: 0.1,
 
       integrations: [tanstackRouterBrowserTracingIntegration(router)],
@@ -120,10 +138,7 @@ export function getRouter() {
 // `firebase/analytics` and the gtag.js network request it triggers are loaded
 // lazily here so they stay out of the hydration critical path.
 async function logPageView(pagePath: string, pageLocation: string) {
-  const [{ logEvent }, { getAnalyticsInstance }] = await Promise.all([
-    import('firebase/analytics'),
-    import('~/firebase/firebaseConfig'),
-  ]);
+  const { logEvent } = await import('firebase/analytics');
 
   const analytics = await getAnalyticsInstance();
   if (analytics === null) {
@@ -137,7 +152,7 @@ async function logPageView(pagePath: string, pageLocation: string) {
   });
 }
 
-function ErrorComponent({ error }: { error: Error }) {
+function ErrorComponent({ error }: ErrorComponentProps) {
   routerLogger.error(error, 'Router error');
 
   useEffect(() => {
@@ -149,7 +164,9 @@ function ErrorComponent({ error }: { error: Error }) {
     }
   }, [error]);
 
-  const stack = error.stack ?? error.message;
+  const normalizedError =
+    error instanceof Error ? error : new Error(String(error));
+  const stack = normalizedError.stack ?? normalizedError.message;
 
   const agentPrompt = [
     'I ran into the following error. Please find the root cause. ',
@@ -175,7 +192,7 @@ function ErrorComponent({ error }: { error: Error }) {
     <div className="py-8">
       <h1 className="mb-3 text-3xl font-medium">Oh Noes!1!!</h1>
       <h2 className="text-2xl">An error occurred.</h2>
-      {process.env.NODE_ENV !== 'production' && error.stack && (
+      {process.env.NODE_ENV !== 'production' && normalizedError.stack && (
         <>
           <div className="mt-4 flex gap-2">
             <Button
@@ -199,7 +216,7 @@ function ErrorComponent({ error }: { error: Error }) {
             className="mt-4 overflow-x-auto rounded bg-muted p-4 text-sm
               whitespace-pre-wrap"
           >
-            {error.stack}
+            {normalizedError.stack}
           </pre>
         </>
       )}

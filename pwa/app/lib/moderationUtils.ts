@@ -1,11 +1,11 @@
 import { Temporal } from 'temporal-polyfill';
 
+import type { AcceptRequest } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
 
-// Queue display order, matching the web review home
-// (suggestions/pending_suggestion_rows_partial.html). Which types exist comes
-// from the API's SuggestionType enum; the order is a presentation choice made
-// here, and a test asserts the two stay in sync.
+// Queue display order, carried over from the retired Jinja review home. Which
+// types exist comes from the API's SuggestionType enum; the order is a
+// presentation choice made here, and a test asserts the two stay in sync.
 export const SUGGESTION_TYPE_ORDER: readonly SuggestionType[] = [
   SuggestionType.MATCH,
   SuggestionType.EVENT,
@@ -30,19 +30,28 @@ export function suggestionTypeOrderComparator(a: string, b: string): number {
  * targets first appear. Used to cluster webcast suggestions per event like
  * the web review page.
  */
+// Groups items by key, preserving first-seen order of both keys and items
+export function groupBy<T>(
+  items: T[],
+  keyOf: (item: T) => string,
+): Map<string, T[]> {
+  const groups = new Map<string, T[]>();
+  for (const item of items) {
+    const key = keyOf(item);
+    const group = groups.get(key);
+    if (group) {
+      group.push(item);
+    } else {
+      groups.set(key, [item]);
+    }
+  }
+  return groups;
+}
+
 export function groupSuggestionsByTargetKey<
   T extends { target_key?: string | null },
 >(suggestions: T[]): { targetKey: string; suggestions: T[] }[] {
-  const groups = new Map<string, T[]>();
-  for (const suggestion of suggestions) {
-    const key = suggestion.target_key ?? '';
-    const group = groups.get(key);
-    if (group) {
-      group.push(suggestion);
-    } else {
-      groups.set(key, [suggestion]);
-    }
-  }
+  const groups = groupBy(suggestions, (s) => s.target_key ?? '');
   return [...groups.entries()].map(([targetKey, grouped]) => ({
     targetKey,
     suggestions: grouped,
@@ -61,6 +70,42 @@ export function formatEventDateRange(
       day: 'numeric',
     });
   return `${format(startDate)} – ${format(endDate)}`;
+}
+
+export type EventTiming = {
+  kind: 'upcoming' | 'ongoing' | 'past';
+  /** "Starts in 3 days", "Happening now", "Ended 12 days ago". */
+  label: string;
+};
+
+/**
+ * Where an event sits relative to today, so a reviewer can tell at a glance
+ * whether a key request is early, current, or after the fact. Undefined when
+ * the event has no dates. `today` is injectable for tests.
+ */
+export function eventTiming(
+  startDate: string | null | undefined,
+  endDate: string | null | undefined,
+  today: Temporal.PlainDate = Temporal.Now.plainDateISO(),
+): EventTiming | undefined {
+  if (!startDate || !endDate) return undefined;
+  const start = Temporal.PlainDate.from(startDate);
+  const end = Temporal.PlainDate.from(endDate);
+  if (Temporal.PlainDate.compare(today, start) < 0) {
+    const days = today.until(start).days;
+    return {
+      kind: 'upcoming',
+      label: days === 1 ? 'Starts tomorrow' : `Starts in ${days} days`,
+    };
+  }
+  if (Temporal.PlainDate.compare(today, end) > 0) {
+    const days = end.until(today).days;
+    return {
+      kind: 'past',
+      label: days === 1 ? 'Ended yesterday' : `Ended ${days} days ago`,
+    };
+  }
+  return { kind: 'ongoing', label: 'Happening now' };
 }
 
 /**
@@ -163,7 +208,14 @@ export function formatAuthorReputation(author: {
   return `${accepted} accepted · ${rejected} rejected`;
 }
 
-const MATCH_KEY_PATTERN = /^(qm|ef|qf|sf|f)(\d+)(?:m(\d+))?$/;
+const MATCH_KEY_COMP_LEVELS = ['qm', 'ef', 'qf', 'sf', 'f'] as const;
+type MatchKeyCompLevel = (typeof MATCH_KEY_COMP_LEVELS)[number];
+
+// Built from MATCH_KEY_COMP_LEVELS, so its first capture group is always a
+// MatchKeyCompLevel.
+const MATCH_KEY_PATTERN = new RegExp(
+  `^(${MATCH_KEY_COMP_LEVELS.join('|')})(\\d+)(?:m(\\d+))?$`,
+);
 
 /** Normalize for fuzzy title comparison: lowercase, punctuation → spaces. */
 function normalizeTitle(value: string): string {
@@ -174,7 +226,11 @@ function normalizeTitle(value: string): string {
 }
 
 /** Tokens a video title might use to refer to a match, per comp level. */
-function matchTokens(compLevel: string, set: number, num: number): string[] {
+function matchTokens(
+  compLevel: MatchKeyCompLevel,
+  set: number,
+  num: number,
+): string[] {
   switch (compLevel) {
     case 'qm':
       return [
@@ -214,8 +270,6 @@ function matchTokens(compLevel: string, set: number, num: number): string[] {
         `final`,
         `finals`,
       ];
-    default:
-      return [];
   }
 }
 
@@ -245,7 +299,11 @@ export function matchVideoTitleWarning(
   const parsed = MATCH_KEY_PATTERN.exec(matchPart.toLowerCase());
   if (!parsed) return undefined;
   const [, compLevel, setStr, numStr] = parsed;
-  const tokens = matchTokens(compLevel, Number(setStr), Number(numStr ?? '1'));
+  const tokens = matchTokens(
+    compLevel as MatchKeyCompLevel,
+    Number(setStr),
+    Number(numStr ?? '1'),
+  );
   const mentionsMatch = tokens.some((token) =>
     token.includes(' ') ? title.includes(` ${token} `) : title.includes(token),
   );
@@ -313,3 +371,46 @@ export function defaultSetPreferred(suggestion: {
  * deliberate exception, not the default.
  */
 export const DEFAULT_EXPIRATION_DAYS = 7;
+
+// The moderation API answers 403 both for "no review permissions" (the
+// normal case for most accounts, which is data, not an error) and for a
+// moderator whose sign-in email is unverified (which they need to fix).
+export function isNotModeratorResponse(
+  status: number | undefined,
+  error: unknown,
+): boolean {
+  if (status !== 403) return false;
+  const message =
+    typeof error === 'object' && error !== null && 'Error' in error
+      ? String((error as { Error: unknown }).Error)
+      : '';
+  return !message.toLowerCase().includes('verified email');
+}
+
+// Prefilled in the API key card's message box. The API sends exactly what the
+// client sends, so whatever the moderator sees is what the requester gets.
+export const DEFAULT_USER_MESSAGE = 'Thanks for helping make TBA better!';
+
+export function resolveUserMessage(
+  overrides: AcceptRequest | undefined,
+): string {
+  return overrides?.user_message ?? DEFAULT_USER_MESSAGE;
+}
+
+export interface RejectDecision {
+  key: string;
+  /** Emailed to api_auth_access requesters with the verdict. */
+  userMessage?: string;
+}
+
+// The reject endpoint takes one user_message per request, so rejects that
+// carry different messages go out as separate requests.
+export function groupRejectsByMessage(
+  rejects: RejectDecision[],
+): { keys: string[]; userMessage?: string }[] {
+  const groups = groupBy(rejects, (r) => r.userMessage?.trim() ?? '');
+  return Array.from(groups, ([userMessage, group]) => ({
+    keys: group.map((r) => r.key),
+    userMessage: userMessage || undefined,
+  }));
+}

@@ -32,6 +32,7 @@ import FuzzysortFilterer, {
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
   const searchIndexQuery = useQuery({
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
@@ -107,6 +108,7 @@ export function SearchModal() {
       </DialogTrigger>
 
       <DialogTrigger
+        aria-label="Search"
         className="z-30 cursor-pointer rounded-full p-2 text-white
           transition-colors duration-200 hover:bg-black/20 lg:hidden"
       >
@@ -114,6 +116,7 @@ export function SearchModal() {
       </DialogTrigger>
 
       <DialogContent
+        initialFocus={inputRef}
         showCloseButton={false}
         className="top-[10%] translate-y-0 rounded-2xl border-none
           bg-clip-padding p-2 shadow-2xl dark:bg-neutral-900"
@@ -134,6 +137,7 @@ export function SearchModal() {
         >
           <div className="relative">
             <CommandInput
+              ref={inputRef}
               placeholder="Search teams and events..."
               value={query}
               onValueChange={setQuery}

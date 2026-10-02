@@ -8,6 +8,7 @@ from backend.common.consts.suggestion_type import (
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
 )
+from backend.common.helpers.pwa_url_helper import BETA_BASE_URL
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
 
@@ -36,7 +37,9 @@ def nag_pending_suggestions() -> str:
             )
 
     if suggestions_to_nag:
-        nag_text += "_Review them on <https://www.thebluealliance.com/suggest/review|TBA> or on <https://beta.thebluealliance.com/suggest/review|Beta>_"
+        # The review UI lives on the PWA (beta) now; the nag is prod-only, so
+        # link straight to the beta host rather than the env-aware helper
+        nag_text += f"_Review them on <{BETA_BASE_URL}/suggest/review|Beta>_"
         OutgoingNotificationHelper.send_slack_alert(channel_url, nag_text)
 
     return ""

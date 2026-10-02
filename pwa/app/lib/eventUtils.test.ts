@@ -1,5 +1,5 @@
 import { Temporal } from 'temporal-polyfill';
-import { describe, expect, test, vi } from 'vitest';
+import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import { Event, EventType } from '~/api/tba/read';
 import {
@@ -7,15 +7,20 @@ import {
   eventCacheControlHeaders,
   eventSsrTtlSeconds,
   getCurrentWeekEvents,
+  getDivisionShortform,
   getEventDateString,
+  getEventNormalizedName,
   getEventWeekString,
   getPublicAgendaUrl,
   groupEventsByParent,
   groupEventsBySections,
   hasEventEnded,
   isEventActive,
+  isEventWithinADay,
   isEventWithinDays,
   isValidEventKey,
+  sortEvents,
+  sortEventsComparator,
   stripParentPrefix,
   toCalendarEvent,
 } from '~/lib/eventUtils';
@@ -1171,5 +1176,321 @@ describe('eventCacheControlHeaders', () => {
       'CDN-Cache-Control': `max-age=${ttl}`,
     });
     vi.unstubAllEnvs();
+  });
+});
+
+describe('getEventNormalizedName', () => {
+  const base = {
+    year: 2026,
+    city: 'Houston',
+    name: 'Full Name',
+    short_name: null,
+  };
+
+  test('district championship division uses the short name plus the type', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.DISTRICT_CMP_DIVISION,
+        short_name: 'NEDC - Newsom',
+        name: 'New England FIRST District Championship - Newsom Division presented by GE Aerospace',
+      }),
+    ).toBe('NEDC - Newsom District Championship Division');
+  });
+
+  test('does not repeat a type suffix already in the short name', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.REGIONAL,
+        short_name: 'Silicon Valley Regional',
+      }),
+    ).toBe('Silicon Valley Regional');
+  });
+
+  test('championship finals are named by city from 2017', () => {
+    expect(
+      getEventNormalizedName({ ...base, event_type: EventType.CMP_FINALS }),
+    ).toBe('Houston Championship');
+    expect(
+      getEventNormalizedName({
+        ...base,
+        year: 2016,
+        event_type: EventType.CMP_FINALS,
+      }),
+    ).toBe('Championship');
+  });
+
+  test('offseason events use the bare short name', () => {
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.OFFSEASON,
+        short_name: 'Chezy Champs',
+      }),
+    ).toBe('Chezy Champs');
+  });
+
+  test('falls back to the full name without a short name, or for FoC', () => {
+    expect(
+      getEventNormalizedName({ ...base, event_type: EventType.DISTRICT }),
+    ).toBe('Full Name');
+    expect(
+      getEventNormalizedName({
+        ...base,
+        event_type: EventType.FOC,
+        short_name: 'FoC short',
+      }),
+    ).toBe('Full Name');
+  });
+});
+
+describe('sortEventsComparator', () => {
+  function makeEvent(overrides: Partial<Event>): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: '2024-03-01',
+      end_date: '2024-03-03',
+      event_type: EventType.REGIONAL,
+      name: 'Event',
+      ...overrides,
+    };
+  }
+
+  test('the earlier start date sorts first', () => {
+    const later = makeEvent({
+      start_date: '2024-03-08',
+      end_date: '2024-03-10',
+    });
+    const earlier = makeEvent({});
+
+    expect(sortEventsComparator(later, earlier)).toBeGreaterThan(0);
+  });
+
+  test('with the same start, the earlier end date sorts first', () => {
+    const shorter = makeEvent({ end_date: '2024-03-02' });
+    const longer = makeEvent({ end_date: '2024-03-03' });
+
+    expect(sortEventsComparator(shorter, longer)).toBeLessThan(0);
+  });
+
+  test('a district championship sorts after its divisions on the same dates', () => {
+    const dcmp = makeEvent({ event_type: EventType.DISTRICT_CMP, name: 'A' });
+    const division = makeEvent({
+      event_type: EventType.DISTRICT_CMP_DIVISION,
+      name: 'B',
+    });
+
+    expect(sortEventsComparator(dcmp, division)).toBe(1);
+  });
+
+  test('a division sorts before its district championship on the same dates', () => {
+    const dcmp = makeEvent({ event_type: EventType.DISTRICT_CMP, name: 'A' });
+    const division = makeEvent({
+      event_type: EventType.DISTRICT_CMP_DIVISION,
+      name: 'B',
+    });
+
+    expect(sortEventsComparator(division, dcmp)).toBe(-1);
+  });
+
+  test('events on the same dates of the same type sort by name', () => {
+    const events = [makeEvent({ name: 'B' }), makeEvent({ name: 'A' })];
+
+    expect(events.sort(sortEventsComparator).map((e) => e.name)).toEqual([
+      'A',
+      'B',
+    ]);
+  });
+
+  test('a later name sorts after an earlier one', () => {
+    expect(
+      sortEventsComparator(makeEvent({ name: 'B' }), makeEvent({ name: 'A' })),
+    ).toBe(1);
+  });
+
+  test('identical events compare equal', () => {
+    expect(sortEventsComparator(makeEvent({}), makeEvent({}))).toBe(0);
+  });
+});
+
+describe('sortEvents', () => {
+  test('orders events chronologically', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const later: Event = {
+      key: 'later',
+      start_date: '2024-03-08',
+      end_date: '2024-03-10',
+      event_type: EventType.REGIONAL,
+      name: 'Later',
+    };
+    // @ts-expect-error: Don't need to fill out all the fields
+    const earlier: Event = {
+      key: 'earlier',
+      start_date: '2024-03-01',
+      end_date: '2024-03-03',
+      event_type: EventType.REGIONAL,
+      name: 'Earlier',
+    };
+
+    expect(sortEvents([later, earlier]).map((e) => e.key)).toEqual([
+      'earlier',
+      'later',
+    ]);
+  });
+});
+
+describe('getEventWeekString 2021 challenges', () => {
+  test('unknown 2021 challenge weeks have no label', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = { year: 2021, week: 3 };
+
+    expect(getEventWeekString(event)).toBeNull();
+  });
+});
+
+describe('groupEventsBySections with several events in a week', () => {
+  test('groups events from the same week together', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const first: Event = {
+      key: '2026a',
+      year: 2026,
+      event_type: EventType.REGIONAL,
+      week: 0,
+      start_date: '2026-02-27',
+      end_date: '2026-03-01',
+    };
+    // @ts-expect-error: Don't need to fill out all the fields
+    const second: Event = {
+      key: '2026b',
+      year: 2026,
+      event_type: EventType.REGIONAL,
+      week: 0,
+      start_date: '2026-02-28',
+      end_date: '2026-03-01',
+    };
+
+    const groups = groupEventsBySections([first, second]);
+
+    expect(
+      groups.map((g) => [g.groupName, g.events.map((e) => e.key)]),
+    ).toEqual([['Week 1', ['2026a', '2026b']]]);
+  });
+});
+
+describe('getDivisionShortform', () => {
+  test.each([
+    ['Newton Division', 'New'],
+    ['FIRST Championship - Archimedes Division', 'Arc'],
+    ['Carver Division', 'Crv'],
+  ])('%s is shortened to %s', (name, expected) => {
+    expect(getDivisionShortform(name)).toBe(expected);
+  });
+
+  test('unknown divisions use their first three letters', () => {
+    expect(getDivisionShortform('Unknown Division')).toBe('Unk');
+  });
+});
+
+describe('events with only one date', () => {
+  const onlyEnd = {
+    start_date: null,
+    end_date: '2024-03-03',
+    timezone: 'UTC',
+  } as unknown as Event;
+  const onlyStart = {
+    start_date: '2024-03-03',
+    timezone: 'UTC',
+  } as unknown as Event;
+  const undated = {
+    start_date: null,
+    end_date: null,
+    timezone: 'UTC',
+  } as unknown as Event;
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test.each([
+    ['only an end date', onlyEnd],
+    ['only a start date', onlyStart],
+  ])('an event with %s is a one-day event on that date', (_, event) => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-03-03T12:00:00Z'));
+    expect(isEventActive(event)).toBe(true);
+    expect(hasEventEnded(event)).toBe(true);
+
+    vi.setSystemTime(new Date('2024-03-04T12:00:00Z'));
+    expect(isEventActive(event)).toBe(false);
+    expect(isEventWithinDays(event, 0, 1)).toBe(true);
+
+    vi.setSystemTime(new Date('2024-03-02T12:00:00Z'));
+    expect(isEventActive(event)).toBe(false);
+    expect(hasEventEnded(event)).toBe(false);
+  });
+
+  test('an event with no dates is never active or ended', () => {
+    expect(isEventActive(undated)).toBe(false);
+    expect(isEventWithinDays(undated, 365, 365)).toBe(false);
+    expect(hasEventEnded(undated)).toBe(false);
+    expect(getCurrentWeekEvents([undated])).toEqual([]);
+  });
+});
+
+describe('isEventWithinADay', () => {
+  function makeEvent(
+    start: Temporal.PlainDate,
+    end: Temporal.PlainDate,
+  ): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return {
+      start_date: start.toString(),
+      end_date: end.toString(),
+      timezone: 'UTC',
+    };
+  }
+
+  test('is true for an event running today', () => {
+    const today = Temporal.Now.plainDateISO('UTC');
+
+    expect(
+      isEventWithinADay(
+        makeEvent(today.subtract({ days: 3 }), today.add({ days: 3 })),
+      ),
+    ).toBe(true);
+  });
+
+  test('is false for an event that ended years ago', () => {
+    expect(
+      isEventWithinADay(
+        makeEvent(
+          Temporal.PlainDate.from('2000-01-01'),
+          Temporal.PlainDate.from('2000-01-03'),
+        ),
+      ),
+    ).toBe(false);
+  });
+});
+
+describe('hasEventEnded for a far future event', () => {
+  test('is false when the end date is years away in every timezone', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = { end_date: '2999-01-01', timezone: 'UTC' };
+
+    expect(hasEventEnded(event)).toBe(false);
+  });
+});
+
+describe('eventSsrTtlSeconds against the real clock', () => {
+  test("last season's events get the past-season TTL", () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    const event: Event = {
+      year: Temporal.Now.plainDateISO().year - 1,
+      start_date: '2020-04-10',
+      end_date: '2020-04-12',
+    };
+
+    expect(eventSsrTtlSeconds(event)).toBe(EVENT_SSR_TTL_SECONDS.PAST_SEASON);
   });
 });

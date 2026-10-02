@@ -146,10 +146,10 @@ class GameSpecifics2024(
                 coopertition_count += 1
 
             red_all_rp = red_sb.get("melodyBonusAchieved", False) and red_sb.get(
-                "melodyBonusAchieved", False
+                "ensembleBonusAchieved", False
             )
             blue_all_rp = blue_sb.get("melodyBonusAchieved", False) and blue_sb.get(
-                "melodyBonusAchieved", False
+                "ensembleBonusAchieved", False
             )
 
             if (red_score > blue_score and red_all_rp) or (
@@ -257,6 +257,8 @@ class GameSpecifics2024(
             PredictionStatConfig("score", 0, 20**2),
             PredictionStatConfig("note_scored", 0, 10**2),
             PredictionStatConfig("stage_points", 0, 10**2),
+            PredictionStatConfig("coopertition_criteria", 0, 1),
+            PredictionStatConfig("robot_on_stage", 0, 1),
         ]
 
     def ranking_sort_order_info(self) -> Optional[List[RankingSortOrderInfo]]:

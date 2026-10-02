@@ -32,11 +32,11 @@ from backend.common.models.match_suggestion import (
 )
 
 # Weights sum to 1.0, so the final score also lands in [0, 1]
-W_FAVORITES: float = 0.25
-W_SIGNIFICANCE: float = 0.25
-W_TIME_DECAY: float = 0.25
-W_HIGH_SCORE: float = 0.125
-W_CLOSE_SCORE: float = 0.125
+W_FAVORITES: float = 0.175
+W_SIGNIFICANCE: float = 0.225
+W_TIME_DECAY: float = 0.40
+W_HIGH_SCORE: float = 0.10
+W_CLOSE_SCORE: float = 0.10
 
 NUM_SUGGESTIONS: int = 25
 
@@ -67,10 +67,12 @@ DOUBLE_ELIM_ROUND_WEIGHTS: Dict[DoubleElimRound, float] = {
 #
 # PAST covers a match whose time has gone by but which still has no score.
 # That is either a match on the field right now -- the most valuable thing we
-# can show -- or a dead schedule entry that will never be played. The short
-# PAST tau keeps the former hot while the latter fades.
+# can show -- or a dead schedule entry that will never be played. Keep matches
+# fully hot for a short window while they are likely ongoing, then use the short
+# PAST tau to fade stale schedule entries.
 TIME_DECAY_TAU_FUTURE_S: int = 15 * 60
 TIME_DECAY_TAU_PAST_S: int = 5 * 60
+TIME_DECAY_ONGOING_GRACE_S: int = 5 * 60
 
 DEGENERATE_NORMALIZED_VALUE: float = 0.5
 EPSILON: float = 1e-9
@@ -266,6 +268,16 @@ class MatchSuggestionHelper:
                     else None
                 ),
                 scheduled_time=(int(match.time.timestamp()) if match.time else None),
+                predicted_red_score=(
+                    predictions[match.key_name]["red"]["score"]
+                    if match.key_name in predictions
+                    else None
+                ),
+                predicted_blue_score=(
+                    predictions[match.key_name]["blue"]["score"]
+                    if match.key_name in predictions
+                    else None
+                ),
                 rank=rank,
                 score=score,
                 components=components,
@@ -276,7 +288,8 @@ class MatchSuggestionHelper:
     @classmethod
     def _candidate_matches(cls, events: List[Event]) -> List[Tuple[Event, Match]]:
         """
-        Every unplayed match with a known time from the given events.
+        Every unplayed match with a known time and assigned alliances from the
+        given events.
         """
         for event in events:
             event.prep_matches()
@@ -288,6 +301,8 @@ class MatchSuggestionHelper:
                 for match in event.matches
                 if not match.has_been_played
                 and (match.predicted_time is not None or match.time is not None)
+                and match.alliances[AllianceColor.RED]["teams"]
+                and match.alliances[AllianceColor.BLUE]["teams"]
             )
 
         return candidates
@@ -330,7 +345,9 @@ class MatchSuggestionHelper:
         match_time: Optional[datetime.datetime], now: datetime.datetime
     ) -> float:
         """
-        Peaks at 1.0 when the match is starting and decays smoothly either side.
+        Peaks at 1.0 when the match is starting, stays there while an unscored
+        match is likely ongoing, and then decays smoothly. Future matches decay
+        toward the peak as they approach their start time.
 
         Deliberately absolute rather than pool-normalized: on a day where every
         candidate is 40 minutes out, normalizing would still hand one of them a
@@ -341,7 +358,9 @@ class MatchSuggestionHelper:
         delta = (match_time - now).total_seconds()
         if delta >= 0:
             return math.exp(-delta / TIME_DECAY_TAU_FUTURE_S)
-        return math.exp(delta / TIME_DECAY_TAU_PAST_S)
+        if delta >= -TIME_DECAY_ONGOING_GRACE_S:
+            return 1.0
+        return math.exp((delta + TIME_DECAY_ONGOING_GRACE_S) / TIME_DECAY_TAU_PAST_S)
 
     @classmethod
     def _significance(cls, event: Event, match: Match) -> float:
@@ -518,8 +537,13 @@ class MatchSuggestionHelper:
             return "none"
 
         delta = (match_time - now).total_seconds()
-        tau = "future" if delta >= 0 else "past"
-        return f"{source} delta={delta / 60:+.1f}m tau={tau}"
+        if delta >= 0:
+            phase = "future"
+        elif delta >= -TIME_DECAY_ONGOING_GRACE_S:
+            phase = "ongoing"
+        else:
+            phase = "past"
+        return f"{source} delta={delta / 60:+.1f}m phase={phase}"
 
     @classmethod
     def _elim_round_suffix(cls, event: Event, match: Match) -> str:

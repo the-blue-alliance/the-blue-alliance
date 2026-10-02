@@ -50,3 +50,10 @@ def test_sitevar_edit_post(web_client: Client, login_gae_admin) -> None:
     assert sv is not None
     assert sv.description == "test"
     assert sv.contents == []
+
+
+def test_sitevar_edit(web_client: Client, login_gae_admin) -> None:
+    Sitevar(id="test_sitevar", description="desc", values_json="{}").put()
+    resp = web_client.get("/admin/sitevar/edit/test_sitevar?success=true")
+    assert resp.status_code == 200
+    assert b"test_sitevar" in resp.data

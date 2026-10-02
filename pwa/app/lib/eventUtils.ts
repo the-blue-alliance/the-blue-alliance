@@ -20,17 +20,36 @@ function getEventTz(event: Event): string {
   return event.timezone ?? EVENT_FALLBACK_TIMEZONE;
 }
 
-/** Returns the instants when the event opens (8am start_date) and closes (6pm end_date). */
+/**
+ * The event's first and last day, from whichever dates it has. An event with
+ * only one of start_date/end_date is a one-day event on that date; null if it
+ * has neither.
+ */
+function getEventDays(
+  event: Event,
+): { start: Temporal.PlainDate; end: Temporal.PlainDate } | null {
+  const start = event.start_date || event.end_date;
+  const end = event.end_date || event.start_date;
+  if (!start || !end) return null;
+  return {
+    start: Temporal.PlainDate.from(start),
+    end: Temporal.PlainDate.from(end),
+  };
+}
+
+/** Returns the instants when the event opens (8am first day) and closes (6pm last day). */
 function getEventActiveWindow(event: Event): {
   start: Temporal.Instant;
   end: Temporal.Instant;
-} {
+} | null {
+  const days = getEventDays(event);
+  if (!days) return null;
   const tz = getEventTz(event);
   return {
-    start: Temporal.PlainDate.from(event.start_date)
+    start: days.start
       .toZonedDateTime({ timeZone: tz, plainTime: EVENT_START_TIME })
       .toInstant(),
-    end: Temporal.PlainDate.from(event.end_date)
+    end: days.end
       .toZonedDateTime({ timeZone: tz, plainTime: EVENT_END_TIME })
       .toInstant(),
   };
@@ -283,7 +302,9 @@ export function getCurrentWeekEvents(events: Event[]) {
 
   const filteredEvents = [];
   for (const event of events) {
-    const { start: eventStart, end: eventEnd } = getEventActiveWindow(event);
+    const window = getEventActiveWindow(event);
+    if (!window) continue;
+    const { start: eventStart, end: eventEnd } = window;
     // Compute how much of the event's active window falls inside this week.
     const overlapStart =
       Temporal.Instant.compare(eventStart, weekStart) > 0
@@ -306,7 +327,6 @@ export function getCurrentWeekEvents(events: Event[]) {
  * the event runs early or late.
  */
 export function isEventActive(event: Event): boolean {
-  if (!event.start_date || !event.end_date) return false;
   return isEventWithinDays(event, 0, 0);
 }
 
@@ -388,14 +408,12 @@ export function isEventWithinDays(
   negativeDaysBefore: number,
   positiveDaysAfter: number,
 ): boolean {
-  if (event.start_date === null || event.end_date === null) {
-    return false;
-  }
+  const days = getEventDays(event);
+  if (!days) return false;
   // Use the event's own timezone so that "midnight" refers to the event's
   // local midnight, not the user's. Falls back to EVENT_FALLBACK_TIMEZONE.
   const eventTimeZone = getEventTz(event);
-  const startDate = Temporal.PlainDate.from(event.start_date);
-  const endDate = Temporal.PlainDate.from(event.end_date);
+  const { start: startDate, end: endDate } = days;
 
   // Window opens negativeDaysBefore days before midnight of start_date in the
   // event's timezone.
@@ -466,8 +484,9 @@ export function stripParentPrefix(
 }
 
 export function hasEventEnded(event: Event): boolean {
-  if (!event.end_date) return false;
-  const endDate = Temporal.PlainDate.from(event.end_date);
+  const days = getEventDays(event);
+  if (!days) return false;
+  const endDate = days.end;
   const eventTz = getEventTz(event);
   const todayInEventTz = Temporal.Now.plainDateISO(eventTz);
   if (Temporal.PlainDate.compare(endDate, todayInEventTz) <= 0) return true;
@@ -490,12 +509,13 @@ export function eventSsrTtlSeconds(event: Event): number {
     return EVENT_SSR_TTL_SECONDS.PAST_SEASON;
   }
 
-  if (!event.start_date || !event.end_date) {
+  const window = getEventActiveWindow(event);
+  if (!window) {
     return EVENT_SSR_TTL_SECONDS.LIVE;
   }
 
   const now = Temporal.Now.instant();
-  const { start, end } = getEventActiveWindow(event);
+  const { start, end } = window;
   const endedLongAgo =
     Temporal.Instant.compare(now, end.add(SSR_STABLE_AFTER_END)) > 0;
   const startsFarOut =
@@ -512,4 +532,45 @@ export function eventCacheControlHeaders(
   return buildPublicCacheControlHeaders(
     event ? eventSsrTtlSeconds(event) : EVENT_SSR_TTL_SECONDS.LIVE,
   );
+}
+
+// Mirrors SHORT_TYPE_NAMES in backend/common/consts/event_type.py
+const SHORT_TYPE_NAMES: Partial<Record<EventType, string>> = {
+  [EventType.REGIONAL]: 'Regional',
+  [EventType.DISTRICT]: 'District',
+  [EventType.DISTRICT_CMP_DIVISION]: 'District Championship Division',
+  [EventType.DISTRICT_CMP]: 'District Championship',
+  [EventType.CMP_DIVISION]: 'Division',
+  [EventType.CMP_FINALS]: 'Championship',
+  [EventType.FOC]: 'FoC',
+  [EventType.OFFSEASON]: 'Offseason',
+  [EventType.PRESEASON]: 'Preseason',
+  [EventType.REMOTE]: 'Remote',
+  [EventType.UNLABLED]: '--',
+};
+
+/**
+ * The short, banner-friendly event name the Jinja site uses (Event.normalized_name):
+ * "NEDC - Newsom District Championship Division" rather than
+ * "New England FIRST District Championship - Newsom Division presented by GE Aerospace".
+ */
+export function getEventNormalizedName(
+  event: Pick<Event, 'event_type' | 'year' | 'city' | 'short_name' | 'name'>,
+): string {
+  if (event.event_type === EventType.CMP_FINALS) {
+    return event.year >= 2017 && event.city
+      ? `${event.city} Championship`
+      : 'Championship';
+  }
+  if (event.short_name && event.event_type !== EventType.FOC) {
+    if (event.event_type === EventType.OFFSEASON) {
+      return event.short_name;
+    }
+    const suffix = SHORT_TYPE_NAMES[event.event_type];
+    if (!suffix || event.short_name.trim().endsWith(suffix)) {
+      return event.short_name;
+    }
+    return `${event.short_name} ${suffix}`;
+  }
+  return event.name;
 }

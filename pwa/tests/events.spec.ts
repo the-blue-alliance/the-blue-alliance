@@ -28,6 +28,22 @@ test.describe('/events/2025', () => {
       page.getByRole('link', { name: 'Mercury Division', exact: true }),
     ).toBeVisible();
   });
+
+  test('preloads an event team list when its link is hovered', async ({
+    page,
+  }) => {
+    const teamsRequest = page.waitForRequest((request) =>
+      request.url().includes('/api/v3/event/2025cmptx/teams'),
+    );
+
+    await page
+      .getByRole('link', { name: 'Einstein Field', exact: true })
+      .hover();
+
+    expect((await teamsRequest).url()).toContain(
+      '/api/v3/event/2025cmptx/teams',
+    );
+  });
 });
 
 test.describe('/events', () => {

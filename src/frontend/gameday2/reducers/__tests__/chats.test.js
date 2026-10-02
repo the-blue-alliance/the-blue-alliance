@@ -76,3 +76,106 @@ describe("chats reducer", () => {
     expect(chats(initialState, action)).toEqual(expectedState);
   });
 });
+
+describe("chats reducer webcast and default chat handling", () => {
+  // WEBCASTS_UPDATED mutates module-level default state, so reload per test.
+  let freshChats;
+  let types;
+  beforeEach(() => {
+    jest.isolateModules(() => {
+      freshChats = require("../chats").default;
+      types = require("../../constants/ActionTypes");
+    });
+  });
+
+  const webcasts = {
+    bluezone: {
+      key: "bluezone",
+      type: "twitch",
+      channel: "bluezonechannel",
+      name: "BlueZone",
+    },
+    "2024casj-0": {
+      key: "2024casj",
+      type: "twitch",
+      channel: "silicon_valley",
+      name: "SVR",
+    },
+    "2024nyny-0": {
+      key: "2024nyny",
+      type: "youtube",
+      channel: "abc123",
+      name: "NYC",
+    },
+  };
+
+  it("builds chats from twitch webcasts, skipping BlueZone and non-twitch webcasts", () => {
+    const initial = Object.assign({}, freshChats(undefined, {}), {
+      currentChat: "somechat",
+      renderedChats: ["firstupdatesnow", "somechat"],
+    });
+    const state = freshChats(initial, {
+      type: types.WEBCASTS_UPDATED,
+      webcasts,
+    });
+    expect(state.chats).toEqual({
+      firstupdatesnow: {
+        name: "FIRST Updates Now",
+        channel: "firstupdatesnow",
+      },
+      silicon_valley: { name: "SVR", channel: "silicon_valley" },
+    });
+    expect(state.currentChat).toBe("somechat");
+    expect(state.renderedChats).toEqual(["firstupdatesnow", "somechat"]);
+  });
+
+  it("does not leak chats from WEBCASTS_UPDATED into the default state", () => {
+    // Twitch chats must not be written into the module-level default state.
+    const pristine = JSON.parse(JSON.stringify(freshChats(undefined, {})));
+    freshChats(undefined, { type: types.WEBCASTS_UPDATED, webcasts });
+    expect(freshChats(undefined, {})).toEqual(pristine);
+  });
+
+  it("sets the default chat to a known channel", () => {
+    let state = freshChats(undefined, {
+      type: types.WEBCASTS_UPDATED,
+      webcasts,
+    });
+    state = freshChats(state, {
+      type: types.SET_DEFAULT_TWITCH_CHAT,
+      channel: "silicon_valley",
+    });
+    expect(state.defaultChat).toBe("silicon_valley");
+  });
+
+  it("keeps the page's default chat across WEBCASTS_UPDATED", () => {
+    // defaultChat is preserved while that chat still exists.
+    let state = freshChats(undefined, {
+      type: types.WEBCASTS_UPDATED,
+      webcasts,
+    });
+    state = freshChats(state, {
+      type: types.SET_DEFAULT_TWITCH_CHAT,
+      channel: "silicon_valley",
+    });
+    state = freshChats(state, { type: types.WEBCASTS_UPDATED, webcasts });
+    expect(state.defaultChat).toBe("silicon_valley");
+  });
+
+  it("ignores SET_TWITCH_CHAT for an unknown channel", () => {
+    const state = freshChats(undefined, {});
+    expect(
+      freshChats(state, { type: types.SET_TWITCH_CHAT, channel: "nope" })
+    ).toBe(state);
+  });
+
+  it("ignores SET_DEFAULT_TWITCH_CHAT for an unknown channel", () => {
+    const state = freshChats(undefined, {});
+    expect(
+      freshChats(state, {
+        type: types.SET_DEFAULT_TWITCH_CHAT,
+        channel: "nope",
+      })
+    ).toBe(state);
+  });
+});

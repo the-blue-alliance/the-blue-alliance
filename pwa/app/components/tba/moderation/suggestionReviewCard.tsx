@@ -9,6 +9,7 @@ import type {
   ModerationSuggestion,
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
+import { EventType } from '~/api/tba/read';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -18,10 +19,12 @@ import { Input } from '~/components/ui/input';
 import {
   DEFAULT_EXPIRATION_DAYS,
   defaultSetPreferred,
+  eventTiming,
   formatAuthorReputation,
   formatEventDateRange,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  resolveUserMessage,
   socialProfileWarning,
 } from '~/lib/moderationUtils';
 
@@ -37,6 +40,22 @@ interface SuggestionReviewCardProps {
   hideEventContext?: boolean;
   /** Highlight this card as the keyboard-navigation target. */
   focused?: boolean;
+}
+
+// Event types an accepted offseason-event suggestion can become. The
+// suggestion carries a type derived from its dates (Jan/Feb -> preseason);
+// the API uses that unless the moderator overrides it, so the select shows
+// the same default.
+export const OFFSEASON_EVENT_TYPE_OPTIONS = [
+  { value: EventType.OFFSEASON, label: 'Offseason' },
+  { value: EventType.PRESEASON, label: 'Preseason' },
+] as const;
+
+export function suggestedEventType(contentsEventType: string): number {
+  const parsed = Number(contentsEventType);
+  return parsed === EventType.PRESEASON
+    ? EventType.PRESEASON
+    : EventType.OFFSEASON;
 }
 
 // The write auth types moderators can grant for api_auth_access suggestions,
@@ -930,6 +949,32 @@ function OffseasonEventDetails({
           value={field('end_date', 'end_date')}
           onChange={setField('end_date')}
         />
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium text-muted-foreground">
+            Event type (Preseason: Jan-Feb, Offseason: Mar+)
+          </span>
+          <select
+            className="h-9 rounded-md border border-input bg-transparent px-3
+              text-sm"
+            aria-label="Event type"
+            value={
+              overrides.event_type_enum ??
+              suggestedEventType(contentsString(suggestion, 'event_type'))
+            }
+            onChange={(e) =>
+              onOverridesChange({
+                ...overrides,
+                event_type_enum: Number(e.target.value),
+              })
+            }
+          >
+            {OFFSEASON_EVENT_TYPE_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
         <LabeledInput
           label="Website"
           value={field('website', 'website')}
@@ -999,10 +1044,36 @@ function ApiWriteDetails({
       : selectedTypes.filter((t) => t !== type);
     onOverridesChange({ ...overrides, auth_types: next });
   };
+  // Keys are usually wanted for an event that is imminent or underway, so
+  // show when it is without the reviewer opening the event page.
+  const eventDates = formatEventDateRange(
+    suggestion.event?.start_date,
+    suggestion.event?.end_date,
+  );
+  const timing = eventTiming(
+    suggestion.event?.start_date,
+    suggestion.event?.end_date,
+  );
   return (
     <div className="flex flex-col gap-3">
       <FieldRow label="Event">
-        <ReferenceLink suggestion={suggestion} />
+        <span className="inline-flex flex-wrap items-center gap-2">
+          <ReferenceLink suggestion={suggestion} />
+          {eventDates && <span>({eventDates})</span>}
+          {timing && (
+            <Badge
+              variant={
+                timing.kind === 'ongoing'
+                  ? 'success'
+                  : timing.kind === 'upcoming'
+                    ? 'secondary'
+                    : 'outline'
+              }
+            >
+              {timing.label}
+            </Badge>
+          )}
+        </span>
       </FieldRow>
       <FieldRow label="User">
         {suggestion.author?.nickname ?? 'unknown'}
@@ -1076,14 +1147,12 @@ function ApiWriteDetails({
       </div>
       <label className="flex max-w-xl flex-col gap-1 text-sm">
         <span className="font-medium text-muted-foreground">
-          Message for the user (included in the admin alert email)
+          Message for the requester (emailed to them with the verdict)
         </span>
         <textarea
           className="min-h-20 rounded-md border border-input bg-transparent p-2
             text-sm"
-          value={
-            overrides.user_message ?? 'Thanks for helping make TBA better!'
-          }
+          value={resolveUserMessage(overrides)}
           onChange={(e) =>
             onOverridesChange({ ...overrides, user_message: e.target.value })
           }
@@ -1163,7 +1232,7 @@ export function SuggestionReviewCard(
                 ? 'border-green-700 bg-green-700 text-white hover:bg-green-800'
                 : `border-green-600/60 bg-green-50 text-green-800
                   hover:bg-green-200 hover:text-green-900 dark:bg-green-950
-                  dark:text-green-300 dark:hover:bg-green-900`,
+                  dark:text-green-300 hover:dark:bg-green-900`,
             )}
             onClick={() =>
               onDecisionChange(decision === 'accept' ? undefined : 'accept')
@@ -1179,7 +1248,7 @@ export function SuggestionReviewCard(
                 ? 'border-red-700 bg-red-700 text-white hover:bg-red-800'
                 : `border-red-600/60 bg-red-50 text-red-800 hover:bg-red-200
                   hover:text-red-900 dark:bg-red-950 dark:text-red-300
-                  dark:hover:bg-red-900`,
+                  hover:dark:bg-red-900`,
             )}
             onClick={() =>
               onDecisionChange(decision === 'reject' ? undefined : 'reject')

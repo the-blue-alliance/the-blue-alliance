@@ -1,4 +1,5 @@
 import HelpCircleIcon from '~icons/lucide/help-circle';
+import ListOrderedIcon from '~icons/lucide/list-ordered';
 import VideoIcon from '~icons/lucide/video';
 import VideoOffIcon from '~icons/lucide/video-off';
 
@@ -18,13 +19,19 @@ import type { WebcastWithMeta } from '~/lib/gameday/types';
 export function WebcastSelectorDialog({
   open,
   onOpenChange,
-  onWebcastSelected,
+  onContentSelected,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onWebcastSelected: (webcastId: string) => void;
+  onContentSelected: (contentId: string) => void;
 }) {
-  const { availableWebcasts } = useGameday();
+  const { availableContent } = useGameday();
+  const dataPanels = availableContent.filter(
+    (content) => content.type === 'data-panel',
+  );
+  const availableWebcasts = availableContent
+    .filter((content) => content.type === 'webcast')
+    .map((content) => content.webcast);
 
   // Group webcasts by special vs regular, then by online/offline status
   const specialWebcasts = availableWebcasts.filter(
@@ -44,19 +51,42 @@ export function WebcastSelectorDialog({
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent focusContentOnOpen className="max-w-md p-0">
         <DialogHeader className="border-b px-4 py-3">
-          <DialogTitle>Select a webcast</DialogTitle>
+          <DialogTitle>Select content</DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh]">
-          {availableWebcasts.length === 0 ? (
+          {availableContent.length === 0 ? (
             <div className="px-4 py-8 text-center text-muted-foreground">
-              No webcasts available
+              No content available
             </div>
           ) : (
             <div className="py-2">
+              {dataPanels.length > 0 && (
+                <>
+                  <div
+                    className="px-4 py-1.5 text-xs font-semibold tracking-wider
+                      text-primary uppercase"
+                  >
+                    Data Panels
+                  </div>
+                  {dataPanels.map((panel) => (
+                    <button
+                      key={panel.id}
+                      onClick={() => onContentSelected(panel.id)}
+                      className="flex w-full cursor-pointer items-center gap-3
+                        px-4 py-2 text-left transition-colors hover:bg-accent"
+                    >
+                      <ListOrderedIcon className="size-5 shrink-0" />
+                      <span>{panel.name}</span>
+                    </button>
+                  ))}
+                </>
+              )}
+
               {/* Special Webcasts */}
               {specialWebcasts.length > 0 && (
                 <>
+                  {dataPanels.length > 0 && <Separator className="my-2" />}
                   <div
                     className="px-4 py-1.5 text-xs font-semibold tracking-wider
                       text-primary uppercase"
@@ -67,7 +97,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>
@@ -76,7 +106,9 @@ export function WebcastSelectorDialog({
               {/* Online Event Webcasts */}
               {regularWebcasts.length > 0 && (
                 <>
-                  {specialWebcasts.length > 0 && <Separator className="my-2" />}
+                  {(dataPanels.length > 0 || specialWebcasts.length > 0) && (
+                    <Separator className="my-2" />
+                  )}
                   <div
                     className="px-4 py-1.5 text-xs font-semibold tracking-wider
                       text-primary uppercase"
@@ -87,7 +119,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>
@@ -96,7 +128,8 @@ export function WebcastSelectorDialog({
               {/* Offline Event Webcasts */}
               {offlineRegularWebcasts.length > 0 && (
                 <>
-                  {(specialWebcasts.length > 0 ||
+                  {(dataPanels.length > 0 ||
+                    specialWebcasts.length > 0 ||
                     regularWebcasts.length > 0) && (
                     <Separator className="my-2" />
                   )}
@@ -110,7 +143,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>
@@ -119,7 +152,8 @@ export function WebcastSelectorDialog({
               {/* Offline Special Webcasts */}
               {offlineSpecialWebcasts.length > 0 && (
                 <>
-                  {(specialWebcasts.length > 0 ||
+                  {(dataPanels.length > 0 ||
+                    specialWebcasts.length > 0 ||
                     regularWebcasts.length > 0 ||
                     offlineRegularWebcasts.length > 0) && (
                     <Separator className="my-2" />
@@ -134,7 +168,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>

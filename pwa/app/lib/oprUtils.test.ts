@@ -1,6 +1,59 @@
 import { describe, expect, test } from 'vitest';
 
-import { buildCoprTableModel } from '~/lib/oprUtils';
+import {
+  buildCoprTableModel,
+  getDefaultCoprYAxisComponentName,
+} from '~/lib/oprUtils';
+
+describe('getDefaultCoprYAxisComponentName', () => {
+  test('prefers auto points when available', () => {
+    const componentName = getDefaultCoprYAxisComponentName(
+      {
+        autoPoints: { frc254: 21 },
+        totalPoints: { frc254: 88.4 },
+      },
+      2024,
+    );
+
+    expect(componentName).toEqual('autoPoints');
+  });
+
+  test('uses total points when auto points are unavailable', () => {
+    const componentName = getDefaultCoprYAxisComponentName(
+      {
+        teleopPoints: { frc254: 55.2 },
+        totalPoints: { frc254: 88.4 },
+      },
+      2019,
+    );
+
+    expect(componentName).toEqual('totalPoints');
+  });
+
+  test('uses the 2015 snake_case component names', () => {
+    const componentName = getDefaultCoprYAxisComponentName(
+      {
+        teleop_points: { frc254: 55.2 },
+        total_points: { frc254: 88.4 },
+      },
+      2015,
+    );
+
+    expect(componentName).toEqual('total_points');
+  });
+
+  test('uses the 2026 total-prefixed auto component name', () => {
+    const componentName = getDefaultCoprYAxisComponentName(
+      {
+        totalAutoPoints: { frc254: 21 },
+        totalPoints: { frc254: 88.4 },
+      },
+      2026,
+    );
+
+    expect(componentName).toEqual('totalAutoPoints');
+  });
+});
 
 describe('buildCoprTableModel', () => {
   test('drops components whose values are all zero', () => {

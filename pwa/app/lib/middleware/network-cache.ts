@@ -33,9 +33,9 @@ interface CacheEntry {
 /**
  * Cap kept deliberately modest: heavy pages (e.g. district stats) can fan out
  * 20–40 entries and benefit from headroom, but each SSR instance holds the
- * full LRU in memory — raising this fights F1 OOM pressure (see #9984).
+ * full LRU in memory — raising this fights instance OOM pressure (see #9984).
  */
-const CACHE_MAX_ENTRIES = 300;
+const CACHE_MAX_ENTRIES = 1_000;
 /** Fallback when the origin omits Cache-Control / max-age — matches TBA API max-age. */
 const CACHE_TTL = secondsToMilliseconds(61);
 
