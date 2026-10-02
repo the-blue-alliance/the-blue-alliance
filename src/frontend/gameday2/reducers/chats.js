@@ -38,7 +38,9 @@ const defaultState = {
 };
 
 const setChatsFromWebcasts = (webcasts, state) => {
-  const newState = Object.assign({}, defaultState);
+  const newState = Object.assign({}, defaultState, {
+    chats: Object.assign({}, defaultState.chats),
+  });
   newState.currentChat = state.currentChat;
   newState.renderedChats = state.renderedChats;
 
@@ -58,6 +60,10 @@ const setChatsFromWebcasts = (webcasts, state) => {
       };
     }
   });
+
+  if (newState.chats[state.defaultChat] !== undefined) {
+    newState.defaultChat = state.defaultChat;
+  }
 
   return newState;
 };

@@ -1,6 +1,5 @@
 import { Link } from '@tanstack/react-router';
 import { cn } from 'cn';
-import { Temporal } from 'temporal-polyfill';
 
 import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
 import PlayArrowIcon from '~icons/ic/baseline-play-arrow';
@@ -25,7 +24,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { matchTitleShort } from '~/lib/matchUtils';
+import { formatMatchTime, matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
 
 interface PlaylistEntry {
@@ -270,17 +269,7 @@ export function MatchRow({
             xl:col-start-auto xl:row-span-1 xl:row-start-auto"
         >
           <span className="flex h-full items-center justify-center text-center">
-            {match.predicted_time &&
-              Temporal.Instant.fromEpochMilliseconds(
-                match.predicted_time * 1000,
-              )
-                .toZonedDateTimeISO(Temporal.Now.timeZoneId())
-                .toLocaleString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  weekday: 'short',
-                  hour12: true,
-                })}
+            {match.predicted_time && formatMatchTime(match.predicted_time)}
           </span>
         </div>
       )}
@@ -384,16 +373,7 @@ export function SimpleMatchRow({
               justify-center text-center"
           >
             <span>
-              {match.predicted_time &&
-                new Date(match.predicted_time * 1000).toLocaleTimeString(
-                  'en-US',
-                  {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    weekday: 'short',
-                    hour12: true,
-                  },
-                )}
+              {match.predicted_time && formatMatchTime(match.predicted_time)}
             </span>
           </div>
         )}
