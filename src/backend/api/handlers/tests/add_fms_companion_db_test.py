@@ -10,6 +10,7 @@ import string
 from typing import List, Optional, Tuple
 from unittest.mock import Mock, patch
 
+import pytest
 from freezegun import freeze_time
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -26,6 +27,16 @@ from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
+
+
+@pytest.fixture(autouse=True)
+def no_stored_companion_db(monkeypatch: MonkeyPatch) -> None:
+    # Keep the handler off the real GCS client; tests needing a stored DB override this.
+    monkeypatch.setattr(
+        FMSCompanionHelper,
+        "get_newest_file_path",
+        staticmethod(lambda event_key: None),
+    )
 
 
 def setup_event(event_type: EventType = EventType.OFFSEASON) -> None:

@@ -87,7 +87,10 @@ vi.mock('~/components/tba/tableOfContents', () => ({
 }));
 vi.mock('~/components/ui/sonner', () => ({ Toaster: () => null }));
 vi.mock('~/components/ui/tooltip', () => ({ TooltipProvider: passThrough }));
-vi.mock('~/lib/theme', () => ({ ThemeProvider: passThrough }));
+vi.mock('~/lib/theme', () => ({
+  THEME_INIT_SCRIPT: 'theme-init-script',
+  ThemeProvider: passThrough,
+}));
 
 vi.mock('@tanstack/react-router-devtools', () => ({
   TanStackRouterDevtools: () => <div>Router devtools</div>,
@@ -296,14 +299,14 @@ describe('RootComponent', () => {
     expect(await screen.findByText('Query devtools')).toBeTruthy();
   });
 
-  test('applies the stored theme before hydration', async () => {
+  test('renders the theme init script in the head', async () => {
     const { component: Root } = await loadRoot();
 
     renderRoot(Root);
 
     expect(
       within(document.head).getByTestId('script-once').getAttribute('content'),
-    ).toContain("localStorage.getItem('theme')");
+    ).toBe('theme-init-script');
   });
 
   test('drops the container on full-width routes', async () => {
