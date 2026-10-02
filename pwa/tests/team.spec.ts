@@ -40,7 +40,10 @@ test.describe('/team/604/2024', () => {
 
   test('shows the team sponsor summary', async ({ page }) => {
     await expect(
-      page.getByRole('button', { name: 'Leland High School with 13 sponsors' }),
+      // Live data: the sponsor count changes as the team updates its sponsors.
+      page.getByRole('button', {
+        name: /^Leland High School with \d+ sponsors$/,
+      }),
     ).toBeVisible();
   });
 

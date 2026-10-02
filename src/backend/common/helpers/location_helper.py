@@ -472,7 +472,7 @@ class LocationHelper:
                 cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents["api_key"]
             else:
                 logging.warning(
-                    "Must have sitevar google.api_key to use Google Maps nearbysearch"
+                    "Must have sitevar google.secrets to use Google Maps nearbysearch"
                 )
                 return []
 
@@ -549,7 +549,7 @@ class LocationHelper:
                 cls.GOOGLE_API_KEY = GOOGLE_SECRETS.contents["api_key"]
             else:
                 logging.warning(
-                    "Must have sitevar google.api_key to use Google Maps PlaceDetails"
+                    "Must have sitevar google.secrets to use Google Maps PlaceDetails"
                 )
                 return None
 
@@ -624,7 +624,7 @@ class LocationHelper:
             google_api_key = None
             if google_secrets is None:
                 logging.warning(
-                    "Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit."
+                    "Missing sitevar: google.secrets. API calls rate limited by IP and may be over rate limit."
                 )
             else:
                 google_api_key = google_secrets.contents["api_key"]
@@ -682,7 +682,7 @@ class LocationHelper:
         google_api_key = None
         if google_secrets is None:
             logging.warning(
-                "Missing sitevar: google.api_key. API calls rate limited by IP and may be over rate limit."
+                "Missing sitevar: google.secrets. API calls rate limited by IP and may be over rate limit."
             )
         else:
             google_api_key = google_secrets.contents["api_key"]
