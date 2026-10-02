@@ -4,14 +4,13 @@ import logging
 import traceback
 from typing import Any, Dict, List, Optional, Tuple, TypedDict
 
-from pyre_extensions import none_throws
-
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2017
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
 )
@@ -144,11 +143,12 @@ class GameSpecifics2017(
         high_kpa: Tuple[int, str, str] = (0, "", "")  # score, match key, match name
         high_score: Tuple[int, str, str] = (0, "", "")  # kpa, match key, match name
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
-            if not match.has_been_played or not match.score_breakdown:
+            if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -161,7 +161,9 @@ class GameSpecifics2017(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            score_breakdown = none_throws(match.score_breakdown)
+            score_breakdown = match.score_breakdown
+            if not score_breakdown:
+                continue
 
             for alliance_color in ALLIANCE_COLORS:
                 try:
@@ -253,7 +255,6 @@ class GameSpecifics2017(
                     )
 
                     foul_scores += alliance_breakdown["foulPoints"]
-                    has_insights = True
                 except Exception:
                     msg = "Event insights failed for {}".format(match.key.id())
                     # event.get() below should be cheap since it's backed by context cache
@@ -262,95 +263,103 @@ class GameSpecifics2017(
                         logging.warning(traceback.format_exc())
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        opportunities_1x = 2 * finished_matches  # once per alliance
-        opportunities_3x = 6 * finished_matches  # 3x per alliance
+        opportunities_1x = 2 * breakdown_matches  # once per alliance
+        opportunities_3x = 6 * breakdown_matches  # 3x per alliance
         event_insights = {
             # Auto
-            "average_mobility_points_auto": float(mobility_points_auto)
-            / (2 * finished_matches),
-            "average_rotor_points_auto": float(rotor_points_auto)
-            / (2 * finished_matches),
-            "average_fuel_points_auto": float(fuel_points_auto)
-            / (2 * finished_matches),
-            "average_high_goals_auto": float(high_goals_auto) / (2 * finished_matches),
-            "average_low_goals_auto": float(low_goals_auto) / (2 * finished_matches),
-            "average_points_auto": float(points_auto) / (2 * finished_matches),
+            "average_mobility_points_auto": safe_div(
+                mobility_points_auto, 2 * breakdown_matches
+            ),
+            "average_rotor_points_auto": safe_div(
+                rotor_points_auto, 2 * breakdown_matches
+            ),
+            "average_fuel_points_auto": safe_div(
+                fuel_points_auto, 2 * breakdown_matches
+            ),
+            "average_high_goals_auto": safe_div(high_goals_auto, 2 * breakdown_matches),
+            "average_low_goals_auto": safe_div(low_goals_auto, 2 * breakdown_matches),
+            "average_points_auto": safe_div(points_auto, 2 * breakdown_matches),
             "mobility_counts": [
                 mobility_counts,
                 opportunities_3x,
-                100.0 * float(mobility_counts) / opportunities_3x,
+                safe_div(100.0 * mobility_counts, opportunities_3x),
             ],
             # Teleop
-            "average_rotor_points_teleop": float(rotor_points_teleop)
-            / (2 * finished_matches),
-            "average_fuel_points_teleop": float(fuel_points_teleop)
-            / (2 * finished_matches),
-            "average_high_goals_teleop": float(high_goals_teleop)
-            / (2 * finished_matches),
-            "average_low_goals_teleop": float(low_goals_teleop)
-            / (2 * finished_matches),
-            "average_takeoff_points_teleop": float(takeoff_points_teleop)
-            / (2 * finished_matches),
-            "average_points_teleop": float(points_teleop) / (2 * finished_matches),
+            "average_rotor_points_teleop": safe_div(
+                rotor_points_teleop, 2 * breakdown_matches
+            ),
+            "average_fuel_points_teleop": safe_div(
+                fuel_points_teleop, 2 * breakdown_matches
+            ),
+            "average_high_goals_teleop": safe_div(
+                high_goals_teleop, 2 * breakdown_matches
+            ),
+            "average_low_goals_teleop": safe_div(
+                low_goals_teleop, 2 * breakdown_matches
+            ),
+            "average_takeoff_points_teleop": safe_div(
+                takeoff_points_teleop, 2 * breakdown_matches
+            ),
+            "average_points_teleop": safe_div(points_teleop, 2 * breakdown_matches),
             "takeoff_counts": [
                 takeoff_counts,
                 opportunities_3x,
-                100.0 * float(takeoff_counts) / opportunities_3x,
+                safe_div(100.0 * takeoff_counts, opportunities_3x),
             ],
             # Overall
-            "average_rotor_points": float(rotor_points) / (2 * finished_matches),
-            "average_fuel_points": float(fuel_points) / (2 * finished_matches),
-            "average_high_goals": float(high_goals) / (2 * finished_matches),
-            "average_low_goals": float(low_goals) / (2 * finished_matches),
+            "average_rotor_points": safe_div(rotor_points, 2 * breakdown_matches),
+            "average_fuel_points": safe_div(fuel_points, 2 * breakdown_matches),
+            "average_high_goals": safe_div(high_goals, 2 * breakdown_matches),
+            "average_low_goals": safe_div(low_goals, 2 * breakdown_matches),
             "rotor_1_engaged_auto": [
                 rotor_1_engaged_auto,
                 opportunities_1x,
-                100.0 * float(rotor_1_engaged_auto) / opportunities_1x,
+                safe_div(100.0 * rotor_1_engaged_auto, opportunities_1x),
             ],
             "rotor_2_engaged_auto": [
                 rotor_2_engaged_auto,
                 opportunities_1x,
-                100.0 * float(rotor_2_engaged_auto) / opportunities_1x,
+                safe_div(100.0 * rotor_2_engaged_auto, opportunities_1x),
             ],
             "rotor_1_engaged": [
                 rotor_1_engaged,
                 opportunities_1x,
-                100.0 * float(rotor_1_engaged) / opportunities_1x,
+                safe_div(100.0 * rotor_1_engaged, opportunities_1x),
             ],
             "rotor_2_engaged": [
                 rotor_2_engaged,
                 opportunities_1x,
-                100.0 * float(rotor_2_engaged) / opportunities_1x,
+                safe_div(100.0 * rotor_2_engaged, opportunities_1x),
             ],
             "rotor_3_engaged": [
                 rotor_3_engaged,
                 opportunities_1x,
-                100.0 * float(rotor_3_engaged) / opportunities_1x,
+                safe_div(100.0 * rotor_3_engaged, opportunities_1x),
             ],
             "rotor_4_engaged": [
                 rotor_4_engaged,
                 opportunities_1x,
-                100.0 * float(rotor_4_engaged) / opportunities_1x,
+                safe_div(100.0 * rotor_4_engaged, opportunities_1x),
             ],
             "kpa_achieved": [
                 kpa_achieved,
                 opportunities_1x,
-                100.0 * float(kpa_achieved) / opportunities_1x,
+                safe_div(100.0 * kpa_achieved, opportunities_1x),
             ],
             "unicorn_matches": [
                 unicorn_matches,
                 opportunities_1x,
-                100.0 * float(unicorn_matches) / opportunities_1x,
+                safe_div(100.0 * unicorn_matches, opportunities_1x),
             ],
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / (2 * finished_matches),
-            "average_foul_score": float(foul_scores) / (2 * finished_matches),
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_foul_score": safe_div(foul_scores, 2 * breakdown_matches),
             "high_score": list(high_score),  # [score, match key, match name]
             "high_kpa": list(high_kpa),  # [kpa, match key, match name]
         }

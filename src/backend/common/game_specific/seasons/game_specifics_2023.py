@@ -4,8 +4,6 @@ import logging
 import traceback
 from typing import Any, Dict, List, Optional, Tuple
 
-from pyre_extensions import none_throws
-
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
     AllianceColor,
@@ -16,6 +14,7 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2023
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     StatAccessor,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -131,11 +130,12 @@ class GameSpecifics2023(
         foul_scores = 0
         high_score: Tuple[int, str, str] = (0, "", "")
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
-            if not match.has_been_played or not match.score_breakdown:
+            if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -148,7 +148,9 @@ class GameSpecifics2023(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            score_breakdown = none_throws(match.score_breakdown)
+            score_breakdown = match.score_breakdown
+            if not score_breakdown:
+                continue
 
             for alliance_color in ALLIANCE_COLORS:
                 try:
@@ -232,7 +234,6 @@ class GameSpecifics2023(
                         else 0
                     )
                     foul_scores += alliance_breakdown["foulPoints"]
-                    has_insights = True
                 except Exception as e:
                     msg = "Event insights failed for {}: {}".format(match.key.id(), e)
                     # event.get() below should be cheap since it's backed by context cache
@@ -241,68 +242,71 @@ class GameSpecifics2023(
                         logging.warning(traceback.format_exc())
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        opportunities_1x = 2 * finished_matches
-        opportunities_3x = 6 * finished_matches
+        opportunities_1x = 2 * breakdown_matches
+        opportunities_3x = 6 * breakdown_matches
         event_insights = {
             # Auto
             "mobility_count": [
                 mobility_count,
                 opportunities_3x,
-                100.0 * float(mobility_count) / opportunities_3x,
+                safe_div(100.0 * mobility_count, opportunities_3x),
             ],
             "auto_docked_count": [
                 auto_docked_count,
                 opportunities_1x,
-                100.0 * float(auto_docked_count) / opportunities_1x,
+                safe_div(100.0 * auto_docked_count, opportunities_1x),
             ],
             "auto_engaged_count": [
                 auto_engaged_count,
                 opportunities_1x,
-                100.0 * float(auto_engaged_count) / opportunities_1x,
+                safe_div(100.0 * auto_engaged_count, opportunities_1x),
             ],
-            "average_mobility_points": float(mobility_points) / opportunities_1x,
-            "average_piece_points_auto": float(auto_piece_points) / opportunities_1x,
-            "average_charge_station_points_auto": float(auto_charge_station_points)
-            / opportunities_1x,
-            "average_points_auto": float(points_auto) / opportunities_1x,
+            "average_mobility_points": safe_div(mobility_points, opportunities_1x),
+            "average_piece_points_auto": safe_div(auto_piece_points, opportunities_1x),
+            "average_charge_station_points_auto": safe_div(
+                auto_charge_station_points, opportunities_1x
+            ),
+            "average_points_auto": safe_div(points_auto, opportunities_1x),
             # Teleop
-            "average_piece_points_teleop": float(teleop_piece_points)
-            / opportunities_1x,
-            "average_park_points": float(park_points) / opportunities_1x,
-            "average_charge_station_points_teleop": float(teleop_charge_station_points)
-            / opportunities_1x,
-            "average_points_teleop": float(points_teleop) / opportunities_1x,
+            "average_piece_points_teleop": safe_div(
+                teleop_piece_points, opportunities_1x
+            ),
+            "average_park_points": safe_div(park_points, opportunities_1x),
+            "average_charge_station_points_teleop": safe_div(
+                teleop_charge_station_points, opportunities_1x
+            ),
+            "average_points_teleop": safe_div(points_teleop, opportunities_1x),
             # Overall
-            "average_link_points": float(link_points) / opportunities_1x,
+            "average_link_points": safe_div(link_points, opportunities_1x),
             "coopertition": [
                 coopertition_count,
                 opportunities_1x,
-                100.0 * float(coopertition_count) / opportunities_1x,
+                safe_div(100.0 * coopertition_count, opportunities_1x),
             ],
             "sustainability_bonus_rp": [
                 sustainability_bonus_count,
                 opportunities_1x,
-                100.0 * float(sustainability_bonus_count) / opportunities_1x,
+                safe_div(100.0 * sustainability_bonus_count, opportunities_1x),
             ],
             "activation_bonus_rp": [
                 activation_bonus_count,
                 opportunities_1x,
-                100.0 * float(activation_bonus_count) / opportunities_1x,
+                safe_div(100.0 * activation_bonus_count, opportunities_1x),
             ],
             "unicorn_matches": [
                 unicorn_matches,
                 opportunities_1x,
-                100.0 * float(unicorn_matches) / opportunities_1x,
+                safe_div(100.0 * unicorn_matches, opportunities_1x),
             ],
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / opportunities_1x,
-            "average_foul_score": float(foul_scores) / opportunities_1x,
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_foul_score": safe_div(foul_scores, opportunities_1x),
             "high_score": list(high_score),
         }
         return event_insights

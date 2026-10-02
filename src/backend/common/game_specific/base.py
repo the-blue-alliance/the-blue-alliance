@@ -29,6 +29,12 @@ TCriteria = Optional[Tuple[int, int]]
 # Computes a numeric value from a match + alliance for use in OPR calculations.
 StatAccessor = Callable[[Match, AllianceColor], float]
 
+
+def safe_div(numerator: float, denominator: float) -> float:
+    """Divides, or returns 0.0 when there is nothing to divide by."""
+    return float(numerator) / denominator if denominator else 0.0
+
+
 TScoreBreakdown = TypeVar("TScoreBreakdown")
 TRpBreakdownField = TypeVar("TRpBreakdownField", bound=str)
 TRpPredictionField = TypeVar("TRpPredictionField", bound=str)

@@ -12,7 +12,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2024
 from backend.common.game_specific.seasons.game_specifics_2024 import GameSpecifics2024
 from backend.common.game_specific.seasons.tests.conftest import (
-    assert_breakdownless_match_excluded,
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     tiebreak_winner,
@@ -205,13 +206,14 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
 
 
-def test_breakdownless_match_excluded_from_insights(
-    test_data_importer,
-) -> None:
-    """A played match without a score breakdown leaves every insight unchanged."""
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2024(), "2024test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2024nytr_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2024nytr")).fetch()
-    assert_breakdownless_match_excluded(GameSpecifics2024(), matches)
+    assert_partial_breakdowns_split_counters(GameSpecifics2024(), matches)
 
 
 def test_rp_sweep_requires_melody_and_ensemble() -> None:

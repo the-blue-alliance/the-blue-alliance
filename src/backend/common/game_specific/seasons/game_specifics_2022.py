@@ -4,8 +4,6 @@ import logging
 import traceback
 from typing import Any, Dict, List, Optional, Tuple
 
-from pyre_extensions import none_throws
-
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
     AllianceColor,
@@ -15,6 +13,7 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2022
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
 )
@@ -112,11 +111,12 @@ class GameSpecifics2022(
         foul_scores = 0
         high_score: Tuple[int, str, str] = (0, "", "")
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
-            if not match.has_been_played or not match.score_breakdown:
+            if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -129,7 +129,9 @@ class GameSpecifics2022(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            score_breakdown = none_throws(match.score_breakdown)
+            score_breakdown = match.score_breakdown
+            if not score_breakdown:
+                continue
 
             for alliance_color in ALLIANCE_COLORS:
                 try:
@@ -207,7 +209,6 @@ class GameSpecifics2022(
                         else 0
                     )
                     foul_scores += alliance_breakdown["foulPoints"]
-                    has_insights = True
                 except Exception as e:
                     msg = "Event insights failed for {}: {}".format(match.key.id(), e)
                     # event.get() below should be cheap since it's backed by context cache
@@ -216,106 +217,108 @@ class GameSpecifics2022(
                         logging.warning(traceback.format_exc())
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        opportunities_1x = 2 * finished_matches
-        opportunities_3x = 6 * finished_matches
+        opportunities_1x = 2 * breakdown_matches
+        opportunities_3x = 6 * breakdown_matches
         event_insights = {
             # Auto
             "taxi_count": [
                 taxi_count,
                 opportunities_3x,
-                100.0 * float(taxi_count) / opportunities_3x,
+                safe_div(100.0 * taxi_count, opportunities_3x),
             ],
-            "average_taxi_points": float(taxi_points) / opportunities_1x,
-            "average_lower_cargo_count_auto": float(auto_lower_cargo_count)
-            / opportunities_1x,
-            "average_upper_cargo_count_auto": float(auto_upper_cargo_count)
-            / opportunities_1x,
-            "average_cargo_count_auto": float(
-                auto_lower_cargo_count + auto_upper_cargo_count
-            )
-            / opportunities_1x,
+            "average_taxi_points": safe_div(taxi_points, opportunities_1x),
+            "average_lower_cargo_count_auto": safe_div(
+                auto_lower_cargo_count, opportunities_1x
+            ),
+            "average_upper_cargo_count_auto": safe_div(
+                auto_upper_cargo_count, opportunities_1x
+            ),
+            "average_cargo_count_auto": safe_div(
+                auto_lower_cargo_count + auto_upper_cargo_count, opportunities_1x
+            ),
             "quintet_count": [
                 quintet_count,
                 opportunities_1x,
-                100.0 * float(quintet_count) / opportunities_1x,
+                safe_div(100.0 * quintet_count, opportunities_1x),
             ],
-            "average_cargo_points_auto": float(cargo_points_auto) / opportunities_1x,
-            "average_points_auto": float(points_auto) / opportunities_1x,
+            "average_cargo_points_auto": safe_div(cargo_points_auto, opportunities_1x),
+            "average_points_auto": safe_div(points_auto, opportunities_1x),
             # Teleop
-            "average_lower_cargo_count_teleop": float(teleop_lower_cargo_count)
-            / opportunities_1x,
-            "average_upper_cargo_count_teleop": float(teleop_upper_cargo_count)
-            / opportunities_1x,
-            "average_cargo_count_teleop": float(
-                teleop_lower_cargo_count + teleop_upper_cargo_count
-            )
-            / opportunities_1x,
-            "average_cargo_points_teleop": float(cargo_points_teleop)
-            / opportunities_1x,
+            "average_lower_cargo_count_teleop": safe_div(
+                teleop_lower_cargo_count, opportunities_1x
+            ),
+            "average_upper_cargo_count_teleop": safe_div(
+                teleop_upper_cargo_count, opportunities_1x
+            ),
+            "average_cargo_count_teleop": safe_div(
+                teleop_lower_cargo_count + teleop_upper_cargo_count, opportunities_1x
+            ),
+            "average_cargo_points_teleop": safe_div(
+                cargo_points_teleop, opportunities_1x
+            ),
             "low_climb_count": [
                 low_climb_count,
                 opportunities_3x,
-                100.0 * float(low_climb_count) / opportunities_3x,
+                safe_div(100.0 * low_climb_count, opportunities_3x),
             ],
             "mid_climb_count": [
                 mid_climb_count,
                 opportunities_3x,
-                100.0 * float(mid_climb_count) / opportunities_3x,
+                safe_div(100.0 * mid_climb_count, opportunities_3x),
             ],
             "high_climb_count": [
                 high_climb_count,
                 opportunities_3x,
-                100.0 * float(high_climb_count) / opportunities_3x,
+                safe_div(100.0 * high_climb_count, opportunities_3x),
             ],
             "traversal_climb_count": [
                 traversal_climb_count,
                 opportunities_3x,
-                100.0 * float(traversal_climb_count) / opportunities_3x,
+                safe_div(100.0 * traversal_climb_count, opportunities_3x),
             ],
-            "average_endgame_points": float(endgame_points) / opportunities_1x,
-            "average_points_teleop": float(points_teleop) / opportunities_1x,
+            "average_endgame_points": safe_div(endgame_points, opportunities_1x),
+            "average_points_teleop": safe_div(points_teleop, opportunities_1x),
             # Overall
             "cargo_bonus_rp": [
                 cargo_bonus_count,
                 opportunities_1x,
-                100.0 * float(cargo_bonus_count) / opportunities_1x,
+                safe_div(100.0 * cargo_bonus_count, opportunities_1x),
             ],
             "hangar_bonus_rp": [
                 hangar_bonus_count,
                 opportunities_1x,
-                100.0 * float(hangar_bonus_count) / opportunities_1x,
+                safe_div(100.0 * hangar_bonus_count, opportunities_1x),
             ],
             "unicorn_matches": [
                 unicorn_matches,
                 opportunities_1x,
-                100.0 * float(unicorn_matches) / opportunities_1x,
+                safe_div(100.0 * unicorn_matches, opportunities_1x),
             ],
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / opportunities_1x,
-            "average_lower_cargo_count": float(
-                auto_lower_cargo_count + teleop_lower_cargo_count
-            )
-            / opportunities_1x,
-            "average_upper_cargo_count": float(
-                auto_upper_cargo_count + teleop_upper_cargo_count
-            )
-            / opportunities_1x,
-            "average_cargo_count": float(
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_lower_cargo_count": safe_div(
+                auto_lower_cargo_count + teleop_lower_cargo_count, opportunities_1x
+            ),
+            "average_upper_cargo_count": safe_div(
+                auto_upper_cargo_count + teleop_upper_cargo_count, opportunities_1x
+            ),
+            "average_cargo_count": safe_div(
                 auto_lower_cargo_count
                 + teleop_lower_cargo_count
                 + auto_upper_cargo_count
-                + teleop_upper_cargo_count
-            )
-            / opportunities_1x,
-            "average_cargo_points": float(cargo_points_auto + cargo_points_teleop)
-            / opportunities_1x,
-            "average_foul_score": float(foul_scores) / opportunities_1x,
+                + teleop_upper_cargo_count,
+                opportunities_1x,
+            ),
+            "average_cargo_points": safe_div(
+                cargo_points_auto + cargo_points_teleop, opportunities_1x
+            ),
+            "average_foul_score": safe_div(foul_scores, opportunities_1x),
             "high_score": list(high_score),
         }
         return event_insights

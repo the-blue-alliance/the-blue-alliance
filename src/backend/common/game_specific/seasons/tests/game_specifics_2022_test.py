@@ -15,7 +15,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2022
 from backend.common.game_specific.seasons.game_specifics_2022 import GameSpecifics2022
 from backend.common.game_specific.seasons.tests.conftest import (
-    assert_breakdownless_match_excluded,
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     put_event,
@@ -100,11 +101,8 @@ def test_tiebreak_criteria_without_breakdown_data() -> None:
 _BROKEN_BREAKDOWN = {"red": {}, "blue": {}}
 
 
-def test_calculate_event_insights_ignores_unplayed_and_breakdownless_matches() -> None:
-    matches = [
-        build_match("2022test", "qm", 1, -1, -1, None),
-        build_match("2022test", "qm", 2, 30, 10, None),
-    ]
+def test_calculate_event_insights_ignores_unplayed_matches() -> None:
+    matches = [build_match("2022test", "qm", 1, -1, -1, None)]
     assert GameSpecifics2022().calculate_event_insights(matches) == {
         "qual": None,
         "playoff": None,
@@ -122,7 +120,7 @@ def test_calculate_event_insights_logs_failed_matches(
     broken = build_match("2022test", "qm", 1, 30, 10, _BROKEN_BREAKDOWN)
     with caplog.at_level(logging.INFO):
         insights = GameSpecifics2022().calculate_event_insights([broken])
-    assert insights == {"qual": None, "playoff": None}
+    assert insights is not None and insights["qual"] is not None
     failures = [
         record
         for record in caplog.records
@@ -156,10 +154,11 @@ def test_calculate_event_insights_counts_low_climbs_in_quals(
     assert none_throws(insights["qual"])["low_climb_count"] == [1, 6, 100.0 / 6]
 
 
-def test_breakdownless_match_excluded_from_insights(
-    test_data_importer,
-) -> None:
-    """A played match without a score breakdown leaves every insight unchanged."""
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2022(), "2022test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
     test_data_importer.import_match_list(HELPERS_TESTS, "data/2022cmptx_matches.json")
     matches = Match.query(Match.event == ndb.Key(Event, "2022cmptx")).fetch()
-    assert_breakdownless_match_excluded(GameSpecifics2022(), matches)
+    assert_partial_breakdowns_split_counters(GameSpecifics2022(), matches)
