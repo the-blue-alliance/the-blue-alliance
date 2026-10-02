@@ -2295,6 +2295,12 @@ def test_location_info_annotations_match_stored_values() -> None:
     assert hints["postal_code"] is str
 
 
+def test_get_similarity_matches_acronyms() -> None:
+    """A name and its acronym are fully similar, in either order."""
+    assert LocationHelper.get_similarity("Leland High School", "lhs") == 1.0
+    assert LocationHelper.get_similarity("lhs", "Leland High School") == 1.0
+
+
 def test_compute_event_location_score_without_formatted_address() -> None:
     """Without a formatted_address the score falls back to name similarity."""
     info = cast(
