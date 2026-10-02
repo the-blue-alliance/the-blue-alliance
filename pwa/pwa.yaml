@@ -4,6 +4,9 @@ runtime: nodejs24
 instance_class: F2
 automatic_scaling:
   max_idle_instances: 1
-  target_cpu_utilization: 0.9
-  target_throughput_utilization: 0.9
-  max_concurrent_requests: 80
+  # SSR is single-threaded and CPU-bound; keep per-instance concurrency low so
+  # App Engine scales out before renders queue on the event loop.
+  target_cpu_utilization: 0.6
+  target_throughput_utilization: 0.6
+  max_concurrent_requests: 10
+  max_instances: 40
