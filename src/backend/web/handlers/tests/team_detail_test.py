@@ -502,3 +502,19 @@ def test_team_alliance_status(web_client: Client, setup_full_event) -> None:
     assert resp.status_code == 200
     event_info = helpers.get_team_event_participation(resp.data, "2019ctwat")
     assert event_info is not None
+
+
+def test_team_district_without_display_name(web_client: Client, ndb_stub) -> None:
+    helpers.preseed_team(254)
+    helpers.preseed_event_for_team(254, "2020test")
+    District(id="2020ne", year=2020, abbreviation="ne").put()
+    DistrictTeam(
+        id="2020ne_frc254",
+        year=2020,
+        district_key=ndb.Key(District, "2020ne"),
+        team=ndb.Key(Team, "frc254"),
+    ).put()
+
+    resp = web_client.get("/team/254/2020")
+    assert resp.status_code == 200
+    assert helpers.get_team_info(resp.data).district == "NE District"

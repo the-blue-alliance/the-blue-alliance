@@ -103,6 +103,18 @@ def test_do_districts(tasks_cpu_client: Client) -> None:
     assert TypeaheadEntry.get_by_id(TypeaheadEntry.ALL_EVENTS_KEY) is None
 
 
+def test_do_districts_without_display_name_uses_render_name(
+    tasks_cpu_client: Client,
+) -> None:
+    """A district with no display name is labelled by its render_name, not None."""
+    District(id="2020ont", year=2020, abbreviation="ont").put()
+
+    resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/typeaheadcalc")
+    assert resp.status_code == 200
+
+    assert _entry_data(TypeaheadEntry.ALL_DISTRICTS_KEY) == ["ONT District [ONT]"]
+
+
 def test_do_events(tasks_cpu_client: Client) -> None:
     Event(
         id="2020casj",
