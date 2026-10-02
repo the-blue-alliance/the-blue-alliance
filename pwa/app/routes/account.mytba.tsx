@@ -118,8 +118,7 @@ function MyTBA() {
         <h1 className="text-2xl font-bold">myTBA</h1>
       </div>
       <Tabs
-        key={tabs.key}
-        defaultValue={tabs.defaultValue}
+        value={tabs.value}
         onValueChange={(value) => tabs.onValueChange(String(value))}
         className="mt-4"
       >

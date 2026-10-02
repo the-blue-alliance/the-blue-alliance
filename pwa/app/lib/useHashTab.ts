@@ -1,5 +1,5 @@
 import { useNavigate } from '@tanstack/react-router';
-import { useCallback, useSyncExternalStore } from 'react';
+import { useCallback, useState, useSyncExternalStore } from 'react';
 
 function subscribeToHashChange(onChange: () => void): () => void {
   window.addEventListener('hashchange', onChange);
@@ -20,13 +20,13 @@ function serverHash(): undefined {
  * the Rankings tab, and picking a tab rewrites the hash (replace, not push, so
  * the back button still leaves the page).
  *
- * The tabs stay uncontrolled. The server never sees the hash, so the page
- * renders and hydrates on `defaultValue`; once the client reads the hash the
- * returned `key` changes and the tab bar remounts on the hashed tab. Our own
- * tab clicks use history.replaceState, which fires no `hashchange`, so they
- * never remount; only external changes (initial load, back/forward) do.
+ * The tabs are controlled by the returned `value`, so switching tabs only
+ * re-renders; nothing remounts. The server never sees the hash, so the page
+ * renders and hydrates on `defaultValue`; React then re-renders with the
+ * client's hash. Clicks set the selection directly, and any later change to
+ * the hash itself (back/forward, editing the address bar) is adopted too.
  *
- * `values` may change between renders (data-driven tabs): the hash is
+ * `values` may change between renders (data-driven tabs): the selection is
  * matched against the current list on every render, so a hash naming a tab
  * that appears once its data loads takes effect at that point.
  *
@@ -42,29 +42,38 @@ export function useHashTab<T extends string>({
   defaultValue: T;
   legacyHashes?: Record<string, T>;
 }): {
-  key: string;
-  defaultValue: T;
+  value: T;
   onValueChange: (value: string) => void;
 } {
   const navigate = useNavigate();
-  // The store holds only the raw hash; which tab it names is decided during
-  // render against the current `values`, so data-driven tab lists work too
   const rawHash = useSyncExternalStore(
     subscribeToHashChange,
     readRawHash,
     serverHash,
   );
+  // Clicks select immediately; a hash we haven't seen yet (hydration,
+  // back/forward) replaces the selection
+  const [selection, setSelection] = useState({
+    selected: rawHash,
+    seenHash: rawHash,
+  });
+  let { selected } = selection;
+  if (rawHash !== selection.seenHash) {
+    selected = rawHash;
+    setSelection({ selected: rawHash, seenHash: rawHash });
+  }
   const candidate =
-    rawHash === undefined ? undefined : (legacyHashes[rawHash] ?? rawHash);
-  const hashTab =
+    selected === undefined ? undefined : (legacyHashes[selected] ?? selected);
+  const value =
     candidate !== undefined && (values as readonly string[]).includes(candidate)
       ? (candidate as T)
-      : undefined;
+      : defaultValue;
   const onValueChange = useCallback(
-    (value: string) => {
+    (next: string) => {
+      setSelection((prev) => ({ ...prev, selected: next }));
       void navigate({
         to: '.',
-        hash: value,
+        hash: next,
         replace: true,
         resetScroll: false,
         hashScrollIntoView: false,
@@ -72,9 +81,5 @@ export function useHashTab<T extends string>({
     },
     [navigate],
   );
-  return {
-    key: hashTab ?? '',
-    defaultValue: hashTab ?? defaultValue,
-    onValueChange,
-  };
+  return { value, onValueChange };
 }

@@ -646,8 +646,7 @@ function EventPage() {
       </div>
 
       <AnimatedTabs
-        key={tabs.key}
-        defaultValue={tabs.defaultValue}
+        value={tabs.value}
         onValueChange={tabs.onValueChange}
         className="mt-4"
       >

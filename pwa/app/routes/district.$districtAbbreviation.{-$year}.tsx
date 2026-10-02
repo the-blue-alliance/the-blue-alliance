@@ -281,8 +281,7 @@ function DistrictPage() {
       </div>
 
       <AnimatedTabs
-        key={tabs.key}
-        defaultValue={tabs.defaultValue}
+        value={tabs.value}
         onValueChange={tabs.onValueChange}
         className="mt-6"
       >

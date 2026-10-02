@@ -846,8 +846,7 @@ function DistrictInsightsPage() {
         <Spinner className="mx-auto mt-16 size-8" />
       ) : (
         <Tabs
-          key={tabs.key}
-          defaultValue={tabs.defaultValue}
+          value={tabs.value}
           onValueChange={(value) => tabs.onValueChange(String(value))}
           className="mt-6"
         >
