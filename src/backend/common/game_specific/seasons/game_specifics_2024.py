@@ -112,7 +112,7 @@ class GameSpecifics2024(
         finished_matches = 0
 
         for match in matches:
-            if not match.has_been_played:
+            if not match.has_been_played or not match.score_breakdown:
                 continue
 
             finished_matches += 1
@@ -123,9 +123,6 @@ class GameSpecifics2024(
 
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
-
-            if match.score_breakdown is None:
-                continue
 
             red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
             blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]

@@ -4,6 +4,8 @@ import logging
 import traceback
 from typing import Any, Dict, List, Optional, Tuple
 
+from pyre_extensions import none_throws
+
 from backend.common.consts.alliance_color import (
     ALLIANCE_COLORS,
     AllianceColor,
@@ -132,7 +134,7 @@ class GameSpecifics2023(
         finished_matches = 0
         has_insights = False
         for match in matches:
-            if not match.has_been_played:
+            if not match.has_been_played or not match.score_breakdown:
                 continue
 
             red_score = match.alliances[AllianceColor.RED]["score"]
@@ -146,9 +148,7 @@ class GameSpecifics2023(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            score_breakdown = match.score_breakdown
-            if score_breakdown is None:
-                continue
+            score_breakdown = none_throws(match.score_breakdown)
 
             for alliance_color in ALLIANCE_COLORS:
                 try:
