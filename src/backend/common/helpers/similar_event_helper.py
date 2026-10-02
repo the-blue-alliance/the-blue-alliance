@@ -282,8 +282,16 @@ def location_similarity(a: Event, b: Event) -> float:
 def event_similarity(a: Event, b: Event) -> float:
     """
     How likely two events are to be the same event, name plus location.
+
+    An existing event is matched on either its name or its short name -- a
+    returning "Beach Blitz" is usually suggested under that name, not as the
+    "Southern California Robotics Invitational" it is formally listed as.
     """
-    return name_similarity(a.name, b.name) + location_similarity(a, b)
+    candidate_names = [name for name in (b.name, b.short_name) if name]
+    name_score = max(
+        (name_similarity(a.name, name) for name in candidate_names), default=0.0
+    )
+    return name_score + location_similarity(a, b)
 
 
 class SimilarEventHelper:
