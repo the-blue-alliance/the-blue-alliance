@@ -1123,6 +1123,12 @@ def test_venue_address_safe_without_venue_address() -> None:
     assert Event(venue="Some Gym").venue_address_safe is None
 
 
+def test_venue_address_safe_is_plain_text() -> None:
+    """Without a venue_address, venue_address_safe is plain text, not bytes reprs."""
+    event = Event(venue="Some Gym", city="Berkeley", state_prov="CA", country="USA")
+    assert event.venue_address_safe == "Some Gym\nBerkeley, CA, USA"
+
+
 @freeze_time("2020-02-02")
 def test_webcast_status_patched_from_memcache() -> None:
     from backend.common.memcache_models.webcast_online_status_memcache import (
