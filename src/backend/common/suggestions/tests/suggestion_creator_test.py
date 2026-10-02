@@ -1704,6 +1704,16 @@ class TestDummyOffseasonSuggestions(SuggestionCreatorTest):
             country="USA",
         )
 
+    def test_creates_suggestion_without_patching(self) -> None:
+        """An offseason event with no existing suggestion gets one."""
+        SuggestionCreator.createDummyOffseasonSuggestions([self._event()])
+
+        self.assertEqual(Suggestion.query().count(), 1)
+        suggestion = none_throws(Suggestion.get_by_id("offseason_with_data_2016test"))
+        self.assertEqual(suggestion.target_model, "offseason-event")
+        self.assertEqual(suggestion.review_state, SuggestionState.REVIEW_PENDING)
+        self.assertEqual(suggestion.contents["first_code"], "TEST")
+
     def test_creates_suggestion_for_new_event(self) -> None:
         # Keep the key iterator intact so the loop body runs as intended
         event = self._event()

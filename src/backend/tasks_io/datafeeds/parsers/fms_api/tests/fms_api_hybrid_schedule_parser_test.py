@@ -3,6 +3,7 @@ from datetime import datetime
 from typing import Any, cast, Dict, List, Optional, Tuple
 
 import pytest
+from google.appengine.ext import ndb
 
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
@@ -193,6 +194,141 @@ def test_parse_2015_playoff(ndb_stub, test_data_importer) -> None:
         assert len(clean_matches[CompLevel.QF]) == 8
         assert len(clean_matches[CompLevel.SF]) == 6
         assert len(clean_matches[CompLevel.F]) == 3
+
+
+def _parse_2015nyny_with_null_finals_teams(
+    test_data_importer, stations: List[str]
+) -> List[Match]:
+    Event(
+        id="2015nyny",
+        name="NYC Regional",
+        event_type_enum=EventType.REGIONAL,
+        short_name="NYC",
+        event_short="nyny",
+        year=2015,
+        end_date=datetime(2015, 3, 27),
+        official=True,
+        start_date=datetime(2015, 3, 24),
+        timezone_id="America/New_York",
+        playoff_type=PlayoffType.AVG_SCORE_8_TEAM,
+    ).put()
+    path = test_data_importer._get_path(
+        __file__, "data/2015nyny_hybrid_schedule_playoff.json"
+    )
+    with open(path, "r") as f:
+        data = json.loads(f.read())
+    f1m1 = next(m for m in data["Schedule"] if m["matchNumber"] == 15)
+    for team in f1m1["Teams"]:
+        if team["station"] in stations:
+            team["teamNumber"] = None
+    matches, _ = FMSAPIHybridScheduleParser(2015, "nyny").parse(data)
+    return matches
+
+
+def _store_2015nyny_f1m1(
+    blue_teams: Tuple[str, ...] = ("frc354", "frc694", "frc271")
+) -> None:
+    Match(
+        id="2015nyny_f1m1",
+        event=ndb.Key(Event, "2015nyny"),
+        year=2015,
+        comp_level=CompLevel.F,
+        set_number=1,
+        match_number=1,
+        team_key_names=[
+            "frc2344",
+            "frc1884",
+            "frc1796",
+            "frc354",
+            "frc694",
+            "frc271",
+        ],
+        alliances_json=json.dumps(
+            {
+                "red": {
+                    "teams": ["frc2344", "frc1884", "frc1796"],
+                    "surrogates": [],
+                    "dqs": [],
+                    "score": 104,
+                },
+                "blue": {
+                    "teams": list(blue_teams),
+                    "surrogates": [],
+                    "dqs": [],
+                    "score": 56,
+                },
+            }
+        ),
+    ).put()
+
+
+def test_parse_null_team_keeps_known_teams(
+    ndb_stub, test_data_importer, caplog
+) -> None:
+    _store_2015nyny_f1m1()
+
+    matches = _parse_2015nyny_with_null_finals_teams(
+        test_data_importer, ["Red1", "Red2", "Red3", "Blue1", "Blue2", "Blue3"]
+    )
+
+    f1m1 = next(m for m in matches if m.key_name == "2015nyny_f1m1")
+    assert f1m1.alliances[AllianceColor.RED]["teams"] == [
+        "frc2344",
+        "frc1884",
+        "frc1796",
+    ]
+    assert f1m1.alliances[AllianceColor.BLUE]["teams"] == [
+        "frc354",
+        "frc694",
+        "frc271",
+    ]
+    assert f1m1.alliances[AllianceColor.RED]["score"] == 104
+    assert len(f1m1.team_key_names) == 6
+    warnings = [r for r in caplog.records if r.levelname == "WARNING"]
+    assert [w.getMessage() for w in warnings] == [
+        "FRC API returned a null team for 2015nyny_f1m1 red; "
+        "keeping known teams ['frc2344', 'frc1884', 'frc1796']",
+        "FRC API returned a null team for 2015nyny_f1m1 blue; "
+        "keeping known teams ['frc354', 'frc694', 'frc271']",
+    ]
+
+
+def test_parse_null_team_only_keeps_affected_alliance(
+    ndb_stub, test_data_importer, caplog
+) -> None:
+    _store_2015nyny_f1m1()
+
+    matches = _parse_2015nyny_with_null_finals_teams(test_data_importer, ["Blue3"])
+
+    f1m1 = next(m for m in matches if m.key_name == "2015nyny_f1m1")
+    assert f1m1.alliances[AllianceColor.BLUE]["teams"] == [
+        "frc354",
+        "frc694",
+        "frc271",
+    ]
+    assert len([r for r in caplog.records if r.levelname == "WARNING"]) == 1
+
+
+def test_parse_null_team_ignores_known_match_without_teams(
+    ndb_stub, test_data_importer, caplog
+) -> None:
+    _store_2015nyny_f1m1(blue_teams=())
+
+    matches = _parse_2015nyny_with_null_finals_teams(test_data_importer, ["Blue3"])
+
+    f1m1 = next(m for m in matches if m.key_name == "2015nyny_f1m1")
+    assert f1m1.alliances[AllianceColor.BLUE]["teams"] == ["frc354", "frc694"]
+    assert not [r for r in caplog.records if r.levelname == "WARNING"]
+
+
+def test_parse_null_team_without_known_match(
+    ndb_stub, test_data_importer, caplog
+) -> None:
+    matches = _parse_2015nyny_with_null_finals_teams(test_data_importer, ["Blue3"])
+
+    f1m1 = next(m for m in matches if m.key_name == "2015nyny_f1m1")
+    assert f1m1.alliances[AllianceColor.BLUE]["teams"] == ["frc354", "frc694"]
+    assert not [r for r in caplog.records if r.levelname == "WARNING"]
 
 
 def test_parse_2017micmp(ndb_stub, test_data_importer) -> None:
@@ -611,6 +747,24 @@ def test_parse_team_with_null_station(ndb_stub) -> None:
     assert matches[0].team_key_names == ["frc254"]
     assert matches[0].alliances[AllianceColor.RED]["teams"] == []
     assert matches[0].alliances[AllianceColor.BLUE]["teams"] == []
+
+
+def test_parse_null_station_in_full_match(ndb_stub) -> None:
+    """A null-station team in a full match is listed but on neither alliance."""
+    _put_event()
+    teams = _default_teams()
+    teams[2] = _team(3, None)
+    matches, _ = _parse([_schedule_match(teams=teams)])
+    assert len(matches) == 1
+    assert sorted(matches[0].team_key_names) == sorted(
+        ["frc1", "frc2", "frc3", "frc4", "frc5", "frc6"]
+    )
+    assert matches[0].alliances[AllianceColor.RED]["teams"] == ["frc1", "frc2"]
+    assert matches[0].alliances[AllianceColor.BLUE]["teams"] == [
+        "frc4",
+        "frc5",
+        "frc6",
+    ]
 
 
 def test_parse_skips_match_without_start_time(ndb_stub) -> None:

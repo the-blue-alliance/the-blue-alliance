@@ -51,4 +51,24 @@ describe('DoubleSlider', () => {
     fireEvent.keyDown(high, { key: 'ArrowLeft' });
     expect(labels(container)).toEqual(['Y2', 'Y7']);
   });
+
+  test('minStepsBetweenThumbs reaches Base UI instead of the DOM', () => {
+    // Base UI names this prop minStepsBetweenValues.
+    const { container } = render(
+      <DoubleSlider
+        min={0}
+        max={10}
+        step={1}
+        minStepsBetweenThumbs={2}
+        value={[4, 6]}
+      />,
+    );
+    expect(
+      container.firstElementChild?.hasAttribute('minstepsbetweenthumbs'),
+    ).toBe(false);
+
+    const [, high] = screen.getAllByRole('slider', { hidden: true });
+    fireEvent.keyDown(high, { key: 'ArrowLeft' });
+    expect(labels(container)).toEqual(['4', '6']);
+  });
 });

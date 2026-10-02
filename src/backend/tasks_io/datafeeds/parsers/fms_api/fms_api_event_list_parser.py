@@ -224,7 +224,7 @@ class FMSAPIEventListParser(
                     f"Skipping event {code} with type {api_event_type} as not a real division"
                 )
                 continue
-            if event_type is None and not self.event_short:
+            if event_type is None:
                 logging.warning(
                     "Event type '{}' not recognized!".format(api_event_type)
                 )
