@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { type Page, expect, test } from '@playwright/test';
 
 test('fetches Nexus event data in the browser', async ({ page }) => {
   const nexusRequests: string[] = [];
@@ -280,4 +280,126 @@ test('shows the favorite button for an event', async ({ page }) => {
   await expect(
     page.getByRole('button', { name: /add to favorites/i }),
   ).toBeVisible();
+});
+
+async function openQuixilverDialog(page: Page) {
+  await page.getByRole('searchbox', { name: 'Search teams' }).fill('Quixilver');
+  await page.getByRole('button', { name: '604 - Quixilver' }).click();
+}
+
+test.describe('event teams directory', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2024mil');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.getByRole('tab', { name: /^Teams/ }).click();
+    await page.getByRole('searchbox', { name: 'Search teams' }).waitFor();
+  });
+
+  ['', ' mobile'].forEach((viewport) => {
+    test(`filters teams by name${viewport}`, async ({ page }) => {
+      await page
+        .getByRole('searchbox', { name: 'Search teams' })
+        .fill('Quixilver');
+
+      await expect(
+        page.getByRole('region', { name: 'Event teams' }).getByRole('listitem'),
+      ).toHaveCount(1);
+    });
+
+    test(`opens the team dialog from row whitespace${viewport}`, async ({
+      page,
+    }) => {
+      await page
+        .getByRole('searchbox', { name: 'Search teams' })
+        .fill('Quixilver');
+      const row = page
+        .getByRole('region', { name: 'Event teams' })
+        .getByRole('listitem');
+      const bounds = await row.boundingBox();
+      if (!bounds) throw new Error('Team row is not visible');
+      await row.click({
+        position: { x: bounds.width / 2, y: bounds.height - 2 },
+      });
+
+      await expect(
+        page.getByRole('dialog', { name: 'Team 604 — Quixilver' }),
+      ).toBeVisible();
+    });
+
+    test(`shows the team's matches in the dialog${viewport}`, async ({
+      page,
+    }) => {
+      await openQuixilverDialog(page);
+
+      await expect(
+        page
+          .getByRole('dialog')
+          .getByRole('link', { name: /^Quals \d+$/ })
+          .first(),
+      ).toBeVisible();
+    });
+
+    test(`keeps location clicks separate from team navigation${viewport}`, async ({
+      page,
+    }) => {
+      await page
+        .getByRole('searchbox', { name: 'Search teams' })
+        .fill('Quixilver');
+      const popupPromise = page.waitForEvent('popup');
+      await page
+        .getByRole('region', { name: 'Event teams' })
+        .getByRole('link', { name: 'San Jose, CA, USA' })
+        .click();
+      const popup = await popupPromise;
+      await popup.waitForLoadState('domcontentloaded');
+
+      await expect(page).toHaveURL(/\/event\/2024mil$/);
+      expect(popup.url()).toMatch(/google\.com\/maps|maps\.google\.com/);
+    });
+
+    test(`restores teams when search is cleared${viewport}`, async ({
+      page,
+    }) => {
+      await page
+        .getByRole('searchbox', { name: 'Search teams' })
+        .fill('Quixilver');
+      await page.getByRole('button', { name: 'Clear search' }).click();
+
+      await expect(
+        page.getByRole('region', { name: 'Event teams' }).getByRole('listitem'),
+      ).toHaveCount(75);
+    });
+  });
+
+  test('keeps the video link clear of the break label in the team dialog mobile', async ({
+    page,
+  }) => {
+    await openQuixilverDialog(page);
+    const dialog = page.getByRole('dialog');
+    const label = await dialog
+      .getByText('Qualifications', { exact: true })
+      .boundingBox();
+    const link = await dialog
+      .getByRole('link', { name: 'Watch All Videos' })
+      .boundingBox();
+    if (!label || !link) throw new Error('Break row is not visible');
+
+    expect(label.x + label.width).toBeLessThanOrEqual(link.x);
+  });
+});
+
+test('shows historical teams without avatars', async ({ page }) => {
+  await page.goto('/event/2017casj');
+  await page.locator('body[data-hydrated]').waitFor();
+  await page.getByRole('tab', { name: /^Teams/ }).click();
+  await page.getByRole('searchbox', { name: 'Search teams' }).fill('254');
+
+  await expect(
+    page.getByRole('button', { name: '254 - The Cheesy Poofs' }),
+  ).toBeVisible();
+  await expect(
+    page
+      .getByRole('region', { name: 'Event teams' })
+      .getByRole('img', { name: 'Team Avatar' }),
+  ).toHaveCount(0);
 });
