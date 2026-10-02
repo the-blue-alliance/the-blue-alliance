@@ -1,7 +1,7 @@
 import { act, renderHook } from '@testing-library/react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { ThemeProvider, useTheme } from '~/lib/theme';
+import { THEME_INIT_SCRIPT, ThemeProvider, useTheme } from '~/lib/theme';
 
 interface FakeMediaQueryList {
   matches: boolean;
@@ -31,6 +31,11 @@ function installMatchMedia(prefersDark: boolean) {
 
 function renderTheme() {
   return renderHook(() => useTheme(), { wrapper: ThemeProvider });
+}
+
+function runThemeInitScript() {
+  // eslint-disable-next-line typescript/no-implied-eval -- runs the serialized script exactly as the browser will
+  new Function(THEME_INIT_SCRIPT)();
 }
 
 function storageEvent(key: string, newValue: string) {
@@ -166,5 +171,55 @@ describe('useTheme', () => {
     });
 
     expect(result.current.theme).toBe('system');
+  });
+});
+
+describe('THEME_INIT_SCRIPT', () => {
+  beforeEach(() => {
+    localStorage.clear();
+    document.documentElement.classList.remove('dark');
+    vi.restoreAllMocks();
+  });
+
+  test.each([
+    {
+      name: 'stored dark on a light OS',
+      stored: 'dark',
+      prefersDark: false,
+      dark: true,
+    },
+    {
+      name: 'stored light on a dark OS',
+      stored: 'light',
+      prefersDark: true,
+      dark: false,
+    },
+    {
+      name: 'stored system on a dark OS',
+      stored: 'system',
+      prefersDark: true,
+      dark: true,
+    },
+    {
+      name: 'stored system on a light OS',
+      stored: 'system',
+      prefersDark: false,
+      dark: false,
+    },
+  ])('sets dark to $dark for $name', ({ stored, prefersDark, dark }) => {
+    localStorage.setItem('theme', stored);
+    installMatchMedia(prefersDark);
+
+    runThemeInitScript();
+
+    expect(document.documentElement.classList.contains('dark')).toBe(dark);
+  });
+
+  test('does not throw when storage is unavailable', () => {
+    vi.spyOn(Storage.prototype, 'getItem').mockImplementation(() => {
+      throw new Error('blocked');
+    });
+
+    expect(() => runThemeInitScript()).not.toThrow();
   });
 });
