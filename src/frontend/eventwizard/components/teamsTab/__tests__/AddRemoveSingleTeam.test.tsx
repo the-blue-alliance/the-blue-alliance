@@ -437,6 +437,55 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
     expect(removeButton()).toBeEnabled();
   });
 
+  it("requires a re-fetch after a successful add, even without clearTeams", async () => {
+    // Without clearTeams, the component must reset hasFetchedTeams itself.
+    mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
+    renderComponent({ clearTeams: undefined });
+    await selectTeam("254 | The Cheesy Poofs", "254");
+
+    fireEvent.click(addButton());
+
+    expect(mockUpdateTeamList).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByText(/Please fetch the current team list/)
+    ).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { hidden: true })).toBeDisabled();
+  });
+
+  it("requires a re-fetch after a successful remove, even without clearTeams", async () => {
+    mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
+    renderComponent({ clearTeams: undefined });
+    await selectTeam("1678 | Citrus Circuits", "1678");
+
+    fireEvent.click(removeButton());
+
+    expect(mockUpdateTeamList).toHaveBeenCalledTimes(1);
+    expect(
+      screen.getByText(/Please fetch the current team list/)
+    ).toBeInTheDocument();
+    expect(screen.getByRole("combobox", { hidden: true })).toBeDisabled();
+  });
+
+  it("clears the selection with Backspace and Escape", async () => {
+    // react-select needs isClearable, plus escapeClearsValue for Escape.
+    renderComponent();
+    await selectTeam("254 | The Cheesy Poofs", "254");
+    expect(addButton()).toBeEnabled();
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Backspace", keyCode: 8 });
+
+    expect(addButton()).toBeDisabled();
+    expect(screen.queryByText("254 | The Cheesy Poofs")).not.toBeInTheDocument();
+
+    await selectTeam("254 | The Cheesy Poofs", "254");
+    expect(addButton()).toBeEnabled();
+
+    fireEvent.keyDown(screen.getByRole("combobox"), { key: "Escape", keyCode: 27 });
+
+    expect(addButton()).toBeDisabled();
+    expect(screen.queryByText("254 | The Cheesy Poofs")).not.toBeInTheDocument();
+  });
+
   it("adds the selected team to the existing list and resets on success", async () => {
     mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
     renderComponent();
@@ -509,10 +558,20 @@ describe("AddRemoveSingleTeam selecting, adding and removing", () => {
 
   it("tolerates a missing clearTeams callback on add and remove", async () => {
     mockUpdateTeamList.mockImplementation((_keys, onSuccess) => onSuccess());
-    renderComponent({ clearTeams: undefined });
+    const { rerender } = renderComponent({ clearTeams: undefined });
 
     await selectTeam("254 | The Cheesy Poofs", "254");
     fireEvent.click(addButton());
+    // Re-fetching delivers a new team list, which allows another edit.
+    rerender(
+      <AddRemoveSingleTeam
+        selectedEvent="2024nytr"
+        updateTeamList={mockUpdateTeamList}
+        hasFetchedTeams={true}
+        currentTeams={[...attending]}
+        showErrorMessage={mockShowErrorMessage}
+      />
+    );
     await selectTeam("1678 | Citrus Circuits", "1678");
     fireEvent.click(removeButton());
 
