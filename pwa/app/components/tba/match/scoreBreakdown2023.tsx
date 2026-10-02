@@ -1,12 +1,16 @@
-import { Match, MatchScoreBreakdown2023 } from '~/api/tba/read';
+import {
+  AutoChargeStationRobot2023,
+  Match,
+  MatchScoreBreakdown2023,
+  MobilityRobot2023,
+} from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
-  FoulDisplay,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
 export default function ScoreBreakdown2023({
   scoreBreakdown,
@@ -25,79 +29,94 @@ export default function ScoreBreakdown2023({
       <TableBody>
         {/* Mobility */}
         <TableRow>
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.mobilityRobot1 === 'Yes'}
-              teamKey={match.alliances.red.team_keys[0].substring(3)}
+              condition={
+                scoreBreakdown.red.mobilityRobot1 === MobilityRobot2023.YES
+              }
+              teamKey={match.alliances.red.team_keys[0]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.mobilityRobot2 === 'Yes'}
-              teamKey={match.alliances.red.team_keys[1].substring(3)}
+              condition={
+                scoreBreakdown.red.mobilityRobot2 === MobilityRobot2023.YES
+              }
+              teamKey={match.alliances.red.team_keys[1]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.red.mobilityRobot3 === 'Yes'}
-              teamKey={match.alliances.red.team_keys[2].substring(3)}
+              condition={
+                scoreBreakdown.red.mobilityRobot3 === MobilityRobot2023.YES
+              }
+              teamKey={match.alliances.red.team_keys[2]}
             />
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Mobility
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.mobilityRobot1 === 'Yes'}
-              teamKey={match.alliances.blue.team_keys[0].substring(3)}
+              condition={
+                scoreBreakdown.blue.mobilityRobot1 === MobilityRobot2023.YES
+              }
+              teamKey={match.alliances.blue.team_keys[0]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.mobilityRobot2 === 'Yes'}
-              teamKey={match.alliances.blue.team_keys[1].substring(3)}
+              condition={
+                scoreBreakdown.blue.mobilityRobot2 === MobilityRobot2023.YES
+              }
+              teamKey={match.alliances.blue.team_keys[1]}
             />
             <ConditionalCheckmark
-              condition={scoreBreakdown.blue.mobilityRobot3 === 'Yes'}
-              teamKey={match.alliances.blue.team_keys[2].substring(3)}
+              condition={
+                scoreBreakdown.blue.mobilityRobot3 === MobilityRobot2023.YES
+              }
+              teamKey={match.alliances.blue.team_keys[2]}
             />
           </TableCell>
         </TableRow>
 
         {/* Auto Game Piece Count */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.autoGamePieceCount}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Auto Game Piece Count
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.autoGamePieceCount}
           </TableCell>
         </TableRow>
 
         {/* Auto Game Piece Points */}
         <TableRow>
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.autoGamePiecePoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Auto Game Piece Points
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.autoGamePiecePoints}
           </TableCell>
         </TableRow>
 
         {/* Charge Station Auto */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            {scoreBreakdown.red.autoChargeStationRobot1 === 'Docked' && (
+          <TableCell className="bg-alliance-red-loser">
+            {scoreBreakdown.red.autoChargeStationRobot1 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.red.team_keys[0].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.red.autoChargeStationRobot2 === 'Docked' && (
+            {scoreBreakdown.red.autoChargeStationRobot2 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.red.team_keys[1].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.red.autoChargeStationRobot3 === 'Docked' && (
+            {scoreBreakdown.red.autoChargeStationRobot3 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.red.team_keys[2].substring(3)}
               </Badge>
@@ -106,18 +125,21 @@ export default function ScoreBreakdown2023({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Charge Station Auto
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            {scoreBreakdown.blue.autoChargeStationRobot1 === 'Docked' && (
+          <TableCell className="bg-alliance-blue-loser">
+            {scoreBreakdown.blue.autoChargeStationRobot1 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.blue.team_keys[0].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.blue.autoChargeStationRobot2 === 'Docked' && (
+            {scoreBreakdown.blue.autoChargeStationRobot2 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.blue.team_keys[1].substring(3)}
               </Badge>
             )}
-            {scoreBreakdown.blue.autoChargeStationRobot3 === 'Docked' && (
+            {scoreBreakdown.blue.autoChargeStationRobot3 ===
+              AutoChargeStationRobot2023.DOCKED && (
               <Badge variant={'outline'}>
                 {match.alliances.blue.team_keys[2].substring(3)}
               </Badge>
@@ -127,59 +149,59 @@ export default function ScoreBreakdown2023({
 
         {/* Total Auto */}
         <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.autoPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Total Auto
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.autoPoints}
           </TableCell>
         </TableRow>
 
         {/* Game Piece Count */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.teleopGamePieceCount}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Game Piece Count
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.teleopGamePieceCount}
           </TableCell>
         </TableRow>
 
         {/* Supercharged Nodes */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.extraGamePieceCount}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Supercharged Node
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.extraGamePieceCount}
           </TableCell>
         </TableRow>
 
         {/* Game Piece Points */}
         <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.teleopGamePiecePoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Game Piece Points
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.teleopGamePiecePoints}
           </TableCell>
         </TableRow>
 
         {/* Robot 1 Endgame */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameChargeStationRobot1}
               teamKey={match.alliances.red.team_keys[0]}
@@ -188,7 +210,7 @@ export default function ScoreBreakdown2023({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Robot 1 Endgame
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameChargeStationRobot1}
               teamKey={match.alliances.blue.team_keys[0]}
@@ -198,7 +220,7 @@ export default function ScoreBreakdown2023({
 
         {/* Robot 2 Endgame */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameChargeStationRobot2}
               teamKey={match.alliances.red.team_keys[1]}
@@ -207,7 +229,7 @@ export default function ScoreBreakdown2023({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Robot 2 Endgame
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameChargeStationRobot2}
               teamKey={match.alliances.blue.team_keys[1]}
@@ -217,7 +239,7 @@ export default function ScoreBreakdown2023({
 
         {/* Robot 3 Endgame */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameChargeStationRobot3}
               teamKey={match.alliances.red.team_keys[2]}
@@ -226,7 +248,7 @@ export default function ScoreBreakdown2023({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Robot 3 Endgame
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameChargeStationRobot3}
               teamKey={match.alliances.blue.team_keys[2]}
@@ -236,27 +258,27 @@ export default function ScoreBreakdown2023({
 
         {/* Total Teleop */}
         <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.teleopPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Total Teleop
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.teleopPoints}
           </TableCell>
         </TableRow>
 
         {/* Links */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.links?.length} (+{scoreBreakdown.red.linkPoints}
             )
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Links
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.links?.length} (+
             {scoreBreakdown.blue.linkPoints})
           </TableCell>
@@ -264,7 +286,7 @@ export default function ScoreBreakdown2023({
 
         {/* Coopertition Criteria Met */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.red.coopertitionCriteriaMet ?? false}
             />
@@ -272,7 +294,7 @@ export default function ScoreBreakdown2023({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Coopertition Criteria Met
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.coopertitionCriteriaMet ?? false}
             />
@@ -281,7 +303,7 @@ export default function ScoreBreakdown2023({
 
         {/* Sustainability Bonus */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <ConditionalRpAchieved
               condition={
                 scoreBreakdown.red.sustainabilityBonusAchieved ?? false
@@ -291,7 +313,7 @@ export default function ScoreBreakdown2023({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Sustainability Bonus
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <ConditionalRpAchieved
               condition={
                 scoreBreakdown.blue.sustainabilityBonusAchieved ?? false
@@ -302,7 +324,7 @@ export default function ScoreBreakdown2023({
 
         {/* Activation Bonus */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.red.activationBonusAchieved ?? false}
             />
@@ -310,73 +332,80 @@ export default function ScoreBreakdown2023({
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Activation Bonus
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             <ConditionalRpAchieved
               condition={scoreBreakdown.blue.activationBonusAchieved ?? false}
             />
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Tech Fouls */}
+        {/* Fouls committed by each alliance */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
-            <FoulDisplay
-              foulsReceived={scoreBreakdown.red.foulCount}
-              pointsPerFoul={POINTS_PER_FOUL[2023]}
-              techFoulsReceived={scoreBreakdown.red.techFoulCount}
-              pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
-              techOrMajor="tech"
-            />
+          <TableCell className="bg-alliance-red-loser">
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.red.foulCount,
+              techFouls: scoreBreakdown.red.techFoulCount,
+            })}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Fouls / Tech Fouls
+            Fouls / Tech Fouls Committed
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
-            <FoulDisplay
-              foulsReceived={scoreBreakdown.blue.foulCount}
-              pointsPerFoul={POINTS_PER_FOUL[2023]}
-              techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-              pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
-              techOrMajor="tech"
-            />
+          <TableCell className="bg-alliance-blue-loser">
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.blue.foulCount,
+              techFouls: scoreBreakdown.blue.techFoulCount,
+            })}
+          </TableCell>
+        </TableRow>
+
+        {/* Foul Points: points each alliance received from the other's fouls */}
+        <TableRow>
+          <TableCell className="bg-alliance-red-winner">
+            {scoreBreakdown.red.foulPoints}
+          </TableCell>
+          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
+            Foul Points Received
+          </TableCell>
+          <TableCell className="bg-alliance-blue-winner">
+            {scoreBreakdown.blue.foulPoints}
           </TableCell>
         </TableRow>
 
         {/* Adjustments */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             {scoreBreakdown.red.adjustPoints}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             Adjustments
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             {scoreBreakdown.blue.adjustPoints}
           </TableCell>
         </TableRow>
 
         {/* Total Score */}
         <TableRow className="font-bold">
-          <TableCell className="bg-alliance-red-dark">
+          <TableCell className="bg-alliance-red-winner">
             {scoreBreakdown.red.totalPoints}
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
             Total Score
           </TableCell>
-          <TableCell className="bg-alliance-blue-dark">
+          <TableCell className="bg-alliance-blue-winner">
             {scoreBreakdown.blue.totalPoints}
           </TableCell>
         </TableRow>
 
         {/* RP */}
         <TableRow>
-          <TableCell className="bg-alliance-red-light">
+          <TableCell className="bg-alliance-red-loser">
             +{scoreBreakdown.red.rp} RP
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
             RP
           </TableCell>
-          <TableCell className="bg-alliance-blue-light">
+          <TableCell className="bg-alliance-blue-loser">
             +{scoreBreakdown.blue.rp} RP
           </TableCell>
         </TableRow>

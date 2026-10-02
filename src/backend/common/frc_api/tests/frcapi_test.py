@@ -1,9 +1,12 @@
+import datetime
 import json
+import os
 from typing import Any
 from unittest import mock
 from unittest.mock import patch
 
 import pytest
+from google.appengine.api import urlfetch_errors
 from google.appengine.ext import testbed
 
 from backend.common.frc_api import FRCAPI
@@ -235,6 +238,26 @@ def test_get(
     assert called_headers == expected_headers
 
 
+def test_get_deadline_exceeded_returns_408(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+
+    api = FRCAPI("zach", save_response=True)
+
+    with patch.object(
+        urlfetch_stub,
+        "_Dynamic_Fetch",
+        side_effect=urlfetch_errors.DeadlineExceededError("deadline exceeded"),
+    ):
+        response = api.root().get_result()
+
+    assert response.status_code == 408
+    assert response.content == b""
+    assert cloud_storage_get_files("frc-api-response/v3.0/") == []
+
+
 def _mock_frc_api(
     urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
     content: dict,
@@ -367,3 +390,205 @@ def test_save_response_updated(
     f2 = cloud_storage_read(files[1])
     assert f2 is not None
     assert f2 == json.dumps(content2).encode()
+
+
+def test_regional_rankings() -> None:
+    api = FRCAPI("zach")
+    with patch.object(FRCAPI, "_get") as mock_get:
+        api.regional_rankings(2025, 2)
+    mock_get.assert_called_once_with(
+        "/2025/rankings/regional/teamdetail?page=2", mock.ANY
+    )
+
+
+def test_save_response_disabled(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+    _mock_frc_api(urlfetch_stub, {"status": "normal"})
+
+    api = FRCAPI("zach", save_response=False)
+    api.root().get_result()
+
+    assert cloud_storage_get_files("frc-api-response/v3.0/") == []
+
+
+def test_save_response_storage_error(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
+) -> None:
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+    _mock_frc_api(urlfetch_stub, {"status": "normal"})
+
+    api = FRCAPI("zach", save_response=True)
+    with patch("backend.common.storage.get_files", side_effect=Exception("gcs down")):
+        # Storage errors are logged, not raised
+        resp = api.root().get_result()
+
+    assert resp.status_code == 200
+
+
+def test_get_cached_gcs_files_downloads_and_caches(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    from backend.common.frc_api import frc_api as frc_api_module
+
+    monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
+    gcs_dir = "frc-api-response/v3.0/2020/root/"
+    contents = {
+        f"{gcs_dir}2020-03-01 10:00:00.0.json": "text",
+        f"{gcs_dir}2020-03-02 10:00:00.0.json": b"bytes",
+        f"{gcs_dir}2020-03-03 10:00:00.0.json": None,
+    }
+    with (
+        patch("backend.common.storage.get_files", return_value=list(contents)),
+        patch("backend.common.storage.read", side_effect=contents.get),
+    ):
+        files = FRCAPI.get_cached_gcs_files(gcs_dir)
+
+    safe_dir = "frc-api-response/v3.0/2020/root/"
+    # Only the file names are asserted here; the returned path shape is
+    # covered by a separate test.
+    assert [os.path.basename(f) for f in files] == [
+        "2020-03-01 10_00_00.0.json",
+        "2020-03-02 10_00_00.0.json",
+    ]
+    cache_dir = tmp_path / "gcs_test_data_cache" / safe_dir
+    assert (cache_dir / "2020-03-01 10_00_00.0.json").read_text() == "text"
+    assert (cache_dir / "2020-03-02 10_00_00.0.json").read_bytes() == b"bytes"
+    assert not (cache_dir / "2020-03-03 10_00_00.0.json").exists()
+
+    # A second lookup is served from the local cache
+    with patch("backend.common.storage.get_files") as mock_get_files:
+        cached = FRCAPI.get_cached_gcs_files(gcs_dir)
+    mock_get_files.assert_not_called()
+    assert sorted(cached) == sorted(
+        [
+            f"{safe_dir}2020-03-01 10_00_00.0.json",
+            f"{safe_dir}2020-03-02 10_00_00.0.json",
+        ]
+    )
+
+
+def test_get_cached_gcs_files_same_paths_downloaded_or_cached(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    """Downloaded and cached GCS files have the same dir/file paths."""
+    from backend.common.frc_api import frc_api as frc_api_module
+
+    monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
+    gcs_dir = "frc-api-response/v3.0/2020/root/"
+    contents = {f"{gcs_dir}2020-03-01 10:00:00.0.json": "text"}
+    with (
+        patch("backend.common.storage.get_files", return_value=list(contents)),
+        patch("backend.common.storage.read", side_effect=contents.get),
+    ):
+        downloaded = FRCAPI.get_cached_gcs_files(gcs_dir)
+    cached = FRCAPI.get_cached_gcs_files(gcs_dir)
+
+    expected = [f"{gcs_dir}2020-03-01 10_00_00.0.json"]
+    assert downloaded == expected
+    assert cached == expected
+
+
+def test_simulated_v2_schedule_uses_hybrid_endpoint() -> None:
+    api = FRCAPI("zach", sim_time=datetime.datetime(2022, 3, 1), sim_api_version="v2.0")
+    with patch.object(FRCAPI, "_get_api_response_from_gcs") as mock_gcs:
+        api._get_simulated("/2022/schedule/CADA?tournamentLevel=qual", dict, "v2.0")
+    mock_gcs.assert_called_once_with("/2022/schedule/CADA/qual/hybrid", "v2.0", dict)
+
+
+def test_simulated_response_no_files() -> None:
+    api = FRCAPI("zach", sim_time=datetime.datetime(2022, 3, 1))
+    with patch.object(FRCAPI, "get_cached_gcs_files", return_value=[]):
+        resp = api._get_api_response_from_gcs("/2022/teams", "v3.0", dict)
+    assert resp.status_code == 200
+    assert resp.json() == {}
+
+
+def test_simulated_response_error() -> None:
+    api = FRCAPI("zach", sim_time=datetime.datetime(2022, 3, 1))
+    with patch.object(
+        FRCAPI, "get_cached_gcs_files", return_value=["dir/not-a-timestamp.json"]
+    ):
+        resp = api._get_api_response_from_gcs("/2022/teams", "v3.0", dict)
+    assert resp.status_code == 500
+
+
+def test_merge_schedule_without_results() -> None:
+    api = FRCAPI("zach")
+    schedule = {"Schedule": [{"matchNumber": 1, "teams": []}]}
+    assert api._merge_match_schedule_and_results(schedule, {}) == {
+        "Schedule": [{"matchNumber": 1, "teams": []}]
+    }
+
+
+def test_merge_match_normalizes_capitalized_teams() -> None:
+    """A "Teams" key on both sides is merged and normalized to "teams"."""
+    scheduled = {"Teams": [{"teamNumber": 254, "station": "Red1"}]}
+    merged = FRCAPI._merge_match(
+        scheduled, {"Teams": [{"teamNumber": 254, "dq": False}]}
+    )
+    assert merged["teams"] == [{"teamNumber": 254, "station": "Red1", "dq": False}]
+    assert "Teams" not in merged
+
+
+@pytest.mark.parametrize(
+    "schedule_key, result_key",
+    [("teams", "Teams"), ("Teams", "teams")],
+)
+def test_merge_match_merges_mixed_case_teams(
+    schedule_key: str, result_key: str
+) -> None:
+    """Result team flags reach the scheduled teams whatever the key capitalisation."""
+    scheduled = {schedule_key: [{"teamNumber": 254, "station": "Red1"}]}
+    merged = FRCAPI._merge_match(
+        scheduled, {result_key: [{"teamNumber": 254, "surrogate": True}]}
+    )
+    assert merged["teams"] == [
+        {"teamNumber": 254, "station": "Red1", "surrogate": True}
+    ]
+    assert "Teams" not in merged
+
+
+def test_merge_match_clears_capitalized_placeholder_teams() -> None:
+    """The {1, 2, 3} placeholder teams are cleared when the schedule uses "Teams"."""
+    scheduled = {
+        "Teams": [
+            {"teamNumber": 1, "station": "Red1"},
+            {"teamNumber": 2, "station": "Red2"},
+            {"teamNumber": 3, "station": "Red3"},
+        ]
+    }
+    merged = FRCAPI._merge_match(scheduled, {"scoreRedFinal": 10})
+    assert merged["teams"] == [
+        {"teamNumber": None, "station": "Red1"},
+        {"teamNumber": None, "station": "Red2"},
+        {"teamNumber": None, "station": "Red3"},
+    ]
+    assert "Teams" not in merged
+
+
+def test_merge_match_schedule_without_teams() -> None:
+    merged = FRCAPI._merge_match(
+        {"matchNumber": 1}, {"teams": [{"teamNumber": 254, "dq": False}]}
+    )
+    assert merged["teams"] == [{"teamNumber": 254, "dq": False}]
+
+
+def test_merge_match_placeholder_teams() -> None:
+    scheduled = {
+        "teams": [
+            {"teamNumber": 1, "station": "Red1"},
+            {"teamNumber": 2, "station": "Red2"},
+            {"teamNumber": 3, "station": "Red3"},
+        ]
+    }
+    merged = FRCAPI._merge_match(scheduled, {"scoreRedFinal": 10})
+    assert merged["teams"] == [
+        {"teamNumber": None, "station": "Red1"},
+        {"teamNumber": None, "station": "Red2"},
+        {"teamNumber": None, "station": "Red3"},
+    ]
+    assert merged["scoreRedFinal"] == 10

@@ -1,5 +1,8 @@
-import pytest
+import json
+from datetime import timedelta
 
+import pytest
+from freezegun import freeze_time
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
@@ -9,16 +12,29 @@ from backend.api.handlers.tests.helpers import (
     validate_simple_event_keys,
     validate_simple_team_keys,
 )
+from backend.common.consts.api_version import ApiMajorVersion
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.award_type import AwardType
+from backend.common.consts.cmp_qualification import CmpQualificationMethod
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.award import Award
 from backend.common.models.district import District
+from backend.common.models.district_advancement import (
+    DistrictAdvancementCutoffs,
+    TeamDistrictAdvancement,
+)
 from backend.common.models.district_ranking import DistrictRanking
 from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
+from backend.common.models.insight import Insight
 from backend.common.models.team import Team
+from backend.common.queries.district_query import (
+    DistrictAbbreviationQuery,
+    DistrictsInYearQuery,
+)
+from backend.common.queries.event_query import DistrictEventsQuery
+from backend.common.queries.team_query import DistrictTeamsQuery
 
 
 def test_district_events(ndb_stub, api_client: Client) -> None:
@@ -145,12 +161,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "fim",
             "display_name": "Michigan",
             "key": "2019fim",
+            "official_advancement_counts": {"dcmp": 160, "cmp": 87},
             "year": 2019,
         },
         {
             "abbreviation": "fim",
             "display_name": "Michigan",
             "key": "2020fim",
+            "official_advancement_counts": {"dcmp": 200, "cmp": 90},
             "year": 2020,
         },
     ]
@@ -173,12 +191,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "mar",
             "display_name": "Mid-Atlantic",
             "key": "2014mar",
+            "official_advancement_counts": {"dcmp": 55, "cmp": 18},
             "year": 2014,
         },
         {
             "abbreviation": "fma",
             "display_name": "Mid-Atlantic",
             "key": "2024fma",
+            "official_advancement_counts": {"dcmp": 60, "cmp": 22},
             "year": 2024,
         },
     ]
@@ -194,12 +214,14 @@ def test_district_events(ndb_stub, api_client: Client) -> None:
             "abbreviation": "mar",
             "display_name": "Mid-Atlantic",
             "key": "2014mar",
+            "official_advancement_counts": {"dcmp": 55, "cmp": 18},
             "year": 2014,
         },
         {
             "abbreviation": "fma",
             "display_name": "Mid-Atlantic",
             "key": "2024fma",
+            "official_advancement_counts": {"dcmp": 60, "cmp": 22},
             "year": 2024,
         },
     ]
@@ -338,6 +360,8 @@ def test_district_list_year(ndb_stub, api_client: Client) -> None:
     district_keys = set([d["key"] for d in resp.json])
     assert "2020ne" in district_keys
     assert "2020fim" in district_keys
+    for d in resp.json:
+        assert "official_advancement_counts" in d
 
 
 def test_district_awards(ndb_stub, api_client: Client) -> None:
@@ -393,39 +417,569 @@ def test_district_awards(ndb_stub, api_client: Client) -> None:
     ]
 
 
-@pytest.mark.parametrize(
-    "endpoint", ["advancement", "awards", "rankings", "teams", "events"]
-)
-def test_district_endpoints_validate(endpoint, ndb_stub, api_client: Client) -> None:
+def test_district_insights(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",
         auth_types_enum=[AuthType.READ_API],
     ).put()
 
-    # Invalid district endpoint
+    District(
+        id="2024fim",
+        year=2024,
+        abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+
+    Insight(
+        id=Insight.render_key_name(
+            0,
+            Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHTS_TEAM_DATA],
+        year=0,
+        district_abbreviation="fim",
+        data_json=json.dumps({"frc1": {"district_seasons": 1}}),
+    ).put()
+    Insight(
+        id=Insight.render_key_name(
+            0,
+            Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.DISTRICT_INSIGHT_DISTRICT_DATA],
+        year=0,
+        district_abbreviation="fim",
+        data_json=json.dumps({"district_wide_data": {}, "region_data": {}}),
+    ).put()
+    Insight(
+        id=Insight.render_key_name(
+            2024,
+            Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.NUM_MATCHES],
+        year=2024,
+        district_abbreviation="fim",
+        data_json=json.dumps(42),
+    ).put()
+    Insight(
+        id=Insight.render_key_name(
+            2024,
+            Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS],
+            "fim",
+        ),
+        name=Insight.INSIGHT_NAMES[Insight.MATCH_PREDICTIONS],
+        year=2024,
+        district_abbreviation="fim",
+        data_json=json.dumps({"qual": {"total_matches_count": 42}}),
+    ).put()
+
     resp = api_client.get(
-        f"/api/v3/district/2024Minnesota/{endpoint}",
+        "/api/v3/district/fim/insights",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert resp.status_code == 404
-    assert resp.json == {"Error": "2024Minnesota is not a valid district key"}
 
-    # Missing district
+    assert resp.status_code == 200
+    assert resp.json == {
+        "team_data": {"frc1": {"district_seasons": 1}},
+        "district_data": {"district_wide_data": {}, "region_data": {}},
+        "seasonal_insights": {
+            "2024": {
+                "num_matches": 42,
+                "match_predictions": {"qual": {"total_matches_count": 42}},
+            }
+        },
+    }
+
+
+def _cutoffs() -> DistrictAdvancementCutoffs:
+    return DistrictAdvancementCutoffs(
+        dcmp_original=60,
+        dcmp_effective=64,
+        dcmp_declines=["frc1", "frc2"],
+        cmp_original=22,
+        cmp_effective=24,
+        cmp_declines=["frc3"],
+        cmp_qualification={
+            "frc95": CmpQualificationMethod.DISTRICT_POINTS,
+            "frc133": CmpQualificationMethod.DCMP_WINNER,
+        },
+    )
+
+
+def test_district_advancement(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={
+            "frc95": TeamDistrictAdvancement(dcmp=True, cmp=True),
+            "frc133": TeamDistrictAdvancement(dcmp=True, cmp=True),
+            "frc190": TeamDistrictAdvancement(dcmp=True, cmp=False),
+        },
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
     resp = api_client.get(
-        f"/api/v3/district/2024ne/{endpoint}",
+        "/api/v3/district/2026ne/advancement",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
-    assert resp.status_code == 404
-    assert resp.json == {"Error": "district key: 2024ne does not exist"}
+    assert resp.status_code == 200
+    assert resp.json == {
+        "teams": {
+            "frc95": {
+                "dcmp": True,
+                "cmp": True,
+                "cmp_qualification": "district_points",
+            },
+            "frc133": {"dcmp": True, "cmp": True, "cmp_qualification": "dcmp_winner"},
+            "frc190": {"dcmp": True, "cmp": False, "cmp_qualification": None},
+        },
+        "cutoffs": {
+            "dcmp_original": 60,
+            "dcmp_effective": 64,
+            "dcmp_declines": ["frc1", "frc2"],
+            "cmp_original": 22,
+            "cmp_effective": 24,
+            "cmp_declines": ["frc3"],
+            "cmp_qualification": {
+                "frc95": "district_points",
+                "frc133": "dcmp_winner",
+            },
+        },
+    }
 
+
+def test_district_advancement_cutoffs_key_set(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={"frc95": TeamDistrictAdvancement(dcmp=True, cmp=True)},
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert set(resp.json["cutoffs"].keys()) == {
+        "dcmp_original",
+        "dcmp_effective",
+        "dcmp_declines",
+        "cmp_original",
+        "cmp_effective",
+        "cmp_declines",
+        "cmp_qualification",
+    }
+
+
+def test_district_advancement_does_not_mutate_model(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={"frc95": TeamDistrictAdvancement(dcmp=True, cmp=True)},
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+
+    district = District.get_by_id("2026ne")
+    assert district is not None
+    assert district.advancement_cutoffs == _cutoffs()
+    assert district.advancement == {
+        "frc95": TeamDistrictAdvancement(dcmp=True, cmp=True)
+    }
+
+
+def test_district_advancement_without_cutoffs(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={"frc95": TeamDistrictAdvancement(dcmp=True, cmp=False)},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {
+        "teams": {
+            "frc95": {"dcmp": True, "cmp": False, "cmp_qualification": None},
+        },
+        "cutoffs": None,
+    }
+
+
+def test_district_advancement_qualification_survives_empty_advancement(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={},
+        advancement_cutoffs=_cutoffs(),
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json["teams"] == {}
+    assert resp.json["cutoffs"]["cmp_qualification"] == {
+        "frc95": "district_points",
+        "frc133": "dcmp_winner",
+    }
+
+
+def test_district_advancement_empty_map_is_not_null(
+    ndb_stub, api_client: Client
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+        advancement={},
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {"teams": {}, "cutoffs": None}
+
+
+def test_district_advancement_empty(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    District(
+        id="2026ne",
+        year=2026,
+        abbreviation="ne",
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/district/2026ne/advancement",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == {"teams": None, "cutoffs": None}
+
+
+@pytest.mark.parametrize(
+    "endpoint", ["advancement", "awards", "rankings", "teams", "events"]
+)
+def test_district_endpoints_validate(endpoint, ndb_stub, api_client: Client) -> None:
+    with freeze_time("2024-01-01 00:00:00") as frozen_time:
+        ApiAuthAccess(
+            id="test_auth_key",
+            auth_types_enum=[AuthType.READ_API],
+        ).put()
+
+        # Invalid district endpoint
+        resp = api_client.get(
+            f"/api/v3/district/2024Minnesota/{endpoint}",
+            headers={"X-TBA-Auth-Key": "test_auth_key"},
+        )
+        assert resp.status_code == 404
+        assert resp.json == {"Error": "2024Minnesota is not a valid district key"}
+
+        # Missing district
+        resp = api_client.get(
+            f"/api/v3/district/2024ne/{endpoint}",
+            headers={"X-TBA-Auth-Key": "test_auth_key"},
+        )
+        assert resp.status_code == 404
+        assert resp.json == {"Error": "district key: 2024ne does not exist"}
+
+        District(
+            id="2024ne",
+            year=2024,
+            abbreviation="ne",
+        ).put()
+        frozen_time.tick(delta=timedelta(seconds=65))
+
+        resp = api_client.get(
+            f"/api/v3/district/2024ne/{endpoint}",
+            headers={"X-TBA-Auth-Key": "test_auth_key"},
+        )
+        assert resp.status_code == 200
+
+
+def test_district_models_query_response_passthrough(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    District(
+        id="2020fim",
+        year=2020,
+        abbreviation="fim",
+        display_name="Michigan",
+    ).put()
+    Event(
+        id="2020casj",
+        year=2020,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+        district_key=ndb.Key(District, "2020fim"),
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+    DistrictTeam(
+        id="2020fim_frc254",
+        district_key=ndb.Key(District, "2020fim"),
+        team=ndb.Key(Team, "frc254"),
+        year=2020,
+    ).put()
+
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    from backend.common.queries.database_query import CachedDatabaseQuery
+
+    orig_fetch_json = CachedDatabaseQuery.fetch_json
+    orig_fetch_dict = CachedDatabaseQuery.fetch_dict
+    calls_fetch_json = []
+    calls_fetch_dict = []
+
+    def spy_fetch_json(self, version):
+        calls_fetch_json.append((type(self), version))
+        return orig_fetch_json(self, version)
+
+    def spy_fetch_dict(self, version):
+        calls_fetch_dict.append((type(self), version))
+        return orig_fetch_dict(self, version)
+
+    monkeypatch.setattr(CachedDatabaseQuery, "fetch_json", spy_fetch_json)
+    monkeypatch.setattr(CachedDatabaseQuery, "fetch_dict", spy_fetch_dict)
+
+    # 1. district_history (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/fim/history", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictAbbreviationQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 2. district_list_year (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/districts/2020", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictsInYearQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 3. district_events (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/events", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictEventsQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 4. district_events (simple -> fetch_dict)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/events/simple", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 0
+    assert len(calls_fetch_dict) == 1
+    assert calls_fetch_dict[0] == (DistrictEventsQuery, ApiMajorVersion.API_V3)
+
+    # 5. district_teams (nominal -> fetch_json)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/teams", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 1
+    assert calls_fetch_json[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3)
+    assert len(calls_fetch_dict) == 0
+
+    # 6. district_teams (simple -> fetch_dict)
+    calls_fetch_json.clear()
+    calls_fetch_dict.clear()
+    resp = api_client.get("/api/v3/district/2020fim/teams/simple", headers=headers)
+    assert resp.status_code == 200
+    assert len(calls_fetch_json) == 0
+    assert len(calls_fetch_dict) == 1
+    assert calls_fetch_dict[0] == (DistrictTeamsQuery, ApiMajorVersion.API_V3)
+
+
+@pytest.mark.parametrize("endpoint", ["rankings", "advancement"])
+def test_district_endpoint_404_when_district_deleted_after_key_cache_warm(
+    endpoint: str, ndb_stub, api_client: Client
+) -> None:
+    # validate_keys remembers that a district key exists for a short TTL. If
+    # the District is deleted inside that window, the decorator still lets the
+    # request through and the handler itself must return the 404.
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
     District(
         id="2024ne",
         year=2024,
         abbreviation="ne",
     ).put()
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    # Warm the key-exists cache through an endpoint that doesn't use
+    # DistrictQuery, so the district lookup below actually hits the datastore.
+    resp = api_client.get("/api/v3/district/2024ne/events", headers=headers)
+    assert resp.status_code == 200
+
+    ndb.Key(District, "2024ne").delete()
+
+    resp = api_client.get(f"/api/v3/district/2024ne/{endpoint}", headers=headers)
+    assert resp.status_code == 404
+
+
+def test_dcmp_history(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    for year in (2023, 2024):
+        District(
+            id=f"{year}ne",
+            year=year,
+            abbreviation="ne",
+            display_name="New England",
+        ).put()
+    Team(id="frc2713", team_number=2713).put()
+
+    # A DCMP, a DCMP division, and a plain district event (which must be
+    # excluded) in 2024; a DCMP in 2023.
+    Event(
+        id="2024necmp",
+        year=2024,
+        event_short="necmp",
+        district_key=ndb.Key(District, "2024ne"),
+        event_type_enum=EventType.DISTRICT_CMP,
+    ).put()
+    Event(
+        id="2024necmp1",
+        year=2024,
+        event_short="necmp1",
+        district_key=ndb.Key(District, "2024ne"),
+        event_type_enum=EventType.DISTRICT_CMP_DIVISION,
+    ).put()
+    Event(
+        id="2024nhgrs",
+        year=2024,
+        event_short="nhgrs",
+        district_key=ndb.Key(District, "2024ne"),
+        event_type_enum=EventType.DISTRICT,
+    ).put()
+    Event(
+        id="2023necmp",
+        year=2023,
+        event_short="necmp",
+        district_key=ndb.Key(District, "2023ne"),
+        event_type_enum=EventType.DISTRICT_CMP,
+    ).put()
+    Award(
+        id="2024necmp_1",
+        name_str="Winner",
+        event=ndb.Key(Event, "2024necmp"),
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.DISTRICT_CMP,
+        year=2024,
+        team_list=[ndb.Key(Team, "frc2713")],
+    ).put()
+    Award(
+        id="2024nhgrs_1",
+        name_str="Winner",
+        event=ndb.Key(Event, "2024nhgrs"),
+        award_type_enum=AwardType.WINNER,
+        event_type_enum=EventType.DISTRICT,
+        year=2024,
+        team_list=[ndb.Key(Team, "frc2713")],
+    ).put()
 
     resp = api_client.get(
-        f"/api/v3/district/2024ne/{endpoint}",
+        "/api/v3/district/ne/dcmp_history",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
     assert resp.status_code == 200
+    by_key = {entry["event"]["key"]: entry for entry in resp.json}
+    assert set(by_key.keys()) == {"2023necmp", "2024necmp", "2024necmp1"}
+    assert by_key["2024necmp"]["event"]["event_type"] == EventType.DISTRICT_CMP
+    assert by_key["2024necmp1"]["event"]["event_type"] == (
+        EventType.DISTRICT_CMP_DIVISION
+    )
+    assert by_key["2024necmp"]["awards"] == [
+        {
+            "award_type": AwardType.WINNER,
+            "event_key": "2024necmp",
+            "name": "Winner",
+            "recipient_list": [],
+            "year": 2024,
+        }
+    ]
+    assert by_key["2024necmp1"]["awards"] == []
+    assert by_key["2023necmp"]["awards"] == []
+
+
+def test_dcmp_history_unknown_abbreviation(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    resp = api_client.get(
+        "/api/v3/district/zz/dcmp_history",
+        headers={"X-TBA-Auth-Key": "test_auth_key"},
+    )
+    assert resp.status_code == 200
+    assert resp.json == []

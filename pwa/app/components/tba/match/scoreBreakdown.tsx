@@ -1,4 +1,5 @@
 import { type VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 import {
   Children,
   type ComponentPropsWithoutRef,
@@ -12,7 +13,6 @@ import MdiArrowLeft from '~icons/mdi/arrow-left';
 import MdiArrowRight from '~icons/mdi/arrow-right';
 
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { cn } from '~/lib/utils';
 
 export function ScoreBreakdownTable({
   children,
@@ -40,8 +40,8 @@ export function ScoreBreakdownTable({
 
 export function ScoreBreakdownRow({
   children,
-  blueValue = undefined,
-  redValue = undefined,
+  blueValue,
+  redValue,
 }: {
   children: ReactNode;
   blueValue?: number;
@@ -60,7 +60,7 @@ export function ScoreBreakdownRow({
       })}
     >
       {Children.map(children, (child) => {
-        if (isValidElement(child)) {
+        if (isValidElement(child) && child.type === ScoreBreakdownLabelCell) {
           return cloneElement(
             child as ReactElement<{
               redWon?: boolean;
@@ -98,32 +98,32 @@ const cellVariants = cva('', {
     {
       color: 'red',
       shade: 'light',
-      class: 'bg-alliance-red/15',
+      class: 'bg-alliance-red-loser',
     },
     {
       color: 'red',
       shade: 'dark',
-      class: 'bg-alliance-red/20',
+      class: 'bg-alliance-red-winner',
     },
     {
       color: 'blue',
       shade: 'light',
-      class: 'bg-alliance-blue/15',
+      class: 'bg-alliance-blue-loser',
     },
     {
       color: 'blue',
       shade: 'dark',
-      class: 'bg-alliance-blue/20',
+      class: 'bg-alliance-blue-winner',
     },
     {
       color: 'neutral',
       shade: 'light',
-      class: 'bg-neutral-50',
+      class: 'bg-neutral-50 dark:bg-neutral-900',
     },
     {
       color: 'neutral',
       shade: 'dark',
-      class: 'bg-neutral-200',
+      class: 'bg-neutral-200 dark:bg-neutral-800',
     },
   ],
   defaultVariants: {

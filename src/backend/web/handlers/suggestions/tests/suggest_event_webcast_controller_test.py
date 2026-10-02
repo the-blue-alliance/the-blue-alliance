@@ -9,6 +9,7 @@ from werkzeug.test import Client
 from backend.common.consts.event_type import EventType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.models.webcast import Webcast
@@ -187,3 +188,42 @@ def test_submit_webcast(
     assert suggestion.contents.get("webcast_dict") == Webcast(
         type=WebcastType.TWITCH, channel="frcgamesense"
     )
+
+
+def test_get_form_shows_official_webcast_unit_notice(
+    login_user, ndb_stub, web_client: Client
+) -> None:
+    from google.appengine.ext import ndb as ndb_module
+
+    district = District(
+        id="2016ne",
+        year=2016,
+        abbreviation="ne",
+        display_name="New England",
+        uses_official_webcast_unit=True,
+    )
+    district.put()
+
+    event = Event.get_by_id("2016necmp")
+    assert event is not None
+    event.district_key = ndb_module.Key(District, "2016ne")
+    event.put()
+
+    response = web_client.get("/suggest/event/webcast?event_key=2016necmp")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+    alert = soup.find("div", class_="alert-info")
+    assert alert is not None
+    assert "official webcast unit" in alert.get_text()
+
+
+def test_get_form_no_official_webcast_unit_notice_for_non_district(
+    login_user, ndb_stub, web_client: Client
+) -> None:
+    response = web_client.get("/suggest/event/webcast?event_key=2016necmp")
+    assert response.status_code == 200
+
+    soup = BeautifulSoup(response.data, "html.parser")
+    alert = soup.find("div", class_="alert-info")
+    assert alert is None

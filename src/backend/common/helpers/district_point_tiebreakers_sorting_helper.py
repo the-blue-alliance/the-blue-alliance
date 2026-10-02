@@ -1,7 +1,8 @@
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
+    EventRegionalChampsPoolPoints,
     TeamAtEventDistrictPoints,
 )
 from backend.common.models.keys import TeamKey
@@ -11,7 +12,8 @@ class DistrictPointTiebreakersSortingHelper:
 
     @classmethod
     def sorted_points(
-        cls, event_points: EventDistrictPoints
+        cls,
+        event_points: Union[EventDistrictPoints, EventRegionalChampsPoolPoints],
     ) -> List[Tuple[TeamKey, TeamAtEventDistrictPoints]]:
         return sorted(
             event_points["points"].items(),
@@ -25,6 +27,6 @@ class DistrictPointTiebreakersSortingHelper:
                 -score
                 for score in event_points["tiebreakers"]
                 .get(team_and_points[0], {})
-                .get("highest_qual_scores", [])
+                .get("highest_match_scores", [])
             ],
         )

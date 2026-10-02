@@ -1,0 +1,51 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Mobile Clients{% endblock %}
+
+{% block content %}
+
+<h1>Mobile Clients</h1>
+
+{% with messages = get_flashed_messages() %}
+  {% if messages %}
+    {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+    {% endfor %}
+  {% endif %}
+{% endwith %}
+
+<div class="panel panel-default">
+  <div class="panel-heading">
+    <h3 class="panel-title">Stats</h3>
+  </div>
+  <div class="panel-body">
+    <dl class="dl-horizontal">
+      <dt>Total registered clients</dt>
+      <dd>{{ total_clients }}</dd>
+      {% for type_name, count in type_counts %}
+      <dt>{{ type_name }}</dt>
+      <dd>{{ count }}</dd>
+      {% endfor %}
+    </dl>
+  </div>
+</div>
+
+<div class="panel panel-warning">
+  <div class="panel-heading">
+    <h3 class="panel-title">Dedupe</h3>
+  </div>
+  <div class="panel-body">
+    <p>
+      Collapses <code>MobileClient</code> rows that share an <code>(account, messaging_id)</code>
+      pair down to one — keeps the most recently <code>updated</code> row, deletes the rest.
+      The task self-defers across pages of {{ page_size if page_size is defined else 500 }} entities;
+      watch logs for per-page deletion counts.
+    </p>
+    <form action="{{ url_for('admin.mobile_clients_dedupe_post') }}" method="POST">
+      <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+      <button type="submit" class="btn btn-danger">Dedupe MobileClients</button>
+    </form>
+  </div>
+</div>
+
+{% endblock %}

@@ -1,5 +1,8 @@
+/* @jest-environment jsdom */
 import React from "react";
 import { renderToStaticMarkup } from "react-dom/server";
+import { render, screen, fireEvent } from "@testing-library/react";
+import "@testing-library/jest-dom";
 import AuthInput from "../AuthInput";
 
 describe("AuthInput", () => {
@@ -127,5 +130,61 @@ describe("AuthInput", () => {
     );
     expect(html).toContain('value="id123"');
     expect(html).toContain('value="old_secret"');
+  });
+});
+
+describe("AuthInput interactions", () => {
+  const mockSetAuth = jest.fn();
+
+  afterEach(() => {
+    jest.clearAllMocks();
+  });
+
+  it("reports the typed auth ID together with the existing secret", () => {
+    render(
+      <AuthInput
+        authId="old_id"
+        authSecret="existing_secret"
+        manualEvent={true}
+        setAuth={mockSetAuth}
+      />
+    );
+
+    fireEvent.change(screen.getByLabelText("Auth Id"), {
+      target: { value: "new_id" },
+    });
+
+    expect(mockSetAuth).toHaveBeenCalledWith("new_id", "existing_secret");
+  });
+
+  it("reports the typed auth secret together with the existing ID", () => {
+    render(
+      <AuthInput
+        authId="existing_id"
+        authSecret="old_secret"
+        manualEvent={true}
+        setAuth={mockSetAuth}
+      />
+    );
+
+    fireEvent.change(screen.getByLabelText("Auth Secret"), {
+      target: { value: "new_secret" },
+    });
+
+    expect(mockSetAuth).toHaveBeenCalledWith("existing_id", "new_secret");
+  });
+
+  it("substitutes empty strings when the other credential is unset", () => {
+    render(<AuthInput manualEvent={true} setAuth={mockSetAuth} />);
+
+    fireEvent.change(screen.getByLabelText("Auth Id"), {
+      target: { value: "only_id" },
+    });
+    fireEvent.change(screen.getByLabelText("Auth Secret"), {
+      target: { value: "only_secret" },
+    });
+
+    expect(mockSetAuth).toHaveBeenNthCalledWith(1, "only_id", "");
+    expect(mockSetAuth).toHaveBeenNthCalledWith(2, "", "only_secret");
   });
 });

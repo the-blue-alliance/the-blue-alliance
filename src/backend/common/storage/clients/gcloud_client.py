@@ -37,10 +37,14 @@ class GCloudStorageClient(StorageClient):
 
         return None
 
-    def get_files(self, path: Optional[str] = None) -> List[str]:
+    def get_files(
+        self, path: Optional[str] = None, recursive: bool = False
+    ) -> List[str]:
+        # Use delimiter only if path is specified and recursive is False
+        delimiter = None if (path is None or recursive) else "/"
         return [
             blob.name
             for blob in self.client.list_blobs(
-                self.bucket, prefix=path, delimiter="/" if path else None
+                self.bucket, prefix=path, delimiter=delimiter
             )
         ]

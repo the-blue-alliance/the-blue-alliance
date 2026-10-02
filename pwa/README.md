@@ -4,13 +4,12 @@ https://beta.thebluealliance.com/
 
 ## Development
 
-If you don't have `pnpm`, you can install it with
+You may optionally install [mise](https://mise.jdx.dev/), which provisions the exact node and pnpm versions
+this project pins in `pwa/mise.toml`:
 
 ```shellscript
-npm i -g pnpm
+mise install
 ```
-
-or any of their strategies here: https://pnpm.io/installation
 
 Install node deps:
 
@@ -21,7 +20,7 @@ pnpm i
 Make sure you have your TBA APIv3 Read Key set in `.env`:
 
 ```sh
-$ cp default.env .env
+$ cp .env.example .env
 VITE_TBA_API_READ_KEY="myKey"
 ```
 
@@ -115,20 +114,152 @@ With all that said... There are various levels of caching available when making 
    - This is best done by utilizing a combination of `cache-control`, `etag`, or other headers (like [`Expires`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Expires), [`Last-Modified`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Last-Modified), or [`If-Modified-Since`](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/If-Modified-Since)).
    - All major browsers will automatically & intelligently obey all of the caching-related headers I mentioned above (except the Cloudflare one, which is proprietary).
    - Most Node.js `fetch()` implementations don't automatically do this (some do, like [Undici](https://github.com/nodejs/undici))
-2. TanStack Query cache layer
+2. **SSR network LRU** (`app/lib/middleware/network-cache.ts`)
+   - Server-only transport cache under the hey-api TBA client (`client.setConfig` in `__root.tsx` installs it only when `typeof window === 'undefined'`).
+   - Reduces duplicate upstream API calls during SSR on a given Node process. TTL comes from the response `Cache-Control: max-age` (61s fallback).
+   - Shared across users on that process — safe because TBA read data is public and we use one shared `X-TBA-Auth-Key`. The browser must **not** get a second LRU underneath React Query.
+3. TanStack Query cache layer
    - This is a library that effectively wraps `fetch()` into a more state-management oriented philosophy
    - There are a [_lot_ of docs](https://tanstack.com/query/latest) on this
-3. TanStack Router cache layer
+   - Client freshness is owned here via `staleTime` (see below) — not by the SSR network LRU
+4. TanStack Router cache layer
    - Router caches `loader` data _per-route_ for us automatically
    - [Docs here](https://tanstack.com/router/v1/docs/framework/react/guide/data-loading)
    - Anything that is cached on the server is JSON-ified and sent to the client. So a larger server cache implies a slower first paint.
-4. Cache the entire html response
+   - Intent preloading is enabled in `app/router.tsx` (`defaultPreload: 'intent'`) so hovering/touching a `Link` warms the destination route's loader before click. `defaultPreloadStaleTime: 0` means Router always invokes loaders on preload and lets React Query's `staleTime` alone govern freshness — without the Query defaults above, preloaded data would go stale before the click lands.
+5. Cache the entire html response
    - This is what the prod site does
    - But TanStack Router / React don't support this extremely well out of the box
+
+### `staleTime` policy
+
+TanStack Query is the cache that matters most for perceived freshness on the client —
+the SSR network LRU above is a transport optimization for the Node process only. `staleTime` defaults to `0`
+in TanStack Query, which means data is considered stale the instant it arrives; left
+unset, this caused every `useSuspenseQuery` to refetch immediately on hydration, even
+though the server had just sent the same data moments earlier.
+
+The policy is centralized in `app/lib/queryClient.ts` and applied via `createQueryClient()`
+(wired into the router in `app/router.tsx`):
+
+- **Default: `staleTime: 60_000`** (~60s) on every query, anchored to the TBA API's own
+  `cache-control: max-age=61` header — this is the single default `defaultOptions.queries.staleTime`
+  set on the `QueryClient`.
+- **Historical data: `staleTimeForYear(year)`**, which returns a 1-hour `staleTime` for any past
+  calendar year (comparing against `Temporal.Now.plainDateISO().year`, deliberately not the
+  `/status` API's `current_season`, to avoid deepening that dependency) and falls back to the 60s
+  default for the current year. Applied today on the event page (`event.$eventKey.tsx`), the
+  team-year page (`team.$teamNumber.{-$year}.tsx`), and the districts list page
+  (`districts.{-$year}.tsx`); other year-scoped routes still inherit the 60s default.
+- **`/status`: `staleTime: STALE_TIME.STATUS`** (6h) — `/status` gates the default year/page-size
+  params for most of the site (`current_season`, `max_season`, `max_team_page`), so instead of
+  every route independently awaiting it, the root route's `beforeLoad` (`app/routes/__root.tsx`)
+  resolves it once per navigation and exposes `status`/`currentSeason` on router context for every
+  child loader to read. The long `staleTime` means this is a cache read after the first hit.
+- **Live data keeps its own `staleTime`/`refetchInterval`** and is unaffected by the above — e.g.
+  the district Champs tab (`districtChampsTab.tsx`) polls on a
+  `refetchInterval` independent of `staleTime`, the live Nexus queuing status on the event page
+  (`getEventNexusInfo`) overrides a short 30s `staleTime`, and Firebase-backed queries
+  (`app/lib/gameday/useFirebaseWebcasts.ts`) keep their own `Infinity` values.
+
+The generated `<name>Options()` helpers (from `hey-api`) return plain objects, so overrides
+compose by spreading:
+
+```ts
+useSuspenseQuery({
+  ...getEventOptions({ path: { event_key: eventKey } }),
+  staleTime: staleTimeForYear(year),
+});
+```
+
+A few routes still fetch data directly with the generated SDK functions instead of going through
+the `QueryClient` (e.g. `team.$teamNumber.stats.tsx`,
+`district.$districtAbbreviation.{-$year}.tsx`, `district.$districtAbbreviation.insights.tsx`,
+`teams.{-$pgNum}.tsx`). Those routes get no benefit from `staleTime` until they're converted to use
+`ensureQueryData`/`useSuspenseQuery`; that conversion is tracked separately.
 
 ## Styling
 
 TBA Beta uses [TailwindCSS](https://tailwindcss.com/) and [ShadCN](https://ui.shadcn.com/) components.
+
+## Color
+
+It's important to be familiar with some color resources before adding or modifying colors:
+
+- https://stripe.com/blog/accessible-color-systems
+- https://evilmartians.com/chronicles/oklch-in-css-why-quit-rgb-hsl
+- https://oklch.fyi/
+- https://lea.verou.me/blog/tags/color/
+- https://git.apcacontrast.com/documentation/WhyAPCA.html
+
+The following colors (defined in `app/style/colors/`) were rigorously analyzed and chosen deliberately:
+
+|                                                   | Name    | OKLCH                        | Hex       |
+| ------------------------------------------------- | ------- | ---------------------------- | --------- |
+| ![](https://placehold.co/16x16/3f51b5/3f51b5.png) | Primary | `oklch(0.4782 0.1589 271.4)` | `#3f51b5` |
+
+**Alliance — light mode**
+
+|                                                   | Name        | OKLCH                          | Hex       |
+| ------------------------------------------------- | ----------- | ------------------------------ | --------- |
+| ![](https://placehold.co/16x16/fbb4a8/fbb4a8.png) | Red winner  | `oklch(0.832852 0.085938 29)`  | `#fbb4a8` |
+| ![](https://placehold.co/16x16/fed7d1/fed7d1.png) | Red loser   | `oklch(0.910855 0.04375 29)`   | `#fed7d1` |
+| ![](https://placehold.co/16x16/a9c6fe/a9c6fe.png) | Blue winner | `oklch(0.824681 0.085938 264)` | `#a9c6fe` |
+| ![](https://placehold.co/16x16/d2e1fe/d2e1fe.png) | Blue loser  | `oklch(0.906397 0.04375 264)`  | `#d2e1fe` |
+
+**Alliance — dark mode**
+
+|                                                   | Name        | OKLCH                       | Hex       |
+| ------------------------------------------------- | ----------- | --------------------------- | --------- |
+| ![](https://placehold.co/16x16/a23127/a23127.png) | Red winner  | `oklch(0.482064 0.15 29)`   | `#a23127` |
+| ![](https://placehold.co/16x16/4e1c17/4e1c17.png) | Red loser   | `oklch(0.30319 0.077 29)`   | `#4e1c17` |
+| ![](https://placehold.co/16x16/3056b0/3056b0.png) | Blue winner | `oklch(0.477592 0.15 264)`  | `#3056b0` |
+| ![](https://placehold.co/16x16/1a2c55/1a2c55.png) | Blue loser  | `oklch(0.302296 0.077 264)` | `#1a2c55` |
+
+**Alliance accents — light mode** (used as a background; no text is placed on top)
+
+|                                                   | Name | OKLCH                          | Hex       |
+| ------------------------------------------------- | ---- | ------------------------------ | --------- |
+| ![](https://placehold.co/16x16/ff9789/ff9789.png) | Red  | `oklch(0.781918 0.126563 29)`  | `#ff9789` |
+| ![](https://placehold.co/16x16/8fb4fe/8fb4fe.png) | Blue | `oklch(0.770976 0.114063 264)` | `#8fb4fe` |
+
+**Alliance accents — dark mode** (used as a background; no text is placed on top)
+
+|                                                   | Name | OKLCH                          | Hex       |
+| ------------------------------------------------- | ---- | ------------------------------ | --------- |
+| ![](https://placehold.co/16x16/ff4537/ff4537.png) | Red  | `oklch(0.663086 0.223438 29)`  | `#ff4537` |
+| ![](https://placehold.co/16x16/5488fe/5488fe.png) | Blue | `oklch(0.650391 0.184375 264)` | `#5488fe` |
+
+The other colors used across the site are just Tailwind or ShadCN colors that seemed to look good — they weren't rigorously analyzed like the above.
+
+These colors were generated from [here](https://harmonizer.evilmartians.com/), with APCA contrasts of 70 and 85 on text colors `#1f1f1f` (for light mode) and `#e3e3e3` (for dark mode). These are all sRGB colors so they should be mostly consistent across device screens (OKLCH can attempt to display P3 colors which are not supported on every display). All reds have hue of 29 and all blues have a hue of 264 (except the primary brand color, which is separate).
+
+The accent colors generally should not have text overtop of them. They can be used for borders, etc. They are rated to be used as text elements on both light and dark backgrounds as well.
+
+The other colors that are being used across the site (that are not listed above) are just Tailwind or Shadcn colors that seemed to look good -- they weren't rigorously analyzed like the above.
+
+**Districts**
+
+These are mostly arbitrary values for each district. If your district has branding guidelines, please let us know.
+
+|                                                   | Name              | Districts    | OKLCH                               | Hex       | Reason                                        |
+| ------------------------------------------------- | ----------------- | ------------ | ----------------------------------- | --------- | --------------------------------------------- |
+| ![](https://placehold.co/16x16/B78727/B78727.png) | California        | `ca`         | `oklch(0.6542 0.122 80.14)`         | `#B78727` | University of California gold (Pantone 116 U) |
+| ![](https://placehold.co/16x16/2FA4A9/2FA4A9.png) | Chesapeake        | `chs`, `fch` | `oklch(0.658 0.1 199.3)`            | `#2FA4A9` | Arbitrary                                     |
+| ![](https://placehold.co/16x16/FAD040/FAD040.png) | Indiana           | `fin`, `in`  | `oklch(0.8702 0.1592 91.9)`         | `#FAD040` | Corn                                          |
+| ![](https://placehold.co/16x16/005EB8/005EB8.png) | Israel            | `isr`        | `oklch(0.489212 0.160786 254.9444)` | `#005EB8` | Flag of Israel blue                           |
+| ![](https://placehold.co/16x16/94A3B8/94A3B8.png) | Michigan          | `fim`        | `oklch(0.711 0.035 256.8)`          | `#94A3B8` | Arbitrary                                     |
+| ![](https://placehold.co/16x16/9A8FD1/9A8FD1.png) | Mid-Atlantic      | `fma`, `mar` | `oklch(0.685 0.096 291.3)`          | `#9A8FD1` | Arbitrary                                     |
+| ![](https://placehold.co/16x16/A51C30/A51C30.png) | New England       | `ne`         | `oklch(0.4701 0.1703 20)`           | `#A51C30` | Harvard crimson red (Pantone 187 U)           |
+| ![](https://placehold.co/16x16/4B9CD3/4B9CD3.png) | North Carolina    | `fnc`        | `oklch(0.6655 0.1138 241.09)`       | `#4B9CD3` | UNC blue (Pantone 542 C)                      |
+| ![](https://placehold.co/16x16/D80621/D80621.png) | Ontario           | `ont`        | `oklch(0.5569 0.2241 25.65)`        | `#D80621` | Flag of Canada red                            |
+| ![](https://placehold.co/16x16/05472A/05472A.png) | Pacific Northwest | `pnw`        | `oklch(0.3517 0.0798 157.61)`       | `#05472A` | Nature evergreen                              |
+| ![](https://placehold.co/16x16/E9A99A/E9A99A.png) | Peachtree         | `pch`        | `oklch(0.7913 0.079 33.61)`         | `#E9A99A` | Peach                                         |
+| ![](https://placehold.co/16x16/9BB35B/9BB35B.png) | South Carolina    | `fsc`        | `oklch(0.7289 0.1178 121.94)`       | `#9BB35B` | Arbitrary shade of Palmetto Green             |
+| ![](https://placehold.co/16x16/BF5700/BF5700.png) | Texas             | `fit`, `tx`  | `oklch(0.5778 0.1545 49.2)`         | `#BF5700` | UT Austin burnt orange (Pantone 159 C)        |
+| ![](https://placehold.co/16x16/E84393/E84393.png) | Wisconsin         | `win`        | `oklch(0.643 0.212 355.2)`          | `#E84393` | Arbitrary                                     |
+
+(All this said, colors are never "final", so be sure to double-check the code to verify this readme is up to date.)
 
 ## Icons
 
@@ -148,32 +279,25 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 
 ## Adding environment variables
 
-1. Put some form of example in `default.env`
+1. Put some form of example in `.env.example`
 2. Add the environment variable to `app/vite-env.d.ts`
 3. Add a validator to `vite.config.ts`
 4. You can then reference it in code with `import.env.meta.VITE_MY_VAR`.
 
 ## PR Screenshots
 
-PRs that touch `pwa/` files can get before/after screenshots posted as a PR comment (via the `PWA Screenshots` workflow). To request screenshots, add a `## Screenshot Pages` section to your PR description:
-
-```markdown
-## Screenshot Pages
-
-- /match/2024mil_f1m2
-- /team/254/2024 Team 254 Page
-- /gameday
-```
-
-Each line is `- /path` optionally followed by a display name. If no pages are listed, the workflow skips screenshot capture.
-
-> **Note:** Screenshots require the `TBA_API_READ_KEY` secret, which is only available for same-repo branches (not fork PRs). Fork PRs will gracefully skip screenshot capture.
+CI does not post screenshots. PRs that change what a user sees include a Before | After | Diff table the author captures; see [AGENTS.md](AGENTS.md#pr-screenshots) for the rule and the capture scripts.
 
 ## Playwright tests
 
-Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports.
+Playwright (end to end) tests are within `./tests` and cover route-level behavior. Keep assertions for a specific route in that route's spec file; `routes.spec.ts` is the exception and provides the exhaustive route smoke-test matrix. Component and unit tests live next to the source file they cover.
+
+Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
 
 ```sh
+# Installs playwright binaries
+pnpm dlx playwright install
+
 # Runs the end-to-end tests.
 pnpm dlx playwright test
 

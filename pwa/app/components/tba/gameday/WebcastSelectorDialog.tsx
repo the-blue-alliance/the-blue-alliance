@@ -1,7 +1,9 @@
 import HelpCircleIcon from '~icons/lucide/help-circle';
+import ListOrderedIcon from '~icons/lucide/list-ordered';
 import VideoIcon from '~icons/lucide/video';
 import VideoOffIcon from '~icons/lucide/video-off';
 
+import { WebcastStatus } from '~/api/tba/read';
 import { WebcastTypeIcon } from '~/components/tba/gameday/WebcastTypeIcon';
 import {
   Dialog,
@@ -17,52 +19,74 @@ import type { WebcastWithMeta } from '~/lib/gameday/types';
 export function WebcastSelectorDialog({
   open,
   onOpenChange,
-  onWebcastSelected,
+  onContentSelected,
 }: {
   open: boolean;
   onOpenChange: (open: boolean) => void;
-  onWebcastSelected: (webcastId: string) => void;
+  onContentSelected: (contentId: string) => void;
 }) {
-  const { availableWebcasts } = useGameday();
+  const { availableContent } = useGameday();
+  const dataPanels = availableContent.filter(
+    (content) => content.type === 'data-panel',
+  );
+  const availableWebcasts = availableContent
+    .filter((content) => content.type === 'webcast')
+    .map((content) => content.webcast);
 
   // Group webcasts by special vs regular, then by online/offline status
   const specialWebcasts = availableWebcasts.filter(
-    (w) => w.isSpecial && w.webcast.status !== 'offline',
+    (w) => w.isSpecial && w.webcast.status !== WebcastStatus.OFFLINE,
   );
   const offlineSpecialWebcasts = availableWebcasts.filter(
-    (w) => w.isSpecial && w.webcast.status === 'offline',
+    (w) => w.isSpecial && w.webcast.status === WebcastStatus.OFFLINE,
   );
   const regularWebcasts = availableWebcasts.filter(
-    (w) => !w.isSpecial && w.webcast.status !== 'offline',
+    (w) => !w.isSpecial && w.webcast.status !== WebcastStatus.OFFLINE,
   );
   const offlineRegularWebcasts = availableWebcasts.filter(
-    (w) => !w.isSpecial && w.webcast.status === 'offline',
+    (w) => !w.isSpecial && w.webcast.status === WebcastStatus.OFFLINE,
   );
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
-      <DialogContent
-        // Auto focus on the content area and not first element
-        onOpenAutoFocus={(e) => {
-          e.preventDefault();
-          (e.currentTarget as HTMLElement)?.focus();
-        }}
-        className="max-w-md p-0"
-      >
+      <DialogContent focusContentOnOpen className="max-w-md p-0">
         <DialogHeader className="border-b px-4 py-3">
-          <DialogTitle>Select a webcast</DialogTitle>
+          <DialogTitle>Select content</DialogTitle>
         </DialogHeader>
 
         <ScrollArea className="max-h-[60vh]">
-          {availableWebcasts.length === 0 ? (
+          {availableContent.length === 0 ? (
             <div className="px-4 py-8 text-center text-muted-foreground">
-              No webcasts available
+              No content available
             </div>
           ) : (
             <div className="py-2">
+              {dataPanels.length > 0 && (
+                <>
+                  <div
+                    className="px-4 py-1.5 text-xs font-semibold tracking-wider
+                      text-primary uppercase"
+                  >
+                    Data Panels
+                  </div>
+                  {dataPanels.map((panel) => (
+                    <button
+                      key={panel.id}
+                      onClick={() => onContentSelected(panel.id)}
+                      className="flex w-full cursor-pointer items-center gap-3
+                        px-4 py-2 text-left transition-colors hover:bg-accent"
+                    >
+                      <ListOrderedIcon className="size-5 shrink-0" />
+                      <span>{panel.name}</span>
+                    </button>
+                  ))}
+                </>
+              )}
+
               {/* Special Webcasts */}
               {specialWebcasts.length > 0 && (
                 <>
+                  {dataPanels.length > 0 && <Separator className="my-2" />}
                   <div
                     className="px-4 py-1.5 text-xs font-semibold tracking-wider
                       text-primary uppercase"
@@ -73,7 +97,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>
@@ -82,7 +106,9 @@ export function WebcastSelectorDialog({
               {/* Online Event Webcasts */}
               {regularWebcasts.length > 0 && (
                 <>
-                  {specialWebcasts.length > 0 && <Separator className="my-2" />}
+                  {(dataPanels.length > 0 || specialWebcasts.length > 0) && (
+                    <Separator className="my-2" />
+                  )}
                   <div
                     className="px-4 py-1.5 text-xs font-semibold tracking-wider
                       text-primary uppercase"
@@ -93,7 +119,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>
@@ -102,7 +128,8 @@ export function WebcastSelectorDialog({
               {/* Offline Event Webcasts */}
               {offlineRegularWebcasts.length > 0 && (
                 <>
-                  {(specialWebcasts.length > 0 ||
+                  {(dataPanels.length > 0 ||
+                    specialWebcasts.length > 0 ||
                     regularWebcasts.length > 0) && (
                     <Separator className="my-2" />
                   )}
@@ -116,7 +143,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>
@@ -125,7 +152,8 @@ export function WebcastSelectorDialog({
               {/* Offline Special Webcasts */}
               {offlineSpecialWebcasts.length > 0 && (
                 <>
-                  {(specialWebcasts.length > 0 ||
+                  {(dataPanels.length > 0 ||
+                    specialWebcasts.length > 0 ||
                     regularWebcasts.length > 0 ||
                     offlineRegularWebcasts.length > 0) && (
                     <Separator className="my-2" />
@@ -140,7 +168,7 @@ export function WebcastSelectorDialog({
                     <WebcastItem
                       key={webcast.id}
                       webcast={webcast}
-                      onClick={() => onWebcastSelected(webcast.id)}
+                      onClick={() => onContentSelected(webcast.id)}
                     />
                   ))}
                 </>
@@ -153,6 +181,16 @@ export function WebcastSelectorDialog({
   );
 }
 
+function WebcastStatusIcon({ status }: { status?: WebcastStatus }) {
+  if (status === WebcastStatus.ONLINE) {
+    return <VideoIcon className="h-4 w-4 shrink-0 text-green-500" />;
+  }
+  if (status === WebcastStatus.OFFLINE) {
+    return <VideoOffIcon className="h-4 w-4 shrink-0 text-muted-foreground" />;
+  }
+  return <HelpCircleIcon className="h-4 w-4 shrink-0 text-muted-foreground" />;
+}
+
 function WebcastItem({
   webcast,
   onClick,
@@ -162,25 +200,9 @@ function WebcastItem({
 }) {
   const status = webcast.webcast.status;
 
-  // Determine the status icon
-  const StatusIcon = () => {
-    if (status === 'online') {
-      return <VideoIcon className="h-4 w-4 shrink-0 text-green-500" />;
-    }
-    if (status === 'offline') {
-      return (
-        <VideoOffIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-      );
-    }
-    // Unknown status
-    return (
-      <HelpCircleIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-    );
-  };
-
   // Secondary text: stream title for online streams
   const secondaryText =
-    status === 'online' && webcast.webcast.stream_title
+    status === WebcastStatus.ONLINE && webcast.webcast.stream_title
       ? webcast.webcast.stream_title
       : null;
 
@@ -204,13 +226,14 @@ function WebcastItem({
       </div>
       <div className="flex shrink-0 items-center gap-2">
         {/* Viewer count for online streams */}
-        {status === 'online' && webcast.webcast.viewer_count != null && (
-          <div className="text-right text-xs text-muted-foreground">
-            <div>{webcast.webcast.viewer_count.toLocaleString()}</div>
-            <div>Viewers</div>
-          </div>
-        )}
-        <StatusIcon />
+        {status === WebcastStatus.ONLINE &&
+          webcast.webcast.viewer_count != null && (
+            <div className="text-right text-xs text-muted-foreground">
+              <div>{webcast.webcast.viewer_count.toLocaleString()}</div>
+              <div>Viewers</div>
+            </div>
+          )}
+        <WebcastStatusIcon status={status} />
       </div>
     </button>
   );

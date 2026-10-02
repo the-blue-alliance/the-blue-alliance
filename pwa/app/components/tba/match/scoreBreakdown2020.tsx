@@ -1,8 +1,13 @@
-import { Match, MatchScoreBreakdown2020 } from '~/api/tba/read';
+import {
+  EndgameRungIsLevel2020,
+  InitLineRobot2020,
+  Match,
+  MatchScoreBreakdown2020,
+} from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
-  FoulDisplay,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
@@ -11,7 +16,6 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
 const ENDGAME_2020_POINTS: Record<string, number> = {
   Hang: 25,
@@ -39,15 +43,21 @@ export default function ScoreBreakdown2020({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.initLineRobot1 === 'Exited'}
+            condition={
+              scoreBreakdown.red.initLineRobot1 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.initLineRobot2 === 'Exited'}
+            condition={
+              scoreBreakdown.red.initLineRobot2 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.red.initLineRobot3 === 'Exited'}
+            condition={
+              scoreBreakdown.red.initLineRobot3 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.red.team_keys[2]}
           />
           (+{scoreBreakdown.red.autoInitLinePoints})
@@ -61,15 +71,21 @@ export default function ScoreBreakdown2020({
           className="whitespace-nowrap *:align-middle"
         >
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.initLineRobot1 === 'Exited'}
+            condition={
+              scoreBreakdown.blue.initLineRobot1 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.initLineRobot2 === 'Exited'}
+            condition={
+              scoreBreakdown.blue.initLineRobot2 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
-            condition={scoreBreakdown.blue.initLineRobot3 === 'Exited'}
+            condition={
+              scoreBreakdown.blue.initLineRobot3 === InitLineRobot2020.EXITED
+            }
             teamKey={match.alliances.blue.team_keys[2]}
           />
           (+{scoreBreakdown.blue.autoInitLinePoints})
@@ -307,7 +323,10 @@ export default function ScoreBreakdown2020({
       <ScoreBreakdownRow>
         <ScoreBreakdownAllianceCell color="red" shade="light">
           <ConditionalRpAchieved
-            condition={scoreBreakdown.red.endgameRungIsLevel === 'IsLevel'}
+            condition={
+              scoreBreakdown.red.endgameRungIsLevel ===
+              EndgameRungIsLevel2020.IS_LEVEL
+            }
           />
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
@@ -315,7 +334,10 @@ export default function ScoreBreakdown2020({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
           <ConditionalRpAchieved
-            condition={scoreBreakdown.blue.endgameRungIsLevel === 'IsLevel'}
+            condition={
+              scoreBreakdown.blue.endgameRungIsLevel ===
+              EndgameRungIsLevel2020.IS_LEVEL
+            }
           />
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
@@ -386,31 +408,38 @@ export default function ScoreBreakdown2020({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls / Tech Fouls */}
+      {/* Fouls committed by each alliance */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.foulCount,
+            techFouls: scoreBreakdown.red.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Fouls / Tech Fouls Committed
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.foulCount,
+            techFouls: scoreBreakdown.blue.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Foul Points: points each alliance received from the other's fouls */}
       <ScoreBreakdownRow
         redValue={scoreBreakdown.red.foulPoints}
         blueValue={scoreBreakdown.blue.foulPoints}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2020]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2020]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.red.foulPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls / Tech Fouls
+          Foul Points Received
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2020]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2020]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.blue.foulPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 

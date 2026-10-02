@@ -25,7 +25,10 @@ class AppspotRedirectMiddleware:
         request = Request(environ)
         host = request.host.lower()
 
-        if host in ("tbatv-prod-hrd.appspot.com", "www.tbatv-prod-hrd.appspot.com"):
+        if not request.path.startswith("/_ah/") and host in (
+            "tbatv-prod-hrd.appspot.com",
+            "www.tbatv-prod-hrd.appspot.com",
+        ):
             redirect_url = f"https://www.thebluealliance.com{request.full_path}"
 
             # Create a 301 (permanent) redirect response
@@ -68,12 +71,26 @@ class AfterResponseMiddleware:
     @ndb.toplevel
     def __call__(self, environ: Any, start_response: Any):
         response_context.request = Request(environ)
-        return ClosingIterator(self.app(environ, start_response), self._run_after)
+        try:
+            app_iter = self.app(environ, start_response)
+        except Exception:
+            self._cleanup()
+            send_traces()
+            raise
+        return ClosingIterator(app_iter, self._run_after)
 
-    def _run_after(self):
-        with Span("Running AfterResponseMiddleware"):
-            execute_callbacks()
-        send_traces()
+    @ndb.toplevel
+    def _run_after(self) -> None:
+        try:
+            with Span("Running AfterResponseMiddleware"):
+                execute_callbacks()
+            send_traces()
+        finally:
+            self._cleanup()
+
+    def _cleanup(self) -> None:
+        if hasattr(response_context, "request"):
+            del response_context.request
 
 
 def install_middleware(

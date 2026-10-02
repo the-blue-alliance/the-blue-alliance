@@ -1,4 +1,6 @@
 import {
+  Bay2019,
+  HabLine2019,
   Match,
   MatchScoreBreakdown2019,
   MatchScoreBreakdown2019Alliance,
@@ -6,7 +8,7 @@ import {
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
-  FoulDisplay,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
@@ -15,24 +17,25 @@ import {
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
 import { Badge } from '~/components/ui/badge';
-import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
+// HAB Climb Bonus per robot. 2019 Game Manual, Section 5.3 Scoring,
+// Table 5-1 (page 38, Section 5 V8): Level 1 = 3, Level 2 = 6, Level 3 = 12.
 const ENDGAME_2019_POINTS: Record<string, number> = {
-  HabLevel3: 6,
-  HabLevel2: 3,
+  HabLevel3: 12,
+  HabLevel2: 6,
   HabLevel1: 3,
   None: 0,
   Unknown: 0,
 };
 
-type Bay2019 = MatchScoreBreakdown2019Alliance['bay1'];
-
 function countPanels(...bays: Bay2019[]): number {
-  return bays.filter((b) => b === 'Panel' || b === 'PanelAndCargo').length;
+  return bays.filter(
+    (b) => b === Bay2019.PANEL || b === Bay2019.PANEL_AND_CARGO,
+  ).length;
 }
 
 function countCargo(...bays: Bay2019[]): number {
-  return bays.filter((b) => b === 'PanelAndCargo').length;
+  return bays.filter((b) => b === Bay2019.PANEL_AND_CARGO).length;
 }
 
 function cargoShipPanels(a: MatchScoreBreakdown2019Alliance): number {
@@ -110,19 +113,22 @@ export default function ScoreBreakdown2019({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.habLineRobot1 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.red.habLineRobot1 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.habLineRobot2 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.red.habLineRobot2 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.habLineRobot3 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.red.habLineRobot3 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.red.team_keys[2]}
           />
@@ -138,19 +144,22 @@ export default function ScoreBreakdown2019({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot1 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot1 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot2 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot2 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.habLineRobot3 === 'CrossedHabLineInSandstorm'
+              scoreBreakdown.blue.habLineRobot3 ===
+              HabLine2019.CROSSED_HAB_LINE_IN_SANDSTORM
             }
             teamKey={match.alliances.blue.team_keys[2]}
           />
@@ -385,31 +394,38 @@ export default function ScoreBreakdown2019({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls / Tech Fouls */}
+      {/* Fouls committed by each alliance */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.foulCount,
+            techFouls: scoreBreakdown.red.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Fouls / Tech Fouls Committed
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.foulCount,
+            techFouls: scoreBreakdown.blue.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Foul Points: points each alliance received from the other's fouls */}
       <ScoreBreakdownRow
         redValue={scoreBreakdown.red.foulPoints}
         blueValue={scoreBreakdown.blue.foulPoints}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2019]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2019]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.red.foulPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls / Tech Fouls
+          Foul Points Received
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2019]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2019]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.blue.foulPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 

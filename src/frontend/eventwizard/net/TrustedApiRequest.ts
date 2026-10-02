@@ -6,7 +6,8 @@ async function makeTrustedApiRequest(
   authId: string,
   authSecret: string,
   requestPath: string,
-  requestBody: string | FormData
+  requestBody: string | FormData,
+  method: string = "POST"
 ): Promise<Response> {
   const headers = new Headers();
   headers.append("X-TBA-Auth-Id", authId);
@@ -21,7 +22,7 @@ async function makeTrustedApiRequest(
   }
   
   const response = await fetch(requestPath, {
-    method: "POST",
+    method: method,
     headers: headers,
     credentials: "same-origin",
     body: requestBody,

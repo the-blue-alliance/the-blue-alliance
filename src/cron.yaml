@@ -50,14 +50,20 @@ cron:
     schedule: every day 02:00
     timezone: America/Los_Angeles
 
-  - description: Hall of Fame team list scraping
-    url: /tasks/get/hof_teams
-    schedule: every thursday 01:00
-    timezone: America/Los_Angeles
-
   - description: Typeahead Calculation
     url: /backend-tasks-b2/enqueue/math/typeaheadcalc
     schedule: every day 01:00
+    timezone: America/Los_Angeles
+
+  # Insights V2
+  - description: Insights V2 Calculation
+    url: /backend-tasks-b2/enqueue/math/insights_v2
+    schedule: every day 21:00
+    timezone: America/Los_Angeles
+
+  - description: Insights V2 Calculation (All Years)
+    url: /backend-tasks-b2/enqueue/math/insights_v2/0
+    schedule: every day 21:30
     timezone: America/Los_Angeles
 
   # Legacy Insights
@@ -90,6 +96,11 @@ cron:
 
   - description: District Rankings Calculation
     url: /tasks/math/enqueue/district_rankings_calc
+    schedule: every day 01:05
+    timezone: America/Los_Angeles
+
+  - description: District Advancement Refresh
+    url: /tasks/enqueue/district_advancement
     schedule: every day 01:05
     timezone: America/Los_Angeles
 
@@ -158,18 +169,13 @@ cron:
     schedule: every day 08:00
     timezone: America/Los_Angeles
 
-  - description: Backup Cron job
-    url: /backend-tasks/backup/enqueue
-    schedule: every monday 03:00
-    timezone: America/Los_Angeles
-
   # - description: BlueZone Update
   #   url: /tasks/do/bluezone_update
   #   schedule: every 1 minutes
 
-  - description: Update Team Search Indexes
-    url: /tasks/enqueue/update_all_team_search_index
-    schedule: every monday 04:00
+  - description: Update Match Suggestions
+    url: /tasks/do/update_match_suggestions
+    schedule: every 1 minutes
 
   - description: Archive Old API Keys
     url: /tasks/do/archive_api_keys

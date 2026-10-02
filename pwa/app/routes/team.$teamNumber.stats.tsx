@@ -1,62 +1,72 @@
-import { useQueries } from '@tanstack/react-query';
-import { createFileRoute, notFound } from '@tanstack/react-router';
+import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
+import { createFileRoute } from '@tanstack/react-router';
 import { uniq } from 'lodash-es';
 import { useMemo, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import MdiCog from '~icons/mdi/cog';
 import MdiRobotExcited from '~icons/mdi/robot-excited';
 
-import { getTeamMatchesByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import { MediaAvatar } from '~/api/tba/read';
 import {
-  getTeam,
-  getTeamAwards,
-  getTeamEvents,
-  getTeamMediaByYear,
-  getTeamSocialMedia,
-} from '~/api/tba/read/sdk.gen';
+  getTeamAwardsOptions,
+  getTeamEventsOptions,
+  getTeamMatchesByYearOptions,
+  getTeamMediaByYearOptions,
+  getTeamOptions,
+  getTeamSocialMediaOptions,
+} from '~/api/tba/read/@tanstack/react-query.gen';
 import { DoubleSlider } from '~/components/tba/doubleSlider';
 import TeamAwardsSummary from '~/components/tba/teamAwardsSummary';
 import TeamMatchStats from '~/components/tba/teamMatchStats';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
+import { YearSelector } from '~/components/tba/yearSelector';
 import { Checkbox } from '~/components/ui/checkbox';
 import { Divider } from '~/components/ui/divider';
 import { SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
 import { sortMultipleEventsMatches } from '~/lib/matchUtils';
-import { publicCacheControlHeaders } from '~/lib/utils';
+import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/stats')({
-  loader: async ({ params }) => {
-    const [team, events, awards, socials, media] = await Promise.all([
-      getTeam({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamEvents({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamAwards({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamSocialMedia({ path: { team_key: `frc${params.teamNumber}` } }),
-      getTeamMediaByYear({
-        path: {
-          team_key: `frc${params.teamNumber}`,
-          year: new Date().getFullYear(),
-        },
-      }),
-    ]);
-    if (
-      team.data === undefined ||
-      events.data === undefined ||
-      awards.data === undefined ||
-      socials.data === undefined ||
-      media.data === undefined
-    ) {
-      throw notFound();
-    }
+  loader: async ({ params, context: { queryClient } }) => {
+    const teamKey = `frc${params.teamNumber}`;
+    // Resolved once here so the loader and the component build the same query
+    // key, rather than each reading the clock independently.
+    const mediaYear = Temporal.Now.plainDateISO().year;
 
-    return {
-      team: team.data,
-      allAwards: awards.data,
-      allEvents: events.data,
-      socials: socials.data,
-      media: media.data,
-    };
+    // spawn these now, we don't need to await them yet though
+    const awardsQuery = queryClient
+      .ensureQueryData(getTeamAwardsOptions({ path: { team_key: teamKey } }))
+      .catch(() => []);
+    const socialsQuery = queryClient
+      .ensureQueryData(
+        getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+      )
+      .catch(() => []);
+    const mediaQuery = queryClient
+      .ensureQueryData(
+        getTeamMediaByYearOptions({
+          path: { team_key: teamKey, year: mediaYear },
+        }),
+      )
+      .catch(() => []);
+
+    const [team] = await Promise.all([
+      queryClient
+        .ensureQueryData(getTeamOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      queryClient
+        .ensureQueryData(getTeamEventsOptions({ path: { team_key: teamKey } }))
+        .catch(doThrowNotFound),
+      awardsQuery,
+      socialsQuery,
+      mediaQuery,
+    ]);
+
+    // team needs to be returned so we can access it in meta
+    return { teamKey, mediaYear, team };
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
@@ -75,7 +85,8 @@ export const Route = createFileRoute('/team/$teamNumber/stats')({
     };
   },
   component: TeamStatsPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function MatchStatsLoadingState({
   numLoaded,
@@ -95,7 +106,7 @@ function MatchStatsLoadingState({
         />
         <MdiCog
           className="absolute -bottom-1 -left-3 size-6 animate-spin
-            text-blue-300 direction-[reverse]"
+            text-blue-300 direction-reverse"
         />
       </div>
       <div className="mb-3 text-lg font-medium text-foreground">
@@ -115,14 +126,40 @@ function MatchStatsLoadingState({
 }
 
 function TeamStatsPage() {
-  const { team, allEvents, allAwards, socials, media } = Route.useLoaderData();
+  const { teamKey, mediaYear } = Route.useLoaderData();
+
+  const { data: team } = useSuspenseQuery(
+    getTeamOptions({ path: { team_key: teamKey } }),
+  );
+  const { data: allEvents } = useSuspenseQuery(
+    getTeamEventsOptions({ path: { team_key: teamKey } }),
+  );
+  const awardsQuery = useQuery(
+    getTeamAwardsOptions({ path: { team_key: teamKey } }),
+  );
+  const allAwards = useMemo(() => awardsQuery.data ?? [], [awardsQuery.data]);
+  const socialsQuery = useQuery(
+    getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
+  );
+  const socials = socialsQuery.data ?? [];
+  const mediaQuery = useQuery(
+    getTeamMediaByYearOptions({
+      path: { team_key: teamKey, year: mediaYear },
+    }),
+  );
+  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
 
   const [includeOffseasons, setIncludeOffseasons] = useState(false);
   const [minYear, setMinYear] = useState(allEvents[0].year);
   const [maxYear, setMaxYear] = useState(allEvents[allEvents.length - 1].year);
 
+  const yearsParticipated = useMemo(
+    () => uniq(allEvents.map((e) => e.year)).sort((a, b) => b - a),
+    [allEvents],
+  );
+
   const maybeAvatar = useMemo(() => {
-    return media.find((m) => m.type === 'avatar');
+    return media.find((m): m is MediaAvatar => m.type === 'avatar');
   }, [media]);
 
   const usedEvents = useMemo(() => {
@@ -157,14 +194,9 @@ function TeamStatsPage() {
     ),
   });
 
-  const matchQueriesNumLoaded = useMemo(() => {
-    return matchQueries.filter((q) => q.isSuccess).length;
-  }, [matchQueries]);
+  const matchQueriesNumLoaded = matchQueries.filter((q) => q.isSuccess).length;
 
-  const allMatchesByYear = useMemo(
-    () => matchQueries.map((q) => q.data ?? []),
-    [matchQueries],
-  );
+  const allMatchesByYear = matchQueries.map((q) => q.data ?? []);
 
   const usedMatches = useMemo(() => {
     const eventKeys = new Set(usedEvents.map((event) => event.key));
@@ -182,57 +214,76 @@ function TeamStatsPage() {
   }, [allMatchesByYear, usedEvents, minYear, maxYear]);
 
   return (
-    <div>
-      <div className="mt-8 flex w-full flex-row justify-between">
-        <div>
-          <TeamPageTeamInfo
-            team={team}
-            maybeAvatar={maybeAvatar}
-            socials={socials}
-          />
-        </div>
-        <div className="flex flex-col gap-2">
-          <div className="flex flex-row items-center gap-2">
-            <Checkbox
-              checked={includeOffseasons}
-              onCheckedChange={(checked) =>
-                setIncludeOffseasons(
-                  checked === 'indeterminate' ? false : checked,
-                )
-              }
-            />
-            <span className="text-sm text-muted-foreground">
-              Include Offseasons
-            </span>
-          </div>
-          <DoubleSlider
-            min={allEvents[0].year}
-            max={allEvents[allEvents.length - 1].year}
-            value={[minYear, maxYear]}
-            onValueChange={(value) => {
-              setMinYear(value[0]);
-              setMaxYear(value[1]);
-            }}
-            minStepsBetweenThumbs={0}
-            step={1}
-          />
-        </div>
+    <div className="flex flex-wrap sm:flex-nowrap">
+      <div className="top-0 mr-4 pt-5 sm:sticky">
+        <YearSelector
+          currentLabel="Stats"
+          triggerClassName="w-[180px]"
+          options={[
+            {
+              label: 'History',
+              to: `/team/${team.team_number}/history`,
+            },
+            {
+              label: 'Stats',
+              to: `/team/${team.team_number}/stats`,
+              isCurrent: true,
+            },
+            ...yearsParticipated.map((y) => ({
+              label: String(y),
+              to: `/team/${team.team_number}/${y}`,
+            })),
+          ]}
+        />
       </div>
-      <Divider className="my-4" />
-      <TeamAwardsSummary awards={usedAwards} events={usedEvents} />
-      <Divider className="my-4" />
-      {matchQueriesNumLoaded < matchQueries.length ? (
-        <MatchStatsLoadingState
-          numLoaded={matchQueriesNumLoaded}
-          total={matchQueries.length}
-        />
-      ) : (
-        <TeamMatchStats
-          teamKey={team.key}
-          matches={usedMatches}
-          events={usedEvents}
-        />
-      )}
+      <div className="w-full">
+        <div className="mt-8 flex w-full flex-row justify-between">
+          <div>
+            <TeamPageTeamInfo
+              team={team}
+              maybeAvatar={maybeAvatar}
+              socials={socials}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <div className="flex flex-row items-center gap-2">
+              <Checkbox
+                checked={includeOffseasons}
+                onCheckedChange={setIncludeOffseasons}
+              />
+              <span className="text-sm text-muted-foreground">
+                Include Offseasons
+              </span>
+            </div>
+            <DoubleSlider
+              min={allEvents[0].year}
+              max={allEvents[allEvents.length - 1].year}
+              value={[minYear, maxYear]}
+              onValueChange={(value) => {
+                setMinYear(value[0]);
+                setMaxYear(value[1]);
+              }}
+              minStepsBetweenThumbs={0}
+              step={1}
+            />
+          </div>
+        </div>
+        <Divider className="my-4" />
+        <TeamAwardsSummary awards={usedAwards} events={usedEvents} />
+        <Divider className="my-4" />
+        {matchQueriesNumLoaded < matchQueries.length ? (
+          <MatchStatsLoadingState
+            numLoaded={matchQueriesNumLoaded}
+            total={matchQueries.length}
+          />
+        ) : (
+          <TeamMatchStats
+            teamKey={team.key}
+            matches={usedMatches}
+            events={usedEvents}
+          />
+        )}
+      </div>
     </div>
   );
 }

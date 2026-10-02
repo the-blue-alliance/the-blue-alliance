@@ -1,42 +1,39 @@
-import { Link } from '@tanstack/react-router';
-import type { ColumnDef } from '@tanstack/react-table';
-
-import BiTrophy from '~icons/bi/trophy';
+import { cn } from 'cn';
 
 import { EventRanking } from '~/api/tba/read';
-import { DataTable } from '~/components/tba/dataTable';
-import InlineIcon from '~/components/tba/inlineIcon';
-import { cn } from '~/lib/utils';
+import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
+import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 
-type RankingColumnType = ColumnDef<EventRanking['rankings'][number]>[];
+type RankingColumnType = TbaColumnDef<EventRanking['rankings'][number]>[];
 
 export default function RankingsTable({
   rankings,
   winners,
+  captains,
+  year,
 }: {
   rankings: EventRanking;
   winners: string[];
+  captains: string[];
+  year: number;
 }) {
   const standardCols: RankingColumnType = [
     { header: 'Rank', accessorKey: 'rank', sortDescFirst: false },
     {
       header: 'Team',
-      cell: ({ row }) => (
-        <Link
-          to="/team/$teamNumber/{-$year}"
-          params={{ teamNumber: row.original.team_key.substring(3) }}
-          className="whitespace-nowrap"
-        >
-          {winners.includes(row.original.team_key) ? (
-            <InlineIcon className="relative right-[1ch] justify-center">
-              <BiTrophy />
-              {row.original.team_key.substring(3)}
-            </InlineIcon>
-          ) : (
-            <>{row.original.team_key.substring(3)}</>
-          )}
-        </Link>
-      ),
+      cell: ({ row }) => {
+        const teamKey = row.original.team_key;
+        const isWinner = winners.includes(teamKey);
+        const isCaptain = captains.includes(teamKey);
+        return (
+          <TeamLinkWithTooltip
+            teamKey={row.original.team_key}
+            year={year}
+            isWinner={isWinner}
+            isCaptain={isCaptain}
+          />
+        );
+      },
       accessorFn: (row) => Number(row.team_key.substring(3)),
       sortDescFirst: false,
     },
@@ -60,7 +57,7 @@ export default function RankingsTable({
               row.record &&
               `${row.record.wins}-${row.record.losses}-${row.record.ties}`,
             sortDescFirst: true,
-            sortingFn: (a, b) => {
+            sortFn: (a, b) => {
               if (a.original.record === null || b.original.record === null) {
                 return 0;
               }
@@ -102,8 +99,10 @@ export default function RankingsTable({
       data={rankings.rankings}
       conditionalRowStyling={(row) =>
         cn({
-          'bg-yellow-100 font-bold shadow-inner shadow-yellow-200':
-            winners.includes(row.original.team_key),
+          [`bg-yellow-100! font-bold shadow-inner shadow-yellow-200
+          dark:bg-yellow-500/15! dark:shadow-yellow-500/10`]: winners.includes(
+            row.original.team_key,
+          ),
         })
       }
     />

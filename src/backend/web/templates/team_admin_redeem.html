@@ -23,17 +23,17 @@
 {% endif %}
 
 {% if existing_access %}
-  <p>This account has been linked to the following teams:</p>
+  <p>This account has active moderator access for the following team{% if existing_access|length > 1 %}s{% endif %}:</p>
   <ul>
     {% for team_link in existing_access %}
-      <li><a href="/team/{{team_link.team_number}}">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}}</a></li>
+      <li><a href="/team/{{team_link.team_number}}/{{team_link.year}}">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}}</a> ({{team_link.year}} season)</li>
     {% endfor %}
   </ul>
   <a class="btn btn-primary" href="/mod"><span class="glyphicon glyphicon-eye-open"></span> View Team Admin Dashboard</a>
 {% endif %}
 <p>Redeem an access code to administer your team's media on The Blue Alliance. Having administrative access allows you to manage media linked to your team's TBA profile as well as accept or reject suggestions for additional media links.</p>
 
-<p>Only one account can be linked per team for each year and the administration access will expire at the end of the competition season. For additional support, please <a href="/contact">contact us</a>.</p>
+<p>Admin codes are issued per season, so access expires at the end of each competition season and you'll need to redeem a fresh code from the current year's FIRST Digital Kit of Parts to regain access. Only one account can be linked per team per year. For additional support, please <a href="/contact">contact us</a>.</p>
 <form class="form-inline" acount="/mod/redeem" method="post" id="redeem">
   <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
   <legend>Redeem</legend>

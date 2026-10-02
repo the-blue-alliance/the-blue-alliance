@@ -2,11 +2,13 @@ import {
   Match,
   MatchScoreBreakdown2016,
   MatchScoreBreakdown2016Alliance,
+  RobotAuto2016WithUnknown,
+  RobotAuto2016WithoutUnknown,
 } from '~/api/tba/read';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
-  FoulDisplay,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
@@ -14,7 +16,6 @@ import {
   ScoreBreakdownRow,
   ScoreBreakdownTable,
 } from '~/components/tba/match/scoreBreakdown';
-import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
 const DEFENSE_NAMES: Record<string, string> = {
   A_ChevalDeFrise: 'Cheval de Frise',
@@ -63,22 +64,26 @@ export default function ScoreBreakdown2016({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.robot1Auto === 'Crossed' ||
-              scoreBreakdown.red.robot1Auto === 'Reached'
+              scoreBreakdown.red.robot1Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.red.robot1Auto === RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.red.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.robot2Auto === 'Crossed' ||
-              scoreBreakdown.red.robot2Auto === 'Reached'
+              scoreBreakdown.red.robot2Auto ===
+                RobotAuto2016WithoutUnknown.CROSSED ||
+              scoreBreakdown.red.robot2Auto ===
+                RobotAuto2016WithoutUnknown.REACHED
             }
             teamKey={match.alliances.red.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.red.robot3Auto === 'Crossed' ||
-              scoreBreakdown.red.robot3Auto === 'Reached'
+              scoreBreakdown.red.robot3Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.red.robot3Auto === RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.red.team_keys[2]}
           />
@@ -93,22 +98,28 @@ export default function ScoreBreakdown2016({
         >
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.robot1Auto === 'Crossed' ||
-              scoreBreakdown.blue.robot1Auto === 'Reached'
+              scoreBreakdown.blue.robot1Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.blue.robot1Auto ===
+                RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.blue.team_keys[0]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.robot2Auto === 'Crossed' ||
-              scoreBreakdown.blue.robot2Auto === 'Reached'
+              scoreBreakdown.blue.robot2Auto ===
+                RobotAuto2016WithoutUnknown.CROSSED ||
+              scoreBreakdown.blue.robot2Auto ===
+                RobotAuto2016WithoutUnknown.REACHED
             }
             teamKey={match.alliances.blue.team_keys[1]}
           />
           <ConditionalCheckmark
             condition={
-              scoreBreakdown.blue.robot3Auto === 'Crossed' ||
-              scoreBreakdown.blue.robot3Auto === 'Reached'
+              scoreBreakdown.blue.robot3Auto ===
+                RobotAuto2016WithUnknown.CROSSED ||
+              scoreBreakdown.blue.robot3Auto ===
+                RobotAuto2016WithUnknown.REACHED
             }
             teamKey={match.alliances.blue.team_keys[2]}
           />
@@ -402,31 +413,38 @@ export default function ScoreBreakdown2016({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls / Tech Fouls — show opponent's committed fouls */}
+      {/* Fouls committed by each alliance */}
+      <ScoreBreakdownRow>
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.foulCount,
+            techFouls: scoreBreakdown.red.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Fouls / Tech Fouls Committed
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.foulCount,
+            techFouls: scoreBreakdown.blue.techFoulCount,
+          })}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Foul Points: points each alliance received from the other's fouls */}
       <ScoreBreakdownRow
         redValue={scoreBreakdown.red.foulPoints}
         blueValue={scoreBreakdown.blue.foulPoints}
       >
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.blue.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2016]}
-            techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2016]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.red.foulPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls / Tech Fouls
+          Foul Points Received
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          <FoulDisplay
-            foulsReceived={scoreBreakdown.red.foulCount}
-            pointsPerFoul={POINTS_PER_FOUL[2016]}
-            techFoulsReceived={scoreBreakdown.red.techFoulCount}
-            pointsPerTechFoul={POINTS_PER_TECH_FOUL[2016]}
-            techOrMajor="tech"
-          />
+          {scoreBreakdown.blue.foulPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 

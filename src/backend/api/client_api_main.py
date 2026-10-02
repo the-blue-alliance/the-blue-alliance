@@ -2,11 +2,15 @@ from flask import Blueprint
 from flask_cors import CORS
 
 from backend.api.handlers.client_api import (
+    add_api_read_key,
+    delete_api_read_key,
+    list_api_keys,
     list_favorites,
     list_mobile_clients,
     list_subscriptions,
     ping_mobile_client,
     register_mobile_client,
+    suggest_event_media,
     suggest_team_media,
     unregister_mobile_client,
     update_model_preferences,
@@ -51,6 +55,11 @@ client_api.add_url_rule(
     view_func=list_subscriptions,
 )
 client_api.add_url_rule(
+    "/event/media/suggest",
+    methods=["POST"],
+    view_func=suggest_event_media,
+)
+client_api.add_url_rule(
     "/team/media/suggest",
     methods=["POST"],
     view_func=suggest_team_media,
@@ -59,4 +68,19 @@ client_api.add_url_rule(
     "/unregister",
     methods=["POST"],
     view_func=unregister_mobile_client,
+)
+client_api.add_url_rule(
+    "/api_keys/list",
+    methods=["POST"],
+    view_func=list_api_keys,
+)
+client_api.add_url_rule(
+    "/api_keys/read/add",
+    methods=["POST"],
+    view_func=add_api_read_key,
+)
+client_api.add_url_rule(
+    "/api_keys/read/delete",
+    methods=["POST"],
+    view_func=delete_api_read_key,
 )

@@ -12,6 +12,7 @@ from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
 from backend.common.models.api_auth_access import ApiAuthAccess
+from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.models.event import Event
 from backend.common.models.match import Match
 
@@ -349,6 +350,132 @@ def test_matches_update(api_client: Client) -> None:
     assert match.alliances[AllianceColor.BLUE]["score"] == 260
     assert match.alliances[AllianceColor.BLUE]["surrogates"] == []
     assert match.alliances[AllianceColor.BLUE]["dqs"] == []
+
+
+def test_unplayed_finals_match_cleaned_up(api_client: Client) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_MATCHES])
+
+    # Red sweeps finals 2-0; uploader still posts an unplayed f1m3 placeholder.
+    matches = [
+        {
+            "comp_level": "f",
+            "set_number": 1,
+            "match_number": 1,
+            "alliances": {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": 100},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+            },
+        },
+        {
+            "comp_level": "f",
+            "set_number": 1,
+            "match_number": 2,
+            "alliances": {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": 100},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+            },
+        },
+        {
+            "comp_level": "f",
+            "set_number": 1,
+            "match_number": 3,
+            "alliances": {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+            },
+        },
+    ]
+    request_body = json.dumps(matches)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    event = none_throws(Event.get_by_id("2014casj"))
+    db_match_keys = [m.key.id() for m in Match.query(Match.event == event.key).fetch()]
+    assert "2014casj_f1m1" in db_match_keys
+    assert "2014casj_f1m2" in db_match_keys
+    assert "2014casj_f1m3" not in db_match_keys
+
+
+def test_unplayed_finals_match_cleaned_up_on_followup_upload(
+    api_client: Client,
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_MATCHES])
+
+    # Initial upload: bracket pre-created with f1m1 played + unplayed f1m2/f1m3.
+    initial = [
+        {
+            "comp_level": "f",
+            "set_number": 1,
+            "match_number": 1,
+            "alliances": {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": 100},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+            },
+        },
+        {
+            "comp_level": "f",
+            "set_number": 1,
+            "match_number": 2,
+            "alliances": {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+            },
+        },
+        {
+            "comp_level": "f",
+            "set_number": 1,
+            "match_number": 3,
+            "alliances": {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+            },
+        },
+    ]
+    request_body = json.dumps(initial)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    # Cache invalidation runs on a deferred queue that doesn't fire in tests,
+    # so manually clear cached query results to simulate the production state
+    # where the followup upload sees fresh matches via EventMatchesQuery.
+    ndb.delete_multi(CachedQueryResult.query().fetch(keys_only=True))
+
+    # Follow-up upload: only f1m2 is sent (now played, red wins again).
+    # f1m3 should be cleaned up by merging with existing matches.
+    followup = [
+        {
+            "comp_level": "f",
+            "set_number": 1,
+            "match_number": 2,
+            "alliances": {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": 100},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": 50},
+            },
+        },
+    ]
+    request_body = json.dumps(followup)
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    event = none_throws(Event.get_by_id("2014casj"))
+    db_match_keys = [m.key.id() for m in Match.query(Match.event == event.key).fetch()]
+    assert "2014casj_f1m1" in db_match_keys
+    assert "2014casj_f1m2" in db_match_keys
+    assert "2014casj_f1m3" not in db_match_keys
 
 
 def test_calculate_match_time(api_client: Client) -> None:

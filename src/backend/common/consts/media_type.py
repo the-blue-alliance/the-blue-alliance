@@ -29,6 +29,8 @@ class MediaType(enum.IntEnum):
     ONSHAPE = 13
     GITLAB_PROFILE = 14
     CD_THREAD = 15
+    SMUGMUG_PHOTO = 16
+    SMUGMUG_ALBUM = 17
 
 
 MEDIA_TYPES: Set[MediaType] = {t for t in MediaType}
@@ -51,6 +53,8 @@ SLUG_NAMES: Dict[MediaType, str] = {
     MediaType.AVATAR: "avatar",
     MediaType.GITLAB_PROFILE: "gitlab-profile",
     MediaType.CD_THREAD: "cd-thread",
+    MediaType.SMUGMUG_PHOTO: "smugmug-photo",
+    MediaType.SMUGMUG_ALBUM: "smugmug-album",
 }
 
 SLUG_NAME_TO_TYPE: Dict[str, MediaType] = {
@@ -74,12 +78,15 @@ TYPE_NAMES: Dict[MediaType, str] = {
     MediaType.ONSHAPE: "Onshape",
     MediaType.GITLAB_PROFILE: "GitLab Profile",
     MediaType.CD_THREAD: "Chief Delphi Thread",
+    MediaType.SMUGMUG_PHOTO: "SmugMug Photo",
+    MediaType.SMUGMUG_ALBUM: "SmugMug Album",
 }
 
 IMAGE_TYPES: Set[MediaType] = {
     MediaType.CD_PHOTO_THREAD,
     MediaType.IMGUR,
     MediaType.INSTAGRAM_IMAGE,
+    MediaType.SMUGMUG_PHOTO,
 }
 
 SOCIAL_TYPES: Set[MediaType] = {
@@ -90,6 +97,12 @@ SOCIAL_TYPES: Set[MediaType] = {
     MediaType.INSTAGRAM_PROFILE,
     MediaType.PERISCOPE_PROFILE,
     MediaType.GITLAB_PROFILE,
+}
+
+# Media that may be attached to an Event
+EVENT_MEDIA_TYPES: Set[MediaType] = {
+    MediaType.YOUTUBE_VIDEO,
+    MediaType.SMUGMUG_ALBUM,
 }
 
 # Media used to back a Robot Profile

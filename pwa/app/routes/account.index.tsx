@@ -1,13 +1,17 @@
 import { useQuery } from '@tanstack/react-query';
 import { Link, createFileRoute } from '@tanstack/react-router';
 import { deleteUser, updateProfile } from 'firebase/auth';
-import { Mail, User } from 'lucide-react';
 import { useState } from 'react';
 
+import MailIcon from '~icons/lucide/mail';
+import UserIcon from '~icons/lucide/user';
+
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
+import ApiKeysSection from '~/components/tba/account/apiKeys';
+import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -25,10 +29,12 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
+import { Spinner } from '~/components/ui/spinner';
 
 export const Route = createFileRoute('/account/')({
   component: Account,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Account() {
   const { isInitialLoading, user, logout } = useAuth();
@@ -41,6 +47,9 @@ function Account() {
       const response = await listFavorites({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
@@ -54,13 +63,20 @@ function Account() {
       const response = await listSubscriptions({
         auth: token,
       });
+      if (response.data === undefined) {
+        throw new Error('Failed to load subscriptions');
+      }
       return response.data;
     },
     enabled: !!user,
   });
 
   if (isInitialLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -84,11 +100,11 @@ function Account() {
           <div className="flex items-center gap-4">
             <div className="space-y-1">
               <div className="flex items-center gap-2 text-foreground">
-                <User className="h-4 w-4 text-muted-foreground" />
+                <UserIcon className="h-4 w-4 text-muted-foreground" />
                 <span className="font-medium">{user.displayName}</span>
               </div>
               <div className="flex items-center gap-2 text-muted-foreground">
-                <Mail className="h-4 w-4" />
+                <MailIcon className="h-4 w-4" />
                 <span className="text-sm">{user.email}</span>
               </div>
             </div>
@@ -132,11 +148,15 @@ function Account() {
               <div className="text-sm text-muted-foreground">Subscriptions</div>
             </div>
           </div>
-          <Button size="sm" asChild>
-            <Link to="/account/mytba">Manage myTBA</Link>
-          </Button>
+          <Link to="/account/mytba" className={buttonVariants({ size: 'sm' })}>
+            Manage myTBA
+          </Link>
         </CardContent>
       </Card>
+
+      <SuggestionReviewSection />
+
+      <ApiKeysSection />
     </div>
   );
 }
@@ -181,9 +201,7 @@ function EditProfileDialog({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button size="sm">Edit Profile</Button>
-      </DialogTrigger>
+      <DialogTrigger render={<Button size="sm" />}>Edit Profile</DialogTrigger>
       <DialogContent>
         <DialogHeader>
           <DialogTitle>Edit Profile</DialogTitle>
@@ -249,10 +267,8 @@ function DeleteAccountDialog({
         }
       }}
     >
-      <DialogTrigger asChild>
-        <Button size="sm" variant="destructive">
-          Delete Account
-        </Button>
+      <DialogTrigger render={<Button size="sm" variant="destructive" />}>
+        Delete Account
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>

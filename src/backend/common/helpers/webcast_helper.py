@@ -5,7 +5,11 @@ from typing import Any, Generator, Optional, Tuple
 from google.appengine.ext import ndb
 
 from backend.common.consts.webcast_type import WebcastType
+from backend.common.datafeeds.parsers.youtube.youtube_video_details_parser import (
+    ParsedVideoDetails,
+)
 from backend.common.frc_api.types import WebcastDetailModelExtV33
+from backend.common.models.event import Event
 from backend.common.models.webcast import Webcast
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import URLFetchResult
@@ -16,6 +20,28 @@ class WebcastParser:
     YOUTUBE_URL_PATTERNS = ["youtube.com/", "youtu.be/"]
     USTREAM_URL_PATTERNS = ["ustream.tv/"]
     LIVESTREAM_URL_PATTERNS = ["livestream.com/"]
+
+    @staticmethod
+    def stream_matches_event(video_details: ParsedVideoDetails, event: Event) -> bool:
+        """Returns True if the given stream's title/description matches the given event.
+
+        A stream is considered a match if the event's short name appears in the
+        stream title or description, or if the upper-cased event code appears in
+        the stream description.
+        """
+        title = video_details.get("title", "")
+        description = video_details.get("description", "")
+
+        if event.short_name:
+            if event.short_name in title:
+                return True
+            if event.short_name in description:
+                return True
+
+        if event.event_short and event.event_short.upper() in description:
+            return True
+
+        return False
 
     @classmethod
     def webcast_dict_from_api_response(

@@ -1,8 +1,8 @@
 from typing import List
 
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.types import AllianceListModelV2, AllianceModelV2
 from backend.common.models.alliance import EventAlliance, EventAllianceBackup
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
 
 
 class FMSAPIEventAlliancesParser(ParserBase[AllianceListModelV2, List[EventAlliance]]):

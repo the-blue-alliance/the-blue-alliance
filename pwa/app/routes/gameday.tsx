@@ -8,6 +8,7 @@ import { publicCacheControlHeaders } from '~/lib/utils';
 // Search params schema for gameday URL state
 const gamedaySearchSchema = z.object({
   layout: z.coerce.number().int().optional(),
+  event: z.string().optional(),
   view_0: z.string().optional(),
   view_1: z.string().optional(),
   view_2: z.string().optional(),
@@ -36,11 +37,13 @@ export const Route = createFileRoute('/gameday')({
     ],
   }),
   component: GamedayRoute,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function GamedayRoute() {
+  const { event } = Route.useSearch();
   return (
-    <GamedayProvider>
+    <GamedayProvider initialEventCode={event}>
       <GamedayFrame />
     </GamedayProvider>
   );

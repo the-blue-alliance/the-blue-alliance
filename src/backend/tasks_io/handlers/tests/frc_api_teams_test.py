@@ -9,8 +9,8 @@ from backend.common.consts.media_type import MediaType
 from backend.common.futures import InstantFuture
 from backend.common.models.district import District
 from backend.common.models.district_team import DistrictTeam
-from backend.common.models.event_team import EventTeam
 from backend.common.models.media import Media
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
@@ -82,12 +82,6 @@ def test_fetch_team_details_bad_key(tasks_client: Client) -> None:
 
 @mock.patch.object(DatafeedFMSAPI, "get_team_details")
 def test_fetch_team_details(api_mock, tasks_client: Client) -> None:
-    EventTeam(
-        id="2019fim_frc254",
-        event=ndb.Key("Event", "2019fim"),
-        team=ndb.Key("Team", "frc254"),
-        year=2019,
-    ).put()
     api_mock.return_value = InstantFuture(
         (
             Team(id="frc254", team_number=254),
@@ -109,12 +103,6 @@ def test_fetch_team_details(api_mock, tasks_client: Client) -> None:
 def test_fetch_team_details_no_output_in_taskqueue(
     api_mock, tasks_client: Client
 ) -> None:
-    EventTeam(
-        id="2019fim_frc254",
-        event=ndb.Key("Event", "2019fim"),
-        team=ndb.Key("Team", "frc254"),
-        year=2019,
-    ).put()
     api_mock.return_value = InstantFuture(
         (
             Team(id="frc254", team_number=254),
@@ -204,13 +192,9 @@ def test_fetch_team_none_clears_districtteams(api_mock, tasks_client: Client) ->
 @freeze_time("2019-04-01")
 @mock.patch.object(DatafeedFMSAPI, "get_team_details")
 def test_fetch_team_fixes_district_teams(api_mock, tasks_client: Client) -> None:
+    # Team moved districts within the same year: the old same-year row
+    # should be replaced with the new one the API just confirmed.
     DistrictTeam(id="2019ne_frc254", team=ndb.Key(Team, "frc254"), year=2019).put()
-    EventTeam(
-        id="2019ne_frc254",
-        event=ndb.Key("Event", "2019ne"),
-        team=ndb.Key("Team", "frc254"),
-        year=2019,
-    ).put()
     api_mock.return_value = InstantFuture(
         (
             Team(id="frc254", team_number=254),
@@ -222,7 +206,6 @@ def test_fetch_team_fixes_district_teams(api_mock, tasks_client: Client) -> None
     assert resp.status_code == 200
     assert len(resp.data) > 0
 
-    # Make sure we wrote no models
     assert Team.get_by_id("frc254") is not None
     assert DistrictTeam.get_by_id("2019fim_frc254") is not None
     assert DistrictTeam.get_by_id("2019ne_frc254") is None
@@ -231,19 +214,16 @@ def test_fetch_team_fixes_district_teams(api_mock, tasks_client: Client) -> None
 
 @freeze_time("2019-04-01")
 @mock.patch.object(DatafeedFMSAPI, "get_team_details")
-def test_fetch_team_removes_bad_district_teams(api_mock, tasks_client: Client) -> None:
-    # Create a bad DistrictTeam, from a previous year, with no events for that team
+def test_fetch_team_preserves_past_year_district_teams(
+    api_mock, tasks_client: Client
+) -> None:
+    # Past-year DistrictTeams must not be touched by a current-year sync.
+    # FIRST's answer for 2019 says nothing about 2018, so leave 2018 alone.
     DistrictTeam(
         id="2018in_frc254",
         district_key=ndb.Key(District, "2018in"),
         team=ndb.Key(Team, "frc254"),
         year=2018,
-    ).put()
-    EventTeam(
-        id="2019fim_frc254",
-        event=ndb.Key("Event", "2019fim"),
-        team=ndb.Key("Team", "frc254"),
-        year=2019,
     ).put()
     api_mock.return_value = InstantFuture(
         (
@@ -254,14 +234,134 @@ def test_fetch_team_removes_bad_district_teams(api_mock, tasks_client: Client) -
     )
     resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
     assert resp.status_code == 200
-    assert len(resp.data) > 0
 
-    # Make sure we wrote no models
-    assert Team.get_by_id("frc254") is not None
-    assert DistrictTeam.get_by_id("2018in_frc254") is None
+    assert DistrictTeam.get_by_id("2018in_frc254") is not None
     assert DistrictTeam.get_by_id("2019fim_frc254") is not None
-    assert DistrictTeam.get_by_id("2019ne_frc254") is None
-    assert Robot.query().fetch() == []
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_keeps_district_team_without_eventteams(
+    api_mock, tasks_client: Client
+) -> None:
+    # A team with no EventTeam records yet (e.g., rookies, or early season
+    # before events are synced) must still have their DistrictTeam preserved.
+    # FIRST's API is the authority on district membership, not EventTeam presence.
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc6921", team_number=6921),
+            DistrictTeam(
+                id="2026fma_frc6921",
+                team=ndb.Key(Team, "frc6921"),
+                year=2026,
+                district_key=ndb.Key(District, "2026fma"),
+            ),
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc6921")
+    assert resp.status_code == 200
+
+    assert Team.get_by_id("frc6921") is not None
+    assert DistrictTeam.get_by_id("2026fma_frc6921") is not None
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_with_year_override(api_mock, tasks_client: Client) -> None:
+    # Callers can target a specific year via the ?year= query param. Useful for
+    # one-off backfill when a prior year's DistrictTeams are missing.
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc6921", team_number=6921),
+            DistrictTeam(
+                id="2025fma_frc6921",
+                team=ndb.Key(Team, "frc6921"),
+                year=2025,
+                district_key=ndb.Key(District, "2025fma"),
+            ),
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc6921/2025")
+    assert resp.status_code == 200
+
+    api_mock.assert_called_once_with(2025, "frc6921")
+    assert DistrictTeam.get_by_id("2025fma_frc6921") is not None
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_year_override_scoped_to_that_year(
+    api_mock, tasks_client: Client
+) -> None:
+    # A year-overridden call must only reconcile DistrictTeams for that year.
+    # Other years' rows must be untouched.
+    DistrictTeam(
+        id="2026fim_frc6921",
+        team=ndb.Key(Team, "frc6921"),
+        year=2026,
+        district_key=ndb.Key(District, "2026fim"),
+    ).put()
+    DistrictTeam(
+        id="2025ne_frc6921",
+        team=ndb.Key(Team, "frc6921"),
+        year=2025,
+        district_key=ndb.Key(District, "2025ne"),
+    ).put()
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc6921", team_number=6921),
+            DistrictTeam(
+                id="2025fma_frc6921",
+                team=ndb.Key(Team, "frc6921"),
+                year=2025,
+                district_key=ndb.Key(District, "2025fma"),
+            ),
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc6921/2025")
+    assert resp.status_code == 200
+
+    # 2025 reconciled: new row created, stale same-year row deleted
+    assert DistrictTeam.get_by_id("2025fma_frc6921") is not None
+    assert DistrictTeam.get_by_id("2025ne_frc6921") is None
+    # 2026 untouched
+    assert DistrictTeam.get_by_id("2026fim_frc6921") is not None
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_historical_year_does_not_overwrite_team(
+    api_mock, tasks_client: Client
+) -> None:
+    # Backfilling a historical year must not clobber current Team metadata
+    # (name, nickname, city, etc.) with a stale snapshot. The handler should
+    # still reconcile year-scoped rows (DistrictTeam, Robot) but skip the
+    # global Team write when year < max_year.
+    Team(id="frc6921", team_number=6921, nickname="Current Name").put()
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc6921", team_number=6921, nickname="Stale 2025 Name"),
+            DistrictTeam(
+                id="2025fma_frc6921",
+                team=ndb.Key(Team, "frc6921"),
+                year=2025,
+                district_key=ndb.Key(District, "2025fma"),
+            ),
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc6921/2025")
+    assert resp.status_code == 200
+
+    # DistrictTeam for 2025 was created (year-scoped, safe)
+    assert DistrictTeam.get_by_id("2025fma_frc6921") is not None
+    # Team metadata was NOT overwritten with the stale 2025 snapshot
+    current_team = Team.get_by_id("frc6921")
+    assert current_team is not None
+    assert current_team.nickname == "Current Name"
 
 
 def test_fetch_team_avatar_bad_key(tasks_client: Client) -> None:
@@ -312,3 +412,64 @@ def test_fetch_team_avatar_no_output_in_taskqueue(
 
     # Make sure we write models
     assert Media.get_by_id("avatar_media") is not None
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_creates_regional_pool_team(
+    api_mock, tasks_client: Client
+) -> None:
+    # A team with no district membership in a regional-pool year (2025+) is
+    # eligible for Championship via the regional pool, so a RegionalPoolTeam
+    # row is written alongside the Team.
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc254", team_number=254),
+            None,
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
+    assert resp.status_code == 200
+
+    assert Team.get_by_id("frc254") is not None
+    regional_pool_team = RegionalPoolTeam.get_by_id(
+        RegionalPoolTeam.render_key_name(2026, "frc254")
+    )
+    assert regional_pool_team is not None
+    assert regional_pool_team.year == 2026
+    assert regional_pool_team.team == ndb.Key(Team, "frc254")
+
+
+@freeze_time("2026-04-01")
+@mock.patch.object(DatafeedFMSAPI, "get_team_details")
+def test_fetch_team_details_district_team_removes_regional_pool_team(
+    api_mock, tasks_client: Client
+) -> None:
+    # If FIRST now reports the team as a district team, any stale
+    # RegionalPoolTeam for that year is deleted.
+    RegionalPoolTeam(
+        id=RegionalPoolTeam.render_key_name(2026, "frc254"),
+        year=2026,
+        team=ndb.Key(Team, "frc254"),
+    ).put()
+    api_mock.return_value = InstantFuture(
+        (
+            Team(id="frc254", team_number=254),
+            DistrictTeam(
+                id="2026fim_frc254",
+                team=ndb.Key(Team, "frc254"),
+                year=2026,
+                district_key=ndb.Key(District, "2026fim"),
+            ),
+            None,
+        )
+    )
+    resp = tasks_client.get("/backend-tasks/get/team_details/frc254")
+    assert resp.status_code == 200
+
+    assert DistrictTeam.get_by_id("2026fim_frc254") is not None
+    assert (
+        RegionalPoolTeam.get_by_id(RegionalPoolTeam.render_key_name(2026, "frc254"))
+        is None
+    )

@@ -10,8 +10,14 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '~/components/ui/accordion';
+import { useApiKeys } from '~/lib/hooks/useApiKeys';
+import { useTheme } from '~/lib/theme';
 
 export const Route = createFileRoute('/apidocs_/v3')({
+  // @scalar/api-reference-react is very large and has no SSR benefit here —
+  // render it client-only so it's excluded from the server bundle and the
+  // initial HTML payload.
+  ssr: false,
   head: () => {
     return {
       meta: [
@@ -23,10 +29,12 @@ export const Route = createFileRoute('/apidocs_/v3')({
           content: 'Read API (v3) documentation for The Blue Alliance',
         },
       ],
+      links: [{ rel: 'stylesheet', href: scalarCSS }],
     };
   },
   component: ApiDocsV3,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 const ChangelogDisplay = ({ xChanges }: { xChanges: string }) => {
   const entries = useMemo(() => {
@@ -42,7 +50,7 @@ const ChangelogDisplay = ({ xChanges }: { xChanges: string }) => {
 
   return (
     <div className="my-4 rounded-lg bg-(--scalar-background-2) p-4">
-      <Accordion type="single" collapsible>
+      <Accordion>
         <AccordionItem value="changelog">
           <AccordionTrigger
             className="text-lg font-semibold text-(--scalar-color-1)"
@@ -88,21 +96,38 @@ const XChangesPlugin = () => {
 };
 
 function ApiDocsV3(): React.JSX.Element {
+  const { resolvedTheme } = useTheme();
+  const { readKeys } = useApiKeys();
   return (
-    <>
-      <ApiReferenceReact
-        configuration={{
-          url: 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance/refs/heads/main/src/backend/web/static/swagger/api_v3.json',
-          hideClientButton: true,
-          hideDarkModeToggle: true,
-          showDeveloperTools: 'never',
-          operationsSorter: 'alpha',
-          plugins: [XChangesPlugin()],
-          searchHotKey: 'l', // to not conflict with the navbar search hotkey
-          telemetry: false,
-        }}
-      />
-      <link rel="stylesheet" href={scalarCSS} />
-    </>
+    // key forces a remount when the theme changes; Scalar's Vue internals don't
+    // treat darkMode as reactive after initialization, so updateConfiguration
+    // won't apply theme changes without a full remount.
+    <ApiReferenceReact
+      key={resolvedTheme}
+      configuration={{
+        url: 'https://raw.githubusercontent.com/the-blue-alliance/the-blue-alliance/refs/heads/main/src/backend/web/static/swagger/api_v3.json',
+        hideClientButton: true,
+        hideDarkModeToggle: true,
+        darkMode: resolvedTheme === 'dark',
+        showDeveloperTools: 'localhost',
+        operationsSorter: 'alpha',
+        plugins: [XChangesPlugin()],
+        searchHotKey: 'l', // to not conflict with the navbar search hotkey
+        telemetry: false,
+        agent: { disabled: true },
+        mcp: { disabled: true },
+        authentication: {
+          preferredSecurityScheme: 'apiKey',
+          securitySchemes: {
+            apiKey: {
+              value: readKeys[0]?.key ?? '',
+            },
+          },
+        },
+        defaultOpenAllTags: true,
+        persistAuth: true,
+        showOperationId: true,
+      }}
+    />
   );
 }

@@ -1,4 +1,6 @@
-import type { Webcast } from '~/api/tba/read';
+import type { Webcast, WebcastStatus } from '~/api/tba/read';
+
+export const DATA_PANEL_ID_PREFIX = 'data-panel:';
 
 /**
  * Supported webcast types
@@ -15,7 +17,7 @@ export interface FirebaseWebcast {
   file?: string;
   date?: string;
   // Live status fields populated by WebcastOnlineHelper
-  status?: 'unknown' | 'online' | 'offline';
+  status?: WebcastStatus;
   stream_title?: string | null;
   viewer_count?: number | null;
 }
@@ -51,6 +53,26 @@ export interface WebcastWithMeta {
   webcast: FirebaseWebcast;
   /** Whether this is a special webcast (vs regular event webcast) */
   isSpecial: boolean;
+}
+
+export interface GamedayWebcastContent {
+  type: 'webcast';
+  id: string;
+  name: string;
+  webcast: WebcastWithMeta;
+}
+
+export interface GamedayDataPanelContent {
+  type: 'data-panel';
+  id: string;
+  name: string;
+  component: React.ComponentType;
+}
+
+export type GamedayContent = GamedayWebcastContent | GamedayDataPanelContent;
+
+export function isDataPanelId(id: string): boolean {
+  return id.startsWith(DATA_PANEL_ID_PREFIX);
 }
 
 /**

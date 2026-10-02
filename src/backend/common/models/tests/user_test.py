@@ -20,8 +20,13 @@ from backend.common.models.user import User
 from backend.common.queries.account_query import AccountQuery
 
 
-def test_init_no_email() -> None:
+def test_init_no_email_no_uid() -> None:
     user = User(session_claims={"email": ""})
+    assert user._account is None
+
+
+def test_init_no_email() -> None:
+    user = User(session_claims={})
     assert user._account is None
 
 
@@ -389,7 +394,7 @@ def test_submissions_method_count_none(method) -> None:
     assert method.__get__(user) == 0
 
 
-@pytest.mark.parametrize("method, count", zip(submission_methods, [1, 1]))
+@pytest.mark.parametrize("method, count", list(zip(submission_methods, [1, 1])))
 def test_submissions_method_count(method, count) -> None:
     email = "zach@thebluealliance.com"
     account = Account(id="account", email=email)
@@ -480,13 +485,15 @@ def _api_key(auth_type: AuthType) -> Callable[[], ApiAuthAccess]:
 
 @pytest.mark.parametrize(
     "method, keys",
-    zip(
-        api_keys_method,
-        [
-            [_api_key(AuthType.ZEBRA_MOTIONWORKS), _api_key(AuthType.READ_API)],
-            [_api_key(AuthType.READ_API)],
-            [_api_key(AuthType.ZEBRA_MOTIONWORKS)],
-        ],
+    list(
+        zip(
+            api_keys_method,
+            [
+                [_api_key(AuthType.ZEBRA_MOTIONWORKS), _api_key(AuthType.READ_API)],
+                [_api_key(AuthType.READ_API)],
+                [_api_key(AuthType.ZEBRA_MOTIONWORKS)],
+            ],
+        )
     ),
 )
 def test_api_keys_method(method, keys) -> None:
@@ -655,3 +662,30 @@ def test_mytba() -> None:
     mytba = user.myTBA
     assert mytba is not None
     assert mytba.models == [f, s]
+
+
+def test_has_permission_none() -> None:
+    user = User(session_claims={})
+    assert user._account is None
+    assert user.has_permission(AccountPermission.REVIEW_MEDIA) is False
+
+
+def test_has_permission() -> None:
+    email = "zach@thebluealliance.com"
+    account = Account(
+        id="account", email=email, permissions=[AccountPermission.REVIEW_MEDIA]
+    )
+    account.put()
+
+    user = User(session_claims={"email": email})
+    assert user._account is not None
+    assert user.has_permission(AccountPermission.REVIEW_MEDIA) is True
+    assert user.has_permission(AccountPermission.REVIEW_EVENT_MEDIA) is False
+
+
+@pytest.mark.parametrize(
+    "claims, expected",
+    [({}, False), ({"email_verified": False}, False), ({"email_verified": True}, True)],
+)
+def test_email_verified(claims: dict, expected: bool) -> None:
+    assert User(session_claims=claims).email_verified is expected

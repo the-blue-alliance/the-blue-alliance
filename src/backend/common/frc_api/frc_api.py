@@ -15,7 +15,9 @@ from typing import (
     Union,
 )
 
+from google.appengine.api import urlfetch_errors
 from google.appengine.ext import ndb
+from google.appengine.runtime import apiproxy_errors
 from pyre_extensions import JSON, none_throws
 
 from backend.common.environment import Environment
@@ -273,7 +275,17 @@ class FRCAPI:
         }
 
         with Span(f"frc_api_fetch:{endpoint}"):
-            r = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
+            try:
+                r = yield self.ndb_context.urlfetch(url, headers=headers, deadline=30)
+            except (
+                apiproxy_errors.DeadlineExceededError,
+                urlfetch_errors.DeadlineExceededError,
+            ) as e:
+                logging.warning(f"FRC API fetch deadline exceeded for {url}: {e}")
+                return TypedURLFetchResult.typed_mock_for_content(
+                    url, 408, "", return_type
+                )
+
             response = TypedURLFetchResult(url, r, return_type)
             if response.status_code == 200:
                 with Span(f"maybe_save_fmsapi_response:{response.url}"):
@@ -344,7 +356,7 @@ class FRCAPI:
                     else:
                         with open(filename, "wb") as f:
                             f.write(content)
-                    files.append(f"{safe_dir_name}/{safe_file_name}")
+                    files.append(f"{safe_dir_name}{safe_file_name}")
         return sorted(files)
 
     def _get_simulated(
@@ -456,35 +468,41 @@ class FRCAPI:
 
     @classmethod
     def _merge_match(cls, scheduled: Dict, result: Dict) -> Dict:
-        # Over the years, both "Teams" and "teams" have been used in FRC API responses...
-        teams_key = "Teams" if "Teams" in scheduled else "teams"
+        # Over the years, both "Teams" and "teams" have been used in FRC API
+        # responses, and a schedule and its results don't always agree.
+        # Normalize both to "teams" so their teams always merge.
+        cls._normalize_teams_key(scheduled)
+        cls._normalize_teams_key(result)
 
         # 2024, Week 4: As part of attempting to restore sync,
         # schedules sync with teams [1, 2, 3] in to-be-played playoff matches
         # In a case where the only teams for a match are those three, overwrite
         # the team numbers in each station to None
-        schedule_team_numbers = [t["teamNumber"] for t in scheduled.get(teams_key)]
-        if set(schedule_team_numbers) == {1, 2, 3}:
-            scheduled["teams"] = [
-                {**t, "teamNumber": None} for t in scheduled.get(teams_key)
-            ]
+        scheduled_teams = scheduled.get("teams") or []
+        if {t["teamNumber"] for t in scheduled_teams} == {1, 2, 3}:
+            scheduled["teams"] = [{**t, "teamNumber": None} for t in scheduled_teams]
 
         for field, value in result.items():
-            if field == teams_key:
-                for team in value:
-                    schedule_idx, schedule_team = next(
-                        filter(
-                            lambda t: t[1]["teamNumber"] == team["teamNumber"],
-                            enumerate(scheduled["teams"]),
-                        ),
-                        (None, None),
-                    )
-                    if schedule_team is None:
-                        # 2024, Week 3: Upstream FMS sync issues leading to schedules returned with no teams
-                        # Some match results have been sync'd, so patch around this where we can
-                        scheduled["teams"].append(team)
-                    else:
-                        scheduled["teams"][schedule_idx].update(team)
-            else:
+            if field != "teams":
                 scheduled[field] = value
+                continue
+            teams = scheduled.setdefault("teams", [])
+            for team in value:
+                schedule_team = next(
+                    (t for t in teams if t["teamNumber"] == team["teamNumber"]),
+                    None,
+                )
+                if schedule_team is None:
+                    # 2024, Week 3: Upstream FMS sync issues leading to schedules returned with no teams
+                    # Some match results have been sync'd, so patch around this where we can
+                    teams.append(team)
+                else:
+                    schedule_team.update(team)
         return scheduled
+
+    @staticmethod
+    def _normalize_teams_key(data: Dict) -> None:
+        """Rename a "Teams" key to "teams" in place. If both exist, "teams" wins."""
+        if "Teams" in data:
+            teams = data.pop("Teams")
+            data.setdefault("teams", teams)

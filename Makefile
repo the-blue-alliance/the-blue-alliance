@@ -1,17 +1,20 @@
-.PHONY: test lint lint-bash typecheck sync freeze help
+.PHONY: test test-inline lint lint-bash typecheck sync freeze pwa-generate-api benchmark-coldstart help
 
 # Default target
 help:
 	@echo "Available targets:"
 	@echo "  make test                       - Run all tests"
 	@echo "  make test ARGS='...'            - Run tests with custom arguments"
+	@echo "  make test-inline                - Run staged/related tests only (pre-commit)"
 	@echo "  make lint                       - Check code formatting (black + flake8)"
-	@echo "  make lint ARGS='--fix'          - Auto-fix formatting with black, then run flake8"
+	@echo "  make lint-fix                   - Auto-fix formatting with black, then run flake8"
 	@echo "  make typecheck                  - Run pyre type checker"
 	@echo "  make lint-bash                  - Check bash script formatting (shellcheck + shfmt)"
 	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
 	@echo "  make sync                       - Sync all dev dependencies via uv"
 	@echo "  make freeze                     - Generate src/requirements.txt from pyproject.toml"
+	@echo "  make pwa-generate-api           - Regenerate the PWA OpenAPI clients (in Docker)"
+	@echo "  make benchmark-coldstart        - Benchmark service startup and coldstart latency"
 	@echo ""
 	@echo "Examples:"
 	@echo "  make test"
@@ -37,6 +40,14 @@ else
 	uv run --group test ./ops/test_py3.sh
 endif
 
+# Run staged/related tests for fast pre-commit feedback
+test-inline:
+ifdef ARGS
+	uv run --group test ./ops/test_py3.sh --inline $(ARGS)
+else
+	uv run --group test ./ops/test_py3.sh --inline
+endif
+
 # Run tests with coverage (CI only)
 test-ci:
 ifdef ARGS
@@ -50,10 +61,17 @@ endif
 lint:
 	uv run --group lint ./ops/lint_py3.sh $(ARGS)
 
+lint-fix:
+	uv run --group lint ./ops/lint_py3.sh --fix
+
 # Run bash linter (shellcheck + shfmt)
 # Use ARGS='--fix' to auto-fix formatting issues
 lint-bash:
-	docker compose run --rm lint-bash $(ARGS)
+	docker compose --profile tools run --rm lint-bash $(ARGS)
+
+# Regenerate the PWA's OpenAPI clients in Docker
+pwa-generate-api:
+	docker compose --profile tools run --rm --build pwa-tools
 
 # Run pyre type checker
 typecheck:
@@ -62,3 +80,8 @@ typecheck:
 # Generate src/requirements.txt from pyproject.toml for GAE deploys
 freeze:
 	uv export --no-dev --no-hashes --frozen -o src/requirements.txt
+
+# Benchmark service startup and endpoint coldstart latency
+benchmark-coldstart:
+	uv run python3 ./ops/benchmark_coldstart.py $(ARGS)
+

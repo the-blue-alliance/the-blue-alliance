@@ -16,9 +16,9 @@ from backend.common.models.event import Event
 from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import Year
 from backend.common.models.media import Media
+from backend.common.models.regional_pool_team import RegionalPoolTeam
 from backend.common.models.robot import Robot
 from backend.common.models.team import Team
-from backend.common.sitevars.cmp_registration_hacks import ChampsRegistrationHacks
 from backend.tasks_io.datafeeds.datafeed_fms_api import DatafeedFMSAPI
 
 
@@ -204,7 +204,7 @@ def test_get_event_details_clears_eventteams(
 
 
 @mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
-@mock.patch.object(ChampsRegistrationHacks, "should_skip_eventteams", return_value=True)
+@mock.patch.object(Event, "should_skip_eventteams", return_value=True)
 @mock.patch.object(
     DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
 )
@@ -240,3 +240,252 @@ def test_get_event_details_skip_eventteams(
     tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
     assert len(tasks) == 1
     assert tasks[0].url == "/tasks/math/do/eventteam_update/2019casj?allow_deletes=True"
+
+
+def create_division_event(
+    year: Year = 2019, parent_event_key: str = "2019cmp"
+) -> Event:
+    parent_key = ndb.Key(Event, parent_event_key)
+    e = Event(
+        id=f"{year}cmptx",
+        year=year,
+        event_short="cmptx",
+        start_date=datetime.datetime(year, 4, 1),
+        end_date=datetime.datetime(year, 4, 3),
+        event_type_enum=EventType.CMP_DIVISION,
+        parent_event=parent_key,
+    )
+    return e
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_division_new_teams_enqueues_post_division_tasks(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    event_mock.return_value = InstantFuture(([create_division_event()], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2019cmptx")
+    assert resp.status_code == 200
+
+    # Make sure we enqueue post_division_tasks for the parent event
+    admin_tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert len(admin_tasks) == 1
+    assert admin_tasks[0].url == "/tasks/admin/do/post_division_tasks/2019cmp"
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_division_no_new_teams_no_post_division_tasks(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    # Pre-create an existing EventTeam so no new team is added
+    EventTeam(
+        id="2019cmptx_frc254",
+        event=ndb.Key(Event, "2019cmptx"),
+        team=ndb.Key(Team, "frc254"),
+        year=2019,
+    ).put()
+
+    event_mock.return_value = InstantFuture(([create_division_event()], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2019cmptx")
+    assert resp.status_code == 200
+
+    # No post_division_tasks should be enqueued since no new teams were added
+    admin_tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert len(admin_tasks) == 0
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_non_division_new_teams_no_post_division_tasks(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    event_mock.return_value = InstantFuture(([create_event()], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2019casj")
+    assert resp.status_code == 200
+
+    # No post_division_tasks should be enqueued since this is not a division event
+    admin_tasks = taskqueue_stub.get_filtered_tasks(queue_names="admin")
+    assert len(admin_tasks) == 0
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_no_output_in_taskqueue(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+) -> None:
+    event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                DistrictTeam(id="2019fim_frc254"),
+                None,
+            ),
+        ]
+    )
+    avatars_mock.return_value = InstantFuture(([], []))
+
+    resp = tasks_client.get(
+        "/backend-tasks/get/event_details/2019casj",
+        headers={"X-Appengine-Taskname": "test"},
+    )
+    assert resp.status_code == 200
+    assert len(resp.data) == 0
+
+    # Models are still written even though nothing is rendered
+    assert Event.get_by_id("2019casj") is not None
+    assert Team.get_by_id("frc254") is not None
+    assert EventTeam.get_by_id("2019casj_frc254") is not None
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2025)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_regional_creates_regional_pool_teams(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+) -> None:
+    # In a regional-pool year (2025+), non-district teams at a regional are
+    # written as RegionalPoolTeams; district teams are not.
+    event_mock.return_value = InstantFuture(([create_event(year=2025)], []))
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+            (
+                Team(id="frc1678", team_number=1678),
+                DistrictTeam(
+                    id="2025fim_frc1678",
+                    team=ndb.Key(Team, "frc1678"),
+                    year=2025,
+                    district_key=ndb.Key(District, "2025fim"),
+                ),
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
+    assert resp.status_code == 200
+    assert len(resp.data) > 0
+
+    regional_pool_team = RegionalPoolTeam.get_by_id(
+        RegionalPoolTeam.render_key_name(2025, "frc254")
+    )
+    assert regional_pool_team is not None
+    assert regional_pool_team.year == 2025
+    assert regional_pool_team.team == ndb.Key(Team, "frc254")
+    assert (
+        RegionalPoolTeam.get_by_id(RegionalPoolTeam.render_key_name(2025, "frc1678"))
+        is None
+    )
+    assert DistrictTeam.get_by_id("2025fim_frc1678") is not None
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2025)
+@mock.patch.object(
+    DatafeedFMSAPI, "get_event_team_avatars", return_value=InstantFuture(([], []))
+)
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_district_event_no_regional_pool_teams(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+) -> None:
+    # Only regional / championship events feed the regional pool
+    event_mock.return_value = InstantFuture(
+        ([create_event(year=2025, event_type=EventType.DISTRICT)], [])
+    )
+    teams_mock.return_value = InstantFuture(
+        [
+            (
+                Team(id="frc254", team_number=254),
+                None,
+                None,
+            ),
+        ]
+    )
+
+    resp = tasks_client.get("/backend-tasks/get/event_details/2025casj")
+    assert resp.status_code == 200
+
+    assert (
+        RegionalPoolTeam.get_by_id(RegionalPoolTeam.render_key_name(2025, "frc254"))
+        is None
+    )

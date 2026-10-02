@@ -1,7 +1,6 @@
 import datetime
 from typing import Any, Dict, Optional
 
-from firebase_admin import auth
 from flask import session
 
 from backend.common.firebase import app
@@ -9,11 +8,17 @@ from backend.common.models.user import User
 
 _SESSION_KEY = "session"
 
+# 14 days is Firebase Admin's max (MAX_SESSION_COOKIE_DURATION_SECONDS) and
+# drives both the Firebase session cookie TTL and the Flask cookie's Max-Age.
+SESSION_COOKIE_LIFETIME = datetime.timedelta(days=14)
+
 
 # Code from https://firebase.google.com/docs/auth/admin/manage-cookies
 
 
 def _verify_id_token(id_token: str) -> Optional[dict]:
+    from firebase_admin import auth
+
     try:
         return auth.verify_id_token(id_token, check_revoked=True, app=app())
     except Exception:
@@ -25,15 +30,20 @@ def verify_id_token(id_token: str) -> Optional[dict]:
 
 
 def create_session_cookie(id_token: str, expires_in: datetime.timedelta) -> None:
+    from firebase_admin import auth
+
     session_cookie = auth.create_session_cookie(
         id_token, expires_in=expires_in, app=app()
     )
+    session.permanent = True
     session[_SESSION_KEY] = session_cookie
 
 
 def revoke_session_cookie() -> None:
     session_claims = _decoded_claims()
     if session_claims:
+        from firebase_admin import auth
+
         auth.revoke_refresh_tokens(session_claims["sub"], app=app())
     session.pop(_SESSION_KEY, None)
 
@@ -46,6 +56,8 @@ def _decoded_claims() -> Optional[Dict[str, Any]]:
     # Verify the session cookie. In this case an additional check is added to detect
     # if the user's Firebase session was revoked, user deleted/disabled, etc.
     try:
+        from firebase_admin import auth
+
         return auth.verify_session_cookie(session_cookie, check_revoked=True, app=app())
     except Exception:
         # Session cookie is invalid, expired or revoked. Force user to login.
@@ -64,6 +76,8 @@ def current_user() -> Optional[User]:
 
 
 def _delete_user(uid: str) -> None:
+    from firebase_admin import auth
+
     auth.delete_user(uid, app=app())
 
 

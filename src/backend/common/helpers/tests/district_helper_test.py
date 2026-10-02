@@ -1,16 +1,27 @@
 import json
+from typing import cast
 
 import pytest
+from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
+from backend.common.consts.comp_level import CompLevel
+from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.district_helper import (
     DistrictHelper,
     DistrictRankingTeamTotal,
     DistrictRankingTiebreakers,
     TeamAtEventDistrictPoints,
 )
+from backend.common.helpers.match_helper import MatchHelper
+from backend.common.models.alliance import EventAlliance
+from backend.common.models.district import District
 from backend.common.models.event import Event
+from backend.common.models.event_details import EventDetails
+from backend.common.models.event_district_points import EventDistrictPoints
 from backend.common.models.keys import Year
+from backend.common.models.match import Match
 from backend.common.models.team import Team
 
 
@@ -52,6 +63,18 @@ def test_calc_event_points(
         expected_event_points = json.load(f)
 
     assert event_points == expected_event_points
+
+
+def test_calc_event_points_excludes_dq_from_match_score_tiebreaker(
+    setup_full_event,
+) -> None:
+    # 2023onlon_qm27 scored 128 with frc6162 on the alliance but frc6162 was
+    # DQ'd in that match; the score must not count toward frc6162's top-3
+    # match score tiebreaker.
+    setup_full_event("2023onlon")
+    event = none_throws(Event.get_by_id("2023onlon"))
+    event_points = DistrictHelper.calculate_event_points(event)
+    assert 128 not in event_points["tiebreakers"]["frc6162"]["highest_match_scores"]
 
 
 def test_calculate_multi_event_rankings_all_teams_filtered(setup_full_event) -> None:
@@ -100,7 +123,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
             )
         ],
         point_total=70,
-        qual_scores=[85, 71, 69],
+        match_scores=[94, 91, 89],
         rookie_bonus=0,
         other_bonus=0,
         single_event_bonus=0,
@@ -131,7 +154,7 @@ def test_calculate_multi_event_rankings(setup_full_event) -> None:
             ),
         ],
         point_total=267,
-        qual_scores=[104, 97, 93],
+        match_scores=[127, 121, 113],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -180,7 +203,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             ),
         ],
         point_total=123,
-        qual_scores=[93, 82, 82],
+        match_scores=[93, 82, 82],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=2,
@@ -201,7 +224,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             )
         ],
         point_total=59,
-        qual_scores=[52, 41, 40],
+        match_scores=[73, 59, 57],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -222,7 +245,7 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
             )
         ],
         point_total=41,
-        qual_scores=[67, 56, 45],
+        match_scores=[67, 56, 45],
         rookie_bonus=0,
         single_event_bonus=0,
         other_bonus=0,
@@ -249,6 +272,31 @@ def test_2022_back_to_back_single_day_bonus(setup_full_event) -> None:
 )
 def test_pandemic_rookie_edge_cases(year: Year, rookie_year: Year, bonus: int) -> None:
     assert DistrictHelper._get_rookie_bonus(year, rookie_year) == bonus
+
+
+def test_calc_rankings_tolerates_legacy_tiebreaker_key(setup_full_event) -> None:
+    # Pre-migration EventDetails.district_points entries store
+    # "highest_qual_scores" instead of the renamed "highest_match_scores".
+    # Rankings calc reads stored JSON directly and must not KeyError on those.
+    setup_full_event("2019nyny")
+
+    event_details = none_throws(EventDetails.get_by_id("2019nyny"))
+    district_points = none_throws(event_details.district_points)
+    for tiebreakers in district_points["tiebreakers"].values():
+        # Cast away the TypedDict to simulate legacy on-disk JSON shape.
+        legacy: dict[str, object] = cast(dict[str, object], tiebreakers)
+        legacy["highest_qual_scores"] = legacy.pop("highest_match_scores", [])
+    event_details.district_points = district_points
+    event_details.put()
+
+    event = none_throws(Event.get_by_id("2019nyny"))
+    event.prep_details()
+
+    teams = [none_throws(Team.get_by_id("frc694"))]
+    rankings = DistrictHelper.calculate_rankings([event], teams, 2019, None)
+
+    # Tiebreak scores aren't recovered from the old key, but the calc completes.
+    assert rankings["frc694"]["match_scores"] == []
 
 
 def test_hq_adjustments(setup_full_event) -> None:
@@ -280,10 +328,85 @@ def test_hq_adjustments(setup_full_event) -> None:
             )
         ],
         point_total=75,
-        qual_scores=[85, 71, 69],
+        match_scores=[94, 91, 89],
         rookie_bonus=0,
         other_bonus=0,
         single_event_bonus=0,
         adjustments=5,
         tiebreakers=DistrictRankingTiebreakers(*[30, 30, 16, 16, 19]),
     )
+
+
+def _unplayed_match(comp_level: CompLevel, set_number: int = 1) -> Match:
+    return Match(
+        id=f"2015test_{comp_level}{set_number}m1",
+        event=ndb.Key(Event, "2015test"),
+        year=2015,
+        comp_level=comp_level,
+        set_number=set_number,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                "red": {"teams": ["frc1", "frc2", "frc3"], "score": -1},
+                "blue": {"teams": ["frc4", "frc5", "frc6"], "score": -1},
+            }
+        ),
+    )
+
+
+def _empty_points() -> EventDistrictPoints:
+    return EventDistrictPoints(points={}, tiebreakers={})
+
+
+def test_event_level_rookie_bonus_skips_missing_team(ndb_context) -> None:
+    event = Event(id="2023test", year=2023)
+    assert DistrictHelper._get_event_level_rookie_bonus_points(event, {"frc9999"}) == {}
+
+
+def test_alliance_number_not_found() -> None:
+    assert (
+        DistrictHelper._get_alliance_number_from_teams(
+            [EventAlliance(picks=["frc1", "frc2", "frc3"])],
+            ["frc4", "frc5", "frc6"],
+        )
+        is None
+    )
+
+
+def test_elim_match_points_double_elim_4_team_unplayed() -> None:
+    points = _empty_points()
+    DistrictHelper._calc_elim_match_points(
+        points, [_unplayed_match(CompLevel.SF)], [], PlayoffType.DOUBLE_ELIM_4_TEAM, 1
+    )
+    assert points["points"] == {}
+
+
+def test_elim_match_points_2015_skips_unplayed() -> None:
+    points = _empty_points()
+    _, organized = MatchHelper.organized_matches(
+        [_unplayed_match(CompLevel.QF), _unplayed_match(CompLevel.F)]
+    )
+    DistrictHelper._calc_elim_match_points_2015(points, organized, 1)
+    assert points["points"] == {}
+
+
+def test_wlt_based_match_points_skips_unplayed() -> None:
+    points = _empty_points()
+    DistrictHelper._calc_wlt_based_match_points(
+        points, [_unplayed_match(CompLevel.QM)], 1
+    )
+    assert points["points"] == {}
+
+
+def test_alliance_selections_to_points_error_is_logged(ndb_context) -> None:
+    event = Event(
+        id="2019test",
+        year=2019,
+        event_type_enum=EventType.DISTRICT,
+        district_key=ndb.Key(District, "2019ne"),
+    )
+    # A malformed alliance (too few picks) errors partway through
+    points = DistrictHelper._alliance_selections_to_points(
+        event, 1, [EventAlliance(picks=["frc1", "frc2"])]
+    )
+    assert points == {"frc1": 16, "frc2": 16}

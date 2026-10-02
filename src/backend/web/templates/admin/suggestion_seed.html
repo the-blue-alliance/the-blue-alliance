@@ -1,0 +1,62 @@
+{% extends "admin/base.html" %}
+
+{% block title %}Seed Suggestions{% endblock %}
+
+{% block content %}
+
+<h1>Seed Suggestions</h1>
+
+<p>Create pending suggestions of each type for testing the moderation queue
+(web review UI, moderation API, and PWA review UI). Suggestions are authored
+by a <code>Suggestion Seed Bot</code> account. Missing target entities
+(team/event/match) are created automatically.</p>
+
+{% if results %}
+<div class="alert alert-info">
+    <h4>Seed results</h4>
+    <ul>
+        {% for type, status in results %}
+        <li><strong>{{ type }}</strong>: {{ status }}</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endif %}
+
+<div class="row">
+    <div class="col-sm-6">
+        <h3>Create suggestions</h3>
+        <form method="post" action="/admin/suggestions/seed">
+            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+            <div class="form-group">
+                {% for type, name in type_names.items() %}
+                <div class="checkbox">
+                    <label>
+                        <input type="checkbox" name="types" value="{{ type }}" checked>
+                        {{ name }} (<code>{{ type }}</code>) &mdash; {{ pending_counts[type] }} pending
+                    </label>
+                </div>
+                {% endfor %}
+            </div>
+            <div class="form-group">
+                <label for="team_key">Target team key</label>
+                <input class="form-control" type="text" name="team_key" id="team_key" value="{{ default_team_key }}">
+            </div>
+            <div class="form-group">
+                <label for="event_key">Target event key</label>
+                <input class="form-control" type="text" name="event_key" id="event_key" value="{{ default_event_key }}">
+            </div>
+            <div class="form-group">
+                <label for="match_key">Target match key</label>
+                <input class="form-control" type="text" name="match_key" id="match_key" value="{{ default_match_key }}">
+            </div>
+            <div class="form-group">
+                <label for="grant_email">Grant all review permissions to account email (optional)</label>
+                <input class="form-control" type="text" name="grant_email" id="grant_email" placeholder="moderator@example.com">
+                <span class="help-block">The account must exist already (log in once first).</span>
+            </div>
+            <button class="btn btn-primary" type="submit">Seed Selected Suggestions</button>
+        </form>
+    </div>
+</div>
+
+{% endblock %}

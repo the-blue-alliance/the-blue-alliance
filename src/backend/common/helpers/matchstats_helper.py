@@ -23,6 +23,7 @@ from backend.common.consts.alliance_color import (
 )
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
+from backend.common.game_specific.registry import get_game
 from backend.common.memcache import MemcacheClient
 from backend.common.models.event_matchstats import (
     Component,
@@ -46,179 +47,6 @@ CCWM_ACCESSOR: StatAccessor = (
     lambda match, color: match.alliances[color]["score"]
     - match.alliances[OPPONENT[color]]["score"]
 )
-MANUAL_COMPONENTS = {
-    2019: {
-        "Cargo + Panel Points": lambda match, color: (
-            match.score_breakdown[color].get("cargoPoints", 0)
-            + match.score_breakdown[color].get("hatchPanelPoints", 0)
-        )
-    },
-    2023: {
-        "Total Game Piece Count": lambda match, color: (
-            match.score_breakdown[color].get("teleopGamePieceCount", 0)
-            + match.score_breakdown[color].get("extraGamePieceCount", 0)
-        ),
-        "Total Game Piece Points": lambda match, color: (
-            match.score_breakdown[color].get("autoGamePiecePoints", 0)
-            + match.score_breakdown[color].get("teleopGamePiecePoints", 0)
-        ),
-        "Foul Count Received": lambda match, color: (
-            match.score_breakdown[OPPONENT[color]].get("foulCount", 0)
-        ),
-        "Foul Points Received": lambda match, color: (
-            match.score_breakdown[OPPONENT[color]].get("foulPoints", 0)
-        ),
-        "Total Points Less Fouls": lambda match, color: (
-            match.score_breakdown[color].get("totalPoints", 0)
-            - match.score_breakdown[color].get("foulPoints", 0)
-        ),
-        "Total Cones Scored": lambda match, color: (
-            sum(
-                [
-                    match.score_breakdown[color]["teleopCommunity"]["B"].count("Cone"),
-                    match.score_breakdown[color]["teleopCommunity"]["M"].count("Cone"),
-                    match.score_breakdown[color]["teleopCommunity"]["T"].count("Cone"),
-                ]
-            )
-        ),
-        "Total Cubes Scored": lambda match, color: (
-            sum(
-                [
-                    match.score_breakdown[color]["teleopCommunity"]["B"].count("Cube"),
-                    match.score_breakdown[color]["teleopCommunity"]["M"].count("Cube"),
-                    match.score_breakdown[color]["teleopCommunity"]["T"].count("Cube"),
-                ]
-            )
-        ),
-    },
-    2024: {
-        "Total Mic": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("micCenterStage", 0),
-                match.score_breakdown[color].get("micStageLeft", 0),
-                match.score_breakdown[color].get("micStageRight", 0),
-            ]
-        ),
-        "Total Trap": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("trapCenterStage", 0),
-                match.score_breakdown[color].get("trapStageLeft", 0),
-                match.score_breakdown[color].get("trapStageRight", 0),
-            ]
-        ),
-        "Total Teleop Game Pieces": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("teleopAmpNoteCount", 0),
-                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
-                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
-            ]
-        ),
-        "Total Auto Game Pieces": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("autoAmpNoteCount", 0),
-                match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
-            ]
-        ),
-        "Total Overall Game Pieces": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("autoAmpNoteCount", 0),
-                match.score_breakdown[color].get("autoSpeakerNoteCount", 0),
-                match.score_breakdown[color].get("teleopAmpNoteCount", 0),
-                match.score_breakdown[color].get("teleopSpeakerNoteCount", 0),
-                match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
-            ]
-        ),
-        "Amplification Rate": lambda match, color: match.score_breakdown[color].get(
-            "teleopSpeakerNoteAmplifiedCount", 0
-        )
-        / max(
-            1,
-            match.score_breakdown[color].get("teleopSpeakerNoteCount", 0)
-            + match.score_breakdown[color].get("teleopSpeakerNoteAmplifiedCount", 0),
-        ),
-    },
-    2025: {
-        "L1 Coral Count": lambda match, color: (
-            match.score_breakdown[color].get("autoReef", {}).get("trough", 0)
-            + match.score_breakdown[color].get("teleopReef", {}).get("trough", 0)
-        ),
-        "L2 Coral Count": lambda match, color: (
-            match.score_breakdown[color].get("teleopReef", {}).get("tba_botRowCount", 0)
-        ),
-        "L3 Coral Count": lambda match, color: (
-            match.score_breakdown[color].get("teleopReef", {}).get("tba_midRowCount", 0)
-        ),
-        "L4 Coral Count": lambda match, color: (
-            match.score_breakdown[color].get("teleopReef", {}).get("tba_topRowCount", 0)
-        ),
-        "Total Coral Count": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("autoCoralCount", 0),
-                match.score_breakdown[color].get("teleopCoralCount", 0),
-            ]
-        ),
-        "Total Coral Points": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("autoCoralPoints", 0),
-                match.score_breakdown[color].get("teleopCoralPoints", 0),
-            ]
-        ),
-        "Total Algae Count": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("wallAlgaeCount", 0),
-                match.score_breakdown[color].get("netAlgaeCount", 0),
-            ]
-        ),
-        "Total Game Piece Count": lambda match, color: sum(
-            [
-                match.score_breakdown[color].get("autoCoralCount", 0),
-                match.score_breakdown[color].get("teleopCoralCount", 0),
-                match.score_breakdown[color].get("wallAlgaeCount", 0),
-                match.score_breakdown[color].get("netAlgaeCount", 0),
-            ]
-        ),
-    },
-    2026: {
-        "Hub Auto Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("autoCount", 0),
-        "Hub Teleop Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("teleopCount", 0),
-        "Hub Endgame Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("endgameCount", 0),
-        "Hub Total Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("totalCount", 0),
-        "Hub Transition Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("transitionCount", 0),
-        "Hub Shift 1 Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift1Count", 0),
-        "Hub Shift 2 Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift2Count", 0),
-        "Hub Shift 3 Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift3Count", 0),
-        "Hub Shift 4 Fuel Count": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("shift4Count", 0),
-        "Hub First Active Shift Count": lambda match, color: (
-            match.score_breakdown[color]["hubScore"].get("shift1Count", 0)
-            + match.score_breakdown[color]["hubScore"].get("shift2Count", 0)
-        ),
-        "Hub Second Active Shift Count": lambda match, color: (
-            match.score_breakdown[color]["hubScore"].get("shift3Count", 0)
-            + match.score_breakdown[color]["hubScore"].get("shift4Count", 0)
-        ),
-        "Hub Uncounted": lambda match, color: match.score_breakdown[color][
-            "hubScore"
-        ].get("uncounted", 0),
-    },
-}
 
 
 def make_default_component_accessor(component: Component) -> StatAccessor:
@@ -354,11 +182,10 @@ class MatchstatsHelper(object):
 
         Minv = cls.build_Minv_matrix(matches_with_score_breakdown, team_id_map)
 
-        if year in MANUAL_COMPONENTS.keys():
-            for name, accessor in MANUAL_COMPONENTS[year].items():
-                coprs[name] = cls.calc_stat(
-                    matches_with_score_breakdown, team_list, team_id_map, Minv, accessor
-                )
+        for name, accessor in get_game(year).get_manual_coprs().items():
+            coprs[name] = cls.calc_stat(
+                matches_with_score_breakdown, team_list, team_id_map, Minv, accessor
+            )
 
         # For each k-v in score_breakdown, attempt to convert v to a float.
         # If we can't do that, we can't calculate a component OPR for it.

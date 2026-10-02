@@ -1,19 +1,20 @@
-from typing import cast, Dict
+from typing import Dict
 
-from pyre_extensions import JSON
-
+from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.models.event_team_pit_location import EventTeamPitLocation
 from backend.common.models.keys import TeamKey
-from backend.tasks_io.datafeeds.parsers.parser_base import ParserBase
+from backend.common.nexus_api.types import PitAddresses
 
 
-class NexusAPIPitLocationParser(ParserBase[JSON, Dict[TeamKey, EventTeamPitLocation]]):
+class NexusAPIPitLocationParser(
+    ParserBase[PitAddresses, Dict[TeamKey, EventTeamPitLocation]]
+):
 
-    def parse(self, response: JSON) -> Dict[TeamKey, EventTeamPitLocation]:
-        if response == "No pits." or not isinstance(response, dict):
+    def parse(self, response: PitAddresses) -> Dict[TeamKey, EventTeamPitLocation]:
+        if not isinstance(response, dict):
             return {}
 
         return {
-            f"frc{team_number}": EventTeamPitLocation(location=cast(str, pit_location))
+            f"frc{team_number}": EventTeamPitLocation(location=pit_location)
             for team_number, pit_location in response.items()
         }

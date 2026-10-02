@@ -14,7 +14,9 @@ Edit the fields specified in the file and save. If you're using the development 
 
 ## Rebuilding Web Resources (JavaScript, CSS, etc.)
 
-If you make changes to JavaScript or CSS files for the `web` service, you will have to recompile the files in order for the changes to show up in your browser. After syncing changes from your local environment to the development container, run the `run_buildweb.sh` script from inside the development container.
+When using `docker compose` for local development, the `webpack` service automatically watches for changes to JavaScript and CSS files and rebuilds them. This includes both webpack-managed assets and legacy concatenated JS bundles. No manual steps are needed — just edit the files and refresh your browser.
+
+For CI or manual one-shot builds outside of Docker, run the `run_buildweb.sh` script:
 
 ```
 $ ./ops/build/run_buildweb.sh
@@ -94,7 +96,6 @@ Use the [authentication decorators](<(https://github.com/the-blue-alliance/the-b
 | `enforce_login`          | Ensures that a user is currently logged in - otherwise, this method will throw a 401.                                                                                                                                                                                                                                                                                                                               |
 | `require_admin`          | Ensures that a user is an admin. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page.                                                                                                                                                                                                            |
 | `require_permission`     | Ensures that a user has a given permission. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user does not have the given permission, this method will throw a 401.                                                                                                                   |
-| `require_any_permission` | Ensures that a user has any of the given permission. If the user is not logged in, this method will automatically redirect the user to the login page and after logging in will redirect the user back to the original page. If the user does not have any of the given permission, this method will throw a 401.                                                                                                   |
 
 ```python
 from backend.web.decorators import require_login

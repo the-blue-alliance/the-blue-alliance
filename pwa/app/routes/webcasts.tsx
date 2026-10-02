@@ -1,12 +1,10 @@
 import { useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { useMemo } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Event } from '~/api/tba/read';
-import {
-  getEventsByYearOptions,
-  getStatusOptions,
-} from '~/api/tba/read/@tanstack/react-query.gen';
+import { getEventsByYearOptions } from '~/api/tba/read/@tanstack/react-query.gen';
 import { EventLink, EventLocationLink } from '~/components/tba/links';
 import { WebcastIcon } from '~/components/tba/socialBadges';
 import { Badge } from '~/components/ui/badge';
@@ -21,15 +19,12 @@ import { getEventDateString, getEventWeekString } from '~/lib/eventUtils';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 export const Route = createFileRoute('/webcasts')({
-  loader: async ({ context: { queryClient } }) => {
-    const status = await queryClient.ensureQueryData(getStatusOptions());
-    const year = status.current_season;
-
+  loader: async ({ context: { queryClient, currentSeason } }) => {
     await queryClient.ensureQueryData(
-      getEventsByYearOptions({ path: { year } }),
+      getEventsByYearOptions({ path: { year: currentSeason } }),
     );
 
-    return { year };
+    return { year: currentSeason };
   },
   headers: publicCacheControlHeaders(),
   head: () => ({
@@ -48,7 +43,8 @@ export const Route = createFileRoute('/webcasts')({
 interface EventGroup {
   label: string;
   events: Event[];
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function groupEventsByWeek(events: Event[]): EventGroup[] {
   const groups = new Map<string, EventGroup>();
@@ -77,36 +73,43 @@ function WebcastsPage() {
     [allEvents],
   );
 
-  const now = useMemo(() => new Date(), []);
+  const today = useMemo(() => Temporal.Now.plainDateISO(), []);
 
   const currentEvents = useMemo(
     () =>
       eventsWithWebcasts.filter((event) => {
-        const start = new Date(event.start_date);
-        const end = new Date(event.end_date);
-        end.setDate(end.getDate() + 1);
-        return now >= start && now <= end;
+        const start = Temporal.PlainDate.from(event.start_date);
+        const end = Temporal.PlainDate.from(event.end_date);
+        return (
+          Temporal.PlainDate.compare(today, start) >= 0 &&
+          Temporal.PlainDate.compare(today, end) <= 0
+        );
       }),
-    [eventsWithWebcasts, now],
+    [eventsWithWebcasts, today],
   );
 
   const upcomingEvents = useMemo(
     () =>
-      eventsWithWebcasts.filter((event) => {
-        const start = new Date(event.start_date);
-        return start > now;
-      }),
-    [eventsWithWebcasts, now],
+      eventsWithWebcasts.filter(
+        (event) =>
+          Temporal.PlainDate.compare(
+            Temporal.PlainDate.from(event.start_date),
+            today,
+          ) > 0,
+      ),
+    [eventsWithWebcasts, today],
   );
 
   const pastEvents = useMemo(
     () =>
-      eventsWithWebcasts.filter((event) => {
-        const end = new Date(event.end_date);
-        end.setDate(end.getDate() + 1);
-        return end < now;
-      }),
-    [eventsWithWebcasts, now],
+      eventsWithWebcasts.filter(
+        (event) =>
+          Temporal.PlainDate.compare(
+            Temporal.PlainDate.from(event.end_date),
+            today,
+          ) < 0,
+      ),
+    [eventsWithWebcasts, today],
   );
 
   const upcomingGroups = groupEventsByWeek(upcomingEvents);

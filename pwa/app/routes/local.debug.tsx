@@ -1,5 +1,6 @@
 import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import { Badge } from '~/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
@@ -11,6 +12,7 @@ interface CacheInfo {
   method: string;
   url: string;
   dataPreview: string;
+  etag: string;
   remainingTTL: number;
   expiresAt: string;
 }
@@ -21,11 +23,11 @@ export const Route = createFileRoute('/local/debug')({
   loader: () => {
     const stats = getCacheStats();
     const entries = getCacheEntries();
-    const now = Date.now();
+    const now = Temporal.Now.instant().epochMilliseconds;
 
     // Parse cache entries to extract useful information
     const cacheEntries: CacheInfo[] = entries.map(
-      ({ key, data, remainingTTL }) => {
+      ({ key, data, etag, remainingTTL }) => {
         // Format: METHOD:URL
         const parts = key.split(':');
         const method = parts[0] || 'UNKNOWN';
@@ -38,13 +40,16 @@ export const Route = createFileRoute('/local/debug')({
             : data;
 
         // Calculate expiry time
-        const expiresAt = new Date(now + remainingTTL).toISOString();
+        const expiresAt = Temporal.Instant.fromEpochMilliseconds(
+          Math.round(now + remainingTTL),
+        ).toString();
 
         return {
           key,
           method,
           url,
           dataPreview: preview,
+          etag: etag ?? '—',
           remainingTTL,
           expiresAt,
         };
@@ -54,7 +59,7 @@ export const Route = createFileRoute('/local/debug')({
     return {
       stats,
       cacheEntries,
-      timestamp: new Date().toISOString(),
+      timestamp: Temporal.Now.instant().toString(),
     };
   },
   headers: publicCacheControlHeaders(),
@@ -72,7 +77,8 @@ export const Route = createFileRoute('/local/debug')({
       ],
     };
   },
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function formatTimeRemaining(ms: number): string {
   const totalSeconds = Math.floor(ms / 1000);
@@ -97,12 +103,14 @@ function CacheEntryRow({
   loadTime: number;
 }): React.JSX.Element {
   const [timeRemaining, setTimeRemaining] = useState(
-    entry.remainingTTL - (Date.now() - loadTime),
+    entry.remainingTTL - (Temporal.Now.instant().epochMilliseconds - loadTime),
   );
 
   useEffect(() => {
     const interval = setInterval(() => {
-      const remaining = entry.remainingTTL - (Date.now() - loadTime);
+      const remaining =
+        entry.remainingTTL -
+        (Temporal.Now.instant().epochMilliseconds - loadTime);
       if (remaining <= 0) {
         setTimeRemaining(0);
         clearInterval(interval);
@@ -114,7 +122,9 @@ function CacheEntryRow({
     return () => clearInterval(interval);
   }, [entry.remainingTTL, loadTime]);
 
-  const expiryDate = new Date(entry.expiresAt);
+  const expiryDate = Temporal.Instant.from(entry.expiresAt).toZonedDateTimeISO(
+    Temporal.Now.timeZoneId(),
+  );
 
   return (
     <tr key={entry.key} className="border-b hover:bg-muted">
@@ -125,10 +135,11 @@ function CacheEntryRow({
       <td className="px-4 py-2 font-mono text-xs break-all">
         {entry.dataPreview}
       </td>
+      <td className="px-4 py-2 font-mono text-xs break-all">{entry.etag}</td>
       <td className="px-4 py-2 font-mono text-xs">
         <div>{formatTimeRemaining(timeRemaining)}</div>
         <div className="text-muted-foreground">
-          {expiryDate.toLocaleString()}
+          {expiryDate.toLocaleString('default')}
         </div>
       </td>
     </tr>
@@ -138,7 +149,7 @@ function CacheEntryRow({
 function LocalDebug(): React.JSX.Element {
   const loaderData = Route.useLoaderData();
   const { stats, cacheEntries, timestamp } = loaderData;
-  const loadTime = Date.parse(timestamp);
+  const loadTime = Temporal.Instant.from(timestamp).epochMilliseconds;
 
   return (
     <div className="container max-w-6xl py-8">
@@ -170,9 +181,58 @@ function LocalDebug(): React.JSX.Element {
               </div>
               <div className="text-sm text-muted-foreground">capacity</div>
             </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Hits</div>
+              <div className="text-3xl font-bold">{stats.hits}</div>
+              <div className="text-sm text-muted-foreground">hits</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Cache Misses</div>
+              <div className="text-3xl font-bold">{stats.misses}</div>
+              <div className="text-sm text-muted-foreground">misses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">Hit Rate</div>
+              <div className="text-3xl font-bold">
+                {Math.round(stats.hitRate * 100)}%
+              </div>
+              <div className="text-sm text-muted-foreground">all-time</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Revalidations: Not Modified
+              </div>
+              <div className="text-3xl font-bold">
+                {stats.revalidatedNotModified}
+              </div>
+              <div className="text-sm text-muted-foreground">304 responses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Revalidations: Modified
+              </div>
+              <div className="text-3xl font-bold">
+                {stats.revalidatedModified}
+              </div>
+              <div className="text-sm text-muted-foreground">200 responses</div>
+            </div>
+            <div className="rounded-lg border p-4">
+              <div className="text-sm text-muted-foreground">
+                Not Modified Rate
+              </div>
+              <div className="text-3xl font-bold">
+                {Math.round(stats.notModifiedRate * 100)}%
+              </div>
+              <div className="text-sm text-muted-foreground">
+                of revalidations
+              </div>
+            </div>
           </div>
           <div className="mt-4 text-sm text-muted-foreground">
-            Last updated: {new Date(timestamp).toLocaleString()}
+            Last updated:{' '}
+            {Temporal.Instant.from(timestamp)
+              .toZonedDateTimeISO(Temporal.Now.timeZoneId())
+              .toLocaleString('default')}
           </div>
         </CardContent>
       </Card>
@@ -188,7 +248,7 @@ function LocalDebug(): React.JSX.Element {
             <div className="overflow-x-auto">
               <table className="w-full table-auto border-collapse">
                 <thead>
-                  <tr className="border-b bg-neutral-50">
+                  <tr className="border-b bg-muted">
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       Method
                     </th>
@@ -197,6 +257,9 @@ function LocalDebug(): React.JSX.Element {
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       Data Preview
+                    </th>
+                    <th className="px-4 py-2 text-left text-sm font-medium">
+                      ETag
                     </th>
                     <th className="px-4 py-2 text-left text-sm font-medium">
                       TTL

@@ -50,21 +50,43 @@ ops/                    # Build, deploy, and dev scripts
 - Async work via `defer()` to task queues (see docs/common/Queues-and-defer.md)
 - **NEVER** modify data directly without manipulators
 - Configuration via `tba_dev_config.json` for local dev
+- **UI changes SHOULD ship with a before/after screenshot table in the PR description** (see [Pull Requests](#pull-requests))
+
+## Pull Requests
+- **Before/after screenshots are a SHOULD for any change a user can see.** That covers PWA routes and components, Jinja templates, CSS, and email templates. Put a Markdown table in the PR description under `## Screenshots` with **Before**, **After**, and **Diff** columns, one row per affected state (for example empty vs. populated, upcoming vs. finished, light vs. dark mode). A PR without one is incomplete unless the change has no visible effect, and in that case say so in the description.
+- **The Diff column is a pixel diff of the other two**, made with `uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py before.png after.png diff.png`. It paints changed pixels red on a faded copy of the after image and prints the changed percentage; put that percentage in the cell under the image. A diff proves a refactor or dependency bump changed nothing (0.00%) as clearly as it shows what a feature touched, so include it even when before and after look identical.
+- Put the table in the PR body, not in a trailing comment, so it stays with the description as the PR evolves. Update it when the UI changes after review.
+- **The author captures the screenshots, not CI.** CI posts no screenshots; whoever opens the PR (human or agent) captures before and after for the states the change affects. For PWA pages and components, render the component with fixture data on a throwaway route and run `pwa/scripts/screenshot-route.mjs` against the dev server, once on `main` and once on the branch, then diff the pair. The same script captures any local page, including Jinja pages on `http://localhost:8080`. For Jinja pages, render through the Flask test client with a logged-in fixture user. Then commit the PNGs to the `ci-screenshots` branch (`pr-<N>-<what>-{before,after,diff}-*.png`) and reference them as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`. Never commit screenshots or throwaway routes to the feature branch.
+- Reviewers should ask for the table when a UI PR lacks it.
+- **Screenshots are for reviewers; tests are what prove production still works.** A screenshot shows what changed, never that nothing broke. Every change still needs tests that would fail if it broke production: unit tests beside the code, Playwright route specs for PWA routes, and the Ops Fullstack Test (`ops/test_ops.sh`), which boots the whole stack in CI.
+
+### Jinja pages that need a login or seeded data
+
+Account, admin, and suggestion-review pages are Jinja pages the dev server can only show after a login, so render them through the Flask test client instead and screenshot the saved HTML against the running dev server's CSS:
+
+1. Have the dev server up (`docker compose up`); it serves the CSS/JS at `http://localhost:8080`.
+2. Render the page with a **throwaway** pytest in `src/backend/web/handlers/tests/`. Use the fixtures the real tests use (`web_client`, `login_user`; set `login_user.permissions` and `login_user.has_permission.return_value = True` for gated pages), seed whatever models the page needs, `GET` it, and write `response.data` to a file after inserting `<base href="http://localhost:8080/">` right after `<head>`. Run it with `make test ARGS='src/backend/web/handlers/tests/<file> -q -s'`, then **delete the file**; it is a tool, not a test. Redact secrets the page renders (API keys, tokens) in the seed data.
+3. Screenshot: `cd pwa && node scripts/screenshot_html.mjs /tmp/after.html /tmp/after.png '[data-testid=...]'`. (The script lives in `pwa/` because Node resolves `@playwright/test` from the script's own directory, not from where you run it.) Pass a selector for an element inside the content you want; the script captures its surrounding content container. Do not target `div.container`, the navbar is one too.
+4. Get the **before** the same way after `git checkout origin/main -- <the templates and handlers you changed>`, then `git checkout HEAD -- <those files>` to restore the branch.
+5. Diff each pair (`uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py /tmp/before.png /tmp/after.png /tmp/diff.png`), publish all three to the `ci-screenshots` branch, and fill the Before | After | Diff table as described above.
+
+Look at every screenshot before posting it: an identical byte size across two supposedly different pages means the locator grabbed the wrong element.
 
 ## Development Setup
-**Recommended**: Use docker-compose for the local dev server, and `uv` for Python tooling (tests, linting).
+**Recommended**: Use docker compose for the local dev server, and `uv` for Python tooling (tests, linting).
 
-See docs/Setup/Setup-Guide-Beta.md for setup instructions.
+See docs/Setup/Setup-Guide.md for setup instructions.
 
 ```bash
-# Start dev environment with docker-compose
-docker-compose up
+# Start dev environment with docker compose (always use --build)
+docker compose up --build
 
 # Access shell in container
-docker-compose exec tba bash
+docker compose exec tba bash
 
-# Or use convenience script
-./ops/shell/run_local_shell.sh
+# View logs
+docker compose logs -f tba
+docker compose logs -f webpack
 ```
 
 ## Running Python Commands
@@ -109,6 +131,16 @@ make freeze             # Generate src/requirements.txt for GAE deploy
 
 ## Testing & Linting
 Tests and linting use `uv` for dependency management. Dependencies are synced automatically on first `make` invocation.
+
+**Run commands inside Docker when the container is running, otherwise run locally.** Check with `docker compose ps tba` — if the `tba` service is up, prefix commands with `docker compose exec tba`. Example:
+
+```bash
+# Container running
+docker compose exec tba make test ARGS='src/backend/...'
+
+# Container not running
+make test ARGS='src/backend/...'
+```
 
 ```bash
 # Sync all dev dependencies explicitly
@@ -159,7 +191,34 @@ make typecheck
 - **Add web page**: Create handler in `web/handlers/`, template in `web/templates/`, route in `web/main.py`
 - **Add async task**: Use `defer()` to enqueue, create handler in `tasks_io/` or `tasks_cpu/`
 - **Add configuration**: Use Sitevar (see docs/common/Sitevars.md)
-- **Update API/models**: Reflect changes in `src/backend/web/static/swagger/*.json` OpenAPI specs (api_v3.json, api_trusted_v1.json, client_v9.json), then regenerate PWA client by running `cd pwa && ./generate-api.sh`
+- **Update API/models**: Reflect changes in `src/backend/web/static/swagger/*.json` OpenAPI specs (api_v3.json, api_trusted_v1.json, client_v9.json), then regenerate PWA client by running `make pwa-generate-api` (runs `pwa/generate-api.sh` in Docker; use `cd pwa && ./generate-api.sh` if node/pnpm are installed locally)
+
+## Tournament Structures
+
+### FIRST Championship
+At the FIRST Championship, teams are split into 8 divisions. Each division runs a full tournament to crown division Champions. Those 8 division Champions then compete in the **Championship Playoffs** on the **Einstein fields** (event type `CMP_FINALS`) to determine the overall Championship Winners.
+
+### District Championships
+Some district championships have grown large enough to split into multiple divisions (either 2 or 4, depending on the district). These divisions feed into a finals field that mirrors the Einstein structure, though it is not officially called Einstein. Not all district championships use this format — smaller ones run as a single standard tournament.
+
+### Standard Tournament Format (pre-2023 vs. 2023+)
+See [Data Idiosyncrasies](#data-idiosyncrasies) for notes on the elimination bracket format change (single-elimination BO3 before 2023, Double Elimination from 2023 onward).
+
+### Game Manual
+The 2026 FIRST Game Manual (authoritative source for tournament rules and structure) is available at:
+https://firstfrc.blob.core.windows.net/frc2026/Manual/2026GameManual.pdf
+
+If unsure about tournament structure details, consult this manual.
+
+## Data Idiosyncrasies
+FRC data has several quirks that are important to understand when working with historical records:
+
+- **Award renames**: The Chairman's Award was renamed to the Impact Award in fall of 2022 — they are the same award. The Dean's List Award was renamed to the FIRST Leadership Award in fall of 2025 — they are the same award.
+- **Award types**: FIRST has added and removed many award types over the years. Most `AwardType` values are not in active use today, but they still appear in historical records.
+- **Score breakdowns**: Match score breakdowns only became available in 2015. Finer details such as foul points are unavailable for prior years.
+- **Data completeness varies by era**: Event data may be fully populated, partially populated, or entirely missing. The further back in history, the less reliable the data. Rankings, alliances, match results, award data, and team lists may be partially or entirely absent on older events.
+- **Reliability by year**: Data becomes more reliable around 2010. Prior to 2006, data is uncommon.
+- **Elimination format**: FIRST implemented Double Elimination brackets starting in the 2023 season. Prior seasons used a single-elimination best-of-three bracket.
 
 ## Notes
 - The PWA (Progressive Web App) is a separate project in `pwa/` with its own AGENTS.md

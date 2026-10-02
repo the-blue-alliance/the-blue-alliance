@@ -18,6 +18,7 @@ from backend.web.profiled_render import render_template
 
 
 def api_auth_add() -> Response:
+    event_key = request.args.get("event_key", "")
     template_values = {
         "auth_id": "".join(
             random.choice(
@@ -25,6 +26,7 @@ def api_auth_add() -> Response:
             )
             for _ in range(16)
         ),
+        "event_key": event_key,
     }
 
     return render_template("admin/api_add_auth.html", template_values)

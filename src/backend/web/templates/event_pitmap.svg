@@ -1,0 +1,92 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="{{ svg_namespace }}" width="{{ outer_width }}" height="{{ outer_height }}" viewBox="{{ view_box }}">
+  <style>
+    svg {
+      color-scheme: light dark;
+      --page-bg: #eef2f7;
+      --map-bg: #ffffff;
+      --map-border: #c8d2e3;
+      --footer-link: #0f172a;
+      --footer-text: #64748b;
+      --wall-fill: #546e7a;
+      --wall-stroke: #455a64;
+      --pit-fill: #f8faff;
+      --pit-stroke: #3f51b5;
+      --pit-title: #2f3d8f;
+      --pit-team: #1f2937;
+      --highlight-fill: #fff8e6;
+      --highlight-stroke: #ff9800;
+      --highlight-title: #bf6d00;
+      --highlight-team: #7c4a03;
+      --area-fill: #f2f5fb;
+      --area-stroke: #90a4ae;
+      --area-text: #37474f;
+      --label-text: #263238;
+      --arrow-fill: #5c6bc0;
+      --arrow-stroke: #3949ab;
+    }
+    @media (prefers-color-scheme: dark) {
+      svg {
+        --page-bg: #0f172a;
+        --map-bg: #1e293b;
+        --map-border: #334155;
+        --footer-link: #e2e8f0;
+        --footer-text: #94a3b8;
+        --wall-fill: #cbd5e1;
+        --wall-stroke: #f1f5f9;
+        --pit-fill: #0f172a;
+        --pit-stroke: #818cf8;
+        --pit-title: #c7d2fe;
+        --pit-team: #f1f5f9;
+        --highlight-fill: #422006;
+        --highlight-stroke: #fbbf24;
+        --highlight-title: #fcd34d;
+        --highlight-team: #fef3c7;
+        --area-fill: #1e293b;
+        --area-stroke: #64748b;
+        --area-text: #cbd5e1;
+        --label-text: #e2e8f0;
+        --arrow-fill: #818cf8;
+        --arrow-stroke: #a5b4fc;
+      }
+    }
+    text { font-family: Roboto, Arial, Helvetica, sans-serif; letter-spacing: 0.1px; }
+    a { text-decoration: none; }
+    .page-bg { fill: var(--page-bg); }
+    .map-bg { fill: var(--map-bg); stroke: var(--map-border); stroke-width: 2; }
+    .map-border-line { stroke: var(--map-border); stroke-width: 1; }
+    .footer-link-text { fill: var(--footer-link); }
+    .footer-text { fill: var(--footer-text); }
+    .wall { fill: var(--wall-fill); stroke: var(--wall-stroke); stroke-width: 1; }
+    .area-rect { fill: var(--area-fill); stroke: var(--area-stroke); stroke-width: 2; }
+    .area-text { fill: var(--area-text); }
+    .pit-rect { fill: var(--pit-fill); stroke: var(--pit-stroke); stroke-width: 2; }
+    .pit-title { fill: var(--pit-title); }
+    .pit-team { fill: var(--pit-team); }
+    .pit.pit-highlighted .pit-rect { fill: var(--highlight-fill); stroke: var(--highlight-stroke); stroke-width: 4; }
+    .pit.pit-highlighted .pit-title { fill: var(--highlight-title); }
+    .pit.pit-highlighted .pit-team { fill: var(--highlight-team); }
+    .label-text { fill: var(--label-text); }
+    .arrow { fill: var(--arrow-fill); stroke: var(--arrow-stroke); stroke-width: 2; }
+  </style>
+
+  <rect class="page-bg" x="0" y="0" width="{{ outer_width }}" height="{{ outer_height }}" />
+
+  <g transform="{{ map_translate }}">
+    <rect class="map-bg" x="0" y="0" width="{{ canvas_width }}" height="{{ canvas_height }}" rx="10" />
+    {{ wall_elements | safe }}
+    {{ area_elements | safe }}
+    {{ pit_elements | safe }}
+    {{ label_elements | safe }}
+    {{ arrow_elements | safe }}
+  </g>
+
+  <line class="map-border-line" x1="{{ padding }}" y1="{{ footer_top }}" x2="{{ footer_line_x2 }}" y2="{{ footer_top }}" />
+
+  <a href="{{ event_url }}">
+    <text class="footer-link-text" x="{{ padding }}" y="{{ footer_link_y }}" font-size="18" text-anchor="start" dominant-baseline="middle" font-weight="700">{{ event_url }}</text>
+  </a>
+  <text class="footer-text" x="{{ padding }}" y="{{ footer_text_y }}" font-size="13" text-anchor="start" dominant-baseline="middle">Rendered from frc.nexus pit map data</text>
+
+  {{ logo_element | safe }}
+</svg>

@@ -25,6 +25,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
         status: webcast.status,
         streamTitle: webcast.stream_title,
         viewerCount: webcast.viewer_count,
+        scheduledStartTimeUtc: webcast.scheduled_start_time_utc,
       };
       specialWebcastIds.add(id);
     });
@@ -50,6 +51,7 @@ const getWebcastsFromRawWebcasts = (webcasts) => {
           status: webcast.status,
           streamTitle: webcast.stream_title,
           viewerCount: webcast.viewer_count,
+          scheduledStartTimeUtc: webcast.scheduled_start_time_utc,
         };
       });
     });

@@ -3,11 +3,15 @@
   <div class="carousel-inner">
     {% for media in image_medias %}
     <div class="item{% if loop.first %} active{% endif %}" data-foreign-key="{{media.foreign_key}}" data-media-type="{{media.slug_name}}">
+      {% if media.media_type_enum == 10 %}
+      {% include "media_partials/instagram_partial.html" %}
+      {% else %}
       <div class="cdphotothread-thumbnail">
         <a href="{{media.image_direct_url}}" class="gallery">
           <span style="background-image:url('{% if small_thumbnail %}{{media.image_direct_url_sm}}{% else %}{{media.image_direct_url_med}}{% endif %}')"></span>
         </a>
       </div>
+      {% endif %}
     </div>
     {% endfor %}
   </div>

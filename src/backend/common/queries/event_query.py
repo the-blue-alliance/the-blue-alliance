@@ -23,6 +23,7 @@ class EventQuery(CachedDatabaseQuery[Optional[Event], Optional[EventDict]]):
     CACHE_VERSION = 3
     CACHE_KEY_FORMAT = "event_{event_key}"
     MODEL_CACHING_ENABLED = False  # No need to cache a point query
+    DICT_CACHING_ENABLED = False  # No need to cache a point query dict
     DICT_CONVERTER = EventConverter
 
     def __init__(self, event_key: EventKey) -> None:
@@ -94,6 +95,25 @@ class DistrictChampsInYearQuery(CachedDatabaseQuery[List[Event], List[EventDict]
     def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
         all_cmp_event_keys = yield Event.query(
             Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP
+        ).fetch_async(keys_only=True)
+        events = yield ndb.get_multi_async(all_cmp_event_keys)
+        return list(events)
+
+
+class DistrictCmpDivisionsInYearQuery(
+    CachedDatabaseQuery[List[Event], List[EventDict]]
+):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "district_cmp_division_events_{year}"
+    DICT_CONVERTER = EventConverter
+
+    def __init__(self, year: Year) -> None:
+        super().__init__(year=year)
+
+    @typed_tasklet
+    def _query_async(self, year: Year) -> Generator[Any, Any, List[Event]]:
+        all_cmp_event_keys = yield Event.query(
+            Event.year == year, Event.event_type_enum == EventType.DISTRICT_CMP_DIVISION
         ).fetch_async(keys_only=True)
         events = yield ndb.get_multi_async(all_cmp_event_keys)
         return list(events)

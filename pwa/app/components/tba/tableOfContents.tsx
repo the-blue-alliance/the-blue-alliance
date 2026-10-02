@@ -1,10 +1,11 @@
 import { useRouter } from '@tanstack/react-router';
+import { cn } from 'cn';
 import {
   createContext,
+  startTransition,
   useCallback,
   useContext,
   useEffect,
-  useLayoutEffect,
   useMemo,
   useState,
 } from 'react';
@@ -23,7 +24,6 @@ import {
   TableOfContentsLink,
   TableOfContentsList,
 } from '~/components/ui/toc';
-import { cn } from '~/lib/utils';
 
 const TOCRendererContext = createContext<{
   content: React.ReactNode;
@@ -52,7 +52,7 @@ export function TOCRendererProvider({
 function TOCRenderPortal({ children }: { children: React.ReactNode }) {
   const { setContent } = useContext(TOCRendererContext);
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     setContent(children);
   }, [children, setContent]);
 
@@ -137,14 +137,16 @@ export function TableOfContents({
               open={mobilePopoverOpen}
               onOpenChange={setMobilePopoverOpen}
             >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-8 gap-1.5 px-2 text-foreground"
-                >
-                  <TableOfContentsIcon className="size-5" />
-                  <span className="text-sm">{activeItem?.label}</span>
-                </Button>
+              <PopoverTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    className="h-8 gap-1.5 px-2 text-foreground"
+                  />
+                }
+              >
+                <TableOfContentsIcon className="size-5" />
+                <span className="text-sm">{activeItem?.label}</span>
               </PopoverTrigger>
               <PopoverContent
                 side="top"
@@ -190,13 +192,17 @@ export function TableOfContentsSection({
       className={cn('scroll-mt-12 lg:scroll-mt-4', className)}
       rootMargin="-15% 0px 0px 0px"
       onChange={(inView) => {
-        setInView((prev) => {
-          if (inView) {
-            prev.add(id);
-          } else {
-            prev.delete(id);
-          }
-          return new Set(prev);
+        // Low-priority update so pointer events/hover aren't blocked by the re-render
+        startTransition(() => {
+          setInView((prev) => {
+            const next = new Set(prev);
+            if (inView) {
+              next.add(id);
+            } else {
+              next.delete(id);
+            }
+            return next;
+          });
         });
       }}
       {...props}

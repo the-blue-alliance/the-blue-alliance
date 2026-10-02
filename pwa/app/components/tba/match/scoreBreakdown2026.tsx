@@ -2,6 +2,7 @@ import { Match, MatchScoreBreakdown2026, TowerRobot2026 } from '~/api/tba/read';
 import {
   ConditionalBadge,
   ConditionalRpAchieved,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
@@ -60,17 +61,23 @@ export default function ScoreBreakdown2026({
           <div className="flex flex-row items-center gap-1">
             <div className="flex flex-col items-start justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoTowerRobot1 !== 'None'}
+                condition={
+                  scoreBreakdown.red.autoTowerRobot1 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.red.team_keys[0]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoTowerRobot2 !== 'None'}
+                condition={
+                  scoreBreakdown.red.autoTowerRobot2 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.red.team_keys[1]}
                 alignIcon="left"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.red.autoTowerRobot3 !== 'None'}
+                condition={
+                  scoreBreakdown.red.autoTowerRobot3 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.red.team_keys[2]}
                 alignIcon="left"
               />
@@ -90,17 +97,23 @@ export default function ScoreBreakdown2026({
             </div>
             <div className="flex flex-col items-end justify-center gap-1">
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoTowerRobot1 !== 'None'}
+                condition={
+                  scoreBreakdown.blue.autoTowerRobot1 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.blue.team_keys[0]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoTowerRobot2 !== 'None'}
+                condition={
+                  scoreBreakdown.blue.autoTowerRobot2 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.blue.team_keys[1]}
                 alignIcon="right"
               />
               <ConditionalBadge
-                condition={scoreBreakdown.blue.autoTowerRobot3 !== 'None'}
+                condition={
+                  scoreBreakdown.blue.autoTowerRobot3 !== TowerRobot2026.NONE
+                }
                 teamKey={match.alliances.blue.team_keys[2]}
                 alignIcon="right"
               />
@@ -122,6 +135,22 @@ export default function ScoreBreakdown2026({
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="dark">
           {scoreBreakdown.blue.totalAutoPoints}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Transition Fuel */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.hubScore.transitionPoints}
+        redValue={scoreBreakdown.red.hubScore.transitionPoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.hubScore.transitionPoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Transition Fuel
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.hubScore.transitionPoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
@@ -215,6 +244,22 @@ export default function ScoreBreakdown2026({
           {scoreBreakdown.blue.hubScore.shift2Points} /{' '}
           {scoreBreakdown.blue.hubScore.shift3Points} /{' '}
           {scoreBreakdown.blue.hubScore.shift4Points}
+        </ScoreBreakdownAllianceCell>
+      </ScoreBreakdownRow>
+
+      {/* Endgame Hub Fuel */}
+      <ScoreBreakdownRow
+        blueValue={scoreBreakdown.blue.hubScore.endgamePoints}
+        redValue={scoreBreakdown.red.hubScore.endgamePoints}
+      >
+        <ScoreBreakdownAllianceCell color="red" shade="light">
+          {scoreBreakdown.red.hubScore.endgamePoints}
+        </ScoreBreakdownAllianceCell>
+        <ScoreBreakdownLabelCell shade="light">
+          Endgame Hub Fuel
+        </ScoreBreakdownLabelCell>
+        <ScoreBreakdownAllianceCell color="blue" shade="light">
+          {scoreBreakdown.blue.hubScore.endgamePoints}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
@@ -430,22 +475,26 @@ export default function ScoreBreakdown2026({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls / Major Fouls */}
+      {/* Fouls committed by each alliance */}
       <ScoreBreakdownRow>
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.minorFoulCount} /{' '}
-          {scoreBreakdown.red.majorFoulCount}
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.minorFoulCount,
+            techFouls: scoreBreakdown.red.majorFoulCount,
+          })}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls / Major Fouls
+          Fouls / Major Fouls Committed
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.minorFoulCount} /{' '}
-          {scoreBreakdown.blue.majorFoulCount}
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.minorFoulCount,
+            techFouls: scoreBreakdown.blue.majorFoulCount,
+          })}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Foul Points */}
+      {/* Foul Points: points each alliance received from the other's fouls */}
       <ScoreBreakdownRow
         blueValue={scoreBreakdown.blue.foulPoints}
         redValue={scoreBreakdown.red.foulPoints}
@@ -454,7 +503,7 @@ export default function ScoreBreakdown2026({
           {scoreBreakdown.red.foulPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
-          Foul Points
+          Foul Points Received
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="dark">
           {scoreBreakdown.blue.foulPoints}

@@ -15,9 +15,9 @@
                   {% for team in match.red_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
                 </span>
               </td>
-              {% if match.red_record.wins + match.red_record.losses + match.red_record.ties > 0 %}
-                <td class="redScore {% if match.winning_alliance == 'red' %}winner{% endif %}">{{ match.red_record.wins }}</td>
-              {% endif %}
+              {% for game in match.results %}
+                <td class="redScore {% if game.winner == 'red' %}winner{% endif %}">{{ game.get("red_score", "?") }}</td>
+              {% endfor %}
             </tr>
           {% else %}
             <tr>
@@ -36,9 +36,9 @@
                   {% for team in match.blue_alliance %}{{ delim() }}<wbr><a href="/team/{{ team }}">{{ team }}</a>{% endfor %}
                 </span>
               </td>
-              {% if match.blue_record.wins + match.blue_record.losses + match.blue_record.ties > 0 %}
-                <td class="blueScore {% if match.winning_alliance == 'blue' %}winner{% endif %}">{{ match.blue_record.wins }}</td>
-              {% endif %}
+              {% for game in match.results %}
+                <td class="blueScore {% if game.winner == 'blue' %}winner{% endif %}">{{ game.get("blue_score", "?") }}</td>
+              {% endfor %}
             </tr>
           {% else %}
             <tr>

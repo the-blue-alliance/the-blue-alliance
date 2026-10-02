@@ -24,7 +24,8 @@ export const Route = createFileRoute('/apidocs')({
       ],
     };
   },
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function ApiDocs(): React.JSX.Element {
   const [inView, setInView] = useState(new Set<string>());
@@ -146,7 +147,7 @@ function ApiDocs(): React.JSX.Element {
               <code>https://www.thebluealliance.com/api/v3</code>.
             </p>
             <h3 className="mt-4 mb-2 text-xl">Authentication</h3>
-            <h4 className="text-l mb-2">
+            <h4 className="mb-2 text-lg">
               <code>X-TBA-Auth-Key</code> Header
             </h4>
             <p>
@@ -161,7 +162,7 @@ function ApiDocs(): React.JSX.Element {
               browser.
             </p>
             <h3 className="mt-4 mb-2 text-xl">Caching</h3>
-            <h4 className="text-l mb-2">
+            <h4 className="mb-2 text-lg">
               <code>ETag</code> and <code>If-None-Match</code> Headers
             </h4>
             <p>
@@ -187,7 +188,7 @@ function ApiDocs(): React.JSX.Element {
               </a>
               .
             </p>
-            <h4 className="text-l mt-4 mb-2">
+            <h4 className="mt-4 mb-2 text-lg">
               <code>Cache-Control</code> Header
             </h4>
             <p>

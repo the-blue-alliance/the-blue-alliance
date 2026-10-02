@@ -53,7 +53,7 @@
                             </li>
                         </ul>
                         <h3>Suggest An Event</h3>
-                        <p>All fields below are required, please do the best you can to fill them accurately </p>
+                        <p>All fields below are required unless marked optional; please do the best you can to fill them accurately </p>
 
                         <form action="/suggest/offseason" method="post" id="suggest_offseason">
                             <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
@@ -94,7 +94,7 @@
                                     <td>Venue Name</td>
                                     <td>
                                         <span{% if failures and 'venue_name' in failures %} class="has-error"{% endif %}>
-                                            <input class="form-control" type="text" name="venue_name" placeholder="Jacob K. Javits Center"{% if venue_address %} value="{{venue_name}}"{% endif %}/>
+                                            <input class="form-control" type="text" name="venue_name" placeholder="Jacob K. Javits Center"{% if venue_name %} value="{{venue_name}}"{% endif %}/>
                                             {% if failures and 'venue_name' in failures %}<span class="help-block">{{failures.venue_name}}</span>{% endif %}
                                         </span>
                                     </td>
@@ -136,9 +136,12 @@
                                     </td>
                                 </tr>
                                 <tr>
-                                    <td>FIRST Sync Code</td>
+                                                                        <td>frc-events link (optional)</td>
                                     <td>
-                                      <input class="form-control" type="text" name="first_code" placeholder="Like 'INLaf'."{% if first_code %} value="{{first_code}}"{% endif %}/>
+                                                                            <span{% if failures and 'frc_events_link' in failures %} class="has-error"{% endif %}>
+                                                                                    <input class="form-control" type="text" name="frc_events_link" placeholder="https://frc-events.firstinspires.org/2026/INLAF"{% if frc_events_link %} value="{{frc_events_link}}"{% endif %}/>
+                                                                                    {% if failures and 'frc_events_link' in failures %}<span class="help-block">{{failures.frc_events_link}}</span>{% endif %}
+                                                                            </span>
                                     </td>
                                 </tr>
                             </table>
@@ -150,3 +153,4 @@
         </div>
     </div>
 {% endblock %}
+

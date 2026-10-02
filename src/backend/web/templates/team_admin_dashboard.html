@@ -8,12 +8,27 @@
 {% block content %}
 <div class="container">
   <h1>Team Admin Dashboard</h1>
+  {% if review_error %}
+  <div class="alert alert-danger" id="review-error">
+    <button type="button" class="close" data-dismiss="alert">&times;</button>
+    <strong>A suggestion could not be reviewed:</strong> {{ review_error }}
+  </div>
+  {% endif %}
   <h3>Hi, {{ user.display_name }}, you have administrative access for {{teams|length}} team{% if teams|length > 1%}s{%endif%}</h3>
   <ul>
     {% for team_link in existing_access %}
     <li><a href="/team/{{team_link.team_number}}/{{team_link.year}}">Team {{team_link.team_number}} - {{teams[team_link.team_number].nickname}} ({{team_link.year}})</a></li>
     {%endfor%}
   </ul>
+
+  {% if show_year_jump %}
+  <form class="form-inline" action="/mod" method="get">
+    <legend>Jump to Year</legend>
+    <input type="hidden" name="team" value="{{year_jump_team_number}}">
+    <input class="form-control" name="year" type="text" placeholder="year" value="{{year_jump_current_year}}">
+    <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-fast-forward"></span> Go</button>
+  </form>
+  {% endif %}
 
   <div class="row">
     <div class="col-sm-12">
@@ -73,8 +88,11 @@
       <h2>Team {{team_link.team_number}}: Pending Suggestions</h2>
       {% for suggestion_type, suggestions in suggestions_by_team[team_link.team_number].items() %}
       <h3>{{suggestions|length}} {{suggestion_names[suggestion_type]}} Suggestion{% if suggestions|length > 1 %}s{%endif%}</h3>
-      <form action="{{suggestion_review_urls[suggestion_type]}}" method="post" id="review_{{suggestion_type}}">
-      <input type="hidden" name="return_url" value="/mod" />
+      <form action="/mod/review" method="post" id="review_{{suggestion_type}}">
+      {% if review_return_team %}
+      <input type="hidden" name="team" value="{{ review_return_team }}" />
+      <input type="hidden" name="year" value="{{ review_return_year }}" />
+      {% endif %}
       {% for suggestion in suggestions %}
       <div class="row">
         <div class="well">

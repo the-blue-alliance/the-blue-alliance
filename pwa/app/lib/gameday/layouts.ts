@@ -131,9 +131,40 @@ const LAYOUTS: LayoutConfig[] = [
 ];
 
 /**
+ * Named indices into the LAYOUTS array
+ */
+export const Layout = {
+  SINGLE_VIEW: 0,
+  VERTICAL_SPLIT: 1,
+  ONE_PLUS_TWO: 2,
+  QUAD_VIEW: 3,
+  ONE_PLUS_THREE: 4,
+  ONE_PLUS_FOUR: 5,
+  HEX_VIEW: 6,
+  OCTO_VIEW: 7,
+  NONA_VIEW: 8,
+  HORIZONTAL_SPLIT: 9,
+  ONE_PLUS_SIX: 10,
+  OCTO_VIEW_VERTICAL: 11,
+} as const;
+
+/**
  * Order in which layouts should be displayed in the selection UI
  */
-export const LAYOUT_DISPLAY_ORDER = [0, 1, 9, 2, 3, 4, 5, 6, 10, 7, 11, 8];
+export const LAYOUT_DISPLAY_ORDER = [
+  Layout.SINGLE_VIEW,
+  Layout.VERTICAL_SPLIT,
+  Layout.HORIZONTAL_SPLIT,
+  Layout.ONE_PLUS_TWO,
+  Layout.QUAD_VIEW,
+  Layout.ONE_PLUS_THREE,
+  Layout.ONE_PLUS_FOUR,
+  Layout.HEX_VIEW,
+  Layout.ONE_PLUS_SIX,
+  Layout.OCTO_VIEW,
+  Layout.OCTO_VIEW_VERTICAL,
+  Layout.NONA_VIEW,
+];
 
 /**
  * Get a layout by its index
@@ -149,4 +180,18 @@ export function getLayoutById(id: number | null): LayoutConfig | undefined {
 export function getNumViewsForLayout(layoutId: number): number {
   const layout = getLayoutById(layoutId);
   return layout?.numViews ?? 1;
+}
+
+/**
+ * Pick the best layout index to display a given number of webcasts
+ */
+export function getBestLayoutForCount(count: number): number {
+  if (count <= 1) return Layout.SINGLE_VIEW;
+  if (count <= 2) return Layout.VERTICAL_SPLIT;
+  if (count <= 3) return Layout.ONE_PLUS_TWO;
+  if (count <= 4) return Layout.QUAD_VIEW;
+  if (count <= 5) return Layout.ONE_PLUS_FOUR;
+  if (count <= 6) return Layout.HEX_VIEW;
+  if (count <= 8) return Layout.OCTO_VIEW;
+  return Layout.NONA_VIEW;
 }

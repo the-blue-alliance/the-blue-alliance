@@ -1,6 +1,7 @@
 import json
 from datetime import datetime
 from typing import cast, Dict, List
+from unittest.mock import patch
 
 from google.appengine.ext import ndb
 from requests_mock.mocker import Mocker as RequestsMocker
@@ -16,6 +17,7 @@ from backend.common.helpers.deferred import run_from_task
 from backend.common.models.alliance import EventAlliance, MatchAlliance
 from backend.common.models.award import Award
 from backend.common.models.district import District
+from backend.common.models.district_team import DistrictTeam
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_predictions import EventPredictions
@@ -277,6 +279,42 @@ def mock_event_predictions_url(
     )
 
 
+def mock_event_teams_statuses_url(
+    m: RequestsMocker,
+    event_key: EventKey,
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/teams/statuses",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json={},
+    )
+
+
+def mock_event_district_points_url(
+    m: RequestsMocker,
+    event_key: EventKey,
+) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/event/{event_key}/district_points",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json={},
+    )
+
+
+def mock_districts_url(m: RequestsMocker, year: Year, districts: List[Dict]) -> None:
+    m.register_uri(
+        "GET",
+        f"https://www.thebluealliance.com/api/v3/districts/{year}",
+        headers={"X-TBA-Auth-Key": "test_apiv3"},
+        status_code=200,
+        json=districts,
+    )
+
+
 def test_bootstrap_unknown_key() -> None:
     resp = LocalDataBootstrap.bootstrap_key("asdf", "asdf")
     assert resp is None
@@ -348,6 +386,7 @@ def test_bootstrap_event(
     )
     mock_event_detail_url(requests_mock, event)
     mock_event_teams_url(requests_mock, event.key_name, [team1, team2])
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
     mock_event_matches_url(requests_mock, event.key_name, [match])
     mock_event_rankings_url(requests_mock, event.key_name, rankings)
     mock_event_alliances_url(requests_mock, event.key_name, alliances)
@@ -363,6 +402,7 @@ def test_bootstrap_event(
             "ranking_prediction_stats": None,
         },
     )
+    mock_event_district_points_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
@@ -407,6 +447,74 @@ def test_bootstrap_event(
     assert award == remove_auto_add_properties(stored_award)
 
 
+def test_bootstrap_event_batches_match_writes(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    """
+    Regression test: bootstrapping an event should write all of its matches in a
+    single batch (one createOrUpdate call over a list), rather than one at a time.
+    A single batch write means MatchManipulator's post-update hook - which itself
+    dedupes stats recalculation per event - only fires once for the whole event,
+    instead of once per match (which used to fan out into N x as many redundant
+    stats-recalc tasks).
+    """
+    event = make_event("2020nyny")
+    matches = [make_match(f"2020nyny_qm{i}") for i in range(1, 4)]
+    for i, match in enumerate(matches, start=1):
+        # make_match() hardcodes match_number/set_number=1; vary them here so
+        # each match's key_name (rendered from comp_level/set/match_number)
+        # actually matches its distinct id, like a real event's matches would.
+        match.match_number = i
+
+    mock_event_detail_url(requests_mock, event)
+    mock_event_teams_url(requests_mock, event.key_name, [])
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
+    mock_event_matches_url(requests_mock, event.key_name, matches)
+    mock_event_rankings_url(requests_mock, event.key_name, [])
+    mock_event_alliances_url(requests_mock, event.key_name, [])
+    mock_event_awards_url(requests_mock, event.key_name, [])
+    mock_event_predictions_url(
+        requests_mock,
+        event.key_name,
+        {
+            "match_predictions": None,
+            "match_prediction_stats": None,
+            "stat_mean_vars": None,
+            "ranking_predictions": None,
+            "ranking_prediction_stats": None,
+        },
+    )
+    mock_event_district_points_url(requests_mock, event.key_name)
+
+    resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
+    assert resp == "/event/2020nyny"
+
+    for match in matches:
+        stored_match = Match.get_by_id(match.key_name)
+        assert match == remove_auto_add_properties(stored_match)
+
+    # All 3 matches should have been written in a single batch, resulting in a
+    # single MatchManipulator post-update-hook task (not one per match).
+    hook_tasks = taskqueue_stub.get_filtered_tasks(queue_names="post-update-hooks")
+    match_hook_tasks = [t for t in hook_tasks if "MatchManipulator" in t.url]
+    assert len(match_hook_tasks) == 1
+
+    for task in match_hook_tasks:
+        run_from_task(task)
+
+    # Regardless of match count, stats recalculation should only be enqueued
+    # once for the event, not once per match.
+    stats_tasks = taskqueue_stub.get_filtered_tasks(queue_names="stats")
+    tasks_urls = [t.url for t in stats_tasks]
+    for expected_url in (
+        "/tasks/math/do/playoff_advancement_update/2020nyny",
+        "/tasks/math/do/event_team_status/2020nyny",
+        "/tasks/math/do/district_points_calc/2020nyny",
+        "/tasks/math/do/event_matchstats/2020nyny",
+    ):
+        assert tasks_urls.count(expected_url) == 1
+
+
 def test_bootstrap_year(
     ndb_context, requests_mock: RequestsMocker, taskqueue_stub
 ) -> None:
@@ -421,6 +529,7 @@ def test_bootstrap_year(
     for event in [e1, e2]:
         mock_event_detail_url(requests_mock, event)
         mock_event_teams_url(requests_mock, event.key_name, [])
+        mock_event_teams_statuses_url(requests_mock, event.key_name)
         mock_event_matches_url(requests_mock, event.key_name, [])
         mock_event_rankings_url(requests_mock, event.key_name, [])
         mock_event_alliances_url(requests_mock, event.key_name, [])
@@ -436,6 +545,9 @@ def test_bootstrap_year(
                 "ranking_prediction_stats": None,
             },
         )
+        mock_event_district_points_url(requests_mock, event.key_name)
+
+    mock_districts_url(requests_mock, 2020, [])
 
     resp = LocalDataBootstrap.bootstrap_key("2020", "test_apiv3")
     assert resp == "/events/2020"
@@ -467,6 +579,7 @@ def test_bootstrap_event_with_district(
 
     mock_event_detail_url(requests_mock, event)
     mock_event_teams_url(requests_mock, event.key_name, [])
+    mock_event_teams_statuses_url(requests_mock, event.key_name)
     mock_event_matches_url(requests_mock, event.key_name, [])
     mock_event_rankings_url(requests_mock, event.key_name, [])
     mock_event_alliances_url(requests_mock, event.key_name, [])
@@ -482,9 +595,167 @@ def test_bootstrap_event_with_district(
             "ranking_prediction_stats": None,
         },
     )
+    mock_event_district_points_url(requests_mock, event.key_name)
 
     resp = LocalDataBootstrap.bootstrap_key("2020nyny", "test_apiv3")
     assert resp == "/event/2020nyny"
 
     stored_event = Event.get_by_id("2020nyny")
     assert event == remove_auto_add_properties(stored_event)
+
+
+def test_fetch_helpers_build_endpoints() -> None:
+    with patch.object(
+        LocalDataBootstrap, "fetch_endpoint", return_value={}
+    ) as mock_fetch:
+        LocalDataBootstrap.fetch_event("2020nyny", "key")
+        LocalDataBootstrap.fetch_event_detail("2020nyny", "teams", "key")
+        LocalDataBootstrap.fetch_district_history("ne", "key")
+        LocalDataBootstrap.fetch_district_events("2020ne", "key")
+        LocalDataBootstrap.fetch_district_rankings("2020ne", "key")
+        LocalDataBootstrap.fetch_district_teams("2020ne", "key")
+
+    assert [c.args[0] for c in mock_fetch.call_args_list] == [
+        "event/2020nyny",
+        "event/2020nyny/teams",
+        "district/ne/history",
+        "district/2020ne/events",
+        "district/2020ne/rankings",
+        "district/2020ne/teams",
+    ]
+
+
+def test_store_empty_lists(ndb_context) -> None:
+    district = District(id="2020ne", year=2020, abbreviation="ne")
+    assert LocalDataBootstrap.store_district_teams([], district) == []
+    assert LocalDataBootstrap.store_team_medias([], 2020, "frc254") == []
+    assert LocalDataBootstrap.store_match_zebra(cast(Dict, None)) is None
+
+
+def test_update_events(ndb_context) -> None:
+    with patch.object(LocalDataBootstrap, "update_event") as mock_update:
+        LocalDataBootstrap.update_events(["2020nyny", "2020ctha"], "key")
+    assert [c.args for c in mock_update.call_args_list] == [
+        ("2020nyny", "key"),
+        ("2020ctha", "key"),
+    ]
+
+
+def test_update_event_with_pit_locations_and_district_points(
+    ndb_context, taskqueue_stub
+) -> None:
+    event = make_event("2020nyny")
+    team = make_team(254)
+    district_points = {
+        "points": {
+            "frc254": {
+                "qual_points": 1,
+                "elim_points": 0,
+                "alliance_points": 0,
+                "award_points": 0,
+                "total": 1,
+            }
+        },
+        "tiebreakers": {},
+    }
+    bundle = {
+        "event": EventConverter(event).convert(ApiMajorVersion.API_V3),
+        "teams": TeamConverter([team]).convert(ApiMajorVersion.API_V3),
+        "teams_statuses": {"frc254": {"pit_location": "A1"}, "frc1": None},
+        "matches": [],
+        "rankings": None,
+        "alliances": None,
+        "awards": [],
+        "predictions": None,
+        "district_points": district_points,
+    }
+    with patch.object(LocalDataBootstrap, "_fetch_event_bundle", return_value=bundle):
+        LocalDataBootstrap.update_event("2020nyny", "key")
+
+    event_team = EventTeam.get_by_id("2020nyny_frc254")
+    assert event_team is not None
+    assert event_team.pit_location == {"location": "A1"}
+
+    details = EventDetails.get_by_id("2020nyny")
+    assert details is not None
+    assert details.district_points == district_points
+
+
+def test_bootstrap_year_with_districts(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    mock_events_url(requests_mock, 2020, [])
+    district_data = {
+        "key": "2020ne",
+        "year": 2020,
+        "abbreviation": "ne",
+        "display_name": "New England",
+    }
+    mock_districts_url(requests_mock, 2020, [district_data])
+
+    resp = LocalDataBootstrap.bootstrap_key("2020", "test_apiv3")
+    assert resp == "/events/2020"
+
+    # The district is deferred for its own update
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+
+
+def test_bootstrap_district_abbreviation(
+    ndb_context, requests_mock: RequestsMocker, taskqueue_stub
+) -> None:
+    district_data = {
+        "key": "2020ne",
+        "year": 2020,
+        "abbreviation": "ne",
+        "display_name": "New England",
+    }
+    team = make_team(254)
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/ne/history",
+        json=[district_data],
+    )
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/2020ne/teams",
+        json=TeamConverter([team]).convert(ApiMajorVersion.API_V3),
+    )
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/2020ne/events",
+        json=[{"key": "2020nyny"}],
+    )
+    rankings = [
+        {
+            "rank": 1,
+            "team_key": "frc254",
+            "point_total": 10,
+            "rookie_bonus": 0,
+            "event_points": [],
+        }
+    ]
+    requests_mock.register_uri(
+        "GET",
+        "https://www.thebluealliance.com/api/v3/district/2020ne/rankings",
+        json=rankings,
+    )
+
+    resp = LocalDataBootstrap.bootstrap_key("ne", "test_apiv3")
+    assert resp == "/events/ne"
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert len(tasks) == 1
+    run_from_task(tasks[0])
+
+    # update_district defers an update for each of the district's events
+    assert len(taskqueue_stub.get_filtered_tasks(queue_names="default")) == 2
+
+    district = District.get_by_id("2020ne")
+    assert district is not None
+    assert district.display_name == "New England"
+    assert district.rankings == rankings
+
+    district_team = DistrictTeam.get_by_id("2020ne_frc254")
+    assert district_team is not None
+    assert district_team.year == 2020

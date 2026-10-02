@@ -8,6 +8,26 @@ export const IMAGE_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
   'external-link',
 ]);
 
+const EMBED_MEDIA_TYPE_LIST = [
+  'imgur',
+  'instagram-image',
+  'cd-thread',
+] as const;
+
+/** Media types that represent embeddable images (shown in the media gallery). */
+export const EMBED_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set(
+  EMBED_MEDIA_TYPE_LIST,
+);
+
+/** A media item of one of the embeddable types in `EMBED_MEDIA_TYPES`. */
+export type EmbedMedia = Media & {
+  type: (typeof EMBED_MEDIA_TYPE_LIST)[number];
+};
+
+function isEmbedMedia(media: Media): media is EmbedMedia {
+  return EMBED_MEDIA_TYPES.has(media.type);
+}
+
 /** Media types that represent CAD models. */
 export const CAD_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
   'grabcad',
@@ -16,51 +36,74 @@ export const CAD_MEDIA_TYPES: ReadonlySet<Media['type']> = new Set([
 
 /** Returns the image URL for a media item, handling type-specific URL formats. */
 export function getMediaImageUrl(media: Media): string | undefined {
-  switch (media.type) {
-    case 'imgur':
-      return `https://i.imgur.com/${media.foreign_key}m.jpg`;
-    case 'cdphotothread':
-      return media.direct_url;
-    case 'cd-thread': {
-      const details = media.details as { image_url?: string } | undefined;
-      return details?.image_url;
-    }
-    case 'external-link':
-      return media.direct_url;
-    default:
-      return media.direct_url;
+  if (media.type === 'cd-thread') {
+    return media.details?.image_url ?? undefined;
   }
+  return media.direct_url || undefined;
 }
 
-/** Returns the full-size image URL (for lightbox/detail views). */
-export function getMediaImageUrlFull(media: Media): string | undefined {
-  switch (media.type) {
-    case 'imgur':
-      return `https://i.imgur.com/${media.foreign_key}h.jpg`;
-    case 'cdphotothread':
-      return media.direct_url;
-    case 'cd-thread': {
-      const details = media.details as { image_url?: string } | undefined;
-      return details?.image_url;
-    }
-    case 'external-link':
-      return media.direct_url;
-    default:
-      return media.direct_url;
+function imgurThumbUrl(
+  directUrl: string | undefined,
+  size: 'l' | 'h',
+): string | undefined {
+  if (!directUrl) return undefined;
+  let parsed: URL;
+  try {
+    parsed = new URL(directUrl);
+  } catch {
+    return undefined;
   }
+  if (parsed.hostname !== 'i.imgur.com') return undefined;
+  const match = parsed.pathname.match(
+    /^\/([A-Za-z0-9]+)\.(jpe?g|png|gif|webp)$/i,
+  );
+  if (!match) return undefined;
+  const [, id, ext] = match;
+  if (id.length === 8 && /[sbtmlh]$/.test(id)) return undefined;
+  return `https://i.imgur.com/${id}${size}.${ext}`;
+}
+
+/** Returns an appropriately sized thumbnail URL for a media item, falling back to the full-resolution URL when the provider has no resized variant. */
+export function getMediaThumbUrl(media: Media): string | undefined {
+  if (media.type === 'imgur') {
+    return imgurThumbUrl(media.direct_url, 'l') ?? getMediaImageUrl(media);
+  }
+  if (media.type === 'smugmug-photo') {
+    return media.details?.image_url_med ?? getMediaImageUrl(media);
+  }
+  if (media.type === 'smugmug-album') {
+    return media.details?.cover_url_med ?? getMediaImageUrl(media);
+  }
+  return getMediaImageUrl(media);
+}
+
+/** Returns a `srcset` string for providers that expose multiple thumbnail sizes, or undefined when only a single URL is available. */
+export function getMediaThumbSrcSet(media: Media): string | undefined {
+  if (media.type !== 'imgur') return undefined;
+  const medium = imgurThumbUrl(media.direct_url, 'l');
+  const large = imgurThumbUrl(media.direct_url, 'h');
+  if (!medium || !large) return undefined;
+  return `${medium} 1x, ${large} 2x`;
+}
+
+/** Returns all embeddable image media (imgur, instagram-image, cd-thread). */
+export function getEmbedMedia(media: Media[]): EmbedMedia[] {
+  return media.filter(isEmbedMedia);
 }
 
 /** Returns the link URL for a media item (where clicking should navigate). */
 export function getMediaLinkUrl(media: Media): string | undefined {
   switch (media.type) {
     case 'imgur':
-      return `https://imgur.com/${media.foreign_key}`;
-    case 'cdphotothread': {
-      const details = media.details as { image_partial?: string } | undefined;
-      return details?.image_partial
-        ? `https://www.chiefdelphi.com/media/img/${details.image_partial}`
+      return media.view_url || `https://imgur.com/${media.foreign_key}`;
+    case 'instagram-image':
+      return (
+        media.view_url || `https://www.instagram.com/p/${media.foreign_key}/`
+      );
+    case 'cdphotothread':
+      return media.details?.image_partial
+        ? `https://www.chiefdelphi.com/media/img/${media.details.image_partial}`
         : undefined;
-    }
     case 'cd-thread':
       return `https://www.chiefdelphi.com/t/${media.foreign_key}`;
     case 'grabcad':
@@ -69,16 +112,28 @@ export function getMediaLinkUrl(media: Media): string | undefined {
       return `https://cad.onshape.com/documents/${media.foreign_key}`;
     case 'external-link':
       return media.foreign_key;
+    case 'smugmug-album':
+    case 'smugmug-photo':
+      return media.details?.web_uri || media.view_url || undefined;
     default:
       return undefined;
   }
 }
 
+/** Returns all SmugMug album media. */
+export function getSmugmugAlbums(media: Media[]): Media[] {
+  return media.filter((m) => m.type === 'smugmug-album');
+}
+
+/** Returns all YouTube video media (as attached to an event, not webcasts). */
+export function getEventVideos(media: Media[]): Media[] {
+  return media.filter((m) => m.type === 'youtube');
+}
+
 /** Returns the display name for a CAD model media item. */
 export function getCadModelName(media: Media): string {
-  if (media.type === 'grabcad') {
-    const details = media.details as { model_name?: string } | undefined;
-    return details?.model_name ?? 'GrabCAD Model';
+  if (media.type === 'grabcad' || media.type === 'onshape') {
+    return media.details?.model_name ?? 'CAD Model';
   }
   return 'CAD Model';
 }
@@ -97,13 +152,8 @@ export function getImageMedia(media: Media[]): Media[] {
 export function getTeamPreferredRobotPicMedium(
   media: Media[],
 ): string | undefined {
-  const maybePreferredImg = media.filter(
+  const preferred = media.find(
     (m) => IMAGE_MEDIA_TYPES.has(m.type) && m.preferred,
   );
-
-  if (maybePreferredImg.length === 0) {
-    return undefined;
-  }
-
-  return getMediaImageUrl(maybePreferredImg[0]);
+  return preferred ? getMediaImageUrl(preferred) : undefined;
 }
