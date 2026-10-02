@@ -5,6 +5,7 @@ import { Event, Match } from '~/api/tba/read';
 import { SimpleMatchRow } from '~/components/tba/match/matchRows';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Checkbox } from '~/components/ui/checkbox';
+import { formatMatchTime } from '~/lib/matchUtils';
 import {
   isScoreBreakdown2015,
   isScoreBreakdown2016,
@@ -74,19 +75,18 @@ function formatMatchDate(timestamp: number, timezone: string): string {
     });
 }
 
-function formatMatchTime(
-  timestamp: number,
-  timezone: string,
-): React.JSX.Element {
-  const time = Temporal.Instant.fromEpochMilliseconds(timestamp * 1000)
-    .toZonedDateTimeISO(timezone)
-    .toLocaleString('en-US', {
-      hour: '2-digit',
-      minute: '2-digit',
-      hour12: true,
-    });
-
-  return <span className="font-bold">{time}</span>;
+function MatchTime({
+  timestamp,
+  timeZone,
+}: {
+  timestamp: number;
+  timeZone: string;
+}): React.JSX.Element {
+  return (
+    <span className="font-bold">
+      {formatMatchTime(timestamp, { timeZone, weekday: false })}
+    </span>
+  );
 }
 
 function formatTimeDifference(
@@ -277,7 +277,10 @@ export default function MatchDetails({
                 <div className="flex gap-1">
                   <span className="w-20 font-medium">Actual:</span>
                   <span>
-                    {formatMatchTime(match.actual_time, displayTimezone)}
+                    <MatchTime
+                      timestamp={match.actual_time}
+                      timeZone={displayTimezone}
+                    />
                     {match.time && (
                       <span className="text-muted-foreground">
                         {' '}
@@ -290,13 +293,19 @@ export default function MatchDetails({
               {match.time && (
                 <div className="flex gap-1">
                   <span className="w-20 font-medium">Scheduled:</span>
-                  {formatMatchTime(match.time, displayTimezone)}
+                  <MatchTime
+                    timestamp={match.time}
+                    timeZone={displayTimezone}
+                  />
                 </div>
               )}
               {match.predicted_time && (
                 <div className="flex gap-1">
                   <span className="w-20 font-medium">Predicted:</span>
-                  {formatMatchTime(match.predicted_time, displayTimezone)}
+                  <MatchTime
+                    timestamp={match.predicted_time}
+                    timeZone={displayTimezone}
+                  />
                 </div>
               )}
             </div>
