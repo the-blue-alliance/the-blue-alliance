@@ -249,13 +249,22 @@ describe('ScoreBreakdown2022', () => {
     ).toHaveLength(3);
   });
 
-  test('credits each alliance with the fouls the other alliance committed', () => {
-    renderBreakdown();
+  // Counts and foul points from 2022gal_qm73; each alliance's foulPoints come from the other's fouls.
+  test('shows the fouls each alliance committed and the foul points it received', () => {
+    renderBreakdown(
+      makeBreakdown(
+        { foulCount: 5, techFoulCount: 1, foulPoints: 4 },
+        { foulCount: 1, techFoulCount: 0, foulPoints: 28 },
+      ),
+    );
 
     expect(
       screen.getByRole('row', {
-        name: /^Regular: ?3 \(\+12\) Tech: ?0 \(\+0\) Fouls Regular: ?2 \(\+8\) Tech: ?1 \(\+8\)$/,
+        name: '5 / 1 Fouls / Tech Fouls Committed 1 / 0',
       }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('row', { name: '4 Foul Points Received 28' }),
     ).toBeTruthy();
   });
 
