@@ -109,7 +109,7 @@ def test_api_auth_edit_get(login_gae_admin, web_client: Client) -> None:
     assert 'value="2030-06-30"' in content
     assert 'value="2020nyny"' in content
     assert 'value="2020ne"' in content
-    assert 'value="chan1,chan2"' in content
+    assert 'name="webcast_list_str" value="chan1,chan2"' in content
 
 
 # ---------------------------------------------------------------------------
@@ -384,3 +384,28 @@ def test_api_auth_edit_read_key_with_write_flag_rejected_gracefully(
     assert auth is not None
     assert auth.description == "readkey description"
     assert auth.auth_types_enum == [AuthType.READ_API]
+
+
+def test_api_auth_edit_updates_offseason_webcast_channels(
+    login_gae_admin, web_client: Client
+) -> None:
+    """Editing an existing key replaces its offseason webcast channels."""
+    _store_write_auth(
+        "writekey",
+        auth_types=[AuthType.EVENT_MATCHES],
+        offseason_webcast_channels=["oldchan"],
+    )
+
+    resp = web_client.post(
+        "/admin/api_auth/edit/writekey",
+        data={
+            "description": "Updated",
+            "allow_edit_matches": "on",
+            "webcast_list_str": "newchan1,newchan2",
+        },
+    )
+    assert resp.status_code == 302
+
+    auth = ApiAuthAccess.get_by_id("writekey")
+    assert auth is not None
+    assert auth.offseason_webcast_channels == ["newchan1", "newchan2"]
