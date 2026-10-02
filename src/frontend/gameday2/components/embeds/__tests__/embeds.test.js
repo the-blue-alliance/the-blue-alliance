@@ -86,6 +86,19 @@ describe("EmbedIframe", () => {
     expect(iframe).not.toBeNull();
     expect(iframe.getAttribute("src")).toBe("https://example.com/embed");
   });
+
+  it("decodes every &lt; and &gt; in the embed markup", () => {
+    // Every entity must be decoded, not just the first match.
+    const { container } = render(
+      <EmbedIframe
+        webcast={{
+          ...webcast,
+          channel: '&lt;iframe src="x"&gt;&lt;/iframe&gt;',
+        }}
+      />
+    );
+    expect(container.firstChild.innerHTML).toBe('<iframe src="x"></iframe>');
+  });
 });
 
 describe("EmbedLivestream", () => {
