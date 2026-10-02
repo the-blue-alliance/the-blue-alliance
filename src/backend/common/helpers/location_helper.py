@@ -20,7 +20,7 @@ class LocationInfo(TypedDict, total=False):
     lat: float
     lng: float
     name: str
-    types: str
+    types: List[str]
     street_number: str
     street: str
     city: str
@@ -28,7 +28,7 @@ class LocationInfo(TypedDict, total=False):
     state_prov_short: str
     country: str
     country_short: str
-    postal_code: int
+    postal_code: str
     formatted_address: str
     place_details: Dict
 
