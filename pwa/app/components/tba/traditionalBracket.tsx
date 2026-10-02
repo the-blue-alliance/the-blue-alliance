@@ -74,8 +74,10 @@ const _BracketMatchCard = forwardRef<
 
   if (!result) return null;
 
-  const isRedHighlighted = hoveredAlliance === result.redAllianceNumber;
-  const isBlueHighlighted = hoveredAlliance === result.blueAllianceNumber;
+  const isRedHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.redAllianceNumber;
+  const isBlueHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.blueAllianceNumber;
   const isHighlighted = isRedHighlighted || isBlueHighlighted;
 
   return (

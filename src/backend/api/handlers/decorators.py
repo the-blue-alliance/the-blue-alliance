@@ -117,7 +117,12 @@ def require_write_auth(auth_types: set[AuthType] | None, file_param: str | None 
                     try:
                         FMSReportType(fms_report_type)
                     except ValueError:
-                        fms_report_type = None
+                        return make_response(
+                            jsonify(
+                                {"Error": f"Unknown FMS report type {fms_report_type}"}
+                            ),
+                            400,
+                        )
 
                 # This will abort the request on failure
                 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper

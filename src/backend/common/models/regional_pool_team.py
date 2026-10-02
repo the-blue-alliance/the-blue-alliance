@@ -30,7 +30,7 @@ class RegionalPoolTeam(CachedModel):
     def key_name(self) -> RegionalPoolTeamKey:
         return self.render_key_name(self.year, self.team.id())
 
-    @staticmethod
+    @classmethod
     def validate_key_name(cls, key: str) -> bool:
         split = key.split("_")
         try:

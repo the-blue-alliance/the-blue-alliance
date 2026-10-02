@@ -247,7 +247,7 @@ class InsightsHelper(object):
                                 brier_scores_cmp[level].append(bs["win_loss"])
 
         if not has_insights:
-            data = None
+            return []
 
         data = defaultdict(dict)
         for level in ["qual", "playoff"]:
