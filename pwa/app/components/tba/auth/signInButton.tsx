@@ -1,10 +1,21 @@
 import { cn } from 'cn';
-import { AuthProvider, signInWithPopup } from 'firebase/auth';
+import { FirebaseError } from 'firebase/app';
+import {
+  AuthProvider,
+  signInWithPopup,
+  signInWithRedirect,
+} from 'firebase/auth';
 
 import { auth } from '~/firebase/firebaseConfig';
 import { createLogger } from '~/lib/utils';
 
 const authLogger = createLogger('auth');
+
+const REDIRECT_FALLBACK_CODES = new Set([
+  'auth/popup-blocked',
+  'auth/cancelled-popup-request',
+  'auth/operation-not-supported-in-this-environment',
+]);
 
 export default function SignInButton({
   provider,
@@ -19,7 +30,22 @@ export default function SignInButton({
 }) {
   const handleSignIn = () => {
     if (!auth) return;
-    signInWithPopup(auth, provider).catch((error: unknown) => {
+    const activeAuth = auth;
+    signInWithPopup(activeAuth, provider).catch((error: unknown) => {
+      if (
+        error instanceof FirebaseError &&
+        REDIRECT_FALLBACK_CODES.has(error.code)
+      ) {
+        signInWithRedirect(activeAuth, provider).catch(
+          (redirectError: unknown) => {
+            authLogger.error(
+              { error: redirectError },
+              'Error during redirect sign-in',
+            );
+          },
+        );
+        return;
+      }
       authLogger.error({ error }, 'Error during sign-in');
     });
   };

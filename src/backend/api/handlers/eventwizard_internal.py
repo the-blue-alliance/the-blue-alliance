@@ -80,11 +80,14 @@ def add_fms_companion_db(event_key: EventKey) -> Response:
     newest_db_contents = FMSCompanionHelper.read_newest_companion_db(event_key)
     if newest_db_contents == file_contents:
         newest_file_path = FMSCompanionHelper.get_newest_file_path(event_key)
-        storage_path = (
-            f"{FMSCompanionHelper.get_bucket()}/{newest_file_path}"
-            if newest_file_path
-            else ""
-        )
+        if not newest_file_path:
+            return make_response(
+                profiled_jsonify(
+                    {"Error": "Unable to locate stored FMS Companion database"}
+                ),
+                500,
+            )
+        storage_path = f"{FMSCompanionHelper.get_bucket()}/{newest_file_path}"
     else:
         filename = Path(form_data.filename or "fms_companion.db")
 

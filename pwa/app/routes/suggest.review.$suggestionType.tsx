@@ -34,6 +34,7 @@ import {
   defaultSetPreferred,
   formatEventDateRange,
   groupSuggestionsByTargetKey,
+  resolveUserMessage,
   summarizeReviewOutcomes,
 } from '~/lib/moderationUtils';
 
@@ -45,7 +46,7 @@ const TYPE_NAMES: Record<SuggestionType, string> = {
   [SuggestionType.OFFSEASON_EVENT]: 'Offseason Events',
   [SuggestionType.API_AUTH_ACCESS]: 'API Key Requests',
   [SuggestionType.ROBOT]: 'CAD Models',
-  [SuggestionType.EVENT_MEDIA]: 'Event Videos',
+  [SuggestionType.EVENT_MEDIA]: 'Event Media',
 };
 
 function WebcastEventGroup({
@@ -120,7 +121,8 @@ export const Route = createFileRoute('/suggest/review/$suggestionType')({
     },
   },
   component: SuggestionReviewList,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SuggestionReviewList(): JSX.Element {
   const { suggestionType } = Route.useParams();
@@ -203,7 +205,7 @@ function SuggestionReviewList(): JSX.Element {
           return {
             ...prev,
             [focusedSuggestion.key]: {
-              ...(prev[focusedSuggestion.key] ?? {}),
+              ...prev[focusedSuggestion.key],
               set_preferred: !current,
             },
           };
@@ -245,7 +247,7 @@ function SuggestionReviewList(): JSX.Element {
     const accepts = suggestions
       .filter((s) => decisions[s.key] === 'accept')
       .map((s) => {
-        const acceptOverrides = { ...(overrides[s.key] ?? {}) };
+        const acceptOverrides = { ...overrides[s.key] };
         // The preferred checkbox shows a computed default; send it explicitly
         // when the moderator didn't touch it
         if (
@@ -256,17 +258,26 @@ function SuggestionReviewList(): JSX.Element {
         }
         // Likewise the expiration dropdown: always send what the moderator
         // saw, so the server default never decides a key's lifetime.
-        if (
-          suggestionType === SuggestionType.API_AUTH_ACCESS &&
-          acceptOverrides.expiration_days === undefined
-        ) {
-          acceptOverrides.expiration_days = DEFAULT_EXPIRATION_DAYS;
+        if (suggestionType === SuggestionType.API_AUTH_ACCESS) {
+          if (acceptOverrides.expiration_days === undefined) {
+            acceptOverrides.expiration_days = DEFAULT_EXPIRATION_DAYS;
+          }
+          // The message box shows a default; send what the moderator saw
+          acceptOverrides.user_message = resolveUserMessage(acceptOverrides);
         }
         return { key: s.key, overrides: acceptOverrides };
       });
     const rejects = suggestions
       .filter((s) => decisions[s.key] === 'reject')
-      .map((s) => s.key);
+      .map((s) => ({
+        key: s.key,
+        // Only API key requesters are told the verdict; send what the
+        // moderator saw in the message box, default included
+        userMessage:
+          suggestionType === SuggestionType.API_AUTH_ACCESS
+            ? resolveUserMessage(overrides[s.key])
+            : undefined,
+      }));
     submission.mutate(
       { accepts, rejects },
       {

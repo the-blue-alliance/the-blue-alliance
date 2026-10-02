@@ -106,10 +106,11 @@ jobs:
           uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.python == 'true'
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
+          flags: python
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-24.04
@@ -164,10 +165,11 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: steps.changes.outputs.node == 'true'
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
+          flags: node
   bash-lint:
     name: "[bash] Lint"
     runs-on: ubuntu-24.04
@@ -234,6 +236,8 @@ jobs:
               - 'src/**'
               - 'package.json'
               - 'pyproject.toml'
+              - 'docker-compose*.yml'
+              - '.github/workflows/pull_request.yml'
       # See https://github.com/puppeteer/puppeteer/issues/12818
       # Ubuntu 23+ doesn't like running puppeteer without disabling AppArmor.
       - name: Disable AppArmor
@@ -261,28 +265,34 @@ jobs:
         if: steps.changes.outputs.web == 'true'
         run: |
           npm ci
-          npm install -g capture-website-cli
       - name: Create keys file
         if: steps.changes.outputs.web == 'true'
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build Containers
+        if: steps.changes.outputs.web == 'true'
+        uses: docker/bake-action@v7
+        with:
+          files: |
+            docker-compose.yml
+            docker-compose.ci.yml
+          targets: |
+            tba
+            firebase
+            webpack
+            datastore
+          load: true
       - name: Start Containers
         if: steps.changes.outputs.web == 'true'
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+        run: |
+          docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest &
+          PULL_PID=$!
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+          wait $PULL_PID
       - name: Test Docker Startup
         if: steps.changes.outputs.web == 'true'
         run: python ./ops/test_docker_startup.py
-      - name: Pre-pull companion import image
-        if: steps.changes.outputs.web == 'true'
-        run: docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest
       - name: Test Ops Fullstack
         if: steps.changes.outputs.web == 'true'
         run: ./ops/test_ops.sh
-      - name: Capture screenshots
-        if: steps.changes.outputs.web == 'true'
-        run: python ./ops/pr_screenshots/capture_screenshots.py
-      - name: Upload screenshots artifact
-        if: steps.changes.outputs.web == 'true'
-        uses: actions/upload-artifact@v7
-        with:
-          name: ci_screenshots
-          path: ci_screenshots.pickle

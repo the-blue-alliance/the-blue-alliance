@@ -10,13 +10,14 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.helpers.match_suggestion_helper import (
     MatchSuggestionHelper,
-    MAX_UPCOMING_PER_EVENT,
     NUM_SUGGESTIONS,
+    W_CLOSE_SCORE,
     W_FAVORITES,
-    W_PERFORMANCE,
+    W_HIGH_SCORE,
     W_SIGNIFICANCE,
     W_TIME_DECAY,
 )
+from backend.common.helpers.playoff_type_helper import PlayoffTypeHelper
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.keys import TeamKey
@@ -60,8 +61,8 @@ def make_match(
     predicted_time: Optional[datetime.datetime] = None,
     time: Optional[datetime.datetime] = None,
 ) -> Match:
-    red = red or ["frc1", "frc2", "frc3"]
-    blue = blue or ["frc4", "frc5", "frc6"]
+    red = red if red is not None else ["frc1", "frc2", "frc3"]
+    blue = blue if blue is not None else ["frc4", "frc5", "frc6"]
     score = 100 if played else -1
     return Match(
         id=Match.render_key_name(event.key_name, comp_level, set_number, match_number),
@@ -92,6 +93,15 @@ def seed_matches(event: Event, matches: List[Match]) -> Event:
 # --------------------------------------------------------------------------
 # Pure scoring functions
 # --------------------------------------------------------------------------
+
+
+def test_scoring_weights() -> None:
+    assert W_HIGH_SCORE == 0.10
+    assert W_CLOSE_SCORE == 0.10
+    assert (
+        W_FAVORITES + W_SIGNIFICANCE + W_TIME_DECAY + W_HIGH_SCORE + W_CLOSE_SCORE
+        == 1.0
+    )
 
 
 def test_min_max_normalize_empty() -> None:
@@ -133,7 +143,19 @@ def test_time_decay_falls_off_into_the_future(offset_s: int) -> None:
     assert 0.0 < further < nearer <= 1.0
 
 
-@pytest.mark.parametrize("offset_s", [60, 300, 900, 1800])
+@pytest.mark.parametrize("offset_s", [1, 60, 299, 300])
+def test_time_decay_stays_at_peak_while_match_is_likely_ongoing(
+    offset_s: int,
+) -> None:
+    assert (
+        MatchSuggestionHelper._time_decay(
+            NOW - datetime.timedelta(seconds=offset_s), NOW
+        )
+        == 1.0
+    )
+
+
+@pytest.mark.parametrize("offset_s", [301, 360, 900, 1800])
 def test_time_decay_falls_off_into_the_past(offset_s: int) -> None:
     nearer = MatchSuggestionHelper._time_decay(
         NOW - datetime.timedelta(seconds=offset_s - 60), NOW
@@ -264,7 +286,7 @@ def test_significance_falls_back_on_out_of_bracket_set_number() -> None:
 
 
 # --------------------------------------------------------------------------
-# performance from stored match predictions
+# scores from stored match predictions
 # --------------------------------------------------------------------------
 
 
@@ -315,7 +337,7 @@ def _upcoming_match(event: Event, match_number: int) -> Match:
     )
 
 
-def test_performance_favors_predicted_close_matches(ndb_stub, memcache_stub) -> None:
+def test_close_score_favors_predicted_close_matches(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(event, [_upcoming_match(event, 1), _upcoming_match(event, 2)])
     seed_predictions(
@@ -329,11 +351,11 @@ def test_performance_favors_predicted_close_matches(ndb_stub, memcache_stub) -> 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
     close = result.suggestions["2026casj_qm1"]
     lopsided = result.suggestions["2026casj_qm2"]
-    assert close.components.performance > lopsided.components.performance
+    assert close.components.close_score > lopsided.components.close_score
     assert close.rank < lopsided.rank
 
 
-def test_performance_favors_higher_scoring_predictions(ndb_stub, memcache_stub) -> None:
+def test_high_score_favors_higher_scoring_predictions(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(event, [_upcoming_match(event, 1), _upcoming_match(event, 2)])
     seed_predictions(
@@ -346,12 +368,26 @@ def test_performance_favors_higher_scoring_predictions(ndb_stub, memcache_stub) 
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
     assert (
-        result.suggestions["2026casj_qm1"].components.performance
-        > result.suggestions["2026casj_qm2"].components.performance
+        result.suggestions["2026casj_qm1"].components.high_score
+        > result.suggestions["2026casj_qm2"].components.high_score
     )
 
 
-def test_performance_reads_playoff_predictions(ndb_stub, memcache_stub) -> None:
+def test_suggestion_includes_predicted_alliance_scores(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+    seed_predictions(
+        event.key_name,
+        qual={"2026casj_qm1": (123.5, 118.25, 0.6)},
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.predicted_red_score == 123.5
+    assert suggestion.predicted_blue_score == 118.25
+
+
+def test_scores_read_playoff_predictions(ndb_stub, memcache_stub) -> None:
     event = make_event("2026cmptx", EventType.CMP_FINALS)
     seed_matches(
         event,
@@ -367,31 +403,44 @@ def test_performance_reads_playoff_predictions(ndb_stub, memcache_stub) -> None:
     seed_predictions(event.key_name, playoff={"2026cmptx_f1m1": (120.0, 120.0, 0.5)})
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    # Single predicted match: magnitude is neutral, closeness is full
-    performance = result.suggestions["2026cmptx_f1m1"].components.performance
-    assert performance == pytest.approx(0.75)  # pyre-ignore[16]
+    # Single predicted match: high score is neutral, closeness is full
+    components = result.suggestions["2026cmptx_f1m1"].components
+    assert components.high_score == 0.5
+    assert components.close_score == 1.0
 
 
-def test_performance_is_neutral_without_event_details(ndb_stub, memcache_stub) -> None:
+def test_scores_are_neutral_without_event_details(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(event, [_upcoming_match(event, 1)])
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert result.suggestions["2026casj_qm1"].components.performance == 0.5
+    components = result.suggestions["2026casj_qm1"].components
+    assert components.high_score == 0.5
+    assert components.close_score == 0.5
 
 
-def test_performance_is_neutral_when_predictions_is_none(
-    ndb_stub, memcache_stub
-) -> None:
+def test_suggestion_omits_scores_without_prediction(ndb_stub, memcache_stub) -> None:
+    event = make_event()
+    seed_matches(event, [_upcoming_match(event, 1)])
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.predicted_red_score is None
+    assert suggestion.predicted_blue_score is None
+
+
+def test_scores_are_neutral_when_predictions_is_none(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(event, [_upcoming_match(event, 1)])
     seed_predictions(event.key_name, predictions_is_none=True)
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert result.suggestions["2026casj_qm1"].components.performance == 0.5
+    components = result.suggestions["2026casj_qm1"].components
+    assert components.high_score == 0.5
+    assert components.close_score == 0.5
 
 
-def test_performance_is_neutral_when_match_absent_from_predictions(
+def test_scores_are_neutral_when_match_absent_from_predictions(
     ndb_stub, memcache_stub
 ) -> None:
     event = make_event()
@@ -399,7 +448,9 @@ def test_performance_is_neutral_when_match_absent_from_predictions(
     seed_predictions(event.key_name, qual={"2026casj_qm99": (100.0, 100.0, 0.5)})
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert result.suggestions["2026casj_qm1"].components.performance == 0.5
+    components = result.suggestions["2026casj_qm1"].components
+    assert components.high_score == 0.5
+    assert components.close_score == 0.5
 
 
 def test_unpredicted_match_is_neutral_not_the_pool_minimum(
@@ -423,12 +474,15 @@ def test_unpredicted_match_is_neutral_not_the_pool_minimum(
     )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    predicted_high = result.suggestions["2026casj_qm1"].components.performance
-    predicted_low = result.suggestions["2026casj_qm2"].components.performance
-    unpredicted = result.suggestions["2026casj_qm3"].components.performance
-    assert predicted_high == pytest.approx(1.0)  # pyre-ignore[16]
-    assert unpredicted == 0.5
-    assert predicted_low < unpredicted < predicted_high
+    predicted_high = result.suggestions["2026casj_qm1"].components
+    predicted_low = result.suggestions["2026casj_qm2"].components
+    unpredicted = result.suggestions["2026casj_qm3"].components
+    assert predicted_high.high_score == 1.0
+    assert predicted_high.close_score == 1.0
+    assert predicted_low.high_score == 0.0
+    assert predicted_low.close_score == 0.5
+    assert unpredicted.high_score == 0.5
+    assert unpredicted.close_score == 0.5
 
 
 # --------------------------------------------------------------------------
@@ -473,7 +527,43 @@ def test_skips_matches_with_no_time(ndb_stub, memcache_stub) -> None:
     assert result.suggestions == {}
 
 
-def test_skips_matches_beyond_the_future_horizon(ndb_stub, memcache_stub) -> None:
+@pytest.mark.parametrize(
+    "red,blue",
+    [
+        ([], ["frc4", "frc5", "frc6"]),
+        (["frc1", "frc2", "frc3"], []),
+        ([], []),
+    ],
+    ids=["red-unassigned", "blue-unassigned", "both-unassigned"],
+)
+def test_skips_matches_with_unassigned_alliances(
+    ndb_stub,
+    memcache_stub,
+    red: List[TeamKey],
+    blue: List[TeamKey],
+) -> None:
+    event = make_event()
+    seed_matches(
+        event,
+        [
+            make_match(
+                event,
+                match_number=1,
+                red=red,
+                blue=blue,
+                predicted_time=NOW + datetime.timedelta(minutes=10),
+            )
+        ],
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+
+    assert result.suggestions == {}
+
+
+def test_scores_distant_future_matches_with_low_time_decay(
+    ndb_stub, memcache_stub
+) -> None:
     event = make_event()
     seed_matches(
         event,
@@ -487,10 +577,13 @@ def test_skips_matches_beyond_the_future_horizon(ndb_stub, memcache_stub) -> Non
     )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert result.suggestions == {}
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert 0.0 < suggestion.components.time_decay < 0.001
 
 
-def test_skips_stale_late_matches(ndb_stub, memcache_stub) -> None:
+def test_scores_stale_unplayed_matches_with_low_time_decay(
+    ndb_stub, memcache_stub
+) -> None:
     event = make_event()
     seed_matches(
         event,
@@ -504,7 +597,28 @@ def test_skips_stale_late_matches(ndb_stub, memcache_stub) -> None:
     )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert result.suggestions == {}
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert 0.0 < suggestion.components.time_decay < 0.001
+
+
+def test_scores_unplayed_match_as_ongoing_during_grace_period(
+    ndb_stub, memcache_stub
+) -> None:
+    event = make_event()
+    seed_matches(
+        event,
+        [
+            make_match(
+                event,
+                match_number=1,
+                predicted_time=NOW - datetime.timedelta(minutes=5),
+            )
+        ],
+    )
+
+    result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
+    suggestion = result.suggestions["2026casj_qm1"]
+    assert suggestion.components.time_decay == 1.0
 
 
 def test_falls_back_to_scheduled_time(ndb_stub, memcache_stub) -> None:
@@ -518,7 +632,7 @@ def test_falls_back_to_scheduled_time(ndb_stub, memcache_stub) -> None:
     assert list(result.suggestions) == ["2026casj_qm1"]
 
 
-def test_respects_max_upcoming_per_event(ndb_stub, memcache_stub) -> None:
+def test_scores_all_unplayed_matches_per_event(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(
         event,
@@ -531,9 +645,16 @@ def test_respects_max_upcoming_per_event(ndb_stub, memcache_stub) -> None:
             for i in range(1, 8)
         ],
     )
+    seed_predictions(
+        event.key_name,
+        qual={f"2026casj_qm{i}": (50.0, 50.0, 0.5) for i in range(1, 7)}
+        | {"2026casj_qm7": (150.0, 150.0, 0.5)},
+    )
 
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
-    assert len(result.suggestions) == MAX_UPCOMING_PER_EVENT
+    assert len(result.suggestions) == 7
+    assert result.suggestions["2026casj_qm1"].components.high_score == 0.0
+    assert result.suggestions["2026casj_qm7"].components.high_score == 1.0
 
 
 def test_truncates_to_num_suggestions(ndb_stub, memcache_stub) -> None:
@@ -612,7 +733,8 @@ def test_score_is_the_weighted_sum_of_components(ndb_stub, memcache_stub) -> Non
         W_FAVORITES * c.favorites
         + W_SIGNIFICANCE * c.significance
         + W_TIME_DECAY * c.time_decay
-        + W_PERFORMANCE * c.performance
+        + W_HIGH_SCORE * c.high_score
+        + W_CLOSE_SCORE * c.close_score
     )
     assert suggestion.score == pytest.approx(expected, abs=1e-4)  # pyre-ignore[16]
 
@@ -679,7 +801,8 @@ def test_stronger_teams_score_higher(ndb_stub, memcache_stub) -> None:
     result = MatchSuggestionHelper.compute_match_suggestions(events=[event], now=NOW)
     strong = result.suggestions["2026cmptx_qm1"]
     weak = result.suggestions["2026cmptx_qm2"]
-    assert strong.components.performance > weak.components.performance
+    assert strong.components.high_score > weak.components.high_score
+    assert strong.components.close_score > weak.components.close_score
     assert strong.rank < weak.rank
 
 
@@ -721,7 +844,7 @@ def test_score_all_includes_played_and_unscheduled(ndb_stub, memcache_stub) -> N
     assert set(result.suggestions) == {"2026casj_qm1", "2026casj_qm2"}
 
 
-def test_score_all_ignores_the_time_horizon(ndb_stub, memcache_stub) -> None:
+def test_score_all_includes_matches_with_distant_times(ndb_stub, memcache_stub) -> None:
     event = make_event()
     seed_matches(
         event,
@@ -758,7 +881,8 @@ def test_score_all_zeroes_time_decay(ndb_stub, memcache_stub) -> None:
     expected = (
         W_FAVORITES * suggestion.components.favorites
         + W_SIGNIFICANCE * suggestion.components.significance
-        + W_PERFORMANCE * suggestion.components.performance
+        + W_HIGH_SCORE * suggestion.components.high_score
+        + W_CLOSE_SCORE * suggestion.components.close_score
     )
     assert suggestion.score == pytest.approx(expected, abs=1e-4)  # pyre-ignore[16]
 
@@ -777,7 +901,7 @@ def test_score_all_is_not_truncated(ndb_stub, memcache_stub) -> None:
     assert len(result.suggestions) == NUM_SUGGESTIONS + 11
 
 
-def test_score_all_ranks_by_significance_and_performance(
+def test_score_all_ranks_by_significance_and_prediction_scores(
     ndb_stub, memcache_stub
 ) -> None:
     event = make_event("2026cmptx", EventType.CMP_FINALS)
@@ -804,7 +928,8 @@ def test_score_all_ranks_by_significance_and_performance(
     quals = result.suggestions["2026cmptx_qm1"]
     assert finals.components.significance == 1.0
     assert quals.components.significance == 0.0
-    assert finals.components.performance > quals.components.performance
+    assert finals.components.high_score > quals.components.high_score
+    assert finals.components.close_score > quals.components.close_score
     assert finals.rank < quals.rank
 
 
@@ -817,11 +942,36 @@ def test_score_all_normalizes_across_the_events_passed(ndb_stub, memcache_stub) 
     seed_predictions(weak.key_name, qual={"2026ev01_qm1": (20.0, 20.0, 0.5)})
 
     together = MatchSuggestionHelper.score_all_matches([strong, weak], now=NOW)
-    # Both are predicted coin flips, so magnitude is the only mover: 0.5 * norm + 0.5
-    assert together.suggestions["2026cmptx_qm1"].components.performance == 1.0
-    assert together.suggestions["2026ev01_qm1"].components.performance == 0.5
+    # Both are predicted coin flips, so only the normalized high score differs.
+    assert together.suggestions["2026cmptx_qm1"].components.high_score == 1.0
+    assert together.suggestions["2026ev01_qm1"].components.high_score == 0.0
+    assert together.suggestions["2026cmptx_qm1"].components.close_score == 1.0
+    assert together.suggestions["2026ev01_qm1"].components.close_score == 1.0
 
-    # Scored alone there is nothing to normalize magnitude against
+    # Scored alone there is nothing to normalize high score against.
     alone = MatchSuggestionHelper.score_all_matches([strong], now=NOW)
-    performance = alone.suggestions["2026cmptx_qm1"].components.performance
-    assert performance == pytest.approx(0.75)  # pyre-ignore[16]
+    components = alone.suggestions["2026cmptx_qm1"].components
+    assert components.high_score == 0.5
+    assert components.close_score == 1.0
+
+
+def test_double_elim_round_legacy_bracket() -> None:
+    event = make_event("2023cmptx", EventType.CMP_DIVISION)
+    event.playoff_type = PlayoffType.LEGACY_DOUBLE_ELIM_8_TEAM
+    match = make_match(event, comp_level=CompLevel.SF, set_number=1)
+    assert MatchSuggestionHelper._double_elim_round(
+        event, match
+    ) == PlayoffTypeHelper.get_double_elim_round_pre_2023(CompLevel.SF, 1)
+
+
+def test_time_decay_detail_no_time() -> None:
+    event = make_event("2026cmptx", EventType.CMP_DIVISION)
+    match = make_match(event, comp_level=CompLevel.QM, set_number=1)
+    match.time = None
+    match.predicted_time = None
+    assert (
+        MatchSuggestionHelper._time_decay_detail(
+            match, datetime.datetime(2026, 4, 1), True
+        )
+        == "none"
+    )

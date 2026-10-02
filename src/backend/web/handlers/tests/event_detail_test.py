@@ -4,6 +4,7 @@ from datetime import datetime
 from bs4 import BeautifulSoup
 from freezegun import freeze_time
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.common.consts.alliance_color import AllianceColor
@@ -16,12 +17,16 @@ from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
 from backend.common.models.alliance import MatchAlliance
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
+from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.regional_champs_pool import RegionalChampsPool
+from backend.common.models.team import Team
 from backend.common.models.webcast import Webcast
+from backend.web.handlers.event import _label_event_keys_for, convert_component_name
 from backend.web.handlers.tests import helpers
 
 
@@ -547,3 +552,133 @@ def test_media_tab_badge_counts_youtube_and_smugmug(
     media_link = soup.find("a", href="#media")
     assert media_link is not None
     assert media_link.find("span", {"class": "badge"}).get_text(strip=True) == "2"
+
+
+def test_convert_component_name() -> None:
+    assert convert_component_name("OPR") == "OPR"
+    assert convert_component_name("rp") == "RP"
+    assert convert_component_name("foulCount") == "Foul Count"
+
+
+def test_label_event_keys_for() -> None:
+    event = Event(id="2026hop", short_name="Hopper Division")
+    assert _label_event_keys_for(event) == {
+        "hopper division": "2026hop",
+        "hopper": "2026hop",
+    }
+
+    event = Event(id="2026nyny", short_name="New York City")
+    assert _label_event_keys_for(event) == {
+        "new york city": "2026nyny",
+        "new": "2026nyny",
+    }
+
+    assert _label_event_keys_for(Event(id="2026xx", short_name="  ")) == {}
+
+
+def test_render_event_with_stats_medias_and_district_points(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_district("2020ne")
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event",
+        event_type_enum=EventType.DISTRICT,
+        district_key=ndb.Key(District, "2020ne"),
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    Team(id="frc1124", team_number=1124).put()
+    for team_key in ["frc254", "frc1124"]:
+        EventTeam(
+            id=f"2020nyny_{team_key}",
+            event=ndb.Key(Event, "2020nyny"),
+            team=ndb.Key(Team, team_key),
+            year=2020,
+        ).put()
+    Media(
+        id=Media.render_key_name(MediaType.IMGUR, "abc123"),
+        media_type_enum=MediaType.IMGUR,
+        foreign_key="abc123",
+        year=2020,
+        references=[ndb.Key(Team, "frc254")],
+        preferred_references=[ndb.Key(Team, "frc254")],
+    ).put()
+    EventDetails(
+        id="2020nyny",
+        matchstats={"oprs": {"frc254": 30.0, "frc1124": 10.0}},
+        coprs={"Cargo": {"frc254": 5.0, "frc1124": 2.0}},
+        district_points={
+            "points": {
+                "frc254": {
+                    "qual_points": 20,
+                    "elim_points": 10,
+                    "alliance_points": 16,
+                    "award_points": 5,
+                    "total": 51,
+                },
+            },
+            "tiebreakers": {},
+        },
+    ).put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert b"imgur.com/abc123" in resp.data
+
+
+def test_event_rss_no_event(web_client: Client) -> None:
+    resp = web_client.get("/event/2020nyny/feed")
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/events"
+
+
+def test_event_rss(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.get("/event/2020nyny/feed")
+    assert resp.status_code == 200
+    assert resp.headers["content-type"] == "application/xml; charset=UTF-8"
+    assert b"Test Event" in resp.data
+
+
+def test_event_agenda_bad_key(web_client: Client) -> None:
+    resp = web_client.get("/event/notakey/agenda")
+    assert resp.status_code == 404
+
+
+def test_event_agenda_no_agenda(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
+    resp = web_client.get("/event/2020nyny/agenda")
+    assert resp.status_code == 404
+
+
+def test_event_agenda(ndb_stub, web_client: Client) -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    resp = web_client.get("/event/2020nyny/agenda")
+    assert resp.status_code == 302
+    assert (
+        resp.headers["Location"]
+        == "https://info.firstinspires.org/hubfs/web/event/frc/2020/2020_NYNY_Agenda.pdf"
+    )
+
+
+def test_render_event_district_without_display_name(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+    District(id="2020ne", year=2020, abbreviation="ne").put()
+    event = none_throws(Event.get_by_id("2020nyny"))
+    event.district_key = ndb.Key(District, "2020ne")
+    event.put()
+
+    resp = web_client.get("/event/2020nyny")
+    assert resp.status_code == 200
+    assert '<a href="/events/ne/2020">NE District</a>' in resp.get_data(as_text=True)

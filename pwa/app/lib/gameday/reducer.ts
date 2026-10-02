@@ -5,8 +5,8 @@ import type { GamedayUrlState } from '~/lib/gameday/useGamedayUrlSync';
 // State
 export interface GamedayState {
   layoutId: number | null;
-  /** Map from grid position to webcast ID */
-  positionToWebcast: (string | null)[];
+  /** Map from grid position to webcast or data-panel ID */
+  positionToContent: (string | null)[];
   chatSidebarVisible: boolean;
   currentChat: string;
   webcastsById: Record<string, WebcastWithMeta>;
@@ -19,7 +19,7 @@ export function createEmptyPositionArray(): (string | null)[] {
 
 export const initialState: GamedayState = {
   layoutId: null,
-  positionToWebcast: createEmptyPositionArray(),
+  positionToContent: createEmptyPositionArray(),
   chatSidebarVisible: true,
   currentChat: 'funroboticsnetwork', // TODO: Pull this from some configurable source
   webcastsById: {},
@@ -29,11 +29,15 @@ export const initialState: GamedayState = {
 // Actions
 export type GamedayAction =
   | { type: 'SET_LAYOUT'; layoutId: number }
-  | { type: 'SET_WEBCASTS'; webcasts: Record<string, WebcastWithMeta> }
-  | { type: 'ADD_WEBCAST_AT_POSITION'; webcastId: string; position: number }
-  | { type: 'REMOVE_WEBCAST'; webcastId: string }
+  | {
+      type: 'SET_WEBCASTS';
+      webcasts: Record<string, WebcastWithMeta>;
+      dataPanelIds?: readonly string[];
+    }
+  | { type: 'ADD_CONTENT_AT_POSITION'; contentId: string; position: number }
+  | { type: 'REMOVE_CONTENT'; contentId: string }
   | { type: 'SWAP_POSITIONS'; position1: number; position2: number }
-  | { type: 'RESET_WEBCASTS' }
+  | { type: 'RESET_CONTENT' }
   | { type: 'TOGGLE_CHAT_SIDEBAR' }
   | { type: 'SET_CURRENT_CHAT'; channel: string }
   | { type: 'RESTORE_URL_STATE'; urlState: GamedayUrlState }
@@ -51,76 +55,78 @@ export function gamedayReducer(
   switch (action.type) {
     case 'SET_LAYOUT': {
       const numViews = getNumViewsForLayout(action.layoutId);
-      // Trim webcasts that don't fit in the new layout
-      const newPositionToWebcast = state.positionToWebcast.slice(0, numViews);
+      // Trim content that doesn't fit in the new layout
+      const newPositionToContent = state.positionToContent.slice(0, numViews);
       // Pad with nulls if needed
-      while (newPositionToWebcast.length < MAX_VIEWS) {
-        newPositionToWebcast.push(null);
+      while (newPositionToContent.length < MAX_VIEWS) {
+        newPositionToContent.push(null);
       }
       return {
         ...state,
         layoutId: action.layoutId,
-        positionToWebcast: newPositionToWebcast,
+        positionToContent: newPositionToContent,
       };
     }
 
     case 'SET_WEBCASTS': {
-      // Validate positionToWebcast - remove any IDs that don't exist in the new webcasts
-      const validPositionToWebcast = state.positionToWebcast.map((id) =>
-        id !== null && action.webcasts[id] ? id : null,
-      );
+      const validPositionToContent = state.positionToContent.map((id) => {
+        const isAvailable =
+          id !== null &&
+          (action.webcasts[id] || action.dataPanelIds?.includes(id));
+        return isAvailable ? id : null;
+      });
 
       return {
         ...state,
         webcastsById: action.webcasts,
-        positionToWebcast: validPositionToWebcast,
+        positionToContent: validPositionToContent,
       };
     }
 
-    case 'ADD_WEBCAST_AT_POSITION': {
+    case 'ADD_CONTENT_AT_POSITION': {
       if (state.layoutId === null) return state;
 
       const numViews = getNumViewsForLayout(state.layoutId);
       if (action.position < 0 || action.position >= numViews) return state;
 
-      // Remove the webcast from any existing position first
-      const newPositionToWebcast = state.positionToWebcast.map((id) =>
-        id === action.webcastId ? null : id,
+      // Remove the content from any existing position first
+      const newPositionToContent = state.positionToContent.map((id) =>
+        id === action.contentId ? null : id,
       );
       // Add to new position
-      newPositionToWebcast[action.position] = action.webcastId;
+      newPositionToContent[action.position] = action.contentId;
 
       return {
         ...state,
-        positionToWebcast: newPositionToWebcast,
+        positionToContent: newPositionToContent,
       };
     }
 
-    case 'REMOVE_WEBCAST': {
+    case 'REMOVE_CONTENT': {
       return {
         ...state,
-        positionToWebcast: state.positionToWebcast.map((id) =>
-          id === action.webcastId ? null : id,
+        positionToContent: state.positionToContent.map((id) =>
+          id === action.contentId ? null : id,
         ),
       };
     }
 
     case 'SWAP_POSITIONS': {
-      const newPositionToWebcast = [...state.positionToWebcast];
-      const temp = newPositionToWebcast[action.position1];
-      newPositionToWebcast[action.position1] =
-        newPositionToWebcast[action.position2];
-      newPositionToWebcast[action.position2] = temp;
+      const newPositionToContent = [...state.positionToContent];
+      const temp = newPositionToContent[action.position1];
+      newPositionToContent[action.position1] =
+        newPositionToContent[action.position2];
+      newPositionToContent[action.position2] = temp;
       return {
         ...state,
-        positionToWebcast: newPositionToWebcast,
+        positionToContent: newPositionToContent,
       };
     }
 
-    case 'RESET_WEBCASTS': {
+    case 'RESET_CONTENT': {
       return {
         ...state,
-        positionToWebcast: createEmptyPositionArray(),
+        positionToContent: createEmptyPositionArray(),
       };
     }
 
@@ -147,11 +153,11 @@ export function gamedayReducer(
         const numViews = getNumViewsForLayout(urlState.layoutId);
         newState.layoutId = urlState.layoutId;
 
-        // Restore webcasts at positions, clearing any beyond layout capacity
-        const positionToWebcast = urlState.positionToWebcast.map((id, i) =>
+        // Restore content at positions, clearing any beyond layout capacity
+        const positionToContent = urlState.positionToContent.map((id, i) =>
           i < numViews ? id : null,
         );
-        newState.positionToWebcast = positionToWebcast;
+        newState.positionToContent = positionToContent;
       }
 
       // Restore chat state
@@ -167,14 +173,14 @@ export function gamedayReducer(
     case 'LOAD_EVENT_WEBCASTS': {
       const { webcasts, layoutId } = action;
       const numViews = getNumViewsForLayout(layoutId);
-      const positionToWebcast = createEmptyPositionArray();
+      const positionToContent = createEmptyPositionArray();
       webcasts.slice(0, numViews).forEach((w, i) => {
-        positionToWebcast[i] = w.id;
+        positionToContent[i] = w.id;
       });
       return {
         ...state,
         layoutId,
-        positionToWebcast,
+        positionToContent,
       };
     }
 

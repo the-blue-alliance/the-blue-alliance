@@ -12,6 +12,7 @@ from backend.api.handlers.helpers.model_properties import (
     filter_team_properties,
     ModelType,
 )
+from backend.api.handlers.helpers.model_query_response import models_query_response
 from backend.api.handlers.helpers.profiled_jsonify import (
     profiled_jsonify,
     TypedFlaskResponse,
@@ -47,12 +48,9 @@ def district_history(
     Returns a list of District objects with the given district abbreviation. Accounts for abbreviation changes.
     """
     track_call_after_response("district", district_abbreviation)
-
-    districts = DistrictAbbreviationQuery(
-        abbreviation=district_abbreviation
-    ).fetch_dict(ApiMajorVersion.API_V3)
-
-    return profiled_jsonify(districts)
+    return models_query_response(
+        DistrictAbbreviationQuery(abbreviation=district_abbreviation)
+    )
 
 
 @api_authenticated
@@ -66,13 +64,11 @@ def district_events(
     Returns a list of events for a given DistrictKey.
     """
     track_call_after_response("district/events", district_key, model_type)
-
-    events = DistrictEventsQuery(district_key=district_key).fetch_dict(
-        ApiMajorVersion.API_V3
+    return models_query_response(
+        DistrictEventsQuery(district_key=district_key),
+        model_type=model_type,
+        filter_func=filter_event_properties,
     )
-    if model_type is not None:
-        events = filter_event_properties(events, model_type)
-    return profiled_jsonify(events)
 
 
 @api_authenticated
@@ -86,13 +82,11 @@ def district_teams(
     Returns a list of teams for a given DistrictKey.
     """
     track_call_after_response("district/teams", district_key, model_type)
-
-    teams = DistrictTeamsQuery(district_key=district_key).fetch_dict(
-        ApiMajorVersion.API_V3
+    return models_query_response(
+        DistrictTeamsQuery(district_key=district_key),
+        model_type=model_type,
+        filter_func=filter_team_properties,
     )
-    if model_type is not None:
-        teams = filter_team_properties(teams, model_type)
-    return profiled_jsonify(teams)
 
 
 @api_authenticated
@@ -119,9 +113,7 @@ def district_list_year(year: int) -> TypedFlaskResponse[list[DistrictDict]]:
     Returns a list of all districts for a given year.
     """
     track_call_after_response("district/list", str(year))
-
-    districts = DistrictsInYearQuery(year=year).fetch_dict(ApiMajorVersion.API_V3)
-    return profiled_jsonify(districts)
+    return models_query_response(DistrictsInYearQuery(year=year))
 
 
 @api_authenticated

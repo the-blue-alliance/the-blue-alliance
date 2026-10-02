@@ -8,7 +8,7 @@ const KICKOFF_2026 = '2026-01-10T17:00:00+00:00';
 
 const at = (s: string) => Temporal.Instant.from(s);
 
-describe.concurrent('getKickoffCountdownTarget', () => {
+describe('getKickoffCountdownTarget', () => {
   test.each([undefined, ''])('returns null for %o', (value) => {
     expect(getKickoffCountdownTarget(value, at('2026-12-15T12:00:00Z'))).toBe(
       null,

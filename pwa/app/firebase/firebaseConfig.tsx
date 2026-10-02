@@ -1,7 +1,13 @@
 import { isServer } from '@tanstack/react-query';
 import type { Analytics } from 'firebase/analytics';
 import { type FirebaseApp, getApps, initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
+import {
+  browserLocalPersistence,
+  browserPopupRedirectResolver,
+  connectAuthEmulator,
+  indexedDBLocalPersistence,
+  initializeAuth,
+} from 'firebase/auth';
 import type { Database } from 'firebase/database';
 
 const firebaseConfig = {
@@ -20,7 +26,12 @@ if (!getApps().length) {
   app = getApps()[0];
 }
 
-const auth = isServer ? null : getAuth(app);
+const auth = isServer
+  ? null
+  : initializeAuth(app, {
+      persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+      popupRedirectResolver: browserPopupRedirectResolver,
+    });
 
 if (auth && import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST) {
   connectAuthEmulator(auth, import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST, {

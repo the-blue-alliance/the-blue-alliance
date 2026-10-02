@@ -9,6 +9,7 @@ import {
   listFavorites,
   listSubscriptions,
   setModelPreferences,
+  suggestEventMedia,
   suggestTeamMedia,
 } from '../sdk.gen';
 import type {
@@ -24,6 +25,8 @@ import type {
   ListSubscriptionsResponse,
   SetModelPreferencesData,
   SetModelPreferencesResponse,
+  SuggestEventMediaData,
+  SuggestEventMediaResponse,
   SuggestTeamMediaData,
   SuggestTeamMediaResponse,
 } from '../types.gen';
@@ -72,6 +75,33 @@ export const setModelPreferencesMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await setModelPreferences({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Suggest event media
+ */
+export const suggestEventMediaMutation = (
+  options?: Partial<Options<SuggestEventMediaData>>,
+): UseMutationOptions<
+  SuggestEventMediaResponse,
+  DefaultError,
+  Options<SuggestEventMediaData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SuggestEventMediaResponse,
+    DefaultError,
+    Options<SuggestEventMediaData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await suggestEventMedia({
         ...options,
         ...fnOptions,
         throwOnError: true,

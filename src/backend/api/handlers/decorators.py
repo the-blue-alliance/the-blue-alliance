@@ -1,13 +1,15 @@
-import json
+import datetime
 import logging
 from dataclasses import dataclass
 from functools import wraps
 from typing import Any, Callable, Optional, Type, TypeVar
 
+import orjson
 from flask import g, jsonify, make_response, request, Response
 
 from backend.api.client_api_types import VoidRequest
 from backend.api.handlers.helpers.etag_helper import (
+    etag_deps_persisted_cache,
     get_incoming_etags,
     get_request_path,
     is_etag_valid,
@@ -81,10 +83,6 @@ def api_authenticated(func):
                 # Add to trace span for visibility in Cloud Trace
                 span.set_label("api_auth_key", auth_key)
                 span.set_label("auth_owner_id", str(auth_owner_id))
-                # Log API key usage for visibility in GCP Console
-                logging.info(
-                    f"API request authenticated with key: {auth_key[:16]}... (owner: {auth_owner_id})"
-                )
             else:
                 from backend.common.auth import current_user
 
@@ -119,7 +117,12 @@ def require_write_auth(auth_types: set[AuthType] | None, file_param: str | None 
                     try:
                         FMSReportType(fms_report_type)
                     except ValueError:
-                        fms_report_type = None
+                        return make_response(
+                            jsonify(
+                                {"Error": f"Unknown FMS report type {fms_report_type}"}
+                            ),
+                            400,
+                        )
 
                 # This will abort the request on failure
                 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
@@ -209,22 +212,27 @@ def client_api_method(
         def decorated_function(*args, **kwargs) -> Response:
             data = request.get_data()
             if data:
-                req = json.loads(data)
+                req = orjson.loads(data)
             else:
                 req = VoidRequest()
 
             resp = func(req)
-            return jsonify(resp)
+            return Response(orjson.dumps(resp), mimetype="application/json")
 
         return decorated_function
 
     return decorator
 
 
-KEY_EXISTS_CACHE_TTL: float = 600.0  # 10 minutes
-KEY_EXISTS_CACHE_MAX_SIZE: int = 5000
+KEY_EXISTS_CACHE_TTL_DEFAULT: float = (
+    86400.0  # 24 hours (teams, past season events/matches, districts)
+)
+KEY_EXISTS_CACHE_TTL_CURRENT_YEAR: float = (
+    3600.0  # 1 hour (events/matches in the current year)
+)
+KEY_EXISTS_CACHE_MAX_SIZE: int = 25000
 key_exists_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
-    ttl_seconds=KEY_EXISTS_CACHE_TTL, max_size=KEY_EXISTS_CACHE_MAX_SIZE
+    ttl_seconds=KEY_EXISTS_CACHE_TTL_DEFAULT, max_size=KEY_EXISTS_CACHE_MAX_SIZE
 )
 
 KEY_DOES_NOT_EXIST_CACHE_TTL: float = 60.0  # 1 minute (aligned with 61s 404 cache)
@@ -232,6 +240,15 @@ KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE: int = 2000
 key_does_not_exist_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
     ttl_seconds=KEY_DOES_NOT_EXIST_CACHE_TTL, max_size=KEY_DOES_NOT_EXIST_CACHE_MAX_SIZE
 )
+
+
+def _get_key_exists_ttl(entity_name: str, key: str) -> float:
+    if entity_name in ("Event", "Match"):
+        current_year = datetime.date.today().year
+        year_prefix = key[:4]
+        if year_prefix.isdigit() and int(year_prefix) == current_year:
+            return KEY_EXISTS_CACHE_TTL_CURRENT_YEAR
+    return KEY_EXISTS_CACHE_TTL_DEFAULT
 
 
 @dataclass(frozen=True)
@@ -281,7 +298,7 @@ def validate_keys(func):
     @wraps(func)
     def decorated_function(*args, **kwargs):
         with Span("validate_keys"):
-            # 1. Format validation
+            # 1. Format validation for all provided keys
             for validator in _KEY_VALIDATORS:
                 key = kwargs.get(validator.param_name)
                 if key and not validator.validate_format(key):
@@ -289,27 +306,33 @@ def validate_keys(func):
                         "Error": f"{key} is not a valid {validator.key_type} key"
                     }, 404
 
-            # 2. Fast negative cache check
+            # 2. Check existence in positive/negative cache or queue for async fetch
+            pending_checks: list[tuple[_KeyValidator, str, Optional[str], Any]] = []
             for validator in _KEY_VALIDATORS:
                 key = kwargs.get(validator.param_name)
-                if key and (validator.entity_name, key) in key_does_not_exist_cache:
+                if not key:
+                    continue
+
+                # Hot path: Fast positive cache check (skips negative cache lock)
+                if (validator.entity_name, key) in key_exists_cache:
+                    continue
+
+                # Fast negative cache check
+                if (validator.entity_name, key) in key_does_not_exist_cache:
                     return {
                         "Error": f"{validator.key_type} key: {key} does not exist"
                     }, 404
 
-            # 3. Check key existence for keys not already in key_exists_cache
-            pending_checks: list[tuple[_KeyValidator, str, Optional[str], Any]] = []
-            for validator in _KEY_VALIDATORS:
-                key = kwargs.get(validator.param_name)
-                if not key or (validator.entity_name, key) in key_exists_cache:
-                    continue
-
+                # Check alias / resolved key
                 lookup_key = (
                     validator.resolve_key(key) if validator.resolve_key else key
                 )
                 if lookup_key != key:
                     if (validator.entity_name, lookup_key) in key_exists_cache:
-                        key_exists_cache.set((validator.entity_name, key), True)
+                        ttl = _get_key_exists_ttl(validator.entity_name, key)
+                        key_exists_cache.set(
+                            (validator.entity_name, key), True, ttl_seconds=ttl
+                        )
                         continue
                     if (validator.entity_name, lookup_key) in key_does_not_exist_cache:
                         key_does_not_exist_cache.set((validator.entity_name, key), True)
@@ -322,25 +345,43 @@ def validate_keys(func):
                     (validator, key, lookup_key if lookup_key != key else None, future)
                 )
 
-            # 4. Resolve futures and populate positive / negative caches
+            # 3. Resolve futures and populate positive / negative caches
             for validator, key, resolved_key, future in pending_checks:
-                if not future.get_result():
-                    key_does_not_exist_cache.set((validator.entity_name, key), True)
-                    return {
-                        "Error": f"{validator.key_type} key: {key} does not exist"
-                    }, 404
+                with Span(f"validate_keys.resolve:{validator.entity_name}") as span:
+                    span.set_label("lookup_key", key)
+                    entity_result = future.get_result()
+                    span.set_label("exists", str(bool(entity_result)))
+                    if not entity_result:
+                        key_does_not_exist_cache.set((validator.entity_name, key), True)
+                        if resolved_key:
+                            key_does_not_exist_cache.set(
+                                (validator.entity_name, resolved_key), True
+                            )
+                        return {
+                            "Error": f"{validator.key_type} key: {key} does not exist"
+                        }, 404
 
-                key_exists_cache.set((validator.entity_name, key), True)
-                if resolved_key:
-                    key_exists_cache.set((validator.entity_name, resolved_key), True)
+                    ttl = _get_key_exists_ttl(validator.entity_name, key)
+                    key_exists_cache.set(
+                        (validator.entity_name, key), True, ttl_seconds=ttl
+                    )
+                    if resolved_key:
+                        resolved_ttl = _get_key_exists_ttl(
+                            validator.entity_name, resolved_key
+                        )
+                        key_exists_cache.set(
+                            (validator.entity_name, resolved_key),
+                            True,
+                            ttl_seconds=resolved_ttl,
+                        )
 
         return func(*args, **kwargs)
 
     return decorated_function
 
 
-ETAG_304_CACHE_TTL: float = 15.0  # 15 seconds
-ETAG_304_CACHE_MAX_SIZE: int = 2000
+ETAG_304_CACHE_TTL: float = 61.0  # 61 seconds (aligned with Cache-Control: max-age=61)
+ETAG_304_CACHE_MAX_SIZE: int = 5000
 etag_304_cache: InstanceCache[tuple[str, str], bool] = InstanceCache(
     ttl_seconds=ETAG_304_CACHE_TTL, max_size=ETAG_304_CACHE_MAX_SIZE
 )
@@ -374,7 +415,7 @@ def validate_etag(func: Callable) -> Callable:
                         hit_source: Optional[str] = None
                         if etag_304_cache.get((request_path, etag)):
                             hit_source = "memory"
-                        elif is_etag_valid(etag):
+                        elif is_etag_valid(etag, path=request_path):
                             etag_304_cache.set((request_path, etag), True)
                             hit_source = "memcache"
 
@@ -390,12 +431,28 @@ def validate_etag(func: Callable) -> Callable:
             if resp.status_code == 200:
                 try:
                     if not resp.headers.get("ETag"):
-                        resp.add_etag()
+                        with Span("etag.compute_md5") as span:
+                            resp.add_etag()
+                            data = resp.get_data()
+                            if data:
+                                span.set_label("response_size_bytes", str(len(data)))
                     etag_header = resp.headers.get("ETag")
                     if etag_header and accessed_keys:
                         normalized = normalize_etag(etag_header)
                         if normalized:
-                            save_etag_dependencies(normalized, accessed_keys)
+                            request_path = get_request_path()
+                            if not etag_deps_persisted_cache.get(
+                                (request_path, normalized)
+                            ):
+                                with Span("etag.save_dependencies") as span:
+                                    span.set_label(
+                                        "num_query_keys", str(len(accessed_keys))
+                                    )
+                                    save_etag_dependencies(
+                                        normalized,
+                                        accessed_keys,
+                                        path=request_path,
+                                    )
                 except Exception as e:
                     logging.warning(f"Error saving validate_etag dependencies: {e}")
 

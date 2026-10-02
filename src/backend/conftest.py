@@ -1,6 +1,6 @@
 import time
 from concurrent import futures
-from typing import Generator
+from typing import Callable, Generator, List, Sequence, Tuple
 
 import pytest
 from freezegun import api as freezegun_api
@@ -9,11 +9,30 @@ from google.appengine.api import datastore_types
 from google.appengine.ext import ndb, testbed
 
 from backend.common.context_cache import context_cache
+from backend.common.logging import logging_context
 from backend.common.models.cached_query_result import CachedQueryResult
+from backend.common.profiler import trace_context
+from backend.common.run_after_response import response_context
 from backend.common.storage.clients.cloudstorage.stub_dispatcher import (
     dispatch as dispatch_gcs_stub,
 )
 from backend.tests.json_data_importer import JsonDataImporter
+
+
+@pytest.fixture(autouse=True)
+def clear_request_contexts() -> Generator[None, None, None]:
+    _clear_request_contexts()
+    yield
+    _clear_request_contexts()
+
+
+def _clear_request_contexts() -> None:
+    if hasattr(logging_context, "request"):
+        del logging_context.request
+    if hasattr(trace_context, "request"):
+        del trace_context.request
+    if hasattr(response_context, "request"):
+        del response_context.request
 
 
 @pytest.fixture(autouse=True)
@@ -30,7 +49,7 @@ def drain_gae_rpc_thread_pool(
     # This thread pool can leave work dangling after the test session
     # is done, which can cause pytest to hang.
     # So we add this fixture to manually shut it down
-    thread_pool.shutdown()
+    thread_pool.shutdown(cancel_futures=True)
 
 
 @pytest.fixture(autouse=True)
@@ -44,10 +63,29 @@ def clear_context_cache(monkeypatch: pytest.MonkeyPatch) -> None:
 
 
 @pytest.fixture(autouse=True)
+def bypass_first_event_start_dates(
+    request: pytest.FixtureRequest, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    if (
+        "no_bypass_first_event_start_dates" in request.keywords
+        or "no_bypass_event_start_dates" in request.keywords
+    ):
+        return
+    from backend.common.helpers.season_helper import SeasonHelper
+
+    monkeypatch.setattr(
+        SeasonHelper,
+        "get_first_event_start_date",
+        classmethod(lambda cls, year: None),
+    )
+
+
+@pytest.fixture(autouse=True)
 def clear_auth_key_cache() -> None:
     from backend.api.handlers.decorators import (
         auth_key_cache,
         etag_304_cache,
+        etag_deps_persisted_cache,
         key_does_not_exist_cache,
         key_exists_cache,
     )
@@ -56,6 +94,7 @@ def clear_auth_key_cache() -> None:
     key_exists_cache.clear()
     key_does_not_exist_cache.clear()
     etag_304_cache.clear()
+    etag_deps_persisted_cache.clear()
 
 
 @pytest.fixture()
@@ -182,3 +221,89 @@ def test_data_importer(ndb_stub) -> JsonDataImporter:
 
 def clear_cached_queries() -> None:
     ndb.delete_multi(CachedQueryResult.query().fetch(keys_only=True))
+
+
+@pytest.fixture()
+def run_deferred_tasks(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> Callable[..., int]:
+    """
+    Runs every task currently in the task queue stub (deferred payloads), in
+    order, and returns how many ran. Tasks enqueued while running are picked
+    up too. Use it to exercise work that handlers hand off with defer_safe.
+    """
+    from backend.common.helpers.deferred import run_from_task
+
+    def _run(queue_names: Sequence[str] = ("default", "notifications")) -> int:
+        ran = 0
+        while True:
+            tasks = taskqueue_stub.get_filtered_tasks(queue_names=list(queue_names))
+            if not tasks:
+                return ran
+            # Snapshot then flush, so a task that enqueues more work is not
+            # re-run and the newly enqueued ones are picked up next loop
+            for queue_name in queue_names:
+                taskqueue_stub.FlushQueue(queue_name)
+            for task in tasks:
+                run_from_task(task)
+                ran += 1
+
+    return _run
+
+
+@pytest.fixture()
+def sent_result_emails(monkeypatch: pytest.MonkeyPatch) -> List[Tuple[str, str, str]]:
+    """Captures (to, subject, body) for every suggestion-result email."""
+    from backend.common.helpers.outgoing_notification_helper import (
+        OutgoingNotificationHelper,
+    )
+
+    sent: List[Tuple[str, str, str]] = []
+    monkeypatch.setattr(
+        OutgoingNotificationHelper,
+        "send_suggestion_result_email",
+        classmethod(
+            lambda cls, to, subject, email_body: sent.append((to, subject, email_body))
+        ),
+    )
+    return sent
+
+
+@pytest.fixture()
+def sent_admin_alerts(monkeypatch: pytest.MonkeyPatch) -> List[Tuple[str, str]]:
+    """Captures (subject, body) for every admin alert email."""
+    from backend.common.helpers.outgoing_notification_helper import (
+        OutgoingNotificationHelper,
+    )
+
+    sent: List[Tuple[str, str]] = []
+    monkeypatch.setattr(
+        OutgoingNotificationHelper,
+        "send_admin_alert_email",
+        classmethod(
+            lambda cls, subject, email_body: sent.append((subject, email_body))
+        ),
+    )
+    return sent
+
+
+@pytest.fixture()
+def sent_slack_alerts(monkeypatch: pytest.MonkeyPatch) -> List[Tuple[str, str]]:
+    """Captures (webhook_url, body) for every Slack alert, with a hook configured."""
+    from backend.common.helpers.outgoing_notification_helper import (
+        OutgoingNotificationHelper,
+    )
+    from backend.common.sitevars.slack_hook_urls import SlackHookUrls
+
+    sent: List[Tuple[str, str]] = []
+    monkeypatch.setattr(
+        SlackHookUrls, "url_for", staticmethod(lambda channel: "http://hook")
+    )
+    monkeypatch.setattr(
+        OutgoingNotificationHelper,
+        "send_slack_alert",
+        classmethod(
+            lambda cls, url, body, attachment_list=None: sent.append((url, body))
+        ),
+    )
+    return sent

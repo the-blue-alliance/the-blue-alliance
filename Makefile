@@ -1,4 +1,4 @@
-.PHONY: test test-inline lint lint-bash typecheck sync freeze benchmark-coldstart help
+.PHONY: test test-inline lint lint-bash typecheck sync freeze pwa-generate-api benchmark-coldstart help
 
 # Default target
 help:
@@ -13,6 +13,7 @@ help:
 	@echo "  make lint-bash ARGS='--fix'     - Auto-fix bash formatting with shfmt"
 	@echo "  make sync                       - Sync all dev dependencies via uv"
 	@echo "  make freeze                     - Generate src/requirements.txt from pyproject.toml"
+	@echo "  make pwa-generate-api           - Regenerate the PWA OpenAPI clients (in Docker)"
 	@echo "  make benchmark-coldstart        - Benchmark service startup and coldstart latency"
 	@echo ""
 	@echo "Examples:"
@@ -67,6 +68,10 @@ lint-fix:
 # Use ARGS='--fix' to auto-fix formatting issues
 lint-bash:
 	docker compose --profile tools run --rm lint-bash $(ARGS)
+
+# Regenerate the PWA's OpenAPI clients in Docker
+pwa-generate-api:
+	docker compose --profile tools run --rm --build pwa-tools
 
 # Run pyre type checker
 typecheck:

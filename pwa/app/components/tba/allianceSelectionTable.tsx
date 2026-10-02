@@ -64,7 +64,7 @@ export default function AllianceSelectionTable(props: {
   year: number;
 }) {
   const allianceSize =
-    Math.max(...props.alliances.map((a) => a.picks.length)) || 3;
+    Math.max(0, ...props.alliances.map((a) => a.picks.length)) || 3;
 
   return (
     <>

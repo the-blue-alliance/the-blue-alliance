@@ -14,6 +14,7 @@ from backend.api.handlers.helpers.model_properties import (
 from backend.api.handlers.helpers.model_query_response import (
     model_query_response,
     models_query_response,
+    multi_models_query_response,
 )
 from backend.api.handlers.helpers.profiled_jsonify import (
     profiled_jsonify,
@@ -394,25 +395,17 @@ def team_list_all(
     max_team_num = int(max_team_key.id()[3:])
     max_team_page = int(max_team_num / TEAM_PAGE_SIZE)
 
-    futures = []
     # Query up to max_team_page + 1 (i.e. range(max_team_page + 2)).
     # Page max_team_page + 1 is currently empty ([]), but querying it registers its
     # cache key in @validate_etag's accessed_keys. When a new team is created that starts
     # this next page, TeamManipulator invalidates TeamListQuery(max_team_page + 1),
     # which invalidates the ETag and ensures clients receive the new team.
-    for page_num in range(max_team_page + 2):
-        futures.append(
-            TeamListQuery(page=page_num).fetch_dict_async(ApiMajorVersion.API_V3)
-        )
-
-    team_list = []
-    for future in futures:
-        partial_team_list = future.get_result()
-        team_list += partial_team_list
-
-    if model_type is not None:
-        team_list = filter_team_properties(team_list, model_type)
-    return profiled_jsonify(team_list)
+    queries = [TeamListQuery(page=page_num) for page_num in range(max_team_page + 2)]
+    return multi_models_query_response(
+        queries,
+        model_type=model_type,
+        filter_func=filter_team_properties,
+    )
 
 
 @api_authenticated

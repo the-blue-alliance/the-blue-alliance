@@ -2,8 +2,8 @@ import datetime
 import json
 import logging
 import re
-from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional
+from urllib.parse import unquote
 
 from flask import g, jsonify, make_response, request, Response
 from google.appengine.ext import ndb
@@ -12,13 +12,17 @@ from pyre_extensions import none_throws
 from backend.api.handlers.decorators import require_moderation_permission
 from backend.common.consts.account_permission import SUGGESTION_PERMISSIONS
 from backend.common.consts.auth_type import WRITE_TYPE_NAMES
-from backend.common.consts.event_type import EventType
-from backend.common.consts.media_type import IMAGE_TYPES
+from backend.common.consts.media_type import IMAGE_TYPES, MediaType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.consts.suggestion_type import SuggestionType, TYPE_NAMES
 from backend.common.datafeeds.datafeed_youtube import YoutubeVideoDetailsDatafeed
-from backend.common.helpers.outgoing_notification_helper import (
-    OutgoingNotificationHelper,
+from backend.common.helpers.similar_event_helper import (
+    MAX_SIMILAR_EVENTS,
+    SimilarEventHelper,
+)
+from backend.common.helpers.smugmug_helper import (
+    album_preview_images_many,
+    SmugmugPreviewImage,
 )
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.common.memcache import MemcacheClient
@@ -30,7 +34,9 @@ from backend.common.models.suggestion import Suggestion
 from backend.common.models.user import User
 from backend.common.queries.event_query import EventListQuery
 from backend.common.sitevars.google_api_secret import GoogleApiSecret
-from backend.common.sitevars.slack_hook_urls import SlackHookUrls
+from backend.common.suggestions.offseason_event_candidate import (
+    candidate_event_from_suggestion,
+)
 from backend.common.suggestions.suggestion_reviewer import (
     REQUIRED_REVIEW_PERMISSIONS,
     SuggestionReviewer,
@@ -39,6 +45,14 @@ from backend.common.suggestions.suggestion_reviewer import (
 
 MAX_SUGGESTIONS_PER_PAGE = 100
 MAX_REJECT_BATCH = 500
+USER_MESSAGE_ERROR = "user_message must be a string"
+
+
+def _valid_user_message(user_message: Any) -> bool:
+    """user_message is optional, but when present it goes into an email to
+    a real person, so it must be a plain string."""
+    return user_message is None or isinstance(user_message, str)
+
 
 # HTTP status for each review outcome (accept/reject endpoints return the
 # outcome per suggestion; single-suggestion endpoints map it to the response
@@ -128,9 +142,19 @@ def moderation_suggestion_list(suggestion_type: str) -> Response:
     authors_by_key = {none_throws(a.key): a for a in authors if a is not None}
     review_counts = _author_review_counts(author_keys)
 
+    # One batched, cached lookup for every SmugMug album on the page
+    album_previews = album_preview_images_many(
+        s.contents.get("foreign_key", "")
+        for s in suggestions
+        if s.contents.get("media_type_enum") == MediaType.SMUGMUG_ALBUM
+    )
+
     serialized = [
         _serialize_suggestion(
-            s, authors_by_key.get(s.author), review_counts.get(s.author)
+            s,
+            authors_by_key.get(s.author),
+            review_counts.get(s.author),
+            album_previews,
         )
         for s in suggestions
     ]
@@ -142,24 +166,28 @@ def moderation_suggestion_list(suggestion_type: str) -> Response:
 @require_moderation_permission(SUGGESTION_PERMISSIONS)
 def moderation_suggestion_accept(suggestion_key: str) -> Response:
     """Accept a single pending suggestion, with optional type-specific overrides."""
+    # Clients percent-encode path params, so a key with slashes (Onshape CAD
+    # models) may arrive as %2F if the server doesn't decode it first
+    suggestion_key = unquote(suggestion_key)
     user: User = g.moderation_user
     overrides = request.get_json(silent=True) or {}
     if not isinstance(overrides, dict):
         return make_response(
             jsonify({"Error": "Request body must be a JSON object"}), 400
         )
+    if not _valid_user_message(overrides.get("user_message")):
+        return make_response(jsonify({"Error": USER_MESSAGE_ERROR}), 400)
 
+    # The API authorizes by AccountPermission only; team-admin delegation
+    # (/mod) is not offered here because the list/queue endpoints don't
+    # know about it either
     outcome = SuggestionReviewer.accept_suggestion(
-        suggestion_key, user, overrides=overrides, endpoint=request.endpoint or ""
+        suggestion_key,
+        user,
+        overrides=overrides,
+        endpoint=request.endpoint or "",
+        delegated_team_keys=frozenset(),
     )
-    if outcome.result == SuggestionReviewResult.ACCEPTED:
-        _send_apiwrite_review_alert(
-            suggestion_key,
-            user,
-            verdict="accepted",
-            user_message=overrides.get("user_message"),
-            auth_id=outcome.created_target_key,
-        )
     response: Dict[str, Any] = {
         "result": outcome.result.value,
         "suggestion_key": outcome.suggestion_key,
@@ -190,17 +218,17 @@ def moderation_suggestions_reject() -> Response:
             400,
         )
 
+    user_message = body.get("user_message")
+    if not _valid_user_message(user_message):
+        return make_response(jsonify({"Error": USER_MESSAGE_ERROR}), 400)
+
     outcomes = SuggestionReviewer.reject_suggestions(
-        suggestion_keys, user, endpoint=request.endpoint or ""
+        suggestion_keys,
+        user,
+        endpoint=request.endpoint or "",
+        delegated_team_keys=frozenset(),
+        user_message=user_message,
     )
-    for outcome in outcomes:
-        if outcome.result == SuggestionReviewResult.REJECTED:
-            _send_apiwrite_review_alert(
-                outcome.suggestion_key,
-                user,
-                verdict="rejected",
-                user_message=body.get("user_message"),
-            )
     return jsonify(
         {
             "results": [
@@ -213,48 +241,6 @@ def moderation_suggestions_reject() -> Response:
             ]
         }
     )
-
-
-def _get_suggestion_for_alert(suggestion_key: str) -> Optional[Suggestion]:
-    try:
-        return Suggestion.get_by_id(int(suggestion_key))
-    except ValueError:
-        return Suggestion.get_by_id(suggestion_key)
-
-
-def _send_apiwrite_review_alert(
-    suggestion_key: str,
-    user: User,
-    verdict: str,
-    user_message: Optional[str],
-    auth_id: Optional[str] = None,
-) -> None:
-    """
-    Admin alert for reviewed Trusted API key requests, carrying forward the
-    web review controller's (never-ported) admin email as a Slack alert on
-    the existing suggestion-nag channel. Only apiwrite suggestions alert.
-    """
-    suggestion = _get_suggestion_for_alert(suggestion_key)
-    if suggestion is None or suggestion.target_model != "api_auth_access":
-        return
-    channel_url = SlackHookUrls.url_for("suggestion-nag")
-    if not channel_url:
-        return
-
-    event_key = suggestion.contents.get("event_key")
-    # The default message mirrors the prefilled textarea on the review forms
-    message = user_message or "Thanks for helping make TBA better!"
-    body = (
-        f"*Trusted API Key Request for {event_key}*\n"
-        f"{user.display_name} ({user.email}) has {verdict} the request "
-        f"with the following message:\n{message}"
-    )
-    if auth_id:
-        body += (
-            "\n<https://www.thebluealliance.com/admin/api_auth/edit/"
-            f"{auth_id}|View the key>"
-        )
-    OutgoingNotificationHelper.send_slack_alert(channel_url, body)
 
 
 AUTHOR_REVIEW_COUNT_CACHE_SECONDS = 60 * 60
@@ -313,6 +299,7 @@ def _serialize_suggestion(
     suggestion: Suggestion,
     author: Optional[Any],
     author_review_counts: Optional[Dict[str, int]] = None,
+    album_previews: Optional[Dict[str, List[SmugmugPreviewImage]]] = None,
 ) -> Dict[str, Any]:
     serialized: Dict[str, Any] = {
         "key": str(none_throws(suggestion.key.id())),
@@ -345,12 +332,16 @@ def _serialize_suggestion(
 
     # A preview of the Media that would be created, for media-backed types
     if "media_type_enum" in suggestion.contents:
-        serialized["candidate_media"] = _serialize_candidate_media(suggestion)
+        serialized["candidate_media"] = _serialize_candidate_media(
+            suggestion, album_previews or {}
+        )
 
     return serialized
 
 
-def _serialize_candidate_media(suggestion: Suggestion) -> Dict[str, Any]:
+def _serialize_candidate_media(
+    suggestion: Suggestion, album_previews: Dict[str, List[SmugmugPreviewImage]]
+) -> Dict[str, Any]:
     media = suggestion.candidate_media
     serialized = {
         "key": media.key_name,
@@ -368,6 +359,16 @@ def _serialize_candidate_media(suggestion: Suggestion) -> Dict[str, Any]:
     if media.is_image:
         serialized["view_image_url"] = media.view_image_url
         serialized["image_direct_url"] = media.image_direct_url_med
+    elif media.media_type_enum == MediaType.SMUGMUG_ALBUM:
+        # Albums aren't single images, but the parser already fetched the
+        # cover and album metadata at suggestion time; surface it so
+        # reviewers can preview the gallery instead of following a bare link
+        details = media.details or {}
+        serialized["view_image_url"] = details.get("web_uri")
+        serialized["image_direct_url"] = details.get("cover_url_med")
+        serialized["title"] = details.get("title")
+        serialized["image_count"] = details.get("image_count")
+        serialized["preview_images"] = album_previews.get(media.foreign_key, [])
     if suggestion.contents.get("is_social"):
         serialized["social_profile_url"] = media.social_profile_url
     return serialized
@@ -551,38 +552,18 @@ def _add_webcast_metadata(
         )
 
 
-def _normalized_event_name(name: str) -> str:
-    return " ".join(re.sub(r"[^a-z0-9]+", " ", name.lower()).split())
-
-
 def _find_similar_events(
-    name: str, events: List[Event], limit: int = 5
+    candidate: Event, events: List[Event], limit: int = MAX_SIMILAR_EVENTS
 ) -> List[Dict[str, str]]:
     """
-    Offseason events whose name or short name resembles the suggested name.
-    Comparison is case/punctuation-insensitive; containment (either direction)
-    counts as a strong match. Results are strongest-match first.
+    Existing events most likely to be the same event as the candidate, best
+    match first -- the same ranking the web review page shows, via
+    SimilarEventHelper (name, short name, acronyms, and location).
     """
-    normalized = _normalized_event_name(name)
-    if not normalized:
-        return []
-    scored = []
-    for event in events:
-        best = 0.0
-        for candidate in (event.name, event.short_name):
-            if not candidate:
-                continue
-            normalized_candidate = _normalized_event_name(candidate)
-            if not normalized_candidate:
-                continue
-            score = SequenceMatcher(a=normalized, b=normalized_candidate).ratio()
-            if normalized in normalized_candidate or normalized_candidate in normalized:
-                score = max(score, 0.9)
-            best = max(best, score)
-        if best > 0.5:
-            scored.append((best, event))
-    scored.sort(key=lambda pair: -pair[0])
-    return [{"key": e.key_name, "name": e.name} for _, e in scored[:limit]]
+    return [
+        {"key": e.key_name, "name": e.name}
+        for e in SimilarEventHelper.similar_events(candidate, events, limit=limit)
+    ]
 
 
 def _suggested_event_year(suggestion: Suggestion) -> int:
@@ -605,21 +586,22 @@ def _add_offseason_metadata(
         for y in (base_year, base_year - 1)
     }
     event_futures = {year: EventListQuery(year).fetch_async() for year in years}
+    # "Offseason" here means anything not in-season -- preseason and unlabeled
+    # events included -- matching the web review page. Returning events cross
+    # the offseason/preseason line often enough to matter.
     offseason_events_by_year = {
-        year: [
-            e for e in future.get_result() if e.event_type_enum == EventType.OFFSEASON
-        ]
+        year: [e for e in future.get_result() if e.is_offseason]
         for year, future in event_futures.items()
     }
 
     for i, suggestion in enumerate(suggestions):
-        name = suggestion.contents.get("name") or ""
+        candidate = candidate_event_from_suggestion(suggestion)
         year = _suggested_event_year(suggestion)
         serialized[i]["similar_events"] = _find_similar_events(
-            name, offseason_events_by_year[year]
+            candidate, offseason_events_by_year[year]
         )
         serialized[i]["similar_events_last_year"] = _find_similar_events(
-            name, offseason_events_by_year[year - 1]
+            candidate, offseason_events_by_year[year - 1]
         )
 
 

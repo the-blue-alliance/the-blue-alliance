@@ -29,9 +29,9 @@ class MatchSuggestionComponents(BaseModel):
     """
     The individual scoring factors behind a suggestion, each normalized to [0, 1].
 
-    `favorites` and `performance` are min-max normalized across the candidate pool
+    `favorites` and `high_score` are min-max normalized across the candidate pool
     of a single cron run, so they are only meaningful relative to their siblings in
-    that same run. `significance` and `time_decay` are absolute.
+    that same run. `significance`, `time_decay`, and `close_score` are absolute.
     """
 
     model_config = ConfigDict(populate_by_name=True)
@@ -39,7 +39,8 @@ class MatchSuggestionComponents(BaseModel):
     favorites: float = Field(alias="f")
     significance: float = Field(alias="sig")
     time_decay: float = Field(alias="td")
-    performance: float = Field(alias="p")
+    high_score: float = Field(alias="hs")
+    close_score: float = Field(alias="cs")
 
 
 class MatchSuggestion(BaseModel):
@@ -69,6 +70,11 @@ class MatchSuggestion(BaseModel):
     # these arrive at the client as absent rather than null.
     predicted_time: Optional[int] = Field(default=None, alias="pt")
     scheduled_time: Optional[int] = Field(default=None, alias="st")
+
+    # Predicted alliance scores. Predictions are not always available, and the
+    # Realtime Database drops these null children on write.
+    predicted_red_score: Optional[float] = Field(default=None, alias="rs")
+    predicted_blue_score: Optional[float] = Field(default=None, alias="bs")
 
     # 0-based; the stable ordering key for clients
     rank: int = Field(alias="r")

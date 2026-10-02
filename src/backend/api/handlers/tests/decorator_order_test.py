@@ -1,8 +1,11 @@
+from typing import Any
 from unittest.mock import MagicMock
 
+import orjson
 import pytest
 from werkzeug.test import Client
 
+from backend.api.handlers.decorators import client_api_method
 from backend.common.consts.auth_type import AuthType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.team import Team
@@ -212,3 +215,44 @@ def test_apiv3_query_params_ignored_for_caching(
     )
     assert resp4.status_code == 304
     mock_get_by_id_async.assert_not_called()
+
+
+def test_client_api_method_uses_orjson(
+    api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from backend.api.main import app
+
+    loads_called = False
+    dumps_called = False
+    real_loads = orjson.loads
+    real_dumps = orjson.dumps
+
+    def mock_loads(val: Any) -> Any:
+        nonlocal loads_called
+        loads_called = True
+        return real_loads(val)
+
+    def mock_dumps(val: Any) -> bytes:
+        nonlocal dumps_called
+        dumps_called = True
+        return real_dumps(val)
+
+    monkeypatch.setattr("backend.api.handlers.decorators.orjson.loads", mock_loads)
+    monkeypatch.setattr("backend.api.handlers.decorators.orjson.dumps", mock_dumps)
+
+    @client_api_method(dict, dict)
+    def dummy_handler(req: dict) -> dict:
+        return {"echo": req.get("msg")}
+
+    with app.test_request_context(
+        "/",
+        method="POST",
+        data=b'{"msg": "hello"}',
+        content_type="application/json",
+    ):
+        resp = dummy_handler()
+        assert resp.status_code == 200
+        assert resp.mimetype == "application/json"
+        assert resp.data == b'{"echo":"hello"}'
+        assert loads_called is True
+        assert dumps_called is True

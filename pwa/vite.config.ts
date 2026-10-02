@@ -2,10 +2,10 @@ import { Schema, ValidateEnv } from '@julr/vite-plugin-validate-env';
 import { sentryVitePlugin } from '@sentry/vite-plugin';
 import tailwindcss from '@tailwindcss/vite';
 import { tanstackStart } from '@tanstack/react-start/plugin/vite';
-import react, { reactCompilerPreset } from '@vitejs/plugin-react';
+import react from '@vitejs/plugin-react';
 import * as child from 'child_process';
 import Icons from 'unplugin-icons/vite';
-import { defineConfig } from 'vite';
+import { configDefaults, defineConfig } from 'vitest/config';
 
 function getCommitHash(): string {
   try {
@@ -22,18 +22,43 @@ const staticRoutes = [
   '/apidocs/v3',
   '/contact',
   '/donate',
-  '/gameday',
   '/privacy',
   '/thanks',
 ];
 
 export default defineConfig({
+  test: {
+    environment: 'jsdom',
+    exclude: [...configDefaults.exclude, 'tests/**', 'app/api/**'],
+    setupFiles: ['./vitest.setup.ts'],
+    clearMocks: true,
+    restoreMocks: true,
+    unstubEnvs: true,
+    unstubGlobals: true,
+    coverage: {
+      // Measure every source file, not only the ones a test happens to
+      // import, so untested modules show up as 0% instead of vanishing.
+      include: ['app/**/*.{ts,tsx}'],
+      exclude: [
+        'app/**/*.test.{ts,tsx}',
+        'app/**/*.d.ts',
+        // Generated: the OpenAPI client and the TanStack route tree.
+        'app/**/*.gen.ts',
+        'app/api/**',
+      ],
+    },
+  },
   resolve: {
     tsconfigPaths: true,
   },
   plugins: [
     tanstackStart({
       srcDirectory: 'app',
+      router: {
+        // Vitest unit tests sit beside the route modules they cover; keep the
+        // route generator from treating them as routes.
+        routeFileIgnorePattern: '\\.test\\.tsx?$',
+      },
       prerender: {
         enabled: true,
         filter: ({ path }) => staticRoutes.includes(path),
@@ -49,6 +74,7 @@ export default defineConfig({
       org: 'the-blue-alliance',
       project: 'the-blue-alliance-pwa',
       authToken: process.env.SENTRY_AUTH_TOKEN,
+      telemetry: process.env.NODE_ENV !== 'test',
       sourcemaps: {
         assets: ['./build/client/**/*'],
         ignore: ['**/node_modules/**'],
@@ -81,12 +107,17 @@ export default defineConfig({
   build: {
     outDir: 'build',
     sourcemap: true,
+    chunkSizeWarningLimit: 1700,
     rollupOptions: {
       output: {
         manualChunks(id) {
           if (!id.includes('/node_modules/')) return;
 
           if (id.includes('/temporal-polyfill/')) return 'temporal-polyfill';
+
+          // Base UI primitives + their floating-ui dep — spread across 36 chunks
+          if (id.includes('/@base-ui/react/') || id.includes('/@floating-ui/'))
+            return 'vendor-baseui';
 
           // React core — already eager on every page, one stable long-cache chunk
           if (
@@ -98,10 +129,6 @@ export default defineConfig({
 
           // TanStack router/query/store — eager, spread across ~10 chunks today
           if (id.includes('/@tanstack/')) return 'vendor-tanstack';
-
-          // Base UI primitives + their floating-ui dep — spread across 36 chunks
-          if (id.includes('/@base-ui/react/') || id.includes('/@floating-ui/'))
-            return 'vendor-baseui';
         },
       },
     },

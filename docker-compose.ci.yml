@@ -5,13 +5,26 @@
 #   - webpack runs in one-shot build mode (WATCH=false) and tba waits for it to finish
 #   - tba has a healthcheck on the admin server (port 8000), the last thing to start
 #   - datastore dependency is non-blocking (it starts fast enough to be ready before tba needs it)
+#   - BuildKit GitHub Actions layer caching (type=gha) for all built services
 
 services:
   webpack:
+    image: the-blue-alliance-webpack
+    build:
+      cache_from:
+        - type=gha,scope=webpack
+      cache_to:
+        - type=gha,mode=max,scope=webpack
     environment:
       - WATCH=false
 
   tba:
+    image: the-blue-alliance-tba
+    build:
+      cache_from:
+        - type=gha,scope=tba
+      cache_to:
+        - type=gha,mode=max,scope=tba
     depends_on:
       firebase:
         condition: service_started
@@ -25,3 +38,25 @@ services:
       timeout: 10s
       retries: 30
       start_period: 120s
+
+  firebase:
+    image: the-blue-alliance-firebase
+    build:
+      cache_from:
+        - type=gha,scope=firebase
+      cache_to:
+        - type=gha,mode=max,scope=firebase
+
+  datastore:
+    image: the-blue-alliance-datastore
+    build:
+      cache_from:
+        - type=gha,scope=datastore
+      cache_to:
+        - type=gha,mode=max,scope=datastore
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8089/"]
+      interval: 2s
+      timeout: 2s
+      retries: 10
+      start_period: 1s

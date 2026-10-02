@@ -72,10 +72,11 @@ jobs:
           uv run --frozen --group ci coverage xml
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           file: coverage.xml
+          flags: python
   node-lint:
     name: "[node] Format & Lint"
     runs-on: ubuntu-24.04
@@ -112,10 +113,11 @@ jobs:
         run: ./ops/test_node.sh
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./.node_coverage/
+          flags: node
   pwa-lint:
     name: "[pwa] Format & Lint"
     runs-on: ubuntu-24.04
@@ -169,10 +171,11 @@ jobs:
         run: pnpm --dir pwa test
       - name: Upload coverage to Codecov
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        uses: codecov/codecov-action@v7.0.0
+        uses: codecov/codecov-action@v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           directory: ./pwa/coverage/
+          flags: pwa
   pwa-build:
     name: "[pwa] Build"
     runs-on: ubuntu-24.04
@@ -306,15 +309,31 @@ jobs:
       - name: Create keys file
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: cp ./src/backend/web/static/javascript/tba_js/tba_keys_template.js ./src/backend/web/static/javascript/tba_js/tba_keys.js
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v4
+      - name: Build Containers
+        if: contains(github.event.commits[0].message, '[clowntown]') == false
+        uses: docker/bake-action@v7
+        with:
+          files: |
+            docker-compose.yml
+            docker-compose.ci.yml
+          targets: |
+            tba
+            firebase
+            webpack
+            datastore
+          load: true
       - name: Start Containers
         if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d --build
+        run: |
+          docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest &
+          PULL_PID=$!
+          docker compose -f docker-compose.yml -f docker-compose.ci.yml up -d
+          wait $PULL_PID
       - name: Test Docker Startup
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: python ./ops/test_docker_startup.py
-      - name: Pre-pull companion import image
-        if: contains(github.event.commits[0].message, '[clowntown]') == false
-        run: docker pull gcr.io/tbatv-prod-hrd/tba-offseason-companion-import:latest
       - name: Test Ops Fullstack
         if: contains(github.event.commits[0].message, '[clowntown]') == false
         run: ./ops/test_ops.sh

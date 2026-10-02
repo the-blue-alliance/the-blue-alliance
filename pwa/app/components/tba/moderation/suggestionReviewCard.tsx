@@ -9,6 +9,7 @@ import type {
   ModerationSuggestion,
 } from '~/api/tba/moderation/types.gen';
 import { SuggestionType } from '~/api/tba/moderation/types.gen';
+import { EventType } from '~/api/tba/read';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Badge } from '~/components/ui/badge';
 import { Button } from '~/components/ui/button';
@@ -18,10 +19,12 @@ import { Input } from '~/components/ui/input';
 import {
   DEFAULT_EXPIRATION_DAYS,
   defaultSetPreferred,
+  eventTiming,
   formatAuthorReputation,
   formatEventDateRange,
   matchVideoDurationWarning,
   matchVideoTitleWarning,
+  resolveUserMessage,
   socialProfileWarning,
 } from '~/lib/moderationUtils';
 
@@ -37,6 +40,22 @@ interface SuggestionReviewCardProps {
   hideEventContext?: boolean;
   /** Highlight this card as the keyboard-navigation target. */
   focused?: boolean;
+}
+
+// Event types an accepted offseason-event suggestion can become. The
+// suggestion carries a type derived from its dates (Jan/Feb -> preseason);
+// the API uses that unless the moderator overrides it, so the select shows
+// the same default.
+export const OFFSEASON_EVENT_TYPE_OPTIONS = [
+  { value: EventType.OFFSEASON, label: 'Offseason' },
+  { value: EventType.PRESEASON, label: 'Preseason' },
+] as const;
+
+export function suggestedEventType(contentsEventType: string): number {
+  const parsed = Number(contentsEventType);
+  return parsed === EventType.PRESEASON
+    ? EventType.PRESEASON
+    : EventType.OFFSEASON;
 }
 
 // The write auth types moderators can grant for api_auth_access suggestions,
@@ -350,6 +369,9 @@ function MediaPreview({
       </div>
     ) : null;
   }
+  if (media.slug_name === 'smugmug-album') {
+    return <SmugmugAlbumPreview media={media} />;
+  }
   if (media.is_image) {
     const imageUrl =
       media.image_direct_url ??
@@ -396,6 +418,69 @@ function MediaPreview({
     );
   }
   return null;
+}
+
+/**
+ * SmugMug albums arrive with a cover, title, photo count and the album's
+ * first few photos (the moderation API fetches them; SmugMug's own embed
+ * endpoint serves an empty page). Show a thumbnail grid so a reviewer can
+ * see what the album actually contains, with the cover as the fallback.
+ */
+function SmugmugAlbumPreview({
+  media,
+}: {
+  media: NonNullable<ModerationSuggestion['candidate_media']>;
+}): JSX.Element {
+  const previews = (media.preview_images ?? []).filter((p) => p.image_url);
+  const caption = [
+    media.title,
+    media.image_count !== undefined
+      ? `${media.image_count.toLocaleString()} ${
+          media.image_count === 1 ? 'photo' : 'photos'
+        }`
+      : undefined,
+  ]
+    .filter(Boolean)
+    .join(' · ');
+  return (
+    <div className="flex max-w-xl flex-col gap-2">
+      {previews.length > 0 ? (
+        <div
+          className="grid grid-cols-4 gap-1 overflow-hidden rounded-lg border"
+          data-testid="smugmug-album-previews"
+        >
+          {previews.map((photo, i) => (
+            <a
+              key={photo.web_uri || i}
+              href={photo.web_uri || media.external_link}
+              target="_blank"
+              rel="noreferrer"
+              aria-label={`Photo ${i + 1}${media.title ? ` of ${media.title}` : ''}`}
+              className="aspect-square bg-muted"
+            >
+              <img
+                src={photo.image_url}
+                alt=""
+                loading="lazy"
+                className="size-full object-cover"
+              />
+            </a>
+          ))}
+        </div>
+      ) : (
+        media.image_direct_url && (
+          <img
+            src={media.image_direct_url}
+            alt={media.title ?? 'SmugMug album cover'}
+            className="max-h-80 w-fit max-w-full rounded-lg border"
+          />
+        )
+      )}
+      {caption && (
+        <div className="text-sm text-muted-foreground">{caption}</div>
+      )}
+    </div>
+  );
 }
 
 function TeamMediaDetails({
@@ -864,6 +949,32 @@ function OffseasonEventDetails({
           value={field('end_date', 'end_date')}
           onChange={setField('end_date')}
         />
+        <label className="flex flex-col gap-1 text-sm">
+          <span className="font-medium text-muted-foreground">
+            Event type (Preseason: Jan-Feb, Offseason: Mar+)
+          </span>
+          <select
+            className="h-9 rounded-md border border-input bg-transparent px-3
+              text-sm"
+            aria-label="Event type"
+            value={
+              overrides.event_type_enum ??
+              suggestedEventType(contentsString(suggestion, 'event_type'))
+            }
+            onChange={(e) =>
+              onOverridesChange({
+                ...overrides,
+                event_type_enum: Number(e.target.value),
+              })
+            }
+          >
+            {OFFSEASON_EVENT_TYPE_OPTIONS.map(({ value, label }) => (
+              <option key={value} value={value}>
+                {label}
+              </option>
+            ))}
+          </select>
+        </label>
         <LabeledInput
           label="Website"
           value={field('website', 'website')}
@@ -933,15 +1044,41 @@ function ApiWriteDetails({
       : selectedTypes.filter((t) => t !== type);
     onOverridesChange({ ...overrides, auth_types: next });
   };
+  // Keys are usually wanted for an event that is imminent or underway, so
+  // show when it is without the reviewer opening the event page.
+  const eventDates = formatEventDateRange(
+    suggestion.event?.start_date,
+    suggestion.event?.end_date,
+  );
+  const timing = eventTiming(
+    suggestion.event?.start_date,
+    suggestion.event?.end_date,
+  );
   return (
     <div className="flex flex-col gap-3">
       <FieldRow label="Event">
-        <ReferenceLink suggestion={suggestion} />
+        <span className="inline-flex flex-wrap items-center gap-2">
+          <ReferenceLink suggestion={suggestion} />
+          {eventDates && <span>({eventDates})</span>}
+          {timing && (
+            <Badge
+              variant={
+                timing.kind === 'ongoing'
+                  ? 'success'
+                  : timing.kind === 'upcoming'
+                    ? 'secondary'
+                    : 'outline'
+              }
+            >
+              {timing.label}
+            </Badge>
+          )}
+        </span>
       </FieldRow>
       <FieldRow label="User">
         {suggestion.author?.nickname ?? 'unknown'}
+        {suggestion.author?.email ? ` (${suggestion.author.email})` : ''}
       </FieldRow>
-      <FieldRow label="Email">{suggestion.author?.email ?? 'unknown'}</FieldRow>
       <FieldRow label="Affiliation">
         {contentsString(suggestion, 'affiliation')}
       </FieldRow>
@@ -1010,14 +1147,12 @@ function ApiWriteDetails({
       </div>
       <label className="flex max-w-xl flex-col gap-1 text-sm">
         <span className="font-medium text-muted-foreground">
-          Message for the user (included in the admin alert email)
+          Message for the requester (emailed to them with the verdict)
         </span>
         <textarea
           className="min-h-20 rounded-md border border-input bg-transparent p-2
             text-sm"
-          value={
-            overrides.user_message ?? 'Thanks for helping make TBA better!'
-          }
+          value={resolveUserMessage(overrides)}
           onChange={(e) =>
             onOverridesChange({ ...overrides, user_message: e.target.value })
           }
@@ -1090,12 +1225,15 @@ export function SuggestionReviewCard(
         <div className="flex gap-2">
           <Button
             size="sm"
-            variant={decision === 'accept' ? 'default' : 'outline'}
-            className={
+            variant="outline"
+            className={cn(
+              // Tinted at rest, more saturated on hover, solid when chosen
               decision === 'accept'
-                ? 'bg-green-700 text-white hover:bg-green-800'
-                : ''
-            }
+                ? 'border-green-700 bg-green-700 text-white hover:bg-green-800'
+                : `border-green-600/60 bg-green-50 text-green-800
+                  hover:bg-green-200 hover:text-green-900 dark:bg-green-950
+                  dark:text-green-300 hover:dark:bg-green-900`,
+            )}
             onClick={() =>
               onDecisionChange(decision === 'accept' ? undefined : 'accept')
             }
@@ -1104,7 +1242,14 @@ export function SuggestionReviewCard(
           </Button>
           <Button
             size="sm"
-            variant={decision === 'reject' ? 'destructive' : 'outline'}
+            variant="outline"
+            className={cn(
+              decision === 'reject'
+                ? 'border-red-700 bg-red-700 text-white hover:bg-red-800'
+                : `border-red-600/60 bg-red-50 text-red-800 hover:bg-red-200
+                  hover:text-red-900 dark:bg-red-950 dark:text-red-300
+                  hover:dark:bg-red-900`,
+            )}
             onClick={() =>
               onDecisionChange(decision === 'reject' ? undefined : 'reject')
             }

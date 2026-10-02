@@ -5,10 +5,16 @@ from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
-from backend.api.handlers.decorators import etag_304_cache
+from backend.api.handlers.decorators import (
+    etag_304_cache,
+    ETAG_304_CACHE_MAX_SIZE,
+    ETAG_304_CACHE_TTL,
+    etag_deps_persisted_cache,
+)
 from backend.api.handlers.helpers.etag_helper import (
     get_etag_dependencies,
     normalize_etag,
+    save_etag_dependencies,
 )
 from backend.common.consts.auth_type import AuthType
 from backend.common.environment import Environment
@@ -758,3 +764,468 @@ def test_validate_etag_in_memory_cache_different_path(
     assert etag_304_cache.get(("/api/v3/team/frc254", norm_etag)) is True
     # Different endpoint path must not be in cache
     assert etag_304_cache.get(("/api/v3/team/frc9999", norm_etag)) is None
+
+
+def test_save_etag_dependencies_batches_in_single_set_multi(
+    memcache_stub, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    memcache = MemcacheClient.get()
+    get_mock = MagicMock(wraps=memcache.get)
+    get_multi_mock = MagicMock(wraps=memcache.get_multi)
+    set_mock = MagicMock(wraps=memcache.set)
+    set_multi_mock = MagicMock(wraps=memcache.set_multi)
+    monkeypatch.setattr(memcache, "get", get_mock)
+    monkeypatch.setattr(memcache, "get_multi", get_multi_mock)
+    monkeypatch.setattr(memcache, "set", set_mock)
+    monkeypatch.setattr(memcache, "set_multi", set_multi_mock)
+
+    query_versions = {
+        "team_query_1": "e2a9c7677594150d2629d0ffe18699f9",
+        "team_query_2": "608de49a4600dbb5b173492759792e4a",
+    }
+    save_etag_dependencies("test_etag_123", query_versions, path="/api/v3/team/frc254")
+
+    # Verify no memcache read round-trips occurred
+    get_mock.assert_not_called()
+    get_multi_mock.assert_not_called()
+
+    # Verify set was not called (eliminates redundant round-trip)
+    set_mock.assert_not_called()
+
+    # Verify set_multi was called once with the exact precomputed MD5 hashes and etag_deps
+    set_multi_mock.assert_called_once()
+    mapping = set_multi_mock.call_args[0][0]
+    assert mapping[b"q_ver:team_query_1"] == "e2a9c7677594150d2629d0ffe18699f9"
+    assert mapping[b"q_ver:team_query_2"] == "608de49a4600dbb5b173492759792e4a"
+    assert mapping[b"etag_deps:/api/v3/team/frc254:test_etag_123"] == query_versions
+
+
+def test_database_query_tracks_deterministic_md5_hashes(
+    ndb_stub,
+) -> None:
+    from backend.common.consts.api_version import ApiMajorVersion
+    from backend.common.models.team import Team
+    from backend.common.queries.database_query import track_accessed_query_cache_keys
+    from backend.common.queries.team_query import TeamQuery
+
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    with track_accessed_query_cache_keys() as accessed_keys_1:
+        TeamQuery(team_key="frc254").fetch_dict(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as accessed_keys_2:
+        TeamQuery(team_key="frc254").fetch_dict(ApiMajorVersion.API_V3)
+
+    assert len(accessed_keys_1) == 1
+    key = TeamQuery(team_key="frc254").dict_cache_key(ApiMajorVersion.API_V3)
+    assert key in accessed_keys_1
+    assert accessed_keys_1[key] == accessed_keys_2[key]
+    assert len(accessed_keys_1[key]) == 32  # Valid MD5 hex digest length
+
+
+def test_database_query_tracks_deterministic_md5_hashes_with_unicode(
+    ndb_stub,
+) -> None:
+    from backend.common.consts.api_version import ApiMajorVersion
+    from backend.common.models.team import Team
+    from backend.common.queries.database_query import track_accessed_query_cache_keys
+    from backend.common.queries.team_query import TeamQuery
+
+    Team(id="frc9999", team_number=9999, nickname="Café Robotics").put()
+
+    # Test fetch_dict cache miss vs cache hit
+    with track_accessed_query_cache_keys() as dict_miss_keys:
+        TeamQuery(team_key="frc9999").fetch_dict(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as dict_hit_keys:
+        TeamQuery(team_key="frc9999").fetch_dict(ApiMajorVersion.API_V3)
+
+    key = TeamQuery(team_key="frc9999").dict_cache_key(ApiMajorVersion.API_V3)
+    assert dict_miss_keys[key] == dict_hit_keys[key]
+
+    # Invalidate cache to test fetch_json cache miss vs cache hit
+    TeamQuery.delete_cache_multi({TeamQuery(team_key="frc9999").cache_key})
+
+    with track_accessed_query_cache_keys() as json_miss_keys:
+        raw_miss = TeamQuery(team_key="frc9999").fetch_json(ApiMajorVersion.API_V3)
+
+    with track_accessed_query_cache_keys() as json_hit_keys:
+        raw_hit = TeamQuery(team_key="frc9999").fetch_json(ApiMajorVersion.API_V3)
+
+    assert raw_miss == raw_hit
+    assert json_miss_keys[key] == json_hit_keys[key]
+    assert dict_hit_keys[key] == json_hit_keys[key]
+
+
+def test_delete_cache_multi_without_data_change_restores_etag_304(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    from backend.common.queries.team_query import TeamQuery
+
+    # 1. Initial request -> 200
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = resp1.headers.get("ETag")
+    assert etag is not None
+
+    # Track handler execution via Team.get_by_id_async
+    original_get_by_id_async = Team.get_by_id_async
+    mock_get_by_id_async = MagicMock(side_effect=original_get_by_id_async)
+    monkeypatch.setattr(Team, "get_by_id_async", mock_get_by_id_async)
+
+    # 2. Re-request with If-None-Match -> 304 via @validate_etag fastpath (handler bypassed)
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp2.status_code == 304
+    mock_get_by_id_async.assert_not_called()
+
+    # 3. Simulate cache wipe without modifying the underlying data
+    TeamQuery.delete_cache_multi({TeamQuery(team_key="frc254").cache_key})
+    etag_304_cache.clear()
+
+    # 4. Request with old ETag misses fastpath because q_ver key was wiped;
+    # handler executes, re-records identical MD5 hash, and Werkzeug returns 304
+    resp3 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp3.status_code == 304
+    mock_get_by_id_async.assert_called_once()
+    mock_get_by_id_async.reset_mock()
+
+    # Clear in-memory cache to force checking Memcache fastpath
+    etag_304_cache.clear()
+
+    # 5. Subsequent request hits @validate_etag fastpath in Memcache because MD5 matched!
+    resp4 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    assert resp4.status_code == 304
+    mock_get_by_id_async.assert_not_called()
+
+
+def test_validate_etag_304_cache_contract() -> None:
+    assert ETAG_304_CACHE_TTL == 61.0
+    assert ETAG_304_CACHE_MAX_SIZE == 5000
+
+
+def test_validate_etag_deduplicates_dependency_writes_on_identical_200(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254, nickname="The Cheesy Poofs").put()
+
+    memcache = MemcacheClient.get()
+    set_multi_mock = MagicMock(wraps=memcache.set_multi)
+    monkeypatch.setattr(memcache, "set_multi", set_multi_mock)
+
+    # 1. First 200 request: persists dependencies to Memcache
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag1 = resp1.headers.get("ETag")
+    assert etag1 is not None
+    norm_etag1 = normalize_etag(etag1)
+    assert norm_etag1 is not None
+
+    assert set_multi_mock.call_count == 1
+    assert etag_deps_persisted_cache.get(("/api/v3/team/frc254", norm_etag1)) is True
+
+    # 2. Second 200 request with identical response/ETag: skips Memcache set_multi
+    set_multi_mock.reset_mock()
+    resp2 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp2.status_code == 200
+    assert resp2.headers.get("ETag") == etag1
+    set_multi_mock.assert_not_called()
+
+
+def test_validate_etag_persists_dependencies_on_altered_etag(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    team = Team(id="frc254", team_number=254, nickname="The Cheesy Poofs")
+    team.put()
+
+    memcache = MemcacheClient.get()
+    set_multi_mock = MagicMock(wraps=memcache.set_multi)
+    monkeypatch.setattr(memcache, "set_multi", set_multi_mock)
+
+    # 1. First request generates initial ETag
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag1 = resp1.headers.get("ETag")
+    norm_etag1 = normalize_etag(etag1)
+    assert norm_etag1 is not None
+    assert set_multi_mock.call_count == 1
+
+    # 2. Alter team data and invalidate query cache
+    team.nickname = "Updated Poofs"
+    team.put()
+    TeamQuery.delete_cache_multi({TeamQuery(team_key="frc254").cache_key})
+
+    # 3. Next request produces new ETag and must persist its dependencies
+    set_multi_mock.reset_mock()
+    resp2 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp2.status_code == 200
+    etag2 = resp2.headers.get("ETag")
+    assert etag2 != etag1
+    norm_etag2 = normalize_etag(etag2)
+    assert norm_etag2 is not None
+
+    set_multi_mock.assert_called_once()
+    assert etag_deps_persisted_cache.get(("/api/v3/team/frc254", norm_etag2)) is True
+
+
+def test_cached_database_query_tracks_identical_hashes_for_fetch_dict_and_fetch_json(
+    ndb_stub,
+) -> None:
+    from backend.common.consts.api_version import ApiMajorVersion
+    from backend.common.models.event import Event
+    from backend.common.models.event_team import EventTeam
+    from backend.common.models.team import Team
+    from backend.common.queries.database_query import track_accessed_query_cache_keys
+    from backend.common.queries.team_query import EventTeamsQuery
+
+    event = Event(id="2026test", year=2026, event_short="test", event_type_enum=0)
+    event.put()
+    team = Team(id="frc9999", team_number=9999, nickname="Café Robotics")
+    team.put()
+    EventTeam(id="2026test_frc9999", event=event.key, team=team.key, year=2026).put()
+
+    query = EventTeamsQuery(event_key="2026test")
+    cache_key = query.dict_cache_key(ApiMajorVersion.API_V3)
+
+    # 1. fetch_dict cache miss
+    with track_accessed_query_cache_keys() as dict_miss_keys:
+        query.fetch_dict(ApiMajorVersion.API_V3)
+
+    # 2. fetch_dict cache hit
+    with track_accessed_query_cache_keys() as dict_hit_keys:
+        query.fetch_dict(ApiMajorVersion.API_V3)
+
+    # 3. fetch_json cache hit
+    with track_accessed_query_cache_keys() as json_hit_keys:
+        query.fetch_json(ApiMajorVersion.API_V3)
+
+    # Invalidate query cache to test fetch_json cache miss
+    EventTeamsQuery.delete_cache_multi({query.cache_key})
+
+    # 4. fetch_json cache miss
+    with track_accessed_query_cache_keys() as json_miss_keys:
+        query.fetch_json(ApiMajorVersion.API_V3)
+
+    assert dict_miss_keys[cache_key] == dict_hit_keys[cache_key]
+    assert dict_hit_keys[cache_key] == json_hit_keys[cache_key]
+    assert json_hit_keys[cache_key] == json_miss_keys[cache_key]
+
+
+def test_validate_etag_short_circuits_across_json_and_dict_endpoints(
+    ndb_stub, memcache_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    from unittest.mock import patch
+    import backend.api.handlers.event
+    from backend.common.models.event import Event
+    from backend.common.models.event_team import EventTeam
+    from backend.common.models.team import Team
+
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    event = Event(id="2026test", year=2026, event_short="test", event_type_enum=0)
+    event.put()
+    team = Team(id="frc9999", team_number=9999, nickname="Café Robotics")
+    team.put()
+    EventTeam(id="2026test_frc9999", event=event.key, team=team.key, year=2026).put()
+
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    # 1. Full teams endpoint (uses fetch_json)
+    resp1 = api_client.get("/api/v3/event/2026test/teams", headers=headers)
+    assert resp1.status_code == 200
+    etag_full = resp1.headers.get("ETag")
+    assert etag_full is not None
+
+    # 2. Simple teams endpoint (uses fetch_dict on the same EventTeamsQuery)
+    resp2 = api_client.get("/api/v3/event/2026test/teams/simple", headers=headers)
+    assert resp2.status_code == 200
+    etag_simple = resp2.headers.get("ETag")
+    assert etag_simple is not None
+
+    # 3. Conditional request to full teams with etag_full -> should short-circuit
+    with patch(
+        "backend.api.handlers.event.models_query_response",
+        wraps=backend.api.handlers.event.models_query_response,
+    ) as mock_mqr:
+        cond_headers = {"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag_full}
+        resp3 = api_client.get("/api/v3/event/2026test/teams", headers=cond_headers)
+        assert resp3.status_code == 304
+        assert mock_mqr.called is False
+
+    # 4. Conditional request to simple teams with etag_simple -> should also short-circuit
+    with patch(
+        "backend.api.handlers.event.models_query_response",
+        wraps=backend.api.handlers.event.models_query_response,
+    ) as mock_mqr:
+        cond_headers = {"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag_simple}
+        resp4 = api_client.get(
+            "/api/v3/event/2026test/teams/simple", headers=cond_headers
+        )
+        assert resp4.status_code == 304
+        assert mock_mqr.called is False
+
+
+def test_validate_etag_skips_empty_incoming_etags(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = none_throws(resp1.headers.get("ETag"))
+
+    # Empty entries in the incoming ETag list are skipped rather than looked up
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.get_incoming_etags",
+        lambda: ["", none_throws(normalize_etag(etag))],
+    )
+    mock_is_etag_valid = MagicMock(return_value=False)
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.is_etag_valid", mock_is_etag_valid
+    )
+
+    # Track handler execution via track_call_after_response
+    from backend.api.handlers.team import track_call_after_response
+
+    mock_track_call = MagicMock(side_effect=track_call_after_response)
+    monkeypatch.setattr(
+        "backend.api.handlers.team.track_call_after_response", mock_track_call
+    )
+
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    # Flask's own conditional response handling may still produce a 304, but
+    # the fast path did not short-circuit: the handler ran
+    assert resp2.status_code in (200, 304)
+    mock_track_call.assert_called()
+    mock_is_etag_valid.assert_called_once_with(
+        normalize_etag(etag), path="/api/v3/team/frc254"
+    )
+
+
+def test_validate_etag_fast_path_exception_falls_through(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp1.status_code == 200
+    etag = none_throws(resp1.headers.get("ETag"))
+
+    # An unexpected error while validating the incoming ETag must not break the
+    # request; the handler runs and a full response is returned.
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.is_etag_valid",
+        MagicMock(side_effect=RuntimeError("boom")),
+    )
+
+    # Track handler execution via track_call_after_response
+    from backend.api.handlers.team import track_call_after_response
+
+    mock_track_call = MagicMock(side_effect=track_call_after_response)
+    monkeypatch.setattr(
+        "backend.api.handlers.team.track_call_after_response", mock_track_call
+    )
+
+    resp2 = api_client.get(
+        "/api/v3/team/frc254",
+        headers={"X-TBA-Auth-Key": "test_auth_key", "If-None-Match": etag},
+    )
+    # Flask's own conditional response handling may still produce a 304, but
+    # the fast path did not short-circuit: the handler ran
+    assert resp2.status_code in (200, 304)
+    mock_track_call.assert_called()
+
+
+def test_validate_etag_save_dependencies_exception_is_swallowed(
+    ndb_stub, api_client: Client, monkeypatch: pytest.MonkeyPatch
+) -> None:
+    monkeypatch.setattr(Environment, "flask_response_cache_enabled", lambda: False)
+
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    mock_save = MagicMock(side_effect=RuntimeError("boom"))
+    monkeypatch.setattr(
+        "backend.api.handlers.decorators.save_etag_dependencies", mock_save
+    )
+
+    # An error while persisting ETag dependencies must not break the response
+    resp = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.json["key"] == "frc254"
+    assert resp.headers.get("ETag") is not None
+    mock_save.assert_called_once()
+    # Nothing was recorded, so the ETag can't be validated on a later request
+    assert (
+        etag_deps_persisted_cache.get(
+            ("/api/v3/team/frc254", none_throws(normalize_etag(resp.headers["ETag"])))
+        )
+        is None
+    )

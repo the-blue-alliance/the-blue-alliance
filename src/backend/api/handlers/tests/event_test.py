@@ -28,6 +28,7 @@ from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_district_points import (
     EventDistrictPoints,
+    EventRegionalChampsPoolPoints,
     TeamAtEventDistrictPoints,
 )
 from backend.common.models.event_queue_status import (
@@ -154,6 +155,9 @@ def test_event_list_all(ndb_stub, api_client: Client) -> None:
         "/api/v3/events/all", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data.startswith(b"[") and resp.data.endswith(b"]")
+    assert json.loads(resp.data) == resp.json
     assert len(resp.json) == 2
     for event in resp.json:
         validate_nominal_event_keys(event)
@@ -180,6 +184,21 @@ def test_event_list_all(ndb_stub, api_client: Client) -> None:
     assert len(resp.json) == 2
     assert "2019casj" in resp.json
     assert "2020casj" in resp.json
+
+
+def test_event_list_all_empty(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+
+    resp = api_client.get(
+        "/api/v3/events/all", headers={"X-TBA-Auth-Key": "test_auth_key"}
+    )
+    assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data == b"[]"
+    assert json.loads(resp.data) == []
 
 
 def test_event_list_year(ndb_stub, api_client: Client) -> None:
@@ -786,4 +805,111 @@ def test_event_media_bad_key(ndb_stub, api_client: Client) -> None:
         "/api/v3/event/badkey/media",
         headers={"X-TBA-Auth-Key": "test_auth_key"},
     )
+    assert resp.status_code == 404
+
+
+def test_event_advancement_points(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+    for event_key in ("2025casj", "2025nhgrs", "2025nyny", "2025txho", "2025mndu"):
+        Event(
+            id=event_key,
+            year=2025,
+            event_short=event_key[4:],
+            event_type_enum=EventType.REGIONAL,
+        ).put()
+
+    district_points = EventDistrictPoints(
+        points={
+            "frc254": TeamAtEventDistrictPoints(
+                event_key="2025nhgrs",
+                district_cmp=False,
+                qual_points=10,
+                elim_points=20,
+                alliance_points=10,
+                award_points=5,
+                total=45,
+            )
+        },
+        tiebreakers={},
+    )
+    regional_points = EventRegionalChampsPoolPoints(
+        points={
+            "frc604": TeamAtEventDistrictPoints(
+                event_key="2025casj",
+                district_cmp=False,
+                qual_points=12,
+                elim_points=30,
+                alliance_points=16,
+                award_points=0,
+                total=58,
+            )
+        },
+        tiebreakers={},
+    )
+    EventDetails(id="2025nhgrs", district_points=district_points).put()
+    EventDetails(id="2025casj", regional_champs_pool_points=regional_points).put()
+    # Both populated: the regional pool points win
+    EventDetails(
+        id="2025txho",
+        district_points=district_points,
+        regional_champs_pool_points=regional_points,
+    ).put()
+
+    # No EventDetails at all
+    resp = api_client.get("/api/v3/event/2025nyny/advancement_points", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json is None
+
+    # EventDetails with neither kind of points
+    EventDetails(id="2025mndu").put()
+    resp = api_client.get("/api/v3/event/2025mndu/advancement_points", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json is None
+
+    # District points only
+    resp = api_client.get("/api/v3/event/2025nhgrs/advancement_points", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json == district_points
+
+    # Regional champs pool points only
+    resp = api_client.get("/api/v3/event/2025casj/advancement_points", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json == regional_points
+
+    # Both: regional champs pool points take precedence
+    resp = api_client.get("/api/v3/event/2025txho/advancement_points", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json == regional_points
+
+
+def test_event_playoff_advancement_404_when_event_deleted_after_key_cache_warm(
+    ndb_stub, api_client: Client
+) -> None:
+    # validate_keys remembers that an event key exists for a short TTL. If the
+    # Event is deleted inside that window, the decorator still lets the request
+    # through and the handler itself must return the 404.
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019nyny",
+        year=2019,
+        event_short="nyny",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    # Warm the key-exists cache through an endpoint that doesn't use
+    # EventQuery, so the event lookup below actually hits the datastore.
+    resp = api_client.get("/api/v3/event/2019nyny/matches", headers=headers)
+    assert resp.status_code == 200
+
+    ndb.Key(Event, "2019nyny").delete()
+
+    resp = api_client.get("/api/v3/event/2019nyny/playoff_advancement", headers=headers)
     assert resp.status_code == 404

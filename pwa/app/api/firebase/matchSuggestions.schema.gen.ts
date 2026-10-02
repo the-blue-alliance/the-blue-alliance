@@ -11,6 +11,18 @@ export const matchSuggestionsSchema = {
       description:
         'A single suggested match, with enough denormalized context to render it\nwithout any further TBA API calls.',
       properties: {
+        bs: {
+          anyOf: [
+            {
+              type: 'number',
+            },
+            {
+              type: 'null',
+            },
+          ],
+          default: null,
+          title: 'Bs',
+        },
         bt: {
           items: {
             type: 'integer',
@@ -72,6 +84,18 @@ export const matchSuggestionsSchema = {
           title: 'R',
           type: 'integer',
         },
+        rs: {
+          anyOf: [
+            {
+              type: 'number',
+            },
+            {
+              type: 'null',
+            },
+          ],
+          default: null,
+          title: 'Rs',
+        },
         rt: {
           items: {
             type: 'integer',
@@ -119,14 +143,18 @@ export const matchSuggestionsSchema = {
     },
     MatchSuggestionComponents: {
       description:
-        'The individual scoring factors behind a suggestion, each normalized to [0, 1].\n\n`favorites` and `performance` are min-max normalized across the candidate pool\nof a single cron run, so they are only meaningful relative to their siblings in\nthat same run. `significance` and `time_decay` are absolute.',
+        'The individual scoring factors behind a suggestion, each normalized to [0, 1].\n\n`favorites` and `high_score` are min-max normalized across the candidate pool\nof a single cron run, so they are only meaningful relative to their siblings in\nthat same run. `significance`, `time_decay`, and `close_score` are absolute.',
       properties: {
+        cs: {
+          title: 'Cs',
+          type: 'number',
+        },
         f: {
           title: 'F',
           type: 'number',
         },
-        p: {
-          title: 'P',
+        hs: {
+          title: 'Hs',
           type: 'number',
         },
         sig: {
@@ -138,7 +166,7 @@ export const matchSuggestionsSchema = {
           type: 'number',
         },
       },
-      required: ['f', 'sig', 'td', 'p'],
+      required: ['f', 'sig', 'td', 'hs', 'cs'],
       title: 'MatchSuggestionComponents',
       type: 'object',
     },
