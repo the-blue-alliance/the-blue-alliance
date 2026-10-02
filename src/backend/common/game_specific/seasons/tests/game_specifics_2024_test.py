@@ -202,3 +202,20 @@ def test_calculate_event_insights_without_finished_matches() -> None:
     unplayed = build_match("2024test", "qm", 1, -1, -1, None)
     assert _insights([]) == {"qual": None, "playoff": None}
     assert _insights([unplayed]) == {"qual": None, "playoff": None}
+
+
+def test_rp_sweep_requires_melody_and_ensemble() -> None:
+    """A 4 RP sweep is WIN + MELODY + ENSEMBLE (2024 manual, Table 6-2)."""
+    melody_only = {"melodyBonusAchieved": True, "ensembleBonusAchieved": False}
+    both = {"melodyBonusAchieved": True, "ensembleBonusAchieved": True}
+    matches = [
+        # Red wins with only the MELODY RP: 3 RP, not a sweep.
+        build_match(
+            "2024test", "qm", 1, 30, 10, {"red": melody_only, "blue": melody_only}
+        ),
+        # Red wins with both bonus RPs: a 4 RP sweep, but blue has no bonus RP.
+        build_match("2024test", "qm", 2, 30, 10, {"red": both, "blue": {}}),
+    ]
+    qual = none_throws(_insights(matches)["qual"])
+    assert qual["four_rp_count"] == [1, 2, 50.0]
+    assert qual["six_rp_count"] == [0, 2, 0.0]
