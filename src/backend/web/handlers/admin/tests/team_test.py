@@ -1,4 +1,5 @@
 import json
+from unittest.mock import patch
 
 import bs4
 from google.appengine.ext import ndb
@@ -262,3 +263,36 @@ def test_team_website_update_ignores_blocklisted_url(
     team = Team.get_by_id("frc1124")
     assert team is not None
     assert team.website == "https://www.thebluealliance.com"
+
+
+def test_team_detail_media_years_sorted_newest_first(
+    web_client: Client, login_gae_admin
+) -> None:
+    """Admin team_detail lists media years newest first."""
+    helpers.preseed_team(1124)
+    team_key = ndb.Key(Team, "frc1124")
+    # Keys chosen so the query returns the older year first.
+    Media(
+        id="cdphotothread_a",
+        media_type_enum=MediaType.CD_PHOTO_THREAD,
+        foreign_key="a",
+        details_json=json.dumps({"image_partial": "a_l.jpg"}),
+        year=2018,
+        references=[team_key],
+    ).put()
+    Media(
+        id="youtube_b",
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        foreign_key="b",
+        year=2019,
+        references=[team_key],
+    ).put()
+
+    with patch(
+        "backend.web.handlers.admin.team.render_template", return_value="ok"
+    ) as mock_render:
+        resp = web_client.get("/admin/team/1124")
+
+    assert resp.status_code == 200
+    template_values = mock_render.call_args[0][1]
+    assert template_values["team_media_years"] == [2019, 2018]

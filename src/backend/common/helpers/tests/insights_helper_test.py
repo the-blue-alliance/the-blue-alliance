@@ -1093,3 +1093,11 @@ def test_no_prediction_insight_without_predictions() -> None:
     insights = InsightsHelper._doPredictionInsightsForEvents(year=2024, events=[])
 
     assert insights == []
+
+
+def test_no_highscore_insight_without_matches(ndb_stub) -> None:
+    """A year with no matches emits no MATCH_HIGHSCORE insight."""
+    insights = InsightsHelper.doMatchInsights(2014)
+    by_name = _insights_by_name(insights)
+
+    assert Insight.INSIGHT_NAMES[Insight.MATCH_HIGHSCORE] not in by_name

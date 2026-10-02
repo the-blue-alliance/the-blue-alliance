@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 import {
   AllianceColor,
   CompLevel,
@@ -389,4 +391,26 @@ export function formatMatchKeyName(
     event?.playoff_type ?? null,
   );
   return event ? `${getEventNormalizedName(event)} ${title}` : title;
+}
+
+/**
+ * A match time such as "Sat 9:30 AM", in the viewer's time zone unless one is
+ * given. Uses a numeric hour: with a 2-digit hour, native Temporal and the
+ * polyfill disagree on zero-padding.
+ */
+export function formatMatchTime(
+  seconds: number,
+  {
+    timeZone = Temporal.Now.timeZoneId(),
+    weekday = true,
+  }: { timeZone?: string; weekday?: boolean } = {},
+): string {
+  return Temporal.Instant.fromEpochMilliseconds(seconds * 1000)
+    .toZonedDateTimeISO(timeZone)
+    .toLocaleString('en-US', {
+      ...(weekday && { weekday: 'short' }),
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 }

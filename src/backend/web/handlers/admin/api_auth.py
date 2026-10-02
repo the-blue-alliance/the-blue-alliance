@@ -90,6 +90,8 @@ def api_auth_edit_post(auth_id: str) -> Response:
         auth_types_enum.append(AuthType.EVENT_INFO)
     if request.form.get("allow_edit_zebra_motionworks"):
         auth_types_enum.append(AuthType.ZEBRA_MOTIONWORKS)
+    if AuthType.READ_API in auth_types_enum and len(auth_types_enum) > 1:
+        abort(400, "Cannot combine READ_API with write auth types")
 
     owner_email = request.form.get("owner", None)
     if owner_email:

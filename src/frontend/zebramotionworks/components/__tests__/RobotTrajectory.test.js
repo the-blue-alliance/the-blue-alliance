@@ -46,6 +46,19 @@ describe("RobotTrajectory", () => {
     expect(indicator(container)).toEqual(["1.5", "16"]);
   });
 
+  it("includes the sample at the (floored) end time in the path", () => {
+    // Every sample from ceil(start) through floor(end) is drawn.
+    const container = renderTrajectory({
+      teamData,
+      startTime: 1.5,
+      endTime: 3,
+      indicatorAtStart: true,
+    });
+    expect(container.querySelector("path").getAttribute("d")).toBe(
+      "M 2 15 L 2 15 L 3 13"
+    );
+  });
+
   it("falls back to the first known position after the start time", () => {
     const container = renderTrajectory({
       teamData,

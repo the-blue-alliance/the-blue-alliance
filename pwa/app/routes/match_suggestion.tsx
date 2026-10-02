@@ -3,7 +3,6 @@ import { useQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
 import { cn } from 'cn';
 import { type JSX, useState } from 'react';
-import { Temporal } from 'temporal-polyfill';
 
 import MedalIcon from '~icons/lucide/medal';
 import TrophyIcon from '~icons/lucide/trophy';
@@ -41,7 +40,11 @@ import {
   EVENT_FALLBACK_TIMEZONE,
   getCurrentWeekEvents,
 } from '~/lib/eventUtils';
-import { matchTitleShort, sortMatchComparator } from '~/lib/matchUtils';
+import {
+  formatMatchTime,
+  matchTitleShort,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
 import { publicCacheControlHeaders, queryFromAPI } from '~/lib/utils';
 
 export const Route = createFileRoute('/match_suggestion')({
@@ -531,16 +534,9 @@ function MatchSuggestionRow({
         <td className="border">
           {match.predicted_time && (
             <span>
-              {Temporal.Instant.fromEpochMilliseconds(
-                match.predicted_time * 1000,
-              )
-                .toZonedDateTimeISO(event.timezone ?? EVENT_FALLBACK_TIMEZONE)
-                .toLocaleString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  weekday: 'short',
-                  hour12: true,
-                })}
+              {formatMatchTime(match.predicted_time, {
+                timeZone: event.timezone ?? EVENT_FALLBACK_TIMEZONE,
+              })}
             </span>
           )}
         </td>
