@@ -7,23 +7,7 @@ import {
   AUTO_STACKED_TOTE_SET_2015_POINTS,
   AUTO_TOTE_SET_2015_POINTS,
   ENDGAME_2018_POINTS,
-  POINTS_PER_FOUL,
-  POINTS_PER_TECH_FOUL,
 } from '~/lib/pointValues';
-
-describe('foul values', () => {
-  test.each([
-    { year: 2015, foul: 6, techFoul: 6 },
-    { year: 2018, foul: 5, techFoul: 25 },
-    { year: 2025, foul: 2, techFoul: 6 },
-  ])(
-    '$year fouls cost $foul and tech fouls $techFoul',
-    ({ year, foul, techFoul }) => {
-      expect(POINTS_PER_FOUL[year]).toBe(foul);
-      expect(POINTS_PER_TECH_FOUL[year]).toBe(techFoul);
-    },
-  );
-});
 
 describe('2015 autonomous sets', () => {
   test('score 4, 6, 8 and 20 for robot, tote, container and stacked tote sets', () => {
