@@ -83,10 +83,6 @@ def api_authenticated(func):
                 # Add to trace span for visibility in Cloud Trace
                 span.set_label("api_auth_key", auth_key)
                 span.set_label("auth_owner_id", str(auth_owner_id))
-                # Log API key usage for visibility in GCP Console
-                logging.info(
-                    f"API request authenticated with key: {auth_key[:16]}... (owner: {auth_owner_id})"
-                )
             else:
                 from backend.common.auth import current_user
 

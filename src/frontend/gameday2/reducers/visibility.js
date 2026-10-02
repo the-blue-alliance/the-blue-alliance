@@ -46,7 +46,7 @@ const toggleLayoutDrawerVisibility = (state) =>
 
 const setLayoutDrawerVisibility = (visibility, state) =>
   Object.assign({}, state, {
-    layoutDrawer: !state.layoutDrawer,
+    layoutDrawer: visibility,
   });
 
 const visibility = (state = defaultState, action) => {
