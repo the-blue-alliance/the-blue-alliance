@@ -32,47 +32,53 @@ class LiveEventPanel extends React.PureComponent {
 
   componentDidMount() {
     this.updateCurrentTime();
-    setInterval(this.updateCurrentTime, 10000);
+    this.interval = setInterval(this.updateCurrentTime, 10000);
 
-    FirebaseApp.database()
-      .ref(`/e/${this.props.eventKey}/m`)
-      .on("value", (snapshot) => {
-        const val = snapshot.val();
-        const matches = [];
-        if (val) {
-          Object.keys(val).forEach((shortKey) => {
-            const match = val[shortKey];
-            match.key = `${this.props.eventKey}_${shortKey}`;
-            match.shortKey = shortKey;
-            matches.push(match);
-          });
+    this.matchesRef = FirebaseApp.database().ref(`/e/${this.props.eventKey}/m`);
+    this.matchesRef.on("value", (snapshot) => {
+      const val = snapshot.val();
+      const matches = [];
+      if (val) {
+        Object.keys(val).forEach((shortKey) => {
+          const match = val[shortKey];
+          match.key = `${this.props.eventKey}_${shortKey}`;
+          match.shortKey = shortKey;
+          matches.push(match);
+        });
+      }
+      matches.sort((match1, match2) => playOrder(match1) - playOrder(match2));
+
+      const playedMatches = matches.filter(
+        (match) => match.r !== -1 && match.b !== -1
+      );
+      // Compute next unplayed matches, skipping unplayed matches in the middle of played ones
+      let unplayedMatches = [];
+      matches.forEach((match) => {
+        if (match.r !== -1 && match.b !== -1) {
+          unplayedMatches = [];
+        } else {
+          unplayedMatches.push(match);
         }
-        matches.sort((match1, match2) => playOrder(match1) - playOrder(match2));
+      });
+      this.setState({
+        playedMatches,
+        unplayedMatches,
+      });
+    });
+    this.matchStateRef = FirebaseApp.database().ref(
+      `/le/${this.props.eventKey}`
+    );
+    this.matchStateRef.on("value", (snapshot) => {
+      this.setState({
+        matchState: snapshot.val(),
+      });
+    });
+  }
 
-        const playedMatches = matches.filter(
-          (match) => match.r !== -1 && match.b !== -1
-        );
-        // Compute next unplayed matches, skipping unplayed matches in the middle of played ones
-        let unplayedMatches = [];
-        matches.forEach((match) => {
-          if (match.r !== -1 && match.b !== -1) {
-            unplayedMatches = [];
-          } else {
-            unplayedMatches.push(match);
-          }
-        });
-        this.setState({
-          playedMatches,
-          unplayedMatches,
-        });
-      });
-    FirebaseApp.database()
-      .ref(`/le/${this.props.eventKey}`)
-      .on("value", (snapshot) => {
-        this.setState({
-          matchState: snapshot.val(),
-        });
-      });
+  componentWillUnmount() {
+    clearInterval(this.interval);
+    this.matchesRef.off("value");
+    this.matchStateRef.off("value");
   }
 
   updateCurrentTime = () => {
