@@ -27,6 +27,8 @@ class CSVOffseasonMatchesParser:
 
     @classmethod
     def parse_csv_match(cls, row):
+        for i in range(len(row)):
+            row[i] = row[i].strip()
         (
             match_id,
             red_1,
@@ -38,8 +40,6 @@ class CSVOffseasonMatchesParser:
             red_score,
             blue_score,
         ) = row
-        for i in range(len(row)):
-            row[i] = row[i].strip()
 
         team_key_names = []
 
