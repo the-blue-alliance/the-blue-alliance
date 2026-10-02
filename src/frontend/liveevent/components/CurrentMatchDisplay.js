@@ -116,10 +116,10 @@ const CurrentMatchDisplay = (props) => {
   return (
     <div className="row liveEventPanel">
       <div className="col-xs-4">
-        <div className={`booleanIndicator ${redScaleOwned && "red"}`}>
+        <div className={`booleanIndicator${redScaleOwned ? " red" : ""}`}>
           Scale
         </div>
-        <div className={`booleanIndicator ${redSwitchOwned && "red"}`}>
+        <div className={`booleanIndicator${redSwitchOwned ? " red" : ""}`}>
           Switch
         </div>
         <div className="powerupsContainer">
@@ -143,10 +143,10 @@ const CurrentMatchDisplay = (props) => {
             played={redBoostPlayed}
           />
         </div>
-        <div className={`booleanIndicator ${redAutoQuest && "red"}`}>
+        <div className={`booleanIndicator${redAutoQuest ? " red" : ""}`}>
           Auto Quest
         </div>
-        <div className={`booleanIndicator ${redFaceTheBoss && "red"}`}>
+        <div className={`booleanIndicator${redFaceTheBoss ? " red" : ""}`}>
           Face The Boss
         </div>
       </div>
@@ -200,10 +200,10 @@ const CurrentMatchDisplay = (props) => {
         )}
       </div>
       <div className="col-xs-4">
-        <div className={`booleanIndicator ${blueScaleOwned && "blue"}`}>
+        <div className={`booleanIndicator${blueScaleOwned ? " blue" : ""}`}>
           Scale
         </div>
-        <div className={`booleanIndicator ${blueSwitchOwned && "blue"}`}>
+        <div className={`booleanIndicator${blueSwitchOwned ? " blue" : ""}`}>
           Switch
         </div>
         <div className="powerupsContainer">
@@ -227,10 +227,10 @@ const CurrentMatchDisplay = (props) => {
             played={blueBoostPlayed}
           />
         </div>
-        <div className={`booleanIndicator ${blueAutoQuest && "blue"}`}>
+        <div className={`booleanIndicator${blueAutoQuest ? " blue" : ""}`}>
           Auto Quest
         </div>
-        <div className={`booleanIndicator ${blueFaceTheBoss && "blue"}`}>
+        <div className={`booleanIndicator${blueFaceTheBoss ? " blue" : ""}`}>
           Face The Boss
         </div>
       </div>
@@ -242,7 +242,7 @@ CurrentMatchDisplay.propTypes = {
   year: PropTypes.number.isRequired,
   match: PropTypes.object,
   matchState: PropTypes.object,
-  forcePreMatch: PropTypes.boolean,
+  forcePreMatch: PropTypes.bool,
 };
 
 export default CurrentMatchDisplay;

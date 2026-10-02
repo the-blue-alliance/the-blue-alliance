@@ -18,7 +18,11 @@ class RobotTrajectory extends React.PureComponent {
   generatePath = (teamData, startTime, endTime) => {
     let path = "";
     let first = true;
-    for (let i = startTime; i < Math.min(teamData.xs.length, endTime); i++) {
+    for (
+      let i = startTime;
+      i <= Math.min(teamData.xs.length - 1, endTime);
+      i++
+    ) {
       if (teamData.xs[i] !== null && teamData.ys[i] !== null) {
         if (first) {
           first = false;

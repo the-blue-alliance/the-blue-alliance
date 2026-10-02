@@ -356,7 +356,7 @@ class FRCAPI:
                     else:
                         with open(filename, "wb") as f:
                             f.write(content)
-                    files.append(f"{safe_dir_name}/{safe_file_name}")
+                    files.append(f"{safe_dir_name}{safe_file_name}")
         return sorted(files)
 
     def _get_simulated(

@@ -1,4 +1,6 @@
 import { act, renderHook } from '@testing-library/react';
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import { THEME_INIT_SCRIPT, ThemeProvider, useTheme } from '~/lib/theme';
@@ -221,5 +223,24 @@ describe('THEME_INIT_SCRIPT', () => {
     });
 
     expect(() => runThemeInitScript()).not.toThrow();
+  });
+});
+
+describe('theme.css color-scheme', () => {
+  const themeCss = readFileSync(
+    resolve(__dirname, '../style/theme.css'),
+    'utf8',
+  );
+
+  function ruleBody(selector: string): string {
+    const escaped = selector.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    const match = new RegExp(`^${escaped} \\{([^}]*)\\}`, 'm').exec(themeCss);
+    if (!match) throw new Error(`No top-level ${selector} rule in theme.css`);
+    return match[1];
+  }
+
+  test('native controls follow the site theme, not the OS preference', () => {
+    expect(ruleBody(':root')).toMatch(/^\s*color-scheme: light;$/m);
+    expect(ruleBody('.dark')).toMatch(/^\s*color-scheme: dark;$/m);
   });
 });

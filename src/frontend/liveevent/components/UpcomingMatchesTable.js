@@ -10,7 +10,11 @@ class UpcomingMatchesTable extends React.PureComponent {
 
   componentDidMount() {
     this.updateCurrentTime();
-    setInterval(this.updateCurrentTime, 10000);
+    this.interval = setInterval(this.updateCurrentTime, 10000);
+  }
+
+  componentWillUnmount() {
+    clearInterval(this.interval);
   }
 
   updateCurrentTime = () => {
