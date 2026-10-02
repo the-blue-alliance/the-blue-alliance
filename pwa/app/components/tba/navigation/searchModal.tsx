@@ -27,12 +27,22 @@ import { Spinner } from '~/components/ui/spinner';
 import { STALE_TIME } from '~/lib/queryClient';
 import FuzzysortFilterer, {
   FilteredSearchIndex,
+  firstSearchResult,
+  keyToPath,
 } from '~/lib/search/fuzzysortFilterer';
 
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
   const inputRef = useRef<HTMLInputElement>(null);
+  // cmdk's selected item, controlled so Enter navigates to exactly what is
+  // highlighted — regardless of how it got there (typing, arrows, vim keys, or
+  // pointer hover, which all report through onValueChange) — instead of cmdk's
+  // asynchronously-committed DOM selection that can lag a keystroke (#10104).
+  const [selection, setSelection] = useState<{ query: string; value: string }>({
+    query: '',
+    value: '',
+  });
   const searchIndexQuery = useQuery({
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
@@ -50,6 +60,15 @@ export function SearchModal() {
     }
     return filterer.filter(searchIndexQuery.data, query);
   }, [query, searchIndexQuery.data, filterer]);
+
+  // The first result in display order is the default highlight. The user's own
+  // selection (captured via the controlled value's onValueChange) takes over
+  // until the query changes, at which point we fall back to the fresh top
+  // result — computed during render so it never lags a keystroke.
+  const topValue = searchResults
+    ? (firstSearchResult(searchResults)?.value ?? '')
+    : '';
+  const selectedValue = selection.query === query ? selection.value : topValue;
 
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
@@ -134,6 +153,10 @@ export function SearchModal() {
             **:data-[slot=command-input-wrapper]:border-input
             **:data-[slot=command-input-wrapper]:bg-transparent"
           shouldFilter={false}
+          value={selectedValue}
+          onValueChange={(value) => {
+            setSelection({ query, value });
+          }}
         >
           <div className="relative">
             <CommandInput
@@ -141,6 +164,25 @@ export function SearchModal() {
               placeholder="Search teams and events..."
               value={query}
               onValueChange={setQuery}
+              onKeyDown={(e) => {
+                if (e.key !== 'Enter' || e.nativeEvent.isComposing) {
+                  return;
+                }
+                // Navigate to whatever is highlighted, read from our controlled
+                // React selection rather than cmdk's async DOM selection, so a
+                // fast type-then-Enter can't land on a stale, off-by-one item
+                // (#10104). The highlight is the deterministic top result for a
+                // fresh query, or the user's own pick via arrows/vim/pointer.
+                if (!selectedValue) {
+                  return;
+                }
+                // Stop cmdk's root keydown handler from also navigating to its
+                // (possibly stale) aria-selected item.
+                e.preventDefault();
+                e.stopPropagation();
+                void navigate({ to: keyToPath(selectedValue) });
+                setOpen(false);
+              }}
               className="h-20 text-base"
             />
             {isIndexPending && (
@@ -189,9 +231,7 @@ export function SearchModal() {
                               key={team.key}
                               value={team.key}
                               onSelect={() => {
-                                void navigate({
-                                  to: `/team/${team.key.substring(3)}`,
-                                });
+                                void navigate({ to: keyToPath(team.key) });
                                 setOpen(false);
                               }}
                             >
@@ -213,7 +253,7 @@ export function SearchModal() {
                               key={event.key}
                               value={event.key}
                               onSelect={() => {
-                                void navigate({ to: `/event/${event.key}` });
+                                void navigate({ to: keyToPath(event.key) });
                                 setOpen(false);
                               }}
                             >
