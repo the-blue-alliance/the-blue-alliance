@@ -1,0 +1,29 @@
+name: Set up PWA toolchain
+description: Installs node and pnpm from pwa/mise.toml and restores the pnpm store cache.
+
+runs:
+  using: composite
+  steps:
+    # mise resolves node/pnpm from pwa/mise.toml (checksum-verified against pwa/mise.lock).
+    # export_path defaults to true, so the tool bin dirs land in $GITHUB_PATH and are
+    # available to every later step in the job regardless of that step's working directory.
+    - name: Install mise and tools
+      uses: jdx/mise-action@v4
+      with:
+        working_directory: pwa
+        install: true
+        cache: true
+
+    # mise-action caches the tool binaries, not the pnpm package store, so cache that too.
+    - name: Locate pnpm store
+      id: pnpm-store
+      shell: bash
+      working-directory: pwa
+      run: echo "path=$(pnpm store path --silent)" >> "$GITHUB_OUTPUT"
+
+    - name: Cache pnpm store
+      uses: actions/cache@v6
+      with:
+        path: ${{ steps.pnpm-store.outputs.path }}
+        key: ${{ runner.os }}-pnpm-store-${{ hashFiles('pwa/pnpm-lock.yaml') }}
+        restore-keys: ${{ runner.os }}-pnpm-store-

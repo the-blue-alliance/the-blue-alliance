@@ -22,10 +22,12 @@ def test_default_sitevar():
     assert default_sitevar is not None
 
     year = datetime.datetime.now().year
+    # android/ios placeholders keep the default consistent with the APIv3
+    # contract, which declares them as non-null objects
     default_json = {
-        "android": None,
+        "android": {"min_app_version": -1, "latest_app_version": -1},
         "current_season": year,
-        "ios": None,
+        "ios": {"min_app_version": -1, "latest_app_version": -1},
         "max_season": year,
         "web": None,
         "max_team_page": 0,
@@ -37,9 +39,9 @@ def test_default_sitevar():
 def test_status_empty():
     year = datetime.datetime.now().year
     assert ApiStatus.status() == {
-        "android": None,
+        "android": {"min_app_version": -1, "latest_app_version": -1},
         "current_season": year,
-        "ios": None,
+        "ios": {"min_app_version": -1, "latest_app_version": -1},
         "max_season": year,
         "web": None,
         "max_team_page": 0,

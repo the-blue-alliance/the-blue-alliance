@@ -20,12 +20,13 @@ class ConverterBase(abc.ABC, Generic[QueryReturn, DictQueryReturn]):
     def convert(
         self, version: ApiMajorVersion
     ) -> Union[None, DictQueryReturn, List[DictQueryReturn]]:
-        with Span("{}.convert".format(self.__class__.__name__)):
+        with Span("{}.convert".format(self.__class__.__name__)) as span:
             if self._query_return is None:
                 return None
-            converted_query_return = self._convert_list(
-                listify(self._query_return), version
-            )
+            items = listify(self._query_return)
+            span.set_label("input_item_count", str(len(items)))
+            span.set_label("api_version", str(version))
+            converted_query_return = self._convert_list(items, version)
             if isinstance(self._query_return, list):
                 return converted_query_return
             else:

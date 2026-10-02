@@ -1,7 +1,6 @@
-import * as PopoverPrimitive from '@radix-ui/react-popover';
+import { Popover as PopoverPrimitive } from '@base-ui/react/popover';
+import { cn } from 'cn';
 import { type ComponentProps } from 'react';
-
-import { cn } from '~/lib/utils';
 
 function Popover({ ...props }: ComponentProps<typeof PopoverPrimitive.Root>) {
   return <PopoverPrimitive.Root data-slot="popover" {...props} />;
@@ -15,38 +14,43 @@ function PopoverTrigger({
 
 function PopoverContent({
   className,
+  side,
   align = 'center',
+  alignOffset,
   sideOffset = 4,
   ...props
-}: ComponentProps<typeof PopoverPrimitive.Content>) {
+}: ComponentProps<typeof PopoverPrimitive.Popup> &
+  Pick<
+    ComponentProps<typeof PopoverPrimitive.Positioner>,
+    'side' | 'sideOffset' | 'align' | 'alignOffset'
+  >) {
   return (
     <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        data-slot="popover-content"
+      <PopoverPrimitive.Positioner
+        side={side}
         align={align}
+        alignOffset={alignOffset}
         sideOffset={sideOffset}
-        className={cn(
-          `z-50 w-72 origin-(--radix-popover-content-transform-origin)
-          rounded-md border bg-popover p-4 text-popover-foreground shadow-md
-          outline-hidden data-[side=bottom]:slide-in-from-top-2
-          data-[side=left]:slide-in-from-right-2
-          data-[side=right]:slide-in-from-left-2
-          data-[side=top]:slide-in-from-bottom-2 data-[state=closed]:animate-out
-          data-[state=closed]:fade-out-0 data-[state=closed]:zoom-out-95
-          data-[state=open]:animate-in data-[state=open]:fade-in-0
-          data-[state=open]:zoom-in-95`,
-          className,
-        )}
-        {...props}
-      />
+        className="isolate z-50"
+      >
+        <PopoverPrimitive.Popup
+          data-slot="popover-content"
+          className={cn(
+            `z-50 w-72 origin-(--transform-origin) rounded-md border bg-popover
+            p-4 text-popover-foreground shadow-md outline-hidden
+            data-[side=bottom]:slide-in-from-top-2
+            data-[side=left]:slide-in-from-right-2
+            data-[side=right]:slide-in-from-left-2
+            data-[side=top]:slide-in-from-bottom-2 data-open:animate-in
+            data-open:fade-in-0 data-open:zoom-in-95 data-closed:animate-out
+            data-closed:fade-out-0 data-closed:zoom-out-95`,
+            className,
+          )}
+          {...props}
+        />
+      </PopoverPrimitive.Positioner>
     </PopoverPrimitive.Portal>
   );
 }
 
-function PopoverAnchor({
-  ...props
-}: ComponentProps<typeof PopoverPrimitive.Anchor>) {
-  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />;
-}
-
-export { Popover, PopoverTrigger, PopoverContent, PopoverAnchor };
+export { Popover, PopoverTrigger, PopoverContent };

@@ -1,10 +1,7 @@
-from unittest.mock import patch
-
 import pytest
 from firebase_admin import messaging
 
 from backend.common.consts.fcm.platform_priority import PlatformPriority
-from backend.common.consts.fcm.platform_type import PlatformType
 from backend.common.models.fcm.platform_config import PlatformConfig
 
 
@@ -31,25 +28,9 @@ def test_priority_supported():
         PlatformConfig(priority=-1)
 
 
-def test_platform_config_unsupported_platform_type():
-    config = PlatformConfig()
-    with pytest.raises(ValueError, match="Unsupported platform_type: -1"):
-        config.platform_config(-1)
-
-
-def test_platform_config_unsupported_platform_payload_type():
-    # Hack this test as if we'd added a new PlatformType but hadn't supported it properly
-    config = PlatformConfig()
-    with (
-        patch.object(PlatformType, "validate"),
-        pytest.raises(TypeError, match="Unsupported PlatformPayload platform_type: -1"),
-    ):
-        config.platform_config(-1)
-
-
 def test_platform_config_android_empty():
     config = PlatformConfig()
-    android_config = config.platform_config(PlatformType.ANDROID)
+    android_config = config.android_config()
     assert isinstance(android_config, messaging.AndroidConfig)
     assert android_config.collapse_key is None
     assert android_config.priority is None
@@ -57,7 +38,7 @@ def test_platform_config_android_empty():
 
 def test_platform_config_android_collapse_key():
     config = PlatformConfig(collapse_key="android_collapse_key")
-    android_config = config.platform_config(PlatformType.ANDROID)
+    android_config = config.android_config()
     assert isinstance(android_config, messaging.AndroidConfig)
     assert android_config.collapse_key == "android_collapse_key"
     assert android_config.priority is None
@@ -65,7 +46,7 @@ def test_platform_config_android_collapse_key():
 
 def test_platform_config_android_priority():
     config = PlatformConfig(priority=PlatformPriority.HIGH)
-    android_config = config.platform_config(PlatformType.ANDROID)
+    android_config = config.android_config()
     assert isinstance(android_config, messaging.AndroidConfig)
     assert android_config.collapse_key is None
     assert android_config.priority == "high"
@@ -75,7 +56,7 @@ def test_platform_config_android():
     config = PlatformConfig(
         priority=PlatformPriority.NORMAL, collapse_key="collapse_key"
     )
-    android_config = config.platform_config(PlatformType.ANDROID)
+    android_config = config.android_config()
     assert isinstance(android_config, messaging.AndroidConfig)
     assert android_config.collapse_key == "collapse_key"
     assert android_config.priority == "normal"
@@ -83,7 +64,7 @@ def test_platform_config_android():
 
 def test_platform_config_apns_empty():
     config = PlatformConfig()
-    apns_config = config.platform_config(PlatformType.APNS)
+    apns_config = config.apns_config()
     assert isinstance(apns_config, messaging.APNSConfig)
     assert apns_config.headers is None
     assert isinstance(apns_config.payload, messaging.APNSPayload)
@@ -92,7 +73,7 @@ def test_platform_config_apns_empty():
 
 def test_platform_config_apns_collapse_key():
     config = PlatformConfig(collapse_key="apns_collapse_key")
-    apns_config = config.platform_config(PlatformType.APNS)
+    apns_config = config.apns_config()
     assert isinstance(apns_config, messaging.APNSConfig)
     assert apns_config.headers == {"apns-collapse-id": "apns_collapse_key"}
     assert isinstance(apns_config.payload, messaging.APNSPayload)
@@ -101,7 +82,7 @@ def test_platform_config_apns_collapse_key():
 
 def test_platform_config_apns_priority():
     config = PlatformConfig(priority=PlatformPriority.HIGH)
-    apns_config = config.platform_config(PlatformType.APNS)
+    apns_config = config.apns_config()
     assert isinstance(apns_config, messaging.APNSConfig)
     assert apns_config.headers == {"apns-priority": "10"}
     assert isinstance(apns_config.payload, messaging.APNSPayload)
@@ -112,7 +93,7 @@ def test_platform_config_apns():
     config = PlatformConfig(
         priority=PlatformPriority.NORMAL, collapse_key="collapse_key"
     )
-    apns_config = config.platform_config(PlatformType.APNS)
+    apns_config = config.apns_config()
     assert isinstance(apns_config, messaging.APNSConfig)
     assert apns_config.headers == {
         "apns-collapse-id": "collapse_key",
@@ -124,21 +105,21 @@ def test_platform_config_apns():
 
 def test_platform_config_webpush_empty():
     config = PlatformConfig()
-    webpush_config = config.platform_config(PlatformType.WEBPUSH)
+    webpush_config = config.webpush_config()
     assert isinstance(webpush_config, messaging.WebpushConfig)
     assert webpush_config.headers is None
 
 
 def test_platform_config_webpush_collapse_key():
     config = PlatformConfig(collapse_key="webpush_collapse_key")
-    webpush_config = config.platform_config(PlatformType.WEBPUSH)
+    webpush_config = config.webpush_config()
     assert isinstance(webpush_config, messaging.WebpushConfig)
     assert webpush_config.headers == {"Topic": "webpush_collapse_key"}
 
 
 def test_platform_config_webpush_priority():
     config = PlatformConfig(priority=PlatformPriority.HIGH)
-    webpush_config = config.platform_config(PlatformType.WEBPUSH)
+    webpush_config = config.webpush_config()
     assert isinstance(webpush_config, messaging.WebpushConfig)
     assert webpush_config.headers == {"Urgency": "high"}
 
@@ -147,6 +128,6 @@ def test_platform_config_webpush():
     config = PlatformConfig(
         priority=PlatformPriority.NORMAL, collapse_key="collapse_key"
     )
-    webpush_config = config.platform_config(PlatformType.WEBPUSH)
+    webpush_config = config.webpush_config()
     assert isinstance(webpush_config, messaging.WebpushConfig)
     assert webpush_config.headers == {"Topic": "collapse_key", "Urgency": "normal"}

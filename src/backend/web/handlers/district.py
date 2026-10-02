@@ -97,7 +97,7 @@ def district_detail(
     valid_districts: List[Tuple[str, DistrictAbbreviation]] = []
     districts_in_year = districts_in_year_future.get_result()
     for dist in districts_in_year:
-        valid_districts.append((dist.display_name, dist.abbreviation))
+        valid_districts.append((dist.render_name, dist.abbreviation))
     valid_districts = sorted(valid_districts, key=itemgetter(0))
     valid_districts.insert(0, ("Regional Events", "regional"))
 
@@ -188,7 +188,7 @@ def district_detail(
         "year": year,
         "valid_years": valid_years,
         "valid_districts": valid_districts,
-        "district_name": district.display_name,
+        "district_name": district.render_name,
         "district_abbrev": district_abbrev,
         "week_events": week_events,
         "events_by_key": events_by_key,
@@ -239,9 +239,9 @@ def district_insights(
         ),
         "insights_overview_url": f"/district/{district_abbrev}/insights",
         "insights_base_path": f"/district/{district_abbrev}/insights",
-        "page_title": f"{year} {latest_district.display_name} District Insights - The Blue Alliance",
-        "meta_description": f"FIRST Robotics Competition (FRC) insights from {year} for the {latest_district.display_name} District.",
-        "heading": f"{year} {latest_district.display_name} District Insights",
+        "page_title": f"{year} {latest_district.render_name} District Insights - The Blue Alliance",
+        "meta_description": f"FIRST Robotics Competition (FRC) insights from {year} for the {latest_district.render_name} District.",
+        "heading": f"{year} {latest_district.render_name} District Insights",
     }
 
     insights = ndb.get_multi(
@@ -307,7 +307,7 @@ def regional_detail(year: Optional[Year]) -> Response:
     valid_districts: List[Tuple[str, DistrictAbbreviation]] = []
     districts_in_year = districts_in_year_future.get_result()
     for dist in districts_in_year:
-        valid_districts.append((dist.display_name, dist.abbreviation))
+        valid_districts.append((dist.render_name, dist.abbreviation))
     valid_districts = sorted(valid_districts, key=itemgetter(0))
 
     if regional_champs_pool_future and (

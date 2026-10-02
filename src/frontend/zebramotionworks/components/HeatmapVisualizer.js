@@ -53,7 +53,14 @@ class HeatmapVisualizer extends React.Component {
           for (let i = 0; i < dataLen; i++) {
             const x = xs[i];
             const y = ys[i];
-            if (x !== null && y !== null && x < WIDTH && y < HEIGHT) {
+            if (
+              x !== null &&
+              y !== null &&
+              x >= 0 &&
+              y >= 0 &&
+              x < WIDTH &&
+              y < HEIGHT
+            ) {
               grid[Math.floor(x * GRID_SCALE)][Math.floor(y * GRID_SCALE)] += 1;
             }
           }

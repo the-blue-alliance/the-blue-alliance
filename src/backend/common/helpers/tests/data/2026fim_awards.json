@@ -1,0 +1,7118 @@
+[
+  {
+    "award_type": 0,
+    "event_key": "2026mibat",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4810"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mibat",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc11511"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mibat",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11511"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mibat",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9215"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mibat",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9758"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mibat",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5675"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mibat",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mibat",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5675"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9776"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mibat",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5462"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mibat",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mibat",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11431"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mibat",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5248"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mibat",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5577"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mibat",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Tyler W",
+        "team_key": "frc1502"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mibat",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mibat",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8126"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mibat",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9776"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mibat",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1502"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mibel",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1188"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mibel",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6615"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6538"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mibel",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6615"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mibel",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4405"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mibel",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6120"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mibel",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mibel",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1188"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5067"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9455"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mibel",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8373"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mibel",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mibel",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9455"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mibel",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mibel",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6528"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mibel",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Aarya Y",
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mibel",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mibel",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mibel",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9751"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mibel",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10656"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026miber",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026miber",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9758"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6588"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026miber",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11431"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026miber",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026miber",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026miber",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2959"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026miber",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9758"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026miber",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5535"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9182"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026miber",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5227"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026miber",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5462"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026miber",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4855"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026miber",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026miber",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5927"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026miber",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Vrishab M",
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026miber",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3620"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026miber",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2604"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026miber",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10633"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026miber",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mibig",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1718"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mibig",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7160"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5213"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mibig",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11435"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mibig",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9176"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mibig",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7160"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mibig",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5535"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mibig",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5982"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mibig",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc244"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6100"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8286"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mibig",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3618"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mibig",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9673"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mibig",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6642"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mibig",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4004"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mibig",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5704"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mibig",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Arianna M",
+        "team_key": "frc3618"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mibig",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mibig",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc244"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mibig",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10421"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mibig",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc288"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mibkn",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9312"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mibkn",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9210"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3773"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mibkn",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11444"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mibkn",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2611"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mibkn",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mibkn",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4003"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mibkn",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3668"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mibkn",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5676"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1481"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9312"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mibkn",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9210"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mibkn",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1025"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mibkn",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4216"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mibkn",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7501"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mibkn",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4422"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mibkn",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Sayan S",
+        "team_key": "frc9312"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mibkn",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc862"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mibkn",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1481"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mibkn",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5205"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mibkn",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mibro",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3604"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mibro",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7769"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc469"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8179"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mibro",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8179"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mibro",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6152"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mibro",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2620"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mibro",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3322"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mibro",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc247"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6528"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2832"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mibro",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mibro",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7769"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mibro",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6528"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mibro",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc469"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mibro",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mibro",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Gus S",
+        "team_key": "frc1189"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mibro",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5907"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mibro",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2832"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mibro",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc247"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mibro",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026miche",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1502"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026miche",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5567"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026miche",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11387"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026miche",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026miche",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026miche",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026miche",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2611"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026miche",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3656"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc302"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7056"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026miche",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7501"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026miche",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026miche",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7197"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026miche",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1076"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026miche",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6570"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026miche",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Sawyer B",
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026miche",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026miche",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5530"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026miche",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10285"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026miche",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5708"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026micmp",
+    "name": "District Championship FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5577"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3620"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3604"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026micmp",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7769"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3668"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026micmp",
+    "name": "District Championship Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11387"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc11493"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026micmp",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7197"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4327"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 3,
+    "event_key": "2026micmp",
+    "name": "Woodie Flowers Finalist Award",
+    "recipient_list": [
+      {
+        "awardee": "Darren Losey",
+        "team_key": "frc226"
+      },
+      {
+        "awardee": "Julie Kausch",
+        "team_key": "frc217"
+      },
+      {
+        "awardee": "Jason Markesino",
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026micmp",
+    "name": "FIRST Leadership Award Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Sawyer B",
+        "team_key": "frc27"
+      },
+      {
+        "awardee": "Brett D",
+        "team_key": "frc2851"
+      },
+      {
+        "awardee": "Julia F",
+        "team_key": "frc6753"
+      },
+      {
+        "awardee": "Varun G",
+        "team_key": "frc548"
+      },
+      {
+        "awardee": "Emily L",
+        "team_key": "frc4422"
+      },
+      {
+        "awardee": "Vrishab M",
+        "team_key": "frc503"
+      },
+      {
+        "awardee": "Arianna M",
+        "team_key": "frc3618"
+      },
+      {
+        "awardee": "Samantha M",
+        "team_key": "frc3604"
+      },
+      {
+        "awardee": "Caiden N",
+        "team_key": "frc4967"
+      },
+      {
+        "awardee": "Logan P",
+        "team_key": "frc4810"
+      },
+      {
+        "awardee": "Soph R",
+        "team_key": "frc247"
+      },
+      {
+        "awardee": "Sayan S",
+        "team_key": "frc9312"
+      },
+      {
+        "awardee": "Casper S",
+        "team_key": "frc201"
+      },
+      {
+        "awardee": "Aarya Y",
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026micmp",
+    "name": "District Championship Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026micmp1",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7769"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3668"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026micmp1",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026micmp1",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026micmp1",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8517"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026micmp1",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1502"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026micmp1",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5907"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9771"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026micmp1",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4362"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026micmp1",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026micmp1",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4680"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026micmp1",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8126"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026micmp1",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc85"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026micmp1",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7769"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026micmp1",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026micmp1",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9771"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026micmp2",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2586"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026micmp2",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2611"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026micmp2",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3572"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026micmp2",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1023"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026micmp2",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026micmp2",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc469"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc862"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026micmp2",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9245"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026micmp2",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026micmp2",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6528"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026micmp2",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc469"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026micmp2",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7598"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026micmp2",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026micmp2",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026micmp2",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4398"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026micmp3",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8280"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026micmp3",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8280"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026micmp3",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026micmp3",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026micmp3",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc818"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026micmp3",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5066"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc548"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026micmp3",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7056"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026micmp3",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2960"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026micmp3",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc70"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026micmp3",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5066"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026micmp3",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1481"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026micmp3",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026micmp3",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4956"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026micmp3",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5229"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026micmp4",
+    "name": "District Championship Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7197"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026micmp4",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2619"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026micmp4",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9312"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026micmp4",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026micmp4",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5534"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026micmp4",
+    "name": "District Championship Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3641"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026micmp4",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026micmp4",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc573"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026micmp4",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7197"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026micmp4",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026micmp4",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8873"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026micmp4",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026micmp4",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026micmp4",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11386"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026midtr",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5577"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026midtr",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3175"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc123"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5478"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026midtr",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11490"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026midtr",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2224"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026midtr",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2048"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026midtr",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7196"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026midtr",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4838"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026midtr",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8352"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9255"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3632"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026midtr",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026midtr",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc123"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026midtr",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7692"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026midtr",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8352"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026midtr",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4680"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026midtr",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Katia C",
+        "team_key": "frc5577"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026midtr",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9255"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026midtr",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10577"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026midtr",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10607"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026midtr",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3175"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026miesc",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5193"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026miesc",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5193"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6079"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026miesc",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4835"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026miesc",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5086"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026miesc",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3602"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026miesc",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10589"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026miesc",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5505"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2586"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10622"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026miesc",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10595"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026miesc",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6637"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026miesc",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6079"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026miesc",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4392"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026miesc",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4377"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026miesc",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Brooke R",
+        "team_key": "frc3770"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026miesc",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4391"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026miesc",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6088"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026miesc",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10605"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026miesc",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3770"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mifen",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc862"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mifen",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5114"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5660"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8193"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mifen",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10978"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mifen",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9207"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mifen",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6073"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mifen",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc494"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mifen",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc70"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mifen",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc494"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc68"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7598"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mifen",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6548"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mifen",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5114"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mifen",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7598"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mifen",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7202"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mifen",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3098"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mifen",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Logan P",
+        "team_key": "frc4810"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mifen",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc68"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mifen",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3568"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mifen",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7772"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mifen",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4810"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mifli",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mifli",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc68"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6085"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mifli",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11527"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mifli",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mifli",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5612"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mifli",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9757"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mifli",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5660"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mifli",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9757"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5660"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9648"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mifli",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6085"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mifli",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc68"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mifli",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4998"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mifli",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5046"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mifli",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5167"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mifli",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc894"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mifli",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5561"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mifli",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5282"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mifli",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5235"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026miken",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3620"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026miken",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7220"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10633"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10642"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026miken",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11399"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026miken",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9638"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026miken",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9549"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026miken",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1023"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026miken",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9208"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026miken",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5166"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc858"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026miken",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3234"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026miken",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6081"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026miken",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5980"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026miken",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2771"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026miken",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026miken",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Caiden N",
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026miken",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10633"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026miken",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5166"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026miken",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7656"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026miken",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026milac",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026milac",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3603"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2054"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9650"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026milac",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11437"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026milac",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8041"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026milac",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2586"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026milac",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5534"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026milac",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7790"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026milac",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4983"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7855"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026milac",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7768"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026milac",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1684"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026milac",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6121"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026milac",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3603"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026milac",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7250"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026milac",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Finnegan E",
+        "team_key": "frc3536"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026milac",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2054"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026milac",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc141"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026milac",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3537"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026milac",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026milak",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc245"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026milak",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8608"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8397"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026milak",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11386"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026milak",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5248"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026milak",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3875"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026milak",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026milak",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5675"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026milak",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10473"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026milak",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026milak",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8608"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026milak",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7226"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026milak",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6002"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026milak",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9566"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026milak",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Niyati P",
+        "team_key": "frc4237"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026milak",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5152"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026milak",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4327"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026milak",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11407"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026milak",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1188"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026miliv",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026miliv",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc27"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8115"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026miliv",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11361"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026miliv",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9572"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026miliv",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1481"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026miliv",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2832"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026miliv",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026miliv",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5050"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026miliv",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc123"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026miliv",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3414"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026miliv",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5843"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026miliv",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1189"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026miliv",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5533"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026miliv",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Charles G",
+        "team_key": "frc3414"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026miliv",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6152"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026miliv",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5907"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026miliv",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8297"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026miliv",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2604"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026milsu",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3452"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026milsu",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6121"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4779"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6088"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026milsu",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7768"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026milsu",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9249"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026milsu",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5424"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026milsu",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4398"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026milsu",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10666"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8517"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4375"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026milsu",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9548"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026milsu",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026milsu",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4779"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026milsu",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3536"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026milsu",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10605"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026milsu",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Robert P",
+        "team_key": "frc6121"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026milsu",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6121"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026milsu",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10666"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026milsu",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8517"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026milsu",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mimar",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1506"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mimar",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3539"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc1718"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mimar",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11493"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mimar",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7211"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mimar",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7247"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mimar",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6120"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mimar",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5843"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mimar",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9245"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2851"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4130"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mimar",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8728"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mimar",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc818"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mimar",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5926"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mimar",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9245"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mimar",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3539"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mimar",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "John T",
+        "team_key": "frc1506"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mimar",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mimar",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1718"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mimar",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4130"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mimar",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8280"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mimas",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4327"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mimas",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8608"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9251"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mimas",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3655"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mimas",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8424"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mimas",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mimas",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mimas",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2137"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8374"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mimas",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8608"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mimas",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9312"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mimas",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9255"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mimas",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6078"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mimas",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5926"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mimas",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Leo R",
+        "team_key": "frc3655"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mimas",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2137"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mimas",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc910"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mimas",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11490"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mimas",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mimid",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mimid",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5166"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5603"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mimid",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11458"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mimid",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5712"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mimid",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6073"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mimid",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8517"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mimid",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8873"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mimid",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8873"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5424"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mimid",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9685"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mimid",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3770"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mimid",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2619"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mimid",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mimid",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5216"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mimid",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Casper S",
+        "team_key": "frc201"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mimid",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5533"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mimid",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6753"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mimid",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10629"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mimid",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5166"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mimil",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mimil",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4362"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3538"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8424"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mimil",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11457"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mimil",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1023"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mimil",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5066"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mimil",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mimil",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4362"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mimil",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2137"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc308"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mimil",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2145"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mimil",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3707"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mimil",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7660"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mimil",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6615"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mimil",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8424"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mimil",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Varun G",
+        "team_key": "frc548"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mimil",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2137"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mimil",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc548"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mimil",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10285"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mimil",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5114"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mimtp",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mimtp",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7166"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5234"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mimtp",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6642"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mimtp",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5110"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mimtp",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8873"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mimtp",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3688"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mimtp",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc573"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9673"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mimtp",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3655"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mimtp",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2337"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mimtp",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5982"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mimtp",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc573"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mimtp",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4422"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mimtp",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Emily L",
+        "team_key": "frc4422"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mimtp",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4381"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mimtp",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5436"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mimtp",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9568"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mimtp",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mimus",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mimus",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8612"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4967"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9106"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mimus",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11503"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mimus",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc107"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mimus",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7160"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mimus",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mimus",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3572"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mimus",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2075"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc11503"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mimus",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3458"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mimus",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8612"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mimus",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7248"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mimus",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5505"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mimus",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6428"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mimus",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "McKenna B",
+        "team_key": "frc2405"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mimus",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2075"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mimus",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2771"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mimus",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6079"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mimus",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2405"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026misal",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc548"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026misal",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3568"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026misal",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11455"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026misal",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4395"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026misal",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5066"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026misal",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5460"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026misal",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc66"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026misal",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5066"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc548"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3632"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026misal",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc67"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026misal",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2834"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026misal",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc10656"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026misal",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1076"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026misal",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc308"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026misal",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Samantha M",
+        "team_key": "frc3604"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026misal",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3322"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026misal",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3604"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026misal",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6057"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026misal",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1506"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mitr2",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc217"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mitr2",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2224"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mitr2",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11461"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mitr2",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8352"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mitr2",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc818"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mitr2",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc51"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mitr2",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8280"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mitr2",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7188"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc51"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc2591"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mitr2",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3667"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mitr2",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1025"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mitr2",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2048"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mitr2",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1701"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mitr2",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5756"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mitr2",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Soph R",
+        "team_key": "frc247"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mitr2",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5531"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mitr2",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc503"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mitr2",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6616"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mitr2",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2960"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mitry",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc573"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mitry",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7769"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4362"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9679"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mitry",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11486"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mitry",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc8728"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mitry",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5436"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mitry",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9245"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mitry",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc226"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mitry",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10612"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mitry",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc33"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mitry",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4362"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mitry",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4998"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mitry",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc469"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mitry",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7762"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mitry",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Brett D",
+        "team_key": "frc2851"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mitry",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7769"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mitry",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc201"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mitry",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1498"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mitry",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2851"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026mitvc",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7598"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026mitvc",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5534"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc4398"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc9771"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026mitvc",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11466"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026mitvc",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3618"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026mitvc",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026mitvc",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5193"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026mitvc",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5534"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026mitvc",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5193"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5086"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc10614"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026mitvc",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6569"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026mitvc",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5086"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026mitvc",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5110"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026mitvc",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7782"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026mitvc",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9771"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026mitvc",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Cole H",
+        "team_key": "frc3767"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026mitvc",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7790"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026mitvc",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1711"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026mitvc",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4398"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026mitvc",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc5509"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 0,
+    "event_key": "2026miwmi",
+    "name": "District FIRST Impact Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc2619"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 1,
+    "event_key": "2026miwmi",
+    "name": "District Event Winner",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3539"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc5623"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 10,
+    "event_key": "2026miwmi",
+    "name": "Rookie All Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc11522"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 11,
+    "event_key": "2026miwmi",
+    "name": "Gracious Professionalism Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc85"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 13,
+    "event_key": "2026miwmi",
+    "name": "Judges' Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6753"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 16,
+    "event_key": "2026miwmi",
+    "name": "Industrial Design Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6114"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 17,
+    "event_key": "2026miwmi",
+    "name": "Quality Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3357"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 2,
+    "event_key": "2026miwmi",
+    "name": "District Event Finalist",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc3572"
+      },
+      {
+        "awardee": null,
+        "team_key": "frc8397"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 20,
+    "event_key": "2026miwmi",
+    "name": "Creativity Award sponsored by Rockwell Automation",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3539"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 21,
+    "event_key": "2026miwmi",
+    "name": "Excellence in Engineering Award sponsored by Littelfuse",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc1918"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 27,
+    "event_key": "2026miwmi",
+    "name": "Imagery Award in honor of Jack Kamen",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7248"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 29,
+    "event_key": "2026miwmi",
+    "name": "Innovation in Control Award sponsored by nVent",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7054"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 30,
+    "event_key": "2026miwmi",
+    "name": "Team Spirit Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc4680"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 4,
+    "event_key": "2026miwmi",
+    "name": "District Championship FIRST Leadership Award Semi-Finalist",
+    "recipient_list": [
+      {
+        "awardee": "Julia F",
+        "team_key": "frc6753"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 71,
+    "event_key": "2026miwmi",
+    "name": "Autonomous Award sponsored by Google.org",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc6090"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 82,
+    "event_key": "2026miwmi",
+    "name": "Team Sustainability Award sponsored by Dow",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc7195"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 83,
+    "event_key": "2026miwmi",
+    "name": "Rising All-Star Award",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc9542"
+      }
+    ],
+    "year": 2026
+  },
+  {
+    "award_type": 9,
+    "event_key": "2026miwmi",
+    "name": "District Engineering Inspiration Award sponsored by SpaceX",
+    "recipient_list": [
+      {
+        "awardee": null,
+        "team_key": "frc3572"
+      }
+    ],
+    "year": 2026
+  }
+]

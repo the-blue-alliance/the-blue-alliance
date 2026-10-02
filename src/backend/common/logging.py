@@ -1,13 +1,46 @@
 import json
 import logging
-from typing import Any, Dict
+import re
+from typing import Any, Dict, Optional, Tuple
 
 from werkzeug.local import Local
 
 from backend.common.environment import Environment
+from backend.common.profiler import trace_context
 
 # Request-local context for storing additional logging context
 logging_context = Local()
+
+# Match TRACE_ID/SPAN_ID;o=SAMPLED from X-Cloud-Trace-Context header
+TRACE_CONTEXT_REGEX = re.compile(r"^([0-9a-fA-F]+)(?:/([0-9]+))?(?:;o=([01]))?")
+
+
+def get_trace_context() -> Tuple[Optional[str], Optional[str], Optional[bool]]:
+    """
+    Get Cloud Trace context (trace, span_id, trace_sampled) for the current request.
+    """
+    req = getattr(logging_context, "request", None) or getattr(
+        trace_context, "request", None
+    )
+    if not req or not hasattr(req, "headers"):
+        return None, None, None
+
+    header = req.headers.get("X-Cloud-Trace-Context")
+    if not header:
+        return None, None, None
+
+    match = TRACE_CONTEXT_REGEX.match(header)
+    if not match:
+        return None, None, None
+
+    trace_id, span_id, sampled = match.groups()
+    project = Environment.project()
+
+    trace = f"projects/{project}/traces/{trace_id}" if project else trace_id
+    formatted_span = f"{int(span_id):016x}" if span_id else None
+    trace_sampled = (sampled == "1") if sampled is not None else None
+
+    return trace, formatted_span, trace_sampled
 
 
 def set_logging_context(key: str, value: Any) -> None:
@@ -78,6 +111,15 @@ class LoggingContextFilter(logging.Filter):
                 context_str = " ".join(f"{k}={v}" for k, v in context.items())
                 record.msg = f"{record.msg} [{context_str}]"
 
+        if self.use_labels:
+            trace, span_id, trace_sampled = get_trace_context()
+            if trace and not hasattr(record, "trace"):
+                setattr(record, "trace", trace)
+            if span_id and not hasattr(record, "span_id"):
+                setattr(record, "span_id", span_id)
+            if trace_sampled is not None and not hasattr(record, "trace_sampled"):
+                setattr(record, "trace_sampled", trace_sampled)
+
         return True
 
 
@@ -95,7 +137,7 @@ class GoogleCloudStructuredFormatter(logging.Formatter):
     def format(self, record: logging.LogRecord) -> str:
         """Format the log record as JSON for App Engine."""
         # Start with the basic log structure
-        log_object = {
+        log_object: Dict[str, Any] = {
             "message": super().format(record),
             "severity": record.levelname,
         }
@@ -105,6 +147,23 @@ class GoogleCloudStructuredFormatter(logging.Formatter):
         if labels:
             # Use the special key that App Engine recognizes for labels
             log_object["logging.googleapis.com/labels"] = labels
+
+        trace = getattr(record, "trace", None)
+        span_id = getattr(record, "span_id", None)
+        trace_sampled = getattr(record, "trace_sampled", None)
+
+        if not trace:
+            trace, span_id, trace_sampled = get_trace_context()
+
+        if trace:
+            project = Environment.project()
+            if project and not trace.startswith("projects/"):
+                trace = f"projects/{project}/traces/{trace}"
+            log_object["logging.googleapis.com/trace"] = trace
+            if span_id:
+                log_object["logging.googleapis.com/spanId"] = span_id
+            if trace_sampled is not None:
+                log_object["logging.googleapis.com/trace_sampled"] = trace_sampled
 
         return json.dumps(log_object)
 

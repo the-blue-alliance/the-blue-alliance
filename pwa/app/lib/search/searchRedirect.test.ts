@@ -162,3 +162,17 @@ describe('getSearchRedirect', () => {
     });
   });
 });
+
+describe('getSearchRedirect when both a team and an event match', () => {
+  it('should redirect to the team', () => {
+    const index: SearchIndex = {
+      teams: [{ key: 'frc1', nickname: 'Milstein Robotics' }],
+      events: [{ key: '2024mil', name: 'Milstein' }],
+    };
+
+    const result = getSearchRedirect(index, 'Milstein');
+
+    expect(result.type).toBe('team');
+    expect(result.path).toBe('/team/1');
+  });
+});

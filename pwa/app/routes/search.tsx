@@ -2,19 +2,21 @@ import { createFileRoute, redirect } from '@tanstack/react-router';
 import { z } from 'zod';
 
 import { getSearchIndexOptions } from '~/api/tba/read/@tanstack/react-query.gen';
+import { STALE_TIME } from '~/lib/queryClient';
 import { getSearchRedirect } from '~/lib/search/searchRedirect';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 const searchSchema = z.object({
-  q: z.string().optional().default(''),
+  q: z.coerce.string().optional().default(''),
 });
 
 export const Route = createFileRoute('/search')({
   validateSearch: searchSchema,
   beforeLoad: async ({ context: { queryClient }, search }) => {
-    const searchIndex = await queryClient.ensureQueryData(
-      getSearchIndexOptions({}),
-    );
+    const searchIndex = await queryClient.ensureQueryData({
+      ...getSearchIndexOptions({}),
+      staleTime: STALE_TIME.SEARCH_INDEX,
+    });
     // Tanstack may auto-parse '604' to a number, so just stringify it just in case
     const result = getSearchRedirect(searchIndex, search.q.toString());
 
@@ -37,7 +39,8 @@ export const Route = createFileRoute('/search')({
     ],
   }),
   component: SearchRoute,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SearchRoute() {
   const { query } = Route.useRouteContext();

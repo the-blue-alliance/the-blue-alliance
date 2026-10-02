@@ -1,0 +1,283 @@
+import { expect, test } from '@playwright/test';
+
+test('fetches Nexus event data in the browser', async ({ page }) => {
+  const nexusRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/nexus_info')) {
+      nexusRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect.poll(() => nexusRequests.length).toBeGreaterThan(0);
+});
+
+test.describe('/event/2024mil', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2024mil');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('focuses the match dialog when it opens', async ({ page }) => {
+    await page.getByRole('link', { name: 'Quals 1', exact: true }).click();
+
+    await expect(page.locator('[data-slot="dialog-content"]')).toBeFocused();
+  });
+
+  test('labels the rank column as a sorting control', async ({ page }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    await expect(
+      page.getByRole('columnheader').first().getByRole('button'),
+    ).toHaveAccessibleName(/Rank/);
+  });
+
+  test('offers ascending rank order before sorting', async ({ page }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    await expect(
+      page.getByRole('columnheader').first().getByRole('button'),
+    ).toHaveAttribute('title', 'Sort ascending');
+  });
+
+  test('shows rank one first before sorting', async ({ page }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    await expect(
+      page.getByRole('row').locator('td:first-child').first(),
+    ).toHaveText('1');
+  });
+
+  test('offers descending rank order after sorting ascending', async ({
+    page,
+  }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    const rankHeader = page
+      .getByRole('columnheader')
+      .first()
+      .getByRole('button');
+    await rankHeader.click();
+
+    await expect(rankHeader).toHaveAttribute('title', 'Sort descending');
+  });
+
+  test('keeps rank one first after sorting ascending', async ({ page }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    await page.getByRole('columnheader').first().getByRole('button').click();
+
+    await expect(
+      page.getByRole('row').locator('td:first-child').first(),
+    ).toHaveText('1');
+  });
+
+  test('offers clearing rank order after sorting descending', async ({
+    page,
+  }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    const rankHeader = page
+      .getByRole('columnheader')
+      .first()
+      .getByRole('button');
+    await rankHeader.click();
+    await rankHeader.click();
+
+    await expect(rankHeader).toHaveAttribute('title', 'Clear sort');
+  });
+
+  test('restores the original row order after clearing rank order', async ({
+    page,
+  }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    const rankHeader = page
+      .getByRole('columnheader')
+      .first()
+      .getByRole('button');
+    await rankHeader.click();
+    await rankHeader.click();
+
+    await expect(
+      page.getByRole('row').locator('td:first-child').first(),
+    ).not.toHaveText('1');
+  });
+
+  test('shows the event insights chart when the Insights tab opens', async ({
+    page,
+  }) => {
+    await page.getByRole('tab', { name: 'Insights' }).click();
+
+    await expect(page.locator('svg.recharts-surface')).toBeVisible();
+  });
+
+  test('links to the Match13 event page', async ({ page }) => {
+    await expect(page.getByRole('link', { name: 'Match13' })).toHaveAttribute(
+      'href',
+      'https://www.match13.com/event/2024mil',
+    );
+  });
+});
+
+test('defers the animated tab indicator until a tab changes', async ({
+  page,
+}) => {
+  const scriptUrls: string[] = [];
+  page.on('request', (request) => {
+    if (request.resourceType() === 'script') {
+      scriptUrls.push(request.url());
+    }
+  });
+
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  expect(scriptUrls.some((url) => url.includes('animatedTabIndicator'))).toBe(
+    false,
+  );
+});
+
+test('loads the animated tab indicator when a tab changes', async ({
+  page,
+}) => {
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  const indicatorRequest = page.waitForRequest((request) =>
+    request.url().includes('animatedTabIndicator'),
+  );
+  await page.getByRole('tab', { name: 'Rankings' }).click();
+
+  expect((await indicatorRequest).url()).toContain('animatedTabIndicator');
+});
+
+test.describe('/event/2026necmp Media tab', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2026necmp');
+    await page.getByRole('tab', { name: 'Media' }).click();
+  });
+
+  test('shows the media count in the tab', async ({ page }) => {
+    await expect(page.getByRole('tab', { name: /^Media \d+$/ })).toBeVisible();
+  });
+
+  test('links to the event media suggestion form', async ({ page }) => {
+    await expect(
+      page.getByRole('link', { name: 'Add Event Media' }),
+    ).toHaveAttribute('href', '/suggest/event/media?event_key=2026necmp');
+  });
+
+  test('shows the photo galleries heading', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Photo Galleries' }),
+    ).toBeVisible();
+  });
+
+  test('shows the SmugMug album gallery', async ({ page }) => {
+    await expect(page.getByTestId('smugmug-album-gallery')).toBeVisible();
+  });
+
+  test('links to the NE FIRST SmugMug gallery', async ({ page }) => {
+    await expect(
+      page
+        .getByTestId('smugmug-album-gallery')
+        .locator('a[href*="nefirst.smugmug.com"]')
+        .first(),
+    ).toBeVisible();
+  });
+});
+
+test.describe('/event/2019cmptx', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2019cmptx');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('shows the Round Robin Semifinals standings', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Round Robin Semifinals' }),
+    ).toBeVisible();
+  });
+
+  ['Champ Points', 'Advance to Finals'].forEach((name) => {
+    test(`shows the ${name} column in the round robin standings`, async ({
+      page,
+    }) => {
+      await expect(page.getByRole('columnheader', { name })).toBeVisible();
+    });
+  });
+
+  test('shows the Turing win-loss-tie record', async ({ page }) => {
+    await expect(page.getByRole('row', { name: /^1 Turing/ })).toContainText(
+      '5-0-0',
+    );
+  });
+
+  test('shows the Turing championship points', async ({ page }) => {
+    await expect(page.getByRole('row', { name: /^1 Turing/ })).toContainText(
+      '10',
+    );
+  });
+});
+
+test('hides round robin standings for a non-round-robin event', async ({
+  page,
+}) => {
+  await page.goto('/event/2023cmptx');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.getByRole('heading', { name: 'Round Robin Semifinals' }),
+  ).toHaveCount(0);
+});
+
+test.describe('/event/2015rismi', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/event/2015rismi');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('shows playoff advancement below the playoff matches', async ({
+    page,
+  }) => {
+    await expect(
+      page
+        .locator('#playoff-matches')
+        .getByRole('heading', { name: 'Playoff Advancement' }),
+    ).toBeVisible();
+  });
+
+  test('shows the quarterfinal advancement standings', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Quarterfinals' }),
+    ).toBeVisible();
+  });
+
+  test('shows the semifinal advancement standings', async ({ page }) => {
+    await expect(
+      page.getByRole('heading', { name: 'Semifinals' }),
+    ).toBeVisible();
+  });
+});
+
+test('hides average-score advancement for a non-2015-format event', async ({
+  page,
+}) => {
+  await page.goto('/event/2024mil');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.getByRole('heading', { name: 'Playoff Advancement' }),
+  ).toHaveCount(0);
+});
+
+test('shows the favorite button for an event', async ({ page }) => {
+  await page.goto('/event/2024casj');
+
+  await expect(
+    page.getByRole('button', { name: /add to favorites/i }),
+  ).toBeVisible();
+});

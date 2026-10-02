@@ -2,6 +2,7 @@ from backend.common.helpers.insights_v2.leaderboards.highest_match_clean_score i
     HighestMatchCleanScoreV2Calculator,
 )
 from backend.common.helpers.insights_v2.registry import compute_insights_for_year
+from backend.common.helpers.tests.insights_v2.fakes import fake_event, fake_match
 
 
 def test_highest_match_clean_score_year(ndb_stub, test_data_importer) -> None:
@@ -79,3 +80,22 @@ def test_highest_match_clean_score_rankings_descending(
 
     values = [r["value"] for r in insights[0].data["rankings"]]
     assert values == sorted(values, reverse=True)
+
+
+def test_highest_match_clean_score_skips_unusable_matches() -> None:
+    calc = HighestMatchCleanScoreV2Calculator()
+    calc.on_event(
+        fake_event(
+            [
+                fake_match(-1, -1),  # Unplayed
+                # Both alliances score less than their foul points
+                fake_match(
+                    5,
+                    5,
+                    red_breakdown={"foulPoints": 10},
+                    blue_breakdown={"foulPoints": 10},
+                ),
+            ]
+        )
+    )
+    assert calc.counts == {}

@@ -94,3 +94,15 @@ def test_get_files_prefix(tmp_path):
     client.write(file_name, file_content)
     assert client.get_files("foo") == []
     assert client.get_files("some") == ["some_file.json"]
+
+
+def test_write_read_bytes(tmp_path) -> None:
+    client = LocalStorageClient(tmp_path)
+    client.write("dir/file.bin", b"\x00\x01")
+    assert (tmp_path / "dir" / "file.bin").read_bytes() == b"\x00\x01"
+    assert client.read("dir/file.bin") == b"\x00\x01"
+
+
+def test_get_files_missing_base_path(tmp_path) -> None:
+    client = LocalStorageClient(tmp_path / "does_not_exist")
+    assert client.get_files() == []

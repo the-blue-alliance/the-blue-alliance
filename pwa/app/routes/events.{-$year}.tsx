@@ -6,9 +6,7 @@ import {
   useNavigate,
 } from '@tanstack/react-router';
 import { useMemo, useState } from 'react';
-import { Temporal } from 'temporal-polyfill';
 
-import { Event, EventType } from '~/api/tba/read';
 import {
   getDistrictsByYearOptions,
   getEventsByYearOptions,
@@ -27,13 +25,16 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
-import { CMP_EVENT_TYPES } from '~/lib/api/EventType';
-import { getEventWeekString, sortEventsComparator } from '~/lib/eventUtils';
+import {
+  type EventGroup,
+  groupEventsBySections,
+  sortEventsComparator,
+} from '~/lib/eventUtils';
+import { staleTimeForYear } from '~/lib/queryClient';
 import {
   parseParamsForYearElseDefault,
   pluralize,
   publicCacheControlHeaders,
-  slugify,
   useValidYears,
 } from '~/lib/utils';
 
@@ -46,17 +47,22 @@ export const Route = createFileRoute('/events/{-$year}')({
       });
     }
   },
-  loader: async ({ params, context: { queryClient } }) => {
-    const year = await parseParamsForYearElseDefault(queryClient, params);
+  loader: async ({ params, context: { queryClient, currentSeason } }) => {
+    const year = parseParamsForYearElseDefault(currentSeason, params);
     if (year === undefined) {
       throw notFound();
     }
 
+    const yearStaleTime = staleTimeForYear(year);
     await Promise.all([
-      queryClient.ensureQueryData(getEventsByYearOptions({ path: { year } })),
-      queryClient.ensureQueryData(
-        getDistrictsByYearOptions({ path: { year } }),
-      ),
+      queryClient.ensureQueryData({
+        ...getEventsByYearOptions({ path: { year } }),
+        staleTime: yearStaleTime,
+      }),
+      queryClient.ensureQueryData({
+        ...getDistrictsByYearOptions({ path: { year } }),
+        staleTime: yearStaleTime,
+      }),
     ]);
 
     return { year };
@@ -88,114 +94,26 @@ export const Route = createFileRoute('/events/{-$year}')({
     };
   },
   component: YearEventsPage,
-});
-
-interface EventGroup {
-  groupName: string;
-  slug: string;
-  events: Event[];
-  isOfficial: boolean;
-}
-
-function groupBySections(events: Event[]): EventGroup[] {
-  const eventsByWeek = new Map<string, EventGroup>();
-  const eventsByChampionship = new Map<string, EventGroup>();
-  const unofficialEventsByMonth = new Map<string, EventGroup>();
-  const FOCEvents: EventGroup = {
-    groupName: 'FIRST Festival of Champions',
-    slug: 'foc',
-    events: [],
-    isOfficial: true,
-  };
-  events.forEach((event) => {
-    // Events by week
-    const weekStr = getEventWeekString(event);
-    if (weekStr != null) {
-      const weekGroup = eventsByWeek.get(weekStr);
-      if (weekGroup) {
-        weekGroup.events.push(event);
-      } else {
-        eventsByWeek.set(weekStr, {
-          groupName: weekStr,
-          slug: slugify(weekStr),
-          events: [event],
-          isOfficial: true,
-        });
-      }
-    }
-
-    // Events by Championship
-    if (CMP_EVENT_TYPES.has(event.event_type)) {
-      const groupName =
-        event.year >= 2017 && event.year <= 2020
-          ? `FIRST Championship - ${event.city}`
-          : 'FIRST Championship';
-      const championshipGroup = eventsByChampionship.get(groupName);
-      if (championshipGroup) {
-        championshipGroup.events.push(event);
-      } else {
-        eventsByChampionship.set(groupName, {
-          groupName,
-          slug: slugify(groupName),
-          events: [event],
-          isOfficial: true,
-        });
-      }
-    }
-
-    // FOC
-    if (event.event_type === EventType.FOC) {
-      FOCEvents.events.push(event);
-    }
-
-    // Group unofficial events by month
-    if (
-      event.event_type == EventType.PRESEASON ||
-      event.event_type == EventType.OFFSEASON
-    ) {
-      const monthName = Temporal.PlainDate.from(
-        event.start_date,
-      ).toLocaleString('default', { month: 'long' });
-      const offseasonGroup = unofficialEventsByMonth.get(monthName);
-      if (offseasonGroup) {
-        offseasonGroup.events.push(event);
-      } else {
-        unofficialEventsByMonth.set(monthName, {
-          groupName: monthName,
-          slug: slugify(monthName),
-          events: [event],
-          isOfficial: false,
-        });
-      }
-    }
-  });
-
-  const groups = Array.from(eventsByWeek.values()).concat(
-    Array.from(eventsByChampionship.values()),
-  );
-  if (FOCEvents.events.length > 0) {
-    groups.push(FOCEvents);
-  }
-  if (unofficialEventsByMonth.size > 0) {
-    groups.push(...Array.from(unofficialEventsByMonth.values()));
-  }
-  return groups;
-}
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function YearEventsPage() {
   const { year } = Route.useLoaderData();
+  const yearStaleTime = staleTimeForYear(year);
   const { data: events } = useSuspenseQuery({
     ...getEventsByYearOptions({ path: { year } }),
+    staleTime: yearStaleTime,
   });
   const { data: districts } = useSuspenseQuery({
     ...getDistrictsByYearOptions({ path: { year } }),
+    staleTime: yearStaleTime,
   });
   const validYears = useValidYears();
   const [inView, setInView] = useState<Set<string>>(new Set());
   const navigate = useNavigate();
 
   const sortedEvents = events.sort(sortEventsComparator);
-  const groupedEvents = groupBySections(sortedEvents);
+  const groupedEvents = groupEventsBySections(sortedEvents);
   const officialGroups = groupedEvents.filter((group) => group.isOfficial);
   const unofficialGroups = groupedEvents.filter((group) => !group.isOfficial);
 
@@ -227,6 +145,19 @@ function YearEventsPage() {
     return tocNodes;
   }, [officialGroups, unofficialGroups]);
 
+  // Base UI's Select.Value renders the raw value unless the items are
+  // registered on Select.Root, so provide value -> label pairs there too.
+  const districtItems = [
+    { value: 'all', label: 'All Events' },
+    ...districts
+      .slice()
+      .sort((a, b) => a.display_name.localeCompare(b.display_name))
+      .map((district) => ({
+        value: district.abbreviation,
+        label: district.display_name,
+      })),
+  ];
+
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView}>
@@ -240,6 +171,7 @@ function YearEventsPage() {
           }))}
         />
         <Select
+          items={districtItems}
           defaultValue="all"
           onValueChange={(value) => {
             if (value !== 'all') {
@@ -252,19 +184,12 @@ function YearEventsPage() {
           >
             <SelectValue />
           </SelectTrigger>
-          <SelectContent className="max-h-[70vh] overflow-y-auto">
-            <SelectItem value="all">All Events</SelectItem>
-            {districts
-              .slice()
-              .sort((a, b) => a.display_name.localeCompare(b.display_name))
-              .map((district) => (
-                <SelectItem
-                  key={district.abbreviation}
-                  value={district.abbreviation}
-                >
-                  {district.display_name}
-                </SelectItem>
-              ))}
+          <SelectContent>
+            {districtItems.map(({ value, label }) => (
+              <SelectItem key={value} value={value}>
+                {label}
+              </SelectItem>
+            ))}
           </SelectContent>
         </Select>
       </TableOfContents>
