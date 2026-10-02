@@ -221,6 +221,18 @@ describe("WebcastSelectionDialog", () => {
     ]);
   });
 
+  it("divides a BlueZone-only special section from event webcasts", () => {
+    // The divider must not depend on there being non-BlueZone specials.
+    renderDialog({ webcasts: ["bluezone-0", "2026casj-0"] });
+    expect(listText()).toEqual([
+      "Special Webcasts",
+      "BlueZone",
+      "---",
+      "Event Webcasts",
+      "Webcast 2026casj-0",
+    ]);
+  });
+
   it("treats every webcast as a regular one when specialWebcastIds is not a Set", () => {
     renderDialog({
       webcasts: ["firstupdatesnow-0"],

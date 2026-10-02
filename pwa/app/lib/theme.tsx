@@ -18,6 +18,19 @@ const ThemeContext = createContext<ThemeContextValue | undefined>(undefined);
 
 const STORAGE_KEY = 'theme';
 
+function applyInitialTheme(storageKey: string) {
+  try {
+    const theme = localStorage.getItem(storageKey);
+    const isDark =
+      theme === 'dark' ||
+      (theme !== 'light' &&
+        window.matchMedia('(prefers-color-scheme: dark)').matches);
+    document.documentElement.classList.toggle('dark', isDark);
+  } catch {}
+}
+
+export const THEME_INIT_SCRIPT = `(${applyInitialTheme.toString()})(${JSON.stringify(STORAGE_KEY)})`;
+
 function getSystemTheme(): 'light' | 'dark' {
   if (typeof window === 'undefined') return 'light';
   return window.matchMedia('(prefers-color-scheme: dark)').matches
