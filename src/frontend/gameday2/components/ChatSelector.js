@@ -3,6 +3,7 @@ import PropTypes from "prop-types";
 import { TransitionGroup } from "react-transition-group";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
@@ -42,17 +43,15 @@ export default class ChatSelector extends React.Component {
       }
 
       chatItems.push(
-        <ListItem
-          button
-          onClick={(e) => this.setTwitchChat(e, chat.channel)}
-          key={chat.channel}
-        >
-          {isDefault && (
-            <ListItemIcon>
-              <HomeIcon />
-            </ListItemIcon>
-          )}
-          <ListItemText primary={chatName} />
+        <ListItem key={chat.channel} disablePadding>
+          <ListItemButton onClick={(e) => this.setTwitchChat(e, chat.channel)}>
+            {isDefault && (
+              <ListItemIcon>
+                <HomeIcon />
+              </ListItemIcon>
+            )}
+            <ListItemText primary={chatName} />
+          </ListItemButton>
           {icon && <ListItemSecondaryAction>{icon}</ListItemSecondaryAction>}
         </ListItem>
       );

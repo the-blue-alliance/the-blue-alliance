@@ -372,4 +372,17 @@ describe("video grid reducer additional cases", () => {
     expect(state.displayed).toEqual([]);
     expect(state.domOrder[0]).toBeNull();
   });
+
+  it("resets the livescore flags on RESET_WEBCASTS", () => {
+    // domOrderLivescoreOn resets along with displayed, domOrder and positionMap.
+    let state = add(withLayout(3), "a-0", 0);
+    state = videoGrid(state, {
+      type: types.TOGGLE_POSITION_LIVESCORE,
+      position: 0,
+    });
+    state = videoGrid(state, { type: types.RESET_WEBCASTS });
+    expect(state.domOrderLivescoreOn).toEqual(
+      videoGrid(undefined, {}).domOrderLivescoreOn
+    );
+  });
 });

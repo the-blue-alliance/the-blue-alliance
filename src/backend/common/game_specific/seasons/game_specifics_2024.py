@@ -146,10 +146,10 @@ class GameSpecifics2024(
                 coopertition_count += 1
 
             red_all_rp = red_sb.get("melodyBonusAchieved", False) and red_sb.get(
-                "melodyBonusAchieved", False
+                "ensembleBonusAchieved", False
             )
             blue_all_rp = blue_sb.get("melodyBonusAchieved", False) and blue_sb.get(
-                "melodyBonusAchieved", False
+                "ensembleBonusAchieved", False
             )
 
             if (red_score > blue_score and red_all_rp) or (

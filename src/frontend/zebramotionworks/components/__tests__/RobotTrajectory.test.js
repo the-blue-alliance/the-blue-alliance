@@ -85,4 +85,15 @@ describe("RobotTrajectory", () => {
     expect(container.querySelector("text")).toBeNull();
     expect(container.querySelector("path").getAttribute("d")).toBe("");
   });
+
+  it("draws the indicator for a robot at x = 0 with no stray 0", () => {
+    // Expects a circle at cx=0, cy=27-5 and the team label as the only text.
+    const container = renderTrajectory({
+      teamData: { team_key: "frc254", xs: [0, 0], ys: [5, 5] },
+      startTime: 0,
+      endTime: 1,
+    });
+    expect(indicator(container)).toEqual(["0", "22"]);
+    expect(container.querySelector("g").textContent).toBe("254");
+  });
 });
