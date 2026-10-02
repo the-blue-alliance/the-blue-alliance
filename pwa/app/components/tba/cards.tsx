@@ -1,6 +1,5 @@
+import { cn } from 'cn';
 import { type HTMLAttributes, type ReactNode, forwardRef } from 'react';
-
-import { cn } from '~/lib/utils';
 
 const TitledCard = forwardRef<
   HTMLDivElement,
@@ -12,7 +11,7 @@ const TitledCard = forwardRef<
   <div
     className={cn(
       `flex flex-col justify-center overflow-hidden rounded-lg border
-      border-border/50 bg-gradient-to-br from-muted/30 to-muted/10 px-6 py-8
+      border-border/50 bg-linear-to-br from-muted/30 to-muted/10 px-6 py-8
       text-center shadow-sm transition-all duration-300 ease-in-out
       hover:-translate-y-1 hover:shadow-md`,
       className,

@@ -1,8 +1,14 @@
 import { isServer } from '@tanstack/react-query';
-import { initializeAnalytics } from 'firebase/analytics';
-import { getApps, initializeApp } from 'firebase/app';
-import { connectAuthEmulator, getAuth } from 'firebase/auth';
-import { getDatabase } from 'firebase/database';
+import type { Analytics } from 'firebase/analytics';
+import { type FirebaseApp, getApps, initializeApp } from 'firebase/app';
+import {
+  browserLocalPersistence,
+  browserPopupRedirectResolver,
+  connectAuthEmulator,
+  indexedDBLocalPersistence,
+  initializeAuth,
+} from 'firebase/auth';
+import type { Database } from 'firebase/database';
 
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
@@ -13,14 +19,19 @@ const firebaseConfig = {
   measurementId: import.meta.env.VITE_FIREBASE_MEASUREMENT_ID,
 };
 
-let app;
+let app: FirebaseApp;
 if (!getApps().length) {
   app = initializeApp(firebaseConfig);
 } else {
   app = getApps()[0];
 }
 
-const auth = isServer ? null : getAuth(app);
+const auth = isServer
+  ? null
+  : initializeAuth(app, {
+      persistence: [indexedDBLocalPersistence, browserLocalPersistence],
+      popupRedirectResolver: browserPopupRedirectResolver,
+    });
 
 if (auth && import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST) {
   connectAuthEmulator(auth, import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST, {
@@ -28,9 +39,23 @@ if (auth && import.meta.env.VITE_FIREBASE_AUTH_EMULATOR_HOST) {
   });
 }
 
-const database = getDatabase(app);
-const analytics =
-  !isServer && typeof window !== 'undefined'
-    ? initializeAnalytics(app, { config: { send_page_view: false } })
-    : null;
-export { auth, analytics, database };
+let cachedDatabase: Database | null = null;
+export async function getDatabaseInstance(): Promise<Database> {
+  if (cachedDatabase) return cachedDatabase;
+  const { getDatabase } = await import('firebase/database');
+  cachedDatabase = getDatabase(app);
+  return cachedDatabase;
+}
+
+let cachedAnalytics: Analytics | null = null;
+export async function getAnalyticsInstance(): Promise<Analytics | null> {
+  if (isServer || typeof window === 'undefined') return null;
+  if (cachedAnalytics) return cachedAnalytics;
+  const { initializeAnalytics } = await import('firebase/analytics');
+  cachedAnalytics = initializeAnalytics(app, {
+    config: { send_page_view: false },
+  });
+  return cachedAnalytics;
+}
+
+export { auth };

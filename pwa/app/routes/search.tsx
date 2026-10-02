@@ -7,7 +7,7 @@ import { getSearchRedirect } from '~/lib/search/searchRedirect';
 import { publicCacheControlHeaders } from '~/lib/utils';
 
 const searchSchema = z.object({
-  q: z.string().optional().default(''),
+  q: z.coerce.string().optional().default(''),
 });
 
 export const Route = createFileRoute('/search')({
@@ -39,7 +39,8 @@ export const Route = createFileRoute('/search')({
     ],
   }),
   component: SearchRoute,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function SearchRoute() {
   const { query } = Route.useRouteContext();

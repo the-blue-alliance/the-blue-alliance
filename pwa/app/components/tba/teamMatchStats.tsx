@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import { maxBy, startCase, uniq } from 'lodash-es';
 import { ReactNode, useMemo, useState } from 'react';
 import {
@@ -40,7 +41,6 @@ import {
 } from '~/lib/matchUtils';
 import {
   addRecords,
-  cn,
   confidence,
   joinComponents,
   stringifyRecord,

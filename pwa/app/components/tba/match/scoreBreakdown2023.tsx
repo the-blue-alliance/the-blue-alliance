@@ -7,11 +7,10 @@ import {
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
-  FoulDisplay,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
-import { POINTS_PER_FOUL, POINTS_PER_TECH_FOUL } from '~/lib/pointValues';
 
 export default function ScoreBreakdown2023({
   scoreBreakdown,
@@ -35,19 +34,19 @@ export default function ScoreBreakdown2023({
               condition={
                 scoreBreakdown.red.mobilityRobot1 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.red.team_keys[0].substring(3)}
+              teamKey={match.alliances.red.team_keys[0]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.red.mobilityRobot2 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.red.team_keys[1].substring(3)}
+              teamKey={match.alliances.red.team_keys[1]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.red.mobilityRobot3 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.red.team_keys[2].substring(3)}
+              teamKey={match.alliances.red.team_keys[2]}
             />
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
@@ -58,19 +57,19 @@ export default function ScoreBreakdown2023({
               condition={
                 scoreBreakdown.blue.mobilityRobot1 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.blue.team_keys[0].substring(3)}
+              teamKey={match.alliances.blue.team_keys[0]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.blue.mobilityRobot2 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.blue.team_keys[1].substring(3)}
+              teamKey={match.alliances.blue.team_keys[1]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.blue.mobilityRobot3 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.blue.team_keys[2].substring(3)}
+              teamKey={match.alliances.blue.team_keys[2]}
             />
           </TableCell>
         </TableRow>
@@ -340,28 +339,35 @@ export default function ScoreBreakdown2023({
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Tech Fouls */}
+        {/* Fouls committed by each alliance */}
         <TableRow>
           <TableCell className="bg-alliance-red-loser">
-            <FoulDisplay
-              foulsReceived={scoreBreakdown.red.foulCount}
-              pointsPerFoul={POINTS_PER_FOUL[2023]}
-              techFoulsReceived={scoreBreakdown.red.techFoulCount}
-              pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
-              techOrMajor="tech"
-            />
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.red.foulCount,
+              techFouls: scoreBreakdown.red.techFoulCount,
+            })}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Fouls / Tech Fouls
+            Fouls / Tech Fouls Committed
           </TableCell>
           <TableCell className="bg-alliance-blue-loser">
-            <FoulDisplay
-              foulsReceived={scoreBreakdown.blue.foulCount}
-              pointsPerFoul={POINTS_PER_FOUL[2023]}
-              techFoulsReceived={scoreBreakdown.blue.techFoulCount}
-              pointsPerTechFoul={POINTS_PER_TECH_FOUL[2023]}
-              techOrMajor="tech"
-            />
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.blue.foulCount,
+              techFouls: scoreBreakdown.blue.techFoulCount,
+            })}
+          </TableCell>
+        </TableRow>
+
+        {/* Foul Points: points each alliance received from the other's fouls */}
+        <TableRow>
+          <TableCell className="bg-alliance-red-winner">
+            {scoreBreakdown.red.foulPoints}
+          </TableCell>
+          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
+            Foul Points Received
+          </TableCell>
+          <TableCell className="bg-alliance-blue-winner">
+            {scoreBreakdown.blue.foulPoints}
           </TableCell>
         </TableRow>
 

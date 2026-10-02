@@ -1,8 +1,8 @@
 import { VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 
 import { CompLevel, Match } from '~/api/tba/read';
 import RpDots from '~/components/tba/rpDot';
-import { cn } from '~/lib/utils';
 
 const scoreCellVariants = cva(
   'relative flex items-center justify-center numeric-data',

@@ -16,7 +16,7 @@
         "type": "object",
         "properties": {
           "code": {
-            "type": "string",
+            "type": "integer",
             "format": "int64"
           },
           "message": {
@@ -121,6 +121,51 @@
           }
         }
       },
+      "EventMediaSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "event_key",
+          "media_url"
+        ],
+        "properties": {
+          "event_key": {
+            "type": "string",
+            "description": "The event receiving the suggested media"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "The URL of the event media being suggested"
+          }
+        }
+      },
+      "EventMediaSuggestionResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "suggestion_exists",
+              "media_exists",
+              "bad_url",
+              "bad_event",
+              "unauthorized"
+            ]
+          }
+        }
+      },
       "SubscriptionMessage": {
         "type": "object",
         "required": [
@@ -142,6 +187,95 @@
             "items": {
               "$ref": "#/components/schemas/NotificationType"
             }
+          }
+        }
+      },
+      "ApiReadKeyMessage": {
+        "type": "object",
+        "required": [
+          "key",
+          "description"
+        ],
+        "properties": {
+          "key": {
+            "type": "string",
+            "description": "The X-TBA-Auth-Key value"
+          },
+          "description": {
+            "type": "string"
+          },
+          "created": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO-formatted creation datetime"
+          }
+        }
+      },
+      "ApiWriteKeyMessage": {
+        "type": "object",
+        "required": [
+          "auth_id",
+          "secret",
+          "description",
+          "event_keys",
+          "auth_types"
+        ],
+        "properties": {
+          "auth_id": {
+            "type": "string"
+          },
+          "secret": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "event_keys": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "auth_types": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            },
+            "description": "Human-readable write permission names"
+          },
+          "expiration": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "ISO-formatted expiration datetime"
+          }
+        }
+      },
+      "ApiKeysResponse": {
+        "type": "object",
+        "properties": {
+          "read_keys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiReadKeyMessage"
+            }
+          },
+          "write_keys": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ApiWriteKeyMessage"
+            }
+          }
+        }
+      },
+      "AddApiReadKeyResponse": {
+        "type": "object",
+        "properties": {
+          "read_key": {
+            "$ref": "#/components/schemas/ApiReadKeyMessage"
           }
         }
       }
@@ -258,6 +392,39 @@
         }
       }
     },
+    "/event/media/suggest": {
+      "post": {
+        "summary": "Suggest event media",
+        "operationId": "suggestEventMedia",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EventMediaSuggestionMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EventMediaSuggestionResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/team/media/suggest": {
       "post": {
         "summary": "Suggest team media",
@@ -307,6 +474,113 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/SubscriptionCollection"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api_keys/list": {
+      "post": {
+        "summary": "List API keys",
+        "operationId": "listApiKeys",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ApiKeysResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api_keys/read/add": {
+      "post": {
+        "summary": "Add a read API key",
+        "operationId": "addApiReadKey",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "description"
+                ],
+                "properties": {
+                  "description": {
+                    "type": "string",
+                    "description": "Human-readable description of the key"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AddApiReadKeyResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api_keys/read/delete": {
+      "post": {
+        "summary": "Delete a read API key",
+        "operationId": "deleteApiReadKey",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": [
+                  "key_id"
+                ],
+                "properties": {
+                  "key_id": {
+                    "type": "string",
+                    "description": "The id of the read key to delete"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/BaseResponse"
                 }
               }
             }

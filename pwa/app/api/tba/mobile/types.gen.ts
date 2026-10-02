@@ -6,7 +6,7 @@ export type ClientOptions = {
 };
 
 export type BaseResponse = {
-  code?: string;
+  code?: number;
   message?: string;
 };
 
@@ -62,11 +62,70 @@ export type MediaSuggestionMessage = {
   details_json: string;
 };
 
+export type EventMediaSuggestionMessage = {
+  /**
+   * The event receiving the suggested media
+   */
+  event_key: string;
+  /**
+   * The URL of the event media being suggested
+   */
+  media_url: string;
+};
+
+export type EventMediaSuggestionResponse = {
+  code: number;
+  message: string;
+  status:
+    | 'success'
+    | 'suggestion_exists'
+    | 'media_exists'
+    | 'bad_url'
+    | 'bad_event'
+    | 'unauthorized';
+};
+
 export type SubscriptionMessage = {
   device_key?: string;
   model_key: string;
   model_type: ModelType;
   notifications?: Array<NotificationType>;
+};
+
+export type ApiReadKeyMessage = {
+  /**
+   * The X-TBA-Auth-Key value
+   */
+  key: string;
+  description: string;
+  /**
+   * ISO-formatted creation datetime
+   */
+  created?: string | null;
+};
+
+export type ApiWriteKeyMessage = {
+  auth_id: string;
+  secret: string;
+  description: string;
+  event_keys: Array<string>;
+  /**
+   * Human-readable write permission names
+   */
+  auth_types: Array<string>;
+  /**
+   * ISO-formatted expiration datetime
+   */
+  expiration?: string | null;
+};
+
+export type ApiKeysResponse = {
+  read_keys?: Array<ApiReadKeyMessage>;
+  write_keys?: Array<ApiWriteKeyMessage>;
+};
+
+export type AddApiReadKeyResponse = {
+  read_key?: ApiReadKeyMessage;
 };
 
 export type ListFavoritesData = {
@@ -121,6 +180,23 @@ export type SetModelPreferencesResponses = {
 export type SetModelPreferencesResponse =
   SetModelPreferencesResponses[keyof SetModelPreferencesResponses];
 
+export type SuggestEventMediaData = {
+  body: EventMediaSuggestionMessage;
+  path?: never;
+  query?: never;
+  url: '/event/media/suggest';
+};
+
+export type SuggestEventMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: EventMediaSuggestionResponse;
+};
+
+export type SuggestEventMediaResponse =
+  SuggestEventMediaResponses[keyof SuggestEventMediaResponses];
+
 export type SuggestTeamMediaData = {
   body: MediaSuggestionMessage;
   path?: never;
@@ -154,3 +230,64 @@ export type ListSubscriptionsResponses = {
 
 export type ListSubscriptionsResponse =
   ListSubscriptionsResponses[keyof ListSubscriptionsResponses];
+
+export type ListApiKeysData = {
+  body?: never;
+  path?: never;
+  query?: never;
+  url: '/api_keys/list';
+};
+
+export type ListApiKeysResponses = {
+  /**
+   * Successful response
+   */
+  200: ApiKeysResponse;
+};
+
+export type ListApiKeysResponse =
+  ListApiKeysResponses[keyof ListApiKeysResponses];
+
+export type AddApiReadKeyData = {
+  body: {
+    /**
+     * Human-readable description of the key
+     */
+    description: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/api_keys/read/add';
+};
+
+export type AddApiReadKeyResponses = {
+  /**
+   * Successful response
+   */
+  200: AddApiReadKeyResponse;
+};
+
+export type AddApiReadKeyResponse2 =
+  AddApiReadKeyResponses[keyof AddApiReadKeyResponses];
+
+export type DeleteApiReadKeyData = {
+  body: {
+    /**
+     * The id of the read key to delete
+     */
+    key_id: string;
+  };
+  path?: never;
+  query?: never;
+  url: '/api_keys/read/delete';
+};
+
+export type DeleteApiReadKeyResponses = {
+  /**
+   * Successful response
+   */
+  200: BaseResponse;
+};
+
+export type DeleteApiReadKeyResponse =
+  DeleteApiReadKeyResponses[keyof DeleteApiReadKeyResponses];

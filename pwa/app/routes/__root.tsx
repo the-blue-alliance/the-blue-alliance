@@ -3,15 +3,19 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   HeadContent,
   Outlet,
+  ScriptOnce,
   Scripts,
   createRootRouteWithContext,
   useLocation,
 } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { Suspense, lazy, useEffect } from 'react';
 import { Temporal } from 'temporal-polyfill';
 import { z } from 'zod';
 
+import { client as colorsClient } from '~/api/colors/client.gen';
 import { client as mobileClient } from '~/api/tba/mobile/client.gen';
+import { client as moderationClient } from '~/api/tba/moderation/client.gen';
 import {
   getSearchIndexOptions,
   getStatusOptions,
@@ -25,12 +29,12 @@ import { TOCRendererProvider } from '~/components/tba/tableOfContents';
 import { Toaster } from '~/components/ui/sonner';
 import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
-import { ApiError } from '~/lib/apiError';
+import { mapClientError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { STALE_TIME } from '~/lib/queryClient';
-import { ThemeProvider } from '~/lib/theme';
-import { cn, createLogger } from '~/lib/utils';
+import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
+import { createLogger } from '~/lib/utils';
 import appCss from '~/style/tailwind.css?url';
 
 const logger = createLogger('root');
@@ -57,7 +61,7 @@ const ReactQueryDevtools = import.meta.env.PROD
 client.interceptors.request.use((request) => {
   request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
 
-  logger.info(
+  logger.debug(
     {
       method: request.method,
       url: request.url,
@@ -70,11 +74,20 @@ client.interceptors.request.use((request) => {
 
 // Attach the HTTP status code to thrown errors so the QueryClient's retry
 // function can distinguish 4xx "client error" failures from transient ones.
-client.interceptors.error.use((_error, response) => {
-  return new ApiError(
-    response?.statusText || String(response?.status ?? 0),
-    response?.status ?? 0,
-  );
+client.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
+});
+
+// Same ApiError mapping for the colors client — consumers rely on 404s being
+// skipped and 4xx not being retried (see queryClient.ts).
+colorsClient.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
+});
+
+// And for the moderation client, so a failed queue probe throws a real
+// ApiError (with status) rather than a bare object.
+moderationClient.interceptors.error.use((error, response) => {
+  return mapClientError(error, response);
 });
 
 // SSR-only network LRU under the API client. Client freshness is owned by
@@ -91,6 +104,13 @@ if (typeof window === 'undefined') {
 if (import.meta.env.VITE_TBA_MOBILE_API_BASE_URL) {
   mobileClient.setConfig({
     baseUrl: import.meta.env.VITE_TBA_MOBILE_API_BASE_URL,
+  });
+}
+
+// Point moderation API client at local backend when configured
+if (import.meta.env.VITE_TBA_MODERATION_API_BASE_URL) {
+  moderationClient.setConfig({
+    baseUrl: import.meta.env.VITE_TBA_MODERATION_API_BASE_URL,
   });
 }
 
@@ -128,16 +148,6 @@ export const Route = createRootRouteWithContext<{
       currentSeason: status.current_season ?? Temporal.Now.plainDateISO().year,
     };
   },
-  loader: () => ({
-    renderTime: Temporal.Now.zonedDateTimeISO().toLocaleString('en-US', {
-      month: 'short',
-      day: 'numeric',
-      year: 'numeric',
-      hour: 'numeric',
-      minute: 'numeric',
-      hour12: true,
-    }),
-  }),
   head: ({ matches }) => ({
     meta: [
       {
@@ -172,12 +182,6 @@ export const Route = createRootRouteWithContext<{
         rel: 'stylesheet',
         href: appCss,
       },
-      { rel: 'preconnect', href: 'https://fonts.googleapis.com' },
-      {
-        rel: 'preconnect',
-        href: 'https://fonts.gstatic.com',
-        crossOrigin: 'anonymous',
-      },
       { rel: 'manifest', href: '/manifest.webmanifest' },
       { rel: 'apple-touch-icon', href: appleTouchIcon180 },
       ...APPLE_SPLASH_STARTUP_LINKS,
@@ -190,7 +194,6 @@ const FULLSCREEN_ROUTES = ['/gameday'];
 const FULLWIDTH_ROUTES = ['/match_suggestion'];
 
 function RootComponent() {
-  const { renderTime } = Route.useLoaderData();
   const { pathname } = useLocation();
 
   // Set data-hydrated on <body> after React mounts so Playwright tests can
@@ -208,23 +211,8 @@ function RootComponent() {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          // This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded.
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  var isDark = theme === 'dark' || 
-                    (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded. */}
+        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
         <HeadContent />
       </head>
       <body>
@@ -239,7 +227,7 @@ function RootComponent() {
                   <TOCRendererProvider>
                     <div
                       className={cn(
-                        !isFullwidth && 'container mx-auto',
+                        !isFullwidth && 'container',
                         'flex-1 px-4 text-sm',
                       )}
                     >
@@ -249,7 +237,7 @@ function RootComponent() {
                       </div>
                     </div>
                   </TOCRendererProvider>
-                  <Footer renderTime={renderTime} />
+                  <Footer />
                 </div>
               )}
             </AuthContextProvider>
@@ -270,4 +258,5 @@ function RootComponent() {
       </body>
     </html>
   );
-}
+} // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop

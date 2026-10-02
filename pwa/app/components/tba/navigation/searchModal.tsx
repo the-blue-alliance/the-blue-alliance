@@ -1,5 +1,6 @@
 import { useQuery } from '@tanstack/react-query';
 import { ClientOnly, useNavigate } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { useEffect, useMemo, useRef, useState } from 'react';
 
 import SearchIcon from '~icons/lucide/search';
@@ -27,11 +28,11 @@ import { STALE_TIME } from '~/lib/queryClient';
 import FuzzysortFilterer, {
   FilteredSearchIndex,
 } from '~/lib/search/fuzzysortFilterer';
-import { cn } from '~/lib/utils';
 
 export function SearchModal() {
   const [open, setOpen] = useState<boolean>(false);
   const [query, setQuery] = useState<string>('');
+  const inputRef = useRef<HTMLInputElement>(null);
   const searchIndexQuery = useQuery({
     ...getSearchIndexOptions({}),
     staleTime: STALE_TIME.SEARCH_INDEX,
@@ -85,8 +86,8 @@ export function SearchModal() {
           <Button
             variant="secondary"
             className={cn(
-              `bg-surface relative h-9 w-full justify-start rounded-lg bg-white
-              pl-4 font-normal text-muted-foreground shadow-none hover:bg-white
+              `relative h-9 w-full justify-start rounded-lg bg-white pl-4
+              font-normal text-muted-foreground shadow-none hover:bg-white
               max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
             )}
           />
@@ -107,6 +108,7 @@ export function SearchModal() {
       </DialogTrigger>
 
       <DialogTrigger
+        aria-label="Search"
         className="z-30 cursor-pointer rounded-full p-2 text-white
           transition-colors duration-200 hover:bg-black/20 lg:hidden"
       >
@@ -114,6 +116,7 @@ export function SearchModal() {
       </DialogTrigger>
 
       <DialogContent
+        initialFocus={inputRef}
         showCloseButton={false}
         className="top-[10%] translate-y-0 rounded-2xl border-none
           bg-clip-padding p-2 shadow-2xl dark:bg-neutral-900"
@@ -134,6 +137,7 @@ export function SearchModal() {
         >
           <div className="relative">
             <CommandInput
+              ref={inputRef}
               placeholder="Search teams and events..."
               value={query}
               onValueChange={setQuery}

@@ -1,3 +1,4 @@
+import { cn } from 'cn';
 import useEmblaCarousel, {
   type UseEmblaCarouselType,
 } from 'embla-carousel-react';
@@ -17,7 +18,6 @@ import ArrowLeftIcon from '~icons/lucide/arrow-left';
 import ArrowRightIcon from '~icons/lucide/arrow-right';
 
 import { Button } from '~/components/ui/button';
-import { cn } from '~/lib/utils';
 
 type CarouselApi = UseEmblaCarouselType[1];
 type UseCarouselParameters = Parameters<typeof useEmblaCarousel>;
@@ -121,6 +121,7 @@ const Carousel = forwardRef<
         return;
       }
 
+      // eslint-disable-next-line react/set-state-in-effect -- syncing initial scroll state from the embla API
       onSelect(api);
       api.on('reInit', onSelect);
       api.on('select', onSelect);
@@ -147,6 +148,9 @@ const Carousel = forwardRef<
           ref={ref}
           onKeyDownCapture={handleKeyDown}
           className={cn('relative', className)}
+          // `<section>` only exposes role=region when it has an accessible
+          // name, which the carousel has none of, so the explicit role stays.
+          // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
           role="region"
           aria-roledescription="carousel"
           {...props}
@@ -188,6 +192,9 @@ const CarouselItem = forwardRef<HTMLDivElement, HTMLAttributes<HTMLDivElement>>(
     return (
       <div
         ref={ref}
+        // None of the suggested tags (address/details/fieldset/hgroup/optgroup)
+        // describes a carousel slide.
+        // eslint-disable-next-line jsx-a11y/prefer-tag-over-role
         role="group"
         aria-roledescription="slide"
         className={cn(

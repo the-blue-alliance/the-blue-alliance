@@ -1,5 +1,7 @@
+import copy
 import json
 import unittest
+from typing import Any, Dict
 from unittest.mock import patch
 
 import pytest
@@ -7,6 +9,7 @@ import pytest
 from backend.common.consts.media_type import MediaType, TYPE_NAMES
 from backend.common.futures import InstantFuture
 from backend.common.helpers.webcast_helper import WebcastParser
+from backend.common.sitevars.smugmug_api_secret import ContentType, SmugmugApiSecret
 from backend.common.suggestions.media_parser import MediaParser
 from backend.common.urlfetch import URLFetchResult
 
@@ -437,3 +440,425 @@ class TestWebcastUrlParser(unittest.TestCase):
             "http://mywebsite.somewebcast"
         ).get_result()
         self.assertIsNone(bad)
+
+
+SMUGMUG_ALBUM_RESPONSE: Dict[str, Any] = {
+    "Response": {
+        "Locator": "Album",
+        "LocatorType": "Object",
+        "Album": {
+            "AlbumKey": "4RWMLM",
+            "Name": "2026 FIRST Championship - BAE Systems",
+            "Title": "2026 FIRST Championship - BAE Systems",
+            "ImageCount": 81,
+            "WebUri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE",
+        },
+    },
+    # The cover image's sizes, from the AlbumHighlightImage expansion
+    "Expansions": {
+        "/api/v2/image/2F65K6P-0!sizedetails": {
+            "ImageSizeDetails": {
+                "ImageSizeSmall": {"Url": "https://photos.smugmug.com/S/cover-S.png"},
+                "ImageSizeMedium": {"Url": "https://photos.smugmug.com/M/cover-M.png"},
+                "ImageSizeLarge": {"Url": "https://photos.smugmug.com/L/cover-L.png"},
+            }
+        },
+        "/api/v2/album/4RWMLM!highlightimage": {"AlbumImage": {"ImageKey": "2F65K6P"}},
+    },
+}
+
+SMUGMUG_PHOTO_RESPONSE: Dict[str, Any] = {
+    "Response": {
+        "Locator": "AlbumImage",
+        "LocatorType": "Object",
+        "AlbumImage": {
+            "ImageKey": "xxrbgK6",
+            "Title": "",
+            "Caption": "A robot",
+            "WebUri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+        },
+    },
+    "Expansions": {
+        "/api/v2/image/xxrbgK6-0!sizedetails": {
+            "ImageSizeDetails": {
+                "ImageSizeSmall": {"Url": "https://photos.smugmug.com/S/x-S.jpg"},
+                "ImageSizeMedium": {"Url": "https://photos.smugmug.com/M/x-M.jpg"},
+                "ImageSizeLarge": {"Url": "https://photos.smugmug.com/L/x-L.jpg"},
+            }
+        }
+    },
+}
+
+
+class TestSmugmugParser(unittest.TestCase):
+    ALBUM_URL = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE"
+    PHOTO_URL = "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6/A"
+
+    def setUp(self) -> None:
+        SmugmugApiSecret.put(ContentType(api_key="abc", api_secret="def"))
+
+    def _parse(self, url: str, status_code: int, content: str):
+        mock_urlfetch_result = URLFetchResult.mock_urlfetch_result(
+            MediaParser.SMUGMUG_WEBURI_LOOKUP_URL, status_code, content
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch",
+            return_value=InstantFuture(mock_urlfetch_result),
+        ):
+            return MediaParser.partial_media_dict_from_url(url).get_result()
+
+    def test_album_parse(self) -> None:
+        urls = [
+            self.ALBUM_URL,
+            self.ALBUM_URL + "/",
+            self.ALBUM_URL + "?utm_source=tba",
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                result = self._parse(url, 200, json.dumps(SMUGMUG_ALBUM_RESPONSE))
+                self.assertIsNotNone(result)
+                self.assertEqual(result["media_type_enum"], MediaType.SMUGMUG_ALBUM)
+                self.assertEqual(result["foreign_key"], "4RWMLM")
+                self.assertFalse(result["is_social"])
+                self.assertEqual(
+                    result["site_name"], TYPE_NAMES[MediaType.SMUGMUG_ALBUM]
+                )
+                self.assertEqual(
+                    json.loads(result["details_json"]),
+                    {
+                        "title": "2026 FIRST Championship - BAE Systems",
+                        "web_uri": self.ALBUM_URL,
+                        "image_count": 81,
+                        "cover_url": "https://photos.smugmug.com/L/cover-L.png",
+                        "cover_url_med": "https://photos.smugmug.com/M/cover-M.png",
+                        "cover_url_sm": "https://photos.smugmug.com/S/cover-S.png",
+                    },
+                )
+
+    def test_album_parse_falls_back_to_name(self) -> None:
+        response = copy.deepcopy(SMUGMUG_ALBUM_RESPONSE)
+        response["Response"]["Album"]["Title"] = ""
+        result = self._parse(self.ALBUM_URL, 200, json.dumps(response))
+        self.assertIsNotNone(result)
+        self.assertEqual(
+            json.loads(result["details_json"])["title"],
+            "2026 FIRST Championship - BAE Systems",
+        )
+
+    def test_photo_parse(self) -> None:
+        urls = [
+            self.PHOTO_URL,
+            "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+            self.PHOTO_URL + "?utm_source=tba",
+        ]
+        for url in urls:
+            with self.subTest(url=url):
+                result = self._parse(url, 200, json.dumps(SMUGMUG_PHOTO_RESPONSE))
+                self.assertIsNotNone(result)
+                self.assertEqual(result["media_type_enum"], MediaType.SMUGMUG_PHOTO)
+                self.assertEqual(result["foreign_key"], "xxrbgK6")
+                self.assertFalse(result["is_social"])
+                self.assertEqual(
+                    result["site_name"], TYPE_NAMES[MediaType.SMUGMUG_PHOTO]
+                )
+                self.assertEqual(
+                    json.loads(result["details_json"]),
+                    {
+                        "title": "",
+                        "caption": "A robot",
+                        "web_uri": "https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE/i-xxrbgK6",
+                        "image_url": "https://photos.smugmug.com/L/x-L.jpg",
+                        "image_url_med": "https://photos.smugmug.com/M/x-M.jpg",
+                        "image_url_sm": "https://photos.smugmug.com/S/x-S.jpg",
+                    },
+                )
+
+    def test_album_parse_missing_cover(self) -> None:
+        response = copy.deepcopy(SMUGMUG_ALBUM_RESPONSE)
+        del response["Expansions"]
+        result = self._parse(self.ALBUM_URL, 200, json.dumps(response))
+        self.assertIsNotNone(result)
+        details = json.loads(result["details_json"])
+        self.assertEqual(details["cover_url"], "")
+        self.assertEqual(details["cover_url_med"], "")
+        self.assertEqual(details["cover_url_sm"], "")
+
+    def test_photo_parse_missing_size_details(self) -> None:
+        response = copy.deepcopy(SMUGMUG_PHOTO_RESPONSE)
+        del response["Expansions"]
+        result = self._parse(self.PHOTO_URL, 200, json.dumps(response))
+        self.assertIsNotNone(result)
+        details = json.loads(result["details_json"])
+        self.assertEqual(details["image_url"], "")
+        self.assertEqual(details["image_url_med"], "")
+        self.assertEqual(details["image_url_sm"], "")
+
+    def test_no_api_key(self) -> None:
+        SmugmugApiSecret.put(ContentType(api_key="", api_secret=""))
+        with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+            result = MediaParser.partial_media_dict_from_url(
+                self.ALBUM_URL
+            ).get_result()
+        self.assertIsNone(result)
+        mock_urlfetch.assert_not_called()
+
+    def test_api_non_200(self) -> None:
+        self.assertIsNone(self._parse(self.ALBUM_URL, 500, ""))
+
+    def test_api_empty_response(self) -> None:
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, ""))
+
+    def test_url_is_not_an_album_or_photo(self) -> None:
+        # A folder page
+        response = {"Response": {"Locator": "Folder", "Folder": {"NodeID": "rSxh6r"}}}
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, json.dumps(response)))
+
+    def test_url_does_not_resolve(self) -> None:
+        # SmugMug answers 200 and names every type the url could have been
+        response = {"Response": {"Locator": "Folder,Album,Page,AlbumImage"}}
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, json.dumps(response)))
+
+    def test_album_missing_key(self) -> None:
+        response = copy.deepcopy(SMUGMUG_ALBUM_RESPONSE)
+        del response["Response"]["Album"]["AlbumKey"]
+        self.assertIsNone(self._parse(self.ALBUM_URL, 200, json.dumps(response)))
+
+    def test_photo_missing_key(self) -> None:
+        response = copy.deepcopy(SMUGMUG_PHOTO_RESPONSE)
+        del response["Response"]["AlbumImage"]["ImageKey"]
+        self.assertIsNone(self._parse(self.PHOTO_URL, 200, json.dumps(response)))
+
+
+class TestMediaParserRemoteLookups(unittest.TestCase):
+    """
+    The parsers that need a second HTTP fetch (GrabCAD, oEmbed, CD threads).
+    The live-network tests above are skipped; these mock the urlfetch instead.
+    """
+
+    GRABCAD_URL = "https://grabcad.com/library/2016-148-robowranglers-1"
+    GRABCAD_API_URL = (
+        "https://grabcad.com/community/api/v1/models/2016-148-robowranglers-1"
+    )
+
+    def test_cd_photo_thread_is_dead(self) -> None:
+        # cd-media no longer exists, so the CD photo branch of
+        # partial_media_dict_from_url always resolves to None
+        result = MediaParser.partial_media_dict_from_url(
+            "https://www.chiefdelphi.com/media/photos/41999"
+        ).get_result()
+        self.assertIsNone(result)
+
+    def test_cdphotothread_foreign_key(self) -> None:
+        self.assertEqual(
+            MediaParser._parse_cdphotothread_foreign_key(
+                "https://www.chiefdelphi.com/media/photos/41999"
+            ),
+            "41999",
+        )
+        self.assertIsNone(
+            MediaParser._parse_cdphotothread_foreign_key("http://example.com/41999")
+        )
+
+    def test_cdphotothread_image_partial_is_dead(self) -> None:
+        self.assertIsNone(
+            MediaParser._parse_cdphotothread_image_partial(b"<html></html>")
+        )
+
+    def test_grabcad_no_foreign_key(self) -> None:
+        with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+            result = MediaParser._partial_media_dict_from_grabcad(
+                "http://example.com/not-grabcad"
+            ).get_result()
+        self.assertIsNone(result)
+        mock_urlfetch.assert_not_called()
+
+    def test_grabcad_api_non_200(self) -> None:
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(self.GRABCAD_API_URL, 429, "")
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ):
+            result = MediaParser.partial_media_dict_from_url(
+                self.GRABCAD_URL
+            ).get_result()
+        self.assertIsNone(result)
+
+    def test_grabcad_api_empty_response(self) -> None:
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(self.GRABCAD_API_URL, 200, "{}")
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ):
+            result = MediaParser.partial_media_dict_from_url(
+                self.GRABCAD_URL
+            ).get_result()
+        self.assertIsNone(result)
+
+    def test_grabcad_api_success(self) -> None:
+        mock_content = json.dumps(
+            {
+                "name": "2016 | 148 - Robowranglers",
+                "raw_description": "Renegade",
+                "preview_image": "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/bf832651cc688c27a78c224fbd07d9d7/card.jpg",
+                "created_at": "2016-09-19T11:52:23Z",
+            }
+        )
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(self.GRABCAD_API_URL, 200, mock_content)
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ) as mock_urlfetch:
+            result = MediaParser.partial_media_dict_from_url(
+                self.GRABCAD_URL
+            ).get_result()
+        mock_urlfetch.assert_called_once_with(self.GRABCAD_API_URL, deadline=10)
+        self.assertIsNotNone(result)
+        self.assertEqual(result["media_type_enum"], MediaType.GRABCAD)
+        self.assertEqual(result["is_social"], False)
+        self.assertEqual(result["foreign_key"], "2016-148-robowranglers-1")
+        details = json.loads(result["details_json"])
+        self.assertEqual(details["model_name"], "2016 | 148 - Robowranglers")
+        self.assertEqual(details["model_description"], "Renegade")
+        self.assertEqual(
+            details["model_image"],
+            "https://d2t1xqejof9utc.cloudfront.net/screenshots/pics/bf832651cc688c27a78c224fbd07d9d7/card.jpg",
+        )
+        self.assertEqual(details["model_created"], "2016-09-19T11:52:23Z")
+
+    def test_onshape_no_foreign_key(self) -> None:
+        with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+            result = MediaParser._partial_media_dict_from_onshape(
+                "http://example.com/not-onshape"
+            ).get_result()
+        self.assertIsNone(result)
+        mock_urlfetch.assert_not_called()
+
+    def test_onshape_api_200_with_empty_body(self) -> None:
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(
+                "https://cad.onshape.com/api/documents/5481081f48161555332968ff",
+                200,
+                "{}",
+            )
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ):
+            result = MediaParser.partial_media_dict_from_url(
+                TestOnshapeParser.ONSHAPE_URL
+            ).get_result()
+        self.assertIsNone(result)
+
+    def test_cd_thread_no_foreign_key(self) -> None:
+        with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+            result = MediaParser._parse_cd_thread(
+                "http://example.com/not-chiefdelphi"
+            ).get_result()
+        self.assertIsNone(result)
+        mock_urlfetch.assert_not_called()
+
+    def test_cd_thread_no_data(self) -> None:
+        # A 200 with no body, or a body that isn't a JSON object, is not a thread
+        for content in ("", "[]", "null"):
+            with self.subTest(content=content):
+                mock_future = InstantFuture(
+                    URLFetchResult.mock_urlfetch_result(
+                        "https://www.chiefdelphi.com/t/506115.json", 200, content
+                    )
+                )
+                with patch(
+                    "google.appengine.ext.ndb.Context.urlfetch",
+                    return_value=mock_future,
+                ):
+                    result = MediaParser.partial_media_dict_from_url(
+                        "https://www.chiefdelphi.com/t/506115"
+                    ).get_result()
+                self.assertIsNone(result)
+
+
+class TestOembedParser(unittest.TestCase):
+    """
+    No oEmbed providers are configured today (Instagram's legacy oEmbed is
+    gone), so these register Instagram images as one to exercise the path.
+    """
+
+    OEMBED_URL = "https://www.instagram.com/p/BUnZiriBYre/"
+    OEMBED_API_URL = "https://oembed.example.com/?id={}"
+
+    def setUp(self) -> None:
+        providers_patch = patch.object(
+            MediaParser, "OEMBED_PROVIDERS", {MediaType.INSTAGRAM_IMAGE}
+        )
+        detail_url_patch = patch.object(
+            MediaParser,
+            "OEMBED_DETAIL_URL",
+            {MediaType.INSTAGRAM_IMAGE: self.OEMBED_API_URL},
+        )
+        providers_patch.start()
+        detail_url_patch.start()
+        self.addCleanup(providers_patch.stop)
+        self.addCleanup(detail_url_patch.stop)
+
+    def test_oembed_no_foreign_key(self) -> None:
+        with patch("google.appengine.ext.ndb.Context.urlfetch") as mock_urlfetch:
+            result = MediaParser._partial_media_dict_from_oembed(
+                MediaType.INSTAGRAM_IMAGE, "http://example.com/not-instagram"
+            ).get_result()
+        self.assertIsNone(result)
+        mock_urlfetch.assert_not_called()
+
+    def test_oembed_api_non_200(self) -> None:
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(
+                self.OEMBED_API_URL.format("BUnZiriBYre"), 404, ""
+            )
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ):
+            result = MediaParser.partial_media_dict_from_url(
+                self.OEMBED_URL
+            ).get_result()
+        self.assertIsNone(result)
+
+    def test_oembed_api_empty_response(self) -> None:
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(
+                self.OEMBED_API_URL.format("BUnZiriBYre"), 200, "{}"
+            )
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ):
+            result = MediaParser.partial_media_dict_from_url(
+                self.OEMBED_URL
+            ).get_result()
+        self.assertIsNone(result)
+
+    def test_oembed_api_success(self) -> None:
+        oembed_data = {
+            "title": "FRC 195 @ 2017 Battlecry @ WPI",
+            "author_name": "1stroboticsrocks",
+            "thumbnail_url": "https://example.com/thumb.jpg",
+        }
+        mock_future = InstantFuture(
+            URLFetchResult.mock_urlfetch_result(
+                self.OEMBED_API_URL.format("BUnZiriBYre"), 200, json.dumps(oembed_data)
+            )
+        )
+        with patch(
+            "google.appengine.ext.ndb.Context.urlfetch", return_value=mock_future
+        ) as mock_urlfetch:
+            result = MediaParser.partial_media_dict_from_url(
+                self.OEMBED_URL
+            ).get_result()
+        mock_urlfetch.assert_called_once_with(
+            self.OEMBED_API_URL.format("BUnZiriBYre"), deadline=10
+        )
+        self.assertIsNotNone(result)
+        self.assertEqual(result["media_type_enum"], MediaType.INSTAGRAM_IMAGE)
+        self.assertEqual(result["foreign_key"], "BUnZiriBYre")
+        self.assertEqual(json.loads(result["details_json"]), oembed_data)

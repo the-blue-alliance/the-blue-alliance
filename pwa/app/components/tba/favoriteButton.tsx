@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 import BiStar from '~icons/bi/star';
 import BiStarFill from '~icons/bi/star-fill';
@@ -32,17 +32,12 @@ export default function FavoriteButton({
     modelKey,
     modelType,
   );
-  const [loginOpen, setLoginOpen] = useState(false);
-
-  useEffect(() => {
-    if (user && loginOpen) {
-      setLoginOpen(false);
-    }
-  }, [user, loginOpen]);
+  const [wantsLogin, setWantsLogin] = useState(false);
+  const loginOpen = wantsLogin && !user;
 
   const handleClick = () => {
     if (!user) {
-      setLoginOpen(true);
+      setWantsLogin(true);
       return;
     }
     toggleFavorite();
@@ -63,7 +58,7 @@ export default function FavoriteButton({
           <BiStar className="h-5 w-5" />
         )}
       </Button>
-      <Credenza open={loginOpen} onOpenChange={setLoginOpen}>
+      <Credenza open={loginOpen} onOpenChange={setWantsLogin}>
         <CredenzaContent className="max-h-[85vh] overflow-y-auto">
           <CredenzaHeader>
             <CredenzaTitle>Sign in to use myTBA</CredenzaTitle>

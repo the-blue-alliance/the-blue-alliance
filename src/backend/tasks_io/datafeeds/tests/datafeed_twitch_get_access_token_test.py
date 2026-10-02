@@ -10,7 +10,7 @@ from backend.common.sitevars.twitch_secrets import (
     ContentType as TwitchSecretsContent,
     TwitchSecrets,
 )
-from backend.common.urlfetch import URLFetchResult
+from backend.common.urlfetch import URLFetchMethod, URLFetchResult
 from backend.tasks_io.datafeeds.datafeed_twitch import TwitchGetAccessToken
 
 
@@ -93,3 +93,9 @@ def test_get_cached_token_returns_none_on_fetch_failure(
 
     result = TwitchGetAccessToken.get_cached_token_async().get_result()
     assert result is None
+
+
+def test_url_and_method(twitch_secrets) -> None:
+    df = TwitchGetAccessToken(refresh_token=None)
+    assert df.url() == "https://id.twitch.tv/oauth2/token"
+    assert df.method == URLFetchMethod.POST

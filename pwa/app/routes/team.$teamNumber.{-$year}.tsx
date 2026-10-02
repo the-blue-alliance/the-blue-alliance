@@ -1,4 +1,4 @@
-import * as Sentry from '@sentry/tanstackstart-react';
+import { metrics } from '@sentry/tanstackstart-react';
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import {
   Link,
@@ -95,7 +95,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     const teamKey = `frc${params.teamNumber}`;
     const year = parseParamsForYearElseDefault(currentSeason, params);
 
-    Sentry.metrics.count('team.page.view', 1, {
+    metrics.count('team.page.view', 1, {
       attributes: { team_number: params.teamNumber, year },
     });
 
@@ -156,10 +156,14 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
         .ensureQueryData(
           getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
         )
-        .catch((): number[] => []),
+        // Distinguish "fetch failed" from "team genuinely has no years" —
+        // coercing a failure to [] would make the check below always redirect
+        // or 404, even though the failure was already reported (see
+        // ~/lib/queryClient.ts's onError) and has nothing to do with the year.
+        .catch((): number[] | null => null),
     ]);
 
-    if (!yearsParticipated.includes(year)) {
+    if (yearsParticipated !== null && !yearsParticipated.includes(year)) {
       if (params.year === undefined) {
         throw redirect({
           to: '/team/$teamNumber/history',
@@ -182,7 +186,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
 
     const endTime = Temporal.Now.instant().epochMilliseconds;
     const duration = endTime - startTime;
-    Sentry.metrics.distribution('team.page.loader.duration', duration, {
+    metrics.distribution('team.page.loader.duration', duration, {
       attributes: { team_number: params.teamNumber, year },
     });
 
@@ -251,7 +255,8 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     };
   },
   component: TeamPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function TeamPage(): React.JSX.Element {
   const { teamKey, year } = Route.useLoaderData();
@@ -260,37 +265,45 @@ function TeamPage(): React.JSX.Element {
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key: teamKey } }),
   );
-  const { data: media } = useSuspenseQuery({
+  const mediaQuery = useQuery({
     ...getTeamMediaByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: socials } = useSuspenseQuery(
+  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
+  const socialsQuery = useQuery(
     getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
   );
-  const { data: yearsParticipated } = useSuspenseQuery(
+  const socials = socialsQuery.data ?? [];
+  const yearsParticipatedQuery = useQuery(
     getTeamYearsParticipatedOptions({ path: { team_key: teamKey } }),
   );
-  const { data: events } = useSuspenseQuery({
+  const yearsParticipated = yearsParticipatedQuery.data ?? [];
+  const eventsQuery = useQuery({
     ...getTeamEventsByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: matches } = useSuspenseQuery({
+  const events = useMemo(() => eventsQuery.data ?? [], [eventsQuery.data]);
+  const matchesQuery = useQuery({
     ...getTeamMatchesByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: statuses } = useSuspenseQuery({
+  const matches = matchesQuery.data ?? [];
+  const statusesQuery = useQuery({
     ...getTeamEventsStatusesByYearOptions({
       path: { team_key: teamKey, year },
     }),
     staleTime: yearStaleTime,
   });
-  const { data: awards } = useSuspenseQuery({
+  const statuses = statusesQuery.data ?? {};
+  const awardsQuery = useQuery({
     ...getTeamAwardsByYearOptions({ path: { team_key: teamKey, year } }),
     staleTime: yearStaleTime,
   });
-  const { data: districts } = useSuspenseQuery(
+  const awards = awardsQuery.data ?? [];
+  const districtsQuery = useQuery(
     getTeamDistrictsOptions({ path: { team_key: teamKey } }),
   );
+  const districts = districtsQuery.data ?? [];
 
   const currentDistrict = districts.find((d) => d.year === year);
 
@@ -404,7 +417,7 @@ function TeamPage(): React.JSX.Element {
       <TableOfContents tocItems={tocItems} inView={inView}>
         <YearSelector
           currentLabel={String(year)}
-          triggerClassName="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
+          triggerClassName="w-[180px]"
           options={[
             {
               label: 'History',

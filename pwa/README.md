@@ -4,13 +4,12 @@ https://beta.thebluealliance.com/
 
 ## Development
 
-If you don't have `pnpm`, you can install it with
+You may optionally install [mise](https://mise.jdx.dev/), which provisions the exact node and pnpm versions
+this project pins in `pwa/mise.toml`:
 
 ```shellscript
-npm i -g pnpm
+mise install
 ```
-
-or any of their strategies here: https://pnpm.io/installation
 
 Install node deps:
 
@@ -158,10 +157,10 @@ The policy is centralized in `app/lib/queryClient.ts` and applied via `createQue
   resolves it once per navigation and exposes `status`/`currentSeason` on router context for every
   child loader to read. The long `staleTime` means this is a cache read after the first hit.
 - **Live data keeps its own `staleTime`/`refetchInterval`** and is unaffected by the above — e.g.
-  the district champs page (`district.$districtAbbreviation.champs.$year.tsx`) polls on a
-  `refetchInterval` independent of `staleTime`, and Nexus/Firebase-backed queries
-  (`app/lib/nexus.ts`, `app/lib/gameday/useFirebaseWebcasts.ts`) keep their own shorter or
-  `Infinity` values.
+  the district Champs tab (`districtChampsTab.tsx`) polls on a
+  `refetchInterval` independent of `staleTime`, the live Nexus queuing status on the event page
+  (`getEventNexusInfo`) overrides a short 30s `staleTime`, and Firebase-backed queries
+  (`app/lib/gameday/useFirebaseWebcasts.ts`) keep their own `Infinity` values.
 
 The generated `<name>Options()` helpers (from `hey-api`) return plain objects, so overrides
 compose by spreading:
@@ -174,7 +173,7 @@ useSuspenseQuery({
 ```
 
 A few routes still fetch data directly with the generated SDK functions instead of going through
-the `QueryClient` (e.g. `team.$teamNumber.stats.tsx`, `district.$districtAbbreviation.stats.tsx`,
+the `QueryClient` (e.g. `team.$teamNumber.stats.tsx`,
 `district.$districtAbbreviation.{-$year}.tsx`, `district.$districtAbbreviation.insights.tsx`,
 `teams.{-$pgNum}.tsx`). Those routes get no benefit from `staleTime` until they're converted to use
 `ensureQueryData`/`useSuspenseQuery`; that conversion is tracked separately.
@@ -287,23 +286,13 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 
 ## PR Screenshots
 
-PRs that touch `pwa/` files can get before/after screenshots posted as a PR comment (via the `PWA Screenshots` workflow). To request screenshots, add a `## Screenshot Pages` section to your PR description:
-
-```markdown
-## Screenshot Pages
-
-- /match/2024mil_f1m2
-- /team/254/2024 Team 254 Page
-- /gameday
-```
-
-Each line is `- /path` optionally followed by a display name. If no pages are listed, the workflow skips screenshot capture.
-
-> **Note:** Screenshots require the `TBA_API_READ_KEY` secret, which is only available for same-repo branches (not fork PRs). Fork PRs will gracefully skip screenshot capture.
+CI does not post screenshots. PRs that change what a user sees include a Before | After | Diff table the author captures; see [AGENTS.md](AGENTS.md#pr-screenshots) for the rule and the capture scripts.
 
 ## Playwright tests
 
-Playwright (end to end) tests are within `./tests`. Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
+Playwright (end to end) tests are within `./tests` and cover route-level behavior. Keep assertions for a specific route in that route's spec file; `routes.spec.ts` is the exception and provides the exhaustive route smoke-test matrix. Component and unit tests live next to the source file they cover.
+
+Test names with `mobile` in the name will be run on mobile; others will be run on desktop viewports. Note that these are run on the production build, so if you make changes, you should re-build with `pnpm run build`.
 
 ```sh
 # Installs playwright binaries

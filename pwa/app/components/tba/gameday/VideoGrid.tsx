@@ -5,7 +5,7 @@ import { useGameday } from '~/lib/gameday/context';
 import { getLayoutById } from '~/lib/gameday/layouts';
 
 export function VideoGrid() {
-  const { state } = useGameday();
+  const { state, contentById } = useGameday();
 
   const layout = getLayoutById(state.layoutId);
 
@@ -20,37 +20,37 @@ export function VideoGrid() {
     const positionData: Array<{
       position: number;
       gridArea: string;
-      webcastId: string | null;
+      contentId: string | null;
     }> = [];
 
     for (let i = 0; i < layout.numViews; i++) {
       positionData.push({
         position: i,
         gridArea: layout.gridAreas[i],
-        webcastId: state.positionToWebcast[i],
+        contentId: state.positionToContent[i],
       });
     }
 
     // Separate into cells with webcasts and empty cells
     // Use type predicate to narrow webcastId to string (not null)
-    const webcastCells = positionData.filter(
-      (p): p is typeof p & { webcastId: string } => p.webcastId !== null,
+    const contentCells = positionData.filter(
+      (p): p is typeof p & { contentId: string } => p.contentId !== null,
     );
-    const emptyCells = positionData.filter((p) => p.webcastId === null);
+    const emptyCells = positionData.filter((p) => p.contentId === null);
 
     // Sort webcast cells by webcast ID for stable ordering
-    webcastCells.sort((a, b) => a.webcastId.localeCompare(b.webcastId));
+    contentCells.sort((a, b) => a.contentId.localeCompare(b.contentId));
 
     // Render webcast cells first (stable order), then empty cells (by position)
     const result: React.ReactNode[] = [];
 
-    for (const cell of webcastCells) {
-      const webcast = state.webcastsById[cell.webcastId];
+    for (const cell of contentCells) {
+      const content = contentById[cell.contentId];
       result.push(
         <VideoCell
-          key={cell.webcastId}
+          key={cell.contentId}
           position={cell.position}
-          webcast={webcast}
+          content={content ?? null}
           gridArea={cell.gridArea}
         />,
       );
@@ -61,14 +61,14 @@ export function VideoGrid() {
         <VideoCell
           key={`empty-${cell.position}`}
           position={cell.position}
-          webcast={null}
+          content={null}
           gridArea={cell.gridArea}
         />,
       );
     }
 
     return result;
-  }, [layout, state.positionToWebcast, state.webcastsById]);
+  }, [contentById, layout, state.positionToContent]);
 
   if (!layout) return null;
 

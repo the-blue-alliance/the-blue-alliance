@@ -12,10 +12,21 @@ if (!isProd) {
 
 Sentry.init({
   dsn: 'https://1420d805bff3f6f12a13817725266abd@o4507688293695488.ingest.us.sentry.io/4507745278492672',
-  sendDefaultPii: false,
-  enableLogs: true,
-  enableMetrics: true,
-  tracesSampleRate: 1.0,
+  dataCollection: {
+    userInfo: false,
+    cookies: false,
+    httpHeaders: {
+      request: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+      response: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+    },
+    httpBodies: [],
+    urlQueryParams: { deny: ['forwarded', '-ip', 'remote-', 'via', '-user'] },
+    genAI: { inputs: false, outputs: false },
+    databaseQueryData: false,
+    queues: false,
+    graphQL: { document: false, variables: false },
+  },
+  tracesSampleRate: 0.05,
 });
 
 const app = express();
@@ -51,7 +62,11 @@ app.use(
 // Everything else is cached for 24 hours.
 app.use(express.static('build/client', { maxAge: '24h' }));
 
-app.use(morgan('tiny'));
+// App Engine already emits a request log for every request; morgan would
+// duplicate it into stdout at our own expense.
+if (process.env.NODE_ENV !== 'production') {
+  app.use(morgan('tiny'));
+}
 
 // handle SSR requests
 const { default: handler } = await import('./build/server/server.js');
@@ -61,9 +76,6 @@ const nodeHandler = toNodeHandler((request) => handler.fetch(request)) as (
 ) => Promise<void>;
 
 app.use(async (req, res, next) => {
-  // Enable JavaScript profiling for Sentry browser profiling
-  res.setHeader('Document-Policy', 'js-profiling');
-
   try {
     await nodeHandler(req, res);
   } catch (error) {

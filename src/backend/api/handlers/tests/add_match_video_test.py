@@ -266,3 +266,56 @@ def test_delete_malformed_match_id(ndb_stub, api_client: Client) -> None:
 
     # make sure the valid match is unchanged
     assert none_throws(Match.get_by_id("2014casj_sf1m1")).youtube_videos == []
+
+
+def test_set_video_with_start_time(
+    ndb_stub, api_client: Client, taskqueue_stub
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    setup_matches()
+
+    request_body = json.dumps({"qm1": "aFZy8iibMD0?t=90"})
+
+    response = api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    assert set(none_throws(Match.get_by_id("2014casj_qm1")).youtube_videos) == {
+        "abcdef",
+        "aFZy8iibMD0?t=90",
+    }
+
+
+def test_delete_video_with_start_time(
+    ndb_stub, api_client: Client, taskqueue_stub
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.MATCH_VIDEO])
+    Match(
+        id="2014casj_qm1",
+        alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level=CompLevel.QM,
+        event=ndb.Key(Event, "2014casj"),
+        year=2014,
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc69", "frc571", "frc176", "frc3464", "frc20", "frc1073"],
+        youtube_videos=["aFZy8iibMD0?t=90", "RpSgUrsghv4"],
+    ).put()
+
+    request_body = json.dumps({"qm1": "aFZy8iibMD0?t=90"})
+
+    response = api_client.delete(
+        DELETE_REQUEST_PATH,
+        headers=get_auth_headers(DELETE_REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    assert response.status_code == 200
+
+    assert none_throws(
+        Match.get_by_id("2014casj_qm1", use_cache=False)
+    ).youtube_videos == ["RpSgUrsghv4"]
