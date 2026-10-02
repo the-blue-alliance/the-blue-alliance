@@ -3,18 +3,30 @@ import type { DefaultError, UseMutationOptions } from '@tanstack/react-query';
 
 import {
   type Options,
+  addApiReadKey,
+  deleteApiReadKey,
+  listApiKeys,
   listFavorites,
   listSubscriptions,
   setModelPreferences,
+  suggestEventMedia,
   suggestTeamMedia,
 } from '../sdk.gen';
 import type {
+  AddApiReadKeyData,
+  AddApiReadKeyResponse2,
+  DeleteApiReadKeyData,
+  DeleteApiReadKeyResponse,
+  ListApiKeysData,
+  ListApiKeysResponse,
   ListFavoritesData,
   ListFavoritesResponse,
   ListSubscriptionsData,
   ListSubscriptionsResponse,
   SetModelPreferencesData,
   SetModelPreferencesResponse,
+  SuggestEventMediaData,
+  SuggestEventMediaResponse,
   SuggestTeamMediaData,
   SuggestTeamMediaResponse,
 } from '../types.gen';
@@ -74,6 +86,33 @@ export const setModelPreferencesMutation = (
 };
 
 /**
+ * Suggest event media
+ */
+export const suggestEventMediaMutation = (
+  options?: Partial<Options<SuggestEventMediaData>>,
+): UseMutationOptions<
+  SuggestEventMediaResponse,
+  DefaultError,
+  Options<SuggestEventMediaData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SuggestEventMediaResponse,
+    DefaultError,
+    Options<SuggestEventMediaData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await suggestEventMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
  * Suggest team media
  */
 export const suggestTeamMediaMutation = (
@@ -117,6 +156,87 @@ export const listSubscriptionsMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await listSubscriptions({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * List API keys
+ */
+export const listApiKeysMutation = (
+  options?: Partial<Options<ListApiKeysData>>,
+): UseMutationOptions<
+  ListApiKeysResponse,
+  DefaultError,
+  Options<ListApiKeysData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    ListApiKeysResponse,
+    DefaultError,
+    Options<ListApiKeysData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await listApiKeys({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Add a read API key
+ */
+export const addApiReadKeyMutation = (
+  options?: Partial<Options<AddApiReadKeyData>>,
+): UseMutationOptions<
+  AddApiReadKeyResponse2,
+  DefaultError,
+  Options<AddApiReadKeyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    AddApiReadKeyResponse2,
+    DefaultError,
+    Options<AddApiReadKeyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await addApiReadKey({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Delete a read API key
+ */
+export const deleteApiReadKeyMutation = (
+  options?: Partial<Options<DeleteApiReadKeyData>>,
+): UseMutationOptions<
+  DeleteApiReadKeyResponse,
+  DefaultError,
+  Options<DeleteApiReadKeyData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    DeleteApiReadKeyResponse,
+    DefaultError,
+    Options<DeleteApiReadKeyData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await deleteApiReadKey({
         ...options,
         ...fnOptions,
         throwOnError: true,

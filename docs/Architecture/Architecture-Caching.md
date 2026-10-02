@@ -1,6 +1,6 @@
-In order to keep costs down, TBA uses multiple [caching](https://en.wikipedia.org/wiki/Cache_(computing)) stragegies. In essence, we duplicate data in a faster or cheaper storage location in order to optimize for performance or costs.
+In order to keep costs down, TBA uses multiple [caching](https://en.wikipedia.org/wiki/Cache_(computing)) strategies. In essence, we duplicate data in a faster or cheaper storage location in order to optimize for performance or costs.
 
-There are a number of layers of caching. Here is an over of each, from lowest to highest level.
+There are a number of layers of caching. Here is an overview of each, from lowest to highest level.
 
 ## NDB Caching
 
@@ -12,11 +12,15 @@ Each HTTP request has its own "context" which is visible to only that request. W
 
 ### Global Memcache
 
-The legacy NDB libray used legacy App Engine's hosted memcache as a layer after the context cache. Memcache is slower than the in-context cache, but still faster than reading from the datastore. The Cloud NDB library connects to a Redis instance running on [Google Cloud Memorystore](https://cloud.google.com/memorystore) and reads/writes to it with similar semantics to the context cache.
+After the context cache, the legacy NDB library uses legacy App Engine's bundled [memcache](https://cloud.google.com/appengine/docs/legacy/standard/python/memcache) as a shared layer. Memcache is slower than the in-context cache, but still faster than reading from the datastore.
 
-This cache is "write through" (which means the NDB library automatically updates data stored when it changes), and therefore does not have an expiration time by default (although we can configure it if we so choose). Redis also has a finite storage capacity and will evict data when the cache is full using a [least recently used](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)) algorithm.
+This is enabled by `app_engine_apis: true` in each service's yaml, which is what makes the bundled `google.appengine.api.memcache` client available. `MemcacheClient` (`src/backend/common/memcache.py`) wraps it.
 
-The main differences is that the global cache is shared between requests, while the context cache is isolated to a single request.
+This cache is "write through" (the NDB library automatically updates stored data when it changes), and therefore does not have an expiration time by default. Memcache has a finite capacity and evicts data under memory pressure using a [least recently used](https://en.wikipedia.org/wiki/Cache_replacement_policies#Least_recently_used_(LRU)) algorithm, so treat every read as a potential miss.
+
+The main difference from the context cache is that the global cache is shared between requests, while the context cache is isolated to a single request.
+
+> **Note:** TBA does *not* use Redis or [Cloud Memorystore](https://cloud.google.com/memorystore). It did briefly during the Python 3 migration, but moved back to bundled memcache in November 2021 (`faf5bb389`, `707e9b7d1`) when it adopted the legacy builtin NDB library. There are no Memorystore instances in the project. If you find a doc or comment referring to Redis, it is out of date.
 
 ## Application Level Query Caching
 
@@ -26,7 +30,13 @@ The results of these queries is highly deterministic and repeatable, so it is a 
 
 We have a special DB model named `CachedQueryResult` that stores the output of other DB queries. We can store both raw models, or JSON structured dictionaries for the API.
 
-These objects do not have an expiration, so they need to manually cleared when the data within changes. This means we need to maintain a mechanism to do so within our application code. This logic is typically handled by the `Manipulator` classes, which contain the abstractions for doing DB writes.
+These objects do not have an expiration, so they need to be manually cleared when the data within changes. This means we need to maintain a mechanism to do so within our application code. This logic is typically handled by the `Manipulator` classes, which contain the abstractions for doing DB writes.
+
+Two things follow from there being no expiry, and both matter:
+
+**Entries are only written on a miss.** `CachedDatabaseQuery` writes a `CachedQueryResult` only when the lookup returned nothing (`src/backend/common/queries/database_query.py`); a cache *hit* returns the stored result without writing. So the model's `updated` field never advances past `created`, and there is no record of when an entry was last *read*. Do not treat age as a proxy for coldness — the oldest entries tend to be queries over long-finished seasons, which are both the most stable and the most expensive to recompute.
+
+**Cache keys are versioned, and bumping a version orphans data.** The key is `{query key}:{CACHE_VERSION}:{DATABASE_QUERY_VERSION}`. Bumping either number changes every affected key, so the previous generation becomes permanently unreachable — it is not deleted, just stranded, and it keeps costing storage. If you bump a version, plan to purge the old generation by key prefix. `/admin/cache` shows the breakdown per version.
 
 ## Flask Page Caching
 
@@ -34,7 +44,9 @@ Compute instance hours are one of the more expensive parts of App Engine, and re
 
 We use the [`flask-caching`](https://flask-caching.readthedocs.io/en/latest/) library to integrate with the `@cached_public` decorator used to annotate views that return public data we can cache.
 
-On successful responses, we write the resulting HTML into Redis (again, running in [Google Cloud Memorystore](https://cloud.google.com/memorystore)). If a pre-cached version of the page is present in the cache at the beginning of the request, we skip processing it and instead return the value fetched from cache.
+On successful responses, we write the resulting HTML into the same App Engine bundled memcache described above, via `MemcacheFlaskResponseCache` (`src/backend/common/flask_cache.py`). If a pre-cached version of the page is present at the beginning of the request, we skip processing it and return the cached value.
+
+> **Careful:** the cache key is the path plus query string — it has **no user component**. Anything user-specific rendered into a `@cached_public` page will be served to every other visitor. That includes CSRF tokens; see #10495 for a bug caused by exactly this.
 
 ## Cloudflare CDN Edge Caching
 

@@ -1,6 +1,31 @@
 var favoriteTeamsCookieName = "tba-favorite-teams";
+var cachedCsrfToken = null;
 
-function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
+function withCsrfToken(success, error) {
+  /*
+  Fetches a CSRF token for the current session and hands it to success().
+  The token cannot be embedded in the page because team/event pages are
+  publicly cached, so every visitor would receive whichever token happened to
+  warm the cache. See /_/account/info.
+  */
+  if (cachedCsrfToken != null) {
+    success(cachedCsrfToken);
+    return;
+  }
+  $.ajax({
+    type: 'GET',
+    dataType: 'json',
+    url: '/_/account/info',
+    timeout: 10000,  // 10s
+    success: function(data, textStatus, xhr) {
+      cachedCsrfToken = data['csrf_token'];
+      success(cachedCsrfToken);
+    },
+    error: error
+  });
+}
+
+function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken, isCsrfRetry) {
   /*
   Updates Favorites locally and on the server and
   updates the page to reflect these changes
@@ -24,12 +49,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
           updateFavoriteTeams(null, null, false);
         },
         error: function(xhr, textStatus, errorThrown) {
-          if (xhr.status == 401) {
-            $('#login-modal').modal('show');
-          } else {
-            $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to add favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
-          }
-          updateFavoriteTeams(null, null, false);
+          handleFavoriteError(xhr, teamKey, 'add', isCsrfRetry);
         }
       });
     } else if (action == 'delete') {
@@ -46,12 +66,7 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
           updateFavoriteTeams(null, null, false);
         },
         error: function(xhr, textStatus, errorThrown) {
-          if (xhr.status == 401) {
-            $('#login-modal').modal('show');
-          } else {
-            $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to delete favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
-          }
-          updateFavoriteTeams(null, null, false);
+          handleFavoriteError(xhr, teamKey, 'delete', isCsrfRetry);
         }
       });
     }
@@ -77,6 +92,32 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken) {
       updatePageFavoriteTeams(storedFavoriteTeams, skipDelay);
     }
   }
+}
+
+function handleFavoriteError(xhr, teamKey, action, isCsrfRetry) {
+  /*
+  Handles a failed favorites POST.
+
+  A CSRF token is only valid for WTF_CSRF_TIME_LIMIT (one hour by default), but
+  cachedCsrfToken lives as long as the page does. A tab left open past that
+  limit would otherwise keep POSTing the same expired token and fail forever,
+  so on a 400 we drop the cached token, fetch a fresh one, and retry once.
+  */
+  if (xhr.status == 401) {
+    $('#login-modal').modal('show');
+  } else if (xhr.status == 400 && !isCsrfRetry) {
+    cachedCsrfToken = null;
+    withCsrfToken(function(csrfToken) {
+      updateFavoriteTeams(teamKey, action, false, csrfToken, true);
+    }, function(xhr, textStatus, errorThrown) {
+      showFavoriteError(action);
+      updateFavoriteTeams(null, null, false);
+    });
+    return;
+  } else {
+    showFavoriteError(action);
+  }
+  updateFavoriteTeams(null, null, false);
 }
 
 function getLocalFavoriteTeams() {
@@ -158,26 +199,34 @@ function updateTeamFABFavoriteTeams(favoriteTeams) {
   });
 }
 
-function setupFavAddClick() {
+function setupFavClick(action, hideSelector) {
   $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
   $(".tba-fab-team").click(function() {
     $(".tba-fab-team").off("click");
-    $(this).find(".not-favorite").hide();
+    $(this).find(hideSelector).hide();
     addSpinner($(this));
 
-    updateFavoriteTeams($(this).attr("data-team"), 'add', false, $(this).attr("data-csrf-token"));
+    var teamKey = $(this).attr("data-team");
+    withCsrfToken(function(csrfToken) {
+      updateFavoriteTeams(teamKey, action, false, csrfToken);
+    }, function(xhr, textStatus, errorThrown) {
+      showFavoriteError(action);
+      updateFavoriteTeams(null, null, false);
+    });
   });
 }
 
-function setupFavDeleteClick() {
-  $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
-  $(".tba-fab-team").click(function() {
-    $(".tba-fab-team").off("click");
-    $(this).find(".favorite").hide();
-    addSpinner($(this));
+function setupFavAddClick() {
+  setupFavClick('add', ".not-favorite");
+}
 
-    updateFavoriteTeams($(this).attr("data-team"), 'delete', false, $(this).attr("data-csrf-token"));
-  });
+function setupFavDeleteClick() {
+  setupFavClick('delete', ".favorite");
+}
+
+function showFavoriteError(action) {
+  var verb = (action == 'delete') ? 'delete' : 'add';
+  $('#fixed-alert-container').append('<div class="alert alert-danger alert-dismissible" role="alert"><button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button><strong>Oops! Failed to ' + verb + ' favorite.</strong><br>Something went wrong on our end. Please try again later.</div>');
 }
 
 function addSpinner(el) {

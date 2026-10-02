@@ -1,7 +1,6 @@
 import { type VariantProps, cva } from 'class-variance-authority';
+import { cn } from 'cn';
 import { type HTMLAttributes } from 'react';
-
-import { cn } from '~/lib/utils';
 
 const badgeVariants = cva(
   `inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs
@@ -14,8 +13,8 @@ const badgeVariants = cva(
         hover:bg-primary/80`,
         secondary: `border-transparent bg-secondary text-secondary-foreground
         hover:bg-secondary/80`,
-        destructive: `text-destructive-foreground border-transparent
-        bg-destructive hover:bg-destructive/80`,
+        destructive: `border-transparent bg-destructive text-white
+        hover:bg-destructive/80`,
         outline: 'text-foreground',
         success: `border-transparent bg-green-500 text-white
         hover:bg-green-500/80`,

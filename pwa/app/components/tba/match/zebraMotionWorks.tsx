@@ -234,8 +234,8 @@ export default function ZebraMotionWorks({ zebra }: { zebra: Zebra }) {
           value={[frameIndex]}
           max={Math.max(totalFrames - 1, 1)}
           step={1}
-          onValueChange={([value]) => {
-            setFrameIndex(value);
+          onValueChange={(value) => {
+            setFrameIndex(Array.isArray(value) ? value[0] : value);
             if (isPlaying) {
               setIsPlaying(false);
             }

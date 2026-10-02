@@ -1,6 +1,6 @@
-import json
 from typing import cast, Dict, List, Optional, Set
 
+import orjson
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -83,14 +83,14 @@ class Media(CachedModel):
     def details(self) -> Optional[Dict]:
         # TODO add better typing
         if self._details is None and self.details_json is not None:
-            self._details = json.loads(self.details_json)
+            self._details = orjson.loads(self.details_json)
         return self._details
 
     @property
     def private_details(self) -> Optional[Dict]:
         # TODO add better typing
         if self._private_details is None and self.private_details_json is not None:
-            self._private_details = json.loads(self.private_details_json)
+            self._private_details = orjson.loads(self.private_details_json)
         return self._private_details
 
     @classmethod
@@ -185,6 +185,8 @@ class Media(CachedModel):
             return self.instagram_url
         elif self.media_type_enum == MediaType.CD_THREAD:
             return "https://www.chiefdelphi.com/t/{}".format(self.foreign_key)
+        elif self.media_type_enum in {MediaType.SMUGMUG_PHOTO, MediaType.SMUGMUG_ALBUM}:
+            return none_throws(self.details)["web_uri"]
         else:
             return ""
 
@@ -205,6 +207,10 @@ class Media(CachedModel):
             )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
+        elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
+            return none_throws(self.details)["image_url"]
+        elif self.media_type_enum == MediaType.SMUGMUG_ALBUM:
+            return none_throws(self.details)["cover_url"]
         else:
             return ""
 
@@ -240,6 +246,10 @@ class Media(CachedModel):
             return none_throws(self.details)["model_image"]
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
+        elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
+            return none_throws(self.details)["image_url_med"]
+        elif self.media_type_enum == MediaType.SMUGMUG_ALBUM:
+            return none_throws(self.details)["cover_url_med"]
         else:
             return ""
 
@@ -259,12 +269,16 @@ class Media(CachedModel):
             )
         elif self.media_type_enum == MediaType.INSTAGRAM_IMAGE:
             return self.instagram_url
+        elif self.media_type_enum == MediaType.SMUGMUG_PHOTO:
+            return none_throws(self.details)["image_url_sm"]
+        elif self.media_type_enum == MediaType.SMUGMUG_ALBUM:
+            return none_throws(self.details)["cover_url_sm"]
         else:
             return ""
 
     @property
     def avatar_base64_image(self) -> str:
-        image = json.loads(self.details_json)
+        image = orjson.loads(self.details_json)
         return image["base64Image"]
 
     @property

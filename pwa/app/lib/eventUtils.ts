@@ -3,6 +3,7 @@ import { Temporal } from 'temporal-polyfill';
 
 import { Event, EventType } from '~/api/tba/read';
 import { CMP_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
+import { buildPublicCacheControlHeaders, slugify } from '~/lib/utils';
 
 /** IANA timezone used when an event has no timezone field. */
 export const EVENT_FALLBACK_TIMEZONE = 'America/New_York';
@@ -153,6 +154,112 @@ export function getEventWeekString(event: Event) {
     default:
       return `Week ${event.week + 1}`;
   }
+}
+
+export interface EventGroup {
+  groupName: string;
+  slug: string;
+  events: Event[];
+  isOfficial: boolean;
+}
+
+function earliestStartDate(group: EventGroup): Temporal.PlainDate {
+  return group.events
+    .map((event) => Temporal.PlainDate.from(event.start_date))
+    .reduce((min, date) =>
+      Temporal.PlainDate.compare(date, min) < 0 ? date : min,
+    );
+}
+
+/**
+ * Groups events into the labeled sections shown on the events list page.
+ * Official sections are ordered by earliest event start date, not week
+ * number, so Championship stays chronological even when district weeks are
+ * delayed past it (e.g. the 2026 Israel districts in weeks 17–19).
+ */
+export function groupEventsBySections(events: Event[]): EventGroup[] {
+  const eventsByWeek = new Map<string, EventGroup>();
+  const eventsByChampionship = new Map<string, EventGroup>();
+  const unofficialEventsByMonth = new Map<string, EventGroup>();
+  const FOCEvents: EventGroup = {
+    groupName: 'FIRST Festival of Champions',
+    slug: 'foc',
+    events: [],
+    isOfficial: true,
+  };
+  events.forEach((event) => {
+    // Events by week
+    const weekStr = getEventWeekString(event);
+    if (weekStr != null) {
+      const weekGroup = eventsByWeek.get(weekStr);
+      if (weekGroup) {
+        weekGroup.events.push(event);
+      } else {
+        eventsByWeek.set(weekStr, {
+          groupName: weekStr,
+          slug: slugify(weekStr),
+          events: [event],
+          isOfficial: true,
+        });
+      }
+    }
+
+    // Events by Championship
+    if (CMP_EVENT_TYPES.has(event.event_type)) {
+      const groupName =
+        event.year >= 2017 && event.year <= 2020
+          ? `FIRST Championship - ${event.city}`
+          : 'FIRST Championship';
+      const championshipGroup = eventsByChampionship.get(groupName);
+      if (championshipGroup) {
+        championshipGroup.events.push(event);
+      } else {
+        eventsByChampionship.set(groupName, {
+          groupName,
+          slug: slugify(groupName),
+          events: [event],
+          isOfficial: true,
+        });
+      }
+    }
+
+    // FOC
+    if (event.event_type === EventType.FOC) {
+      FOCEvents.events.push(event);
+    }
+
+    // Group unofficial events by month
+    if (
+      event.event_type == EventType.PRESEASON ||
+      event.event_type == EventType.OFFSEASON
+    ) {
+      const monthName = Temporal.PlainDate.from(
+        event.start_date,
+      ).toLocaleString('default', { month: 'long' });
+      const offseasonGroup = unofficialEventsByMonth.get(monthName);
+      if (offseasonGroup) {
+        offseasonGroup.events.push(event);
+      } else {
+        unofficialEventsByMonth.set(monthName, {
+          groupName: monthName,
+          slug: slugify(monthName),
+          events: [event],
+          isOfficial: false,
+        });
+      }
+    }
+  });
+
+  const officialGroups = Array.from(eventsByWeek.values()).concat(
+    Array.from(eventsByChampionship.values()),
+  );
+  if (FOCEvents.events.length > 0) {
+    officialGroups.push(FOCEvents);
+  }
+  officialGroups.sort((a, b) =>
+    Temporal.PlainDate.compare(earliestStartDate(a), earliestStartDate(b)),
+  );
+  return officialGroups.concat(Array.from(unofficialEventsByMonth.values()));
 }
 
 // Minimum overlap (in seconds) between an event's active window and the
@@ -367,4 +474,83 @@ export function hasEventEnded(event: Event): boolean {
   const userTz = Temporal.Now.timeZoneId();
   const todayInUserTz = Temporal.Now.plainDateISO(userTz);
   return Temporal.PlainDate.compare(endDate, todayInUserTz) <= 0;
+}
+
+export const EVENT_SSR_TTL_SECONDS = {
+  PAST_SEASON: 24 * 60 * 60,
+  STABLE: 60 * 60,
+  LIVE: 60,
+} as const;
+
+const SSR_STABLE_AFTER_END = Temporal.Duration.from({ hours: 24 * 7 });
+const SSR_STABLE_BEFORE_START = Temporal.Duration.from({ hours: 24 * 3 });
+
+export function eventSsrTtlSeconds(event: Event): number {
+  if (event.year < Temporal.Now.plainDateISO().year) {
+    return EVENT_SSR_TTL_SECONDS.PAST_SEASON;
+  }
+
+  if (!event.start_date || !event.end_date) {
+    return EVENT_SSR_TTL_SECONDS.LIVE;
+  }
+
+  const now = Temporal.Now.instant();
+  const { start, end } = getEventActiveWindow(event);
+  const endedLongAgo =
+    Temporal.Instant.compare(now, end.add(SSR_STABLE_AFTER_END)) > 0;
+  const startsFarOut =
+    Temporal.Instant.compare(start.subtract(SSR_STABLE_BEFORE_START), now) > 0;
+
+  return endedLongAgo || startsFarOut
+    ? EVENT_SSR_TTL_SECONDS.STABLE
+    : EVENT_SSR_TTL_SECONDS.LIVE;
+}
+
+export function eventCacheControlHeaders(
+  event: Event | undefined,
+): Record<string, string> {
+  return buildPublicCacheControlHeaders(
+    event ? eventSsrTtlSeconds(event) : EVENT_SSR_TTL_SECONDS.LIVE,
+  );
+}
+
+// Mirrors SHORT_TYPE_NAMES in backend/common/consts/event_type.py
+const SHORT_TYPE_NAMES: Partial<Record<EventType, string>> = {
+  [EventType.REGIONAL]: 'Regional',
+  [EventType.DISTRICT]: 'District',
+  [EventType.DISTRICT_CMP_DIVISION]: 'District Championship Division',
+  [EventType.DISTRICT_CMP]: 'District Championship',
+  [EventType.CMP_DIVISION]: 'Division',
+  [EventType.CMP_FINALS]: 'Championship',
+  [EventType.FOC]: 'FoC',
+  [EventType.OFFSEASON]: 'Offseason',
+  [EventType.PRESEASON]: 'Preseason',
+  [EventType.REMOTE]: 'Remote',
+  [EventType.UNLABLED]: '--',
+};
+
+/**
+ * The short, banner-friendly event name the Jinja site uses (Event.normalized_name):
+ * "NEDC - Newsom District Championship Division" rather than
+ * "New England FIRST District Championship - Newsom Division presented by GE Aerospace".
+ */
+export function getEventNormalizedName(
+  event: Pick<Event, 'event_type' | 'year' | 'city' | 'short_name' | 'name'>,
+): string {
+  if (event.event_type === EventType.CMP_FINALS) {
+    return event.year >= 2017 && event.city
+      ? `${event.city} Championship`
+      : 'Championship';
+  }
+  if (event.short_name && event.event_type !== EventType.FOC) {
+    if (event.event_type === EventType.OFFSEASON) {
+      return event.short_name;
+    }
+    const suffix = SHORT_TYPE_NAMES[event.event_type];
+    if (!suffix || event.short_name.trim().endsWith(suffix)) {
+      return event.short_name;
+    }
+    return `${event.short_name} ${suffix}`;
+  }
+  return event.name;
 }

@@ -1,4 +1,5 @@
 import { useRouter } from '@tanstack/react-router';
+import { cn } from 'cn';
 import {
   createContext,
   startTransition,
@@ -23,7 +24,6 @@ import {
   TableOfContentsLink,
   TableOfContentsList,
 } from '~/components/ui/toc';
-import { cn } from '~/lib/utils';
 
 const TOCRendererContext = createContext<{
   content: React.ReactNode;
@@ -137,14 +137,16 @@ export function TableOfContents({
               open={mobilePopoverOpen}
               onOpenChange={setMobilePopoverOpen}
             >
-              <PopoverTrigger asChild>
-                <Button
-                  variant="ghost"
-                  className="h-8 gap-1.5 px-2 text-foreground"
-                >
-                  <TableOfContentsIcon className="size-5" />
-                  <span className="text-sm">{activeItem?.label}</span>
-                </Button>
+              <PopoverTrigger
+                render={
+                  <Button
+                    variant="ghost"
+                    className="h-8 gap-1.5 px-2 text-foreground"
+                  />
+                }
+              >
+                <TableOfContentsIcon className="size-5" />
+                <span className="text-sm">{activeItem?.label}</span>
               </PopoverTrigger>
               <PopoverContent
                 side="top"

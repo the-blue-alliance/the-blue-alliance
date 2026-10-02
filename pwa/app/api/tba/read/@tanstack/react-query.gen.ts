@@ -28,7 +28,10 @@ import {
   getEventMatches,
   getEventMatchesKeys,
   getEventMatchesSimple,
+  getEventMedia,
+  getEventNexusInfo,
   getEventOprs,
+  getEventPlayoffAdvancement,
   getEventPredictions,
   getEventRankings,
   getEventSimple,
@@ -161,9 +164,18 @@ import type {
   GetEventMatchesSimpleData,
   GetEventMatchesSimpleError,
   GetEventMatchesSimpleResponse,
+  GetEventMediaData,
+  GetEventMediaError,
+  GetEventMediaResponse,
+  GetEventNexusInfoData,
+  GetEventNexusInfoError,
+  GetEventNexusInfoResponse,
   GetEventOprsData,
   GetEventOprsError,
   GetEventOprsResponse,
+  GetEventPlayoffAdvancementData,
+  GetEventPlayoffAdvancementError,
+  GetEventPlayoffAdvancementResponse,
   GetEventPredictionsData,
   GetEventPredictionsError,
   GetEventPredictionsResponse,
@@ -473,7 +485,7 @@ export const getDistrictAdvancementQueryKey = (
 ) => createQueryKey('getDistrictAdvancement', options);
 
 /**
- * Gets a list of advancement information per team in a district.
+ * Gets per-team advancement information and the advancement cutoffs for a district.
  */
 export const getDistrictAdvancementOptions = (
   options: Options<GetDistrictAdvancementData>,
@@ -1047,6 +1059,59 @@ export const getEventMatchTimeseriesOptions = (
     queryKey: getEventMatchTimeseriesQueryKey(options),
   });
 
+export const getEventMediaQueryKey = (options: Options<GetEventMediaData>) =>
+  createQueryKey('getEventMedia', options);
+
+/**
+ * Gets a list of media objects associated with this event itself (e.g. SmugMug photo galleries and event videos), as opposed to media belonging to the event's teams.
+ */
+export const getEventMediaOptions = (options: Options<GetEventMediaData>) =>
+  queryOptions<
+    GetEventMediaResponse,
+    GetEventMediaError,
+    GetEventMediaResponse,
+    ReturnType<typeof getEventMediaQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventMedia({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventMediaQueryKey(options),
+  });
+
+export const getEventNexusInfoQueryKey = (
+  options: Options<GetEventNexusInfoData>,
+) => createQueryKey('getEventNexusInfo', options);
+
+/**
+ * Gets live match-queuing info for an event from Nexus (https://frc.nexus/), or `null` if no data is currently available for this event.
+ */
+export const getEventNexusInfoOptions = (
+  options: Options<GetEventNexusInfoData>,
+) =>
+  queryOptions<
+    GetEventNexusInfoResponse,
+    GetEventNexusInfoError,
+    GetEventNexusInfoResponse,
+    ReturnType<typeof getEventNexusInfoQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventNexusInfo({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventNexusInfoQueryKey(options),
+  });
+
 export const getEventOprsQueryKey = (options: Options<GetEventOprsData>) =>
   createQueryKey('getEventOprs', options);
 
@@ -1070,6 +1135,34 @@ export const getEventOprsOptions = (options: Options<GetEventOprsData>) =>
       return data;
     },
     queryKey: getEventOprsQueryKey(options),
+  });
+
+export const getEventPlayoffAdvancementQueryKey = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) => createQueryKey('getEventPlayoffAdvancement', options);
+
+/**
+ * Gets a list of playoff advancement levels for the given Event. For round robin (6-alliance) playoffs the first entry is the Round Robin Semifinals standings; the last entry is the finals bracket. Returns an empty list for events without computed playoff advancement.
+ */
+export const getEventPlayoffAdvancementOptions = (
+  options: Options<GetEventPlayoffAdvancementData>,
+) =>
+  queryOptions<
+    GetEventPlayoffAdvancementResponse,
+    GetEventPlayoffAdvancementError,
+    GetEventPlayoffAdvancementResponse,
+    ReturnType<typeof getEventPlayoffAdvancementQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPlayoffAdvancement({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPlayoffAdvancementQueryKey(options),
   });
 
 export const getEventPredictionsQueryKey = (
@@ -1489,7 +1582,7 @@ export const getInsightsV2YearCategoryQueryKey = (
 ) => createQueryKey('getInsightsV2YearCategory', options);
 
 /**
- * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year filtered by category. Use year=0 for all-time insights. Returns only global (non-district-scoped) insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryOptions = (
   options: Options<GetInsightsV2YearCategoryData>,
@@ -1545,7 +1638,7 @@ export const getInsightsV2YearCategoryDistrictQueryKey = (
 ) => createQueryKey('getInsightsV2YearCategoryDistrict', options);
 
 /**
- * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries.
+ * Gets a list of `InsightV2` objects for the given year, category, and district. Use year=0 for all-time insights. Valid categories: leaderboard, streak, timeseries, game_stats, clubs.
  */
 export const getInsightsV2YearCategoryDistrictOptions = (
   options: Options<GetInsightsV2YearCategoryDistrictData>,

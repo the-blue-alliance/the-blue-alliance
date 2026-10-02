@@ -1,8 +1,11 @@
 name: PWA Preview Build
 
 on:
-  pull_request:
+  pull_request_target:
     types: [labeled, synchronize]
+
+permissions:
+  contents: read
 
 concurrency:
   group: pwa-preview-build-${{ github.event.pull_request.number }}
@@ -25,18 +28,12 @@ jobs:
 
     steps:
       - uses: actions/checkout@v7
-
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v5
         with:
-          version: "10.24.0"
+          ref: ${{ github.event.pull_request.head.sha }}
+          allow-unsafe-pr-checkout: true
 
-      - name: Set up Node
-        uses: actions/setup-node@v6
-        with:
-          node-version: "24"
-          cache: "pnpm"
-          cache-dependency-path: "pwa/pnpm-lock.yaml"
+      - name: Set up PWA toolchain
+        uses: ./.github/actions/setup-pwa
 
       - name: Install Dependencies
         run: pnpm --dir pwa install --frozen-lockfile

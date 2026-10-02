@@ -7,10 +7,30 @@
 @import './colors/alliances.css';
 @import './colors/districts.css';
 @import './colors/frc.css';
+@import './typeset.css';
 
 @layer base {
   a {
     @apply text-blue-800 hover:underline dark:text-blue-400;
+  }
+}
+
+/* Keep TBA's site-wide link color inside typeset prose; typeset's own
+   `.typeset a { color: inherit }` lives in the components layer, which
+   would otherwise beat the rule above. Elements marked `.not-typeset`
+   (e.g. Button-rendered links) are excluded, matching typeset's own
+   opt-out convention. */
+@layer utilities {
+  .typeset
+    :where(a):not(
+      :where(
+        .not-typeset,
+        [data-not-typeset],
+        .not-typeset *,
+        [data-not-typeset] *
+      )
+    ) {
+    @apply text-blue-800 dark:text-blue-400;
   }
 }
 

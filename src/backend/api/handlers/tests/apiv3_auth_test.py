@@ -423,3 +423,55 @@ def test_district_key_does_not_exist(ndb_stub, api_client: Client) -> None:
     )
     assert resp.status_code == 404
     assert resp.json["Error"] == "district key: 2020tx does not exist"
+
+
+def test_auth_key_cache_hit_on_subsequent_read(ndb_stub, api_client: Client) -> None:
+    from backend.api.handlers.decorators import auth_key_cache
+
+    account = Account()
+    account.put()
+    ApiAuthAccess(
+        id="cached_auth_key",
+        description="Test Key Description",
+        auth_types_enum=[AuthType.READ_API],
+        owner=account.key,
+    ).put()
+    Team(id="frc254", team_number=254).put()
+
+    # 1. First request should query Datastore/NDB and populate in-memory cache
+    assert auth_key_cache.get("cached_auth_key") is None
+    resp1 = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "cached_auth_key"}
+    )
+    assert resp1.status_code == 200
+
+    cached = auth_key_cache.get("cached_auth_key")
+    assert cached is not None
+    assert cached.owner_id == account.key.id()
+    assert cached.description == "Test Key Description"
+
+    # 2. Second request should hit in-memory cache without calling ApiAuthAccess.get_by_id
+    with patch.object(
+        ApiAuthAccess,
+        "get_by_id",
+        side_effect=AssertionError("Should not call get_by_id"),
+    ):
+        with api_client.application.test_request_context():  # pyre-ignore[16]
+            resp2 = api_client.get(
+                "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "cached_auth_key"}
+            )
+            assert resp2.status_code == 200
+            assert g.auth_owner_id == account.key.id()
+            assert g.auth_description == "Test Key Description"
+
+
+def test_auth_key_cache_does_not_cache_bad_keys(ndb_stub, api_client: Client) -> None:
+    from backend.api.handlers.decorators import auth_key_cache
+
+    Team(id="frc254", team_number=254).put()
+
+    resp = api_client.get(
+        "/api/v3/team/frc254", headers={"X-TBA-Auth-Key": "invalid_key_123"}
+    )
+    assert resp.status_code == 401
+    assert auth_key_cache.get("invalid_key_123") is None

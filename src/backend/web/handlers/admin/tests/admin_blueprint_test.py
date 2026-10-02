@@ -35,6 +35,17 @@ def test_admin_home_logged_in_admin(web_client: Client, login_gae_admin) -> None
     assert b"Pending Suggestions" in resp.data
 
 
+def test_admin_home_pending_suggestions_links_to_pwa(
+    web_client: Client, login_gae_admin
+) -> None:
+    resp = web_client.get("/admin/", environ_overrides={"GAE_ENV": "standard"})
+    assert resp.status_code == 200
+    assert (
+        b'id="pending-suggestions-link" href="https://beta.thebluealliance.com/suggest/review"'
+        in resp.data
+    )
+
+
 def test_admin_home_shows_pending_suggestions_count(
     web_client: Client, login_gae_admin, ndb_stub
 ) -> None:

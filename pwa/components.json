@@ -1,18 +1,18 @@
 {
   "$schema": "https://ui.shadcn.com/schema.json",
-  "style": "default",
+  "style": "base-vega",
   "rsc": false,
   "tsx": true,
   "tailwind": {
-    "config": "tailwind.config.ts",
     "css": "app/style/tailwind.css",
     "baseColor": "neutral",
     "cssVariables": true,
-    "prefix": ""
+    "prefix": "",
+    "config": "tailwind.config.ts"
   },
   "aliases": {
     "components": "~/components",
-    "utils": "~/lib/utils"
+    "utils": "cn"
   },
   "iconLibrary": "lucide",
   "rtl": false,

@@ -1,16 +1,58 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import * as Sentry from '@sentry/tanstackstart-react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import {
   clearCache,
   createCachedFetch,
+  getCacheEntries,
   getCacheStats,
 } from '~/lib/middleware/network-cache';
 
+const loggerMocks = vi.hoisted(() => ({
+  debug: vi.fn<(bindings: object, message: string) => void>(),
+  warn: vi.fn<(bindings: object, message: string) => void>(),
+  error: vi.fn<(bindings: object, message: string) => void>(),
+}));
+
+vi.mock('@sentry/tanstackstart-react', () => ({
+  metrics: {
+    count: vi.fn<typeof Sentry.metrics.count>(),
+    distribution: vi.fn<typeof Sentry.metrics.distribution>(),
+    gauge: vi.fn<typeof Sentry.metrics.gauge>(),
+  },
+}));
+
+vi.mock('~/lib/logger', () => ({
+  createLogger: () => loggerMocks,
+}));
+
 describe('Network Cache Middleware', () => {
+  let mockedNow: number;
+
   beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    mockedNow = performance.now();
+    vi.spyOn(performance, 'now').mockImplementation(() => mockedNow);
     clearCache();
-    vi.clearAllMocks();
   });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  });
+
+  async function advanceTime(ms: number): Promise<void> {
+    mockedNow += ms;
+    await vi.advanceTimersByTimeAsync(ms);
+  }
+
+  function mockServerEnvironment() {
+    vi.stubGlobal('window', undefined);
+  }
+
+  function mockClientEnvironment() {
+    vi.stubGlobal('window', {});
+  }
 
   it('should create a cached fetch function', () => {
     const cachedFetch = createCachedFetch();
@@ -18,44 +60,36 @@ describe('Network Cache Middleware', () => {
   });
 
   it('should cache GET requests on server side', async () => {
-    // Mock fetch - return fresh Response on each call
-    const mockFetch = vi.fn().mockImplementation(() =>
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
       Promise.resolve(
         new Response(JSON.stringify({ data: 'test' }), {
           status: 200,
-          headers: { 'Content-Type': 'application/json' },
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=61',
+          },
         }),
       ),
     );
-    global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
-
     const url = 'https://api.example.com/data';
 
-    // First request - should hit network
     const response1 = await cachedFetch(url);
     const data1 = await response1.text();
     expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(data1).toBe('{"data":"test"}');
 
-    // Second request - should use cache
     const response2 = await cachedFetch(url);
     const data2 = await response2.text();
-    expect(mockFetch).toHaveBeenCalledTimes(1); // Still 1, not 2
+    expect(mockFetch).toHaveBeenCalledTimes(1);
     expect(data2).toBe('{"data":"test"}');
-
-    // Restore window
-    global.window = originalWindow;
   });
 
   it('should not cache non-GET requests', async () => {
-    const mockFetch = vi.fn().mockImplementation(() =>
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
       Promise.resolve(
         new Response(JSON.stringify({ success: true }), {
           status: 200,
@@ -63,210 +97,746 @@ describe('Network Cache Middleware', () => {
         }),
       ),
     );
-    global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
-
     const url = 'https://api.example.com/data';
 
-    // POST request - should not cache
     await cachedFetch(url, { method: 'POST' });
     await cachedFetch(url, { method: 'POST' });
 
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    // Restore window
-    global.window = originalWindow;
   });
 
-  it('should skip cache on client side', async () => {
+  it('should skip cache on client side and not grow the LRU', async () => {
     const mockFetch = vi
-      .fn()
+      .fn<typeof fetch>()
       .mockImplementation(() =>
         Promise.resolve(new Response('test', { status: 200 })),
       );
-    global.fetch = mockFetch;
+    vi.stubGlobal('fetch', mockFetch);
 
-    // Ensure window is defined (client side)
-    const originalWindow = global.window;
-    if (!global.window) {
-      // @ts-expect-error - mocking window
-      global.window = {};
-    }
+    mockClientEnvironment();
 
     const cachedFetch = createCachedFetch();
-
     const url = 'https://api.example.com/data';
 
     await cachedFetch(url);
     await cachedFetch(url);
 
-    // Should call fetch both times (no caching on client)
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    // Restore window
-    global.window = originalWindow;
+    expect(getCacheStats().size).toBe(0);
   });
 
-  it('should respect global TTL and expire old entries', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockImplementation(() =>
-        Promise.resolve(new Response('test', { status: 200 })),
-      );
-    global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+  it('should respect Cache-Control max-age for TTL', async () => {
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response('cached-body', {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=1',
+          },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/max-age-test';
 
-    const url = 'https://api.example.com/data-ttl-test';
-
-    // First request
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Second request immediately - should use cache
+    // Still within max-age — serve from cache
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Note: We can't easily test TTL expiration without mocking time
-    // The global TTL is 3 hours, which is too long for a unit test
-    // This test verifies caching works, TTL is configured at module level
+    const entries = getCacheEntries();
+    expect(entries).toHaveLength(1);
+    // max-age=1 → ~1000ms remaining (lru-cache may report slightly above)
+    expect(entries[0]?.remainingTTL).toBeGreaterThan(0);
+    expect(entries[0]?.remainingTTL).toBeLessThan(2000);
+  });
 
-    // Restore window
-    global.window = originalWindow;
+  it('should fall back to default TTL when Cache-Control is missing', async () => {
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response('no-cc', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
+
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/no-cache-control';
+
+    await cachedFetch(url);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+    expect(getCacheStats().size).toBe(1);
+
+    // Within the default 61s TTL window — still cached
+    await cachedFetch(url);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    const entries = getCacheEntries();
+    expect(entries).toHaveLength(1);
+    // Default fallback is 61s — longer than a 1s max-age entry
+    expect(entries[0]?.remainingTTL).toBeGreaterThan(1000);
+    expect(entries[0]?.remainingTTL).toBeLessThanOrEqual(62_000);
+  });
+
+  it('should warn when Cache-Control is missing', async () => {
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response('no-cc', {
+          status: 200,
+          headers: { 'Content-Type': 'application/json' },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
+
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/no-cache-control-warning';
+
+    await cachedFetch(url);
+
+    expect(loggerMocks.warn).toHaveBeenCalledWith(
+      { method: 'GET', url },
+      'No usable Cache-Control max-age; falling back to default TTL',
+    );
   });
 
   it('should respect maxEntries limit', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockImplementation((url: string) =>
-        Promise.resolve(new Response(url, { status: 200 })),
-      );
-    global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation((url) =>
+      Promise.resolve(
+        new Response(url instanceof Request ? url.url : String(url), {
+          status: 200,
+          headers: { 'Cache-Control': 'public, max-age=61' },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
 
-    // Make requests to different URLs - should respect default maxEntries
     for (let i = 0; i < 5; i++) {
       await cachedFetch(`https://api.example.com/data/${i}`);
     }
 
     const stats = getCacheStats();
-    // Should have cached all 5 entries (well under default of 500)
     expect(stats.size).toBe(5);
-
-    // Restore window
-    global.window = originalWindow;
   });
 
   it('should clear cache correctly', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockImplementation(() =>
-        Promise.resolve(new Response('test', { status: 200 })),
-      );
-    global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response('test', {
+          status: 200,
+          headers: { 'Cache-Control': 'public, max-age=61' },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
     const url = 'https://api.example.com/data';
 
-    // Add to cache
     await cachedFetch(url);
     expect(getCacheStats().size).toBe(1);
 
-    // Clear cache
     clearCache();
     expect(getCacheStats().size).toBe(0);
 
-    // Next request should hit network
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(2);
+  });
 
-    // Restore window
-    global.window = originalWindow;
+  it('serves a stale entry immediately and revalidates in the background', async () => {
+    let body = 'v1';
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response(body, {
+          status: 200,
+          headers: {
+            'Content-Type': 'application/json',
+            'Cache-Control': 'public, max-age=1',
+          },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
+
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/swr';
+
+    const first = await (await cachedFetch(url)).text();
+    expect(first).toBe('v1');
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+
+    body = 'v2';
+    await advanceTime(1100);
+
+    const stale = await (await cachedFetch(url)).text();
+    expect(stale).toBe('v1');
+    expect(Sentry.metrics.count).toHaveBeenCalledWith(
+      'network.cache.stale',
+      1,
+      expect.anything(),
+    );
+
+    await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+
+    const fresh = await (await cachedFetch(url)).text();
+    expect(fresh).toBe('v2');
   });
 
   it('should only cache successful responses (2xx)', async () => {
     const mockFetch = vi
-      .fn()
+      .fn<typeof fetch>()
       .mockImplementation(() =>
         Promise.resolve(new Response('error', { status: 404 })),
       );
-    global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
     const url = 'https://api.example.com/not-found';
 
-    // First 404 request
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Second request - should not use cache (404 not cached)
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(2);
-
-    // Restore window
-    global.window = originalWindow;
   });
 
   it('should use same cache key regardless of headers', async () => {
-    const mockFetch = vi
-      .fn()
-      .mockImplementation(() =>
-        Promise.resolve(new Response('test', { status: 200 })),
-      );
-    global.fetch = mockFetch;
-
-    // Mock server environment
-    const originalWindow = global.window;
-    // @ts-expect-error - mocking window
-    delete global.window;
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+      Promise.resolve(
+        new Response('test', {
+          status: 200,
+          headers: { 'Cache-Control': 'public, max-age=61' },
+        }),
+      ),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    mockServerEnvironment();
 
     const cachedFetch = createCachedFetch();
     const url = 'https://api.example.com/data';
 
-    // Request with header 1
     await cachedFetch(url, {
       headers: { 'Accept-Language': 'en' },
     });
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Request with different header - should use cache (headers ignored)
     await cachedFetch(url, {
       headers: { 'Accept-Language': 'es' },
     });
     expect(mockFetch).toHaveBeenCalledTimes(1);
 
-    // Request without headers - should use cache
     await cachedFetch(url);
     expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
 
-    // Restore window
-    global.window = originalWindow;
+  describe('hit rate tracking', () => {
+    function mockOkFetch() {
+      const mockFetch = vi.fn<typeof fetch>().mockImplementation(() =>
+        Promise.resolve(
+          new Response('{"data":"test"}', {
+            status: 200,
+            headers: { 'Cache-Control': 'public, max-age=61' },
+          }),
+        ),
+      );
+      vi.stubGlobal('fetch', mockFetch);
+      return mockFetch;
+    }
+
+    it('counts a miss then a hit', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+
+      const stats = getCacheStats();
+      expect(stats.hits).toBe(1);
+      expect(stats.misses).toBe(1);
+      expect(stats.hitRate).toBe(0.5);
+    });
+
+    it('reports a zero hit rate with no traffic', () => {
+      expect(getCacheStats()).toMatchObject({
+        hits: 0,
+        misses: 0,
+        hitRate: 0,
+      });
+    });
+
+    it('computes the hit rate over repeated requests', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      for (let i = 0; i < 4; i++) {
+        await cachedFetch(url);
+      }
+
+      const stats = getCacheStats();
+      expect(stats.hits).toBe(3);
+      expect(stats.misses).toBe(1);
+      expect(stats.hitRate).toBe(0.75);
+    });
+
+    it('does not move counters for non-cacheable methods', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url, { method: 'POST' });
+      await cachedFetch(url, { method: 'POST' });
+
+      expect(getCacheStats()).toMatchObject({ hits: 0, misses: 0 });
+    });
+
+    it('does not move counters on the client side', async () => {
+      mockOkFetch();
+      mockClientEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+
+      expect(getCacheStats()).toMatchObject({ hits: 0, misses: 0 });
+    });
+
+    it('counts a 404 as a miss, never a hit', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(new Response('error', { status: 404 })),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/not-found';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+
+      expect(getCacheStats()).toMatchObject({ hits: 0, misses: 2 });
+    });
+
+    it('resets counters on clearCache', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+      clearCache();
+
+      expect(getCacheStats()).toMatchObject({
+        hits: 0,
+        misses: 0,
+        hitRate: 0,
+      });
+    });
+
+    it('emits Sentry counters only for real server-side cache accesses', async () => {
+      mockOkFetch();
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/data';
+
+      await cachedFetch(url);
+      await cachedFetch(url);
+      await cachedFetch(url, { method: 'POST' });
+
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.miss',
+        1,
+        {
+          attributes: { client_platform: 'pwa' },
+        },
+      );
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.hit',
+        1,
+        {
+          attributes: { client_platform: 'pwa' },
+        },
+      );
+      expect(Sentry.metrics.count).toHaveBeenCalledTimes(2);
+    });
+  });
+
+  describe('ETag revalidation', () => {
+    function respond(
+      body: string,
+      { etag, maxAge = 1 }: { etag?: string; maxAge?: number } = {},
+    ): Response {
+      const headers: Record<string, string> = {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${maxAge}`,
+      };
+      if (etag) {
+        headers.ETag = etag;
+      }
+      return new Response(body, { status: 200, headers });
+    }
+
+    function notModified(headers: Record<string, string> = {}): Response {
+      return {
+        status: 304,
+        ok: false,
+        headers: new Headers(headers),
+        text: () => Promise.resolve(''),
+      } as unknown as Response;
+    }
+
+    it('stores the ETag and sends If-None-Match once stale', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(respond('v1', { etag: '"abc"' })),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/etag';
+
+      await cachedFetch(url);
+      expect(getCacheEntries()[0]?.etag).toBe('"abc"');
+
+      await advanceTime(1100);
+      await cachedFetch(url);
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+
+      const headers = new Headers(mockFetch.mock.calls[1]?.[1]?.headers);
+      expect(headers.get('If-None-Match')).toBe('"abc"');
+    });
+
+    it('serves the cached body and refreshes TTL on a 304', async () => {
+      let isNotModified = false;
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            isNotModified
+              ? notModified({ 'Cache-Control': 'public, max-age=60' })
+              : respond('body-v1', { etag: '"v1"' }),
+          ),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/not-modified';
+
+      await cachedFetch(url);
+      await advanceTime(1100);
+      isNotModified = true;
+
+      const stale = await (await cachedFetch(url)).text();
+      expect(stale).toBe('body-v1');
+
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+      await vi.waitFor(() =>
+        expect(getCacheEntries()[0]?.remainingTTL ?? 0).toBeGreaterThan(30_000),
+      );
+      const revalidated = await (await cachedFetch(url)).text();
+      expect(revalidated).toBe('body-v1');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.revalidate.not_modified',
+        1,
+        expect.anything(),
+      );
+      expect(getCacheStats()).toMatchObject({
+        revalidatedNotModified: 1,
+        revalidatedModified: 0,
+        notModifiedRate: 1,
+      });
+    });
+
+    it('tracks the not-modified rate across mixed revalidations', async () => {
+      let mode: '200' | '304' = '200';
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            mode === '304'
+              ? notModified({ 'Cache-Control': 'public, max-age=1' })
+              : respond('v1', { etag: '"v1"', maxAge: 1 }),
+          ),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/rate';
+
+      await cachedFetch(url);
+
+      await advanceTime(1100);
+      mode = '304';
+      await cachedFetch(url);
+      await vi.waitFor(() =>
+        expect(getCacheStats().revalidatedNotModified).toBe(1),
+      );
+
+      await advanceTime(1100);
+      mode = '200';
+      await cachedFetch(url);
+      await vi.waitFor(() =>
+        expect(getCacheStats().revalidatedModified).toBe(1),
+      );
+
+      expect(getCacheStats().notModifiedRate).toBe(0.5);
+    });
+
+    it('reuses the original freshness window when a 304 omits Cache-Control', async () => {
+      let isNotModified = false;
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            isNotModified
+              ? notModified()
+              : respond('body-v1', { etag: '"v1"', maxAge: 3 }),
+          ),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/no-cc-304';
+
+      await cachedFetch(url);
+      await advanceTime(3100);
+      isNotModified = true;
+      await cachedFetch(url);
+
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+      await vi.waitFor(() =>
+        expect(getCacheEntries()[0]?.remainingTTL ?? 0).toBeGreaterThan(1000),
+      );
+      expect(getCacheEntries()[0]?.remainingTTL).toBeLessThan(4000);
+    });
+
+    it('replaces the body and ETag when revalidation returns a 200', async () => {
+      let second = false;
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(
+            second
+              ? respond('v2', { etag: '"v2"' })
+              : respond('v1', { etag: '"v1"' }),
+          ),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/changed';
+
+      await cachedFetch(url);
+      await advanceTime(1100);
+      second = true;
+      await cachedFetch(url);
+
+      await vi.waitFor(() => expect(getCacheEntries()[0]?.data).toBe('v2'));
+      expect(getCacheEntries()[0]?.etag).toBe('"v2"');
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.revalidate.modified',
+        1,
+        expect.anything(),
+      );
+    });
+
+    it('revalidates unconditionally when no ETag was stored', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() => Promise.resolve(respond('v1')));
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/no-etag';
+
+      await cachedFetch(url);
+      await advanceTime(1100);
+      await cachedFetch(url);
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+
+      const headers = new Headers(mockFetch.mock.calls[1]?.[1]?.headers);
+      expect(headers.get('If-None-Match')).toBeNull();
+    });
+
+    it('treats max-age=0 as stale on the next read', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(() =>
+          Promise.resolve(respond('v1', { etag: '"v1"', maxAge: 0 })),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/no-store';
+
+      await cachedFetch(url);
+      await advanceTime(10);
+      await cachedFetch(url);
+      await vi.waitFor(() => expect(mockFetch).toHaveBeenCalledTimes(2));
+      expect(Sentry.metrics.count).toHaveBeenCalledWith(
+        'network.cache.stale',
+        1,
+        expect.anything(),
+      );
+    });
+
+    it('collapses concurrent cold misses to one origin request', async () => {
+      const mockFetch = vi
+        .fn<typeof fetch>()
+        .mockImplementation(
+          () =>
+            new Promise((resolve) =>
+              setTimeout(() => resolve(respond('shared', { maxAge: 60 })), 50),
+            ),
+        );
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/stampede';
+
+      const responses = Promise.all([cachedFetch(url), cachedFetch(url)]);
+      await advanceTime(50);
+      const [a, b] = await responses;
+
+      expect(mockFetch).toHaveBeenCalledTimes(1);
+      expect(await a.text()).toBe('shared');
+      expect(await b.text()).toBe('shared');
+    });
+
+    it('refetches unconditionally when a 304 arrives with no cached body', async () => {
+      let calls = 0;
+      const mockFetch = vi.fn<typeof fetch>().mockImplementation(() => {
+        calls++;
+        return Promise.resolve(
+          calls === 1 ? notModified() : respond('recovered', { maxAge: 60 }),
+        );
+      });
+      vi.stubGlobal('fetch', mockFetch);
+      mockServerEnvironment();
+
+      const cachedFetch = createCachedFetch();
+      const url = 'https://api.example.com/orphan-304';
+
+      const body = await (await cachedFetch(url)).text();
+      expect(body).toBe('recovered');
+      expect(mockFetch).toHaveBeenCalledTimes(2);
+    });
+  });
+});
+
+describe('Network Cache Middleware in-flight requests', () => {
+  let mockedNow: number;
+
+  beforeEach(() => {
+    vi.useFakeTimers({ toFake: ['setTimeout', 'clearTimeout'] });
+    mockedNow = performance.now();
+    vi.spyOn(performance, 'now').mockImplementation(() => mockedNow);
+    vi.stubGlobal('window', undefined);
+    clearCache();
+  });
+
+  afterEach(() => {
+    vi.runOnlyPendingTimers();
+    vi.useRealTimers();
+  });
+
+  function okResponse(body: string, maxAge: number): Response {
+    return new Response(body, {
+      status: 200,
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': `public, max-age=${maxAge}`,
+      },
+    });
+  }
+
+  it('collapses concurrent misses for one key into a single origin request', async () => {
+    let resolveOrigin: (response: Response) => void = () => undefined;
+    const mockFetch = vi.fn<typeof fetch>().mockImplementation(
+      () =>
+        new Promise<Response>((resolve) => {
+          resolveOrigin = resolve;
+        }),
+    );
+    vi.stubGlobal('fetch', mockFetch);
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/inflight';
+
+    const first = cachedFetch(url);
+    const second = cachedFetch(url);
+    resolveOrigin(okResponse('v1', 60));
+    const bodies = await Promise.all([
+      first.then((r) => r.text()),
+      second.then((r) => r.text()),
+    ]);
+
+    expect(bodies).toEqual(['v1', 'v1']);
+    expect(mockFetch).toHaveBeenCalledTimes(1);
+  });
+
+  it('keeps serving the stale entry when background revalidation fails', async () => {
+    const mockFetch = vi
+      .fn<typeof fetch>()
+      .mockResolvedValueOnce(okResponse('v1', 1))
+      .mockRejectedValueOnce(new Error('origin down'));
+    vi.stubGlobal('fetch', mockFetch);
+    const cachedFetch = createCachedFetch();
+    const url = 'https://api.example.com/swr-failure';
+    await cachedFetch(url);
+    mockedNow += 1100;
+    await vi.advanceTimersByTimeAsync(1100);
+
+    const stale = await (await cachedFetch(url)).text();
+    await vi.waitFor(() => expect(loggerMocks.error).toHaveBeenCalled());
+
+    expect(stale).toBe('v1');
+    expect(loggerMocks.error).toHaveBeenCalledWith(
+      expect.objectContaining({ url }),
+      'Request failed',
+    );
   });
 });

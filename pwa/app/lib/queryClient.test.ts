@@ -1,0 +1,195 @@
+import * as Sentry from '@sentry/tanstackstart-react';
+import { dehydrate, hydrate } from '@tanstack/react-query';
+import { Temporal } from 'temporal-polyfill';
+import { describe, expect, test, vi } from 'vitest';
+
+import { ApiError } from '~/lib/apiError';
+import {
+  STALE_TIME,
+  createQueryClient,
+  staleTimeForYear,
+} from '~/lib/queryClient';
+
+const loggerMocks = vi.hoisted(() => ({
+  error: vi.fn<(bindings: object, message: string) => void>(),
+}));
+
+vi.mock('@sentry/tanstackstart-react', () => ({
+  captureException: vi.fn<typeof Sentry.captureException>(),
+}));
+
+vi.mock('~/lib/logger', () => ({
+  createLogger: () => loggerMocks,
+}));
+
+describe('createQueryClient', () => {
+  test('defaults staleTime to STALE_TIME.DEFAULT', () => {
+    const queryClient = createQueryClient();
+    expect(queryClient.getDefaultOptions().queries?.staleTime).toEqual(
+      STALE_TIME.DEFAULT,
+    );
+  });
+
+  test('STALE_TIME.STATUS is longer than STALE_TIME.HISTORICAL', () => {
+    // /status changes at most a few times a year, so it should be held even
+    // longer than "historical" (immutable past season) data.
+    expect(STALE_TIME.STATUS).toBeGreaterThan(STALE_TIME.HISTORICAL);
+  });
+
+  test('STALE_TIME.SEARCH_INDEX is one day', () => {
+    expect(STALE_TIME.SEARCH_INDEX).toEqual(24 * 60 * 60 * 1000);
+    expect(STALE_TIME.SEARCH_INDEX).toBeGreaterThan(STALE_TIME.STATUS);
+  });
+
+  test('retry predicate skips 4xx ApiErrors', () => {
+    const queryClient = createQueryClient();
+    const retry = queryClient.getDefaultOptions().queries?.retry;
+    expect(typeof retry).toEqual('function');
+    if (typeof retry !== 'function') return;
+
+    expect(retry(0, new ApiError('not found', 404))).toEqual(false);
+    expect(retry(0, new ApiError('server error', 500))).toEqual(true);
+    expect(retry(2, new ApiError('server error', 500))).toEqual(true);
+    expect(retry(3, new ApiError('server error', 500))).toEqual(false);
+    expect(retry(0, new Error('network error'))).toEqual(true);
+  });
+
+  test('onError reports non-404 ApiErrors to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('server error', 500);
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-500'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('server error');
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test('onError reports non-ApiErrors (e.g. network failures) to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new Error('network error');
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-network'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('network error');
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test('onError does not report 404 ApiErrors to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('not found', 404);
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-404'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('not found');
+
+    expect(Sentry.captureException).not.toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test.each([
+    {
+      name: '500 API errors',
+      error: new ApiError('server error', 500),
+      queryKey: ['test-log-error-500'],
+    },
+    {
+      name: 'network errors',
+      error: new Error('network error'),
+      queryKey: ['test-log-error-network'],
+    },
+  ])('onError logs $name', async ({ error, queryKey }) => {
+    const queryClient = createQueryClient();
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey,
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow(error.message);
+
+    expect(loggerMocks.error).toHaveBeenCalledWith(
+      { err: error, queryKey },
+      'Query failed',
+    );
+  });
+
+  test('onError does not log 404 ApiErrors', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('not found', 404);
+    const queryKey = ['test-log-error-404'];
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey,
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('not found');
+
+    expect(loggerMocks.error).not.toHaveBeenCalledWith(
+      { err: error, queryKey },
+      'Query failed',
+    );
+  });
+
+  test('freshly hydrated data is not stale under the default staleTime', () => {
+    // Simulates the SSR -> hydration flow: a loader warms the cache on the
+    // server, the cache is dehydrated into the payload, and a fresh
+    // QueryClient hydrates it on the client. With staleTime: 0 (the old
+    // default), this data would be instantly stale and every
+    // useSuspenseQuery would refetch on mount. With STALE_TIME.DEFAULT set,
+    // it should not be stale immediately after hydration.
+    const serverQueryClient = createQueryClient();
+    const queryKey = ['test-query'];
+    serverQueryClient.setQueryData(queryKey, { hello: 'world' });
+
+    const dehydratedState = dehydrate(serverQueryClient);
+
+    const clientQueryClient = createQueryClient();
+    hydrate(clientQueryClient, dehydratedState);
+
+    const query = clientQueryClient.getQueryCache().find({ queryKey });
+    expect(query).toBeDefined();
+    expect(query?.isStaleByTime(STALE_TIME.DEFAULT)).toEqual(false);
+  });
+});
+
+describe('staleTimeForYear', () => {
+  const currentYear = Temporal.Now.plainDateISO().year;
+
+  test('returns HISTORICAL for a past year', () => {
+    expect(staleTimeForYear(currentYear - 1)).toEqual(STALE_TIME.HISTORICAL);
+    expect(staleTimeForYear(2015)).toEqual(STALE_TIME.HISTORICAL);
+  });
+
+  test('returns DEFAULT for the current year', () => {
+    expect(staleTimeForYear(currentYear)).toEqual(STALE_TIME.DEFAULT);
+  });
+
+  test('returns DEFAULT for a future year', () => {
+    expect(staleTimeForYear(currentYear + 1)).toEqual(STALE_TIME.DEFAULT);
+  });
+});

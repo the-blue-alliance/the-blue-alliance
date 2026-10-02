@@ -20,6 +20,9 @@ export function useFavoriteTeams(): UseFavoriteTeamsResult {
       if (!user) throw new Error('User not authenticated');
       const token = await user.getIdToken();
       const response = await listFavorites({ auth: token });
+      if (response.data === undefined) {
+        throw new Error('Failed to load favorites');
+      }
       return response.data;
     },
     enabled: !!user,
