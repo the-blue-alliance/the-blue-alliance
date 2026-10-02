@@ -28,6 +28,12 @@ describe('search route beforeLoad', () => {
     });
   });
 
+  test('redirects a team number and year query to the team year page', async () => {
+    await expect(beforeLoad('604 2025')).rejects.toMatchObject({
+      options: { to: '/team/604/2025' },
+    });
+  });
+
   test('redirects an event key query to the event page', async () => {
     await expect(beforeLoad('2024casj')).rejects.toMatchObject({
       options: { to: '/event/2024casj' },

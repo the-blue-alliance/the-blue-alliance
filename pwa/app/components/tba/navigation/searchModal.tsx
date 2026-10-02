@@ -26,7 +26,7 @@ import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
 import { STALE_TIME } from '~/lib/queryClient';
 import FuzzysortFilterer, {
-  FilteredSearchIndex,
+  SearchResult,
 } from '~/lib/search/fuzzysortFilterer';
 
 export function SearchModal() {
@@ -44,7 +44,7 @@ export function SearchModal() {
       ? navigator.userAgent.includes('Macintosh')
       : false;
 
-  const searchResults: FilteredSearchIndex | null = useMemo(() => {
+  const searchResults: SearchResult[] | null = useMemo(() => {
     if (!searchIndexQuery.data) {
       return null;
     }
@@ -74,10 +74,7 @@ export function SearchModal() {
   }, []);
 
   const isIndexPending = searchIndexQuery.isPending && !searchIndexQuery.data;
-  const hasNoResults =
-    searchResults !== null &&
-    searchResults.teams.length === 0 &&
-    searchResults.events.length === 0;
+  const hasNoResults = searchResults !== null && searchResults.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -169,62 +166,21 @@ export function SearchModal() {
                 Failed to load search data. Try again later.
               </div>
             )}
-            {searchResults && (
-              <>
-                {[
-                  searchResults.teamsFirst ? 'teams' : 'events',
-                  searchResults.teamsFirst ? 'events' : 'teams',
-                ].map((group) =>
-                  group === 'teams'
-                    ? searchResults.teams.length > 0 && (
-                        <CommandGroup
-                          key="teams"
-                          heading="Teams"
-                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                            **:[[cmdk-group-heading]]:p-3!
-                            **:[[cmdk-group-heading]]:pb-1!"
-                        >
-                          {searchResults.teams.map((team) => (
-                            <SearchItem
-                              key={team.key}
-                              value={team.key}
-                              onSelect={() => {
-                                void navigate({
-                                  to: `/team/${team.key.substring(3)}`,
-                                });
-                                setOpen(false);
-                              }}
-                            >
-                              {team.key.substring(3)} - {team.nickname}
-                            </SearchItem>
-                          ))}
-                        </CommandGroup>
-                      )
-                    : searchResults.events.length > 0 && (
-                        <CommandGroup
-                          key="events"
-                          heading="Events"
-                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                            **:[[cmdk-group-heading]]:p-3!
-                            **:[[cmdk-group-heading]]:pb-1!"
-                        >
-                          {searchResults.events.map((event) => (
-                            <SearchItem
-                              key={event.key}
-                              value={event.key}
-                              onSelect={() => {
-                                void navigate({ to: `/event/${event.key}` });
-                                setOpen(false);
-                              }}
-                            >
-                              {event.key.substring(0, 4)} {event.name} [
-                              {event.key.substring(4)}]
-                            </SearchItem>
-                          ))}
-                        </CommandGroup>
-                      ),
-                )}
-              </>
+            {searchResults && searchResults.length > 0 && (
+              <CommandGroup className="p-0! pt-2!">
+                {searchResults.map((result) => (
+                  <SearchItem
+                    key={result.key}
+                    value={result.key}
+                    onSelect={() => {
+                      void navigate({ to: result.path });
+                      setOpen(false);
+                    }}
+                  >
+                    {result.label}
+                  </SearchItem>
+                ))}
+              </CommandGroup>
             )}
             {hasNoResults && <CommandEmpty>No results found.</CommandEmpty>}
           </CommandList>
