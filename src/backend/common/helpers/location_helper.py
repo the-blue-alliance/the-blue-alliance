@@ -618,7 +618,7 @@ class LocationHelper:
         cache_key = "google_maps_geocode:{}".format(location).encode()
         memcache = MemcacheClient.get()
         results = memcache.get(cache_key)
-        if not results:
+        if results is None:
             if not location:
                 return []
 

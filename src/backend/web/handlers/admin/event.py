@@ -361,7 +361,7 @@ def event_edit_post(event_key: Optional[EventKey] = None) -> Response:
         "rankings_json"
     ):
         event_details = EventDetails(
-            id=event_key,
+            id=key,
             alliance_selections=json.loads(
                 request.form.get("alliance_selections_json", "[]")
             ),

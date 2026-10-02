@@ -476,23 +476,23 @@ export default function ScoreBreakdown2018({
       </ScoreBreakdownRow>
 
       {/* Adjustments */}
-      {(scoreBreakdown.blue.adjustPoints ?? 0) !== 0 &&
-        (scoreBreakdown.red.adjustPoints ?? 0) !== 0 && (
-          <ScoreBreakdownRow
-            blueValue={scoreBreakdown.blue.adjustPoints}
-            redValue={scoreBreakdown.red.adjustPoints}
-          >
-            <ScoreBreakdownAllianceCell color="red" shade="light">
-              {scoreBreakdown.red.adjustPoints}
-            </ScoreBreakdownAllianceCell>
-            <ScoreBreakdownLabelCell shade="light">
-              Adjustments
-            </ScoreBreakdownLabelCell>
-            <ScoreBreakdownAllianceCell color="blue" shade="light">
-              {scoreBreakdown.blue.adjustPoints}
-            </ScoreBreakdownAllianceCell>
-          </ScoreBreakdownRow>
-        )}
+      {((scoreBreakdown.blue.adjustPoints ?? 0) !== 0 ||
+        (scoreBreakdown.red.adjustPoints ?? 0) !== 0) && (
+        <ScoreBreakdownRow
+          blueValue={scoreBreakdown.blue.adjustPoints}
+          redValue={scoreBreakdown.red.adjustPoints}
+        >
+          <ScoreBreakdownAllianceCell color="red" shade="light">
+            {scoreBreakdown.red.adjustPoints}
+          </ScoreBreakdownAllianceCell>
+          <ScoreBreakdownLabelCell shade="light">
+            Adjustments
+          </ScoreBreakdownLabelCell>
+          <ScoreBreakdownAllianceCell color="blue" shade="light">
+            {scoreBreakdown.blue.adjustPoints}
+          </ScoreBreakdownAllianceCell>
+        </ScoreBreakdownRow>
+      )}
 
       {/* Total Score */}
       <ScoreBreakdownRow

@@ -262,6 +262,6 @@ def clear_model_cache(model_type: str, model_key: str) -> Response:
             if not team:
                 abort(404)
             TeamManipulator.clearCache(team)
-            return redirect(url_for("admin.team_detail", team_key=model_key))
+            return redirect(url_for("admin.team_detail", team_number=team.team_number))
 
     return redirect(url_for("admin.admin_home"))

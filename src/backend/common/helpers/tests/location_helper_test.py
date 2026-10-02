@@ -2301,6 +2301,18 @@ def test_get_similarity_matches_acronyms() -> None:
     assert LocationHelper.get_similarity("lhs", "Leland High School") == 1.0
 
 
+def test_geocode_zero_results_are_served_from_cache(
+    requests_mock: Mocker,
+) -> None:
+    """A cached empty geocode result is served without another request."""
+    requests_mock.get(GEOCODE_URL, json={"status": "ZERO_RESULTS", "results": []})
+
+    assert LocationHelper.google_maps_geocode("Nowhere") == []
+    assert LocationHelper.google_maps_geocode("Nowhere") == []
+
+    assert requests_mock.call_count == 1
+
+
 def test_compute_event_location_score_without_formatted_address() -> None:
     """Without a formatted_address the score falls back to name similarity."""
     info = cast(
