@@ -286,19 +286,7 @@ Unfortunately, Iconify wants you to get the icons from their API, but we'd rathe
 
 ## PR Screenshots
 
-PRs that touch `pwa/` files can get before/after screenshots posted as a PR comment (via the `PWA Screenshots` workflow). To request screenshots, add a `## Screenshot Pages` section to your PR description:
-
-```markdown
-## Screenshot Pages
-
-- /match/2024mil_f1m2
-- /team/254/2024 Team 254 Page
-- /gameday
-```
-
-Each line is `- /path` optionally followed by a display name. If no pages are listed, the workflow skips screenshot capture.
-
-> **Note:** Screenshots require the `TBA_API_READ_KEY` secret, which is only available for same-repo branches (not fork PRs). Fork PRs will gracefully skip screenshot capture.
+CI does not post screenshots. PRs that change what a user sees include a Before | After | Diff table the author captures; see [AGENTS.md](AGENTS.md#pr-screenshots) for the rule and the capture scripts.
 
 ## Playwright tests
 

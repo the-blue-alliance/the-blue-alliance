@@ -50,6 +50,27 @@ ops/                    # Build, deploy, and dev scripts
 - Async work via `defer()` to task queues (see docs/common/Queues-and-defer.md)
 - **NEVER** modify data directly without manipulators
 - Configuration via `tba_dev_config.json` for local dev
+- **UI changes SHOULD ship with a before/after screenshot table in the PR description** (see [Pull Requests](#pull-requests))
+
+## Pull Requests
+- **Before/after screenshots are a SHOULD for any change a user can see.** That covers PWA routes and components, Jinja templates, CSS, and email templates. Put a Markdown table in the PR description under `## Screenshots` with **Before**, **After**, and **Diff** columns, one row per affected state (for example empty vs. populated, upcoming vs. finished, light vs. dark mode). A PR without one is incomplete unless the change has no visible effect, and in that case say so in the description.
+- **The Diff column is a pixel diff of the other two**, made with `uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py before.png after.png diff.png`. It paints changed pixels red on a faded copy of the after image and prints the changed percentage; put that percentage in the cell under the image. A diff proves a refactor or dependency bump changed nothing (0.00%) as clearly as it shows what a feature touched, so include it even when before and after look identical.
+- Put the table in the PR body, not in a trailing comment, so it stays with the description as the PR evolves. Update it when the UI changes after review.
+- **The author captures the screenshots, not CI.** CI posts no screenshots; whoever opens the PR (human or agent) captures before and after for the states the change affects. For PWA pages and components, render the component with fixture data on a throwaway route and run `pwa/scripts/screenshot-route.mjs` against the dev server, once on `main` and once on the branch, then diff the pair. The same script captures any local page, including Jinja pages on `http://localhost:8080`. For Jinja pages, render through the Flask test client with a logged-in fixture user. Then commit the PNGs to the `ci-screenshots` branch (`pr-<N>-<what>-{before,after,diff}-*.png`) and reference them as `https://github.com/the-blue-alliance/the-blue-alliance/raw/ci-screenshots/<file>`. Never commit screenshots or throwaway routes to the feature branch.
+- Reviewers should ask for the table when a UI PR lacks it.
+- **Screenshots are for reviewers; tests are what prove production still works.** A screenshot shows what changed, never that nothing broke. Every change still needs tests that would fail if it broke production: unit tests beside the code, Playwright route specs for PWA routes, and the Ops Fullstack Test (`ops/test_ops.sh`), which boots the whole stack in CI.
+
+### Jinja pages that need a login or seeded data
+
+Account, admin, and suggestion-review pages are Jinja pages the dev server can only show after a login, so render them through the Flask test client instead and screenshot the saved HTML against the running dev server's CSS:
+
+1. Have the dev server up (`docker compose up`); it serves the CSS/JS at `http://localhost:8080`.
+2. Render the page with a **throwaway** pytest in `src/backend/web/handlers/tests/`. Use the fixtures the real tests use (`web_client`, `login_user`; set `login_user.permissions` and `login_user.has_permission.return_value = True` for gated pages), seed whatever models the page needs, `GET` it, and write `response.data` to a file after inserting `<base href="http://localhost:8080/">` right after `<head>`. Run it with `make test ARGS='src/backend/web/handlers/tests/<file> -q -s'`, then **delete the file**; it is a tool, not a test. Redact secrets the page renders (API keys, tokens) in the seed data.
+3. Screenshot: `cd pwa && node scripts/screenshot_html.mjs /tmp/after.html /tmp/after.png '[data-testid=...]'`. (The script lives in `pwa/` because Node resolves `@playwright/test` from the script's own directory, not from where you run it.) Pass a selector for an element inside the content you want; the script captures its surrounding content container. Do not target `div.container`, the navbar is one too.
+4. Get the **before** the same way after `git checkout origin/main -- <the templates and handlers you changed>`, then `git checkout HEAD -- <those files>` to restore the branch.
+5. Diff each pair (`uv run --group dev python3 ops/pr_screenshots/diff_screenshots.py /tmp/before.png /tmp/after.png /tmp/diff.png`), publish all three to the `ci-screenshots` branch, and fill the Before | After | Diff table as described above.
+
+Look at every screenshot before posting it: an identical byte size across two supposedly different pages means the locator grabbed the wrong element.
 
 ## Development Setup
 **Recommended**: Use docker compose for the local dev server, and `uv` for Python tooling (tests, linting).

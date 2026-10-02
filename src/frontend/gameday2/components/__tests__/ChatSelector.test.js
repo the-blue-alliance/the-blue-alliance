@@ -1,6 +1,7 @@
 /* @jest-environment jsdom */
 import React from "react";
-import { render, fireEvent } from "@testing-library/react";
+import { render, fireEvent, act } from "@testing-library/react";
+import { format } from "util";
 import ChatSelector from "../ChatSelector";
 
 const chats = [
@@ -21,6 +22,24 @@ const renderSelector = (props = {}) =>
       {...props}
     />
   );
+
+describe("ChatSelector ListItem button prop", () => {
+  // Runs first: React warns about a given unknown DOM attribute only once per module registry.
+  it("does not pass MUI's removed `button` prop through to the DOM", () => {
+    // MUI v7 ListItem has no `button` prop; React warns if it reaches the DOM.
+    const spy = jest.spyOn(console, "error").mockImplementation(() => {});
+    try {
+      const { container } = renderSelector();
+      expect(container.querySelector("[button]")).toBeNull();
+      const buttonWarnings = spy.mock.calls
+        .map((args) => format(...args))
+        .filter((msg) => msg.includes("`button`"));
+      expect(buttonWarnings).toEqual([]);
+    } finally {
+      spy.mockRestore();
+    }
+  });
+});
 
 describe("ChatSelector", () => {
   beforeEach(() => {
@@ -88,5 +107,32 @@ describe("ChatSelector", () => {
     const { container } = renderSelector({ onRequestClose });
     fireEvent.click(container.querySelector("ul"));
     expect(onRequestClose).not.toHaveBeenCalled();
+  });
+
+  it("animates the overlay in to its endStyle and removes it after closing", () => {
+    // The overlay must follow react-transition-group v4's `in`/`onExited` lifecycle.
+    const { container, rerender } = renderSelector();
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    const [overlay, list] = container.firstChild.children;
+    expect(overlay.style.opacity).toBe("1");
+    expect(list.style.opacity).toBe("1");
+    expect(list.style.transform).toBe("translate(0, 0)");
+
+    rerender(
+      <ChatSelector
+        chats={chats}
+        currentChat="svr"
+        defaultChat="firstupdatesnow"
+        setTwitchChat={() => {}}
+        onRequestClose={() => {}}
+        open={false}
+      />
+    );
+    act(() => {
+      jest.advanceTimersByTime(1000);
+    });
+    expect(container.firstChild.children).toHaveLength(0);
   });
 });
