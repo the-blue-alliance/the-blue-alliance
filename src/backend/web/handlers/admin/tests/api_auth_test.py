@@ -109,7 +109,7 @@ def test_api_auth_edit_get(login_gae_admin, web_client: Client) -> None:
     assert 'value="2030-06-30"' in content
     assert 'value="2020nyny"' in content
     assert 'value="2020ne"' in content
-    assert 'value="chan1,chan2"' in content
+    assert 'name="webcast_list_str" value="chan1,chan2"' in content
 
 
 # ---------------------------------------------------------------------------
