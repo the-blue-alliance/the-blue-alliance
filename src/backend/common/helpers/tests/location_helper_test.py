@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import unittest
-from typing import Any, cast, Dict, List, Optional
+from typing import Any, cast, Dict, get_type_hints, List, Optional
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
@@ -2286,6 +2286,13 @@ def test_missing_key_warnings_name_google_secrets(
     for message in warnings:
         assert "google.secrets" in message
         assert "google.api_key" not in message
+
+
+def test_location_info_annotations_match_stored_values() -> None:
+    """LocationInfo annotates types as List[str] and postal_code as str."""
+    hints = get_type_hints(LocationInfo)
+    assert hints["types"] == List[str]
+    assert hints["postal_code"] is str
 
 
 def test_compute_event_location_score_without_formatted_address() -> None:
