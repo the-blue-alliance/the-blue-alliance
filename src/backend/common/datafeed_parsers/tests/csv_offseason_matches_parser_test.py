@@ -85,6 +85,18 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
             matches[0]["team_key_names"], ["frc254", "frc148", "frc217", "frc118"]
         )
 
+    def test_parse_strips_whitespace_from_team_numbers(self) -> None:
+        """Whitespace around a team number is stripped before use."""
+        matches, _ = CSVOffseasonMatchesParser.parse(
+            "qm1,254,1114 ,2056,148,217,118,1,2"
+        )
+        alliances = json.loads(matches[0]["alliances_json"])
+        self.assertEqual(alliances["red"]["teams"], ["frc254", "frc1114", "frc2056"])
+        self.assertEqual(
+            matches[0]["team_key_names"],
+            ["frc254", "frc1114", "frc2056", "frc148", "frc217", "frc118"],
+        )
+
     def test_parse_csv_match_strips_row_in_place(self) -> None:
         row = [" qm1", "254 ", "1114", "2056", "148", "217", "118", "1", "2"]
         CSVOffseasonMatchesParser.parse_csv_match(row)
