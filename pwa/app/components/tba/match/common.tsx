@@ -57,53 +57,13 @@ export function ConditionalBadge({
   );
 }
 
-export function fmtFouls({
-  foulCount,
-  pointsPerFoul,
+/** Formats the fouls an alliance committed as "fouls / tech (or major) fouls". */
+export function fmtFoulsCommitted({
+  fouls,
+  techFouls,
 }: {
-  foulCount: number | undefined;
-  pointsPerFoul: number;
+  fouls: number | undefined;
+  techFouls: number | undefined;
 }): string {
-  const definedFoulCount = foulCount ?? 0;
-
-  return `${definedFoulCount} (+${definedFoulCount * pointsPerFoul})`;
-}
-
-export function FoulDisplay({
-  foulsReceived,
-  pointsPerFoul,
-  techFoulsReceived,
-  pointsPerTechFoul,
-  techOrMajor,
-}: {
-  foulsReceived: number | undefined;
-  pointsPerFoul: number;
-  techFoulsReceived: number | undefined;
-  pointsPerTechFoul: number;
-  techOrMajor: 'tech' | 'major'; // 1992-2024 Tech; 2025+ Major
-}) {
-  return (
-    <div className="flex flex-col items-center gap-1">
-      <div className="flex items-center gap-1">
-        <span className="text-xs opacity-70">Regular:</span>
-        <span>
-          {fmtFouls({
-            foulCount: foulsReceived,
-            pointsPerFoul,
-          })}
-        </span>
-      </div>
-      <div className="flex items-center gap-1">
-        <span className="text-xs opacity-70">
-          {techOrMajor === 'tech' ? 'Tech' : 'Major'}:
-        </span>
-        <span>
-          {fmtFouls({
-            foulCount: techFoulsReceived,
-            pointsPerFoul: pointsPerTechFoul,
-          })}
-        </span>
-      </div>
-    </div>
-  );
+  return `${fouls ?? 0} / ${techFouls ?? 0}`;
 }
