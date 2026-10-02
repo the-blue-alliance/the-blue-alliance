@@ -206,7 +206,10 @@ export default class WebcastSelectionDialog extends React.Component {
       allWebcastItems = allWebcastItems.concat(specialWebcastItems);
     }
     if (webcastItems.length !== 0) {
-      if (specialWebcastItems.length !== 0) {
+      if (
+        specialWebcastItems.length !== 0 ||
+        bluezoneWebcastItems.length !== 0
+      ) {
         allWebcastItems.push(<Divider key="eventWebcastsDivider" />);
       }
       allWebcastItems.push(
