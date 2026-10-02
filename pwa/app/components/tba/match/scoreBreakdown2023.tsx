@@ -34,19 +34,19 @@ export default function ScoreBreakdown2023({
               condition={
                 scoreBreakdown.red.mobilityRobot1 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.red.team_keys[0].substring(3)}
+              teamKey={match.alliances.red.team_keys[0]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.red.mobilityRobot2 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.red.team_keys[1].substring(3)}
+              teamKey={match.alliances.red.team_keys[1]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.red.mobilityRobot3 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.red.team_keys[2].substring(3)}
+              teamKey={match.alliances.red.team_keys[2]}
             />
           </TableCell>
           <TableCell className="bg-neutral-200 dark:bg-neutral-800">
@@ -57,19 +57,19 @@ export default function ScoreBreakdown2023({
               condition={
                 scoreBreakdown.blue.mobilityRobot1 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.blue.team_keys[0].substring(3)}
+              teamKey={match.alliances.blue.team_keys[0]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.blue.mobilityRobot2 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.blue.team_keys[1].substring(3)}
+              teamKey={match.alliances.blue.team_keys[1]}
             />
             <ConditionalCheckmark
               condition={
                 scoreBreakdown.blue.mobilityRobot3 === MobilityRobot2023.YES
               }
-              teamKey={match.alliances.blue.team_keys[2].substring(3)}
+              teamKey={match.alliances.blue.team_keys[2]}
             />
           </TableCell>
         </TableRow>

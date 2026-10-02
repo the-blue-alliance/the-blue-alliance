@@ -17,6 +17,7 @@ function DoubleSlider({
   className,
   min,
   max,
+  minStepsBetweenThumbs,
   step,
   formatLabel,
   value,
@@ -38,6 +39,7 @@ function DoubleSlider({
       min={min}
       max={max}
       step={step}
+      minStepsBetweenValues={minStepsBetweenThumbs}
       value={localValues}
       onValueChange={handleValueChange}
       thumbAlignment="edge"

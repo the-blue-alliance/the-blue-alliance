@@ -10,6 +10,7 @@ import {
 import {
   calculateTeamRecordsFromMatches,
   formatMatchKeyName,
+  formatMatchTime,
   getAllianceMatchResult,
   getMatchScoreWithoutAdjustPoints,
   getTeamMatchResults,
@@ -712,5 +713,33 @@ describe('getMatchScoreWithoutAdjustPoints', () => {
       redScore: 100,
       blueScore: 50,
     });
+  });
+});
+
+describe('formatMatchTime', () => {
+  // 2026-03-07 is a Saturday; New York is on EST (UTC-5) until March 8.
+  const utc = (iso: string) => Date.parse(iso) / 1000;
+  const newYork = { timeZone: 'America/New_York' };
+
+  test.each([
+    ['2026-03-07T14:30:00Z', 'Sat 9:30 AM'],
+    ['2026-03-07T19:05:00Z', 'Sat 2:05 PM'],
+    ['2026-03-07T05:00:00Z', 'Sat 12:00 AM'],
+  ])('formats %s in the given time zone as %s', (iso, expected) => {
+    expect(formatMatchTime(utc(iso), newYork)).toBe(expected);
+  });
+
+  test('omits the weekday when asked', () => {
+    expect(
+      formatMatchTime(utc('2026-03-07T14:30:00Z'), {
+        ...newYork,
+        weekday: false,
+      }),
+    ).toBe('9:30 AM');
+  });
+
+  test("defaults to the viewer's time zone", () => {
+    const nineThirty = new Date(2026, 2, 7, 9, 30).getTime() / 1000;
+    expect(formatMatchTime(nineThirty)).toBe('Sat 9:30 AM');
   });
 });
