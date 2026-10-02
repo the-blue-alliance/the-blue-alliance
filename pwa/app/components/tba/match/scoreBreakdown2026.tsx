@@ -2,6 +2,7 @@ import { Match, MatchScoreBreakdown2026, TowerRobot2026 } from '~/api/tba/read';
 import {
   ConditionalBadge,
   ConditionalRpAchieved,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import {
   ScoreBreakdownAllianceCell,
@@ -474,22 +475,26 @@ export default function ScoreBreakdown2026({
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Fouls / Major Fouls */}
+      {/* Fouls committed by each alliance */}
       <ScoreBreakdownRow>
         <ScoreBreakdownAllianceCell color="red" shade="light">
-          {scoreBreakdown.red.minorFoulCount} /{' '}
-          {scoreBreakdown.red.majorFoulCount}
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.red.minorFoulCount,
+            techFouls: scoreBreakdown.red.majorFoulCount,
+          })}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="light">
-          Fouls / Major Fouls
+          Fouls / Major Fouls Committed
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="light">
-          {scoreBreakdown.blue.minorFoulCount} /{' '}
-          {scoreBreakdown.blue.majorFoulCount}
+          {fmtFoulsCommitted({
+            fouls: scoreBreakdown.blue.minorFoulCount,
+            techFouls: scoreBreakdown.blue.majorFoulCount,
+          })}
         </ScoreBreakdownAllianceCell>
       </ScoreBreakdownRow>
 
-      {/* Foul Points */}
+      {/* Foul Points: points each alliance received from the other's fouls */}
       <ScoreBreakdownRow
         blueValue={scoreBreakdown.blue.foulPoints}
         redValue={scoreBreakdown.red.foulPoints}
@@ -498,7 +503,7 @@ export default function ScoreBreakdown2026({
           {scoreBreakdown.red.foulPoints}
         </ScoreBreakdownAllianceCell>
         <ScoreBreakdownLabelCell shade="dark">
-          Foul Points
+          Foul Points Received
         </ScoreBreakdownLabelCell>
         <ScoreBreakdownAllianceCell color="blue" shade="dark">
           {scoreBreakdown.blue.foulPoints}

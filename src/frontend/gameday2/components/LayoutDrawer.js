@@ -6,6 +6,7 @@ import Drawer from "@mui/material/Drawer";
 import Divider from "@mui/material/Divider";
 import List from "@mui/material/List";
 import ListItem from "@mui/material/ListItem";
+import ListItemButton from "@mui/material/ListItemButton";
 import ListItemText from "@mui/material/ListItemText";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemSecondaryAction from "@mui/material/ListItemSecondaryAction";
@@ -32,13 +33,11 @@ const LayoutDrawer = (props) => {
       const icon = showCheck ? <CheckIcon /> : null;
 
       layouts.push(
-        <ListItem
-          button
-          onClick={() => props.setLayout(layoutNum)}
-          key={i.toString()}
-        >
-          <ListItemIcon>{getLayoutSvgIcon(layoutNum)}</ListItemIcon>
-          <ListItemText primary={NAME_FOR_LAYOUT[layoutNum]} />
+        <ListItem key={i.toString()} disablePadding>
+          <ListItemButton onClick={() => props.setLayout(layoutNum)}>
+            <ListItemIcon>{getLayoutSvgIcon(layoutNum)}</ListItemIcon>
+            <ListItemText primary={NAME_FOR_LAYOUT[layoutNum]} />
+          </ListItemButton>
           <ListItemSecondaryAction>{icon}</ListItemSecondaryAction>
         </ListItem>
       );

@@ -143,7 +143,7 @@ def test_fcm_message_empty(fcm_app):
     assert message.android is None
     assert isinstance(message.apns, messaging.APNSConfig)
     assert message.webpush is None
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_apns_sound(fcm_app):
@@ -167,7 +167,7 @@ def test_fcm_message_apns_sound(fcm_app):
     assert message.apns.payload.aps.sound is not None
     assert not message.apns.payload.aps.content_available
     assert message.webpush is None
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_apns_content_available(fcm_app):
@@ -183,7 +183,7 @@ def test_fcm_message_apns_content_available(fcm_app):
     assert message.apns.payload.aps.sound is None
     assert message.apns.payload.aps.content_available
     assert message.webpush is None
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_platform_config(fcm_app):
@@ -202,7 +202,7 @@ def test_fcm_message_platform_config(fcm_app):
     assert isinstance(message.android, messaging.AndroidConfig)
     assert isinstance(message.apns, messaging.APNSConfig)
     assert isinstance(message.webpush, messaging.WebpushConfig)
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_platform_config_override(fcm_app):
@@ -226,7 +226,7 @@ def test_fcm_message_platform_config_override(fcm_app):
     assert message.apns.headers == {"apns-collapse-id": "ios_collapse_key"}
     assert isinstance(message.webpush, messaging.WebpushConfig)
     assert message.webpush.headers == {"Topic": "collapse_key", "Urgency": "high"}
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_data_payload_default(fcm_app):
@@ -238,7 +238,7 @@ def test_fcm_message_data_payload_default(fcm_app):
     assert message.android is None
     assert isinstance(message.apns, messaging.APNSConfig)
     assert message.webpush is None
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_data_payload(fcm_app):
@@ -257,7 +257,7 @@ def test_fcm_message_data_payload(fcm_app):
     assert message.android is None
     assert isinstance(message.apns, messaging.APNSConfig)
     assert message.webpush is None
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_data_payload_none(fcm_app):
@@ -278,7 +278,7 @@ def test_fcm_message_data_payload_none(fcm_app):
     assert message.android is None
     assert isinstance(message.apns, messaging.APNSConfig)
     assert message.webpush is None
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]
 
 
 def test_fcm_message_notification(fcm_app):
@@ -298,4 +298,4 @@ def test_fcm_message_notification(fcm_app):
     assert message.android is None
     assert isinstance(message.apns, messaging.APNSConfig)
     assert message.webpush is None
-    assert message.tokens == ["abc"]
+    assert message.fids == ["abc"]

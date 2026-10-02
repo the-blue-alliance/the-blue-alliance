@@ -7,7 +7,10 @@ from backend.common.flask_cache import configure_flask_cache
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
-from backend.web.context_processors import render_time_context_processor
+from backend.web.context_processors import (
+    pwa_url_context_processor,
+    render_time_context_processor,
+)
 from backend.web.handlers.account import blueprint as account_blueprint
 from backend.web.handlers.admin.blueprint import admin_routes as admin_blueprint
 from backend.web.handlers.ajax import (
@@ -60,8 +63,8 @@ from backend.web.handlers.static import (
     swag,
     thanks,
 )
-from backend.web.handlers.suggestions.suggestion_review import (
-    blueprint as suggestion_review_blueprint,
+from backend.web.handlers.suggestions.suggestion_review_redirects import (
+    blueprint as suggestion_review_redirects_blueprint,
 )
 from backend.web.handlers.suggestions.suggestion_submission import (
     blueprint as suggestion_blueprint,
@@ -225,7 +228,7 @@ app.register_blueprint(apidocs_blueprint)
 app.register_blueprint(admin_blueprint)
 app.register_blueprint(account_blueprint)
 app.register_blueprint(suggestion_blueprint)
-app.register_blueprint(suggestion_review_blueprint)
+app.register_blueprint(suggestion_review_redirects_blueprint)
 app.register_blueprint(team_admin)
 app.register_blueprint(webcast_mod_blueprint)
 app.register_blueprint(webhooks)
@@ -235,6 +238,7 @@ app.register_error_handler(500, handle_500)
 
 app.context_processor(_user_context_processor)
 app.context_processor(render_time_context_processor)
+app.context_processor(pwa_url_context_processor)
 
 register_template_filters(app)
 maybe_install_local_routes(app, csrf)

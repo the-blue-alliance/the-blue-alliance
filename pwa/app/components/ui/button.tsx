@@ -1,7 +1,6 @@
 import { Button as ButtonPrimitive } from '@base-ui/react/button';
 import { type VariantProps, cva } from 'class-variance-authority';
-
-import { cn } from '~/lib/utils';
+import { cn } from 'cn';
 
 const buttonVariants = cva(
   `inline-flex cursor-pointer items-center justify-center rounded-md text-sm

@@ -1,4 +1,5 @@
 import { Link } from '@tanstack/react-router';
+import { cn } from 'cn';
 
 import CheckIcon from '~icons/lucide/check';
 import ChevronDownIcon from '~icons/lucide/chevron-down';
@@ -9,7 +10,6 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { cn } from '~/lib/utils';
 
 export interface YearSelectorOption {
   label: string;

@@ -344,3 +344,27 @@ def test_rankings_table_game_year_2021_offseason(ndb_context) -> None:
         ],
         [1, "254", "1.00", "2", "3", "4", "1-0-0", 0, 1, "1"],
     ]
+
+
+def test_rankings_table_no_sort_order_info_for_year() -> None:
+    # 2000 predates RANKING_SORT_ORDERS, so there is nothing to render
+    details = EventDetails(
+        id="2000nyny",
+        rankings2=[
+            EventRanking(
+                rank=1,
+                team_key="frc254",
+                record=None,
+                qual_average=None,
+                matches_played=0,
+                dq=0,
+                sort_orders=[],
+            )
+        ],
+    )
+    assert details.renderable_rankings["sort_order_info"] is None
+    assert details.rankings_table is None
+
+
+def test_rankings_table_no_rankings(ndb_context) -> None:
+    assert EventDetails(id="2024test").rankings_table is None

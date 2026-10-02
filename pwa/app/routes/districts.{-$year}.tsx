@@ -2,12 +2,15 @@ import { useQueries, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 import { useMemo } from 'react';
 
+import type { DistrictAdvancementCutoffs } from '~/api/tba/read';
 import {
+  getDistrictAdvancementOptions,
   getDistrictTeamsKeysOptions,
   getDistrictsByYearOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { DistrictLink } from '~/components/tba/links';
 import { YearSelector } from '~/components/tba/yearSelector';
+import { Skeleton } from '~/components/ui/skeleton';
 import {
   Table,
   TableBody,
@@ -71,7 +74,8 @@ export const Route = createFileRoute('/districts/{-$year}')({
     };
   },
   component: DistrictsPage,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function AdvancementCountCell({
   slots,
@@ -91,6 +95,47 @@ function AdvancementCountCell({
       <Tooltip>
         <TooltipTrigger>{slots}</TooltipTrigger>
         <TooltipContent>{percentage}% of teams</TooltipContent>
+      </Tooltip>
+    </TableCell>
+  );
+}
+
+function CutoffCell({
+  original,
+  effective,
+  declines,
+  isLoading,
+}: {
+  original: number | undefined;
+  effective: number | undefined;
+  declines: number | undefined;
+  isLoading: boolean;
+}) {
+  if (isLoading) {
+    return (
+      <TableCell className="text-right">
+        <Skeleton className="ml-auto h-4 w-8" />
+      </TableCell>
+    );
+  }
+
+  if (effective === undefined || effective <= 0) {
+    return <TableCell className="text-right numeric-data">-</TableCell>;
+  }
+
+  if (!original || original === effective || !declines) {
+    return (
+      <TableCell className="text-right numeric-data">{effective}</TableCell>
+    );
+  }
+
+  return (
+    <TableCell className="text-right numeric-data">
+      <Tooltip>
+        <TooltipTrigger>{effective}</TooltipTrigger>
+        <TooltipContent>
+          {original} before {declines} declines
+        </TooltipContent>
       </Tooltip>
     </TableCell>
   );
@@ -120,6 +165,15 @@ function DistrictsPage() {
   });
 
   const teamKeyCounts = teamKeyResults.map((result) => result.data?.length);
+  const teamKeyPending = teamKeyResults.map((result) => result.isPending);
+
+  const teamCountPendingByDistrict = useMemo(() => {
+    const map = new Map<string, boolean>();
+    districts.forEach((district, i) => {
+      map.set(district.key, teamKeyPending[i]);
+    });
+    return map;
+  }, [districts, teamKeyPending]);
 
   const teamCountByDistrict = useMemo(() => {
     const map = new Map<string, number | undefined>();
@@ -128,6 +182,37 @@ function DistrictsPage() {
     });
     return map;
   }, [districts, teamKeyCounts]);
+
+  const advancementResults = useQueries({
+    queries: districts.map((district) => ({
+      ...getDistrictAdvancementOptions({
+        path: { district_key: district.key },
+      }),
+      staleTime: yearStaleTime,
+    })),
+  });
+
+  const cutoffs = advancementResults.map((result) => result.data?.cutoffs);
+  const cutoffsPending = advancementResults.map((result) => result.isPending);
+
+  const cutoffsPendingByDistrict = useMemo(() => {
+    const map = new Map<string, boolean>();
+    districts.forEach((district, i) => {
+      map.set(district.key, cutoffsPending[i]);
+    });
+    return map;
+  }, [districts, cutoffsPending]);
+
+  const cutoffsByDistrict = useMemo(() => {
+    const map = new Map<
+      string,
+      DistrictAdvancementCutoffs | null | undefined
+    >();
+    districts.forEach((district, i) => {
+      map.set(district.key, cutoffs[i]);
+    });
+    return map;
+  }, [districts, cutoffs]);
 
   return (
     <div className="py-8">
@@ -156,7 +241,9 @@ function DistrictsPage() {
             <TableHead>Key</TableHead>
             <TableHead className="text-right">Teams</TableHead>
             <TableHead className="text-right">DCMP Slots</TableHead>
+            <TableHead className="text-right">DCMP Cutoff</TableHead>
             <TableHead className="text-right">CMP Slots</TableHead>
+            <TableHead className="text-right">CMP Cutoff</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
@@ -174,15 +261,35 @@ function DistrictsPage() {
                 {district.abbreviation}
               </TableCell>
               <TableCell className="text-right numeric-data">
-                {teamCountByDistrict.get(district.key) ?? '-'}
+                {teamCountPendingByDistrict.get(district.key) ? (
+                  <Skeleton className="ml-auto h-4 w-8" />
+                ) : (
+                  (teamCountByDistrict.get(district.key) ?? '-')
+                )}
               </TableCell>
               <AdvancementCountCell
                 slots={district.official_advancement_counts.dcmp}
                 teamCount={teamCountByDistrict.get(district.key)}
               />
+              <CutoffCell
+                original={cutoffsByDistrict.get(district.key)?.dcmp_original}
+                effective={cutoffsByDistrict.get(district.key)?.dcmp_effective}
+                declines={
+                  cutoffsByDistrict.get(district.key)?.dcmp_declines.length
+                }
+                isLoading={cutoffsPendingByDistrict.get(district.key) ?? false}
+              />
               <AdvancementCountCell
                 slots={district.official_advancement_counts.cmp}
                 teamCount={teamCountByDistrict.get(district.key)}
+              />
+              <CutoffCell
+                original={cutoffsByDistrict.get(district.key)?.cmp_original}
+                effective={cutoffsByDistrict.get(district.key)?.cmp_effective}
+                declines={
+                  cutoffsByDistrict.get(district.key)?.cmp_declines.length
+                }
+                isLoading={cutoffsPendingByDistrict.get(district.key) ?? false}
               />
             </TableRow>
           ))}

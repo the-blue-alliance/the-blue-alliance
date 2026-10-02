@@ -20,6 +20,8 @@ import type {
   ListSubscriptionsResponses,
   SetModelPreferencesData,
   SetModelPreferencesResponses,
+  SuggestEventMediaData,
+  SuggestEventMediaResponses,
   SuggestTeamMediaData,
   SuggestTeamMediaResponses,
 } from './types.gen';
@@ -71,6 +73,26 @@ export const setModelPreferences = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/model/setPreferences',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Suggest event media
+ */
+export const suggestEventMedia = <ThrowOnError extends boolean = false>(
+  options: Options<SuggestEventMediaData, ThrowOnError>,
+): RequestResult<SuggestEventMediaResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SuggestEventMediaResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/event/media/suggest',
     ...options,
     headers: {
       'Content-Type': 'application/json',

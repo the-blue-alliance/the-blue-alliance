@@ -118,5 +118,5 @@ class CSVOffseasonMatchesParser:
     def parse_elim_match_number_info(cls, string):
         set_number, match_number = string.split("m")
         match_number = int(match_number)
-        set_number = int(set_number[-1])
+        set_number = int(re.sub(r"\D", "", set_number))
         return match_number, set_number

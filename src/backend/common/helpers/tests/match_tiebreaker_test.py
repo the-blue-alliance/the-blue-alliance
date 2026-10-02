@@ -1,4 +1,5 @@
 import json
+from unittest.mock import MagicMock, patch
 
 import pytest
 
@@ -43,3 +44,28 @@ def test_match_not_played() -> None:
         ),
     )
     assert MatchTiebreakers.tiebreak_winner(m) == ""
+
+
+def _sf_match(score_breakdown: dict) -> Match:
+    return Match(
+        comp_level=CompLevel.SF,
+        year=2014,
+        set_number=1,
+        match_number=1,
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=["frc1"], score=10),
+                AllianceColor.BLUE: MatchAlliance(teams=["frc4"], score=10),
+            }
+        ),
+        score_breakdown_json=json.dumps(score_breakdown),
+    )
+
+
+def test_undecidable_tiebreaker() -> None:
+    m = _sf_match({AllianceColor.RED: {}, AllianceColor.BLUE: {}})
+    game = MagicMock()
+    game.finals_can_be_tiebroken.return_value = True
+    game.tiebreak_criteria.return_value = [None, (2, 1)]
+    with patch("backend.common.helpers.match_tiebreakers.get_game", return_value=game):
+        assert MatchTiebreakers.tiebreak_winner(m) == ""

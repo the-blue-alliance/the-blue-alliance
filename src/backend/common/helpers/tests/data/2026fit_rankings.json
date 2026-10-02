@@ -1,0 +1,5625 @@
+[
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txsan",
+        "qual_points": 22,
+        "total": 76
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txwac",
+        "qual_points": 22,
+        "total": 73
+      },
+      {
+        "alliance_points": 48,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2026txcmp2",
+        "qual_points": 66,
+        "total": 204
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 24,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 54
+      }
+    ],
+    "point_total": 407,
+    "rank": 1,
+    "rookie_bonus": 0,
+    "team_key": "frc6369"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txcle",
+        "qual_points": 22,
+        "total": 68
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txfar",
+        "qual_points": 21,
+        "total": 77
+      },
+      {
+        "alliance_points": 48,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2026txcmp2",
+        "qual_points": 60,
+        "total": 198
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 30
+      }
+    ],
+    "point_total": 373,
+    "rank": 2,
+    "rookie_bonus": 0,
+    "team_key": "frc9128"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txcle",
+        "qual_points": 20,
+        "total": 71
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txman",
+        "qual_points": 21,
+        "total": 75
+      },
+      {
+        "alliance_points": 48,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2026txcmp1",
+        "qual_points": 66,
+        "total": 219
+      }
+    ],
+    "point_total": 365,
+    "rank": 3,
+    "rookie_bonus": 0,
+    "team_key": "frc6800"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txcle",
+        "qual_points": 19,
+        "total": 51
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txmca",
+        "qual_points": 22,
+        "total": 78
+      },
+      {
+        "alliance_points": 48,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2026txcmp1",
+        "qual_points": 63,
+        "total": 201
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 30,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 30
+      }
+    ],
+    "point_total": 360,
+    "rank": 4,
+    "rookie_bonus": 0,
+    "team_key": "frc118"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txcle",
+        "qual_points": 21,
+        "total": 61
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txfar",
+        "qual_points": 22,
+        "total": 73
+      },
+      {
+        "alliance_points": 45,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2026txcmp1",
+        "qual_points": 60,
+        "total": 180
+      }
+    ],
+    "point_total": 319,
+    "rank": 5,
+    "rookie_bonus": 5,
+    "team_key": "frc10340"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txbel",
+        "qual_points": 21,
+        "total": 72
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txfor",
+        "qual_points": 22,
+        "total": 63
+      },
+      {
+        "alliance_points": 45,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 39,
+        "event_key": "2026txcmp2",
+        "qual_points": 60,
+        "total": 159
+      }
+    ],
+    "point_total": 294,
+    "rank": 6,
+    "rookie_bonus": 0,
+    "team_key": "frc148"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txwac",
+        "qual_points": 21,
+        "total": 72
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txfar",
+        "qual_points": 20,
+        "total": 55
+      },
+      {
+        "alliance_points": 42,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2026txcmp2",
+        "qual_points": 57,
+        "total": 159
+      }
+    ],
+    "point_total": 286,
+    "rank": 7,
+    "rookie_bonus": 0,
+    "team_key": "frc2848"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txcle",
+        "qual_points": 18,
+        "total": 58
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txcl2",
+        "qual_points": 18,
+        "total": 64
+      },
+      {
+        "alliance_points": 45,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2026txcmp1",
+        "qual_points": 45,
+        "total": 150
+      }
+    ],
+    "point_total": 272,
+    "rank": 8,
+    "rookie_bonus": 0,
+    "team_key": "frc3847"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txbel",
+        "qual_points": 22,
+        "total": 73
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txdri",
+        "qual_points": 22,
+        "total": 78
+      },
+      {
+        "alliance_points": 36,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 54,
+        "total": 105
+      }
+    ],
+    "point_total": 256,
+    "rank": 9,
+    "rookie_bonus": 0,
+    "team_key": "frc2468"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txbel",
+        "qual_points": 18,
+        "total": 56
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txfar",
+        "qual_points": 19,
+        "total": 54
+      },
+      {
+        "alliance_points": 33,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 39,
+        "event_key": "2026txcmp1",
+        "qual_points": 54,
+        "total": 141
+      }
+    ],
+    "point_total": 251,
+    "rank": 10,
+    "rookie_bonus": 0,
+    "team_key": "frc1296"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txfor",
+        "qual_points": 17,
+        "total": 48
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txama",
+        "qual_points": 19,
+        "total": 54
+      },
+      {
+        "alliance_points": 45,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 39,
+        "event_key": "2026txcmp2",
+        "qual_points": 63,
+        "total": 147
+      }
+    ],
+    "point_total": 249,
+    "rank": 11,
+    "rookie_bonus": 0,
+    "team_key": "frc4206"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txsan",
+        "qual_points": 14,
+        "total": 30
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txman",
+        "qual_points": 14,
+        "total": 52
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 90,
+        "event_key": "2026txcmp2",
+        "qual_points": 42,
+        "total": 135
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 30,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 30
+      }
+    ],
+    "point_total": 247,
+    "rank": 12,
+    "rookie_bonus": 0,
+    "team_key": "frc9140"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txbel",
+        "qual_points": 14,
+        "total": 35
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 16,
+        "total": 32
+      },
+      {
+        "alliance_points": 42,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2026txcmp2",
+        "qual_points": 54,
+        "total": 171
+      }
+    ],
+    "point_total": 238,
+    "rank": 13,
+    "rookie_bonus": 0,
+    "team_key": "frc8749"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txbel",
+        "qual_points": 9,
+        "total": 33
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txwac",
+        "qual_points": 16,
+        "total": 51
+      },
+      {
+        "alliance_points": 33,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 39,
+        "event_key": "2026txcmp1",
+        "qual_points": 48,
+        "total": 135
+      }
+    ],
+    "point_total": 224,
+    "rank": 14,
+    "rookie_bonus": 5,
+    "team_key": "frc10014"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txmca",
+        "qual_points": 20,
+        "total": 71
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txman",
+        "qual_points": 19,
+        "total": 51
+      },
+      {
+        "alliance_points": 33,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 21,
+        "event_key": "2026txcmp2",
+        "qual_points": 48,
+        "total": 102
+      }
+    ],
+    "point_total": 224,
+    "rank": 15,
+    "rookie_bonus": 0,
+    "team_key": "frc2583"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txfar",
+        "qual_points": 17,
+        "total": 57
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txama",
+        "qual_points": 22,
+        "total": 73
+      },
+      {
+        "alliance_points": 39,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 39,
+        "total": 93
+      }
+    ],
+    "point_total": 223,
+    "rank": 16,
+    "rookie_bonus": 0,
+    "team_key": "frc6773"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txbel",
+        "qual_points": 18,
+        "total": 51
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txhou",
+        "qual_points": 21,
+        "total": 72
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2026txcmp1",
+        "qual_points": 33,
+        "total": 99
+      }
+    ],
+    "point_total": 222,
+    "rank": 17,
+    "rookie_bonus": 0,
+    "team_key": "frc624"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 15,
+        "total": 33
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txhou",
+        "qual_points": 19,
+        "total": 57
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 60,
+        "event_key": "2026txcmp2",
+        "qual_points": 33,
+        "total": 102
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 24,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 24
+      }
+    ],
+    "point_total": 216,
+    "rank": 18,
+    "rookie_bonus": 0,
+    "team_key": "frc5414"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txmca",
+        "qual_points": 18,
+        "total": 58
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txcl2",
+        "qual_points": 19,
+        "total": 50
+      },
+      {
+        "alliance_points": 27,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 21,
+        "event_key": "2026txcmp1",
+        "qual_points": 42,
+        "total": 105
+      }
+    ],
+    "point_total": 213,
+    "rank": 19,
+    "rookie_bonus": 0,
+    "team_key": "frc5829"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txsan",
+        "qual_points": 21,
+        "total": 72
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txfar",
+        "qual_points": 17,
+        "total": 49
+      },
+      {
+        "alliance_points": 42,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 48,
+        "total": 90
+      }
+    ],
+    "point_total": 211,
+    "rank": 20,
+    "rookie_bonus": 0,
+    "team_key": "frc2582"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txsan",
+        "qual_points": 19,
+        "total": 59
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txman",
+        "qual_points": 18,
+        "total": 45
+      },
+      {
+        "alliance_points": 36,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 54,
+        "total": 105
+      }
+    ],
+    "point_total": 209,
+    "rank": 21,
+    "rookie_bonus": 0,
+    "team_key": "frc5572"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txsan",
+        "qual_points": 20,
+        "total": 55
+      },
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txdri",
+        "qual_points": 21,
+        "total": 72
+      },
+      {
+        "alliance_points": 30,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 51,
+        "total": 81
+      }
+    ],
+    "point_total": 208,
+    "rank": 22,
+    "rookie_bonus": 0,
+    "team_key": "frc3035"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 19,
+        "total": 43
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txwac",
+        "qual_points": 19,
+        "total": 62
+      },
+      {
+        "alliance_points": 39,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 57,
+        "total": 96
+      }
+    ],
+    "point_total": 201,
+    "rank": 23,
+    "rookie_bonus": 0,
+    "team_key": "frc2881"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 16,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txfor",
+        "qual_points": 20,
+        "total": 61
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txfar",
+        "qual_points": 14,
+        "total": 34
+      },
+      {
+        "alliance_points": 36,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 54,
+        "total": 105
+      }
+    ],
+    "point_total": 200,
+    "rank": 24,
+    "rookie_bonus": 0,
+    "team_key": "frc3005"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txcle",
+        "qual_points": 7,
+        "total": 23
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txwac",
+        "qual_points": 14,
+        "total": 41
+      },
+      {
+        "alliance_points": 42,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 60,
+        "total": 102
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 30,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 30
+      }
+    ],
+    "point_total": 196,
+    "rank": 25,
+    "rookie_bonus": 0,
+    "team_key": "frc1477"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txfor",
+        "qual_points": 19,
+        "total": 46
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 15,
+        "total": 25
+      },
+      {
+        "alliance_points": 33,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 21,
+        "event_key": "2026txcmp2",
+        "qual_points": 51,
+        "total": 105
+      }
+    ],
+    "point_total": 176,
+    "rank": 26,
+    "rookie_bonus": 0,
+    "team_key": "frc8858"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 15,
+        "total": 26
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txcl2",
+        "qual_points": 20,
+        "total": 59
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 51,
+        "event_key": "2026txcmp1",
+        "qual_points": 39,
+        "total": 90
+      }
+    ],
+    "point_total": 175,
+    "rank": 27,
+    "rookie_bonus": 0,
+    "team_key": "frc2587"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txmca",
+        "qual_points": 14,
+        "total": 33
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txama",
+        "qual_points": 17,
+        "total": 49
+      },
+      {
+        "alliance_points": 39,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 54,
+        "total": 93
+      }
+    ],
+    "point_total": 175,
+    "rank": 28,
+    "rookie_bonus": 0,
+    "team_key": "frc4063"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 15,
+        "total": 26
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 12,
+        "total": 27
+      },
+      {
+        "alliance_points": 18,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 39,
+        "event_key": "2026txcmp1",
+        "qual_points": 45,
+        "total": 117
+      }
+    ],
+    "point_total": 170,
+    "rank": 29,
+    "rookie_bonus": 0,
+    "team_key": "frc5892"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txcle",
+        "qual_points": 17,
+        "total": 42
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txman",
+        "qual_points": 17,
+        "total": 49
+      },
+      {
+        "alliance_points": 21,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 42,
+        "total": 78
+      }
+    ],
+    "point_total": 169,
+    "rank": 30,
+    "rookie_bonus": 0,
+    "team_key": "frc6377"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 16,
+        "total": 27
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txama",
+        "qual_points": 20,
+        "total": 60
+      },
+      {
+        "alliance_points": 18,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 21,
+        "event_key": "2026txcmp2",
+        "qual_points": 42,
+        "total": 81
+      }
+    ],
+    "point_total": 168,
+    "rank": 31,
+    "rookie_bonus": 0,
+    "team_key": "frc3310"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 9,
+        "total": 20
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txfor",
+        "qual_points": 18,
+        "total": 67
+      },
+      {
+        "alliance_points": 30,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 51,
+        "total": 81
+      }
+    ],
+    "point_total": 168,
+    "rank": 32,
+    "rookie_bonus": 0,
+    "team_key": "frc2728"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txbel",
+        "qual_points": 16,
+        "total": 54
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 13,
+        "total": 30
+      },
+      {
+        "alliance_points": 30,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 39,
+        "total": 84
+      }
+    ],
+    "point_total": 168,
+    "rank": 33,
+    "rookie_bonus": 0,
+    "team_key": "frc9418"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 15,
+        "total": 35
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txman",
+        "qual_points": 16,
+        "total": 54
+      },
+      {
+        "alliance_points": 27,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 48,
+        "total": 75
+      }
+    ],
+    "point_total": 164,
+    "rank": 34,
+    "rookie_bonus": 0,
+    "team_key": "frc418"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 13,
+        "total": 24
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txcl2",
+        "qual_points": 17,
+        "total": 56
+      },
+      {
+        "alliance_points": 24,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 21,
+        "event_key": "2026txcmp1",
+        "qual_points": 36,
+        "total": 81
+      }
+    ],
+    "point_total": 161,
+    "rank": 35,
+    "rookie_bonus": 0,
+    "team_key": "frc324"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 8,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 10,
+        "total": 28
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 16,
+        "total": 34
+      },
+      {
+        "alliance_points": 27,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 21,
+        "event_key": "2026txcmp1",
+        "qual_points": 48,
+        "total": 96
+      }
+    ],
+    "point_total": 158,
+    "rank": 36,
+    "rookie_bonus": 0,
+    "team_key": "frc3481"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txwac",
+        "qual_points": 18,
+        "total": 45
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txfar",
+        "qual_points": 18,
+        "total": 43
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 45,
+        "total": 69
+      }
+    ],
+    "point_total": 157,
+    "rank": 37,
+    "rookie_bonus": 0,
+    "team_key": "frc7506"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txmca",
+        "qual_points": 8,
+        "total": 38
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txcl2",
+        "qual_points": 16,
+        "total": 52
+      },
+      {
+        "alliance_points": 21,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 45,
+        "total": 66
+      }
+    ],
+    "point_total": 156,
+    "rank": 38,
+    "rookie_bonus": 0,
+    "team_key": "frc5427"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 14,
+        "total": 28
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txfor",
+        "qual_points": 15,
+        "total": 64
+      },
+      {
+        "alliance_points": 24,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 39,
+        "total": 63
+      }
+    ],
+    "point_total": 155,
+    "rank": 39,
+    "rookie_bonus": 0,
+    "team_key": "frc2714"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 9,
+        "total": 24
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txfor",
+        "qual_points": 13,
+        "total": 40
+      },
+      {
+        "alliance_points": 39,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 51,
+        "total": 90
+      }
+    ],
+    "point_total": 154,
+    "rank": 40,
+    "rookie_bonus": 0,
+    "team_key": "frc6672"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txmca",
+        "qual_points": 13,
+        "total": 53
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txdri",
+        "qual_points": 18,
+        "total": 43
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 36,
+        "total": 51
+      }
+    ],
+    "point_total": 152,
+    "rank": 41,
+    "rookie_bonus": 5,
+    "team_key": "frc10385"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 15,
+        "total": 31
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txcl2",
+        "qual_points": 21,
+        "total": 48
+      },
+      {
+        "alliance_points": 27,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 45,
+        "total": 72
+      }
+    ],
+    "point_total": 151,
+    "rank": 42,
+    "rookie_bonus": 0,
+    "team_key": "frc8576"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txcle",
+        "qual_points": 16,
+        "total": 41
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 9,
+        "total": 22
+      },
+      {
+        "alliance_points": 36,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 48,
+        "total": 84
+      }
+    ],
+    "point_total": 147,
+    "rank": 43,
+    "rookie_bonus": 0,
+    "team_key": "frc7312"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txmca",
+        "qual_points": 16,
+        "total": 41
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txdri",
+        "qual_points": 17,
+        "total": 42
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 45,
+        "total": 60
+      }
+    ],
+    "point_total": 143,
+    "rank": 44,
+    "rookie_bonus": 0,
+    "team_key": "frc2158"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 5,
+        "event_key": "2026txcle",
+        "qual_points": 17,
+        "total": 36
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txdri",
+        "qual_points": 20,
+        "total": 60
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 27,
+        "total": 42
+      }
+    ],
+    "point_total": 138,
+    "rank": 45,
+    "rookie_bonus": 0,
+    "team_key": "frc4639"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 11,
+        "total": 21
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txdri",
+        "qual_points": 13,
+        "total": 45
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 39,
+        "event_key": "2026txcmp2",
+        "qual_points": 24,
+        "total": 69
+      }
+    ],
+    "point_total": 135,
+    "rank": 46,
+    "rookie_bonus": 0,
+    "team_key": "frc6357"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 12,
+        "total": 23
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 16,
+        "total": 32
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 42,
+        "event_key": "2026txcmp1",
+        "qual_points": 30,
+        "total": 75
+      }
+    ],
+    "point_total": 130,
+    "rank": 47,
+    "rookie_bonus": 0,
+    "team_key": "frc8088"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txbel",
+        "qual_points": 20,
+        "total": 48
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txdri",
+        "qual_points": 19,
+        "total": 46
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 36,
+        "total": 36
+      }
+    ],
+    "point_total": 130,
+    "rank": 48,
+    "rookie_bonus": 0,
+    "team_key": "frc2689"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txfor",
+        "qual_points": 11,
+        "total": 44
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 10,
+        "total": 23
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 30,
+        "total": 57
+      }
+    ],
+    "point_total": 129,
+    "rank": 49,
+    "rookie_bonus": 5,
+    "team_key": "frc10032"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txhou",
+        "qual_points": 20,
+        "total": 53
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 14,
+        "total": 31
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 30,
+        "total": 45
+      }
+    ],
+    "point_total": 129,
+    "rank": 50,
+    "rookie_bonus": 0,
+    "team_key": "frc231"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txhou",
+        "qual_points": 9,
+        "total": 32
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 17,
+        "total": 28
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 33,
+        "total": 33
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 24,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 24
+      }
+    ],
+    "point_total": 127,
+    "rank": 51,
+    "rookie_bonus": 10,
+    "team_key": "frc11242"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 14,
+        "total": 33
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 16,
+        "total": 34
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 33,
+        "total": 60
+      }
+    ],
+    "point_total": 127,
+    "rank": 52,
+    "rookie_bonus": 0,
+    "team_key": "frc4192"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 17,
+        "total": 37
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 13,
+        "total": 13
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 39,
+        "total": 39
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 24,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp",
+        "qual_points": 0,
+        "total": 24
+      }
+    ],
+    "point_total": 123,
+    "rank": 53,
+    "rookie_bonus": 10,
+    "team_key": "frc11178"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txwac",
+        "qual_points": 7,
+        "total": 34
+      },
+      {
+        "alliance_points": 1,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txama",
+        "qual_points": 12,
+        "total": 51
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 27,
+        "total": 27
+      }
+    ],
+    "point_total": 122,
+    "rank": 54,
+    "rookie_bonus": 10,
+    "team_key": "frc10994"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txsan",
+        "qual_points": 19,
+        "total": 51
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 18,
+        "total": 35
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 36,
+        "total": 36
+      }
+    ],
+    "point_total": 122,
+    "rank": 55,
+    "rookie_bonus": 0,
+    "team_key": "frc3735"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txbel",
+        "qual_points": 15,
+        "total": 31
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 12,
+        "total": 23
+      },
+      {
+        "alliance_points": 30,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 36,
+        "total": 66
+      }
+    ],
+    "point_total": 120,
+    "rank": 56,
+    "rookie_bonus": 0,
+    "team_key": "frc9506"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txsan",
+        "qual_points": 12,
+        "total": 51
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txdri",
+        "qual_points": 11,
+        "total": 27
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 30,
+        "total": 30
+      }
+    ],
+    "point_total": 118,
+    "rank": 57,
+    "rookie_bonus": 10,
+    "team_key": "frc11169"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txsan",
+        "qual_points": 18,
+        "total": 50
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 12,
+        "total": 22
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 42,
+        "total": 42
+      }
+    ],
+    "point_total": 114,
+    "rank": 58,
+    "rookie_bonus": 0,
+    "team_key": "frc457"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 14,
+        "total": 29
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txwac",
+        "qual_points": 17,
+        "total": 49
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 36,
+        "total": 36
+      }
+    ],
+    "point_total": 114,
+    "rank": 59,
+    "rookie_bonus": 0,
+    "team_key": "frc7492"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 16,
+        "total": 31
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txdri",
+        "qual_points": 15,
+        "total": 55
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 12,
+        "total": 27
+      }
+    ],
+    "point_total": 113,
+    "rank": 60,
+    "rookie_bonus": 0,
+    "team_key": "frc2687"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txfor",
+        "qual_points": 15,
+        "total": 46
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 14,
+        "total": 31
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 36,
+        "total": 36
+      }
+    ],
+    "point_total": 113,
+    "rank": 61,
+    "rookie_bonus": 0,
+    "team_key": "frc7503"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 14,
+        "event_key": "2026txcle",
+        "qual_points": 13,
+        "total": 32
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 14,
+        "total": 28
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 33,
+        "total": 48
+      }
+    ],
+    "point_total": 108,
+    "rank": 62,
+    "rookie_bonus": 0,
+    "team_key": "frc127"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txwac",
+        "qual_points": 10,
+        "total": 49
+      },
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txama",
+        "qual_points": 11,
+        "total": 33
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 15,
+        "total": 15
+      }
+    ],
+    "point_total": 107,
+    "rank": 63,
+    "rookie_bonus": 10,
+    "team_key": "frc11200"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txhou",
+        "qual_points": 18,
+        "total": 52
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 16,
+        "total": 28
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 27,
+        "total": 27
+      }
+    ],
+    "point_total": 107,
+    "rank": 64,
+    "rookie_bonus": 0,
+    "team_key": "frc1255"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txsan",
+        "qual_points": 16,
+        "total": 36
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 14,
+        "total": 32
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 39,
+        "total": 39
+      }
+    ],
+    "point_total": 107,
+    "rank": 65,
+    "rookie_bonus": 0,
+    "team_key": "frc3679"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txfar",
+        "qual_points": 13,
+        "total": 35
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txama",
+        "qual_points": 8,
+        "total": 29
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 39,
+        "total": 39
+      }
+    ],
+    "point_total": 103,
+    "rank": 66,
+    "rookie_bonus": 0,
+    "team_key": "frc5411"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txcle",
+        "qual_points": 12,
+        "total": 38
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 12,
+        "total": 23
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 42,
+        "total": 42
+      }
+    ],
+    "point_total": 103,
+    "rank": 67,
+    "rookie_bonus": 0,
+    "team_key": "frc5417"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txmca",
+        "qual_points": 12,
+        "total": 35
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txwac",
+        "qual_points": 11,
+        "total": 33
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 33,
+        "total": 33
+      }
+    ],
+    "point_total": 101,
+    "rank": 68,
+    "rookie_bonus": 0,
+    "team_key": "frc4295"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txfar",
+        "qual_points": 11,
+        "total": 47
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txama",
+        "qual_points": 13,
+        "total": 31
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 21,
+        "total": 21
+      }
+    ],
+    "point_total": 99,
+    "rank": 69,
+    "rookie_bonus": 0,
+    "team_key": "frc9492"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 4,
+        "event_key": "2026txsan",
+        "qual_points": 6,
+        "total": 19
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txama",
+        "qual_points": 18,
+        "total": 50
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 15,
+        "total": 30
+      }
+    ],
+    "point_total": 99,
+    "rank": 70,
+    "rookie_bonus": 0,
+    "team_key": "frc9136"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 6,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 13,
+        "total": 24
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 13,
+        "total": 30
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 30,
+        "total": 45
+      }
+    ],
+    "point_total": 99,
+    "rank": 71,
+    "rookie_bonus": 0,
+    "team_key": "frc8114"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txfor",
+        "qual_points": 8,
+        "total": 17
+      },
+      {
+        "alliance_points": 4,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txman",
+        "qual_points": 10,
+        "total": 39
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 39,
+        "total": 39
+      }
+    ],
+    "point_total": 95,
+    "rank": 72,
+    "rookie_bonus": 0,
+    "team_key": "frc6901"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txsan",
+        "qual_points": 17,
+        "total": 42
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 15,
+        "total": 32
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 21,
+        "total": 21
+      }
+    ],
+    "point_total": 95,
+    "rank": 73,
+    "rookie_bonus": 0,
+    "team_key": "frc3561"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txbel",
+        "qual_points": 5,
+        "total": 36
+      },
+      {
+        "alliance_points": 1,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txdri",
+        "qual_points": 6,
+        "total": 37
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 21,
+        "total": 21
+      }
+    ],
+    "point_total": 94,
+    "rank": 74,
+    "rookie_bonus": 0,
+    "team_key": "frc5503"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 15,
+        "total": 27
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 14,
+        "total": 29
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 36,
+        "total": 36
+      }
+    ],
+    "point_total": 92,
+    "rank": 75,
+    "rookie_bonus": 0,
+    "team_key": "frc8507"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 10,
+        "total": 25
+      },
+      {
+        "alliance_points": 1,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txcl2",
+        "qual_points": 12,
+        "total": 43
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 21,
+        "total": 21
+      }
+    ],
+    "point_total": 89,
+    "rank": 76,
+    "rookie_bonus": 0,
+    "team_key": "frc3676"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txcle",
+        "qual_points": 4,
+        "total": 35
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 15,
+        "total": 32
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 21,
+        "total": 21
+      }
+    ],
+    "point_total": 88,
+    "rank": 77,
+    "rookie_bonus": 0,
+    "team_key": "frc8370"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txhou",
+        "qual_points": 12,
+        "total": 51
+      },
+      {
+        "alliance_points": 15,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txcl2",
+        "qual_points": 14,
+        "total": 36
+      }
+    ],
+    "point_total": 87,
+    "rank": 78,
+    "rookie_bonus": 0,
+    "team_key": "frc8515"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 6,
+        "total": 14
+      },
+      {
+        "alliance_points": 1,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txhou",
+        "qual_points": 10,
+        "total": 46
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 15,
+        "total": 15
+      }
+    ],
+    "point_total": 85,
+    "rank": 79,
+    "rookie_bonus": 10,
+    "team_key": "frc11277"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 12,
+        "total": 25
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txcl2",
+        "qual_points": 5,
+        "total": 33
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 27,
+        "total": 27
+      }
+    ],
+    "point_total": 85,
+    "rank": 80,
+    "rookie_bonus": 0,
+    "team_key": "frc7616"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 12,
+        "total": 27
+      },
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txcl2",
+        "qual_points": 11,
+        "total": 28
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 30,
+        "total": 30
+      }
+    ],
+    "point_total": 85,
+    "rank": 81,
+    "rookie_bonus": 0,
+    "team_key": "frc7691"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txfor",
+        "qual_points": 11,
+        "total": 37
+      },
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 13,
+        "total": 20
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 15,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 12,
+        "total": 27
+      }
+    ],
+    "point_total": 84,
+    "rank": 82,
+    "rookie_bonus": 0,
+    "team_key": "frc4153"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 16,
+        "total": 26
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 16,
+        "total": 33
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 24,
+        "total": 24
+      }
+    ],
+    "point_total": 83,
+    "rank": 83,
+    "rookie_bonus": 0,
+    "team_key": "frc4734"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 11,
+        "total": 25
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 14,
+        "total": 31
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 27,
+        "total": 27
+      }
+    ],
+    "point_total": 83,
+    "rank": 84,
+    "rookie_bonus": 0,
+    "team_key": "frc9577"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 6,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 11,
+        "total": 22
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 17,
+        "total": 35
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 24,
+        "total": 24
+      }
+    ],
+    "point_total": 81,
+    "rank": 85,
+    "rookie_bonus": 0,
+    "team_key": "frc5261"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 12,
+        "total": 22
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 17,
+        "total": 35
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 24,
+        "total": 24
+      }
+    ],
+    "point_total": 81,
+    "rank": 86,
+    "rookie_bonus": 0,
+    "team_key": "frc8769"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 8,
+        "total": 15
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txhou",
+        "qual_points": 14,
+        "total": 38
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 27,
+        "total": 27
+      }
+    ],
+    "point_total": 80,
+    "rank": 87,
+    "rookie_bonus": 0,
+    "team_key": "frc8177"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 17,
+        "total": 29
+      },
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txdri",
+        "qual_points": 10,
+        "total": 32
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp1",
+        "qual_points": 18,
+        "total": 18
+      }
+    ],
+    "point_total": 79,
+    "rank": 88,
+    "rookie_bonus": 0,
+    "team_key": "frc9444"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 16,
+        "total": 27
+      },
+      {
+        "alliance_points": 14,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txman",
+        "qual_points": 18,
+        "total": 50
+      }
+    ],
+    "point_total": 77,
+    "rank": 89,
+    "rookie_bonus": 0,
+    "team_key": "frc436"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txman",
+        "qual_points": 13,
+        "total": 28
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 12,
+        "total": 21
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 18,
+        "total": 18
+      }
+    ],
+    "point_total": 77,
+    "rank": 90,
+    "rookie_bonus": 10,
+    "team_key": "frc10913"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txmca",
+        "qual_points": 10,
+        "total": 37
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 10,
+        "total": 16
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 21,
+        "total": 21
+      }
+    ],
+    "point_total": 74,
+    "rank": 91,
+    "rookie_bonus": 0,
+    "team_key": "frc8818"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 14,
+        "total": 23
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txmca",
+        "qual_points": 15,
+        "total": 45
+      }
+    ],
+    "point_total": 73,
+    "rank": 92,
+    "rookie_bonus": 5,
+    "team_key": "frc10118"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 13,
+        "total": 13
+      },
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txsan",
+        "qual_points": 13,
+        "total": 35
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": true,
+        "elim_points": 0,
+        "event_key": "2026txcmp2",
+        "qual_points": 15,
+        "total": 15
+      }
+    ],
+    "point_total": 68,
+    "rank": 93,
+    "rookie_bonus": 5,
+    "team_key": "frc10518"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 10,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 12,
+        "total": 27
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 17,
+        "total": 35
+      }
+    ],
+    "point_total": 62,
+    "rank": 94,
+    "rookie_bonus": 0,
+    "team_key": "frc1164"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 14,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txmca",
+        "qual_points": 17,
+        "total": 39
+      },
+      {
+        "alliance_points": 2,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txman",
+        "qual_points": 6,
+        "total": 20
+      }
+    ],
+    "point_total": 59,
+    "rank": 95,
+    "rookie_bonus": 0,
+    "team_key": "frc8573"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 13,
+        "total": 22
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 15,
+        "total": 31
+      }
+    ],
+    "point_total": 53,
+    "rank": 96,
+    "rookie_bonus": 0,
+    "team_key": "frc9512"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 7,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 9,
+        "total": 21
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 16,
+        "total": 32
+      }
+    ],
+    "point_total": 53,
+    "rank": 97,
+    "rookie_bonus": 0,
+    "team_key": "frc4219"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 20,
+        "event_key": "2026txhou",
+        "qual_points": 8,
+        "total": 31
+      },
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txcl2",
+        "qual_points": 12,
+        "total": 21
+      }
+    ],
+    "point_total": 52,
+    "rank": 98,
+    "rookie_bonus": 0,
+    "team_key": "frc4587"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txfor",
+        "qual_points": 7,
+        "total": 24
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 16,
+        "total": 28
+      }
+    ],
+    "point_total": 52,
+    "rank": 99,
+    "rookie_bonus": 0,
+    "team_key": "frc7119"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 16,
+        "total": 28
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 15,
+        "total": 24
+      }
+    ],
+    "point_total": 52,
+    "rank": 100,
+    "rookie_bonus": 0,
+    "team_key": "frc5790"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 9,
+        "event_key": "2026txcle",
+        "qual_points": 11,
+        "total": 20
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 15,
+        "total": 31
+      }
+    ],
+    "point_total": 51,
+    "rank": 101,
+    "rookie_bonus": 0,
+    "team_key": "frc5788"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 14,
+        "total": 21
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 15,
+        "total": 30
+      }
+    ],
+    "point_total": 51,
+    "rank": 102,
+    "rookie_bonus": 0,
+    "team_key": "frc4328"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 13,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txmca",
+        "qual_points": 11,
+        "total": 36
+      },
+      {
+        "alliance_points": 5,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 9,
+        "total": 14
+      }
+    ],
+    "point_total": 50,
+    "rank": 103,
+    "rookie_bonus": 0,
+    "team_key": "frc6180"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 6,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 11,
+        "total": 22
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 11,
+        "total": 28
+      }
+    ],
+    "point_total": 50,
+    "rank": 104,
+    "rookie_bonus": 0,
+    "team_key": "frc5103"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 6,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 10,
+        "total": 21
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 14,
+        "total": 29
+      }
+    ],
+    "point_total": 50,
+    "rank": 105,
+    "rookie_bonus": 0,
+    "team_key": "frc7540"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 16,
+        "total": 27
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 7,
+        "total": 17
+      }
+    ],
+    "point_total": 49,
+    "rank": 106,
+    "rookie_bonus": 5,
+    "team_key": "frc10312"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 13,
+        "total": 22
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 14,
+        "total": 27
+      }
+    ],
+    "point_total": 49,
+    "rank": 107,
+    "rookie_bonus": 0,
+    "team_key": "frc5682"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txbel",
+        "qual_points": 13,
+        "total": 33
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 9,
+        "total": 15
+      }
+    ],
+    "point_total": 48,
+    "rank": 108,
+    "rookie_bonus": 0,
+    "team_key": "frc2789"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 9,
+        "total": 21
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 12,
+        "total": 27
+      }
+    ],
+    "point_total": 48,
+    "rank": 109,
+    "rookie_bonus": 0,
+    "team_key": "frc5431"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 15,
+        "total": 29
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 48,
+    "rank": 110,
+    "rookie_bonus": 10,
+    "team_key": "frc10904"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 30,
+        "event_key": "2026txmca",
+        "qual_points": 7,
+        "total": 38
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 47,
+    "rank": 111,
+    "rookie_bonus": 0,
+    "team_key": "frc4597"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txbel",
+        "qual_points": 11,
+        "total": 26
+      },
+      {
+        "alliance_points": 5,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 11,
+        "total": 21
+      }
+    ],
+    "point_total": 47,
+    "rank": 112,
+    "rookie_bonus": 0,
+    "team_key": "frc4610"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 7,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 8,
+        "total": 20
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 13,
+        "total": 26
+      }
+    ],
+    "point_total": 46,
+    "rank": 113,
+    "rookie_bonus": 0,
+    "team_key": "frc4076"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 8,
+        "total": 13
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 14,
+        "total": 23
+      }
+    ],
+    "point_total": 46,
+    "rank": 114,
+    "rookie_bonus": 10,
+    "team_key": "frc11469"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 9,
+        "total": 9
+      },
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txman",
+        "qual_points": 10,
+        "total": 26
+      }
+    ],
+    "point_total": 45,
+    "rank": 115,
+    "rookie_bonus": 10,
+    "team_key": "frc11309"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 14,
+        "total": 24
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 12,
+        "total": 21
+      }
+    ],
+    "point_total": 45,
+    "rank": 116,
+    "rookie_bonus": 0,
+    "team_key": "frc4641"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 4,
+        "event_key": "2026txsan",
+        "qual_points": 13,
+        "total": 17
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 16,
+        "total": 27
+      }
+    ],
+    "point_total": 44,
+    "rank": 117,
+    "rookie_bonus": 0,
+    "team_key": "frc5726"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 14,
+        "total": 23
+      },
+      {
+        "alliance_points": 11,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 10,
+        "total": 21
+      }
+    ],
+    "point_total": 44,
+    "rank": 118,
+    "rookie_bonus": 0,
+    "team_key": "frc1745"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 15,
+        "total": 24
+      },
+      {
+        "alliance_points": 13,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 6,
+        "total": 19
+      }
+    ],
+    "point_total": 43,
+    "rank": 119,
+    "rookie_bonus": 0,
+    "team_key": "frc6645"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 15,
+        "total": 24
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 10,
+        "total": 19
+      }
+    ],
+    "point_total": 43,
+    "rank": 120,
+    "rookie_bonus": 0,
+    "team_key": "frc6974"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 12,
+        "total": 25
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 9,
+        "total": 17
+      }
+    ],
+    "point_total": 42,
+    "rank": 121,
+    "rookie_bonus": 0,
+    "team_key": "frc5866"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txfar",
+        "qual_points": 5,
+        "total": 21
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 12,
+        "total": 20
+      }
+    ],
+    "point_total": 41,
+    "rank": 122,
+    "rookie_bonus": 0,
+    "team_key": "frc9105"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 1,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 24,
+        "event_key": "2026txman",
+        "qual_points": 7,
+        "total": 32
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 8,
+        "total": 8
+      }
+    ],
+    "point_total": 40,
+    "rank": 123,
+    "rookie_bonus": 0,
+    "team_key": "frc7088"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 13,
+        "event_key": "2026txwac",
+        "qual_points": 9,
+        "total": 30
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 5,
+        "total": 10
+      }
+    ],
+    "point_total": 40,
+    "rank": 124,
+    "rookie_bonus": 0,
+    "team_key": "frc5613"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 2,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txcle",
+        "qual_points": 5,
+        "total": 14
+      },
+      {
+        "alliance_points": 10,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 15,
+        "total": 25
+      }
+    ],
+    "point_total": 39,
+    "rank": 125,
+    "rookie_bonus": 0,
+    "team_key": "frc6243"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txhou",
+        "qual_points": 7,
+        "total": 19
+      },
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 13,
+        "total": 20
+      }
+    ],
+    "point_total": 39,
+    "rank": 126,
+    "rookie_bonus": 0,
+    "team_key": "frc2585"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 10,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 16,
+        "total": 31
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 8,
+        "total": 8
+      }
+    ],
+    "point_total": 39,
+    "rank": 127,
+    "rookie_bonus": 0,
+    "team_key": "frc5070"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 4,
+        "total": 4
+      },
+      {
+        "alliance_points": 5,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 12,
+        "total": 25
+      }
+    ],
+    "point_total": 39,
+    "rank": 128,
+    "rookie_bonus": 10,
+    "team_key": "frc11224"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 12,
+        "total": 20
+      },
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txwac",
+        "qual_points": 4,
+        "total": 18
+      }
+    ],
+    "point_total": 38,
+    "rank": 129,
+    "rookie_bonus": 0,
+    "team_key": "frc9121"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 3,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txmca",
+        "qual_points": 5,
+        "total": 13
+      },
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txdri",
+        "qual_points": 14,
+        "total": 25
+      }
+    ],
+    "point_total": 38,
+    "rank": 130,
+    "rookie_bonus": 0,
+    "team_key": "frc4332"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 12,
+        "total": 17
+      },
+      {
+        "alliance_points": 5,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 11,
+        "total": 21
+      }
+    ],
+    "point_total": 38,
+    "rank": 131,
+    "rookie_bonus": 0,
+    "team_key": "frc9034"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 8,
+        "total": 8
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 17,
+        "total": 29
+      }
+    ],
+    "point_total": 37,
+    "rank": 132,
+    "rookie_bonus": 0,
+    "team_key": "frc9786"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 8,
+        "total": 8
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 8,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 11,
+        "total": 19
+      }
+    ],
+    "point_total": 37,
+    "rank": 133,
+    "rookie_bonus": 10,
+    "team_key": "frc11132"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 7,
+        "total": 7
+      },
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 17,
+        "total": 29
+      }
+    ],
+    "point_total": 36,
+    "rank": 134,
+    "rookie_bonus": 0,
+    "team_key": "frc9311"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 8,
+        "total": 13
+      },
+      {
+        "alliance_points": 7,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 11,
+        "total": 23
+      }
+    ],
+    "point_total": 36,
+    "rank": 135,
+    "rookie_bonus": 0,
+    "team_key": "frc4717"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txmca",
+        "qual_points": 12,
+        "total": 12
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 14,
+        "total": 23
+      }
+    ],
+    "point_total": 35,
+    "rank": 136,
+    "rookie_bonus": 0,
+    "team_key": "frc8750"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txmca",
+        "qual_points": 15,
+        "total": 26
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 8,
+        "total": 8
+      }
+    ],
+    "point_total": 34,
+    "rank": 137,
+    "rookie_bonus": 0,
+    "team_key": "frc5894"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 9,
+        "total": 9
+      },
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 15,
+        "total": 24
+      }
+    ],
+    "point_total": 33,
+    "rank": 138,
+    "rookie_bonus": 0,
+    "team_key": "frc9307"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 13,
+        "total": 20
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 8,
+        "total": 13
+      }
+    ],
+    "point_total": 33,
+    "rank": 139,
+    "rookie_bonus": 0,
+    "team_key": "frc9080"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 12,
+        "total": 16
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 10,
+        "total": 16
+      }
+    ],
+    "point_total": 32,
+    "rank": 140,
+    "rookie_bonus": 0,
+    "team_key": "frc5908"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 8,
+        "total": 8
+      },
+      {
+        "alliance_points": 8,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 11,
+        "total": 24
+      }
+    ],
+    "point_total": 32,
+    "rank": 141,
+    "rookie_bonus": 0,
+    "team_key": "frc5923"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 14,
+        "total": 14
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txama",
+        "qual_points": 4,
+        "total": 17
+      }
+    ],
+    "point_total": 31,
+    "rank": 142,
+    "rookie_bonus": 0,
+    "team_key": "frc8732"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 10,
+        "total": 15
+      },
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 7,
+        "event_key": "2026txfar",
+        "qual_points": 4,
+        "total": 15
+      }
+    ],
+    "point_total": 30,
+    "rank": 143,
+    "rookie_bonus": 0,
+    "team_key": "frc9289"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 9,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 11,
+        "total": 20
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 29,
+    "rank": 144,
+    "rookie_bonus": 0,
+    "team_key": "frc8528"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 12,
+        "total": 12
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 10,
+        "total": 16
+      }
+    ],
+    "point_total": 28,
+    "rank": 145,
+    "rookie_bonus": 0,
+    "team_key": "frc6526"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 12,
+        "total": 17
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 6,
+        "total": 11
+      }
+    ],
+    "point_total": 28,
+    "rank": 146,
+    "rookie_bonus": 0,
+    "team_key": "frc9181"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 11,
+        "total": 17
+      }
+    ],
+    "point_total": 27,
+    "rank": 147,
+    "rookie_bonus": 0,
+    "team_key": "frc9478"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 9,
+        "total": 9
+      },
+      {
+        "alliance_points": 5,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 13,
+        "total": 18
+      }
+    ],
+    "point_total": 27,
+    "rank": 148,
+    "rookie_bonus": 0,
+    "team_key": "frc2882"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 12,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 6,
+        "total": 18
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 8,
+        "total": 8
+      }
+    ],
+    "point_total": 26,
+    "rank": 149,
+    "rookie_bonus": 0,
+    "team_key": "frc7121"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 6,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 10,
+        "total": 16
+      }
+    ],
+    "point_total": 26,
+    "rank": 150,
+    "rookie_bonus": 0,
+    "team_key": "frc2969"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 8,
+        "total": 8
+      },
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 8,
+        "total": 15
+      }
+    ],
+    "point_total": 23,
+    "rank": 151,
+    "rookie_bonus": 0,
+    "team_key": "frc3545"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 12,
+        "total": 12
+      },
+      {
+        "alliance_points": 7,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 4,
+        "total": 11
+      }
+    ],
+    "point_total": 23,
+    "rank": 152,
+    "rookie_bonus": 0,
+    "team_key": "frc9137"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 8,
+        "total": 12
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 11,
+        "total": 11
+      }
+    ],
+    "point_total": 23,
+    "rank": 153,
+    "rookie_bonus": 0,
+    "team_key": "frc2950"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcle",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 11,
+        "total": 11
+      }
+    ],
+    "point_total": 21,
+    "rank": 154,
+    "rookie_bonus": 0,
+    "team_key": "frc7115"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 11,
+        "total": 11
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 10,
+        "total": 10
+      }
+    ],
+    "point_total": 21,
+    "rank": 155,
+    "rookie_bonus": 0,
+    "team_key": "frc9658"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 5,
+        "total": 5
+      },
+      {
+        "alliance_points": 4,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 11,
+        "total": 15
+      }
+    ],
+    "point_total": 20,
+    "rank": 156,
+    "rookie_bonus": 0,
+    "team_key": "frc2657"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 19,
+    "rank": 157,
+    "rookie_bonus": 0,
+    "team_key": "frc4364"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txwac",
+        "qual_points": 6,
+        "total": 6
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 8,
+        "total": 13
+      }
+    ],
+    "point_total": 19,
+    "rank": 158,
+    "rookie_bonus": 0,
+    "team_key": "frc3282"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txmca",
+        "qual_points": 9,
+        "total": 14
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 5,
+        "total": 5
+      }
+    ],
+    "point_total": 19,
+    "rank": 159,
+    "rookie_bonus": 0,
+    "team_key": "frc7521"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 5,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 11,
+        "total": 16
+      }
+    ],
+    "point_total": 16,
+    "rank": 160,
+    "rookie_bonus": 0,
+    "team_key": "frc9457"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 10,
+        "total": 10
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 6,
+        "total": 6
+      }
+    ],
+    "point_total": 16,
+    "rank": 161,
+    "rookie_bonus": 0,
+    "team_key": "frc7271"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 6,
+        "total": 6
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 15,
+    "rank": 162,
+    "rookie_bonus": 0,
+    "team_key": "frc6171"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 7,
+        "total": 7
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 7,
+        "total": 7
+      }
+    ],
+    "point_total": 14,
+    "rank": 163,
+    "rookie_bonus": 0,
+    "team_key": "frc7091"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txman",
+        "qual_points": 7,
+        "total": 7
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txdri",
+        "qual_points": 7,
+        "total": 7
+      }
+    ],
+    "point_total": 14,
+    "rank": 164,
+    "rookie_bonus": 0,
+    "team_key": "frc7138"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 14,
+        "total": 14
+      }
+    ],
+    "point_total": 14,
+    "rank": 165,
+    "rookie_bonus": 0,
+    "team_key": "frc6768"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 7,
+        "total": 7
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 7,
+        "total": 7
+      }
+    ],
+    "point_total": 14,
+    "rank": 166,
+    "rookie_bonus": 0,
+    "team_key": "frc5986"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 13,
+        "total": 13
+      }
+    ],
+    "point_total": 13,
+    "rank": 167,
+    "rookie_bonus": 0,
+    "team_key": "frc8816"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 7,
+        "total": 7
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 6,
+        "total": 6
+      }
+    ],
+    "point_total": 13,
+    "rank": 168,
+    "rookie_bonus": 0,
+    "team_key": "frc7125"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txbel",
+        "qual_points": 4,
+        "total": 4
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 13,
+    "rank": 169,
+    "rookie_bonus": 0,
+    "team_key": "frc3240"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 4,
+        "total": 4
+      },
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 8,
+        "total": 8
+      }
+    ],
+    "point_total": 12,
+    "rank": 170,
+    "rookie_bonus": 0,
+    "team_key": "frc6488"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txcl2",
+        "qual_points": 11,
+        "total": 11
+      }
+    ],
+    "point_total": 11,
+    "rank": 171,
+    "rookie_bonus": 0,
+    "team_key": "frc3728"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 5,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 6,
+        "total": 11
+      }
+    ],
+    "point_total": 11,
+    "rank": 172,
+    "rookie_bonus": 0,
+    "team_key": "frc9419"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txama",
+        "qual_points": 10,
+        "total": 10
+      }
+    ],
+    "point_total": 10,
+    "rank": 173,
+    "rookie_bonus": 0,
+    "team_key": "frc8512"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txmca",
+        "qual_points": 10,
+        "total": 10
+      }
+    ],
+    "point_total": 10,
+    "rank": 174,
+    "rookie_bonus": 0,
+    "team_key": "frc8591"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [],
+    "point_total": 10,
+    "rank": 175,
+    "rookie_bonus": 10,
+    "team_key": "frc11091"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [],
+    "point_total": 10,
+    "rank": 176,
+    "rookie_bonus": 10,
+    "team_key": "frc11465"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfar",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 9,
+    "rank": 177,
+    "rookie_bonus": 0,
+    "team_key": "frc8408"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 9,
+        "total": 9
+      }
+    ],
+    "point_total": 9,
+    "rank": 178,
+    "rookie_bonus": 0,
+    "team_key": "frc5212"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txfor",
+        "qual_points": 5,
+        "total": 5
+      }
+    ],
+    "point_total": 5,
+    "rank": 179,
+    "rookie_bonus": 0,
+    "team_key": "frc7534"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txhou",
+        "qual_points": 5,
+        "total": 5
+      }
+    ],
+    "point_total": 5,
+    "rank": 180,
+    "rookie_bonus": 0,
+    "team_key": "frc9521"
+  },
+  {
+    "adjustments": 0,
+    "event_points": [
+      {
+        "alliance_points": 0,
+        "award_points": 0,
+        "district_cmp": false,
+        "elim_points": 0,
+        "event_key": "2026txsan",
+        "qual_points": 4,
+        "total": 4
+      }
+    ],
+    "point_total": 4,
+    "rank": 181,
+    "rookie_bonus": 0,
+    "team_key": "frc6155"
+  }
+]

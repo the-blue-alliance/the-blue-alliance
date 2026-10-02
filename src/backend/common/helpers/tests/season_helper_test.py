@@ -209,3 +209,27 @@ def test_first_event_datetime_multiple_events(ndb_stub) -> None:
     first_event_datetime = SeasonHelper.first_event_datetime_utc(start_date.year)
 
     assert first_event_datetime == start_date
+
+
+@pytest.mark.no_bypass_first_event_start_dates
+def test_get_first_event_start_date() -> None:
+    assert SeasonHelper.get_first_event_start_date(1995) == datetime(1995, 2, 25)
+    assert SeasonHelper.get_first_event_start_date(2019) == datetime(2019, 2, 27)
+    assert SeasonHelper.get_first_event_start_date(2024) == datetime(2024, 2, 24)
+    assert SeasonHelper.get_first_event_start_date(2025) == datetime(2025, 2, 23)
+    assert SeasonHelper.get_first_event_start_date(2026) == datetime(2026, 3, 3)
+    assert SeasonHelper.get_first_event_start_date(2027) == datetime(2027, 3, 3)
+    assert SeasonHelper.get_first_event_start_date(1992) is None
+    assert SeasonHelper.get_first_event_start_date(2099) is None
+
+
+def test_get_first_event_start_date_bypassed_by_default() -> None:
+    # Under test environment without no_bypass marker, get_first_event_start_date returns None
+    assert SeasonHelper.get_first_event_start_date(2024) is None
+
+
+def test_first_event_start_dates_coverage() -> None:
+    # All applicable years from 1995 to 2027 must be present
+    for year in range(1995, 2028):
+        assert year in SeasonHelper.FIRST_EVENT_START_DATES
+        assert isinstance(SeasonHelper.FIRST_EVENT_START_DATES[year], datetime)
