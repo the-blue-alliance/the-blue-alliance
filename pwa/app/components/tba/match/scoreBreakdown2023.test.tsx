@@ -244,19 +244,22 @@ describe('ScoreBreakdown2023', () => {
     ).toHaveLength(3);
   });
 
-  // Both alliances get identical counts, so column placement is not checked.
-  test('shows foul counts with derived points', () => {
+  // Counts and foul points from 2023gal_qm82; each alliance's foulPoints come from the other's fouls.
+  test('shows the fouls each alliance committed and the foul points it received', () => {
     renderBreakdown(
       makeBreakdown(
-        { foulCount: 2, techFoulCount: 1 },
-        { foulCount: 2, techFoulCount: 1 },
+        { foulCount: 1, techFoulCount: 0, foulPoints: 27 },
+        { foulCount: 3, techFoulCount: 1, foulPoints: 5 },
       ),
     );
 
     expect(
       screen.getByRole('row', {
-        name: /^Regular: ?2 \(\+10\) Tech: ?1 \(\+12\) Fouls \/ Tech Fouls Regular: ?2 \(\+10\) Tech: ?1 \(\+12\)$/,
+        name: '1 / 0 Fouls / Tech Fouls Committed 3 / 1',
       }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('row', { name: '27 Foul Points Received 5' }),
     ).toBeTruthy();
   });
 });

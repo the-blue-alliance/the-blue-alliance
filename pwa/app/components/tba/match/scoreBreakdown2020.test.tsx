@@ -438,35 +438,30 @@ describe('ScoreBreakdown2020 ranking points', () => {
 });
 
 describe('ScoreBreakdown2020 fouls', () => {
-  test("shows the opponent's fouls under each alliance", () => {
+  // Counts and foul points from 2020scmb_qm92; each alliance's foulPoints come from the other's fouls.
+  function renderFouls() {
     render(
       <ScoreBreakdown2020
         scoreBreakdown={makeBreakdown(
-          { foulCount: 2, techFoulCount: 1 },
-          { foulCount: 4, techFoulCount: 0 },
+          { foulCount: 2, techFoulCount: 1, foulPoints: 15 },
+          { foulCount: 0, techFoulCount: 1, foulPoints: 21 },
         )}
         match={match}
       />,
     );
+  }
 
-    expect(
-      within(redCell('Fouls / Tech Fouls')).getByText('4 (+12)'),
-    ).toBeTruthy();
-    expect(
-      within(blueCell('Fouls / Tech Fouls')).getByText('2 (+6)'),
-    ).toBeTruthy();
+  test('shows the fouls and tech fouls each alliance committed', () => {
+    renderFouls();
+
+    expect(redCell('Fouls / Tech Fouls Committed').textContent).toBe('2 / 1');
+    expect(blueCell('Fouls / Tech Fouls Committed').textContent).toBe('0 / 1');
   });
 
-  test('values tech fouls at 15 points each', () => {
-    render(
-      <ScoreBreakdown2020
-        scoreBreakdown={makeBreakdown({ techFoulCount: 2 }, {})}
-        match={match}
-      />,
-    );
+  test('shows the foul points each alliance received', () => {
+    renderFouls();
 
-    expect(
-      within(blueCell('Fouls / Tech Fouls')).getByText('2 (+30)'),
-    ).toBeTruthy();
+    expect(redCell('Foul Points Received').textContent).toBe('15');
+    expect(blueCell('Foul Points Received').textContent).toBe('21');
   });
 });
