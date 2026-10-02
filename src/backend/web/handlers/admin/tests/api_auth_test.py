@@ -366,3 +366,21 @@ def test_api_auth_manage_unknown_type_is_404(
 ) -> None:
     resp = web_client.get("/admin/api_auth/manage/bogus")
     assert resp.status_code == 404
+
+
+def test_api_auth_edit_read_key_with_write_flag_rejected_gracefully(
+    login_gae_admin, web_client: Client
+) -> None:
+    """Adding a write flag to a READ_API key is rejected without a 500."""
+    _store_write_auth("readkey", auth_types=[AuthType.READ_API])
+
+    resp = web_client.post(
+        "/admin/api_auth/edit/readkey",
+        data={"description": "Now a write key?", "allow_edit_matches": "on"},
+    )
+    assert resp.status_code in (302, 400)
+
+    auth = ApiAuthAccess.get_by_id("readkey")
+    assert auth is not None
+    assert auth.description == "readkey description"
+    assert auth.auth_types_enum == [AuthType.READ_API]
