@@ -82,6 +82,19 @@ def test_refresh_token(api_mock: mock.Mock, twitch_secrets) -> None:
     assert result == expected
 
 
+@mock.patch.object(TwitchGetAccessToken, "_fetch")
+def test_get_cached_token_returns_none_on_fetch_failure(
+    api_mock: mock.Mock, twitch_secrets
+) -> None:
+    api_response = URLFetchResult.mock_for_content(
+        "https://id.twitch.tv/oauth2/token", 503, ""
+    )
+    api_mock.return_value = InstantFuture(api_response)
+
+    result = TwitchGetAccessToken.get_cached_token_async().get_result()
+    assert result is None
+
+
 def test_url_and_method(twitch_secrets) -> None:
     df = TwitchGetAccessToken(refresh_token=None)
     assert df.url() == "https://id.twitch.tv/oauth2/token"
