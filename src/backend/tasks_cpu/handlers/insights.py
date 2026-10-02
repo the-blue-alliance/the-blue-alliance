@@ -248,6 +248,8 @@ def do_overall_insights(kind: str) -> Response:
         insights = InsightsHelper.doOverallMatchInsights()
     elif kind == "awards":
         insights = InsightsHelper.doOverallAwardInsights()
+    elif "X-Appengine-Taskname" not in request.headers:
+        abort(404)
 
     if insights is not None:
         InsightManipulator.createOrUpdate(insights)
