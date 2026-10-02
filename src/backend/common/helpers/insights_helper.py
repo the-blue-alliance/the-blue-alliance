@@ -1194,6 +1194,8 @@ class InsightsHelper(object):
         ).fetch(1000)
         world_champions = defaultdict(list)
         for insight in year_world_champions:
+            if insight.district_abbreviation is not None:
+                continue
             for team in insight.data:
                 world_champions[team].append(insight.year)
 
@@ -1203,6 +1205,8 @@ class InsightsHelper(object):
         ).fetch(1000)
         division_winners = defaultdict(list)
         for insight in year_division_winners:
+            if insight.district_abbreviation is not None:
+                continue
             for team in insight.data:
                 division_winners[team].append(insight.year)
 
@@ -1233,6 +1237,8 @@ class InsightsHelper(object):
         ).fetch(1000)
         successful_einstein_teamups = defaultdict(int)
         for insight in year_successful_einstein_teamups:
+            if insight.district_abbreviation is not None:
+                continue
             for teams in insight.data:
                 for pairs in itertools.combinations(teams, 2):
                     successful_einstein_teamups[tuple(sorted(pairs))] += 1
