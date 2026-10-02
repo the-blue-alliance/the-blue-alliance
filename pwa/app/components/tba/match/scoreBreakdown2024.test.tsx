@@ -23,9 +23,7 @@ vi.mock('~/components/tba/match/common', async (importOriginal) => ({
     condition: boolean;
     teamKey: string;
   }) => (
-    // Normalised so these rows don't depend on whether the component passes
-    // "frc254" or "254"; which one it should pass is Bug #58, covered by
-    // its own failing-test PR.
+    // Normalised so rows match whether the component passes "frc254" or "254".
     <div>
       {teamKey.replace(/^frc/, '')}={condition ? 'yes' : 'no'}
     </div>
@@ -188,8 +186,69 @@ describe('ScoreBreakdown2024', () => {
     ).toBeTruthy();
   });
 
-  // Robot endgame labels that depend on trap/microphone flags ("Spotlit")
-  // are Bug #57, covered by its own failing-test PR.
+  // Spotlit needs a HIGH NOTE on the MICROPHONE above the robot (2024 Manual 6.5.4).
+  const noStageFlags = {
+    trapCenterStage: false,
+    trapStageLeft: false,
+    trapStageRight: false,
+    micCenterStage: false,
+    micStageLeft: false,
+    micStageRight: false,
+  };
+
+  test('a trap note alone does not make an onstage robot spotlit', () => {
+    renderBreakdown(
+      makeBreakdown(
+        {
+          endGameRobot1: EndGameRobot2024.CENTER_STAGE,
+          ...noStageFlags,
+          trapCenterStage: true,
+        },
+        { endGameRobot1: EndGameRobot2024.NONE, ...noStageFlags },
+      ),
+    );
+
+    expect(
+      screen.getByRole('row', {
+        name: '254 Onstage (+3) Robot 1 Endgame 148 None (+0)',
+      }),
+    ).toBeTruthy();
+  });
+
+  test.each([
+    {
+      position: 'center stage',
+      endgame: EndGameRobot2024.CENTER_STAGE,
+      mic: { micCenterStage: true },
+    },
+    {
+      position: 'stage left',
+      endgame: EndGameRobot2024.STAGE_LEFT,
+      mic: { micStageLeft: true },
+    },
+    {
+      position: 'stage right',
+      endgame: EndGameRobot2024.STAGE_RIGHT,
+      mic: { micStageRight: true },
+    },
+  ])(
+    'a high note on the microphone above an onstage robot at $position makes it spotlit',
+    ({ endgame, mic }) => {
+      renderBreakdown(
+        makeBreakdown(
+          { endGameRobot1: endgame, ...noStageFlags, ...mic },
+          { endGameRobot1: EndGameRobot2024.NONE, ...noStageFlags },
+        ),
+      );
+
+      expect(
+        screen.getByRole('row', {
+          name: '254 Spotlit (+4) Robot 1 Endgame 148 None (+0)',
+        }),
+      ).toBeTruthy();
+    },
+  );
+
   test.each([
     { name: '1114 Onstage (+3) Robot 2 Endgame 217 None (+0)' },
     { name: '2056 Parked (+1) Robot 3 Endgame 33 None (+0)' },
@@ -246,25 +305,26 @@ describe('ScoreBreakdown2024', () => {
     ).toHaveLength(2);
   });
 
-  // Both alliances get identical counts in these two tests: which
-  // alliance's counts belong under which column is Bug #56, covered by its
-  // own failing-test PR.
-  test('shows foul counts with points', () => {
+  // Counts and foul points from 2024cmptx_sf5m1; each alliance's foulPoints come from the other's fouls.
+  test('shows the fouls each alliance committed and the foul points it received', () => {
     renderBreakdown(
       makeBreakdown(
-        { foulCount: 3, techFoulCount: 1 },
-        { foulCount: 3, techFoulCount: 1 },
+        { foulCount: 1, techFoulCount: 0, foulPoints: 10 },
+        { foulCount: 0, techFoulCount: 2, foulPoints: 2 },
       ),
     );
 
     expect(
       screen.getByRole('row', {
-        name: '3 (+6) / 1 (+5) Fouls / Tech Fouls 3 (+6) / 1 (+5)',
+        name: '1 / 0 Fouls / Tech Fouls Committed 0 / 2',
       }),
+    ).toBeTruthy();
+    expect(
+      screen.getByRole('row', { name: '10 Foul Points Received 2' }),
     ).toBeTruthy();
   });
 
-  test('shows blank foul counts when missing', () => {
+  test('shows zero foul counts when missing', () => {
     renderBreakdown(
       makeBreakdown(
         { foulCount: undefined, techFoulCount: undefined },
@@ -274,7 +334,7 @@ describe('ScoreBreakdown2024', () => {
 
     expect(
       screen.getByRole('row', {
-        name: '(+0) / (+0) Fouls / Tech Fouls (+0) / (+0)',
+        name: '0 / 0 Fouls / Tech Fouls Committed 0 / 0',
       }),
     ).toBeTruthy();
   });

@@ -3,6 +3,7 @@ import type { QueryClient } from '@tanstack/react-query';
 import {
   HeadContent,
   Outlet,
+  ScriptOnce,
   Scripts,
   createRootRouteWithContext,
   useLocation,
@@ -32,7 +33,7 @@ import { mapClientError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { STALE_TIME } from '~/lib/queryClient';
-import { ThemeProvider } from '~/lib/theme';
+import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
 import { createLogger } from '~/lib/utils';
 import appCss from '~/style/tailwind.css?url';
 
@@ -210,23 +211,8 @@ function RootComponent() {
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
-        <script
-          // This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded.
-          dangerouslySetInnerHTML={{
-            __html: `
-              (function() {
-                try {
-                  var theme = localStorage.getItem('theme');
-                  var isDark = theme === 'dark' || 
-                    (theme !== 'light' && window.matchMedia('(prefers-color-scheme: dark)').matches);
-                  if (isDark) {
-                    document.documentElement.classList.add('dark');
-                  }
-                } catch (e) {}
-              })();
-            `,
-          }}
-        />
+        {/* This render-blocking script is necessary to ensure the correct theme is applied when the page is loaded. */}
+        <ScriptOnce>{THEME_INIT_SCRIPT}</ScriptOnce>
         <HeadContent />
       </head>
       <body>

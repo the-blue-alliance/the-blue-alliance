@@ -1246,10 +1246,7 @@ def test_empty_request_body_does_not_log_to_storage(
 def test_file_upload_unknown_report_type_is_rejected(
     monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
 ) -> None:
-    """
-    A trusted-key upload to an unknown FMS report type is rejected and nothing
-    is stored. Which client error it gets is covered by bug #10840-b.
-    """
+    """An upload to an unknown FMS report type is rejected and nothing is stored."""
     setup_event(event_type=EventType.OFFSEASON)
     setup_user(monkeypatch, permissions=[])
     auth_id, auth_secret = setup_api_auth(
@@ -1289,6 +1286,49 @@ def test_file_upload_unknown_report_type_is_rejected(
 
     assert 400 <= resp.status_code < 500
     mock_write.assert_not_called()
+
+
+@freeze_time("2019-06-01")
+def test_file_upload_unknown_report_type_is_client_error_not_auth_error(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """A signed upload of an unknown report type gets a 400 or 404, not a 401."""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_RANKINGS],
+        expiration=None,
+    )
+
+    with api_client.application.test_request_context():  # pyre-ignore[16]
+        file_content = create_excel_file()
+        file_digest = hashlib.sha256(file_content).hexdigest()
+
+        request_path = "/api/_eventwizard/event/2019nyny/fms_reports/not_a_report"
+
+        file_storage = FileStorage(
+            stream=io.BytesIO(file_content),
+            filename="test.xlsx",
+            content_type="application/vnd.ms-excel",
+        )
+
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, file_digest
+                ),
+            },
+            data={
+                "reportFile": file_storage,
+                "fileDigest": file_digest,
+            },
+        )
+
+    assert resp.status_code in (400, 404), resp.json
+    assert "no required auth types" not in resp.json["Error"]
 
 
 def test_explicit_auth_trusted_api_disabled(

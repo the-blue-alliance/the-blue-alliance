@@ -11,17 +11,17 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import MatchDetails from '~/components/tba/match/matchDetails';
+import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { formatMatchTime } from '~/lib/matchUtils';
 
 vi.mock('~/components/tba/teamTooltip', () => ({
   TeamLinkWithTooltip: ({
     teamKey,
     year,
+    disqualified: _disqualified,
+    surrogate: _surrogate,
     ...props
-  }: AnchorHTMLAttributes<HTMLAnchorElement> & {
-    teamKey: string;
-    year: number;
-  }) => (
+  }: AnchorHTMLAttributes<HTMLAnchorElement> & TeamTooltipProps) => (
     <a href={`/team/${teamKey.substring(3)}/${year}`} {...props}>
       {teamKey.substring(3)}
     </a>

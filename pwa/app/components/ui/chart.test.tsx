@@ -168,6 +168,21 @@ describe('ChartTooltipContent', () => {
     expect(empty.querySelector('.shadow-xl')).toBeNull();
   });
 
+  test('renders nothing when inactive with a non-object payload item', () => {
+    const { container } = renderInChart(
+      <ChartTooltipContent
+        active={false}
+        payload={
+          ['not-an-object'] as unknown as ComponentProps<
+            typeof ChartTooltipContent
+          >['payload']
+        }
+      />,
+    );
+
+    expect(container.querySelector('.shadow-xl')).toBeNull();
+  });
+
   test('renders a dot indicator row with the config label and formatted value', () => {
     renderInChart(
       <ChartTooltipContent
@@ -314,6 +329,15 @@ describe('ChartTooltipContent', () => {
 
     expect(screen.getByText('unknown')).toBeTruthy();
   });
+
+  test('a string label with no config entry falls back to the raw label', () => {
+    // Upstream shadcn reads `config[label]?.label || label`.
+    renderInChart(
+      <ChartTooltipContent active payload={[item({})]} label="missing" />,
+    );
+
+    expect(screen.getByText('missing')).toBeTruthy();
+  });
 });
 
 describe('ChartLegendContent', () => {
@@ -356,8 +380,6 @@ describe('ChartLegendContent', () => {
               payload: { series: 'red' },
             },
             { value: 'b', dataKey: 'y', color: '#0000ff', series: 'blue' },
-            // Exercises the non-object guard in getPayloadConfigFromPayload.
-            'not-an-object',
           ] as unknown as ComponentProps<typeof ChartLegendContent>['payload']
         }
       />,

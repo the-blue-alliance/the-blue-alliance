@@ -78,8 +78,7 @@ describe("chats reducer", () => {
 });
 
 describe("chats reducer webcast and default chat handling", () => {
-  // Load a fresh copy of the reducer for each test because WEBCASTS_UPDATED
-  // mutates the module-level default state (Bug #44).
+  // WEBCASTS_UPDATED mutates module-level default state, so reload per test.
   let freshChats;
   let types;
   beforeEach(() => {
@@ -130,6 +129,13 @@ describe("chats reducer webcast and default chat handling", () => {
     expect(state.renderedChats).toEqual(["firstupdatesnow", "somechat"]);
   });
 
+  it("does not leak chats from WEBCASTS_UPDATED into the default state", () => {
+    // Twitch chats must not be written into the module-level default state.
+    const pristine = JSON.parse(JSON.stringify(freshChats(undefined, {})));
+    freshChats(undefined, { type: types.WEBCASTS_UPDATED, webcasts });
+    expect(freshChats(undefined, {})).toEqual(pristine);
+  });
+
   it("sets the default chat to a known channel", () => {
     let state = freshChats(undefined, {
       type: types.WEBCASTS_UPDATED,
@@ -139,6 +145,20 @@ describe("chats reducer webcast and default chat handling", () => {
       type: types.SET_DEFAULT_TWITCH_CHAT,
       channel: "silicon_valley",
     });
+    expect(state.defaultChat).toBe("silicon_valley");
+  });
+
+  it("keeps the page's default chat across WEBCASTS_UPDATED", () => {
+    // defaultChat is preserved while that chat still exists.
+    let state = freshChats(undefined, {
+      type: types.WEBCASTS_UPDATED,
+      webcasts,
+    });
+    state = freshChats(state, {
+      type: types.SET_DEFAULT_TWITCH_CHAT,
+      channel: "silicon_valley",
+    });
+    state = freshChats(state, { type: types.WEBCASTS_UPDATED, webcasts });
     expect(state.defaultChat).toBe("silicon_valley");
   });
 

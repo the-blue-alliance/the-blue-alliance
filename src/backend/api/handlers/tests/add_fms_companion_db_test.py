@@ -10,6 +10,7 @@ import string
 from typing import List, Optional, Tuple
 from unittest.mock import Mock, patch
 
+import pytest
 from freezegun import freeze_time
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -26,6 +27,16 @@ from backend.common.models.account import Account
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey
+
+
+@pytest.fixture(autouse=True)
+def no_stored_companion_db(monkeypatch: MonkeyPatch) -> None:
+    # Keep the handler off the real GCS client; tests needing a stored DB override this.
+    monkeypatch.setattr(
+        FMSCompanionHelper,
+        "get_newest_file_path",
+        staticmethod(lambda event_key: None),
+    )
 
 
 def setup_event(event_type: EventType = EventType.OFFSEASON) -> None:
@@ -633,3 +644,60 @@ def test_upload_duplicate_db_reuses_newest_path(
     mock_start_job.assert_called_once()
     assert mock_start_job.call_args[1]["args"] == [f"gs://{expected_path}"]
     assert resp.json["execution_id"] == "exec-123"
+
+
+@freeze_time("2019-06-01")
+def test_upload_duplicate_db_with_unknown_newest_path_does_not_start_job(
+    monkeypatch: MonkeyPatch, ndb_stub, api_client: Client
+) -> None:
+    """A duplicate upload whose stored path is unknown starts no import job."""
+    setup_event(event_type=EventType.OFFSEASON)
+    setup_user(monkeypatch, permissions=[])
+    auth_id, auth_secret = setup_api_auth(
+        "2019nyny",
+        auth_types=[AuthType.EVENT_TEAMS],
+        expiration=None,
+    )
+
+    file_content = create_sqlite_db()
+    file_digest = hashlib.sha256(file_content).hexdigest()
+
+    request_path = "/api/_eventwizard/event/2019nyny/fms_companion_db"
+
+    file_storage = FileStorage(
+        stream=io.BytesIO(file_content),
+        filename="companion.db",
+        content_type="application/octet-stream",
+    )
+
+    monkeypatch.setattr(
+        FMSCompanionHelper,
+        "read_newest_companion_db",
+        staticmethod(lambda event_key: file_content),
+    )
+    monkeypatch.setattr(
+        FMSCompanionHelper,
+        "get_newest_file_path",
+        staticmethod(lambda event_key: None),
+    )
+
+    with patch(
+        "backend.api.handlers.eventwizard_internal.start_job",
+        return_value="exec-123",
+    ) as mock_start_job:
+        resp = api_client.post(
+            request_path,
+            headers={
+                "X-TBA-Auth-Id": auth_id,
+                "X-TBA-Auth-Sig": TrustedApiAuthHelper.compute_auth_signature(
+                    auth_secret, request_path, file_digest
+                ),
+            },
+            data={
+                "companionDb": file_storage,
+                "fileDigest": file_digest,
+            },
+        )
+
+    mock_start_job.assert_not_called()
+    assert resp.json.get("storage_path") != ""

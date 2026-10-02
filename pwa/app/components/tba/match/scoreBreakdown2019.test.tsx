@@ -355,8 +355,6 @@ describe('ScoreBreakdown2019 game pieces', () => {
 });
 
 describe('ScoreBreakdown2019 endgame', () => {
-  // HAB Level 2 and Level 3 point values are covered by the Bug #52
-  // failing-test PR.
   test.each([
     { value: EndgameRobot2019.HAB_LEVEL1, expected: '254HAB 1 (+3)' },
     { value: EndgameRobot2019.NONE, expected: '254None (+0)' },
@@ -371,6 +369,24 @@ describe('ScoreBreakdown2019 endgame', () => {
 
     expect(redCell('Robot 1 Endgame').textContent).toBe(expected);
   });
+
+  // HAB climbs score 3/6/12 for Levels 1/2/3 (2019 Manual Table 5-1).
+  test.each([
+    { value: EndgameRobot2019.HAB_LEVEL2, expected: '254HAB 2 (+6)' },
+    { value: EndgameRobot2019.HAB_LEVEL3, expected: '254HAB 3 (+12)' },
+  ])(
+    'shows $value with its HAB climb points for robot 1',
+    ({ value, expected }) => {
+      render(
+        <ScoreBreakdown2019
+          scoreBreakdown={makeBreakdown({ endgameRobot1: value })}
+          match={match}
+        />,
+      );
+
+      expect(redCell('Robot 1 Endgame').textContent).toBe(expected);
+    },
+  );
 
   test('shows an unrecognised endgame value verbatim with zero points', () => {
     render(
@@ -454,35 +470,30 @@ describe('ScoreBreakdown2019 ranking points', () => {
 });
 
 describe('ScoreBreakdown2019 fouls', () => {
-  test("shows the opponent's fouls under each alliance", () => {
+  // Counts and foul points from 2019cars_qm6; each alliance's foulPoints come from the other's fouls.
+  function renderFouls() {
     render(
       <ScoreBreakdown2019
         scoreBreakdown={makeBreakdown(
-          { foulCount: 2, techFoulCount: 1 },
-          { foulCount: 4, techFoulCount: 0 },
+          { foulCount: 1, techFoulCount: 1, foulPoints: 10 },
+          { foulCount: 0, techFoulCount: 1, foulPoints: 13 },
         )}
         match={match}
       />,
     );
+  }
 
-    expect(
-      within(redCell('Fouls / Tech Fouls')).getByText('4 (+12)'),
-    ).toBeTruthy();
-    expect(
-      within(blueCell('Fouls / Tech Fouls')).getByText('2 (+6)'),
-    ).toBeTruthy();
+  test('shows the fouls and tech fouls each alliance committed', () => {
+    renderFouls();
+
+    expect(redCell('Fouls / Tech Fouls Committed').textContent).toBe('1 / 1');
+    expect(blueCell('Fouls / Tech Fouls Committed').textContent).toBe('0 / 1');
   });
 
-  test('values tech fouls at 10 points each', () => {
-    render(
-      <ScoreBreakdown2019
-        scoreBreakdown={makeBreakdown({ techFoulCount: 2 }, {})}
-        match={match}
-      />,
-    );
+  test('shows the foul points each alliance received', () => {
+    renderFouls();
 
-    expect(
-      within(blueCell('Fouls / Tech Fouls')).getByText('2 (+20)'),
-    ).toBeTruthy();
+    expect(redCell('Foul Points Received').textContent).toBe('10');
+    expect(blueCell('Foul Points Received').textContent).toBe('13');
   });
 });

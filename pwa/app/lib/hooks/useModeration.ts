@@ -124,7 +124,13 @@ export function useReviewSubmission(suggestionType: SuggestionType) {
           auth: token,
           body: { suggestion_keys: keys, user_message: userMessage },
         });
-        for (const outcome of response.data?.results ?? []) {
+        if (!response.data) {
+          for (const key of keys) {
+            result.failed.push({ key, message: 'request failed' });
+          }
+          continue;
+        }
+        for (const outcome of response.data.results) {
           if (outcome.result === ReviewResult.REJECTED) {
             result.rejected.push(outcome.suggestion_key);
           } else if (outcome.result === ReviewResult.ALREADY_REVIEWED) {

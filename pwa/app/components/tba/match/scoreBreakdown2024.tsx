@@ -11,6 +11,7 @@ import InlineIcon from '~/components/tba/inlineIcon';
 import {
   ConditionalCheckmark,
   ConditionalRpAchieved,
+  fmtFoulsCommitted,
 } from '~/components/tba/match/common';
 import { Badge } from '~/components/ui/badge';
 import { Table, TableBody, TableCell, TableRow } from '~/components/ui/table';
@@ -201,9 +202,9 @@ export default function ScoreBreakdown2024({
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot1}
               teamKey={match.alliances.red.team_keys[0]}
-              trapCenterStage={scoreBreakdown.red.trapCenterStage ?? false}
-              trapStageLeft={scoreBreakdown.red.trapStageLeft ?? false}
-              trapStageRight={scoreBreakdown.red.trapStageRight ?? false}
+              micCenterStage={scoreBreakdown.red.micCenterStage ?? false}
+              micStageLeft={scoreBreakdown.red.micStageLeft ?? false}
+              micStageRight={scoreBreakdown.red.micStageRight ?? false}
             />
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
@@ -213,9 +214,9 @@ export default function ScoreBreakdown2024({
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot1}
               teamKey={match.alliances.blue.team_keys[0]}
-              trapCenterStage={scoreBreakdown.blue.trapCenterStage ?? false}
-              trapStageLeft={scoreBreakdown.blue.trapStageLeft ?? false}
-              trapStageRight={scoreBreakdown.blue.trapStageRight ?? false}
+              micCenterStage={scoreBreakdown.blue.micCenterStage ?? false}
+              micStageLeft={scoreBreakdown.blue.micStageLeft ?? false}
+              micStageRight={scoreBreakdown.blue.micStageRight ?? false}
             />
           </TableCell>
         </TableRow>
@@ -226,9 +227,9 @@ export default function ScoreBreakdown2024({
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot2}
               teamKey={match.alliances.red.team_keys[1]}
-              trapCenterStage={scoreBreakdown.red.trapCenterStage ?? false}
-              trapStageLeft={scoreBreakdown.red.trapStageLeft ?? false}
-              trapStageRight={scoreBreakdown.red.trapStageRight ?? false}
+              micCenterStage={scoreBreakdown.red.micCenterStage ?? false}
+              micStageLeft={scoreBreakdown.red.micStageLeft ?? false}
+              micStageRight={scoreBreakdown.red.micStageRight ?? false}
             />
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
@@ -238,9 +239,9 @@ export default function ScoreBreakdown2024({
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot2}
               teamKey={match.alliances.blue.team_keys[1]}
-              trapCenterStage={scoreBreakdown.blue.trapCenterStage ?? false}
-              trapStageLeft={scoreBreakdown.blue.trapStageLeft ?? false}
-              trapStageRight={scoreBreakdown.blue.trapStageRight ?? false}
+              micCenterStage={scoreBreakdown.blue.micCenterStage ?? false}
+              micStageLeft={scoreBreakdown.blue.micStageLeft ?? false}
+              micStageRight={scoreBreakdown.blue.micStageRight ?? false}
             />
           </TableCell>
         </TableRow>
@@ -251,9 +252,9 @@ export default function ScoreBreakdown2024({
             <EndgameRobotCell
               endgame={scoreBreakdown.red.endGameRobot3}
               teamKey={match.alliances.red.team_keys[2]}
-              trapCenterStage={scoreBreakdown.red.trapCenterStage ?? false}
-              trapStageLeft={scoreBreakdown.red.trapStageLeft ?? false}
-              trapStageRight={scoreBreakdown.red.trapStageRight ?? false}
+              micCenterStage={scoreBreakdown.red.micCenterStage ?? false}
+              micStageLeft={scoreBreakdown.red.micStageLeft ?? false}
+              micStageRight={scoreBreakdown.red.micStageRight ?? false}
             />
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
@@ -263,9 +264,9 @@ export default function ScoreBreakdown2024({
             <EndgameRobotCell
               endgame={scoreBreakdown.blue.endGameRobot3}
               teamKey={match.alliances.blue.team_keys[2]}
-              trapCenterStage={scoreBreakdown.blue.trapCenterStage ?? false}
-              trapStageLeft={scoreBreakdown.blue.trapStageLeft ?? false}
-              trapStageRight={scoreBreakdown.blue.trapStageRight ?? false}
+              micCenterStage={scoreBreakdown.blue.micCenterStage ?? false}
+              micStageLeft={scoreBreakdown.blue.micStageLeft ?? false}
+              micStageRight={scoreBreakdown.blue.micStageRight ?? false}
             />
           </TableCell>
         </TableRow>
@@ -343,22 +344,35 @@ export default function ScoreBreakdown2024({
           </TableCell>
         </TableRow>
 
-        {/* Fouls / Tech Fouls */}
+        {/* Fouls committed by each alliance */}
         <TableRow>
           <TableCell className="bg-alliance-red-loser">
-            {scoreBreakdown.red.foulCount} (+
-            {(scoreBreakdown.red.foulCount ?? 0) * 2}) /{' '}
-            {scoreBreakdown.red.techFoulCount} (+
-            {(scoreBreakdown.red.techFoulCount ?? 0) * 5})
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.red.foulCount,
+              techFouls: scoreBreakdown.red.techFoulCount,
+            })}
           </TableCell>
           <TableCell className="bg-neutral-50 dark:bg-neutral-950">
-            Fouls / Tech Fouls
+            Fouls / Tech Fouls Committed
           </TableCell>
           <TableCell className="bg-alliance-blue-loser">
-            {scoreBreakdown.blue.foulCount} (+
-            {(scoreBreakdown.blue.foulCount ?? 0) * 2}) /{' '}
-            {scoreBreakdown.blue.techFoulCount} (+
-            {(scoreBreakdown.blue.techFoulCount ?? 0) * 5})
+            {fmtFoulsCommitted({
+              fouls: scoreBreakdown.blue.foulCount,
+              techFouls: scoreBreakdown.blue.techFoulCount,
+            })}
+          </TableCell>
+        </TableRow>
+
+        {/* Foul Points: points each alliance received from the other's fouls */}
+        <TableRow>
+          <TableCell className="bg-alliance-red-winner">
+            {scoreBreakdown.red.foulPoints}
+          </TableCell>
+          <TableCell className="bg-neutral-200 dark:bg-neutral-800">
+            Foul Points Received
+          </TableCell>
+          <TableCell className="bg-alliance-blue-winner">
+            {scoreBreakdown.blue.foulPoints}
           </TableCell>
         </TableRow>
 
@@ -408,23 +422,26 @@ export default function ScoreBreakdown2024({
 function EndgameRobotCell({
   endgame,
   teamKey,
-  trapCenterStage,
-  trapStageLeft,
-  trapStageRight,
+  micCenterStage,
+  micStageLeft,
+  micStageRight,
 }: {
   endgame: MatchScoreBreakdown2024['red']['endGameRobot1'];
-  trapCenterStage: boolean;
-  trapStageLeft: boolean;
-  trapStageRight: boolean;
+  micCenterStage: boolean;
+  micStageLeft: boolean;
+  micStageRight: boolean;
   teamKey: string;
 }) {
   let display = 'None';
   let points = 0;
 
+  // An ONSTAGE robot is SPOTLIT when a HIGH NOTE is scored on the MICROPHONE
+  // above it (2024 Game Manual, Section 6.5.4 SPOTLIGHTING). A NOTE in the
+  // TRAP is a separate 5-point score and does not spotlight anyone.
   if (
-    (endgame === EndGameRobot2024.CENTER_STAGE && trapCenterStage) ||
-    (endgame === EndGameRobot2024.STAGE_LEFT && trapStageLeft) ||
-    (endgame === EndGameRobot2024.STAGE_RIGHT && trapStageRight)
+    (endgame === EndGameRobot2024.CENTER_STAGE && micCenterStage) ||
+    (endgame === EndGameRobot2024.STAGE_LEFT && micStageLeft) ||
+    (endgame === EndGameRobot2024.STAGE_RIGHT && micStageRight)
   ) {
     display = 'Spotlit';
     points = 4;

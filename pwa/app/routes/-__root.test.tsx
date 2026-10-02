@@ -1,5 +1,5 @@
 import { QueryClient } from '@tanstack/react-query';
-import { render, screen, waitFor } from '@testing-library/react';
+import { render, screen, waitFor, within } from '@testing-library/react';
 import type { ComponentType, ReactNode } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
@@ -36,6 +36,9 @@ function passThrough({ children }: { children?: ReactNode }) {
 vi.mock('@tanstack/react-router', () => ({
   createRootRouteWithContext: () => (options: unknown) => ({ options }),
   HeadContent: () => <meta name="head-content" />,
+  ScriptOnce: ({ children }: { children: string }) => (
+    <meta data-testid="script-once" content={children} />
+  ),
   Scripts: () => <span data-testid="scripts" />,
   Outlet: () => <main>Outlet</main>,
   useLocation: () => ({ pathname: mocks.pathname }),
@@ -84,7 +87,10 @@ vi.mock('~/components/tba/tableOfContents', () => ({
 }));
 vi.mock('~/components/ui/sonner', () => ({ Toaster: () => null }));
 vi.mock('~/components/ui/tooltip', () => ({ TooltipProvider: passThrough }));
-vi.mock('~/lib/theme', () => ({ ThemeProvider: passThrough }));
+vi.mock('~/lib/theme', () => ({
+  THEME_INIT_SCRIPT: 'theme-init-script',
+  ThemeProvider: passThrough,
+}));
 
 vi.mock('@tanstack/react-router-devtools', () => ({
   TanStackRouterDevtools: () => <div>Router devtools</div>,
@@ -291,6 +297,16 @@ describe('RootComponent', () => {
     expect(document.body.getAttribute('data-hydrated')).toBe('true');
     expect(await screen.findByText('Router devtools')).toBeTruthy();
     expect(await screen.findByText('Query devtools')).toBeTruthy();
+  });
+
+  test('renders the theme init script in the head', async () => {
+    const { component: Root } = await loadRoot();
+
+    renderRoot(Root);
+
+    expect(
+      within(document.head).getByTestId('script-once').getAttribute('content'),
+    ).toBe('theme-init-script');
   });
 
   test('drops the container on full-width routes', async () => {

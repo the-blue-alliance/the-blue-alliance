@@ -112,7 +112,7 @@ const _PlayoffMatch = forwardRef<
   },
   ref,
 ): JSX.Element | null {
-  const cardRef = useRef<HTMLDivElement>(null);
+  const cardRef = useRef<HTMLFieldSetElement>(null);
   const redRowRef = useRef<HTMLDivElement>(null);
   const blueRowRef = useRef<HTMLDivElement>(null);
   const result = getSeriesResult(matches);
@@ -143,14 +143,15 @@ const _PlayoffMatch = forwardRef<
     );
   }
 
-  const isRedHighlighted = hoveredAlliance === result.redAllianceNumber;
-  const isBlueHighlighted = hoveredAlliance === result.blueAllianceNumber;
+  const isRedHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.redAllianceNumber;
+  const isBlueHighlighted =
+    hoveredAlliance !== null && hoveredAlliance === result.blueAllianceNumber;
   const isHighlighted = isRedHighlighted || isBlueHighlighted;
 
   return (
-    <div
+    <fieldset
       ref={cardRef}
-      role="group"
       aria-label={matchLabel}
       className={cn(
         `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200
@@ -335,7 +336,7 @@ const _PlayoffMatch = forwardRef<
           </div>
         </div>
       </div>
-    </div>
+    </fieldset>
   );
 });
 
