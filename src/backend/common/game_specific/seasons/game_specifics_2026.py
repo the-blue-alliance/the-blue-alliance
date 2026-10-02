@@ -212,11 +212,7 @@ class GameSpecifics2026(
             elif (auto_winner == AllianceColor.BLUE) and (blue_score > red_score):
                 auto_win_conversion += 1
 
-            for i in range(3):
-                if red_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
-                    auto_climb_count += 1
-                if blue_sb.get("autoTowerRobot{}".format(i + 1)) != "None":
-                    auto_climb_count += 1
+            auto_climb_count += _count_auto_climb(match)[0]
 
             auto_fuel_scored += red_sb.get("hubScore").get("autoCount")
             auto_fuel_scored += blue_sb.get("hubScore").get("autoCount")
@@ -413,12 +409,23 @@ def _robot_tower_states(
     ]
 
 
+# 2026 Game Manual, Table 6-4: "Each ROBOT at LEVEL 1 (2 ROBOTS max in AUTO)".
+MAX_AUTO_CLIMBS_PER_ALLIANCE = 2
+
+
 def _count_auto_climb(match: Match) -> Tuple[int, int]:
     breakdown = match.score_breakdown
     if breakdown is None:
         return (0, 0)
-    states = _robot_tower_states(breakdown, "autoTowerRobot")
-    return (sum(1 for state in states if state not in (None, "None")), len(states))
+    climbs = 0
+    for color in ALLIANCE_COLORS:
+        alliance_climbs = sum(
+            1
+            for i in range(3)
+            if breakdown[color].get(f"autoTowerRobot{i + 1}") not in (None, "None")
+        )
+        climbs += min(alliance_climbs, MAX_AUTO_CLIMBS_PER_ALLIANCE)
+    return (climbs, MAX_AUTO_CLIMBS_PER_ALLIANCE * len(ALLIANCE_COLORS))
 
 
 def _tower_level_counter(level: str) -> Callable[[Match], Tuple[int, int]]:
