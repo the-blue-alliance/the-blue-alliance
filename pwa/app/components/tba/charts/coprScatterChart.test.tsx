@@ -239,6 +239,13 @@ describe('CoprScatterChart', () => {
     ).toEqual(['hsl(var(--primary))', '#000000', '#0000ff']);
   });
 
+  test('does not mutate the passed-in colors when darkening a white team', () => {
+    // The passed-in colors are typically React Query cache data.
+    const colors = renderChart();
+
+    expect(colors).toEqual(makeColors());
+  });
+
   test('leaves dots unfilled for teams with no colors on record', () => {
     const colors = makeColors();
     colors.teams['254'].colors = null;

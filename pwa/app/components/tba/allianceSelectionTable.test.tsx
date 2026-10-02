@@ -92,6 +92,11 @@ describe('AllianceSelectionTable', () => {
     expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);
   });
 
+  test('an empty alliance list falls back to the default three team columns', () => {
+    render(<AllianceSelectionTable year={2026} alliances={[]} />);
+    expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);
+  });
+
   test('renders a single-team alliance without pick columns', () => {
     render(
       <AllianceSelectionTable

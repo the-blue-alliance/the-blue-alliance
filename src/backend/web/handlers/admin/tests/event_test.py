@@ -2280,3 +2280,14 @@ def test_link_frc_api_post_not_found(web_client: Client, login_gae_admin) -> Non
         "/admin/event/link_frc_api/2020nyny", data={"frc_event_input": "NYNY"}
     )
     assert resp.status_code == 404
+
+
+def test_empty_divisions_field_means_no_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """An empty divisions field saves the event with no divisions."""
+    resp = web_client.post("/admin/event/edit", data=_full_event_form(divisions=""))
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.divisions == []

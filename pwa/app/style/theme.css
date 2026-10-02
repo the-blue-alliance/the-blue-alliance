@@ -84,6 +84,9 @@
 }
 
 :root {
+  /* Native controls (select popups, date pickers, scrollbars) follow the
+     site's theme, not the OS preference. */
+  color-scheme: light;
   --background: oklch(1 0 0);
   --foreground: oklch(0.2393 0 0);
   --card: oklch(1 0 0);
@@ -121,6 +124,7 @@
 }
 
 .dark {
+  color-scheme: dark;
   --background: oklch(0.2273 0.0038 286.09);
   --foreground: oklch(0.9158 0 0);
   --card: oklch(0.287 0.004 286.09);
