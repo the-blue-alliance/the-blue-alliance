@@ -1,6 +1,7 @@
 import datetime
 
 from flask import abort, jsonify, make_response, request, Response
+from flask_wtf.csrf import generate_csrf
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -122,10 +123,24 @@ def account_favorites_delete_handler() -> Response:
 
 
 def account_info_handler() -> Response:
+    """
+    Returns information about the current session, including a CSRF token for
+    use with the other /_/account/ endpoints.
+
+    A CSRF token is per-session, so it must never be rendered into a page served
+    by `cached_public` - that cache is keyed on path + query string with no user
+    component, so every visitor would be handed the token belonging to whoever
+    warmed the cache. Client-side code needing a token should fetch it from here
+    instead.
+    """
     user = current_user()
-    return jsonify(
+    response = jsonify(
         {
             "logged_in": (user is not None),
             "user_id": str(user.uid) if user else None,
+            "csrf_token": generate_csrf(),
         }
     )
+    # Session-specific, so it must not be stored by any shared cache
+    response.headers["Cache-Control"] = "no-store, private"
+    return response

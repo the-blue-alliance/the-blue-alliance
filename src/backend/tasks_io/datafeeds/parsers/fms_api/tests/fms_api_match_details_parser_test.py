@@ -1,6 +1,6 @@
 import json
 from datetime import datetime
-from typing import cast
+from typing import Any, cast, Dict, List
 
 import pytest
 
@@ -218,3 +218,125 @@ def test_parse_playoff_with_octofinals(test_data_importer) -> None:
         assert len(clean_matches[CompLevel.QF]) == 10
         assert len(clean_matches[CompLevel.SF]) == 4
         assert len(clean_matches[CompLevel.F]) == 2
+
+
+def _put_event(year: int, event_short: str, playoff_type: PlayoffType) -> None:
+    Event(
+        id=f"{year}{event_short}",
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        short_name="Test",
+        event_short=event_short,
+        year=year,
+        end_date=datetime(year, 3, 27),
+        official=True,
+        start_date=datetime(year, 3, 24),
+        timezone_id="America/New_York",
+        playoff_type=playoff_type,
+    ).put()
+
+
+def _parse(
+    year: int, event_short: str, matches: List[Dict[str, Any]]
+) -> Dict[str, Any]:
+    return FMSAPIMatchDetailsParser(year, event_short).parse(
+        cast(TScoreDetailReturn, {"MatchScores": matches})
+    )
+
+
+def test_parse_2015_coopertition() -> None:
+    """2015 responses carry top-level coopertition fields onto the breakdown."""
+    _put_event(2015, "nyny", PlayoffType.AVG_SCORE_8_TEAM)
+    breakdowns = _parse(
+        2015,
+        "nyny",
+        [
+            {
+                "matchLevel": "Qualification",
+                "matchNumber": 1,
+                "coopertition": "Stack",
+                "coopertitionPoints": 40,
+                "Alliances": [
+                    {"alliance": "Red", "totalPoints": 50},
+                    {"alliance": "Blue", "totalPoints": 60},
+                ],
+            }
+        ],
+    )
+    breakdown = breakdowns["2015nyny_qm1"]
+    assert breakdown["coopertition"] == "Stack"
+    assert breakdown["coopertition_points"] == 40
+    assert breakdown[AllianceColor.RED] == {"totalPoints": 50}
+    assert breakdown[AllianceColor.BLUE] == {"totalPoints": 60}
+
+
+def test_parse_2024_copies_bonus_thresholds_to_each_alliance() -> None:
+    """2024 bonus thresholds live on the match and are duplicated per alliance."""
+    _put_event(2024, "nyny", PlayoffType.DOUBLE_ELIM_8_TEAM)
+    breakdowns = _parse(
+        2024,
+        "nyny",
+        [
+            {
+                "matchLevel": "Qualification",
+                "matchNumber": 3,
+                "coopertitionBonusAchieved": True,
+                "melodyBonusThresholdCoop": 15,
+                "melodyBonusThresholdNonCoop": 18,
+                "melodyBonusThreshold": 15,
+                "ensembleBonusStagePointsThreshold": 10,
+                "ensembleBonusOnStageRobotsThreshold": 2,
+                "alliances": [
+                    {"alliance": "Red", "totalPoints": 70},
+                    {"alliance": "Blue", "totalPoints": 65},
+                ],
+            }
+        ],
+    )
+    breakdown = breakdowns["2024nyny_qm3"]
+    for color, total in [(AllianceColor.RED, 70), (AllianceColor.BLUE, 65)]:
+        assert breakdown[color] == {
+            "coopertitionBonusAchieved": True,
+            "melodyBonusThresholdCoop": 15,
+            "melodyBonusThresholdNonCoop": 18,
+            "melodyBonusThreshold": 15,
+            "ensembleBonusStagePointsThreshold": 10,
+            "ensembleBonusOnStageRobotsThreshold": 2,
+            "totalPoints": total,
+        }
+
+
+def _rocket_fields(near_complete: bool, far_complete: bool) -> Dict[str, Any]:
+    fields: Dict[str, Any] = {}
+    for side, complete in [("Near", near_complete), ("Far", far_complete)]:
+        for level in ["low", "mid", "top"]:
+            for side2 in ["Left", "Right"]:
+                fields[f"{level}{side2}Rocket{side}"] = "PanelAndCargo"
+        if not complete:
+            fields[f"topRightRocket{side}"] = "Panel"
+    return fields
+
+
+def test_parse_2019_derives_completed_rockets() -> None:
+    """2019 completedRocket flags are recomputed from the individual bays."""
+    _put_event(2019, "nyny", PlayoffType.BRACKET_8_TEAM)
+    red = {"alliance": "Red", "completedRocketNear": False, "completedRocketFar": True}
+    red.update(_rocket_fields(near_complete=True, far_complete=False))
+    blue = {"alliance": "Blue", "completedRocketNear": True, "completedRocketFar": True}
+    blue.update(_rocket_fields(near_complete=False, far_complete=False))
+    breakdowns = _parse(
+        2019,
+        "nyny",
+        [
+            {
+                "matchLevel": "Qualification",
+                "matchNumber": 7,
+                "alliances": [red, blue],
+            }
+        ],
+    )
+    breakdown = breakdowns["2019nyny_qm7"]
+    assert breakdown[AllianceColor.RED]["completedRocketNear"] is True
+    assert breakdown[AllianceColor.RED]["completedRocketFar"] is False
+    assert breakdown[AllianceColor.BLUE]["completedRocketNear"] is False
+    assert breakdown[AllianceColor.BLUE]["completedRocketFar"] is False

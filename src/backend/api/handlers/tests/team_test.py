@@ -828,6 +828,9 @@ def test_team_list_all(ndb_stub, api_client: Client) -> None:
         "/api/v3/teams/all", headers={"X-TBA-Auth-Key": "test_auth_key"}
     )
     assert resp.status_code == 200
+    assert resp.headers.get("Content-Type") == "application/json"
+    assert resp.data.startswith(b"[") and resp.data.endswith(b"]")
+    assert json.loads(resp.data) == resp.json
     assert len(resp.json) == 4
     for team in resp.json:
         validate_nominal_team_keys(team)

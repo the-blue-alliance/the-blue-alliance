@@ -7,9 +7,11 @@ import MailIcon from '~icons/lucide/mail';
 import UserIcon from '~icons/lucide/user';
 
 import { listFavorites, listSubscriptions } from '~/api/tba/mobile/sdk.gen';
+import ApiKeysSection from '~/components/tba/account/apiKeys';
+import { SuggestionReviewSection } from '~/components/tba/account/suggestionReviewSection';
 import { useAuth } from '~/components/tba/auth/auth';
 import LoginPage from '~/components/tba/auth/loginPage';
-import { Button } from '~/components/ui/button';
+import { Button, buttonVariants } from '~/components/ui/button';
 import {
   Card,
   CardContent,
@@ -27,10 +29,12 @@ import {
   DialogTrigger,
 } from '~/components/ui/dialog';
 import { Input } from '~/components/ui/input';
+import { Spinner } from '~/components/ui/spinner';
 
 export const Route = createFileRoute('/account/')({
   component: Account,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 function Account() {
   const { isInitialLoading, user, logout } = useAuth();
@@ -68,7 +72,11 @@ function Account() {
   });
 
   if (isInitialLoading) {
-    return <div>Loading...</div>;
+    return (
+      <div className="flex justify-center py-16">
+        <Spinner className="size-8 text-muted-foreground" />
+      </div>
+    );
   }
 
   if (!user) {
@@ -140,11 +148,15 @@ function Account() {
               <div className="text-sm text-muted-foreground">Subscriptions</div>
             </div>
           </div>
-          <Button size="sm" render={<Link to="/account/mytba" />}>
+          <Link to="/account/mytba" className={buttonVariants({ size: 'sm' })}>
             Manage myTBA
-          </Button>
+          </Link>
         </CardContent>
       </Card>
+
+      <SuggestionReviewSection />
+
+      <ApiKeysSection />
     </div>
   );
 }

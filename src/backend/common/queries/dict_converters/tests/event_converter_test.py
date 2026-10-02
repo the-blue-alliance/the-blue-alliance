@@ -1,6 +1,10 @@
+import datetime
+import json
+
 from google.appengine.ext import ndb
 
 from backend.common.consts.event_type import EventType
+from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.location import Location
@@ -121,3 +125,188 @@ def test_eventConverter_v3_omits_nexus_code_for_api(ndb_context) -> None:
     converted = EventConverter.eventConverter_v3(event)
 
     assert "nexus_code_for_api" not in converted
+
+
+def test_eventsConverter_v3_batched_district_lookups(monkeypatch, ndb_context) -> None:
+    district_ne = District(
+        id="2025ne",
+        year=2025,
+        abbreviation="ne",
+        display_name="New England",
+    )
+    district_fim = District(
+        id="2025fim",
+        year=2025,
+        abbreviation="fim",
+        display_name="FIRST in Michigan",
+    )
+    district_ne.put()
+    district_fim.put()
+
+    ne_key = ndb.Key(District, "2025ne")
+    fim_key = ndb.Key(District, "2025fim")
+    missing_key = ndb.Key(District, "2025nonexistent")
+
+    e1 = Event(
+        id="2025ne1", year=2025, event_type_enum=EventType.DISTRICT, district_key=ne_key
+    )
+    e2 = Event(
+        id="2025ne2", year=2025, event_type_enum=EventType.DISTRICT, district_key=ne_key
+    )
+    e3 = Event(
+        id="2025fim1",
+        year=2025,
+        event_type_enum=EventType.DISTRICT,
+        district_key=fim_key,
+    )
+    e4 = Event(
+        id="2025fim2",
+        year=2025,
+        event_type_enum=EventType.DISTRICT,
+        district_key=fim_key,
+    )
+    e5 = Event(
+        id="2025regional",
+        year=2025,
+        event_type_enum=EventType.REGIONAL,
+        district_key=None,
+    )
+    e6 = Event(
+        id="2025missing",
+        year=2025,
+        event_type_enum=EventType.DISTRICT,
+        district_key=missing_key,
+    )
+
+    events = [e1, e2, e3, e4, e5, e6]
+
+    from unittest.mock import MagicMock
+
+    get_multi_mock = MagicMock(wraps=ndb.get_multi)
+    monkeypatch.setattr(ndb, "get_multi", get_multi_mock)
+
+    converted_events = EventConverter.eventsConverter_v3(events)
+
+    # get_multi should have been called exactly once with the unique district keys
+    assert get_multi_mock.call_count == 1
+    call_args = get_multi_mock.call_args[0][0]
+    assert set(call_args) == {ne_key, fim_key, missing_key}
+
+    expected_ne_district = DistrictConverter.districtConverter_v3(district_ne)
+    expected_fim_district = DistrictConverter.districtConverter_v3(district_fim)
+
+    assert converted_events[0]["district"] == expected_ne_district
+    assert converted_events[1]["district"] == expected_ne_district
+    assert converted_events[2]["district"] == expected_fim_district
+    assert converted_events[3]["district"] == expected_fim_district
+    assert converted_events[4]["district"] is None
+    assert converted_events[5]["district"] is None
+
+
+def test_eventConverter_v3_with_district_map(monkeypatch, ndb_context) -> None:
+    district = District(
+        id="2025ne",
+        year=2025,
+        abbreviation="ne",
+        display_name="New England",
+    )
+    expected_district_dict = DistrictConverter.districtConverter_v3(district)
+    district_key = ndb.Key(District, "2025ne")
+
+    event = Event(
+        id="2025test",
+        year=2025,
+        event_type_enum=EventType.DISTRICT,
+        district_key=district_key,
+    )
+
+    from unittest.mock import MagicMock
+
+    get_async_mock = MagicMock(wraps=ndb.Key.get_async)
+    monkeypatch.setattr(ndb.Key, "get_async", get_async_mock)
+
+    # When district_map is passed, get_async should not be called
+    converted = EventConverter.eventConverter_v3(
+        event, district_map={district_key: expected_district_dict}
+    )
+    assert converted["district"] == expected_district_dict
+    get_async_mock.assert_not_called()
+
+
+def test_eventConverter_v3_dictToModel_v3_round_trip(ndb_context) -> None:
+    district = District(
+        id="2025ne", year=2025, abbreviation="ne", display_name="New England"
+    )
+    district.put()
+    event = Event(
+        id="2025mabos",
+        name="Boston District",
+        short_name="Boston",
+        event_short="mabos",
+        event_type_enum=EventType.DISTRICT,
+        year=2025,
+        timezone_id="America/New_York",
+        website="https://example.com",
+        start_date=datetime.datetime(2025, 3, 7),
+        end_date=datetime.datetime(2025, 3, 9),
+        webcast_json=json.dumps([{"type": "twitch", "channel": "firstinspires"}]),
+        venue="Venue",
+        city="Boston",
+        state_prov="MA",
+        country="USA",
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+        parent_event=ndb.Key(Event, "2025necmp"),
+        divisions=[ndb.Key(Event, "2025div1")],
+        district_key=district.key,
+        remap_teams={"frc9999": "frc254B"},
+    )
+
+    data = EventConverter.eventConverter_v3(event)
+    assert data["start_date"] == "2025-03-07"
+    assert data["end_date"] == "2025-03-09"
+    assert data["webcasts"] == [{"type": "twitch", "channel": "firstinspires"}]
+
+    model = EventConverter.dictToModel_v3(data)
+    assert model.key.id() == "2025mabos"
+    assert model.name == "Boston District"
+    assert model.short_name == "Boston"
+    assert model.event_short == "mabos"
+    assert model.event_type_enum == EventType.DISTRICT
+    assert model.official is True
+    assert model.year == 2025
+    assert model.timezone_id == "America/New_York"
+    assert model.website == "https://example.com"
+    assert model.start_date == datetime.datetime(2025, 3, 7)
+    assert model.end_date == datetime.datetime(2025, 3, 9)
+    assert model.webcast == [{"type": "twitch", "channel": "firstinspires"}]
+    assert model.venue == "Venue"
+    assert model.city == "Boston"
+    assert model.state_prov == "MA"
+    assert model.country == "USA"
+    assert model.playoff_type == PlayoffType.DOUBLE_ELIM_8_TEAM
+    assert model.parent_event == ndb.Key(Event, "2025necmp")
+    assert model.divisions == [ndb.Key(Event, "2025div1")]
+    assert model.district_key == ndb.Key(District, "2025ne")
+    assert model.remap_teams == {"frc9999": "frc254B"}
+
+
+def test_eventConverter_v3_dictToModel_v3_minimal(ndb_context) -> None:
+    event = Event(
+        id="2025test",
+        event_short="test",
+        event_type_enum=EventType.OFFSEASON,
+        year=2025,
+    )
+
+    data = EventConverter.eventConverter_v3(event)
+    assert data["start_date"] is None
+    assert data["end_date"] is None
+    assert data["webcasts"] == []
+
+    model = EventConverter.dictToModel_v3(data)
+    assert model.official is False
+    assert model.start_date is None
+    assert model.end_date is None
+    assert model.parent_event is None
+    assert model.divisions == []
+    assert model.district_key is None

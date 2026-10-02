@@ -1,6 +1,7 @@
+import * as Sentry from '@sentry/tanstackstart-react';
 import { dehydrate, hydrate } from '@tanstack/react-query';
 import { Temporal } from 'temporal-polyfill';
-import { describe, expect, test } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { ApiError } from '~/lib/apiError';
 import {
@@ -9,7 +10,19 @@ import {
   staleTimeForYear,
 } from '~/lib/queryClient';
 
-describe.concurrent('createQueryClient', () => {
+const loggerMocks = vi.hoisted(() => ({
+  error: vi.fn<(bindings: object, message: string) => void>(),
+}));
+
+vi.mock('@sentry/tanstackstart-react', () => ({
+  captureException: vi.fn<typeof Sentry.captureException>(),
+}));
+
+vi.mock('~/lib/logger', () => ({
+  createLogger: () => loggerMocks,
+}));
+
+describe('createQueryClient', () => {
   test('defaults staleTime to STALE_TIME.DEFAULT', () => {
     const queryClient = createQueryClient();
     expect(queryClient.getDefaultOptions().queries?.staleTime).toEqual(
@@ -41,6 +54,107 @@ describe.concurrent('createQueryClient', () => {
     expect(retry(0, new Error('network error'))).toEqual(true);
   });
 
+  test('onError reports non-404 ApiErrors to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('server error', 500);
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-500'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('server error');
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test('onError reports non-ApiErrors (e.g. network failures) to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new Error('network error');
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-network'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('network error');
+
+    expect(Sentry.captureException).toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test('onError does not report 404 ApiErrors to Sentry', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('not found', 404);
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey: ['test-error-404'],
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('not found');
+
+    expect(Sentry.captureException).not.toHaveBeenCalledWith(
+      error,
+      expect.anything(),
+    );
+  });
+
+  test.each([
+    {
+      name: '500 API errors',
+      error: new ApiError('server error', 500),
+      queryKey: ['test-log-error-500'],
+    },
+    {
+      name: 'network errors',
+      error: new Error('network error'),
+      queryKey: ['test-log-error-network'],
+    },
+  ])('onError logs $name', async ({ error, queryKey }) => {
+    const queryClient = createQueryClient();
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey,
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow(error.message);
+
+    expect(loggerMocks.error).toHaveBeenCalledWith(
+      { err: error, queryKey },
+      'Query failed',
+    );
+  });
+
+  test('onError does not log 404 ApiErrors', async () => {
+    const queryClient = createQueryClient();
+    const error = new ApiError('not found', 404);
+    const queryKey = ['test-log-error-404'];
+
+    await expect(
+      queryClient.fetchQuery({
+        queryKey,
+        queryFn: () => Promise.reject(error),
+        retry: false,
+      }),
+    ).rejects.toThrow('not found');
+
+    expect(loggerMocks.error).not.toHaveBeenCalledWith(
+      { err: error, queryKey },
+      'Query failed',
+    );
+  });
+
   test('freshly hydrated data is not stale under the default staleTime', () => {
     // Simulates the SSR -> hydration flow: a loader warms the cache on the
     // server, the cache is dehydrated into the payload, and a fresh
@@ -63,7 +177,7 @@ describe.concurrent('createQueryClient', () => {
   });
 });
 
-describe.concurrent('staleTimeForYear', () => {
+describe('staleTimeForYear', () => {
   const currentYear = Temporal.Now.plainDateISO().year;
 
   test('returns HISTORICAL for a past year', () => {

@@ -10,6 +10,7 @@ import {
   AccordionItem,
   AccordionTrigger,
 } from '~/components/ui/accordion';
+import { useApiKeys } from '~/lib/hooks/useApiKeys';
 import { useTheme } from '~/lib/theme';
 
 export const Route = createFileRoute('/apidocs_/v3')({
@@ -32,7 +33,8 @@ export const Route = createFileRoute('/apidocs_/v3')({
     };
   },
   component: ApiDocsV3,
-});
+}); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+// v8 ignore stop
 
 const ChangelogDisplay = ({ xChanges }: { xChanges: string }) => {
   const entries = useMemo(() => {
@@ -95,6 +97,7 @@ const XChangesPlugin = () => {
 
 function ApiDocsV3(): React.JSX.Element {
   const { resolvedTheme } = useTheme();
+  const { readKeys } = useApiKeys();
   return (
     // key forces a remount when the theme changes; Scalar's Vue internals don't
     // treat darkMode as reactive after initialization, so updateConfiguration
@@ -117,7 +120,7 @@ function ApiDocsV3(): React.JSX.Element {
           preferredSecurityScheme: 'apiKey',
           securitySchemes: {
             apiKey: {
-              value: '',
+              value: readKeys[0]?.key ?? '',
             },
           },
         },
