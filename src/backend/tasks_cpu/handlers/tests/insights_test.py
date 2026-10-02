@@ -622,3 +622,12 @@ def test_district_insights_heading_names_year_and_district(
     assert heading is not None
     assert b"2026" in heading.group(1)
     assert b"fim" in heading.group(1)
+
+
+def test_unknown_overall_insight_kind_outside_taskqueue_is_not_found(
+    tasks_cpu_client: Client,
+) -> None:
+    """An unknown overall-insight kind is a client error and writes nothing."""
+    resp = tasks_cpu_client.get("/backend-tasks-b2/do/math/overallinsights/asdf")
+    assert resp.status_code in (400, 404)
+    assert Insight.query().count() == 0

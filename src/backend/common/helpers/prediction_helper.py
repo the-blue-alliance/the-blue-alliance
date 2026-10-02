@@ -389,13 +389,13 @@ class ContributionCalculator:
                     means[color] = count
                 elif self._stat == "robot_on_stage":
                     count = 0
-                    for i in range(1, 4):
+                    for robot in range(1, 4):
                         if (
-                            score_breakdown[color]["endGameRobot{}".format(i)]
+                            score_breakdown[color]["endGameRobot{}".format(robot)]
                             == "StageLeft"
-                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            or score_breakdown[color]["endGameRobot{}".format(robot)]
                             == "StageRight"
-                            or score_breakdown[color]["endGameRobot{}".format(i)]
+                            or score_breakdown[color]["endGameRobot{}".format(robot)]
                             == "CenterStage"
                         ):
                             count += 1

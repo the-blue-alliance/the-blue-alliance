@@ -444,3 +444,23 @@ def test_avatar_list_sorts_by_team_and_caches_shards(
         "frc604",
         "frc1114",
     ]
+
+
+def test_avatar_list_cached_order_matches_fresh_order(
+    ndb_stub, captured_templates: List[CapturedTemplate], web_client: Client
+) -> None:
+    """The cached avatar page lists avatars in the same order as the fresh one."""
+    team_numbers = list(range(1, 26))
+    for team_number in team_numbers:
+        _put_avatar(2024, team_number)
+
+    resp = web_client.get("/avatars/2024")
+    assert resp.status_code == 200
+    fresh_order = [a.references[0].id() for a in captured_templates[0][1]["avatars"]]
+    assert fresh_order == [f"frc{n}" for n in team_numbers]
+
+    # A new query string skips the response cache, so this reads the shards.
+    resp = web_client.get("/avatars/2024?fresh=1")
+    assert resp.status_code == 200
+    cached_order = [a.references[0].id() for a in captured_templates[1][1]["avatars"]]
+    assert cached_order == fresh_order
