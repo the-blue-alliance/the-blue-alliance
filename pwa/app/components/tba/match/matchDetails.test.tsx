@@ -1,7 +1,6 @@
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { fireEvent, render, screen } from '@testing-library/react';
 import type { AnchorHTMLAttributes } from 'react';
-import { Temporal } from 'temporal-polyfill';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import {
@@ -14,6 +13,7 @@ import {
 } from '~/api/tba/read';
 import MatchDetails from '~/components/tba/match/matchDetails';
 import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
+import { formatMatchTime } from '~/lib/matchUtils';
 
 const zebraMocks = vi.hoisted(() => ({
   fetchZebra: vi.fn<() => Promise<unknown>>(),
@@ -306,7 +306,7 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch({ time: SCHEDULED }));
 
     expect(screen.getByText('Scheduled:').parentElement?.textContent).toMatch(
-      /^Scheduled:0?2:30 AM$/,
+      /^Scheduled:2:30 AM$/,
     );
   });
 
@@ -314,7 +314,7 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch({ predicted_time: SCHEDULED + 600 }));
 
     expect(screen.getByText('Predicted:').parentElement?.textContent).toMatch(
-      /^Predicted:0?2:40 AM$/,
+      /^Predicted:2:40 AM$/,
     );
   });
 
@@ -322,7 +322,7 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch({ actual_time: SCHEDULED + 300 }));
 
     expect(screen.getByText('Actual:').parentElement?.textContent).toMatch(
-      /^Actual:0?2:35 AM$/,
+      /^Actual:2:35 AM$/,
     );
   });
 
@@ -366,19 +366,16 @@ describe('MatchDetails', () => {
     renderDetails(makeMatch({ time: SCHEDULED }), { timezone: null });
 
     expect(screen.getByText('Scheduled:').parentElement?.textContent).toMatch(
-      /^Scheduled:0?2:30 PM$/,
+      /^Scheduled:2:30 PM$/,
     );
   });
 
   test('shows times in the viewer timezone once the toggle is checked', () => {
     const viewerTimezone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-    const expected = Temporal.Instant.fromEpochMilliseconds(SCHEDULED * 1000)
-      .toZonedDateTimeISO(viewerTimezone)
-      .toLocaleString('en-US', {
-        hour: '2-digit',
-        minute: '2-digit',
-        hour12: true,
-      });
+    const expected = formatMatchTime(SCHEDULED, {
+      timeZone: viewerTimezone,
+      weekday: false,
+    });
     renderDetails(makeMatch({ time: SCHEDULED }));
 
     fireEvent.click(
@@ -400,7 +397,7 @@ describe('MatchDetails', () => {
     fireEvent.click(toggle);
 
     expect(screen.getByText('Scheduled:').parentElement?.textContent).toMatch(
-      /^Scheduled:0?2:30 AM$/,
+      /^Scheduled:2:30 AM$/,
     );
   });
 

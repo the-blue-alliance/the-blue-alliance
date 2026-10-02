@@ -18,6 +18,7 @@ import SimpleMatchRowsWithBreaks, {
 } from '~/components/tba/match/matchRows';
 import type { TeamTooltipProps } from '~/components/tba/teamTooltip';
 import { TooltipProvider } from '~/components/ui/tooltip';
+import { formatMatchTime } from '~/lib/matchUtils';
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -597,6 +598,18 @@ describe('SimpleMatchRow', () => {
     );
 
     expect(screen.getByText(/^\w{3} \d{1,2}:\d{2} [AP]M$/)).toBeTruthy();
+  });
+
+  test('formats the predicted time with formatMatchTime', () => {
+    const predictedTime = new Date(2026, 2, 7, 9, 30).getTime() / 1000;
+    render(
+      <SimpleMatchRow
+        match={makeUnplayedMatch({ predicted_time: predictedTime })}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText(formatMatchTime(predictedTime))).toBeTruthy();
   });
 
   test('shows no time for an unplayed match without a prediction', () => {
