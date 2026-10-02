@@ -2300,3 +2300,14 @@ def test_create_event_with_details_json_saves_event_and_details(
     details = EventDetails.get_by_id("2020nyny")
     assert details is not None
     assert details.alliance_selections == alliances
+
+
+def test_empty_divisions_field_means_no_divisions(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    """An empty divisions field saves the event with no divisions."""
+    resp = web_client.post("/admin/event/edit", data=_full_event_form(divisions=""))
+    assert resp.status_code == 302
+    event = Event.get_by_id("2020nyny")
+    assert event is not None
+    assert event.divisions == []

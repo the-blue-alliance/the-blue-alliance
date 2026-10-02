@@ -102,7 +102,7 @@ function getNonWhiteTeamColor(
   };
 
   if (color.colors?.primaryHex === '#ffffff') {
-    color.colors.primaryHex = '#000000';
+    return { ...color, colors: { ...color.colors, primaryHex: '#000000' } };
   }
 
   return color;

@@ -11,6 +11,7 @@ from backend.common.consts.webcast_type import WebcastType
 from backend.common.memcache_models.webcast_online_status_memcache import (
     WebcastOnlineStatusMemcache,
 )
+from backend.common.models.district import District
 from backend.common.models.event import Event
 from backend.common.models.webcast import Webcast
 from backend.web.handlers.tests import helpers
@@ -165,3 +166,18 @@ def test_render_event_state_prov_no_events_redirects(
     resp = web_client.get("/events/2020?state_prov=ZZ")
     assert resp.status_code == 302
     assert resp.headers["Location"] == "/events/2020"
+
+
+def test_render_districts_dropdown_without_display_name(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+    District(id="2020ne", year=2020, abbreviation="ne", display_name="Zed").put()
+    District(id="2020fim", year=2020, abbreviation="fim").put()
+
+    resp = web_client.get("/events/2020")
+    assert resp.status_code == 200
+
+    body = resp.get_data(as_text=True)
+    assert 'href="/events/fim/2020">FIM</a>' in body
+    assert body.index(">FIM</a>") < body.index(">Zed</a>")

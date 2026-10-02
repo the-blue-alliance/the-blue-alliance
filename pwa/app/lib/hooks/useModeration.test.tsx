@@ -285,4 +285,27 @@ describe('useReviewSubmission', () => {
       ],
     });
   });
+
+  test('rejects whose request fails outright are reported as failed', async () => {
+    mocks.rejectModerationSuggestions.mockResolvedValue({
+      error: { Error: 'Internal Server Error' },
+      response: { status: 500 },
+    });
+    const { result } = renderSubmission();
+
+    let outcome: ReviewSubmissionResult | undefined;
+    await act(async () => {
+      outcome = await result.current.mutateAsync({
+        accepts: [],
+        rejects: [{ key: 'r1' }],
+      });
+    });
+
+    expect(outcome).toEqual({
+      accepted: [],
+      rejected: [],
+      alreadyReviewed: [],
+      failed: [{ key: 'r1', message: expect.any(String) }],
+    });
+  });
 });

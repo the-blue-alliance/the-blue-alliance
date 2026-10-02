@@ -117,6 +117,15 @@ class TestCSVOffseasonMatchesParser(unittest.TestCase):
         with self.assertRaises(KeyError):
             CSVOffseasonMatchesParser.parse_match_number_info("xx1")
 
+    def test_parse_elim_match_number_info_two_digit_set(self) -> None:
+        """The elim id "sf12m1" is set 12, match 1."""
+        self.assertEqual(
+            CSVOffseasonMatchesParser.parse_elim_match_number_info("sf12m1"), (1, 12)
+        )
+        self.assertEqual(
+            CSVOffseasonMatchesParser.parse_match_number_info("sf12m1"), ("sf", 1, 12)
+        )
+
     def test_parse_elim_match_number_info_requires_set_number(self) -> None:
         # An elim id without a set number ("fm1") is rejected. Today that is a
         # ValueError from int("f"), since COMP_LEVEL_MAP happens to accept
