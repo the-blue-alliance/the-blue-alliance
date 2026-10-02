@@ -105,4 +105,16 @@ describe('TeamPageTeamInfo', () => {
     expect(screen.getByText('Some High School')).toBeTruthy();
     expect(screen.queryByText(/sponsor/)).toBeNull();
   });
+
+  test('the sponsor label has a single space before "sponsors"', () => {
+    // HTML collapses a double space when rendered, so this checks textContent.
+    render(
+      <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,
+    );
+    expect(
+      screen.getByRole('button', {
+        name: 'Bellarmine College Preparatory with 2 sponsors',
+      }).textContent,
+    ).toBe('Bellarmine College Preparatory with 2 sponsors');
+  });
 });

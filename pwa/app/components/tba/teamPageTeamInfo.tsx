@@ -81,7 +81,7 @@ export default function TeamPageTeamInfo({
                   <DetailEntity icon={<SponsorsIcon />}>
                     {schoolName}
                     {sponsors.length > 0 &&
-                      ` with ${pluralize(sponsors.length, ' sponsor', ' sponsors')}`}
+                      ` with ${pluralize(sponsors.length, 'sponsor', 'sponsors')}`}
                   </DetailEntity>
                 </AccordionTrigger>
                 <AccordionContent className="pb-0">

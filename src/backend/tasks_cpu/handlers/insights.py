@@ -96,7 +96,10 @@ def do_year_insights(kind: str, year: Year) -> Response:
     ):  # Only write out if not in taskqueue
         return make_response(
             render_template(
-                "math/year_insights_do.html", kind=kind, insights=insights or []
+                "math/year_insights_do.html",
+                year=year,
+                kind=kind,
+                insights=insights or [],
             )
         )
 
@@ -245,6 +248,8 @@ def do_overall_insights(kind: str) -> Response:
         insights = InsightsHelper.doOverallMatchInsights()
     elif kind == "awards":
         insights = InsightsHelper.doOverallAwardInsights()
+    elif "X-Appengine-Taskname" not in request.headers:
+        abort(404)
 
     if insights is not None:
         InsightManipulator.createOrUpdate(insights)

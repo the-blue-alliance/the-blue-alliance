@@ -399,12 +399,10 @@ class SuggestionCreator:
         Create an offseason suggestion from a made up bot.
         Used to link offseasons with official data sync
         """
-        keys_to_check = map(
-            lambda event: ndb.Key(
-                Suggestion, "offseason_with_data_{}".format(event.key_name)
-            ),
-            events_to_suggest,
-        )
+        keys_to_check = [
+            ndb.Key(Suggestion, "offseason_with_data_{}".format(event.key_name))
+            for event in events_to_suggest
+        ]
         keys_found = ndb.get_multi(keys_to_check)
         logging.info("Fetched {} suggestion keys from ndb".format(len(keys_found)))
 
