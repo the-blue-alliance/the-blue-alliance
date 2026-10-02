@@ -14,7 +14,7 @@ export function ConditionalCheckmark({
   teamKey,
 }: {
   condition: boolean;
-  teamKey: string;
+  teamKey?: string;
 }) {
   return (
     <TooltipProvider>
@@ -22,7 +22,7 @@ export function ConditionalCheckmark({
         <TooltipTrigger>
           {condition ? <MdiCheck /> : <MdiClose />}
         </TooltipTrigger>
-        <TooltipContent>{teamKey.substring(3)}</TooltipContent>
+        <TooltipContent>{teamKey?.substring(3)}</TooltipContent>
       </Tooltip>
     </TooltipProvider>
   );
