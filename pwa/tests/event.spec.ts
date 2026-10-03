@@ -106,6 +106,16 @@ test.describe('/event/2024mil', () => {
     ).not.toHaveText('1');
   });
 
+  test('explains the alliance captain mark on the Rankings tab', async ({
+    page,
+  }) => {
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+
+    await expect(page.getByRole('list', { name: 'Key' })).toContainText(
+      'Alliance captain',
+    );
+  });
+
   test('shows the event insights chart when the Insights tab opens', async ({
     page,
   }) => {
