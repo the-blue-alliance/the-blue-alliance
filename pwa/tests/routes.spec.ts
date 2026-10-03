@@ -44,6 +44,7 @@ const allRoutes = defineAllRoutes([
   '/suggest/review/',
   '/suggest/review/$suggestionType',
   '/suggest/team/media',
+  '/suggest/team/social_media',
   '/team/$teamNumber/{-$year}',
   '/team/$teamNumber/history',
   '/team/$teamNumber/stats',
