@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { cn } from 'cn';
 
+import BiStarFill from '~icons/bi/star-fill';
 import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
 import PlayArrowIcon from '~icons/ic/baseline-play-arrow';
 import PendingIcon from '~icons/ic/outline-pending';
@@ -24,6 +25,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
+import { useFavoriteTeamKeys } from '~/lib/hooks/useFavoriteTeams';
 import { formatMatchTime, matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
 
@@ -194,6 +196,11 @@ export function MatchRow({
         ? AllianceColor.BLUE
         : null
     : null;
+  const { teamKeys: favoriteTeamKeys } = useFavoriteTeamKeys();
+  const hasFavorite = [
+    ...match.alliances.red.team_keys,
+    ...match.alliances.blue.team_keys,
+  ].some((teamKey) => favoriteTeamKeys.includes(teamKey));
 
   /* Desktop: 1x11 grid, Mobile: 2x6 grid */
   return (
@@ -229,13 +236,21 @@ export function MatchRow({
         className="row-span-2 flex items-center justify-center p-1.5
           xl:col-span-2 xl:row-span-1"
       >
-        <MatchLink
-          matchOrKey={match}
-          event={event}
-          className="text-center text-sm text-foreground"
-        >
-          {matchTitleShort(match, playoffType)}
-        </MatchLink>
+        <span className="relative">
+          {hasFavorite && (
+            <span className="absolute top-1/2 right-full mr-1 -translate-y-1/2">
+              <BiStarFill aria-hidden className="size-3 text-yellow-500" />
+              <span className="sr-only">Includes a favorite team</span>
+            </span>
+          )}
+          <MatchLink
+            matchOrKey={match}
+            event={event}
+            className="text-center text-sm text-foreground"
+          >
+            {matchTitleShort(match, playoffType)}
+          </MatchLink>
+        </span>
       </div>
 
       {/* Red Team Players - Subgrid Component */}
@@ -249,6 +264,7 @@ export function MatchRow({
         surrogate={match.alliances.red.surrogate_team_keys}
         year={year}
         focusTeamKey={focusTeamKey}
+        favoriteTeamKeys={favoriteTeamKeys}
       />
 
       {/* Blue Team Players - Subgrid Component */}
@@ -262,6 +278,7 @@ export function MatchRow({
         surrogate={match.alliances.blue.surrogate_team_keys}
         year={year}
         focusTeamKey={focusTeamKey}
+        favoriteTeamKeys={favoriteTeamKeys}
       />
 
       {!isPlayed && (
