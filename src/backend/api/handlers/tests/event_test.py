@@ -560,6 +560,63 @@ def test_event_matches(ndb_stub, api_client: Client) -> None:
     assert "2019casj_qm2" in keys
 
 
+def test_event_practice_matches(ndb_stub, api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Event(
+        id="2019casj",
+        year=2019,
+        event_short="casj",
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+    for comp_level in ("qm", "pm"):
+        Match(
+            id=f"2019casj_{comp_level}1",
+            comp_level=comp_level,
+            match_number=1,
+            year=2019,
+            set_number=1,
+            event=ndb.Key("Event", "2019casj"),
+            alliances_json=json.dumps(
+                {
+                    "red": {"score": None, "teams": ["frc254"]},
+                    "blue": {"score": None, "teams": ["frc604"]},
+                }
+            ),
+        ).put()
+    headers = {"X-TBA-Auth-Key": "test_auth_key"}
+
+    resp = api_client.get("/api/v3/event/2019casj/matches/practice", headers=headers)
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    validate_nominal_match_keys(resp.json[0])
+    assert resp.json[0]["key"] == "2019casj_pm1"
+    assert resp.json[0]["comp_level"] == "pm"
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/matches/practice/simple", headers=headers
+    )
+    assert resp.status_code == 200
+    assert len(resp.json) == 1
+    validate_simple_match_keys(resp.json[0])
+    assert resp.json[0]["key"] == "2019casj_pm1"
+
+    resp = api_client.get(
+        "/api/v3/event/2019casj/matches/practice/keys", headers=headers
+    )
+    assert resp.status_code == 200
+    assert resp.json == ["2019casj_pm1"]
+
+    resp = api_client.get("/api/v3/event/2019casj/matches/keys", headers=headers)
+    assert resp.json == ["2019casj_qm1"]
+
+    resp = api_client.get("/api/v3/match/2019casj_pm1", headers=headers)
+    assert resp.status_code == 200
+    assert resp.json["key"] == "2019casj_pm1"
+
+
 def test_event_awards(ndb_stub, api_client: Client) -> None:
     ApiAuthAccess(
         id="test_auth_key",

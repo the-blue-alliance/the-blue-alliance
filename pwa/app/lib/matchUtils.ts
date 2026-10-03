@@ -17,6 +17,7 @@ const COMP_LEVEL_SORT_ORDER: Record<CompLevel, number> = {
   [CompLevel.QF]: 3,
   [CompLevel.EF]: 2,
   [CompLevel.QM]: 1,
+  [CompLevel.PM]: 0,
 };
 
 export const COMP_LEVEL_SHORT_STRINGS: Record<CompLevel, string> = {
@@ -25,6 +26,7 @@ export const COMP_LEVEL_SHORT_STRINGS: Record<CompLevel, string> = {
   [CompLevel.QF]: 'Quarters',
   [CompLevel.EF]: 'Eighths',
   [CompLevel.QM]: 'Quals',
+  [CompLevel.PM]: 'Practice',
 };
 
 export const COMP_LEVEL_LONG_STRINGS: Record<CompLevel, string> = {
@@ -33,6 +35,7 @@ export const COMP_LEVEL_LONG_STRINGS: Record<CompLevel, string> = {
   [CompLevel.QF]: 'Quarterfinals',
   [CompLevel.EF]: 'Eighthfinals',
   [CompLevel.QM]: 'Qualifications',
+  [CompLevel.PM]: 'Practice',
 };
 
 type RecycleRushWLTStrategy = 'official' | 'score-based';

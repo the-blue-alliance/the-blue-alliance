@@ -223,6 +223,8 @@ class TestDatabaseCacheClearer(unittest.TestCase):
             # self.assertTrue(match_query.MatchGdcvDataQuery('2015casj_qm2').cache_key in cache_keys)
             match_query.EventMatchesQuery("2015casj").cache_key,
             match_query.EventMatchesQuery("2015cama").cache_key,
+            match_query.EventPracticeMatchesQuery("2015casj").cache_key,
+            match_query.EventPracticeMatchesQuery("2015cama").cache_key,
             # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015casj').cache_key in cache_keys)
             # self.assertTrue(match_query.EventMatchesGdcvDataQuery('2015cama').cache_key in cache_keys)
             match_query.TeamEventMatchesQuery("frc254", "2015casj").cache_key,

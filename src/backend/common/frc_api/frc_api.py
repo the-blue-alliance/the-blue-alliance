@@ -56,7 +56,7 @@ from backend.common.sitevars.fms_api_secrets import FMSApiSecrets
 from backend.common.tasklets import typed_tasklet
 from backend.common.urlfetch import TypedURLFetchResult
 
-TCompLevel = Literal["qual", "playoff"]
+TCompLevel = Literal["Practice", "qual", "playoff"]
 
 T = TypeVar("T", bound=JSON)
 

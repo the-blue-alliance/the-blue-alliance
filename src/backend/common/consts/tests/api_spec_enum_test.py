@@ -7,6 +7,7 @@ import pytest
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.award_type import AwardType
 from backend.common.consts.cmp_qualification import CmpQualificationMethod
+from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.consts.webcast_status import WebcastStatus
@@ -92,3 +93,7 @@ def test_spec_string_enum_matches_python(
         f"{enum_class.__name__} member names from Python"
     )
     assert len(schema["enum"]) == len(schema["x-enum-varnames"])
+
+
+def test_spec_comp_level_matches_python(spec_schemas: dict) -> None:
+    assert spec_schemas["Comp_Level"]["enum"] == [level.value for level in CompLevel]

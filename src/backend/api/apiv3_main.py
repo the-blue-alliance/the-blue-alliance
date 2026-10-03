@@ -23,6 +23,7 @@ from backend.api.handlers.event import (
     event_media,
     event_nexus_info,
     event_playoff_advancement,
+    event_practice_matches,
     event_teams,
     event_teams_media,
     event_teams_statuses,
@@ -137,6 +138,13 @@ api_v3.add_url_rule("event/<string:event_key>/matches", view_func=event_matches)
 api_v3.add_url_rule(
     "/event/<string:event_key>/matches/<model_type:model_type>",
     view_func=event_matches,
+)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/matches/practice", view_func=event_practice_matches
+)
+api_v3.add_url_rule(
+    "/event/<string:event_key>/matches/practice/<model_type:model_type>",
+    view_func=event_practice_matches,
 )
 api_v3.add_url_rule("/event/<string:event_key>/awards", view_func=event_awards)
 api_v3.add_url_rule(

@@ -2,6 +2,7 @@ from typing import Any, Generator, List, Optional
 
 from google.appengine.ext import ndb
 
+from backend.common.consts.comp_level import CompLevel
 from backend.common.models.event import Event
 from backend.common.models.keys import EventKey, MatchKey, TeamKey, Year
 from backend.common.models.match import Match
@@ -40,7 +41,25 @@ class EventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
     @typed_tasklet
     def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Match]]:
         matches = yield Match.query(
-            Match.event == ndb.Key(Event, event_key)
+            Match.event == ndb.Key(Event, event_key),
+            Match.comp_level != CompLevel.PM,
+        ).fetch_async()
+        return matches
+
+
+class EventPracticeMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
+    CACHE_VERSION = 0
+    CACHE_KEY_FORMAT = "event_practice_matches_{event_key}"
+    DICT_CONVERTER = MatchConverter
+
+    def __init__(self, event_key: EventKey) -> None:
+        super().__init__(event_key=event_key)
+
+    @typed_tasklet
+    def _query_async(self, event_key: EventKey) -> Generator[Any, Any, List[Match]]:
+        matches = yield Match.query(
+            Match.event == ndb.Key(Event, event_key),
+            Match.comp_level == CompLevel.PM,
         ).fetch_async()
         return matches
 
@@ -58,7 +77,9 @@ class TeamEventMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
         self, team_key: TeamKey, event_key: EventKey
     ) -> Generator[Any, Any, List[Match]]:
         match_keys = yield Match.query(
-            Match.team_key_names == team_key, Match.event == ndb.Key(Event, event_key)
+            Match.team_key_names == team_key,
+            Match.event == ndb.Key(Event, event_key),
+            Match.comp_level != CompLevel.PM,
         ).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
         return list(filter(None, matches))
@@ -77,7 +98,9 @@ class TeamYearMatchesQuery(CachedDatabaseQuery[List[Match], List[MatchDict]]):
         self, team_key: TeamKey, year: Year
     ) -> Generator[Any, Any, List[Match]]:
         match_keys = yield Match.query(
-            Match.team_key_names == team_key, Match.year == year
+            Match.team_key_names == team_key,
+            Match.year == year,
+            Match.comp_level != CompLevel.PM,
         ).fetch_async(keys_only=True)
         matches = yield ndb.get_multi_async(match_keys)
         return list(filter(None, matches))
