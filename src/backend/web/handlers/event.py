@@ -43,7 +43,13 @@ from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.regional_champs_pool import RegionalChampsPool
 from backend.common.models.team import Team
 from backend.common.nexus_api.types import PitMap
-from backend.common.queries import district_query, event_query, media_query, team_query
+from backend.common.queries import (
+    district_query,
+    event_query,
+    match_query,
+    media_query,
+    team_query,
+)
 from backend.web.profiled_render import render_template
 
 
@@ -151,6 +157,9 @@ def event_detail(event_key: EventKey) -> Response:
     )
     event_medias_future = media_query.EventMediasQuery(event_key).fetch_async()
     event_eventteams_future = team_query.EventEventTeamsQuery(event_key).fetch_async()
+    practice_matches_future = match_query.EventPracticeMatchesQuery(
+        event_key
+    ).fetch_async()
     # status_sitevar_future = Sitevar.get_by_id_async('apistatus.down_events')
 
     event_divisions_future = None
@@ -445,6 +454,9 @@ def event_detail(event_key: EventKey) -> Response:
         "match_count": match_count,
         "matches_recent": matches_recent,
         "matches_upcoming": matches_upcoming,
+        "practice_matches": MatchHelper.natural_sorted_matches(
+            practice_matches_future.get_result()
+        ),
         "has_time_predictions": has_time_predictions,
         "awards": awards,
         "teams_a": teams_a,

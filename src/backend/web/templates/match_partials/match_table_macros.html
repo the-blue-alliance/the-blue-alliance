@@ -20,6 +20,23 @@
 </table>
 {% endmacro %}
 
+{% macro practice_match_table(matches) %}
+<table class="match-table" id="practice-match-table">
+  <thead>
+    {% include "match_partials/match_table_header.html" %}
+    <tr class="key">
+        <th colspan="16">Practice</th>
+    </tr>
+  </thead>
+
+  <tbody>
+    {% for match in matches %}
+      {{mtrm.match_row_tr(match)}}
+    {% endfor %}
+  </tbody>
+</table>
+{% endmacro %}
+
 {% macro qual_match_table_hot(matches) %}
 <table class="match-table">
   <thead>

@@ -186,6 +186,7 @@ export function MatchRow({
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+  const matchTime = match.predicted_time ?? match.time;
   const focusedAlliance = focusTeamKey
     ? match.alliances.red.team_keys.includes(focusTeamKey)
       ? AllianceColor.RED
@@ -269,7 +270,7 @@ export function MatchRow({
             xl:col-start-auto xl:row-span-1 xl:row-start-auto"
         >
           <span className="flex h-full items-center justify-center text-center">
-            {match.predicted_time && formatMatchTime(match.predicted_time)}
+            {matchTime && formatMatchTime(matchTime)}
           </span>
         </div>
       )}
@@ -319,6 +320,7 @@ export function SimpleMatchRow({
 }) {
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+  const matchTime = match.predicted_time ?? match.time;
 
   return (
     <div>
@@ -372,9 +374,7 @@ export function SimpleMatchRow({
             className="col-start-4 row-span-2 row-start-2 flex items-center
               justify-center text-center"
           >
-            <span>
-              {match.predicted_time && formatMatchTime(match.predicted_time)}
-            </span>
+            <span>{matchTime && formatMatchTime(matchTime)}</span>
           </div>
         )}
 
