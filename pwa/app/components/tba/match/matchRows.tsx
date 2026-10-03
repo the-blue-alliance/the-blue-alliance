@@ -436,13 +436,14 @@ export function BreakRow({
     >
       <div
         className={cn(
-          'relative flex w-full items-center justify-center font-medium',
+          `grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-2
+          font-medium`,
           size === 'small' ? 'h-5 text-xs' : 'h-8 text-sm',
         )}
       >
-        <span>{text}</span>
+        <span className="col-start-2">{text}</span>
         {playlists && playlists.length > 0 && (
-          <div className="absolute right-2 flex items-center">
+          <div className="flex items-center justify-self-end whitespace-nowrap">
             {playlists.length === 1 ? (
               <a
                 href={playlists[0].url}
