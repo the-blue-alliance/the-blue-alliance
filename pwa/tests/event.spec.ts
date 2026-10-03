@@ -157,6 +157,7 @@ test('loads the animated tab indicator when a tab changes', async ({
 test.describe('/event/2026necmp Media tab', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/event/2026necmp');
+    await page.locator('body[data-hydrated]').waitFor();
     await page.getByRole('tab', { name: 'Media' }).click();
   });
 
