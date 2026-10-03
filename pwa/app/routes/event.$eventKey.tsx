@@ -15,6 +15,7 @@ import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import AgendaIcon from '~icons/lucide/paperclip';
+import PracticeIcon from '~icons/lucide/repeat';
 import InsightsIcon from '~icons/lucide/scatter-chart';
 import ChampsQualPointsIcon from '~icons/lucide/star';
 import AwardsIcon from '~icons/lucide/trophy';
@@ -46,6 +47,7 @@ import {
   getEventNexusInfoOptions,
   getEventOptions,
   getEventPlayoffAdvancementOptions,
+  getEventPracticeMatchesOptions,
   getEventRankingsOptions,
   getEventSimpleOptions,
   getEventTeamMediaOptions,
@@ -62,6 +64,7 @@ import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
 import EliminationBracket from '~/components/tba/eliminationBracket';
+import EventPracticeTab from '~/components/tba/eventPracticeTab';
 import { EventSuccessRateTable } from '~/components/tba/eventSuccessRateTable';
 import EventTeamsTab from '~/components/tba/eventTeamsTab';
 import FavoriteButton from '~/components/tba/favoriteButton';
@@ -315,6 +318,17 @@ function EventPage() {
     staleTime: eventStaleTime,
   });
   const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data]);
+
+  const isSeasonEvent = SEASON_EVENT_TYPES.has(event.event_type);
+  const practiceMatchesQuery = useQuery({
+    ...getEventPracticeMatchesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: isSeasonEvent,
+  });
+  const practiceMatches = practiceMatchesQuery.data ?? [];
+  const shouldShowPracticeTab =
+    isSeasonEvent &&
+    (practiceMatchesQuery.isPending || practiceMatches.length > 0);
 
   const alliancesQuery = useQuery({
     ...getEventAlliancesOptions({ path: { event_key: eventKey } }),
@@ -690,6 +704,14 @@ function EventPage() {
               Scouting
             </InlineIcon>
           </AnimatedTabsTrigger>
+          {shouldShowPracticeTab && (
+            <AnimatedTabsTrigger value="practice">
+              <InlineIcon>
+                <PracticeIcon />
+                Practice
+              </InlineIcon>
+            </AnimatedTabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="results" keepMounted className="data-hidden:hidden">
@@ -804,6 +826,12 @@ function EventPage() {
               eventKey={event.key}
               coprs={coprsQuery.data ?? undefined}
             />
+          )}
+        </TabsContent>
+
+        <TabsContent value="practice">
+          {practiceMatches.length > 0 && (
+            <EventPracticeTab event={event} matches={practiceMatches} />
           )}
         </TabsContent>
       </AnimatedTabs>

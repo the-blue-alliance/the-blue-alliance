@@ -274,6 +274,40 @@ test('hides average-score advancement for a non-2015-format event', async ({
   ).toHaveCount(0);
 });
 
+test('shows practice matches on the Practice tab', async ({ page }) => {
+  await page.goto('/event/2026nysu');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await page.getByRole('tab', { name: 'Practice' }).click();
+
+  await expect(
+    page.getByRole('link', { name: 'Practice 5', exact: true }),
+  ).toBeVisible();
+});
+
+test('skips the practice matches request for an offseason event', async ({
+  page,
+}) => {
+  const practiceRequests: string[] = [];
+  page.on('request', (request) => {
+    if (request.url().includes('/matches/practice')) {
+      practiceRequests.push(request.url());
+    }
+  });
+
+  await page.goto('/event/2024cc');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  expect(practiceRequests).toEqual([]);
+});
+
+test('hides the practice tab for an offseason event', async ({ page }) => {
+  await page.goto('/event/2024cc');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(page.getByRole('tab', { name: 'Practice' })).toHaveCount(0);
+});
+
 test('shows the favorite button for an event', async ({ page }) => {
   await page.goto('/event/2024casj');
 

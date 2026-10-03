@@ -1,6 +1,7 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
-import { beforeAll, describe, expect, test, vi } from 'vitest';
+import { Temporal } from 'temporal-polyfill';
+import { afterEach, beforeAll, describe, expect, test, vi } from 'vitest';
 
 import {
   AllianceColor,
@@ -67,6 +68,10 @@ class ResizeObserverMock {
 
 beforeAll(() => {
   global.ResizeObserver = ResizeObserverMock;
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 const event: Event = {
@@ -504,6 +509,19 @@ describe('MatchRow', () => {
     expect(screen.queryByText(/[AP]M$/)).toBeNull();
   });
 
+  test('shows the scheduled time for an unplayed match without a prediction', () => {
+    vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue('America/New_York');
+    render(
+      <MatchRow
+        match={makeUnplayedMatch({ time: 1772893800 })}
+        event={event}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText('Sat 9:30 AM')).toBeTruthy();
+  });
+
   test.each([
     { alliance: 'red', focusTeamKey: 'frc254' },
     { alliance: 'blue', focusTeamKey: 'frc217' },
@@ -616,6 +634,18 @@ describe('SimpleMatchRow', () => {
     render(<SimpleMatchRow match={makeUnplayedMatch()} year={2026} />);
 
     expect(screen.queryByText(/[AP]M$/)).toBeNull();
+  });
+
+  test('shows the scheduled time for an unplayed match without a prediction', () => {
+    vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue('America/New_York');
+    render(
+      <SimpleMatchRow
+        match={makeUnplayedMatch({ time: 1772893800 })}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText('Sat 9:30 AM')).toBeTruthy();
   });
 });
 
