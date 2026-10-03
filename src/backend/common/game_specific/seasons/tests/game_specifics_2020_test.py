@@ -15,6 +15,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2020
 from backend.common.game_specific.seasons.game_specifics_2020 import GameSpecifics2020
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     put_event,
@@ -100,11 +102,8 @@ _BROKEN_BREAKDOWN = {
 }
 
 
-def test_calculate_event_insights_ignores_unplayed_and_breakdownless_matches() -> None:
-    matches = [
-        build_match("2020test", "qm", 1, -1, -1, None),
-        build_match("2020test", "qm", 2, 30, 10, None),
-    ]
+def test_calculate_event_insights_ignores_unplayed_matches() -> None:
+    matches = [build_match("2020test", "qm", 1, -1, -1, None)]
     assert GameSpecifics2020().calculate_event_insights(matches) == {
         "qual": None,
         "playoff": None,
@@ -122,7 +121,7 @@ def test_calculate_event_insights_logs_failed_matches(
     broken = build_match("2020test", "qm", 1, 30, 10, _BROKEN_BREAKDOWN)
     with caplog.at_level(logging.INFO):
         insights = GameSpecifics2020().calculate_event_insights([broken])
-    assert insights == {"qual": None, "playoff": None}
+    assert insights is not None and insights["qual"] is not None
     failures = [
         record
         for record in caplog.records
@@ -130,3 +129,13 @@ def test_calculate_event_insights_logs_failed_matches(
     ]
     assert failures
     assert all(record.levelno == level for record in failures)
+
+
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2020(), "2020test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2020scmb_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2020scmb")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2020(), matches)

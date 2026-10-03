@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import logging
 import traceback
-from collections import defaultdict
 from typing import Any, Dict, List, Optional, Tuple
 
 from backend.common.consts.alliance_color import (
@@ -14,6 +13,7 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2019
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     StatAccessor,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
@@ -116,8 +116,15 @@ class GameSpecifics2019(
         cargo_ship_cargo_preload_count = [0] * 6  # 0 starts from far left
         cargo_ship_hatch_panel_count = [0] * 8  # 0 starts from far left
         cargo_ship_cargo_count = [0] * 8  # 0 starts from far left
-        rocket_hatch_panel_count = defaultdict(int)
-        rocket_cargo_count = defaultdict(int)
+        # Every slot is present so templates render even without breakdowns
+        rocket_slots = [
+            f"{level}{side}{end}"
+            for level in ("low", "mid", "top")
+            for side in ("Left", "Right")
+            for end in ("Near", "Far")
+        ]
+        rocket_hatch_panel_count: Dict[str, int] = {slot: 0 for slot in rocket_slots}
+        rocket_cargo_count: Dict[str, int] = {slot: 0 for slot in rocket_slots}
         hatch_panel_points = 0
         cargo_points = 0
         level1_climb_count = 0
@@ -135,11 +142,12 @@ class GameSpecifics2019(
         foul_scores = 0
         high_score: Tuple[int, str, str] = (0, "", "")  # kpa, match key, match name
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
             if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -303,7 +311,6 @@ class GameSpecifics2019(
                     )
 
                     foul_scores += alliance_breakdown["foulPoints"]
-                    has_insights = True
                 except Exception:
                     msg = "Event insights failed for {}".format(match.key.id())
                     # event.get() below should be cheap since it's backed by context cache
@@ -312,104 +319,108 @@ class GameSpecifics2019(
                         logging.warning(traceback.format_exc())
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        opportunities_1x = 2 * finished_matches  # once per alliance
-        opportunities_3x = 6 * finished_matches  # 3x per alliance
+        opportunities_1x = 2 * breakdown_matches  # once per alliance
+        opportunities_3x = 6 * breakdown_matches  # 3x per alliance
         average_rocket_hatch_panel_count = {}
         for key, value in rocket_hatch_panel_count.items():
-            average_rocket_hatch_panel_count[key] = (
-                100 * float(value) / opportunities_1x
+            average_rocket_hatch_panel_count[key] = safe_div(
+                100 * value, opportunities_1x
             )
         average_rocket_cargo_count = {}
         for key, value in rocket_cargo_count.items():
-            average_rocket_cargo_count[key] = 100 * float(value) / opportunities_1x
+            average_rocket_cargo_count[key] = safe_div(100 * value, opportunities_1x)
         event_insights = {
             # Auto
-            "average_sandstorm_bonus_auto": float(sandstorm_bonus_auto)
-            / (2 * finished_matches),
-            "average_points_auto": float(points_auto) / (2 * finished_matches),
+            "average_sandstorm_bonus_auto": safe_div(
+                sandstorm_bonus_auto, 2 * breakdown_matches
+            ),
+            "average_points_auto": safe_div(points_auto, 2 * breakdown_matches),
             # Teleop
-            "average_hab_climb_teleop": float(hab_climb_teleop)
-            / (2 * finished_matches),
-            "average_points_teleop": float(points_teleop) / (2 * finished_matches),
+            "average_hab_climb_teleop": safe_div(
+                hab_climb_teleop, 2 * breakdown_matches
+            ),
+            "average_points_teleop": safe_div(points_teleop, 2 * breakdown_matches),
             # Overall
             "cross_hab_line_count": [
                 cross_hab_line_count,
                 opportunities_3x,
-                100.0 * float(cross_hab_line_count) / opportunities_3x,
+                safe_div(100.0 * cross_hab_line_count, opportunities_3x),
             ],
             "cross_hab_line_sandstorm_count": [
                 cross_hab_line_sandstorm_count,
                 opportunities_3x,
-                100.0 * float(cross_hab_line_sandstorm_count) / opportunities_3x,
+                safe_div(100.0 * cross_hab_line_sandstorm_count, opportunities_3x),
             ],
             "level1_climb_count": [
                 level1_climb_count,
                 opportunities_3x,
-                100.0 * float(level1_climb_count) / opportunities_3x,
+                safe_div(100.0 * level1_climb_count, opportunities_3x),
             ],
             "level2_climb_count": [
                 level2_climb_count,
                 opportunities_3x,
-                100.0 * float(level2_climb_count) / opportunities_3x,
+                safe_div(100.0 * level2_climb_count, opportunities_3x),
             ],
             "level3_climb_count": [
                 level3_climb_count,
                 opportunities_3x,
-                100.0 * float(level3_climb_count) / opportunities_3x,
+                safe_div(100.0 * level3_climb_count, opportunities_3x),
             ],
             "complete_1_rocket_count": [
                 complete_1_rocket_count,
                 opportunities_1x,
-                100.0 * float(complete_1_rocket_count) / opportunities_1x,
+                safe_div(100.0 * complete_1_rocket_count, opportunities_1x),
             ],
             "complete_2_rockets_count": [
                 complete_2_rockets_count,
                 opportunities_1x,
-                100.0 * float(complete_2_rockets_count) / opportunities_1x,
+                safe_div(100.0 * complete_2_rockets_count, opportunities_1x),
             ],
             "average_cargo_ship_hatch_panel_preload_count": [
-                100.0 * float(x) / opportunities_1x
+                safe_div(100.0 * x, opportunities_1x)
                 for x in cargo_ship_hatch_panel_preload_count
             ],
             "average_cargo_ship_cargo_preload_count": [
-                100.0 * float(x) / opportunities_1x
+                safe_div(100.0 * x, opportunities_1x)
                 for x in cargo_ship_cargo_preload_count
             ],
             "average_cargo_ship_hatch_panel_count": [
-                100.0 * float(x) / opportunities_1x
+                safe_div(100.0 * x, opportunities_1x)
                 for x in cargo_ship_hatch_panel_count
             ],
             "average_cargo_ship_cargo_count": [
-                100.0 * float(x) / opportunities_1x for x in cargo_ship_cargo_count
+                safe_div(100.0 * x, opportunities_1x) for x in cargo_ship_cargo_count
             ],
             "average_rocket_hatch_panel_count": average_rocket_hatch_panel_count,
             "average_rocket_cargo_count": average_rocket_cargo_count,
-            "average_hatch_panel_points": float(hatch_panel_points) / opportunities_1x,
-            "average_cargo_points": float(cargo_points) / opportunities_1x,
+            "average_hatch_panel_points": safe_div(
+                hatch_panel_points, opportunities_1x
+            ),
+            "average_cargo_points": safe_div(cargo_points, opportunities_1x),
             "rocket_rp_achieved": [
                 rocket_rp_achieved,
                 opportunities_1x,
-                100.0 * float(rocket_rp_achieved) / opportunities_1x,
+                safe_div(100.0 * rocket_rp_achieved, opportunities_1x),
             ],
             "climb_rp_achieved": [
                 climb_rp_achieved,
                 opportunities_1x,
-                100.0 * float(climb_rp_achieved) / opportunities_1x,
+                safe_div(100.0 * climb_rp_achieved, opportunities_1x),
             ],
             "unicorn_matches": [
                 unicorn_matches,
                 opportunities_1x,
-                100.0 * float(unicorn_matches) / opportunities_1x,
+                safe_div(100.0 * unicorn_matches, opportunities_1x),
             ],
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / opportunities_1x,
-            "average_foul_score": float(foul_scores) / opportunities_1x,
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_foul_score": safe_div(foul_scores, opportunities_1x),
             "high_score": list(high_score),  # [score, match key, match name]
         }
 

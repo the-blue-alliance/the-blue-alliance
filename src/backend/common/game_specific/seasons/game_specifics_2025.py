@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Dict, List, Optional, Tuple, TypedDict
 
-from pyre_extensions import none_throws
-
 from backend.common.consts.alliance_color import AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2025
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     StatAccessor,
     TCriteria,
     TripleWinTotalPointsScoreBonusRpGameConfig,
@@ -107,13 +106,14 @@ class GameSpecifics2025(
 
         high_score: Tuple[int, str, str] = (0, "", "")
 
-        finished_matches = 0
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
 
         for match in matches:
             if not match.has_been_played:
                 continue
 
-            finished_matches += 1
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -122,11 +122,17 @@ class GameSpecifics2025(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            if match.score_breakdown is None:
-                continue
+            total_scores += red_score + blue_score
+            total_win_margins += win_score - min(red_score, blue_score)
+            total_winning_scores += win_score
 
-            red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
-            blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+            score_breakdown = match.score_breakdown
+            if not score_breakdown:
+                continue
+            breakdown_matches += 1
+
+            red_sb = score_breakdown[AllianceColor.RED]
+            blue_sb = score_breakdown[AllianceColor.BLUE]
 
             if red_sb.get("autoBonusAchieved"):
                 auto_rp_count += 1
@@ -166,47 +172,43 @@ class GameSpecifics2025(
                 if red_all_rp and blue_all_rp:
                     nine_rp_count += 1
 
-            total_scores += red_score + blue_score
-            total_win_margins += win_score - min(red_score, blue_score)
-            total_winning_scores += win_score
-
-        if finished_matches == 0:
+        if scored_matches == 0:
             return None
 
         return {
             "auto_rp_count": [
                 auto_rp_count,
-                finished_matches * 2,
-                100.0 * auto_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * auto_rp_count, breakdown_matches * 2),
             ],
             "barge_rp_count": [
                 barge_rp_count,
-                finished_matches * 2,
-                100.0 * barge_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * barge_rp_count, breakdown_matches * 2),
             ],
             "coral_rp_count": [
                 coral_rp_count,
-                finished_matches * 2,
-                100.0 * coral_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * coral_rp_count, breakdown_matches * 2),
             ],
             "coopertition_count": [
                 coopertition_count,
-                finished_matches * 2,
-                100.0 * coopertition_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * coopertition_count, breakdown_matches * 2),
             ],
             "six_rp_count": [
                 six_rp_count,
-                finished_matches,
-                100.0 * six_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * six_rp_count, breakdown_matches),
             ],
             "nine_rp_count": [
                 nine_rp_count,
-                finished_matches,
-                100.0 * nine_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * nine_rp_count, breakdown_matches),
             ],
-            "average_score": total_scores / (finished_matches * 2),
-            "average_win_margin": total_win_margins / finished_matches,
-            "average_winning_score": total_winning_scores / finished_matches,
+            "average_score": total_scores / (scored_matches * 2),
+            "average_win_margin": total_win_margins / scored_matches,
+            "average_winning_score": total_winning_scores / scored_matches,
             "high_score": high_score,
         }
 
