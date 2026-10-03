@@ -28,6 +28,10 @@ vi.mock('~/components/tba/teamTooltip', () => ({
   ),
 }));
 
+vi.mock('~/lib/hooks/useFavoriteTeams', () => ({
+  useFavoriteTeamKeys: () => ({ teamKeys: [], isLoading: false }),
+}));
+
 vi.mock('~/components/tba/videoEmbeds', () => ({
   YoutubeEmbed: ({ videoId, title }: { videoId: string; title: string }) => (
     <iframe title={title} src={`https://www.youtube.com/embed/${videoId}`} />
