@@ -85,6 +85,29 @@ export type EventMediaSuggestionResponse = {
     | 'unauthorized';
 };
 
+export type TeamSocialMediaSuggestionMessage = {
+  /**
+   * The team receiving the suggested social media
+   */
+  team_key: string;
+  /**
+   * The URL of the social media account being suggested
+   */
+  media_url: string;
+};
+
+export type TeamSocialMediaSuggestionResponse = {
+  code: number;
+  message: string;
+  status:
+    | 'success'
+    | 'suggestion_exists'
+    | 'media_exists'
+    | 'bad_url'
+    | 'bad_team'
+    | 'unauthorized';
+};
+
 export type SubscriptionMessage = {
   device_key?: string;
   model_key: string;
@@ -213,6 +236,23 @@ export type SuggestTeamMediaResponses = {
 
 export type SuggestTeamMediaResponse =
   SuggestTeamMediaResponses[keyof SuggestTeamMediaResponses];
+
+export type SuggestTeamSocialMediaData = {
+  body: TeamSocialMediaSuggestionMessage;
+  path?: never;
+  query?: never;
+  url: '/team/social_media/suggest';
+};
+
+export type SuggestTeamSocialMediaResponses = {
+  /**
+   * Successful response
+   */
+  200: TeamSocialMediaSuggestionResponse;
+};
+
+export type SuggestTeamSocialMediaResponse =
+  SuggestTeamSocialMediaResponses[keyof SuggestTeamSocialMediaResponses];
 
 export type ListSubscriptionsData = {
   body?: never;

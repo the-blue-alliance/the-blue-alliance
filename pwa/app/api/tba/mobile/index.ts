@@ -10,6 +10,7 @@ export {
   setModelPreferences,
   suggestEventMedia,
   suggestTeamMedia,
+  suggestTeamSocialMedia,
 } from './sdk.gen';
 export type {
   AddApiReadKeyData,
@@ -51,4 +52,9 @@ export type {
   SuggestTeamMediaData,
   SuggestTeamMediaResponse,
   SuggestTeamMediaResponses,
+  SuggestTeamSocialMediaData,
+  SuggestTeamSocialMediaResponse,
+  SuggestTeamSocialMediaResponses,
+  TeamSocialMediaSuggestionMessage,
+  TeamSocialMediaSuggestionResponse,
 } from './types.gen';

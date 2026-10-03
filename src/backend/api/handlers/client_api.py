@@ -24,6 +24,8 @@ from backend.api.client_api_types import (
     RegistrationRequest,
     SubscriptionCollection,
     SubscriptionMessage,
+    TeamSocialMediaSuggestionMessage,
+    TeamSocialMediaSuggestionResponse,
     UpdatePreferencesInternalResponse,
     VoidRequest,
 )
@@ -45,6 +47,7 @@ from backend.common.models.event import Event
 from backend.common.models.favorite import Favorite
 from backend.common.models.mobile_client import MobileClient
 from backend.common.models.subscription import Subscription
+from backend.common.models.team import Team
 from backend.common.suggestions.suggestion_creator import (
     SuggestionCreationStatus,
     SuggestionCreator,
@@ -253,6 +256,59 @@ def suggest_event_media(
             status="media_exists",
         )
     return EventMediaSuggestionResponse(
+        code=400,
+        message="Bad suggestion url",
+        status="bad_url",
+    )
+
+
+@client_api_method(TeamSocialMediaSuggestionMessage, TeamSocialMediaSuggestionResponse)
+def suggest_team_social_media(
+    request: TeamSocialMediaSuggestionMessage,
+) -> TeamSocialMediaSuggestionResponse:
+    current_user = ClientApiAuthHelper.get_current_user()
+    if current_user is None:
+        return TeamSocialMediaSuggestionResponse(
+            code=401,
+            message="Unauthorized to make suggestions",
+            status="unauthorized",
+        )
+
+    team_key = request["team_key"]
+    if not Team.validate_key_name(team_key) or Team.get_by_id(team_key) is None:
+        return TeamSocialMediaSuggestionResponse(
+            code=404,
+            message="Team not found",
+            status="bad_team",
+        )
+
+    status, _ = SuggestionCreator.createTeamMediaSuggestion(
+        author_account_key=none_throws(current_user.account_key),
+        media_url=request["media_url"],
+        team_key=team_key,
+        year_str=None,
+        is_social=True,
+    ).get_result()
+
+    if status == SuggestionCreationStatus.SUCCESS:
+        return TeamSocialMediaSuggestionResponse(
+            code=200,
+            message="Suggestion added",
+            status="success",
+        )
+    if status == SuggestionCreationStatus.SUGGESTION_EXISTS:
+        return TeamSocialMediaSuggestionResponse(
+            code=304,
+            message="Suggestion is already pending review",
+            status="suggestion_exists",
+        )
+    if status == SuggestionCreationStatus.MEDIA_EXISTS:
+        return TeamSocialMediaSuggestionResponse(
+            code=304,
+            message="Media is already approved",
+            status="media_exists",
+        )
+    return TeamSocialMediaSuggestionResponse(
         code=400,
         message="Bad suggestion url",
         status="bad_url",
