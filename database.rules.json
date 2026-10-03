@@ -1,0 +1,24 @@
+{
+  "rules": {
+    "e": {
+      ".read": true,
+      ".write": false
+    },
+    "le": {
+      ".read": true,
+      ".write": false
+    },
+    "live_events": {
+      ".read": true,
+      ".write": false
+    },
+    "special_webcasts": {
+      ".read": true,
+      ".write": false
+    },
+    "api_updated": {
+      ".read": true,
+      ".write": false
+    }
+  }
+}
