@@ -24,6 +24,8 @@ import type {
   SuggestEventMediaResponses,
   SuggestTeamMediaData,
   SuggestTeamMediaResponses,
+  SuggestTeamSocialMediaData,
+  SuggestTeamSocialMediaResponses,
 } from './types.gen';
 
 export type Options<
@@ -113,6 +115,26 @@ export const suggestTeamMedia = <ThrowOnError extends boolean = false>(
   >({
     security: [{ scheme: 'bearer', type: 'http' }],
     url: '/team/media/suggest',
+    ...options,
+    headers: {
+      'Content-Type': 'application/json',
+      ...options.headers,
+    },
+  });
+
+/**
+ * Suggest team social media
+ */
+export const suggestTeamSocialMedia = <ThrowOnError extends boolean = false>(
+  options: Options<SuggestTeamSocialMediaData, ThrowOnError>,
+): RequestResult<SuggestTeamSocialMediaResponses, unknown, ThrowOnError> =>
+  (options.client ?? client).post<
+    SuggestTeamSocialMediaResponses,
+    unknown,
+    ThrowOnError
+  >({
+    security: [{ scheme: 'bearer', type: 'http' }],
+    url: '/team/social_media/suggest',
     ...options,
     headers: {
       'Content-Type': 'application/json',

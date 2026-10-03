@@ -11,6 +11,7 @@ import {
   setModelPreferences,
   suggestEventMedia,
   suggestTeamMedia,
+  suggestTeamSocialMedia,
 } from '../sdk.gen';
 import type {
   AddApiReadKeyData,
@@ -29,6 +30,8 @@ import type {
   SuggestEventMediaResponse,
   SuggestTeamMediaData,
   SuggestTeamMediaResponse,
+  SuggestTeamSocialMediaData,
+  SuggestTeamSocialMediaResponse,
 } from '../types.gen';
 
 /**
@@ -129,6 +132,33 @@ export const suggestTeamMediaMutation = (
   > = {
     mutationFn: async (fnOptions) => {
       const { data } = await suggestTeamMedia({
+        ...options,
+        ...fnOptions,
+        throwOnError: true,
+      });
+      return data;
+    },
+  };
+  return mutationOptions;
+};
+
+/**
+ * Suggest team social media
+ */
+export const suggestTeamSocialMediaMutation = (
+  options?: Partial<Options<SuggestTeamSocialMediaData>>,
+): UseMutationOptions<
+  SuggestTeamSocialMediaResponse,
+  DefaultError,
+  Options<SuggestTeamSocialMediaData>
+> => {
+  const mutationOptions: UseMutationOptions<
+    SuggestTeamSocialMediaResponse,
+    DefaultError,
+    Options<SuggestTeamSocialMediaData>
+  > = {
+    mutationFn: async (fnOptions) => {
+      const { data } = await suggestTeamSocialMedia({
         ...options,
         ...fnOptions,
         throwOnError: true,
