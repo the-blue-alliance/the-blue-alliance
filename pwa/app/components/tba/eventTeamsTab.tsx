@@ -22,7 +22,10 @@ import {
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import TeamAvatar from '~/components/tba/teamAvatar';
-import { TeamEventRecord } from '~/components/tba/teamEventAppearance';
+import {
+  TeamEventRecord,
+  getTeamEventRecord,
+} from '~/components/tba/teamEventAppearance';
 import { Button } from '~/components/ui/button';
 import {
   Dialog,
@@ -198,6 +201,11 @@ export default function EventTeamsTab({
                             event={event}
                             teamKey={team.key}
                             status={statuses?.[team.key] ?? null}
+                            record={getTeamEventRecord(
+                              event,
+                              team.key,
+                              teamMatches,
+                            )}
                           />
                           <SimpleMatchRowsWithBreaks
                             matches={teamMatches}
