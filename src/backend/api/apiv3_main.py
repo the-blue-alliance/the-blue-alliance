@@ -67,6 +67,7 @@ api_v3 = Blueprint("apiv3", __name__, url_prefix="/api/v3")
 CORS(
     api_v3,
     origins="*",
+    send_wildcard=True,
     methods=["OPTIONS", "GET"],
     allow_headers=["X-TBA-Auth-Key", "If-None-Match", "If-Modified-Since"],
     expose_headers=["ETag"],
