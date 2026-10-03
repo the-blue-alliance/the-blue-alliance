@@ -14,7 +14,10 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
-import { getDistrictColorBorderClass } from '~/lib/districtUtils';
+import {
+  getDistrictColorBorderClass,
+  getDistrictColorShadowClass,
+} from '~/lib/districtUtils';
 import {
   getEventDateString,
   groupEventsByParent,
@@ -34,8 +37,11 @@ export default function EventListTable({ events }: { events: Event[] }) {
   );
 
   return (
-    <Table className="w-full">
-      <TableHeader>
+    <Table className="w-full" wrapperClassName="overflow-visible">
+      <TableHeader
+        className="sticky top-[6.5rem] z-1 bg-background
+          shadow-[0_1px_0_0_var(--color-border)]"
+      >
         <TableRow>
           <TableHead>Event</TableHead>
           <TableHead>Webcast</TableHead>
@@ -53,6 +59,9 @@ export default function EventListTable({ events }: { events: Event[] }) {
           const districtColor = getDistrictColorBorderClass(
             event.district?.abbreviation,
           );
+          const districtShadow = getDistrictColorShadowClass(
+            event.district?.abbreviation,
+          );
           const watchButtonContent = (
             <InlineIcon iconSize="large">
               <MdiVideo />
@@ -65,8 +74,8 @@ export default function EventListTable({ events }: { events: Event[] }) {
             <TableRow
               key={event.key}
               className={cn(
-                !isDivision && districtColor
-                  ? `border-l-4 ${districtColor}`
+                !isDivision && districtShadow
+                  ? `${districtShadow} [&>td:first-child]:pl-2`
                   : '',
                 {
                   'bg-muted/40': isDivision,
