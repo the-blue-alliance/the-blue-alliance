@@ -3,18 +3,17 @@ import { createFileRoute, notFound } from '@tanstack/react-router';
 import { type JSX, useState } from 'react';
 import { z } from 'zod';
 
-import { suggestEventMedia } from '~/api/tba/mobile/sdk.gen';
-import type { EventMediaSuggestionResponse } from '~/api/tba/mobile/types.gen';
+import { suggestTeamSocialMedia } from '~/api/tba/mobile/sdk.gen';
+import type { TeamSocialMediaSuggestionResponse } from '~/api/tba/mobile/types.gen';
 import {
-  getEventMediaOptions,
-  getEventOptions,
+  getTeamOptions,
+  getTeamSocialMediaOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { useAuth } from '~/components/tba/auth/auth';
 import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
-import SmugmugAlbumGallery from '~/components/tba/smugmugAlbumGallery';
 import SuggestionStatusMessage from '~/components/tba/suggestionStatusMessage';
-import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
+import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
 import { Button } from '~/components/ui/button';
 import {
   Credenza,
@@ -25,61 +24,58 @@ import {
   CredenzaTitle,
 } from '~/components/ui/credenza';
 import { Input } from '~/components/ui/input';
-import { isValidEventKey } from '~/lib/eventUtils';
-import { getEventVideos, getSmugmugAlbums } from '~/lib/mediaUtils';
 import { doThrowNotFound, publicCacheControlHeaders } from '~/lib/utils';
 
 const searchSchema = z.object({
-  event_key: z.string().catch(''),
+  team_key: z.string().catch(''),
 });
 
-export const Route = createFileRoute('/suggest/event/media')({
+export const Route = createFileRoute('/suggest/team/social_media')({
   validateSearch: searchSchema,
   loaderDeps: ({ search }) => search,
-  loader: async ({ deps: { event_key }, context: { queryClient } }) => {
-    if (!isValidEventKey(event_key)) {
+  loader: async ({ deps: { team_key }, context: { queryClient } }) => {
+    if (!/^frc\d+$/.test(team_key)) {
       throw notFound();
     }
 
     await Promise.all([
       queryClient
-        .ensureQueryData(getEventOptions({ path: { event_key } }))
+        .ensureQueryData(getTeamOptions({ path: { team_key } }))
         .catch(doThrowNotFound),
       queryClient.ensureQueryData(
-        getEventMediaOptions({ path: { event_key } }),
+        getTeamSocialMediaOptions({ path: { team_key } }),
       ),
     ]);
   },
   headers: publicCacheControlHeaders(),
-  component: SuggestEventMedia,
+  component: SuggestTeamSocialMedia,
 });
 
-type SubmitStatus = 'idle' | EventMediaSuggestionResponse['status'] | 'error'; // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
+type SubmitStatus =
+  'idle' | TeamSocialMediaSuggestionResponse['status'] | 'error'; // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
 // v8 ignore stop
 
-function SuggestEventMedia(): JSX.Element {
-  const { event_key } = Route.useSearch();
+function SuggestTeamSocialMedia(): JSX.Element {
+  const { team_key } = Route.useSearch();
   const { user } = useAuth();
   const [mediaUrl, setMediaUrl] = useState('');
   const [status, setStatus] = useState<SubmitStatus>('idle');
   const [loginOpen, setLoginOpen] = useState(false);
 
-  const { data: event } = useSuspenseQuery(
-    getEventOptions({ path: { event_key } }),
+  const { data: team } = useSuspenseQuery(
+    getTeamOptions({ path: { team_key } }),
   );
-  const { data: media } = useSuspenseQuery(
-    getEventMediaOptions({ path: { event_key } }),
+  const { data: socials } = useSuspenseQuery(
+    getTeamSocialMediaOptions({ path: { team_key } }),
   );
-  const videos = getEventVideos(media);
-  const albums = getSmugmugAlbums(media);
 
   const { mutate: submitMedia, isPending } = useMutation({
     mutationFn: async (url: string) => {
       if (!user) throw new Error('User not authenticated');
       const token = await user.getIdToken();
-      const { data } = await suggestEventMedia({
+      const { data } = await suggestTeamSocialMedia({
         auth: token,
-        body: { event_key, media_url: url },
+        body: { team_key, media_url: url },
       });
       if (!data) throw new Error('Missing suggestion response');
       return data;
@@ -106,9 +102,10 @@ function SuggestEventMedia(): JSX.Element {
   return (
     <div className="mx-auto max-w-3xl space-y-6 py-8">
       <div>
-        <h1 className="text-2xl font-semibold">Add Event Media</h1>
+        <h1 className="text-2xl font-semibold">Add Social Media</h1>
         <p className="text-lg text-muted-foreground">
-          {event.year} {event.name}
+          Team {team.team_number}
+          {team.nickname ? ` — ${team.nickname}` : ''}
         </p>
       </div>
 
@@ -134,7 +131,7 @@ function SuggestEventMedia(): JSX.Element {
         </SuggestionStatusMessage>
       )}
       {(status === 'error' ||
-        status === 'bad_event' ||
+        status === 'bad_team' ||
         status === 'unauthorized') && (
         <SuggestionStatusMessage tone="error" title="Something went wrong">
           Please try again.
@@ -143,79 +140,72 @@ function SuggestEventMedia(): JSX.Element {
 
       <div className="space-y-2">
         <p>
-          Thanks for helping make The Blue Alliance better! Suggest media that
-          helps the community experience this event.
+          Thanks for helping make The Blue Alliance better! Let us know about
+          this team&apos;s social media accounts so we can add them to the site.
         </p>
         <ul className="list-disc pl-6 text-sm text-muted-foreground">
           <li>Your suggestion will be reviewed by a moderator.</li>
-          <li>
-            Supported formats are YouTube videos and complete SmugMug albums.
-          </li>
         </ul>
-      </div>
-
-      <div className="grid gap-4 sm:grid-cols-2">
-        <Guidance title="Please submit" tone="success">
-          <li>Videos of award ceremonies</li>
-          <li>Opening or closing ceremony speeches</li>
-          <li>Community interviews and other engaging event content</li>
-          <li>Complete SmugMug photo albums from the event</li>
-        </Guidance>
-        <Guidance title="Please do not submit" tone="error">
-          <li>
-            Full match videos; submit those through the{' '}
-            <a
-              href={`https://www.thebluealliance.com/suggest/event/video?event_key=${event_key}`}
-              className="underline underline-offset-4"
-            >
-              match video form
-            </a>
-          </li>
-          <li>Videos of people dancing</li>
-          <li>Long videos with little event-related content</li>
-          <li>Meme videos or individual SmugMug photos</li>
-        </Guidance>
       </div>
 
       <div>
         <h2 className="mb-2 text-lg font-semibold">Supported formats</h2>
         <ul className="list-disc space-y-1 pl-6 text-sm text-muted-foreground">
           <li>
-            <strong className="text-foreground">YouTube videos</strong>, like{' '}
-            <code>https://www.youtube.com/watch?v=pRaKQ0yCLJY</code>
+            <strong className="text-foreground">Facebook pages</strong>, like{' '}
+            <code>https://facebook.com/theuberbots</code>
           </li>
           <li>
-            <strong className="text-foreground">SmugMug albums</strong>, like{' '}
-            <code>https://nefirst.smugmug.com/2026-FIRST-AGE/2026-CMP-BAE</code>
+            <strong className="text-foreground">Twitter profiles</strong>, like{' '}
+            <code>https://twitter.com/team1124</code>
+          </li>
+          <li>
+            <strong className="text-foreground">YouTube channels</strong>, like{' '}
+            <code>https://www.youtube.com/user/Uberbots1124</code>. We can only
+            accept channels with a custom URL.{' '}
+            <a
+              href="https://support.google.com/youtube/answer/2657968?hl=en"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="underline underline-offset-4"
+            >
+              Here&apos;s how to create one
+            </a>
+            .
+          </li>
+          <li>
+            <strong className="text-foreground">GitHub accounts</strong>, like{' '}
+            <code>https://github.com/frc1124</code>
+          </li>
+          <li>
+            <strong className="text-foreground">GitLab accounts</strong>, like{' '}
+            <code>https://gitlab.com/frc1124</code>
+          </li>
+          <li>
+            <strong className="text-foreground">Instagram profiles</strong>,
+            like <code>https://www.instagram.com/4hteamneutrino</code>
           </li>
         </ul>
       </div>
 
-      {(videos.length > 0 || albums.length > 0) && (
-        <div className="space-y-4">
-          <h2 className="text-lg font-semibold">
-            Existing Media ({media.length})
-          </h2>
-          {videos.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2">
-              {videos.map((video) => (
-                <YoutubeEmbed
-                  key={video.foreign_key}
-                  videoId={video.foreign_key}
-                  title={video.foreign_key}
-                />
-              ))}
-            </div>
-          )}
-          <SmugmugAlbumGallery albums={albums} />
-        </div>
-      )}
+      <div>
+        <h2 className="mb-2 text-lg font-semibold">
+          Existing social media accounts
+        </h2>
+        {socials.length > 0 ? (
+          <TeamSocialMediaList socials={socials} />
+        ) : (
+          <p className="text-sm text-muted-foreground">
+            No existing social media accounts.
+          </p>
+        )}
+      </div>
 
       <div>
-        <h2 className="mb-2 text-lg font-semibold">Add media</h2>
+        <h2 className="mb-2 text-lg font-semibold">Add social media</h2>
         {!user && (
           <p className="mb-2 text-sm text-muted-foreground">
-            You must be signed in to suggest media.
+            You must be signed in to suggest social media.
           </p>
         )}
         <form
@@ -224,15 +214,15 @@ function SuggestEventMedia(): JSX.Element {
         >
           <Input
             type="url"
-            aria-label="Media URL"
-            placeholder="https://www.youtube.com/watch?v=pRaKQ0yCLJY"
+            aria-label="Social media URL"
+            placeholder="https://facebook.com/theuberbots"
             value={mediaUrl}
             onChange={(e) => setMediaUrl(e.target.value)}
             required
             className="flex-1"
           />
           <Button type="submit" disabled={isPending}>
-            {isPending ? 'Submitting…' : 'Add Media'}
+            {isPending ? 'Submitting…' : 'Add Social Media'}
           </Button>
         </form>
       </div>
@@ -240,9 +230,10 @@ function SuggestEventMedia(): JSX.Element {
       <Credenza open={loginOpen} onOpenChange={setLoginOpen}>
         <CredenzaContent className="max-h-[85vh] overflow-y-auto">
           <CredenzaHeader>
-            <CredenzaTitle>Sign in to suggest media</CredenzaTitle>
+            <CredenzaTitle>Sign in to suggest social media</CredenzaTitle>
             <CredenzaDescription>
-              You need to be signed in to suggest media for {event.name}.
+              You need to be signed in to suggest social media for Team{' '}
+              {team.team_number}.
             </CredenzaDescription>
           </CredenzaHeader>
           <CredenzaBody>
@@ -253,27 +244,6 @@ function SuggestEventMedia(): JSX.Element {
           </CredenzaBody>
         </CredenzaContent>
       </Credenza>
-    </div>
-  );
-}
-
-function Guidance({
-  children,
-  title,
-  tone,
-}: {
-  children: React.ReactNode;
-  title: string;
-  tone: 'success' | 'error';
-}): JSX.Element {
-  const colors =
-    tone === 'success'
-      ? 'border-green-300 bg-green-50 dark:border-green-800 dark:bg-green-950'
-      : 'border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950';
-  return (
-    <div className={`rounded-lg border p-4 ${colors}`}>
-      <h2 className="mb-2 font-semibold">{title}</h2>
-      <ul className="list-disc space-y-1 pl-5 text-sm">{children}</ul>
     </div>
   );
 }
