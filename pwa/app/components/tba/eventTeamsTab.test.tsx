@@ -277,7 +277,7 @@ describe('EventTeamsTab', () => {
     ).toBe('/team/254/2024');
   });
 
-  test("shows the team's record in the dialog", async () => {
+  test("shows the team's record from its matches in the dialog", async () => {
     const status = {
       qual: {
         ranking: {
@@ -288,14 +288,33 @@ describe('EventTeamsTab', () => {
       },
     } satisfies TeamEventStatus;
     renderTeams({
-      matches: [match('2024casj_qm1', ['frc254'], [])],
+      matches: [
+        {
+          key: '2024casj_qm1',
+          comp_level: 'qm',
+          winning_alliance: 'red',
+          alliances: {
+            red: { team_keys: ['frc254'], score: 10 },
+            blue: { team_keys: ['frc604'], score: 5 },
+          },
+        } as Match,
+        {
+          key: '2024casj_qm2',
+          comp_level: 'qm',
+          winning_alliance: 'red',
+          alliances: {
+            red: { team_keys: ['frc604'], score: 10 },
+            blue: { team_keys: ['frc254'], score: 5 },
+          },
+        } as Match,
+      ],
       statuses: { frc254: status },
     });
     fireEvent.click(
       screen.getByRole('button', { name: '254 - The Cheesy Poofs' }),
     );
     const dialog = await screen.findByRole('dialog');
-    expect(within(dialog).getByText('8-3-0')).toBeTruthy();
+    expect(within(dialog).getByText('1-1-0')).toBeTruthy();
   });
 
   test("shows only the team's matches in the dialog", async () => {
