@@ -1,15 +1,10 @@
-import { fireEvent, render, screen } from '@testing-library/react';
+import { render, screen } from '@testing-library/react';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { renderToString } from 'react-dom/server';
 import { Temporal } from 'temporal-polyfill';
-import { beforeEach, describe, expect, test, vi } from 'vitest';
+import { describe, expect, test, vi } from 'vitest';
 
 import { Footer } from '~/components/tba/navigation/footer';
-
-const mocks = vi.hoisted(() => ({
-  resolvedTheme: 'light' as 'light' | 'dark',
-  setTheme: vi.fn<(theme: string) => void>(),
-}));
 
 vi.mock('@tanstack/react-router', () => ({
   Link: ({
@@ -26,22 +21,7 @@ vi.mock('@tanstack/react-router', () => ({
   ),
 }));
 
-vi.mock('~/lib/theme', () => ({
-  useTheme: () => ({
-    resolvedTheme: mocks.resolvedTheme,
-    setTheme: mocks.setTheme,
-  }),
-}));
-
-function themeToggle() {
-  return screen.getByRole('button', { name: 'Toggle Theme' });
-}
-
 describe('Footer', () => {
-  beforeEach(() => {
-    mocks.resolvedTheme = 'light';
-  });
-
   test('links to internal pages and external sites', () => {
     render(<Footer />);
 
@@ -79,32 +59,9 @@ describe('Footer', () => {
     );
   });
 
-  test('omits the render time and active theme on the server', () => {
+  test('omits the render time on the server', () => {
     const html = renderToString(<Footer />);
 
     expect(html).not.toContain('Generated on');
-    expect(html).toContain('data-mounted="false"');
-    expect(html).not.toContain('data-active="true"');
-  });
-
-  test('marks the active theme and switches from light to dark', () => {
-    render(<Footer />);
-
-    const icons = themeToggle().querySelectorAll('svg');
-    expect(icons[0].getAttribute('data-active')).toBe('true');
-    expect(icons[1].getAttribute('data-active')).toBe('false');
-
-    fireEvent.click(themeToggle());
-
-    expect(mocks.setTheme).toHaveBeenCalledWith('dark');
-  });
-
-  test('switches from dark to light', () => {
-    mocks.resolvedTheme = 'dark';
-    render(<Footer />);
-
-    fireEvent.click(themeToggle());
-
-    expect(mocks.setTheme).toHaveBeenCalledWith('light');
   });
 });

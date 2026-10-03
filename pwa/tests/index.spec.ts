@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { Page, expect, test } from '@playwright/test';
 
 test.beforeEach(async ({ page }) => {
   await page.goto('/');
@@ -94,9 +94,9 @@ test('footer links are present', async ({ page }) => {
   ).toBeVisible();
 });
 
-test('footer toggle theme button is visible', async ({ page }) => {
+test('navbar profile menu button is visible', async ({ page }) => {
   await expect(
-    page.getByRole('button', { name: 'Toggle Theme' }),
+    page.getByRole('button', { name: 'Account menu' }),
   ).toBeVisible();
 });
 
@@ -246,36 +246,41 @@ test('(mobile) opening search focuses the input', async ({ page }) => {
   await expect(input).toBeFocused();
 });
 
-test.describe('Dark mode toggle', () => {
+// The theme selector lives in the navbar profile menu as a
+// light/dark/system radio group.
+async function selectTheme(page: Page, name: 'Light' | 'Dark' | 'System') {
+  await page.getByRole('button', { name: 'Account menu' }).click();
+  await page.getByRole('menuitemradio', { name }).click();
+  // Radio selection keeps the menu open; close it before interacting
+  // with the page underneath
+  await page.keyboard.press('Escape');
+}
+
+test.describe('Theme selection', () => {
   test.beforeEach(async ({ page }) => {
     await page.evaluate(() => localStorage.removeItem('theme'));
     await page.reload();
-    await page.locator('footer').scrollIntoViewIfNeeded();
-    await page.waitForSelector(
-      '[aria-label="Toggle Theme"][data-mounted="true"]',
-    );
+    await page.locator('body[data-hydrated]').waitFor();
   });
 
-  test('toggle changes theme to dark mode', async ({ page }) => {
+  test('selecting Dark applies dark mode', async ({ page }) => {
     const html = page.locator('html');
-    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
   });
 
-  test('toggle changes theme to light mode', async ({ page }) => {
+  test('selecting Light switches back from dark mode', async ({ page }) => {
     const html = page.locator('html');
-    const toggleButton = page.getByRole('button', { name: 'Toggle Theme' });
-
-    await toggleButton.click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
-    await toggleButton.click();
 
+    await selectTheme(page, 'Light');
     await expect(html).not.toHaveClass(/dark/);
   });
 
   test('theme persists across page reload', async ({ page }) => {
     const html = page.locator('html');
-    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
 
     await page.reload();
@@ -285,7 +290,7 @@ test.describe('Dark mode toggle', () => {
 
   test('theme persists after navigation', async ({ page }) => {
     const html = page.locator('html');
-    await page.getByRole('button', { name: 'Toggle Theme' }).click();
+    await selectTheme(page, 'Dark');
     await expect(html).toHaveClass(/dark/);
 
     await page
