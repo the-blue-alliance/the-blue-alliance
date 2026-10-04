@@ -1,9 +1,13 @@
 import { useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { createFileRoute } from '@tanstack/react-router';
+import { useMemo } from 'react';
 import { Fragment } from 'react/jsx-runtime';
+import { Temporal } from 'temporal-polyfill';
 
+import { MediaAvatar } from '~/api/tba/read';
 import {
   getTeamHistoryOptions,
+  getTeamMediaByYearOptions,
   getTeamOptions,
   getTeamSocialMediaOptions,
   getTeamYearsParticipatedOptions,
@@ -34,6 +38,9 @@ import {
 export const Route = createFileRoute('/team/$teamNumber/history')({
   loader: async ({ params, context: { queryClient } }) => {
     const teamKey = `frc${params.teamNumber}`;
+    // Resolved once here so the loader and the component build the same query
+    // key, rather than each reading the clock independently.
+    const mediaYear = Temporal.Now.plainDateISO().year;
 
     // spawn these now, we don't need to await them yet though
     const yearsParticipatedQuery = queryClient
@@ -46,6 +53,13 @@ export const Route = createFileRoute('/team/$teamNumber/history')({
         getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
       )
       .catch(() => []);
+    const mediaQuery = queryClient
+      .ensureQueryData(
+        getTeamMediaByYearOptions({
+          path: { team_key: teamKey, year: mediaYear },
+        }),
+      )
+      .catch(() => []);
 
     const [team] = await Promise.all([
       queryClient
@@ -56,10 +70,11 @@ export const Route = createFileRoute('/team/$teamNumber/history')({
         .catch(doThrowNotFound),
       yearsParticipatedQuery,
       socialsQuery,
+      mediaQuery,
     ]);
 
     // team needs to be returned so we can access it in meta
-    return { teamKey, team };
+    return { teamKey, mediaYear, team };
   },
   headers: publicCacheControlHeaders(),
   head: ({ loaderData }) => {
@@ -94,7 +109,7 @@ export const Route = createFileRoute('/team/$teamNumber/history')({
 // v8 ignore stop
 
 function TeamHistoryPage(): React.JSX.Element {
-  const { teamKey } = Route.useLoaderData();
+  const { teamKey, mediaYear } = Route.useLoaderData();
 
   const { data: team } = useSuspenseQuery(
     getTeamOptions({ path: { team_key: teamKey } }),
@@ -108,6 +123,16 @@ function TeamHistoryPage(): React.JSX.Element {
   const socialsQuery = useQuery(
     getTeamSocialMediaOptions({ path: { team_key: teamKey } }),
   );
+  const mediaQuery = useQuery(
+    getTeamMediaByYearOptions({
+      path: { team_key: teamKey, year: mediaYear },
+    }),
+  );
+  const media = useMemo(() => mediaQuery.data ?? [], [mediaQuery.data]);
+
+  const maybeAvatar = useMemo(() => {
+    return media.find((m): m is MediaAvatar => m.type === 'avatar');
+  }, [media]);
 
   // These arrays live in the query cache, so sort copies rather than in place.
   const yearsParticipated = (yearsParticipatedQuery.data ?? []).toSorted(
@@ -173,7 +198,7 @@ function TeamHistoryPage(): React.JSX.Element {
         >
           <div className="flex flex-col justify-between">
             <TeamPageTeamInfo
-              maybeAvatar={undefined}
+              maybeAvatar={maybeAvatar}
               socials={socials}
               team={team}
             />

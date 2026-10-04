@@ -37,7 +37,7 @@ export default function TeamPageTeamInfo({
   favoriteButton,
 }: {
   team: Team;
-  maybeAvatar: MediaAvatar | undefined; // undefined on team history page
+  maybeAvatar: MediaAvatar | undefined;
   socials: Media[];
   district?: District;
   favoriteButton?: ReactNode;

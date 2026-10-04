@@ -1,4 +1,5 @@
 import type { QueryClient } from '@tanstack/react-query';
+import { Temporal } from 'temporal-polyfill';
 import { describe, expect, test, vi } from 'vitest';
 
 import { runHead, runLoader } from '~/routes/-testUtils';
@@ -31,11 +32,47 @@ function load(responses: Record<string, unknown>) {
 }
 
 describe('team history route loader', () => {
-  test('loads the team despite failed years and socials', async () => {
+  test('loads the team despite failed years, socials, and media', async () => {
     await expect(load({ getTeam: team, getTeamHistory: {} })).resolves.toEqual({
       teamKey: 'frc254',
+      mediaYear: expect.any(Number),
       team,
     });
+  });
+
+  test('resolves mediaYear from the current year', async () => {
+    vi.spyOn(Temporal.Now, 'plainDateISO').mockReturnValueOnce(
+      Temporal.PlainDate.from('2026-03-01'),
+    );
+    await expect(load({ getTeam: team, getTeamHistory: {} })).resolves.toEqual({
+      teamKey: 'frc254',
+      mediaYear: 2026,
+      team,
+    });
+  });
+
+  test('prefetches media for the current year', async () => {
+    vi.spyOn(Temporal.Now, 'plainDateISO').mockReturnValueOnce(
+      Temporal.PlainDate.from('2026-03-01'),
+    );
+    const ensureQueryData = vi
+      .fn<() => Promise<unknown>>()
+      .mockResolvedValue({});
+    const queryClient = { ensureQueryData } as unknown as QueryClient;
+    await runLoader(Route, {
+      params: { teamNumber: '254' },
+      context: { queryClient },
+    });
+    expect(ensureQueryData).toHaveBeenCalledWith(
+      expect.objectContaining({
+        queryKey: expect.arrayContaining([
+          expect.objectContaining({
+            _id: 'getTeamMediaByYear',
+            path: { team_key: 'frc254', year: 2026 },
+          }),
+        ]),
+      }),
+    );
   });
 
   test('throws not-found when the team fails to load', async () => {
