@@ -108,7 +108,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import { TabsContent, TabsList } from '~/components/ui/tabs';
+import { TabsBadge, TabsContent, TabsList } from '~/components/ui/tabs';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import {
   ROUND_ROBIN_TYPES,
@@ -653,9 +653,7 @@ function EventPage() {
             <InlineIcon>
               <TeamsIcon />
               Teams
-              <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
-                {teamsQuery.data?.length ?? '-'}
-              </Badge>
+              <TabsBadge>{teamsQuery.data?.length ?? '-'}</TabsBadge>
             </InlineIcon>
           </AnimatedTabsTrigger>
           {((shouldPreviewInsightsTab &&
@@ -691,11 +689,11 @@ function EventPage() {
             <InlineIcon>
               <MediaIcon />
               Media
-              <Badge className="mx-2 h-[1.5em] align-text-top" variant="inline">
+              <TabsBadge>
                 {eventMediaQuery.data
                   ? eventMediaQuery.data.length + event.webcasts.length
                   : '-'}
-              </Badge>
+              </TabsBadge>
             </InlineIcon>
           </AnimatedTabsTrigger>
           <AnimatedTabsTrigger value="scouting">

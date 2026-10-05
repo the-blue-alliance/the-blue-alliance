@@ -2,6 +2,8 @@ import { Tabs as TabsPrimitive } from '@base-ui/react/tabs';
 import { cn } from 'cn';
 import { type ComponentProps } from 'react';
 
+import { Badge, type BadgeProps } from '~/components/ui/badge';
+
 const Tabs = TabsPrimitive.Root;
 
 function TabsList({
@@ -41,6 +43,18 @@ function TabsTrigger({
   );
 }
 
+// Count pill after a tab label. Only a leading margin, so the tab's own
+// padding stays symmetric around its content.
+function TabsBadge({ className, ...props }: BadgeProps) {
+  return (
+    <Badge
+      variant="inline"
+      className={cn('ml-2 h-[1.5em] align-text-top', className)}
+      {...props}
+    />
+  );
+}
+
 function TabsContent({
   className,
   ...props
@@ -53,4 +67,4 @@ function TabsContent({
   );
 }
 
-export { Tabs, TabsList, TabsTrigger, TabsContent };
+export { Tabs, TabsList, TabsTrigger, TabsBadge, TabsContent };

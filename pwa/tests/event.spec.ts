@@ -175,6 +175,20 @@ test.describe('/event/2026necmp Media tab', () => {
     await expect(page.getByRole('tab', { name: /^Media \d+$/ })).toBeVisible();
   });
 
+  test('pads the selected Media tab equally on both sides', async ({
+    page,
+  }) => {
+    const tab = page.getByRole('tab', { name: /^Media \d+$/ });
+    await expect(tab).toHaveAttribute('aria-selected', 'true');
+    const tabBox = await tab.boundingBox();
+    const iconBox = await tab.locator('svg').first().boundingBox();
+    const badgeBox = await tab.locator('.rounded-full').boundingBox();
+
+    const left = iconBox!.x - tabBox!.x;
+    const right = tabBox!.x + tabBox!.width - (badgeBox!.x + badgeBox!.width);
+    expect(Math.abs(left - right)).toBeLessThanOrEqual(1);
+  });
+
   test('links to the event media suggestion form', async ({ page }) => {
     await expect(
       page.getByRole('link', { name: 'Add Event Media' }),
