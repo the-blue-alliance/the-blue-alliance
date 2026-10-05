@@ -114,6 +114,22 @@ test.describe('/event/2024mil', () => {
     await expect(page.locator('svg.recharts-surface')).toBeVisible();
   });
 
+  test('selects a tab whose content is still loading', async ({ page }) => {
+    // Hold back the lazily loaded Insights chart so its tab suspends
+    await page.route(/coprScatterChart/, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await route.continue();
+    });
+    await page.getByRole('tab', { name: /^Teams/ }).click();
+    await page.getByRole('tab', { name: 'Insights' }).click();
+
+    await expect(page.getByRole('tab', { name: 'Insights' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+      { timeout: 1000 },
+    );
+  });
+
   test('links to the Match13 event page', async ({ page }) => {
     await expect(page.getByRole('link', { name: 'Match13' })).toHaveAttribute(
       'href',

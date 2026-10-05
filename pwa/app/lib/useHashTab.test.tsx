@@ -11,32 +11,42 @@ import {
 import { TabsContent, TabsList } from '~/components/ui/tabs';
 import { useHashTab } from '~/lib/useHashTab';
 
-// Stand-in for the router: navigate replaces the hash and re-renders subscribers
+// Stand-in for the router: like TanStack's, navigate commits the new hash
+// asynchronously, then re-renders location subscribers
 const routerListeners = new Set<() => void>();
-let routerVersion = 0;
 const navigate = vi.fn<
   (opts: { hash: string; replace?: boolean }) => Promise<void>
->((opts) => {
-  window.history.replaceState(null, '', `#${opts.hash}`);
-  routerVersion += 1;
-  routerListeners.forEach((l) => l());
-  return Promise.resolve();
-});
+>(
+  (opts) =>
+    new Promise((resolve) => {
+      setTimeout(() => {
+        window.history.replaceState(null, '', `#${opts.hash}`);
+        routerListeners.forEach((l) => l());
+        resolve();
+      }, 0);
+    }),
+);
+
+function subscribeToLocation(cb: () => void) {
+  routerListeners.add(cb);
+  window.addEventListener('hashchange', cb);
+  return () => {
+    routerListeners.delete(cb);
+    window.removeEventListener('hashchange', cb);
+  };
+}
 
 vi.mock('@tanstack/react-router', () => ({
   useNavigate: () => navigate,
+  useLocation: <T,>({ select }: { select: (l: { hash: string }) => T }) =>
+    select({
+      hash: useSyncExternalStore(
+        subscribeToLocation,
+        () => window.location.hash.slice(1),
+        () => '',
+      ),
+    }),
 }));
-
-function useRouterRerender() {
-  return useSyncExternalStore(
-    (cb) => {
-      routerListeners.add(cb);
-      return () => routerListeners.delete(cb);
-    },
-    () => routerVersion,
-    () => routerVersion,
-  );
-}
 
 const mounts = vi.fn<() => void>();
 
@@ -48,7 +58,6 @@ function MountCounter() {
 }
 
 function Page({ values = ['results', 'rankings', 'media'] as string[] }) {
-  useRouterRerender();
   const tabs = useHashTab({
     values,
     defaultValue: 'results',
@@ -87,22 +96,34 @@ describe('useHashTab', () => {
     window.history.replaceState(null, '', '/');
   });
 
-  test('clicking tabs updates the hash without remounting the page', () => {
+  test('clicking tabs updates the hash without remounting the page', async () => {
     render(<Page />);
-    expect(selectedTab()).toBe('results');
 
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'rankings' }));
+    });
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'media' }));
+    });
+
+    expect([
+      window.location.hash,
+      selectedTab(),
+      mounts.mock.calls.length,
+    ]).toEqual(['#media', 'media', 1]);
+  });
+
+  test('rapid clicks select the last clicked tab', async () => {
+    render(<Page />);
+
+    // Both clicks land before the router commits either navigation
     fireEvent.click(screen.getByRole('tab', { name: 'rankings' }));
-    expect(window.location.hash).toBe('#rankings');
-    expect(selectedTab()).toBe('rankings');
-
     fireEvent.click(screen.getByRole('tab', { name: 'media' }));
-    expect(window.location.hash).toBe('#media');
-    expect(selectedTab()).toBe('media');
+    await act(async () => {
+      await new Promise((r) => setTimeout(r, 10));
+    });
 
-    expect(navigate).toHaveBeenLastCalledWith(
-      expect.objectContaining({ hash: 'media', replace: true }),
-    );
-    expect(mounts).toHaveBeenCalledTimes(1);
+    expect([window.location.hash, selectedTab()]).toEqual(['#media', 'media']);
   });
 
   test('opens the tab named by the hash on load', () => {
@@ -122,9 +143,11 @@ describe('useHashTab', () => {
     expect(selectedTab()).toBe('results');
   });
 
-  test('follows external hash changes such as back/forward', () => {
+  test('follows external hash changes such as back/forward', async () => {
     render(<Page />);
-    fireEvent.click(screen.getByRole('tab', { name: 'rankings' }));
+    await act(async () => {
+      fireEvent.click(screen.getByRole('tab', { name: 'rankings' }));
+    });
 
     act(() => {
       window.history.replaceState(null, '', '/#media');
