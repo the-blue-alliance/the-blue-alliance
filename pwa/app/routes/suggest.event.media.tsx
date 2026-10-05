@@ -13,6 +13,7 @@ import { useAuth } from '~/components/tba/auth/auth';
 import SignInWithAppleButton from '~/components/tba/auth/signInWithAppleButton';
 import SignInWithGoogleButton from '~/components/tba/auth/signInWithGoogleButton';
 import SmugmugAlbumGallery from '~/components/tba/smugmugAlbumGallery';
+import SuggestionStatusMessage from '~/components/tba/suggestionStatusMessage';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
 import { Button } from '~/components/ui/button';
 import {
@@ -112,32 +113,32 @@ function SuggestEventMedia(): JSX.Element {
       </div>
 
       {status === 'success' && (
-        <StatusMessage tone="success" title="Thanks!">
+        <SuggestionStatusMessage tone="success" title="Thanks!">
           We&apos;ll review your suggestion and get it added to the site soon!
-        </StatusMessage>
+        </SuggestionStatusMessage>
       )}
       {status === 'media_exists' && (
-        <StatusMessage tone="info" title="Already approved">
+        <SuggestionStatusMessage tone="info" title="Already approved">
           The URL you submitted has already been approved.
-        </StatusMessage>
+        </SuggestionStatusMessage>
       )}
       {status === 'suggestion_exists' && (
-        <StatusMessage tone="info" title="Already pending">
+        <SuggestionStatusMessage tone="info" title="Already pending">
           The URL you submitted is already pending review.
-        </StatusMessage>
+        </SuggestionStatusMessage>
       )}
       {status === 'bad_url' && (
-        <StatusMessage tone="error" title="Unsupported URL">
+        <SuggestionStatusMessage tone="error" title="Unsupported URL">
           We can&apos;t support the URL you submitted. Check the supported
           formats below.
-        </StatusMessage>
+        </SuggestionStatusMessage>
       )}
       {(status === 'error' ||
         status === 'bad_event' ||
         status === 'unauthorized') && (
-        <StatusMessage tone="error" title="Something went wrong">
+        <SuggestionStatusMessage tone="error" title="Something went wrong">
           Please try again.
-        </StatusMessage>
+        </SuggestionStatusMessage>
       )}
 
       <div className="space-y-2">
@@ -252,30 +253,6 @@ function SuggestEventMedia(): JSX.Element {
           </CredenzaBody>
         </CredenzaContent>
       </Credenza>
-    </div>
-  );
-}
-
-function StatusMessage({
-  children,
-  title,
-  tone,
-}: {
-  children: React.ReactNode;
-  title: string;
-  tone: 'success' | 'info' | 'error';
-}): JSX.Element {
-  const colors = {
-    success:
-      'border-green-300 bg-green-50 text-green-900 dark:border-green-800 dark:bg-green-950 dark:text-green-100',
-    info: 'border-blue-300 bg-blue-50 text-blue-900 dark:border-blue-800 dark:bg-blue-950 dark:text-blue-100',
-    error:
-      'border-red-300 bg-red-50 text-red-900 dark:border-red-800 dark:bg-red-950 dark:text-red-100',
-  };
-  return (
-    <div role="alert" className={`rounded-lg border p-4 ${colors[tone]}`}>
-      <p className="font-semibold">{title}</p>
-      <p className="text-sm">{children}</p>
     </div>
   );
 }

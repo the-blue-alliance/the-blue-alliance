@@ -291,7 +291,7 @@ function TeamDetails({
       {/* Header */}
       <div className="mb-2">
         <div className="flex items-center gap-2">
-          {teamMediaQuery.data && (
+          {teamMediaQuery.isSuccess && (
             <TeamAvatar
               media={teamMediaQuery.data}
               className="shrink-0"

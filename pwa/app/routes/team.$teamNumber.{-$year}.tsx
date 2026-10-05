@@ -20,7 +20,6 @@ import {
   RegionalAdvancement,
   RegionalRanking,
   Team,
-  WltRecord,
 } from '~/api/tba/read';
 import {
   getDistrictRankingsOptions,
@@ -51,30 +50,12 @@ import TeamMediaGallery from '~/components/tba/teamMediaGallery';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
 import { YearSelector } from '~/components/tba/yearSelector';
-import { Badge } from '~/components/ui/badge';
 import { Separator } from '~/components/ui/separator';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipProvider,
-  TooltipTrigger,
-} from '~/components/ui/tooltip';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { sortEventsComparator } from '~/lib/eventUtils';
-import {
-  calculateTeamRecordsFromMatches,
-  getTeamsUnpenalizedHighScore,
-} from '~/lib/matchUtils';
+import { calculateTeamRecordsFromMatches } from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import {
@@ -83,10 +64,7 @@ import {
   doThrowNotFound,
   hasAnyMatches,
   parseParamsForYearElseDefault,
-  pluralize,
   publicCacheControlHeaders,
-  stringifyRecord,
-  winrateFromRecord,
 } from '~/lib/utils';
 
 export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
@@ -467,7 +445,6 @@ function TeamPage(): React.JSX.Element {
             events={sortedEvents}
             team={team}
             matches={matches}
-            awards={awards}
             year={year}
             district={currentDistrict}
             districtRanking={teamDistrictRanking}
@@ -543,7 +520,6 @@ function StatsSection({
   events,
   team,
   matches,
-  awards,
   year,
   district,
   districtRanking,
@@ -552,14 +528,11 @@ function StatsSection({
   events: Event[];
   team: Team;
   matches: Match[];
-  awards: Award[];
   year: number;
   district?: District;
   districtRanking?: DistrictRanking;
   regionalRanking?: RegionalRanking;
 }) {
-  const [showTable, setShowTable] = useState(false);
-
   const officialEvents = events.filter((e) =>
     SEASON_EVENT_TYPES.has(e.event_type),
   );
@@ -600,15 +573,6 @@ function StatsSection({
   const officialRecord = addRecords(officialQuals, officialPlayoff);
   const unofficialRecord = addRecords(unofficialQuals, unofficialPlayoff);
   const hasUnofficialMatches = hasAnyMatches(unofficialRecord);
-
-  const combinedQuals = addRecords(officialQuals, unofficialQuals);
-  const combinedPlayoff = addRecords(officialPlayoff, unofficialPlayoff);
-  const combinedRecord = addRecords(combinedQuals, combinedPlayoff);
-
-  const highScoreMatch = useMemo(
-    () => getTeamsUnpenalizedHighScore(team.key, officialMatches),
-    [officialMatches, team.key],
-  );
 
   if (matches.length === 0) {
     return null;
@@ -666,180 +630,8 @@ function StatsSection({
             points.
           </>
         )}
-        <Badge
-          className="ml-2 cursor-pointer"
-          onClick={() => {
-            setShowTable((prev) => !prev);
-          }}
-        >
-          {showTable ? 'Hide' : 'Show'} Details
-        </Badge>
       </div>
-
-      {showTable && (
-        <div>
-          <div
-            // The padding/margins make the separator not actually perfectly centered
-            // left-47.5 looks significantly better than left-1/2
-            className={`relative flex flex-wrap *:w-full before:absolute
-            before:inset-y-0 before:left-[47.5%] before:hidden before:w-px
-            before:bg-neutral-200 sm:mt-0 lg:*:w-1/2 lg:before:block`}
-          >
-            <div className="grid grid-cols-2 items-center gap-y-4">
-              <Stat
-                label={`Official ${pluralize(officialEvents.length, 'Event', 'Events', false)}`}
-                value={officialEvents.length}
-              />
-
-              <Stat
-                label={`Official ${pluralize(matches.length, 'Match', 'Matches', false)}`}
-                value={officialMatches.length}
-              />
-
-              {awards.length > 0 && (
-                <Stat
-                  label={pluralize(awards.length, 'Award', 'Awards', false)}
-                  value={awards.length}
-                />
-              )}
-
-              {highScoreMatch && (
-                <TooltippedStat
-                  label="High Score"
-                  value={highScoreMatch.score}
-                  tooltip={`${highScoreMatch.match.key} - ${highScoreMatch.alliance.team_keys.map((k) => k.substring(3)).join('-')}`}
-                />
-              )}
-            </div>
-
-            <Table className="table-fixed [&_tr]:border-b-0">
-              <TableHeader>
-                <TableRow>
-                  <TableHead className="text-center"></TableHead>
-                  <TableHead className="text-center">Quals</TableHead>
-                  <TableHead className="text-center">Playoffs</TableHead>
-                  <TableHead className="text-center">Overall</TableHead>
-                </TableRow>
-              </TableHeader>
-              <TableBody>
-                <TableRow>
-                  <TableHead>Official</TableHead>
-                  <RecordCell
-                    record={officialRecords.quals}
-                    dataTestId="official_quals"
-                  />
-                  <RecordCell
-                    record={officialRecords.playoff}
-                    dataTestId="official_playoff"
-                  />
-                  <RecordCell
-                    record={officialRecord}
-                    dataTestId="official_overall"
-                  />
-                </TableRow>
-
-                <TableRow>
-                  <TableHead>Unofficial</TableHead>
-                  <RecordCell
-                    record={unofficialRecords.quals}
-                    dataTestId="unofficial_quals"
-                  />
-                  <RecordCell
-                    record={unofficialRecords.playoff}
-                    dataTestId="unofficial_playoff"
-                  />
-                  <RecordCell
-                    record={unofficialRecord}
-                    dataTestId="unofficial_overall"
-                  />
-                </TableRow>
-
-                <TableRow>
-                  <TableHead>Combined</TableHead>
-                  <RecordCell
-                    record={combinedQuals}
-                    dataTestId="combined_quals"
-                  />
-                  <RecordCell
-                    record={combinedPlayoff}
-                    dataTestId="combined_playoff"
-                  />
-                  <RecordCell
-                    record={combinedRecord}
-                    dataTestId="combined_overall"
-                  />
-                </TableRow>
-              </TableBody>
-            </Table>
-          </div>
-        </div>
-      )}
     </>
-  );
-}
-
-function RecordCell({
-  record,
-  dataTestId,
-}: {
-  record: WltRecord;
-  dataTestId: string;
-}) {
-  return (
-    <TableCell className="text-center">
-      <TooltipProvider>
-        <Tooltip>
-          <TooltipTrigger
-            render={
-              <div
-                className="cursor-pointer"
-                data-testid={`${dataTestId}_cell`}
-              />
-            }
-          >
-            {stringifyRecord(record)}
-          </TooltipTrigger>
-          <TooltipContent side="top" data-testid={`${dataTestId}_tooltip`}>
-            {(winrateFromRecord(record) * 100).toFixed(0)}% winrate
-          </TooltipContent>
-        </Tooltip>
-      </TooltipProvider>
-    </TableCell>
-  );
-}
-
-function Stat({ label, value }: { label: string; value: string | number }) {
-  return (
-    <div
-      className="mx-auto flex min-w-[16ch] flex-col text-center"
-      data-testid={`test_${label}`}
-    >
-      <dt className="text-muted-foreground">{label}</dt>
-      <dd className="order-first text-2xl font-semibold tracking-tight">
-        {value}
-      </dd>
-    </div>
-  );
-}
-
-function TooltippedStat({
-  label,
-  value,
-  tooltip,
-}: {
-  label: string;
-  value: string | number;
-  tooltip: string;
-}) {
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger>
-          <Stat label={label} value={value} />
-        </TooltipTrigger>
-        <TooltipContent>{tooltip}</TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
   );
 }
 

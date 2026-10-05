@@ -11,6 +11,7 @@ import {
   RegionalAdvancement,
   Team,
   TeamEventStatus,
+  WltRecord,
 } from '~/api/tba/read';
 import AddToCalendarLinks from '~/components/tba/addToCalendarLinks';
 import { AwardBanner } from '~/components/tba/banner';
@@ -28,7 +29,11 @@ import { Separator } from '~/components/ui/separator';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
-import { sortMatchComparator } from '~/lib/matchUtils';
+import {
+  calculateTeamRecordsFromMatches,
+  sortMatchComparator,
+} from '~/lib/matchUtils';
+import { addRecords, hasAnyMatches } from '~/lib/utils';
 
 function StatChip({
   label,
@@ -76,6 +81,19 @@ export function getTotalRankingPoints(
   }
 
   return Math.round(rankingScore * ranking.matches_played);
+}
+
+export function getTeamEventRecord(
+  event: Event,
+  teamKey: string,
+  matches: Match[],
+): WltRecord | undefined {
+  if (event.year === 2015) {
+    return undefined;
+  }
+  const { quals, playoff } = calculateTeamRecordsFromMatches(teamKey, matches);
+  const record = addRecords(quals, playoff);
+  return hasAnyMatches(record) ? record : undefined;
 }
 
 function Section({
@@ -154,6 +172,7 @@ export default function TeamEventAppearance({
           </div>
           <TeamStatus
             event={event}
+            matches={matches}
             status={status}
             team={team}
             awards={awards}
@@ -193,8 +212,47 @@ export default function TeamEventAppearance({
   );
 }
 
+export function TeamEventRecord({
+  event,
+  teamKey,
+  status,
+  record,
+}: {
+  event: Event;
+  teamKey: string;
+  status: TeamEventStatus | null;
+  record: WltRecord | undefined;
+}) {
+  const rank = status?.qual?.ranking?.rank;
+  if (!rank && !record) {
+    return null;
+  }
+  const rankingPoints = getTotalRankingPoints(event, status);
+
+  return (
+    <div className="grid grid-cols-2 gap-2">
+      {rank && (
+        <EventRankTooltip
+          eventKey={event.key}
+          teamKey={teamKey}
+          rank={rank}
+          numTeams={status?.qual?.num_teams}
+        />
+      )}
+      {record && (
+        <StatChip
+          label="Record"
+          value={`${record.wins}-${record.losses}-${record.ties}`}
+          sub={rankingPoints === undefined ? undefined : `${rankingPoints} RP`}
+        />
+      )}
+    </div>
+  );
+}
+
 export function TeamStatus({
   event,
+  matches,
   status,
   team,
   awards,
@@ -204,6 +262,7 @@ export function TeamStatus({
   teamRegionalAdvancement,
 }: {
   event: Event;
+  matches: Match[];
   status: TeamEventStatus | null;
   team: Team;
   awards: Award[];
@@ -213,7 +272,7 @@ export function TeamStatus({
   teamRegionalAdvancement?: RegionalAdvancement;
 }) {
   const hasRank = status?.qual?.ranking?.rank;
-  const hasRecord = status?.qual?.ranking?.record;
+  const record = getTeamEventRecord(event, team.key, matches);
   const hasAlliance =
     status?.alliance && maybeAlliances && maybeAlliances.length > 0;
   const hasAwards = awards.length > 0;
@@ -223,41 +282,19 @@ export function TeamStatus({
   const hasRegionalPoolPoints =
     event.event_type === EventType.REGIONAL &&
     maybeRegionalPoolPoints?.points[team.key];
-  const rankingPoints = getTotalRankingPoints(event, status);
 
   const sections = [];
 
   // Stats row (rank + record)
-  if (hasRank || hasRecord) {
+  if (hasRank || record) {
     sections.push(
-      <div key="stats" className="grid grid-cols-2 gap-2">
-        {hasRank && status?.qual?.ranking?.rank && (
-          <EventRankTooltip
-            eventKey={event.key}
-            teamKey={team.key}
-            rank={status.qual.ranking.rank}
-            numTeams={status.qual.num_teams}
-          />
-        )}
-        {hasRecord && status?.qual?.ranking?.record && (
-          <StatChip
-            label="Record"
-            value={`${
-              status.qual.ranking.record.wins +
-              (status.playoff?.record?.wins ?? 0)
-            }-${
-              status.qual.ranking.record.losses +
-              (status.playoff?.record?.losses ?? 0)
-            }-${
-              status.qual.ranking.record.ties +
-              (status.playoff?.record?.ties ?? 0)
-            }`}
-            sub={
-              rankingPoints === undefined ? undefined : `${rankingPoints} RP`
-            }
-          />
-        )}
-      </div>,
+      <TeamEventRecord
+        key="stats"
+        event={event}
+        teamKey={team.key}
+        status={status}
+        record={record}
+      />,
     );
   }
 

@@ -126,11 +126,17 @@ describe('TeamTooltip', () => {
     expect(screen.getByText('Surrogate')).toBeTruthy();
   });
 
-  test('renders without an avatar or flags', async () => {
+  test('renders without flags', async () => {
     renderWithClient(<TeamTooltip teamKey="frc254" year={2026} />);
     expect(await screen.findByText('The Cheesy Poofs')).toBeTruthy();
-    expect(screen.queryByRole('img')).toBeNull();
     expect(screen.queryByText('Disqualified')).toBeNull();
+  });
+
+  test('shows the default avatar for a team without one', async () => {
+    renderWithClient(<TeamTooltip teamKey="frc254" year={2026} />);
+    expect(
+      await screen.findByRole('img', { name: 'Default Team Avatar' }),
+    ).toBeTruthy();
   });
 
   test('renders nothing for an unknown team', async () => {

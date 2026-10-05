@@ -1,6 +1,15 @@
 import { fireEvent, render, screen, within } from '@testing-library/react';
 import type { AnchorHTMLAttributes, ReactNode } from 'react';
-import { beforeAll, describe, expect, test, vi } from 'vitest';
+import { Temporal } from 'temporal-polyfill';
+import {
+  afterEach,
+  beforeAll,
+  beforeEach,
+  describe,
+  expect,
+  test,
+  vi,
+} from 'vitest';
 
 import {
   AllianceColor,
@@ -59,6 +68,19 @@ vi.mock('~/components/tba/teamTooltip', () => ({
   ),
 }));
 
+const mocks = vi.hoisted(() => ({
+  useFavoriteTeamKeys:
+    vi.fn<() => { teamKeys: string[]; isLoading: boolean }>(),
+}));
+
+vi.mock('~/lib/hooks/useFavoriteTeams', () => ({
+  useFavoriteTeamKeys: mocks.useFavoriteTeamKeys,
+}));
+
+beforeEach(() => {
+  mocks.useFavoriteTeamKeys.mockReturnValue({ teamKeys: [], isLoading: false });
+});
+
 class ResizeObserverMock {
   observe() {}
   unobserve() {}
@@ -67,6 +89,10 @@ class ResizeObserverMock {
 
 beforeAll(() => {
   global.ResizeObserver = ResizeObserverMock;
+});
+
+afterEach(() => {
+  vi.restoreAllMocks();
 });
 
 const event: Event = {
@@ -504,6 +530,19 @@ describe('MatchRow', () => {
     expect(screen.queryByText(/[AP]M$/)).toBeNull();
   });
 
+  test('shows the scheduled time for an unplayed match without a prediction', () => {
+    vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue('America/New_York');
+    render(
+      <MatchRow
+        match={makeUnplayedMatch({ time: 1772893800 })}
+        event={event}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText('Sat 9:30 AM')).toBeTruthy();
+  });
+
   test.each([
     { alliance: 'red', focusTeamKey: 'frc254' },
     { alliance: 'blue', focusTeamKey: 'frc217' },
@@ -554,6 +593,56 @@ describe('MatchRow', () => {
         'Energized Bonus (Achieved), Supercharged Bonus (Not Achieved), Traversal Bonus (Achieved)',
       ),
     ).toBeTruthy();
+  });
+
+  test('marks the match with a star when a favorite team plays in it', () => {
+    mocks.useFavoriteTeamKeys.mockReturnValue({
+      teamKeys: ['frc217'],
+      isLoading: false,
+    });
+
+    render(<MatchRow match={makeMatch()} event={event} year={2026} />);
+
+    expect(screen.getByText('Includes a favorite team')).toBeTruthy();
+  });
+
+  test('shows no star when no favorite team plays in the match', () => {
+    mocks.useFavoriteTeamKeys.mockReturnValue({
+      teamKeys: ['frc604'],
+      isLoading: false,
+    });
+
+    render(<MatchRow match={makeMatch()} event={event} year={2026} />);
+
+    expect(screen.queryByText('Includes a favorite team')).toBeNull();
+  });
+
+  test("marks only the favorite team's number with a dot", () => {
+    mocks.useFavoriteTeamKeys.mockReturnValue({
+      teamKeys: ['frc217'],
+      isLoading: false,
+    });
+
+    render(<MatchRow match={makeMatch()} event={event} year={2026} />);
+
+    expect(screen.getByText('Favorite team').closest('div')?.textContent).toBe(
+      '217Favorite team',
+    );
+  });
+
+  test("marks each favorite team's number when several play in the match", () => {
+    mocks.useFavoriteTeamKeys.mockReturnValue({
+      teamKeys: ['frc254', 'frc33'],
+      isLoading: false,
+    });
+
+    render(<MatchRow match={makeMatch()} event={event} year={2026} />);
+
+    expect(
+      screen
+        .getAllByText('Favorite team')
+        .map((dot) => dot.closest('div')?.textContent),
+    ).toEqual(['254Favorite team', '33Favorite team']);
   });
 });
 
@@ -616,6 +705,18 @@ describe('SimpleMatchRow', () => {
     render(<SimpleMatchRow match={makeUnplayedMatch()} year={2026} />);
 
     expect(screen.queryByText(/[AP]M$/)).toBeNull();
+  });
+
+  test('shows the scheduled time for an unplayed match without a prediction', () => {
+    vi.spyOn(Temporal.Now, 'timeZoneId').mockReturnValue('America/New_York');
+    render(
+      <SimpleMatchRow
+        match={makeUnplayedMatch({ time: 1772893800 })}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText('Sat 9:30 AM')).toBeTruthy();
   });
 });
 

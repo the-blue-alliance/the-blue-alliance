@@ -43,3 +43,19 @@ def test_matches_exist_across_years() -> None:
     preseed_matches(5, "2011ct", ["frc254"])
     matches = TeamYearMatchesQuery(team_key="frc254", year=2010).fetch()
     assert len(matches) == 5
+
+
+def test_excludes_practice_matches() -> None:
+    preseed_matches(5, "2010ct", ["frc254"])
+    Match(
+        id="2010ct_pm1",
+        event=ndb.Key(Event, "2010ct"),
+        year=2010,
+        comp_level=CompLevel.PM,
+        set_number=1,
+        match_number=1,
+        alliances_json="",
+        team_key_names=["frc254"],
+    ).put()
+    matches = TeamYearMatchesQuery(team_key="frc254", year=2010).fetch()
+    assert len(matches) == 5

@@ -4,7 +4,10 @@ import type { PropsWithChildren } from 'react';
 import { beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { TeamSimple } from '~/api/tba/read';
-import { useFavoriteTeams } from '~/lib/hooks/useFavoriteTeams';
+import {
+  useFavoriteTeamKeys,
+  useFavoriteTeams,
+} from '~/lib/hooks/useFavoriteTeams';
 import { MODEL_TYPE } from '~/lib/utils';
 
 const mocks = vi.hoisted(() => ({
@@ -122,5 +125,41 @@ describe('useFavoriteTeams', () => {
     await waitFor(() => expect(result.current.isLoading).toBe(false));
     expect(result.current.favoriteTeams).toEqual([]);
     expect(mocks.getTeamSimple).not.toHaveBeenCalled();
+  });
+});
+
+describe('useFavoriteTeamKeys', () => {
+  beforeEach(() => {
+    mocks.useAuth.mockReturnValue({ user: USER });
+  });
+
+  test('returns only favorited team keys', async () => {
+    mocks.listFavorites.mockResolvedValue({
+      data: {
+        favorites: [
+          { model_key: 'frc604', model_type: MODEL_TYPE.TEAM },
+          { model_key: '2026casj', model_type: MODEL_TYPE.EVENT },
+          { model_key: 'frc254', model_type: MODEL_TYPE.TEAM },
+        ],
+      },
+    });
+
+    const { result } = renderHook(() => useFavoriteTeamKeys(), {
+      wrapper: createWrapper(),
+    });
+
+    await waitFor(() =>
+      expect(result.current.teamKeys).toEqual(['frc604', 'frc254']),
+    );
+  });
+
+  test('returns no team keys when signed out', () => {
+    mocks.useAuth.mockReturnValue({ user: null });
+
+    const { result } = renderHook(() => useFavoriteTeamKeys(), {
+      wrapper: createWrapper(),
+    });
+
+    expect(result.current.teamKeys).toEqual([]);
   });
 });

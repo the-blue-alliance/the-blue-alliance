@@ -142,6 +142,7 @@ describe('TeamStatus', () => {
     render(
       <TeamStatus
         event={event}
+        matches={[makeMatch('2026test_qm1', 'qm', 1, ['frc254'])]}
         status={status}
         team={{ key: 'frc254' } as Team}
         awards={[]}
@@ -263,23 +264,30 @@ const points: EventDistrictPoints = {
   },
 };
 
-function makeMatch(key: string, compLevel: 'qm' | 'sf', matchNumber: number) {
+function makeMatch(
+  key: string,
+  compLevel: 'qm' | 'sf',
+  matchNumber: number,
+  red: string[] = [],
+  blue: string[] = [],
+) {
   return {
     key,
     comp_level: compLevel,
     set_number: 1,
     match_number: matchNumber,
     event_key: '2026casj',
+    winning_alliance: 'red',
     alliances: {
       red: {
         score: 1,
-        team_keys: [],
+        team_keys: red,
         surrogate_team_keys: [],
         dq_team_keys: [],
       },
       blue: {
         score: 0,
-        team_keys: [],
+        team_keys: blue,
         surrogate_team_keys: [],
         dq_team_keys: [],
       },
@@ -381,6 +389,11 @@ describe('TeamStatus sections', () => {
     return render(
       <TeamStatus
         event={fullEvent}
+        matches={[
+          makeMatch('2026casj_qm1', 'qm', 1, ['frc254']),
+          makeMatch('2026casj_qm2', 'qm', 2, [], ['frc254']),
+          makeMatch('2026casj_sf1m1', 'sf', 1, ['frc254']),
+        ]}
         status={fullStatus}
         team={team}
         awards={awards}
@@ -394,6 +407,7 @@ describe('TeamStatus sections', () => {
 
   test('renders nothing when there is nothing to show', () => {
     const { container } = renderStatus({
+      matches: [],
       status: null,
       awards: [],
       maybeAlliances: null,
@@ -404,7 +418,7 @@ describe('TeamStatus sections', () => {
   test('combines qualification and playoff records', () => {
     renderStatus();
 
-    expect(screen.getByText('11-4-0')).toBeTruthy();
+    expect(screen.getByText('2-1-0')).toBeTruthy();
     expect(screen.getByText('25 RP')).toBeTruthy();
     expect(screen.getByTestId('rank').textContent).toBe('3 of 40');
   });
@@ -417,12 +431,29 @@ describe('TeamStatus sections', () => {
           ...fullStatus.qual,
           ranking: { ...fullStatus.qual?.ranking, rank: null },
         },
-        playoff: null,
       } as unknown as TeamEventStatus,
     });
 
     expect(screen.queryByTestId('rank')).toBeNull();
-    expect(screen.getByText('7-3-0')).toBeTruthy();
+    expect(screen.getByText('2-1-0')).toBeTruthy();
+  });
+
+  test('excludes playoff matches the team did not play', () => {
+    renderStatus({
+      matches: [
+        makeMatch('2026casj_qm1', 'qm', 1, ['frc254']),
+        makeMatch('2026casj_qm2', 'qm', 2, ['frc254']),
+        makeMatch('2026casj_sf1m1', 'sf', 1, ['frc1678', 'frc971']),
+      ],
+    });
+
+    expect(screen.getByText('2-0-0')).toBeTruthy();
+  });
+
+  test('omits the record at 2015 events', () => {
+    renderStatus({ event: { ...fullEvent, year: 2015 } });
+
+    expect(screen.queryByText('Record')).toBeNull();
   });
 
   test('lists the alliance with the team itself marked current', () => {

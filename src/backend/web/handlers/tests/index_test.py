@@ -4,6 +4,7 @@ from typing import Any, cast, List
 
 import pytest
 from flask import render_template
+from freezegun import freeze_time
 from google.appengine.ext import ndb
 from werkzeug.test import Client
 
@@ -209,6 +210,7 @@ def test_index_buildseason(
     assert context["special_webcasts"] == []
 
 
+@freeze_time("2026-03-04")
 def test_index_competitionseason(
     ndb_stub, captured_templates: List[CapturedTemplate], web_client: Client
 ) -> None:

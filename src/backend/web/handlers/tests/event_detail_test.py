@@ -46,6 +46,80 @@ def test_render_event(ndb_stub, web_client: Client) -> None:
     assert soup.find(id="event-name").string == "Test Event 2020"
 
 
+def _put_practice_match(match_number: int) -> None:
+    Match(
+        id=f"2020nyny_pm{match_number}",
+        year=2020,
+        comp_level=CompLevel.PM,
+        set_number=1,
+        match_number=match_number,
+        event=ndb.Key(Event, "2020nyny"),
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(
+                    teams=["frc1", "frc2", "frc3"], score=-1
+                ),
+                AllianceColor.BLUE: MatchAlliance(
+                    teams=["frc4", "frc5", "frc6"], score=-1
+                ),
+            }
+        ),
+    ).put()
+
+
+def test_render_event_shows_practice_tab(ndb_stub, web_client: Client) -> None:
+    helpers.preseed_event("2020nyny")
+    _put_practice_match(1)
+
+    resp = web_client.get("/event/2020nyny")
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="#practice") is not None
+
+
+def test_render_event_hides_practice_tab_without_practice_matches(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+
+    resp = web_client.get("/event/2020nyny")
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert soup.find("a", href="#practice") is None
+
+
+def test_render_event_lists_practice_matches_in_match_number_order(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+    _put_practice_match(10)
+    _put_practice_match(2)
+
+    resp = web_client.get("/event/2020nyny")
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    practice_table = soup.find(id="practice-match-table")
+    match_links = [
+        a["href"] for a in practice_table.select("tr.visible-lg .match-name a")
+    ]
+    assert match_links == ["/match/2020nyny_pm2", "/match/2020nyny_pm10"]
+
+
+def test_render_event_warns_practice_results_are_not_published(
+    ndb_stub, web_client: Client
+) -> None:
+    helpers.preseed_event("2020nyny")
+    _put_practice_match(1)
+
+    resp = web_client.get("/event/2020nyny")
+
+    soup = BeautifulSoup(resp.data, "html.parser")
+    assert (
+        soup.find(id="practice-results-note").get_text(strip=True)
+        == "Results are not published for practice matches."
+    )
+
+
 def test_render_2026_event_with_legacy_insight_data(
     ndb_stub, web_client: Client
 ) -> None:
