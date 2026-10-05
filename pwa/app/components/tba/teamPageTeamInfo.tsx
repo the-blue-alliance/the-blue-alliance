@@ -50,7 +50,7 @@ export default function TeamPageTeamInfo({
     <>
       <div>
         <div className="mb-2 flex items-center gap-2">
-          {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
+          <TeamAvatar media={maybeAvatar} />
           <h1 className="text-3xl font-medium">
             Team {team.team_number} - {team.nickname}
           </h1>

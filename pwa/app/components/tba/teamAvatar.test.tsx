@@ -11,11 +11,28 @@ const avatar = {
 } as MediaAvatar;
 
 describe('TeamAvatar', () => {
-  test('renders nothing without details', () => {
-    const { container } = render(
+  test('shows the default avatar without media', () => {
+    render(<TeamAvatar media={undefined} />);
+    expect(
+      screen.getByRole('img', { name: 'Default Team Avatar' }),
+    ).toBeTruthy();
+  });
+
+  test('shows the default avatar when media has no details', () => {
+    render(
       <TeamAvatar media={{ ...avatar, details: undefined } as MediaAvatar} />,
     );
-    expect(container.innerHTML).toBe('');
+    expect(
+      screen.getByRole('img', { name: 'Default Team Avatar' }),
+    ).toBeTruthy();
+  });
+
+  test('the default avatar toggles the accent color on click', () => {
+    render(<TeamAvatar media={undefined} />);
+    fireEvent.click(screen.getByRole('button'));
+    expect(
+      screen.getByRole('img', { name: 'Default Team Avatar' }).className,
+    ).toContain('bg-alliance-red-accent');
   });
 
   test('toggles the accent color on click and keydown', () => {

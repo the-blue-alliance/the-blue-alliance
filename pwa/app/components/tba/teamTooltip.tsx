@@ -125,7 +125,7 @@ export function TeamTooltip({
 
   return (
     <div>
-      {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
+      <TeamAvatar media={maybeAvatar} />
       <h1>{team.nickname}</h1>
       {disqualified && (
         <i>
