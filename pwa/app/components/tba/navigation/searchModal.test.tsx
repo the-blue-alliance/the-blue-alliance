@@ -249,4 +249,47 @@ describe('SearchModal', () => {
 
     expect(useNavigateMock).toHaveBeenCalledWith({ to: '/event/2026casj' });
   });
+
+  test('links team results to the current year avatar', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2027-02-01T12:00:00Z'));
+    try {
+      await openAndType('254');
+
+      const avatar = await screen.findByAltText('Team Avatar');
+      expect(avatar.getAttribute('src')).toBe(
+        'https://www.thebluealliance.com/avatar/2027/frc254.png',
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('falls back to the FIRST logo when the avatar fails to load', async () => {
+    await openAndType('254');
+
+    fireEvent.error(await screen.findByAltText('Team Avatar'));
+
+    const fallback = await screen.findByAltText('Default Team Avatar');
+    expect(fallback.getAttribute('src')).not.toContain('/avatar/');
+  });
+
+  test('shows no avatar for event results', async () => {
+    await openAndType('Silicon Valley');
+
+    await screen.findByText('2026 Silicon Valley Regional [casj]');
+
+    expect(screen.queryByRole('img')).toBeNull();
+  });
+
+  test('fades the avatar in once it loads', async () => {
+    await openAndType('254');
+
+    const avatar = await screen.findByAltText('Team Avatar');
+    expect(avatar.className).toContain('opacity-0');
+
+    fireEvent.load(avatar);
+
+    await waitFor(() => expect(avatar.className).toContain('opacity-100'));
+  });
 });

@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ClientOnly, useNavigate } from '@tanstack/react-router';
 import { cn } from 'cn';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import SearchIcon from '~icons/lucide/search';
 
@@ -24,6 +25,7 @@ import {
 } from '~/components/ui/dialog';
 import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
+import defaultAvatar from '~/images/default-avatar.png';
 import { STALE_TIME } from '~/lib/queryClient';
 import FuzzysortFilterer, {
   SearchResult,
@@ -177,7 +179,10 @@ export function SearchModal() {
                       setOpen(false);
                     }}
                   >
-                    {result.label}
+                    {result.type === 'team' && (
+                      <SearchTeamAvatar teamKey={result.key} />
+                    )}
+                    <span className="truncate">{result.label}</span>
                   </SearchItem>
                 ))}
               </CommandGroup>
@@ -187,6 +192,31 @@ export function SearchModal() {
         </Command>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function SearchTeamAvatar({ teamKey }: { teamKey: string }) {
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const year = Temporal.Now.plainDateISO().year;
+
+  return (
+    <span className="size-6 shrink-0">
+      <img
+        alt={failed ? 'Default Team Avatar' : 'Team Avatar'}
+        src={
+          failed
+            ? defaultAvatar
+            : `https://www.thebluealliance.com/avatar/${year}/${teamKey}.png`
+        }
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+        className={cn(
+          'size-full transition-opacity duration-200',
+          loaded ? 'opacity-100' : 'opacity-0',
+        )}
+      />
+    </span>
   );
 }
 
