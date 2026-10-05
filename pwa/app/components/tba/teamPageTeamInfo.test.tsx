@@ -117,10 +117,18 @@ describe('TeamPageTeamInfo', () => {
         socials={[]}
       />,
     );
-    expect(screen.queryByRole('img')).toBeNull();
     expect(screen.queryByText(/Part of the/)).toBeNull();
     expect(screen.getByText('Some High School')).toBeTruthy();
     expect(screen.queryByText(/sponsor/)).toBeNull();
+  });
+
+  test('shows the default avatar for a team without one', () => {
+    render(
+      <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,
+    );
+    expect(
+      screen.getByRole('img', { name: 'Default Team Avatar' }),
+    ).toBeTruthy();
   });
 
   test('links to the social media suggestion form for the team', () => {

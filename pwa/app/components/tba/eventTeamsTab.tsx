@@ -171,9 +171,10 @@ export default function EventTeamsTab({
                 >
                   {hasAvatars && (
                     <div className="size-12 shrink-0">
-                      {avatar?.type === 'avatar' && (
-                        <TeamAvatar media={avatar} className="relative z-10" />
-                      )}
+                      <TeamAvatar
+                        media={avatar?.type === 'avatar' ? avatar : undefined}
+                        className="relative z-10"
+                      />
                     </div>
                   )}
                   <div className="min-w-0 flex-1 py-1">

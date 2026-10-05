@@ -132,13 +132,20 @@ describe('EventTeamsTab', () => {
 
   test('renders historical teams without avatars', () => {
     renderTeams({ event: { ...event, year: 2017 } });
-    expect(screen.queryByRole('img', { name: 'Team Avatar' })).toBeNull();
+    expect(screen.queryByRole('img', { name: /Team Avatar/ })).toBeNull();
     expect(screen.getAllByRole('listitem')).toHaveLength(2);
   });
 
   test('shows available avatars when other teams have none', () => {
     renderTeams({ media: [avatar] });
     expect(screen.getAllByRole('img', { name: 'Team Avatar' })).toHaveLength(1);
+  });
+
+  test('shows the default avatar for teams without one when others have avatars', () => {
+    renderTeams({ media: [avatar] });
+    expect(
+      screen.getAllByRole('img', { name: 'Default Team Avatar' }),
+    ).toHaveLength(1);
   });
 
   test.each([
