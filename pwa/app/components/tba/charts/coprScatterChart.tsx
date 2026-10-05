@@ -87,25 +87,17 @@ function generateDomain(dataMin: number, dataMax: number): [number, number] {
   return [-0.1, 1 + DOMAIN_PADDING_RATIO];
 }
 
-// If a team has a white primary color, it doesn't show up on the chart
-function getNonWhiteTeamColor(
-  colors: EventColors,
-  teamKey: string,
-): TeamWithColor {
-  const color = colors.teams[teamKey.substring(3)] ?? {
-    teamNumber: 0,
-    colors: {
-      verified: false,
-      primaryHex: 'hsl(var(--primary))',
-      secondaryHex: 'hsl(var(--primary))',
-    },
-  };
-
-  if (color.colors?.primaryHex === '#ffffff') {
-    return { ...color, colors: { ...color.colors, primaryHex: '#000000' } };
-  }
-
-  return color;
+function getTeamColor(colors: EventColors, teamKey: string): TeamWithColor {
+  return (
+    colors.teams[teamKey.substring(3)] ?? {
+      teamNumber: 0,
+      colors: {
+        verified: false,
+        primaryHex: 'hsl(var(--primary))',
+        secondaryHex: 'hsl(var(--primary))',
+      },
+    }
+  );
 }
 
 export default function CoprScatterChart({
@@ -264,12 +256,13 @@ export default function CoprScatterChart({
             />
             <Scatter>
               {data.map((entry, index) => (
+                // Outline every dot in the theme's foreground so team colors
+                // close to the card background (white, black) stay visible.
                 <Cell
                   key={`cell-${index}`}
-                  fill={
-                    getNonWhiteTeamColor(colors, entry.teamKey).colors
-                      ?.primaryHex
-                  }
+                  fill={getTeamColor(colors, entry.teamKey).colors?.primaryHex}
+                  stroke="var(--card-foreground)"
+                  strokeWidth={1}
                 />
               ))}
 

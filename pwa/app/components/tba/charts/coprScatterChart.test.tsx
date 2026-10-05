@@ -230,16 +230,28 @@ describe('CoprScatterChart', () => {
     expect(axis('yAxis').domain([0.1, 0.9])).toEqual([-0.1, 1.05]);
   });
 
-  test('colors dots by team, darkening white and defaulting missing teams', () => {
+  test("fills each dot with its team's primary color", () => {
     renderChart();
 
     // Sorted by X value: frc604, frc1678, frc254.
-    expect(
-      screen.getAllByTestId('cell').map((cell) => cell.dataset.fill),
-    ).toEqual(['hsl(var(--primary))', '#000000', '#0000ff']);
+    expect(screen.getAllByTestId('cell')[2].dataset.fill).toBe('#0000ff');
   });
 
-  test('does not mutate the passed-in colors when darkening a white team', () => {
+  test('keeps a white team color instead of darkening it', () => {
+    renderChart();
+
+    expect(screen.getAllByTestId('cell')[1].dataset.fill).toBe('#ffffff');
+  });
+
+  test('fills dots for teams missing from the colors data with the theme primary', () => {
+    renderChart();
+
+    expect(screen.getAllByTestId('cell')[0].dataset.fill).toBe(
+      'hsl(var(--primary))',
+    );
+  });
+
+  test('does not mutate the passed-in colors', () => {
     // The passed-in colors are typically React Query cache data.
     const colors = renderChart();
 
