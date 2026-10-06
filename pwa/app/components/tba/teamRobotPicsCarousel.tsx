@@ -1,14 +1,12 @@
-import Autoplay from 'embla-carousel-autoplay';
-import { useEffect, useState } from 'react';
+import { useEffect, useEffectEvent, useState } from 'react';
 
 import { Media } from '~/api/tba/read';
 import {
   Carousel,
-  type CarouselApi,
   CarouselContent,
+  CarouselIndicator,
   CarouselItem,
-  CarouselNext,
-  CarouselPrevious,
+  CarouselNavigation,
 } from '~/components/ui/carousel';
 import {
   getMediaLinkUrl,
@@ -25,45 +23,40 @@ export default function TeamRobotPicsCarousel({
 }: {
   media: Media[];
 }): React.JSX.Element {
-  const [api, setApi] = useState<CarouselApi>();
+  const slides = media.filter((m) => getMediaThumbUrl(m));
+  const [index, setIndex] = useState(0);
   const [loaded, setLoaded] = useState<ReadonlySet<number>>(
-    () => new Set(neighbors(0, media.length)),
+    () => new Set(neighbors(0, slides.length)),
   );
 
+  const select = (next: number) => {
+    setIndex(next);
+    setLoaded((prev) => new Set([...prev, ...neighbors(next, slides.length)]));
+  };
+
+  const advance = useEffectEvent(() => select((index + 1) % slides.length));
+
   useEffect(() => {
-    if (!api) return;
-    const sync = () => {
-      const selected = api.selectedScrollSnap();
-      setLoaded((prev) => {
-        const next = new Set(prev);
-        for (const i of neighbors(selected, media.length)) next.add(i);
-        return next;
-      });
-    };
-    sync();
-    api.on('select', sync);
-    return () => {
-      api.off('select', sync);
-    };
-  }, [api, media.length]);
+    if (slides.length < 2) return;
+    const timer = setTimeout(advance, 5000);
+    return () => clearTimeout(timer);
+  }, [index, slides.length]);
 
   return (
     <Carousel
       className="w-full max-w-xs"
-      setApi={setApi}
-      plugins={[Autoplay({ delay: 5000 })]}
+      aria-label="Robot pictures"
+      index={index}
+      onIndexChange={select}
     >
-      <CarouselContent className="items-center">
-        {media.map((m, index) => {
-          const imageUrl = getMediaThumbUrl(m);
+      <CarouselContent className="mb-6 items-center">
+        {slides.map((m, i) => {
           const linkUrl = getMediaLinkUrl(m);
-          if (!imageUrl) return null;
-
-          const isFirst = index === 0;
-          const img = loaded.has(index) ? (
+          const isFirst = i === 0;
+          const img = loaded.has(i) ? (
             <img
               className="max-h-[250px] w-full rounded object-contain"
-              src={imageUrl}
+              src={getMediaThumbUrl(m)}
               srcSet={getMediaThumbSrcSet(m)}
               sizes="320px"
               width={320}
@@ -78,7 +71,7 @@ export default function TeamRobotPicsCarousel({
           );
 
           return (
-            <CarouselItem key={index}>
+            <CarouselItem key={i}>
               <div
                 className="flex h-[250px] w-full items-center justify-center
                   rounded-lg border-2 border-neutral-300"
@@ -95,11 +88,11 @@ export default function TeamRobotPicsCarousel({
           );
         })}
       </CarouselContent>
-      {media.length > 1 && (
-        <div className="mt-1 flex justify-center gap-2">
-          <CarouselPrevious className="relative left-0 transform-none" />
-          <CarouselNext className="relative right-0 transform-none" />
-        </div>
+      {slides.length > 1 && (
+        <>
+          <CarouselNavigation className="left-0 w-full" />
+          <CarouselIndicator />
+        </>
       )}
     </Carousel>
   );

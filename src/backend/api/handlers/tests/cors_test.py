@@ -1,8 +1,11 @@
 import pytest
 from werkzeug.test import Client
 
+from backend.common.consts.auth_type import AuthType
 from backend.common.consts.event_type import EventType
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
+from backend.common.models.team import Team
 
 
 @pytest.fixture(autouse=True)
@@ -100,7 +103,7 @@ def test_apiv3_options_expected_headers(api_client: Client) -> None:
 
     assert resp.status_code == 200
     assert method in resp.headers["Allow"]
-    assert resp.headers["Access-Control-Allow-Origin"] == origin
+    assert resp.headers["Access-Control-Allow-Origin"] == "*"
     assert resp.headers["Access-Control-Allow-Headers"] == headers
 
 
@@ -118,7 +121,25 @@ def test_apiv3_options_cross_origin(api_client: Client) -> None:
     )
 
     assert resp.status_code == 200
-    assert resp.headers["Access-Control-Allow-Origin"] == origin
+    assert resp.headers["Access-Control-Allow-Origin"] == "*"
+
+
+def test_apiv3_get_sends_wildcard_origin(api_client: Client) -> None:
+    ApiAuthAccess(
+        id="test_auth_key",
+        auth_types_enum=[AuthType.READ_API],
+    ).put()
+    Team(id="frc254", team_number=254).put()
+    resp = api_client.get(
+        "/api/v3/team/frc254",
+        headers={
+            "Origin": "http://localhost:3132",
+            "X-TBA-Auth-Key": "test_auth_key",
+        },
+    )
+
+    assert resp.status_code == 200
+    assert resp.headers["Access-Control-Allow-Origin"] == "*"
 
 
 def test_apiv3_options_wrong_method(api_client: Client) -> None:

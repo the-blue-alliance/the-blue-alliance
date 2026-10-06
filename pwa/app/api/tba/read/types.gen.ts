@@ -128,6 +128,7 @@ export enum BridgeState2023 {
  * The competition level the match was played at.
  */
 export enum CompLevel {
+  PM = 'pm',
   QM = 'qm',
   EF = 'ef',
   QF = 'qf',
@@ -1806,7 +1807,7 @@ export type LeaderboardInsight = {
 
 export type Match = {
   /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (pm, qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may be appended to the competition level if more than one match in required per set.
    */
   key: string;
   comp_level: CompLevel;
@@ -2465,7 +2466,7 @@ export type MatchScoreBreakdown2026Alliance = {
 
 export type MatchSimple = {
   /**
-   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
+   * TBA match key with the format `yyyy[EVENT_CODE]_[COMP_LEVEL]m[MATCH_NUMBER]`, where `yyyy` is the year, and `EVENT_CODE` is the event code of the event, `COMP_LEVEL` is (pm, qm, ef, qf, sf, f), and `MATCH_NUMBER` is the match number in the competition level. A set number may append the competition level if more than one match in required per set.
    */
   key: string;
   comp_level: CompLevel;
@@ -5003,6 +5004,147 @@ export type GetEventMatchesSimpleResponses = {
 
 export type GetEventMatchesSimpleResponse =
   GetEventMatchesSimpleResponses[keyof GetEventMatchesSimpleResponses];
+
+export type GetEventPracticeMatchesData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/practice';
+};
+
+export type GetEventPracticeMatchesErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPracticeMatchesError =
+  GetEventPracticeMatchesErrors[keyof GetEventPracticeMatchesErrors];
+
+export type GetEventPracticeMatchesResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<Match>;
+};
+
+export type GetEventPracticeMatchesResponse =
+  GetEventPracticeMatchesResponses[keyof GetEventPracticeMatchesResponses];
+
+export type GetEventPracticeMatchesKeysData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/practice/keys';
+};
+
+export type GetEventPracticeMatchesKeysErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPracticeMatchesKeysError =
+  GetEventPracticeMatchesKeysErrors[keyof GetEventPracticeMatchesKeysErrors];
+
+export type GetEventPracticeMatchesKeysResponses = {
+  /**
+   * Array of Match Keys
+   */
+  200: Array<string>;
+};
+
+export type GetEventPracticeMatchesKeysResponse =
+  GetEventPracticeMatchesKeysResponses[keyof GetEventPracticeMatchesKeysResponses];
+
+export type GetEventPracticeMatchesSimpleData = {
+  body?: never;
+  headers?: {
+    /**
+     * Value of the `ETag` header in the most recently cached response by the client.
+     */
+    'If-None-Match'?: string;
+  };
+  path: {
+    /**
+     * TBA Event Key, eg `2016nytr`
+     */
+    event_key: string;
+  };
+  query?: never;
+  url: '/event/{event_key}/matches/practice/simple';
+};
+
+export type GetEventPracticeMatchesSimpleErrors = {
+  /**
+   * Authorization information is missing or invalid.
+   */
+  401: {
+    /**
+     * Authorization error description.
+     */
+    Error: string;
+  };
+  /**
+   * Not Found
+   */
+  404: unknown;
+};
+
+export type GetEventPracticeMatchesSimpleError =
+  GetEventPracticeMatchesSimpleErrors[keyof GetEventPracticeMatchesSimpleErrors];
+
+export type GetEventPracticeMatchesSimpleResponses = {
+  /**
+   * Successful response
+   */
+  200: Array<MatchSimple>;
+};
+
+export type GetEventPracticeMatchesSimpleResponse =
+  GetEventPracticeMatchesSimpleResponses[keyof GetEventPracticeMatchesSimpleResponses];
 
 export type GetEventMatchTimeseriesData = {
   body?: never;

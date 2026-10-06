@@ -42,6 +42,7 @@ interface TeamListSubgridProps
   surrogate: string[];
   year: number;
   focusTeamKey?: string;
+  favoriteTeamKeys?: string[];
   teamCellClassName?: string;
 }
 
@@ -54,6 +55,7 @@ export default function TeamListSubgrid({
   surrogate,
   year,
   focusTeamKey,
+  favoriteTeamKeys,
   teamCellClassName,
   ...props
 }: TeamListSubgridProps) {
@@ -67,6 +69,7 @@ export default function TeamListSubgrid({
           dq={dq.includes(teamKey)}
           surrogate={surrogate.includes(teamKey)}
           focus={focusTeamKey === teamKey}
+          favorite={favoriteTeamKeys?.includes(teamKey) ?? false}
           className={cn(
             teamListSubgridVariants({
               allianceColor,
@@ -111,6 +114,7 @@ interface TeamCellProps
     VariantProps<typeof teamCellVariants> {
   teamKey: string;
   year: number;
+  favorite: boolean;
 }
 
 function TeamCell({
@@ -119,17 +123,28 @@ function TeamCell({
   dq,
   surrogate,
   focus,
+  favorite,
   ...props
 }: TeamCellProps) {
   return (
     <div {...props}>
-      <TeamLinkWithTooltip
-        teamKey={teamKey}
-        year={year}
-        disqualified={dq ?? false}
-        surrogate={surrogate ?? false}
-        className={cn(teamCellVariants({ dq, surrogate, focus }))}
-      />
+      <span className="relative">
+        <TeamLinkWithTooltip
+          teamKey={teamKey}
+          year={year}
+          disqualified={dq ?? false}
+          surrogate={surrogate ?? false}
+          className={cn(teamCellVariants({ dq, surrogate, focus }))}
+        />
+        {favorite && (
+          <span
+            className="absolute -top-0.5 -right-1.5 size-1.5 rounded-full
+              bg-yellow-500"
+          >
+            <span className="sr-only">Favorite team</span>
+          </span>
+        )}
+      </span>
     </div>
   );
 }

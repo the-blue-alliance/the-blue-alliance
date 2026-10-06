@@ -2,7 +2,7 @@ import json
 import logging
 import os
 import unittest
-from typing import Any, cast, Dict, List, Optional
+from typing import Any, cast, Dict, get_type_hints, List, Optional
 from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
@@ -2286,3 +2286,45 @@ def test_missing_key_warnings_name_google_secrets(
     for message in warnings:
         assert "google.secrets" in message
         assert "google.api_key" not in message
+
+
+def test_location_info_annotations_match_stored_values() -> None:
+    """LocationInfo annotates types as List[str] and postal_code as str."""
+    hints = get_type_hints(LocationInfo)
+    assert hints["types"] == List[str]
+    assert hints["postal_code"] is str
+
+
+def test_get_similarity_matches_acronyms() -> None:
+    """A name and its acronym are fully similar, in either order."""
+    assert LocationHelper.get_similarity("Leland High School", "lhs") == 1.0
+    assert LocationHelper.get_similarity("lhs", "Leland High School") == 1.0
+
+
+def test_geocode_zero_results_are_served_from_cache(
+    requests_mock: Mocker,
+) -> None:
+    """A cached empty geocode result is served without another request."""
+    requests_mock.get(GEOCODE_URL, json={"status": "ZERO_RESULTS", "results": []})
+
+    assert LocationHelper.google_maps_geocode("Nowhere") == []
+    assert LocationHelper.google_maps_geocode("Nowhere") == []
+
+    assert requests_mock.call_count == 1
+
+
+def test_compute_event_location_score_without_formatted_address() -> None:
+    """Without a formatted_address the score falls back to name similarity."""
+    info = cast(
+        LocationInfo,
+        {
+            "name": "Leland High School",
+            "lat": SAN_JOSE.lat,
+            "lng": SAN_JOSE.lon,
+            "types": ["point_of_interest"],
+        },
+    )
+    score = LocationHelper.compute_event_location_score(
+        "Leland High School", info, SAN_JOSE
+    )
+    assert score == pytest.approx(1.0)  # pyre-ignore[16]

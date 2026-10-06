@@ -338,6 +338,9 @@ class Match(CachedModel):
         if self.display_name:
             return self.display_name
 
+        if self.comp_level == CompLevel.PM:
+            return f"Practice {self.match_number}"
+
         from backend.common.helpers.event_helper import EventHelper
 
         event = self.event.get()
@@ -393,6 +396,8 @@ class Match(CachedModel):
 
     @property
     def short_name(self) -> str:
+        if self.comp_level == CompLevel.PM:
+            return "P%s" % self.match_number
         event = self.event.get()
         if self.comp_level == "qm":
             return "Q%s" % self.match_number
@@ -444,7 +449,7 @@ class Match(CachedModel):
         # For double elimination brackets, use "Playoff" instead of the
         # comp-level-derived name (e.g. "Semifinals") for non-QM/non-Finals matches.
         # Finals matches intentionally keep the "Finals" label.
-        if self.comp_level not in (CompLevel.QM, CompLevel.F):
+        if self.comp_level not in (CompLevel.PM, CompLevel.QM, CompLevel.F):
             event = self.event.get()
             if event and event.playoff_type in DOUBLE_ELIM_TYPES:
                 return "Playoff"
@@ -529,15 +534,15 @@ class Match(CachedModel):
         set_number: int,
         match_number: int,
     ) -> MatchKey:
-        if comp_level == "qm":
-            return "%s_qm%s" % (event_key_name, match_number)
+        if comp_level in (CompLevel.PM, CompLevel.QM):
+            return "%s_%s%s" % (event_key_name, comp_level, match_number)
         else:
             return "%s_%s%sm%s" % (event_key_name, comp_level, set_number, match_number)
 
     @classmethod
     def validate_key_name(cls, match_key: str) -> bool:
         key_name_regex = re.compile(
-            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$"
+            r"^[1-9]\d{3}[a-z]+[0-9]*\_(?:pm|qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$"
         )
         match = re.match(key_name_regex, match_key)
         return True if match else False

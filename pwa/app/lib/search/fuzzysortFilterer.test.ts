@@ -1,65 +1,101 @@
-import { describe, expect, it } from 'vitest';
+import { Temporal } from 'temporal-polyfill';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
-import { firstSearchResult, keyToPath } from '~/lib/search/fuzzysortFilterer';
+import { SearchIndex } from '~/api/tba/read';
+import FuzzysortFilterer from '~/lib/search/fuzzysortFilterer';
 
-const team = (key: string) => ({ key, nickname: '' });
-const event = (key: string) => ({ key, name: '' });
+const SEARCH_INDEX: SearchIndex = {
+  teams: [
+    { key: 'frc254', nickname: 'The Cheesy Poofs' },
+    { key: 'frc6324', nickname: 'The Blue Devils' },
+    { key: 'frc2025', nickname: 'Silicon Valley Robotics' },
+  ],
+  events: [
+    { key: '2026casj', name: 'Silicon Valley Regional' },
+    { key: '2025cmptx', name: 'Einstein Field' },
+  ],
+};
 
-describe('keyToPath', () => {
-  it('maps a team key to its team route', () => {
-    expect(keyToPath('frc254')).toBe('/team/254');
-    expect(keyToPath('frc10221')).toBe('/team/10221');
+describe('FuzzysortFilterer', () => {
+  beforeEach(() => {
+    vi.spyOn(Temporal.Now, 'plainDateISO').mockReturnValue(
+      Temporal.PlainDate.from('2026-10-02'),
+    );
   });
 
-  it('maps an event key to its event route', () => {
-    expect(keyToPath('2024casj')).toBe('/event/2024casj');
-  });
-});
-
-describe('firstSearchResult', () => {
-  it('returns the top team when teamsFirst is set', () => {
-    expect(
-      firstSearchResult({
-        teams: [team('frc1022'), team('frc10221')],
-        events: [event('2024casj')],
-        teamsFirst: true,
-      }),
-    ).toEqual({ type: 'team', value: 'frc1022', path: '/team/1022' });
+  afterEach(() => {
+    vi.restoreAllMocks();
   });
 
-  it('returns the top event when not teamsFirst, even if a team also matches', () => {
-    // cmdk shows the higher-scoring group first; Enter must follow that, not
-    // unconditionally prefer a team the way the /search-route helper does.
-    expect(
-      firstSearchResult({
-        teams: [team('frc254')],
-        events: [event('2024casj')],
-        teamsFirst: false,
-      }),
-    ).toEqual({ type: 'event', value: '2024casj', path: '/event/2024casj' });
+  test('ranks teams and events together in one list by score', () => {
+    const results = new FuzzysortFilterer().filter(
+      SEARCH_INDEX,
+      'Silicon Valley',
+    );
+
+    expect(results.map((r) => r.key)).toEqual(['2026casj', 'frc2025']);
   });
 
-  it('falls back to the other group when the preferred group is empty', () => {
-    expect(
-      firstSearchResult({
-        teams: [],
-        events: [event('2024casj')],
-        teamsFirst: true,
-      }),
-    ).toEqual({ type: 'event', value: '2024casj', path: '/event/2024casj' });
+  test.each(['20', 'frc20'])(
+    'ranks the exact team number match for %s above current events',
+    (query) => {
+      const index: SearchIndex = {
+        teams: [{ key: 'frc20', nickname: 'The Rocketeers' }],
+        events: [{ key: '2026grits', name: 'GRITS 2026' }],
+      };
 
-    expect(
-      firstSearchResult({
-        teams: [team('frc254')],
-        events: [],
-        teamsFirst: false,
-      }),
-    ).toEqual({ type: 'team', value: 'frc254', path: '/team/254' });
+      expect(new FuzzysortFilterer().filter(index, query)[0].key).toBe('frc20');
+    },
+  );
+
+  test('labels an event result with its year, name, and event code', () => {
+    const [result] = new FuzzysortFilterer().filter(SEARCH_INDEX, '2026casj');
+
+    expect(result).toEqual({
+      type: 'event',
+      key: '2026casj',
+      label: '2026 Silicon Valley Regional [casj]',
+      path: '/event/2026casj',
+    });
   });
 
-  it('returns null when there are no results', () => {
-    expect(
-      firstSearchResult({ teams: [], events: [], teamsFirst: true }),
-    ).toBeNull();
+  test('returns at most 10 results', () => {
+    const index: SearchIndex = {
+      teams: Array.from({ length: 8 }, (_, i) => ({
+        key: `frc${i + 1}`,
+        nickname: `Robot Team ${i + 1}`,
+      })),
+      events: Array.from({ length: 8 }, (_, i) => ({
+        key: `2026ev${i + 1}`,
+        name: `Robot Event ${i + 1}`,
+      })),
+    };
+
+    expect(new FuzzysortFilterer().filter(index, 'Robot')).toHaveLength(10);
+  });
+
+  test.each(['6324 2025', '6324/2025', 'frc6324 2025', ' 6324  /  2025 '])(
+    'returns only the team year page for %s',
+    (query) => {
+      expect(new FuzzysortFilterer().filter(SEARCH_INDEX, query)).toEqual([
+        {
+          type: 'team',
+          key: 'frc6324',
+          label: '6324 - The Blue Devils (2025)',
+          path: '/team/6324/2025',
+        },
+      ]);
+    },
+  );
+
+  test('falls back to fuzzy search when the team in a team year query does not exist', () => {
+    const index: SearchIndex = {
+      teams: [{ key: 'frc254', nickname: 'The Cheesy Poofs' }],
+      events: [{ key: '2026week1', name: 'Week 1 2026' }],
+    };
+
+    const results = new FuzzysortFilterer().filter(index, '1 2026');
+
+    expect(results.map((r) => r.path)).toEqual(['/event/2026week1']);
   });
 });

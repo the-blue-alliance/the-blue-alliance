@@ -6,40 +6,82 @@ import { SearchIndex } from '~/api/tba/read';
 type SearchableTeam = SearchIndex['teams'][number];
 type SearchableEvent = SearchIndex['events'][number];
 
-export interface FilteredSearchIndex {
-  teams: SearchableTeam[];
-  events: SearchableEvent[];
-  teamsFirst: boolean;
+export interface SearchResult {
+  type: 'team' | 'event';
+  key: string;
+  label: string;
+  path: string;
 }
 
-function searchTeams(
+interface ScoredResult {
+  result: SearchResult;
+  score: number;
+}
+
+const RESULT_LIMIT = 10;
+const TEAM_NUMBER_PATTERN = /^(?:frc)?(\d+)$/i;
+const TEAM_YEAR_PATTERN = /^(?:frc)?(\d+)[\s/]+(\d{4})$/i;
+
+function teamResult(team: SearchableTeam, year?: number): SearchResult {
+  const teamNumber = team.key.substring(3);
+  const label = `${teamNumber} - ${team.nickname}`;
+  const path = `/team/${teamNumber}`;
+  return year === undefined
+    ? { type: 'team', key: team.key, label, path }
+    : {
+        type: 'team',
+        key: team.key,
+        label: `${label} (${year})`,
+        path: `${path}/${year}`,
+      };
+}
+
+function eventResult(event: SearchableEvent): SearchResult {
+  return {
+    type: 'event',
+    key: event.key,
+    label: `${event.key.substring(0, 4)} ${event.name} [${event.key.substring(4)}]`,
+    path: `/event/${event.key}`,
+  };
+}
+
+function findTeamYear(
   teams: SearchableTeam[],
   query: string,
-  limit: number,
-): { results: SearchableTeam[]; topScore: number } {
+): SearchResult | undefined {
+  const match = TEAM_YEAR_PATTERN.exec(query.trim());
+  if (!match) {
+    return undefined;
+  }
+  const [, teamNumber, year] = match;
+  const team = teams.find((t) => t.key === `frc${Number(teamNumber)}`);
+  return team && teamResult(team, Number(year));
+}
+
+function searchTeams(teams: SearchableTeam[], query: string): ScoredResult[] {
+  const exactKey = `frc${TEAM_NUMBER_PATTERN.exec(query.trim())?.[1]}`;
   const results = fuzzysort.go(
     query,
     teams.map((t) => ({ ...t, team_number: Number(t.key.substring(3)) })),
     {
-      limit,
+      limit: RESULT_LIMIT,
       keys: ['key', 'nickname', 'team_number'],
       threshold: 0.5,
     },
   );
 
-  return {
-    results: results.map((result) => result.obj),
-    topScore: results[0]?.score ?? -Infinity,
-  };
+  return results.map((r) => ({
+    result: teamResult(r.obj),
+    score: r.obj.key === exactKey ? Infinity : r.score,
+  }));
 }
 
 function searchEvents(
   events: SearchableEvent[],
   query: string,
-  limit: number,
-): { results: SearchableEvent[]; topScore: number } {
+): ScoredResult[] {
   const results = fuzzysort.go(query, events, {
-    limit,
+    limit: RESULT_LIMIT,
     keys: ['key', 'name'],
     threshold: 0.5,
     scoreFn: (r) => {
@@ -56,67 +98,26 @@ function searchEvents(
     },
   });
 
-  return {
-    results: results.map((result) => result.obj),
-    topScore: results[0]?.score ?? -Infinity,
-  };
+  return results.map((r) => ({ result: eventResult(r.obj), score: r.score }));
 }
 
 interface SearchDataFilterer {
-  filter(data: SearchIndex, query: string): FilteredSearchIndex;
+  filter(data: SearchIndex, query: string): SearchResult[];
 }
 
 export default class FuzzysortFilterer implements SearchDataFilterer {
-  filter(data: SearchIndex, query: string): FilteredSearchIndex {
-    const teams = searchTeams(data.teams, query, 5);
-    const events = searchEvents(data.events, query, 5);
-
-    return {
-      teams: teams.results,
-      events: events.results,
-      teamsFirst: teams.topScore >= events.topScore,
-    };
-  }
-}
-
-/**
- * Maps a search-index key to its route path. Team keys look like "frc254"
- * (-> /team/254); event keys look like "2024casj" (-> /event/2024casj). Single
- * source of truth for both the rendered result links and Enter navigation.
- */
-export function keyToPath(key: string): string {
-  return key.startsWith('frc') ? `/team/${key.substring(3)}` : `/event/${key}`;
-}
-
-export interface TopSearchResult {
-  type: 'team' | 'event';
-  /** The result's search-index key (matches the cmdk item value). */
-  value: string;
-  path: string;
-}
-
-/**
- * Returns the first result in display order — i.e. the item shown highlighted
- * at the top of the list, honoring `teamsFirst` — or null if there are no
- * results. Used to seed the controlled cmdk selection so a freshly-typed
- * query's default highlight (and therefore Enter) always matches what the user
- * sees, rather than trusting cmdk's asynchronously-committed selection (#10104).
- */
-export function firstSearchResult(
-  results: FilteredSearchIndex,
-): TopSearchResult | null {
-  const order: ('teams' | 'events')[] = results.teamsFirst
-    ? ['teams', 'events']
-    : ['events', 'teams'];
-  for (const group of order) {
-    const item = group === 'teams' ? results.teams[0] : results.events[0];
-    if (item) {
-      return {
-        type: group === 'teams' ? 'team' : 'event',
-        value: item.key,
-        path: keyToPath(item.key),
-      };
+  filter(data: SearchIndex, query: string): SearchResult[] {
+    const teamYear = findTeamYear(data.teams, query);
+    if (teamYear) {
+      return [teamYear];
     }
+
+    return [
+      ...searchTeams(data.teams, query),
+      ...searchEvents(data.events, query),
+    ]
+      .sort((a, b) => b.score - a.score)
+      .slice(0, RESULT_LIMIT)
+      .map((r) => r.result);
   }
-  return null;
 }

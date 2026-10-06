@@ -13,10 +13,12 @@ from backend.common.manipulators.event_details_manipulator import (
 )
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.manipulators.team_manipulator import TeamManipulator
 from backend.common.models.cached_query_result import CachedQueryResult
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.match import Match
+from backend.common.models.team import Team
 from backend.common.queries.database_query import CachedDatabaseQuery
 
 # ---------------------------------------------------------------------------
@@ -719,3 +721,37 @@ def test_clear_model_cache_unknown_type_redirects_home(
     resp = web_client.get("/admin/cache/clear/district/2020ne")
     assert resp.status_code == 302
     assert resp.headers["Location"] == "/admin/"
+
+
+def test_clear_event_cache_without_details_redirects_to_event_page(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    """An event without EventDetails still has its cache cleared and redirects."""
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        event_type_enum=EventType.REGIONAL,
+    ).put()
+
+    with patch.object(EventManipulator, "clearCache") as mock_event_clear:
+        resp = web_client.get("/admin/cache/clear/event/2020nyny")
+
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/event/2020nyny"
+    mock_event_clear.assert_called_once()
+
+
+def test_clear_team_cache_redirects_to_team_page(
+    web_client: Client, login_gae_admin, ndb_stub, taskqueue_stub
+) -> None:
+    """Clearing a team's cache redirects to its admin page."""
+    Team(id="frc254", team_number=254).put()
+
+    with patch.object(TeamManipulator, "clearCache") as mock_clear:
+        resp = web_client.get("/admin/cache/clear/team/frc254")
+
+    assert resp.status_code == 302
+    assert resp.headers["Location"] == "/admin/team/254"
+    mock_clear.assert_called_once()
+    assert mock_clear.call_args[0][0].key_name == "frc254"

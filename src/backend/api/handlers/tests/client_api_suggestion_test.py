@@ -9,6 +9,8 @@ from backend.api.client_api_types import (
     EventMediaSuggestionMessage,
     EventMediaSuggestionResponse,
     MediaSuggestionMessage,
+    TeamSocialMediaSuggestionMessage,
+    TeamSocialMediaSuggestionResponse,
 )
 from backend.api.handlers.tests.clientapi_test_helper import make_clientapi_request
 from backend.common.consts.event_type import EventType
@@ -17,6 +19,7 @@ from backend.common.futures import InstantFuture
 from backend.common.models.event import Event
 from backend.common.models.media import Media
 from backend.common.models.suggestion import Suggestion
+from backend.common.models.team import Team
 from backend.common.models.user import User
 from backend.common.suggestions.media_parser import MediaParser
 from backend.common.suggestions.suggestion_creator import (
@@ -274,5 +277,100 @@ def test_suggest_event_media_reports_approved_media(
     resp = _suggest_event_media(
         api_client, "https://www.youtube.com/watch?v=H-54KMwMKY0"
     )
+
+    assert (resp["code"], resp["status"]) == (304, "media_exists")
+
+
+def _put_team() -> None:
+    Team(id="frc1124", team_number=1124).put()
+
+
+def _suggest_team_social_media(
+    api_client: Client, media_url: str, team_key: str = "frc1124"
+) -> TeamSocialMediaSuggestionResponse:
+    req = TeamSocialMediaSuggestionMessage(team_key=team_key, media_url=media_url)
+    return make_clientapi_request(
+        api_client,
+        "/team/social_media/suggest",
+        req,
+        TeamSocialMediaSuggestionResponse,
+    )
+
+
+def test_suggest_team_social_media_no_auth(api_client: Client) -> None:
+    resp = _suggest_team_social_media(api_client, "https://github.com/frc1124")
+
+    assert (resp["code"], resp["status"]) == (401, "unauthorized")
+
+
+def test_suggest_team_social_media_rejects_bad_team_key(
+    api_client: Client, mock_clientapi_auth: User
+) -> None:
+    resp = _suggest_team_social_media(api_client, "https://github.com/frc1124", "1124")
+
+    assert (resp["code"], resp["status"]) == (404, "bad_team")
+
+
+def test_suggest_team_social_media_rejects_missing_team(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    resp = _suggest_team_social_media(api_client, "https://github.com/frc1124")
+
+    assert (resp["code"], resp["status"]) == (404, "bad_team")
+
+
+def test_suggest_team_social_media_rejects_non_social_url(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_team()
+
+    resp = _suggest_team_social_media(api_client, "https://imgur.com/aF8T5ZE")
+
+    assert (resp["code"], resp["status"]) == (400, "bad_url")
+
+
+def test_suggest_team_social_media_adds_github_profile(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_team()
+
+    resp = _suggest_team_social_media(api_client, "https://github.com/frc1124")
+
+    suggestion = Suggestion.get_by_id(
+        Suggestion.render_media_key_name(
+            None, "team", "frc1124", "github-profile", "frc1124"
+        )
+    )
+    assert suggestion is not None
+    assert (resp["code"], resp["status"], suggestion.author) == (
+        200,
+        "success",
+        mock_clientapi_auth.account_key,
+    )
+
+
+def test_suggest_team_social_media_reports_pending_suggestion(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_team()
+    _suggest_team_social_media(api_client, "https://github.com/frc1124")
+
+    resp = _suggest_team_social_media(api_client, "https://github.com/frc1124")
+
+    assert (resp["code"], resp["status"]) == (304, "suggestion_exists")
+
+
+def test_suggest_team_social_media_reports_approved_media(
+    api_client: Client, mock_clientapi_auth: User, ndb_stub
+) -> None:
+    _put_team()
+    Media(
+        id=Media.render_key_name(MediaType.GITHUB_PROFILE, "frc1124"),
+        media_type_enum=MediaType.GITHUB_PROFILE,
+        foreign_key="frc1124",
+        references=[ndb.Key(Team, "frc1124")],
+    ).put()
+
+    resp = _suggest_team_social_media(api_client, "https://github.com/frc1124")
 
     assert (resp["code"], resp["status"]) == (304, "media_exists")

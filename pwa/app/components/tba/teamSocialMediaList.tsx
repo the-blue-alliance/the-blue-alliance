@@ -1,7 +1,15 @@
+import type { ReactNode } from 'react';
+
 import { Media } from '~/api/tba/read';
 import { MediaIcon } from '~/components/tba/socialBadges';
 
-export default function TeamSocialMediaList({ socials }: { socials: Media[] }) {
+export default function TeamSocialMediaList({
+  socials,
+  children,
+}: {
+  socials: Media[];
+  children?: ReactNode;
+}) {
   socials.sort((a, b) => a.type.localeCompare(b.type));
 
   return (
@@ -12,6 +20,7 @@ export default function TeamSocialMediaList({ socials }: { socials: Media[] }) {
       {socials.map((m) => (
         <MediaIcon media={m} key={`${m.type}-${m.foreign_key}`} />
       ))}
+      {children}
     </div>
   );
 }

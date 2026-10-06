@@ -14,9 +14,13 @@ def cached_public(
     ttl: Union[int, timedelta] = 61,
     cache_redirects: bool = False,
     query_string: bool = True,
+    not_found_ttl: Union[int, timedelta] = 61,
 ):
     """
     Caches the handler's response and marks it publicly cacheable.
+
+    404 responses are cached for not_found_ttl instead of ttl, so a resource
+    that appears later isn't hidden for the full ttl.
 
     The cache is keyed on path (and query string by default unless query_string=False),
     with no user component, so the response body is stored once and served to every
@@ -28,12 +32,18 @@ def cached_public(
     https://github.com/the-blue-alliance/the-blue-alliance/issues/10495.
     """
     timeout = ttl if isinstance(ttl, int) else int(ttl.total_seconds())
+    not_found_timeout = (
+        not_found_ttl
+        if isinstance(not_found_ttl, int)
+        else int(not_found_ttl.total_seconds())
+    )
     if func is None:  # Handle no-argument decorator
         return partial(
             cached_public,
             ttl=ttl,
             cache_redirects=cache_redirects,
             query_string=query_string,
+            not_found_ttl=not_found_ttl,
         )
 
     @wraps(func)
@@ -49,7 +59,7 @@ def cached_public(
             resp = make_response(rv)
             if resp.status_code == 404:
                 resp.freeze()
-                return CachedResponse(resp, 61)
+                return CachedResponse(resp, not_found_timeout)
             return rv
 
         if hasattr(current_app, "cache") and Environment.flask_response_cache_enabled():
@@ -74,7 +84,7 @@ def cached_public(
             if isinstance(resp, CachedResponse):
                 browser_timeout = resp.timeout
             if resp.status_code == 404:
-                browser_timeout = 61
+                browser_timeout = not_found_timeout
             resp.headers["Cache-Control"] = "public, max-age={0}, s-maxage={0}".format(
                 max(
                     browser_timeout, 61

@@ -1,3 +1,5 @@
+import { Temporal } from 'temporal-polyfill';
+
 import {
   AllianceColor,
   CompLevel,
@@ -15,6 +17,7 @@ const COMP_LEVEL_SORT_ORDER: Record<CompLevel, number> = {
   [CompLevel.QF]: 3,
   [CompLevel.EF]: 2,
   [CompLevel.QM]: 1,
+  [CompLevel.PM]: 0,
 };
 
 export const COMP_LEVEL_SHORT_STRINGS: Record<CompLevel, string> = {
@@ -23,6 +26,7 @@ export const COMP_LEVEL_SHORT_STRINGS: Record<CompLevel, string> = {
   [CompLevel.QF]: 'Quarters',
   [CompLevel.EF]: 'Eighths',
   [CompLevel.QM]: 'Quals',
+  [CompLevel.PM]: 'Practice',
 };
 
 export const COMP_LEVEL_LONG_STRINGS: Record<CompLevel, string> = {
@@ -31,12 +35,13 @@ export const COMP_LEVEL_LONG_STRINGS: Record<CompLevel, string> = {
   [CompLevel.QF]: 'Quarterfinals',
   [CompLevel.EF]: 'Eighthfinals',
   [CompLevel.QM]: 'Qualifications',
+  [CompLevel.PM]: 'Practice',
 };
 
 type RecycleRushWLTStrategy = 'official' | 'score-based';
 
 export function isValidMatchKey(key: string) {
-  return /^[1-9]\d{3}[a-z]+[0-9]*_(?:qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$/.test(
+  return /^[1-9]\d{3}[a-z]+[0-9]*_(?:pm|qm|ef\d{1,2}m|qf\d{1,2}m|sf\d{1,2}m|f\dm)\d+$/.test(
     key,
   );
 }
@@ -63,7 +68,11 @@ export function matchTitleShort(
   match: Pick<Match, 'comp_level' | 'set_number' | 'match_number'>,
   playoffType: PlayoffType | null,
 ): string {
-  if (match.comp_level === CompLevel.QM || match.comp_level === CompLevel.F) {
+  if (
+    match.comp_level === CompLevel.PM ||
+    match.comp_level === CompLevel.QM ||
+    match.comp_level === CompLevel.F
+  ) {
     return `${COMP_LEVEL_SHORT_STRINGS[match.comp_level]} ${match.match_number}`;
   }
 
@@ -340,7 +349,7 @@ export function getMatchScoreWithoutAdjustPoints(match: Match): {
 }
 
 const MATCH_KEY_PATTERN =
-  /^(?<eventKey>[1-9]\d{3}[a-z]+[0-9]*)_(?<compLevel>qm|ef|qf|sf|f)(?:(?<setNumber>\d{1,2})m)?(?<matchNumber>\d+)$/;
+  /^(?<eventKey>[1-9]\d{3}[a-z]+[0-9]*)_(?<compLevel>pm|qm|ef|qf|sf|f)(?:(?<setNumber>\d{1,2})m)?(?<matchNumber>\d+)$/;
 
 export interface ParsedMatchKey {
   eventKey: string;
@@ -389,4 +398,26 @@ export function formatMatchKeyName(
     event?.playoff_type ?? null,
   );
   return event ? `${getEventNormalizedName(event)} ${title}` : title;
+}
+
+/**
+ * A match time such as "Sat 9:30 AM", in the viewer's time zone unless one is
+ * given. Uses a numeric hour: with a 2-digit hour, native Temporal and the
+ * polyfill disagree on zero-padding.
+ */
+export function formatMatchTime(
+  seconds: number,
+  {
+    timeZone = Temporal.Now.timeZoneId(),
+    weekday = true,
+  }: { timeZone?: string; weekday?: boolean } = {},
+): string {
+  return Temporal.Instant.fromEpochMilliseconds(seconds * 1000)
+    .toZonedDateTimeISO(timeZone)
+    .toLocaleString('en-US', {
+      ...(weekday && { weekday: 'short' }),
+      hour: 'numeric',
+      minute: '2-digit',
+      hour12: true,
+    });
 }

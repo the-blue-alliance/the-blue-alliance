@@ -40,6 +40,7 @@ import { Route as SuggestEventMediaRouteImport } from './routes/suggest.event.me
 import { Route as SuggestReviewIndexRouteImport } from './routes/suggest.review.index'
 import { Route as SuggestReviewSuggestionTypeRouteImport } from './routes/suggest.review.$suggestionType'
 import { Route as SuggestTeamMediaRouteImport } from './routes/suggest.team.media'
+import { Route as SuggestTeamSocial_mediaRouteImport } from './routes/suggest.team.social_media'
 import { Route as TeamTeamNumberHistoryRouteImport } from './routes/team.$teamNumber.history'
 import { Route as TeamTeamNumberStatsRouteImport } from './routes/team.$teamNumber.stats'
 import { Route as TeamTeamNumberChar123YearChar125RouteImport } from './routes/team.$teamNumber.{-$year}'
@@ -207,6 +208,11 @@ const SuggestTeamMediaRoute = SuggestTeamMediaRouteImport.update({
   path: '/suggest/team/media',
   getParentRoute: () => rootRouteImport,
 } as any)
+const SuggestTeamSocial_mediaRoute = SuggestTeamSocial_mediaRouteImport.update({
+  id: '/suggest/team/social_media',
+  path: '/suggest/team/social_media',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const TeamTeamNumberHistoryRoute = TeamTeamNumberHistoryRouteImport.update({
   id: '/team/$teamNumber/history',
   path: '/team/$teamNumber/history',
@@ -255,6 +261,7 @@ export interface FileRoutesByFullPath {
   '/suggest/event/media': typeof SuggestEventMediaRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
+  '/suggest/team/social_media': typeof SuggestTeamSocial_mediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
@@ -291,6 +298,7 @@ export interface FileRoutesByTo {
   '/suggest/event/media': typeof SuggestEventMediaRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
+  '/suggest/team/social_media': typeof SuggestTeamSocial_mediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
@@ -328,6 +336,7 @@ export interface FileRoutesById {
   '/suggest/event/media': typeof SuggestEventMediaRoute
   '/suggest/review/$suggestionType': typeof SuggestReviewSuggestionTypeRoute
   '/suggest/team/media': typeof SuggestTeamMediaRoute
+  '/suggest/team/social_media': typeof SuggestTeamSocial_mediaRoute
   '/team/$teamNumber/history': typeof TeamTeamNumberHistoryRoute
   '/team/$teamNumber/stats': typeof TeamTeamNumberStatsRoute
   '/team/$teamNumber/{-$year}': typeof TeamTeamNumberChar123YearChar125Route
@@ -366,6 +375,7 @@ export interface FileRouteTypes {
     | '/suggest/event/media'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
+    | '/suggest/team/social_media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
@@ -402,6 +412,7 @@ export interface FileRouteTypes {
     | '/suggest/event/media'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
+    | '/suggest/team/social_media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
@@ -438,6 +449,7 @@ export interface FileRouteTypes {
     | '/suggest/event/media'
     | '/suggest/review/$suggestionType'
     | '/suggest/team/media'
+    | '/suggest/team/social_media'
     | '/team/$teamNumber/history'
     | '/team/$teamNumber/stats'
     | '/team/$teamNumber/{-$year}'
@@ -474,6 +486,7 @@ export interface RootRouteChildren {
   SuggestEventMediaRoute: typeof SuggestEventMediaRoute
   SuggestReviewSuggestionTypeRoute: typeof SuggestReviewSuggestionTypeRoute
   SuggestTeamMediaRoute: typeof SuggestTeamMediaRoute
+  SuggestTeamSocial_mediaRoute: typeof SuggestTeamSocial_mediaRoute
   TeamTeamNumberHistoryRoute: typeof TeamTeamNumberHistoryRoute
   TeamTeamNumberStatsRoute: typeof TeamTeamNumberStatsRoute
   TeamTeamNumberChar123YearChar125Route: typeof TeamTeamNumberChar123YearChar125Route
@@ -699,6 +712,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuggestTeamMediaRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/suggest/team/social_media': {
+      id: '/suggest/team/social_media'
+      path: '/suggest/team/social_media'
+      fullPath: '/suggest/team/social_media'
+      preLoaderRoute: typeof SuggestTeamSocial_mediaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/team/$teamNumber/history': {
       id: '/team/$teamNumber/history'
       path: '/team/$teamNumber/history'
@@ -766,6 +786,7 @@ const rootRouteChildren: RootRouteChildren = {
   SuggestEventMediaRoute: SuggestEventMediaRoute,
   SuggestReviewSuggestionTypeRoute: SuggestReviewSuggestionTypeRoute,
   SuggestTeamMediaRoute: SuggestTeamMediaRoute,
+  SuggestTeamSocial_mediaRoute: SuggestTeamSocial_mediaRoute,
   TeamTeamNumberHistoryRoute: TeamTeamNumberHistoryRoute,
   TeamTeamNumberStatsRoute: TeamTeamNumberStatsRoute,
   TeamTeamNumberChar123YearChar125Route: TeamTeamNumberChar123YearChar125Route,

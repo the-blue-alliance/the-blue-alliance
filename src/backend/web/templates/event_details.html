@@ -107,6 +107,7 @@
         {% if event_insights_qual or event_insights_playoff or oprs|length > 0 %}<li><a href="#event-insights" data-toggle="tab">Insights</a></li>{% endif %}
         <li><a href="#media" data-toggle="tab">Media <span class="badge">{{medias_by_slugname.youtube|length + medias_by_slugname['smugmug-album']|length}}</span></a></li>
         <li><a href="#scouting" data-toggle="tab">Scouting</a></li>
+        {% if practice_matches %}<li><a href="#practice" data-toggle="tab">Practice</a></li>{% endif %}
       </ul>
     </div>
   </div>
@@ -544,6 +545,18 @@
         </div>
       </div>
     </div>
+
+    {% if practice_matches %}
+    <div class="tab-pane" id="practice">
+      <div class="row">
+        <div class="col-sm-12">
+          <h3>Practice Matches</h3>
+          <div class="alert alert-info" id="practice-results-note">Results are not published for practice matches.</div>
+          {{mtm.practice_match_table(practice_matches)}}
+        </div>
+      </div>
+    </div>
+    {% endif %}
 
       </div>
     </div>

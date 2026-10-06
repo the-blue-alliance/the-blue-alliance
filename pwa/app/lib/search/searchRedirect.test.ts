@@ -164,7 +164,7 @@ describe('getSearchRedirect', () => {
 });
 
 describe('getSearchRedirect when both a team and an event match', () => {
-  it('should redirect to the team', () => {
+  it('should redirect to the higher-scoring event', () => {
     const index: SearchIndex = {
       teams: [{ key: 'frc1', nickname: 'Milstein Robotics' }],
       events: [{ key: '2024mil', name: 'Milstein' }],
@@ -172,7 +172,17 @@ describe('getSearchRedirect when both a team and an event match', () => {
 
     const result = getSearchRedirect(index, 'Milstein');
 
-    expect(result.type).toBe('team');
-    expect(result.path).toBe('/team/1');
+    expect(result.path).toBe('/event/2024mil');
   });
+});
+
+describe('getSearchRedirect with a team number and year', () => {
+  it.each(['254 2024', '254/2024'])(
+    'should redirect %s to the team year page',
+    (query) => {
+      expect(getSearchRedirect(mockSearchIndex, query).path).toBe(
+        '/team/254/2024',
+      );
+    },
+  );
 });

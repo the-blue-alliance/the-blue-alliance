@@ -326,7 +326,7 @@ const COLLIDING_SEARCH_INDEX = {
 
 test.describe('search modal navigation (#10104)', () => {
   test.beforeEach(async ({ page }) => {
-    await page.route('**/search_index*', async (route) => {
+    await page.route('**/api/v3/search_index**', async (route) => {
       await route.fulfill({ json: COLLIDING_SEARCH_INDEX });
     });
     await page.goto('/');

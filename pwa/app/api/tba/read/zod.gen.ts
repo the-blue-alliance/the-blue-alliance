@@ -45,7 +45,7 @@ export const zBridgeState2023 = z.enum(['Level', 'NotLevel']);
 /**
  * The competition level the match was played at.
  */
-export const zCompLevel = z.enum(['qm', 'ef', 'qf', 'sf', 'f']);
+export const zCompLevel = z.enum(['pm', 'qm', 'ef', 'qf', 'sf', 'f']);
 
 /**
  * AwardType
@@ -2597,6 +2597,45 @@ export const zGetEventMatchesSimplePath = z.object({
  * Successful response
  */
 export const zGetEventMatchesSimpleResponse = z.array(zMatchSimple);
+
+export const zGetEventPracticeMatchesHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventPracticeMatchesPath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventPracticeMatchesResponse = z.array(zMatch);
+
+export const zGetEventPracticeMatchesKeysHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventPracticeMatchesKeysPath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Array of Match Keys
+ */
+export const zGetEventPracticeMatchesKeysResponse = z.array(z.string());
+
+export const zGetEventPracticeMatchesSimpleHeaders = z.object({
+  'If-None-Match': z.string().optional(),
+});
+
+export const zGetEventPracticeMatchesSimplePath = z.object({
+  event_key: z.string(),
+});
+
+/**
+ * Successful response
+ */
+export const zGetEventPracticeMatchesSimpleResponse = z.array(zMatchSimple);
 
 export const zGetEventMatchTimeseriesHeaders = z.object({
   'If-None-Match': z.string().optional(),

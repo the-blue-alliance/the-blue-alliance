@@ -93,6 +93,15 @@ import type {
   GetEventPlayoffAdvancementData,
   GetEventPlayoffAdvancementErrors,
   GetEventPlayoffAdvancementResponses,
+  GetEventPracticeMatchesData,
+  GetEventPracticeMatchesErrors,
+  GetEventPracticeMatchesKeysData,
+  GetEventPracticeMatchesKeysErrors,
+  GetEventPracticeMatchesKeysResponses,
+  GetEventPracticeMatchesResponses,
+  GetEventPracticeMatchesSimpleData,
+  GetEventPracticeMatchesSimpleErrors,
+  GetEventPracticeMatchesSimpleResponses,
   GetEventPredictionsData,
   GetEventPredictionsErrors,
   GetEventPredictionsResponses,
@@ -356,6 +365,15 @@ import {
   zGetEventPlayoffAdvancementHeaders,
   zGetEventPlayoffAdvancementPath,
   zGetEventPlayoffAdvancementResponse,
+  zGetEventPracticeMatchesHeaders,
+  zGetEventPracticeMatchesKeysHeaders,
+  zGetEventPracticeMatchesKeysPath,
+  zGetEventPracticeMatchesKeysResponse,
+  zGetEventPracticeMatchesPath,
+  zGetEventPracticeMatchesResponse,
+  zGetEventPracticeMatchesSimpleHeaders,
+  zGetEventPracticeMatchesSimplePath,
+  zGetEventPracticeMatchesSimpleResponse,
   zGetEventPredictionsHeaders,
   zGetEventPredictionsPath,
   zGetEventPredictionsResponse,
@@ -1249,6 +1267,103 @@ export const getEventMatchesSimple = <ThrowOnError extends boolean = false>(
       await zGetEventMatchesSimpleResponse.parseAsync(data),
     security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
     url: '/event/{event_key}/matches/simple',
+    ...options,
+  });
+
+/**
+ * Gets a list of practice matches for the given event.
+ */
+export const getEventPracticeMatches = <ThrowOnError extends boolean = false>(
+  options: Options<GetEventPracticeMatchesData, ThrowOnError>,
+): RequestResult<
+  GetEventPracticeMatchesResponses,
+  GetEventPracticeMatchesErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventPracticeMatchesResponses,
+    GetEventPracticeMatchesErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventPracticeMatchesHeaders.optional(),
+          path: zGetEventPracticeMatchesPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPracticeMatchesResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/matches/practice',
+    ...options,
+  });
+
+/**
+ * Gets a list of practice match keys for the given event.
+ */
+export const getEventPracticeMatchesKeys = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetEventPracticeMatchesKeysData, ThrowOnError>,
+): RequestResult<
+  GetEventPracticeMatchesKeysResponses,
+  GetEventPracticeMatchesKeysErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventPracticeMatchesKeysResponses,
+    GetEventPracticeMatchesKeysErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventPracticeMatchesKeysHeaders.optional(),
+          path: zGetEventPracticeMatchesKeysPath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPracticeMatchesKeysResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/matches/practice/keys',
+    ...options,
+  });
+
+/**
+ * Gets a short-form list of practice matches for the given event.
+ */
+export const getEventPracticeMatchesSimple = <
+  ThrowOnError extends boolean = false,
+>(
+  options: Options<GetEventPracticeMatchesSimpleData, ThrowOnError>,
+): RequestResult<
+  GetEventPracticeMatchesSimpleResponses,
+  GetEventPracticeMatchesSimpleErrors,
+  ThrowOnError
+> =>
+  (options.client ?? client).get<
+    GetEventPracticeMatchesSimpleResponses,
+    GetEventPracticeMatchesSimpleErrors,
+    ThrowOnError
+  >({
+    requestValidator: async (data) =>
+      await z
+        .object({
+          body: z.never().optional(),
+          headers: zGetEventPracticeMatchesSimpleHeaders.optional(),
+          path: zGetEventPracticeMatchesSimplePath,
+          query: z.never().optional(),
+        })
+        .parseAsync(data),
+    responseValidator: async (data) =>
+      await zGetEventPracticeMatchesSimpleResponse.parseAsync(data),
+    security: [{ name: 'X-TBA-Auth-Key', type: 'apiKey' }],
+    url: '/event/{event_key}/matches/practice/simple',
     ...options,
   });
 

@@ -1,3 +1,4 @@
+import { Link } from '@tanstack/react-router';
 import type { ReactNode } from 'react';
 
 import SponsorsIcon from '~icons/lucide/anchor';
@@ -6,10 +7,12 @@ import StatbotIcon from '~icons/lucide/chart-spline';
 import Match13Icon from '~icons/lucide/cloud';
 import DistrictIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
+import PlusIcon from '~icons/lucide/plus';
 import RookieIcon from '~icons/lucide/sprout';
 
 import { District, Media, MediaAvatar, Team } from '~/api/tba/read';
 import DetailEntity from '~/components/tba/detailEntity';
+import InlineIcon from '~/components/tba/inlineIcon';
 import { DistrictLink, TeamLocationLink } from '~/components/tba/links';
 import TeamAvatar from '~/components/tba/teamAvatar';
 import TeamSocialMediaList from '~/components/tba/teamSocialMediaList';
@@ -34,7 +37,7 @@ export default function TeamPageTeamInfo({
   favoriteButton,
 }: {
   team: Team;
-  maybeAvatar: MediaAvatar | undefined; // undefined on team history page
+  maybeAvatar: MediaAvatar | undefined;
   socials: Media[];
   district?: District;
   favoriteButton?: ReactNode;
@@ -47,7 +50,7 @@ export default function TeamPageTeamInfo({
     <>
       <div>
         <div className="mb-2 flex items-center gap-2">
-          {maybeAvatar && <TeamAvatar media={maybeAvatar} />}
+          <TeamAvatar media={maybeAvatar} />
           <h1 className="text-3xl font-medium">
             Team {team.team_number} - {team.nickname}
           </h1>
@@ -138,7 +141,21 @@ export default function TeamPageTeamInfo({
       </div>
 
       <div className="flex flex-wrap justify-center md:justify-start">
-        <TeamSocialMediaList socials={socials} />
+        <TeamSocialMediaList socials={socials}>
+          <Badge variant="secondary">
+            <Link
+              to="/suggest/team/social_media"
+              search={{ team_key: team.key }}
+              aria-label="Add Social Media"
+              className="text-secondary-foreground"
+            >
+              <InlineIcon>
+                <PlusIcon />
+                Add
+              </InlineIcon>
+            </Link>
+          </Badge>
+        </TeamSocialMediaList>
       </div>
     </>
   );

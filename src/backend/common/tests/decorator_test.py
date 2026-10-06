@@ -441,3 +441,39 @@ def test_flask_cache_with_memcache_abort_404_overrides_ttl(
     resp2 = app.test_client().get("/")
     assert resp2.status_code == 404
     assert calls == 1
+
+
+def test_cached_public_404_custom_ttl(app: Flask) -> None:
+    @app.route("/")
+    @cached_public(ttl=3600, not_found_ttl=timedelta(days=1))
+    def view():
+        abort(404)
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 404
+    assert resp.headers.get("Cache-Control") == "public, max-age=86400, s-maxage=86400"
+
+
+def test_flask_cache_with_memcache_404_custom_ttl(app: Flask, memcache_stub) -> None:
+    configure_flask_cache(app)
+
+    calls = 0
+
+    @app.route("/")
+    @cached_public(ttl=3600, not_found_ttl=timedelta(days=1))
+    def view():
+        nonlocal calls
+        calls += 1
+        abort(404)
+
+    resp = app.test_client().get("/")
+    assert resp.status_code == 404
+    assert calls == 1
+
+    cached_entry = app.cache.get("/bcd8b0c2eb1fce714eab6cef0d771acc")  # pyre-ignore[16]
+    assert isinstance(cached_entry, CachedResponse)
+    assert cached_entry.timeout == 86400
+
+    resp2 = app.test_client().get("/")
+    assert resp2.status_code == 404
+    assert calls == 1

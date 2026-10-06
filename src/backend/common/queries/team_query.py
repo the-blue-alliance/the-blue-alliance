@@ -99,10 +99,10 @@ class DistrictTeamsQuery(CachedDatabaseQuery[List[Team], List[TeamDict]]):
         return list(teams)
 
 
-class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], List[str]]):
+class RegionalTeamsQuery(CachedDatabaseQuery[List[ndb.Key], None]):
     CACHE_VERSION = 2
     CACHE_KEY_FORMAT = "regional_teams_{year}"
-    DICT_CONVERTER = TeamConverter
+    DICT_CONVERTER = None
 
     def __init__(self, year: Year) -> None:
         super().__init__(year=year)

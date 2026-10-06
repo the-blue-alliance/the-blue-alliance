@@ -1,7 +1,7 @@
 import { Link } from '@tanstack/react-router';
 import { cn } from 'cn';
-import { Temporal } from 'temporal-polyfill';
 
+import BiStarFill from '~icons/bi/star-fill';
 import HourglassIcon from '~icons/ic/baseline-hourglass-empty';
 import PlayArrowIcon from '~icons/ic/baseline-play-arrow';
 import PendingIcon from '~icons/ic/outline-pending';
@@ -25,7 +25,8 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '~/components/ui/tooltip';
-import { matchTitleShort } from '~/lib/matchUtils';
+import { useFavoriteTeamKeys } from '~/lib/hooks/useFavoriteTeams';
+import { formatMatchTime, matchTitleShort } from '~/lib/matchUtils';
 import type { NexusMatchStatus } from '~/lib/nexus';
 
 interface PlaylistEntry {
@@ -187,6 +188,7 @@ export function MatchRow({
   const maybeVideoURL = maybeGetFirstMatchVideoURL(match);
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+  const matchTime = match.predicted_time ?? match.time;
   const focusedAlliance = focusTeamKey
     ? match.alliances.red.team_keys.includes(focusTeamKey)
       ? AllianceColor.RED
@@ -194,6 +196,11 @@ export function MatchRow({
         ? AllianceColor.BLUE
         : null
     : null;
+  const { teamKeys: favoriteTeamKeys } = useFavoriteTeamKeys();
+  const hasFavorite = [
+    ...match.alliances.red.team_keys,
+    ...match.alliances.blue.team_keys,
+  ].some((teamKey) => favoriteTeamKeys.includes(teamKey));
 
   /* Desktop: 1x11 grid, Mobile: 2x6 grid */
   return (
@@ -229,13 +236,21 @@ export function MatchRow({
         className="row-span-2 flex items-center justify-center p-1.5
           xl:col-span-2 xl:row-span-1"
       >
-        <MatchLink
-          matchOrKey={match}
-          event={event}
-          className="text-center text-sm text-foreground"
-        >
-          {matchTitleShort(match, playoffType)}
-        </MatchLink>
+        <span className="relative">
+          {hasFavorite && (
+            <span className="absolute top-1/2 right-full mr-1 -translate-y-1/2">
+              <BiStarFill aria-hidden className="size-3 text-yellow-500" />
+              <span className="sr-only">Includes a favorite team</span>
+            </span>
+          )}
+          <MatchLink
+            matchOrKey={match}
+            event={event}
+            className="text-center text-sm text-foreground"
+          >
+            {matchTitleShort(match, playoffType)}
+          </MatchLink>
+        </span>
       </div>
 
       {/* Red Team Players - Subgrid Component */}
@@ -249,6 +264,7 @@ export function MatchRow({
         surrogate={match.alliances.red.surrogate_team_keys}
         year={year}
         focusTeamKey={focusTeamKey}
+        favoriteTeamKeys={favoriteTeamKeys}
       />
 
       {/* Blue Team Players - Subgrid Component */}
@@ -262,6 +278,7 @@ export function MatchRow({
         surrogate={match.alliances.blue.surrogate_team_keys}
         year={year}
         focusTeamKey={focusTeamKey}
+        favoriteTeamKeys={favoriteTeamKeys}
       />
 
       {!isPlayed && (
@@ -270,17 +287,7 @@ export function MatchRow({
             xl:col-start-auto xl:row-span-1 xl:row-start-auto"
         >
           <span className="flex h-full items-center justify-center text-center">
-            {match.predicted_time &&
-              Temporal.Instant.fromEpochMilliseconds(
-                match.predicted_time * 1000,
-              )
-                .toZonedDateTimeISO(Temporal.Now.timeZoneId())
-                .toLocaleString('en-US', {
-                  hour: '2-digit',
-                  minute: '2-digit',
-                  weekday: 'short',
-                  hour12: true,
-                })}
+            {matchTime && formatMatchTime(matchTime)}
           </span>
         </div>
       )}
@@ -330,6 +337,7 @@ export function SimpleMatchRow({
 }) {
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+  const matchTime = match.predicted_time ?? match.time;
 
   return (
     <div>
@@ -383,18 +391,7 @@ export function SimpleMatchRow({
             className="col-start-4 row-span-2 row-start-2 flex items-center
               justify-center text-center"
           >
-            <span>
-              {match.predicted_time &&
-                new Date(match.predicted_time * 1000).toLocaleTimeString(
-                  'en-US',
-                  {
-                    hour: '2-digit',
-                    minute: '2-digit',
-                    weekday: 'short',
-                    hour12: true,
-                  },
-                )}
-            </span>
+            <span>{matchTime && formatMatchTime(matchTime)}</span>
           </div>
         )}
 
@@ -456,13 +453,14 @@ export function BreakRow({
     >
       <div
         className={cn(
-          'relative flex w-full items-center justify-center font-medium',
+          `grid w-full grid-cols-[1fr_auto_1fr] items-center gap-2 px-2
+          font-medium`,
           size === 'small' ? 'h-5 text-xs' : 'h-8 text-sm',
         )}
       >
-        <span>{text}</span>
+        <span className="col-start-2">{text}</span>
         {playlists && playlists.length > 0 && (
-          <div className="absolute right-2 flex items-center">
+          <div className="flex items-center justify-self-end whitespace-nowrap">
             {playlists.length === 1 ? (
               <a
                 href={playlists[0].url}

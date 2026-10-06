@@ -72,4 +72,14 @@ describe("UpcomingMatchesTable", () => {
     });
     expect(screen.getAllByText("<2 min")).toHaveLength(2);
   });
+
+  it("clears its refresh interval on unmount", () => {
+    // componentDidMount starts a 10s refresh interval.
+    const { unmount } = render(
+      <UpcomingMatchesTable year={2018} matches={[]} />
+    );
+    expect(jest.getTimerCount()).toBe(1);
+    unmount();
+    expect(jest.getTimerCount()).toBe(0);
+  });
 });
