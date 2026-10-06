@@ -63,8 +63,18 @@ vi.mock('recharts', () => ({
     return null;
   },
   Scatter: ({ children }: { children: ReactNode }) => <div>{children}</div>,
-  Cell: ({ fill }: { fill?: string }) => (
-    <span data-testid="cell" data-fill={fill ?? 'none'} />
+  Cell: ({
+    fill,
+    style,
+  }: {
+    fill?: string;
+    style?: Record<string, string>;
+  }) => (
+    <span
+      data-testid="cell"
+      data-fill={fill ?? 'none'}
+      data-dark-fill={style?.['--dot-dark'] ?? 'none'}
+    />
   ),
   LabelList: ({ formatter }: { formatter: (value: unknown) => string }) => {
     captured.formatter = formatter;
@@ -100,6 +110,10 @@ function makeColors(): EventColors {
       },
     },
   };
+}
+
+function cellData(key: 'fill' | 'darkFill'): (string | undefined)[] {
+  return screen.getAllByTestId('cell').map((cell) => cell.dataset[key]);
 }
 
 function renderChart(colors = makeColors()) {
@@ -230,28 +244,37 @@ describe('CoprScatterChart', () => {
     expect(axis('yAxis').domain([0.1, 0.9])).toEqual([-0.1, 1.05]);
   });
 
-  test('colors dots by team, darkening white and defaulting missing teams', () => {
+  test('fills dots with team colors adjusted for the light card', () => {
     renderChart();
 
-    // Sorted by X value: frc604, frc1678, frc254.
-    expect(
-      screen.getAllByTestId('cell').map((cell) => cell.dataset.fill),
-    ).toEqual(['hsl(var(--primary))', '#000000', '#0000ff']);
+    // Sorted by X value: frc604 (no entry), frc1678 (white), frc254 (blue).
+    expect(cellData('fill')).toEqual(['var(--primary)', '#949494', '#0000ff']);
   });
 
-  test('does not mutate the passed-in colors when darkening a white team', () => {
+  test('fills dots with team colors adjusted for the dark card', () => {
+    renderChart();
+
+    expect(cellData('darkFill')).toEqual([
+      'var(--primary)',
+      '#ffffff',
+      '#2a66ff',
+    ]);
+  });
+
+  test('does not mutate the passed-in colors when adjusting them', () => {
     // The passed-in colors are typically React Query cache data.
     const colors = renderChart();
 
     expect(colors).toEqual(makeColors());
   });
 
-  test('leaves dots unfilled for teams with no colors on record', () => {
+  test('fills dots gray for teams with no colors on record', () => {
     const colors = makeColors();
     colors.teams['254'].colors = null;
     renderChart(colors);
 
-    expect(screen.getAllByTestId('cell')[2].dataset.fill).toBe('none');
+    expect(cellData('fill')[2]).toBe('#808080');
+    expect(cellData('darkFill')[2]).toBe('#808080');
   });
 
   test('labels dots with the team number', () => {

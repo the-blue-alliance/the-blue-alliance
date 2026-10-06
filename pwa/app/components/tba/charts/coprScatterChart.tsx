@@ -18,7 +18,7 @@ import {
 
 import HelpCircleIcon from '~icons/lucide/help-circle';
 
-import { EventColors, TeamWithColor } from '~/api/colors';
+import { EventColors } from '~/api/colors';
 import { EventCoprs } from '~/api/tba/read';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { ChartContainer } from '~/components/ui/chart';
@@ -36,6 +36,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from '~/components/ui/select';
+import { readableTeamColors } from '~/lib/colorContrast';
 import { useMediaQuery } from '~/lib/hooks';
 import { camelCaseToHumanReadable } from '~/lib/utils';
 
@@ -87,25 +88,23 @@ function generateDomain(dataMin: number, dataMax: number): [number, number] {
   return [-0.1, 1 + DOMAIN_PADDING_RATIO];
 }
 
-// If a team has a white primary color, it doesn't show up on the chart
-function getNonWhiteTeamColor(
+// Teams with no colors on record get a neutral gray, adjusted per theme.
+const NEUTRAL_TEAM_COLOR = '#808080';
+
+// Fill for a team's dot: its primary color, with lightness adjusted so the dot
+// stays visible on the card in both light and dark mode.
+function teamDotColors(
   colors: EventColors,
   teamKey: string,
-): TeamWithColor {
-  const color = colors.teams[teamKey.substring(3)] ?? {
-    teamNumber: 0,
-    colors: {
-      verified: false,
-      primaryHex: 'hsl(var(--primary))',
-      secondaryHex: 'hsl(var(--primary))',
-    },
-  };
-
-  if (color.colors?.primaryHex === '#ffffff') {
-    return { ...color, colors: { ...color.colors, primaryHex: '#000000' } };
+): { light: string; dark: string } {
+  const team = colors.teams[teamKey.substring(3)];
+  if (team === undefined) {
+    return { light: 'var(--primary)', dark: 'var(--primary)' };
   }
-
-  return color;
+  return (
+    readableTeamColors(team.colors?.primaryHex ?? NEUTRAL_TEAM_COLOR) ??
+    readableTeamColors(NEUTRAL_TEAM_COLOR)!
+  );
 }
 
 export default function CoprScatterChart({
@@ -188,11 +187,11 @@ export default function CoprScatterChart({
         <ChartContainer
           className="aspect-4/5 sm:aspect-video"
           config={{
-            teamKey: { color: 'hsl(var(--primary))' },
-            valueX: { label: selectedXCopr, color: 'hsl(var(--primary))' },
-            valueY: { label: selectedYCopr, color: 'hsl(var(--primary))' },
+            teamKey: { color: 'var(--primary)' },
+            valueX: { label: selectedXCopr, color: 'var(--primary)' },
+            valueY: { label: selectedYCopr, color: 'var(--primary)' },
             label: {
-              color: 'hsl(var(--primary))',
+              color: 'var(--primary)',
             },
           }}
         >
@@ -263,15 +262,17 @@ export default function CoprScatterChart({
               }
             />
             <Scatter>
-              {data.map((entry, index) => (
-                <Cell
-                  key={`cell-${index}`}
-                  fill={
-                    getNonWhiteTeamColor(colors, entry.teamKey).colors
-                      ?.primaryHex
-                  }
-                />
-              ))}
+              {data.map((entry, index) => {
+                const dot = teamDotColors(colors, entry.teamKey);
+                return (
+                  <Cell
+                    key={`cell-${index}`}
+                    fill={dot.light}
+                    className="dark:fill-(--dot-dark)"
+                    style={{ '--dot-dark': dot.dark } as React.CSSProperties}
+                  />
+                );
+              })}
 
               <LabelList
                 dataKey={'teamKey'}
