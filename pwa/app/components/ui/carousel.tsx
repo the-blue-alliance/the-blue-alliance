@@ -159,7 +159,7 @@ function CarouselIndicator({
         className,
       )}
     >
-      <div className="flex space-x-2">
+      <div className="flex gap-4">
         {Array.from({ length: itemsCount }, (_, i) => (
           <button
             key={i}
@@ -168,8 +168,9 @@ function CarouselIndicator({
             aria-current={index === i}
             onClick={() => setIndex(i)}
             className={cn(
-              `h-2 w-2 rounded-full transition-opacity duration-300
-              active:scale-97 motion-safe:transition-[opacity,scale]`,
+              `relative h-2 w-2 rounded-full transition-opacity duration-300
+              after:absolute after:-inset-2 after:content-[''] active:scale-97
+              motion-safe:transition-[opacity,scale]`,
               index === i
                 ? 'bg-zinc-950 dark:bg-zinc-50'
                 : 'bg-zinc-900/50 dark:bg-zinc-100/50',

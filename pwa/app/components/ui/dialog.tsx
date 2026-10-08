@@ -99,10 +99,11 @@ function DialogContent({
             data-slot="dialog-close"
             className="absolute top-4 right-4 cursor-pointer rounded-xs
               opacity-70 ring-offset-background transition-opacity
-              hover:opacity-100 focus-visible:ring-2 focus-visible:ring-ring
-              focus-visible:ring-offset-2 focus-visible:outline-hidden
-              active:scale-97 disabled:pointer-events-none
-              data-[state=open]:bg-accent
+              after:absolute after:inset-[min(0px,(100%-44px)/2)]
+              after:content-[''] hover:opacity-100 focus-visible:ring-2
+              focus-visible:ring-ring focus-visible:ring-offset-2
+              focus-visible:outline-hidden active:scale-97
+              disabled:pointer-events-none data-[state=open]:bg-accent
               data-[state=open]:text-muted-foreground
               motion-safe:transition-[opacity,scale] [&_svg]:pointer-events-none
               [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4"
