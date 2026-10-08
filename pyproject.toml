@@ -13,7 +13,7 @@ dependencies = [
     "google-api-core==2.40.0",
     "google-api-python-client==2.201.0",
     "google-cloud-logging==3.16.3",
-    "google-cloud-run==0.16.1",
+    "google-cloud-run==0.16.2",
     "grpcio==1.84.0",
     "gunicorn==26.2.0",
     "Jinja2==3.1.6",
