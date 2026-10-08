@@ -1,5 +1,4 @@
 import { useRouter } from '@tanstack/react-router';
-import { cn } from 'cn';
 import {
   createContext,
   startTransition,
@@ -128,8 +127,9 @@ export function TableOfContents({
       {/* Mobile TOC - Sticky header */}
       <TOCRenderPortal>
         <div
-          className="sticky inset-x-0 top-14 z-1 flex items-center
-            justify-between gap-8 border-b bg-background/80 px-4 py-1
+          data-toc-bar
+          className="sticky inset-x-0 top-14 z-1 flex h-(--toc-bar-height)
+            items-center justify-between gap-8 border-b bg-background/80 px-4
             text-muted-foreground backdrop-blur-xs transition-colors lg:hidden"
         >
           <div className="flex items-center gap-1">
@@ -189,7 +189,7 @@ export function TableOfContentsSection({
     <InView
       as="section"
       id={id}
-      className={cn('scroll-mt-12 lg:scroll-mt-4', className)}
+      className={className}
       rootMargin="-15% 0px 0px 0px"
       onChange={(inView) => {
         // Low-priority update so pointer events/hover aren't blocked by the re-render

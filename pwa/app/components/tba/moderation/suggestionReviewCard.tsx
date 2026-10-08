@@ -1194,7 +1194,7 @@ export function SuggestionReviewCard(
   return (
     <Card
       className={cn(
-        'flex scroll-mt-24 flex-col gap-3 p-4',
+        'flex flex-col gap-3 p-4',
         // Keyboard-focus glow, distinct from the browser focus ring
         focused &&
           `shadow-lg ring-2 shadow-primary/25 ring-primary/70 ring-offset-2
