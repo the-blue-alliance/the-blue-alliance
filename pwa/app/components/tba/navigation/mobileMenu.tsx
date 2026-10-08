@@ -19,7 +19,8 @@ export function MobileMenu() {
       </NavigationMenuTrigger>
       <NavigationMenuContent
         className="absolute inset-x-0 top-0 z-12 mt-0 flex max-h-[80svh]
-          flex-col overflow-auto rounded-b-xl bg-brand px-4 text-white"
+          flex-col overflow-auto overscroll-contain rounded-b-xl bg-brand px-4
+          text-white"
       >
         <ul className="grid divide-y divide-white/10">
           {NAV_ITEMS_LIST.map(({ title, to, icon: Icon }, index) => (

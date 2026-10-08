@@ -71,8 +71,9 @@ function TooltipContent({
         >
           <div
             className={cn(
-              `relative z-10 max-h-60 overflow-x-hidden overflow-y-auto px-3
-              py-1.5 text-center text-balance [&::-webkit-scrollbar]:w-2
+              `relative z-10 max-h-60 overflow-x-hidden overflow-y-auto
+              overscroll-contain px-3 py-1.5 text-center text-balance
+              [&::-webkit-scrollbar]:w-2
               [&::-webkit-scrollbar-thumb]:rounded-full
               [&::-webkit-scrollbar-thumb]:bg-muted-foreground/30
               [&::-webkit-scrollbar-track]:bg-transparent`,

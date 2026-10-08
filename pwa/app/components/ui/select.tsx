@@ -99,10 +99,10 @@ function SelectContent({
         <SelectPrimitive.Popup
           className={cn(
             `relative z-50 max-h-(--available-height) min-w-[8rem]
-            overflow-x-hidden overflow-y-auto rounded-md border bg-popover
-            text-popover-foreground shadow-md data-[side=bottom]:translate-y-1
-            data-[side=left]:-translate-x-1 data-[side=right]:translate-x-1
-            data-[side=top]:-translate-y-1
+            overflow-x-hidden overflow-y-auto overscroll-contain rounded-md
+            border bg-popover text-popover-foreground shadow-md
+            data-[side=bottom]:translate-y-1 data-[side=left]:-translate-x-1
+            data-[side=right]:translate-x-1 data-[side=top]:-translate-y-1
             motion-safe:data-[side=bottom]:slide-in-from-top-2
             motion-safe:data-[side=left]:slide-in-from-right-2
             motion-safe:data-[side=right]:slide-in-from-left-2

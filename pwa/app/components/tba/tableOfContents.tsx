@@ -153,7 +153,8 @@ export function TableOfContents({
                 side="top"
                 align="start"
                 sideOffset={0}
-                className="max-h-[70vh] w-60 overflow-y-auto lg:hidden"
+                className="max-h-[70vh] w-60 overflow-y-auto overscroll-contain
+                  lg:hidden"
               >
                 <TOCContent
                   tocItems={tocItems}
