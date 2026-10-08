@@ -31,6 +31,11 @@ import { TooltipProvider } from '~/components/ui/tooltip';
 import appleTouchIcon180 from '~/images/apple-splash/apple-touch-icon-180.png?url&no-inline';
 import { mapClientError } from '~/lib/apiError';
 import { APPLE_SPLASH_STARTUP_LINKS } from '~/lib/appleSplashLinks';
+import {
+  LOCAL_API_AUTH_KEY,
+  LOCAL_API_BASE_URL,
+  isLocalDataSource,
+} from '~/lib/dataSource';
 import { createCachedFetch } from '~/lib/middleware/network-cache';
 import { STALE_TIME } from '~/lib/queryClient';
 import { THEME_INIT_SCRIPT, ThemeProvider } from '~/lib/theme';
@@ -59,7 +64,14 @@ const ReactQueryDevtools = import.meta.env.PROD
 
 // Configure request interceptor for auth
 client.interceptors.request.use((request) => {
-  request.headers.set('X-TBA-Auth-Key', import.meta.env.VITE_TBA_API_READ_KEY);
+  // The prod read key isn't valid against the local dev datastore, which
+  // has its own well-known dev key (seeded by /local/bootstrap)
+  request.headers.set(
+    'X-TBA-Auth-Key',
+    isLocalDataSource()
+      ? LOCAL_API_AUTH_KEY
+      : import.meta.env.VITE_TBA_API_READ_KEY,
+  );
 
   logger.debug(
     {
@@ -98,6 +110,13 @@ if (typeof window === 'undefined') {
       cacheableMethods: ['GET'],
     }),
   });
+}
+
+// Dev-only: read from the local dev stack instead of prod when toggled via the
+// profile menu. isLocalDataSource() is false without a browser, so server
+// rendering always reads prod.
+if (isLocalDataSource()) {
+  client.setConfig({ baseUrl: LOCAL_API_BASE_URL });
 }
 
 // Point mobile API client at local backend when configured
