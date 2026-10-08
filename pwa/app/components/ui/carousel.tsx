@@ -94,10 +94,15 @@ function CarouselNavigation({
   const buttonClassName = cn(
     `pointer-events-auto h-fit w-fit rounded-full bg-zinc-50 p-2
     transition-opacity duration-300 dark:bg-zinc-950`,
-    alwaysShow ? 'opacity-100' : 'opacity-0 group-hover/hover:opacity-100',
+    alwaysShow
+      ? 'opacity-100'
+      : `opacity-0 group-focus-within/hover:opacity-100
+        group-hover/hover:opacity-100 pointer-coarse:opacity-100`,
     alwaysShow
       ? 'disabled:opacity-40'
-      : 'disabled:group-hover/hover:opacity-40',
+      : `group-focus-within/hover:disabled:opacity-40
+        group-hover/hover:disabled:opacity-40
+        pointer-coarse:disabled:opacity-40`,
     classNameButton,
   );
 
