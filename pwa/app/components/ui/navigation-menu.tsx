@@ -110,11 +110,12 @@ function NavigationMenuLink({
       data-slot="navigation-menu-link"
       className={cn(
         `flex gap-1 rounded-md p-2 text-sm leading-4 outline-hidden
-        transition-all hover:bg-accent hover:text-accent-foreground
-        focus-visible:ring-[3px] focus-visible:ring-ring/50
-        focus-visible:outline-1 data-active:bg-accent/50
-        data-active:text-accent-foreground hover:data-active:bg-accent
-        focus:data-active:bg-accent [&_svg:not([class*='size-'])]:size-4
+        transition-[color,background-color,box-shadow] hover:bg-accent
+        hover:text-accent-foreground focus-visible:ring-[3px]
+        focus-visible:ring-ring/50 focus-visible:outline-1
+        data-active:bg-accent/50 data-active:text-accent-foreground
+        hover:data-active:bg-accent focus:data-active:bg-accent
+        [&_svg:not([class*='size-'])]:size-4
         [&_svg:not([class*='text-'])]:text-muted-foreground`,
         className,
       )}

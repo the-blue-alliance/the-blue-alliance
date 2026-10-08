@@ -34,10 +34,10 @@ function AccordionTrigger({
         className={cn(
           `flex flex-1 cursor-pointer items-start justify-between gap-4
           rounded-md py-4 text-left text-sm font-medium outline-hidden
-          transition-all hover:underline focus-visible:border-ring
-          focus-visible:ring-[3px] focus-visible:ring-ring/50
-          aria-disabled:pointer-events-none aria-disabled:opacity-50
-          [&[data-panel-open]>svg]:rotate-180`,
+          transition-[color,border-color,box-shadow] hover:underline
+          focus-visible:border-ring focus-visible:ring-[3px]
+          focus-visible:ring-ring/50 aria-disabled:pointer-events-none
+          aria-disabled:opacity-50 [&[data-panel-open]>svg]:rotate-180`,
           className,
         )}
         {...props}
