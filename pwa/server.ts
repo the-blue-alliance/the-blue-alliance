@@ -60,7 +60,16 @@ app.use(
 );
 
 // Everything else is cached for 24 hours.
-app.use(express.static('build/client', { maxAge: '24h' }));
+app.use(
+  express.static('build/client', {
+    maxAge: '24h',
+    setHeaders: (res, path) => {
+      if (path.endsWith('.html')) {
+        res.setHeader('Cache-Control', 'no-cache');
+      }
+    },
+  }),
+);
 
 // App Engine already emits a request log for every request; morgan would
 // duplicate it into stdout at our own expense.
