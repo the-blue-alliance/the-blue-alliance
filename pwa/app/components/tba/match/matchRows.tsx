@@ -142,7 +142,7 @@ export default function SimpleMatchRowsWithBreaks({
     }
   }
 
-  return <div className="flex flex-col divide-y">{divs}</div>;
+  return <div className="@container flex flex-col divide-y">{divs}</div>;
 }
 
 const NEXUS_STATUS_ICONS: Record<NexusMatchStatus, React.ReactNode> = {
@@ -208,14 +208,16 @@ export function MatchRow({
       className={cn(
         `mx-auto grid w-full max-w-6xl grid-cols-[2.5em_7em_repeat(4,1fr)]
         grid-rows-[2em_2em] gap-0.5 text-sm numeric-data
-        xl:grid-cols-[2.5em_7em_repeat(9,1fr)] xl:grid-rows-1`,
+        @min-[34rem]:grid-cols-[2.5em_7em_repeat(9,1fr)]
+        @min-[34rem]:grid-rows-1`,
         className,
       )}
     >
       {/* Play Button */}
       <div
         className="row-span-2 flex items-center justify-center rounded-tl-lg
-          xl:col-span-1 xl:row-span-1 xl:rounded-l-lg"
+          @min-[34rem]:col-span-1 @min-[34rem]:row-span-1
+          @min-[34rem]:rounded-l-lg"
       >
         {maybeVideoURL ? (
           <Link
@@ -234,7 +236,7 @@ export function MatchRow({
       {/* Match Name */}
       <div
         className="row-span-2 flex items-center justify-center p-1.5
-          xl:col-span-2 xl:row-span-1"
+          @min-[34rem]:col-span-2 @min-[34rem]:row-span-1"
       >
         <span className="relative">
           {hasFavorite && (
@@ -257,8 +259,9 @@ export function MatchRow({
       <TeamListSubgrid
         teamKeys={match.alliances.red.team_keys}
         allianceColor="red"
-        className="col-span-3 pt-0.5 xl:col-span-3 xl:pb-0.5"
-        teamCellClassName="max-xl:first:rounded-tl-lg max-xl:last:rounded-tr-lg xl:first:rounded-l-lg"
+        className="col-span-3 pt-0.5 @min-[34rem]:col-span-3
+          @min-[34rem]:pb-0.5"
+        teamCellClassName="@max-[34rem]:first:rounded-tl-lg @max-[34rem]:last:rounded-tr-lg @min-[34rem]:first:rounded-l-lg"
         winner={match.winning_alliance === AllianceColor.RED}
         dq={match.alliances.red.dq_team_keys}
         surrogate={match.alliances.red.surrogate_team_keys}
@@ -271,8 +274,9 @@ export function MatchRow({
       <TeamListSubgrid
         teamKeys={match.alliances.blue.team_keys}
         allianceColor="blue"
-        className="col-span-3 pb-0.5 xl:col-span-3 xl:pt-0.5"
-        teamCellClassName="max-xl:first:rounded-bl-lg max-xl:last:rounded-br-lg xl:last:rounded-r-lg"
+        className="col-span-3 pb-0.5 @min-[34rem]:col-span-3
+          @min-[34rem]:pt-0.5"
+        teamCellClassName="@max-[34rem]:first:rounded-bl-lg @max-[34rem]:last:rounded-br-lg @min-[34rem]:last:rounded-r-lg"
         winner={match.winning_alliance === AllianceColor.BLUE}
         dq={match.alliances.blue.dq_team_keys}
         surrogate={match.alliances.blue.surrogate_team_keys}
@@ -283,8 +287,9 @@ export function MatchRow({
 
       {!isPlayed && (
         <div
-          className="col-start-6 row-span-2 row-start-1 xl:col-span-2
-            xl:col-start-auto xl:row-span-1 xl:row-start-auto"
+          className="col-start-6 row-span-2 row-start-1 @min-[34rem]:col-span-2
+            @min-[34rem]:col-start-auto @min-[34rem]:row-span-1
+            @min-[34rem]:row-start-auto"
         >
           <span className="flex h-full items-center justify-center text-center">
             {matchTime && formatMatchTime(matchTime)}
@@ -297,9 +302,10 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.red.score}
           allianceColor="red"
-          className="col-start-6 row-start-1 mt-0.5 max-xl:rounded-t-lg
-            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mb-0.5
-            xl:rounded-l-lg"
+          className="col-start-6 row-start-1 mt-0.5 @max-[34rem]:rounded-t-lg
+            @min-[34rem]:col-span-1 @min-[34rem]:col-start-auto
+            @min-[34rem]:row-start-auto @min-[34rem]:mb-0.5
+            @min-[34rem]:rounded-l-lg"
           winner={match.winning_alliance === AllianceColor.RED}
           scoreBreakdown={match.score_breakdown?.red}
           year={year}
@@ -313,9 +319,10 @@ export function MatchRow({
         <ScoreCell
           score={match.alliances.blue.score}
           allianceColor="blue"
-          className="col-start-6 row-start-2 mb-0.5 max-xl:rounded-b-lg
-            xl:col-span-1 xl:col-start-auto xl:row-start-auto xl:mt-0.5
-            xl:rounded-r-lg"
+          className="col-start-6 row-start-2 mb-0.5 @max-[34rem]:rounded-b-lg
+            @min-[34rem]:col-span-1 @min-[34rem]:col-start-auto
+            @min-[34rem]:row-start-auto @min-[34rem]:mt-0.5
+            @min-[34rem]:rounded-r-lg"
           winner={match.winning_alliance === AllianceColor.BLUE}
           scoreBreakdown={match.score_breakdown?.blue}
           year={year}
