@@ -46,13 +46,17 @@ export function Navbar() {
           setSelected((value as string | null) ?? null);
         }}
         render={
-          <header className="sticky top-0 z-50 h-14 w-full bg-brand shadow-md" />
+          <header
+            className="sticky top-0 z-50 h-(--header-height) w-full bg-brand
+              shadow-md"
+          />
         }
       >
         <div className="container">
           <NavigationMenuList
             render={<nav />}
-            className="flex h-14 w-full items-center justify-between"
+            className="flex h-(--header-height) w-full items-center
+              justify-between"
           >
             <Link
               to="/"

@@ -118,7 +118,7 @@ export function TableOfContents({
       {/* Desktop TOC - Split screen */}
       {!mobileOnly && (
         <div className="basis-full max-lg:hidden lg:basis-1/6">
-          <div className="sticky top-14 space-y-6 pt-8">
+          <div className="sticky top-(--header-height) space-y-6 pt-8">
             {children}
             <TOCContent tocItems={tocItems} activeItem={activeItem} />
           </div>
@@ -128,9 +128,10 @@ export function TableOfContents({
       <TOCRenderPortal>
         <div
           data-toc-bar
-          className="sticky inset-x-0 top-14 z-1 flex h-(--toc-bar-height)
-            items-center justify-between gap-8 border-b bg-background/80 px-4
-            text-muted-foreground backdrop-blur-xs transition-colors lg:hidden"
+          className="sticky inset-x-0 top-(--header-height) z-1 flex
+            h-(--toc-bar-height) items-center justify-between gap-8 border-b
+            bg-background/80 px-4 text-muted-foreground backdrop-blur-xs
+            transition-colors lg:hidden"
         >
           <div className="flex items-center gap-1">
             <Popover

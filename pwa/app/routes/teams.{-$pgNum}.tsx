@@ -83,7 +83,7 @@ function TeamsPage() {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <div className="basis-full lg:basis-1/6">
-        <div className="top-14 pt-8 lg:sticky">
+        <div className="top-(--header-height) pt-8 lg:sticky">
           <Select
             items={pageItems}
             value={pageNum.toString()}
