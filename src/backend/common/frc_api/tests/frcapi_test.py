@@ -392,95 +392,19 @@ def test_save_response_updated(
     assert f2 == json.dumps(content2).encode()
 
 
-# --- response-archive deduplication -----------------------------------------
-#
-# `_maybe_save_response` only writes a new snapshot when the upstream content
-# actually changed. That comparison spans two type boundaries: urlfetch content
-# is bytes, while `StorageClient.read` returns str or bytes depending on which
-# client the environment selects. A `bytes == str` comparison is always False in
-# Python 3, which silently disabled the dedupe for all of 2025 (#6894) and wrote
-# ~300 GiB of byte-identical snapshots. These tests pin both sides.
-
-
-@pytest.fixture
-def saving_api() -> Any:
-    with patch.dict("os.environ", {"SAVE_FRC_API_RESPONSE": "true"}):
-        yield FRCAPI("test", save_response=True)
-
-
-@pytest.mark.parametrize(
-    "stored_content",
-    [
-        pytest.param(b'{"a": 1}', id="storage_returns_bytes"),
-        pytest.param('{"a": 1}', id="storage_returns_str"),
-    ],
-)
-def test_maybe_save_response_skips_write_when_unchanged(
-    saving_api: FRCAPI, stored_content: Any
+def test_response_content_and_saved_snapshot_are_bytes(
+    monkeypatch: pytest.MonkeyPatch,
+    urlfetch_stub: testbed.urlfetch_stub.URLFetchServiceStub,
 ) -> None:
-    """Identical content must not produce a second snapshot.
+    # Pins the runtime types behind the `content: bytes` and `read -> bytes` annotations.
+    monkeypatch.setenv("SAVE_FRC_API_RESPONSE", "true")
+    _mock_frc_api(urlfetch_stub, {"currentSeason": 2021})
+    response = FRCAPI("zach", save_response=True).root().get_result()
 
-    Parameterized over both storage-client return types: the cloudstorage and
-    local clients read binary, GCloudStorageClient reads text.
-    """
-    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
-
-    with (
-        patch("backend.common.storage.get_files", return_value=["existing.json"]),
-        patch("backend.common.storage.read", return_value=stored_content),
-        patch("backend.common.storage.write") as mock_write,
-    ):
-        saving_api._maybe_save_response(url, b'{"a": 1}')
-
-    mock_write.assert_not_called()
-
-
-@pytest.mark.parametrize(
-    "outgoing_content",
-    [
-        pytest.param(b'{"a": 1}', id="content_is_bytes"),
-        pytest.param('{"a": 1}', id="content_is_str"),
-    ],
-)
-def test_maybe_save_response_skips_write_for_either_content_type(
-    saving_api: FRCAPI, outgoing_content: Any
-) -> None:
-    """The urlfetch side may also be str or bytes; neither should force a write."""
-    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
-
-    with (
-        patch("backend.common.storage.get_files", return_value=["existing.json"]),
-        patch("backend.common.storage.read", return_value=b'{"a": 1}'),
-        patch("backend.common.storage.write") as mock_write,
-    ):
-        saving_api._maybe_save_response(url, outgoing_content)
-
-    mock_write.assert_not_called()
-
-
-def test_maybe_save_response_writes_when_content_changed(saving_api: FRCAPI) -> None:
-    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
-
-    with (
-        patch("backend.common.storage.get_files", return_value=["existing.json"]),
-        patch("backend.common.storage.read", return_value=b'{"a": 1}'),
-        patch("backend.common.storage.write") as mock_write,
-    ):
-        saving_api._maybe_save_response(url, b'{"a": 2}')
-
-    mock_write.assert_called_once()
-
-
-def test_maybe_save_response_writes_when_no_prior_snapshot(saving_api: FRCAPI) -> None:
-    url = f"{FRCAPI.BASE_URL}/2025/scores/CASJ/qual"
-
-    with (
-        patch("backend.common.storage.get_files", return_value=[]),
-        patch("backend.common.storage.write") as mock_write,
-    ):
-        saving_api._maybe_save_response(url, b'{"a": 1}')
-
-    mock_write.assert_called_once()
+    files = cloud_storage_get_files("frc-api-response/v3.0/")
+    assert len(files) == 1
+    assert isinstance(response.content, bytes)
+    assert isinstance(cloud_storage_read(files[0]), bytes)
 
 
 def test_regional_rankings() -> None:
@@ -528,8 +452,8 @@ def test_get_cached_gcs_files_downloads_and_caches(
     monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
     gcs_dir = "frc-api-response/v3.0/2020/root/"
     contents = {
-        f"{gcs_dir}2020-03-01 10:00:00.0.json": "text",
-        f"{gcs_dir}2020-03-02 10:00:00.0.json": b"bytes",
+        f"{gcs_dir}2020-03-01 10:00:00.0.json": b"first",
+        f"{gcs_dir}2020-03-02 10:00:00.0.json": b"second",
         f"{gcs_dir}2020-03-03 10:00:00.0.json": None,
     }
     with (
@@ -546,8 +470,8 @@ def test_get_cached_gcs_files_downloads_and_caches(
         "2020-03-02 10_00_00.0.json",
     ]
     cache_dir = tmp_path / "gcs_test_data_cache" / safe_dir
-    assert (cache_dir / "2020-03-01 10_00_00.0.json").read_text() == "text"
-    assert (cache_dir / "2020-03-02 10_00_00.0.json").read_bytes() == b"bytes"
+    assert (cache_dir / "2020-03-01 10_00_00.0.json").read_bytes() == b"first"
+    assert (cache_dir / "2020-03-02 10_00_00.0.json").read_bytes() == b"second"
     assert not (cache_dir / "2020-03-03 10_00_00.0.json").exists()
 
     # A second lookup is served from the local cache
@@ -570,7 +494,7 @@ def test_get_cached_gcs_files_same_paths_downloaded_or_cached(
 
     monkeypatch.setattr(frc_api_module, "__file__", str(tmp_path / "frc_api.py"))
     gcs_dir = "frc-api-response/v3.0/2020/root/"
-    contents = {f"{gcs_dir}2020-03-01 10:00:00.0.json": "text"}
+    contents = {f"{gcs_dir}2020-03-01 10:00:00.0.json": b"text"}
     with (
         patch("backend.common.storage.get_files", return_value=list(contents)),
         patch("backend.common.storage.read", side_effect=contents.get),

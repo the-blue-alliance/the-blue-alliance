@@ -293,23 +293,7 @@ class FRCAPI:
 
             return response
 
-    @staticmethod
-    def _as_bytes(value: str | bytes | None) -> bytes | None:
-        """Normalize storage/urlfetch payloads for comparison.
-
-        `StorageClient.read` returns `str | bytes` depending on which client the
-        environment selects (GCloudStorageClient opens in text mode, the
-        cloudstorage and local clients open in binary), and urlfetch content is
-        bytes. Comparing across those types is silently always False in Python 3,
-        which is how the dedupe below broke for all of 2025 -- see #6894 and the
-        ~300 GiB of duplicate snapshots it wrote. Normalize both sides instead of
-        trusting either one's type.
-        """
-        if value is None:
-            return None
-        return value.encode() if isinstance(value, str) else value
-
-    def _maybe_save_response(self, url: str, content: str | bytes) -> None:
+    def _maybe_save_response(self, url: str, content: bytes) -> None:
         if not Environment.save_frc_api_response() or not self._save_response:
             return
 
@@ -331,7 +315,7 @@ class FRCAPI:
             write_new = True
             if last_item_filename is not None:
                 last_json_file = cloud_storage_read(last_item_filename)
-                if self._as_bytes(last_json_file) == self._as_bytes(content):
+                if last_json_file == content:
                     write_new = False  # Do not write if content didn't change
 
             if write_new:
@@ -366,12 +350,8 @@ class FRCAPI:
                 os.makedirs(os.path.dirname(filename), exist_ok=True)
                 content = read(gcs_file)
                 if content is not None:
-                    if isinstance(content, str):
-                        with open(filename, "w") as f:
-                            f.write(content)
-                    else:
-                        with open(filename, "wb") as f:
-                            f.write(content)
+                    with open(filename, "wb") as f:
+                        f.write(content)
                     files.append(f"{safe_dir_name}{safe_file_name}")
         return sorted(files)
 

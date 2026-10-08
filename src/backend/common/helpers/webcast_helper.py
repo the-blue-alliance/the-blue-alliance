@@ -201,7 +201,7 @@ class WebcastParser:
             return youtube_id
 
     @classmethod
-    def _parse_ustream_channel(cls, html: str) -> Optional[str]:
+    def _parse_ustream_channel(cls, html: str | bytes) -> Optional[str]:
         from bs4 import BeautifulSoup
 
         content = html
@@ -219,7 +219,7 @@ class WebcastParser:
                 return None
 
     @classmethod
-    def _parse_livestream_channel(cls, html: str) -> Optional[Tuple[str, str]]:
+    def _parse_livestream_channel(cls, html: str | bytes) -> Optional[Tuple[str, str]]:
         from bs4 import BeautifulSoup
 
         content = html

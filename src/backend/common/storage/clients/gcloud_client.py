@@ -29,11 +29,10 @@ class GCloudStorageClient(StorageClient):
             blob.metadata = metadata
         blob.upload_from_string(content, content_type=content_type)
 
-    def read(self, file_name: str) -> Optional[str | bytes]:
+    def read(self, file_name: str) -> Optional[bytes]:
         blob = self.bucket.get_blob(file_name)
         if blob:
-            with blob.open("r") as f:
-                return f.read()
+            return blob.download_as_bytes()
 
         return None
 

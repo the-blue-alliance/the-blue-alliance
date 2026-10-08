@@ -27,7 +27,7 @@ class TypedURLFetchResult(Generic[T]):
 
     request_url: str
 
-    content: str
+    content: bytes
     status_code: int
     content_was_truncated: bool
     header_msg: str
