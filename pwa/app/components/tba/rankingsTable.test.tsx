@@ -144,6 +144,58 @@ describe('RankingsTable', () => {
     expect(rows[0].className).not.toContain('bg-yellow-100!');
   });
 
+  test('shows the event winner key when the event has winners', () => {
+    render(
+      <RankingsTable
+        rankings={rankings}
+        winners={['frc1']}
+        captains={[]}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText('Event winner')).toBeTruthy();
+  });
+
+  test('shows the alliance captain key when the event has captains', () => {
+    render(
+      <RankingsTable
+        rankings={rankings}
+        winners={[]}
+        captains={['frc1']}
+        year={2026}
+      />,
+    );
+
+    expect(screen.getByText('Alliance captain')).toBeTruthy();
+  });
+
+  test('omits the event winner key when the event has no winners', () => {
+    render(
+      <RankingsTable
+        rankings={rankings}
+        winners={[]}
+        captains={['frc1']}
+        year={2026}
+      />,
+    );
+
+    expect(screen.queryByText('Event winner')).toBeNull();
+  });
+
+  test('omits the key when the event has no winners or captains', () => {
+    render(
+      <RankingsTable
+        rankings={rankings}
+        winners={[]}
+        captains={[]}
+        year={2026}
+      />,
+    );
+
+    expect(screen.queryByRole('list', { name: 'Key' })).toBeNull();
+  });
+
   test('omits the record column when the first team has no record', () => {
     render(
       <RankingsTable

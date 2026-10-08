@@ -1,56 +1,22 @@
-import { act, render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
-import { describe, expect, test, vi } from 'vitest';
+import { act, fireEvent, render, screen } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 
 import type { Media } from '~/api/tba/read';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
 
-interface FakeApi {
-  selectedScrollSnap: () => number;
-  on: (event: string, cb: () => void) => void;
-  off: (event: string, cb: () => void) => void;
+class FakeIntersectionObserver {
+  observe() {}
+  disconnect() {}
 }
 
-const { carousel } = vi.hoisted(() => ({
-  carousel: {
-    selected: 0,
-    listeners: new Set<() => void>(),
-    setApi: undefined as ((api: FakeApi) => void) | undefined,
-  },
-}));
+beforeEach(() => {
+  vi.stubGlobal('IntersectionObserver', FakeIntersectionObserver);
+});
 
-vi.mock('embla-carousel-autoplay', () => ({
-  default: (options: unknown) => ({ name: 'autoplay', options }),
-}));
-
-// Embla needs real layout, so the carousel shell is replaced with one that
-// hands the component a controllable API.
-vi.mock('~/components/ui/carousel', () => ({
-  Carousel: ({
-    children,
-    setApi,
-  }: {
-    children: ReactNode;
-    setApi: (api: FakeApi) => void;
-  }) => {
-    carousel.setApi = setApi;
-    return <div data-testid="carousel">{children}</div>;
-  },
-  CarouselContent: ({ children }: { children: ReactNode }) => (
-    <div>{children}</div>
-  ),
-  CarouselItem: ({ children }: { children: ReactNode }) => (
-    <div data-testid="slide">{children}</div>
-  ),
-  CarouselPrevious: () => <button type="button">Previous</button>,
-  CarouselNext: () => <button type="button">Next</button>,
-}));
-
-const fakeApi: FakeApi = {
-  selectedScrollSnap: () => carousel.selected,
-  on: (_event, cb) => carousel.listeners.add(cb),
-  off: (_event, cb) => carousel.listeners.delete(cb),
-};
+afterEach(() => {
+  vi.unstubAllGlobals();
+  vi.useRealTimers();
+});
 
 function imgur(key: string): Media {
   return {
@@ -62,51 +28,82 @@ function imgur(key: string): Media {
   } as Media;
 }
 
-/** The slide images are decorative (empty alt), so they have no img role. */
+const fiveRobots = ['aaaaaaa', 'bbbbbbb', 'ccccccc', 'ddddddd', 'eeeeeee'].map(
+  imgur,
+);
+
 function images() {
   return Array.from(document.querySelectorAll('img'));
 }
 
 function loadedSlides() {
-  return screen
-    .getAllByTestId('slide')
-    .map((slide) => slide.querySelector('img') !== null);
+  return Array.from(
+    document.querySelectorAll('[aria-roledescription="slide"]'),
+  ).map((slide) => slide.querySelector('img') !== null);
+}
+
+function currentDot() {
+  return document
+    .querySelector('[aria-current="true"]')
+    ?.getAttribute('aria-label');
 }
 
 describe('TeamRobotPicsCarousel', () => {
-  test('lazily loads images around the selected slide', () => {
-    carousel.selected = 0;
-    carousel.listeners.clear();
-    const media = ['aaaaaaa', 'bbbbbbb', 'ccccccc', 'ddddddd', 'eeeeeee'].map(
-      imgur,
-    );
-    const { unmount } = render(<TeamRobotPicsCarousel media={media} />);
+  test('loads only the first two images initially', () => {
+    render(<TeamRobotPicsCarousel media={fiveRobots} />);
+
     expect(loadedSlides()).toEqual([true, true, false, false, false]);
-    const first = images()[0];
-    expect(first.getAttribute('loading')).toBe('eager');
-    expect(first.getAttribute('fetchpriority')).toBe('high');
-    expect(first.getAttribute('srcset')).toBe(
-      'https://i.imgur.com/aaaaaaal.jpg 1x, https://i.imgur.com/aaaaaaah.jpg 2x',
-    );
-    expect(images()[1].getAttribute('loading')).toBe('lazy');
-    expect(screen.getByRole('button', { name: 'Next' })).toBeTruthy();
-
-    act(() => {
-      carousel.setApi?.(fakeApi);
-    });
-    expect(carousel.listeners.size).toBe(1);
-
-    carousel.selected = 3;
-    act(() => {
-      carousel.listeners.forEach((cb) => cb());
-    });
-    expect(loadedSlides()).toEqual([true, true, true, true, true]);
-
-    unmount();
-    expect(carousel.listeners.size).toBe(0);
   });
 
-  test('renders unlinked images, skips media without images, and hides arrows for one slide', () => {
+  test('loads the first image eagerly at high priority', () => {
+    render(<TeamRobotPicsCarousel media={fiveRobots} />);
+
+    expect([
+      images()[0].getAttribute('loading'),
+      images()[0].getAttribute('fetchpriority'),
+    ]).toEqual(['eager', 'high']);
+  });
+
+  test('uses resized imgur thumbnails for the first image', () => {
+    render(<TeamRobotPicsCarousel media={fiveRobots} />);
+
+    expect(images()[0].getAttribute('srcset')).toBe(
+      'https://i.imgur.com/aaaaaaal.jpg 1x, https://i.imgur.com/aaaaaaah.jpg 2x',
+    );
+  });
+
+  test('loads the image after the next slide when next is clicked', () => {
+    render(<TeamRobotPicsCarousel media={fiveRobots} />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Next slide' }));
+
+    expect(loadedSlides()).toEqual([true, true, true, false, false]);
+  });
+
+  test('autoplays to the next slide after five seconds', () => {
+    vi.useFakeTimers();
+    render(<TeamRobotPicsCarousel media={fiveRobots} />);
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(currentDot()).toBe('Go to slide 2');
+  });
+
+  test('autoplay wraps from the last slide to the first', () => {
+    vi.useFakeTimers();
+    render(<TeamRobotPicsCarousel media={fiveRobots} />);
+    fireEvent.click(screen.getByRole('button', { name: 'Go to slide 5' }));
+
+    act(() => {
+      vi.advanceTimersByTime(5000);
+    });
+
+    expect(currentDot()).toBe('Go to slide 1');
+  });
+
+  test('renders an unlinked image without a link', () => {
     render(
       <TeamRobotPicsCarousel
         media={[
@@ -119,7 +116,13 @@ describe('TeamRobotPicsCarousel', () => {
         ]}
       />,
     );
-    expect(images()[0].parentElement?.tagName).toBe('DIV');
+
+    expect(screen.queryByRole('link')).toBeNull();
+  });
+
+  test('hides navigation for a single slide', () => {
+    render(<TeamRobotPicsCarousel media={[imgur('aaaaaaa')]} />);
+
     expect(screen.queryByRole('button')).toBeNull();
   });
 
@@ -132,9 +135,7 @@ describe('TeamRobotPicsCarousel', () => {
         ]}
       />,
     );
-    expect(screen.getAllByTestId('slide')).toHaveLength(1);
-    expect(screen.getByRole('link').getAttribute('href')).toBe(
-      'https://imgur.com/aaaaaaa',
-    );
+
+    expect(loadedSlides()).toEqual([true]);
   });
 });

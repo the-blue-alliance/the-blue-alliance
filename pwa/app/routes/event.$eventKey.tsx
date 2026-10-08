@@ -1,6 +1,5 @@
 import { useQueries, useQuery, useSuspenseQuery } from '@tanstack/react-query';
 import { Link, createFileRoute, notFound } from '@tanstack/react-router';
-import { cn } from 'cn';
 import { Suspense, lazy, useMemo, useState } from 'react';
 
 import ParentEventIcon from '~icons/lucide/arrow-up-right';
@@ -16,6 +15,7 @@ import RankingsIcon from '~icons/lucide/list-ordered';
 import DistrictPointsIcon from '~icons/lucide/map';
 import LocationIcon from '~icons/lucide/map-pin';
 import AgendaIcon from '~icons/lucide/paperclip';
+import PracticeIcon from '~icons/lucide/repeat';
 import InsightsIcon from '~icons/lucide/scatter-chart';
 import ChampsQualPointsIcon from '~icons/lucide/star';
 import AwardsIcon from '~icons/lucide/trophy';
@@ -47,6 +47,7 @@ import {
   getEventNexusInfoOptions,
   getEventOptions,
   getEventPlayoffAdvancementOptions,
+  getEventPracticeMatchesOptions,
   getEventRankingsOptions,
   getEventSimpleOptions,
   getEventTeamMediaOptions,
@@ -63,16 +64,16 @@ import { DataTable, type TbaColumnDef } from '~/components/tba/dataTable';
 import DetailEntity from '~/components/tba/detailEntity';
 import DoubleElim4TeamBracket from '~/components/tba/doubleElim4TeamBracket';
 import EliminationBracket from '~/components/tba/eliminationBracket';
+import EventPracticeTab from '~/components/tba/eventPracticeTab';
 import { EventSuccessRateTable } from '~/components/tba/eventSuccessRateTable';
+import EventTeamsTab from '~/components/tba/eventTeamsTab';
 import FavoriteButton from '~/components/tba/favoriteButton';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   DistrictLink,
   EventLink,
   EventLocationLink,
-  PitLocationLink,
   TeamLink,
-  TeamLocationLink,
 } from '~/components/tba/links';
 import {
   CHANGE_IN_COMP_LEVEL_BREAKER,
@@ -92,7 +93,6 @@ import {
   TableOfContents,
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
-import TeamAvatar from '~/components/tba/teamAvatar';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import TraditionalBracket from '~/components/tba/traditionalBracket';
 import { YoutubeEmbed } from '~/components/tba/videoEmbeds';
@@ -100,31 +100,14 @@ import {
   AnimatedTabs,
   AnimatedTabsTrigger,
 } from '~/components/ui/animated-tabs';
-import { Avatar, AvatarImage } from '~/components/ui/avatar';
 import { Badge } from '~/components/ui/badge';
 import { Button, buttonVariants } from '~/components/ui/button';
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger,
-} from '~/components/ui/dialog';
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from '~/components/ui/dropdown-menu';
-import {
-  Table,
-  TableBody,
-  TableCell,
-  TableHead,
-  TableHeader,
-  TableRow,
-} from '~/components/ui/table';
 import { TabsContent, TabsList } from '~/components/ui/tabs';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import {
@@ -143,19 +126,15 @@ import {
   stripParentPrefix,
 } from '~/lib/eventUtils';
 import { sortMatchComparator } from '~/lib/matchUtils';
-import {
-  getEventVideos,
-  getSmugmugAlbums,
-  getTeamPreferredRobotPicMedium,
-} from '~/lib/mediaUtils';
+import { getEventVideos, getSmugmugAlbums } from '~/lib/mediaUtils';
 import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
   getDefaultCoprYAxisComponentName,
   getDefaultTeleopComponentName,
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
-import { sortTeamKeysComparator, sortTeamsComparator } from '~/lib/teamUtils';
-import { MODEL_TYPE, doThrowNotFound, splitIntoNChunks } from '~/lib/utils';
+import { sortTeamKeysComparator } from '~/lib/teamUtils';
+import { MODEL_TYPE, doThrowNotFound } from '~/lib/utils';
 
 // Lazy-loaded: recharts is heavy and this chart only renders once the
 // insights tab is opened, which most visitors never do.
@@ -339,6 +318,17 @@ function EventPage() {
     staleTime: eventStaleTime,
   });
   const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data]);
+
+  const isSeasonEvent = SEASON_EVENT_TYPES.has(event.event_type);
+  const practiceMatchesQuery = useQuery({
+    ...getEventPracticeMatchesOptions({ path: { event_key: eventKey } }),
+    staleTime: eventStaleTime,
+    enabled: isSeasonEvent,
+  });
+  const practiceMatches = practiceMatchesQuery.data ?? [];
+  const shouldShowPracticeTab =
+    isSeasonEvent &&
+    (practiceMatchesQuery.isPending || practiceMatches.length > 0);
 
   const alliancesQuery = useQuery({
     ...getEventAlliancesOptions({ path: { event_key: eventKey } }),
@@ -714,6 +704,14 @@ function EventPage() {
               Scouting
             </InlineIcon>
           </AnimatedTabsTrigger>
+          {shouldShowPracticeTab && (
+            <AnimatedTabsTrigger value="practice">
+              <InlineIcon>
+                <PracticeIcon />
+                Practice
+              </InlineIcon>
+            </AnimatedTabsTrigger>
+          )}
         </TabsList>
 
         <TabsContent value="results" keepMounted className="data-hidden:hidden">
@@ -744,12 +742,12 @@ function EventPage() {
 
         <TabsContent value="teams">
           {teamsQuery.data && teamMediaQuery.data && (
-            <TeamsTab
+            <EventTeamsTab
+              event={event}
               teams={teamsQuery.data}
+              matches={sortedMatches}
               media={teamMediaQuery.data}
-              year={event.year}
-              firstEventCode={event.first_event_code}
-              pitLocations={teamStatusesQuery.data}
+              statuses={teamStatusesQuery.data}
             />
           )}
         </TabsContent>
@@ -828,6 +826,12 @@ function EventPage() {
               eventKey={event.key}
               coprs={coprsQuery.data ?? undefined}
             />
+          )}
+        </TabsContent>
+
+        <TabsContent value="practice">
+          {practiceMatches.length > 0 && (
+            <EventPracticeTab event={event} matches={practiceMatches} />
           )}
         </TabsContent>
       </AnimatedTabs>
@@ -1054,128 +1058,6 @@ function AwardsTab({ awards }: { awards: Award[] }) {
           ))}
         </dl>
       </div>
-    </div>
-  );
-}
-
-function TeamsTab({
-  teams,
-  media,
-  year,
-  firstEventCode,
-  pitLocations,
-}: {
-  teams: Team[];
-  media: Media[];
-  year: number;
-  firstEventCode: string | null;
-  pitLocations?: { [key: string]: { pit_location?: string | null } | null };
-}) {
-  teams.sort(sortTeamsComparator);
-
-  const showPitLocations = pitLocations
-    ? Object.values(pitLocations).some((s) => s?.pit_location)
-    : false;
-
-  const teamChunks = splitIntoNChunks(teams, 2);
-
-  return (
-    <div className="flex flex-row flex-wrap md:flex-nowrap">
-      {teamChunks.map((chunk, idx) => (
-        <Table key={`chunk-${idx}`}>
-          <TableHeader>
-            <TableRow>
-              <TableHead className="w-[60px] text-center">Avatar</TableHead>
-              <TableHead className="w-[30ch]">Team</TableHead>
-              <TableHead>Location</TableHead>
-              {showPitLocations && <TableHead>Pit</TableHead>}
-              <TableHead>Pic</TableHead>
-            </TableRow>
-          </TableHeader>
-          <TableBody>
-            {chunk.map((t) => {
-              const teamMedia = media.filter((m) =>
-                m.team_keys.includes(t.key),
-              );
-
-              const maybeAvatar = teamMedia.find((m) => m.type === 'avatar');
-              const maybeRobotPic = getTeamPreferredRobotPicMedium(teamMedia);
-              const pitLoc = pitLocations?.[t.key]?.pit_location;
-
-              return (
-                <TableRow key={t.key}>
-                  <TableCell
-                    className={cn({
-                      'h-[61px]': maybeAvatar === undefined,
-                    })}
-                  >
-                    {maybeAvatar && (
-                      <div
-                        className="flex h-full w-full items-center
-                          justify-center"
-                      >
-                        <TeamAvatar media={maybeAvatar} />
-                      </div>
-                    )}
-                  </TableCell>
-                  <TableCell className="mt-1 flex flex-col">
-                    <TeamLink teamOrKey={t.key} year={year}>
-                      {t.team_number}
-                    </TeamLink>
-                    <div>{t.nickname}</div>
-                  </TableCell>
-                  <TableCell className={'text-xs'}>
-                    <TeamLocationLink team={t} />
-                  </TableCell>
-                  {showPitLocations && (
-                    <TableCell className="text-xs">
-                      {pitLoc && firstEventCode ? (
-                        <PitLocationLink
-                          teamNumber={t.team_number}
-                          year={year}
-                          firstEventCode={firstEventCode}
-                          pitLocation={pitLoc}
-                        />
-                      ) : (
-                        (pitLoc ?? '--')
-                      )}
-                    </TableCell>
-                  )}
-                  {maybeRobotPic && (
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger className="align-middle">
-                          <Avatar className="size-12 cursor-pointer">
-                            <AvatarImage src={maybeRobotPic} />
-                          </Avatar>
-                        </DialogTrigger>
-                        <DialogContent>
-                          <DialogHeader>
-                            <DialogTitle>
-                              <TeamLink teamOrKey={t.key}>
-                                Team {t.team_number} - {t.nickname}
-                              </TeamLink>
-                            </DialogTitle>
-                            <DialogDescription>
-                              <img
-                                src={maybeRobotPic}
-                                alt=""
-                                className="max-h-[80vh] w-3xl rounded-lg
-                                  object-cover"
-                                loading="lazy"
-                              />
-                            </DialogDescription>
-                          </DialogHeader>
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-                  )}
-                </TableRow>
-              );
-            })}
-          </TableBody>
-        </Table>
-      ))}
     </div>
   );
 }

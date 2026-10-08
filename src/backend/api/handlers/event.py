@@ -48,7 +48,10 @@ from backend.common.queries.event_query import (
     EventListQuery,
     EventQuery,
 )
-from backend.common.queries.match_query import EventMatchesQuery
+from backend.common.queries.match_query import (
+    EventMatchesQuery,
+    EventPracticeMatchesQuery,
+)
 from backend.common.queries.media_query import EventMediasQuery, EventTeamsMediasQuery
 from backend.common.queries.team_query import EventEventTeamsQuery, EventTeamsQuery
 
@@ -239,6 +242,21 @@ def event_matches(
     track_call_after_response("event/matches", event_key, model_type)
     return models_query_response(
         EventMatchesQuery(event_key=event_key),
+        model_type=model_type,
+        filter_func=filter_match_properties,
+    )
+
+
+@api_authenticated
+@cached_public(query_string=False)
+@validate_etag
+@validate_keys
+def event_practice_matches(
+    event_key: EventKey, model_type: Optional[ModelType] = None
+) -> TypedFlaskResponse[list[MatchDict]]:
+    track_call_after_response("event/matches/practice", event_key, model_type)
+    return models_query_response(
+        EventPracticeMatchesQuery(event_key=event_key),
         model_type=model_type,
         filter_func=filter_match_properties,
     )

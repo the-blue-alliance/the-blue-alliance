@@ -166,6 +166,51 @@
           }
         }
       },
+      "TeamSocialMediaSuggestionMessage": {
+        "type": "object",
+        "required": [
+          "team_key",
+          "media_url"
+        ],
+        "properties": {
+          "team_key": {
+            "type": "string",
+            "description": "The team receiving the suggested social media"
+          },
+          "media_url": {
+            "type": "string",
+            "description": "The URL of the social media account being suggested"
+          }
+        }
+      },
+      "TeamSocialMediaSuggestionResponse": {
+        "type": "object",
+        "required": [
+          "code",
+          "message",
+          "status"
+        ],
+        "properties": {
+          "code": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "message": {
+            "type": "string"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "success",
+              "suggestion_exists",
+              "media_exists",
+              "bad_url",
+              "bad_team",
+              "unauthorized"
+            ]
+          }
+        }
+      },
       "SubscriptionMessage": {
         "type": "object",
         "required": [
@@ -451,6 +496,39 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/BaseResponse"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/team/social_media/suggest": {
+      "post": {
+        "summary": "Suggest team social media",
+        "operationId": "suggestTeamSocialMedia",
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/TeamSocialMediaSuggestionMessage"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Successful response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TeamSocialMediaSuggestionResponse"
                 }
               }
             }

@@ -211,16 +211,26 @@ describe('SearchModal', () => {
     expect(await screen.findByText('No results found.')).toBeTruthy();
   });
 
-  test('lists teams first for a team query and navigates to the team', async () => {
+  test('lists teams and events in one list without section headings', async () => {
+    await openAndType('Silicon Valley');
+
+    await screen.findByText('2026 Silicon Valley Regional [casj]');
+
+    expect(screen.queryByText(/^(Teams|Events)$/)).toBeNull();
+  });
+
+  test('navigates to the team year page for a team number and year', async () => {
+    await openAndType('254 2025');
+
+    fireEvent.click(await screen.findByText('254 - The Cheesy Poofs (2025)'));
+
+    expect(useNavigateMock).toHaveBeenCalledWith({ to: '/team/254/2025' });
+  });
+
+  test('navigates to the team for a team query', async () => {
     await openAndType('254');
 
-    const team = await screen.findByText('254 - The Cheesy Poofs');
-    const headings = screen
-      .getAllByText(/^(Teams|Events)$/)
-      .map((heading) => heading.textContent);
-    expect(headings[0]).toBe('Teams');
-
-    fireEvent.click(team);
+    fireEvent.click(await screen.findByText('254 - The Cheesy Poofs'));
 
     expect(useNavigateMock).toHaveBeenCalledWith({ to: '/team/254' });
     await waitFor(() =>
@@ -230,15 +240,56 @@ describe('SearchModal', () => {
     );
   });
 
-  test('lists events first for an event query and navigates to the event', async () => {
+  test('navigates to the event for an event query', async () => {
     await openAndType('Silicon Valley');
 
-    const event = await screen.findByText(/Silicon Valley Regional/);
-    expect(event.textContent).toBe('2026 Silicon Valley Regional [casj]');
-    expect(screen.queryByText('Teams')).toBeNull();
-
-    fireEvent.click(event);
+    fireEvent.click(
+      await screen.findByText('2026 Silicon Valley Regional [casj]'),
+    );
 
     expect(useNavigateMock).toHaveBeenCalledWith({ to: '/event/2026casj' });
+  });
+
+  test('links team results to the current year avatar', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    vi.setSystemTime(new Date('2027-02-01T12:00:00Z'));
+    try {
+      await openAndType('254');
+
+      const avatar = await screen.findByAltText('Team Avatar');
+      expect(avatar.getAttribute('src')).toBe(
+        'https://www.thebluealliance.com/avatar/2027/frc254.png',
+      );
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
+  test('falls back to the FIRST logo when the avatar fails to load', async () => {
+    await openAndType('254');
+
+    fireEvent.error(await screen.findByAltText('Team Avatar'));
+
+    const fallback = await screen.findByAltText('Default Team Avatar');
+    expect(fallback.getAttribute('src')).not.toContain('/avatar/');
+  });
+
+  test('shows no avatar for event results', async () => {
+    await openAndType('Silicon Valley');
+
+    await screen.findByText('2026 Silicon Valley Regional [casj]');
+
+    expect(screen.queryByRole('img')).toBeNull();
+  });
+
+  test('fades the avatar in once it loads', async () => {
+    await openAndType('254');
+
+    const avatar = await screen.findByAltText('Team Avatar');
+    expect(avatar.className).toContain('opacity-0');
+
+    fireEvent.load(avatar);
+
+    await waitFor(() => expect(avatar.className).toContain('opacity-100'));
   });
 });

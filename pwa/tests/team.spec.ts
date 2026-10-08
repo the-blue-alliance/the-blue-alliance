@@ -51,6 +51,12 @@ test.describe('/team/604/2024', () => {
     await expect(page.getByText('Rookie Year: 2001')).toBeVisible();
   });
 
+  test('links to the social media suggestion form', async ({ page }) => {
+    await expect(
+      page.getByRole('link', { name: 'Add Social Media' }),
+    ).toHaveAttribute('href', '/suggest/team/social_media?team_key=frc604');
+  });
+
   [
     ['FRC Events', 'https://frc-events.firstinspires.org/team/604'],
     ['Statbotics', 'https://www.statbotics.io/team/604'],

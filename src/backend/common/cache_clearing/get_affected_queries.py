@@ -136,6 +136,7 @@ def match_updated(affected_refs: TAffectedReferences) -> List[TCacheKeyAndQuery]
 
     for event_key in event_keys:
         queries.append(match_query.EventMatchesQuery(event_key.id()))
+        queries.append(match_query.EventPracticeMatchesQuery(event_key.id()))
         # queries.append(match_query.EventMatchesGdcvDataQuery(event_key.id()))
         for team_key in team_keys:
             queries.append(

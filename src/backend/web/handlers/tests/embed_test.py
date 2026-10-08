@@ -30,6 +30,10 @@ def test_nonexistent_avatar(web_client: Client):
         headers={"Referer": "thebluealliance.com"},
     )
     assert resp.status_code == 404
+    assert resp.cache_control.public
+    assert (
+        resp.cache_control.max_age and float(resp.cache_control.max_age) == 24 * 60 * 60
+    )
 
 
 def test_avatar(web_client: Client):

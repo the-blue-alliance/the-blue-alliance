@@ -18,4 +18,19 @@ describe('TeamSocialMediaList', () => {
       'yt',
     ]);
   });
+
+  test('renders children after the socials', () => {
+    const socials = [
+      { type: 'github-profile', foreign_key: 'gh', team_keys: [] },
+    ] as unknown as Media[];
+    render(
+      <TeamSocialMediaList socials={socials}>
+        <a href="/add">Add</a>
+      </TeamSocialMediaList>,
+    );
+    expect(screen.getAllByRole('link').map((l) => l.textContent)).toEqual([
+      'gh',
+      'Add',
+    ]);
+  });
 });

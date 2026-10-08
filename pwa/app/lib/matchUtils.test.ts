@@ -10,6 +10,7 @@ import {
 import {
   calculateTeamRecordsFromMatches,
   formatMatchKeyName,
+  formatMatchTime,
   getAllianceMatchResult,
   getMatchScoreWithoutAdjustPoints,
   getTeamMatchResults,
@@ -25,6 +26,7 @@ import {
 describe('isValidMatchKey', () => {
   test.each([
     '2019nyny_qm1',
+    '2026nysu_pm5',
     '2010ct_sf1m3',
     '2022on306_qm15',
     '2023week0_sf13m1',
@@ -37,6 +39,7 @@ describe('isValidMatchKey', () => {
   test.each([
     'frc177',
     '2010ct_qm1m1',
+    '2026nysu_pm1m5',
     '2010ctf1m1',
     '2010ct_f1',
     '2022on_306_qm15',
@@ -261,6 +264,15 @@ describe('parseMatchKey', () => {
     });
   });
 
+  test('parses practice keys with an implied set of 1', () => {
+    expect(parseMatchKey('2026nysu_pm5')).toEqual({
+      eventKey: '2026nysu',
+      compLevel: CompLevel.PM,
+      setNumber: 1,
+      matchNumber: 5,
+    });
+  });
+
   test('rejects malformed keys', () => {
     expect(parseMatchKey('frc254')).toBeNull();
     expect(parseMatchKey('2026arc_xx1')).toBeNull();
@@ -367,6 +379,21 @@ describe('sortMatchComparator', () => {
     expect(keys).toEqual(['2024test_qm9', '2024test_sf2m1', '2024test_f1m1']);
   });
 
+  test('orders practice matches before qualification matches', () => {
+    const matches = [
+      makeMatch({ key: '2024test_qm1', match_number: 1 }),
+      makeMatch({
+        key: '2024test_pm2',
+        comp_level: CompLevel.PM,
+        match_number: 2,
+      }),
+    ];
+
+    const keys = matches.sort(sortMatchComparator).map((m) => m.key);
+
+    expect(keys).toEqual(['2024test_pm2', '2024test_qm1']);
+  });
+
   test('orders by set number then match number within a level', () => {
     const matches = [
       makeMatch({
@@ -421,6 +448,12 @@ describe('matchTitleShort', () => {
       match: { comp_level: CompLevel.QM, set_number: 1, match_number: 12 },
       playoffType: null,
       expected: 'Quals 12',
+    },
+    {
+      name: 'practice at a double elim event',
+      match: { comp_level: CompLevel.PM, set_number: 1, match_number: 7 },
+      playoffType: PlayoffType.DOUBLE_ELIM_8_TEAM,
+      expected: 'Practice 7',
     },
     {
       name: 'finals',
@@ -712,5 +745,33 @@ describe('getMatchScoreWithoutAdjustPoints', () => {
       redScore: 100,
       blueScore: 50,
     });
+  });
+});
+
+describe('formatMatchTime', () => {
+  // 2026-03-07 is a Saturday; New York is on EST (UTC-5) until March 8.
+  const utc = (iso: string) => Date.parse(iso) / 1000;
+  const newYork = { timeZone: 'America/New_York' };
+
+  test.each([
+    ['2026-03-07T14:30:00Z', 'Sat 9:30 AM'],
+    ['2026-03-07T19:05:00Z', 'Sat 2:05 PM'],
+    ['2026-03-07T05:00:00Z', 'Sat 12:00 AM'],
+  ])('formats %s in the given time zone as %s', (iso, expected) => {
+    expect(formatMatchTime(utc(iso), newYork)).toBe(expected);
+  });
+
+  test('omits the weekday when asked', () => {
+    expect(
+      formatMatchTime(utc('2026-03-07T14:30:00Z'), {
+        ...newYork,
+        weekday: false,
+      }),
+    ).toBe('9:30 AM');
+  });
+
+  test("defaults to the viewer's time zone", () => {
+    const nineThirty = new Date(2026, 2, 7, 9, 30).getTime() / 1000;
+    expect(formatMatchTime(nineThirty)).toBe('Sat 9:30 AM');
   });
 });

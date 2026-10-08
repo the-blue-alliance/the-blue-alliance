@@ -1,4 +1,6 @@
 import datetime
+import secrets
+import string
 from typing import List, Optional
 
 from google.appengine.ext import ndb
@@ -48,6 +50,33 @@ class ApiAuthAccess(ndb.Model):
     # Allow access for all events marked official
     all_official_events: bool = ndb.BooleanProperty()
     expiration: Optional[datetime.datetime] = ndb.DateTimeProperty()
+
+    # Read keys and write secrets are bearer credentials, and write auth IDs
+    # are the lookup key for a secret. All of them must come from a
+    # cryptographically secure source, never from `random`.
+    TOKEN_ALPHABET = string.ascii_letters + string.digits
+    AUTH_ID_LENGTH = 16
+    READ_KEY_LENGTH = 64
+    SECRET_LENGTH = 64
+
+    @classmethod
+    def generate_auth_id(cls) -> str:
+        """The public identifier of a write key (X-TBA-Auth-Id)."""
+        return cls._generate_token(cls.AUTH_ID_LENGTH)
+
+    @classmethod
+    def generate_read_key(cls) -> str:
+        """The bearer token for the read API (X-TBA-Auth-Key); also the entity ID."""
+        return cls._generate_token(cls.READ_KEY_LENGTH)
+
+    @classmethod
+    def generate_secret(cls) -> str:
+        """The signing secret of a write key (used for X-TBA-Auth-Sig)."""
+        return cls._generate_token(cls.SECRET_LENGTH)
+
+    @classmethod
+    def _generate_token(cls, length: int) -> str:
+        return "".join(secrets.choice(cls.TOKEN_ALPHABET) for _ in range(length))
 
     def put(self, *args, **kwargs):
         # Validation for making sure that we never mix the READ_API and other write types together

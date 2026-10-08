@@ -1,9 +1,26 @@
 import { fireEvent, render, screen } from '@testing-library/react';
-import type { ReactNode } from 'react';
+import type { AnchorHTMLAttributes, ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
 import type { District, Media, MediaAvatar, Team } from '~/api/tba/read';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
+
+vi.mock('@tanstack/react-router', () => ({
+  Link: ({
+    children,
+    to,
+    search,
+    ...props
+  }: Omit<AnchorHTMLAttributes<HTMLAnchorElement>, 'href'> & {
+    children?: ReactNode;
+    to: string;
+    search: Record<string, string>;
+  }) => (
+    <a href={`${to}?${new URLSearchParams(search).toString()}`} {...props}>
+      {children}
+    </a>
+  ),
+}));
 
 vi.mock('~/components/tba/links', () => ({
   TeamLocationLink: ({ team }: { team: Team }) => (
@@ -100,10 +117,29 @@ describe('TeamPageTeamInfo', () => {
         socials={[]}
       />,
     );
-    expect(screen.queryByRole('img')).toBeNull();
     expect(screen.queryByText(/Part of the/)).toBeNull();
     expect(screen.getByText('Some High School')).toBeTruthy();
     expect(screen.queryByText(/sponsor/)).toBeNull();
+  });
+
+  test('shows the default avatar for a team without one', () => {
+    render(
+      <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,
+    );
+    expect(
+      screen.getByRole('img', { name: 'Default Team Avatar' }),
+    ).toBeTruthy();
+  });
+
+  test('links to the social media suggestion form for the team', () => {
+    render(
+      <TeamPageTeamInfo team={team} maybeAvatar={undefined} socials={[]} />,
+    );
+    expect(
+      screen
+        .getByRole('link', { name: 'Add Social Media' })
+        .getAttribute('href'),
+    ).toBe('/suggest/team/social_media?team_key=frc254');
   });
 
   test('the sponsor label has a single space before "sponsors"', () => {

@@ -54,6 +54,15 @@ class EventMediaSuggestionResponse(BaseResponse):
     status: str
 
 
+class TeamSocialMediaSuggestionMessage(TypedDict):
+    team_key: str
+    media_url: str
+
+
+class TeamSocialMediaSuggestionResponse(BaseResponse):
+    status: str
+
+
 class FavoriteMessage(TypedDict):
     model_key: str
     model_type: ModelType

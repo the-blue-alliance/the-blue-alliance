@@ -14,6 +14,8 @@ from backend.common.datafeeds.parsers.parser_base import ParserBase
 from backend.common.frc_api.frc_api import TScoreDetailReturn, TScoreDetailUnion
 from backend.common.frc_api.types import (
     EventScheduleHybridModelV2,
+    ScheduleListModelV31,
+    ScheduleTeamModelV2,
     ScoreDetailModel2018,
     ScoreDetailModel2024,
 )
@@ -329,6 +331,75 @@ class FMSAPIHybridScheduleParser(
         return parsed_matches, remapped_matches
 
 
+class FMSAPIPracticeScheduleParser(ParserBase[ScheduleListModelV31, List[Match]]):
+    def __init__(self, year: Year, event_short: str):
+        self.year = year
+        self.event_short = event_short
+
+    @staticmethod
+    def _alliance_teams(
+        teams: List[ScheduleTeamModelV2], color_prefix: str
+    ) -> List[TeamKey]:
+        return [
+            f"frc{team['teamNumber']}"
+            for team in sorted(teams, key=lambda team: team["station"] or "")
+            if team["teamNumber"] and (team["station"] or "").startswith(color_prefix)
+        ]
+
+    def parse(self, response: ScheduleListModelV31) -> List[Match]:
+        import pytz
+
+        event_key = f"{self.year}{self.event_short}"
+        event = none_throws(Event.get_by_id(event_key))
+        event_tz = pytz.timezone(event.timezone_id) if event.timezone_id else None
+
+        matches: List[Match] = []
+        for scheduled in response.get("Schedule") or []:
+            start_time = scheduled["startTime"]
+            if not start_time:
+                continue
+
+            time = datetime.datetime.strptime(start_time.split(".")[0], TIME_PATTERN)
+            if event_tz is not None:
+                time = time - event_tz.utcoffset(time)
+
+            teams = scheduled["teams"] or []
+            red_teams = self._alliance_teams(teams, "Red")
+            blue_teams = self._alliance_teams(teams, "Blue")
+            matches.append(
+                Match(
+                    id=Match.render_key_name(
+                        event_key, CompLevel.PM, 1, scheduled["matchNumber"]
+                    ),
+                    event=event.key,
+                    year=event.year,
+                    set_number=1,
+                    match_number=scheduled["matchNumber"],
+                    comp_level=CompLevel.PM,
+                    team_key_names=red_teams + blue_teams,
+                    time=time,
+                    alliances_json=json.dumps(
+                        {
+                            "red": {
+                                "teams": red_teams,
+                                "surrogates": [],
+                                "dqs": [],
+                                "score": None,
+                            },
+                            "blue": {
+                                "teams": blue_teams,
+                                "surrogates": [],
+                                "dqs": [],
+                                "score": None,
+                            },
+                        }
+                    ),
+                )
+            )
+
+        return matches
+
+
 class FMSAPIMatchDetailsParser(
     ParserBase[TScoreDetailReturn, Dict[MatchKey, MatchScoreBreakdown]]
 ):
@@ -415,9 +486,9 @@ class FMSAPIMatchDetailsParser(
                         for side2 in ["Left", "Right"]:
                             for level in ["low", "mid", "top"]:
                                 if (
-                                    breakdown[color][
+                                    breakdown[color].get(
                                         "{}{}Rocket{}".format(level, side2, side1)
-                                    ]
+                                    )
                                     != "PanelAndCargo"
                                 ):
                                     completedRocket = False

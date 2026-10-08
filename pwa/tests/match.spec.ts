@@ -79,3 +79,11 @@ test.describe('/match/2026cmptx_f1m1 videos', () => {
     await expect(page.getByRole('table').first()).toBeVisible();
   });
 });
+
+test('renders a practice match page', async ({ page }) => {
+  await page.goto('/match/2026nysu_pm5');
+
+  await expect(
+    page.getByRole('heading', { name: /Practice 5/ }).first(),
+  ).toBeVisible();
+});

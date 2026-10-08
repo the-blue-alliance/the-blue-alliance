@@ -62,6 +62,7 @@ def get_base_qual_match(**kwargs) -> Match:
         "2023week0_sf13m1",
         "2023bc_ef10m1",
         "2023bc_qf10m1",
+        "2026nysu_pm1",
     ],
 )
 def test_valid_key_names(key: str) -> None:
@@ -80,6 +81,7 @@ def test_valid_key_names(key: str) -> None:
         "2023bc_f10m1",
         "2023bc_ef123m1",
         "2023bc_qf123m1",
+        "2026nysu_pm1m1",
     ],
 )
 def test_invalid_key_names(key: str) -> None:
@@ -915,6 +917,37 @@ def test_score_breakdown_2025_tba_fields() -> None:
                 actual_value = computed_score_breakdown[color][peroid][tba_key]
                 assert_string = f"{color}/{peroid}/{tba_key} expected {expected_value} got {actual_value}"
                 assert expected_value == actual_value, assert_string
+
+
+def test_practice_match() -> None:
+    Event(
+        id="2026nysu",
+        event_short="nysu",
+        year=2026,
+        event_type_enum=EventType.REGIONAL,
+        playoff_type=PlayoffType.DOUBLE_ELIM_8_TEAM,
+    ).put()
+    match = Match(
+        id="2026nysu_pm3",
+        event=ndb.Key(Event, "2026nysu"),
+        year=2026,
+        comp_level=CompLevel.PM,
+        set_number=1,
+        match_number=3,
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: MatchAlliance(teams=["frc1"], score=-1),
+                AllianceColor.BLUE: MatchAlliance(teams=["frc2"], score=-1),
+            }
+        ),
+    )
+
+    assert match.key_name == "2026nysu_pm3"
+    assert match.verbose_name == "Practice 3"
+    assert match.short_name == "P3"
+    assert match.full_name == "Practice"
+    assert match.has_been_played is False
+    assert match.play_order < get_base_qual_match().play_order
 
 
 def test_verbose_name_display_name() -> None:

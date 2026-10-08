@@ -2,6 +2,7 @@ import { useQuery } from '@tanstack/react-query';
 import { ClientOnly, useNavigate } from '@tanstack/react-router';
 import { cn } from 'cn';
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { Temporal } from 'temporal-polyfill';
 
 import SearchIcon from '~icons/lucide/search';
 
@@ -24,9 +25,10 @@ import {
 } from '~/components/ui/dialog';
 import { Kbd, KbdGroup } from '~/components/ui/kbd';
 import { Spinner } from '~/components/ui/spinner';
+import defaultAvatar from '~/images/default-avatar.png';
 import { STALE_TIME } from '~/lib/queryClient';
 import FuzzysortFilterer, {
-  FilteredSearchIndex,
+  SearchResult,
 } from '~/lib/search/fuzzysortFilterer';
 
 export function SearchModal() {
@@ -44,7 +46,7 @@ export function SearchModal() {
       ? navigator.userAgent.includes('Macintosh')
       : false;
 
-  const searchResults: FilteredSearchIndex | null = useMemo(() => {
+  const searchResults: SearchResult[] | null = useMemo(() => {
     if (!searchIndexQuery.data) {
       return null;
     }
@@ -74,10 +76,7 @@ export function SearchModal() {
   }, []);
 
   const isIndexPending = searchIndexQuery.isPending && !searchIndexQuery.data;
-  const hasNoResults =
-    searchResults !== null &&
-    searchResults.teams.length === 0 &&
-    searchResults.events.length === 0;
+  const hasNoResults = searchResults !== null && searchResults.length === 0;
 
   return (
     <Dialog open={open} onOpenChange={setOpen}>
@@ -169,68 +168,55 @@ export function SearchModal() {
                 Failed to load search data. Try again later.
               </div>
             )}
-            {searchResults && (
-              <>
-                {[
-                  searchResults.teamsFirst ? 'teams' : 'events',
-                  searchResults.teamsFirst ? 'events' : 'teams',
-                ].map((group) =>
-                  group === 'teams'
-                    ? searchResults.teams.length > 0 && (
-                        <CommandGroup
-                          key="teams"
-                          heading="Teams"
-                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                            **:[[cmdk-group-heading]]:p-3!
-                            **:[[cmdk-group-heading]]:pb-1!"
-                        >
-                          {searchResults.teams.map((team) => (
-                            <SearchItem
-                              key={team.key}
-                              value={team.key}
-                              onSelect={() => {
-                                void navigate({
-                                  to: `/team/${team.key.substring(3)}`,
-                                });
-                                setOpen(false);
-                              }}
-                            >
-                              {team.key.substring(3)} - {team.nickname}
-                            </SearchItem>
-                          ))}
-                        </CommandGroup>
-                      )
-                    : searchResults.events.length > 0 && (
-                        <CommandGroup
-                          key="events"
-                          heading="Events"
-                          className="p-0! **:[[cmdk-group-heading]]:scroll-mt-16
-                            **:[[cmdk-group-heading]]:p-3!
-                            **:[[cmdk-group-heading]]:pb-1!"
-                        >
-                          {searchResults.events.map((event) => (
-                            <SearchItem
-                              key={event.key}
-                              value={event.key}
-                              onSelect={() => {
-                                void navigate({ to: `/event/${event.key}` });
-                                setOpen(false);
-                              }}
-                            >
-                              {event.key.substring(0, 4)} {event.name} [
-                              {event.key.substring(4)}]
-                            </SearchItem>
-                          ))}
-                        </CommandGroup>
-                      ),
-                )}
-              </>
+            {searchResults && searchResults.length > 0 && (
+              <CommandGroup className="p-0! pt-2!">
+                {searchResults.map((result) => (
+                  <SearchItem
+                    key={result.key}
+                    value={result.key}
+                    onSelect={() => {
+                      void navigate({ to: result.path });
+                      setOpen(false);
+                    }}
+                  >
+                    {result.type === 'team' && (
+                      <SearchTeamAvatar teamKey={result.key} />
+                    )}
+                    <span className="truncate">{result.label}</span>
+                  </SearchItem>
+                ))}
+              </CommandGroup>
             )}
             {hasNoResults && <CommandEmpty>No results found.</CommandEmpty>}
           </CommandList>
         </Command>
       </DialogContent>
     </Dialog>
+  );
+}
+
+function SearchTeamAvatar({ teamKey }: { teamKey: string }) {
+  const [failed, setFailed] = useState(false);
+  const [loaded, setLoaded] = useState(false);
+  const year = Temporal.Now.plainDateISO().year;
+
+  return (
+    <span className="size-6 shrink-0">
+      <img
+        alt={failed ? 'Default Team Avatar' : 'Team Avatar'}
+        src={
+          failed
+            ? defaultAvatar
+            : `https://www.thebluealliance.com/avatar/${year}/${teamKey}.png`
+        }
+        onLoad={() => setLoaded(true)}
+        onError={() => setFailed(true)}
+        className={cn(
+          'size-full transition-opacity duration-200',
+          loaded ? 'opacity-100' : 'opacity-0',
+        )}
+      />
+    </span>
   );
 }
 

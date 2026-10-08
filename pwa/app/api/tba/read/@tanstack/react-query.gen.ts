@@ -32,6 +32,9 @@ import {
   getEventNexusInfo,
   getEventOprs,
   getEventPlayoffAdvancement,
+  getEventPracticeMatches,
+  getEventPracticeMatchesKeys,
+  getEventPracticeMatchesSimple,
   getEventPredictions,
   getEventRankings,
   getEventSimple,
@@ -176,6 +179,15 @@ import type {
   GetEventPlayoffAdvancementData,
   GetEventPlayoffAdvancementError,
   GetEventPlayoffAdvancementResponse,
+  GetEventPracticeMatchesData,
+  GetEventPracticeMatchesError,
+  GetEventPracticeMatchesKeysData,
+  GetEventPracticeMatchesKeysError,
+  GetEventPracticeMatchesKeysResponse,
+  GetEventPracticeMatchesResponse,
+  GetEventPracticeMatchesSimpleData,
+  GetEventPracticeMatchesSimpleError,
+  GetEventPracticeMatchesSimpleResponse,
   GetEventPredictionsData,
   GetEventPredictionsError,
   GetEventPredictionsResponse,
@@ -1027,6 +1039,90 @@ export const getEventMatchesSimpleOptions = (
       return data;
     },
     queryKey: getEventMatchesSimpleQueryKey(options),
+  });
+
+export const getEventPracticeMatchesQueryKey = (
+  options: Options<GetEventPracticeMatchesData>,
+) => createQueryKey('getEventPracticeMatches', options);
+
+/**
+ * Gets a list of practice matches for the given event.
+ */
+export const getEventPracticeMatchesOptions = (
+  options: Options<GetEventPracticeMatchesData>,
+) =>
+  queryOptions<
+    GetEventPracticeMatchesResponse,
+    GetEventPracticeMatchesError,
+    GetEventPracticeMatchesResponse,
+    ReturnType<typeof getEventPracticeMatchesQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPracticeMatches({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPracticeMatchesQueryKey(options),
+  });
+
+export const getEventPracticeMatchesKeysQueryKey = (
+  options: Options<GetEventPracticeMatchesKeysData>,
+) => createQueryKey('getEventPracticeMatchesKeys', options);
+
+/**
+ * Gets a list of practice match keys for the given event.
+ */
+export const getEventPracticeMatchesKeysOptions = (
+  options: Options<GetEventPracticeMatchesKeysData>,
+) =>
+  queryOptions<
+    GetEventPracticeMatchesKeysResponse,
+    GetEventPracticeMatchesKeysError,
+    GetEventPracticeMatchesKeysResponse,
+    ReturnType<typeof getEventPracticeMatchesKeysQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPracticeMatchesKeys({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPracticeMatchesKeysQueryKey(options),
+  });
+
+export const getEventPracticeMatchesSimpleQueryKey = (
+  options: Options<GetEventPracticeMatchesSimpleData>,
+) => createQueryKey('getEventPracticeMatchesSimple', options);
+
+/**
+ * Gets a short-form list of practice matches for the given event.
+ */
+export const getEventPracticeMatchesSimpleOptions = (
+  options: Options<GetEventPracticeMatchesSimpleData>,
+) =>
+  queryOptions<
+    GetEventPracticeMatchesSimpleResponse,
+    GetEventPracticeMatchesSimpleError,
+    GetEventPracticeMatchesSimpleResponse,
+    ReturnType<typeof getEventPracticeMatchesSimpleQueryKey>
+  >({
+    queryFn: async ({ queryKey, signal }) => {
+      const { data } = await getEventPracticeMatchesSimple({
+        ...options,
+        ...queryKey[0],
+        signal,
+        throwOnError: true,
+      });
+      return data;
+    },
+    queryKey: getEventPracticeMatchesSimpleQueryKey(options),
   });
 
 export const getEventMatchTimeseriesQueryKey = (
