@@ -241,7 +241,7 @@ function RootComponent() {
               {isFullscreen ? (
                 <Outlet />
               ) : (
-                <div className="flex min-h-screen flex-col">
+                <div className="flex min-h-svh flex-col">
                   <Navbar />
                   <TOCRendererProvider>
                     <div
