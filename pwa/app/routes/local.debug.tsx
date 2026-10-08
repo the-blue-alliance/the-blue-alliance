@@ -152,7 +152,7 @@ function LocalDebug(): React.JSX.Element {
   const loadTime = Temporal.Instant.from(timestamp).epochMilliseconds;
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-4 text-3xl font-medium">Network Cache Debug</h1>
 
       <Card>
@@ -160,7 +160,10 @@ function LocalDebug(): React.JSX.Element {
           <CardTitle>Cache Statistics</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4"
+          >
             <div className="rounded-lg border p-4">
               <div className="text-sm text-muted-foreground">Cache Size</div>
               <div className="text-3xl font-bold">{stats.size}</div>

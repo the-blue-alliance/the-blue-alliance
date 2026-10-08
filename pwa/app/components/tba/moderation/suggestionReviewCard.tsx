@@ -821,7 +821,10 @@ function WebcastDetails({
           District uses the Official Webcast Unit
         </Badge>
       )}
-      <div className="grid max-w-2xl grid-cols-2 gap-3 sm:grid-cols-4">
+      <div
+        className="grid max-w-2xl
+          grid-cols-[repeat(auto-fill,minmax(min(100%,9rem),1fr))] gap-3"
+      >
         <label className="flex flex-col gap-1 text-sm">
           <span className="font-medium text-muted-foreground">Type</span>
           <select
@@ -921,7 +924,10 @@ function OffseasonEventDetails({
             </div>
           ),
       )}
-      <div className="grid max-w-3xl grid-cols-1 gap-3 sm:grid-cols-3">
+      <div
+        className="grid max-w-3xl
+          grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-3"
+      >
         <LabeledInput
           label="Event short (required, e.g. 'cc')"
           value={overrides.event_short ?? ''}
@@ -1194,7 +1200,7 @@ export function SuggestionReviewCard(
   return (
     <Card
       className={cn(
-        'flex scroll-mt-24 flex-col gap-3 p-4',
+        'flex flex-col gap-3 p-4',
         // Keyboard-focus glow, distinct from the browser focus ring
         focused &&
           `shadow-lg ring-2 shadow-primary/25 ring-primary/70 ring-offset-2

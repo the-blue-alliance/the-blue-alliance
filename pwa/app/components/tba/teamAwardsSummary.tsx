@@ -225,7 +225,10 @@ function TeamAwardsSummary({ awards, events }: TeamAwardsSummaryProps) {
       </div>
 
       <TooltipProvider>
-        <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+        <div
+          className="grid
+            grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-4"
+        >
           {AWARD_CATEGORIES.map((category) => {
             const categoryCount = getCategoryAwardCount(category, awards);
 

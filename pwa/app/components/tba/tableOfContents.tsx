@@ -1,5 +1,4 @@
 import { useRouter } from '@tanstack/react-router';
-import { cn } from 'cn';
 import {
   createContext,
   startTransition,
@@ -119,7 +118,7 @@ export function TableOfContents({
       {/* Desktop TOC - Split screen */}
       {!mobileOnly && (
         <div className="basis-full max-lg:hidden lg:basis-1/6">
-          <div className="sticky top-14 space-y-6 pt-8">
+          <div className="sticky top-(--header-height) space-y-6 pt-8">
             {children}
             <TOCContent tocItems={tocItems} activeItem={activeItem} />
           </div>
@@ -128,9 +127,11 @@ export function TableOfContents({
       {/* Mobile TOC - Sticky header */}
       <TOCRenderPortal>
         <div
-          className="sticky inset-x-0 top-14 z-1 flex items-center
-            justify-between gap-8 border-b bg-background/80 px-4 py-1
-            text-muted-foreground backdrop-blur-xs transition-colors lg:hidden"
+          data-toc-bar
+          className="sticky inset-x-0 top-(--header-height) z-1 flex
+            h-(--toc-bar-height) items-center justify-between gap-8 border-b
+            bg-background/80 px-4 text-muted-foreground backdrop-blur-xs
+            transition-colors lg:hidden"
         >
           <div className="flex items-center gap-1">
             <Popover
@@ -152,7 +153,8 @@ export function TableOfContents({
                 side="top"
                 align="start"
                 sideOffset={0}
-                className="max-h-[70vh] w-60 overflow-y-auto lg:hidden"
+                className="max-h-[70vh] w-60 overflow-y-auto overscroll-contain
+                  lg:hidden"
               >
                 <TOCContent
                   tocItems={tocItems}
@@ -189,7 +191,7 @@ export function TableOfContentsSection({
     <InView
       as="section"
       id={id}
-      className={cn('scroll-mt-12 lg:scroll-mt-4', className)}
+      className={className}
       rootMargin="-15% 0px 0px 0px"
       onChange={(inView) => {
         // Low-priority update so pointer events/hover aren't blocked by the re-render

@@ -860,7 +860,10 @@ function DistrictInsightsPage() {
           </TabsList>
 
           <TabsContent value="championships">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+            >
               <Leaderboard
                 leaderboard={{
                   data: {
@@ -936,7 +939,10 @@ function DistrictInsightsPage() {
           </TabsContent>
 
           <TabsContent value="events">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+            >
               <Leaderboard
                 leaderboard={{
                   data: {
@@ -1017,7 +1023,10 @@ function DistrictInsightsPage() {
           </TabsContent>
 
           <TabsContent value="awards">
-            <div className="grid gap-6 lg:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+            >
               <Leaderboard
                 leaderboard={{
                   data: {

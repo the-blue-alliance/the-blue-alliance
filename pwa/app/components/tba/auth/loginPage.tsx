@@ -10,12 +10,15 @@ import InlineIcon from '~/components/tba/inlineIcon';
 
 export default function LoginPage(): JSX.Element {
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <h1 className="text-3xl font-medium">
         Please log in to your TBA Account
       </h1>
       <section className="border-b py-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div
+          className="grid
+            grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))] gap-4"
+        >
           <div>
             <p>
               Your account settings will be accessible on the web, our{' '}

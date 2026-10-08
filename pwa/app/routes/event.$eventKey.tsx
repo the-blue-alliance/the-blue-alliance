@@ -1316,7 +1316,11 @@ function MediaTab({
         {webcasts.length > 0 ? (
           <>
             {youtubeWebcasts.length > 0 && (
-              <div className="grid gap-4 sm:grid-cols-2">
+              <div
+                className="grid
+                  grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))]
+                  gap-4"
+              >
                 {youtubeWebcasts.map((w) => (
                   <YoutubeEmbed
                     videoId={w.channel}
@@ -1347,7 +1351,10 @@ function MediaTab({
       {videos.length > 0 && (
         <div className="space-y-4">
           <h1 className="text-2xl font-bold">Videos</h1>
-          <div className="grid gap-4 sm:grid-cols-2">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] gap-4"
+          >
             {videos.map((m) => (
               <YoutubeEmbed
                 videoId={m.foreign_key}

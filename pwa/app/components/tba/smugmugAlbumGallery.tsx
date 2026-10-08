@@ -12,7 +12,8 @@ export default function SmugmugAlbumGallery({
 
   return (
     <div
-      className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-4"
+      className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,10rem),1fr))]
+        gap-4"
       data-testid="smugmug-album-gallery"
     >
       {albums.map((album, index) => (

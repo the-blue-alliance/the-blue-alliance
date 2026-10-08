@@ -118,7 +118,7 @@ function Progress({ className, ...props }: ProgressPrimitive.Root.Props) {
         )}
       >
         <ProgressPrimitive.Indicator
-          className="size-full flex-1 bg-primary transition-all"
+          className="size-full flex-1 bg-primary motion-safe:transition-[width]"
         />
       </ProgressPrimitive.Track>
     </ProgressPrimitive.Root>

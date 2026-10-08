@@ -118,12 +118,12 @@ const cellVariants = cva('', {
     {
       color: 'neutral',
       shade: 'light',
-      class: 'bg-neutral-50 dark:bg-neutral-900',
+      class: 'bg-surface-subtle',
     },
     {
       color: 'neutral',
       shade: 'dark',
-      class: 'bg-neutral-200 dark:bg-neutral-800',
+      class: 'bg-breakdown-label',
     },
   ],
   defaultVariants: {

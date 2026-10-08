@@ -127,7 +127,10 @@ function WebcastsPage() {
       {currentEvents.length > 0 && (
         <section className="mb-8">
           <h2 className="mb-3 text-2xl font-medium">Live Now</h2>
-          <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-4"
+          >
             {currentEvents.map((event) => (
               <EventWebcastCard key={event.key} event={event} />
             ))}
@@ -143,7 +146,11 @@ function WebcastsPage() {
               <h3 className="mb-2 text-lg font-medium text-muted-foreground">
                 {group.label}
               </h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div
+                className="grid
+                  grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))]
+                  gap-4"
+              >
                 {group.events.map((event) => (
                   <EventWebcastCard key={event.key} event={event} />
                 ))}
@@ -161,7 +168,11 @@ function WebcastsPage() {
               <h3 className="mb-2 text-lg font-medium text-muted-foreground">
                 {group.label}
               </h3>
-              <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
+              <div
+                className="grid
+                  grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))]
+                  gap-4"
+              >
                 {group.events.map((event) => (
                   <EventWebcastCard key={event.key} event={event} />
                 ))}

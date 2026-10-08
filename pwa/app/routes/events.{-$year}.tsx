@@ -202,10 +202,7 @@ function YearEventsPage() {
         </h1>
         {officialGroups.length > 0 && (
           <>
-            <h2
-              id="official"
-              className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
-            >
+            <h2 id="official" className="mt-5 text-3xl">
               Official Events{' '}
               <small className="text-xl text-muted-foreground">
                 {officialGroups.reduce(
@@ -226,10 +223,7 @@ function YearEventsPage() {
         )}
         {unofficialGroups.length > 0 && (
           <>
-            <h2
-              id="unofficial"
-              className="mt-5 scroll-mt-12 text-3xl lg:scroll-mt-4"
-            >
+            <h2 id="unofficial" className="mt-5 text-3xl">
               Unofficial Events{' '}
               <small className="text-xl text-muted-foreground">
                 {unofficialGroups.reduce(

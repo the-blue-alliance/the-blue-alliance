@@ -48,7 +48,7 @@ interface EventTeamsTabProps {
 }
 
 const ROW_TARGET_CLASS = `block text-sm wrap-break-word after:absolute
-  after:inset-0 hover:underline focus-visible:outline-none
+  after:inset-0 hover:underline focus-visible:[outline:2px_solid_transparent]
   focus-visible:after:outline-2 focus-visible:after:outline-ring`;
 
 function TeamLabel({ team }: { team: Team }) {
@@ -160,7 +160,10 @@ export default function EventTeamsTab({
             : 'No teams match your search'}
         </p>
       ) : (
-        <div className="grid gap-x-6 lg:grid-cols-2">
+        <div
+          className="grid
+            grid-cols-[repeat(auto-fit,minmax(min(100%,25rem),1fr))] gap-x-6"
+        >
           {splitIntoNChunks(filtered, 2).map((chunk, index) => (
             <ul key={index} className="divide-y border-b lg:border-t">
               {chunk.map(({ team, pit, teamMatches, avatar, photo }) => (

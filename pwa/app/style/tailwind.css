@@ -36,4 +36,18 @@
 
 :root {
   --footer-inset-top: 4rem;
+  --header-height: 3.5rem;
+  --toc-bar-height: 2.5rem;
+}
+
+html {
+  scroll-padding-block-start: calc(var(--header-height) + 1rem);
+}
+
+@media (width < 64rem) {
+  html:has([data-toc-bar]) {
+    scroll-padding-block-start: calc(
+      var(--header-height) + var(--toc-bar-height) + 1rem
+    );
+  }
 }

@@ -12,8 +12,9 @@ const TitledCard = forwardRef<
     className={cn(
       `flex flex-col justify-center overflow-hidden rounded-lg border
       border-border/50 bg-linear-to-br from-muted/30 to-muted/10 px-6 py-8
-      text-center shadow-sm transition-all duration-300 ease-in-out
-      hover:-translate-y-1 hover:shadow-md`,
+      text-center shadow-sm transition-shadow duration-300 ease-in-out
+      hover:-translate-y-1 hover:shadow-md
+      motion-safe:transition-[box-shadow,translate]`,
       className,
     )}
     {...props}

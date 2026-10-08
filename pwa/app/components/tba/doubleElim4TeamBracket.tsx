@@ -134,7 +134,8 @@ const _BracketMatch = forwardRef<
       aria-label={matchLabel}
       className={cn(
         `mb-2 min-w-45 overflow-hidden rounded-md border border-neutral-200
-        bg-background transition-all duration-200 dark:border-neutral-700`,
+        bg-background transition-[border-color,box-shadow] duration-200
+        dark:border-neutral-700`,
         {
           [`border-transparent shadow-lg ring-2 ring-alliance-red-accent/75
           dark:border-transparent`]: isHighlighted && result.redWon,
@@ -154,7 +155,7 @@ const _BracketMatch = forwardRef<
               (
               <span
                 className={cn(
-                  'transition-all duration-200',
+                  'transition-colors duration-200',
                   isRedHighlighted &&
                     `rounded bg-red-100 px-1 text-sm dark:bg-red-900
                     dark:text-white`,
@@ -165,7 +166,7 @@ const _BracketMatch = forwardRef<
               vs{' '}
               <span
                 className={cn(
-                  'transition-all duration-200',
+                  'transition-colors duration-200',
                   isBlueHighlighted &&
                     `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
                     dark:text-white`,
