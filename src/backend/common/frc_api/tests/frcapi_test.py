@@ -507,6 +507,25 @@ def test_get_cached_gcs_files_same_paths_downloaded_or_cached(
     assert cached == expected
 
 
+def test_get_cached_gcs_files_rejects_paths_outside_cache(
+    monkeypatch: pytest.MonkeyPatch, tmp_path
+) -> None:
+    from backend.common.frc_api import frc_api as frc_api_module
+
+    gcs_dir = "../escape/"
+    monkeypatch.setattr(
+        frc_api_module, "__file__", str(tmp_path / "pkg" / "frc_api.py")
+    )
+    with (
+        patch("backend.common.storage.get_files", return_value=[f"{gcs_dir}a.json"]),
+        patch("backend.common.storage.read", return_value=b"{}") as mock_read,
+        pytest.raises(ValueError),
+    ):
+        FRCAPI.get_cached_gcs_files(gcs_dir)
+    mock_read.assert_not_called()
+    assert not (tmp_path / "pkg" / "escape").exists()
+
+
 def test_simulated_v2_schedule_uses_hybrid_endpoint() -> None:
     api = FRCAPI("zach", sim_time=datetime.datetime(2022, 3, 1), sim_api_version="v2.0")
     with patch.object(FRCAPI, "_get_api_response_from_gcs") as mock_gcs:
