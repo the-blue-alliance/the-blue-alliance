@@ -18,7 +18,7 @@ import {
 
 import HelpCircleIcon from '~icons/lucide/help-circle';
 
-import { EventColors, TeamWithColor } from '~/api/colors';
+import { EventColors } from '~/api/colors';
 import { EventCoprs } from '~/api/tba/read';
 import { Card, CardContent, CardHeader, CardTitle } from '~/components/ui/card';
 import { ChartContainer } from '~/components/ui/chart';
@@ -87,25 +87,12 @@ function generateDomain(dataMin: number, dataMax: number): [number, number] {
   return [-0.1, 1 + DOMAIN_PADDING_RATIO];
 }
 
-// If a team has a white primary color, it doesn't show up on the chart
-function getNonWhiteTeamColor(
-  colors: EventColors,
-  teamKey: string,
-): TeamWithColor {
-  const color = colors.teams[teamKey.substring(3)] ?? {
-    teamNumber: 0,
-    colors: {
-      verified: false,
-      primaryHex: 'hsl(var(--primary))',
-      secondaryHex: 'hsl(var(--primary))',
-    },
-  };
-
-  if (color.colors?.primaryHex === '#ffffff') {
-    return { ...color, colors: { ...color.colors, primaryHex: '#000000' } };
-  }
-
-  return color;
+// Teams with no colors on record get a neutral theme color.
+function getTeamFill(colors: EventColors, teamKey: string): string {
+  return (
+    colors.teams[teamKey.substring(3)]?.colors?.primaryHex ??
+    'var(--muted-foreground)'
+  );
 }
 
 export default function CoprScatterChart({
@@ -188,11 +175,11 @@ export default function CoprScatterChart({
         <ChartContainer
           className="aspect-4/5 sm:aspect-video"
           config={{
-            teamKey: { color: 'hsl(var(--primary))' },
-            valueX: { label: selectedXCopr, color: 'hsl(var(--primary))' },
-            valueY: { label: selectedYCopr, color: 'hsl(var(--primary))' },
+            teamKey: { color: 'var(--primary)' },
+            valueX: { label: selectedXCopr, color: 'var(--primary)' },
+            valueY: { label: selectedYCopr, color: 'var(--primary)' },
             label: {
-              color: 'hsl(var(--primary))',
+              color: 'var(--primary)',
             },
           }}
         >
@@ -264,12 +251,13 @@ export default function CoprScatterChart({
             />
             <Scatter>
               {data.map((entry, index) => (
+                // Outline every dot in the theme's foreground so team colors
+                // close to the card background (white, black) stay visible.
                 <Cell
                   key={`cell-${index}`}
-                  fill={
-                    getNonWhiteTeamColor(colors, entry.teamKey).colors
-                      ?.primaryHex
-                  }
+                  fill={getTeamFill(colors, entry.teamKey)}
+                  stroke="var(--card-foreground)"
+                  strokeWidth={1}
                 />
               ))}
 
