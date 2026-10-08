@@ -11,6 +11,7 @@ from backend.common.frc_api.types import ScoreDetailModelAlliance2016
 from backend.common.game_specific.base import (
     BonusRpBreakdownSeasonGameConfig,
     PredictionStatConfig,
+    safe_div,
     TCriteria,
 )
 from backend.common.models.event_insights import EventInsights
@@ -148,11 +149,12 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
         foul_scores = 0
         high_score: Tuple[int, str, str] = (0, "", "")  # score, match key, match name
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
             if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -215,7 +217,6 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
                             challenges += 1
                         elif alliance_breakdown[tower_face] == "Scaled":
                             scales += 1
-                    has_insights = True
                 except Exception:
                     msg = "Event insights failed for {}".format(match.key.id())
                     # event.get() below should be cheap since it's backed by context cache
@@ -223,13 +224,13 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
                         logging.warning(msg)
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        opportunities_1x = 2 * finished_matches  # once per alliance
-        opportunities_3x = 6 * finished_matches  # 3x per alliance
+        opportunities_1x = 2 * breakdown_matches  # once per alliance
+        opportunities_3x = 6 * breakdown_matches  # 3x per alliance
         event_insights = {
             "LowBar": [0, 0, 0],
             "A_ChevalDeFrise": [0, 0, 0],
@@ -240,36 +241,36 @@ class GameSpecifics2016(BonusRpBreakdownSeasonGameConfig[ScoreDetailModelAllianc
             "C_Drawbridge": [0, 0, 0],
             "D_RoughTerrain": [0, 0, 0],
             "D_RockWall": [0, 0, 0],
-            "average_high_goals": float(high_goals) / (2 * finished_matches),
-            "average_low_goals": float(low_goals) / (2 * finished_matches),
+            "average_high_goals": safe_div(high_goals, 2 * breakdown_matches),
+            "average_low_goals": safe_div(low_goals, 2 * breakdown_matches),
             "breaches": [
                 breaches,
                 opportunities_1x,
-                100.0 * float(breaches) / opportunities_1x,
+                safe_div(100.0 * breaches, opportunities_1x),
             ],  # [# success, # opportunities, %]
             "scales": [
                 scales,
                 opportunities_3x,
-                100.0 * float(scales) / opportunities_3x,
+                safe_div(100.0 * scales, opportunities_3x),
             ],
             "challenges": [
                 challenges,
                 opportunities_3x,
-                100.0 * float(challenges) / opportunities_3x,
+                safe_div(100.0 * challenges, opportunities_3x),
             ],
             "captures": [
                 captures,
                 opportunities_1x,
-                100.0 * float(captures) / opportunities_1x,
+                safe_div(100.0 * captures, opportunities_1x),
             ],
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / (2 * finished_matches),
-            "average_auto_score": float(auto_scores) / (2 * finished_matches),
-            "average_crossing_score": float(crossing_scores) / (2 * finished_matches),
-            "average_boulder_score": float(boulder_scores) / (2 * finished_matches),
-            "average_tower_score": float(tower_scores) / (2 * finished_matches),
-            "average_foul_score": float(foul_scores) / (2 * finished_matches),
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_auto_score": safe_div(auto_scores, 2 * breakdown_matches),
+            "average_crossing_score": safe_div(crossing_scores, 2 * breakdown_matches),
+            "average_boulder_score": safe_div(boulder_scores, 2 * breakdown_matches),
+            "average_tower_score": safe_div(tower_scores, 2 * breakdown_matches),
+            "average_foul_score": safe_div(foul_scores, 2 * breakdown_matches),
             "high_score": list(high_score),  # [score, match key, match name]
         }
         for defense, opportunities in defense_opportunities.items():

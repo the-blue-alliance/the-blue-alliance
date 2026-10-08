@@ -15,6 +15,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2016
 from backend.common.game_specific.seasons.game_specifics_2016 import GameSpecifics2016
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     put_event,
@@ -108,11 +110,8 @@ def test_tiebreak_criteria_without_breakdown_data() -> None:
 _BROKEN_BREAKDOWN = {"red": {}, "blue": {}}
 
 
-def test_calculate_event_insights_ignores_unplayed_and_breakdownless_matches() -> None:
-    matches = [
-        build_match("2016test", "qm", 1, -1, -1, None),
-        build_match("2016test", "qm", 2, 30, 10, None),
-    ]
+def test_calculate_event_insights_ignores_unplayed_matches() -> None:
+    matches = [build_match("2016test", "qm", 1, -1, -1, None)]
     assert GameSpecifics2016().calculate_event_insights(matches) == {
         "qual": None,
         "playoff": None,
@@ -130,7 +129,7 @@ def test_calculate_event_insights_logs_failed_matches(
     broken = build_match("2016test", "qm", 1, 30, 10, _BROKEN_BREAKDOWN)
     with caplog.at_level(logging.INFO):
         insights = GameSpecifics2016().calculate_event_insights([broken])
-    assert insights == {"qual": None, "playoff": None}
+    assert insights is not None and insights["qual"] is not None
     failures = [
         record
         for record in caplog.records
@@ -138,3 +137,13 @@ def test_calculate_event_insights_logs_failed_matches(
     ]
     assert failures
     assert all(record.levelno == level for record in failures)
+
+
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2016(), "2016test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2016nyny_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2016nyny")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2016(), matches)

@@ -13,6 +13,7 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2020
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
 )
@@ -132,11 +133,12 @@ class GameSpecifics2020(
         foul_scores = 0
         high_score: Tuple[int, str, str] = (0, "", "")
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
             if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -150,7 +152,7 @@ class GameSpecifics2020(
                 high_score = (win_score, match.key_name, match.short_name)
 
             score_breakdown = match.score_breakdown
-            if score_breakdown is None:
+            if not score_breakdown:
                 continue
 
             for alliance_color in ALLIANCE_COLORS:
@@ -222,7 +224,6 @@ class GameSpecifics2020(
                         else 0
                     )
                     foul_scores += alliance_breakdown["foulPoints"]
-                    has_insights = True
                 except Exception as e:
                     msg = "Event insights failed for {}: {}".format(match.key.id(), e)
                     # event.get() below should be cheap since it's backed by context cache
@@ -231,124 +232,130 @@ class GameSpecifics2020(
                         logging.warning(traceback.format_exc())
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        opportunities_1x = 2 * finished_matches
-        opportunities_3x = 6 * finished_matches
+        opportunities_1x = 2 * breakdown_matches
+        opportunities_3x = 6 * breakdown_matches
         event_insights = {
             # Auto
-            "average_init_line_points_auto": float(init_line_auto) / opportunities_1x,
-            "average_cell_count_bottom_auto": float(cell_count_bottom_auto)
-            / opportunities_1x,
-            "average_cell_count_outer_auto": float(cell_count_outer_auto)
-            / opportunities_1x,
-            "average_cell_count_inner_auto": float(cell_count_inner_auto)
-            / opportunities_1x,
-            "average_cell_count_auto": float(
-                cell_count_bottom_auto + cell_count_outer_auto + cell_count_inner_auto
-            )
-            / opportunities_1x,
-            "average_cell_points_auto": float(cell_points_auto) / opportunities_1x,
-            "average_points_auto": float(points_auto) / opportunities_1x,
+            "average_init_line_points_auto": safe_div(init_line_auto, opportunities_1x),
+            "average_cell_count_bottom_auto": safe_div(
+                cell_count_bottom_auto, opportunities_1x
+            ),
+            "average_cell_count_outer_auto": safe_div(
+                cell_count_outer_auto, opportunities_1x
+            ),
+            "average_cell_count_inner_auto": safe_div(
+                cell_count_inner_auto, opportunities_1x
+            ),
+            "average_cell_count_auto": safe_div(
+                cell_count_bottom_auto + cell_count_outer_auto + cell_count_inner_auto,
+                opportunities_1x,
+            ),
+            "average_cell_points_auto": safe_div(cell_points_auto, opportunities_1x),
+            "average_points_auto": safe_div(points_auto, opportunities_1x),
             # Teleop
-            "average_endgame_points": float(climb_park_teleop) / opportunities_1x,
-            "average_num_robots_hanging": float(robots_hanging) / opportunities_1x,
-            "average_cell_count_bottom_teleop": float(cell_count_bottom_teleop)
-            / opportunities_1x,
-            "average_cell_count_outer_teleop": float(cell_count_outer_teleop)
-            / opportunities_1x,
-            "average_cell_count_inner_teleop": float(cell_count_inner_teleop)
-            / opportunities_1x,
-            "average_cell_count_teleop": float(
+            "average_endgame_points": safe_div(climb_park_teleop, opportunities_1x),
+            "average_num_robots_hanging": safe_div(robots_hanging, opportunities_1x),
+            "average_cell_count_bottom_teleop": safe_div(
+                cell_count_bottom_teleop, opportunities_1x
+            ),
+            "average_cell_count_outer_teleop": safe_div(
+                cell_count_outer_teleop, opportunities_1x
+            ),
+            "average_cell_count_inner_teleop": safe_div(
+                cell_count_inner_teleop, opportunities_1x
+            ),
+            "average_cell_count_teleop": safe_div(
                 cell_count_bottom_teleop
                 + cell_count_outer_teleop
-                + cell_count_inner_teleop
-            )
-            / opportunities_1x,
-            "average_cell_points_teleop": float(cell_points_teleop) / opportunities_1x,
-            "average_control_panel_points": float(control_panel_points)
-            / opportunities_1x,
-            "average_points_teleop": float(points_teleop) / opportunities_1x,
+                + cell_count_inner_teleop,
+                opportunities_1x,
+            ),
+            "average_cell_points_teleop": safe_div(
+                cell_points_teleop, opportunities_1x
+            ),
+            "average_control_panel_points": safe_div(
+                control_panel_points, opportunities_1x
+            ),
+            "average_points_teleop": safe_div(points_teleop, opportunities_1x),
             # Overall
             "exit_init_line_count": [
                 exit_init_line_count,
                 opportunities_3x,
-                100.0 * float(exit_init_line_count) / opportunities_3x,
+                safe_div(100.0 * exit_init_line_count, opportunities_3x),
             ],
             "achieve_stage1_count": [
                 achieve_stage1_count,
                 opportunities_1x,
-                100.0 * float(achieve_stage1_count) / opportunities_1x,
+                safe_div(100.0 * achieve_stage1_count, opportunities_1x),
             ],
             "achieve_stage2_count": [
                 achieve_stage2_count,
                 opportunities_1x,
-                100.0 * float(achieve_stage2_count) / opportunities_1x,
+                safe_div(100.0 * achieve_stage2_count, opportunities_1x),
             ],
             "achieve_stage3_count": [
                 achieve_stage3_count,
                 opportunities_1x,
-                100.0 * float(achieve_stage3_count) / opportunities_1x,
+                safe_div(100.0 * achieve_stage3_count, opportunities_1x),
             ],
             "park_count": [
                 park_count,
                 opportunities_3x,
-                100.0 * float(park_count) / opportunities_3x,
+                safe_div(100.0 * park_count, opportunities_3x),
             ],
             "hang_count": [
                 hang_count,
                 opportunities_3x,
-                100.0 * float(hang_count) / opportunities_3x,
+                safe_div(100.0 * hang_count, opportunities_3x),
             ],
             "generator_level_count": [
                 generator_level_count,
                 opportunities_1x,
-                100.0 * float(generator_level_count) / opportunities_1x,
+                safe_div(100.0 * generator_level_count, opportunities_1x),
             ],
             "generator_operational_rp_achieved": [
                 generator_operational_count,
                 opportunities_1x,
-                100.0 * float(generator_operational_count) / opportunities_1x,
+                safe_div(100.0 * generator_operational_count, opportunities_1x),
             ],
             "generator_energized_rp_achieved": [
                 generator_energized_count,
                 opportunities_1x,
-                100.0 * float(generator_energized_count) / opportunities_1x,
+                safe_div(100.0 * generator_energized_count, opportunities_1x),
             ],
             "unicorn_matches": [
                 unicorn_matches,
                 opportunities_1x,
-                100.0 * float(unicorn_matches) / opportunities_1x,
+                safe_div(100.0 * unicorn_matches, opportunities_1x),
             ],
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / opportunities_1x,
-            "average_cell_count_bottom": float(
-                cell_count_bottom_auto + cell_count_bottom_teleop
-            )
-            / opportunities_1x,
-            "average_cell_count_outer": float(
-                cell_count_outer_auto + cell_count_outer_teleop
-            )
-            / opportunities_1x,
-            "average_cell_count_inner": float(
-                cell_count_inner_auto + cell_count_inner_teleop
-            )
-            / opportunities_1x,
-            "average_cell_count": float(
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_cell_count_bottom": safe_div(
+                cell_count_bottom_auto + cell_count_bottom_teleop, opportunities_1x
+            ),
+            "average_cell_count_outer": safe_div(
+                cell_count_outer_auto + cell_count_outer_teleop, opportunities_1x
+            ),
+            "average_cell_count_inner": safe_div(
+                cell_count_inner_auto + cell_count_inner_teleop, opportunities_1x
+            ),
+            "average_cell_count": safe_div(
                 cell_count_bottom_auto
                 + cell_count_outer_auto
                 + cell_count_inner_auto
                 + cell_count_bottom_teleop
                 + cell_count_outer_teleop
-                + cell_count_inner_teleop
-            )
-            / opportunities_1x,
-            "average_cell_score": float(total_cell) / opportunities_1x,
-            "average_foul_score": float(foul_scores) / opportunities_1x,
+                + cell_count_inner_teleop,
+                opportunities_1x,
+            ),
+            "average_cell_score": safe_div(total_cell, opportunities_1x),
+            "average_foul_score": safe_div(foul_scores, opportunities_1x),
             "high_score": list(high_score),
         }
         return event_insights

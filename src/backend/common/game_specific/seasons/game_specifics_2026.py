@@ -2,13 +2,12 @@ from __future__ import annotations
 
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
-from pyre_extensions import none_throws
-
 from backend.common.consts.alliance_color import ALLIANCE_COLORS, AllianceColor
 from backend.common.consts.comp_level import CompLevel
 from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     StatAccessor,
     SuccessRateCounter,
     TCriteria,
@@ -149,13 +148,14 @@ class GameSpecifics2026(
 
         high_score: Tuple[int, str, str] = (0, "", "")
 
-        finished_matches = 0
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
 
         for match in matches:
             if not match.has_been_played:
                 continue
 
-            finished_matches += 1
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -164,11 +164,17 @@ class GameSpecifics2026(
             if win_score > high_score[0]:
                 high_score = (win_score, match.key_name, match.short_name)
 
-            if match.score_breakdown is None:
-                continue
+            total_scores += red_score + blue_score
+            total_win_margins += win_score - min(red_score, blue_score)
+            total_winning_scores += win_score
 
-            red_sb = none_throws(match.score_breakdown)[AllianceColor.RED]
-            blue_sb = none_throws(match.score_breakdown)[AllianceColor.BLUE]
+            score_breakdown = match.score_breakdown
+            if not score_breakdown:
+                continue
+            breakdown_matches += 1
+
+            red_sb = score_breakdown[AllianceColor.RED]
+            blue_sb = score_breakdown[AllianceColor.BLUE]
 
             if red_sb.get("energizedAchieved"):
                 energized_rp_count += 1
@@ -240,88 +246,84 @@ class GameSpecifics2026(
                 if tower_level == "Level3":
                     endgame_climb_count[2] += 1
 
-            total_scores += red_score + blue_score
-            total_win_margins += win_score - min(red_score, blue_score)
-            total_winning_scores += win_score
-
-        if finished_matches == 0:
+        if scored_matches == 0:
             return None
 
         return {
             "energized_rp_count": [
                 energized_rp_count,
-                finished_matches * 2,
-                100.0 * energized_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * energized_rp_count, breakdown_matches * 2),
             ],
             "supercharged_rp_count": [
                 supercharged_rp_count,
-                finished_matches * 2,
-                100.0 * supercharged_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * supercharged_rp_count, breakdown_matches * 2),
             ],
             "traversal_rp_count": [
                 traversal_rp_count,
-                finished_matches * 2,
-                100.0 * traversal_rp_count / (finished_matches * 2),
+                breakdown_matches * 2,
+                safe_div(100.0 * traversal_rp_count, breakdown_matches * 2),
             ],
             "six_rp_count": [
                 six_rp_count,
-                finished_matches,
-                100.0 * six_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * six_rp_count, breakdown_matches),
             ],
             "nine_rp_count": [
                 nine_rp_count,
-                finished_matches,
-                100.0 * nine_rp_count / finished_matches,
+                breakdown_matches,
+                safe_div(100.0 * nine_rp_count, breakdown_matches),
             ],
             "auto_win_conversion": [
                 auto_win_conversion,
-                finished_matches - undefined_auto_conversion_matches,
+                breakdown_matches - undefined_auto_conversion_matches,
                 (
                     0
-                    if (finished_matches - undefined_auto_conversion_matches) == 0
+                    if (breakdown_matches - undefined_auto_conversion_matches) == 0
                     else 100.0
                     * auto_win_conversion
-                    / (finished_matches - undefined_auto_conversion_matches)
+                    / (breakdown_matches - undefined_auto_conversion_matches)
                 ),
             ],
             "auto_fuel_scored": [
                 auto_fuel_scored,
-                auto_fuel_scored / (finished_matches * 2),
-                auto_fuel_scored / (finished_matches * 6),
+                safe_div(auto_fuel_scored, breakdown_matches * 2),
+                safe_div(auto_fuel_scored, breakdown_matches * 6),
             ],
             "teleop_fuel_scored": [
                 teleop_fuel_scored,
-                teleop_fuel_scored / (finished_matches * 2),
-                teleop_fuel_scored / (finished_matches * 6),
+                safe_div(teleop_fuel_scored, breakdown_matches * 2),
+                safe_div(teleop_fuel_scored, breakdown_matches * 6),
             ],
             "total_fuel_scored": [
                 total_fuel_scored,
-                total_fuel_scored / (finished_matches * 2),
-                total_fuel_scored / (finished_matches * 6),
+                safe_div(total_fuel_scored, breakdown_matches * 2),
+                safe_div(total_fuel_scored, breakdown_matches * 6),
             ],
             "auto_climb_count": [
                 auto_climb_count,
-                finished_matches * 4,
-                100.0 * auto_climb_count / (finished_matches * 4),
+                breakdown_matches * 4,
+                safe_div(100.0 * auto_climb_count, breakdown_matches * 4),
             ],
             "level1_climb_count": [
                 endgame_climb_count[0],
-                finished_matches * 6,
-                100.0 * endgame_climb_count[0] / (finished_matches * 6),
+                breakdown_matches * 6,
+                safe_div(100.0 * endgame_climb_count[0], breakdown_matches * 6),
             ],
             "level2_climb_count": [
                 endgame_climb_count[1],
-                finished_matches * 6,
-                100.0 * endgame_climb_count[1] / (finished_matches * 6),
+                breakdown_matches * 6,
+                safe_div(100.0 * endgame_climb_count[1], breakdown_matches * 6),
             ],
             "level3_climb_count": [
                 endgame_climb_count[2],
-                finished_matches * 6,
-                100.0 * endgame_climb_count[2] / (finished_matches * 6),
+                breakdown_matches * 6,
+                safe_div(100.0 * endgame_climb_count[2], breakdown_matches * 6),
             ],
-            "average_score": total_scores / (finished_matches * 2),
-            "average_win_margin": total_win_margins / finished_matches,
-            "average_winning_score": total_winning_scores / finished_matches,
+            "average_score": total_scores / (scored_matches * 2),
+            "average_win_margin": total_win_margins / scored_matches,
+            "average_winning_score": total_winning_scores / scored_matches,
             "high_score": high_score,
         }
 

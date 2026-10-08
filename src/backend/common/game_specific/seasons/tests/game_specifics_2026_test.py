@@ -12,6 +12,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2026
 from backend.common.game_specific.seasons.game_specifics_2026 import GameSpecifics2026
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     tiebreak_winner,
@@ -468,6 +470,16 @@ def test_calculate_event_insights_splits_quals_and_playoffs() -> None:
     insights = _insights([playoff])
     assert insights["qual"] is None
     assert none_throws(insights["playoff"])["high_score"] == (30, "2026casj_f1m1", "F1")
+
+
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2026(), "2026test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2026marea_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2026marea")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2026(), matches)
 
 
 def test_auto_climb_counters_agree() -> None:

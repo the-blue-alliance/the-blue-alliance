@@ -14,6 +14,7 @@ from backend.common.consts.event_type import SEASON_EVENT_TYPES
 from backend.common.frc_api.types import ScoreDetailModelAlliance2018
 from backend.common.game_specific.base import (
     PredictionStatConfig,
+    safe_div,
     TCriteria,
     TotalPointsScoreBonusRpGameConfig,
 )
@@ -108,11 +109,12 @@ class GameSpecifics2018(
         foul_scores = 0
         high_score: Tuple[int, str, str] = (0, "", "")  # score, match key, match name
 
-        finished_matches = 0
-        has_insights = False
+        scored_matches = 0  # played matches, for alliance-score stats
+        breakdown_matches = 0  # played matches with a score breakdown
         for match in matches:
             if not match.has_been_played:
                 continue
+            scored_matches += 1
 
             red_score = match.alliances[AllianceColor.RED]["score"]
             blue_score = match.alliances[AllianceColor.BLUE]["score"]
@@ -269,7 +271,6 @@ class GameSpecifics2018(
                     )
 
                     foul_scores += alliance_breakdown["foulPoints"]
-                    has_insights = True
                 except Exception:
                     msg = "Event insights failed for {}".format(match.key.id())
                     # event.get() below should be cheap since it's backed by context cache
@@ -278,123 +279,124 @@ class GameSpecifics2018(
                         logging.warning(traceback.format_exc())
                     else:
                         logging.info(msg)
-            finished_matches += 1
+            breakdown_matches += 1
 
-        if not has_insights:
+        if scored_matches == 0:
             return None
 
-        opportunities_1x = 2 * finished_matches  # once per alliance
-        opportunities_3x = 6 * finished_matches  # 3x per alliance
+        opportunities_1x = 2 * breakdown_matches  # once per alliance
+        opportunities_3x = 6 * breakdown_matches  # 3x per alliance
         event_insights = {
             # Auto
-            "average_run_points_auto": float(run_points_auto) / (2 * finished_matches),
-            "average_scale_ownership_points_auto": float(scale_ownership_time_auto * 2)
-            / (2 * finished_matches),
-            "average_switch_ownership_points_auto": float(
-                switch_ownership_time_auto * 2
-            )
-            / (2 * finished_matches),
-            "average_points_auto": float(points_auto) / (2 * finished_matches),
+            "average_run_points_auto": safe_div(run_points_auto, 2 * breakdown_matches),
+            "average_scale_ownership_points_auto": safe_div(
+                scale_ownership_time_auto * 2, 2 * breakdown_matches
+            ),
+            "average_switch_ownership_points_auto": safe_div(
+                switch_ownership_time_auto * 2, 2 * breakdown_matches
+            ),
+            "average_points_auto": safe_div(points_auto, 2 * breakdown_matches),
             "run_counts_auto": [
                 run_counts_auto,
                 opportunities_3x,
-                100.0 * float(run_counts_auto) / opportunities_3x,
+                safe_div(100.0 * run_counts_auto, opportunities_3x),
             ],
             "switch_owned_counts_auto": [
                 switch_owned_counts_auto,
                 opportunities_1x,
-                100.0 * float(switch_owned_counts_auto) / opportunities_1x,
+                safe_div(100.0 * switch_owned_counts_auto, opportunities_1x),
             ],
             # Teleop
-            "average_scale_ownership_points_teleop": float(scale_ownership_time_teleop)
-            / (2 * finished_matches),
-            "average_switch_ownership_points_teleop": float(
-                switch_ownership_time_teleop
-            )
-            / (2 * finished_matches),
-            "average_points_teleop": float(points_teleop) / (2 * finished_matches),
+            "average_scale_ownership_points_teleop": safe_div(
+                scale_ownership_time_teleop, 2 * breakdown_matches
+            ),
+            "average_switch_ownership_points_teleop": safe_div(
+                switch_ownership_time_teleop, 2 * breakdown_matches
+            ),
+            "average_points_teleop": safe_div(points_teleop, 2 * breakdown_matches),
             # Overall
             "climb_counts": [
                 climb_counts,
                 opportunities_3x,
-                100.0 * float(climb_counts) / opportunities_3x,
+                safe_div(100.0 * climb_counts, opportunities_3x),
             ],
             "force_played_counts": [
                 force_played_counts,
                 opportunities_1x,
-                100.0 * float(force_played_counts) / opportunities_1x,
+                safe_div(100.0 * force_played_counts, opportunities_1x),
             ],
             "levitate_played_counts": [
                 levitate_played_counts,
                 opportunities_1x,
-                100.0 * float(levitate_played_counts) / opportunities_1x,
+                safe_div(100.0 * levitate_played_counts, opportunities_1x),
             ],
             "boost_played_counts": [
                 boost_played_counts,
                 opportunities_1x,
-                100.0 * float(boost_played_counts) / opportunities_1x,
+                safe_div(100.0 * boost_played_counts, opportunities_1x),
             ],
-            "average_scale_ownership_points": float(
-                scale_ownership_time_auto * 2 + scale_ownership_time_teleop
-            )
-            / (2 * finished_matches),
-            "average_switch_ownership_points": float(
-                switch_ownership_time_auto * 2 + switch_ownership_time_teleop
-            )
-            / (2 * finished_matches),
-            "winning_scale_ownership_percentage_auto": 100.0
-            * float(winning_scale_ownership_percentage_auto)
-            / finished_matches,
-            "winning_own_switch_ownership_percentage_auto": 100.0
-            * float(winning_own_switch_ownership_percentage_auto)
-            / finished_matches,
-            "winning_scale_ownership_percentage_teleop": 100.0
-            * float(winning_scale_ownership_percentage_teleop)
-            / finished_matches,
-            "winning_own_switch_ownership_percentage_teleop": 100.0
-            * float(winning_own_switch_ownership_percentage_teleop)
-            / finished_matches,
-            "winning_opp_switch_denial_percentage_teleop": 100.0
-            * float(winning_opp_switch_denial_percentage_teleop)
-            / finished_matches,
-            "winning_scale_ownership_percentage": 100.0
-            * float(winning_scale_ownership_percentage)
-            / finished_matches,
-            "winning_own_switch_ownership_percentage": 100.0
-            * float(winning_own_switch_ownership_percentage)
-            / finished_matches,
-            "scale_neutral_percentage_auto": 100.0
-            * float(scale_neutral_percentage_auto)
-            / (2 * finished_matches),
-            "scale_neutral_percentage_teleop": 100.0
-            * float(scale_neutral_percentage_teleop)
-            / (2 * finished_matches),
-            "scale_neutral_percentage": 100.0
-            * float(scale_neutral_percentage)
-            / (2 * finished_matches),
-            "average_force_played": float(force_played) / force_played_counts,
-            "average_boost_played": float(boost_played) / boost_played_counts,
-            "average_vault_points": float(vault_points) / (2 * finished_matches),
-            "average_endgame_points": float(endgame_points) / (2 * finished_matches),
-            "average_win_score": float(winning_scores) / finished_matches,
-            "average_win_margin": float(win_margins) / finished_matches,
-            "average_score": float(total_scores) / (2 * finished_matches),
-            "average_foul_score": float(foul_scores) / (2 * finished_matches),
+            "average_scale_ownership_points": safe_div(
+                scale_ownership_time_auto * 2 + scale_ownership_time_teleop,
+                2 * breakdown_matches,
+            ),
+            "average_switch_ownership_points": safe_div(
+                switch_ownership_time_auto * 2 + switch_ownership_time_teleop,
+                2 * breakdown_matches,
+            ),
+            "winning_scale_ownership_percentage_auto": safe_div(
+                100.0 * winning_scale_ownership_percentage_auto, breakdown_matches
+            ),
+            "winning_own_switch_ownership_percentage_auto": safe_div(
+                100.0 * winning_own_switch_ownership_percentage_auto, breakdown_matches
+            ),
+            "winning_scale_ownership_percentage_teleop": safe_div(
+                100.0 * winning_scale_ownership_percentage_teleop, breakdown_matches
+            ),
+            "winning_own_switch_ownership_percentage_teleop": safe_div(
+                100.0 * winning_own_switch_ownership_percentage_teleop,
+                breakdown_matches,
+            ),
+            "winning_opp_switch_denial_percentage_teleop": safe_div(
+                100.0 * winning_opp_switch_denial_percentage_teleop, breakdown_matches
+            ),
+            "winning_scale_ownership_percentage": safe_div(
+                100.0 * winning_scale_ownership_percentage, breakdown_matches
+            ),
+            "winning_own_switch_ownership_percentage": safe_div(
+                100.0 * winning_own_switch_ownership_percentage, breakdown_matches
+            ),
+            "scale_neutral_percentage_auto": safe_div(
+                100.0 * scale_neutral_percentage_auto, 2 * breakdown_matches
+            ),
+            "scale_neutral_percentage_teleop": safe_div(
+                100.0 * scale_neutral_percentage_teleop, 2 * breakdown_matches
+            ),
+            "scale_neutral_percentage": safe_div(
+                100.0 * scale_neutral_percentage, 2 * breakdown_matches
+            ),
+            "average_force_played": safe_div(force_played, force_played_counts),
+            "average_boost_played": safe_div(boost_played, boost_played_counts),
+            "average_vault_points": safe_div(vault_points, 2 * breakdown_matches),
+            "average_endgame_points": safe_div(endgame_points, 2 * breakdown_matches),
+            "average_win_score": float(winning_scores) / scored_matches,
+            "average_win_margin": float(win_margins) / scored_matches,
+            "average_score": float(total_scores) / (2 * scored_matches),
+            "average_foul_score": safe_div(foul_scores, 2 * breakdown_matches),
             "high_score": list(high_score),  # [score, match key, match name]
             "auto_quest_achieved": [
                 auto_quest_achieved,
                 opportunities_1x,
-                100.0 * float(auto_quest_achieved) / opportunities_1x,
+                safe_div(100.0 * auto_quest_achieved, opportunities_1x),
             ],
             "face_the_boss_achieved": [
                 face_the_boss_achieved,
                 opportunities_1x,
-                100.0 * float(face_the_boss_achieved) / opportunities_1x,
+                safe_div(100.0 * face_the_boss_achieved, opportunities_1x),
             ],
             "unicorn_matches": [
                 unicorn_matches,
                 opportunities_1x,
-                100.0 * float(unicorn_matches) / opportunities_1x,
+                safe_div(100.0 * unicorn_matches, opportunities_1x),
             ],
         }
 

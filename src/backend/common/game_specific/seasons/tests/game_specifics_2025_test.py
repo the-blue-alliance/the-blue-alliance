@@ -11,6 +11,8 @@ from backend.common.consts.ranking_sort_orders import SORT_ORDER_INFO
 from backend.common.frc_api.types import ScoreDetailModelAlliance2025
 from backend.common.game_specific.seasons.game_specifics_2025 import GameSpecifics2025
 from backend.common.game_specific.seasons.tests.conftest import (
+    assert_partial_breakdowns_split_counters,
+    assert_score_stats_without_breakdowns,
     build_match,
     HELPERS_TESTS,
     tiebreak_winner,
@@ -158,3 +160,13 @@ def test_calculate_event_insights_counts_coopertition_and_rp_sweeps() -> None:
     qual = none_throws(_insights([tie])["qual"])
     assert qual["six_rp_count"] == [0, 1, 0.0]
     assert qual["nine_rp_count"] == [0, 1, 0.0]
+
+
+def test_insights_without_any_breakdowns() -> None:
+    assert_score_stats_without_breakdowns(GameSpecifics2025(), "2025test")
+
+
+def test_insights_with_some_breakdowns(test_data_importer) -> None:
+    test_data_importer.import_match_list(HELPERS_TESTS, "data/2025mndu_matches.json")
+    matches = Match.query(Match.event == ndb.Key(Event, "2025mndu")).fetch()
+    assert_partial_breakdowns_split_counters(GameSpecifics2025(), matches)
