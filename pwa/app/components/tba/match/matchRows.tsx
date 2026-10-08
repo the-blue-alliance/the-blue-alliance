@@ -112,9 +112,7 @@ export default function SimpleMatchRowsWithBreaks({
         key={match.key}
         focusTeamKey={focusTeamKey}
         nexusStatus={nexusStatusByKey?.[match.key]}
-        className={cn(
-          zebraIdx % 2 === 0 && 'bg-neutral-50 dark:bg-neutral-900',
-        )}
+        className={cn(zebraIdx % 2 === 0 && 'bg-surface-subtle')}
       />,
     );
     zebraIdx++;

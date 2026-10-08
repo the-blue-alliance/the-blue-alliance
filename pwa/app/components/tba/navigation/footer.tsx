@@ -69,7 +69,7 @@ export const Footer = () => {
   return (
     <footer
       className="mt-(--footer-inset-top) flex flex-col space-y-3 border-t
-        bg-neutral-50 dark:bg-neutral-900"
+        bg-surface-subtle"
     >
       <div
         className="mx-auto w-full px-4 sm:max-w-160 md:max-w-3xl md:px-8
