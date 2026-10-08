@@ -45,7 +45,7 @@ function AccordionTrigger({
         {children}
         <ChevronDownIcon
           className="pointer-events-none size-4 shrink-0 translate-y-0.5
-            text-muted-foreground transition-transform duration-200"
+            text-muted-foreground duration-200 motion-safe:transition-transform"
         />
       </AccordionPrimitive.Trigger>
     </AccordionPrimitive.Header>
@@ -60,8 +60,9 @@ function AccordionContent({
   return (
     <AccordionPrimitive.Panel
       data-slot="accordion-content"
-      className="overflow-hidden text-sm data-open:animate-accordion-down
-        data-closed:animate-accordion-up"
+      className="overflow-hidden text-sm
+        motion-safe:data-open:animate-accordion-down
+        motion-safe:data-closed:animate-accordion-up"
       {...props}
     >
       <div className={cn('pt-0 pb-4', className)}>{children}</div>

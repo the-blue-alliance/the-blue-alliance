@@ -27,7 +27,8 @@ export function MobileMenu() {
               key={title}
               to={to}
               className="flex w-full animate-navigation-item-fade-in
-                items-center gap-3 py-4 opacity-0 hover:no-underline"
+                items-center gap-3 py-4 opacity-0 hover:no-underline
+                motion-safe:[--nav-item-shift:-8px]"
               activeProps={{ className: 'bg-white/15 rounded-md' }}
               style={{ animationDelay: `${index * 50}ms` }}
             >

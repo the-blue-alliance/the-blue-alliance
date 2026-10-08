@@ -85,9 +85,10 @@ function DialogContent({
           `fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)]
           translate-x-[-50%] translate-y-[-50%] gap-4 rounded-lg border
           bg-background p-6 shadow-lg duration-200 sm:max-w-lg
-          data-open:animate-in data-open:fade-in-0 data-open:zoom-in-95
-          data-closed:animate-out data-closed:fade-out-0
-          data-closed:fill-mode-forwards data-closed:zoom-out-95`,
+          data-open:animate-in data-open:fade-in-0
+          motion-safe:data-open:zoom-in-95 data-closed:animate-out
+          data-closed:fade-out-0 data-closed:fill-mode-forwards
+          motion-safe:data-closed:zoom-out-95`,
           className,
         )}
         {...props}

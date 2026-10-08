@@ -52,7 +52,7 @@
 
   --animate-accordion-down: accordion-down 0.2s ease-out;
   --animate-accordion-up: accordion-up 0.2s ease-out;
-  --animate-navigation-item-fade-in: navigation-item-fade-in 150ms ease-in
+  --animate-navigation-item-fade-in: navigation-item-fade-in 150ms ease-out
     forwards;
 
   @keyframes accordion-down {
@@ -74,11 +74,11 @@
   @keyframes navigation-item-fade-in {
     from {
       opacity: 0;
-      transform: translateY(-8px);
+      translate: 0 var(--nav-item-shift, 0);
     }
     to {
       opacity: 1;
-      transform: translateY(0);
+      translate: 0 0;
     }
   }
 }

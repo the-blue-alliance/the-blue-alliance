@@ -1,5 +1,10 @@
 import { cn } from 'cn';
-import { type Transition, motion, useMotionValue } from 'motion/react';
+import {
+  type Transition,
+  motion,
+  useMotionValue,
+  useReducedMotion,
+} from 'motion/react';
 import {
   Children,
   type ReactNode,
@@ -198,6 +203,7 @@ function CarouselContent({
   const { index, setIndex, setItemsCount, disableDrag } = useCarousel();
   const [visibleItemsCount, setVisibleItemsCount] = useState(1);
   const dragX = useMotionValue(0);
+  const reduceMotion = useReducedMotion();
   const containerRef = useRef<HTMLUListElement>(null);
   const itemsLength = Children.count(children);
 
@@ -249,12 +255,14 @@ function CarouselContent({
       animate={{ translateX: `-${index * (100 / visibleItemsCount)}%` }}
       onDragEnd={disableDrag ? undefined : onDragEnd}
       transition={
-        transition ?? {
-          damping: 18,
-          stiffness: 90,
-          type: 'spring',
-          duration: 0.2,
-        }
+        reduceMotion
+          ? { duration: 0 }
+          : (transition ?? {
+              damping: 18,
+              stiffness: 90,
+              type: 'spring',
+              duration: 0.2,
+            })
       }
       className={cn(
         'flex items-center',
