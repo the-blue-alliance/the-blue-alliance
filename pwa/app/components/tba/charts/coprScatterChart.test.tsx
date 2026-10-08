@@ -243,11 +243,11 @@ describe('CoprScatterChart', () => {
     expect(screen.getAllByTestId('cell')[1].dataset.fill).toBe('#ffffff');
   });
 
-  test('fills dots for teams missing from the colors data with the theme primary', () => {
+  test('fills dots for teams missing from the colors data with a neutral color', () => {
     renderChart();
 
     expect(screen.getAllByTestId('cell')[0].dataset.fill).toBe(
-      'hsl(var(--primary))',
+      'var(--muted-foreground)',
     );
   });
 
@@ -258,12 +258,14 @@ describe('CoprScatterChart', () => {
     expect(colors).toEqual(makeColors());
   });
 
-  test('leaves dots unfilled for teams with no colors on record', () => {
+  test('fills dots for teams with no colors on record with a neutral color', () => {
     const colors = makeColors();
     colors.teams['254'].colors = null;
     renderChart(colors);
 
-    expect(screen.getAllByTestId('cell')[2].dataset.fill).toBe('none');
+    expect(screen.getAllByTestId('cell')[2].dataset.fill).toBe(
+      'var(--muted-foreground)',
+    );
   });
 
   test('labels dots with the team number', () => {
