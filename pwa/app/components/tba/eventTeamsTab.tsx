@@ -48,7 +48,7 @@ interface EventTeamsTabProps {
 }
 
 const ROW_TARGET_CLASS = `block text-sm wrap-break-word after:absolute
-  after:inset-0 hover:underline focus-visible:outline-none
+  after:inset-0 hover:underline focus-visible:[outline:2px_solid_transparent]
   focus-visible:after:outline-2 focus-visible:after:outline-ring`;
 
 function TeamLabel({ team }: { team: Team }) {

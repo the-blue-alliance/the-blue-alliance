@@ -38,8 +38,7 @@ export default function RpDots({
         aria-label={ariaLabel}
         className="absolute top-[2px] left-[6px] flex cursor-pointer gap-[2px]
           border-0 p-0 after:absolute after:-top-[2px] after:-right-3
-          after:-bottom-3 after:-left-[6px] after:content-['']
-          focus:outline-none"
+          after:-bottom-3 after:-left-[6px] after:content-['']"
       >
         {rpsAchieved.map((achieved, index) => (
           <svg

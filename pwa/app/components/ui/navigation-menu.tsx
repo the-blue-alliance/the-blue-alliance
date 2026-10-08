@@ -70,12 +70,7 @@ function NavigationMenuContent({
   return (
     <NavigationMenuPrimitive.Content
       data-slot="navigation-menu-content"
-      className={cn(
-        `top-0 left-0 w-full p-2 pr-2.5
-        **:focus:data-[slot=navigation-menu-link]:ring-0
-        **:focus:data-[slot=navigation-menu-link]:outline-none md:w-auto`,
-        className,
-      )}
+      className={cn('top-0 left-0 w-full p-2 pr-2.5 md:w-auto', className)}
       {...props}
     />
   );
@@ -113,12 +108,12 @@ function NavigationMenuLink({
     <NavigationMenuPrimitive.Link
       data-slot="navigation-menu-link"
       className={cn(
-        `flex gap-1 rounded-md p-2 text-sm leading-4 transition-all outline-none
-        hover:bg-accent hover:text-accent-foreground focus-visible:ring-[3px]
-        focus-visible:ring-ring/50 focus-visible:outline-1
-        data-active:bg-accent/50 data-active:text-accent-foreground
-        hover:data-active:bg-accent focus:data-active:bg-accent
-        [&_svg:not([class*='size-'])]:size-4
+        `flex gap-1 rounded-md p-2 text-sm leading-4 outline-hidden
+        transition-all hover:bg-accent hover:text-accent-foreground
+        focus-visible:ring-[3px] focus-visible:ring-ring/50
+        focus-visible:outline-1 data-active:bg-accent/50
+        data-active:text-accent-foreground hover:data-active:bg-accent
+        focus:data-active:bg-accent [&_svg:not([class*='size-'])]:size-4
         [&_svg:not([class*='text-'])]:text-muted-foreground`,
         className,
       )}

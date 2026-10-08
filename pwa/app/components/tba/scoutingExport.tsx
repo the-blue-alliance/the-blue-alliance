@@ -68,8 +68,7 @@ export default function ScoutingExport({
         disabled
         value={csvData}
         className="w-full resize-y overflow-x-auto rounded-lg border
-          border-border/50 bg-muted/30 p-4 font-mono text-xs whitespace-nowrap
-          focus:outline-none"
+          border-border/50 bg-muted/30 p-4 font-mono text-xs whitespace-nowrap"
         rows={12}
       />
     </div>
