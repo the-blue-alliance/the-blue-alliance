@@ -124,6 +124,22 @@ test.describe('/event/2024mil', () => {
     await expect(page.locator('svg.recharts-surface')).toBeVisible();
   });
 
+  test('selects a tab whose content is still loading', async ({ page }) => {
+    // Hold back the lazily loaded Insights chart so its tab suspends
+    await page.route(/coprScatterChart/, async (route) => {
+      await new Promise((resolve) => setTimeout(resolve, 3000));
+      await route.continue();
+    });
+    await page.getByRole('tab', { name: /^Teams/ }).click();
+    await page.getByRole('tab', { name: 'Insights' }).click();
+
+    await expect(page.getByRole('tab', { name: 'Insights' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+      { timeout: 1000 },
+    );
+  });
+
   test('links to the Match13 event page', async ({ page }) => {
     await expect(page.getByRole('link', { name: 'Match13' })).toHaveAttribute(
       'href',
@@ -398,7 +414,7 @@ test.describe('event teams directory', () => {
       const popup = await popupPromise;
       await popup.waitForLoadState('domcontentloaded');
 
-      await expect(page).toHaveURL(/\/event\/2024mil$/);
+      expect(new URL(page.url()).pathname).toBe('/event/2024mil');
       expect(popup.url()).toMatch(/google\.com\/maps|maps\.google\.com/);
     });
 
@@ -447,4 +463,47 @@ test('shows historical teams without avatars', async ({ page }) => {
       .getByRole('region', { name: 'Event teams' })
       .getByRole('img', { name: 'Team Avatar' }),
   ).toHaveCount(0);
+});
+
+test.describe('/event/2024mil tabs and the URL hash', () => {
+  test('clicking a tab puts it in the hash without a new history entry', async ({
+    page,
+  }) => {
+    await page.goto('/event/2024mil');
+    await page.locator('body[data-hydrated]').waitFor();
+    await page.getByRole('tab', { name: 'Rankings' }).click();
+    await expect(page).toHaveURL(/#rankings$/);
+    await page.getByRole('tab', { name: 'Awards' }).click();
+    await expect(page).toHaveURL(/#awards$/);
+    await page.goBack();
+    // Replaced, not pushed: back leaves the event page entirely
+    await expect(page).not.toHaveURL(/\/event\/2024mil/);
+  });
+
+  test('opens the tab named by the hash on load', async ({ page }) => {
+    await page.goto('/event/2024mil#media');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Media' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  test("understands the old site's hash names", async ({ page }) => {
+    await page.goto('/event/2024mil#event-insights');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Insights' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
+
+  test('ignores a hash that is not a tab', async ({ page }) => {
+    await page.goto('/event/2024mil#not-a-tab');
+    await page.locator('body[data-hydrated]').waitFor();
+    await expect(page.getByRole('tab', { name: 'Results' })).toHaveAttribute(
+      'aria-selected',
+      'true',
+    );
+  });
 });

@@ -61,6 +61,7 @@ import { getDistrictColorBorderClass } from '~/lib/districtUtils';
 import { getEventDateString, sortEvents } from '~/lib/eventUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeams } from '~/lib/teamUtils';
+import { useHashTab } from '~/lib/useHashTab';
 import {
   doThrowNotFound,
   joinComponents,
@@ -214,6 +215,10 @@ function DistrictPage() {
   } = Route.useLoaderData();
 
   const hasRankings = rankings !== null;
+  const tabs = useHashTab({
+    values: ['rankings', 'events', 'teams', 'champs'] as const,
+    defaultValue: hasRankings ? 'rankings' : 'events',
+  });
 
   const cmpQualification = advancementCutoffs?.cmp_qualification ?? {};
   const cmpDeclines = new Set(advancementCutoffs?.cmp_declines ?? []);
@@ -276,7 +281,8 @@ function DistrictPage() {
       </div>
 
       <AnimatedTabs
-        defaultValue={hasRankings ? 'rankings' : 'events'}
+        value={tabs.value}
+        onValueChange={tabs.onValueChange}
         className="mt-6"
       >
         <TabsList

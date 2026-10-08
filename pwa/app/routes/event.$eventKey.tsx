@@ -134,6 +134,7 @@ import {
 } from '~/lib/oprUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import { sortTeamKeysComparator } from '~/lib/teamUtils';
+import { useHashTab } from '~/lib/useHashTab';
 import { MODEL_TYPE, doThrowNotFound } from '~/lib/utils';
 
 // Lazy-loaded: recharts is heavy and this chart only renders once the
@@ -302,6 +303,24 @@ export const Route = createFileRoute('/event/$eventKey')({
 }); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
 // v8 ignore stop
 
+const EVENT_TAB_VALUES = [
+  'results',
+  'rankings',
+  'awards',
+  'teams',
+  'insights',
+  'district-points',
+  'champs-qual-points',
+  'media',
+  'scouting',
+  'practice',
+] as const;
+// Hash names the Jinja event page has used for years, so old links still work
+const LEGACY_EVENT_TAB_HASHES = {
+  'event-insights': 'insights',
+  'cmp-points': 'champs-qual-points',
+} as const;
+
 function EventPage() {
   const { eventKey } = Route.useLoaderData();
 
@@ -318,6 +337,11 @@ function EventPage() {
     staleTime: eventStaleTime,
   });
   const matches = useMemo(() => matchesQuery.data ?? [], [matchesQuery.data]);
+  const tabs = useHashTab({
+    values: EVENT_TAB_VALUES,
+    defaultValue: matches.length > 0 ? 'results' : 'teams',
+    legacyHashes: LEGACY_EVENT_TAB_HASHES,
+  });
 
   const isSeasonEvent = SEASON_EVENT_TYPES.has(event.event_type);
   const practiceMatchesQuery = useQuery({
@@ -613,7 +637,8 @@ function EventPage() {
       </div>
 
       <AnimatedTabs
-        defaultValue={matches.length > 0 ? 'results' : 'teams'}
+        value={tabs.value}
+        onValueChange={tabs.onValueChange}
         className="mt-4"
       >
         <TabsList
