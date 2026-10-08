@@ -15,7 +15,10 @@ export default function LoginPage(): JSX.Element {
         Please log in to your TBA Account
       </h1>
       <section className="border-b py-6">
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div
+          className="grid
+            grid-cols-[repeat(auto-fit,minmax(min(100%,20rem),1fr))] gap-4"
+        >
           <div>
             <p>
               Your account settings will be accessible on the web, our{' '}

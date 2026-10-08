@@ -160,7 +160,10 @@ function LocalDebug(): React.JSX.Element {
           <CardTitle>Cache Statistics</CardTitle>
         </CardHeader>
         <CardContent>
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-3">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fit,minmax(min(100%,12rem),1fr))] gap-4"
+          >
             <div className="rounded-lg border p-4">
               <div className="text-sm text-muted-foreground">Cache Size</div>
               <div className="text-3xl font-bold">{stats.size}</div>

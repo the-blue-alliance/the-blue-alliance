@@ -154,7 +154,10 @@ function SuggestEventMedia(): JSX.Element {
         </ul>
       </div>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div
+        className="grid grid-cols-[repeat(auto-fit,minmax(min(100%,16rem),1fr))]
+          gap-4"
+      >
         <Guidance title="Please submit" tone="success">
           <li>Videos of award ceremonies</li>
           <li>Opening or closing ceremony speeches</li>
@@ -197,7 +200,10 @@ function SuggestEventMedia(): JSX.Element {
             Existing Media ({media.length})
           </h2>
           {videos.length > 0 && (
-            <div className="grid gap-4 sm:grid-cols-2">
+            <div
+              className="grid
+                grid-cols-[repeat(auto-fill,minmax(min(100%,22rem),1fr))] gap-4"
+            >
               {videos.map((video) => (
                 <YoutubeEmbed
                   key={video.foreign_key}

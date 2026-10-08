@@ -254,7 +254,10 @@ function SingleYearInsights({
       {leaderboards.length > 0 && (
         <div className="mb-8">
           <SectionHeading>Leaderboards</SectionHeading>
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+          >
             {leaderboards.map((l) => (
               <Leaderboard
                 subtitle={l.year > 0 ? `${l.year}` : 'Overall'}
@@ -272,7 +275,10 @@ function SingleYearInsights({
       {streaks.length > 0 && (
         <div className="mb-8">
           <SectionHeading>Streaks</SectionHeading>
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+          >
             {streaks.map((s) => (
               <StreakInsight
                 subtitle={s.year > 0 ? `${s.year}` : 'Overall'}
@@ -287,7 +293,10 @@ function SingleYearInsights({
       {timeseries.length > 0 && (
         <div>
           <SectionHeading>Timeseries</SectionHeading>
-          <div className="grid gap-6 lg:grid-cols-2">
+          <div
+            className="grid
+              grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
+          >
             {timeseries.map((t) => (
               <TimeseriesInsight
                 subtitle={t.year > 0 ? `${t.year}` : 'Overall'}
