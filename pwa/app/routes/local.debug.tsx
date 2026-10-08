@@ -152,7 +152,7 @@ function LocalDebug(): React.JSX.Element {
   const loadTime = Temporal.Instant.from(timestamp).epochMilliseconds;
 
   return (
-    <div className="container max-w-6xl py-8">
+    <div className="mx-auto max-w-6xl px-4 py-8">
       <h1 className="mb-4 text-3xl font-medium">Network Cache Debug</h1>
 
       <Card>

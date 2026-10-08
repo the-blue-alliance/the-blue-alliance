@@ -11,7 +11,7 @@ export const Route = createFileRoute('/contact')({
 
 function Contact(): React.JSX.Element {
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="typeset">
         <h1>Contact us</h1>
         <p>

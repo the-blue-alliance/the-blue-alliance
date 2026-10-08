@@ -46,7 +46,7 @@ function SearchRoute() {
   const { query } = Route.useRouteContext();
 
   return (
-    <div className="container max-w-2xl py-8">
+    <div className="mx-auto max-w-2xl px-4 py-8">
       <h1 className="mb-4 text-3xl font-medium">No Results Found</h1>
       {query && (
         <p className="mb-4 text-muted-foreground">

@@ -10,7 +10,7 @@ export const Route = createFileRoute('/add-data')({
 
 function AddData(): React.JSX.Element {
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="typeset">
         <h1>Add Data to TBA!</h1>
         <p>

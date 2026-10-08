@@ -11,7 +11,7 @@ export const Route = createFileRoute('/about')({
 
 function About(): React.JSX.Element {
   return (
-    <div className="container max-w-4xl py-8">
+    <div className="mx-auto max-w-4xl px-4 py-8">
       <div className="typeset">
         <h1>About Us</h1>
 
