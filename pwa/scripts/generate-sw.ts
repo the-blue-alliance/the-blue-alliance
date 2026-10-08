@@ -9,7 +9,7 @@ async function buildServiceWorker() {
       globDirectory: 'build/client',
 
       // Patterns to match files for precaching
-      globPatterns: ['**/*.{js,css,html,png,jpg,jpeg,svg,woff,woff2,ico}'],
+      globPatterns: ['**/*.{js,css,png,jpg,jpeg,svg,woff,woff2,ico}'],
 
       // Output location for the generated service worker
       swDest: 'build/client/sw.js',
