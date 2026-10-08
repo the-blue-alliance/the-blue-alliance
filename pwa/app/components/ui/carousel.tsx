@@ -98,7 +98,8 @@ function CarouselNavigation({
   const { index, setIndex, itemsCount } = useCarousel();
   const buttonClassName = cn(
     `pointer-events-auto h-fit w-fit rounded-full bg-zinc-50 p-2
-    transition-opacity duration-300 dark:bg-zinc-950`,
+    transition-opacity duration-300 active:scale-97
+    motion-safe:transition-[opacity,scale] dark:bg-zinc-950`,
     alwaysShow
       ? 'opacity-100'
       : `opacity-0 group-focus-within/hover:opacity-100
@@ -176,7 +177,8 @@ function CarouselIndicator({
             aria-current={index === i}
             onClick={() => setIndex(i)}
             className={cn(
-              'h-2 w-2 rounded-full transition-opacity duration-300',
+              `h-2 w-2 rounded-full transition-opacity duration-300
+              active:scale-97 motion-safe:transition-[opacity,scale]`,
               index === i
                 ? 'bg-zinc-950 dark:bg-zinc-50'
                 : 'bg-zinc-900/50 dark:bg-zinc-100/50',

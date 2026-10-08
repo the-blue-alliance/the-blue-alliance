@@ -53,7 +53,8 @@ function NavigationMenuTrigger({
       data-slot="navigation-menu-trigger"
       className={cn(
         `group cursor-pointer rounded-full p-2 text-white transition-colors
-        duration-200 hover:bg-black/20`,
+        duration-200 hover:bg-black/20 active:scale-97
+        motion-safe:transition-[color,background-color,scale]`,
         className,
       )}
       {...props}
