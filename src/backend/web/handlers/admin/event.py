@@ -12,6 +12,7 @@ from werkzeug.wrappers import Response
 from backend.common.consts.comp_level import COMP_LEVELS, COMP_LEVELS_VERBOSE_FULL
 from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType, TYPE_NAMES as EVENT_TYPE_NAMES
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import (
     PlayoffType,
     TYPE_NAMES as PLAYOFF_TYPE_NAMES,
@@ -35,6 +36,7 @@ from backend.common.manipulators.event_details_manipulator import (
 from backend.common.manipulators.event_manipulator import EventManipulator
 from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
+from backend.common.manipulators.media_manipulator import MediaManipulator
 from backend.common.memcache_models.event_nexus_queue_status_memcache import (
     EventNexusQueueStatusMemcache,
 )
@@ -55,6 +57,8 @@ from backend.common.models.match import Match
 from backend.common.models.media import Media
 from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.webcast import Webcast
+from backend.common.queries.media_query import EventMediasQuery
+from backend.common.suggestions.media_parser import MediaParser
 from backend.web.profiled_render import render_template
 
 
@@ -766,3 +770,27 @@ def event_cleanup_youtube_webcasts_post(event_key: EventKey) -> Response:
     return redirect(
         url_for("admin.event_detail", event_key=event.key_name, _anchor="webcasts")
     )
+
+
+def event_refresh_smugmug_albums_post(event_key: EventKey) -> Response:
+    if not Event.get_by_id(event_key):
+        abort(404)
+
+    albums = [
+        media
+        for media in EventMediasQuery(event_key).fetch()
+        if media.media_type_enum == MediaType.SMUGMUG_ALBUM
+    ]
+    for album in albums:
+        web_uri = (album.details or {}).get("web_uri")
+        if not web_uri:
+            continue
+
+        media_dict = MediaParser.partial_media_dict_from_url(web_uri).get_result()
+        if not media_dict or media_dict["details_json"] == album.details_json:
+            continue
+
+        album.details_json = media_dict["details_json"]
+        MediaManipulator.createOrUpdate(album, auto_union=False)
+
+    return redirect(url_for("admin.event_detail", event_key=event_key, _anchor="media"))
