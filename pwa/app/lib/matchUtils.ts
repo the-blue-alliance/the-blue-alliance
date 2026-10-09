@@ -9,7 +9,6 @@ import {
   PlayoffType,
   WltRecord,
 } from '~/api/tba/read';
-import { getEventNormalizedName } from '~/lib/eventUtils';
 
 const COMP_LEVEL_SORT_ORDER: Record<CompLevel, number> = {
   [CompLevel.F]: 5,
@@ -373,17 +372,14 @@ export function parseMatchKey(key: string): ParsedMatchKey | null {
 }
 
 /**
- * Human-friendly name for a match key, e.g. "Archimedes Division Match 3" or
- * "Galileo Division Quals 87", using the same title strings the event and
- * match pages use. Without the event (not loaded, or unknown) it falls back
+ * Human-friendly name for a match key, e.g. "Archimedes Match 3" or
+ * "Galileo Quals 87", using the event's short name and the same title strings
+ * the event and match pages use. Without the event (not loaded, or unknown) it falls back
  * to the match title alone, and to the raw key if it can't be parsed.
  */
 export function formatMatchKeyName(
   key: string,
-  event?: Pick<
-    Event,
-    'event_type' | 'year' | 'city' | 'short_name' | 'name' | 'playoff_type'
-  >,
+  event?: Pick<Event, 'short_name' | 'name' | 'playoff_type'>,
 ): string {
   const parsed = parseMatchKey(key);
   if (!parsed) {
@@ -397,7 +393,7 @@ export function formatMatchKeyName(
     },
     event?.playoff_type ?? null,
   );
-  return event ? `${getEventNormalizedName(event)} ${title}` : title;
+  return event ? `${event.short_name || event.name} ${title}` : title;
 }
 
 /**

@@ -291,19 +291,19 @@ describe('formatMatchKeyName', () => {
 
   test('double-elim playoff match', () => {
     expect(formatMatchKeyName('2026arc_sf3m1', archimedes)).toBe(
-      'Archimedes Division Match 3',
+      'Archimedes Match 3',
     );
   });
 
   test('qualification match', () => {
     expect(formatMatchKeyName('2026arc_qm87', archimedes)).toBe(
-      'Archimedes Division Quals 87',
+      'Archimedes Quals 87',
     );
   });
 
   test('finals', () => {
     expect(formatMatchKeyName('2026arc_f1m2', archimedes)).toBe(
-      'Archimedes Division Finals 2',
+      'Archimedes Finals 2',
     );
   });
 
@@ -311,12 +311,20 @@ describe('formatMatchKeyName', () => {
     expect(
       formatMatchKeyName('2019casj_sf2m3', {
         ...archimedes,
-        year: 2019,
-        event_type: EventType.REGIONAL,
         short_name: 'Silicon Valley',
         playoff_type: PlayoffType.BRACKET_8_TEAM,
       }),
-    ).toBe('Silicon Valley Regional Semis 2 Match 3');
+    ).toBe('Silicon Valley Semis 2 Match 3');
+  });
+
+  test('event without a short name uses its full name', () => {
+    expect(
+      formatMatchKeyName('2005nh_qm4', {
+        ...archimedes,
+        short_name: '',
+        name: 'BAE Systems Granite State Regional',
+      }),
+    ).toBe('BAE Systems Granite State Regional Quals 4');
   });
 
   test('without the event, just the match title; unparseable keys pass through', () => {
