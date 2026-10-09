@@ -73,7 +73,7 @@
     "@svgr/core": "8.1.0",
     "@svgr/plugin-jsx": "8.1.0",
     "@tailwindcss/vite": "4.3.3",
-    "@tanstack/eslint-plugin-query": "5.104.0",
+    "@tanstack/eslint-plugin-query": "5.104.1",
     "@tanstack/eslint-plugin-router": "1.162.0",
     "@testing-library/react": "16.3.3",
     "@trivago/prettier-plugin-sort-imports": "6.0.2",
