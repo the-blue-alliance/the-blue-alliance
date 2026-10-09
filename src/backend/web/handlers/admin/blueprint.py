@@ -61,6 +61,7 @@ from backend.web.handlers.admin.event import (
     event_edit_post,
     event_link_frc_api_post,
     event_list,
+    event_refresh_smugmug_albums_post,
     event_remap_teams_post,
     event_remove_webcast_post,
     event_update_all_webcast_dates_post,
@@ -352,6 +353,11 @@ admin_routes.add_url_rule(
 admin_routes.add_url_rule(
     "/event/cleanup_youtube_webcasts/<event_key>",
     view_func=event_cleanup_youtube_webcasts_post,
+    methods=["POST"],
+)
+admin_routes.add_url_rule(
+    "/event/refresh_smugmug_albums/<event_key>",
+    view_func=event_refresh_smugmug_albums_post,
     methods=["POST"],
 )
 admin_routes.add_url_rule(

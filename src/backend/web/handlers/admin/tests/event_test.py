@@ -12,6 +12,7 @@ from werkzeug.test import Client
 from backend.common.consts.comp_level import CompLevel
 from backend.common.consts.event_sync_type import EventSyncType
 from backend.common.consts.event_type import EventType
+from backend.common.consts.media_type import MediaType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.memcache_models.event_sync_status_memcache import (
     EventSyncStatusMemcache,
@@ -22,6 +23,7 @@ from backend.common.models.event_details import EventDetails
 from backend.common.models.event_team import EventTeam
 from backend.common.models.location import Location
 from backend.common.models.match import Match
+from backend.common.models.media import Media
 from backend.common.models.nexus_event_details import NexusEventDetails
 from backend.common.models.team import Team
 from backend.web.handlers.tests import helpers
@@ -945,6 +947,146 @@ def test_cleanup_youtube_webcasts_button_shown(
         if "Clean up YouTube webcasts" in btn.get_text()
     ]
     assert len(cleanup_buttons) == 1
+
+
+STALE_ALBUM_DETAILS = {
+    "title": "Photos",
+    "web_uri": "https://example.smugmug.com/Photos/n-abc/i-def",
+    "image_count": 0,
+    "cover_url": "",
+    "cover_url_med": "",
+    "cover_url_sm": "",
+}
+FRESH_ALBUM_DETAILS = {
+    **STALE_ALBUM_DETAILS,
+    "image_count": 42,
+    "cover_url": "https://photos.smugmug.com/L.jpg",
+    "cover_url_med": "https://photos.smugmug.com/M.jpg",
+    "cover_url_sm": "https://photos.smugmug.com/S.jpg",
+}
+
+
+def _put_event_for_media() -> None:
+    Event(
+        id="2020nyny",
+        event_short="nyny",
+        year=2020,
+        name="Test Event",
+        event_type_enum=EventType.OFFSEASON,
+        start_date=datetime(2020, 3, 1),
+        end_date=datetime(2020, 3, 5),
+    ).put()
+
+
+def _put_album(details: Dict) -> Media:
+    media = Media(
+        id=Media.render_key_name(MediaType.SMUGMUG_ALBUM, "album1"),
+        foreign_key="album1",
+        media_type_enum=MediaType.SMUGMUG_ALBUM,
+        details_json=json.dumps(details),
+        year=2020,
+        references=[Media.create_reference("event", "2020nyny")],
+    )
+    media.put()
+    return media
+
+
+def _resolved(value) -> ndb.Future:
+    future = ndb.Future()
+    future.set_result(value)
+    return future
+
+
+def test_refresh_smugmug_albums_not_found_event(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    resp = web_client.post(
+        "/admin/event/refresh_smugmug_albums/2020nyny",
+        data={"csrf_token": "test"},
+    )
+    assert resp.status_code == 404
+
+
+def test_refresh_smugmug_albums_updates_stale_album(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    _put_event_for_media()
+    album = _put_album(STALE_ALBUM_DETAILS)
+
+    with patch(
+        "backend.web.handlers.admin.event.MediaParser.partial_media_dict_from_url"
+    ) as mock_parse:
+        mock_parse.return_value = _resolved(
+            {"details_json": json.dumps(FRESH_ALBUM_DETAILS)}
+        )
+        resp = web_client.post(
+            "/admin/event/refresh_smugmug_albums/2020nyny",
+            data={"csrf_token": "test"},
+        )
+
+    assert resp.status_code == 302
+    mock_parse.assert_called_once_with(STALE_ALBUM_DETAILS["web_uri"])
+    assert none_throws(album.key.get()).details == FRESH_ALBUM_DETAILS
+
+
+def test_refresh_smugmug_albums_keeps_album_when_lookup_fails(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    _put_event_for_media()
+    album = _put_album(STALE_ALBUM_DETAILS)
+
+    with patch(
+        "backend.web.handlers.admin.event.MediaParser.partial_media_dict_from_url"
+    ) as mock_parse:
+        mock_parse.return_value = _resolved(None)
+        resp = web_client.post(
+            "/admin/event/refresh_smugmug_albums/2020nyny",
+            data={"csrf_token": "test"},
+        )
+
+    assert resp.status_code == 302
+    assert none_throws(album.key.get()).details == STALE_ALBUM_DETAILS
+
+
+def test_refresh_smugmug_albums_ignores_other_media(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    _put_event_for_media()
+    video = Media(
+        id=Media.render_key_name(MediaType.YOUTUBE_VIDEO, "abc123defgh"),
+        foreign_key="abc123defgh",
+        media_type_enum=MediaType.YOUTUBE_VIDEO,
+        year=2020,
+        references=[Media.create_reference("event", "2020nyny")],
+    )
+    video.put()
+
+    with patch(
+        "backend.web.handlers.admin.event.MediaParser.partial_media_dict_from_url"
+    ) as mock_parse:
+        resp = web_client.post(
+            "/admin/event/refresh_smugmug_albums/2020nyny",
+            data={"csrf_token": "test"},
+        )
+
+    assert resp.status_code == 302
+    mock_parse.assert_not_called()
+
+
+def test_refresh_smugmug_albums_button_shown(
+    web_client: Client, login_gae_admin, taskqueue_stub
+) -> None:
+    _put_event_for_media()
+
+    resp = web_client.get("/admin/event/2020nyny")
+    assert resp.status_code == 200
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    refresh_buttons = [
+        btn
+        for btn in soup.find_all("button")
+        if "Refresh SmugMug Albums" in btn.get_text()
+    ]
+    assert len(refresh_buttons) == 1
 
 
 def test_divisions_released_not_found(

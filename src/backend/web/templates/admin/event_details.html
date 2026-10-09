@@ -265,6 +265,14 @@
       </form>
     </div>
     {% endif %}
+    <h2>Refresh SmugMug Albums</h2>
+    <div>
+      <p>Re-fetch the photo count and cover image for this event's SmugMug albums</p>
+      <form action="/admin/event/refresh_smugmug_albums/{{event.key_name}}" method="post">
+        <button type="submit" class="btn btn-warning"><span class="glyphicon glyphicon-refresh"></span> Refresh SmugMug Albums</button>
+        <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />
+      </form>
+    </div>
     <h2>Remap Teams</h2>
     <div>
       <p>Change all matches, awards and alliance selections for one team to another</p>
