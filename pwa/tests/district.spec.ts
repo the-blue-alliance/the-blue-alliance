@@ -31,11 +31,13 @@ test.describe('/district/fim/2024 header', () => {
     await page.locator('body[data-hydrated]').waitFor();
   });
 
-  [['Rankings'], ['Events'], ['Teams'], ['Champs']].forEach(([tabName]) => {
-    test(`shows the ${tabName} tab`, async ({ page }) => {
-      await expect(page.getByRole('tab', { name: tabName })).toBeVisible();
-    });
-  });
+  [['Rankings'], ['Events'], ['Teams'], ['Champs'], ['Insights']].forEach(
+    ([tabName]) => {
+      test(`shows the ${tabName} tab`, async ({ page }) => {
+        await expect(page.getByRole('tab', { name: tabName })).toBeVisible();
+      });
+    },
+  );
 
   [['511 teams'], ['27 events']].forEach(([summary]) => {
     test(`shows ${summary} below the title`, async ({ page }) => {
@@ -118,4 +120,12 @@ test.describe('district page tabs and the URL hash', () => {
       'true',
     );
   });
+});
+
+test('insights tab shows district leaderboards', async ({ page }) => {
+  await page.goto('/district/fim/2024#insights');
+  await page.locator('body[data-hydrated]').waitFor();
+  await expect(
+    page.getByRole('heading', { name: 'Leaderboards' }),
+  ).toBeVisible();
 });

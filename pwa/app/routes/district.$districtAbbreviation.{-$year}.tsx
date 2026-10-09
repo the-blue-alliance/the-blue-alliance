@@ -5,6 +5,7 @@ import { Temporal } from 'temporal-polyfill';
 
 import TeamsIcon from '~icons/lucide/bot';
 import EventsIcon from '~icons/lucide/calendar-days';
+import InsightsIcon from '~icons/lucide/lightbulb';
 import RankingsIcon from '~icons/lucide/list-ordered';
 import ChampsIcon from '~icons/lucide/trophy';
 
@@ -27,6 +28,7 @@ import {
 } from '~/api/tba/read/@tanstack/react-query.gen';
 import { DataTable } from '~/components/tba/dataTable';
 import { DistrictChampsTab } from '~/components/tba/districtChampsTab';
+import { DistrictInsightsTab } from '~/components/tba/districtInsightsTab';
 import InlineIcon from '~/components/tba/inlineIcon';
 import {
   EventLink,
@@ -216,7 +218,7 @@ function DistrictPage() {
 
   const hasRankings = rankings !== null;
   const tabs = useHashTab({
-    values: ['rankings', 'events', 'teams', 'champs'] as const,
+    values: ['rankings', 'events', 'teams', 'champs', 'insights'] as const,
     defaultValue: hasRankings ? 'rankings' : 'events',
   });
 
@@ -313,6 +315,12 @@ function DistrictPage() {
             <InlineIcon>
               <ChampsIcon />
               Champs
+            </InlineIcon>
+          </AnimatedTabsTrigger>
+          <AnimatedTabsTrigger value="insights">
+            <InlineIcon>
+              <InsightsIcon />
+              Insights
             </InlineIcon>
           </AnimatedTabsTrigger>
         </TabsList>
@@ -432,6 +440,9 @@ function DistrictPage() {
             currentSeason={currentSeason}
             year={year}
           />
+        </TabsContent>
+        <TabsContent value="insights" className="pt-2">
+          <DistrictInsightsTab abbreviation={abbreviation} year={year} />
         </TabsContent>
       </AnimatedTabs>
     </div>

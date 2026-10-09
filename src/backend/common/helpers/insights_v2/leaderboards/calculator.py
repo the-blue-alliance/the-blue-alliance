@@ -2,6 +2,7 @@ from abc import abstractmethod
 from collections import defaultdict
 from typing import Any, Callable, DefaultDict, Dict, List, Optional, Tuple
 
+from backend.common.consts.renamed_districts import RenamedDistricts
 from backend.common.helpers.insights_v2.base import InsightV2Calculator
 from backend.common.helpers.insights_v2.names import InsightV2NameEntry
 from backend.common.models.insight_v2 import (
@@ -330,12 +331,14 @@ def build_leaderboard_match_alliance_rankings(
 class MatchAllianceLeaderboardV2Calculator(LeaderboardV2Calculator):
     """
     Base class for match-level leaderboards that include a MatchAllianceContext
-    per ranking entry. Year-specific only (year=0 is skipped). No district scoping.
+    per ranking entry. Year-specific only (year=0 is skipped). Districts come
+    from the event.
     """
 
     def __init__(self) -> None:
         super().__init__()
         self._match_contexts: Dict[str, MatchAllianceContext] = {}
+        self._match_districts: Dict[str, str] = {}
 
     @property
     def context_type(self) -> LeaderboardContextType:
@@ -354,40 +357,61 @@ class MatchAllianceLeaderboardV2Calculator(LeaderboardV2Calculator):
         # calculator that shows a game-specific label per season).
         return self.insight_name.display_name
 
-    def _record_match(self, match_key: str, score: int, alliance: List[str]) -> None:
+    def _record_match(
+        self,
+        match_key: str,
+        score: int,
+        alliance: List[str],
+        *,
+        district: Optional[str],
+    ) -> None:
         self.counts[match_key] = score
         self._match_contexts[match_key] = MatchAllianceContext(
             match_key=match_key,
             alliance=alliance,
         )
+        if district:
+            self._match_districts[match_key] = RenamedDistricts.get_latest_code(
+                district
+            )
 
     def _build_rankings(self, counts: Dict[str, int]) -> List[LeaderboardRanking]:
         return build_leaderboard_match_alliance_rankings(
             counts, self._match_contexts, min_count=self.min_count
         )
 
+    def _make_insight(
+        self, year: Year, counts: Dict[str, int], district: Optional[str]
+    ) -> Optional[InsightV2]:
+        rankings = self._build_rankings(counts)
+        if not rankings:
+            return None
+        return InsightV2(
+            id=InsightV2.render_key_name(
+                year, InsightCategory.LEADERBOARD, self.insight_name.name, district
+            ),
+            name=self.insight_name.name,
+            display_name=self.display_name_for(year),
+            year=year,
+            category=InsightCategory.LEADERBOARD,
+            district_abbreviation=district,
+            data_json=LeaderboardDataV2(
+                rankings=rankings,
+                key_type=self.key_type,
+                context_type=self.context_type,
+            ),
+        )
+
     def make_insights(
         self, year: Year, team_to_district: Dict[str, str]
     ) -> List[InsightV2]:
-        if year == 0 or not self.counts:
+        if year == 0:
             return []
-        rankings = self._build_rankings(self.counts)
-        if not rankings:
-            return []
-        data = LeaderboardDataV2(
-            rankings=rankings,
-            key_type=self.key_type,
-            context_type=self.context_type,
-        )
-        return [
-            InsightV2(
-                id=InsightV2.render_key_name(
-                    year, InsightCategory.LEADERBOARD, self.insight_name.name
-                ),
-                name=self.insight_name.name,
-                display_name=self.display_name_for(year),
-                year=year,
-                category=InsightCategory.LEADERBOARD,
-                data_json=data,
-            )
+        district_counts: DefaultDict[str, Dict[str, int]] = defaultdict(dict)
+        for match_key, district in self._match_districts.items():
+            district_counts[district][match_key] = self.counts[match_key]
+        insights = [self._make_insight(year, self.counts, None)] + [
+            self._make_insight(year, counts, district)
+            for district, counts in sorted(district_counts.items())
         ]
+        return [insight for insight in insights if insight]

@@ -64,8 +64,9 @@ def test_most_game_pieces_scored(
 
     insights = compute_insights_for_year(year, [MostGamePiecesScoredV2Calculator()])
 
-    assert len(insights) == 1
-    insight = insights[0]
+    insight, *district_insights = insights
+    assert insight.district_abbreviation is None
+    assert all(i.data == insight.data for i in district_insights)
     assert insight.name == "most_game_pieces_scored"
     assert insight.display_name == expected_display_name
     assert insight.key_name == f"{year}_v2_leaderboard_most_game_pieces_scored"
