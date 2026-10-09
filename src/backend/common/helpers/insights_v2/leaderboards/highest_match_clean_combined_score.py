@@ -55,4 +55,5 @@ class HighestMatchCleanCombinedScoreV2Calculator(MatchAllianceLeaderboardV2Calcu
                 match_key=match.key_name,  # type: ignore[union-attr]
                 score=combined,
                 alliance=all_teams,
+                district=event.event_district_abbrev,
             )

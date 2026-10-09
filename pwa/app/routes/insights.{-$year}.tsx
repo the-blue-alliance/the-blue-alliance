@@ -1,22 +1,17 @@
 import { useSuspenseQueries } from '@tanstack/react-query';
 import { createFileRoute, notFound } from '@tanstack/react-router';
 
-import {
-  type Event,
-  type InsightV2GameStats,
-  type InsightV2Leaderboard,
-  type InsightV2Streak,
-  type InsightV2Timeseries,
-} from '~/api/tba/read';
+import { type Event, type InsightV2Leaderboard } from '~/api/tba/read';
 import {
   getEventsByYearOptions,
   getInsightsV2YearOptions,
 } from '~/api/tba/read/@tanstack/react-query.gen';
-import { Leaderboard } from '~/components/tba/leaderboard';
-import { StreakInsight } from '~/components/tba/streakInsight';
-import { SuccessRateInsight } from '~/components/tba/successRateInsight';
-import { TimeseriesInsight } from '~/components/tba/timeseriesInsight';
+import { InsightSections } from '~/components/tba/insightSections';
 import { YearSelector } from '~/components/tba/yearSelector';
+import {
+  type GroupedInsights,
+  groupInsightsByCategory,
+} from '~/lib/insightUtils';
 import { parseMatchKey } from '~/lib/matchUtils';
 import { STALE_TIME, staleTimeForYear } from '~/lib/queryClient';
 import { publicCacheControlHeaders, useValidYears } from '~/lib/utils';
@@ -47,27 +42,8 @@ export const Route = createFileRoute('/insights/{-$year}')({
       throw notFound();
     }
 
-    const leaderboards: InsightV2Leaderboard[] = [];
-    const streaks: InsightV2Streak[] = [];
-    const timeseries: InsightV2Timeseries[] = [];
-    const successRates: InsightV2GameStats[] = [];
-
-    for (const insight of insights) {
-      switch (insight.category) {
-        case 'leaderboard':
-          leaderboards.push(insight);
-          break;
-        case 'streak':
-          streaks.push(insight);
-          break;
-        case 'timeseries':
-          timeseries.push(insight);
-          break;
-        case 'game_stats':
-          successRates.push(insight);
-          break;
-      }
-    }
+    const { leaderboards, streaks, timeseries, successRates } =
+      groupInsightsByCategory(insights);
 
     // Event and match leaderboards render names, not keys, which needs the
     // events behind those keys. Overall (year 0) boards can span seasons.
@@ -174,32 +150,13 @@ function InsightsPage() {
   );
 }
 
-function SectionHeading({ children }: { children: string }) {
-  return (
-    <h2 className="mb-4 flex items-center gap-2 text-2xl font-semibold">
-      <span
-        className="inline-block h-1 w-8 rounded-full bg-linear-to-r from-primary
-          to-primary/50"
-      />
-      {children}
-    </h2>
-  );
-}
-
 function SingleYearInsights({
   year,
   eventsByKey,
-  leaderboards,
-  streaks,
-  timeseries,
-  successRates,
-}: {
+  ...insights
+}: GroupedInsights & {
   year: number;
   eventsByKey: ReadonlyMap<string, Event>;
-  leaderboards: InsightV2Leaderboard[];
-  streaks: InsightV2Streak[];
-  timeseries: InsightV2Timeseries[];
-  successRates: InsightV2GameStats[];
 }) {
   const validYears = useValidYears();
 
@@ -236,77 +193,7 @@ function SingleYearInsights({
         />
       </div>
 
-      {successRates.length > 0 && (
-        <div className="mb-8">
-          <SectionHeading>Success Rates</SectionHeading>
-          <div className="grid gap-6">
-            {successRates.map((sr) => (
-              <SuccessRateInsight
-                subtitle={sr.year > 0 ? `${sr.year} Season` : 'Overall'}
-                insight={sr}
-                key={sr.name}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {leaderboards.length > 0 && (
-        <div className="mb-8">
-          <SectionHeading>Leaderboards</SectionHeading>
-          <div
-            className="grid
-              grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
-          >
-            {leaderboards.map((l) => (
-              <Leaderboard
-                subtitle={l.year > 0 ? `${l.year}` : 'Overall'}
-                leaderboard={l}
-                displayName={l.display_name}
-                key={l.name}
-                year={year}
-                eventsByKey={eventsByKey}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {streaks.length > 0 && (
-        <div className="mb-8">
-          <SectionHeading>Streaks</SectionHeading>
-          <div
-            className="grid
-              grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
-          >
-            {streaks.map((s) => (
-              <StreakInsight
-                subtitle={s.year > 0 ? `${s.year}` : 'Overall'}
-                streak={s}
-                key={s.name}
-              />
-            ))}
-          </div>
-        </div>
-      )}
-
-      {timeseries.length > 0 && (
-        <div>
-          <SectionHeading>Timeseries</SectionHeading>
-          <div
-            className="grid
-              grid-cols-[repeat(auto-fill,minmax(min(100%,25rem),1fr))] gap-6"
-          >
-            {timeseries.map((t) => (
-              <TimeseriesInsight
-                subtitle={t.year > 0 ? `${t.year}` : 'Overall'}
-                timeseries={t}
-                key={t.name}
-              />
-            ))}
-          </div>
-        </div>
-      )}
+      <InsightSections year={year} eventsByKey={eventsByKey} {...insights} />
     </div>
   );
 }

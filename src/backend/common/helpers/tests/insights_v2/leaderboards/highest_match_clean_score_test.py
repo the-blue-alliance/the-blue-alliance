@@ -99,3 +99,18 @@ def test_highest_match_clean_score_skips_unusable_matches() -> None:
         )
     )
     assert calc.counts == {}
+
+
+def test_highest_match_clean_score_district(ndb_stub) -> None:
+    calc = HighestMatchCleanScoreV2Calculator()
+    calc.on_event(
+        fake_event(
+            [fake_match(50, 40, key_name="2024nhgrs_qm1")],
+            event_district_abbrev="ne",
+        )
+    )
+
+    insights = calc.make_insights(2024, {})
+
+    assert [i.district_abbreviation for i in insights] == [None, "ne"]
+    assert insights[1].data["rankings"][0]["keys"] == ["2024nhgrs_qm1"]
