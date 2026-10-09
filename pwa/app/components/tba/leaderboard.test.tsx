@@ -184,7 +184,7 @@ describe('Leaderboard', () => {
     );
     const row = screen.getAllByRole('row')[1];
     const link = within(row).getByRole('link', {
-      name: 'Silicon Valley Regional Quals 1',
+      name: 'Silicon Valley Quals 1',
     });
     expect(link.dataset.event).toBe('2024casj');
     expect(link.title).toBe('2024casj_qm1');
@@ -193,9 +193,7 @@ describe('Leaderboard', () => {
     ).toBe(undefined);
 
     const tooltip = await hoverTooltip(link);
-    expect(tooltip.textContent).toBe(
-      'Silicon Valley Regional Quals 1 (254, 604)',
-    );
+    expect(tooltip.textContent).toBe('Silicon Valley Quals 1 (254, 604)');
   });
 
   test('renders an empty-alliance match context without teams', async () => {
