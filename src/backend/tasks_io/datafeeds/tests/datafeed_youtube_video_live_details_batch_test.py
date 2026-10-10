@@ -21,7 +21,7 @@ class TestYoutubeVideoDetailsDatafeedBatch:
             datafeed = YoutubeVideoDetailsDatafeed(["video1", "video2"])
             params = datafeed.url_params()
 
-            assert params["part"] == "snippet,liveStreamingDetails"
+            assert params["part"] == "snippet,contentDetails,liveStreamingDetails"
             assert params["id"] == "video1,video2"
 
     def test_url_and_headers(self) -> None:
@@ -31,7 +31,7 @@ class TestYoutubeVideoDetailsDatafeedBatch:
             query = parse_qs(parsed.query)
 
             assert parsed.path == "/youtube/v3/videos"
-            assert query["part"] == ["snippet,liveStreamingDetails"]
+            assert query["part"] == ["snippet,contentDetails,liveStreamingDetails"]
             assert query["id"] == ["video1,video2"]
             assert "key" not in query
             assert datafeed.headers() == {"X-goog-api-key": "test_key"}
