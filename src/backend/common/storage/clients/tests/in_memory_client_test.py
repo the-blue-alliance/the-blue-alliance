@@ -13,7 +13,14 @@ def test_write():
     client = InMemoryClient()
     client.write(file_name, file_content)
 
-    assert client.data == {file_name: file_content}
+    assert client.data == {file_name: b"some_content"}
+
+
+def test_write_bytes():
+    client = InMemoryClient()
+    client.write("some_file.json", b"some_content")
+
+    assert client.data == {"some_file.json": b"some_content"}
 
 
 def test_read_none():
@@ -30,7 +37,7 @@ def test_read():
     client = InMemoryClient()
     assert client.read(file_name) is None
     client.write(file_name, file_content)
-    assert client.read(file_name) == file_content
+    assert client.read(file_name) == b"some_content"
 
 
 def test_get_files():
