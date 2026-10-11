@@ -12246,6 +12246,21 @@
           "object"
         ],
         "properties": {
+          "playoff_type": {
+            "oneOf": [
+              {
+                "$ref": "#/components/schemas/PlayoffType"
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "description": "Playoff bracket format, or null if unavailable."
+          },
+          "double_elim_round": {
+            "$ref": "#/components/schemas/Double_Elim_Round",
+            "description": "Current double elimination round, if applicable."
+          },
           "level": {
             "$ref": "#/components/schemas/Comp_Level"
           },
