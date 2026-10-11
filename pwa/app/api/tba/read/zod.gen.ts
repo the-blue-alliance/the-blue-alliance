@@ -2079,6 +2079,8 @@ export const zEventRanking = z.object({
  */
 export const zTeamEventStatusPlayoff = z
   .object({
+    playoff_type: zPlayoffType.nullish(),
+    double_elim_round: zDoubleElimRound.optional(),
     level: zCompLevel.optional(),
     current_level_record: zWltRecord.nullish(),
     record: zWltRecord.nullish(),
