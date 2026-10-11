@@ -3541,6 +3541,14 @@ export type TeamEventStatusAllianceBackup = null | {
  * Playoff status for this team, may be null if the team did not make playoffs, or playoffs have not begun.
  */
 export type TeamEventStatusPlayoff = null | {
+  /**
+   * Playoff bracket format, or null if unavailable.
+   */
+  playoff_type?: PlayoffType | null;
+  /**
+   * Current double elimination round, if applicable.
+   */
+  double_elim_round?: DoubleElimRound;
   level?: CompLevel;
   current_level_record?: WltRecord | null;
   record?: WltRecord | null;
