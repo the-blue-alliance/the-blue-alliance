@@ -33,10 +33,8 @@ export function createLogger(name: string) {
 
   if (isDev) {
     // In development, use pino-pretty for human-readable output
-    return pino({
-      name,
-      transport: { target: 'pino-pretty' },
-    });
+    const transport = { target: 'pino-pretty', caller: import.meta.url };
+    return pino({ name, transport });
   }
 
   // In production (App Engine), output structured JSON for Cloud Logging
