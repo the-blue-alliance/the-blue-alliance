@@ -955,11 +955,16 @@ function ResultsTab({
 
   const alliancesSection = alliances.length > 0 && (
     <TableOfContentsSection id="alliances" setInView={setInView}>
-      <AllianceSelectionTable alliances={alliances} year={event.year} />
+      <AllianceSelectionTable
+        alliances={alliances}
+        year={event.year}
+        remapTeams={event.remap_teams}
+      />
       {roundRobinAdvancement && (
         <RoundRobinRankingsTable
           advancement={roundRobinAdvancement}
           year={event.year}
+          remapTeams={event.remap_teams}
         />
       )}
     </TableOfContentsSection>
