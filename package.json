@@ -22,7 +22,7 @@
     "react-bootstrap": "^2.10.10",
     "react-countup": "^6.5.3",
     "react-dom": "^19.3.0",
-    "react-ga4": "^2.1.0",
+    "react-ga4": "^3.0.1",
     "react-redux": "^9.3.0",
     "react-select": "^5.10.2",
     "react-transition-group": "^4.4.5",
@@ -117,7 +117,7 @@
           ]
         }
       ],
-      "^.+\\.jsx?$": [
+      "^.+\\.m?jsx?$": [
         "babel-jest",
         {
           "presets": [
@@ -142,8 +142,12 @@
       "ts",
       "tsx",
       "js",
+      "mjs",
       "jsx",
       "json"
+    ],
+    "transformIgnorePatterns": [
+      "/node_modules/(?!react-ga4/)"
     ],
     "coverageDirectory": "./.node_coverage/",
     "collectCoverage": true,
