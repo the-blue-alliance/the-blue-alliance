@@ -87,6 +87,27 @@ describe('AllianceSelectionTable', () => {
     ).toEqual(['4', '6', '-', '-', '-']);
   });
 
+  test('shows_remapped_team_in_picks', () => {
+    render(
+      <AllianceSelectionTable
+        year={2026}
+        remapTeams={{ frc9997: 'frc3467B' }}
+        alliances={[
+          alliance({
+            name: 'Alliance 2',
+            picks: ['frc9997', 'frc1073', 'frc1350'],
+          }),
+        ]}
+      />,
+    );
+    const [, row] = screen.getAllByRole('row');
+    expect(
+      within(row)
+        .getAllByRole('cell')
+        .map((c) => c.textContent),
+    ).toEqual(['2', '3467B', '1073', '1350']);
+  });
+
   test('uses three columns when no alliance has picks', () => {
     render(<AllianceSelectionTable year={2026} alliances={[alliance({})]} />);
     expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);

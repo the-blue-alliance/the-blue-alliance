@@ -78,6 +78,35 @@ describe('RoundRobinRankingsTable', () => {
     expect(within(second).queryByLabelText('Advances')).toBeNull();
   });
 
+  test('shows_remapped_alliance_without_duplicate_team', () => {
+    render(
+      <RoundRobinRankingsTable
+        remapTeams={{ frc9997: 'frc3467B' }}
+        advancement={{
+          level: 'sf',
+          level_name: 'Round Robin Semifinals',
+          type: 'round_robin',
+          sort_order_info: [{ name: 'Points', type: 'int', precision: 0 }],
+          extra_stats_info: [],
+          rankings: [
+            {
+              team_keys: ['frc9997', 'frc1073', 'frc1350', 'frc3467B'],
+              alliance_name: 'Alliance 2',
+              rank: 1,
+              record: { wins: 1, losses: 0, ties: 0 },
+              matches_played: 1,
+              sort_orders: [2],
+              extra_stats: [],
+            },
+          ],
+        }}
+        year={2026}
+      />,
+    );
+    const [, row] = screen.getAllByRole('row');
+    expect(cells(row)[2]).toBe('3467B, 1073, 1350');
+  });
+
   test('falls back to Points without sort info, advancement, or rankings', () => {
     render(
       <RoundRobinRankingsTable

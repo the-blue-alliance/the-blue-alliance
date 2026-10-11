@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { remapTeamKeys } from '~/lib/teamRemap';
 
 const rowVariants = cva('text-center', {
   variants: {
@@ -62,9 +63,14 @@ function extractAllianceNumber(input: string): string {
 export default function AllianceSelectionTable(props: {
   alliances: EliminationAlliance[];
   year: number;
+  remapTeams?: Record<string, string> | null;
 }) {
+  const alliances = props.alliances.map((a) => ({
+    ...a,
+    picks: remapTeamKeys(a.picks, props.remapTeams),
+  }));
   const allianceSize =
-    Math.max(0, ...props.alliances.map((a) => a.picks.length)) || 3;
+    Math.max(0, ...alliances.map((a) => a.picks.length)) || 3;
 
   return (
     <>
@@ -82,7 +88,7 @@ export default function AllianceSelectionTable(props: {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {props.alliances.map((a, idx) => (
+          {alliances.map((a, idx) => (
             <AllianceTableRow
               key={`alliance-${idx}`}
               className="odd:bg-transparent"

@@ -12,15 +12,18 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { remapTeamKeys } from '~/lib/teamRemap';
 
 interface RoundRobinRankingsTableProps {
   advancement: PlayoffAdvancement;
   year: number;
+  remapTeams?: Record<string, string> | null;
 }
 
 export default function RoundRobinRankingsTable({
   advancement,
   year,
+  remapTeams,
 }: RoundRobinRankingsTableProps): JSX.Element {
   const rankings = advancement.rankings ?? [];
   const tiebreakerInfo = advancement.sort_order_info.slice(1);
@@ -51,36 +54,41 @@ export default function RoundRobinRankingsTable({
           </TableRow>
         </TableHeader>
         <TableBody>
-          {rankings.map((row, idx) => (
-            <TableRow key={row.alliance_name} className="text-center">
-              <TableCell>{row.rank ?? idx + 1}</TableCell>
-              <TableCell>{row.alliance_name}</TableCell>
-              <TableCell className="whitespace-nowrap">
-                {row.team_keys.map((teamKey, i) => (
-                  <span key={teamKey}>
-                    <TeamLinkWithTooltip teamKey={teamKey} year={year} />
-                    {i < row.team_keys.length - 1 && ', '}
-                  </span>
-                ))}
-              </TableCell>
-              <TableCell>
-                {row.record
-                  ? `${row.record.wins}-${row.record.losses}-${row.record.ties}`
-                  : '—'}
-              </TableCell>
-              <TableCell>{row.sort_orders[0]}</TableCell>
-              {tiebreakerInfo.map((info, i) => (
-                <TableCell key={info.name}>{row.sort_orders[i + 1]}</TableCell>
-              ))}
-              {showAdvance && (
-                <TableCell>
-                  {row.extra_stats[0] ? (
-                    <BiCheck className="mx-auto" aria-label="Advances" />
-                  ) : null}
+          {rankings.map((row, idx) => {
+            const teamKeys = remapTeamKeys(row.team_keys, remapTeams);
+            return (
+              <TableRow key={row.alliance_name} className="text-center">
+                <TableCell>{row.rank ?? idx + 1}</TableCell>
+                <TableCell>{row.alliance_name}</TableCell>
+                <TableCell className="whitespace-nowrap">
+                  {teamKeys.map((teamKey, i) => (
+                    <span key={teamKey}>
+                      <TeamLinkWithTooltip teamKey={teamKey} year={year} />
+                      {i < teamKeys.length - 1 && ', '}
+                    </span>
+                  ))}
                 </TableCell>
-              )}
-            </TableRow>
-          ))}
+                <TableCell>
+                  {row.record
+                    ? `${row.record.wins}-${row.record.losses}-${row.record.ties}`
+                    : '—'}
+                </TableCell>
+                <TableCell>{row.sort_orders[0]}</TableCell>
+                {tiebreakerInfo.map((info, i) => (
+                  <TableCell key={info.name}>
+                    {row.sort_orders[i + 1]}
+                  </TableCell>
+                ))}
+                {showAdvance && (
+                  <TableCell>
+                    {row.extra_stats[0] ? (
+                      <BiCheck className="mx-auto" aria-label="Advances" />
+                    ) : null}
+                  </TableCell>
+                )}
+              </TableRow>
+            );
+          })}
         </TableBody>
       </Table>
     </>
