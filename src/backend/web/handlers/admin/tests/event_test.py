@@ -261,6 +261,47 @@ def test_event_detail_api_sync_has_code_override_inputs(
     assert nexus_code_input.get("value") == "nexuscode"
 
 
+def test_event_detail_prefills_remap_teams(web_client: Client, login_gae_admin) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 5),
+        remap_teams={"frc9254": "frc254B", "frc9971": "frc971B"},
+    ).put()
+
+    resp = web_client.get("/admin/event/2025nyny")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    textarea = soup.find("textarea", attrs={"name": "remap_teams"})
+    assert textarea is not None
+    assert json.loads(textarea.get_text()) == {"9254": "254B", "9971": "971B"}
+
+
+def test_event_detail_remap_teams_empty(web_client: Client, login_gae_admin) -> None:
+    Event(
+        id="2025nyny",
+        event_short="nyny",
+        year=2025,
+        name="Test Event",
+        event_type_enum=EventType.REGIONAL,
+        start_date=datetime(2025, 3, 1),
+        end_date=datetime(2025, 3, 5),
+    ).put()
+
+    resp = web_client.get("/admin/event/2025nyny")
+    assert resp.status_code == 200
+
+    soup = bs4.BeautifulSoup(resp.data, "html.parser")
+    textarea = soup.find("textarea", attrs={"name": "remap_teams"})
+    assert textarea is not None
+    assert textarea.get_text() == ""
+
+
 def test_event_detail_post_updates_api_code_overrides(
     web_client: Client, login_gae_admin, taskqueue_stub
 ) -> None:

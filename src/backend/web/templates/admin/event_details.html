@@ -279,7 +279,7 @@
       <p>Example:</p>
       <div class="well">{"9254": "254B", "9971": "971B"}</div>
       <form action="/admin/event/remap_teams/{{event.key_name}}" method="post">
-        <textarea class="form-control" name="remap_teams"></textarea><br>
+        <textarea class="form-control" name="remap_teams">{{ remap_teams_json }}</textarea><br>
         <button type="submit" class="btn btn-primary"><span class="glyphicon glyphicon-random"></span> Remap
           Teams</button>
         <input type="hidden" name="csrf_token" value="{{ csrf_token() }}" />

@@ -191,6 +191,16 @@ def event_detail(event_key: EventKey) -> str:
         ),
         "sync_status": sorted(sync_status.items()),
         "event_sync_types": dict(EventSyncType.__members__.items()),
+        "remap_teams_json": (
+            json.dumps(
+                {
+                    k.removeprefix("frc"): v.removeprefix("frc")
+                    for k, v in event.remap_teams.items()
+                }
+            )
+            if event.remap_teams
+            else ""
+        ),
     }
 
     return render_template("admin/event_details.html", template_values)
