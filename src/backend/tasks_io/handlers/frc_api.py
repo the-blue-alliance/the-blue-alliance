@@ -609,8 +609,14 @@ def event_alliances(event_key: EventKey) -> Response:
         return make_response(f"No Event for key: {Markup.escape(event_key)}", 404)
 
     alliance_selections = df.get_event_alliances(event_key).get_result()
+    existing_details = EventDetails.get_by_id(event_key)
+    keep_existing = (
+        alliance_selections == []
+        and existing_details is not None
+        and bool(existing_details.alliance_selections)
+    )
 
-    if alliance_selections is not None:
+    if alliance_selections is not None and not keep_existing:
         if event and event.remap_teams:
             EventRemapTeamsHelper.remapteams_alliances(
                 alliance_selections, event.remap_teams
