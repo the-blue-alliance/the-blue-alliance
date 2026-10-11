@@ -15,6 +15,16 @@ SPEC = (
 
 
 class TeamEventStatusSchemaTest(unittest.TestCase):
+    def test_documented_playoff_fields_bump_patch_version_and_changelog(self) -> None:
+        info = json.loads(SPEC.read_text())["info"]
+        self.assertEqual(info["version"], "3.27.1")
+        self.assertTrue(
+            info["x-changes"].startswith(
+                "3.27.1: Document playoff_type and double_elim_round in "
+                "Team_Event_Status_playoff. "
+            )
+        )
+
     def test_playoff_fields_match_wire_types_and_remain_optional(self) -> None:
         schemas = json.loads(SPEC.read_text())["components"]["schemas"]
         playoff = schemas["Team_Event_Status_playoff"]
