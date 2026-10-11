@@ -1,9 +1,11 @@
 import json
 from datetime import datetime
-from typing import Dict, List, Optional
+from typing import Callable, Dict, List, Optional
+from unittest.mock import patch
 
 import pytest
 from google.appengine.ext import ndb, testbed
+from pyre_extensions import none_throws
 from werkzeug.test import Client
 
 from backend.api.trusted_api_auth_helper import TrustedApiAuthHelper
@@ -13,6 +15,8 @@ from backend.common.consts.event_type import EventType
 from backend.common.consts.playoff_type import PlayoffType
 from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
+from backend.common.models.event_team import EventTeam
+from backend.common.models.team import Team
 
 AUTH_ID = "tEsT_id_0"
 AUTH_SECRET = "321tEsTsEcReT"
@@ -164,6 +168,73 @@ def test_update_event_info(
 
     # We should have a job enqueued to remap data
     assert len(taskqueue_stub.get_filtered_tasks(queue_names="admin")) == 1
+
+
+def test_update_event_info_clears_remap_teams(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub, api_client: Client
+) -> None:
+    setup_event()
+    event = none_throws(Event.get_by_id("2014casj"))
+    event.remap_teams = {"frc9254": "frc254B"}
+    event.put()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+
+    request_body = json.dumps({"remap_teams": {}})
+    api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+
+    assert none_throws(Event.get_by_id("2014casj")).remap_teams == {}
+
+
+def test_update_event_info_saves_event_before_deferring_remap(
+    api_client: Client,
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+    stored_remaps = []
+
+    def record_stored_remaps(*args, **kwargs) -> None:
+        event = Event.get_by_id("2014casj", use_cache=False, use_memcache=False)
+        stored_remaps.append(none_throws(event).remap_teams)
+
+    request_body = json.dumps({"remap_teams": {"frc9254": "frc254B"}})
+    with patch(
+        "backend.api.handlers.trusted.defer_safe", side_effect=record_stored_remaps
+    ):
+        api_client.post(
+            REQUEST_PATH,
+            headers=get_auth_headers(REQUEST_PATH, request_body),
+            data=request_body,
+        )
+
+    assert stored_remaps == [{"frc9254": "frc254B"}]
+
+
+def test_update_event_info_remap_sets_eventteam_remap_fields(
+    run_deferred_tasks: Callable[..., int], api_client: Client
+) -> None:
+    setup_event()
+    setup_auth(access_types=[AuthType.EVENT_INFO])
+    EventTeam(
+        id="2014casj_frc9254",
+        event=ndb.Key(Event, "2014casj"),
+        team=ndb.Key(Team, "frc9254"),
+        year=2014,
+    ).put()
+
+    request_body = json.dumps({"remap_teams": {"frc9254": "frc254B"}})
+    api_client.post(
+        REQUEST_PATH,
+        headers=get_auth_headers(REQUEST_PATH, request_body),
+        data=request_body,
+    )
+    run_deferred_tasks(queue_names=("admin",))
+
+    event_team = none_throws(EventTeam.get_by_id("2014casj_frc9254"))
+    assert (event_team.remapped_to, event_team.remapped_team) == ("frc254B", "frc254")
 
 
 @pytest.mark.parametrize(

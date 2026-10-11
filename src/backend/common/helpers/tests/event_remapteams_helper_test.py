@@ -1,7 +1,8 @@
 import json
-from typing import List
+from typing import Dict, List, Optional
 from unittest.mock import patch
 
+import pytest
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -13,6 +14,7 @@ from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_details import EventDetails
 from backend.common.models.event_ranking import EventRanking
+from backend.common.models.event_team import EventTeam
 from backend.common.models.match import Match
 from backend.common.models.team import Team
 
@@ -215,7 +217,7 @@ def test_remap_teams_missing_event(ndb_context) -> None:
     assert EventRemapTeamsHelper.remap_teams("2019casj") is None
 
 
-def test_remap_teams_nothing_to_remap(ndb_context) -> None:
+def test_remap_teams_nothing_to_remap(ndb_context, taskqueue_stub) -> None:
     Event(
         id="2019casj",
         year=2019,
@@ -288,3 +290,147 @@ def test_remap_teams(ndb_context, taskqueue_stub) -> None:
     assert none_throws(details.rankings2)[0]["team_key"] == "frc1B"
     award = none_throws(Award.get_by_id("2019casj_1"))
     assert award.team_list == [ndb.Key(Team, "frc1B")]
+
+
+def _event_team(team_key: str, remapped_to: Optional[str] = None) -> EventTeam:
+    return EventTeam(
+        id=f"2025mttd_{team_key}",
+        event=ndb.Key(Event, "2025mttd"),
+        team=ndb.Key(Team, team_key),
+        year=2025,
+        remapped_to=remapped_to,
+    )
+
+
+def test_remapteams_eventteams_sets_remapped_to(ndb_context) -> None:
+    event_team = _event_team("frc9997")
+
+    EventRemapTeamsHelper.remapteams_eventteams([event_team], {"frc9997": "frc3467B"})
+
+    assert event_team.remapped_to == "frc3467B"
+
+
+@pytest.mark.parametrize(
+    "new_team, expected",
+    [
+        ("frc1678B", "frc1678"),
+        ("frc1678C", "frc1678"),
+        ("frc1678D", "frc1678"),
+        ("frc10345", "frc10345"),
+    ],
+)
+def test_remapteams_eventteams_sets_remapped_team_without_suffix(
+    ndb_context, new_team: str, expected: str
+) -> None:
+    event_team = _event_team("frc9997")
+
+    EventRemapTeamsHelper.remapteams_eventteams([event_team], {"frc9997": new_team})
+
+    assert event_team.remapped_team == expected
+
+
+def test_remapteams_eventteams_marks_removed_remap_for_clearing(ndb_context) -> None:
+    event_team = _event_team("frc9997", remapped_to="frc3467B")
+
+    EventRemapTeamsHelper.remapteams_eventteams([event_team], {})
+
+    assert (event_team.remapped_to, event_team.remapped_team) == ("None", "None")
+
+
+def test_remapteams_eventteams_leaves_unmapped_team_unset(ndb_context) -> None:
+    event_team = _event_team("frc254")
+
+    EventRemapTeamsHelper.remapteams_eventteams([event_team], {"frc9997": "frc3467B"})
+
+    assert (event_team.remapped_to, event_team.remapped_team) == (None, None)
+
+
+def _put_remap_eventteam_event(
+    remap_teams: Dict[str, str], remapped_to: Optional[str]
+) -> None:
+    event = Event(
+        id="2026nhmm",
+        year=2026,
+        event_short="nhmm",
+        event_type_enum=EventType.OFFSEASON,
+        remap_teams=remap_teams,
+    )
+    event.put()
+    EventTeam(
+        id="2026nhmm_frc9997",
+        event=event.key,
+        team=ndb.Key(Team, "frc9997"),
+        year=2026,
+        remapped_to=remapped_to,
+        remapped_team="frc3467" if remapped_to else None,
+    ).put()
+
+
+def test_remap_teams_sets_eventteam_remap_fields(ndb_context, taskqueue_stub) -> None:
+    _put_remap_eventteam_event({"frc9997": "frc3467B"}, remapped_to=None)
+
+    EventRemapTeamsHelper.remap_teams("2026nhmm")
+
+    event_team = none_throws(EventTeam.get_by_id("2026nhmm_frc9997"))
+    assert (event_team.remapped_to, event_team.remapped_team) == (
+        "frc3467B",
+        "frc3467",
+    )
+
+
+def test_remap_teams_clears_removed_remap(ndb_context, taskqueue_stub) -> None:
+    _put_remap_eventteam_event({}, remapped_to="frc3467B")
+
+    EventRemapTeamsHelper.remap_teams("2026nhmm")
+
+    event_team = none_throws(EventTeam.get_by_id("2026nhmm_frc9997"))
+    assert (event_team.remapped_to, event_team.remapped_team) == (None, None)
+
+
+@pytest.mark.parametrize("remap_teams", [{"frc9997": "frc3467B"}, {}])
+def test_remap_teams_enqueues_event_team_status(
+    ndb_context, taskqueue_stub, remap_teams: Dict[str, str]
+) -> None:
+    _put_remap_eventteam_event(remap_teams, remapped_to=None)
+
+    EventRemapTeamsHelper.remap_teams("2026nhmm")
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="stats")
+    assert [t.url for t in tasks] == ["/tasks/math/do/event_team_status/2026nhmm"]
+
+
+def test_remap_teams_enqueues_event_team_status_after_remapping_matches(
+    ndb_context, taskqueue_stub
+) -> None:
+    _put_remap_eventteam_event({"frc9997": "frc3467B"}, remapped_to=None)
+    Match(
+        id="2026nhmm_qm1",
+        event=ndb.Key(Event, "2026nhmm"),
+        year=2026,
+        comp_level="qm",
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc9997", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 1, "teams": ["frc9997", "frc2", "frc3"]},
+                "blue": {"score": 0, "teams": ["frc4", "frc5", "frc6"]},
+            }
+        ),
+    ).put()
+    match_teams_at_enqueue = []
+
+    def record_match_teams(**kwargs) -> None:
+        match = Match.get_by_id("2026nhmm_qm1", use_cache=False, use_memcache=False)
+        match_teams_at_enqueue.append(none_throws(match).team_key_names)
+
+    with patch(
+        "backend.common.helpers.event_remapteams_helper.taskqueue"
+    ) as taskqueue_mock:
+        taskqueue_mock.add.side_effect = record_match_teams
+        EventRemapTeamsHelper.remap_teams("2026nhmm")
+
+    assert match_teams_at_enqueue == [
+        ["frc3467B", "frc2", "frc3", "frc4", "frc5", "frc6"]
+    ]
+    assert taskqueue_mock.add.call_args.kwargs["countdown"] == 90

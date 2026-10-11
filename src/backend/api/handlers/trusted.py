@@ -179,7 +179,6 @@ def update_event_info(event_key: EventKey) -> Response:
 
     if "remap_teams" in parsed_info:
         event.remap_teams = parsed_info["remap_teams"]
-        defer_safe(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
 
     if "first_event_code" in parsed_info:
         first_code = parsed_info["first_event_code"]
@@ -208,6 +207,8 @@ def update_event_info(event_key: EventKey) -> Response:
         event.disable_sync_flags = parsed_info["sync_disabled_flags"]
 
     EventManipulator.createOrUpdate(event, auto_union=False)
+    if "remap_teams" in parsed_info:
+        defer_safe(EventRemapTeamsHelper.remap_teams, event_key, _queue="admin")
     return profiled_jsonify({"Success": f"Event {event_key} updated"})
 
 

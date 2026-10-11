@@ -192,6 +192,24 @@ class TeamYearEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
         return event_teams
 
 
+class TeamYearRemappedEventTeamsQuery(CachedDatabaseQuery[List[EventTeam], None]):
+    CACHE_VERSION = 1
+    CACHE_KEY_FORMAT = "team_year_remapped_eventteams_{team_key}_{year}"
+    DICT_CONVERTER = None
+
+    def __init__(self, team_key: TeamKey, year: Year) -> None:
+        super().__init__(team_key=team_key, year=year)
+
+    @typed_tasklet
+    def _query_async(
+        self, team_key: TeamKey, year: Year
+    ) -> Generator[Any, Any, List[EventTeam]]:
+        event_teams = yield EventTeam.query(
+            EventTeam.remapped_team == team_key, EventTeam.year == year
+        ).fetch_async()
+        return event_teams
+
+
 class EventDivisionsQuery(CachedDatabaseQuery[List[Event], List[EventDict]]):
     CACHE_VERSION = 4
     CACHE_KEY_FORMAT = "event_divisions_{event_key}"

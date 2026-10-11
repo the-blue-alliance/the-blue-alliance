@@ -4,7 +4,7 @@ import urllib.parse
 from unittest.mock import patch
 
 from freezegun import freeze_time
-from google.appengine.ext import ndb
+from google.appengine.ext import ndb, testbed
 from pyre_extensions import none_throws
 from werkzeug.test import Client
 
@@ -236,3 +236,21 @@ def test_remap_teams_without_details(tasks_client: Client) -> None:
     assert EventDetails.get_by_id("2024test") is None
     award = none_throws(Award.get_by_id("2024test_1"))
     assert award.team_list == [ndb.Key(Team, "frc254")]
+
+
+def test_enqueue_remap_teams_only_queues_events_with_remaps(
+    tasks_client: Client, taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub
+) -> None:
+    Event(
+        id="2025mttd",
+        year=2025,
+        event_short="mttd",
+        event_type_enum=99,
+        remap_teams={"frc9997": "frc1678B"},
+    ).put()
+    Event(id="2025cc", year=2025, event_short="cc", event_type_enum=99).put()
+
+    tasks_client.get("/tasks/enqueue/remap_teams/2025")
+
+    tasks = taskqueue_stub.get_filtered_tasks(queue_names="default")
+    assert [t.url for t in tasks] == ["/tasks/do/remap_teams/2025mttd"]

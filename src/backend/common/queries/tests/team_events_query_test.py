@@ -11,6 +11,7 @@ from backend.common.queries.event_query import (
     TeamEventsQuery,
     TeamYearEventsQuery,
     TeamYearEventTeamsQuery,
+    TeamYearRemappedEventTeamsQuery,
 )
 
 
@@ -99,3 +100,37 @@ def test_team_year_event_teams() -> None:
 
     event_teams = TeamYearEventTeamsQuery(team_key="frc254", year=2020).fetch()
     assert len(event_teams) == 1
+
+
+def preseed_remapped_event_team(
+    event_key: EventKey, team_key: TeamKey, remapped_to: TeamKey
+) -> None:
+    EventTeam(
+        id=f"{event_key}_{team_key}",
+        event=ndb.Key(Event, event_key),
+        team=ndb.Key(Team, team_key),
+        year=int(event_key[:4]),
+        remapped_to=remapped_to,
+        remapped_team="frc1678",
+    ).put()
+
+
+def test_team_year_remapped_event_teams_returns_each_robot() -> None:
+    preseed_remapped_event_team("2025mttd", "frc9997", "frc1678B")
+    preseed_remapped_event_team("2025mttd", "frc9996", "frc1678C")
+    preseed_remapped_event_team("2025mttd", "frc9986", "frc1678D")
+    preseed_remapped_event_team("2024mttd", "frc9997", "frc1678B")
+
+    event_teams = TeamYearRemappedEventTeamsQuery(team_key="frc1678", year=2025).fetch()
+    assert {et.remapped_to for et in event_teams} == {
+        "frc1678B",
+        "frc1678C",
+        "frc1678D",
+    }
+
+
+def test_team_year_remapped_event_teams_excludes_other_teams() -> None:
+    preseed_remapped_event_team("2025mttd", "frc9997", "frc1678B")
+
+    event_teams = TeamYearRemappedEventTeamsQuery(team_key="frc254", year=2025).fetch()
+    assert event_teams == []

@@ -262,3 +262,55 @@ def test_update_from_division_winners_includes_backups(
         f"2012parent_{t.key_name}" for t in teams
     }
     assert et_keys_to_delete == set()
+
+
+@pytest.fixture
+def remapped_event(ndb_stub) -> None:
+    event = Event(
+        id="2026nhmm",
+        event_short="nhmm",
+        year=2026,
+        event_type_enum=EventType.OFFSEASON,
+        remap_teams={"frc9997": "frc3467B"},
+    )
+    event.put()
+    Match(
+        id="2026nhmm_qm1",
+        event=event.key,
+        year=2026,
+        comp_level="qm",
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc3467B", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                AllianceColor.RED: {"teams": ["frc3467B", "frc2", "frc3"], "score": 1},
+                AllianceColor.BLUE: {"teams": ["frc4", "frc5", "frc6"], "score": 0},
+            }
+        ),
+    ).put()
+    EventTeam(
+        id="2026nhmm_frc9997",
+        event=event.key,
+        team=ndb.Key(Team, "frc9997"),
+        year=2026,
+    ).put()
+
+
+def test_keeps_remapped_source_team(remapped_event) -> None:
+    _, _, et_keys_to_delete = EventTeamUpdater.update("2026nhmm", allow_deletes=True)
+    assert ndb.Key(EventTeam, "2026nhmm_frc9997") not in et_keys_to_delete
+
+
+def test_adds_parent_team_of_suffixed_robot(remapped_event) -> None:
+    _, event_teams, _ = EventTeamUpdater.update("2026nhmm", allow_deletes=True)
+    assert "2026nhmm_frc3467" in {et.key_name for et in event_teams}
+
+
+def test_sets_remap_fields_on_remapped_source_team(remapped_event) -> None:
+    _, event_teams, _ = EventTeamUpdater.update("2026nhmm", allow_deletes=True)
+    event_team = next(et for et in event_teams if et.key_name == "2026nhmm_frc9997")
+    assert (event_team.remapped_to, event_team.remapped_team) == (
+        "frc3467B",
+        "frc3467",
+    )

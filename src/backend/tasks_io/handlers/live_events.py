@@ -195,7 +195,7 @@ def update_event_team_status(event_key: EventKey) -> Response:
     event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
     for event_team in event_teams:
         status = EventTeamStatusHelper.generate_team_at_event_status(
-            event_team.team.id(), event
+            event_team.competing_team_key, event
         )
         event_team.status = status
         # FirebasePusher.update_event_team_status(event_key, event_team.team.id(), status)
