@@ -3,11 +3,9 @@
 READ-ONLY: this script contains no delete code. It lists objects under a
 prefix of the archive bucket, decides which snapshots are byte-identical
 repeats of the snapshot kept before them, byte-compares a random sample of
-those decisions, and writes a Storage Batch Operations manifest. Deleting is a
+those decisions, and writes a generation-pinned manifest. Deleting is a
 separate, manual step: a maintainer reviews the outputs and then runs
-
-    gcloud storage batch-operations jobs create ... \\
-        --manifest-location=gs://<scratch>/manifest.csv --delete-object
+delete_from_manifest.py on manifest.csv.
 
 The rule: within one directory (object name up to the last "/"), walk objects
 in name order (= time order) and keep an object unless its md5Hash, crc32c and
