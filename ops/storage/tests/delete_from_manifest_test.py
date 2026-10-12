@@ -234,15 +234,54 @@ def test_412_not_retried(tmp_path: Any) -> None:
     assert outcome_of(tmp_path, [412, 204]) == (PRECONDITION_FAILED, 1)
 
 
-@pytest.mark.parametrize("status", [429, 503, None])
+@pytest.mark.parametrize("status", [401, 429, 503, None])
 def test_transient_retried_then_success(tmp_path: Any, status: Optional[int]) -> None:
-    # 429, 5xx and network errors are retried until they succeed.
+    # 401, 429, 5xx and network errors are retried until they succeed.
     assert outcome_of(tmp_path, [status, status, 204]) == (DELETED, 3)
 
 
 def test_other_4xx_failed_without_retry(tmp_path: Any) -> None:
     # Other client errors fail immediately.
     assert outcome_of(tmp_path, [403, 204]) == (FAILED, 1)
+
+
+def test_401_refreshes_credentials() -> None:
+    # A 401 in a batch mints a new access token before the retry.
+    refreshed = []
+
+    class Creds:
+        def refresh(self, request: Any) -> None:
+            refreshed.append(request)
+
+    class Resp:
+        status_code = 401
+
+    class FakeBatch:
+        _responses = [Resp()]
+
+        def __enter__(self) -> "FakeBatch":
+            return self
+
+        def __exit__(self, *a: Any) -> None:
+            pass
+
+    class FakeBucket:
+        def delete_blob(self, *a: Any, **k: Any) -> None:
+            pass
+
+    class FakeClient:
+        _credentials = Creds()
+
+        def bucket(self, name: str) -> FakeBucket:
+            return FakeBucket()
+
+        def batch(self, raise_exception: bool) -> FakeBatch:
+            return FakeBatch()
+
+    GcsBatchDeleter(FakeClient()).delete(
+        [ManifestRow(bucket="b", name="o", generation=1)]
+    )
+    assert len(refreshed) == 1
 
 
 def test_batch_exception_retried(tmp_path: Any) -> None:

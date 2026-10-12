@@ -81,6 +81,8 @@ from typing import (
     Tuple,
 )
 
+import google.auth.transport.requests
+
 if __name__ == "__main__" and not __package__:
     sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
@@ -238,7 +240,7 @@ def classify(status: Optional[int]) -> Optional[str]:
         return ALREADY_GONE
     if status == 412:
         return PRECONDITION_FAILED
-    if status is None or status in (408, 429) or status >= 500:
+    if status is None or status in (401, 408, 429) or status >= 500:
         return None
     return FAILED
 
@@ -280,7 +282,16 @@ class GcsBatchDeleter:
                 bucket.delete_blob(
                     row.name, if_generation_match=row.generation, retry=None
                 )
-        return [r.status_code for r in batch._responses]
+        statuses = [r.status_code for r in batch._responses]
+        if 401 in statuses:
+            # The access token expired mid-run; mint a new one before the retry.
+            self.refresh_credentials()
+        return statuses
+
+    def refresh_credentials(self) -> None:
+        credentials = getattr(self.client, "_credentials", None)
+        if credentials is not None:
+            credentials.refresh(google.auth.transport.requests.Request())
 
 
 @dataclass

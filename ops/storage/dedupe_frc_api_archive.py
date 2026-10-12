@@ -256,10 +256,11 @@ class GcloudUserCredentials(Credentials):
             capture_output=True,
             text=True,
         ).stdout.strip()
+        # gcloud returns its cached token, which may expire soon; refresh often.
         # google-auth compares expiry as naive UTC.
         self.expiry = datetime.datetime.now(UTC).replace(
             tzinfo=None
-        ) + datetime.timedelta(minutes=45)
+        ) + datetime.timedelta(minutes=5)
 
 
 def _to_object_info(blob: Any) -> ObjectInfo:
