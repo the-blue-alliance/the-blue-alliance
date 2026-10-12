@@ -105,7 +105,7 @@ class FCMRequest(Request):
         ]
 
         return messaging.MulticastMessage(
-            fids=self.tokens,
+            tokens=self.tokens,
             data=data_payload,
             notification=self.notification.fcm_notification,
             android=android_config,
