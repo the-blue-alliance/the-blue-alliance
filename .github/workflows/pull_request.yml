@@ -70,7 +70,7 @@ jobs:
         uses: astral-sh/setup-uv@v7
       - name: Run Tests
         if: steps.changes.outputs.python == 'true'
-        run: make test-ci ARGS='src --cov --splits 5 --group ${{ matrix.group }}'
+        run: make test-ci ARGS='src ops/storage --cov --splits 5 --group ${{ matrix.group }}'
       - name: Save coverage artifacts
         if: steps.changes.outputs.python == 'true'
         uses: actions/upload-artifact@v7
