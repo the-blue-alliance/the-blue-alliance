@@ -4,6 +4,7 @@ from google.appengine.api import wrap_wsgi_app
 
 from backend.common.auth import _user_context_processor, SESSION_COOKIE_LIFETIME
 from backend.common.flask_cache import configure_flask_cache
+from backend.common.gzip_middleware import configure_gzip
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
@@ -91,6 +92,7 @@ install_middleware(app, configure_secret_key=True, include_appspot_redirect=True
 app.config["PERMANENT_SESSION_LIFETIME"] = SESSION_COOKIE_LIFETIME
 install_url_converters(app)
 configure_flask_cache(app)
+configure_gzip(app)
 
 csrf = CSRFProtect()
 csrf.init_app(app)

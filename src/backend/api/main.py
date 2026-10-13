@@ -10,6 +10,7 @@ from backend.api.handlers.warmup import warmup
 from backend.api.moderation_api_main import moderation_api
 from backend.api.trusted_api_main import trusted_api
 from backend.common.flask_cache import configure_flask_cache
+from backend.common.gzip_middleware import configure_gzip
 from backend.common.logging import configure_logging
 from backend.common.middleware import install_middleware
 from backend.common.url_converters import install_url_converters
@@ -34,6 +35,7 @@ app.wsgi_app = wrap_wsgi_app(app.wsgi_app)
 install_middleware(app, configure_secret_key=True, include_appspot_redirect=True)
 install_url_converters(app)
 configure_flask_cache(app)
+configure_gzip(app)
 
 app.json.compact = True  # pyre-ignore[16]
 app.url_map.converters["simple_model_type"] = SimpleModelTypeConverter
