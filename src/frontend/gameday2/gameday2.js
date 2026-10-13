@@ -257,14 +257,20 @@ store.subscribe(() => {
   }
 });
 
-// Load myTBA Favorites
-fetch("/_/account/favorites/1", {
-  credentials: "same-origin",
-})
-  .then((response) => {
-    if (response.status === 200) {
-      return response.json();
-    }
-    return [];
+// Load myTBA Favorites. tba-signed-in is set by the server for signed-in
+// sessions; without it there are no favorites to fetch.
+const isSignedIn = document.cookie
+  .split("; ")
+  .some((cookie) => cookie.startsWith("tba-signed-in="));
+if (isSignedIn) {
+  fetch("/_/account/favorites/1", {
+    credentials: "same-origin",
   })
-  .then((json) => store.dispatch(setFavoriteTeams(json)));
+    .then((response) => {
+      if (response.status === 200) {
+        return response.json();
+      }
+      return [];
+    })
+    .then((json) => store.dispatch(setFavoriteTeams(json)));
+}

@@ -82,6 +82,7 @@ from backend.web.handlers.webcasts import webcast_list
 from backend.web.handlers.webhooks import blueprint as webhooks
 from backend.web.jinja2_filters import register_template_filters
 from backend.web.local.blueprint import maybe_register as maybe_install_local_routes
+from backend.web.signed_in_cookie import sync_signed_in_cookie
 
 configure_logging()
 
@@ -239,6 +240,7 @@ app.register_error_handler(500, handle_500)
 app.context_processor(_user_context_processor)
 app.context_processor(render_time_context_processor)
 app.context_processor(pwa_url_context_processor)
+app.after_request(sync_signed_in_cookie)
 
 register_template_filters(app)
 maybe_install_local_routes(app, csrf)
