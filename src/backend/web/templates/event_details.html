@@ -577,7 +577,7 @@
 
 {% block inline_javascript %}
 {% if event.now %}
-<script type="text/javascript" src="/py3_javascript/liveevent.min.js"></script>
+<script type="text/javascript" src="{{ static_asset_url("javascript/liveevent.min.js") }}"></script>
 {% endif %}
 <script type="text/javascript">
   function downloadCSVFromTextarea(textareaId, filename) {

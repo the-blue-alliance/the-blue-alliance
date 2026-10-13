@@ -87,7 +87,7 @@
 
 {% block inline_javascript %}
 {% if zebra_data %}
-<script type="text/javascript" src="/py3_javascript/zebramotionworks.min.js"></script>
+<script type="text/javascript" src="{{ static_asset_url("javascript/zebramotionworks.min.js") }}"></script>
 {% endif %}
 <script src="//cdnjs.cloudflare.com/ajax/libs/Chart.js/2.7.2/Chart.min.js" integrity="sha384-0saKbDOWtYAw5aP4czPUm6ByY5JojfQ9Co6wDgkuM7Zn+anp+4Rj92oGK8cbV91S" crossorigin="anonymous"></script>
 <script type="text/javascript">
