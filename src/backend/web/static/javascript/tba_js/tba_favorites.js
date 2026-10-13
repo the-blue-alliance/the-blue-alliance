@@ -1,4 +1,6 @@
 var favoriteTeamsCookieName = "tba-favorite-teams";
+// Set by the server while this browser has a signed-in session
+var signedInCookieName = "tba-signed-in";
 var cachedCsrfToken = null;
 
 function withCsrfToken(success, error) {
@@ -70,6 +72,8 @@ function updateFavoriteTeams(teamKey, action, skipDelay, csrfToken, isCsrfRetry)
         }
       });
     }
+  } else if (!isSignedIn()) {
+    updatePageFavoriteTeams({}, skipDelay);
   } else {
     if (storedFavoriteTeams == null) {
       $.ajax({
@@ -118,6 +122,10 @@ function handleFavoriteError(xhr, teamKey, action, isCsrfRetry) {
     showFavoriteError(action);
   }
   updateFavoriteTeams(null, null, false);
+}
+
+function isSignedIn() {
+  return $.cookie(signedInCookieName) != null;
 }
 
 function getLocalFavoriteTeams() {
@@ -202,6 +210,10 @@ function updateTeamFABFavoriteTeams(favoriteTeams) {
 function setupFavClick(action, hideSelector) {
   $(".tba-fab-team").off("click");  // make sure only one click handler is attached at a time
   $(".tba-fab-team").click(function() {
+    if (!isSignedIn()) {
+      $('#login-modal').modal('show');
+      return;
+    }
     $(".tba-fab-team").off("click");
     $(this).find(hideSelector).hide();
     addSpinner($(this));
