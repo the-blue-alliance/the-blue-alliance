@@ -1,5 +1,5 @@
 {
-  "name": "sample-noisy-request-logs",
-  "description": "Keep 10% of warning-free py3-api 304s and py3-tasks-io task queue 200s",
-  "filter": "log_id(\"appengine.googleapis.com/request_log\") AND ((resource.labels.module_id=\"py3-api\" AND protoPayload.status=304) OR (resource.labels.module_id=\"py3-tasks-io\" AND protoPayload.status=200 AND protoPayload.resource:\"/_ah/queue\")) AND severity<WARNING AND sample(insertId, 0.9)"
+  "name": "sample-successful-request-logs",
+  "description": "Keep 10% of App Engine request logs for 2xx/3xx requests with no warnings or errors",
+  "filter": "log_id(\"appengine.googleapis.com/request_log\") AND protoPayload.status>=200 AND protoPayload.status<400 AND severity<WARNING AND sample(insertId, 0.9)"
 }
