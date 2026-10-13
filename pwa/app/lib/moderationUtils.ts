@@ -243,10 +243,16 @@ function matchTokens(
         `match ${set}`,
       ];
     case 'ef':
-      return [`ef${set}m${num}`, `octofinal ${set}`, `eighth final ${set}`];
+      return [
+        `ef${set}m${num}`,
+        `ef${set} ${num}`,
+        `octofinal ${set}`,
+        `eighth final ${set}`,
+      ];
     case 'qf':
       return [
         `qf${set}m${num}`,
+        `qf${set} ${num}`,
         `qf${set}`,
         `quarterfinal ${set}`,
         `quarter final ${set}`,
@@ -255,6 +261,7 @@ function matchTokens(
       // Double-elim (2023+) semifinal keys are also called "Playoff Match N"
       return [
         `sf${set}m${num}`,
+        `sf${set} ${num}`,
         `sf${set}`,
         `semifinal ${set}`,
         `semi final ${set}`,
@@ -265,12 +272,26 @@ function matchTokens(
     case 'f':
       return [
         `f${set}m${num}`,
+        `f${set} ${num}`,
         `final ${num}`,
         `finals ${num}`,
         `final`,
         `finals`,
       ];
   }
+}
+
+/**
+ * Whole-word match of a token against a normalized title, allowing optional
+ * spaces between letters and digits ("qm10" matches "QM 10" and "Q M 10") but
+ * not across words ("sf1 1" matches "SF1-1" but not "SF 11"). Bounded by
+ * spaces so "qm1" doesn't match "QM10" and "f1m1" doesn't match "SF1M1".
+ */
+function titleMentions(title: string, token: string): boolean {
+  const words = token
+    .split(' ')
+    .map((word) => (word.match(/[a-z]+|\d+/g) ?? []).join(' ?'));
+  return new RegExp(` ${words.join(' ')} `).test(title);
 }
 
 const EVENT_NAME_STOPWORDS = new Set([
@@ -304,9 +325,7 @@ export function matchVideoTitleWarning(
     Number(setStr),
     Number(numStr ?? '1'),
   );
-  const mentionsMatch = tokens.some((token) =>
-    token.includes(' ') ? title.includes(` ${token} `) : title.includes(token),
-  );
+  const mentionsMatch = tokens.some((token) => titleMentions(title, token));
   if (mentionsMatch) return undefined;
 
   const eventTokens = new Set<string>();
