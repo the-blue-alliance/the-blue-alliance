@@ -30,6 +30,11 @@ APPROVED = "Approved"
 DECLINED = "Declined"
 NEEDS_REVIEW = "Needs review"
 
+# What the PWA's review page sends when the moderator types nothing
+# (DEFAULT_USER_MESSAGE in pwa/app/lib/moderationUtils.ts). Fine as a note on
+# an approval, but not a reason for a decline.
+PWA_DEFAULT_USER_MESSAGE = "Thanks for helping make TBA better!"
+
 USER_EMAIL_FOOTER = (
     f"\nQuestions? Email us at {CONTACT_EMAIL}\n\n"
     "Thanks,\nThe Blue Alliance Admins\n"
@@ -144,15 +149,39 @@ class SuggestionNotifier:
                 f"{event_label} ({event_key})."
             )
             next_steps = [
-                f"Find your keys on your account page: {WWW_BASE_URL}/account",
+                f"Sign in to The Blue Alliance as {author.email} and open "
+                f"EventWizard: {WWW_BASE_URL}/eventwizard",
+                f"Choose {event_label} ({event_key}) from the Select Event list. "
+                "While you are signed in, EventWizard uses the keys on your "
+                "account, so you do not need to enter the key ID or secret.",
+                "Use EventWizard's tabs to upload the data your keys cover, "
+                "such as teams, the schedule, match results, or match videos.",
+                "Your key ID and secret are listed on your account page, for "
+                "tools other than EventWizard: "
+                f"{WWW_BASE_URL}/account#api-write-keys-row",
             ]
+            reviewer_note_label = "Note from the reviewer:"
+            reviewer_note = user_message
         else:
             outcome_line = (
                 f"We have reviewed your request for {API_WRITE_KEYS} for "
                 f"{event_label} ({event_key}) and have regretfully declined to "
                 "issue keys."
             )
-            next_steps = []
+            next_steps = [
+                "If something in your request was wrong (such as the event key "
+                "or your role), submit a new request: "
+                f"{WWW_BASE_URL}/request/apiwrite",
+                "If you are not sure what to change, email "
+                f"{CONTACT_EMAIL} with the details of your request.",
+            ]
+            reviewer_note_label = "Reason from the reviewer:"
+            # The PWA's stock thank-you is not a reason for declining
+            reviewer_note = (
+                None
+                if (user_message or "").strip() == PWA_DEFAULT_USER_MESSAGE
+                else user_message
+            )
         OutgoingNotificationHelper.send_suggestion_result_email(
             to=author.email,
             subject=cls._subject(
@@ -161,7 +190,11 @@ class SuggestionNotifier:
                 event_label,
             ),
             email_body=cls._user_email_body(
-                author, outcome_line, next_steps, user_message
+                author,
+                outcome_line,
+                next_steps,
+                reviewer_note,
+                reviewer_note_label=reviewer_note_label,
             ),
         )
 
@@ -223,11 +256,11 @@ class SuggestionNotifier:
                 f"Your suggestion for {event_label} has been approved.",
                 [
                     f"See the event: {WWW_BASE_URL}/event/{event_key}",
-                    "If you are the event's organizer and would like to upload "
-                    "teams attending, match videos, or real-time match results "
-                    "to TBA before or during the event, you can do so using the "
-                    f"TBA EventWizard. Request {API_WRITE_KEYS} here: "
-                    f"{WWW_BASE_URL}/request/apiwrite",
+                    "If you organize this event and want to post teams, the "
+                    f"schedule, or live results: request {API_WRITE_KEYS} for "
+                    f"{event_key} at {WWW_BASE_URL}/request/apiwrite",
+                    "Once a moderator approves them, upload data with "
+                    f"EventWizard: {WWW_BASE_URL}/eventwizard",
                 ],
             ),
         )
@@ -246,6 +279,7 @@ class SuggestionNotifier:
         outcome_line: str,
         next_steps: List[str],
         reviewer_note: Optional[str] = None,
+        reviewer_note_label: str = "Note from the reviewer:",
     ) -> str:
         """Greeting, outcome, next steps, reviewer note, then the shared footer."""
         body = f"Hi {cls._display_name(recipient)},\n\n{outcome_line}\n"
@@ -255,7 +289,7 @@ class SuggestionNotifier:
             )
         note = (reviewer_note or "").strip()
         if note:
-            body += f"\nNote from the reviewer:\n{note}\n"
+            body += f"\n{reviewer_note_label}\n{note}\n"
         return body + USER_EMAIL_FOOTER
 
     @classmethod
