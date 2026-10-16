@@ -321,8 +321,6 @@ def test_apiwrite_slack_alert_approved(
         ":white_check_mark: *Approved: API write keys for "
         "<https://www.thebluealliance.com/event/2026cc|2026cc> "
         "(2026 Chezy Champs)*",
-        "Requested by Alice Author (author@example.com) · approved by "
-        "Mod Erator (mod@tba.com)",
         "> Enjoy the keys!",
         "<https://www.thebluealliance.com/admin/api_auth/edit/authid123|View the key>",
     ]
@@ -340,8 +338,7 @@ def test_apiwrite_slack_alert_declined(
     _, body = sent_slack_alerts[0]
     lines = body.split("\n")
     assert lines[0].startswith(":x: *Declined: API write keys for <")
-    assert lines[1].endswith(" · declined by Mod Erator (mod@tba.com)")
-    assert lines[2:] == ["> Please ask your mentor."]
+    assert lines[1:] == ["> Please ask your mentor."]
 
 
 def test_apiwrite_slack_alert_quotes_each_message_line(
@@ -354,16 +351,12 @@ def test_apiwrite_slack_alert_quotes_each_message_line(
     )
 
     _, body = sent_slack_alerts[0]
-    assert body.split("\n")[2:] == ["> First line", "> ", "> Third line"]
+    assert body.split("\n")[1:] == ["> First line", "> ", "> Third line"]
 
 
 def test_apiwrite_slack_alert_escapes_stored_text(
-    reviewer: Account, event: Event, sent_slack_alerts
+    author: Account, reviewer: Account, event: Event, sent_slack_alerts
 ) -> None:
-    author = Account(
-        id="sneaky_uid", email="a&b@example.com", display_name="<!channel>"
-    )
-    author.put()
     event.name = "Champs <b> & co"
     event.put()
     suggestion_key = _apiwrite_suggestion(author)
@@ -375,8 +368,7 @@ def test_apiwrite_slack_alert_escapes_stored_text(
     _, body = sent_slack_alerts[0]
     lines = body.split("\n")
     assert lines[0].endswith("(2026 Champs &lt;b&gt; &amp; co)*")
-    assert lines[1].startswith("Requested by &lt;!channel&gt; (a&amp;b@example.com)")
-    assert lines[2] == "> &lt;!channel&gt; a &amp; b"
+    assert lines[1] == "> &lt;!channel&gt; a &amp; b"
     assert "<!channel>" not in body
 
 
@@ -393,17 +385,17 @@ def test_apiwrite_slack_alert_without_event_names_just_the_key(
     )
 
 
-def test_apiwrite_slack_alert_without_message_or_reviewer(
-    author: Account, event: Event, sent_slack_alerts
+def test_apiwrite_slack_alert_names_no_one(
+    author: Account, reviewer: Account, event: Event, sent_slack_alerts
 ) -> None:
-    suggestion_key = _apiwrite_suggestion(author, reviewer_id=None)
+    suggestion_key = _apiwrite_suggestion(author)
 
     SuggestionNotifier._deliver_apiwrite_verdict_slack(suggestion_key, True, None, None)
 
     _, body = sent_slack_alerts[0]
-    assert body.split("\n")[1:] == [
-        "Requested by Alice Author (author@example.com) · approved by account unknown"
-    ]
+    assert body.count("\n") == 0
+    for private in ("Alice", "author@example.com", "Mod Erator", "mod@tba.com", "@"):
+        assert private not in body
 
 
 def test_apiwrite_slack_alert_skipped_without_a_hook(

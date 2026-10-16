@@ -175,20 +175,14 @@ class SuggestionNotifier:
         user_message: Optional[str],
         auth_id: Optional[str],
     ) -> None:
-        """Tell the moderators' channel what was decided and by whom."""
+        """Tell the moderators' channel what was decided."""
         channel_url = SlackHookUrls.url_for("suggestion-nag")
         if not channel_url:
             return
         loaded = cls._apiwrite_suggestion_and_event(suggestion_key)
         if loaded is None:
             return
-        suggestion, event_key, event = loaded
-        # The review already recorded who made the call
-        reviewer_key: Optional[ndb.Key] = suggestion.reviewer
-        reviewer: Optional[Account] = reviewer_key.get() if reviewer_key else None
-        reviewer_id = str(reviewer_key.id()) if reviewer_key else "unknown"
-        author_key: ndb.Key = suggestion.author
-        author: Optional[Account] = author_key.get()
+        _, event_key, event = loaded
 
         if event is None:
             event_label = slack_escape(event_key)
@@ -200,10 +194,6 @@ class SuggestionNotifier:
             f"{':white_check_mark:' if accepted else ':x:'} "
             f"*{APPROVED if accepted else DECLINED}: {API_WRITE_KEYS} for "
             f"{event_label}*",
-            "Requested by "
-            + slack_escape(cls._describe(author, fallback=str(author_key.id())))
-            + f" · {'approved' if accepted else 'declined'} by "
-            + slack_escape(cls._describe(reviewer, fallback=reviewer_id)),
         ]
         message = (user_message or "").strip()
         if message:
