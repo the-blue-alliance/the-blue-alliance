@@ -179,9 +179,43 @@ def test_suggest_api_write_alerts_admins(
     assert run_deferred_tasks() == 1
     subject, body = sent_admin_alerts[0]
     assert subject == "[TBA] Needs review: 2016necmp API write keys"
-    assert "(test@tba.com) has made a request" in body
+    assert "Requester: " in body and "(test@tba.com)\n" in body
+    assert "Role: Test Code\n" in body
+    assert "Permissions requested: match video\n" in body
     assert "https://www.thebluealliance.com/event/2016necmp" in body
     assert "suggest/review/api_auth_access" in body
+
+
+def test_suggest_api_write_alert_lists_only_requestable_permissions(
+    login_user,
+    ndb_stub,
+    taskqueue_stub,
+    run_deferred_tasks,
+    sent_admin_alerts,
+    web_client: Client,
+) -> None:
+    Event(
+        id="2016nhgrs",
+        name="Granite State",
+        event_type_enum=EventType.DISTRICT,
+        event_short="nhgrs",
+        year=2016,
+        start_date=datetime(2016, 3, 3),
+        end_date=datetime(2016, 3, 5),
+    ).put()
+    web_client.post(
+        "/request/apiwrite",
+        data={
+            "event_key": "2016nhgrs",
+            "role": "Volunteer",
+            "auth_types": [int(AuthType.MATCH_VIDEO), int(AuthType.EVENT_TEAMS)],
+        },
+    )
+
+    # Season events only accept match video requests
+    assert run_deferred_tasks() == 1
+    _, body = sent_admin_alerts[0]
+    assert "Permissions requested: match video\n" in body
 
 
 def test_suggest_api_write_no_alert_on_failure(
