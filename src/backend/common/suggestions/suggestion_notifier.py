@@ -1,5 +1,5 @@
 import logging
-from typing import Any, Callable, Optional, Tuple
+from typing import Any, Callable, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
@@ -21,6 +21,19 @@ from backend.common.sitevars.slack_hook_urls import SlackHookUrls
 # exactly one thing so a retry never re-sends something that already worked.
 TASKS_TARGET = "py3-tasks-io"
 NOTIFICATIONS_QUEUE = "notifications"
+
+# One name for the feature in every message, whatever the code calls it
+API_WRITE_KEYS = "API write keys"
+
+# Subjects lead with one of these so the inbox shows the result first
+APPROVED = "Approved"
+DECLINED = "Declined"
+NEEDS_REVIEW = "Needs review"
+
+USER_EMAIL_FOOTER = (
+    f"\nQuestions? Email us at {CONTACT_EMAIL}\n\n"
+    "Thanks,\nThe Blue Alliance Admins\n"
+)
 
 
 class SuggestionNotifier:
@@ -85,9 +98,9 @@ class SuggestionNotifier:
         account = Account.get_by_id(account_id)
         requester = cls._describe(account, fallback=account_id)
         OutgoingNotificationHelper.send_admin_alert_email(
-            subject=f"Trusted API Key Request for {event_key}",
+            subject=cls._subject(NEEDS_REVIEW, f"{event_key} {API_WRITE_KEYS}"),
             email_body=(
-                f"{requester} has made a request for trusted API keys for the "
+                f"{requester} has made a request for {API_WRITE_KEYS} for the "
                 f"event {event_key}.\n\n"
                 f"View the event at {WWW_BASE_URL}/event/{event_key}\n\n"
                 "Review the request at "
@@ -98,7 +111,7 @@ class SuggestionNotifier:
     @classmethod
     def _deliver_offseason_event_suggested(cls, event_name: str) -> None:
         OutgoingNotificationHelper.send_admin_alert_email(
-            subject=f"New Offseason Event Suggestion: {event_name}",
+            subject=cls._subject(NEEDS_REVIEW, f'offseason event "{event_name}"'),
             email_body=(
                 "A new offseason event suggestion has been submitted with title: "
                 f"{event_name}.\n\n"
@@ -111,7 +124,7 @@ class SuggestionNotifier:
     def _deliver_apiwrite_verdict_email(
         cls, suggestion_key: str, accepted: bool, user_message: Optional[str]
     ) -> None:
-        """Tell the requester whether their Trusted API key request was granted."""
+        """Tell the requester whether their API write key request was granted."""
         loaded = cls._apiwrite_suggestion_and_event(suggestion_key)
         if loaded is None:
             return
@@ -124,29 +137,31 @@ class SuggestionNotifier:
             )
             return
 
-        message = (user_message or "").strip()
+        event_label = f"{event.year} {event.name}"
         if accepted:
-            verdict_text = (
-                "We have accepted your request for auth tokens so you can add "
-                f"data to the following event: {event.year} {event.name}\n\n"
-                "You can find the keys on your account overview page: "
-                f"{WWW_BASE_URL}/account\n"
+            outcome_line = (
+                f"We have accepted your request for {API_WRITE_KEYS} for "
+                f"{event_label} ({event_key})."
             )
+            next_steps = [
+                f"Find your keys on your account page: {WWW_BASE_URL}/account",
+            ]
         else:
-            verdict_text = (
-                f"We have reviewed your request for auth tokens for {event.year} "
-                f"{event.name} and have regretfully declined to issue keys.\n"
+            outcome_line = (
+                f"We have reviewed your request for {API_WRITE_KEYS} for "
+                f"{event_label} ({event_key}) and have regretfully declined to "
+                "issue keys."
             )
+            next_steps = []
         OutgoingNotificationHelper.send_suggestion_result_email(
             to=author.email,
-            subject=f"The Blue Alliance Auth Tokens for {event_key}",
-            email_body=(
-                f"Hi {cls._display_name(author)},\n\n"
-                f"{verdict_text}"
-                + (f"\n{message}\n" if message else "")
-                + "\nIf you have any questions, please don't hesitate to reach out "
-                f"to us at {CONTACT_EMAIL}\n\n"
-                "Thanks,\nTBA Admins\n"
+            subject=cls._subject(
+                APPROVED if accepted else DECLINED,
+                f"{event_key} {API_WRITE_KEYS}",
+                event_label,
+            ),
+            email_body=cls._user_email_body(
+                author, outcome_line, next_steps, user_message
             ),
         )
 
@@ -198,23 +213,50 @@ class SuggestionNotifier:
                 f"missing author email or event {event_key!r}"
             )
             return
+        event_label = f"{event.year} {event.name}"
         OutgoingNotificationHelper.send_suggestion_result_email(
             to=author.email,
-            subject=f"[TBA] Offseason Event Suggestion: {event.name}",
-            email_body=(
-                f"Hi {cls._display_name(author)},\n\n"
+            subject=cls._subject(APPROVED, f"{event_key} offseason event", event_label),
+            email_body=cls._user_email_body(
+                author,
                 "Thank you for suggesting an offseason event to The Blue Alliance. "
-                "Your suggestion has been approved and you can find the event at "
-                f"{WWW_BASE_URL}/event/{event_key}\n\n"
-                "If you are the event's organizer and would like to upload teams "
-                "attending, match videos, or real-time match results to TBA before "
-                "or during the event, you can do so using the TBA EventWizard. "
-                f"Request auth keys here: {WWW_BASE_URL}/request/apiwrite\n\n"
-                "Thanks for helping make TBA better,\nThe Blue Alliance Admins\n"
+                f"Your suggestion for {event_label} has been approved.",
+                [
+                    f"See the event: {WWW_BASE_URL}/event/{event_key}",
+                    "If you are the event's organizer and would like to upload "
+                    "teams attending, match videos, or real-time match results "
+                    "to TBA before or during the event, you can do so using the "
+                    f"TBA EventWizard. Request {API_WRITE_KEYS} here: "
+                    f"{WWW_BASE_URL}/request/apiwrite",
+                ],
             ),
         )
 
     # ----- helpers -----
+
+    @staticmethod
+    def _subject(outcome: str, topic: str, detail: Optional[str] = None) -> str:
+        """'<Outcome>: <topic> (<detail>)', so an inbox shows the result first."""
+        return f"{outcome}: {topic}" + (f" ({detail})" if detail else "")
+
+    @classmethod
+    def _user_email_body(
+        cls,
+        recipient: Account,
+        outcome_line: str,
+        next_steps: List[str],
+        reviewer_note: Optional[str] = None,
+    ) -> str:
+        """Greeting, outcome, next steps, reviewer note, then the shared footer."""
+        body = f"Hi {cls._display_name(recipient)},\n\n{outcome_line}\n"
+        if next_steps:
+            body += "\nWhat you can do next:\n" + "".join(
+                f"{i}. {step}\n" for i, step in enumerate(next_steps, start=1)
+            )
+        note = (reviewer_note or "").strip()
+        if note:
+            body += f"\nNote from the reviewer:\n{note}\n"
+        return body + USER_EMAIL_FOOTER
 
     @classmethod
     def _apiwrite_suggestion_and_event(

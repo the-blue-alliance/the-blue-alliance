@@ -1,4 +1,5 @@
-from typing import Optional
+import re
+from typing import List, Optional, Tuple
 
 import pytest
 from google.appengine.ext import ndb
@@ -9,7 +10,10 @@ from backend.common.models.account import Account
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
-from backend.common.suggestions.suggestion_notifier import SuggestionNotifier
+from backend.common.suggestions.suggestion_notifier import (
+    SuggestionNotifier,
+    USER_EMAIL_FOOTER,
+)
 
 
 def _apiwrite_suggestion(
@@ -132,8 +136,8 @@ def test_admin_alerts_run_as_deferred_tasks(
     assert sent_admin_alerts == []
     assert run_deferred_tasks() == 2
     assert [subject for subject, _ in sent_admin_alerts] == [
-        "Trusted API Key Request for 2026cc",
-        "New Offseason Event Suggestion: Chezy Champs",
+        "Needs review: 2026cc API write keys",
+        'Needs review: offseason event "Chezy Champs"',
     ]
 
 
@@ -164,7 +168,7 @@ def test_apiwrite_requested_alerts_admins(author: Account, sent_admin_alerts) ->
 
     assert len(sent_admin_alerts) == 1
     subject, body = sent_admin_alerts[0]
-    assert subject == "Trusted API Key Request for 2026cc"
+    assert subject == "Needs review: 2026cc API write keys"
     assert "Alice Author (author@example.com)" in body
     assert "https://www.thebluealliance.com/event/2026cc" in body
     assert "https://beta.thebluealliance.com/suggest/review/api_auth_access" in body
@@ -186,7 +190,7 @@ def test_offseason_event_suggested_alerts_admins(sent_admin_alerts) -> None:
 
     assert len(sent_admin_alerts) == 1
     subject, body = sent_admin_alerts[0]
-    assert subject == "New Offseason Event Suggestion: Chezy Champs"
+    assert subject == 'Needs review: offseason event "Chezy Champs"'
     assert "Chezy Champs" in body
     assert "https://beta.thebluealliance.com/suggest/review/offseason-event" in body
 
@@ -203,12 +207,16 @@ def test_apiwrite_accepted_email(
     assert len(sent_result_emails) == 1
     to, subject, body = sent_result_emails[0]
     assert to == "author@example.com"
-    assert subject == "The Blue Alliance Auth Tokens for 2026cc"
+    assert subject == "Approved: 2026cc API write keys (2026 Chezy Champs)"
     assert body.startswith("Hi Alice Author,")
     assert "accepted your request" in body
-    assert "2026 Chezy Champs" in body
-    assert "https://www.thebluealliance.com/account" in body
-    assert "Enjoy the keys!" in body
+    assert "2026 Chezy Champs (2026cc)" in body
+    assert (
+        "What you can do next:\n"
+        "1. Find your keys on your account page: "
+        "https://www.thebluealliance.com/account\n"
+    ) in body
+    assert "Note from the reviewer:\nEnjoy the keys!" in body
     assert "contact@thebluealliance.com" in body
 
 
@@ -223,9 +231,10 @@ def test_apiwrite_rejected_email_carries_the_reason(
 
     to, subject, body = sent_result_emails[0]
     assert to == "author@example.com"
-    assert subject == "The Blue Alliance Auth Tokens for 2026cc"
+    assert subject == "Declined: 2026cc API write keys (2026 Chezy Champs)"
     assert "regretfully declined" in body
-    assert "Please ask your mentor." in body
+    assert "Note from the reviewer:\nPlease ask your mentor." in body
+    assert "What you can do next:" not in body
     assert "/account" not in body
 
 
@@ -239,6 +248,7 @@ def test_apiwrite_email_without_message(
     _, _, body = sent_result_emails[0]
     assert "None" not in body
     assert "accepted your request" in body
+    assert "Note from the reviewer" not in body
 
 
 def test_apiwrite_email_skips_when_author_has_no_email(
@@ -368,7 +378,7 @@ def test_offseason_event_accepted_emails_suggester(
     assert len(sent_result_emails) == 1
     to, subject, body = sent_result_emails[0]
     assert to == "author@example.com"
-    assert subject == "[TBA] Offseason Event Suggestion: Chezy Champs"
+    assert subject == "Approved: 2026cc offseason event (2026 Chezy Champs)"
     assert body.startswith("Hi Alice Author,")
     assert "https://www.thebluealliance.com/event/2026cc" in body
     assert "https://www.thebluealliance.com/request/apiwrite" in body
@@ -396,3 +406,87 @@ def test_display_name_falls_back_to_nickname(ndb_stub) -> None:
         SuggestionNotifier._display_name(Account(id="a", email="a@example.com"))
         == "there"
     )
+
+
+# ---------------------------------------------------------------------------
+# Shared format: every email reads the same way
+# ---------------------------------------------------------------------------
+
+
+def _send_every_email(
+    author: Account,
+    sent_admin_alerts: List[Tuple[str, str]],
+    sent_result_emails: List[Tuple[str, str, str]],
+) -> Tuple[List[str], List[str], List[str]]:
+    """Deliver each email once; return (subjects, admin bodies, user bodies)."""
+    apiwrite_key = _apiwrite_suggestion(author)
+    SuggestionNotifier._deliver_apiwrite_requested("author_uid", "2026cc")
+    SuggestionNotifier._deliver_offseason_event_suggested("Chezy Champs")
+    SuggestionNotifier._deliver_apiwrite_verdict_email(apiwrite_key, True, "Hi")
+    SuggestionNotifier._deliver_apiwrite_verdict_email(apiwrite_key, False, None)
+    SuggestionNotifier._deliver_offseason_event_accepted(
+        _offseason_suggestion(author), "2026cc"
+    )
+    subjects = [s for s, _ in sent_admin_alerts] + [s for _, s, _ in sent_result_emails]
+    return (
+        subjects,
+        [b for _, b in sent_admin_alerts],
+        [b for _, _, b in sent_result_emails],
+    )
+
+
+def test_every_subject_leads_with_the_outcome_then_the_event(
+    author: Account, event: Event, sent_admin_alerts, sent_result_emails
+) -> None:
+    subjects, _, _ = _send_every_email(author, sent_admin_alerts, sent_result_emails)
+
+    assert len(subjects) == 5
+    for subject in subjects:
+        assert re.match(r"^(Approved|Declined|Needs review): ", subject), subject
+    # Once an event exists, its key comes right after the outcome
+    assert [s for s in subjects if "2026cc" in s] == [
+        "Needs review: 2026cc API write keys",
+        "Approved: 2026cc API write keys (2026 Chezy Champs)",
+        "Declined: 2026cc API write keys (2026 Chezy Champs)",
+        "Approved: 2026cc offseason event (2026 Chezy Champs)",
+    ]
+
+
+def test_every_email_calls_the_feature_api_write_keys(
+    author: Account, event: Event, sent_admin_alerts, sent_result_emails
+) -> None:
+    subjects, admin_bodies, user_bodies = _send_every_email(
+        author, sent_admin_alerts, sent_result_emails
+    )
+
+    text = "\n".join(subjects + admin_bodies + user_bodies).lower()
+    for old_name in ("auth token", "trusted api key", "auth keys"):
+        assert old_name not in text
+    assert "api write keys" in text
+
+
+def test_user_emails_share_the_footer(
+    author: Account, event: Event, sent_admin_alerts, sent_result_emails
+) -> None:
+    _, _, user_bodies = _send_every_email(author, sent_admin_alerts, sent_result_emails)
+
+    assert len(user_bodies) == 3
+    for body in user_bodies:
+        assert body.startswith("Hi Alice Author,\n\n")
+        assert body.endswith(USER_EMAIL_FOOTER)
+    assert "contact@thebluealliance.com" in USER_EMAIL_FOOTER
+
+
+def test_offseason_accepted_email_numbers_its_next_steps(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    SuggestionNotifier._deliver_offseason_event_accepted(
+        _offseason_suggestion(author), "2026cc"
+    )
+
+    _, _, body = sent_result_emails[0]
+    assert (
+        "What you can do next:\n"
+        "1. See the event: https://www.thebluealliance.com/event/2026cc\n"
+        "2. If you are the event's organizer"
+    ) in body
