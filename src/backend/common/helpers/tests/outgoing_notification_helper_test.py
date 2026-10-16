@@ -8,6 +8,8 @@ import backend.common.helpers.outgoing_notification_helper as helper_module
 from backend.common.environment.environment import Environment
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
+    slack_escape,
+    slack_link,
 )
 
 URL = "https://foo.bar.com/"
@@ -107,3 +109,23 @@ def test_send_failure_propagates_so_the_task_retries(
     ):
         with pytest.raises(RuntimeError):
             OutgoingNotificationHelper.send_admin_alert_email("Subject", "Body")
+
+
+def test_slack_escape() -> None:
+    assert slack_escape("<!channel> a & b") == "&lt;!channel&gt; a &amp; b"
+
+
+def test_slack_escape_leaves_plain_text_alone() -> None:
+    assert slack_escape("Team 254 · 2026cc") == "Team 254 · 2026cc"
+
+
+def test_slack_link_escapes_label() -> None:
+    assert slack_link("https://x.com/a", "<b> & c") == (
+        "<https://x.com/a|&lt;b&gt; &amp; c>"
+    )
+
+
+def test_slack_link_url_cannot_inject_a_label() -> None:
+    assert slack_link("https://x.com/a|evil>", "ok") == (
+        "<https://x.com/a%7Cevil&gt;|ok>"
+    )

@@ -305,7 +305,7 @@ def test_apiwrite_notifications_ignore_other_suggestion_types(
     assert sent_slack_alerts == []
 
 
-def test_apiwrite_slack_alert_names_reviewer_message_and_key(
+def test_apiwrite_slack_alert_approved(
     author: Account, reviewer: Account, event: Event, sent_slack_alerts
 ) -> None:
     suggestion_key = _apiwrite_suggestion(author)
@@ -317,13 +317,18 @@ def test_apiwrite_slack_alert_names_reviewer_message_and_key(
     assert len(sent_slack_alerts) == 1
     url, body = sent_slack_alerts[0]
     assert url == "http://hook"
-    assert "*Trusted API Key Request for 2026cc*" in body
-    assert "Mod Erator (mod@tba.com) has accepted the request" in body
-    assert "with the following message:\nEnjoy the keys!" in body
-    assert "/admin/api_auth/edit/authid123|View the key" in body
+    assert body.split("\n") == [
+        ":white_check_mark: *Approved: API write keys for "
+        "<https://www.thebluealliance.com/event/2026cc|2026cc> "
+        "(2026 Chezy Champs)*",
+        "Requested by Alice Author (author@example.com) · approved by "
+        "Mod Erator (mod@tba.com)",
+        "> Enjoy the keys!",
+        "<https://www.thebluealliance.com/admin/api_auth/edit/authid123|View the key>",
+    ]
 
 
-def test_apiwrite_slack_alert_for_rejection(
+def test_apiwrite_slack_alert_declined(
     author: Account, reviewer: Account, event: Event, sent_slack_alerts
 ) -> None:
     suggestion_key = _apiwrite_suggestion(author)
@@ -333,8 +338,59 @@ def test_apiwrite_slack_alert_for_rejection(
     )
 
     _, body = sent_slack_alerts[0]
-    assert "has rejected the request with the following message:\nPlease ask" in body
-    assert "View the key" not in body
+    lines = body.split("\n")
+    assert lines[0].startswith(":x: *Declined: API write keys for <")
+    assert lines[1].endswith(" · declined by Mod Erator (mod@tba.com)")
+    assert lines[2:] == ["> Please ask your mentor."]
+
+
+def test_apiwrite_slack_alert_quotes_each_message_line(
+    author: Account, reviewer: Account, event: Event, sent_slack_alerts
+) -> None:
+    suggestion_key = _apiwrite_suggestion(author)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_slack(
+        suggestion_key, True, "  First line\n\nThird line\n", None
+    )
+
+    _, body = sent_slack_alerts[0]
+    assert body.split("\n")[2:] == ["> First line", "> ", "> Third line"]
+
+
+def test_apiwrite_slack_alert_escapes_stored_text(
+    reviewer: Account, event: Event, sent_slack_alerts
+) -> None:
+    author = Account(
+        id="sneaky_uid", email="a&b@example.com", display_name="<!channel>"
+    )
+    author.put()
+    event.name = "Champs <b> & co"
+    event.put()
+    suggestion_key = _apiwrite_suggestion(author)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_slack(
+        suggestion_key, True, "<!channel> a & b", None
+    )
+
+    _, body = sent_slack_alerts[0]
+    lines = body.split("\n")
+    assert lines[0].endswith("(2026 Champs &lt;b&gt; &amp; co)*")
+    assert lines[1].startswith("Requested by &lt;!channel&gt; (a&amp;b@example.com)")
+    assert lines[2] == "> &lt;!channel&gt; a &amp; b"
+    assert "<!channel>" not in body
+
+
+def test_apiwrite_slack_alert_without_event_names_just_the_key(
+    author: Account, reviewer: Account, sent_slack_alerts
+) -> None:
+    suggestion_key = _apiwrite_suggestion(author)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_slack(suggestion_key, True, None, None)
+
+    _, body = sent_slack_alerts[0]
+    assert body.split("\n")[0] == (
+        ":white_check_mark: *Approved: API write keys for 2026cc*"
+    )
 
 
 def test_apiwrite_slack_alert_without_message_or_reviewer(
@@ -345,7 +401,9 @@ def test_apiwrite_slack_alert_without_message_or_reviewer(
     SuggestionNotifier._deliver_apiwrite_verdict_slack(suggestion_key, True, None, None)
 
     _, body = sent_slack_alerts[0]
-    assert body.split("\n")[1] == "account unknown has accepted the request"
+    assert body.split("\n")[1:] == [
+        "Requested by Alice Author (author@example.com) · approved by account unknown"
+    ]
 
 
 def test_apiwrite_slack_alert_skipped_without_a_hook(

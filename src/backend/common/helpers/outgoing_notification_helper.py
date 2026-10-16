@@ -11,6 +11,21 @@ CONTACT_SENDER = f"The Blue Alliance Contact <{CONTACT_EMAIL}>"
 ADMIN_SENDER = f"The Blue Alliance Admin <{CONTACT_EMAIL}>"
 
 
+def slack_escape(text: str) -> str:
+    """
+    Escape text for Slack mrkdwn, per Slack's formatting docs: only &, < and >
+    are control characters. Keeps a stored value from posting `<!channel>` or
+    forging a link.
+    """
+    return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
+
+
+def slack_link(url: str, label: str) -> str:
+    """A Slack mrkdwn link, `<url|label>`, with both parts escaped."""
+    # A `|` in the URL would end it early and let the rest become the label
+    return f"<{slack_escape(url).replace('|', '%7C')}|{slack_escape(label)}>"
+
+
 class OutgoingNotificationHelper(object):
     @classmethod
     def email_enabled(cls) -> bool:
