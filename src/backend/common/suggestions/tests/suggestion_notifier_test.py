@@ -1,4 +1,5 @@
 import re
+from pathlib import Path
 from typing import List, Optional, Tuple
 
 import pytest
@@ -11,6 +12,7 @@ from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
 from backend.common.suggestions.suggestion_notifier import (
+    PWA_DEFAULT_USER_MESSAGE,
     SuggestionNotifier,
     USER_EMAIL_FOOTER,
 )
@@ -213,10 +215,18 @@ def test_apiwrite_accepted_email(
     assert "2026 Chezy Champs (2026cc)" in body
     assert (
         "What you can do next:\n"
-        "1. Find your keys on your account page: "
-        "https://www.thebluealliance.com/account\n"
+        "1. Sign in to The Blue Alliance as author@example.com and open "
+        "EventWizard: https://www.thebluealliance.com/eventwizard\n"
+        "2. Choose 2026 Chezy Champs (2026cc) from the Select Event list."
+    ) in body
+    assert "\n3. Use EventWizard's tabs to upload" in body
+    assert (
+        "\n4. Your key ID and secret are listed on your account page, for "
+        "tools other than EventWizard: "
+        "https://www.thebluealliance.com/account#api-write-keys-row\n"
     ) in body
     assert "Note from the reviewer:\nEnjoy the keys!" in body
+    assert "/request/apiwrite" not in body
     assert "contact@thebluealliance.com" in body
 
 
@@ -233,9 +243,57 @@ def test_apiwrite_rejected_email_carries_the_reason(
     assert to == "author@example.com"
     assert subject == "[TBA] Declined: 2026cc API write keys (2026 Chezy Champs)"
     assert "regretfully declined" in body
-    assert "Note from the reviewer:\nPlease ask your mentor." in body
-    assert "What you can do next:" not in body
+    assert "Reason from the reviewer:\nPlease ask your mentor." in body
+    assert "Note from the reviewer" not in body
+    assert (
+        "What you can do next:\n"
+        "1. If something in your request was wrong (such as the event key or "
+        "your role), submit a new request: "
+        "https://www.thebluealliance.com/request/apiwrite\n"
+        "2. If you are not sure what to change, email "
+        "contact@thebluealliance.com with the details of your request.\n"
+    ) in body
     assert "/account" not in body
+    assert "/eventwizard" not in body
+
+
+def test_apiwrite_rejected_email_drops_the_pwa_default_message(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    suggestion_key = _apiwrite_suggestion(author)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_email(
+        suggestion_key, False, f" {PWA_DEFAULT_USER_MESSAGE} "
+    )
+
+    _, _, body = sent_result_emails[0]
+    assert PWA_DEFAULT_USER_MESSAGE not in body
+    assert "from the reviewer" not in body
+    assert "/request/apiwrite" in body
+
+
+def test_apiwrite_accepted_email_keeps_the_pwa_default_message(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    suggestion_key = _apiwrite_suggestion(author)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_email(
+        suggestion_key, True, PWA_DEFAULT_USER_MESSAGE
+    )
+
+    _, _, body = sent_result_emails[0]
+    assert f"Note from the reviewer:\n{PWA_DEFAULT_USER_MESSAGE}" in body
+
+
+def test_pwa_default_message_matches_the_pwa() -> None:
+    repo_root = Path(__file__).resolve().parents[5]
+    moderation_utils = repo_root / "pwa" / "app" / "lib" / "moderationUtils.ts"
+    if not moderation_utils.exists():
+        pytest.skip("PWA sources not checked out")
+    assert (
+        f"DEFAULT_USER_MESSAGE = '{PWA_DEFAULT_USER_MESSAGE}'"
+        in moderation_utils.read_text()
+    )
 
 
 def test_apiwrite_email_without_message(
@@ -382,6 +440,8 @@ def test_offseason_event_accepted_emails_suggester(
     assert body.startswith("Hi Alice Author,")
     assert "https://www.thebluealliance.com/event/2026cc" in body
     assert "https://www.thebluealliance.com/request/apiwrite" in body
+    assert "https://www.thebluealliance.com/eventwizard" in body
+    assert "/account" not in body
 
 
 def test_offseason_event_accepted_skips_when_event_missing(
@@ -490,5 +550,9 @@ def test_offseason_accepted_email_numbers_its_next_steps(
     assert (
         "What you can do next:\n"
         "1. See the event: https://www.thebluealliance.com/event/2026cc\n"
-        "2. If you are the event's organizer"
+        "2. If you organize this event and want to post teams, the schedule, "
+        "or live results: request API write keys for 2026cc at "
+        "https://www.thebluealliance.com/request/apiwrite\n"
+        "3. Once a moderator approves them, upload data with EventWizard: "
+        "https://www.thebluealliance.com/eventwizard\n"
     ) in body
