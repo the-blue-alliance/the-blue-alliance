@@ -298,7 +298,7 @@ def test_suggest_event_alerts_admins(
     assert sent_admin_alerts == []
     assert run_deferred_tasks() == 1
     subject, body = sent_admin_alerts[0]
-    assert subject == "New Offseason Event Suggestion: Test Event"
+    assert subject == '[TBA] Needs review: offseason event "Test Event"'
     assert "Test Event" in body
     assert "suggest/review/offseason-event" in body
 
