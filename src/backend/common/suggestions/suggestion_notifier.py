@@ -176,7 +176,7 @@ class SuggestionNotifier:
             outcome_line = (
                 f"We have accepted your request for {API_WRITE_KEYS} for "
                 f"{event_label} ({event_key})."
-            ) + cls._apiwrite_grant_details(suggestion, auth_id)
+            ) + cls._apiwrite_expiry_line(auth_id)
             next_steps = [
                 f"Find your keys on your account page: {WWW_BASE_URL}/account",
             ]
@@ -302,29 +302,20 @@ class SuggestionNotifier:
         ]
         return ", ".join(names) or "none"
 
-    @classmethod
-    def _apiwrite_grant_details(
-        cls, suggestion: Suggestion, auth_id: Optional[str]
-    ) -> str:
+    @staticmethod
+    def _apiwrite_expiry_line(auth_id: Optional[str]) -> str:
         """
-        Lines saying what the issued key allows and when it stops working, or
-        '' when the key is unknown (tasks queued before auth_id was passed)
-        or can't be loaded.
+        When the issued key stops working, or '' when the key is unknown
+        (tasks queued before auth_id was passed) or can't be loaded.
         """
         auth = ApiAuthAccess.get_by_id(auth_id) if auth_id else None
         if auth is None:
             return ""
-        granted = {int(t) for t in auth.auth_types_enum}
-        requested = {int(t) for t in suggestion.contents.get("auth_types", [])}
-        lines = [f"Permissions granted: {cls._auth_type_names(granted)}"]
-        if requested - granted:
-            lines.append(f"Not granted: {cls._auth_type_names(requested - granted)}")
         # Stored as naive UTC and checked against the server's UTC clock
         expires = (
             f"{auth.expiration:%Y-%m-%d %H:%M} UTC" if auth.expiration else "never"
         )
-        lines.append(f"Expires: {expires}")
-        return "\n\n" + "\n".join(lines)
+        return f"\n\nKeys Expire: {expires}"
 
     @classmethod
     def _apiwrite_suggestion_and_event(

@@ -103,8 +103,8 @@ def test_apiwrite_reviewed_enqueues_email_and_slack_separately(
 
     assert run_deferred_tasks() == 2
     assert [to for to, _, _ in sent_result_emails] == ["author@example.com"]
-    # The missing key degrades to an email without grant details
-    assert "Permissions granted" not in sent_result_emails[0][2]
+    # The missing key degrades to an email without an expiry
+    assert "Keys Expire" not in sent_result_emails[0][2]
     assert len(sent_slack_alerts) == 1
 
 
@@ -293,7 +293,7 @@ def test_apiwrite_accepted_email(
     assert "contact@thebluealliance.com" in body
 
 
-def test_apiwrite_accepted_email_shows_narrowed_permissions_and_expiry(
+def test_apiwrite_accepted_email_shows_expiry_not_permissions(
     author: Account, event: Event, sent_result_emails
 ) -> None:
     suggestion_key = _apiwrite_suggestion(
@@ -313,14 +313,14 @@ def test_apiwrite_accepted_email_shows_narrowed_permissions_and_expiry(
     _, _, body = sent_result_emails[0]
     assert (
         "for 2026 Chezy Champs (2026cc).\n\n"
-        "Permissions granted: match video, event matches\n"
-        "Not granted: event teams\n"
-        "Expires: 2026-10-05 14:30 UTC\n\n"
+        "Keys Expire: 2026-10-05 14:30 UTC\n\n"
         "What you can do next:\n"
     ) in body
+    assert "Permissions" not in body
+    assert "granted" not in body
 
 
-def test_apiwrite_accepted_email_full_grant_never_expires(
+def test_apiwrite_accepted_email_key_never_expires(
     author: Account, event: Event, sent_result_emails
 ) -> None:
     suggestion_key = _apiwrite_suggestion(author)
@@ -331,8 +331,7 @@ def test_apiwrite_accepted_email_full_grant_never_expires(
     )
 
     _, _, body = sent_result_emails[0]
-    assert "Permissions granted: match video\nExpires: never\n" in body
-    assert "Not granted" not in body
+    assert "(2026cc).\n\nKeys Expire: never\n" in body
 
 
 def test_apiwrite_accepted_email_shows_reviewer_default_expiry(
@@ -355,7 +354,7 @@ def test_apiwrite_accepted_email_shows_reviewer_default_expiry(
     )
 
     _, _, body = sent_result_emails[0]
-    assert f"\nExpires: {expiration:%Y-%m-%d %H:%M} UTC\n" in body
+    assert f"\nKeys Expire: {expiration:%Y-%m-%d %H:%M} UTC\n" in body
 
 
 def test_apiwrite_accepted_email_queued_without_auth_id_still_sends(
@@ -372,11 +371,10 @@ def test_apiwrite_accepted_email_queued_without_auth_id_still_sends(
     assert len(sent_result_emails) == 2
     for _, _, body in sent_result_emails:
         assert "accepted your request" in body
-        assert "Permissions granted" not in body
-        assert "Expires" not in body
+        assert "Keys Expire" not in body
 
 
-def test_apiwrite_rejected_email_omits_grant_details(
+def test_apiwrite_rejected_email_omits_expiry(
     author: Account, event: Event, sent_result_emails
 ) -> None:
     suggestion_key = _apiwrite_suggestion(author)
@@ -387,7 +385,7 @@ def test_apiwrite_rejected_email_omits_grant_details(
     )
 
     _, _, body = sent_result_emails[0]
-    assert "Permissions granted" not in body
+    assert "Keys Expire" not in body
 
 
 def test_apiwrite_rejected_email_carries_the_reason(
