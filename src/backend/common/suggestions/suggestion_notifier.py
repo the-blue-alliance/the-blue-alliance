@@ -236,8 +236,8 @@ class SuggestionNotifier:
 
     @staticmethod
     def _subject(outcome: str, topic: str, detail: Optional[str] = None) -> str:
-        """'<Outcome>: <topic> (<detail>)', so an inbox shows the result first."""
-        return f"{outcome}: {topic}" + (f" ({detail})" if detail else "")
+        """'[TBA] <Outcome>: <topic> (<detail>)', so an inbox shows the result first."""
+        return f"[TBA] {outcome}: {topic}" + (f" ({detail})" if detail else "")
 
     @classmethod
     def _user_email_body(

@@ -136,8 +136,8 @@ def test_admin_alerts_run_as_deferred_tasks(
     assert sent_admin_alerts == []
     assert run_deferred_tasks() == 2
     assert [subject for subject, _ in sent_admin_alerts] == [
-        "Needs review: 2026cc API write keys",
-        'Needs review: offseason event "Chezy Champs"',
+        "[TBA] Needs review: 2026cc API write keys",
+        '[TBA] Needs review: offseason event "Chezy Champs"',
     ]
 
 
@@ -168,7 +168,7 @@ def test_apiwrite_requested_alerts_admins(author: Account, sent_admin_alerts) ->
 
     assert len(sent_admin_alerts) == 1
     subject, body = sent_admin_alerts[0]
-    assert subject == "Needs review: 2026cc API write keys"
+    assert subject == "[TBA] Needs review: 2026cc API write keys"
     assert "Alice Author (author@example.com)" in body
     assert "https://www.thebluealliance.com/event/2026cc" in body
     assert "https://beta.thebluealliance.com/suggest/review/api_auth_access" in body
@@ -190,7 +190,7 @@ def test_offseason_event_suggested_alerts_admins(sent_admin_alerts) -> None:
 
     assert len(sent_admin_alerts) == 1
     subject, body = sent_admin_alerts[0]
-    assert subject == 'Needs review: offseason event "Chezy Champs"'
+    assert subject == '[TBA] Needs review: offseason event "Chezy Champs"'
     assert "Chezy Champs" in body
     assert "https://beta.thebluealliance.com/suggest/review/offseason-event" in body
 
@@ -207,7 +207,7 @@ def test_apiwrite_accepted_email(
     assert len(sent_result_emails) == 1
     to, subject, body = sent_result_emails[0]
     assert to == "author@example.com"
-    assert subject == "Approved: 2026cc API write keys (2026 Chezy Champs)"
+    assert subject == "[TBA] Approved: 2026cc API write keys (2026 Chezy Champs)"
     assert body.startswith("Hi Alice Author,")
     assert "accepted your request" in body
     assert "2026 Chezy Champs (2026cc)" in body
@@ -231,7 +231,7 @@ def test_apiwrite_rejected_email_carries_the_reason(
 
     to, subject, body = sent_result_emails[0]
     assert to == "author@example.com"
-    assert subject == "Declined: 2026cc API write keys (2026 Chezy Champs)"
+    assert subject == "[TBA] Declined: 2026cc API write keys (2026 Chezy Champs)"
     assert "regretfully declined" in body
     assert "Note from the reviewer:\nPlease ask your mentor." in body
     assert "What you can do next:" not in body
@@ -378,7 +378,7 @@ def test_offseason_event_accepted_emails_suggester(
     assert len(sent_result_emails) == 1
     to, subject, body = sent_result_emails[0]
     assert to == "author@example.com"
-    assert subject == "Approved: 2026cc offseason event (2026 Chezy Champs)"
+    assert subject == "[TBA] Approved: 2026cc offseason event (2026 Chezy Champs)"
     assert body.startswith("Hi Alice Author,")
     assert "https://www.thebluealliance.com/event/2026cc" in body
     assert "https://www.thebluealliance.com/request/apiwrite" in body
@@ -442,13 +442,15 @@ def test_every_subject_leads_with_the_outcome_then_the_event(
 
     assert len(subjects) == 5
     for subject in subjects:
-        assert re.match(r"^(Approved|Declined|Needs review): ", subject), subject
+        assert re.match(
+            r"^\[TBA\] (Approved|Declined|Needs review): ", subject
+        ), subject
     # Once an event exists, its key comes right after the outcome
     assert [s for s in subjects if "2026cc" in s] == [
-        "Needs review: 2026cc API write keys",
-        "Approved: 2026cc API write keys (2026 Chezy Champs)",
-        "Declined: 2026cc API write keys (2026 Chezy Champs)",
-        "Approved: 2026cc offseason event (2026 Chezy Champs)",
+        "[TBA] Needs review: 2026cc API write keys",
+        "[TBA] Approved: 2026cc API write keys (2026 Chezy Champs)",
+        "[TBA] Declined: 2026cc API write keys (2026 Chezy Champs)",
+        "[TBA] Approved: 2026cc offseason event (2026 Chezy Champs)",
     ]
 
 

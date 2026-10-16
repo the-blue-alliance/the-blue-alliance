@@ -178,7 +178,7 @@ def test_suggest_api_write_alerts_admins(
     assert sent_admin_alerts == []
     assert run_deferred_tasks() == 1
     subject, body = sent_admin_alerts[0]
-    assert subject == "Needs review: 2016necmp API write keys"
+    assert subject == "[TBA] Needs review: 2016necmp API write keys"
     assert "(test@tba.com) has made a request" in body
     assert "https://www.thebluealliance.com/event/2016necmp" in body
     assert "suggest/review/api_auth_access" in body
