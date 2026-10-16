@@ -490,7 +490,14 @@ def submit_apiwrite() -> Response:
     )
 
     if status == SuggestionCreationStatus.SUCCESS:
-        SuggestionNotifier.apiwrite_requested(none_throws(user.account_key), event_key)
+        SuggestionNotifier.apiwrite_requested(
+            none_throws(user.account_key),
+            event_key,
+            role=role,
+            auth_types=SuggestionCreator.requestable_auth_types(
+                none_throws(Event.get_by_id(event_key)), auth_types
+            ),
+        )
 
     return redirect(url_for(".request_apiwrite", status=status.value))
 

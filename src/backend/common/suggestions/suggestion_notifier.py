@@ -1,8 +1,9 @@
 import logging
-from typing import Any, Callable, List, Optional, Tuple
+from typing import Any, Callable, Iterable, List, Optional, Tuple
 
 from google.appengine.ext import ndb
 
+from backend.common.consts.auth_type import AuthType, WRITE_TYPE_NAMES
 from backend.common.consts.suggestion_type import SuggestionType
 from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.outgoing_notification_helper import (
@@ -11,6 +12,7 @@ from backend.common.helpers.outgoing_notification_helper import (
 )
 from backend.common.helpers.pwa_url_helper import PwaUrlHelper, WWW_BASE_URL
 from backend.common.models.account import Account
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
@@ -52,8 +54,20 @@ class SuggestionNotifier:
     # ----- enqueue (called from request handlers and the reviewer) -----
 
     @classmethod
-    def apiwrite_requested(cls, account_key: ndb.Key, event_key: str) -> None:
-        cls._enqueue(cls._deliver_apiwrite_requested, account_key.id(), event_key)
+    def apiwrite_requested(
+        cls,
+        account_key: ndb.Key,
+        event_key: str,
+        role: Optional[str] = None,
+        auth_types: Optional[List[AuthType]] = None,
+    ) -> None:
+        cls._enqueue(
+            cls._deliver_apiwrite_requested,
+            account_key.id(),
+            event_key,
+            role,
+            [int(t) for t in auth_types] if auth_types is not None else None,
+        )
 
     @classmethod
     def offseason_event_suggested(cls, event_name: str) -> None:
@@ -70,7 +84,11 @@ class SuggestionNotifier:
         # Two tasks: the requester's email and the moderators' Slack post
         # succeed or retry independently of each other
         cls._enqueue(
-            cls._deliver_apiwrite_verdict_email, suggestion_key, accepted, user_message
+            cls._deliver_apiwrite_verdict_email,
+            suggestion_key,
+            accepted,
+            user_message,
+            auth_id,
         )
         cls._enqueue(
             cls._deliver_apiwrite_verdict_slack,
@@ -94,16 +112,28 @@ class SuggestionNotifier:
     # ----- deliver (runs on the tasks service) -----
 
     @classmethod
-    def _deliver_apiwrite_requested(cls, account_id: str, event_key: str) -> None:
+    def _deliver_apiwrite_requested(
+        cls,
+        account_id: str,
+        event_key: str,
+        role: Optional[str] = None,
+        auth_types: Optional[List[int]] = None,
+    ) -> None:
+        # role and auth_types default to None so tasks queued before they
+        # were added still send, just without those lines
         account = Account.get_by_id(account_id)
-        requester = cls._describe(account, fallback=account_id)
+        lines = [f"Requester: {cls._describe(account, fallback=account_id)}"]
+        if role:
+            lines.append(f"Role: {role}")
+        if auth_types is not None:
+            lines.append(f"Permissions requested: {cls._auth_type_names(auth_types)}")
+        lines.append(f"Event: {WWW_BASE_URL}/event/{event_key}")
         OutgoingNotificationHelper.send_admin_alert_email(
             subject=cls._subject(NEEDS_REVIEW, f"{event_key} {API_WRITE_KEYS}"),
             email_body=(
-                f"{requester} has made a request for {API_WRITE_KEYS} for the "
-                f"event {event_key}.\n\n"
-                f"View the event at {WWW_BASE_URL}/event/{event_key}\n\n"
-                "Review the request at "
+                f"New request for {API_WRITE_KEYS} for {event_key}.\n\n"
+                + "".join(f"{line}\n" for line in lines)
+                + "\nApprove or reject: "
                 f"{PwaUrlHelper.suggestion_review_url(SuggestionType.API_AUTH_ACCESS)}\n"
             ),
         )
@@ -122,7 +152,11 @@ class SuggestionNotifier:
 
     @classmethod
     def _deliver_apiwrite_verdict_email(
-        cls, suggestion_key: str, accepted: bool, user_message: Optional[str]
+        cls,
+        suggestion_key: str,
+        accepted: bool,
+        user_message: Optional[str],
+        auth_id: Optional[str] = None,
     ) -> None:
         """Tell the requester whether their API write key request was granted."""
         loaded = cls._apiwrite_suggestion_and_event(suggestion_key)
@@ -142,7 +176,7 @@ class SuggestionNotifier:
             outcome_line = (
                 f"We have accepted your request for {API_WRITE_KEYS} for "
                 f"{event_label} ({event_key})."
-            )
+            ) + cls._apiwrite_grant_details(suggestion, auth_id)
             next_steps = [
                 f"Find your keys on your account page: {WWW_BASE_URL}/account",
             ]
@@ -257,6 +291,40 @@ class SuggestionNotifier:
         if note:
             body += f"\nNote from the reviewer:\n{note}\n"
         return body + USER_EMAIL_FOOTER
+
+    @staticmethod
+    def _auth_type_names(auth_types: Iterable[int]) -> str:
+        """Write permission names in AuthType order, e.g. 'match video, event teams'."""
+        names = [
+            WRITE_TYPE_NAMES[AuthType(t)]
+            for t in sorted(set(int(t) for t in auth_types))
+            if t in WRITE_TYPE_NAMES
+        ]
+        return ", ".join(names) or "none"
+
+    @classmethod
+    def _apiwrite_grant_details(
+        cls, suggestion: Suggestion, auth_id: Optional[str]
+    ) -> str:
+        """
+        Lines saying what the issued key allows and when it stops working, or
+        '' when the key is unknown (tasks queued before auth_id was passed)
+        or can't be loaded.
+        """
+        auth = ApiAuthAccess.get_by_id(auth_id) if auth_id else None
+        if auth is None:
+            return ""
+        granted = {int(t) for t in auth.auth_types_enum}
+        requested = {int(t) for t in suggestion.contents.get("auth_types", [])}
+        lines = [f"Permissions granted: {cls._auth_type_names(granted)}"]
+        if requested - granted:
+            lines.append(f"Not granted: {cls._auth_type_names(requested - granted)}")
+        # Stored as naive UTC and checked against the server's UTC clock
+        expires = (
+            f"{auth.expiration:%Y-%m-%d %H:%M} UTC" if auth.expiration else "never"
+        )
+        lines.append(f"Expires: {expires}")
+        return "\n\n" + "\n".join(lines)
 
     @classmethod
     def _apiwrite_suggestion_and_event(

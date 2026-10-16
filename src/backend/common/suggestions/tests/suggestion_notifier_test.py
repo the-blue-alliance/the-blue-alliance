@@ -1,12 +1,16 @@
+import datetime
 import re
 from typing import List, Optional, Tuple
 
 import pytest
 from google.appengine.ext import ndb
+from pyre_extensions import none_throws
 
+from backend.common.consts.account_permission import AccountPermission
 from backend.common.consts.auth_type import AuthType
 from backend.common.consts.suggestion_state import SuggestionState
 from backend.common.models.account import Account
+from backend.common.models.api_auth_access import ApiAuthAccess
 from backend.common.models.event import Event
 from backend.common.models.suggestion import Suggestion
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
@@ -14,6 +18,8 @@ from backend.common.suggestions.suggestion_notifier import (
     SuggestionNotifier,
     USER_EMAIL_FOOTER,
 )
+from backend.common.suggestions.suggestion_reviewer import SuggestionReviewer
+from backend.common.suggestions.tests.conftest import make_user
 
 
 def _apiwrite_suggestion(
@@ -21,23 +27,39 @@ def _apiwrite_suggestion(
     event_key: Optional[str] = "2026cc",
     suggestion_id: int = 1,
     reviewer_id: Optional[str] = "reviewer_uid",
+    auth_types: Optional[List[AuthType]] = None,
+    review_state: SuggestionState = SuggestionState.REVIEW_ACCEPTED,
 ) -> str:
     suggestion = Suggestion(
         id=suggestion_id,
         author=author.key,
         target_model="api_auth_access",
         target_key=event_key,
-        review_state=SuggestionState.REVIEW_ACCEPTED,
+        review_state=review_state,
         # The review records who made the call; the Slack line reads it back
         reviewer=ndb.Key(Account, reviewer_id) if reviewer_id else None,
     )
     suggestion.contents = {
         "event_key": event_key or "",
         "affiliation": "Team 254",
-        "auth_types": [AuthType.MATCH_VIDEO],
+        "auth_types": auth_types or [AuthType.MATCH_VIDEO],
     }
     suggestion.put()
     return str(suggestion.key.id())
+
+
+def _issued_key(
+    author: Account,
+    auth_types: List[AuthType],
+    expiration: Optional[datetime.datetime],
+) -> str:
+    ApiAuthAccess(
+        id="authid123",
+        owner=author.key,
+        auth_types_enum=auth_types,
+        expiration=expiration,
+    ).put()
+    return "authid123"
 
 
 def _offseason_suggestion(author: Account) -> str:
@@ -81,6 +103,8 @@ def test_apiwrite_reviewed_enqueues_email_and_slack_separately(
 
     assert run_deferred_tasks() == 2
     assert [to for to, _, _ in sent_result_emails] == ["author@example.com"]
+    # The missing key degrades to an email without grant details
+    assert "Permissions granted" not in sent_result_emails[0][2]
     assert len(sent_slack_alerts) == 1
 
 
@@ -180,9 +204,58 @@ def test_apiwrite_requested_degrades_without_names(ndb_stub, sent_admin_alerts) 
     SuggestionNotifier._deliver_apiwrite_requested("anon_uid", "2026cc")
     SuggestionNotifier._deliver_apiwrite_requested("missing_uid", "2026cc")
 
-    assert "account anon_uid (anon@example.com) has made" in sent_admin_alerts[0][1]
-    assert "account missing_uid has made" in sent_admin_alerts[1][1]
+    assert "Requester: account anon_uid (anon@example.com)\n" in sent_admin_alerts[0][1]
+    assert "Requester: account missing_uid\n" in sent_admin_alerts[1][1]
     assert "None" not in sent_admin_alerts[0][1] + sent_admin_alerts[1][1]
+
+
+def test_apiwrite_requested_lists_role_and_permissions(
+    author: Account, sent_admin_alerts
+) -> None:
+    SuggestionNotifier._deliver_apiwrite_requested(
+        "author_uid",
+        "2026cc",
+        "Team 254 mentor",
+        [int(AuthType.EVENT_TEAMS), int(AuthType.MATCH_VIDEO)],
+    )
+
+    subject, body = sent_admin_alerts[0]
+    assert subject == "[TBA] Needs review: 2026cc API write keys"
+    assert body == (
+        "New request for API write keys for 2026cc.\n\n"
+        "Requester: Alice Author (author@example.com)\n"
+        "Role: Team 254 mentor\n"
+        "Permissions requested: match video, event teams\n"
+        "Event: https://www.thebluealliance.com/event/2026cc\n\n"
+        "Approve or reject: "
+        "https://beta.thebluealliance.com/suggest/review/api_auth_access\n"
+    )
+
+
+def test_apiwrite_requested_queued_with_old_args_omits_details(
+    author: Account, sent_admin_alerts
+) -> None:
+    # Tasks queued before role/auth_types were passed still send
+    SuggestionNotifier._deliver_apiwrite_requested("author_uid", "2026cc")
+
+    _, body = sent_admin_alerts[0]
+    assert "Requester: Alice Author (author@example.com)\n" in body
+    assert "Role:" not in body
+    assert "Permissions requested:" not in body
+    assert "Event: https://www.thebluealliance.com/event/2026cc\n" in body
+
+
+def test_apiwrite_requested_enqueues_role_and_permissions(
+    author: Account, taskqueue_stub, run_deferred_tasks, sent_admin_alerts
+) -> None:
+    SuggestionNotifier.apiwrite_requested(
+        author.key, "2026cc", role="Volunteer", auth_types=[AuthType.EVENT_INFO]
+    )
+
+    assert run_deferred_tasks() == 1
+    _, body = sent_admin_alerts[0]
+    assert "Role: Volunteer\n" in body
+    assert "Permissions requested: event info\n" in body
 
 
 def test_offseason_event_suggested_alerts_admins(sent_admin_alerts) -> None:
@@ -218,6 +291,103 @@ def test_apiwrite_accepted_email(
     ) in body
     assert "Note from the reviewer:\nEnjoy the keys!" in body
     assert "contact@thebluealliance.com" in body
+
+
+def test_apiwrite_accepted_email_shows_narrowed_permissions_and_expiry(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    suggestion_key = _apiwrite_suggestion(
+        author,
+        auth_types=[AuthType.MATCH_VIDEO, AuthType.EVENT_TEAMS, AuthType.EVENT_MATCHES],
+    )
+    auth_id = _issued_key(
+        author,
+        [AuthType.MATCH_VIDEO, AuthType.EVENT_MATCHES],
+        datetime.datetime(2026, 10, 5, 14, 30),
+    )
+
+    SuggestionNotifier._deliver_apiwrite_verdict_email(
+        suggestion_key, True, None, auth_id
+    )
+
+    _, _, body = sent_result_emails[0]
+    assert (
+        "for 2026 Chezy Champs (2026cc).\n\n"
+        "Permissions granted: match video, event matches\n"
+        "Not granted: event teams\n"
+        "Expires: 2026-10-05 14:30 UTC\n\n"
+        "What you can do next:\n"
+    ) in body
+
+
+def test_apiwrite_accepted_email_full_grant_never_expires(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    suggestion_key = _apiwrite_suggestion(author)
+    auth_id = _issued_key(author, [AuthType.MATCH_VIDEO], None)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_email(
+        suggestion_key, True, None, auth_id
+    )
+
+    _, _, body = sent_result_emails[0]
+    assert "Permissions granted: match video\nExpires: never\n" in body
+    assert "Not granted" not in body
+
+
+def test_apiwrite_accepted_email_shows_reviewer_default_expiry(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    suggestion_key = _apiwrite_suggestion(
+        author, review_state=SuggestionState.REVIEW_PENDING
+    )
+    auth_id = none_throws(
+        SuggestionReviewer.accept_suggestion(
+            suggestion_key,
+            make_user([AccountPermission.REVIEW_APIWRITE]),
+            overrides={},
+        ).created_target_key
+    )
+    expiration = none_throws(none_throws(ApiAuthAccess.get_by_id(auth_id)).expiration)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_email(
+        suggestion_key, True, None, auth_id
+    )
+
+    _, _, body = sent_result_emails[0]
+    assert f"\nExpires: {expiration:%Y-%m-%d %H:%M} UTC\n" in body
+
+
+def test_apiwrite_accepted_email_queued_without_auth_id_still_sends(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    # Tasks queued before auth_id was passed call with three arguments
+    suggestion_key = _apiwrite_suggestion(author)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_email(suggestion_key, True, None)
+    SuggestionNotifier._deliver_apiwrite_verdict_email(
+        suggestion_key, True, None, "missing_key"
+    )
+
+    assert len(sent_result_emails) == 2
+    for _, _, body in sent_result_emails:
+        assert "accepted your request" in body
+        assert "Permissions granted" not in body
+        assert "Expires" not in body
+
+
+def test_apiwrite_rejected_email_omits_grant_details(
+    author: Account, event: Event, sent_result_emails
+) -> None:
+    suggestion_key = _apiwrite_suggestion(author)
+    auth_id = _issued_key(author, [AuthType.MATCH_VIDEO], None)
+
+    SuggestionNotifier._deliver_apiwrite_verdict_email(
+        suggestion_key, False, None, auth_id
+    )
+
+    _, _, body = sent_result_emails[0]
+    assert "Permissions granted" not in body
 
 
 def test_apiwrite_rejected_email_carries_the_reason(
