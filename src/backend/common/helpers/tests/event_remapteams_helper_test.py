@@ -1,3 +1,4 @@
+import datetime
 import json
 from typing import Dict, List, Optional
 from unittest.mock import patch
@@ -353,6 +354,8 @@ def _put_remap_eventteam_event(
         year=2026,
         event_short="nhmm",
         event_type_enum=EventType.OFFSEASON,
+        start_date=datetime.datetime(2026, 10, 10),
+        end_date=datetime.datetime(2026, 10, 10),
         remap_teams=remap_teams,
     )
     event.put()
@@ -385,6 +388,57 @@ def test_remap_teams_clears_removed_remap(ndb_context, taskqueue_stub) -> None:
 
     event_team = none_throws(EventTeam.get_by_id("2026nhmm_frc9997"))
     assert (event_team.remapped_to, event_team.remapped_team) == (None, None)
+
+
+def _put_already_remapped_event() -> None:
+    event = Event(
+        id="2018nyrr",
+        year=2018,
+        event_short="nyrr",
+        event_type_enum=EventType.OFFSEASON,
+        remap_teams={"frc9254": "frc5254B"},
+    )
+    event.put()
+    Match(
+        id="2018nyrr_qm1",
+        event=event.key,
+        year=2018,
+        comp_level="qm",
+        set_number=1,
+        match_number=1,
+        team_key_names=["frc5254B", "frc2", "frc3", "frc4", "frc5", "frc6"],
+        alliances_json=json.dumps(
+            {
+                "red": {"score": 1, "teams": ["frc5254B", "frc2", "frc3"]},
+                "blue": {"score": 0, "teams": ["frc4", "frc5", "frc6"]},
+            }
+        ),
+    ).put()
+
+
+def test_remap_teams_creates_eventteam_for_remapped_source_team(
+    ndb_context, taskqueue_stub
+) -> None:
+    _put_already_remapped_event()
+    Team(id="frc9254", team_number=9254).put()
+
+    EventRemapTeamsHelper.remap_teams("2018nyrr")
+
+    event_team = none_throws(EventTeam.get_by_id("2018nyrr_frc9254"))
+    assert (event_team.remapped_to, event_team.remapped_team) == (
+        "frc5254B",
+        "frc5254",
+    )
+
+
+def test_remap_teams_skips_eventteam_for_nonexistent_team(
+    ndb_context, taskqueue_stub
+) -> None:
+    _put_already_remapped_event()
+
+    EventRemapTeamsHelper.remap_teams("2018nyrr")
+
+    assert EventTeam.get_by_id("2018nyrr_frc9254") is None
 
 
 @pytest.mark.parametrize("remap_teams", [{"frc9997": "frc3467B"}, {}])

@@ -59,6 +59,13 @@ class EventRemapTeamsHelper:
             cls.remapteams_awards(event.awards, event.remap_teams)
             AwardManipulator.createOrUpdate(event.awards, auto_union=False)
 
+            from backend.common.helpers.event_team_updater import EventTeamUpdater
+
+            _, updated_event_teams, _ = EventTeamUpdater.update(event_key)
+            EventTeamManipulator.createOrUpdate(
+                [et for et in updated_event_teams if et.team.get() is not None]
+            )
+
         taskqueue.add(
             url=f"/tasks/math/do/event_team_status/{event_key}",
             method="GET",
