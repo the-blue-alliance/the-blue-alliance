@@ -71,7 +71,8 @@ export default function TeamRobotPicsCarousel({
           const img =
             nearby.includes(i) || visited.has(url) ? (
               <img
-                className="max-h-[250px] w-full rounded object-contain"
+                className="max-h-[250px] w-auto rounded-lg border-2
+                  border-neutral-300"
                 src={url}
                 ref={(el) => {
                   if (el?.complete && el.naturalWidth === 0) markFailed(url);
@@ -92,10 +93,7 @@ export default function TeamRobotPicsCarousel({
 
           return (
             <CarouselItem key={i}>
-              <div
-                className="flex h-[250px] w-full items-center justify-center
-                  rounded-lg border-2 border-neutral-300"
-              >
+              <div className="flex h-[250px] w-full items-center justify-center">
                 {linkUrl ? (
                   <a href={linkUrl} target="_blank" rel="noreferrer">
                     {img}
