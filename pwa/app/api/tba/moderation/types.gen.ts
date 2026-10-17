@@ -5,7 +5,7 @@ export type ClientOptions = {
 };
 
 /**
- * The type of suggestion (event=Webcasts, match=Match Videos, media=Team Media, social-media=Social Media, offseason-event=Offseason Events, api_auth_access=API Key Requests, robot=CAD Models, event_media=Event Videos)
+ * The type of suggestion (event=Webcasts, match=Match Videos, media=Team Media, social-media=Social Media, offseason-event=Offseason Events, api_auth_access=API Write Key Requests, robot=CAD Models, event_media=Event Videos)
  */
 export enum SuggestionType {
   /**

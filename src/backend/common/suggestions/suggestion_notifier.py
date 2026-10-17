@@ -9,6 +9,8 @@ from backend.common.helpers.deferred import defer_safe
 from backend.common.helpers.outgoing_notification_helper import (
     CONTACT_EMAIL,
     OutgoingNotificationHelper,
+    slack_escape,
+    slack_link,
 )
 from backend.common.helpers.pwa_url_helper import PwaUrlHelper, WWW_BASE_URL
 from backend.common.models.account import Account
@@ -240,28 +242,36 @@ class SuggestionNotifier:
         user_message: Optional[str],
         auth_id: Optional[str],
     ) -> None:
-        """Tell the moderators' channel what was decided and by whom."""
+        """Tell the moderators' channel what was decided."""
         channel_url = SlackHookUrls.url_for("suggestion-nag")
         if not channel_url:
             return
         loaded = cls._apiwrite_suggestion_and_event(suggestion_key)
         if loaded is None:
             return
-        suggestion, event_key, _ = loaded
-        # The review already recorded who made the call
-        reviewer_key: Optional[ndb.Key] = suggestion.reviewer
-        reviewer: Optional[Account] = reviewer_key.get() if reviewer_key else None
-        reviewer_id = str(reviewer_key.id()) if reviewer_key else "unknown"
+        _, event_key, event = loaded
 
+        if event is None:
+            event_label = slack_escape(event_key)
+        else:
+            event_label = slack_link(
+                f"{WWW_BASE_URL}/event/{event_key}", event_key
+            ) + slack_escape(f" ({event.year} {event.name})")
+        lines = [
+            f"{':white_check_mark:' if accepted else ':x:'} "
+            f"*{APPROVED if accepted else DECLINED}: {API_WRITE_KEYS} for "
+            f"{event_label}*",
+        ]
         message = (user_message or "").strip()
-        body = (
-            f"*Trusted API Key Request for {event_key}*\n"
-            f"{cls._describe(reviewer, fallback=reviewer_id)} has "
-            f"{'accepted' if accepted else 'rejected'} the request"
-            + (f" with the following message:\n{message}" if message else "")
-        )
+        if message:
+            lines += [f"> {slack_escape(line)}" for line in message.splitlines()]
         if auth_id:
-            body += f"\n<{WWW_BASE_URL}/admin/api_auth/edit/{auth_id}|View the key>"
+            lines.append(
+                slack_link(
+                    f"{WWW_BASE_URL}/admin/api_auth/edit/{auth_id}", "View the key"
+                )
+            )
+        body = "\n".join(lines)
         OutgoingNotificationHelper.send_slack_alert(channel_url, body)
 
     @classmethod

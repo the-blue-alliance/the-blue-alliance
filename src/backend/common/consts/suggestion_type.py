@@ -25,7 +25,7 @@ TYPE_NAMES = {
     SuggestionType.MEDIA: "Team Media",
     SuggestionType.SOCIAL_MEDIA: "Social Media",
     SuggestionType.OFFSEASON_EVENT: "Offseason Events",
-    SuggestionType.API_AUTH_ACCESS: "API Key Requests",
+    SuggestionType.API_AUTH_ACCESS: "API Write Key Requests",
     SuggestionType.ROBOT: "CAD Models",
     SuggestionType.EVENT_MEDIA: "Event Media",
 }

@@ -1585,9 +1585,9 @@ def test_accept_apiwrite_sends_admin_alert(
     assert len(sent_slack_alerts) == 1
     url, body = sent_slack_alerts[0]
     assert url == "http://hook"
-    assert "Trusted API Key Request for 2016necmp" in body
-    assert "accepted" in body
-    assert "Enjoy the keys!" in body
+    assert body.startswith(":white_check_mark: *Approved: API write keys for <")
+    assert "|2016necmp>" in body
+    assert "\n> Enjoy the keys!" in body
     assert resp.json["created_target_key"] in body
 
 
@@ -1622,9 +1622,9 @@ def test_reject_apiwrite_sends_admin_alert(
     assert len(sent_slack_alerts) == 1
     url, body = sent_slack_alerts[0]
     assert url == "http://hook"
-    assert "Trusted API Key Request for 2016necmp" in body
-    assert "rejected" in body
-    assert "Not this one" in body
+    assert body.startswith(":x: *Declined: API write keys for <")
+    assert "|2016necmp>" in body
+    assert "\n> Not this one" in body
 
 
 def test_api_does_not_honor_team_admin_delegation(

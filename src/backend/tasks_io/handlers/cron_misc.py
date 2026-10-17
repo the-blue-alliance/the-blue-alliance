@@ -1,14 +1,12 @@
 from flask import Blueprint
 
 from backend.common.consts.suggestion_state import SuggestionState
-from backend.common.consts.suggestion_type import (
-    SUGGESTION_TYPES,
-    TYPE_NAMES as SUGGESTION_NAMES,
-)
+from backend.common.consts.suggestion_type import SuggestionType, TYPE_NAMES
 from backend.common.helpers.outgoing_notification_helper import (
     OutgoingNotificationHelper,
+    slack_link,
 )
-from backend.common.helpers.pwa_url_helper import BETA_BASE_URL
+from backend.common.helpers.pwa_url_helper import PwaUrlHelper
 from backend.common.helpers.suggestion_fetcher import SuggestionFetcher
 from backend.common.sitevars.slack_hook_urls import SlackHookUrls
 
@@ -21,25 +19,32 @@ def nag_pending_suggestions() -> str:
     if not channel_url:
         return ""
 
-    counts = map(
-        lambda t: SuggestionFetcher.count_async(SuggestionState.REVIEW_PENDING, t),
-        SUGGESTION_TYPES,
+    futures = [
+        (t, SuggestionFetcher.count_async(SuggestionState.REVIEW_PENDING, t.value))
+        for t in SuggestionType
+    ]
+    pending = [(t, f.get_result()) for t, f in futures]
+    # Biggest backlog first; sorted() is stable, so ties keep enum order
+    pending = sorted(
+        [(t, count) for t, count in pending if count > 0],
+        key=lambda tc: tc[1],
+        reverse=True,
     )
+    if not pending:
+        return ""
 
-    nag_text = "There are pending suggestions!\n"
-    suggestions_to_nag = False
-    for count_future, name in zip(counts, SUGGESTION_TYPES):
-        count = count_future.get_result()
-        if count > 0:
-            suggestions_to_nag = True
-            nag_text += "*{0}*: {1} pending suggestions\n".format(
-                SUGGESTION_NAMES.get(name), count
-            )
-
-    if suggestions_to_nag:
-        # The review UI lives on the PWA (beta) now; the nag is prod-only, so
-        # link straight to the beta host rather than the env-aware helper
-        nag_text += f"_Review them on <{BETA_BASE_URL}/suggest/review|Beta>_"
-        OutgoingNotificationHelper.send_slack_alert(channel_url, nag_text)
-
+    total = sum(count for _, count in pending)
+    headline = (
+        "1 suggestion needs review"
+        if total == 1
+        else f"{total} suggestions need review"
+    )
+    # Slack posts are prod-only, where this resolves to the PWA's beta host
+    bullets = [
+        f"• {slack_link(PwaUrlHelper.suggestion_review_url(t), TYPE_NAMES[t])}: {count}"
+        for t, count in pending
+    ]
+    OutgoingNotificationHelper.send_slack_alert(
+        channel_url, "\n".join([f"*:inbox_tray: {headline}*"] + bullets)
+    )
     return ""
