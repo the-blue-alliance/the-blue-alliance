@@ -22,17 +22,30 @@ export default function TeamRobotPicsCarousel({
   media,
 }: {
   media: Media[];
-}): React.JSX.Element {
-  const slides = media.filter((m) => getMediaThumbUrl(m));
-  const [index, setIndex] = useState(0);
-  const [loaded, setLoaded] = useState<ReadonlySet<number>>(
-    () => new Set(neighbors(0, slides.length)),
-  );
+}): React.JSX.Element | null {
+  const [failed, setFailed] = useState<ReadonlySet<string>>(() => new Set());
+  const slides = media.flatMap((m) => {
+    const url = getMediaThumbUrl(m);
+    return url && !failed.has(url) ? [{ media: m, url }] : [];
+  });
+  const [selected, setSelected] = useState(0);
+  const index = Math.min(selected, slides.length - 1);
+  const [visited, setVisited] = useState<ReadonlySet<string>>(() => new Set());
+  const nearby = neighbors(index, slides.length);
 
   const select = (next: number) => {
-    setIndex(next);
-    setLoaded((prev) => new Set([...prev, ...neighbors(next, slides.length)]));
+    setSelected(next);
+    setVisited(
+      (prev) =>
+        new Set([
+          ...prev,
+          ...neighbors(next, slides.length).map((i) => slides[i].url),
+        ]),
+    );
   };
+
+  const markFailed = (url: string) =>
+    setFailed((prev) => new Set([...prev, url]));
 
   const advance = useEffectEvent(() => select((index + 1) % slides.length));
 
@@ -42,6 +55,8 @@ export default function TeamRobotPicsCarousel({
     return () => clearTimeout(timer);
   }, [index, slides.length]);
 
+  if (slides.length === 0) return null;
+
   return (
     <Carousel
       className="w-full max-w-xs"
@@ -50,25 +65,30 @@ export default function TeamRobotPicsCarousel({
       onIndexChange={select}
     >
       <CarouselContent className="mb-6 items-center">
-        {slides.map((m, i) => {
+        {slides.map(({ media: m, url }, i) => {
           const linkUrl = getMediaLinkUrl(m);
           const isFirst = i === 0;
-          const img = loaded.has(i) ? (
-            <img
-              className="max-h-[250px] w-full rounded object-contain"
-              src={getMediaThumbUrl(m)}
-              srcSet={getMediaThumbSrcSet(m)}
-              sizes="320px"
-              width={320}
-              height={250}
-              alt=""
-              decoding="async"
-              loading={isFirst ? 'eager' : 'lazy'}
-              fetchPriority={isFirst ? 'high' : 'low'}
-            />
-          ) : (
-            <div className="h-[250px] w-full" />
-          );
+          const img =
+            nearby.includes(i) || visited.has(url) ? (
+              <img
+                className="max-h-[250px] w-full rounded object-contain"
+                src={url}
+                ref={(el) => {
+                  if (el?.complete && el.naturalWidth === 0) markFailed(url);
+                }}
+                onError={() => markFailed(url)}
+                srcSet={getMediaThumbSrcSet(m)}
+                sizes="320px"
+                width={320}
+                height={250}
+                alt=""
+                decoding="async"
+                loading={isFirst ? 'eager' : 'lazy'}
+                fetchPriority={isFirst ? 'high' : 'low'}
+              />
+            ) : (
+              <div className="h-[250px] w-full" />
+            );
 
           return (
             <CarouselItem key={i}>
