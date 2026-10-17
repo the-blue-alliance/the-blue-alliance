@@ -4,6 +4,7 @@ Follows YouTube Data API v3 schema:
 https://developers.google.com/youtube/v3/docs/videos/list
 """
 
+import re
 from datetime import datetime
 from typing import Any, cast, Dict, List, NotRequired, Optional, TypedDict
 
@@ -29,11 +30,18 @@ class _LiveStreamingDetails(TypedDict):
     concurrentViewers: NotRequired[str]
 
 
+class _ContentDetails(TypedDict):
+    """Content details for a video."""
+
+    duration: NotRequired[str]
+
+
 class _VideoItem(TypedDict):
     """A single item from the videos list response."""
 
     id: str
     snippet: NotRequired[_VideoSnippet]
+    contentDetails: NotRequired[_ContentDetails]
     liveStreamingDetails: NotRequired[_LiveStreamingDetails]
 
 
@@ -51,6 +59,7 @@ class ParsedVideoDetails(TypedDict):
     title: str
     channel_id: NotRequired[Optional[str]]
     description: NotRequired[str]
+    duration_seconds: NotRequired[Optional[int]]
     scheduled_start_time: NotRequired[Optional[str]]
     actual_start_time: NotRequired[Optional[str]]
     concurrent_viewers: NotRequired[Optional[int]]
@@ -67,6 +76,20 @@ def _parse_timestamp(timestamp: str) -> Optional[str]:
         return dt.strftime("%Y-%m-%d")
     except (ValueError, AttributeError):
         return None
+
+
+def _parse_iso8601_duration(duration: str) -> Optional[int]:
+    """Parse an ISO 8601 duration (e.g. PT1H2M30S) into total seconds.
+
+    Returns None if the duration cannot be parsed.
+    """
+    match = re.fullmatch(
+        r"P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+)S)?)?", duration
+    )
+    if not match or not any(match.groups()):
+        return None
+    days, hours, minutes, seconds = (int(g) if g else 0 for g in match.groups())
+    return days * 86400 + hours * 3600 + minutes * 60 + seconds
 
 
 def _parse_video_item(item: _VideoItem) -> Optional[ParsedVideoDetails]:
@@ -86,6 +109,12 @@ def _parse_video_item(item: _VideoItem) -> Optional[ParsedVideoDetails]:
         description = snippet.get("description")
         if description:
             result["description"] = description
+
+    content_details = item.get("contentDetails")
+    if content_details:
+        duration = content_details.get("duration")
+        if duration:
+            result["duration_seconds"] = _parse_iso8601_duration(duration)
 
     live_details = item.get("liveStreamingDetails")
     if live_details:
