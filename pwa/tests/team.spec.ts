@@ -321,6 +321,24 @@ test.describe('/team/3467/2026', () => {
   });
 });
 
+test.describe('/team/11175/2026', () => {
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/team/11175/2026');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('strikes through and underlines the team in a match it was disqualified from', async ({
+    page,
+  }) => {
+    await expect(
+      page
+        .locator('section[id="2026ctsou"]')
+        .getByRole('link', { name: '11175', exact: true })
+        .first(),
+    ).toHaveCSS('text-decoration-line', 'underline line-through');
+  });
+});
+
 test.describe('/team/6324/history', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/team/6324/history');

@@ -100,6 +100,13 @@ const teamCellVariants = cva(
         false: '',
       },
     },
+    compoundVariants: [
+      {
+        dq: true,
+        focus: true,
+        className: '[text-decoration-line:underline_line-through]!',
+      },
+    ],
     defaultVariants: {
       dq: false,
       surrogate: false,
