@@ -121,11 +121,12 @@ import {
   getEventDateString,
   getPublicAgendaUrl,
   hasEventEnded,
+  isAfterEventEndDate,
   isEventWithinADay,
   isValidEventKey,
   stripParentPrefix,
 } from '~/lib/eventUtils';
-import { sortMatchComparator } from '~/lib/matchUtils';
+import { getFinalsResult, sortMatchComparator } from '~/lib/matchUtils';
 import { getEventVideos, getSmugmugAlbums } from '~/lib/mediaUtils';
 import { type NexusMatchStatus, buildNexusStatusMap } from '~/lib/nexus';
 import {
@@ -754,7 +755,8 @@ function EventPage() {
               year={event.year}
               rankings={rankingsQuery.data}
               winners={
-                alliances.find((a) => a.status?.status === 'won')?.picks ?? []
+                getFinalsResult(alliances, matches, isAfterEventEndDate(event))
+                  .winner?.picks ?? []
               }
               captains={alliances.map((a) => a.picks[0])}
             />
@@ -957,6 +959,8 @@ function ResultsTab({
     <TableOfContentsSection id="alliances" setInView={setInView}>
       <AllianceSelectionTable
         alliances={alliances}
+        matches={elims}
+        eventOver={isAfterEventEndDate(event)}
         year={event.year}
         remapTeams={event.remap_teams}
       />

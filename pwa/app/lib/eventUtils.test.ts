@@ -16,6 +16,7 @@ import {
   groupEventsByParent,
   groupEventsBySections,
   hasEventEnded,
+  isAfterEventEndDate,
   isEventActive,
   isEventWithinADay,
   isEventWithinDays,
@@ -959,6 +960,38 @@ describe('hasEventEnded', () => {
     );
     vi.restoreAllMocks();
     vi.useRealTimers();
+  });
+});
+
+describe('isAfterEventEndDate', () => {
+  function makeEvent(end_date: string, timezone: string): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { end_date, timezone };
+  }
+
+  afterEach(() => {
+    vi.useRealTimers();
+  });
+
+  test('returns false on the last day of the event', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T03:00:00Z'));
+    expect(
+      isAfterEventEndDate(makeEvent('2024-04-12', 'America/New_York')),
+    ).toBe(false);
+  });
+
+  test('returns true the day after the event ends in the event timezone', () => {
+    vi.useFakeTimers();
+    vi.setSystemTime(new Date('2024-04-13T05:00:00Z'));
+    expect(
+      isAfterEventEndDate(makeEvent('2024-04-12', 'America/New_York')),
+    ).toBe(true);
+  });
+
+  test('returns false for an event without dates', () => {
+    // @ts-expect-error: Don't need to fill out all the fields
+    expect(isAfterEventEndDate({})).toBe(false);
   });
 });
 
