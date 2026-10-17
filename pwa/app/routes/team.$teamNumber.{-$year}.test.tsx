@@ -83,6 +83,50 @@ describe('team route loader', () => {
       }),
     ).resolves.toMatchObject({ year: 2024 });
   });
+
+  test('loads the page when remapped robot data fails to load', async () => {
+    await expect(
+      load('2026', {
+        getTeam: team,
+        getTeamYearsParticipated: [2026],
+        getTeamEventsByYear: [
+          { key: '2026nhmm', remap_teams: { frc9997: 'frc254B' } },
+        ],
+      }),
+    ).resolves.toMatchObject({ year: 2026 });
+  });
+
+  test('fetches the remapped robot status under its demo team', async () => {
+    const ensureQueryData = vi.fn<
+      (options: {
+        queryKey: [{ _id: string; path?: Record<string, string> }];
+      }) => Promise<unknown>
+    >(({ queryKey }) =>
+      Promise.resolve(
+        {
+          getTeam: team,
+          getTeamYearsParticipated: [2026],
+          getTeamEventsByYear: [
+            { key: '2026nhmm', remap_teams: { frc9997: 'frc254B' } },
+          ],
+        }[queryKey[0]._id] ?? [],
+      ),
+    );
+
+    await runLoader(Route, {
+      params: { teamNumber: '254', year: '2026' },
+      context: {
+        queryClient: { ensureQueryData } as unknown as QueryClient,
+        currentSeason: 2026,
+      },
+    });
+
+    expect(
+      ensureQueryData.mock.calls
+        .map(([{ queryKey }]) => queryKey[0])
+        .find(({ _id }) => _id === 'getTeamEventStatus')?.path,
+    ).toEqual({ team_key: 'frc9997', event_key: '2026nhmm' });
+  });
 });
 
 describe('team route head', () => {

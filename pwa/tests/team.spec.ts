@@ -1,4 +1,4 @@
-import { expect, test } from '@playwright/test';
+import { type Page, expect, test } from '@playwright/test';
 
 [
   ['history', '/team/604/history', 'History'],
@@ -285,6 +285,39 @@ test.describe('/team/4946/2026', () => {
       );
 
     expect(bannersAreSeparated).toBe(true);
+  });
+});
+
+test.describe('/team/3467/2026', () => {
+  const mayhemSection = (page: Page) => page.locator('section[id="2026nhmm"]');
+
+  test.beforeEach(async ({ page }) => {
+    await page.goto('/team/3467/2026');
+    await page.locator('body[data-hydrated]').waitFor();
+  });
+
+  test('offers a tab for the remapped B robot', async ({ page }) => {
+    await expect(
+      mayhemSection(page).getByRole('tab', { name: '3467B' }),
+    ).toBeVisible();
+  });
+
+  test('leaves B robot matches off the main robot tab', async ({ page }) => {
+    await expect(
+      mayhemSection(page)
+        .getByRole('tabpanel')
+        .getByRole('link', { name: 'Quals 1', exact: true }),
+    ).toHaveCount(0);
+  });
+
+  test('lists B robot matches on its tab', async ({ page }) => {
+    await mayhemSection(page).getByRole('tab', { name: '3467B' }).click();
+
+    await expect(
+      mayhemSection(page)
+        .getByRole('tabpanel')
+        .getByRole('link', { name: 'Quals 1', exact: true }),
+    ).toBeVisible();
   });
 });
 

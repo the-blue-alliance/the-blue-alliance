@@ -544,18 +544,19 @@ describe('MatchRow', () => {
   });
 
   test.each([
-    { alliance: 'red', focusTeamKey: 'frc254' },
-    { alliance: 'blue', focusTeamKey: 'frc217' },
-    { alliance: 'neither', focusTeamKey: 'frc9999' },
+    { alliance: 'red', focusTeamKeys: ['frc254'] },
+    { alliance: 'blue', focusTeamKeys: ['frc217'] },
+    { alliance: 'red and blue', focusTeamKeys: ['frc254', 'frc217'] },
+    { alliance: 'neither', focusTeamKeys: ['frc9999'] },
   ])(
     'still shows both scores when the focus team is on the $alliance alliance',
-    ({ focusTeamKey }) => {
+    ({ focusTeamKeys }) => {
       render(
         <MatchRow
           match={makeMatch()}
           event={event}
           year={2026}
-          focusTeamKey={focusTeamKey}
+          focusTeamKeys={focusTeamKeys}
         />,
       );
 

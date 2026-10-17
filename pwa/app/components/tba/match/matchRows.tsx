@@ -64,13 +64,13 @@ export default function SimpleMatchRowsWithBreaks({
   matches,
   event,
   breakers,
-  focusTeamKey,
+  focusTeamKeys,
   nexusStatusByKey,
 }: {
   matches: Match[];
   event: Event;
   breakers: ShouldInsertBreakCallback[];
-  focusTeamKey?: string;
+  focusTeamKeys?: string[];
   nexusStatusByKey?: Record<string, NexusMatchStatus>;
 }) {
   const playlistUrls = buildYoutubePlaylistUrls(matches, event.name);
@@ -110,7 +110,7 @@ export default function SimpleMatchRowsWithBreaks({
         event={event}
         year={event.year}
         key={match.key}
-        focusTeamKey={focusTeamKey}
+        focusTeamKeys={focusTeamKeys}
         nexusStatus={nexusStatusByKey?.[match.key]}
         className={cn(zebraIdx % 2 === 0 && 'bg-surface-subtle')}
       />,
@@ -171,14 +171,14 @@ export function MatchRow({
   match,
   event,
   year,
-  focusTeamKey,
+  focusTeamKeys = [],
   nexusStatus,
   className,
 }: {
   match: Match;
   event: Event;
   year: number;
-  focusTeamKey?: string;
+  focusTeamKeys?: string[];
   nexusStatus?: NexusMatchStatus;
   className?: string;
 }) {
@@ -187,13 +187,12 @@ export function MatchRow({
   const isPlayed =
     match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
   const matchTime = match.predicted_time ?? match.time;
-  const focusedAlliance = focusTeamKey
-    ? match.alliances.red.team_keys.includes(focusTeamKey)
-      ? AllianceColor.RED
-      : match.alliances.blue.team_keys.includes(focusTeamKey)
-        ? AllianceColor.BLUE
-        : null
-    : null;
+  const isRedFocused = match.alliances.red.team_keys.some((k) =>
+    focusTeamKeys.includes(k),
+  );
+  const isBlueFocused = match.alliances.blue.team_keys.some((k) =>
+    focusTeamKeys.includes(k),
+  );
   const { teamKeys: favoriteTeamKeys } = useFavoriteTeamKeys();
   const hasFavorite = [
     ...match.alliances.red.team_keys,
@@ -264,7 +263,7 @@ export function MatchRow({
         dq={match.alliances.red.dq_team_keys}
         surrogate={match.alliances.red.surrogate_team_keys}
         year={year}
-        focusTeamKey={focusTeamKey}
+        focusTeamKeys={focusTeamKeys}
         favoriteTeamKeys={favoriteTeamKeys}
       />
 
@@ -279,7 +278,7 @@ export function MatchRow({
         dq={match.alliances.blue.dq_team_keys}
         surrogate={match.alliances.blue.surrogate_team_keys}
         year={year}
-        focusTeamKey={focusTeamKey}
+        focusTeamKeys={focusTeamKeys}
         favoriteTeamKeys={favoriteTeamKeys}
       />
 
@@ -308,7 +307,7 @@ export function MatchRow({
           scoreBreakdown={match.score_breakdown?.red}
           year={year}
           compLevel={match.comp_level}
-          focused={focusedAlliance === AllianceColor.RED}
+          focused={isRedFocused}
         />
       )}
 
@@ -325,7 +324,7 @@ export function MatchRow({
           scoreBreakdown={match.score_breakdown?.blue}
           year={year}
           compLevel={match.comp_level}
-          focused={focusedAlliance === AllianceColor.BLUE}
+          focused={isBlueFocused}
         />
       )}
     </div>

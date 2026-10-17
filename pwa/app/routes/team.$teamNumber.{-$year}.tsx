@@ -24,12 +24,15 @@ import {
 import {
   getDistrictRankingsOptions,
   getEventAlliancesOptions,
+  getEventAwardsOptions,
   getEventDistrictPointsOptions,
+  getEventMatchesOptions,
   getRegionalAdvancementOptions,
   getRegionalChampsPoolPointsOptions,
   getRegionalRankingsOptions,
   getTeamAwardsByYearOptions,
   getTeamDistrictsOptions,
+  getTeamEventStatusOptions,
   getTeamEventsByYearOptions,
   getTeamEventsStatusesByYearOptions,
   getTeamMatchesByYearOptions,
@@ -45,7 +48,9 @@ import {
   TableOfContents,
   TableOfContentsSection,
 } from '~/components/tba/tableOfContents';
-import TeamEventAppearance from '~/components/tba/teamEventAppearance';
+import TeamEventAppearance, {
+  RobotAppearance,
+} from '~/components/tba/teamEventAppearance';
 import TeamMediaGallery from '~/components/tba/teamMediaGallery';
 import TeamPageTeamInfo from '~/components/tba/teamPageTeamInfo';
 import TeamRobotPicsCarousel from '~/components/tba/teamRobotPicsCarousel';
@@ -54,7 +59,7 @@ import { Separator } from '~/components/ui/separator';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
-import { sortEventsComparator } from '~/lib/eventUtils';
+import { getRemappedRobots, sortEventsComparator } from '~/lib/eventUtils';
 import { calculateTeamRecordsFromMatches } from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
@@ -124,6 +129,40 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
     const teamDistrictsQuery = queryClient
       .ensureQueryData(getTeamDistrictsOptions({ path: { team_key: teamKey } }))
       .catch(() => []);
+    const remappedRobotsQuery = teamEventsQuery.then((events) =>
+      Promise.all(
+        events.flatMap((e) => {
+          const robots = getRemappedRobots(e, teamKey);
+          if (robots.length === 0) {
+            return [];
+          }
+          return [
+            queryClient
+              .ensureQueryData({
+                ...getEventMatchesOptions({ path: { event_key: e.key } }),
+                staleTime: yearStaleTime,
+              })
+              .catch(() => []),
+            queryClient
+              .ensureQueryData({
+                ...getEventAwardsOptions({ path: { event_key: e.key } }),
+                staleTime: yearStaleTime,
+              })
+              .catch(() => []),
+            ...robots.map((r) =>
+              queryClient
+                .ensureQueryData({
+                  ...getTeamEventStatusOptions({
+                    path: { team_key: r.sourceTeamKey, event_key: e.key },
+                  }),
+                  staleTime: yearStaleTime,
+                })
+                .catch(() => null),
+            ),
+          ];
+        }),
+      ),
+    );
 
     // these need to be awaited so we can validate the year
     const [team, yearsParticipated] = await Promise.all([
@@ -160,6 +199,7 @@ export const Route = createFileRoute('/team/$teamNumber/{-$year}')({
       teamAwardsQuery,
       teamEventsQuery,
       teamDistrictsQuery,
+      remappedRobotsQuery,
     ]);
 
     const endTime = Temporal.Now.instant().epochMilliseconds;
@@ -367,6 +407,63 @@ function TeamPage(): React.JSX.Element {
         ]),
       ),
   });
+  const remappedRobotKeys = sortedEvents.flatMap((e) =>
+    getRemappedRobots(e, teamKey).map((r) => ({ eventKey: e.key, ...r })),
+  );
+  const remappedEventKeys = [
+    ...new Set(remappedRobotKeys.map((r) => r.eventKey)),
+  ];
+  const remappedEventMatches = useQueries({
+    queries: remappedEventKeys.map((eventKey) => ({
+      ...getEventMatchesOptions({ path: { event_key: eventKey } }),
+      staleTime: yearStaleTime,
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          remappedEventKeys[index],
+          result.data ?? [],
+        ]),
+      ),
+  });
+  const remappedEventAwards = useQueries({
+    queries: remappedEventKeys.map((eventKey) => ({
+      ...getEventAwardsOptions({ path: { event_key: eventKey } }),
+      staleTime: yearStaleTime,
+    })),
+    combine: (results) =>
+      Object.fromEntries(
+        results.map((result, index) => [
+          remappedEventKeys[index],
+          result.data ?? [],
+        ]),
+      ),
+  });
+  const remappedStatuses = useQueries({
+    queries: remappedRobotKeys.map((r) => ({
+      ...getTeamEventStatusOptions({
+        path: { team_key: r.sourceTeamKey, event_key: r.eventKey },
+      }),
+      staleTime: yearStaleTime,
+    })),
+    combine: (results) => results.map((result) => result.data ?? null),
+  });
+  const remappedRobotsByEvent: Record<string, RobotAppearance[]> = {};
+  remappedRobotKeys.forEach((r, index) => {
+    (remappedRobotsByEvent[r.eventKey] ??= []).push({
+      robotKey: r.robotKey,
+      status: remappedStatuses[index],
+      matches: remappedEventMatches[r.eventKey].filter((m) =>
+        [...m.alliances.red.team_keys, ...m.alliances.blue.team_keys].includes(
+          r.robotKey,
+        ),
+      ),
+      awards: remappedEventAwards[r.eventKey].filter((a) =>
+        a.recipient_list.some((recipient) => recipient.team_key === r.robotKey),
+      ),
+    });
+  });
+
   const [inView, setInView] = useState(new Set<string>());
 
   yearsParticipated.sort((a, b) => b - a);
@@ -491,6 +588,7 @@ function TeamPage(): React.JSX.Element {
                 maybeRegionalPoolPoints={regionalPoolPtsQueries[e.key]}
                 maybeAlliances={eventAlliancesQueries[e.key]}
                 teamRegionalAdvancement={teamRegionalAdvancement}
+                remappedRobots={remappedRobotsByEvent[e.key]}
               />
               <Separator className="my-4" />
             </TableOfContentsSection>
