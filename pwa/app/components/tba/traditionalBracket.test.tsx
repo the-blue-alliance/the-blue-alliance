@@ -237,6 +237,21 @@ describe('TraditionalBracket', () => {
     expect(qf1.querySelector('a[href="/match/2022test_qf1m2"]')).toBeTruthy();
   });
 
+  test('does not label a series with no teams assigned as alliance 1', () => {
+    const { container } = render(
+      <TraditionalBracket
+        alliances={alliances}
+        matches={[
+          ...eightTeamMatches,
+          makeMatch(CompLevel.F, 1, 1, [], [], -1, -1),
+        ]}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(container.textContent).not.toContain('#1 vs #1');
+  });
+
   test('decides the series by the last match', () => {
     render(
       <TraditionalBracket

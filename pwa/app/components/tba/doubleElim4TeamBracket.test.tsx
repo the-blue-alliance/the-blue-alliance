@@ -256,6 +256,61 @@ describe('DoubleElim4TeamBracket', () => {
     expect(group('Match 4').textContent).toContain('#4 vs #2');
   });
 
+  test('labels a series with no teams assigned by its advancing alliances', () => {
+    const matches = [
+      ...fullPlayoffs.slice(0, 2),
+      makeMatch(CompLevel.SF, 3, 1, [], [], -1, -1),
+    ];
+
+    render(
+      <DoubleElim4TeamBracket
+        alliances={alliances}
+        matches={matches}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(group('Match 3').textContent).toContain('#1 vs #3');
+  });
+
+  test('shows a placeholder for the unassigned side of a half-filled series', () => {
+    const matches = [
+      fullPlayoffs[0],
+      makeMatch(CompLevel.SF, 3, 1, allianceTeams(1), [], -1, -1),
+    ];
+
+    render(
+      <DoubleElim4TeamBracket
+        alliances={alliances}
+        matches={matches}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(
+      within(group('Match 3')).getByText('Winner of Match 2'),
+    ).toBeTruthy();
+  });
+
+  test('shows no match link on the next unplayed series', () => {
+    const matches = [
+      ...fullPlayoffs.slice(0, 2),
+      makeMatch(CompLevel.SF, 3, 1, allianceTeams(1), allianceTeams(3), -1, -1),
+    ];
+
+    render(
+      <DoubleElim4TeamBracket
+        alliances={alliances}
+        matches={matches}
+        event={makeEvent()}
+      />,
+    );
+
+    expect(
+      group('Match 3').querySelector('a[href="/match/2026test_sf3m1"]'),
+    ).toBeNull();
+  });
+
   test('highlights an alliance across the bracket while hovering', () => {
     render(
       <DoubleElim4TeamBracket

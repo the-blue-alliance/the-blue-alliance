@@ -159,6 +159,87 @@ describe('EliminationBracket', () => {
     ).not.toBeNull();
   });
 
+  test('shows placeholders for a series with no teams assigned', () => {
+    const match7Blank: Match = {
+      ...match1RedWin,
+      key: '2026test_sf7m1',
+      set_number: 7,
+      alliances: {
+        red: { ...match1RedWin.alliances.red, team_keys: [], score: -1 },
+        blue: { ...match1RedWin.alliances.blue, team_keys: [], score: -1 },
+      },
+      winning_alliance: AllianceColor.NO_ALLIANCE,
+    };
+
+    render(
+      <EliminationBracket
+        alliances={alliances}
+        matches={[match1RedWin, match7Blank]}
+        event={event}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole('group', { name: 'Match 7' })).queryByText(
+        'Winner of Match 2',
+      ),
+    ).not.toBeNull();
+  });
+
+  test('shows a placeholder for the unassigned side of a half-filled series', () => {
+    const match7RedOnly: Match = {
+      ...match1RedWin,
+      key: '2026test_sf7m1',
+      set_number: 7,
+      alliances: {
+        red: { ...match1RedWin.alliances.red, score: -1 },
+        blue: { ...match1RedWin.alliances.blue, team_keys: [], score: -1 },
+      },
+      winning_alliance: AllianceColor.NO_ALLIANCE,
+    };
+
+    render(
+      <EliminationBracket
+        alliances={alliances}
+        matches={[match1RedWin, match7RedOnly]}
+        event={event}
+      />,
+    );
+
+    expect(
+      within(screen.getByRole('group', { name: 'Match 7' })).queryByText(
+        'Winner of Match 2',
+      ),
+    ).not.toBeNull();
+  });
+
+  test('shows no match link on the next unplayed series', () => {
+    const match2Unplayed: Match = {
+      ...match1RedWin,
+      key: '2026test_sf2m1',
+      set_number: 2,
+      alliances: {
+        red: { ...match1RedWin.alliances.red, score: -1 },
+        blue: { ...match1RedWin.alliances.blue, score: -1 },
+      },
+      winning_alliance: AllianceColor.NO_ALLIANCE,
+    };
+
+    render(
+      <EliminationBracket
+        alliances={alliances}
+        matches={[match1RedWin, match2Unplayed]}
+        event={event}
+      />,
+    );
+
+    expect(
+      screen
+        .getByRole('group', { name: 'Match 2' })
+        .querySelector('a[href="/match"]'),
+    ).toBeNull();
+  });
+
   test('marks the series winner row as the winner', () => {
     render(
       <EliminationBracket
