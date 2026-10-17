@@ -515,6 +515,20 @@ test.describe('/team/254/2026', () => {
       .toBeGreaterThan(initialX - 100);
   });
 
+  test('starts the robot pictures at the first slide after changing years', async ({
+    page,
+  }) => {
+    await page.getByRole('button', { name: 'Next slide' }).click();
+    await page.getByRole('button', { name: 'Next slide' }).click();
+    await page.getByRole('button', { name: '2026' }).click();
+    await page.getByRole('menuitem', { name: '2025' }).click();
+    await page.waitForURL('/team/254/2025');
+
+    await expect(
+      page.getByRole('button', { name: 'Go to slide 1', exact: true }),
+    ).toHaveAttribute('aria-current', 'true');
+  });
+
   test('displays media gallery links', async ({ page }) => {
     await expect(
       page

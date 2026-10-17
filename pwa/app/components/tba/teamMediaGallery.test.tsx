@@ -1,14 +1,24 @@
 import { act, render, screen } from '@testing-library/react';
+import { useState } from 'react';
 import { afterEach, describe, expect, test, vi } from 'vitest';
 
 import type { Media } from '~/api/tba/read';
 import TeamMediaGallery from '~/components/tba/teamMediaGallery';
 
 vi.mock('react-social-media-embed', () => ({
-  InstagramEmbed: ({ url }: { url: string }) => (
-    <div data-testid="instagram">{url}</div>
-  ),
+  InstagramEmbed: function InstagramEmbed({ url }: { url: string }) {
+    const [embeddedUrl] = useState(url);
+    return <div data-testid="instagram">{embeddedUrl}</div>;
+  },
 }));
+
+function instagram(key: string): Media {
+  return {
+    type: 'instagram-image',
+    foreign_key: key,
+    team_keys: [],
+  } as Media;
+}
 
 function imgur(key: string, directUrl?: string): Media {
   return {
@@ -139,5 +149,20 @@ describe('TeamMediaGallery', () => {
     expect(screen.getByRole('img', { name: 'Robot reveal' })).toBeTruthy();
     expect(untitled.textContent).toBe('');
     expect(untitled.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
+
+  test('replaces instagram embeds when the media list changes', () => {
+    const { rerender } = render(
+      <TeamMediaGallery media={[instagram('old')]} />,
+    );
+    rerender(
+      <TeamMediaGallery media={[instagram('new1'), instagram('new2')]} />,
+    );
+    expect(
+      screen.getAllByTestId('instagram').map((e) => e.textContent),
+    ).toEqual([
+      'https://www.instagram.com/p/new1/',
+      'https://www.instagram.com/p/new2/',
+    ]);
   });
 });
