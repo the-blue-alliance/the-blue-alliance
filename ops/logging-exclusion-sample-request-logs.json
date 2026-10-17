@@ -1,0 +1,5 @@
+{
+  "name": "sample-successful-request-logs",
+  "description": "Keep 10% of App Engine request logs for 2xx/3xx requests with no warnings or errors",
+  "filter": "log_id(\"appengine.googleapis.com/request_log\") AND protoPayload.status>=200 AND protoPayload.status<400 AND severity<WARNING AND sample(insertId, 0.9)"
+}
