@@ -16,6 +16,7 @@ beforeEach(() => {
 afterEach(() => {
   vi.unstubAllGlobals();
   vi.useRealTimers();
+  vi.restoreAllMocks();
 });
 
 function imgur(key: string): Media {
@@ -137,5 +138,33 @@ describe('TeamRobotPicsCarousel', () => {
     );
 
     expect(loadedSlides()).toEqual([true]);
+  });
+
+  test('drops a slide whose image fails to load', () => {
+    render(
+      <TeamRobotPicsCarousel media={[imgur('aaaaaaa'), imgur('bbbbbbb')]} />,
+    );
+
+    fireEvent.error(images()[0]);
+
+    expect(loadedSlides()).toEqual([true]);
+  });
+
+  test('hides the carousel when every image fails to load', () => {
+    render(<TeamRobotPicsCarousel media={[imgur('aaaaaaa')]} />);
+
+    fireEvent.error(images()[0]);
+
+    expect(screen.queryByRole('region', { name: 'Robot pictures' })).toBeNull();
+  });
+
+  test('hides the carousel when the image failed before mounting', () => {
+    vi.spyOn(HTMLImageElement.prototype, 'complete', 'get').mockReturnValue(
+      true,
+    );
+
+    render(<TeamRobotPicsCarousel media={[imgur('aaaaaaa')]} />);
+
+    expect(screen.queryByRole('region', { name: 'Robot pictures' })).toBeNull();
   });
 });
