@@ -483,6 +483,22 @@ export function stripParentPrefix(
   return name;
 }
 
+export interface RemappedRobot {
+  sourceTeamKey: string;
+  robotKey: string;
+}
+
+export function getRemappedRobots(
+  event: Event,
+  teamKey: string,
+): RemappedRobot[] {
+  const robotKeyPattern = new RegExp(`^${teamKey}[B-Z]$`);
+  return Object.entries(event.remap_teams ?? {})
+    .filter(([, robotKey]) => robotKeyPattern.test(robotKey))
+    .map(([sourceTeamKey, robotKey]) => ({ sourceTeamKey, robotKey }))
+    .sort((a, b) => a.robotKey.localeCompare(b.robotKey));
+}
+
 export function hasEventEnded(event: Event): boolean {
   const days = getEventDays(event);
   if (!days) return false;

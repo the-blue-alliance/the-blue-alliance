@@ -1,4 +1,4 @@
-import { render, screen, within } from '@testing-library/react';
+import { fireEvent, render, screen, within } from '@testing-library/react';
 import { type ReactNode } from 'react';
 import { describe, expect, test, vi } from 'vitest';
 
@@ -58,12 +58,12 @@ vi.mock('~/components/tba/eventRankTooltip', () => ({
 vi.mock('~/components/tba/match/matchRows', () => ({
   default: ({
     matches,
-    focusTeamKey,
+    focusTeamKeys,
   }: {
     matches: Match[];
-    focusTeamKey: string;
+    focusTeamKeys: string[];
   }) => (
-    <ul data-testid="matches" data-focus={focusTeamKey}>
+    <ul data-testid="matches" data-focus={focusTeamKeys.join(' ')}>
       {matches.map((m) => (
         <li key={m.key}>{m.key}</li>
       ))}
@@ -144,7 +144,7 @@ describe('TeamStatus', () => {
         event={event}
         matches={[makeMatch('2026test_qm1', 'qm', 1, ['frc254'])]}
         status={status}
-        team={{ key: 'frc254' } as Team}
+        teamKey="frc254"
         awards={[]}
         maybeDistrictPoints={null}
         maybeRegionalPoolPoints={null}
@@ -382,6 +382,143 @@ describe('TeamEventAppearance', () => {
   });
 });
 
+describe('TeamEventAppearance with a remapped robot', () => {
+  const robotStatus = {
+    qual: {
+      num_teams: 18,
+      ranking: { rank: 7, matches_played: 1, sort_orders: [] },
+      sort_order_info: [],
+    },
+  } as unknown as TeamEventStatus;
+
+  function renderWithRobot() {
+    render(
+      <TeamEventAppearance
+        event={{ ...fullEvent, event_type: EventType.OFFSEASON, week: null }}
+        matches={[
+          makeMatch('2026casj_qm1', 'qm', 1, ['frc254']),
+          makeMatch('2026casj_qm3', 'qm', 3, ['frc254'], ['frc254B']),
+        ]}
+        status={fullStatus}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+        remappedRobots={[
+          {
+            robotKey: 'frc254B',
+            sourceTeamKey: 'frc9997',
+            status: robotStatus,
+            matches: [
+              makeMatch('2026casj_qm2', 'qm', 2, ['frc254B']),
+              makeMatch('2026casj_qm3', 'qm', 3, ['frc254'], ['frc254B']),
+            ],
+            awards: [],
+          },
+        ]}
+      />,
+    );
+  }
+
+  function shownMatchKeys() {
+    return within(screen.getByTestId('matches'))
+      .getAllByRole('listitem')
+      .map((li) => li.textContent);
+  }
+
+  test('has no tabs without a remapped robot', () => {
+    render(
+      <TeamEventAppearance
+        event={fullEvent}
+        matches={[]}
+        status={null}
+        team={team}
+        awards={[]}
+        maybeDistrictPoints={null}
+        maybeRegionalPoolPoints={null}
+        maybeAlliances={null}
+      />,
+    );
+
+    expect(screen.queryByRole('tablist')).toBeNull();
+  });
+
+  test('offers a tab for each robot and the combined view', () => {
+    renderWithRobot();
+
+    expect(screen.getAllByRole('tab').map((tab) => tab.textContent)).toEqual([
+      '254',
+      '254B',
+      'Combined',
+    ]);
+  });
+
+  test('shows the main robot by default', () => {
+    renderWithRobot();
+
+    expect(shownMatchKeys()).toEqual(['2026casj_qm1', '2026casj_qm3']);
+  });
+
+  test('lists the remapped robot matches on its tab', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
+
+    expect(shownMatchKeys()).toEqual(['2026casj_qm2', '2026casj_qm3']);
+  });
+
+  test('shows the rank of both robots', () => {
+    renderWithRobot();
+
+    expect(
+      screen.getAllByTestId('rank').map((rank) => rank.textContent),
+    ).toEqual(['3 of 40', '7 of 18']);
+  });
+
+  test('labels the main robot status with its team number', () => {
+    renderWithRobot();
+
+    expect(screen.getByRole('heading', { level: 3, name: '254' })).toBeTruthy();
+  });
+
+  test('labels the remapped robot status with its FMS team number', () => {
+    renderWithRobot();
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: '254B (9997)' }),
+    ).toBeTruthy();
+  });
+
+  test('lists each match of both robots once on the combined tab', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: 'Combined' }));
+
+    expect(shownMatchKeys()).toEqual([
+      '2026casj_qm1',
+      '2026casj_qm2',
+      '2026casj_qm3',
+    ]);
+  });
+
+  test('focuses both robots on the combined tab', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: 'Combined' }));
+
+    expect(screen.getByTestId('matches').getAttribute('data-focus')).toBe(
+      'frc254 frc254B',
+    );
+  });
+
+  test('keeps the rank of both robots when a robot tab is selected', () => {
+    renderWithRobot();
+    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
+
+    expect(
+      screen.getAllByTestId('rank').map((rank) => rank.textContent),
+    ).toEqual(['3 of 40', '7 of 18']);
+  });
+});
+
 describe('TeamStatus sections', () => {
   function renderStatus(
     overrides: Partial<Parameters<typeof TeamStatus>[0]> = {},
@@ -395,7 +532,7 @@ describe('TeamStatus sections', () => {
           makeMatch('2026casj_sf1m1', 'sf', 1, ['frc254']),
         ]}
         status={fullStatus}
-        team={team}
+        teamKey="frc254"
         awards={awards}
         maybeDistrictPoints={null}
         maybeRegionalPoolPoints={null}

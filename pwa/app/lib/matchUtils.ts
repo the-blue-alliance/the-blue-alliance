@@ -262,6 +262,23 @@ export function calculateTeamRecordsFromMatches(
   return { quals: qualsRecord, playoff: playoffRecord };
 }
 
+export function calculateRobotsRecord(
+  robots: { robotKey: string; matches: Match[] }[],
+): WltRecord {
+  return robots
+    .flatMap((r) =>
+      Object.values(calculateTeamRecordsFromMatches(r.robotKey, r.matches)),
+    )
+    .reduce(
+      (total, record) => ({
+        wins: total.wins + record.wins,
+        losses: total.losses + record.losses,
+        ties: total.ties + record.ties,
+      }),
+      { wins: 0, losses: 0, ties: 0 },
+    );
+}
+
 export function getTeamsUnpenalizedHighScore(
   teamKey: string,
   matches: Match[],

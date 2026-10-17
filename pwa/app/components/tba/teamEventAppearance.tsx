@@ -26,6 +26,7 @@ import {
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
 import { Badge } from '~/components/ui/badge';
 import { Separator } from '~/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '~/components/ui/tabs';
 import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { getEventDateString } from '~/lib/eventUtils';
@@ -116,6 +117,20 @@ function Section({
   );
 }
 
+export interface RobotAppearance {
+  robotKey: string;
+  sourceTeamKey?: string;
+  status: TeamEventStatus | null;
+  matches: Match[];
+  awards: Award[];
+}
+
+interface RobotTab {
+  value: string;
+  label: string;
+  robots: RobotAppearance[];
+}
+
 export default function TeamEventAppearance({
   event,
   matches,
@@ -126,6 +141,7 @@ export default function TeamEventAppearance({
   maybeRegionalPoolPoints,
   maybeAlliances,
   teamRegionalAdvancement,
+  remappedRobots = [],
 }: {
   event: Event;
   matches: Match[];
@@ -136,12 +152,41 @@ export default function TeamEventAppearance({
   maybeRegionalPoolPoints: EventDistrictPoints | null;
   maybeAlliances: EliminationAlliance[] | null;
   teamRegionalAdvancement?: RegionalAdvancement;
+  remappedRobots?: RobotAppearance[];
 }): React.JSX.Element {
   const bannerAwards = awards.filter((a) =>
     BLUE_BANNER_AWARDS.has(a.award_type),
   );
 
-  matches.sort(sortMatchComparator);
+  const robots = [
+    { robotKey: team.key, status, matches, awards },
+    ...remappedRobots,
+  ];
+  const tabs: RobotTab[] = [
+    ...robots.map((r) => ({
+      value: r.robotKey,
+      label: r.robotKey.substring(3),
+      robots: [r],
+    })),
+    { value: 'combined', label: 'Combined', robots },
+  ];
+
+  const matchList = (tab: RobotTab) => (
+    <SimpleMatchRowsWithBreaks
+      matches={[
+        ...new Map(
+          tab.robots.flatMap((r) => r.matches).map((m) => [m.key, m]),
+        ).values(),
+      ].sort(sortMatchComparator)}
+      event={event}
+      breakers={[
+        START_OF_QUALS_BREAKER,
+        END_OF_DAY_BREAKER,
+        CHANGE_IN_COMP_LEVEL_BREAKER,
+      ]}
+      focusTeamKeys={tab.robots.map((r) => r.robotKey)}
+    />
+  );
 
   return (
     <div className="relative min-[1550px]:grid" id={event.key}>
@@ -170,30 +215,51 @@ export default function TeamEventAppearance({
               />
             </DetailEntity>
           </div>
-          <TeamStatus
-            event={event}
-            matches={matches}
-            status={status}
-            team={team}
-            awards={awards}
-            maybeDistrictPoints={maybeDistrictPoints}
-            maybeRegionalPoolPoints={maybeRegionalPoolPoints}
-            maybeAlliances={maybeAlliances}
-            teamRegionalAdvancement={teamRegionalAdvancement}
-          />
+          <div className="space-y-4">
+            {robots.map((r, index) => (
+              <div key={r.robotKey}>
+                {index > 0 && <Separator className="mb-4" />}
+                {robots.length > 1 && (
+                  <h3 className="mb-2 text-lg font-medium">
+                    {r.robotKey.substring(3)}
+                    {r.sourceTeamKey && ` (${r.sourceTeamKey.substring(3)})`}
+                  </h3>
+                )}
+                <TeamStatus
+                  event={event}
+                  matches={r.matches}
+                  status={r.status}
+                  teamKey={r.robotKey}
+                  awards={r.awards}
+                  maybeDistrictPoints={maybeDistrictPoints}
+                  maybeRegionalPoolPoints={maybeRegionalPoolPoints}
+                  maybeAlliances={maybeAlliances}
+                  teamRegionalAdvancement={teamRegionalAdvancement}
+                />
+              </div>
+            ))}
+          </div>
         </div>
 
         <div className="grow">
-          <SimpleMatchRowsWithBreaks
-            matches={matches}
-            event={event}
-            breakers={[
-              START_OF_QUALS_BREAKER,
-              END_OF_DAY_BREAKER,
-              CHANGE_IN_COMP_LEVEL_BREAKER,
-            ]}
-            focusTeamKey={team.key}
-          />
+          {remappedRobots.length > 0 ? (
+            <Tabs defaultValue={team.key} className="mt-4 md:mt-0">
+              <TabsList>
+                {tabs.map((t) => (
+                  <TabsTrigger key={t.value} value={t.value}>
+                    {t.label}
+                  </TabsTrigger>
+                ))}
+              </TabsList>
+              {tabs.map((t) => (
+                <TabsContent key={t.value} value={t.value}>
+                  {matchList(t)}
+                </TabsContent>
+              ))}
+            </Tabs>
+          ) : (
+            matchList(tabs[0])
+          )}
         </div>
       </div>
 
@@ -254,7 +320,7 @@ export function TeamStatus({
   event,
   matches,
   status,
-  team,
+  teamKey,
   awards,
   maybeDistrictPoints,
   maybeRegionalPoolPoints,
@@ -264,7 +330,7 @@ export function TeamStatus({
   event: Event;
   matches: Match[];
   status: TeamEventStatus | null;
-  team: Team;
+  teamKey: string;
   awards: Award[];
   maybeDistrictPoints: EventDistrictPoints | null;
   maybeRegionalPoolPoints: EventDistrictPoints | null;
@@ -272,16 +338,16 @@ export function TeamStatus({
   teamRegionalAdvancement?: RegionalAdvancement;
 }) {
   const hasRank = status?.qual?.ranking?.rank;
-  const record = getTeamEventRecord(event, team.key, matches);
+  const record = getTeamEventRecord(event, teamKey, matches);
   const hasAlliance =
     status?.alliance && maybeAlliances && maybeAlliances.length > 0;
   const hasAwards = awards.length > 0;
   const hasDistrictPoints =
     DISTRICT_EVENT_TYPES.has(event.event_type) &&
-    maybeDistrictPoints?.points[team.key];
+    maybeDistrictPoints?.points[teamKey];
   const hasRegionalPoolPoints =
     event.event_type === EventType.REGIONAL &&
-    maybeRegionalPoolPoints?.points[team.key];
+    maybeRegionalPoolPoints?.points[teamKey];
 
   const sections = [];
 
@@ -291,7 +357,7 @@ export function TeamStatus({
       <TeamEventRecord
         key="stats"
         event={event}
-        teamKey={team.key}
+        teamKey={teamKey}
         status={status}
         record={record}
       />,
@@ -313,15 +379,15 @@ export function TeamStatus({
         </h3>
         <div className="flex flex-wrap justify-end gap-1">
           {maybeAlliances
-            .find((a) => a.picks.includes(team.key))
+            .find((a) => a.picks.includes(teamKey))
             ?.picks.map((k) => (
               <TeamLink
                 key={k}
                 teamOrKey={k}
                 year={event.year}
-                aria-current={k === team.key ? 'page' : undefined}
+                aria-current={k === teamKey ? 'page' : undefined}
               >
-                <Badge variant={k === team.key ? 'secondary' : 'outline'}>
+                <Badge variant={k === teamKey ? 'secondary' : 'outline'}>
                   {k.substring(3)}
                 </Badge>
               </TeamLink>
@@ -342,7 +408,7 @@ export function TeamStatus({
                 (r) =>
                   r.awardee !== null &&
                   r.awardee !== '' &&
-                  r.team_key === team.key,
+                  r.team_key === teamKey,
               );
 
               return (
@@ -368,7 +434,7 @@ export function TeamStatus({
     sections.push(
       <Section key="district" title="District Points">
         <DistrictPointsTable
-          districtPoints={maybeDistrictPoints.points[team.key]}
+          districtPoints={maybeDistrictPoints.points[teamKey]}
         />
       </Section>,
     );
@@ -406,7 +472,7 @@ export function TeamStatus({
         }
       >
         <DistrictPointsTable
-          districtPoints={maybeRegionalPoolPoints.points[team.key]}
+          districtPoints={maybeRegionalPoolPoints.points[teamKey]}
         />
       </Section>,
     );

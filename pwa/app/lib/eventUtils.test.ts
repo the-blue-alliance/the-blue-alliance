@@ -12,6 +12,7 @@ import {
   getEventNormalizedName,
   getEventWeekString,
   getPublicAgendaUrl,
+  getRemappedRobots,
   groupEventsByParent,
   groupEventsBySections,
   hasEventEnded,
@@ -124,6 +125,53 @@ describe('groupEventsByParent', () => {
     expect(groupEventsByParent([parent, division]).map((e) => e.key)).toEqual([
       '2024cmp',
       '2024cmpnew',
+    ]);
+  });
+});
+
+describe('getRemappedRobots', () => {
+  function makeEvent(remap_teams: Record<string, string> | null): Event {
+    // @ts-expect-error: Don't need to fill out all the fields
+    return { key: '2026bc2', remap_teams };
+  }
+
+  test('returns the robot remapped to the team', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc3467B' }), 'frc3467'),
+    ).toEqual([{ sourceTeamKey: 'frc9997', robotKey: 'frc3467B' }]);
+  });
+
+  test('ignores robots remapped to other teams', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9990: 'frc190B' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('ignores robots of a team whose number starts with the team number', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc34671B' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('ignores pre-rookie remaps without a letter suffix', () => {
+    expect(
+      getRemappedRobots(makeEvent({ frc9997: 'frc3467' }), 'frc3467'),
+    ).toEqual([]);
+  });
+
+  test('returns nothing when the event has no remaps', () => {
+    expect(getRemappedRobots(makeEvent(null), 'frc3467')).toEqual([]);
+  });
+
+  test('orders robots by letter', () => {
+    expect(
+      getRemappedRobots(
+        makeEvent({ frc9996: 'frc3467C', frc9997: 'frc3467B' }),
+        'frc3467',
+      ),
+    ).toEqual([
+      { sourceTeamKey: 'frc9997', robotKey: 'frc3467B' },
+      { sourceTeamKey: 'frc9996', robotKey: 'frc3467C' },
     ]);
   });
 });

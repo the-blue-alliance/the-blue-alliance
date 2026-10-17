@@ -219,7 +219,7 @@ export default function EventTeamsTab({
                               END_OF_DAY_BREAKER,
                               CHANGE_IN_COMP_LEVEL_BREAKER,
                             ]}
-                            focusTeamKey={team.key}
+                            focusTeamKeys={[team.key]}
                           />
                         </DialogContent>
                       </Dialog>
