@@ -1,6 +1,8 @@
 import json
+import re
 from typing import cast, Dict, List, Optional
 
+from google.appengine.api import taskqueue
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
 
@@ -9,11 +11,13 @@ from backend.common.manipulators.award_manipulator import AwardManipulator
 from backend.common.manipulators.event_details_manipulator import (
     EventDetailsManipulator,
 )
+from backend.common.manipulators.event_team_manipulator import EventTeamManipulator
 from backend.common.manipulators.match_manipulator import MatchManipulator
 from backend.common.models.alliance import EventAlliance
 from backend.common.models.award import Award
 from backend.common.models.event import Event
 from backend.common.models.event_ranking import EventRanking
+from backend.common.models.event_team import EventTeam
 from backend.common.models.keys import EventKey, TeamKey
 from backend.common.models.match import Match
 from backend.common.models.team import Team
@@ -23,32 +27,45 @@ class EventRemapTeamsHelper:
     @classmethod
     def remap_teams(cls, event_key: EventKey) -> None:
         event: Optional[Event] = Event.get_by_id(event_key)
-        if not event or not event.remap_teams:
+        if not event:
             return None
 
-        event.prep_awards()
-        event.prep_matches()
-        event.prep_teams()
+        event_teams = EventTeam.query(EventTeam.event == event.key).fetch()
+        cls.remapteams_eventteams(event_teams, event.remap_teams or {})
+        EventTeamManipulator.createOrUpdate(event_teams)
 
-        # Remap matches
-        cls.remapteams_matches(event.matches, event.remap_teams)
-        MatchManipulator.createOrUpdate(event.matches)
+        if event.remap_teams:
+            event.prep_awards()
+            event.prep_matches()
+            event.prep_teams()
 
-        # Remap alliance selections
-        if event.alliance_selections:
-            cls.remapteams_alliances(
-                none_throws(event.alliance_selections), event.remap_teams
-            )
+            # Remap matches
+            cls.remapteams_matches(event.matches, event.remap_teams)
+            MatchManipulator.createOrUpdate(event.matches)
 
-        # Remap rankings
-        if event.rankings:
-            cls.remapteams_rankings2(event.rankings, event.remap_teams)
-        if event.details:
-            EventDetailsManipulator.createOrUpdate(event.details)
+            # Remap alliance selections
+            if event.alliance_selections:
+                cls.remapteams_alliances(
+                    none_throws(event.alliance_selections), event.remap_teams
+                )
 
-        # Remap awards
-        cls.remapteams_awards(event.awards, event.remap_teams)
-        AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+            # Remap rankings
+            if event.rankings:
+                cls.remapteams_rankings2(event.rankings, event.remap_teams)
+            if event.details:
+                EventDetailsManipulator.createOrUpdate(event.details)
+
+            # Remap awards
+            cls.remapteams_awards(event.awards, event.remap_teams)
+            AwardManipulator.createOrUpdate(event.awards, auto_union=False)
+
+        taskqueue.add(
+            url=f"/tasks/math/do/event_team_status/{event_key}",
+            method="GET",
+            target="py3-tasks-io",
+            queue_name="stats",
+            countdown=90,
+        )
 
     @classmethod
     def remapteams_awards(
@@ -145,3 +162,16 @@ class EventRemapTeamsHelper:
         for ranking in rankings2:
             if ranking["team_key"] in remap_teams:
                 ranking["team_key"] = remap_teams[ranking["team_key"]]
+
+    @classmethod
+    def remapteams_eventteams(
+        cls, event_teams: List[EventTeam], remap_teams: Dict[str, str]
+    ) -> None:
+        for event_team in event_teams:
+            new_team = remap_teams.get(none_throws(event_team.team.string_id()))
+            if new_team:
+                event_team.remapped_to = new_team
+                event_team.remapped_team = "frc" + re.sub("[^0-9]", "", new_team)
+            elif event_team.remapped_to:
+                event_team.remapped_to = "None"
+                event_team.remapped_team = "None"

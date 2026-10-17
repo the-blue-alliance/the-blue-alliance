@@ -469,6 +469,8 @@ def event_details(event_key: EventKey) -> Response:
         if not skip_eventteams
         else []
     )
+    if event.remap_teams:
+        EventRemapTeamsHelper.remapteams_eventteams(event_teams, event.remap_teams)
 
     # Delete eventteams of teams that are no longer registered
     if event_teams and not skip_eventteams:

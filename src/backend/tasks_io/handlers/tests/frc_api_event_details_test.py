@@ -153,6 +153,33 @@ def test_get_event_details_writes_teams(
 @mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
 @mock.patch.object(DatafeedFMSAPI, "get_event_teams")
 @mock.patch.object(DatafeedFMSAPI, "get_event_details")
+def test_get_event_details_sets_remap_fields_on_new_eventteams(
+    event_mock,
+    teams_mock,
+    avatars_mock,
+    max_year_mock,
+    tasks_client: Client,
+) -> None:
+    stored_event = create_event()
+    stored_event.remap_teams = {"frc9997": "frc254B"}
+    stored_event.put()
+    event_mock.return_value = InstantFuture(([create_event()], [create_district()]))
+    teams_mock.return_value = InstantFuture(
+        [(Team(id="frc9997", team_number=9997), None, None)]
+    )
+    avatars_mock.return_value = InstantFuture(([], []))
+
+    tasks_client.get("/backend-tasks/get/event_details/2019casj")
+
+    event_team = EventTeam.get_by_id("2019casj_frc9997")
+    assert event_team is not None
+    assert (event_team.remapped_to, event_team.remapped_team) == ("frc254B", "frc254")
+
+
+@mock.patch.object(SeasonHelper, "get_max_year", return_value=2019)
+@mock.patch.object(DatafeedFMSAPI, "get_event_team_avatars")
+@mock.patch.object(DatafeedFMSAPI, "get_event_teams")
+@mock.patch.object(DatafeedFMSAPI, "get_event_details")
 def test_get_event_details_clears_eventteams(
     event_mock,
     teams_mock,

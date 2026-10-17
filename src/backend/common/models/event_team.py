@@ -1,4 +1,4 @@
-from typing import cast, Set
+from typing import cast, Optional, Set
 
 from google.appengine.ext import ndb
 from pyre_extensions import none_throws
@@ -11,7 +11,7 @@ from backend.common.models.event_team_status import (
     EventTeamStatus,
     EventTeamStatusStrings,
 )
-from backend.common.models.keys import EventTeamKey, Year
+from backend.common.models.keys import EventTeamKey, TeamKey, Year
 from backend.common.models.team import Team
 
 
@@ -28,6 +28,11 @@ class EventTeam(CachedModel):
 
     status: EventTeamStatus = cast(EventTeamStatus, ndb.JsonProperty())
     pit_location: EventTeamPitLocation = cast(EventTeamPitLocation, ndb.JsonProperty())
+    # Set only on an offseason demo team (e.g. frc9997) that Event.remap_teams maps to a real team's robot.
+    # The key the robot competed as in matches, rankings, and awards, e.g. "frc3467B"
+    remapped_to: Optional[TeamKey] = ndb.StringProperty(indexed=False)
+    # The real team that owns the robot, e.g. "frc3467". Indexed to find all of a team's remapped robots
+    remapped_team: Optional[TeamKey] = ndb.StringProperty()
 
     created = ndb.DateTimeProperty(auto_now_add=True, indexed=False)
     updated = ndb.DateTimeProperty(auto_now=True, indexed=False)
@@ -36,6 +41,8 @@ class EventTeam(CachedModel):
         "status",
         "year",  # technically immutable, but corruptable and needs repair. See github issue #409
         "pit_location",
+        "remapped_to",
+        "remapped_team",
     }
 
     def __init__(self, *args, **kw):
@@ -45,6 +52,7 @@ class EventTeam(CachedModel):
             "event": set(),
             "team": set(),
             "year": set(),
+            "remapped_team": set(),
         }
         super(EventTeam, self).__init__(*args, **kw)
 
@@ -66,8 +74,12 @@ class EventTeam(CachedModel):
         )
 
     @property
+    def competing_team_key(self) -> TeamKey:
+        return self.remapped_to or none_throws(self.team.string_id())
+
+    @property
     def status_strings(self) -> EventTeamStatusStrings:
-        team_key = none_throws(self.team.string_id())
+        team_key = self.competing_team_key
         return EventTeamStatusStrings(
             alliance=EventTeamStatusHelper.generate_team_at_event_alliance_status_string(
                 team_key, self.status

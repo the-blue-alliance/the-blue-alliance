@@ -93,7 +93,7 @@ class JSONEventInfoParser:
         if webcasts := info_dict.get("webcasts"):
             parsed_info["webcasts"] = [self._parse_webcast(w) for w in webcasts]
 
-        if remap_teams := info_dict.get("remap_teams"):
+        if (remap_teams := info_dict.get("remap_teams")) is not None:
             for temp_team, remapped_team in remap_teams.items():
                 temp_match = re.fullmatch(r"frc(\d+)", str(temp_team))
                 if not temp_match:
