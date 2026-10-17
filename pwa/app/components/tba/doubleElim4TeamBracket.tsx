@@ -22,6 +22,7 @@ import {
   EventType,
   Match,
 } from '~/api/tba/read';
+import BracketAllianceName from '~/components/tba/bracketAllianceName';
 import BracketPlaceholderMatch from '~/components/tba/bracketPlaceholderMatch';
 import BracketViewThroughSelect, {
   VIEW_ALL_MATCHES,
@@ -153,43 +154,36 @@ const _BracketMatch = forwardRef<
           {result.redAllianceNumber && result.blueAllianceNumber && (
             <span className="text-xs font-normal">
               (
-              <span
-                className={cn(
-                  'transition-colors duration-200',
-                  isRedHighlighted &&
-                    `rounded bg-red-100 px-1 text-sm dark:bg-red-900
-                    dark:text-white`,
-                )}
-              >
-                {getAllianceDisplayName(result.redAllianceNumber)}
-              </span>{' '}
+              <BracketAllianceName
+                name={getAllianceDisplayName(result.redAllianceNumber)}
+                color="red"
+                isHighlighted={isRedHighlighted}
+              />{' '}
               vs{' '}
-              <span
-                className={cn(
-                  'transition-colors duration-200',
-                  isBlueHighlighted &&
-                    `rounded bg-blue-100 px-1 text-sm dark:bg-blue-900
-                    dark:text-white`,
-                )}
-              >
-                {getAllianceDisplayName(result.blueAllianceNumber)}
-              </span>
+              <BracketAllianceName
+                name={getAllianceDisplayName(result.blueAllianceNumber)}
+                color="blue"
+                isHighlighted={isBlueHighlighted}
+              />
               )
             </span>
           )}
         </div>
         <div className="flex items-center gap-5">
-          {isNext && <Badge variant="success">Next</Badge>}
-          {matches?.map((match) => (
-            <MatchLink
-              key={match.key}
-              matchOrKey={match}
-              event={event}
-              className="flex items-center justify-center"
-            >
-              <PlayCircleIcon className="inline size-4" />
-            </MatchLink>
-          ))}
+          {isNext ? (
+            <Badge variant="success">Next</Badge>
+          ) : (
+            matches?.map((match) => (
+              <MatchLink
+                key={match.key}
+                matchOrKey={match}
+                event={event}
+                className="flex items-center justify-center"
+              >
+                <PlayCircleIcon className="inline size-4" />
+              </MatchLink>
+            ))
+          )}
         </div>
       </div>
       <div
@@ -387,6 +381,7 @@ export default function DoubleElim4TeamBracket({
 
   const getAllianceNumber = useCallback(
     (teamKeys: string[]): number | null => {
+      if (teamKeys.length === 0) return null;
       for (let i = 0; i < alliances.length; i++) {
         const allianceTeamKeys = alliances[i].picks.map((pick) =>
           pick.substring(3),
@@ -422,6 +417,9 @@ export default function DoubleElim4TeamBracket({
       const matchBlueTeams = setMatches[0].alliances.blue.team_keys.map((t) =>
         t.substring(3),
       );
+      if (matchRedTeams.length === 0 || matchBlueTeams.length === 0) {
+        return null;
+      }
 
       const redAllianceNumber = getAllianceNumber(matchRedTeams);
       const blueAllianceNumber = getAllianceNumber(matchBlueTeams);
