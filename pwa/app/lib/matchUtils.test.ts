@@ -1,6 +1,11 @@
 import { describe, expect, test } from 'vitest';
 
-import type { Event, Match, MatchAlliance } from '~/api/tba/read';
+import type {
+  EliminationAlliance,
+  Event,
+  Match,
+  MatchAlliance,
+} from '~/api/tba/read';
 import {
   AllianceColor,
   CompLevel,
@@ -13,6 +18,7 @@ import {
   formatMatchKeyName,
   formatMatchTime,
   getAllianceMatchResult,
+  getFinalsResult,
   getMatchScoreWithoutAdjustPoints,
   getTeamMatchResults,
   getTeamsUnpenalizedHighScore,
@@ -822,5 +828,115 @@ describe('formatMatchTime', () => {
   test("defaults to the viewer's time zone", () => {
     const nineThirty = new Date(2026, 2, 7, 9, 30).getTime() / 1000;
     expect(formatMatchTime(nineThirty)).toBe('Sat 9:30 AM');
+  });
+});
+
+describe('getFinalsResult', () => {
+  const red: EliminationAlliance = {
+    picks: ['frc254', 'frc1678', 'frc2056'],
+    declines: [],
+  };
+  const blue: EliminationAlliance = {
+    picks: ['frc1323', 'frc2910', 'frc604'],
+    declines: [],
+  };
+  const semifinalist: EliminationAlliance = {
+    picks: ['frc1', 'frc2', 'frc3'],
+    declines: [],
+  };
+
+  function final(
+    matchNumber: number,
+    winner: AllianceColor,
+    played = true,
+  ): Match {
+    return makeMatch({
+      key: `2026test_f1m${matchNumber}`,
+      comp_level: CompLevel.F,
+      match_number: matchNumber,
+      winning_alliance: winner,
+      alliances: {
+        red: alliance(played ? 100 : -1, ['frc254', 'frc1678', 'frc2056']),
+        blue: alliance(played ? 90 : -1, ['frc1323', 'frc2910', 'frc604']),
+      },
+    });
+  }
+
+  test('names an alliance with two finals wins as the winner during the event', () => {
+    const matches = [
+      final(1, AllianceColor.BLUE),
+      final(2, AllianceColor.RED),
+      final(3, AllianceColor.RED),
+    ];
+
+    expect(
+      getFinalsResult([semifinalist, red, blue], matches, false).winner,
+    ).toBe(red);
+  });
+
+  test('names a two-win winner while an unneeded finals match is unplayed', () => {
+    const matches = [
+      final(1, AllianceColor.RED),
+      final(2, AllianceColor.RED),
+      final(3, AllianceColor.NO_ALLIANCE, false),
+    ];
+
+    expect(getFinalsResult([red, blue], matches, false).winner).toBe(red);
+  });
+
+  test('has no winner during the event after one finals win', () => {
+    expect(
+      getFinalsResult([red, blue], [final(1, AllianceColor.RED)], false).winner,
+    ).toBeUndefined();
+  });
+
+  test('has no winner during the event when finals are tied 1-1', () => {
+    const matches = [final(1, AllianceColor.RED), final(2, AllianceColor.BLUE)];
+
+    expect(getFinalsResult([red, blue], matches, false).winner).toBeUndefined();
+  });
+
+  test('names the winner of a single finals match once the event is over', () => {
+    expect(
+      getFinalsResult([red, blue], [final(1, AllianceColor.BLUE)], true).winner,
+    ).toBe(blue);
+  });
+
+  test('names the last finals match winner of a 1-1 series once the event is over', () => {
+    const matches = [final(1, AllianceColor.BLUE), final(2, AllianceColor.RED)];
+
+    expect(getFinalsResult([red, blue], matches, true).winner).toBe(red);
+  });
+
+  test('finds the last finals match by match number, not list order', () => {
+    const matches = [final(2, AllianceColor.RED), final(1, AllianceColor.BLUE)];
+
+    expect(getFinalsResult([red, blue], matches, true).winner).toBe(red);
+  });
+
+  test('lists the alliances that played in the finals as finalists', () => {
+    expect(
+      getFinalsResult(
+        [semifinalist, red, blue],
+        [final(1, AllianceColor.RED)],
+        false,
+      ).finalists,
+    ).toEqual([red, blue]);
+  });
+
+  test('ignores semifinal matches', () => {
+    const semifinal = makeMatch({
+      key: '2026test_sf1m1',
+      comp_level: CompLevel.SF,
+      winning_alliance: AllianceColor.RED,
+      alliances: {
+        red: alliance(100, ['frc1', 'frc2', 'frc3']),
+        blue: alliance(90, ['frc254', 'frc1678', 'frc2056']),
+      },
+    });
+
+    expect(
+      getFinalsResult([semifinalist, red, blue], [semifinal], true),
+    ).toEqual({ winner: undefined, finalists: [] });
   });
 });

@@ -2,8 +2,10 @@ import { render, screen, within } from '@testing-library/react';
 import { describe, expect, test, vi } from 'vitest';
 
 import {
+  AllianceColor,
   CompLevel,
   type EliminationAlliance,
+  type Match,
   PlayoffType,
 } from '~/api/tba/read';
 import AllianceSelectionTable from '~/components/tba/allianceSelectionTable';
@@ -33,6 +35,37 @@ function status(
   };
 }
 
+function final(red: string[], blue: string[], winner: AllianceColor): Match {
+  return {
+    key: '2026test_f1m1',
+    event_key: '2026test',
+    comp_level: CompLevel.F,
+    set_number: 1,
+    match_number: 1,
+    alliances: {
+      red: {
+        score: 100,
+        team_keys: red,
+        surrogate_team_keys: [],
+        dq_team_keys: [],
+      },
+      blue: {
+        score: 90,
+        team_keys: blue,
+        surrogate_team_keys: [],
+        dq_team_keys: [],
+      },
+    },
+    winning_alliance: winner,
+    time: null,
+    actual_time: null,
+    predicted_time: null,
+    post_result_time: null,
+    score_breakdown: null,
+    videos: [],
+  };
+}
+
 function headers() {
   return screen.getAllByRole('columnheader').map((h) => h.textContent);
 }
@@ -46,19 +79,24 @@ describe('AllianceSelectionTable', () => {
           alliance({
             name: 'Alliance 1',
             picks: ['frc254', 'frc604', 'frc1678', 'frc4414'],
-            status: status(CompLevel.F, 'won'),
           }),
           alliance({
             name: 'Alliance 2',
             picks: ['frc1', 'frc2', 'frc3'],
-            status: status(CompLevel.F, 'eliminated'),
           }),
           alliance({
             name: 'Custom Name',
             picks: ['frc4', 'frc5'],
-            status: status(CompLevel.SF, 'eliminated'),
           }),
           alliance({ picks: ['frc6'] }),
+        ]}
+        eventOver
+        matches={[
+          final(
+            ['frc254', 'frc604', 'frc1678'],
+            ['frc1', 'frc2', 'frc3'],
+            AllianceColor.RED,
+          ),
         ]}
       />,
     );
@@ -87,6 +125,42 @@ describe('AllianceSelectionTable', () => {
     ).toEqual(['4', '6', '-', '-', '-']);
   });
 
+  test('shows a trophy only for the finals winner when statuses say semifinal alliances won', () => {
+    render(
+      <AllianceSelectionTable
+        year={2026}
+        alliances={[
+          alliance({
+            picks: ['frc694', 'frc1768', 'frc11175'],
+            status: status(CompLevel.F, 'playing'),
+          }),
+          alliance({
+            picks: ['frc48', 'frc5813', 'frc271'],
+            status: status(CompLevel.F, 'playing'),
+          }),
+          alliance({
+            picks: ['frc1922', 'frc238', 'frc1735'],
+            status: status(CompLevel.SF, 'won'),
+          }),
+        ]}
+        eventOver
+        matches={[
+          final(
+            ['frc11175', 'frc1768', 'frc694'],
+            ['frc271', 'frc5813', 'frc48'],
+            AllianceColor.RED,
+          ),
+        ]}
+      />,
+    );
+    const [, ...rows] = screen.getAllByRole('row');
+    expect(rows.map((row) => !!row.querySelector('svg'))).toEqual([
+      true,
+      false,
+      false,
+    ]);
+  });
+
   test('shows_remapped_team_in_picks', () => {
     render(
       <AllianceSelectionTable
@@ -98,6 +172,8 @@ describe('AllianceSelectionTable', () => {
             picks: ['frc9997', 'frc1073', 'frc1350'],
           }),
         ]}
+        eventOver={false}
+        matches={[]}
       />,
     );
     const [, row] = screen.getAllByRole('row');
@@ -109,12 +185,26 @@ describe('AllianceSelectionTable', () => {
   });
 
   test('uses three columns when no alliance has picks', () => {
-    render(<AllianceSelectionTable year={2026} alliances={[alliance({})]} />);
+    render(
+      <AllianceSelectionTable
+        year={2026}
+        alliances={[alliance({})]}
+        eventOver={false}
+        matches={[]}
+      />,
+    );
     expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);
   });
 
   test('an empty alliance list falls back to the default three team columns', () => {
-    render(<AllianceSelectionTable year={2026} alliances={[]} />);
+    render(
+      <AllianceSelectionTable
+        year={2026}
+        alliances={[]}
+        eventOver={false}
+        matches={[]}
+      />,
+    );
     expect(headers()).toEqual(['Alliance', 'Captain', 'Pick 1', 'Pick 2']);
   });
 
@@ -123,6 +213,8 @@ describe('AllianceSelectionTable', () => {
       <AllianceSelectionTable
         year={2026}
         alliances={[alliance({ name: 'Alliance 1', picks: ['frc254'] })]}
+        eventOver={false}
+        matches={[]}
       />,
     );
     expect(headers()).toEqual(['Alliance', 'Captain']);

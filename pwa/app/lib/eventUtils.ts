@@ -511,6 +511,13 @@ export function hasEventEnded(event: Event): boolean {
   return Temporal.PlainDate.compare(endDate, todayInUserTz) <= 0;
 }
 
+export function isAfterEventEndDate(event: Event): boolean {
+  const days = getEventDays(event);
+  if (!days) return false;
+  const todayInEventTz = Temporal.Now.plainDateISO(getEventTz(event));
+  return Temporal.PlainDate.compare(days.end, todayInEventTz) < 0;
+}
+
 export const EVENT_SSR_TTL_SECONDS = {
   PAST_SEASON: 24 * 60 * 60,
   STABLE: 60 * 60,
