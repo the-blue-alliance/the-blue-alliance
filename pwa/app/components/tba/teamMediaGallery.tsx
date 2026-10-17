@@ -1,7 +1,10 @@
 import { useEffect, useRef, useState } from 'react';
 import { InstagramEmbed } from 'react-social-media-embed';
 
+import SimpleIconsInstagram from '~icons/simple-icons/instagram';
+
 import { Media } from '~/api/tba/read';
+import { Skeleton } from '~/components/ui/skeleton';
 import {
   getEmbedMedia,
   getMediaLinkUrl,
@@ -13,7 +16,11 @@ export default function TeamMediaGallery({
 }: {
   media: Media[];
 }): React.JSX.Element | null {
-  const embedMedia = getEmbedMedia(media);
+  const embedMedia = getEmbedMedia(media).toSorted(
+    (a, b) =>
+      Number(b.type === 'instagram-image') -
+      Number(a.type === 'instagram-image'),
+  );
 
   if (embedMedia.length === 0) {
     return null;
@@ -21,8 +28,8 @@ export default function TeamMediaGallery({
 
   return (
     <div
-      className="grid grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))]
-        gap-4"
+      className="grid grid-flow-row-dense auto-rows-[16rem]
+        grid-cols-[repeat(auto-fill,minmax(min(100%,18rem),1fr))] gap-4"
       data-testid="team-media-gallery"
     >
       {embedMedia.map((m): React.JSX.Element => {
@@ -93,7 +100,7 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
       <img
         src={thumbnailUrl}
         alt="Team media"
-        className="h-64 w-full object-cover"
+        className="h-full w-full object-cover"
       />
     </a>
   );
@@ -118,13 +125,13 @@ function CdThreadEmbed({
       href={linkUrl}
       target="_blank"
       rel="noreferrer"
-      className="block overflow-hidden rounded-lg border-2 border-neutral-300
-        hover:border-neutral-400"
+      className="flex flex-col overflow-hidden rounded-lg border-2
+        border-neutral-300 hover:border-neutral-400"
     >
       <img
         src={imageUrl}
         alt={threadTitle ?? ''}
-        className="h-64 w-full object-cover"
+        className="min-h-0 w-full flex-1 object-cover"
       />
       {threadTitle && (
         <div className="truncate px-2 py-1 text-sm font-medium">
@@ -142,5 +149,21 @@ function InstagramImageEmbed({
 }): React.JSX.Element | null {
   const url = getMediaLinkUrl(media);
   if (!url) return null;
-  return <InstagramEmbed url={url} width="100%" />;
+  return (
+    <InstagramEmbed
+      url={url}
+      width="100%"
+      className="row-span-2 rounded-lg! border-2 border-neutral-300
+        hover:border-neutral-400 [&_iframe]:m-0! [&_iframe]:h-full!
+        [&_iframe]:w-full! [&_iframe]:min-w-0! [&_iframe]:rounded-none!
+        [&_iframe]:border-0!"
+      embedPlaceholder={
+        <Skeleton
+          className="flex h-[512px] items-center justify-center rounded-none"
+        >
+          <SimpleIconsInstagram className="size-10 text-muted-foreground" />
+        </Skeleton>
+      }
+    />
+  );
 }
