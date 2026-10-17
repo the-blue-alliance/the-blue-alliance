@@ -538,7 +538,10 @@ function TeamPage(): React.JSX.Element {
               </div>
             </div>
             <div className="flex-none">
-              <TeamRobotPicsCarousel media={robotPics} />
+              <TeamRobotPicsCarousel
+                key={`${teamKey}-${year}`}
+                media={robotPics}
+              />
             </div>
           </div>
 

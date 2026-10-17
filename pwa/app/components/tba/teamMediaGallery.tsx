@@ -25,14 +25,15 @@ export default function TeamMediaGallery({
         gap-4"
       data-testid="team-media-gallery"
     >
-      {embedMedia.map((m, index): React.JSX.Element => {
+      {embedMedia.map((m): React.JSX.Element => {
+        const key = `${m.type}-${m.foreign_key}`;
         switch (m.type) {
           case 'imgur':
-            return <ImgurEmbed key={index} media={m} />;
+            return <ImgurEmbed key={key} media={m} />;
           case 'instagram-image':
-            return <InstagramImageEmbed key={index} media={m} />;
+            return <InstagramImageEmbed key={key} media={m} />;
           case 'cd-thread':
-            return <CdThreadEmbed key={index} media={m} />;
+            return <CdThreadEmbed key={key} media={m} />;
         }
       })}
     </div>
