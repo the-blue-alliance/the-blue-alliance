@@ -83,6 +83,7 @@ import {
   START_OF_QUALS_BREAKER,
 } from '~/components/tba/match/breakers';
 import SimpleMatchRowsWithBreaks from '~/components/tba/match/matchRows';
+import QualMatchesCollapse from '~/components/tba/match/qualMatchesCollapse';
 import PlayoffAdvancement2015Table from '~/components/tba/playoffAdvancement2015Table';
 import RankingsTable from '~/components/tba/rankingsTable';
 import RoundRobinRankingsTable from '~/components/tba/roundRobinRankingsTable';
@@ -995,7 +996,9 @@ function ResultsTab({
             className="basis-full lg:basis-1/2"
           >
             <h2 className="mb-2 text-xl font-medium">Qualification Matches</h2>
-            {leftSideMatches}
+            <QualMatchesCollapse matches={quals} hasElims={elims.length > 0}>
+              {leftSideMatches}
+            </QualMatchesCollapse>
           </TableOfContentsSection>
         )}
 

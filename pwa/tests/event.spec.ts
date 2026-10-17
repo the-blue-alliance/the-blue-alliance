@@ -26,6 +26,27 @@ test.describe('/event/2024mil', () => {
     await expect(page.locator('[data-slot="dialog-content"]')).toBeFocused();
   });
 
+  test('hides qualification matches until expanded mobile', async ({
+    page,
+  }) => {
+    await expect(
+      page.getByRole('link', { name: 'Quals 1', exact: true }),
+    ).toBeHidden();
+  });
+
+  test('shows qualification matches after expanding mobile', async ({
+    page,
+  }) => {
+    await page.locator('[data-toc-bar]').waitFor();
+    await page
+      .getByRole('button', { name: /^Show all \d+ qualification matches$/ })
+      .click();
+
+    await expect(
+      page.getByRole('link', { name: 'Quals 1', exact: true }),
+    ).toBeVisible();
+  });
+
   test('labels the rank column as a sorting control', async ({ page }) => {
     await page.getByRole('tab', { name: 'Rankings' }).click();
 
@@ -259,6 +280,17 @@ test('hides round robin standings for a non-round-robin event', async ({
   await expect(
     page.getByRole('heading', { name: 'Round Robin Semifinals' }),
   ).toHaveCount(0);
+});
+
+test('shows finished qualification matches before elims are posted mobile', async ({
+  page,
+}) => {
+  await page.goto('/event/2018nhmm');
+  await page.locator('body[data-hydrated]').waitFor();
+
+  await expect(
+    page.getByRole('link', { name: 'Quals 1', exact: true }),
+  ).toBeVisible();
 });
 
 test.describe('/event/2015rismi', () => {
