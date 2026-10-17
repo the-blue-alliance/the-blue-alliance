@@ -243,7 +243,7 @@ export default function TeamEventAppearance({
 
         <div className="grow">
           {remappedRobots.length > 0 ? (
-            <Tabs defaultValue={team.key}>
+            <Tabs defaultValue={team.key} className="mt-4 md:mt-0">
               <TabsList>
                 {tabs.map((t) => (
                   <TabsTrigger key={t.value} value={t.value}>
