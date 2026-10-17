@@ -8,6 +8,7 @@ import {
   PlayoffType,
 } from '~/api/tba/read';
 import {
+  calculateRobotsRecord,
   calculateTeamRecordsFromMatches,
   formatMatchKeyName,
   formatMatchTime,
@@ -369,6 +370,46 @@ function breakdown(
 ): Match['score_breakdown'] {
   return { red, blue } as unknown as Match['score_breakdown'];
 }
+
+describe('calculateRobotsRecord', () => {
+  test('sums the records of every robot', () => {
+    expect(
+      calculateRobotsRecord([
+        {
+          robotKey: 'frc3467B',
+          matches: [
+            makeMatch({
+              key: '2026nhmm_qm1',
+              alliances: {
+                red: alliance(100, ['frc3467B', 'frc1', 'frc2']),
+                blue: alliance(50, ['frc3', 'frc4', 'frc5']),
+              },
+              winning_alliance: AllianceColor.RED,
+            }),
+          ],
+        },
+        {
+          robotKey: 'frc3467C',
+          matches: [
+            makeMatch({
+              key: '2026nhmm_sf1m1',
+              comp_level: CompLevel.SF,
+              alliances: {
+                red: alliance(100, ['frc6', 'frc7', 'frc8']),
+                blue: alliance(50, ['frc3467C', 'frc9', 'frc10']),
+              },
+              winning_alliance: AllianceColor.RED,
+            }),
+          ],
+        },
+      ]),
+    ).toEqual({ wins: 1, losses: 1, ties: 0 });
+  });
+
+  test('is an empty record without robots', () => {
+    expect(calculateRobotsRecord([])).toEqual({ wins: 0, losses: 0, ties: 0 });
+  });
+});
 
 describe('sortMatchComparator', () => {
   test('orders qualification matches before playoff matches', () => {

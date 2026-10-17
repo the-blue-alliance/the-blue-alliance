@@ -1,5 +1,3 @@
-import { useState } from 'react';
-
 import DateIcon from '~icons/lucide/calendar-days';
 import LocationIcon from '~icons/lucide/map-pin';
 
@@ -121,6 +119,7 @@ function Section({
 
 export interface RobotAppearance {
   robotKey: string;
+  sourceTeamKey?: string;
   status: TeamEventStatus | null;
   matches: Match[];
   awards: Award[];
@@ -155,7 +154,6 @@ export default function TeamEventAppearance({
   teamRegionalAdvancement?: RegionalAdvancement;
   remappedRobots?: RobotAppearance[];
 }): React.JSX.Element {
-  const [selectedTab, setSelectedTab] = useState(team.key);
   const bannerAwards = awards.filter((a) =>
     BLUE_BANNER_AWARDS.has(a.award_type),
   );
@@ -172,8 +170,6 @@ export default function TeamEventAppearance({
     })),
     { value: 'combined', label: 'Combined', robots },
   ];
-  const shownRobots =
-    tabs.find((t) => t.value === selectedTab)?.robots ?? tabs[0].robots;
 
   const matchList = (tab: RobotTab) => (
     <SimpleMatchRowsWithBreaks
@@ -220,12 +216,13 @@ export default function TeamEventAppearance({
             </DetailEntity>
           </div>
           <div className="space-y-4">
-            {shownRobots.map((r, index) => (
+            {robots.map((r, index) => (
               <div key={r.robotKey}>
                 {index > 0 && <Separator className="mb-4" />}
-                {shownRobots.length > 1 && (
+                {robots.length > 1 && (
                   <h3 className="mb-2 text-lg font-medium">
                     {r.robotKey.substring(3)}
+                    {r.sourceTeamKey && ` (${r.sourceTeamKey.substring(3)})`}
                   </h3>
                 )}
                 <TeamStatus
@@ -246,10 +243,7 @@ export default function TeamEventAppearance({
 
         <div className="grow">
           {remappedRobots.length > 0 ? (
-            <Tabs
-              value={selectedTab}
-              onValueChange={(value) => setSelectedTab(String(value))}
-            >
+            <Tabs defaultValue={team.key}>
               <TabsList>
                 {tabs.map((t) => (
                   <TabsTrigger key={t.value} value={t.value}>

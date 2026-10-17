@@ -60,7 +60,10 @@ import { BLUE_BANNER_AWARDS } from '~/lib/api/AwardType';
 import { DISTRICT_EVENT_TYPES, SEASON_EVENT_TYPES } from '~/lib/api/EventType';
 import { sortAwardsByEventDate } from '~/lib/awardUtils';
 import { getRemappedRobots, sortEventsComparator } from '~/lib/eventUtils';
-import { calculateTeamRecordsFromMatches } from '~/lib/matchUtils';
+import {
+  calculateRobotsRecord,
+  calculateTeamRecordsFromMatches,
+} from '~/lib/matchUtils';
 import { getEmbedMedia, getImageMedia } from '~/lib/mediaUtils';
 import { staleTimeForYear } from '~/lib/queryClient';
 import {
@@ -452,6 +455,7 @@ function TeamPage(): React.JSX.Element {
   remappedRobotKeys.forEach((r, index) => {
     (remappedRobotsByEvent[r.eventKey] ??= []).push({
       robotKey: r.robotKey,
+      sourceTeamKey: r.sourceTeamKey,
       status: remappedStatuses[index],
       matches: remappedEventMatches[r.eventKey].filter((m) =>
         [...m.alliances.red.team_keys, ...m.alliances.blue.team_keys].includes(
@@ -546,6 +550,7 @@ function TeamPage(): React.JSX.Element {
             district={currentDistrict}
             districtRanking={teamDistrictRanking}
             regionalRanking={teamRegionalRanking}
+            remappedRobots={Object.values(remappedRobotsByEvent).flat()}
           />
 
           {awards.filter((a) => BLUE_BANNER_AWARDS.has(a.award_type)).length >
@@ -622,6 +627,7 @@ function StatsSection({
   district,
   districtRanking,
   regionalRanking,
+  remappedRobots,
 }: {
   events: Event[];
   team: Team;
@@ -630,6 +636,7 @@ function StatsSection({
   district?: District;
   districtRanking?: DistrictRanking;
   regionalRanking?: RegionalRanking;
+  remappedRobots: RobotAppearance[];
 }) {
   const officialEvents = events.filter((e) =>
     SEASON_EVENT_TYPES.has(e.event_type),
@@ -669,7 +676,10 @@ function StatsSection({
   const unofficialPlayoff = unofficialRecords.playoff;
 
   const officialRecord = addRecords(officialQuals, officialPlayoff);
-  const unofficialRecord = addRecords(unofficialQuals, unofficialPlayoff);
+  const unofficialRecord = addRecords(
+    addRecords(unofficialQuals, unofficialPlayoff),
+    calculateRobotsRecord(remappedRobots),
+  );
   const hasUnofficialMatches = hasAnyMatches(unofficialRecord);
 
   if (matches.length === 0) {

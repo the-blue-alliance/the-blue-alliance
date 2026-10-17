@@ -408,6 +408,7 @@ describe('TeamEventAppearance with a remapped robot', () => {
         remappedRobots={[
           {
             robotKey: 'frc254B',
+            sourceTeamKey: 'frc9997',
             status: robotStatus,
             matches: [
               makeMatch('2026casj_qm2', 'qm', 2, ['frc254B']),
@@ -466,11 +467,26 @@ describe('TeamEventAppearance with a remapped robot', () => {
     expect(shownMatchKeys()).toEqual(['2026casj_qm2', '2026casj_qm3']);
   });
 
-  test('shows the remapped robot rank on its tab', () => {
+  test('shows the rank of both robots', () => {
     renderWithRobot();
-    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
 
-    expect(screen.getByTestId('rank').textContent).toBe('7 of 18');
+    expect(
+      screen.getAllByTestId('rank').map((rank) => rank.textContent),
+    ).toEqual(['3 of 40', '7 of 18']);
+  });
+
+  test('labels the main robot status with its team number', () => {
+    renderWithRobot();
+
+    expect(screen.getByRole('heading', { level: 3, name: '254' })).toBeTruthy();
+  });
+
+  test('labels the remapped robot status with its FMS team number', () => {
+    renderWithRobot();
+
+    expect(
+      screen.getByRole('heading', { level: 3, name: '254B (9997)' }),
+    ).toBeTruthy();
   });
 
   test('lists each match of both robots once on the combined tab', () => {
@@ -493,9 +509,9 @@ describe('TeamEventAppearance with a remapped robot', () => {
     );
   });
 
-  test('shows the rank of both robots on the combined tab', () => {
+  test('keeps the rank of both robots when a robot tab is selected', () => {
     renderWithRobot();
-    fireEvent.click(screen.getByRole('tab', { name: 'Combined' }));
+    fireEvent.click(screen.getByRole('tab', { name: '254B' }));
 
     expect(
       screen.getAllByTestId('rank').map((rank) => rank.textContent),
