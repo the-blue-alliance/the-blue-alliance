@@ -151,6 +151,16 @@ describe('TeamMediaGallery', () => {
     expect(untitled.querySelector('img')?.getAttribute('alt')).toBe('');
   });
 
+  test('lists instagram posts before imgur images', () => {
+    stubImages({ complete: true, naturalWidth: 640, naturalHeight: 480 });
+    render(<TeamMediaGallery media={[imgur('abcdefg'), instagram('xyz')]} />);
+    expect(
+      screen
+        .getByTestId('team-media-gallery')
+        .firstElementChild?.getAttribute('data-testid'),
+    ).toBe('instagram');
+  });
+
   test('replaces instagram embeds when the media list changes', () => {
     const { rerender } = render(
       <TeamMediaGallery media={[instagram('old')]} />,
