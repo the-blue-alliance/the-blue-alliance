@@ -32,6 +32,18 @@ test('navbar search button is visible', async ({ page }) => {
   ).toBeVisible();
 });
 
+[700, 960, 1165].forEach((width) => {
+  test.describe(`navbar at ${width}px wide`, () => {
+    test.use({ viewport: { width, height: 800 } });
+
+    test('keeps the account menu button fully on screen', async ({ page }) => {
+      await expect(
+        page.getByRole('button', { name: 'Account menu' }),
+      ).toBeInViewport({ ratio: 1 });
+    });
+  });
+});
+
 // (mobile) Navbar
 
 test('(mobile) navbar logo link is visible', async ({ page }) => {

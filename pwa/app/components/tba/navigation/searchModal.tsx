@@ -87,7 +87,7 @@ export function SearchModal() {
             className={cn(
               `relative h-9 w-full justify-start rounded-lg bg-white pl-4
               font-normal text-muted-foreground shadow-none hover:bg-white
-              max-lg:hidden sm:pr-12 md:w-32 lg:w-56 xl:w-64 dark:bg-card`,
+              max-xl:hidden sm:pr-12 md:w-32 xl:w-64 dark:bg-card`,
             )}
           />
         }
@@ -109,7 +109,7 @@ export function SearchModal() {
       <DialogTrigger
         aria-label="Search"
         className="z-30 cursor-pointer rounded-full p-2 text-white
-          transition-colors duration-200 hover:bg-black/20 lg:hidden"
+          transition-colors duration-200 hover:bg-black/20 xl:hidden"
       >
         <SearchIcon className="size-5" />
       </DialogTrigger>
