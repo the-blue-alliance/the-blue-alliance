@@ -451,6 +451,26 @@ def test_update_match_skips_pre_2017(
         FirebasePusher._get_reference("e/2016ct/m/qm1").get()
 
 
+def test_update_match_skips_practice_matches(
+    taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
+) -> None:
+    match = Match(
+        id="2026ct_pm1",
+        alliances_json="""{"blue": {"score": -1, "teams": ["frc3464", "frc20", "frc1073"]}, "red": {"score": -1, "teams": ["frc69", "frc571", "frc176"]}}""",
+        comp_level="pm",
+        event=ndb.Key(Event, "2026ct"),
+        year=2026,
+        set_number=1,
+        match_number=1,
+    )
+
+    FirebasePusher.update_match(match, set())
+    drain_deferred(taskqueue_stub)
+
+    with pytest.raises(firebase_exceptions.NotFoundError):
+        FirebasePusher._get_reference("e/2026ct/m/pm1").get()
+
+
 def test_update_match_merges_predicted_time(
     taskqueue_stub: testbed.taskqueue_stub.TaskQueueServiceStub,
 ) -> None:
