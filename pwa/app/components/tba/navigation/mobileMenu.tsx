@@ -12,7 +12,7 @@ import { NAV_ITEMS_LIST } from '~/lib/navigation/content';
 
 export function MobileMenu() {
   return (
-    <NavigationMenuItem className="md:hidden">
+    <NavigationMenuItem className="min-[60rem]:hidden">
       <NavigationMenuTrigger aria-label="Toggle Menu">
         <MenuIcon className="size-5 group-data-popup-open:hidden" />
         <XIcon className="hidden size-5 group-data-popup-open:block" />
