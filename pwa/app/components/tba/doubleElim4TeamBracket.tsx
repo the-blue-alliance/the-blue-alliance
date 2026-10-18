@@ -518,7 +518,7 @@ export default function DoubleElim4TeamBracket({
 
       <div className="overflow-x-auto overflow-y-hidden">
         <div ref={containerRef} className="relative isolate min-w-max px-4">
-          <div className="relative z-1 space-y-4">
+          <div className="relative z-1 w-fit space-y-4">
             {/* Upper Bracket */}
             <div className="space-y-4">
               <h2 className="text-center text-xl font-medium">Upper Bracket</h2>
@@ -613,9 +613,9 @@ export default function DoubleElim4TeamBracket({
             </div>
 
             {/* Lower Bracket */}
-            <div className="space-y-4">
+            <div className="w-fit space-y-4">
               <h2 className="text-center text-xl font-medium">Lower Bracket</h2>
-              <div className="ml-16 flex items-start gap-8">
+              <div className="flex items-start gap-8">
                 {/* Round 2 - Lower */}
                 <div className="flex flex-col items-center">
                   <h3 className="mb-4 text-center">Round 2</h3>

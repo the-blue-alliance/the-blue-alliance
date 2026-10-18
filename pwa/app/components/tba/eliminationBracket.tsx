@@ -739,9 +739,9 @@ export default function EliminationBracket({
             </div>
 
             {/* Lower Bracket */}
-            <div className="space-y-4">
+            <div className="w-fit space-y-4">
               <h2 className="text-center text-xl font-medium">Lower Bracket</h2>
-              <div className="ml-16 flex items-start gap-8">
+              <div className="flex items-start gap-8">
                 {/* Round 2 */}
                 <div className="flex flex-col items-center">
                   <h3 className="mb-4 text-center">Round 2</h3>
