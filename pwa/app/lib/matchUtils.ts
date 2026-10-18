@@ -3,6 +3,7 @@ import { Temporal } from 'temporal-polyfill';
 import {
   AllianceColor,
   CompLevel,
+  EliminationAlliance,
   Event,
   Match,
   MatchAlliance,
@@ -98,6 +99,56 @@ export function matchTitleShort(
 
 export function matchHasBeenPlayed(match: Match) {
   return match.alliances.red.score !== -1 && match.alliances.blue.score !== -1;
+}
+
+/**
+ * Finds the finals winner and finalists from the finals matches, without
+ * knowing the finals format. Most events play first to 2 wins, but some give
+ * the upper bracket alliance a 1-0 head start, which the match data does not
+ * show.
+ *
+ * - An alliance with 2 finals match wins is the winner in both formats. With a
+ *   head start, the upper bracket alliance stops at 1 real win, so only the
+ *   lower bracket alliance can reach 2.
+ * - Once the finals are over, the winner of the last finals match is the
+ *   winner in both formats. We can only be sure the finals are over once the
+ *   event's last day has passed, so before then a 1-0 or 1-1 series shows no
+ *   winner.
+ */
+export function getFinalsResult(
+  alliances: EliminationAlliance[],
+  matches: Match[],
+  eventOver: boolean,
+): { winner?: EliminationAlliance; finalists: EliminationAlliance[] } {
+  const allianceOf = (teamKeys: string[]) =>
+    alliances.find((a) => a.picks.some((p) => teamKeys.includes(p)));
+  const finals = matches
+    .filter((m) => m.comp_level === CompLevel.F)
+    .sort(sortMatchComparator);
+
+  const finalists = [
+    ...new Set(
+      finals.flatMap((m) => [
+        allianceOf(m.alliances.red.team_keys),
+        allianceOf(m.alliances.blue.team_keys),
+      ]),
+    ),
+  ].filter((a) => a !== undefined);
+  const matchWinners = finals.flatMap((m) =>
+    m.winning_alliance === AllianceColor.RED ||
+    m.winning_alliance === AllianceColor.BLUE
+      ? [allianceOf(m.alliances[m.winning_alliance].team_keys)]
+      : [],
+  );
+
+  const twoTimeWinner = finalists.find(
+    (a) => matchWinners.filter((w) => w === a).length >= 2,
+  );
+
+  return {
+    winner: twoTimeWinner ?? (eventOver ? matchWinners.at(-1) : undefined),
+    finalists,
+  };
 }
 
 function getMaybeUnpenalizedScores(m: Match): { blue: number; red: number } {

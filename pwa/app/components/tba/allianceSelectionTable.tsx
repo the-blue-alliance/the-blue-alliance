@@ -4,7 +4,7 @@ import { type HTMLAttributes, type JSX } from 'react';
 
 import BiTrophy from '~icons/bi/trophy';
 
-import { CompLevel, EliminationAlliance } from '~/api/tba/read';
+import { EliminationAlliance, Match } from '~/api/tba/read';
 import InlineIcon from '~/components/tba/inlineIcon';
 import { TeamLinkWithTooltip } from '~/components/tba/teamTooltip';
 import {
@@ -15,6 +15,7 @@ import {
   TableHeader,
   TableRow,
 } from '~/components/ui/table';
+import { getFinalsResult } from '~/lib/matchUtils';
 import { remapTeamKeys } from '~/lib/teamRemap';
 
 const rowVariants = cva('text-center', {
@@ -62,12 +63,25 @@ function extractAllianceNumber(input: string): string {
 
 export default function AllianceSelectionTable(props: {
   alliances: EliminationAlliance[];
+  matches: Match[];
+  eventOver: boolean;
   year: number;
   remapTeams?: Record<string, string> | null;
 }) {
+  const { winner, finalists } = getFinalsResult(
+    props.alliances,
+    props.matches,
+    props.eventOver,
+  );
   const alliances = props.alliances.map((a) => ({
     ...a,
     picks: remapTeamKeys(a.picks, props.remapTeams),
+    variant:
+      a === winner
+        ? ('winner' as const)
+        : finalists.includes(a)
+          ? ('finalist' as const)
+          : ('default' as const),
   }));
   const allianceSize =
     Math.max(0, ...alliances.map((a) => a.picks.length)) || 3;
@@ -92,16 +106,10 @@ export default function AllianceSelectionTable(props: {
             <AllianceTableRow
               key={`alliance-${idx}`}
               className="odd:bg-transparent"
-              variant={
-                a.status?.level === CompLevel.F
-                  ? a.status.status === 'won'
-                    ? 'winner'
-                    : 'finalist'
-                  : 'default'
-              }
+              variant={a.variant}
             >
               <TableCell className="">
-                {a.status?.status === 'won' ? (
+                {a.variant === 'winner' ? (
                   <InlineIcon className="relative right-[1ch] justify-center">
                     <BiTrophy />
                     {extractAllianceNumber(a.name ?? `${idx + 1}`)}
