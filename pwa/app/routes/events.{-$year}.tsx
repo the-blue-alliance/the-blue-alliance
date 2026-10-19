@@ -5,6 +5,7 @@ import {
   redirect,
   useNavigate,
 } from '@tanstack/react-router';
+import { cn } from 'cn';
 import { useMemo, useState } from 'react';
 
 import {
@@ -97,6 +98,9 @@ export const Route = createFileRoute('/events/{-$year}')({
 }); // v8 ignore start -- TanStack Router's dev-only HMR code maps to this line
 // v8 ignore stop
 
+const compactTriggerClassName = `max-lg:h-8 max-lg:w-auto max-lg:border-none
+  max-lg:px-2 max-lg:text-foreground max-lg:hover:bg-accent`;
+
 function YearEventsPage() {
   const { year } = Route.useLoaderData();
   const yearStaleTime = staleTimeForYear(year);
@@ -162,39 +166,39 @@ function YearEventsPage() {
   return (
     <div className="flex flex-wrap gap-8 lg:flex-nowrap">
       <TableOfContents tocItems={tocItems} inView={inView}>
-        <YearSelector
-          currentLabel={String(year)}
-          triggerClassName="w-[120px] max-lg:h-6 max-lg:w-24 max-lg:border-none"
-          options={validYears.map((y) => ({
-            label: String(y),
-            to: `/events/${y}`,
-            isCurrent: y === year,
-          }))}
-        />
-        <Select
-          items={districtItems}
-          defaultValue="all"
-          onValueChange={(value) => {
-            if (value === 'regional') {
-              void navigate({ to: `/events/regional/${year}` });
-            } else if (value !== 'all') {
-              void navigate({ to: `/district/${value}/${year}` });
-            }
-          }}
-        >
-          <SelectTrigger
-            className="w-[180px] max-lg:h-6 max-lg:w-36 max-lg:border-none"
+        <div className="flex items-center gap-1 lg:flex-col lg:gap-2">
+          <YearSelector
+            currentLabel={String(year)}
+            triggerClassName={compactTriggerClassName}
+            options={validYears.map((y) => ({
+              label: String(y),
+              to: `/events/${y}`,
+              isCurrent: y === year,
+            }))}
+          />
+          <Select
+            items={districtItems}
+            defaultValue="all"
+            onValueChange={(value) => {
+              if (value === 'regional') {
+                void navigate({ to: `/events/regional/${year}` });
+              } else if (value !== 'all') {
+                void navigate({ to: `/district/${value}/${year}` });
+              }
+            }}
           >
-            <SelectValue />
-          </SelectTrigger>
-          <SelectContent>
-            {districtItems.map(({ value, label }) => (
-              <SelectItem key={value} value={value}>
-                {label}
-              </SelectItem>
-            ))}
-          </SelectContent>
-        </Select>
+            <SelectTrigger className={cn(compactTriggerClassName, 'gap-2')}>
+              <SelectValue />
+            </SelectTrigger>
+            <SelectContent align="start">
+              {districtItems.map(({ value, label }) => (
+                <SelectItem key={value} value={value}>
+                  {label}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
       </TableOfContents>
       <div className="basis-full py-8 lg:basis-5/6">
         <h1 className="mb-3 text-3xl font-medium">
