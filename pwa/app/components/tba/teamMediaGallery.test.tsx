@@ -30,6 +30,25 @@ function imgur(key: string, directUrl?: string): Media {
   } as Media;
 }
 
+function cad(
+  type: 'grabcad' | 'onshape',
+  key: string,
+  directUrl: string,
+): Media {
+  return {
+    type,
+    foreign_key: key,
+    team_keys: ['frc1768'],
+    direct_url: directUrl,
+    details: {
+      model_name: 'Nightshade 2026',
+      model_description: null,
+      model_image: directUrl,
+      model_created: null,
+    },
+  } as Media;
+}
+
 const imageProps = ['complete', 'naturalWidth', 'naturalHeight'] as const;
 
 /** jsdom never loads images, so fake the load state every image reports. */
@@ -149,6 +168,71 @@ describe('TeamMediaGallery', () => {
     expect(screen.getByRole('img', { name: 'Robot reveal' })).toBeTruthy();
     expect(untitled.textContent).toBe('');
     expect(untitled.querySelector('img')?.getAttribute('alt')).toBe('');
+  });
+
+  test('links an Onshape model to its document', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(screen.getByRole('link').getAttribute('href')).toBe(
+      'https://cad.onshape.com/documents/abc/w/def',
+    );
+  });
+
+  test('links a GrabCAD model to its library page', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('grabcad', 'nightshade-1', 'https://cad.example/l.png')]}
+      />,
+    );
+    expect(screen.getByRole('link').getAttribute('href')).toBe(
+      'https://grabcad.com/library/nightshade-1',
+    );
+  });
+
+  test('captions a CAD model with its name', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(screen.getByRole('link').textContent).toBe('Nightshade 2026');
+  });
+
+  test('shows the CAD thumbnail', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(
+      screen.getByRole('img', { name: 'Nightshade 2026' }).getAttribute('src'),
+    ).toBe('https://cad.example/s.png');
+  });
+
+  test('marks Onshape models with an Onshape badge', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('onshape', 'abc/w/def', 'https://cad.example/s.png')]}
+      />,
+    );
+    expect(screen.getAllByAltText('Onshape').length).toBeGreaterThan(0);
+  });
+
+  test('leaves the Onshape badge off GrabCAD models', () => {
+    render(
+      <TeamMediaGallery
+        media={[cad('grabcad', 'nightshade-1', 'https://cad.example/l.png')]}
+      />,
+    );
+    expect(screen.queryAllByAltText('Onshape')).toHaveLength(0);
+  });
+
+  test('skips CAD media without a thumbnail', () => {
+    render(<TeamMediaGallery media={[cad('onshape', 'abc/w/def', '')]} />);
+    expect(screen.getByTestId('team-media-gallery').innerHTML).toBe('');
   });
 
   test('lists instagram posts before imgur images', () => {

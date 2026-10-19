@@ -22,6 +22,19 @@ import { type Page, expect, test } from '@playwright/test';
   });
 });
 
+test.describe('/team/1768/2026', () => {
+  test('links Onshape models from the media gallery', async ({ page }) => {
+    await page.goto('/team/1768/2026');
+    await page.locator('body[data-hydrated]').waitFor();
+
+    await expect(
+      page
+        .getByTestId('team-media-gallery')
+        .getByRole('link', { name: 'Nightshade 2026' }),
+    ).toHaveAttribute('href', /^https:\/\/cad\.onshape\.com\/documents\//);
+  });
+});
+
 test.describe('/team/604/2024', () => {
   test.beforeEach(async ({ page }) => {
     await page.goto('/team/604/2024');

@@ -282,6 +282,8 @@ describe('getEmbedMedia', () => {
       imgurMedia(),
       media('instagram-image'),
       cdThreadMedia(),
+      media('grabcad'),
+      media('onshape'),
       externalLinkMedia(),
       youtubeMedia('abc'),
     ];
@@ -290,6 +292,8 @@ describe('getEmbedMedia', () => {
       'imgur',
       'instagram-image',
       'cd-thread',
+      'grabcad',
+      'onshape',
     ]);
   });
 });
