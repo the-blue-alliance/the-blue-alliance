@@ -5,7 +5,10 @@ import SimpleIconsInstagram from '~icons/simple-icons/instagram';
 
 import { Media } from '~/api/tba/read';
 import { Skeleton } from '~/components/ui/skeleton';
+import onshapeLogoDark from '~/images/onshape/onshape-logo-dark.svg';
+import onshapeLogo from '~/images/onshape/onshape-logo.svg';
 import {
+  getCadModelName,
   getEmbedMedia,
   getMediaLinkUrl,
   getMediaThumbUrl,
@@ -40,7 +43,39 @@ export default function TeamMediaGallery({
           case 'instagram-image':
             return <InstagramImageEmbed key={key} media={m} />;
           case 'cd-thread':
-            return <CdThreadEmbed key={key} media={m} />;
+            return (
+              <CaptionedEmbed
+                key={key}
+                media={m}
+                title={m.details?.thread_title}
+              />
+            );
+          case 'grabcad':
+            return (
+              <CaptionedEmbed key={key} media={m} title={getCadModelName(m)} />
+            );
+          case 'onshape':
+            return (
+              <CaptionedEmbed
+                key={key}
+                media={m}
+                title={getCadModelName(m)}
+                badge={
+                  <>
+                    <img
+                      src={onshapeLogo}
+                      alt="Onshape"
+                      className="-my-2.5 h-10 shrink-0 dark:hidden"
+                    />
+                    <img
+                      src={onshapeLogoDark}
+                      alt="Onshape"
+                      className="-my-2.5 hidden h-10 shrink-0 dark:block"
+                    />
+                  </>
+                }
+              />
+            );
         }
       })}
     </div>
@@ -106,16 +141,16 @@ function ImgurEmbed({ media }: { media: Media }): React.JSX.Element | null {
   );
 }
 
-type CdThreadMedia = Extract<Media, { type: 'cd-thread' }>;
-
-function CdThreadEmbed({
+function CaptionedEmbed({
   media,
+  title,
+  badge,
 }: {
-  media: CdThreadMedia;
+  media: Media;
+  title?: string | null;
+  badge?: React.ReactNode;
 }): React.JSX.Element | null {
-  const details = media.details;
-  const imageUrl = details?.image_url;
-  const threadTitle = details?.thread_title;
+  const imageUrl = getMediaThumbUrl(media);
   const linkUrl = getMediaLinkUrl(media);
 
   if (!imageUrl || !linkUrl) return null;
@@ -130,12 +165,13 @@ function CdThreadEmbed({
     >
       <img
         src={imageUrl}
-        alt={threadTitle ?? ''}
+        alt={title ?? ''}
         className="min-h-0 w-full flex-1 object-cover"
       />
-      {threadTitle && (
-        <div className="truncate px-2 py-1 text-sm font-medium">
-          {threadTitle}
+      {title && (
+        <div className="flex items-center gap-1.5 px-2 py-1 text-sm font-medium">
+          <span className="truncate">{title}</span>
+          {badge && <span className="ml-auto flex">{badge}</span>}
         </div>
       )}
     </a>

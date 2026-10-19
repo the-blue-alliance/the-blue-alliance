@@ -12,6 +12,8 @@ const EMBED_MEDIA_TYPE_LIST = [
   'imgur',
   'instagram-image',
   'cd-thread',
+  'grabcad',
+  'onshape',
 ] as const;
 
 /** Media types that represent embeddable images (shown in the media gallery). */
@@ -86,7 +88,7 @@ export function getMediaThumbSrcSet(media: Media): string | undefined {
   return `${medium} 1x, ${large} 2x`;
 }
 
-/** Returns all embeddable image media (imgur, instagram-image, cd-thread). */
+/** Returns all embeddable image media (imgur, instagram-image, cd-thread, grabcad, onshape). */
 export function getEmbedMedia(media: Media[]): EmbedMedia[] {
   return media.filter(isEmbedMedia);
 }
